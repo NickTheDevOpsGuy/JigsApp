@@ -1,0 +1,47 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# TypeScript build artifacts
+*.js.map
+*.d.ts
+*.tsbuildinfo
+vite.config.js
+
+# Coverage
+coverage/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Windows
+Thumbs.db
+
+# ESLint cache
+.eslintcache
+
+# Optional npm cache
+.npm/
+
+# Miscellaneous
+.nyc_output/
+
+# Mac files
+.DS_Store
