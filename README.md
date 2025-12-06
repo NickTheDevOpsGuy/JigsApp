@@ -1,4 +1,4 @@
-# 🧩 JiggySaw
+# JiggySaw
 
 *A raccoon-powered Unity jigsaw game built for smooth piece-snapping satisfaction.* 🦝✨
 
@@ -10,54 +10,54 @@
 
 ------------------------------------------------------------------------
 
-## 📘 Table of Contents
+## Table of Contents
 
-- [🖼 Preview](#-preview)
-- [🧩 About JiggySaw](#-about-jiggysaw)
-- [📋 User Stories](#-user-stories)
-- [🧪 Testing](#-testing)
-- [🖌️ Wireframes / Mockups](#️-wireframes--mockups)
-- [🚀 Features](#-features)
-- [🛣️ Roadmap](#-roadmap)
-- [🧭 Extended Roadmap](#-extended-roadmap)
-- [🧱 Tech Stack](#-tech-stack)
-- [📦 Getting Started](#-getting-started)
-- [📂 Project Structure](#-project-structure)
-- [🤝 Contributing](#-contributing)
-- [🧑‍🤝‍🧑 Collaborators](#-collaborators)
-- [🦝 Built by NickDoesDevOps](#-built-by-nickdoesdevops)
+- [Preview](#preview)
+- [About JiggySaw](#about-jiggysaw)
+- [User Stories](#user-stories)
+- [Testing](#testing)
+- [Wireframes / Mockups](#wireframes--mockups)
+- [Features](#features)
+- [Roadmap](#roadmap)
+- [Extended Roadmap](#extended-roadmap)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Collaborators](#collaborators)
+- [Built by the JiggySaw Community](#built-by-the-jiggysaw-community)
 
 ------------------------------------------------------------------------
 
-## 🖼 Preview
+## Preview
 
 ### Gameplay Demo
 
 *(Replace with a GIF once you have gameplay)*  
 ![Demo Placeholder](./Assets/Preview/preview.gif)
 
-> 🎞️ Captured directly from the Unity Editor
+> Captured directly from the Unity Editor
 
 ------------------------------------------------------------------------
 
-## 🎮 Play the Latest Build
+## Play the Latest Build
 
 A downloadable build will be available once the first playtest is released.
 
 ------------------------------------------------------------------------
 
-## 🧩 About JiggySaw
+## About JiggySaw
 
 **JiggySaw** is a Unity-based jigsaw puzzle game that turns relaxing piece-snapping into a smooth, satisfying experience.  
 Powered by C# and a lightweight 2D setup, it focuses on clear visuals, fluid drag-and-drop, and that "just one more piece" feeling.
 
-### 🧭 Purpose
+### Purpose
 
 A calm, focused puzzle experience you can open anytime — part mindfulness, part cozy challenge.
 
 ------------------------------------------------------------------------
 
-## 📋 User Stories
+## User Stories
 
 ### **Players Want…**
 
@@ -77,24 +77,8 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ------------------------------------------------------------------------
 
-## 🧪 Testing
+## Testing
 
-### ✔️ Manual Testing Completed
-
-- Drag & Drop interaction across various speeds
-- Snap tolerance accuracy
-- Correct piece slicing from uploaded images
-- JPG + PNG upload validation
-- Preview modal display correctness
-- Random scatter boundaries checked
-- No crashes with large images tested manually
-
-### ✔️ Planned Automated Testing
-
-- `SnapPoint` unit tests
-- Image upload validation tests
-- Play Mode drag-and-drop automation
-- Puzzle reconstruction validation
 
 ------------------------------------------------------------------------
 
@@ -116,21 +100,12 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ## 🚀 Features
 
-- 🧩 **Smooth Piece Dragging** — responsive mouse controls for natural movement.
-- 🔒 **Snapping Detection** — pieces lock neatly when placed near their target.
-- 🎯 **Slot-Based Layout** — every piece knows exactly where it belongs.
-- 🔀 **Randomized Start Positions** — every puzzle starts differently.
-- 💾 **Puzzle Progress Persistence** — *(planned)* resume right where you left off.
-- 🎨 **Clean 2D Visuals** — crisp sprites and a simple, calm UI.
-- 🔊 **Optional SFX** — satisfying clicks when pieces snap into place.
-- ⚡ **Lightweight C# Logic** — minimal, readable scripts powering every interaction.
-- 📸 **Custom Image Import** — *(planned)* upload any image to create a puzzle.
 
 ------------------------------------------------------------------------
 
-## 🛣️ Roadmap
+## Roadmap
 
-### ✅ Completed
+### Completed
 
 - [x] 2D scene setup
 - [x] Puzzle piece prefab
@@ -140,7 +115,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ------------------------------------------------------------------------
 
-### 🚧 In Progress / Planned
+### In Progress / Planned
 
 - [ ] Multiple puzzle sizes (3×3, 4×4, 5×5…)
 - [ ] Custom image import
@@ -153,27 +128,27 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ------------------------------------------------------------------------
 
-## 🧭 Extended Roadmap
+## Extended Roadmap
 
 *(Optional — fill in as the project grows)*
 
 ------------------------------------------------------------------------
 
-## 🧱 Tech Stack
+## Tech Stack
 
 -----------------------------------------------------------------------
 Category      | Technologies / Tools
 ------------- | -------------------------------------------------------
-🎮 Engine     | Unity 2022+
-🧠 Scripts    | C# MonoBehaviours
-🎨 Art        | Unity Sprites
-🖱 Input      | Unity Input System
-🔧 Tooling    | GitHub Actions (planned)
+Engine     | Unity 2022+
+Scripts    | C# MonoBehaviours
+Art        | Unity Sprites
+Input      | Unity Input System
+Tooling    | GitHub Actions (planned)
 -----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
-## 📦 Getting Started
+## Getting Started
 
 1. Clone:
 
@@ -187,11 +162,11 @@ git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
 
 ------------------------------------------------------------------------
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 <details>
-<summary>📁 Click to expand file structure</summary>
+<summary>Click to expand file structure</summary>
 .
 ├── .github
 │   ├── ISSUE_TEMPLATE
@@ -224,15 +199,15 @@ git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
 
 ------------------------------------------------------------------------
 
-## 🤝 Contributing
+## Contributing
 
 PRs welcome — ideas, fixes, features… all help make the puzzle feel smoother.
 
 ------------------------------------------------------------------------
 
-## 🧑‍🤝‍🧑 Collaborators
+## Collaborators
 
-🤝 ![Contributors](https://contrib.rocks/image?repo=NickTheDevOpsGuy/JigsApp&columns=10)
+![Contributors](https://contrib.rocks/image?repo=NickTheDevOpsGuy/JigsApp&columns=10)
 
 Meet all our amazing contributors here:
 
@@ -240,6 +215,7 @@ Meet all our amazing contributors here:
 
 ------------------------------------------------------------------------
 
-## 🦝 Built by NickDoesDevOps
+## Built by the JiggySaw Community
 
-Created with ☕, curiosity, Unity magic, and raccoon energy.
+JiggySaw is an open-source project maintained by [CONTRIBUTORS.md](./CONTRIBUTORS.md) around the world.  
+Thanks to everyone helping make this cozy puzzle experience even better.
