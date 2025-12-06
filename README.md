@@ -232,7 +232,7 @@ PRs welcome — ideas, fixes, features… all help make the puzzle feel smoother
 
 ## 🧑‍🤝‍🧑 Collaborators
 
-🤝 ![Contributors](https://contrib.rocks/image?repo=NickTheDevOpsGuy/JigsApp&columns=10)![Contributors](https://contrib.rocks/image?repo=NickTheDevOpsGuy/JiggySaw&columns=10)
+🤝 ![Contributors](https://contrib.rocks/image?repo=NickTheDevOpsGuy/JigsApp&columns=10)
 
 Meet all our amazing contributors here:
 
