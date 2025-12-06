@@ -107,11 +107,11 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ### Completed
 
-- [x] 2D scene setup
-- [x] Puzzle piece prefab
-- [x] Basic drag-and-drop
-- [x] Snapping logic prototype
-- [x] Random scatter placement
+- [] 2D scene setup
+- [] Puzzle piece prefab
+- [] Basic drag-and-drop
+- [] Snapping logic prototype
+- [] Random scatter placement
 
 ------------------------------------------------------------------------
 
@@ -130,7 +130,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ## Extended Roadmap
 
-*(Optional — fill in as the project grows)*
+
 
 ------------------------------------------------------------------------
 
