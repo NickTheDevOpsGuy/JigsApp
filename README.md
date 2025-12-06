@@ -185,10 +185,6 @@ git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
 ├── docs
 │   ├── .DS_Store
 │   └── LightUX
-│       ├── board_mockup.png
-│       ├── loading_screen.png
-│       ├── preview_mockup.png
-│       └── upload_mockup.png
 ├── LICENSE.md
 └── README.md
 
