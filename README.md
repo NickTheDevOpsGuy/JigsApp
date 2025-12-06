@@ -85,16 +85,13 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 ## 🖌️ Wireframes / Mockups
 
 ### **Upload Your Image Screen**
-![Upload Mockup](./docs/LightUX/upload_mockup.png)
 
 ### **Puzzle Loading Screen**
-![Loading Mockup](./docs/LightUX/loading_screen.png)
 
 ### **Puzzle Board Gameplay**
-![Board Mockup](./docs/LightUX/board_mockup.png)
 
 ### **Preview Modal**
-![Preview Mockup](./docs/LightUX/preview_mockup.png)
+
 
 ------------------------------------------------------------------------
 
