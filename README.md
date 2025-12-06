@@ -4,7 +4,7 @@
 
 ![Unity](https://img.shields.io/badge/Built%20with-Unity-000000?logo=unity&logoColor=white)
 ![C#](https://img.shields.io/badge/C%23-239120?logo=csharp&logoColor=white)
-![License](https://img.shields.io/github/license/NickTheDevOpsGuy/JigsApp)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Contributions welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)
 ![Last Commit](https://img.shields.io/github/last-commit/NickTheDevOpsGuy/JigsApp)
 
