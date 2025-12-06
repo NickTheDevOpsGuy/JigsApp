@@ -67,7 +67,7 @@ improvements!
 
 Every contribution makes the puzzle feel even more satisfying.
 
-[![Contributors](https://contrib.rocks/image?repo=NickTheDevOpsGuy/JiggySaw)](./CONTRIBUTORS.md)
+[![Contributors](https://contrib.rocks/image?repo=NickTheDevOpsGuy/JiggySaw)
 
 Meet all our amazing [Contributors](./CONTRIBUTORS.md).
 
