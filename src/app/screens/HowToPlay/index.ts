@@ -1,0 +1,1 @@
+export { HowToPlayModal } from './HowToPlayModal';

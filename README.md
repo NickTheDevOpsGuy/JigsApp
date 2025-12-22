@@ -174,20 +174,97 @@ git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
 │   └── pull_request_template.md
-├── .gitignore
-├── Assets
-│   ├── Art
-│   ├── Prefabs
-│   ├── Scenes
-│   ├── Scripts
-│   └── UI
-├── CONTRIBUTORS.md
 ├── docs
-│   ├── .DS_Store
 │   └── LightUX
+├── public
+├── src
+│   ├── app
+│   │   ├── assets
+│   │   │   ├── art
+│   │   │   ├── images
+│   │   │   ├── logo
+│   │   │   ├── prefabs
+│   │   │   ├── scenes
+│   │   │   ├── sounds
+│   │   │   └── ui
+│   │   │       └── jigsaw-logo.png
+│   │   ├── components
+│   │   │   ├── Button
+│   │   │   │   ├── Button.module.css
+│   │   │   │   ├── Button.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── Dropdown
+│   │   │   │   ├── Dropdown.module.css
+│   │   │   │   ├── Dropdown.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── Modal
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── Modal.module.css
+│   │   │   │   └── Modal.tsx
+│   │   │   └── index.ts
+│   │   ├── features
+│   │   │   └── puzzle
+│   │   │       ├── Difficulty.ts
+│   │   │       ├── Piece.ts
+│   │   │       ├── PuzzleManager.ts
+│   │   │       ├── SnapLogic.ts
+│   │   │       └── types.ts
+│   │   ├── providers
+│   │   │   └── GameProvider.tsx
+│   │   ├── screens
+│   │   │   ├── HowToPlay
+│   │   │   │   ├── HowToPlayModal.module.css
+│   │   │   │   ├── HowToPlayModal.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── Menu
+│   │   │   │   ├── DifficultySelect.module.css
+│   │   │   │   ├── DifficultySelect.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── MenuActions.module.css
+│   │   │   │   ├── MenuActions.tsx
+│   │   │   │   ├── MenuLayout.module.css
+│   │   │   │   ├── MenuLayout.tsx
+│   │   │   │   ├── MenuScreen.module.css
+│   │   │   │   └── MenuScreen.tsx
+│   │   │   ├── Puzzle
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── PuzzleBoard.module.css
+│   │   │   │   ├── PuzzleBoard.tsx
+│   │   │   │   ├── PuzzleHUD.module.css
+│   │   │   │   ├── PuzzleHUD.tsx
+│   │   │   │   ├── PuzzleScreen.module.css
+│   │   │   │   └── PuzzleScreen.tsx
+│   │   │   └── index.ts
+│   │   ├── styles
+│   │   │   ├── colors.css
+│   │   │   ├── globals.css
+│   │   │   ├── spacing.css
+│   │   │   └── typography.css
+│   │   ├── types
+│   │   │   └── index.ts
+│   │   ├── utils
+│   │   │   └── imageUtils.ts
+│   │   ├── App.css
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── routes.tsx
+│   ├── index.tsx
+│   └── vite-env.d.ts
+├── .gitignore
+├── .prettierignore
+├── .prettierrc
+├── .prettierrc.json
+├── .prettierrc.yml
+├── CONTRIBUTORS.md
+├── index.html
 ├── LICENSE.md
-└── README.md
-
+├── package-lock.json
+├── package.json
+├── README.md
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
 </details>
 ```
 
