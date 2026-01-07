@@ -1,4 +1,4 @@
-# JiggySaw
+# Phuzzle.dev
 
 
 ![Unity](https://img.shields.io/badge/Built%20with-Unity-000000?logo=unity&logoColor=white)
