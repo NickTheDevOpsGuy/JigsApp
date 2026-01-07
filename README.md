@@ -1,4 +1,4 @@
-# Phuzzle.dev
+# phuzzle
 
 
 ![Unity](https://img.shields.io/badge/Built%20with-Unity-000000?logo=unity&logoColor=white)
@@ -47,7 +47,7 @@ A downloadable build will be available once the first playtest is released.
 
 ## About JiggySaw
 
-**JiggySaw** is a Unity-based jigsaw puzzle game that turns relaxing piece-snapping into a smooth, satisfying experience.  
+**phuzzle** is a Unity-based jigsaw puzzle game that turns relaxing piece-snapping into a smooth, satisfying experience.  
 Powered by C# and a lightweight 2D setup, it focuses on clear visuals, fluid drag-and-drop, and that "just one more piece" feeling.
 
 ### Purpose
