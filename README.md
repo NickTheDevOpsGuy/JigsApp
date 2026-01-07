@@ -247,6 +247,7 @@ git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
 │       └── vite-env.d.ts
 ├── .gitignore
 ├── CONTRIBUTORS.md
+├── index.html
 ├── LICENSE.md
 ├── package-lock.json
 ├── package.json
