@@ -1,0 +1,19 @@
+:root {
+  --bg: #eaf6ff;
+  --card: #f6fbff;
+  --primary: #0b5aa6;
+  --primary-2: #09508f;
+  --border: #cfe6ff;
+  --text: #063d73;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
