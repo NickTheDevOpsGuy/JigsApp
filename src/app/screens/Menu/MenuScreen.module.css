@@ -1,0 +1,69 @@
+
+.page {
+  min-height: 100vh;
+  background: #dff1ff;
+
+  /* Top aligned layout */
+  display: flex;
+  justify-content: center; /* center card horizontally */
+  align-items: flex-start; /* stick card to top */
+
+  /* Space from top + side padding */
+  padding: 48px 24px 24px;
+}
+
+.card {
+  width: min(420px, 100%);
+  background: #eef8ff;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+}
+
+.logo {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+}
+
+.row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.select {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(11, 99, 184, 0.35);
+  padding: 0 12px;
+  background: white;
+  color: #0b2e52;
+}
+
+.primary,
+.secondary {
+  width: 100%;
+  height: 52px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary {
+  background: #0b63b8;
+  color: white;
+  border: none;
+}
+
+.secondary {
+  background: white;
+  color: #0b63b8;
+  border: 1px solid rgba(11, 99, 184, 0.35);
+}

@@ -1,8 +1,25 @@
-// src/app/App.tsx
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import '@styles/globals.css';
-import { Routes } from './routes';
+import { MenuScreen } from '@/screens/Menu/MenuScreen';
+import { NewGameScreen } from '@/screens/NewGame/NewGameScreen';
+import { PlayScreen } from '@/screens/Play/PlayScreen';
 
-export default function App() {
-  return <Routes />;
+export function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Main menu */}
+        <Route path="/" element={<MenuScreen />} />
+
+        {/* New game / setup */}
+        <Route path="/new" element={<NewGameScreen />} />
+
+        {/* Active puzzle */}
+        <Route path="/play" element={<PlayScreen />} />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
