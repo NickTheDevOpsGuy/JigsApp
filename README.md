@@ -163,6 +163,7 @@ npm run dev
 ```
 <details>
 <summary>Click to expand file structure</summary>
+
 .
 ├── .github
 │   ├── ISSUE_TEMPLATE
@@ -196,9 +197,12 @@ npm run dev
 │       │   ├── NewGame
 │       │   │   ├── NewGameScreen.module.css
 │       │   │   └── NewGameScreen.tsx
-│       │   └── Play
-│       │       ├── PlayScreen.module.css
-│       │       └── PlayScreen.tsx
+│       │   ├── Play
+│       │   │   ├── PlayScreen.module.css
+│       │   │   └── PlayScreen.tsx
+│       │   └── Setup
+│       │       ├── SetupScreen.module.css
+│       │       └── SetupScreen.tsx
 │       ├── styles
 │       │   └── global.css
 │       ├── App.tsx
@@ -216,79 +220,6 @@ npm run dev
 ├── tsconfig.node.json
 └── vite.config.ts
 
-15 directories, 37 files
-MAC-G7L30391G4:phuzzle nicholas.clark$ npm run dev
-
-> phuzzle@0.1.0 dev
-> vite
-
-
-  VITE v7.3.1  ready in 255 ms
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
-  ➜  press h + enter to show help
-10:53:00 AM [vite] (client) hmr update /src/app/styles/global.css
-10:53:04 AM [vite] (client) hmr update /src/app/styles/global.css (x2)
-10:54:38 AM [vite] (client) hmr update /src/app/styles/global.css (x3)
-10:56:53 AM [vite] (client) hmr update /src/app/styles/global.css (x4)
-10:57:49 AM [vite] (client) page reload index.html
-10:58:31 AM [vite] (client) hmr update /src/app/styles/global.css
-10:58:44 AM [vite] (client) hmr update /src/app/screens/Menu/MenuScreen.tsx
-^C
-MAC-G7L30391G4:phuzzle nicholas.clark$ fileTree
-.
-├── .github
-│   ├── ISSUE_TEMPLATE
-│   │   ├── bug.yml
-│   │   ├── config.yml
-│   │   ├── documentation.yml
-│   │   ├── enhancement_refactor.yml
-│   │   ├── feature_request.yml
-│   │   └── question_discussion.yml
-│   └── pull_request_template.md
-├── src
-│   └── app
-│       ├── assets
-│       │   ├── branding
-│       │   └── ui
-│       │       └── phuzzle-logo-512.png
-│       ├── components
-│       │   ├── Button.module.css
-│       │   ├── Button.tsx
-│       │   ├── Dropdown.module.css
-│       │   ├── Dropdown.tsx
-│       │   └── Modal.tsx
-│       ├── puzzle
-│       │   ├── PuzzleManager.ts
-│       │   ├── SnapLogic.ts
-│       │   └── types.ts
-│       ├── screens
-│       │   ├── Menu
-│       │   │   ├── MenuScreen.module.css
-│       │   │   └── MenuScreen.tsx
-│       │   ├── NewGame
-│       │   │   ├── NewGameScreen.module.css
-│       │   │   └── NewGameScreen.tsx
-│       │   └── Play
-│       │       ├── PlayScreen.module.css
-│       │       └── PlayScreen.tsx
-│       ├── styles
-│       │   └── global.css
-│       ├── App.tsx
-│       ├── main.tsx
-│       └── vite-env.d.ts
-├── .gitignore
-├── CONTRIBUTORS.md
-├── index.html
-├── LICENSE.md
-├── package-lock.json
-├── package.json
-├── README.md
-├── tsconfig.app.json
-├── tsconfig.json
-├── tsconfig.node.json
-└── vite.config.ts
 </details>
 ```
 
