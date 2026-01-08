@@ -1,18 +1,19 @@
 # Phuzzle.dev
 
 
-![Unity](https://img.shields.io/badge/Built%20with-Unity-000000?logo=unity&logoColor=white)
-![C#](https://img.shields.io/badge/C%23-239120?logo=csharp&logoColor=white)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Contributions welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)
-![Last Commit](https://img.shields.io/github/last-commit/NickTheDevOpsGuy/JigsApp)
+[![Built with React](https://img.shields.io/badge/Built%20with-React-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Powered%20by-Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
+[![Contributions welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](./CONTRIBUTORS.md)
+[![Last Commit](https://img.shields.io/github/last-commit/NickTheDevOpsGuy/phuzzle)](https://github.com/NickTheDevOpsGuy/phuzzle/commits/main)
 
 ------------------------------------------------------------------------
 
 ## Table of Contents
 
 - [Preview](#preview)
-- [About JiggySaw](#about-jiggysaw)
+- [About Phuzzle](#about-jiggysaw)
 - [User Stories](#user-stories)
 - [Testing](#testing)
 - [Wireframes / Mockups](#wireframes--mockups)
@@ -24,7 +25,7 @@
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [Collaborators](#collaborators)
-- [Built by the JiggySaw Community](#built-by-the-jiggysaw-community)
+- [Built by the Phuzzle Community](#built-by-the-jiggysaw-community)
 
 ------------------------------------------------------------------------
 
@@ -35,7 +36,6 @@
 *(Replace with a GIF once you have gameplay)*  
 ![Demo Placeholder](./Assets/Preview/preview.gif)
 
-> Captured directly from the Unity Editor
 
 ------------------------------------------------------------------------
 
@@ -45,10 +45,10 @@ A downloadable build will be available once the first playtest is released.
 
 ------------------------------------------------------------------------
 
-## About JiggySaw
+## About Phuzzle
 
-**JiggySaw** is a Unity-based jigsaw puzzle game that turns relaxing piece-snapping into a smooth, satisfying experience.  
-Powered by C# and a lightweight 2D setup, it focuses on clear visuals, fluid drag-and-drop, and that "just one more piece" feeling.
+**Phuzzle** is a web-based jigsaw puzzle game built with React that turns relaxing piece-snapping into a smooth, satisfying experience.
+Powered by modern frontend tooling and a lightweight UI architecture, it focuses on clear visuals, fluid drag-and-drop interactions, and that “just one more piece” feeling.
 
 ### Purpose
 
@@ -69,7 +69,6 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ### **Developers Want…**
 
-- Modular, readable C# scripts.
 - A well-defined puzzle-generation flow.
 - A structure that supports expansion (mobile, new puzzle sizes, etc).
 - A roadmap that invites contribution.
@@ -127,7 +126,6 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 ## Extended Roadmap
 
 
-
 ------------------------------------------------------------------------
 
 ## Tech Stack
@@ -152,9 +150,11 @@ Tooling    | GitHub Actions (planned)
 git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
 ```
 
-2. Open in **Unity Hub (2022+)**
+3. Run
 
-3. Press **Play** to run.
+```bash
+npm run dev
+```
 
 ------------------------------------------------------------------------
 
@@ -173,77 +173,28 @@ git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
 │   └── pull_request_template.md
-├── docs
-│   └── WireFrames
-├── public
-│   └── assets
 ├── src
 │   └── app
 │       ├── assets
-│       │   ├── art
-│       │   ├── images
-│       │   ├── logo
-│       │   ├── prefabs
-│       │   ├── scenes
-│       │   └── sounds
+│       │   ├── branding
+│       │   └── ui
 │       ├── components
-│       │   ├── Button
-│       │   │   ├── Button.module.css
-│       │   │   ├── Button.tsx
-│       │   │   └── index.ts
-│       │   ├── Dropdown
-│       │   │   ├── Dropdown.module.css
-│       │   │   ├── Dropdown.tsx
-│       │   │   └── index.ts
-│       │   └── Modal
-│       │       ├── index.ts
-│       │       ├── Modal.module.css
-│       │       └── Modal.tsx
-│       ├── features
-│       │   └── puzzle
-│       │       ├── Difficulty.ts
-│       │       ├── index.ts
-│       │       ├── Piece.ts
-│       │       ├── PuzzleManager.ts
-│       │       ├── SnapLogic.ts
-│       │       └── types.ts
-│       ├── providers
-│       │   └── GameProvider.tsx
+│       │   ├── Button.module.css
+│       │   ├── Button.tsx
+│       │   ├── Dropdown.module.css
+│       │   ├── Dropdown.tsx
+│       │   └── Modal.tsx
+│       ├── puzzle
+│       │   ├── PuzzleManager.ts
+│       │   ├── SnapLogic.ts
+│       │   └── types.ts
 │       ├── screens
-│       │   ├── HowToPlay
-│       │   │   ├── HowToPlayModal.module.css
-│       │   │   ├── HowToPlayModal.tsx
-│       │   │   └── index.ts
-│       │   ├── Menu
-│       │   │   ├── DifficultySelect.module.css
-│       │   │   ├── DifficultySelect.tsx
-│       │   │   ├── index.ts
-│       │   │   ├── MenuActions.module.css
-│       │   │   ├── MenuActions.tsx
-│       │   │   ├── MenuLayout.module.css
-│       │   │   ├── MenuLayout.tsx
-│       │   │   ├── MenuScreen.module.css
-│       │   │   └── MenuScreen.tsx
-│       │   └── Puzzle
-│       │       ├── index.ts
-│       │       ├── PuzzleBoard.module.css
-│       │       ├── PuzzleBoard.tsx
-│       │       ├── PuzzleHUD.module.css
-│       │       ├── PuzzleHUD.tsx
-│       │       ├── PuzzleScreen.module.css
-│       │       └── PuzzleScreen.tsx
-│       ├── styles
-│       │   ├── colors.css
-│       │   ├── globals.css
-│       │   ├── spacing.css
-│       │   └── typography.css
-│       ├── types
-│       │   └── index.ts
-│       ├── utils
-│       │   └── imageUtils.ts
+│       │   ├── MenuScreen.module.css
+│       │   ├── MenuScreen.tsx
+│       │   ├── PuzzleScreen.module.css
+│       │   └── PuzzleScreen.tsx
 │       ├── App.tsx
 │       ├── main.tsx
-│       ├── routes.tsx
 │       └── vite-env.d.ts
 ├── .gitignore
 ├── CONTRIBUTORS.md
@@ -270,7 +221,7 @@ PRs welcome — ideas, fixes, features… all help make the puzzle feel smoother
 
 ## Collaborators
 
-![Contributors](https://contrib.rocks/image?repo=NickTheDevOpsGuy/JigsApp&columns=10)
+![Contributors](https://contrib.rocks/image?repo=NickTheDevOpsGuy/phuzzle&columns=10)
 
 Meet all our amazing contributors here:
 
@@ -278,7 +229,7 @@ Meet all our amazing contributors here:
 
 ------------------------------------------------------------------------
 
-## Built by the JiggySaw Community
+## Built by the Phuzzle Community
 
-JiggySaw is an open-source project maintained by [CONTRIBUTORS.md](./CONTRIBUTORS.md) around the world.  
+Phuzzle is an open-source project maintained by [CONTRIBUTORS.md](./CONTRIBUTORS.md) around the world.  
 Thanks to everyone helping make this cozy puzzle experience even better.
