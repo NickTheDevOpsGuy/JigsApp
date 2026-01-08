@@ -1,0 +1,71 @@
+.page {
+  min-height: 100vh;
+  background: #dff1ff;
+  padding: 18px 16px 40px;
+  display: flex;
+ نشان
+  justify-content: flex-start; /* top */
+}
+
+.card {
+  width: min(520px, 100%);
+  margin: 0 auto;
+  background: #eef8ff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  display: grid;
+  gap: 16px;
+}
+
+.title {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b63b8;
+  text-align: center;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 700;
+  color: #0b2e52;
+}
+
+.select,
+.input {
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(11, 99, 184, 0.35);
+  padding: 0 12px;
+  background: white;
+  color: #0b2e52;
+}
+
+.preview {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(11, 99, 184, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.primary {
+  width: 100%;
+  height: 54px;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  background: #0b63b8;
+  color: white;
+  border: none;
+}
