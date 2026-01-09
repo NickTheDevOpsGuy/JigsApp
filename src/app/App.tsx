@@ -1,8 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { MenuScreen } from '@/screens/Menu/MenuScreen';
-import { NewGameScreen } from '@/screens/NewGame/NewGameScreen';
-import { PlayScreen } from '@/screens/Play/PlayScreen';
+import { MenuScreen } from "@/screens/Menu/MenuScreen";
+import { NewGameScreen } from "@/screens/NewGame/NewGameScreen";
+import { PlayScreen } from "@/screens/Play/PlayScreen";
 
 export function App() {
   return (

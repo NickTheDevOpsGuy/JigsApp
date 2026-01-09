@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from './SetupScreen.module.css';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "./SetupScreen.module.css";
 
-const STORAGE_KEY = 'phuzzle:imageUrl';
+const STORAGE_KEY = "phuzzle:imageUrl";
 
 export function SetupScreen() {
   const nav = useNavigate();
@@ -19,27 +19,27 @@ export function SetupScreen() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const okType = file.type === 'image/png' || file.type === 'image/jpeg';
+    const okType = file.type === "image/png" || file.type === "image/jpeg";
     if (!okType) {
-      console.warn('[Phuzzle] Rejected file (type not allowed)', {
+      console.warn("[Phuzzle] Rejected file (type not allowed)", {
         name: file.name,
         type: file.type,
       });
-      alert('Please choose a PNG or JPG image.');
-      e.currentTarget.value = '';
+      alert("Please choose a PNG or JPG image.");
+      e.currentTarget.value = "";
       return;
     }
 
     // Optional safety limit (10 MB)
     const maxBytes = 10 * 1024 * 1024;
     if (file.size > maxBytes) {
-      console.warn('[Phuzzle] Rejected file (too large)', {
+      console.warn("[Phuzzle] Rejected file (too large)", {
         name: file.name,
         sizeBytes: file.size,
         maxBytes,
       });
-      alert('That image is too large. Please choose one under 10 MB.');
-      e.currentTarget.value = '';
+      alert("That image is too large. Please choose one under 10 MB.");
+      e.currentTarget.value = "";
       return;
     }
 
@@ -48,7 +48,7 @@ export function SetupScreen() {
     // Revoke old URL before replacing
     if (imgUrl) URL.revokeObjectURL(imgUrl);
 
-    console.info('[Phuzzle] Image selected', {
+    console.info("[Phuzzle] Image selected", {
       name: file.name,
       type: file.type,
       sizeKb: Math.round(file.size / 1024),
@@ -59,18 +59,21 @@ export function SetupScreen() {
 
   function onStart() {
     if (!imgUrl) {
-      console.info('[Phuzzle] Start blocked: no image selected');
-      alert('Pick an image first.');
+      console.info("[Phuzzle] Start blocked: no image selected");
+      alert("Pick an image first.");
       return;
     }
 
     sessionStorage.setItem(STORAGE_KEY, imgUrl);
 
-    console.info('[Phuzzle] Upload flow complete: saved imageUrl + navigating to /play', {
-      storageKey: STORAGE_KEY,
-    });
+    console.info(
+      "[Phuzzle] Upload flow complete: saved imageUrl + navigating to /play",
+      {
+        storageKey: STORAGE_KEY,
+      },
+    );
 
-    nav('/play');
+    nav("/play");
   }
 
   return (
@@ -97,7 +100,7 @@ export function SetupScreen() {
         </div>
 
         <div className={styles.row}>
-          <button className={styles.secondary} onClick={() => nav('/')}>
+          <button className={styles.secondary} onClick={() => nav("/")}>
             Back
           </button>
           <button className={styles.primary} onClick={onStart}>

@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import styles from './PuzzlePiece.module.css';
+import { useRef, useState } from "react";
+import styles from "./PuzzlePiece.module.css";
 
 type Props = {
   id: number;
