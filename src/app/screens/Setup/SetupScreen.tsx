@@ -1,58 +1,110 @@
-.page {
-  min-height: 100vh;
-  background: #dff1ff;
-  display: grid;
-  grid-template-rows: auto 1fr;
-}
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styles from './SetupScreen.module.css';
 
-.topBar {
-  height: 56px;
-  background: #7ec9ff;
-  display: grid;
-  grid-template-columns: 64px 1fr 64px;
-  align-items: center;
-  padding: 0 12px;
-}
+const STORAGE_KEY = 'phuzzle:imageUrl';
 
-.title {
-  text-align: center;
-  font-weight: 900;
-  color: #0b2e52;
-}
+export function SetupScreen() {
+  const nav = useNavigate();
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
 
-.iconBtn {
-  height: 40px;
-  width: 40px;
-  justify-self: end;
-  border-radius: 10px;
-  border: 1px solid rgba(11, 99, 184, 0.25);
-  background: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  font-weight: 800;
-  color: #0b63b8;
-}
+  // Cleanup object URLs to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      if (imgUrl) URL.revokeObjectURL(imgUrl);
+    };
+  }, [imgUrl]);
 
-.main {
-  padding: 16px;
-  display: grid;
-  gap: 16px;
-  align-content: start; /* top */
-}
+  function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-.board {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(11, 99, 184, 0.2);
-  border-radius: 16px;
-  min-height: 360px;
-  display: grid;
-  place-items: center;
-}
+    const okType = file.type === 'image/png' || file.type === 'image/jpeg';
+    if (!okType) {
+      console.warn('[Phuzzle] Rejected file (type not allowed)', {
+        name: file.name,
+        type: file.type,
+      });
+      alert('Please choose a PNG or JPG image.');
+      e.currentTarget.value = '';
+      return;
+    }
 
-.tray {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(11, 99, 184, 0.2);
-  border-radius: 16px;
-  min-height: 160px;
-  display: grid;
-  place-items: center;
+    // Optional safety limit (10 MB)
+    const maxBytes = 10 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      console.warn('[Phuzzle] Rejected file (too large)', {
+        name: file.name,
+        sizeBytes: file.size,
+        maxBytes,
+      });
+      alert('That image is too large. Please choose one under 10 MB.');
+      e.currentTarget.value = '';
+      return;
+    }
+
+    const nextUrl = URL.createObjectURL(file);
+
+    // Revoke old URL before replacing
+    if (imgUrl) URL.revokeObjectURL(imgUrl);
+
+    console.info('[Phuzzle] Image selected', {
+      name: file.name,
+      type: file.type,
+      sizeKb: Math.round(file.size / 1024),
+    });
+
+    setImgUrl(nextUrl);
+  }
+
+  function onStart() {
+    if (!imgUrl) {
+      console.info('[Phuzzle] Start blocked: no image selected');
+      alert('Pick an image first.');
+      return;
+    }
+
+    sessionStorage.setItem(STORAGE_KEY, imgUrl);
+
+    console.info('[Phuzzle] Upload flow complete: saved imageUrl + navigating to /play', {
+      storageKey: STORAGE_KEY,
+    });
+
+    nav('/play');
+  }
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>New Game</h1>
+
+        <label className={styles.label}>
+          Choose a Photo (PNG/JPG)
+          <input
+            className={styles.file}
+            type="file"
+            accept="image/png,image/jpeg"
+            onChange={onPickFile}
+          />
+        </label>
+
+        <div className={styles.preview}>
+          {imgUrl ? (
+            <img className={styles.previewImg} src={imgUrl} alt="Preview" />
+          ) : (
+            <div className={styles.previewEmpty}>Image Preview</div>
+          )}
+        </div>
+
+        <div className={styles.row}>
+          <button className={styles.secondary} onClick={() => nav('/')}>
+            Back
+          </button>
+          <button className={styles.primary} onClick={onStart}>
+            Start New Game
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
