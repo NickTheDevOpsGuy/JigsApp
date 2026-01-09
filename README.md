@@ -188,6 +188,8 @@ npm run dev
 │       │   └── Modal.tsx
 │       ├── puzzle
 │       │   ├── PuzzleManager.ts
+│       │   ├── PuzzlePiece.module.css
+│       │   ├── PuzzlePiece.tsx
 │       │   ├── SnapLogic.ts
 │       │   └── types.ts
 │       ├── screens
