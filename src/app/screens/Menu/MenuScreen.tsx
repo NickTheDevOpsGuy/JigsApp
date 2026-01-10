@@ -1,7 +1,7 @@
-import { useNavigate } from 'react-router-dom';
-import styles from './MenuScreen.module.css';
+import { useNavigate } from "react-router-dom";
+import styles from "./MenuScreen.module.css";
 
-import logoImg from '@/assets/ui/phuzzle-logo-512.png';
+import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 
 export function MenuScreen() {
   const nav = useNavigate();
@@ -11,11 +11,14 @@ export function MenuScreen() {
       <div className={styles.card}>
         <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
 
-        <button className={styles.secondary} onClick={() => alert('Hook up modal later')}>
+        <button
+          className={styles.secondary}
+          onClick={() => alert("Hook up modal later")}
+        >
           How to Play
         </button>
 
-        <button className={styles.primary} onClick={() => nav('/new')}>
+        <button className={styles.primary} onClick={() => nav("/new")}>
           Choose Puzzle Photo
         </button>
       </div>

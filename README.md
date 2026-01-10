@@ -1,6 +1,5 @@
 # Phuzzle.dev
 
-
 [![Built with React](https://img.shields.io/badge/Built%20with-React-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Powered%20by-Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -8,7 +7,7 @@
 [![Contributions welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](./CONTRIBUTORS.md)
 [![Last Commit](https://img.shields.io/github/last-commit/NickTheDevOpsGuy/phuzzle)](https://github.com/NickTheDevOpsGuy/phuzzle/commits/main)
 
-------------------------------------------------------------------------
+---
 
 ## Table of Contents
 
@@ -27,23 +26,22 @@
 - [Collaborators](#collaborators)
 - [Built by the Phuzzle Community](#built-by-the-jiggysaw-community)
 
-------------------------------------------------------------------------
+---
 
 ## Preview
 
 ### Gameplay Demo
 
-*(Replace with a GIF once you have gameplay)*  
+_(Replace with a GIF once you have gameplay)_  
 ![Demo Placeholder](./Assets/Preview/preview.gif)
 
-
-------------------------------------------------------------------------
+---
 
 ## Play the Latest Build
 
 A downloadable build will be available once the first playtest is released.
 
-------------------------------------------------------------------------
+---
 
 ## About Phuzzle
 
@@ -54,7 +52,7 @@ Powered by modern frontend tooling and a lightweight UI architecture, it focuses
 
 A calm, focused puzzle experience you can open anytime — part mindfulness, part cozy challenge.
 
-------------------------------------------------------------------------
+---
 
 ## User Stories
 
@@ -73,12 +71,11 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - A structure that supports expansion (mobile, new puzzle sizes, etc).
 - A roadmap that invites contribution.
 
-------------------------------------------------------------------------
+---
 
 ## Testing
 
-
-------------------------------------------------------------------------
+---
 
 ## 🖌️ Wireframes / Mockups
 
@@ -90,13 +87,11 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ### **Preview Modal**
 
-
-------------------------------------------------------------------------
+---
 
 ## 🚀 Features
 
-
-------------------------------------------------------------------------
+---
 
 ## Roadmap
 
@@ -108,7 +103,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [] Snapping logic prototype
 - [] Random scatter placement
 
-------------------------------------------------------------------------
+---
 
 ### In Progress / Planned
 
@@ -121,26 +116,27 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [ ] Save/Load system
 - [ ] Edge shaping / classic jigsaw cuts
 
-------------------------------------------------------------------------
+---
 
 ## Extended Roadmap
 
-
-------------------------------------------------------------------------
+---
 
 ## Tech Stack
 
------------------------------------------------------------------------
-Category      | Technologies / Tools
-------------- | -------------------------------------------------------
-Engine     | Unity 2022+
-Scripts    | C# MonoBehaviours
-Art        | Unity Sprites
-Input      | Unity Input System
-Tooling    | GitHub Actions (planned)
------------------------------------------------------------------------
+---
 
-------------------------------------------------------------------------
+| Category | Technologies / Tools     |
+| -------- | ------------------------ |
+| Engine   | Unity 2022+              |
+| Scripts  | C# MonoBehaviours        |
+| Art      | Unity Sprites            |
+| Input    | Unity Input System       |
+| Tooling  | GitHub Actions (planned) |
+
+---
+
+---
 
 ## Getting Started
 
@@ -156,7 +152,7 @@ git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
 npm run dev
 ```
 
-------------------------------------------------------------------------
+---
 
 ## Project Structure
 
@@ -225,13 +221,13 @@ npm run dev
 </details>
 ```
 
-------------------------------------------------------------------------
+---
 
 ## Contributing
 
 PRs welcome — ideas, fixes, features… all help make the puzzle feel smoother.
 
-------------------------------------------------------------------------
+---
 
 ## Collaborators
 
@@ -241,7 +237,7 @@ Meet all our amazing contributors here:
 
 ➡️ **[CONTRIBUTORS.md](./CONTRIBUTORS.md)**
 
-------------------------------------------------------------------------
+---
 
 ## Built by the Phuzzle Community
 

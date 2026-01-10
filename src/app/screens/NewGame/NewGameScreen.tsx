@@ -1,4 +1,4 @@
-import { SetupScreen } from '@/screens/Setup/SetupScreen';
+import { SetupScreen } from "@/screens/Setup/SetupScreen";
 
 /**
  * NewGameScreen
