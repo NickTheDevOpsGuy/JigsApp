@@ -1,117 +1,31 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from './PlayScreen.module.css';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "./PlayScreen.module.css";
 
-const STORAGE_KEY = 'phuzzle:imageUrl';
+import { PuzzleManager } from "@/puzzle/PuzzleManager";
+import type { PuzzleState } from "@/puzzle/types";
 
-const PIECE_W = 80;
-const PIECE_H = 80;
-const PIECE_COUNT = 20;
-
-type Piece = {
-  id: string;
-  x: number;
-  y: number;
-  z: number;
-};
-
-function makeInitialPieces(): Piece[] {
-  // Start them clustered near the top-left for now (we'll randomize later in #10)
-  return Array.from({ length: PIECE_COUNT }).map((_, i) => ({
-    id: `p${i + 1}`,
-    x: 20 + (i % 5) * (PIECE_W + 10),
-    y: 20 + Math.floor(i / 5) * (PIECE_H + 10),
-    z: 1,
-  }));
-}
+const STORAGE_KEY = "phuzzle:imageDataUrl";
 
 export function PlayScreen() {
   const nav = useNavigate();
-  const imgUrl = sessionStorage.getItem(STORAGE_KEY);
 
-  const [pieces, setPieces] = useState<Piece[]>(() => makeInitialPieces());
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [zCounter, setZCounter] = useState(10);
+  const imgUrl = localStorage.getItem(STORAGE_KEY);
 
-  const activePiece = useMemo(
-    () => pieces.find((p) => p.id === activeId) ?? null,
-    [pieces, activeId]
-  );
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const managerRef = useRef<PuzzleManager | null>(null);
 
-  useEffect(() => {
-    if (imgUrl) {
-      console.info('[Phuzzle] PlayScreen loaded image from sessionStorage', {
-        storageKey: STORAGE_KEY,
-      });
-    } else {
-      console.info('[Phuzzle] PlayScreen: no image found in sessionStorage', {
-        storageKey: STORAGE_KEY,
-      });
-    }
-  }, [imgUrl]);
+  const [state, setState] = useState<PuzzleState | null>(null);
 
-  function onPieceDown(e: React.PointerEvent<HTMLDivElement>, id: string) {
-    e.preventDefault();
-    setActiveId(id);
+  const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
+  const pieceSize = useMemo(() => ({ w: 72, h: 72 }), []);
 
-    // Record where inside the piece we clicked so it doesn't "jump"
-    const rect = e.currentTarget.getBoundingClientRect();
-    setOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-
-    // Bring the piece to the top by bumping its z-index
-    setZCounter((z) => {
-      const nextZ = z + 1;
-      setPieces((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, z: nextZ } : p))
-      );
-      return nextZ;
-    });
-
-    e.currentTarget.setPointerCapture(e.pointerId);
-  }
-
-  function onPieceMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (!activeId) return;
-
-    const board = e.currentTarget.parentElement;
-    if (!board) return;
-
-    const boardRect = board.getBoundingClientRect();
-
-    const rawX = e.clientX - boardRect.left - offset.x;
-    const rawY = e.clientY - boardRect.top - offset.y;
-
-    const maxX = boardRect.width - PIECE_W;
-    const maxY = boardRect.height - PIECE_H;
-
-    const nextX = Math.max(0, Math.min(rawX, maxX));
-    const nextY = Math.max(0, Math.min(rawY, maxY));
-
-    setPieces((prev) =>
-      prev.map((p) => (p.id === activeId ? { ...p, x: nextX, y: nextY } : p))
-    );
-  }
-
-  function onPieceUp(e: React.PointerEvent<HTMLDivElement>) {
-    if (!activeId) return;
-
-    e.currentTarget.releasePointerCapture(e.pointerId);
-
-    const dropped = pieces.find((p) => p.id === activeId);
-    console.info('[Phuzzle] Piece dropped', dropped ?? { id: activeId });
-
-    setActiveId(null);
-  }
-
+  // If there's no image, show a friendly message.
   if (!imgUrl) {
     return (
       <div className={styles.page}>
         <header className={styles.topBar}>
-          <button className={styles.iconBtn} onClick={() => nav('/')}>
+          <button className={styles.iconBtn} onClick={() => nav("/")}>
             Back
           </button>
           <div className={styles.title}>Phuzzle</div>
@@ -119,7 +33,116 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>No image selected.</section>
+          <section className={styles.board}>No image selected. Go back and upload one.</section>
+        </main>
+      </div>
+    );
+  }
+
+  // Initialize manager once
+  useEffect(() => {
+    if (managerRef.current) return;
+
+    // Temporary board size until we measure real DOM size
+    const initialBoardWidth = 900;
+    const initialBoardHeight = 520;
+
+    managerRef.current = new PuzzleManager(
+      {
+        imageUrl: imgUrl,
+        boardWidth: initialBoardWidth,
+        boardHeight: initialBoardHeight,
+        grid,
+        pieceWidth: pieceSize.w,
+        pieceHeight: pieceSize.h,
+        scatterPadding: 16,
+        snapTolerancePx: 18,
+      },
+      {
+        onPuzzleComplete: (s) => {
+          console.log("[Phuzzle] puzzle complete", s);
+        },
+        onPiecePlaced: (p) => {
+          console.log("[Phuzzle] piece placed", p.id);
+        },
+      }
+    );
+
+    const s = managerRef.current.getState();
+    setState(s);
+
+    console.log("[Phuzzle] PuzzleManager init");
+    console.log("[Phuzzle] total pieces:", s.totalCount);
+    console.log("[Phuzzle] placed:", s.placedCount);
+    console.log("[Phuzzle] grid:", s.grid);
+  }, [grid, imgUrl, pieceSize.h, pieceSize.w]);
+
+  // Measure board and set board size on manager
+  useEffect(() => {
+    const board = boardRef.current;
+    const mgr = managerRef.current;
+    if (!board || !mgr) return;
+
+    const ro = new ResizeObserver(() => {
+      const rect = board.getBoundingClientRect();
+      mgr.setBoardSize(rect.width, rect.height);
+      setState(mgr.getState());
+    });
+
+    ro.observe(board);
+    return () => ro.disconnect();
+  }, []);
+
+  // Global pointer move/up while dragging
+  useEffect(() => {
+    function onMove(e: PointerEvent) {
+      const mgr = managerRef.current;
+      const board = boardRef.current;
+      if (!mgr || !board) return;
+
+      const boardRect = board.getBoundingClientRect();
+      mgr.pointerMove(e.clientX, e.clientY, boardRect);
+      setState(mgr.getState());
+    }
+
+    function onUp() {
+      const mgr = managerRef.current;
+      if (!mgr) return;
+
+      mgr.pointerUp();
+      setState(mgr.getState());
+
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    }
+
+    // attached from pointerDown handler
+    (window as any).__phuzzleAttachDragListeners = () => {
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+    };
+
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      delete (window as any).__phuzzleAttachDragListeners;
+    };
+  }, []);
+
+  if (!state) {
+    return (
+      <div className={styles.page}>
+        <header className={styles.topBar}>
+          <button className={styles.iconBtn} onClick={() => nav("/")}>
+            Back
+          </button>
+          <div className={styles.title}>Phuzzle</div>
+          <div />
+        </header>
+
+        <main className={styles.main}>
+          <section className={styles.board}>Loading…</section>
+          <section className={styles.tray}>Piece tray placeholder</section>
         </main>
       </div>
     );
@@ -128,48 +151,59 @@ export function PlayScreen() {
   return (
     <div className={styles.page}>
       <header className={styles.topBar}>
-        <button className={styles.iconBtn} onClick={() => nav('/')}>
+        <button className={styles.iconBtn} onClick={() => nav("/")}>
           Back
         </button>
+
         <div className={styles.title}>Phuzzle</div>
-        <button className={styles.iconBtn} onClick={() => alert('Settings later')}>
-          Settings
+
+        <button
+          className={styles.iconBtn}
+          onClick={() => console.log("[Phuzzle] state", managerRef.current?.getState())}
+        >
+          Debug
         </button>
       </header>
 
       <main className={styles.main}>
-        <section className={styles.board}>
-          <img className={styles.boardImg} src={imgUrl} alt="Puzzle source" />
-
-          {/* 20 draggable pieces */}
-          {pieces.map((p) => (
+        <section
+          className={styles.board}
+          ref={boardRef}
+          style={{
+            backgroundImage: `url(${imgUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          {/* Render pieces from PuzzleManager state */}
+          {state.pieces.map((p) => (
             <div
               key={p.id}
               className={styles.piece}
               style={{
                 left: p.x,
                 top: p.y,
-                width: PIECE_W,
-                height: PIECE_H,
+                width: p.w,
+                height: p.h,
                 zIndex: p.z,
-                outline:
-                  p.id === activeId ? '3px solid rgba(126, 201, 255, 0.9)' : 'none',
               }}
-              onPointerDown={(e) => onPieceDown(e, p.id)}
-              onPointerMove={onPieceMove}
-              onPointerUp={onPieceUp}
-              aria-label={`Puzzle piece ${p.id}`}
-            >
-              <span className={styles.pieceId}>{p.id}</span>
-            </div>
-          ))}
+              onPointerDown={(e) => {
+                const mgr = managerRef.current;
+                const board = boardRef.current;
+                if (!mgr || !board) return;
 
-          {/* Optional: quick debug panel */}
-          <div className={styles.debug}>
-            <div>
-              Active: <b>{activePiece?.id ?? 'none'}</b>
-            </div>
-          </div>
+                const pieceRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+
+                mgr.pointerDown(p.id, e.clientX, e.clientY, pieceRect);
+                setState(mgr.getState());
+
+                const attach = (window as any).__phuzzleAttachDragListeners as undefined | (() => void);
+                attach?.();
+              }}
+              title={p.id}
+            />
+          ))}
         </section>
 
         <section className={styles.tray}>Piece tray placeholder</section>
