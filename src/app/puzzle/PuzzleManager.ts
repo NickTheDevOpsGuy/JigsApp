@@ -1,21 +1,15 @@
-import type { DragState, GridSize, Piece, PieceId, PuzzleState } from '../puzzle/types';
+// src/app/puzzle/PuzzleManager.ts
+
+import type { DragState, GridSize, Piece, PieceId, PuzzleState } from "./types";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
   boardWidth: number;
   boardHeight: number;
-
-  // How many pieces you want for MVP
   grid: GridSize;
-
-  // Piece size in px for now (we are not slicing yet)
   pieceWidth: number;
   pieceHeight: number;
-
-  // Where pieces start (simple scatter region)
   scatterPadding?: number;
-
-  // Snapping tolerance (used later, but we include it now)
   snapTolerancePx?: number;
 };
 
@@ -69,7 +63,7 @@ export class PuzzleManager {
       imageUrl,
       grid,
       pieces,
-      placedCount: pieces.filter((p) => p.isPlaced).length,
+      placedCount: 0,
       totalCount: pieces.length,
       isComplete: false,
     };
@@ -89,16 +83,15 @@ export class PuzzleManager {
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
 
-    // Clamp all pieces into the new bounds
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => {
-        const maxX = Math.max(0, this.boardWidth - p.w);
-        const maxY = Math.max(0, this.boardHeight - p.h);
+      pieces: this.state.pieces.map((piece) => {
+        const maxX = Math.max(0, this.boardWidth - piece.w);
+        const maxY = Math.max(0, this.boardHeight - piece.h);
         return {
-          ...p,
-          x: clamp(p.x, 0, maxX),
-          y: clamp(p.y, 0, maxY),
+          ...piece,
+          x: clamp(piece.x, 0, maxX),
+          y: clamp(piece.y, 0, maxY),
         };
       }),
     };
@@ -110,10 +103,7 @@ export class PuzzleManager {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
 
-    if (piece.isPlaced) {
-      // For MVP, placed pieces are locked. Later you can add "unsnap" rules.
-      return;
-    }
+    if (piece.isPlaced) return;
 
     this.drag = {
       activeId: pieceId,
@@ -151,16 +141,11 @@ export class PuzzleManager {
   }
 
   pointerUp() {
-    const activeId = this.drag.activeId;
-    if (!activeId) return;
-
-    // Future: snapping goes here in #6. For now, just drop.
-    // We still recompute derived state for safety.
+    if (!this.drag.activeId) return;
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
     this.recomputeDerivedState();
   }
 
-  // This will be used in #6
   trySnapActivePiece(): boolean {
     const activeId = this.drag.activeId;
     if (!activeId) return false;
@@ -183,12 +168,11 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === piece.id ? snapped : p)),
+      pieces: this.state.pieces.map((p) => (p.id === snapped.id ? snapped : p)),
     };
 
     this.events.onPiecePlaced?.(snapped);
     this.recomputeDerivedState();
-
     return true;
   }
 
@@ -223,8 +207,6 @@ export class PuzzleManager {
 
     const total = grid.cols * grid.rows;
 
-    // Target positions: a simple grid layout within the board
-    // For MVP we place the targets starting at (16, 16)
     const targetStartX = 16;
     const targetStartY = 16;
 
@@ -237,7 +219,6 @@ export class PuzzleManager {
       const targetX = targetStartX + col * pieceWidth;
       const targetY = targetStartY + row * pieceHeight;
 
-      // Scatter start positions near the bottom area (roughly)
       const scatterMinX = scatterPadding;
       const scatterMaxX = Math.max(scatterPadding, this.boardWidth - pieceWidth - scatterPadding);
 

@@ -97,25 +97,27 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ### Completed
 
-- [] App routes and screens (Menu, New Game/Setup, Play)
-- [] Custom image upload (PNG/JPG) with validation
-- [] Persist selected image and render it in Play view
-- [] PuzzleManager scaffolding (state + piece generation)
-- [] Basic piece rendering (placeholder squares)
-- [] Basic drag-and-drop MVP
+- [x] App routes and screens (Menu, New Game/Setup, Play)
+- [x] Custom image upload (PNG/JPG) with validation
+- [x] Persist selected image and render it in Play view
+- [x] PuzzleManager scaffolding (state + piece generation)
+- [x] Basic piece rendering (placeholder squares)
+- [x] Basic drag-and-drop MVP
 
 ---
 
 ### In Progress / Planned
 
+- [ ] Reference preview of completed image (thumbnail overlay)
+- [ ] Error handling polish for invalid uploads (better UX)
+- [ ] Random scatter placement improvements (more natural spread)
+- [ ] Snapping logic MVP (snap tolerance, lock-in place)
+- [ ] Detect puzzle completion + win state
 - [ ] Multiple puzzle sizes (3×3, 4×4, 5×5…)
-- [ ] Custom image import
-- [ ] Win animation + confetti
-- [ ] Light background music
 - [ ] Mobile support (touch drag)
-- [ ] Level selection screen
-- [ ] Save/Load system
-- [ ] Edge shaping / classic jigsaw cuts
+- [ ] Save/Load game state
+- [ ] Slice image into grid tiles (real pieces)
+- [ ] Edge shaping or classic jigsaw cuts (later)
 
 ---
 

@@ -1,3 +1,4 @@
+// src/app/screens/Play/PlayScreen.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
@@ -59,23 +60,13 @@ export function PlayScreen() {
         snapTolerancePx: 18,
       },
       {
-        onPuzzleComplete: (s) => {
-          console.log("[Phuzzle] puzzle complete", s);
-        },
-        onPiecePlaced: (p) => {
-          console.log("[Phuzzle] piece placed", p.id);
-        },
+        onPuzzleComplete: (s) => console.log("[Phuzzle] puzzle complete", s),
+        onPiecePlaced: (p) => console.log("[Phuzzle] piece placed", p.id),
       }
     );
 
-    const s = managerRef.current.getState();
-    setState(s);
-
-    console.log("[Phuzzle] PuzzleManager init");
-    console.log("[Phuzzle] total pieces:", s.totalCount);
-    console.log("[Phuzzle] placed:", s.placedCount);
-    console.log("[Phuzzle] grid:", s.grid);
-  }, [grid, imgUrl, pieceSize.h, pieceSize.w]);
+    setState(managerRef.current.getState());
+  }, [grid, imgUrl, pieceSize.w, pieceSize.h]);
 
   // Measure board and set board size on manager
   useEffect(() => {
@@ -100,8 +91,7 @@ export function PlayScreen() {
       const board = boardRef.current;
       if (!mgr || !board) return;
 
-      const boardRect = board.getBoundingClientRect();
-      mgr.pointerMove(e.clientX, e.clientY, boardRect);
+      mgr.pointerMove(e.clientX, e.clientY, board.getBoundingClientRect());
       setState(mgr.getState());
     }
 
@@ -109,6 +99,8 @@ export function PlayScreen() {
       const mgr = managerRef.current;
       if (!mgr) return;
 
+      // If you want snapping on drop later, you can call:
+      // mgr.trySnapActivePiece();
       mgr.pointerUp();
       setState(mgr.getState());
 
@@ -116,7 +108,6 @@ export function PlayScreen() {
       window.removeEventListener("pointerup", onUp);
     }
 
-    // attached from pointerDown handler
     (window as any).__phuzzleAttachDragListeners = () => {
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
@@ -176,32 +167,29 @@ export function PlayScreen() {
             backgroundRepeat: "no-repeat",
           }}
         >
-          {/* Render pieces from PuzzleManager state */}
-          {state.pieces.map((p) => (
+          {state.pieces.map((piece) => (
             <div
-              key={p.id}
+              key={piece.id}
               className={styles.piece}
               style={{
-                left: p.x,
-                top: p.y,
-                width: p.w,
-                height: p.h,
-                zIndex: p.z,
+                left: piece.x,
+                top: piece.y,
+                width: piece.w,
+                height: piece.h,
+                zIndex: piece.z,
               }}
               onPointerDown={(e) => {
                 const mgr = managerRef.current;
-                const board = boardRef.current;
-                if (!mgr || !board) return;
+                if (!mgr) return;
 
                 const pieceRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-
-                mgr.pointerDown(p.id, e.clientX, e.clientY, pieceRect);
+                mgr.pointerDown(piece.id, e.clientX, e.clientY, pieceRect);
                 setState(mgr.getState());
 
                 const attach = (window as any).__phuzzleAttachDragListeners as undefined | (() => void);
                 attach?.();
               }}
-              title={p.id}
+              title={piece.id}
             />
           ))}
         </section>
