@@ -97,11 +97,12 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ### Completed
 
-- [] 2D scene setup
-- [] Puzzle piece prefab
-- [] Basic drag-and-drop
-- [] Snapping logic prototype
-- [] Random scatter placement
+- [] App routes and screens (Menu, New Game/Setup, Play)
+- [] Custom image upload (PNG/JPG) with validation
+- [] Persist selected image and render it in Play view
+- [] PuzzleManager scaffolding (state + piece generation)
+- [] Basic piece rendering (placeholder squares)
+- [] Basic drag-and-drop MVP
 
 ---
 
@@ -214,6 +215,7 @@ npm run dev
 ├── package.json
 ├── README.md
 ├── tsconfig.app.json
+├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
 ├── tsconfig.node.json
 └── vite.config.ts
