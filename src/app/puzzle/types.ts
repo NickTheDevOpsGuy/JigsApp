@@ -1,30 +1,28 @@
-export type GridSize = {
-  cols: number;
-  rows: number;
-};
+// src/app/puzzle/types.ts
 
 export type PieceId = string;
 
+export type GridSize = {
+  rows: number;
+  cols: number;
+};
+
 export type Piece = {
   id: PieceId;
-
-  // Current position on the board (px)
   x: number;
   y: number;
-
-  // Render order
   z: number;
-
-  // Dimensions (px)
   w: number;
   h: number;
-
-  // Snap target (px)
   targetX: number;
   targetY: number;
-
-  // Gameplay
   isPlaced: boolean;
+};
+
+export type DragState = {
+  activeId: PieceId | null;
+  offsetX: number;
+  offsetY: number;
 };
 
 export type PuzzleState = {
@@ -34,10 +32,4 @@ export type PuzzleState = {
   placedCount: number;
   totalCount: number;
   isComplete: boolean;
-};
-
-export type DragState = {
-  activeId: PieceId | null;
-  offsetX: number;
-  offsetY: number;
 };
