@@ -11,10 +11,7 @@ export function MenuScreen() {
       <div className={styles.card}>
         <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
 
-        <button
-          className={styles.secondary}
-          onClick={() => alert("Hook up modal later")}
-        >
+        <button className={styles.secondary} onClick={() => alert("Hook up modal later")}>
           How to Play
         </button>
 

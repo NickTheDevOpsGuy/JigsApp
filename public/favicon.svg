@@ -1,0 +1,66 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 256 256"
+  width="256"
+  height="256"
+  fill="none"
+>
+  <!-- background rounded tile -->
+  <rect x="20" y="20" width="216" height="216" rx="44" fill="#0B63B8"/>
+
+  <!-- subtle inner highlight -->
+  <rect x="32" y="32" width="192" height="192" rx="38" fill="#1E78D6" opacity="0.35"/>
+
+  <!-- puzzle piece -->
+  <path
+    d="M86 176
+       c0-10 8-18 18-18
+       h8
+       v-16
+       c0-8 6-14 14-14
+       h12
+       c-4-3-7-8-7-14
+       c0-10 8-18 18-18
+       s18 8 18 18
+       c0 6-3 11-7 14
+       h11
+       c8 0 14 6 14 14
+       v18
+       h8
+       c10 0 18 8 18 18
+       s-8 18-18 18
+       c-6 0-11-3-14-7
+       v11
+       c0 8-6 14-14 14
+       h-18
+       v8
+       c0 10-8 18-18 18
+       s-18-8-18-18
+       c0-6 3-11 7-14
+       h-11
+       c-8 0-14-6-14-14
+       v-18
+       h-8
+       c-10 0-18-8-18-18
+       s8-18 18-18
+       c6 0 11 3 14 7
+       z"
+    fill="#FFFFFF"
+    opacity="0.95"
+  />
+
+  <!-- tiny sparkle notch -->
+  <path
+    d="M198 62
+       l4 10
+       10 4
+       -10 4
+       -4 10
+       -4-10
+       -10-4
+       10-4
+       z"
+    fill="#FFFFFF"
+    opacity="0.9"
+  />
+</svg>

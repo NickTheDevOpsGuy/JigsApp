@@ -172,7 +172,11 @@ npm run dev
 │   │   ├── enhancement_refactor.yml
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
+│   ├── workflows
+│   │   └── Phuzzle.yml
 │   └── pull_request_template.md
+├── public
+│   └── favicon.svg
 ├── src
 │   └── app
 │       ├── assets
@@ -210,7 +214,10 @@ npm run dev
 │       ├── main.tsx
 │       └── vite-env.d.ts
 ├── .gitignore
+├── .prettierignore
+├── .prettierrc.yml
 ├── CONTRIBUTORS.md
+├── eslint.config.ts
 ├── index.html
 ├── LICENSE.md
 ├── package-lock.json
