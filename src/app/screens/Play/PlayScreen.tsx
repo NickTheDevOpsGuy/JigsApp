@@ -8,6 +8,10 @@ import type { PuzzleState } from "@/puzzle/types";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 
+// IMPORTANT: must match PuzzleManager's targetStartX/targetStartY
+const TARGET_ORIGIN_X = 16;
+const TARGET_ORIGIN_Y = 16;
+
 export function PlayScreen() {
   const nav = useNavigate();
 
@@ -21,7 +25,7 @@ export function PlayScreen() {
   const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
   const pieceSize = useMemo(() => ({ w: 72, h: 72 }), []);
 
-  // If there's no image, show a friendly message.
+  // No image, no play
   if (!imgUrl) {
     return (
       <div className={styles.page}>
@@ -34,7 +38,9 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>No image selected. Go back and upload one.</section>
+          <section className={styles.board}>
+            No image selected. Go back and upload one.
+          </section>
         </main>
       </div>
     );
@@ -44,7 +50,6 @@ export function PlayScreen() {
   useEffect(() => {
     if (managerRef.current) return;
 
-    // Temporary board size until we measure real DOM size
     const initialBoardWidth = 900;
     const initialBoardHeight = 520;
 
@@ -68,7 +73,7 @@ export function PlayScreen() {
     setState(managerRef.current.getState());
   }, [grid, imgUrl, pieceSize.w, pieceSize.h]);
 
-  // Measure board and set board size on manager
+  // Keep manager in sync with actual board DOM size
   useEffect(() => {
     const board = boardRef.current;
     const mgr = managerRef.current;
@@ -139,7 +144,7 @@ export function PlayScreen() {
     );
   }
 
-  // Assembled image size (this defines the "big" image each piece samples from)
+  // Size of the assembled "full" image that every tile samples from
   const assembledW = state.grid.cols * pieceSize.w;
   const assembledH = state.grid.rows * pieceSize.h;
 
@@ -163,21 +168,13 @@ export function PlayScreen() {
       <main className={styles.main}>
         <section className={styles.board} ref={boardRef}>
           {state.pieces.map((piece) => {
-            // Compute where this piece should sample from inside the assembled image.
-            // This assumes your targets start at (16,16) in PuzzleManager.
-            const bgX = piece.targetX - 16;
-            const bgY = piece.targetY - 16;
+            // Which tile is this in the assembled grid?
+            const col = (piece.targetX - TARGET_ORIGIN_X) / piece.w;
+            const row = (piece.targetY - TARGET_ORIGIN_Y) / piece.h;
 
-            // Put the log RIGHT HERE.
-            console.log("[slice debug]", {
-              id: piece.id,
-              targetX: piece.targetX,
-              targetY: piece.targetY,
-              bgX,
-              bgY,
-              assembledW,
-              assembledH,
-            });
+            // Pixel offsets for backgroundPosition
+            const bgX = Math.round(col * piece.w);
+            const bgY = Math.round(row * piece.h);
 
             return (
               <div
@@ -192,11 +189,7 @@ export function PlayScreen() {
 
                   backgroundImage: `url(${imgUrl})`,
                   backgroundRepeat: "no-repeat",
-
-                  // Scale the image once to the assembled puzzle size
                   backgroundSize: `${assembledW}px ${assembledH}px`,
-
-                  // Offset the background so the correct tile shows
                   backgroundPosition: `-${bgX}px -${bgY}px`,
                 }}
                 onPointerDown={(e) => {
