@@ -99,7 +99,12 @@ export class PuzzleManager {
     this.recomputeDerivedState();
   }
 
-  pointerDown(pieceId: PieceId, pointerX: number, pointerY: number, pieceRect: DOMRect) {
+  pointerDown(
+    pieceId: PieceId,
+    pointerX: number,
+    pointerY: number,
+    pieceRect: DOMRect,
+  ) {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
 
@@ -114,7 +119,9 @@ export class PuzzleManager {
     this.zCounter += 1;
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, z: this.zCounter } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, z: this.zCounter } : p,
+      ),
     };
   }
 
@@ -136,7 +143,9 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === activeId ? { ...p, x: nextX, y: nextY } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === activeId ? { ...p, x: nextX, y: nextY } : p,
+      ),
     };
   }
 
@@ -220,10 +229,16 @@ export class PuzzleManager {
       const targetY = targetStartY + row * pieceHeight;
 
       const scatterMinX = scatterPadding;
-      const scatterMaxX = Math.max(scatterPadding, this.boardWidth - pieceWidth - scatterPadding);
+      const scatterMaxX = Math.max(
+        scatterPadding,
+        this.boardWidth - pieceWidth - scatterPadding,
+      );
 
       const scatterMinY = Math.max(scatterPadding, this.boardHeight * 0.55);
-      const scatterMaxY = Math.max(scatterMinY, this.boardHeight - pieceHeight - scatterPadding);
+      const scatterMaxY = Math.max(
+        scatterMinY,
+        this.boardHeight - pieceHeight - scatterPadding,
+      );
 
       const x = this.rand(scatterMinX, scatterMaxX);
       const y = this.rand(scatterMinY, scatterMaxY);
