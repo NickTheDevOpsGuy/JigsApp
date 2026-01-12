@@ -50,7 +50,7 @@ export function PlayScreen() {
       {
         onPuzzleComplete: (s) => console.log("[Phuzzle] puzzle complete", s),
         onPiecePlaced: (p) => console.log("[Phuzzle] piece placed", p.id),
-      }
+      },
     );
 
     setState(managerRef.current.getState());
@@ -120,7 +120,9 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>No image selected. Go back and upload one.</section>
+          <section className={styles.board}>
+            No image selected. Go back and upload one.
+          </section>
         </main>
       </div>
     );
@@ -202,7 +204,9 @@ export function PlayScreen() {
                   const mgr = managerRef.current;
                   if (!mgr) return;
 
-                  const pieceRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                  const pieceRect = (
+                    e.currentTarget as HTMLDivElement
+                  ).getBoundingClientRect();
                   mgr.pointerDown(piece.id, e.clientX, e.clientY, pieceRect);
                   setState(mgr.getState());
 
