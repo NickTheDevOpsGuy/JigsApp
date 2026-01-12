@@ -17,6 +17,7 @@ export type Piece = {
   targetX: number;
   targetY: number;
   isPlaced: boolean;
+  justSnapped?: boolean;
 };
 
 export type DragState = {
