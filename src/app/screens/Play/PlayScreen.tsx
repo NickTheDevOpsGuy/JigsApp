@@ -99,7 +99,7 @@ export function PlayScreen() {
       const mgr = managerRef.current;
       if (!mgr) return;
 
-      // If you want snapping on drop later, you can call:
+      // Later, when you want snapping on drop:
       // mgr.trySnapActivePiece();
       mgr.pointerUp();
       setState(mgr.getState());
@@ -139,6 +139,10 @@ export function PlayScreen() {
     );
   }
 
+  // Assembled image size (this defines the "big" image each piece samples from)
+  const assembledW = state.grid.cols * pieceSize.w;
+  const assembledH = state.grid.rows * pieceSize.h;
+
   return (
     <div className={styles.page}>
       <header className={styles.topBar}>
@@ -157,41 +161,61 @@ export function PlayScreen() {
       </header>
 
       <main className={styles.main}>
-        <section
-          className={styles.board}
-          ref={boardRef}
-          style={{
-            backgroundImage: `url(${imgUrl})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-        >
-          {state.pieces.map((piece) => (
-            <div
-              key={piece.id}
-              className={styles.piece}
-              style={{
-                left: piece.x,
-                top: piece.y,
-                width: piece.w,
-                height: piece.h,
-                zIndex: piece.z,
-              }}
-              onPointerDown={(e) => {
-                const mgr = managerRef.current;
-                if (!mgr) return;
+        <section className={styles.board} ref={boardRef}>
+          {state.pieces.map((piece) => {
+            // Compute where this piece should sample from inside the assembled image.
+            // This assumes your targets start at (16,16) in PuzzleManager.
+            const bgX = piece.targetX - 16;
+            const bgY = piece.targetY - 16;
 
-                const pieceRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-                mgr.pointerDown(piece.id, e.clientX, e.clientY, pieceRect);
-                setState(mgr.getState());
+            // Put the log RIGHT HERE.
+            console.log("[slice debug]", {
+              id: piece.id,
+              targetX: piece.targetX,
+              targetY: piece.targetY,
+              bgX,
+              bgY,
+              assembledW,
+              assembledH,
+            });
 
-                const attach = (window as any).__phuzzleAttachDragListeners as undefined | (() => void);
-                attach?.();
-              }}
-              title={piece.id}
-            />
-          ))}
+            return (
+              <div
+                key={piece.id}
+                className={styles.piece}
+                style={{
+                  left: piece.x,
+                  top: piece.y,
+                  width: piece.w,
+                  height: piece.h,
+                  zIndex: piece.z,
+
+                  backgroundImage: `url(${imgUrl})`,
+                  backgroundRepeat: "no-repeat",
+
+                  // Scale the image once to the assembled puzzle size
+                  backgroundSize: `${assembledW}px ${assembledH}px`,
+
+                  // Offset the background so the correct tile shows
+                  backgroundPosition: `-${bgX}px -${bgY}px`,
+                }}
+                onPointerDown={(e) => {
+                  const mgr = managerRef.current;
+                  if (!mgr) return;
+
+                  const pieceRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                  mgr.pointerDown(piece.id, e.clientX, e.clientY, pieceRect);
+                  setState(mgr.getState());
+
+                  const attach = (window as any).__phuzzleAttachDragListeners as
+                    | undefined
+                    | (() => void);
+                  attach?.();
+                }}
+                title={piece.id}
+              />
+            );
+          })}
         </section>
 
         <section className={styles.tray}>Piece tray placeholder</section>
