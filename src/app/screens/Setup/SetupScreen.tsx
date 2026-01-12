@@ -84,12 +84,9 @@ export function SetupScreen() {
 
     localStorage.setItem(STORAGE_KEY, imgDataUrl);
 
-    console.info(
-      "[Phuzzle] Upload flow complete: saved dataUrl + navigating to /play",
-      {
-        storageKey: STORAGE_KEY,
-      },
-    );
+    console.info("[Phuzzle] Upload flow complete: saved dataUrl + navigating to /play", {
+      storageKey: STORAGE_KEY,
+    });
 
     nav("/play");
   }

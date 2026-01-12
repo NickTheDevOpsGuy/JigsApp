@@ -8,6 +8,12 @@ import type { PuzzleState } from "@/puzzle/types";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 
+declare global {
+  interface Window {
+    __phuzzleAttachDragListeners?: () => void;
+  }
+}
+
 export function PlayScreen() {
   const nav = useNavigate();
 
@@ -88,7 +94,8 @@ export function PlayScreen() {
       window.removeEventListener("pointerup", onUp);
     }
 
-    (window as any).__phuzzleAttachDragListeners = () => {
+    // ✅ No `any`, typed property on Window
+    window.__phuzzleAttachDragListeners = () => {
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
     };
@@ -96,7 +103,7 @@ export function PlayScreen() {
     return () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
-      delete (window as any).__phuzzleAttachDragListeners;
+      delete window.__phuzzleAttachDragListeners;
     };
   }, []);
 
@@ -162,7 +169,6 @@ export function PlayScreen() {
       <main className={styles.main}>
         <section className={styles.board} ref={boardRef}>
           {state.pieces.map((piece) => {
-            // Assumes targets start at (16,16) in PuzzleManager.
             const bgX = piece.targetX - 16;
             const bgY = piece.targetY - 16;
 
@@ -180,7 +186,6 @@ export function PlayScreen() {
                   width: piece.w,
                   height: piece.h,
                   zIndex: piece.z,
-
                   backgroundImage: `url(${imgUrl})`,
                   backgroundRepeat: "no-repeat",
                   backgroundSize: `${assembledW}px ${assembledH}px`,
@@ -190,7 +195,6 @@ export function PlayScreen() {
                   const mgr = managerRef.current;
                   if (!mgr) return;
 
-                  // Clear the flag so future snaps can pop again
                   mgr.clearJustSnapped(piece.id);
                   setState(mgr.getState());
                 }}
@@ -202,8 +206,7 @@ export function PlayScreen() {
                   mgr.pointerDown(piece.id, e.clientX, e.clientY, pieceRect);
                   setState(mgr.getState());
 
-                  const attach = (window as any).__phuzzleAttachDragListeners as undefined | (() => void);
-                  attach?.();
+                  window.__phuzzleAttachDragListeners?.();
                 }}
                 title={piece.id}
               />
