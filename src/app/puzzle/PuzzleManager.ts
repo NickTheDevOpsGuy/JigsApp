@@ -11,6 +11,9 @@ export type PuzzleManagerOptions = {
   pieceHeight: number;
   scatterPadding?: number;
   snapTolerancePx?: number;
+
+  // Optional: where scatter starts as ratio of board height (0.0 top → 1.0 bottom)
+  scatterStartYRatio?: number;
 };
 
 export type PuzzleManagerEvents = {
@@ -32,6 +35,9 @@ export class PuzzleManager {
   private boardHeight: number;
   private snapTolerancePx: number;
 
+  // Scatter tuning
+  private scatterStartYRatio: number;
+
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {
       imageUrl,
@@ -42,12 +48,15 @@ export class PuzzleManager {
       pieceHeight,
       scatterPadding = 16,
       snapTolerancePx = 18,
+      scatterStartYRatio = 0.3,
     } = options;
 
     this.events = events;
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
     this.snapTolerancePx = snapTolerancePx;
+
+    this.scatterStartYRatio = scatterStartYRatio;
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
     this.zCounter = 10;
@@ -83,7 +92,6 @@ export class PuzzleManager {
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
 
-    // Clamp all pieces into the new bounds
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((piece) => {
@@ -104,7 +112,6 @@ export class PuzzleManager {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
 
-    // For MVP, placed pieces are locked
     if (piece.isPlaced) return;
 
     this.drag = {
@@ -116,7 +123,9 @@ export class PuzzleManager {
     this.zCounter += 1;
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, z: this.zCounter } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, z: this.zCounter } : p
+      ),
     };
   }
 
@@ -138,19 +147,17 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === activeId ? { ...p, x: nextX, y: nextY } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === activeId ? { ...p, x: nextX, y: nextY } : p
+      ),
     };
   }
 
-  /**
-   * Drop the active piece.
-   * For #32: attempt snap on drop, then release drag.
-   */
   pointerUp() {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
-    // Attempt snap BEFORE clearing drag (trySnapActivePiece uses drag.activeId)
+    // Attempt snap BEFORE clearing drag (trySnapActivePiece reads drag.activeId)
     const snapped = this.trySnapActivePiece();
 
     // Always release drag
@@ -161,6 +168,21 @@ export class PuzzleManager {
     if (!snapped) {
       this.recomputeDerivedState();
     }
+  }
+
+  // Called by UI after the snap-pop animation ends
+  clearJustSnapped(pieceId: PieceId) {
+    const piece = this.findPiece(pieceId);
+    if (!piece) return;
+
+    if (!piece.justSnapped) return;
+
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, justSnapped: false } : p
+      ),
+    };
   }
 
   trySnapActivePiece(): boolean {
@@ -181,6 +203,9 @@ export class PuzzleManager {
       x: piece.targetX,
       y: piece.targetY,
       isPlaced: true,
+
+      // Visual cue trigger
+      justSnapped: true,
     };
 
     this.state = {
@@ -224,7 +249,7 @@ export class PuzzleManager {
 
     const total = grid.cols * grid.rows;
 
-    // Target positions: simple grid layout within the board
+    // Targets start at (16,16) for now (matches your slice math in PlayScreen)
     const targetStartX = 16;
     const targetStartY = 16;
 
@@ -237,11 +262,13 @@ export class PuzzleManager {
       const targetX = targetStartX + col * pieceWidth;
       const targetY = targetStartY + row * pieceHeight;
 
-      // Scatter start positions (roughly lower area by default)
       const scatterMinX = scatterPadding;
       const scatterMaxX = Math.max(scatterPadding, this.boardWidth - pieceWidth - scatterPadding);
 
-      const scatterMinY = Math.max(scatterPadding, this.boardHeight * 0.55);
+      const scatterMinY = Math.max(
+        scatterPadding,
+        Math.floor(this.boardHeight * this.scatterStartYRatio)
+      );
       const scatterMaxY = Math.max(scatterMinY, this.boardHeight - pieceHeight - scatterPadding);
 
       const x = this.rand(scatterMinX, scatterMaxX);
@@ -257,6 +284,7 @@ export class PuzzleManager {
         targetX,
         targetY,
         isPlaced: false,
+        justSnapped: false,
       });
     }
 
