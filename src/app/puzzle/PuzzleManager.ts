@@ -83,6 +83,7 @@ export class PuzzleManager {
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
 
+    // Clamp all pieces into the new bounds
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((piece) => {
@@ -99,15 +100,11 @@ export class PuzzleManager {
     this.recomputeDerivedState();
   }
 
-  pointerDown(
-    pieceId: PieceId,
-    pointerX: number,
-    pointerY: number,
-    pieceRect: DOMRect,
-  ) {
+  pointerDown(pieceId: PieceId, pointerX: number, pointerY: number, pieceRect: DOMRect) {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
 
+    // For MVP, placed pieces are locked
     if (piece.isPlaced) return;
 
     this.drag = {
@@ -119,9 +116,7 @@ export class PuzzleManager {
     this.zCounter += 1;
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, z: this.zCounter } : p,
-      ),
+      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, z: this.zCounter } : p)),
     };
   }
 
@@ -143,16 +138,29 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === activeId ? { ...p, x: nextX, y: nextY } : p,
-      ),
+      pieces: this.state.pieces.map((p) => (p.id === activeId ? { ...p, x: nextX, y: nextY } : p)),
     };
   }
 
+  /**
+   * Drop the active piece.
+   * For #32: attempt snap on drop, then release drag.
+   */
   pointerUp() {
-    if (!this.drag.activeId) return;
+    const activeId = this.drag.activeId;
+    if (!activeId) return;
+
+    // Attempt snap BEFORE clearing drag (trySnapActivePiece uses drag.activeId)
+    const snapped = this.trySnapActivePiece();
+
+    // Always release drag
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
-    this.recomputeDerivedState();
+
+    // If we didn't snap, still recompute derived state
+    // (trySnapActivePiece already recomputes when it snaps)
+    if (!snapped) {
+      this.recomputeDerivedState();
+    }
   }
 
   trySnapActivePiece(): boolean {
@@ -216,6 +224,7 @@ export class PuzzleManager {
 
     const total = grid.cols * grid.rows;
 
+    // Target positions: simple grid layout within the board
     const targetStartX = 16;
     const targetStartY = 16;
 
@@ -228,17 +237,12 @@ export class PuzzleManager {
       const targetX = targetStartX + col * pieceWidth;
       const targetY = targetStartY + row * pieceHeight;
 
+      // Scatter start positions (roughly lower area by default)
       const scatterMinX = scatterPadding;
-      const scatterMaxX = Math.max(
-        scatterPadding,
-        this.boardWidth - pieceWidth - scatterPadding,
-      );
+      const scatterMaxX = Math.max(scatterPadding, this.boardWidth - pieceWidth - scatterPadding);
 
       const scatterMinY = Math.max(scatterPadding, this.boardHeight * 0.55);
-      const scatterMaxY = Math.max(
-        scatterMinY,
-        this.boardHeight - pieceHeight - scatterPadding,
-      );
+      const scatterMaxY = Math.max(scatterMinY, this.boardHeight - pieceHeight - scatterPadding);
 
       const x = this.rand(scatterMinX, scatterMaxX);
       const y = this.rand(scatterMinY, scatterMaxY);
