@@ -1,14 +1,6 @@
 // src/app/puzzle/PuzzleManager.ts
-import type {
-  DragState,
-  EdgeType,
-  GridSize,
-  Piece,
-  PieceEdges,
-  PieceId,
-  PuzzleState,
-} from "./types";
-import { buildPiecePath } from "./shape";
+
+import type { DragState, GridSize, Piece, PieceId, PuzzleState } from "./types";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
@@ -17,15 +9,17 @@ export type PuzzleManagerOptions = {
 
   grid: GridSize;
 
-  // Base tile size (not including tabs)
-  tileWidth: number;
-  tileHeight: number;
+  pieceWidth: number;
+  pieceHeight: number;
 
   scatterPadding?: number;
   snapTolerancePx?: number;
 
-  // Where pieces should start vertically (0..1). 0.3 means above mid, 0.6 means lower.
+  // where to start scattering pieces vertically (0..1 of board height)
   scatterStartYRatio?: number;
+
+  // rotation step (90 = classic)
+  rotationStepDeg?: number;
 };
 
 export type PuzzleManagerEvents = {
@@ -37,16 +31,6 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(n, max));
 }
 
-function invertEdge(edge: EdgeType): EdgeType {
-  if (edge === "tab") return "blank";
-  if (edge === "blank") return "tab";
-  return "flat";
-}
-
-function randomTabBlank(): EdgeType {
-  return Math.random() < 0.5 ? "tab" : "blank";
-}
-
 export class PuzzleManager {
   private state: PuzzleState;
   private drag: DragState;
@@ -56,7 +40,9 @@ export class PuzzleManager {
   private boardWidth: number;
   private boardHeight: number;
   private snapTolerancePx: number;
+
   private scatterStartYRatio: number;
+  private rotationStepDeg: number;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {
@@ -64,26 +50,29 @@ export class PuzzleManager {
       boardWidth,
       boardHeight,
       grid,
-      tileWidth,
-      tileHeight,
+      pieceWidth,
+      pieceHeight,
       scatterPadding = 16,
       snapTolerancePx = 18,
       scatterStartYRatio = 0.3,
+      rotationStepDeg = 90,
     } = options;
 
     this.events = events;
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
     this.snapTolerancePx = snapTolerancePx;
+
     this.scatterStartYRatio = scatterStartYRatio;
+    this.rotationStepDeg = rotationStepDeg;
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
     this.zCounter = 10;
 
     const pieces = this.createPieces({
       grid,
-      tileWidth,
-      tileHeight,
+      pieceWidth,
+      pieceHeight,
       scatterPadding,
     });
 
@@ -125,15 +114,6 @@ export class PuzzleManager {
     };
 
     this.recomputeDerivedState();
-  }
-
-  clearJustSnapped(pieceId: PieceId) {
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, justSnapped: false } : p,
-      ),
-    };
   }
 
   pointerDown(pieceId: PieceId, pointerX: number, pointerY: number, pieceRect: DOMRect) {
@@ -185,15 +165,61 @@ export class PuzzleManager {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
-    // Try snapping before clearing drag
+    // Snap attempt must happen before clearing drag (snap uses drag.activeId)
     const snapped = this.trySnapActivePiece();
 
-    // Always release drag
+    // release drag
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
 
+    // If we didn't snap, still recompute derived state
     if (!snapped) {
       this.recomputeDerivedState();
     }
+  }
+
+  rotateActivePiece() {
+    const activeId = this.drag.activeId;
+    if (!activeId) return;
+
+    const piece = this.findPiece(activeId);
+    if (!piece || piece.isPlaced) return;
+
+    const next = (piece.rotation + this.rotationStepDeg) % 360;
+
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.id === piece.id ? { ...p, rotation: next } : p,
+      ),
+    };
+  }
+
+  rotatePiece(pieceId: PieceId) {
+    const piece = this.findPiece(pieceId);
+    if (!piece || piece.isPlaced) return;
+
+    const next = (piece.rotation + this.rotationStepDeg) % 360;
+
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.id === piece.id ? { ...p, rotation: next } : p,
+      ),
+    };
+  }
+
+  clearJustSnapped(pieceId: PieceId) {
+    const piece = this.findPiece(pieceId);
+    if (!piece) return;
+
+    if (!piece.justSnapped) return;
+
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, justSnapped: false } : p,
+      ),
+    };
   }
 
   trySnapActivePiece(): boolean {
@@ -202,6 +228,11 @@ export class PuzzleManager {
 
     const piece = this.findPiece(activeId);
     if (!piece || piece.isPlaced) return false;
+
+    // Must match rotation too
+    const rotOk =
+      ((piece.rotation % 360) + 360) % 360 === ((piece.targetRotation % 360) + 360) % 360;
+    if (!rotOk) return false;
 
     const dx = piece.x - piece.targetX;
     const dy = piece.y - piece.targetY;
@@ -248,84 +279,34 @@ export class PuzzleManager {
     return this.state.pieces.find((p) => p.id === id) ?? null;
   }
 
-  private createEdges(grid: GridSize): PieceEdges[][] {
-    const edges: PieceEdges[][] = Array.from({ length: grid.rows }, () =>
-      Array.from({ length: grid.cols }, () => ({
-        top: "flat" as EdgeType,
-        right: "flat" as EdgeType,
-        bottom: "flat" as EdgeType,
-        left: "flat" as EdgeType,
-      })),
-    );
-
-    for (let r = 0; r < grid.rows; r++) {
-      for (let c = 0; c < grid.cols; c++) {
-        const e = edges[r][c];
-
-        // Top
-        if (r === 0) e.top = "flat";
-        else e.top = invertEdge(edges[r - 1][c].bottom);
-
-        // Left
-        if (c === 0) e.left = "flat";
-        else e.left = invertEdge(edges[r][c - 1].right);
-
-        // Right
-        if (c === grid.cols - 1) e.right = "flat";
-        else e.right = randomTabBlank();
-
-        // Bottom
-        if (r === grid.rows - 1) e.bottom = "flat";
-        else e.bottom = randomTabBlank();
-      }
-    }
-
-    return edges;
-  }
-
   private createPieces(args: {
     grid: GridSize;
-    tileWidth: number;
-    tileHeight: number;
+    pieceWidth: number;
+    pieceHeight: number;
     scatterPadding: number;
   }): Piece[] {
-    const { grid, tileWidth, tileHeight, scatterPadding } = args;
+    const { grid, pieceWidth, pieceHeight, scatterPadding } = args;
 
-    const edgesGrid = this.createEdges(grid);
+    const total = grid.cols * grid.rows;
 
-    // Pad lets tabs extend outside the tile
-    const pad = Math.round(Math.min(tileWidth, tileHeight) * 0.22);
-    const pieceW = tileWidth + pad * 2;
-    const pieceH = tileHeight + pad * 2;
-
-    // Targets start at 16,16 like your current system
     const targetStartX = 16;
     const targetStartY = 16;
 
-    const total = grid.cols * grid.rows;
     const pieces: Piece[] = [];
+
+    const shapePath = this.buildShapePath(pieceWidth, pieceHeight);
 
     for (let i = 0; i < total; i++) {
       const col = i % grid.cols;
       const row = Math.floor(i / grid.cols);
 
-      const edges = edgesGrid[row][col];
-      const shapePath = buildPiecePath({
-        tileW: tileWidth,
-        tileH: tileHeight,
-        pad,
-        edges,
-      });
+      const targetX = targetStartX + col * pieceWidth;
+      const targetY = targetStartY + row * pieceHeight;
 
-      // target position for the piece container
-      const targetX = targetStartX + col * tileWidth;
-      const targetY = targetStartY + row * tileHeight;
-
-      // Scatter region
       const scatterMinX = scatterPadding;
       const scatterMaxX = Math.max(
         scatterPadding,
-        this.boardWidth - pieceW - scatterPadding,
+        this.boardWidth - pieceWidth - scatterPadding,
       );
 
       const scatterMinY = Math.max(
@@ -334,34 +315,76 @@ export class PuzzleManager {
       );
       const scatterMaxY = Math.max(
         scatterMinY,
-        this.boardHeight - pieceH - scatterPadding,
+        this.boardHeight - pieceHeight - scatterPadding,
       );
 
       const x = this.rand(scatterMinX, scatterMaxX);
       const y = this.rand(scatterMinY, scatterMaxY);
+
+      // rotation: start randomized; target is 0 for now (you can later randomize per-piece target)
+      const startRotation =
+        this.rand(0, 360 / this.rotationStepDeg - 1) * this.rotationStepDeg;
 
       pieces.push({
         id: `p${i + 1}`,
         x,
         y,
         z: 1,
-        w: pieceW,
-        h: pieceH,
+        w: pieceWidth,
+        h: pieceHeight,
         targetX,
         targetY,
+        rotation: startRotation,
+        targetRotation: 0,
         isPlaced: false,
-        row,
-        col,
-        tileW: tileWidth,
-        tileH: tileHeight,
-        pad,
-        edges,
-        shapePath,
         justSnapped: false,
+        shapePath,
       });
     }
 
     return pieces;
+  }
+
+  private buildShapePath(w: number, h: number) {
+    // MVP jigsaw-ish silhouette kept inside the piece bounds (no protrusions outside the SVG viewBox).
+    // Later you can vary tabs per-edge based on piece neighbors (top/bottom/left/right).
+    const k = Math.min(w, h) * 0.22; // tab size
+    const midX = w / 2;
+    const midY = h / 2;
+    const a = k * 0.55; // curve amount
+    const b = k * 0.35; // neck amount
+
+    return [
+      `M 0 ${k}`,
+      `Q 0 0 ${k} 0`,
+
+      `L ${midX - k} 0`,
+      `C ${midX - b} 0 ${midX - a} ${k * 0.35} ${midX} ${k * 0.35}`,
+      `C ${midX + a} ${k * 0.35} ${midX + b} 0 ${midX + k} 0`,
+      `L ${w - k} 0`,
+
+      `Q ${w} 0 ${w} ${k}`,
+
+      `L ${w} ${midY - k}`,
+      `C ${w} ${midY - b} ${w - k * 0.35} ${midY - a} ${w - k * 0.35} ${midY}`,
+      `C ${w - k * 0.35} ${midY + a} ${w} ${midY + b} ${w} ${midY + k}`,
+      `L ${w} ${h - k}`,
+
+      `Q ${w} ${h} ${w - k} ${h}`,
+
+      `L ${midX + k} ${h}`,
+      `C ${midX + b} ${h} ${midX + a} ${h - k * 0.35} ${midX} ${h - k * 0.35}`,
+      `C ${midX - a} ${h - k * 0.35} ${midX - b} ${h} ${midX - k} ${h}`,
+      `L ${k} ${h}`,
+
+      `Q 0 ${h} 0 ${h - k}`,
+
+      `L 0 ${midY + k}`,
+      `C 0 ${midY + b} ${k * 0.35} ${midY + a} ${k * 0.35} ${midY}`,
+      `C ${k * 0.35} ${midY - a} 0 ${midY - b} 0 ${midY - k}`,
+
+      `Z`,
+    ].join(" ");
   }
 
   private rand(min: number, max: number) {

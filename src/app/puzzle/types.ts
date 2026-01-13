@@ -1,5 +1,7 @@
 // src/app/puzzle/types.ts
 
+export type EdgeType = "flat" | "tab" | "blank";
+
 export type PieceId = string;
 
 export type GridSize = {
@@ -7,54 +9,36 @@ export type GridSize = {
   cols: number;
 };
 
-export type EdgeType = "flat" | "tab" | "blank";
-
-export type PieceEdges = {
-  top: EdgeType;
-  right: EdgeType;
-  bottom: EdgeType;
-  left: EdgeType;
-};
-
 export type Piece = {
   id: PieceId;
 
-  // current position (top-left of the piece container)
+  // current position (top-left) in board space
   x: number;
   y: number;
 
-  // z-index stacking
+  // draw order
   z: number;
 
-  // container size including padding for tabs
+  // piece size (px)
   w: number;
   h: number;
 
-  // target position (top-left of the piece container)
+  // correct position (top-left) in board space
   targetX: number;
   targetY: number;
 
+  // rotation state
+  rotation: number;
+  targetRotation: number;
+
+  // placed (locked) state
   isPlaced: boolean;
 
-  // grid metadata
-  row: number;
-  col: number;
-
-  // base tile size (the "real" rectangle before tabs)
-  tileW: number;
-  tileH: number;
-
-  // padding around tile where tabs can extend
-  pad: number;
-
-  // edge definitions
-  edges: PieceEdges;
-
-  // svg path for the piece outline (in the piece local coordinates)
-  shapePath: string;
-
-  // tiny visual cue after snapping
+  // small visual cue trigger
   justSnapped?: boolean;
+
+  // SVG path for the jigsaw silhouette (in the piece's own viewBox space: 0..w, 0..h)
+  shapePath: string;
 };
 
 export type DragState = {
@@ -70,4 +54,11 @@ export type PuzzleState = {
   placedCount: number;
   totalCount: number;
   isComplete: boolean;
+};
+
+export type PieceEdges = {
+  top: EdgeType;
+  right: EdgeType;
+  bottom: EdgeType;
+  left: EdgeType;
 };

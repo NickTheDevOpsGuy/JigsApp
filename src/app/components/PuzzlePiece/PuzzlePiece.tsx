@@ -1,4 +1,3 @@
-// src/app/components/PuzzlePiece/PuzzlePiece.tsx
 import styles from "./PuzzlePiece.module.css";
 import type { Piece } from "@/puzzle/types";
 
@@ -7,8 +6,11 @@ type Props = {
   imageUrl: string;
   assembledW: number;
   assembledH: number;
+
   onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
-  onAnimationEnd: () => void;
+  onDoubleClick?: () => void;
+  onContextMenu?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onAnimationEnd?: () => void;
 };
 
 export function PuzzlePiece({
@@ -17,19 +19,12 @@ export function PuzzlePiece({
   assembledW,
   assembledH,
   onPointerDown,
+  onDoubleClick,
+  onContextMenu,
   onAnimationEnd,
 }: Props) {
-  const clipId = `clip-${piece.id}`;
-
-  // Where this piece should sample from in the assembled image (tile space)
-  // targetStart is (16,16), so remove it to align to (0,0) assembled space.
   const bgX = piece.targetX - 16;
   const bgY = piece.targetY - 16;
-
-  // In the piece local space, the tile starts at (pad, pad)
-  // So shift the image by pad, then by the tile offset.
-  const imgX = -bgX + piece.pad;
-  const imgY = -bgY + piece.pad;
 
   const className = piece.justSnapped ? `${styles.wrap} ${styles.snapped}` : styles.wrap;
 
@@ -42,35 +37,35 @@ export function PuzzlePiece({
         width: piece.w,
         height: piece.h,
         zIndex: piece.z,
+        transform: `rotate(${piece.rotation}deg)`,
       }}
       onPointerDown={onPointerDown}
+      onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
       onAnimationEnd={onAnimationEnd}
-      title={piece.id}
     >
       <svg
         className={styles.svg}
+        viewBox={`0 0 ${piece.w} ${piece.h}`}
         width={piece.w}
         height={piece.h}
-        viewBox={`0 0 ${piece.w} ${piece.h}`}
       >
         <defs>
-          <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+          <clipPath id={`clip-${piece.id}`}>
             <path d={piece.shapePath} />
           </clipPath>
         </defs>
 
-        <g clipPath={`url(#${clipId})`}>
-          <image
-            href={imageUrl}
-            x={imgX}
-            y={imgY}
-            width={assembledW}
-            height={assembledH}
-            preserveAspectRatio="none"
-          />
-        </g>
+        <image
+          href={imageUrl}
+          width={assembledW}
+          height={assembledH}
+          x={-bgX}
+          y={-bgY}
+          clipPath={`url(#clip-${piece.id})`}
+          preserveAspectRatio="none"
+        />
 
-        {/* outline */}
         <path d={piece.shapePath} className={styles.outline} />
       </svg>
     </div>
