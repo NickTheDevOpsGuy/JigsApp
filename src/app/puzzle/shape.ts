@@ -111,14 +111,9 @@ export function buildPiecePath(args: ShapeArgs): string {
   }
 
   // Build path clockwise
-  const d = [
-    `M ${x0} ${y0}`,
-    topEdge(),
-    rightEdge(),
-    bottomEdge(),
-    leftEdge(),
-    `Z`,
-  ].join(" ");
+  const d = [`M ${x0} ${y0}`, topEdge(), rightEdge(), bottomEdge(), leftEdge(), `Z`].join(
+    " ",
+  );
 
   return d;
 }

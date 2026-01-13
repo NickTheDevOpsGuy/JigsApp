@@ -98,13 +98,13 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 ### Completed
 
 - [x] App routes and screens (Menu, New Game/Setup, Play)
-- [X] Custom image upload (PNG/JPG) with validation
-- [X] Persist selected image and render it in Play view
-- [X] PuzzleManager scaffolding (state + piece generation)
-- [X] Piece rendering with image slicing (each piece shows correct tile)
-- [X] Classic jigsaw piece shapes (tabs/blanks) with clipping/masking
-- [X] Drag-and-drop for shaped pieces
-- [X] Target-based snapping still works with shaped pieces
+- [x] Custom image upload (PNG/JPG) with validation
+- [x] Persist selected image and render it in Play view
+- [x] PuzzleManager scaffolding (state + piece generation)
+- [x] Piece rendering with image slicing (each piece shows correct tile)
+- [x] Classic jigsaw piece shapes (tabs/blanks) with clipping/masking
+- [x] Drag-and-drop for shaped pieces
+- [x] Target-based snapping still works with shaped pieces
 
 ---
 

@@ -48,7 +48,7 @@ export function PlayScreen() {
       {
         onPuzzleComplete: (s) => console.log("[Phuzzle] puzzle complete", s),
         onPiecePlaced: (p) => console.log("[Phuzzle] piece placed", p.id),
-      }
+      },
     );
 
     setState(managerRef.current.getState());

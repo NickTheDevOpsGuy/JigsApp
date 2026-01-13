@@ -31,9 +31,7 @@ export function PuzzlePiece({
   const imgX = -bgX + piece.pad;
   const imgY = -bgY + piece.pad;
 
-  const className = piece.justSnapped
-    ? `${styles.wrap} ${styles.snapped}`
-    : styles.wrap;
+  const className = piece.justSnapped ? `${styles.wrap} ${styles.snapped}` : styles.wrap;
 
   return (
     <div

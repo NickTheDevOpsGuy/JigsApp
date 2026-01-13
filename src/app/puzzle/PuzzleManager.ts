@@ -131,7 +131,7 @@ export class PuzzleManager {
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, justSnapped: false } : p
+        p.id === pieceId ? { ...p, justSnapped: false } : p,
       ),
     };
   }
@@ -152,7 +152,7 @@ export class PuzzleManager {
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, z: this.zCounter } : p
+        p.id === pieceId ? { ...p, z: this.zCounter } : p,
       ),
     };
   }
@@ -176,7 +176,7 @@ export class PuzzleManager {
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.id === activeId ? { ...p, x: nextX, y: nextY } : p
+        p.id === activeId ? { ...p, x: nextX, y: nextY } : p,
       ),
     };
   }
@@ -255,7 +255,7 @@ export class PuzzleManager {
         right: "flat" as EdgeType,
         bottom: "flat" as EdgeType,
         left: "flat" as EdgeType,
-      }))
+      })),
     );
 
     for (let r = 0; r < grid.rows; r++) {
@@ -325,16 +325,16 @@ export class PuzzleManager {
       const scatterMinX = scatterPadding;
       const scatterMaxX = Math.max(
         scatterPadding,
-        this.boardWidth - pieceW - scatterPadding
+        this.boardWidth - pieceW - scatterPadding,
       );
 
       const scatterMinY = Math.max(
         scatterPadding,
-        Math.floor(this.boardHeight * this.scatterStartYRatio)
+        Math.floor(this.boardHeight * this.scatterStartYRatio),
       );
       const scatterMaxY = Math.max(
         scatterMinY,
-        this.boardHeight - pieceH - scatterPadding
+        this.boardHeight - pieceH - scatterPadding,
       );
 
       const x = this.rand(scatterMinX, scatterMaxX);
