@@ -1,14 +1,6 @@
 // src/app/puzzle/PuzzleManager.ts
-import type {
-  DragState,
-  EdgeType,
-  GridSize,
-  Piece,
-  PieceEdges,
-  PieceId,
-  PuzzleState,
-} from "./types";
-import { buildPiecePath } from "./shape";
+
+import type { DragState, GridSize, Piece, PieceId, PuzzleState } from "./types";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
@@ -17,15 +9,17 @@ export type PuzzleManagerOptions = {
 
   grid: GridSize;
 
-  // Base tile size (not including tabs)
-  tileWidth: number;
-  tileHeight: number;
+  pieceWidth: number;
+  pieceHeight: number;
 
   scatterPadding?: number;
   snapTolerancePx?: number;
 
-  // Where pieces should start vertically (0..1). 0.3 means above mid, 0.6 means lower.
+  // 0.0 to 1.0, where pieces start vertically (ex: 0.3 means start below 30% height)
   scatterStartYRatio?: number;
+
+  // rotation step in degrees (usually 90)
+  rotationStepDeg?: 90 | 180;
 };
 
 export type PuzzleManagerEvents = {
@@ -37,14 +31,9 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(n, max));
 }
 
-function invertEdge(edge: EdgeType): EdgeType {
-  if (edge === "tab") return "blank";
-  if (edge === "blank") return "tab";
-  return "flat";
-}
-
-function randomTabBlank(): EdgeType {
-  return Math.random() < 0.5 ? "tab" : "blank";
+function normalizeRotation(deg: number) {
+  const n = ((deg % 360) + 360) % 360;
+  return n;
 }
 
 export class PuzzleManager {
@@ -56,7 +45,13 @@ export class PuzzleManager {
   private boardWidth: number;
   private boardHeight: number;
   private snapTolerancePx: number;
+
   private scatterStartYRatio: number;
+  private rotationStepDeg: 90 | 180;
+
+  // NOTE: must match PlayScreen slice math (targets start at 16,16)
+  private targetStartX = 16;
+  private targetStartY = 16;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {
@@ -64,26 +59,29 @@ export class PuzzleManager {
       boardWidth,
       boardHeight,
       grid,
-      tileWidth,
-      tileHeight,
+      pieceWidth,
+      pieceHeight,
       scatterPadding = 16,
       snapTolerancePx = 18,
       scatterStartYRatio = 0.3,
+      rotationStepDeg = 90,
     } = options;
 
     this.events = events;
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
     this.snapTolerancePx = snapTolerancePx;
+
     this.scatterStartYRatio = scatterStartYRatio;
+    this.rotationStepDeg = rotationStepDeg;
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
     this.zCounter = 10;
 
     const pieces = this.createPieces({
       grid,
-      tileWidth,
-      tileHeight,
+      pieceWidth,
+      pieceHeight,
       scatterPadding,
     });
 
@@ -127,15 +125,6 @@ export class PuzzleManager {
     this.recomputeDerivedState();
   }
 
-  clearJustSnapped(pieceId: PieceId) {
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, justSnapped: false } : p,
-      ),
-    };
-  }
-
   pointerDown(pieceId: PieceId, pointerX: number, pointerY: number, pieceRect: DOMRect) {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
@@ -152,7 +141,7 @@ export class PuzzleManager {
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, z: this.zCounter } : p,
+        p.id === pieceId ? { ...p, z: this.zCounter } : p
       ),
     };
   }
@@ -176,7 +165,7 @@ export class PuzzleManager {
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.id === activeId ? { ...p, x: nextX, y: nextY } : p,
+        p.id === activeId ? { ...p, x: nextX, y: nextY } : p
       ),
     };
   }
@@ -185,15 +174,41 @@ export class PuzzleManager {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
-    // Try snapping before clearing drag
-    const snapped = this.trySnapActivePiece();
+    // Try snap before clearing drag
+    this.trySnapActivePiece();
 
-    // Always release drag
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
+    this.recomputeDerivedState();
+  }
 
-    if (!snapped) {
-      this.recomputeDerivedState();
-    }
+  rotatePiece(pieceId: PieceId) {
+    const piece = this.findPiece(pieceId);
+    if (!piece) return;
+    if (piece.isPlaced) return;
+
+    const next = normalizeRotation(piece.rotation + this.rotationStepDeg);
+
+    this.zCounter += 1;
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, rotation: next, z: this.zCounter } : p
+      ),
+    };
+  }
+
+  clearJustSnapped(pieceId: PieceId) {
+    const piece = this.findPiece(pieceId);
+    if (!piece) return;
+
+    if (!piece.justSnapped) return;
+
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, justSnapped: false } : p
+      ),
+    };
   }
 
   trySnapActivePiece(): boolean {
@@ -207,7 +222,10 @@ export class PuzzleManager {
     const dy = piece.y - piece.targetY;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
+    const rotOk = normalizeRotation(piece.rotation) === normalizeRotation(piece.targetRotation);
+
     if (dist > this.snapTolerancePx) return false;
+    if (!rotOk) return false;
 
     const snapped: Piece = {
       ...piece,
@@ -248,59 +266,13 @@ export class PuzzleManager {
     return this.state.pieces.find((p) => p.id === id) ?? null;
   }
 
-  private createEdges(grid: GridSize): PieceEdges[][] {
-    const edges: PieceEdges[][] = Array.from({ length: grid.rows }, () =>
-      Array.from({ length: grid.cols }, () => ({
-        top: "flat" as EdgeType,
-        right: "flat" as EdgeType,
-        bottom: "flat" as EdgeType,
-        left: "flat" as EdgeType,
-      })),
-    );
-
-    for (let r = 0; r < grid.rows; r++) {
-      for (let c = 0; c < grid.cols; c++) {
-        const e = edges[r][c];
-
-        // Top
-        if (r === 0) e.top = "flat";
-        else e.top = invertEdge(edges[r - 1][c].bottom);
-
-        // Left
-        if (c === 0) e.left = "flat";
-        else e.left = invertEdge(edges[r][c - 1].right);
-
-        // Right
-        if (c === grid.cols - 1) e.right = "flat";
-        else e.right = randomTabBlank();
-
-        // Bottom
-        if (r === grid.rows - 1) e.bottom = "flat";
-        else e.bottom = randomTabBlank();
-      }
-    }
-
-    return edges;
-  }
-
   private createPieces(args: {
     grid: GridSize;
-    tileWidth: number;
-    tileHeight: number;
+    pieceWidth: number;
+    pieceHeight: number;
     scatterPadding: number;
   }): Piece[] {
-    const { grid, tileWidth, tileHeight, scatterPadding } = args;
-
-    const edgesGrid = this.createEdges(grid);
-
-    // Pad lets tabs extend outside the tile
-    const pad = Math.round(Math.min(tileWidth, tileHeight) * 0.22);
-    const pieceW = tileWidth + pad * 2;
-    const pieceH = tileHeight + pad * 2;
-
-    // Targets start at 16,16 like your current system
-    const targetStartX = 16;
-    const targetStartY = 16;
+    const { grid, pieceWidth, pieceHeight, scatterPadding } = args;
 
     const total = grid.cols * grid.rows;
     const pieces: Piece[] = [];
@@ -309,54 +281,30 @@ export class PuzzleManager {
       const col = i % grid.cols;
       const row = Math.floor(i / grid.cols);
 
-      const edges = edgesGrid[row][col];
-      const shapePath = buildPiecePath({
-        tileW: tileWidth,
-        tileH: tileHeight,
-        pad,
-        edges,
-      });
+      const targetX = this.targetStartX + col * pieceWidth;
+      const targetY = this.targetStartY + row * pieceHeight;
 
-      // target position for the piece container
-      const targetX = targetStartX + col * tileWidth;
-      const targetY = targetStartY + row * tileHeight;
-
-      // Scatter region
       const scatterMinX = scatterPadding;
-      const scatterMaxX = Math.max(
-        scatterPadding,
-        this.boardWidth - pieceW - scatterPadding,
-      );
+      const scatterMaxX = Math.max(scatterPadding, this.boardWidth - pieceWidth - scatterPadding);
 
       const scatterMinY = Math.max(
         scatterPadding,
-        Math.floor(this.boardHeight * this.scatterStartYRatio),
+        Math.floor(this.boardHeight * this.scatterStartYRatio)
       );
-      const scatterMaxY = Math.max(
-        scatterMinY,
-        this.boardHeight - pieceH - scatterPadding,
-      );
-
-      const x = this.rand(scatterMinX, scatterMaxX);
-      const y = this.rand(scatterMinY, scatterMaxY);
+      const scatterMaxY = Math.max(scatterMinY, this.boardHeight - pieceHeight - scatterPadding);
 
       pieces.push({
         id: `p${i + 1}`,
-        x,
-        y,
+        x: this.rand(scatterMinX, scatterMaxX),
+        y: this.rand(scatterMinY, scatterMaxY),
         z: 1,
-        w: pieceW,
-        h: pieceH,
+        w: pieceWidth,
+        h: pieceHeight,
         targetX,
         targetY,
+        rotation: this.rotationStepDeg === 180 ? (Math.random() < 0.5 ? 0 : 180) : [0, 90, 180, 270][this.rand(0, 3)],
+        targetRotation: 0,
         isPlaced: false,
-        row,
-        col,
-        tileW: tileWidth,
-        tileH: tileHeight,
-        pad,
-        edges,
-        shapePath,
         justSnapped: false,
       });
     }

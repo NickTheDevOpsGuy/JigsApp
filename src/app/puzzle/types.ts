@@ -7,53 +7,33 @@ export type GridSize = {
   cols: number;
 };
 
-export type EdgeType = "flat" | "tab" | "blank";
-
-export type PieceEdges = {
-  top: EdgeType;
-  right: EdgeType;
-  bottom: EdgeType;
-  left: EdgeType;
-};
-
 export type Piece = {
   id: PieceId;
 
-  // current position (top-left of the piece container)
+  // current position on board
   x: number;
   y: number;
 
-  // z-index stacking
+  // draw order
   z: number;
 
-  // container size including padding for tabs
+  // size
   w: number;
   h: number;
 
-  // target position (top-left of the piece container)
+  // where it belongs when solved
   targetX: number;
   targetY: number;
 
+  // rotation in degrees (0, 90, 180, 270)
+  rotation: number;
+
+  // required rotation to be considered correct (for now 0)
+  targetRotation: number;
+
   isPlaced: boolean;
 
-  // grid metadata
-  row: number;
-  col: number;
-
-  // base tile size (the "real" rectangle before tabs)
-  tileW: number;
-  tileH: number;
-
-  // padding around tile where tabs can extend
-  pad: number;
-
-  // edge definitions
-  edges: PieceEdges;
-
-  // svg path for the piece outline (in the piece local coordinates)
-  shapePath: string;
-
-  // tiny visual cue after snapping
+  // used for tiny snap animation
   justSnapped?: boolean;
 };
 

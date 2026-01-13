@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
 
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { PuzzleState, PieceId } from "@/puzzle/types";
-import { PuzzlePiece } from "@/components/PuzzlePiece/PuzzlePiece";
+import type { PieceId, PuzzleState } from "@/puzzle/types";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 
@@ -20,10 +19,9 @@ export function PlayScreen() {
   const [state, setState] = useState<PuzzleState | null>(null);
 
   const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
-  const tileSize = useMemo(() => ({ w: 72, h: 72 }), []);
+  const pieceSize = useMemo(() => ({ w: 72, h: 72 }), []);
 
-  // Drag listener attach function
-  const attachDragListenersRef = useRef<(() => void) | null>(null);
+  const dragActiveIdRef = useRef<PieceId | null>(null);
 
   // Initialize manager once (only if we have an image)
   useEffect(() => {
@@ -39,20 +37,21 @@ export function PlayScreen() {
         boardWidth: initialBoardWidth,
         boardHeight: initialBoardHeight,
         grid,
-        tileWidth: tileSize.w,
-        tileHeight: tileSize.h,
+        pieceWidth: pieceSize.w,
+        pieceHeight: pieceSize.h,
         scatterPadding: 16,
         snapTolerancePx: 18,
         scatterStartYRatio: 0.3,
+        rotationStepDeg: 90,
       },
       {
         onPuzzleComplete: (s) => console.log("[Phuzzle] puzzle complete", s),
         onPiecePlaced: (p) => console.log("[Phuzzle] piece placed", p.id),
-      },
+      }
     );
 
     setState(managerRef.current.getState());
-  }, [grid, imgUrl, tileSize.w, tileSize.h]);
+  }, [grid, imgUrl, pieceSize.w, pieceSize.h]);
 
   // Measure board and set board size on manager
   useEffect(() => {
@@ -70,12 +69,14 @@ export function PlayScreen() {
     return () => ro.disconnect();
   }, []);
 
-  // Global pointer move/up while dragging
+  // Global pointer listeners (no window any, always installed once)
   useEffect(() => {
     function onMove(e: PointerEvent) {
       const mgr = managerRef.current;
       const board = boardRef.current;
       if (!mgr || !board) return;
+
+      if (!dragActiveIdRef.current) return;
 
       mgr.pointerMove(e.clientX, e.clientY, board.getBoundingClientRect());
       setState(mgr.getState());
@@ -85,26 +86,22 @@ export function PlayScreen() {
       const mgr = managerRef.current;
       if (!mgr) return;
 
-      mgr.pointerUp();
-      setState(mgr.getState());
+      if (!dragActiveIdRef.current) return;
 
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
+      mgr.pointerUp();
+      dragActiveIdRef.current = null;
+      setState(mgr.getState());
     }
 
-    attachDragListenersRef.current = () => {
-      window.addEventListener("pointermove", onMove);
-      window.addEventListener("pointerup", onUp);
-    };
-
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
     return () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
-      attachDragListenersRef.current = null;
     };
   }, []);
 
-  // No image: friendly message
+  // No image
   if (!imgUrl) {
     return (
       <div className={styles.page}>
@@ -117,9 +114,7 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>
-            No image selected. Go back and upload one.
-          </section>
+          <section className={styles.board}>No image selected. Go back and upload one.</section>
         </main>
       </div>
     );
@@ -144,30 +139,8 @@ export function PlayScreen() {
     );
   }
 
-  const assembledW = state.grid.cols * tileSize.w;
-  const assembledH = state.grid.rows * tileSize.h;
-
-  function handlePiecePointerDown(pieceId: PieceId) {
-    return (e: React.PointerEvent<HTMLDivElement>) => {
-      const mgr = managerRef.current;
-      if (!mgr) return;
-
-      const pieceRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-      mgr.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
-      setState(mgr.getState());
-
-      attachDragListenersRef.current?.();
-    };
-  }
-
-  function handlePieceAnimationEnd(pieceId: PieceId) {
-    return () => {
-      const mgr = managerRef.current;
-      if (!mgr) return;
-      mgr.clearJustSnapped(pieceId);
-      setState(mgr.getState());
-    };
-  }
+  const assembledW = state.grid.cols * pieceSize.w;
+  const assembledH = state.grid.rows * pieceSize.h;
 
   return (
     <div className={styles.page}>
@@ -188,20 +161,74 @@ export function PlayScreen() {
 
       <main className={styles.main}>
         <section className={styles.board} ref={boardRef}>
-          {state.pieces.map((piece) => (
-            <PuzzlePiece
-              key={piece.id}
-              piece={piece}
-              imageUrl={imgUrl}
-              assembledW={assembledW}
-              assembledH={assembledH}
-              onPointerDown={handlePiecePointerDown(piece.id)}
-              onAnimationEnd={handlePieceAnimationEnd(piece.id)}
-            />
-          ))}
+          {state.pieces.map((piece) => {
+            // Assumes targets start at (16,16) in PuzzleManager.
+            const bgX = piece.targetX - 16;
+            const bgY = piece.targetY - 16;
+
+            const innerClassName = piece.justSnapped
+              ? `${styles.piece} ${styles.snapped}`
+              : styles.piece;
+
+            return (
+              <div
+                key={piece.id}
+                className={styles.pieceWrap}
+                style={{
+                  left: piece.x,
+                  top: piece.y,
+                  width: piece.w,
+                  height: piece.h,
+                  zIndex: piece.z,
+                  transform: `rotate(${piece.rotation}deg)`,
+                }}
+                onPointerDown={(e) => {
+                  const mgr = managerRef.current;
+                  if (!mgr) return;
+
+                  const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                  mgr.pointerDown(piece.id, e.clientX, e.clientY, rect);
+                  dragActiveIdRef.current = piece.id;
+                  setState(mgr.getState());
+                }}
+                onDoubleClick={() => {
+                  const mgr = managerRef.current;
+                  if (!mgr) return;
+                  mgr.rotatePiece(piece.id);
+                  setState(mgr.getState());
+                }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  const mgr = managerRef.current;
+                  if (!mgr) return;
+                  mgr.rotatePiece(piece.id);
+                  setState(mgr.getState());
+                }}
+                onAnimationEnd={() => {
+                  const mgr = managerRef.current;
+                  if (!mgr) return;
+                  mgr.clearJustSnapped(piece.id);
+                  setState(mgr.getState());
+                }}
+                title={`${piece.id} rot=${piece.rotation}`}
+              >
+                <div
+                  className={innerClassName}
+                  style={{
+                    backgroundImage: `url(${imgUrl})`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: `${assembledW}px ${assembledH}px`,
+                    backgroundPosition: `-${bgX}px -${bgY}px`,
+                  }}
+                />
+              </div>
+            );
+          })}
         </section>
 
-        <section className={styles.tray}>Piece tray placeholder</section>
+        <section className={styles.tray}>
+          Tip: Double click or right click a piece to rotate. Snaps only when position and rotation match.
+        </section>
       </main>
     </div>
   );
