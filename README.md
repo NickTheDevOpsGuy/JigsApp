@@ -101,8 +101,10 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [x] Custom image upload (PNG/JPG) with validation
 - [x] Persist selected image and render it in Play view
 - [x] PuzzleManager scaffolding (state + piece generation)
-- [x] Basic piece rendering (placeholder squares)
-- [x] Basic drag-and-drop MVP
+- [x] Piece rendering with image slicing (each piece shows correct tile)
+- [x] Classic jigsaw piece shapes (tabs/blanks) with clipping/masking
+- [x] Drag-and-drop for shaped pieces
+- [x] Target-based snapping still works with shaped pieces
 
 ---
 
@@ -162,10 +164,8 @@ npm run dev
 ```
 <details>
 <summary>Click to expand file structure</summary>
+
 .
-├── CONTRIBUTORS.md
-├── .eslintcache
-├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -174,41 +174,36 @@ npm run dev
 │   │   ├── enhancement_refactor.yml
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
-│   ├── pull_request_template.md
-│   └── workflows
-│       └── Phuzzle.yml
-├── .gitignore
+│   ├── workflows
+│   │   └── Phuzzle.yml
+│   └── pull_request_template.md
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push
-├── index.html
-├── LICENSE.md
-├── package.json
-├── package-lock.json
-├── .prettierignore
-├── .prettierrc.yml
 ├── public
 │   └── favicon.svg
-├── README.md
 ├── scripts
 │   └── precheck.sh
 ├── src
 │   └── app
-│       ├── App.tsx
 │       ├── assets
+│       │   ├── branding
 │       │   └── ui
 │       │       └── phuzzle-logo-512.png
 │       ├── components
+│       │   ├── PuzzlePiece
+│       │   │   ├── PuzzlePiece.module.css
+│       │   │   └── PuzzlePiece.tsx
 │       │   ├── Button.module.css
 │       │   ├── Button.tsx
 │       │   ├── Dropdown.module.css
 │       │   ├── Dropdown.tsx
 │       │   └── Modal.tsx
-│       ├── main.tsx
 │       ├── puzzle
 │       │   ├── PuzzleManager.ts
 │       │   ├── PuzzlePiece.module.css
 │       │   ├── PuzzlePiece.tsx
+│       │   ├── shape.ts
 │       │   ├── SnapLogic.ts
 │       │   └── types.ts
 │       ├── screens
@@ -226,8 +221,22 @@ npm run dev
 │       │       └── SetupScreen.tsx
 │       ├── styles
 │       │   └── global.css
+│       ├── App.tsx
+│       ├── main.tsx
 │       └── vite-env.d.ts
+├── .eslintcache
+├── .gitignore
+├── .prettierignore
+├── .prettierrc.yml
+├── CONTRIBUTORS.md
+├── eslint.config.ts
+├── index.html
+├── LICENSE.md
+├── package-lock.json
+├── package.json
+├── README.md
 ├── tsconfig.app.json
+├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
 ├── tsconfig.node.json
 └── vite.config.ts
