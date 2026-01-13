@@ -81,3 +81,24 @@ $RECYCLE.BIN/
 .cache/
 .tmp/
 .temp/
+
+# =========================
+# Lint / Formatter caches
+# =========================
+
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# ESLint (when using cache folder)
+.eslint/
+
+# Prettier temp files
+.prettier/
+
+# TypeScript incremental / tooling
+.tsbuildinfo
+*.tsbuildinfo
+
+# Vite / tooling temp
+.vite/

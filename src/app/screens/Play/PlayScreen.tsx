@@ -47,7 +47,7 @@ export function PlayScreen() {
       {
         onPuzzleComplete: (s) => console.log("[Phuzzle] puzzle complete", s),
         onPiecePlaced: (p) => console.log("[Phuzzle] piece placed", p.id),
-      }
+      },
     );
 
     setState(managerRef.current.getState());
@@ -114,7 +114,9 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>No image selected. Go back and upload one.</section>
+          <section className={styles.board}>
+            No image selected. Go back and upload one.
+          </section>
         </main>
       </div>
     );
@@ -186,7 +188,9 @@ export function PlayScreen() {
                   const mgr = managerRef.current;
                   if (!mgr) return;
 
-                  const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                  const rect = (
+                    e.currentTarget as HTMLDivElement
+                  ).getBoundingClientRect();
                   mgr.pointerDown(piece.id, e.clientX, e.clientY, rect);
                   dragActiveIdRef.current = piece.id;
                   setState(mgr.getState());
@@ -227,7 +231,8 @@ export function PlayScreen() {
         </section>
 
         <section className={styles.tray}>
-          Tip: Double click or right click a piece to rotate. Snaps only when position and rotation match.
+          Tip: Double click or right click a piece to rotate. Snaps only when position and
+          rotation match.
         </section>
       </main>
     </div>
