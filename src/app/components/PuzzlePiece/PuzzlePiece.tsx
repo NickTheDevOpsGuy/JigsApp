@@ -26,9 +26,7 @@ export function PuzzlePiece({
   const bgX = piece.targetX - 16;
   const bgY = piece.targetY - 16;
 
-  const className = piece.justSnapped
-    ? `${styles.wrap} ${styles.snapped}`
-    : styles.wrap;
+  const className = piece.justSnapped ? `${styles.wrap} ${styles.snapped}` : styles.wrap;
 
   return (
     <div
@@ -68,10 +66,7 @@ export function PuzzlePiece({
           preserveAspectRatio="none"
         />
 
-        <path
-          d={piece.shapePath}
-          className={styles.outline}
-        />
+        <path d={piece.shapePath} className={styles.outline} />
       </svg>
     </div>
   );

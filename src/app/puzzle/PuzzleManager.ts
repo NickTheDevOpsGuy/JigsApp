@@ -131,7 +131,9 @@ export class PuzzleManager {
     this.zCounter += 1;
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, z: this.zCounter } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, z: this.zCounter } : p,
+      ),
     };
   }
 
@@ -153,7 +155,9 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === activeId ? { ...p, x: nextX, y: nextY } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === activeId ? { ...p, x: nextX, y: nextY } : p,
+      ),
     };
   }
 
@@ -184,7 +188,9 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === piece.id ? { ...p, rotation: next } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === piece.id ? { ...p, rotation: next } : p,
+      ),
     };
   }
 
@@ -196,7 +202,9 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === piece.id ? { ...p, rotation: next } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === piece.id ? { ...p, rotation: next } : p,
+      ),
     };
   }
 
@@ -208,7 +216,9 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, justSnapped: false } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, justSnapped: false } : p,
+      ),
     };
   }
 
@@ -220,7 +230,8 @@ export class PuzzleManager {
     if (!piece || piece.isPlaced) return false;
 
     // Must match rotation too
-    const rotOk = ((piece.rotation % 360) + 360) % 360 === ((piece.targetRotation % 360) + 360) % 360;
+    const rotOk =
+      ((piece.rotation % 360) + 360) % 360 === ((piece.targetRotation % 360) + 360) % 360;
     if (!rotOk) return false;
 
     const dx = piece.x - piece.targetX;
@@ -293,16 +304,26 @@ export class PuzzleManager {
       const targetY = targetStartY + row * pieceHeight;
 
       const scatterMinX = scatterPadding;
-      const scatterMaxX = Math.max(scatterPadding, this.boardWidth - pieceWidth - scatterPadding);
+      const scatterMaxX = Math.max(
+        scatterPadding,
+        this.boardWidth - pieceWidth - scatterPadding,
+      );
 
-      const scatterMinY = Math.max(scatterPadding, Math.floor(this.boardHeight * this.scatterStartYRatio));
-      const scatterMaxY = Math.max(scatterMinY, this.boardHeight - pieceHeight - scatterPadding);
+      const scatterMinY = Math.max(
+        scatterPadding,
+        Math.floor(this.boardHeight * this.scatterStartYRatio),
+      );
+      const scatterMaxY = Math.max(
+        scatterMinY,
+        this.boardHeight - pieceHeight - scatterPadding,
+      );
 
       const x = this.rand(scatterMinX, scatterMaxX);
       const y = this.rand(scatterMinY, scatterMaxY);
 
       // rotation: start randomized; target is 0 for now (you can later randomize per-piece target)
-      const startRotation = this.rand(0, 360 / this.rotationStepDeg - 1) * this.rotationStepDeg;
+      const startRotation =
+        this.rand(0, 360 / this.rotationStepDeg - 1) * this.rotationStepDeg;
 
       pieces.push({
         id: `p${i + 1}`,
