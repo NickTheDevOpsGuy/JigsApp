@@ -1,0 +1,34 @@
+# --- The "Anti-Bloat" Verification ---
+# System Audit: Detect node_modules in the stage
+STAGED_MODULES=$(git diff --cached --name-only | grep "node_modules/" || true)
+
+if [ -n "$STAGED_MODULES" ]; then
+  echo "❌ [SYSTEM AUDIT FAILURE]: node_modules detected in commit!"
+  echo "Manual Rewind Required: Run 'git rm -r --cached node_modules' to purge."
+  exit 1 
+fi
+
+# Check for empty files in staged changes
+echo "📂 Checking for empty files in staged changes..."
+
+ALLOW_EMPTY_REGEX='(^|/)\.gitkeep$|(^|/)\.keep$'
+CANDIDATES=$(git diff --cached --name-only --diff-filter=AM)
+EMPTY_FILES=""
+
+while IFS= read -r file; do
+  [ -z "$file" ] && continue
+  if echo "$file" | grep -Eq "$ALLOW_EMPTY_REGEX"; then continue; fi
+
+  # Integrity Check: verify file exists and size is 0
+  if [ -f "$file" ] && [ ! -s "$file" ]; then
+    EMPTY_FILES+="$file"$'\n'
+  fi
+done <<< "$CANDIDATES"
+
+if [ -n "$EMPTY_FILES" ]; then
+  echo "🛑 [SYSTEM AUDIT FAILURE]: Empty files detected!"
+  printf "%s" "$EMPTY_FILES"
+  exit 1
+fi
+
+echo "✅ Integrity Verified. Proceeding with commit."
