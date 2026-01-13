@@ -1,12 +1,15 @@
-# Phuzzle.dev
+# 🧩 Phuzzle
 
+A cozy, modern jigsaw puzzle game built with React.  
+Upload an image, break it into pieces, and snap them together piece by piece.
+
+[![CI](https://github.com/NickTheDevOpsGuy/phuzzle/actions/workflows/Phuzzle.yml/badge.svg?branch=main)](https://github.com/NickTheDevOpsGuy/phuzzle/actions/workflows/Phuzzle.yml)
 [![Built with React](https://img.shields.io/badge/Built%20with-React-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Powered%20by-Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
 [![Contributions welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](./CONTRIBUTORS.md)
 [![Last Commit](https://img.shields.io/github/last-commit/NickTheDevOpsGuy/phuzzle)](https://github.com/NickTheDevOpsGuy/phuzzle/commits/main)
-
 ---
 
 ## Table of Contents
@@ -105,6 +108,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [x] Classic jigsaw piece shapes (tabs/blanks) with clipping/masking
 - [x] Drag-and-drop for shaped pieces
 - [x] Target-based snapping still works with shaped pieces
+- [x] Rotatable puzzle pieces with orientation-aware snapping
 
 ---
 
@@ -178,6 +182,24 @@ npm run dev
 │   │   └── Phuzzle.yml
 │   └── pull_request_template.md
 ├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── pre-push
+│   │   ├── pre-rebase
+│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
 ├── public

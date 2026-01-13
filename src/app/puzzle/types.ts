@@ -1,5 +1,7 @@
 // src/app/puzzle/types.ts
 
+export type EdgeType = "flat" | "tab" | "blank";
+
 export type PieceId = string;
 
 export type GridSize = {
@@ -10,31 +12,33 @@ export type GridSize = {
 export type Piece = {
   id: PieceId;
 
-  // current position on board
+  // current position (top-left) in board space
   x: number;
   y: number;
 
   // draw order
   z: number;
 
-  // size
+  // piece size (px)
   w: number;
   h: number;
 
-  // where it belongs when solved
+  // correct position (top-left) in board space
   targetX: number;
   targetY: number;
 
-  // rotation in degrees (0, 90, 180, 270)
+  // rotation state
   rotation: number;
-
-  // required rotation to be considered correct (for now 0)
   targetRotation: number;
 
+  // placed (locked) state
   isPlaced: boolean;
 
-  // used for tiny snap animation
+  // small visual cue trigger
   justSnapped?: boolean;
+
+  // SVG path for the jigsaw silhouette (in the piece's own viewBox space: 0..w, 0..h)
+  shapePath: string;
 };
 
 export type DragState = {
@@ -50,4 +54,11 @@ export type PuzzleState = {
   placedCount: number;
   totalCount: number;
   isComplete: boolean;
+};
+
+export type PieceEdges = {
+  top: EdgeType;
+  right: EdgeType;
+  bottom: EdgeType;
+  left: EdgeType;
 };

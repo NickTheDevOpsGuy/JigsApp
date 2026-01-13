@@ -3,8 +3,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
 
+import { PuzzlePiece } from "@/components/PuzzlePiece/PuzzlePiece";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { PieceId, PuzzleState } from "@/puzzle/types";
+import type { PuzzleState } from "@/puzzle/types";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 
@@ -20,8 +21,6 @@ export function PlayScreen() {
 
   const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
   const pieceSize = useMemo(() => ({ w: 72, h: 72 }), []);
-
-  const dragActiveIdRef = useRef<PieceId | null>(null);
 
   // Initialize manager once (only if we have an image)
   useEffect(() => {
@@ -47,7 +46,7 @@ export function PlayScreen() {
       {
         onPuzzleComplete: (s) => console.log("[Phuzzle] puzzle complete", s),
         onPiecePlaced: (p) => console.log("[Phuzzle] piece placed", p.id),
-      },
+      }
     );
 
     setState(managerRef.current.getState());
@@ -69,14 +68,12 @@ export function PlayScreen() {
     return () => ro.disconnect();
   }, []);
 
-  // Global pointer listeners (no window any, always installed once)
+  // Global pointer move/up while dragging
   useEffect(() => {
     function onMove(e: PointerEvent) {
       const mgr = managerRef.current;
       const board = boardRef.current;
       if (!mgr || !board) return;
-
-      if (!dragActiveIdRef.current) return;
 
       mgr.pointerMove(e.clientX, e.clientY, board.getBoundingClientRect());
       setState(mgr.getState());
@@ -86,22 +83,26 @@ export function PlayScreen() {
       const mgr = managerRef.current;
       if (!mgr) return;
 
-      if (!dragActiveIdRef.current) return;
-
       mgr.pointerUp();
-      dragActiveIdRef.current = null;
       setState(mgr.getState());
+
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
     }
 
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
+    window.__phuzzleAttachDragListeners = () => {
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+    };
+
     return () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
+      delete window.__phuzzleAttachDragListeners;
     };
   }, []);
 
-  // No image
+  // No image: friendly message
   if (!imgUrl) {
     return (
       <div className={styles.page}>
@@ -114,9 +115,7 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>
-            No image selected. Go back and upload one.
-          </section>
+          <section className={styles.board}>No image selected. Go back and upload one.</section>
         </main>
       </div>
     );
@@ -141,6 +140,7 @@ export function PlayScreen() {
     );
   }
 
+  // Assembled image size (defines the "big" image each piece samples from)
   const assembledW = state.grid.cols * pieceSize.w;
   const assembledH = state.grid.rows * pieceSize.h;
 
@@ -163,76 +163,50 @@ export function PlayScreen() {
 
       <main className={styles.main}>
         <section className={styles.board} ref={boardRef}>
-          {state.pieces.map((piece) => {
-            // Assumes targets start at (16,16) in PuzzleManager.
-            const bgX = piece.targetX - 16;
-            const bgY = piece.targetY - 16;
+          {state.pieces.map((piece) => (
+            <PuzzlePiece
+              key={piece.id}
+              piece={piece}
+              imageUrl={imgUrl}
+              assembledW={assembledW}
+              assembledH={assembledH}
+              onAnimationEnd={() => {
+                const mgr = managerRef.current;
+                if (!mgr) return;
+                mgr.clearJustSnapped(piece.id);
+                setState(mgr.getState());
+              }}
+              onPointerDown={(e) => {
+                const mgr = managerRef.current;
+                if (!mgr) return;
 
-            const innerClassName = piece.justSnapped
-              ? `${styles.piece} ${styles.snapped}`
-              : styles.piece;
-
-            return (
-              <div
-                key={piece.id}
-                className={styles.pieceWrap}
-                style={{
-                  left: piece.x,
-                  top: piece.y,
-                  width: piece.w,
-                  height: piece.h,
-                  zIndex: piece.z,
-                  transform: `rotate(${piece.rotation}deg)`,
-                }}
-                onPointerDown={(e) => {
-                  const mgr = managerRef.current;
-                  if (!mgr) return;
-
-                  const rect = (
-                    e.currentTarget as HTMLDivElement
-                  ).getBoundingClientRect();
-                  mgr.pointerDown(piece.id, e.clientX, e.clientY, rect);
-                  dragActiveIdRef.current = piece.id;
-                  setState(mgr.getState());
-                }}
-                onDoubleClick={() => {
-                  const mgr = managerRef.current;
-                  if (!mgr) return;
-                  mgr.rotatePiece(piece.id);
-                  setState(mgr.getState());
-                }}
-                onContextMenu={(e) => {
+                // Rotate on right click
+                if (e.button === 2) {
                   e.preventDefault();
-                  const mgr = managerRef.current;
-                  if (!mgr) return;
                   mgr.rotatePiece(piece.id);
                   setState(mgr.getState());
-                }}
-                onAnimationEnd={() => {
-                  const mgr = managerRef.current;
-                  if (!mgr) return;
-                  mgr.clearJustSnapped(piece.id);
-                  setState(mgr.getState());
-                }}
-                title={`${piece.id} rot=${piece.rotation}`}
-              >
-                <div
-                  className={innerClassName}
-                  style={{
-                    backgroundImage: `url(${imgUrl})`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundSize: `${assembledW}px ${assembledH}px`,
-                    backgroundPosition: `-${bgX}px -${bgY}px`,
-                  }}
-                />
-              </div>
-            );
-          })}
+                  return;
+                }
+
+                const pieceRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                mgr.pointerDown(piece.id, e.clientX, e.clientY, pieceRect);
+                setState(mgr.getState());
+
+                window.__phuzzleAttachDragListeners?.();
+              }}
+              onDoubleClick={() => {
+                const mgr = managerRef.current;
+                if (!mgr) return;
+                mgr.rotatePiece(piece.id);
+                setState(mgr.getState());
+              }}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          ))}
         </section>
 
         <section className={styles.tray}>
-          Tip: Double click or right click a piece to rotate. Snaps only when position and
-          rotation match.
+          Tip: Double click or right click a piece to rotate. Snaps only when position and rotation match.
         </section>
       </main>
     </div>

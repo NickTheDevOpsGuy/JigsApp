@@ -15,11 +15,11 @@ export type PuzzleManagerOptions = {
   scatterPadding?: number;
   snapTolerancePx?: number;
 
-  // 0.0 to 1.0, where pieces start vertically (ex: 0.3 means start below 30% height)
+  // where to start scattering pieces vertically (0..1 of board height)
   scatterStartYRatio?: number;
 
-  // rotation step in degrees (usually 90)
-  rotationStepDeg?: 90 | 180;
+  // rotation step (90 = classic)
+  rotationStepDeg?: number;
 };
 
 export type PuzzleManagerEvents = {
@@ -29,11 +29,6 @@ export type PuzzleManagerEvents = {
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(n, max));
-}
-
-function normalizeRotation(deg: number) {
-  const n = ((deg % 360) + 360) % 360;
-  return n;
 }
 
 export class PuzzleManager {
@@ -47,11 +42,7 @@ export class PuzzleManager {
   private snapTolerancePx: number;
 
   private scatterStartYRatio: number;
-  private rotationStepDeg: 90 | 180;
-
-  // NOTE: must match PlayScreen slice math (targets start at 16,16)
-  private targetStartX = 16;
-  private targetStartY = 16;
+  private rotationStepDeg: number;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {
@@ -140,9 +131,7 @@ export class PuzzleManager {
     this.zCounter += 1;
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, z: this.zCounter } : p,
-      ),
+      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, z: this.zCounter } : p)),
     };
   }
 
@@ -164,9 +153,7 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === activeId ? { ...p, x: nextX, y: nextY } : p,
-      ),
+      pieces: this.state.pieces.map((p) => (p.id === activeId ? { ...p, x: nextX, y: nextY } : p)),
     };
   }
 
@@ -174,26 +161,42 @@ export class PuzzleManager {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
-    // Try snap before clearing drag
-    this.trySnapActivePiece();
+    // Snap attempt must happen before clearing drag (snap uses drag.activeId)
+    const snapped = this.trySnapActivePiece();
 
+    // release drag
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
-    this.recomputeDerivedState();
+
+    // If we didn't snap, still recompute derived state
+    if (!snapped) {
+      this.recomputeDerivedState();
+    }
+  }
+
+  rotateActivePiece() {
+    const activeId = this.drag.activeId;
+    if (!activeId) return;
+
+    const piece = this.findPiece(activeId);
+    if (!piece || piece.isPlaced) return;
+
+    const next = (piece.rotation + this.rotationStepDeg) % 360;
+
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) => (p.id === piece.id ? { ...p, rotation: next } : p)),
+    };
   }
 
   rotatePiece(pieceId: PieceId) {
     const piece = this.findPiece(pieceId);
-    if (!piece) return;
-    if (piece.isPlaced) return;
+    if (!piece || piece.isPlaced) return;
 
-    const next = normalizeRotation(piece.rotation + this.rotationStepDeg);
+    const next = (piece.rotation + this.rotationStepDeg) % 360;
 
-    this.zCounter += 1;
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, rotation: next, z: this.zCounter } : p,
-      ),
+      pieces: this.state.pieces.map((p) => (p.id === piece.id ? { ...p, rotation: next } : p)),
     };
   }
 
@@ -205,9 +208,7 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, justSnapped: false } : p,
-      ),
+      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, justSnapped: false } : p)),
     };
   }
 
@@ -218,15 +219,15 @@ export class PuzzleManager {
     const piece = this.findPiece(activeId);
     if (!piece || piece.isPlaced) return false;
 
+    // Must match rotation too
+    const rotOk = ((piece.rotation % 360) + 360) % 360 === ((piece.targetRotation % 360) + 360) % 360;
+    if (!rotOk) return false;
+
     const dx = piece.x - piece.targetX;
     const dy = piece.y - piece.targetY;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    const rotOk =
-      normalizeRotation(piece.rotation) === normalizeRotation(piece.targetRotation);
-
     if (dist > this.snapTolerancePx) return false;
-    if (!rotOk) return false;
 
     const snapped: Piece = {
       ...piece,
@@ -276,52 +277,93 @@ export class PuzzleManager {
     const { grid, pieceWidth, pieceHeight, scatterPadding } = args;
 
     const total = grid.cols * grid.rows;
+
+    const targetStartX = 16;
+    const targetStartY = 16;
+
     const pieces: Piece[] = [];
+
+    const shapePath = this.buildShapePath(pieceWidth, pieceHeight);
 
     for (let i = 0; i < total; i++) {
       const col = i % grid.cols;
       const row = Math.floor(i / grid.cols);
 
-      const targetX = this.targetStartX + col * pieceWidth;
-      const targetY = this.targetStartY + row * pieceHeight;
+      const targetX = targetStartX + col * pieceWidth;
+      const targetY = targetStartY + row * pieceHeight;
 
       const scatterMinX = scatterPadding;
-      const scatterMaxX = Math.max(
-        scatterPadding,
-        this.boardWidth - pieceWidth - scatterPadding,
-      );
+      const scatterMaxX = Math.max(scatterPadding, this.boardWidth - pieceWidth - scatterPadding);
 
-      const scatterMinY = Math.max(
-        scatterPadding,
-        Math.floor(this.boardHeight * this.scatterStartYRatio),
-      );
-      const scatterMaxY = Math.max(
-        scatterMinY,
-        this.boardHeight - pieceHeight - scatterPadding,
-      );
+      const scatterMinY = Math.max(scatterPadding, Math.floor(this.boardHeight * this.scatterStartYRatio));
+      const scatterMaxY = Math.max(scatterMinY, this.boardHeight - pieceHeight - scatterPadding);
+
+      const x = this.rand(scatterMinX, scatterMaxX);
+      const y = this.rand(scatterMinY, scatterMaxY);
+
+      // rotation: start randomized; target is 0 for now (you can later randomize per-piece target)
+      const startRotation = this.rand(0, 360 / this.rotationStepDeg - 1) * this.rotationStepDeg;
 
       pieces.push({
         id: `p${i + 1}`,
-        x: this.rand(scatterMinX, scatterMaxX),
-        y: this.rand(scatterMinY, scatterMaxY),
+        x,
+        y,
         z: 1,
         w: pieceWidth,
         h: pieceHeight,
         targetX,
         targetY,
-        rotation:
-          this.rotationStepDeg === 180
-            ? Math.random() < 0.5
-              ? 0
-              : 180
-            : [0, 90, 180, 270][this.rand(0, 3)],
+        rotation: startRotation,
         targetRotation: 0,
         isPlaced: false,
         justSnapped: false,
+        shapePath,
       });
     }
 
     return pieces;
+  }
+
+  private buildShapePath(w: number, h: number) {
+    // MVP jigsaw-ish silhouette kept inside the piece bounds (no protrusions outside the SVG viewBox).
+    // Later you can vary tabs per-edge based on piece neighbors (top/bottom/left/right).
+    const k = Math.min(w, h) * 0.22; // tab size
+    const midX = w / 2;
+    const midY = h / 2;
+    const a = k * 0.55; // curve amount
+    const b = k * 0.35; // neck amount
+
+    return [
+      `M 0 ${k}`,
+      `Q 0 0 ${k} 0`,
+
+      `L ${midX - k} 0`,
+      `C ${midX - b} 0 ${midX - a} ${k * 0.35} ${midX} ${k * 0.35}`,
+      `C ${midX + a} ${k * 0.35} ${midX + b} 0 ${midX + k} 0`,
+      `L ${w - k} 0`,
+
+      `Q ${w} 0 ${w} ${k}`,
+
+      `L ${w} ${midY - k}`,
+      `C ${w} ${midY - b} ${w - k * 0.35} ${midY - a} ${w - k * 0.35} ${midY}`,
+      `C ${w - k * 0.35} ${midY + a} ${w} ${midY + b} ${w} ${midY + k}`,
+      `L ${w} ${h - k}`,
+
+      `Q ${w} ${h} ${w - k} ${h}`,
+
+      `L ${midX + k} ${h}`,
+      `C ${midX + b} ${h} ${midX + a} ${h - k * 0.35} ${midX} ${h - k * 0.35}`,
+      `C ${midX - a} ${h - k * 0.35} ${midX - b} ${h} ${midX - k} ${h}`,
+      `L ${k} ${h}`,
+
+      `Q 0 ${h} 0 ${h - k}`,
+
+      `L 0 ${midY + k}`,
+      `C 0 ${midY + b} ${k * 0.35} ${midY + a} ${k * 0.35} ${midY}`,
+      `C ${k * 0.35} ${midY - a} 0 ${midY - b} 0 ${midY - k}`,
+
+      `Z`,
+    ].join(" ");
   }
 
   private rand(min: number, max: number) {

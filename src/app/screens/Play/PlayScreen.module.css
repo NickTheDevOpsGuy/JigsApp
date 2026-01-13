@@ -61,54 +61,25 @@
   color: #103257;
 }
 
-/* Wrapper rotates, inner keeps the mask and background slice */
-.pieceWrap {
+/* Your draggable piece container (div) */
+.piece {
   position: absolute;
-  transform-origin: center;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
   touch-action: none;
   user-select: none;
   cursor: grab;
+
+  /* If you are using CSS clip-path for jigsaw silhouette, keep it SINGLE LINE */
+  clip-path: path("M10 18 C10 13.5817 13.5817 10 18 10 H126 C130.418 10 134 13.5817 134 18 V42 C134 46.4183 137.582 50 142 50 C146.418 50 150 46.4183 150 42 V18 C150 13.5817 153.582 10 158 10 H266 C270.418 10 274 13.5817 274 18 V126 C274 130.418 270.418 134 266 134 H242 C237.582 134 234 137.582 234 142 C234 146.418 237.582 150 242 150 H266 C270.418 150 274 153.582 274 158 V266 C274 270.418 270.418 274 266 274 H158 C153.582 274 150 270.418 150 266 V242 C150 237.582 146.418 234 142 234 C137.582 234 134 237.582 134 242 V266 C134 270.418 130.418 274 126 274 H18 C13.5817 274 10 270.418 10 266 V158 C10 153.582 13.5817 150 18 150 H42 C46.4183 150 50 146.418 50 142 C50 137.582 46.4183 134 42 134 H18 C13.5817 134 10 130.418 10 126 V18 Z");
 }
 
-.pieceWrap:active {
+.piece:active {
   cursor: grabbing;
 }
 
-/* Inner actual visible piece */
-.piece {
-  width: 100%;
-  height: 100%;
-  background-color: #2d7cff;
-  border: 1px solid rgba(0, 0, 0, 0.18);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
-
-  /* Jigsaw shape using clip-path */
-  clip-path: path(
-    "M10 18
-     C10 14 14 10 18 10
-     L34 10
-     C35 16 41 20 50 20
-     C59 20 65 16 66 10
-     L82 10
-     C86 10 90 14 90 18
-     L90 34
-     C84 35 80 41 80 50
-     C80 59 84 65 90 66
-     L90 82
-     C90 86 86 90 82 90
-     L66 90
-     C65 84 59 80 50 80
-     C41 80 35 84 34 90
-     L18 90
-     C14 90 10 86 10 82
-     L10 66
-     C16 65 20 59 20 50
-     C20 41 16 35 10 34
-     Z"
-  );
-}
-
-/* Tiny snap cue */
+/* Snap visual cue */
 .snapped {
   animation: snapPop 140ms ease-out;
 }
@@ -116,14 +87,11 @@
 @keyframes snapPop {
   0% {
     transform: scale(1);
-    filter: brightness(1);
   }
-  50% {
-    transform: scale(1.05);
-    filter: brightness(1.08);
+  60% {
+    transform: scale(1.04);
   }
   100% {
     transform: scale(1);
-    filter: brightness(1);
   }
 }
