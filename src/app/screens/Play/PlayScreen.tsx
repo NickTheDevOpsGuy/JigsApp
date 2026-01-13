@@ -4,15 +4,10 @@ import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
 
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { PuzzleState } from "@/puzzle/types";
+import type { PuzzleState, PieceId } from "@/puzzle/types";
+import { PuzzlePiece } from "@/components/PuzzlePiece/PuzzlePiece";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
-
-declare global {
-  interface Window {
-    __phuzzleAttachDragListeners?: () => void;
-  }
-}
 
 export function PlayScreen() {
   const nav = useNavigate();
@@ -25,7 +20,10 @@ export function PlayScreen() {
   const [state, setState] = useState<PuzzleState | null>(null);
 
   const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
-  const pieceSize = useMemo(() => ({ w: 72, h: 72 }), []);
+  const tileSize = useMemo(() => ({ w: 72, h: 72 }), []);
+
+  // Drag listener attach function
+  const attachDragListenersRef = useRef<(() => void) | null>(null);
 
   // Initialize manager once (only if we have an image)
   useEffect(() => {
@@ -41,8 +39,8 @@ export function PlayScreen() {
         boardWidth: initialBoardWidth,
         boardHeight: initialBoardHeight,
         grid,
-        pieceWidth: pieceSize.w,
-        pieceHeight: pieceSize.h,
+        tileWidth: tileSize.w,
+        tileHeight: tileSize.h,
         scatterPadding: 16,
         snapTolerancePx: 18,
         scatterStartYRatio: 0.3,
@@ -50,11 +48,11 @@ export function PlayScreen() {
       {
         onPuzzleComplete: (s) => console.log("[Phuzzle] puzzle complete", s),
         onPiecePlaced: (p) => console.log("[Phuzzle] piece placed", p.id),
-      },
+      }
     );
 
     setState(managerRef.current.getState());
-  }, [grid, imgUrl, pieceSize.w, pieceSize.h]);
+  }, [grid, imgUrl, tileSize.w, tileSize.h]);
 
   // Measure board and set board size on manager
   useEffect(() => {
@@ -94,8 +92,7 @@ export function PlayScreen() {
       window.removeEventListener("pointerup", onUp);
     }
 
-    // ✅ No `any`, typed property on Window
-    window.__phuzzleAttachDragListeners = () => {
+    attachDragListenersRef.current = () => {
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
     };
@@ -103,7 +100,7 @@ export function PlayScreen() {
     return () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
-      delete window.__phuzzleAttachDragListeners;
+      attachDragListenersRef.current = null;
     };
   }, []);
 
@@ -147,9 +144,30 @@ export function PlayScreen() {
     );
   }
 
-  // Assembled image size (defines the "big" image each piece samples from)
-  const assembledW = state.grid.cols * pieceSize.w;
-  const assembledH = state.grid.rows * pieceSize.h;
+  const assembledW = state.grid.cols * tileSize.w;
+  const assembledH = state.grid.rows * tileSize.h;
+
+  function handlePiecePointerDown(pieceId: PieceId) {
+    return (e: React.PointerEvent<HTMLDivElement>) => {
+      const mgr = managerRef.current;
+      if (!mgr) return;
+
+      const pieceRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+      mgr.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
+      setState(mgr.getState());
+
+      attachDragListenersRef.current?.();
+    };
+  }
+
+  function handlePieceAnimationEnd(pieceId: PieceId) {
+    return () => {
+      const mgr = managerRef.current;
+      if (!mgr) return;
+      mgr.clearJustSnapped(pieceId);
+      setState(mgr.getState());
+    };
+  }
 
   return (
     <div className={styles.page}>
@@ -170,52 +188,17 @@ export function PlayScreen() {
 
       <main className={styles.main}>
         <section className={styles.board} ref={boardRef}>
-          {state.pieces.map((piece) => {
-            const bgX = piece.targetX - 16;
-            const bgY = piece.targetY - 16;
-
-            const className = piece.justSnapped
-              ? `${styles.piece} ${styles.snapped}`
-              : styles.piece;
-
-            return (
-              <div
-                key={piece.id}
-                className={className}
-                style={{
-                  left: piece.x,
-                  top: piece.y,
-                  width: piece.w,
-                  height: piece.h,
-                  zIndex: piece.z,
-                  backgroundImage: `url(${imgUrl})`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundSize: `${assembledW}px ${assembledH}px`,
-                  backgroundPosition: `-${bgX}px -${bgY}px`,
-                }}
-                onAnimationEnd={() => {
-                  const mgr = managerRef.current;
-                  if (!mgr) return;
-
-                  mgr.clearJustSnapped(piece.id);
-                  setState(mgr.getState());
-                }}
-                onPointerDown={(e) => {
-                  const mgr = managerRef.current;
-                  if (!mgr) return;
-
-                  const pieceRect = (
-                    e.currentTarget as HTMLDivElement
-                  ).getBoundingClientRect();
-                  mgr.pointerDown(piece.id, e.clientX, e.clientY, pieceRect);
-                  setState(mgr.getState());
-
-                  window.__phuzzleAttachDragListeners?.();
-                }}
-                title={piece.id}
-              />
-            );
-          })}
+          {state.pieces.map((piece) => (
+            <PuzzlePiece
+              key={piece.id}
+              piece={piece}
+              imageUrl={imgUrl}
+              assembledW={assembledW}
+              assembledH={assembledH}
+              onPointerDown={handlePiecePointerDown(piece.id)}
+              onAnimationEnd={handlePieceAnimationEnd(piece.id)}
+            />
+          ))}
         </section>
 
         <section className={styles.tray}>Piece tray placeholder</section>

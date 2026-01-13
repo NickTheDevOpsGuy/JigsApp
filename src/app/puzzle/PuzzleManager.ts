@@ -1,18 +1,30 @@
 // src/app/puzzle/PuzzleManager.ts
-
-import type { DragState, GridSize, Piece, PieceId, PuzzleState } from "./types";
+import type {
+  DragState,
+  EdgeType,
+  GridSize,
+  Piece,
+  PieceEdges,
+  PieceId,
+  PuzzleState,
+} from "./types";
+import { buildPiecePath } from "./shape";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
   boardWidth: number;
   boardHeight: number;
+
   grid: GridSize;
-  pieceWidth: number;
-  pieceHeight: number;
+
+  // Base tile size (not including tabs)
+  tileWidth: number;
+  tileHeight: number;
+
   scatterPadding?: number;
   snapTolerancePx?: number;
 
-  // Optional: where scatter starts as ratio of board height (0.0 top → 1.0 bottom)
+  // Where pieces should start vertically (0..1). 0.3 means above mid, 0.6 means lower.
   scatterStartYRatio?: number;
 };
 
@@ -25,6 +37,16 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(n, max));
 }
 
+function invertEdge(edge: EdgeType): EdgeType {
+  if (edge === "tab") return "blank";
+  if (edge === "blank") return "tab";
+  return "flat";
+}
+
+function randomTabBlank(): EdgeType {
+  return Math.random() < 0.5 ? "tab" : "blank";
+}
+
 export class PuzzleManager {
   private state: PuzzleState;
   private drag: DragState;
@@ -34,8 +56,6 @@ export class PuzzleManager {
   private boardWidth: number;
   private boardHeight: number;
   private snapTolerancePx: number;
-
-  // Scatter tuning
   private scatterStartYRatio: number;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
@@ -44,8 +64,8 @@ export class PuzzleManager {
       boardWidth,
       boardHeight,
       grid,
-      pieceWidth,
-      pieceHeight,
+      tileWidth,
+      tileHeight,
       scatterPadding = 16,
       snapTolerancePx = 18,
       scatterStartYRatio = 0.3,
@@ -55,7 +75,6 @@ export class PuzzleManager {
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
     this.snapTolerancePx = snapTolerancePx;
-
     this.scatterStartYRatio = scatterStartYRatio;
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
@@ -63,8 +82,8 @@ export class PuzzleManager {
 
     const pieces = this.createPieces({
       grid,
-      pieceWidth,
-      pieceHeight,
+      tileWidth,
+      tileHeight,
       scatterPadding,
     });
 
@@ -108,6 +127,15 @@ export class PuzzleManager {
     this.recomputeDerivedState();
   }
 
+  clearJustSnapped(pieceId: PieceId) {
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, justSnapped: false } : p
+      ),
+    };
+  }
+
   pointerDown(pieceId: PieceId, pointerX: number, pointerY: number, pieceRect: DOMRect) {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
@@ -124,7 +152,7 @@ export class PuzzleManager {
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, z: this.zCounter } : p,
+        p.id === pieceId ? { ...p, z: this.zCounter } : p
       ),
     };
   }
@@ -148,7 +176,7 @@ export class PuzzleManager {
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.id === activeId ? { ...p, x: nextX, y: nextY } : p,
+        p.id === activeId ? { ...p, x: nextX, y: nextY } : p
       ),
     };
   }
@@ -157,32 +185,15 @@ export class PuzzleManager {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
-    // Attempt snap BEFORE clearing drag (trySnapActivePiece reads drag.activeId)
+    // Try snapping before clearing drag
     const snapped = this.trySnapActivePiece();
 
     // Always release drag
     this.drag = { activeId: null, offsetX: 0, offsetY: 0 };
 
-    // If we didn't snap, still recompute derived state
-    // (trySnapActivePiece already recomputes when it snaps)
     if (!snapped) {
       this.recomputeDerivedState();
     }
-  }
-
-  // Called by UI after the snap-pop animation ends
-  clearJustSnapped(pieceId: PieceId) {
-    const piece = this.findPiece(pieceId);
-    if (!piece) return;
-
-    if (!piece.justSnapped) return;
-
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, justSnapped: false } : p,
-      ),
-    };
   }
 
   trySnapActivePiece(): boolean {
@@ -203,8 +214,6 @@ export class PuzzleManager {
       x: piece.targetX,
       y: piece.targetY,
       isPlaced: true,
-
-      // Visual cue trigger
       justSnapped: true,
     };
 
@@ -239,42 +248,93 @@ export class PuzzleManager {
     return this.state.pieces.find((p) => p.id === id) ?? null;
   }
 
+  private createEdges(grid: GridSize): PieceEdges[][] {
+    const edges: PieceEdges[][] = Array.from({ length: grid.rows }, () =>
+      Array.from({ length: grid.cols }, () => ({
+        top: "flat" as EdgeType,
+        right: "flat" as EdgeType,
+        bottom: "flat" as EdgeType,
+        left: "flat" as EdgeType,
+      }))
+    );
+
+    for (let r = 0; r < grid.rows; r++) {
+      for (let c = 0; c < grid.cols; c++) {
+        const e = edges[r][c];
+
+        // Top
+        if (r === 0) e.top = "flat";
+        else e.top = invertEdge(edges[r - 1][c].bottom);
+
+        // Left
+        if (c === 0) e.left = "flat";
+        else e.left = invertEdge(edges[r][c - 1].right);
+
+        // Right
+        if (c === grid.cols - 1) e.right = "flat";
+        else e.right = randomTabBlank();
+
+        // Bottom
+        if (r === grid.rows - 1) e.bottom = "flat";
+        else e.bottom = randomTabBlank();
+      }
+    }
+
+    return edges;
+  }
+
   private createPieces(args: {
     grid: GridSize;
-    pieceWidth: number;
-    pieceHeight: number;
+    tileWidth: number;
+    tileHeight: number;
     scatterPadding: number;
   }): Piece[] {
-    const { grid, pieceWidth, pieceHeight, scatterPadding } = args;
+    const { grid, tileWidth, tileHeight, scatterPadding } = args;
 
-    const total = grid.cols * grid.rows;
+    const edgesGrid = this.createEdges(grid);
 
-    // Targets start at (16,16) for now (matches your slice math in PlayScreen)
+    // Pad lets tabs extend outside the tile
+    const pad = Math.round(Math.min(tileWidth, tileHeight) * 0.22);
+    const pieceW = tileWidth + pad * 2;
+    const pieceH = tileHeight + pad * 2;
+
+    // Targets start at 16,16 like your current system
     const targetStartX = 16;
     const targetStartY = 16;
 
+    const total = grid.cols * grid.rows;
     const pieces: Piece[] = [];
 
     for (let i = 0; i < total; i++) {
       const col = i % grid.cols;
       const row = Math.floor(i / grid.cols);
 
-      const targetX = targetStartX + col * pieceWidth;
-      const targetY = targetStartY + row * pieceHeight;
+      const edges = edgesGrid[row][col];
+      const shapePath = buildPiecePath({
+        tileW: tileWidth,
+        tileH: tileHeight,
+        pad,
+        edges,
+      });
 
+      // target position for the piece container
+      const targetX = targetStartX + col * tileWidth;
+      const targetY = targetStartY + row * tileHeight;
+
+      // Scatter region
       const scatterMinX = scatterPadding;
       const scatterMaxX = Math.max(
         scatterPadding,
-        this.boardWidth - pieceWidth - scatterPadding,
+        this.boardWidth - pieceW - scatterPadding
       );
 
       const scatterMinY = Math.max(
         scatterPadding,
-        Math.floor(this.boardHeight * this.scatterStartYRatio),
+        Math.floor(this.boardHeight * this.scatterStartYRatio)
       );
       const scatterMaxY = Math.max(
         scatterMinY,
-        this.boardHeight - pieceHeight - scatterPadding,
+        this.boardHeight - pieceH - scatterPadding
       );
 
       const x = this.rand(scatterMinX, scatterMaxX);
@@ -285,11 +345,18 @@ export class PuzzleManager {
         x,
         y,
         z: 1,
-        w: pieceWidth,
-        h: pieceHeight,
+        w: pieceW,
+        h: pieceH,
         targetX,
         targetY,
         isPlaced: false,
+        row,
+        col,
+        tileW: tileWidth,
+        tileH: tileHeight,
+        pad,
+        edges,
+        shapePath,
         justSnapped: false,
       });
     }

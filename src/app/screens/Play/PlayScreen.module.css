@@ -1,3 +1,5 @@
+/* src/app/screens/Play/PlayScreen.module.css */
+
 .page {
   min-height: 100vh;
   background: #f3f7ff;
@@ -59,38 +61,4 @@
   display: grid;
   place-items: center;
   color: #103257;
-}
-
-.piece {
-  position: absolute;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.18);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
-  touch-action: none;
-  user-select: none;
-  cursor: grab;
-
-  /* Helps the snap-pop feel crisp */
-  will-change: transform;
-}
-
-.piece:active {
-  cursor: grabbing;
-}
-
-/* Tiny snap cue */
-.snapped {
-  animation: snap-pop 120ms ease-out;
-}
-
-@keyframes snap-pop {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
 }
