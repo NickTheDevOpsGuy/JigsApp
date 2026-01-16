@@ -16,7 +16,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 ## Table of Contents
 
 - [Preview](#preview)
-- [About Phuzzle](#about-jiggysaw)
+- [About Phuzzle](#about-phuzzle)
 - [User Stories](#user-stories)
 - [Testing](#testing)
 - [Wireframes / Mockups](#wireframes--mockups)
@@ -28,7 +28,8 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [Collaborators](#collaborators)
-- [Built by the Phuzzle Community](#built-by-the-jiggysaw-community)
+- [License](#license)
+- [Built by the Phuzzle Community](#built-by-the-phuzzle-community)
 
 ---
 
@@ -136,13 +137,13 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ---
 
-| Category | Technologies / Tools     |
-| -------- | ------------------------ |
-| Engine   | Unity 2022+              |
-| Scripts  | C# MonoBehaviours        |
-| Art      | Unity Sprites            |
-| Input    | Unity Input System       |
-| Tooling  | GitHub Actions (planned) |
+| Category  | Technologies / Tools |
+| --------- | -------------------- |
+| Framework | React                |
+| Build     | Vite                 |
+| Language  | TypeScript           |
+| Styling   | CSS Modules          |
+| Tooling   | GitHub Actions       |
 
 ---
 
@@ -153,7 +154,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 1. Clone:
 
 ```bash
-git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
+git clone https://github.com/NickTheDevOpsGuy/phuzzle.git
 ```
 
 3. Run
@@ -289,3 +290,9 @@ Meet all our amazing contributors here:
 
 Phuzzle is an open-source project maintained by [CONTRIBUTORS.md](./CONTRIBUTORS.md) around the world.  
 Thanks to everyone helping make this cozy puzzle experience even better.
+
+---
+
+## License
+
+MIT License. See [LICENSE.md](./LICENSE.md) for details.
