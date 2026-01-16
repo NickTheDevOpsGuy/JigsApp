@@ -1,4 +1,11 @@
-import type { DragState, GridSize, Piece, PieceEdges, PieceId, PuzzleState } from "./types";
+import type {
+  DragState,
+  GridSize,
+  Piece,
+  PieceEdges,
+  PieceId,
+  PuzzleState,
+} from "./types";
 import { buildPiecePath } from "./shape";
 
 export type PuzzleManagerOptions = {
@@ -158,7 +165,9 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.groupId === gid ? { ...p, z: this.zCounter } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.groupId === gid ? { ...p, z: this.zCounter } : p,
+      ),
     };
   }
 
@@ -235,7 +244,9 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, rotation: next } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, rotation: next } : p,
+      ),
     };
 
     this.recomputeDerivedState();
@@ -248,7 +259,9 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, justSnapped: false } : p)),
+      pieces: this.state.pieces.map((p) =>
+        p.id === pieceId ? { ...p, justSnapped: false } : p,
+      ),
     };
   }
 
@@ -339,7 +352,8 @@ export class PuzzleManager {
 
       const d = Math.hypot(moveDx, moveDy);
       if (d <= this.snapTolerancePx) {
-        if (!best || d < best.dist) best = { neighbor: n, dx: moveDx, dy: moveDy, dist: d };
+        if (!best || d < best.dist)
+          best = { neighbor: n, dx: moveDx, dy: moveDy, dist: d };
       }
     }
 
@@ -502,7 +516,8 @@ export class PuzzleManager {
   private buildEdgesForGrid(grid: GridSize): PieceEdges[] {
     const edges: PieceEdges[] = [];
 
-    const randomTabOrBlank = (): "tab" | "blank" => (Math.random() < 0.5 ? "tab" : "blank");
+    const randomTabOrBlank = (): "tab" | "blank" =>
+      Math.random() < 0.5 ? "tab" : "blank";
     const opposite = (e: PieceEdges["top"]): PieceEdges["top"] => {
       if (e === "flat") return "flat";
       return e === "tab" ? "blank" : "tab";
@@ -516,8 +531,10 @@ export class PuzzleManager {
         const left: PieceEdges["left"] =
           c === 0 ? "flat" : opposite(edges[r * grid.cols + (c - 1)].right);
 
-        const right: PieceEdges["right"] = c === grid.cols - 1 ? "flat" : randomTabOrBlank();
-        const bottom: PieceEdges["bottom"] = r === grid.rows - 1 ? "flat" : randomTabOrBlank();
+        const right: PieceEdges["right"] =
+          c === grid.cols - 1 ? "flat" : randomTabOrBlank();
+        const bottom: PieceEdges["bottom"] =
+          r === grid.rows - 1 ? "flat" : randomTabOrBlank();
 
         edges.push({ top, right, bottom, left });
       }

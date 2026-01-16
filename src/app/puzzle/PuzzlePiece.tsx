@@ -66,7 +66,12 @@ export function PuzzlePiece({
       title={piece.id}
     >
       <div className={styles.inner}>
-        <svg className={styles.svg} width={piece.w} height={piece.h} viewBox={`0 0 ${piece.w} ${piece.h}`}>
+        <svg
+          className={styles.svg}
+          width={piece.w}
+          height={piece.h}
+          viewBox={`0 0 ${piece.w} ${piece.h}`}
+        >
           <defs>
             <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
               <path d={piece.shapePath} />
