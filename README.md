@@ -289,3 +289,7 @@ Meet all our amazing contributors here:
 
 Phuzzle is an open-source project maintained by [CONTRIBUTORS.md](./CONTRIBUTORS.md) around the world.  
 Thanks to everyone helping make this cozy puzzle experience even better.
+
+---
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
