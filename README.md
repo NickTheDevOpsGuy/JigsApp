@@ -28,6 +28,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [Collaborators](#collaborators)
+- [License](#license)
 - [Built by the Phuzzle Community](#built-by-the-phuzzle-community)
 
 ---
@@ -153,7 +154,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 1. Clone:
 
 ```bash
-git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
+git clone https://github.com/NickTheDevOpsGuy/phuzzle.git
 ```
 
 3. Run
@@ -292,4 +293,6 @@ Thanks to everyone helping make this cozy puzzle experience even better.
 
 ---
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+## License
+
+MIT License. See [LICENSE.md](./LICENSE.md) for details.
