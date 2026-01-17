@@ -195,18 +195,20 @@ npm run dev
 │       │   └── ui
 │       │       └── phuzzle-logo-512.png
 │       ├── components
-│       │   ├── PuzzlePiece
-│       │   │   ├── PuzzlePiece.module.css
-│       │   │   └── PuzzlePiece.tsx
-│       │   ├── Button.module.css
-│       │   ├── Button.tsx
-│       │   ├── Dropdown.module.css
-│       │   ├── Dropdown.tsx
-│       │   └── Modal.tsx
+│       │   ├── Button
+│       │   │   ├── Button.module.css
+│       │   │   └── Button.tsx
+│       │   ├── DropDown
+│       │   │   ├── Dropdown.module.css
+│       │   │   └── Dropdown.tsx
+│       │   └── Modal
+│       │       ├── Modal.module.css
+│       │       └── Modal.tsx
 │       ├── puzzle
+│       │   ├── canvas
+│       │   │   ├── pickPiece.ts
+│       │   │   └── renderBoard.ts
 │       │   ├── PuzzleManager.ts
-│       │   ├── PuzzlePiece.module.css
-│       │   ├── PuzzlePiece.tsx
 │       │   ├── shape.ts
 │       │   ├── SnapLogic.ts
 │       │   └── types.ts

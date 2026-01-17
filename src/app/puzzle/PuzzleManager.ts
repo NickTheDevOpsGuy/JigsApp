@@ -1,3 +1,4 @@
+// src/app/puzzle/PuzzleManager.ts
 import type {
   DragState,
   GridSize,
@@ -24,7 +25,7 @@ export type PuzzleManagerOptions = {
   scatterPadding?: number;
   scatterStartYRatio?: number;
 
-  // overall snapping distance
+  // overall snapping distance (pixels)
   snapTolerancePx?: number;
 
   // rotation step size
@@ -57,12 +58,6 @@ export class PuzzleManager {
   private tileW: number;
   private tileH: number;
 
-  /**
-   * We assemble the solved puzzle starting at (0,0) in board space.
-   * That means tile targets are:
-   *   targetX = col * tileW
-   *   targetY = row * tileH
-   */
   private readonly targetStartX = 0;
   private readonly targetStartY = 0;
 
@@ -150,7 +145,7 @@ export class PuzzleManager {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
 
-    // Lock the whole group if any piece is placed
+    // lock the whole group if any piece is placed
     if (this.groupIsPlaced(piece.groupId)) return;
 
     this.drag = {
@@ -159,7 +154,7 @@ export class PuzzleManager {
       offsetY: pointerY - pieceRect.top,
     };
 
-    // Bring entire group to front
+    // bring entire group to front
     this.zCounter += 1;
     const gid = piece.groupId;
 
@@ -178,7 +173,7 @@ export class PuzzleManager {
     const active = this.findPiece(activeId);
     if (!active) return;
 
-    // Never move placed groups
+    // never move placed groups
     if (this.groupIsPlaced(active.groupId)) return;
 
     const rawX = pointerX - boardRect.left - this.drag.offsetX;
@@ -190,34 +185,29 @@ export class PuzzleManager {
     const nextX = clamp(rawX, 0, maxX);
     const nextY = clamp(rawY, 0, maxY);
 
-    const dx = nextX - active.x;
-    const dy = nextY - active.y;
+    let dx = nextX - active.x;
+    let dy = nextY - active.y;
 
     if (dx === 0 && dy === 0) return;
 
-    /**
-     * OPTION A (classic jigsaw):
-     * - groups act like solid cardboard
-     * - BUT: allow pulling out of existing overlaps
-     * - block only moves that create NEW overlaps
-     *
-     * This fixes "I can't drag at all" when pieces start overlapped.
-     */
-    if (this.wouldCreateNewOverlaps(active.groupId, dx, dy)) return;
-
-    // Move whole group by delta
     const gid = active.groupId;
+
+    // clamp as a group so the cluster stays rigid near edges
+    ({ dx, dy } = this.clampGroupDelta(gid, dx, dy));
+    if (dx === 0 && dy === 0) return;
+
+    // OPTION A: solid cardboard.
+    // If the full move is blocked, try:
+    // 1) axis slide
+    // 2) smaller step fractions (reduces "stuck" feeling)
+    const attempt = this.findAllowedDelta(gid, dx, dy);
+    if (!attempt) return;
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => {
-        if (p.groupId !== gid) return p;
-
-        const nx = clamp(p.x + dx, 0, Math.max(0, this.boardWidth - p.w));
-        const ny = clamp(p.y + dy, 0, Math.max(0, this.boardHeight - p.h));
-
-        return { ...p, x: nx, y: ny };
-      }),
+      pieces: this.state.pieces.map((p) =>
+        p.groupId === gid ? { ...p, x: p.x + attempt.dx, y: p.y + attempt.dy } : p,
+      ),
     };
   }
 
@@ -267,13 +257,6 @@ export class PuzzleManager {
 
   // ---------- Snapping ----------
 
-  /**
-   * Snap the active group into its solved board location.
-   *
-   * Pad-aware alignment:
-   *   tileTopLeft = (x + pad, y + pad)
-   *   target tileTopLeft = (targetX, targetY)
-   */
   private trySnapActiveGroupToBoard(): boolean {
     const activeId = this.drag.activeId;
     if (!activeId) return false;
@@ -283,7 +266,6 @@ export class PuzzleManager {
 
     const gid = active.groupId;
 
-    // Require correct rotation
     if (active.rotation !== active.targetRotation) return false;
 
     const activeTileX = active.x + active.pad;
@@ -294,16 +276,14 @@ export class PuzzleManager {
 
     if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
 
-    // Reject snap if it would create NEW overlaps
-    if (this.wouldCreateNewOverlaps(gid, dx, dy)) return false;
+    // do not allow snapping into overlap
+    if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
 
     this.shiftGroup(gid, dx, dy);
 
-    // If all pieces in group have correct rotation, lock them
     const groupPieces = this.getGroupPieces(gid);
     const allRotOk = groupPieces.every((p) => p.rotation === p.targetRotation);
-
-    if (!allRotOk) return true; // snapped, but not locked
+    if (!allRotOk) return true;
 
     this.state = {
       ...this.state,
@@ -316,10 +296,6 @@ export class PuzzleManager {
     return true;
   }
 
-  /**
-   * Snap the active group to one of its solved neighbors (up/down/left/right).
-   * When snapped, merge groups so they move together as a cluster.
-   */
   private trySnapActiveGroupToNeighbor(): boolean {
     const activeId = this.drag.activeId;
     if (!activeId) return false;
@@ -359,15 +335,13 @@ export class PuzzleManager {
 
     if (!best) return false;
 
-    // Reject snap if it would create NEW overlaps
-    if (this.wouldCreateNewOverlaps(gid, best.dx, best.dy)) return false;
+    if (this.wouldOverlapAnyOtherGroup(gid, best.dx, best.dy)) return false;
 
     this.shiftGroup(gid, best.dx, best.dy);
 
     const neighborGroup = best.neighbor.groupId;
     this.mergeGroups(gid, neighborGroup);
 
-    // Pop animation on merged cluster
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
@@ -378,50 +352,109 @@ export class PuzzleManager {
     return true;
   }
 
-  // ---------- Option A solid cluster collision (but allow pulling apart) ----------
+  // ---------- Option A collision ----------
 
   /**
-   * Returns which OTHER groupIds this group overlaps if moved by (dx,dy).
+   * Block moves that increase total overlap area.
+   * Allow moves that reduce overlap so you can pull pieces apart.
    */
-  private getOverlapsForGroup(groupId: string, dx: number, dy: number): Set<string> {
+  private wouldOverlapAnyOtherGroup(groupId: string, dx: number, dy: number): boolean {
     const moving = this.getGroupPieces(groupId);
-    const overlappedGroups = new Set<string>();
 
-    for (const m of moving) {
-      const ax1 = m.x + dx;
-      const ay1 = m.y + dy;
-      const ax2 = ax1 + m.w;
-      const ay2 = ay1 + m.h;
+    const overlapArea = (ddx: number, ddy: number) => {
+      let total = 0;
 
-      for (const p of this.state.pieces) {
-        if (p.groupId === groupId) continue;
+      for (const m of moving) {
+        const ax1 = m.x + ddx;
+        const ay1 = m.y + ddy;
+        const ax2 = ax1 + m.w;
+        const ay2 = ay1 + m.h;
 
-        const bx1 = p.x;
-        const by1 = p.y;
-        const bx2 = p.x + p.w;
-        const by2 = p.y + p.h;
+        for (const p of this.state.pieces) {
+          if (p.groupId === groupId) continue;
 
-        const overlap = ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
-        if (overlap) overlappedGroups.add(p.groupId);
+          const bx1 = p.x;
+          const by1 = p.y;
+          const bx2 = p.x + p.w;
+          const by2 = p.y + p.h;
+
+          const ix = Math.min(ax2, bx2) - Math.max(ax1, bx1);
+          const iy = Math.min(ay2, by2) - Math.max(ay1, by1);
+
+          if (ix > 0 && iy > 0) total += ix * iy;
+        }
       }
-    }
 
-    return overlappedGroups;
+      return total;
+    };
+
+    const before = overlapArea(0, 0);
+    const after = overlapArea(dx, dy);
+
+    // small epsilon reduces jitter when grazing
+    return after > before + 0.5;
   }
 
   /**
-   * Blocks movement ONLY if it would create a NEW overlap that didn't exist before.
-   * This allows pulling pieces out of an existing overlap.
+   * Find an allowed movement delta.
+   * Tries:
+   * - full move
+   * - axis slide
+   * - fractional steps (reduces "sticky" feel)
    */
-  private wouldCreateNewOverlaps(groupId: string, dx: number, dy: number): boolean {
-    const current = this.getOverlapsForGroup(groupId, 0, 0);
-    const next = this.getOverlapsForGroup(groupId, dx, dy);
+  private findAllowedDelta(
+    groupId: string,
+    dx: number,
+    dy: number,
+  ): { dx: number; dy: number } | null {
+    // full
+    if (!this.wouldOverlapAnyOtherGroup(groupId, dx, dy)) return { dx, dy };
 
-    for (const gid of next) {
-      if (!current.has(gid)) return true;
+    // axis slide
+    if (!this.wouldOverlapAnyOtherGroup(groupId, dx, 0)) return { dx, dy: 0 };
+    if (!this.wouldOverlapAnyOtherGroup(groupId, 0, dy)) return { dx: 0, dy };
+
+    // fractional steps
+    const fractions = [0.75, 0.5, 0.35, 0.25, 0.15];
+    for (const f of fractions) {
+      const ndx = dx * f;
+      const ndy = dy * f;
+
+      // avoid micro jitter
+      if (Math.abs(ndx) < 0.3 && Math.abs(ndy) < 0.3) continue;
+
+      if (!this.wouldOverlapAnyOtherGroup(groupId, ndx, ndy)) return { dx: ndx, dy: ndy };
+      if (!this.wouldOverlapAnyOtherGroup(groupId, ndx, 0)) return { dx: ndx, dy: 0 };
+      if (!this.wouldOverlapAnyOtherGroup(groupId, 0, ndy)) return { dx: 0, dy: ndy };
     }
 
-    return false;
+    return null;
+  }
+
+  private clampGroupDelta(groupId: string, dx: number, dy: number) {
+    const pieces = this.getGroupPieces(groupId);
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const p of pieces) {
+      minX = Math.min(minX, p.x);
+      minY = Math.min(minY, p.y);
+      maxX = Math.max(maxX, p.x + p.w);
+      maxY = Math.max(maxY, p.y + p.h);
+    }
+
+    const dxMin = 0 - minX;
+    const dxMax = this.boardWidth - maxX;
+    const dyMin = 0 - minY;
+    const dyMax = this.boardHeight - maxY;
+
+    return {
+      dx: clamp(dx, dxMin, dxMax),
+      dy: clamp(dy, dyMin, dyMax),
+    };
   }
 
   // ---------- Group utilities ----------
@@ -435,15 +468,14 @@ export class PuzzleManager {
   }
 
   private shiftGroup(groupId: string, dx: number, dy: number) {
+    ({ dx, dy } = this.clampGroupDelta(groupId, dx, dy));
+    if (dx === 0 && dy === 0) return;
+
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => {
-        if (p.groupId !== groupId) return p;
-
-        const nx = clamp(p.x + dx, 0, Math.max(0, this.boardWidth - p.w));
-        const ny = clamp(p.y + dy, 0, Math.max(0, this.boardHeight - p.h));
-        return { ...p, x: nx, y: ny };
-      }),
+      pieces: this.state.pieces.map((p) =>
+        p.groupId === groupId ? { ...p, x: p.x + dx, y: p.y + dy } : p,
+      ),
     };
   }
 
@@ -564,7 +596,6 @@ export class PuzzleManager {
       const targetX = this.targetStartX + col * tileW;
       const targetY = this.targetStartY + row * tileH;
 
-      // Container includes pad
       const w = tileW + pad * 2;
       const h = tileH + pad * 2;
 
