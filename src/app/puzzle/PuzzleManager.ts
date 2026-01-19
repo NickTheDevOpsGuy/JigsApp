@@ -190,8 +190,8 @@ export class PuzzleManager {
     ({ dx, dy } = this.clampGroupDelta(gid, dx, dy));
     if (dx === 0 && dy === 0) return;
 
-    let mdx = dx;
-    let mdy = dy;
+    const mdx = dx;
+    const mdy = dy;
 
     // Allow free movement during drag - pieces can overlap
     // Overlap only matters when trying to snap (checked in pointerUp)
