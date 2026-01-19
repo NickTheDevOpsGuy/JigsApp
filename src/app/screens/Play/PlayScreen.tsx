@@ -169,7 +169,8 @@ export function PlayScreen() {
       const next = { w: Math.max(1, rect.width), h: Math.max(1, rect.height) };
 
       const prev = lastBoardSizeRef.current;
-      const changed = !prev || Math.abs(prev.w - next.w) > 0.5 || Math.abs(prev.h - next.h) > 0.5;
+      const changed =
+        !prev || Math.abs(prev.w - next.w) > 0.5 || Math.abs(prev.h - next.h) > 0.5;
       if (!changed) return;
 
       lastBoardSizeRef.current = next;
@@ -328,7 +329,9 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>No image selected. Go back and upload one.</section>
+          <section className={styles.board}>
+            No image selected. Go back and upload one.
+          </section>
         </main>
       </div>
     );

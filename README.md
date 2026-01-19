@@ -113,7 +113,6 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [x] Target-based snapping still works with shaped pieces
 - [x] Rotatable puzzle pieces with orientation-aware snapping
 
-
 ---
 
 ### In Progress / Planned

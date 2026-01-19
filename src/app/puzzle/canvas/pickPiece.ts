@@ -33,7 +33,9 @@ export function pickPieceId(
     ctx.rotate((p.rotation * Math.PI) / 180);
     ctx.translate(-p.w / 2, -p.h / 2);
 
-    const hit = path ? ctx.isPointInPath(path, x, y) : x >= p.x && x <= p.x + p.w && y >= p.y && y <= p.y + p.h;
+    const hit = path
+      ? ctx.isPointInPath(path, x, y)
+      : x >= p.x && x <= p.x + p.w && y >= p.y && y <= p.y + p.h;
     ctx.restore();
 
     if (hit) return p.id;
