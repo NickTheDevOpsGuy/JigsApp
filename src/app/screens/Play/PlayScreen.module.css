@@ -58,10 +58,9 @@
   min-height: 0;
 
   display: flex;
+  flex-direction: column;
   gap: 12px;
   padding: 12px;
-
-  align-items: stretch;
 }
 
 /*
@@ -92,9 +91,9 @@
   touch-action: none; /* keeps pointer events consistent */
 }
 
-/* Right side tray */
+/* Bottom tray for pieces */
 .tray {
-  width: 280px;
+  height: 140px;
   flex-shrink: 0;
 
   background: #ffffff;
@@ -106,4 +105,48 @@
   font-size: 13px;
   line-height: 1.35;
   color: rgba(0, 0, 0, 0.75);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.tray::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tray::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tray::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.tray::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Reference image button and container */
+.referenceContainer {
+  position: fixed;
+  top: 70px;
+  right: 16px;
+  z-index: 100;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  max-width: 280px;
+}
+
+.referenceImage {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }

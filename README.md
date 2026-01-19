@@ -16,7 +16,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 ## Table of Contents
 
 - [Preview](#preview)
-- [About Phuzzle](#about-jiggysaw)
+- [About Phuzzle](#about-phuzzle)
 - [User Stories](#user-stories)
 - [Testing](#testing)
 - [Wireframes / Mockups](#wireframes--mockups)
@@ -28,7 +28,8 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [Collaborators](#collaborators)
-- [Built by the Phuzzle Community](#built-by-the-jiggysaw-community)
+- [License](#license)
+- [Built by the Phuzzle Community](#built-by-the-phuzzle-community)
 
 ---
 
@@ -102,6 +103,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 ### Completed
 
 - [x] App routes and screens (Menu, New Game/Setup, Play)
+- [x] Changed to using a canvas
 - [x] Custom image upload (PNG/JPG) with validation
 - [x] Persist selected image and render it in Play view
 - [x] PuzzleManager scaffolding (state + piece generation)
@@ -110,6 +112,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [x] Drag-and-drop for shaped pieces
 - [x] Target-based snapping still works with shaped pieces
 - [x] Rotatable puzzle pieces with orientation-aware snapping
+
 
 ---
 
@@ -125,10 +128,13 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [ ] Save/Load game state
 - [ ] Slice image into grid tiles (real pieces)
 - [ ] Edge shaping or classic jigsaw cuts (later)
+- [ ] Added a puzzel draw to hold pieces for (later)
 
 ---
 
 ## Extended Roadmap
+
+TBD
 
 ---
 
@@ -136,13 +142,13 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ---
 
-| Category | Technologies / Tools     |
-| -------- | ------------------------ |
-| Engine   | Unity 2022+              |
-| Scripts  | C# MonoBehaviours        |
-| Art      | Unity Sprites            |
-| Input    | Unity Input System       |
-| Tooling  | GitHub Actions (planned) |
+| Category  | Technologies / Tools |
+| --------- | -------------------- |
+| Framework | React                |
+| Build     | Vite                 |
+| Language  | TypeScript           |
+| Styling   | CSS Modules          |
+| Tooling   | GitHub Actions       |
 
 ---
 
@@ -153,7 +159,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 1. Clone:
 
 ```bash
-git clone https://github.com/NickTheDevOpsGuy/JiggySaw.git
+git clone https://github.com/NickTheDevOpsGuy/phuzzle.git
 ```
 
 3. Run
@@ -171,6 +177,9 @@ npm run dev
 <summary>Click to expand file structure</summary>
 
 .
+├── CONTRIBUTORS.md
+├── .eslintcache
+├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -179,18 +188,27 @@ npm run dev
 │   │   ├── enhancement_refactor.yml
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
-│   ├── workflows
-│   │   └── Phuzzle.yml
-│   └── pull_request_template.md
+│   ├── pull_request_template.md
+│   └── workflows
+│       └── Phuzzle.yml
+├── .gitignore
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push
+├── index.html
+├── LICENSE.md
+├── package.json
+├── package-lock.json
+├── .prettierignore
+├── .prettierrc.yml
 ├── public
 │   └── favicon.svg
+├── README.md
 ├── scripts
 │   └── precheck.sh
 ├── src
 │   └── app
+│       ├── App.tsx
 │       ├── assets
 │       │   └── ui
 │       │       └── phuzzle-logo-512.png
@@ -204,6 +222,7 @@ npm run dev
 │       │   └── Modal
 │       │       ├── Modal.module.css
 │       │       └── Modal.tsx
+│       ├── main.tsx
 │       ├── puzzle
 │       │   ├── canvas
 │       │   │   ├── pickPiece.ts
@@ -227,24 +246,12 @@ npm run dev
 │       │       └── SetupScreen.tsx
 │       ├── styles
 │       │   └── global.css
-│       ├── App.tsx
-│       ├── main.tsx
 │       └── vite-env.d.ts
-├── .eslintcache
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── CONTRIBUTORS.md
-├── eslint.config.ts
-├── index.html
-├── LICENSE.md
-├── package-lock.json
-├── package.json
-├── README.md
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
 ├── tsconfig.node.json
+├── update-phuzzle.sh
 └── vite.config.ts
 
 </details>
@@ -272,3 +279,9 @@ Meet all our amazing contributors here:
 
 Phuzzle is an open-source project maintained by [CONTRIBUTORS.md](./CONTRIBUTORS.md) around the world.  
 Thanks to everyone helping make this cozy puzzle experience even better.
+
+---
+
+## License
+
+MIT License. See [LICENSE.md](./LICENSE.md) for details.

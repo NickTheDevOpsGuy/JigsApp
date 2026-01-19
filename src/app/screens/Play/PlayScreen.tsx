@@ -7,17 +7,10 @@ import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { Piece, PuzzleState } from "@/puzzle/types";
 
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
-import { renderBoard, type PopMap } from "@/puzzle/canvas/renderBoard";
+import { renderBoard, type PopMap, type DebugFlags } from "@/puzzle/canvas/renderBoard";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 
-/**
- * Canvas PlayScreen
- *
- * One canvas:
- * - PuzzleManager owns all state + snapping + grouping
- * - Canvas does drawing + hit testing
- */
 export function PlayScreen() {
   const nav = useNavigate();
   const imgUrl = localStorage.getItem(STORAGE_KEY);
@@ -28,33 +21,41 @@ export function PlayScreen() {
   const managerRef = useRef<PuzzleManager | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
-  // Just used for "Loading..." and for Debug snapshots.
   const [state, setState] = useState<PuzzleState | null>(null);
 
-  // pieceId -> animation start time
   const popMapRef = useRef<PopMap>(new Map());
-
-  // RAF handle
   const rafRef = useRef<number | null>(null);
-
-  // 2D context cache
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
-  // Debug toggle (no React state so it doesn't cause re-render spam)
-  const debugRef = useRef(false);
+  const lastBoardSizeRef = useRef<{ w: number; h: number } | null>(null);
 
-  // Puzzle config
+  const debugRef = useRef<DebugFlags>({
+    showGrid: false,
+    showBounds: false,
+    showIds: false,
+  });
+
   const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
-  const pieceSize = useMemo(() => ({ w: 72, h: 72 }), []);
+  const pieceSize = useMemo(() => ({ w: 100, h: 100 }), []);
 
   const assembledW = useMemo(() => grid.cols * pieceSize.w, [grid.cols, pieceSize.w]);
   const assembledH = useMemo(() => grid.rows * pieceSize.h, [grid.rows, pieceSize.h]);
 
-  /**
-   * Request a draw loop. We keep drawing while:
-   * - dragging is active OR
-   * - snap pop is animating
-   */
+  function logState(tag: string) {
+    const mgr = managerRef.current;
+    if (!mgr) return;
+    const s = mgr.getState();
+    const drag = mgr.getDragState();
+    console.log(`[Phuzzle][${tag}]`, {
+      pieces: s.pieces.length,
+      placed: s.placedCount,
+      complete: s.isComplete,
+      dragActiveId: drag.activeId,
+      board: lastBoardSizeRef.current,
+      debug: debugRef.current,
+    });
+  }
+
   function ensureRaf() {
     if (rafRef.current != null) return;
 
@@ -64,20 +65,17 @@ export function PlayScreen() {
       const mgr = managerRef.current;
       const ctx = ctxRef.current;
       const img = imageRef.current;
-
       if (!mgr || !ctx || !img) return;
 
       const s = mgr.getState();
       const now = performance.now();
 
-      // Seed pop animations whenever a piece becomes justSnapped
       for (const p of s.pieces) {
         if (p.justSnapped && !popMapRef.current.has(p.id)) {
           popMapRef.current.set(p.id, now);
         }
       }
 
-      // Remove finished pops + clear justSnapped in manager
       let anyAnimating = false;
       for (const [id, start] of popMapRef.current) {
         const t = now - start;
@@ -89,19 +87,21 @@ export function PlayScreen() {
         }
       }
 
-      // Draw
-      renderBoard(ctx, s, img, assembledW, assembledH, popMapRef.current, now, {
-        showGrid: debugRef.current,
-        showBounds: debugRef.current,
-        showIds: debugRef.current,
-      });
+      renderBoard(
+        ctx,
+        s,
+        img,
+        assembledW,
+        assembledH,
+        popMapRef.current,
+        now,
+        debugRef.current,
+      );
 
-      // Continue loop?
       const dragActive = mgr.getDragState().activeId != null;
       if (dragActive || anyAnimating) {
         ensureRaf();
       } else {
-        // Keep React state in sync for Debug button snapshots etc.
         setState(mgr.getState());
       }
     };
@@ -109,25 +109,9 @@ export function PlayScreen() {
     rafRef.current = window.requestAnimationFrame(tick);
   }
 
-  // Init image + manager (once)
   useEffect(() => {
     if (!imgUrl) return;
     if (managerRef.current) return;
-
-    const looksLikeDataUrl = imgUrl.startsWith("data:image/");
-    console.info("[Phuzzle] PlayScreen storage check", {
-      hasImgUrl: !!imgUrl,
-      prefix: imgUrl.slice(0, 24),
-      length: imgUrl.length,
-      looksLikeDataUrl,
-    });
-
-    if (!looksLikeDataUrl) {
-      console.warn(
-        "[Phuzzle] Stored image is not a data URL. Re-upload in SetupScreen.",
-        { storageKey: STORAGE_KEY },
-      );
-    }
 
     const img = new Image();
     img.src = imgUrl;
@@ -136,36 +120,28 @@ export function PlayScreen() {
       .then(() => {
         imageRef.current = img;
 
-        console.info("[Phuzzle] Image loaded", {
-          naturalW: img.naturalWidth,
-          naturalH: img.naturalHeight,
-        });
-
-        // Placeholder until ResizeObserver gives real board size
-        const initialBoardWidth = 900;
-        const initialBoardHeight = 520;
-
         managerRef.current = new PuzzleManager(
           {
             imageUrl: imgUrl,
-            boardWidth: initialBoardWidth,
-            boardHeight: initialBoardHeight,
+            boardWidth: 900,
+            boardHeight: 520,
             grid,
             pieceWidth: pieceSize.w,
             pieceHeight: pieceSize.h,
             pad: 18,
             scatterPadding: 16,
-            snapTolerancePx: 18,
+            snapTolerancePx: 35,
             scatterStartYRatio: 0.3,
             rotationStepDeg: 90,
           },
           {
-            onPuzzleComplete: (s2) => console.log("[Phuzzle] puzzle complete", s2),
+            onPuzzleComplete: (s) => console.log("[Phuzzle] puzzle complete", s),
             onPiecePlaced: (p) => console.log("[Phuzzle] piece placed", p.id),
           },
         );
 
         setState(managerRef.current.getState());
+        logState("init");
         ensureRaf();
       })
       .catch((err) => {
@@ -173,7 +149,6 @@ export function PlayScreen() {
       });
   }, [grid, imgUrl, pieceSize.w, pieceSize.h]);
 
-  // Setup canvas context + DPR sizing via ResizeObserver
   useEffect(() => {
     const board = boardRef.current;
     const canvas = canvasRef.current;
@@ -187,65 +162,66 @@ export function PlayScreen() {
       const b = boardRef.current;
       const c = canvasRef.current;
       const context = ctxRef.current;
+      const mgr = managerRef.current;
       if (!b || !c || !context) return;
 
       const rect = b.getBoundingClientRect();
+      const next = { w: Math.max(1, rect.width), h: Math.max(1, rect.height) };
+
+      const prev = lastBoardSizeRef.current;
+      const changed = !prev || Math.abs(prev.w - next.w) > 0.5 || Math.abs(prev.h - next.h) > 0.5;
+      if (!changed) return;
+
+      lastBoardSizeRef.current = next;
+
       const dpr = window.devicePixelRatio || 1;
-
-      // IMPORTANT:
-      // canvas.width/height must be in device pixels
-      c.width = Math.max(1, Math.floor(rect.width * dpr));
-      c.height = Math.max(1, Math.floor(rect.height * dpr));
-
-      // Then map drawing units to CSS pixels
+      c.width = Math.max(1, Math.floor(next.w * dpr));
+      c.height = Math.max(1, Math.floor(next.h * dpr));
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      console.info("[Phuzzle] Canvas resize", {
-        cssW: Math.round(rect.width),
-        cssH: Math.round(rect.height),
-        dpr,
-        backW: c.width,
-        backH: c.height,
-      });
-
-      // Update manager board size (CSS pixels)
-      const mgr = managerRef.current;
-      if (mgr) {
-        mgr.setBoardSize(rect.width, rect.height);
+      // Avoid jitter: do not clamp pieces while actively dragging
+      if (mgr && mgr.getDragState().activeId == null) {
+        mgr.setBoardSize(next.w, next.h);
         setState(mgr.getState());
       }
 
       ensureRaf();
+
+      if (debugRef.current.showBounds) {
+        console.log("[Phuzzle][resize]", {
+          css: next,
+          backing: { w: c.width, h: c.height },
+          dpr,
+        });
+      }
     });
 
     ro.observe(board);
     return () => ro.disconnect();
   }, []);
 
-  // Pointer events on canvas (hit test + forward to manager)
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const onContextMenu = (e: MouseEvent) => e.preventDefault();
+    const board = boardRef.current;
+    if (!canvas || !board) return;
 
     function boardCoords(e: PointerEvent) {
-      const board = boardRef.current;
-      if (!board) return null;
-      const rect = board.getBoundingClientRect();
+      const b = boardRef.current;
+      if (!b) return null;
+      const rect = b.getBoundingClientRect();
       return { x: e.clientX - rect.left, y: e.clientY - rect.top, rect };
     }
 
     function onPointerDown(e: PointerEvent) {
       const mgr = managerRef.current;
       const ctx = ctxRef.current;
-      const canvasEl = canvasRef.current;
-      if (!mgr || !ctx || !canvasEl) return;
+      const b = boardRef.current;
+      const c = canvasRef.current;
+      if (!mgr || !ctx || !b || !c) return;
 
       const bc = boardCoords(e);
       if (!bc) return;
 
-      // Right click rotates
       if (e.button === 2) {
         e.preventDefault();
         const id = pickPieceId(ctx, mgr.getState().pieces, bc.x, bc.y);
@@ -260,7 +236,7 @@ export function PlayScreen() {
       if (e.button !== 0) return;
 
       e.preventDefault();
-      canvasEl.setPointerCapture(e.pointerId);
+      c.setPointerCapture(e.pointerId);
 
       const id = pickPieceId(ctx, mgr.getState().pieces, bc.x, bc.y);
       if (!id) return;
@@ -268,7 +244,6 @@ export function PlayScreen() {
       const p = mgr.getState().pieces.find((pp) => pp.id === id) as Piece | undefined;
       if (!p) return;
 
-      // Synthesize DOMRect for manager.pointerDown (expects screen coords)
       const pieceRect = new DOMRect(bc.rect.left + p.x, bc.rect.top + p.y, p.w, p.h);
 
       mgr.pointerDown(id, e.clientX, e.clientY, pieceRect);
@@ -278,24 +253,23 @@ export function PlayScreen() {
 
     function onPointerMove(e: PointerEvent) {
       const mgr = managerRef.current;
-      const board = boardRef.current;
-      if (!mgr || !board) return;
+      const b = boardRef.current;
+      if (!mgr || !b) return;
 
-      const rect = board.getBoundingClientRect();
+      const rect = b.getBoundingClientRect();
       mgr.pointerMove(e.clientX, e.clientY, rect);
 
-      // During drag we can avoid setState spam, but keeping it is fine for now.
       setState(mgr.getState());
       ensureRaf();
     }
 
     function onPointerUp(e: PointerEvent) {
       const mgr = managerRef.current;
-      const canvasEl = canvasRef.current;
-      if (!mgr || !canvasEl) return;
+      const c = canvasRef.current;
+      if (!mgr || !c) return;
 
       try {
-        canvasEl.releasePointerCapture(e.pointerId);
+        c.releasePointerCapture(e.pointerId);
       } catch {
         // ignore
       }
@@ -308,10 +282,10 @@ export function PlayScreen() {
     function onDblClick(e: MouseEvent) {
       const mgr = managerRef.current;
       const ctx = ctxRef.current;
-      const board = boardRef.current;
-      if (!mgr || !ctx || !board) return;
+      const b = boardRef.current;
+      if (!mgr || !ctx || !b) return;
 
-      const rect = board.getBoundingClientRect();
+      const rect = b.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
@@ -321,6 +295,10 @@ export function PlayScreen() {
         setState(mgr.getState());
         ensureRaf();
       }
+    }
+
+    function onContextMenu(e: MouseEvent) {
+      e.preventDefault();
     }
 
     canvas.addEventListener("pointerdown", onPointerDown);
@@ -338,7 +316,6 @@ export function PlayScreen() {
     };
   }, [assembledW, assembledH]);
 
-  // No image selected
   if (!imgUrl) {
     return (
       <div className={styles.page}>
@@ -351,15 +328,12 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>
-            No image selected. Go back and upload one.
-          </section>
+          <section className={styles.board}>No image selected. Go back and upload one.</section>
         </main>
       </div>
     );
   }
 
-  // Still booting
   if (!state) {
     return (
       <div className={styles.page}>
@@ -373,7 +347,7 @@ export function PlayScreen() {
 
         <main className={styles.main}>
           <section className={styles.board}>Loading…</section>
-          <section className={styles.tray}>Piece tray placeholder</section>
+          <section className={styles.tray}>Loading…</section>
         </main>
       </div>
     );
@@ -391,18 +365,12 @@ export function PlayScreen() {
         <button
           className={styles.iconBtn}
           onClick={() => {
-            debugRef.current = !debugRef.current;
-
-            const mgr = managerRef.current;
-            console.log("[Phuzzle] Debug toggled", {
-              debug: debugRef.current,
-              hasManager: !!mgr,
-              pieces: mgr?.getState().pieces.length,
-              drag: mgr?.getDragState(),
-              imgReady: !!imageRef.current && imageRef.current.naturalWidth > 0,
-            });
-
-            // Force redraw immediately
+            debugRef.current = {
+              showGrid: !debugRef.current.showGrid,
+              showBounds: !debugRef.current.showBounds,
+              showIds: !debugRef.current.showIds,
+            };
+            logState("debug-toggle");
             ensureRaf();
           }}
         >
@@ -416,11 +384,8 @@ export function PlayScreen() {
         </section>
 
         <section className={styles.tray}>
-          Tip: Double click or right click to rotate. Snaps when position and rotation
-          match.
-          <div style={{ marginTop: 8, opacity: 0.8 }}>
-            Debug prints canvas size in console on resize.
-          </div>
+          <div>Double click or right click to rotate.</div>
+          <div>Snaps when position and rotation match.</div>
         </section>
       </main>
     </div>
@@ -432,7 +397,7 @@ async function loadImageReliable(img: HTMLImageElement) {
     await img.decode();
     return;
   } catch {
-    // fall back below
+    // fall through
   }
 
   await new Promise<void>((resolve, reject) => {

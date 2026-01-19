@@ -1,12 +1,5 @@
 // src/app/puzzle/PuzzleManager.ts
-import type {
-  DragState,
-  GridSize,
-  Piece,
-  PieceEdges,
-  PieceId,
-  PuzzleState,
-} from "./types";
+import type { DragState, GridSize, Piece, PieceEdges, PieceId, PuzzleState } from "./types";
 import { buildPiecePath } from "./shape";
 
 export type PuzzleManagerOptions = {
@@ -145,7 +138,6 @@ export class PuzzleManager {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
 
-    // lock the whole group if any piece is placed
     if (this.groupIsPlaced(piece.groupId)) return;
 
     this.drag = {
@@ -154,15 +146,12 @@ export class PuzzleManager {
       offsetY: pointerY - pieceRect.top,
     };
 
-    // bring entire group to front
     this.zCounter += 1;
     const gid = piece.groupId;
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.groupId === gid ? { ...p, z: this.zCounter } : p,
-      ),
+      pieces: this.state.pieces.map((p) => (p.groupId === gid ? { ...p, z: this.zCounter } : p)),
     };
   }
 
@@ -173,17 +162,14 @@ export class PuzzleManager {
     const active = this.findPiece(activeId);
     if (!active) return;
 
-    // never move placed groups
     if (this.groupIsPlaced(active.groupId)) return;
 
     const rawX = pointerX - boardRect.left - this.drag.offsetX;
     const rawY = pointerY - boardRect.top - this.drag.offsetY;
 
-    const maxX = Math.max(0, this.boardWidth - active.w);
-    const maxY = Math.max(0, this.boardHeight - active.h);
-
-    const nextX = clamp(rawX, 0, maxX);
-    const nextY = clamp(rawY, 0, maxY);
+    // Don't clamp here - let clampGroupDelta handle boundaries for the whole group
+    const nextX = rawX;
+    const nextY = rawY;
 
     let dx = nextX - active.x;
     let dy = nextY - active.y;
@@ -192,21 +178,30 @@ export class PuzzleManager {
 
     const gid = active.groupId;
 
-    // clamp as a group so the cluster stays rigid near edges
     ({ dx, dy } = this.clampGroupDelta(gid, dx, dy));
     if (dx === 0 && dy === 0) return;
 
-    // OPTION A: solid cardboard.
-    // If the full move is blocked, try:
-    // 1) axis slide
-    // 2) smaller step fractions (reduces "stuck" feeling)
-    const attempt = this.findAllowedDelta(gid, dx, dy);
-    if (!attempt) return;
+    let mdx = dx;
+    let mdy = dy;
+
+    // Allow free movement during drag - pieces can overlap
+    // Overlap only matters when trying to snap (checked in pointerUp)
+    /* Disabled overlap check during drag
+    if (this.wouldOverlapAnyOtherGroup(gid, mdx, mdy)) {
+      if (!this.wouldOverlapAnyOtherGroup(gid, mdx, 0)) {
+        mdy = 0;
+      } else if (!this.wouldOverlapAnyOtherGroup(gid, 0, mdy)) {
+        mdx = 0;
+      } else {
+        return;
+      }
+    }
+    */
 
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.groupId === gid ? { ...p, x: p.x + attempt.dx, y: p.y + attempt.dy } : p,
+        p.groupId === gid ? { ...p, x: p.x + mdx, y: p.y + mdy } : p,
       ),
     };
   }
@@ -234,9 +229,7 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, rotation: next } : p,
-      ),
+      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, rotation: next } : p)),
     };
 
     this.recomputeDerivedState();
@@ -249,9 +242,7 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, justSnapped: false } : p,
-      ),
+      pieces: this.state.pieces.map((p) => (p.id === pieceId ? { ...p, justSnapped: false } : p)),
     };
   }
 
@@ -276,7 +267,6 @@ export class PuzzleManager {
 
     if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
 
-    // do not allow snapping into overlap
     if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
 
     this.shiftGroup(gid, dx, dy);
@@ -320,16 +310,18 @@ export class PuzzleManager {
 
       const nTile = this.tilePos(n);
 
+      // Expected offset in solved tile space
       const expectedDx = (n.col - active.col) * this.tileW;
       const expectedDy = (n.row - active.row) * this.tileH;
 
-      const moveDx = activeTile.x + expectedDx - nTile.x;
-      const moveDy = activeTile.y + expectedDy - nTile.y;
+      // FIX: move needed so active tile lines up relative to neighbor tile
+      // We want: activeTile + expected == nTile
+      const moveDx = nTile.x - (activeTile.x + expectedDx);
+      const moveDy = nTile.y - (activeTile.y + expectedDy);
 
       const d = Math.hypot(moveDx, moveDy);
       if (d <= this.snapTolerancePx) {
-        if (!best || d < best.dist)
-          best = { neighbor: n, dx: moveDx, dy: moveDy, dist: d };
+        if (!best || d < best.dist) best = { neighbor: n, dx: moveDx, dy: moveDy, dist: d };
       }
     }
 
@@ -352,12 +344,8 @@ export class PuzzleManager {
     return true;
   }
 
-  // ---------- Option A collision ----------
+  // ---------- Collision ----------
 
-  /**
-   * Block moves that increase total overlap area.
-   * Allow moves that reduce overlap so you can pull pieces apart.
-   */
   private wouldOverlapAnyOtherGroup(groupId: string, dx: number, dy: number): boolean {
     const moving = this.getGroupPieces(groupId);
 
@@ -391,44 +379,7 @@ export class PuzzleManager {
     const before = overlapArea(0, 0);
     const after = overlapArea(dx, dy);
 
-    // small epsilon reduces jitter when grazing
-    return after > before + 0.5;
-  }
-
-  /**
-   * Find an allowed movement delta.
-   * Tries:
-   * - full move
-   * - axis slide
-   * - fractional steps (reduces "sticky" feel)
-   */
-  private findAllowedDelta(
-    groupId: string,
-    dx: number,
-    dy: number,
-  ): { dx: number; dy: number } | null {
-    // full
-    if (!this.wouldOverlapAnyOtherGroup(groupId, dx, dy)) return { dx, dy };
-
-    // axis slide
-    if (!this.wouldOverlapAnyOtherGroup(groupId, dx, 0)) return { dx, dy: 0 };
-    if (!this.wouldOverlapAnyOtherGroup(groupId, 0, dy)) return { dx: 0, dy };
-
-    // fractional steps
-    const fractions = [0.75, 0.5, 0.35, 0.25, 0.15];
-    for (const f of fractions) {
-      const ndx = dx * f;
-      const ndy = dy * f;
-
-      // avoid micro jitter
-      if (Math.abs(ndx) < 0.3 && Math.abs(ndy) < 0.3) continue;
-
-      if (!this.wouldOverlapAnyOtherGroup(groupId, ndx, ndy)) return { dx: ndx, dy: ndy };
-      if (!this.wouldOverlapAnyOtherGroup(groupId, ndx, 0)) return { dx: ndx, dy: 0 };
-      if (!this.wouldOverlapAnyOtherGroup(groupId, 0, ndy)) return { dx: 0, dy: ndy };
-    }
-
-    return null;
+    return after > before + 2;
   }
 
   private clampGroupDelta(groupId: string, dx: number, dy: number) {
@@ -446,10 +397,12 @@ export class PuzzleManager {
       maxY = Math.max(maxY, p.y + p.h);
     }
 
-    const dxMin = 0 - minX;
-    const dxMax = this.boardWidth - maxX;
-    const dyMin = 0 - minY;
-    const dyMax = this.boardHeight - maxY;
+    // Allow 30px overflow to accommodate jigsaw tabs
+    const overflow = 30;
+    const dxMin = -overflow - minX;
+    const dxMax = this.boardWidth + overflow - maxX;
+    const dyMin = -overflow - minY;
+    const dyMax = this.boardHeight + overflow - maxY;
 
     return {
       dx: clamp(dx, dxMin, dxMax),
@@ -548,8 +501,7 @@ export class PuzzleManager {
   private buildEdgesForGrid(grid: GridSize): PieceEdges[] {
     const edges: PieceEdges[] = [];
 
-    const randomTabOrBlank = (): "tab" | "blank" =>
-      Math.random() < 0.5 ? "tab" : "blank";
+    const randomTabOrBlank = (): "tab" | "blank" => (Math.random() < 0.5 ? "tab" : "blank");
     const opposite = (e: PieceEdges["top"]): PieceEdges["top"] => {
       if (e === "flat") return "flat";
       return e === "tab" ? "blank" : "tab";
@@ -563,10 +515,8 @@ export class PuzzleManager {
         const left: PieceEdges["left"] =
           c === 0 ? "flat" : opposite(edges[r * grid.cols + (c - 1)].right);
 
-        const right: PieceEdges["right"] =
-          c === grid.cols - 1 ? "flat" : randomTabOrBlank();
-        const bottom: PieceEdges["bottom"] =
-          r === grid.rows - 1 ? "flat" : randomTabOrBlank();
+        const right: PieceEdges["right"] = c === grid.cols - 1 ? "flat" : randomTabOrBlank();
+        const bottom: PieceEdges["bottom"] = r === grid.rows - 1 ? "flat" : randomTabOrBlank();
 
         edges.push({ top, right, bottom, left });
       }

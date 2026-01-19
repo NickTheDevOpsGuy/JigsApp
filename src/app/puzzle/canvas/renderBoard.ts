@@ -3,15 +3,18 @@ import type { Piece, PuzzleState } from "@/puzzle/types";
 
 export type PopMap = Map<string, number>;
 
-/**
- * renderBoard
- *
- * Canvas-only rendering pipeline.
- * Draw order is by z (lowest -> highest).
- *
- * Coordinates are CSS pixels because PlayScreen sets:
- *   ctx.setTransform(dpr,0,0,dpr,0,0)
- */
+export type DebugFlags = {
+  showGrid: boolean;
+  showBounds: boolean;
+  showIds: boolean;
+};
+
+const DEFAULT_DEBUG: DebugFlags = {
+  showGrid: false,
+  showBounds: false,
+  showIds: false,
+};
+
 export function renderBoard(
   ctx: CanvasRenderingContext2D,
   state: PuzzleState,
@@ -20,16 +23,17 @@ export function renderBoard(
   assembledH: number,
   popMap: PopMap,
   nowMs: number,
-  debug: { showGrid: boolean; showBounds: boolean; showIds: boolean },
+  debug?: DebugFlags,
 ) {
-  const canvas = ctx.canvas;
+  const dbg = debug ?? DEFAULT_DEBUG;
 
-  // Clear the visible CSS pixel area (not device pixels)
-  const cssW = canvas.width / (window.devicePixelRatio || 1);
-  const cssH = canvas.height / (window.devicePixelRatio || 1);
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = ctx.canvas.width / dpr;
+  const cssH = ctx.canvas.height / dpr;
+
   ctx.clearRect(0, 0, cssW, cssH);
 
-  if (debug.showGrid) drawDebugBackdrop(ctx, cssW, cssH);
+  if (dbg.showGrid) drawGrid(ctx, cssW, cssH);
 
   if (!img || img.naturalWidth === 0 || img.naturalHeight === 0) {
     ctx.save();
@@ -42,7 +46,7 @@ export function renderBoard(
 
   const pieces = [...state.pieces].sort((a, b) => a.z - b.z);
   for (const p of pieces) {
-    drawPiece(ctx, p, img, assembledW, assembledH, popMap, nowMs, debug);
+    drawPiece(ctx, p, img, assembledW, assembledH, popMap, nowMs, dbg);
   }
 }
 
@@ -54,7 +58,7 @@ function drawPiece(
   assembledH: number,
   popMap: PopMap,
   nowMs: number,
-  debug: { showGrid: boolean; showBounds: boolean; showIds: boolean },
+  dbg: { showBounds: boolean; showIds: boolean },
 ) {
   const start = popMap.get(p.id);
   const scale = start ? snapPopScale(nowMs - start) : 1;
@@ -67,45 +71,45 @@ function drawPiece(
   }
 
   ctx.save();
-
-  // Centered rotation
   ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
   ctx.rotate((p.rotation * Math.PI) / 180);
   ctx.scale(scale, scale);
-
-  // Local coords
   ctx.translate(-p.w / 2, -p.h / 2);
 
-  if (path) {
-    ctx.save();
-    ctx.clip(path);
-
-    const imgX = -p.targetX + p.pad;
-    const imgY = -p.targetY + p.pad;
-
-    ctx.drawImage(img, imgX, imgY, assembledW, assembledH);
-    ctx.restore();
-
-    ctx.strokeStyle = "rgba(0,0,0,0.25)";
-    ctx.lineWidth = 1;
-    ctx.stroke(path);
-  } else {
-    // Fallback rectangle
+  if (!path) {
     ctx.fillStyle = "rgba(0, 0, 255, 0.12)";
     ctx.strokeStyle = "rgba(0, 0, 0, 0.35)";
     ctx.lineWidth = 2;
     ctx.fillRect(0, 0, p.w, p.h);
     ctx.strokeRect(0, 0, p.w, p.h);
+    ctx.restore();
+    return;
   }
 
-  if (debug.showBounds) {
-    ctx.strokeStyle = "rgba(0,0,0,0.2)";
-    ctx.lineWidth = 1;
+  // Clip to silhouette then draw image slice
+  ctx.save();
+  ctx.clip(path);
+
+  // IMPORTANT:
+  // We draw the full assembled image so tabs/blanks show neighbor pixels (bleed).
+  const imgX = -p.targetX + p.pad;
+  const imgY = -p.targetY + p.pad;
+
+  ctx.drawImage(img, imgX, imgY, assembledW, assembledH);
+  ctx.restore();
+
+  // Outline
+  ctx.strokeStyle = "rgba(0,0,0,0.28)";
+  ctx.lineWidth = 1;
+  ctx.stroke(path);
+
+  if (dbg.showBounds) {
+    ctx.strokeStyle = "rgba(255,0,0,0.35)";
     ctx.strokeRect(0, 0, p.w, p.h);
   }
 
-  if (debug.showIds) {
-    ctx.fillStyle = "rgba(0,0,0,0.75)";
+  if (dbg.showIds) {
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
     ctx.font = "12px system-ui";
     ctx.fillText(p.id, 8, 16);
   }
@@ -126,9 +130,9 @@ function snapPopScale(tMs: number) {
   return 1.08 - 0.08 * k;
 }
 
-function drawDebugBackdrop(ctx: CanvasRenderingContext2D, w: number, h: number) {
+function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number) {
   ctx.save();
-  ctx.fillStyle = "rgba(0,0,0,0.02)";
+  ctx.fillStyle = "rgba(0,0,0,0.015)";
   ctx.fillRect(0, 0, w, h);
 
   ctx.strokeStyle = "rgba(0,0,0,0.05)";
