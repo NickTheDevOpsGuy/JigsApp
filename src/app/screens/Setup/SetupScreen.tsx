@@ -1,14 +1,23 @@
+// src/app/screens/Setup/SetupScreen.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./SetupScreen.module.css";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 
+/**
+ * SetupScreen
+ *
+ * Upload + preview step.
+ *
+ * IMPORTANT:
+ * - We store the image as a Data URL in localStorage.
+ * - Do not store blob: URLs in localStorage, they break on refresh.
+ */
 export function SetupScreen() {
   const nav = useNavigate();
   const [imgDataUrl, setImgDataUrl] = useState<string | null>(null);
 
-  // On mount, restore last selected image (optional but nice)
   useEffect(() => {
     const existing = localStorage.getItem(STORAGE_KEY);
     if (existing) setImgDataUrl(existing);
@@ -20,54 +29,32 @@ export function SetupScreen() {
 
     const okType = file.type === "image/png" || file.type === "image/jpeg";
     if (!okType) {
-      console.warn("[Phuzzle] Rejected file (type not allowed)", {
-        name: file.name,
-        type: file.type,
-      });
       alert("Please choose a PNG or JPG image.");
       e.currentTarget.value = "";
       return;
     }
 
-    // Safety limit (10 MB)
     const maxBytes = 10 * 1024 * 1024;
     if (file.size > maxBytes) {
-      console.warn("[Phuzzle] Rejected file (too large)", {
-        name: file.name,
-        sizeBytes: file.size,
-        maxBytes,
-      });
       alert("That image is too large. Please choose one under 10 MB.");
       e.currentTarget.value = "";
       return;
     }
 
-    console.info("[Phuzzle] Reading image file as Data URL", {
-      name: file.name,
-      type: file.type,
-      sizeKb: Math.round(file.size / 1024),
-    });
-
     const reader = new FileReader();
 
     reader.onload = () => {
       const result = reader.result;
-      if (typeof result !== "string") {
-        console.warn("[Phuzzle] Unexpected FileReader result type", { result });
-        alert("Could not read that file. Try another image.");
+      if (typeof result !== "string" || !result.startsWith("data:image/")) {
+        alert("Could not read that file as an image. Try another image.");
         e.currentTarget.value = "";
         return;
       }
 
       setImgDataUrl(result);
-
-      console.info("[Phuzzle] Image selected (dataUrl ready)", {
-        storageKey: STORAGE_KEY,
-      });
     };
 
     reader.onerror = () => {
-      console.warn("[Phuzzle] FileReader error", reader.error);
       alert("Could not read that file. Try another image.");
       e.currentTarget.value = "";
     };
@@ -77,18 +64,17 @@ export function SetupScreen() {
 
   function onStart() {
     if (!imgDataUrl) {
-      console.info("[Phuzzle] Start blocked: no image selected");
       alert("Pick an image first.");
       return;
     }
 
     localStorage.setItem(STORAGE_KEY, imgDataUrl);
-
-    console.info("[Phuzzle] Upload flow complete: saved dataUrl + navigating to /play", {
-      storageKey: STORAGE_KEY,
-    });
-
     nav("/play");
+  }
+
+  function onClear() {
+    localStorage.removeItem(STORAGE_KEY);
+    setImgDataUrl(null);
   }
 
   return (
@@ -118,6 +104,11 @@ export function SetupScreen() {
           <button className={styles.secondary} onClick={() => nav("/")}>
             Back
           </button>
+
+          <button className={styles.secondary} onClick={onClear} type="button">
+            Clear
+          </button>
+
           <button className={styles.primary} onClick={onStart}>
             Start New Game
           </button>
@@ -126,3 +117,5 @@ export function SetupScreen() {
     </div>
   );
 }
+
+export default SetupScreen;

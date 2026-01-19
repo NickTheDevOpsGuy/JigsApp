@@ -103,6 +103,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 ### Completed
 
 - [x] App routes and screens (Menu, New Game/Setup, Play)
+- [x] Changed to using a canvas
 - [x] Custom image upload (PNG/JPG) with validation
 - [x] Persist selected image and render it in Play view
 - [x] PuzzleManager scaffolding (state + piece generation)
@@ -126,10 +127,13 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [ ] Save/Load game state
 - [ ] Slice image into grid tiles (real pieces)
 - [ ] Edge shaping or classic jigsaw cuts (later)
+- [ ] Added a puzzel draw to hold pieces for (later)
 
 ---
 
 ## Extended Roadmap
+
+TBD
 
 ---
 
@@ -172,6 +176,9 @@ npm run dev
 <summary>Click to expand file structure</summary>
 
 .
+├── CONTRIBUTORS.md
+├── .eslintcache
+├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -180,53 +187,46 @@ npm run dev
 │   │   ├── enhancement_refactor.yml
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
-│   ├── workflows
-│   │   └── Phuzzle.yml
-│   └── pull_request_template.md
+│   ├── pull_request_template.md
+│   └── workflows
+│       └── Phuzzle.yml
+├── .gitignore
 ├── .husky
-│   ├── _
-│   │   ├── .gitignore
-│   │   ├── applypatch-msg
-│   │   ├── commit-msg
-│   │   ├── h
-│   │   ├── husky.sh
-│   │   ├── post-applypatch
-│   │   ├── post-checkout
-│   │   ├── post-commit
-│   │   ├── post-merge
-│   │   ├── post-rewrite
-│   │   ├── pre-applypatch
-│   │   ├── pre-auto-gc
-│   │   ├── pre-commit
-│   │   ├── pre-merge-commit
-│   │   ├── pre-push
-│   │   ├── pre-rebase
-│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
+├── index.html
+├── LICENSE.md
+├── package.json
+├── package-lock.json
+├── .prettierignore
+├── .prettierrc.yml
 ├── public
 │   └── favicon.svg
+├── README.md
 ├── scripts
 │   └── precheck.sh
 ├── src
 │   └── app
+│       ├── App.tsx
 │       ├── assets
-│       │   ├── branding
 │       │   └── ui
 │       │       └── phuzzle-logo-512.png
 │       ├── components
-│       │   ├── PuzzlePiece
-│       │   │   ├── PuzzlePiece.module.css
-│       │   │   └── PuzzlePiece.tsx
-│       │   ├── Button.module.css
-│       │   ├── Button.tsx
-│       │   ├── Dropdown.module.css
-│       │   ├── Dropdown.tsx
-│       │   └── Modal.tsx
+│       │   ├── Button
+│       │   │   ├── Button.module.css
+│       │   │   └── Button.tsx
+│       │   ├── DropDown
+│       │   │   ├── Dropdown.module.css
+│       │   │   └── Dropdown.tsx
+│       │   └── Modal
+│       │       ├── Modal.module.css
+│       │       └── Modal.tsx
+│       ├── main.tsx
 │       ├── puzzle
+│       │   ├── canvas
+│       │   │   ├── pickPiece.ts
+│       │   │   └── renderBoard.ts
 │       │   ├── PuzzleManager.ts
-│       │   ├── PuzzlePiece.module.css
-│       │   ├── PuzzlePiece.tsx
 │       │   ├── shape.ts
 │       │   ├── SnapLogic.ts
 │       │   └── types.ts
@@ -245,24 +245,12 @@ npm run dev
 │       │       └── SetupScreen.tsx
 │       ├── styles
 │       │   └── global.css
-│       ├── App.tsx
-│       ├── main.tsx
 │       └── vite-env.d.ts
-├── .eslintcache
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── CONTRIBUTORS.md
-├── eslint.config.ts
-├── index.html
-├── LICENSE.md
-├── package-lock.json
-├── package.json
-├── README.md
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
 ├── tsconfig.node.json
+├── update-phuzzle.sh
 └── vite.config.ts
 
 </details>
