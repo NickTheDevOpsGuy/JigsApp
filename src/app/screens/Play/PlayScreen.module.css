@@ -1,5 +1,3 @@
-/* src/app/screens/Play/PlayScreen.module.css */
-
 .page {
   height: 100vh;
   display: flex;
@@ -7,7 +5,6 @@
   background: #f6f8fb;
 }
 
-/* Top bar fixed height */
 .topBar {
   height: 56px;
   flex-shrink: 0;
@@ -26,7 +23,6 @@
   letter-spacing: 0.2px;
 }
 
-/* Header buttons */
 .iconBtn {
   appearance: none;
   border: 1px solid rgba(0, 0, 0, 0.12);
@@ -48,28 +44,19 @@
   transform: translateY(1px);
 }
 
-/*
-  CRITICAL:
-  - flex: 1 gives height
-  - min-height: 0 prevents flex children from forcing overflow and collapsing siblings
-*/
 .main {
   flex: 1;
   min-height: 0;
 
   display: flex;
-  flex-direction: column;
   gap: 12px;
+
   padding: 12px;
 }
 
-/*
-  Board must have real size or canvas will be blank.
-*/
 .board {
   flex: 1;
-  min-width: 0;
-  min-height: 320px;
+  min-height: 240px;
 
   position: relative;
   background: #ffffff;
@@ -79,21 +66,15 @@
   overflow: hidden;
 }
 
-/*
-  Canvas fills the board (CSS size).
-  Backing store size is set in PlayScreen via DPR resize.
-*/
 .canvas {
   width: 100%;
   height: 100%;
   display: block;
-
-  touch-action: none; /* keeps pointer events consistent */
+  touch-action: none;
 }
 
-/* Bottom tray for pieces */
 .tray {
-  height: 140px;
+  width: 280px;
   flex-shrink: 0;
 
   background: #ffffff;
@@ -105,48 +86,4 @@
   font-size: 13px;
   line-height: 1.35;
   color: rgba(0, 0, 0, 0.75);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.tray::-webkit-scrollbar {
-  height: 6px;
-}
-
-.tray::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.tray::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
-
-.tray::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-/* Reference image button and container */
-.referenceContainer {
-  position: fixed;
-  top: 70px;
-  right: 16px;
-  z-index: 100;
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 12px;
-  max-width: 280px;
-}
-
-.referenceImage {
-  width: 100%;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
 }

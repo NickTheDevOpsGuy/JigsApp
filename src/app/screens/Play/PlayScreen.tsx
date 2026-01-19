@@ -23,35 +23,43 @@ export function PlayScreen() {
 
   const [state, setState] = useState<PuzzleState | null>(null);
 
+  // snap pop animation tracking
   const popMapRef = useRef<PopMap>(new Map());
+
+  // RAF loop control
   const rafRef = useRef<number | null>(null);
+
+  // cached 2d context
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
-  const lastBoardSizeRef = useRef<{ w: number; h: number } | null>(null);
-
-  const debugRef = useRef<DebugFlags>({
-    showGrid: false,
-    showBounds: false,
-    showIds: false,
-  });
+  // Debug toggles (do not put in React state, we do not want rerenders)
+  const debugRef = useRef<DebugFlags>({ showGrid: false, showBounds: false, showIds: false });
 
   const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
-  const pieceSize = useMemo(() => ({ w: 100, h: 100 }), []);
+  const pieceSize = useMemo(() => ({ w: 72, h: 72 }), []);
 
   const assembledW = useMemo(() => grid.cols * pieceSize.w, [grid.cols, pieceSize.w]);
   const assembledH = useMemo(() => grid.rows * pieceSize.h, [grid.rows, pieceSize.h]);
 
-  function logState(tag: string) {
-    const mgr = managerRef.current;
-    if (!mgr) return;
-    const s = mgr.getState();
-    const drag = mgr.getDragState();
-    console.log(`[Phuzzle][${tag}]`, {
-      pieces: s.pieces.length,
-      placed: s.placedCount,
-      complete: s.isComplete,
-      dragActiveId: drag.activeId,
-      board: lastBoardSizeRef.current,
+  function logMetrics(tag: string) {
+    const c = canvasRef.current;
+    const b = boardRef.current;
+    const img = imageRef.current;
+
+    if (!c || !b) return;
+
+    const rect = b.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    console.info(`[Phuzzle] ${tag}`, {
+      backingW: c.width,
+      backingH: c.height,
+      cssW: Math.round(rect.width),
+      cssH: Math.round(rect.height),
+      dpr,
+      img: img
+        ? { naturalW: img.naturalWidth, naturalH: img.naturalHeight }
+        : { naturalW: 0, naturalH: 0 },
       debug: debugRef.current,
     });
   }
@@ -70,34 +78,31 @@ export function PlayScreen() {
       const s = mgr.getState();
       const now = performance.now();
 
+      // Seed pop animations on justSnapped
       for (const p of s.pieces) {
         if (p.justSnapped && !popMapRef.current.has(p.id)) {
           popMapRef.current.set(p.id, now);
         }
       }
 
+      // Cleanup finished pop animations
+      const popMap = popMapRef.current;
       let anyAnimating = false;
-      for (const [id, start] of popMapRef.current) {
+
+      for (const [id, start] of popMap) {
         const t = now - start;
         if (t < 170) {
           anyAnimating = true;
         } else {
-          popMapRef.current.delete(id);
+          popMap.delete(id);
           mgr.clearJustSnapped(id);
         }
       }
 
-      renderBoard(
-        ctx,
-        s,
-        img,
-        assembledW,
-        assembledH,
-        popMapRef.current,
-        now,
-        debugRef.current,
-      );
+      // Draw
+      renderBoard(ctx, s, img, assembledW, assembledH, popMapRef.current, now, debugRef.current);
 
+      // Continue drawing if dragging or animating
       const dragActive = mgr.getDragState().activeId != null;
       if (dragActive || anyAnimating) {
         ensureRaf();
@@ -109,9 +114,18 @@ export function PlayScreen() {
     rafRef.current = window.requestAnimationFrame(tick);
   }
 
+  // Initialize image + manager once
   useEffect(() => {
     if (!imgUrl) return;
     if (managerRef.current) return;
+
+    const looksLikeDataUrl = imgUrl.startsWith("data:image/");
+    console.info("[Phuzzle] PlayScreen storage check", {
+      hasImgUrl: !!imgUrl,
+      prefix: imgUrl.slice(0, 30),
+      length: imgUrl.length,
+      looksLikeDataUrl,
+    });
 
     const img = new Image();
     img.src = imgUrl;
@@ -120,17 +134,26 @@ export function PlayScreen() {
       .then(() => {
         imageRef.current = img;
 
+        console.info("[Phuzzle] Image loaded", {
+          naturalW: img.naturalWidth,
+          naturalH: img.naturalHeight,
+        });
+
+        // placeholder sizes until ResizeObserver runs
+        const initialBoardWidth = 900;
+        const initialBoardHeight = 520;
+
         managerRef.current = new PuzzleManager(
           {
             imageUrl: imgUrl,
-            boardWidth: 900,
-            boardHeight: 520,
+            boardWidth: initialBoardWidth,
+            boardHeight: initialBoardHeight,
             grid,
             pieceWidth: pieceSize.w,
             pieceHeight: pieceSize.h,
             pad: 18,
             scatterPadding: 16,
-            snapTolerancePx: 35,
+            snapTolerancePx: 18,
             scatterStartYRatio: 0.3,
             rotationStepDeg: 90,
           },
@@ -141,7 +164,6 @@ export function PlayScreen() {
         );
 
         setState(managerRef.current.getState());
-        logState("init");
         ensureRaf();
       })
       .catch((err) => {
@@ -149,6 +171,7 @@ export function PlayScreen() {
       });
   }, [grid, imgUrl, pieceSize.w, pieceSize.h]);
 
+  // Setup canvas context + DPR resize
   useEffect(() => {
     const board = boardRef.current;
     const canvas = canvasRef.current;
@@ -158,49 +181,49 @@ export function PlayScreen() {
     if (!ctx) return;
     ctxRef.current = ctx;
 
-    const ro = new ResizeObserver(() => {
+    const resize = () => {
       const b = boardRef.current;
       const c = canvasRef.current;
       const context = ctxRef.current;
-      const mgr = managerRef.current;
       if (!b || !c || !context) return;
 
       const rect = b.getBoundingClientRect();
-      const next = { w: Math.max(1, rect.width), h: Math.max(1, rect.height) };
-
-      const prev = lastBoardSizeRef.current;
-      const changed =
-        !prev || Math.abs(prev.w - next.w) > 0.5 || Math.abs(prev.h - next.h) > 0.5;
-      if (!changed) return;
-
-      lastBoardSizeRef.current = next;
-
       const dpr = window.devicePixelRatio || 1;
-      c.width = Math.max(1, Math.floor(next.w * dpr));
-      c.height = Math.max(1, Math.floor(next.h * dpr));
+
+      // Backing store in device pixels
+      const nextW = Math.max(1, Math.floor(rect.width * dpr));
+      const nextH = Math.max(1, Math.floor(rect.height * dpr));
+
+      // Only set if changed (avoids nuking context state constantly)
+      if (c.width !== nextW) c.width = nextW;
+      if (c.height !== nextH) c.height = nextH;
+
+      // Map drawing to CSS pixels
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Avoid jitter: do not clamp pieces while actively dragging
-      if (mgr && mgr.getDragState().activeId == null) {
-        mgr.setBoardSize(next.w, next.h);
+      const mgr = managerRef.current;
+      if (mgr) {
+        mgr.setBoardSize(rect.width, rect.height);
         setState(mgr.getState());
       }
 
-      ensureRaf();
-
-      if (debugRef.current.showBounds) {
-        console.log("[Phuzzle][resize]", {
-          css: next,
-          backing: { w: c.width, h: c.height },
-          dpr,
-        });
+      if (debugRef.current.showGrid || debugRef.current.showBounds || debugRef.current.showIds) {
+        logMetrics("Canvas resized");
       }
-    });
 
+      ensureRaf();
+    };
+
+    const ro = new ResizeObserver(() => resize());
     ro.observe(board);
+
+    // Important: force initial sizing even if ResizeObserver has not fired yet
+    resize();
+
     return () => ro.disconnect();
   }, []);
 
+  // Pointer events on canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     const board = boardRef.current;
@@ -223,6 +246,7 @@ export function PlayScreen() {
       const bc = boardCoords(e);
       if (!bc) return;
 
+      // Right click rotate
       if (e.button === 2) {
         e.preventDefault();
         const id = pickPieceId(ctx, mgr.getState().pieces, bc.x, bc.y);
@@ -259,7 +283,6 @@ export function PlayScreen() {
 
       const rect = b.getBoundingClientRect();
       mgr.pointerMove(e.clientX, e.clientY, rect);
-
       setState(mgr.getState());
       ensureRaf();
     }
@@ -329,9 +352,7 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>
-            No image selected. Go back and upload one.
-          </section>
+          <section className={styles.board}>No image selected. Go back and upload one.</section>
         </main>
       </div>
     );
@@ -349,7 +370,9 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>Loading…</section>
+          <section className={styles.board} ref={boardRef}>
+            <canvas ref={canvasRef} className={styles.canvas} />
+          </section>
           <section className={styles.tray}>Loading…</section>
         </main>
       </div>
@@ -368,12 +391,24 @@ export function PlayScreen() {
         <button
           className={styles.iconBtn}
           onClick={() => {
+            // Toggle showGrid only (you can expand later)
             debugRef.current = {
+              ...debugRef.current,
               showGrid: !debugRef.current.showGrid,
-              showBounds: !debugRef.current.showBounds,
-              showIds: !debugRef.current.showIds,
             };
-            logState("debug-toggle");
+
+            console.info("[Phuzzle] Debug toggled", debugRef.current);
+
+            const mgr = managerRef.current;
+            if (mgr) {
+              console.info("[Phuzzle] Debug state", {
+                placed: mgr.getState().placedCount,
+                total: mgr.getState().totalCount,
+                drag: mgr.getDragState(),
+              });
+            }
+
+            logMetrics("Debug metrics");
             ensureRaf();
           }}
         >
@@ -387,8 +422,9 @@ export function PlayScreen() {
         </section>
 
         <section className={styles.tray}>
-          <div>Double click or right click to rotate.</div>
-          <div>Snaps when position and rotation match.</div>
+          Double click or right click to rotate. Snaps when position and rotation match.
+          <br />
+          Debug prints canvas size in console and can show a grid.
         </section>
       </main>
     </div>
@@ -400,7 +436,7 @@ async function loadImageReliable(img: HTMLImageElement) {
     await img.decode();
     return;
   } catch {
-    // fall through
+    // fall back
   }
 
   await new Promise<void>((resolve, reject) => {
