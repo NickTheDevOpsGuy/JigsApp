@@ -33,7 +33,11 @@ export function PlayScreen() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
   // Debug toggles (do not put in React state, we do not want rerenders)
-  const debugRef = useRef<DebugFlags>({ showGrid: false, showBounds: false, showIds: false });
+  const debugRef = useRef<DebugFlags>({
+    showGrid: false,
+    showBounds: false,
+    showIds: false,
+  });
 
   const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
   const pieceSize = useMemo(() => ({ w: 72, h: 72 }), []);
@@ -100,7 +104,16 @@ export function PlayScreen() {
       }
 
       // Draw
-      renderBoard(ctx, s, img, assembledW, assembledH, popMapRef.current, now, debugRef.current);
+      renderBoard(
+        ctx,
+        s,
+        img,
+        assembledW,
+        assembledH,
+        popMapRef.current,
+        now,
+        debugRef.current,
+      );
 
       // Continue drawing if dragging or animating
       const dragActive = mgr.getDragState().activeId != null;
@@ -207,7 +220,11 @@ export function PlayScreen() {
         setState(mgr.getState());
       }
 
-      if (debugRef.current.showGrid || debugRef.current.showBounds || debugRef.current.showIds) {
+      if (
+        debugRef.current.showGrid ||
+        debugRef.current.showBounds ||
+        debugRef.current.showIds
+      ) {
         logMetrics("Canvas resized");
       }
 
@@ -352,7 +369,9 @@ export function PlayScreen() {
         </header>
 
         <main className={styles.main}>
-          <section className={styles.board}>No image selected. Go back and upload one.</section>
+          <section className={styles.board}>
+            No image selected. Go back and upload one.
+          </section>
         </main>
       </div>
     );
