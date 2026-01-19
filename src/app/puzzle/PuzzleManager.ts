@@ -8,6 +8,7 @@ import type {
   PuzzleState,
 } from "./types";
 import { buildPiecePath } from "./shape";
+import { PUZZLE_DEFAULTS } from "./config";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
@@ -75,11 +76,11 @@ export class PuzzleManager {
       grid,
       pieceWidth,
       pieceHeight,
-      scatterPadding = 16,
-      pad = 18,
-      snapTolerancePx = 40,
-      scatterStartYRatio = 0.3,
-      rotationStepDeg = 90,
+      scatterPadding = PUZZLE_DEFAULTS.scatterPadding,
+      pad = PUZZLE_DEFAULTS.pad,
+      snapTolerancePx = PUZZLE_DEFAULTS.snapTolerancePx,
+      scatterStartYRatio = PUZZLE_DEFAULTS.scatterStartYRatio,
+      rotationStepDeg = PUZZLE_DEFAULTS.rotationStepDeg,
     } = options;
 
     this.events = events;
@@ -215,13 +216,6 @@ export class PuzzleManager {
         p.groupId === gid ? { ...p, x: p.x + mdx, y: p.y + mdy } : p,
       ),
     };
-
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.groupId === gid ? { ...p, x: p.x + mdx, y: p.y + mdy } : p,
-      ),
-    };
   }
 
   pointerUp() {
@@ -287,25 +281,48 @@ export class PuzzleManager {
     const gid = active.groupId;
 
     // Require correct rotation
-    if (active.rotation !== active.targetRotation) return false;
+    if (active.rotation !== active.targetRotation) {
+      console.log("[trySnapToBoard] FAIL: rotation mismatch", {
+        piece: active.id,
+        rotation: active.rotation,
+        target: active.targetRotation,
+      });
+      return false;
+    }
 
     const activeTileX = active.x + active.pad;
     const activeTileY = active.y + active.pad;
 
     const dx = active.targetX - activeTileX;
     const dy = active.targetY - activeTileY;
+    const dist = Math.hypot(dx, dy);
 
-    if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
+    if (dist > this.snapTolerancePx) {
+      console.log("[trySnapToBoard] FAIL: too far", {
+        piece: active.id,
+        dist: dist.toFixed(1),
+        tolerance: this.snapTolerancePx,
+      });
+      return false;
+    }
 
     // Option A: do not allow snapping into overlap
-    if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
+    if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) {
+      console.log("[trySnapToBoard] FAIL: would overlap");
+      return false;
+    }
 
     this.shiftGroup(gid, dx, dy);
 
     // Lock only if every piece in the group has correct rotation
     const groupPieces = this.getGroupPieces(gid);
     const allRotOk = groupPieces.every((p) => p.rotation === p.targetRotation);
-    if (!allRotOk) return true;
+    if (!allRotOk) {
+      console.log("[trySnapToBoard] Snapped but not locked (rotation mismatch in group)");
+      return true;
+    }
+
+    console.log("[trySnapToBoard] SUCCESS! Marking group as placed:", gid);
 
     this.state = {
       ...this.state,

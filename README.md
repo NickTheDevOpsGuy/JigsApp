@@ -175,10 +175,6 @@ npm run dev
 <details>
 <summary>Click to expand file structure</summary>
 
-.
-├── CONTRIBUTORS.md
-├── .eslintcache
-├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -187,27 +183,18 @@ npm run dev
 │   │   ├── enhancement_refactor.yml
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
-│   ├── pull_request_template.md
-│   └── workflows
-│       └── Phuzzle.yml
-├── .gitignore
+│   ├── workflows
+│   │   └── Phuzzle.yml
+│   └── pull_request_template.md
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push
-├── index.html
-├── LICENSE.md
-├── package.json
-├── package-lock.json
-├── .prettierignore
-├── .prettierrc.yml
 ├── public
 │   └── favicon.svg
-├── README.md
 ├── scripts
 │   └── precheck.sh
 ├── src
 │   └── app
-│       ├── App.tsx
 │       ├── assets
 │       │   └── ui
 │       │       └── phuzzle-logo-512.png
@@ -221,11 +208,11 @@ npm run dev
 │       │   └── Modal
 │       │       ├── Modal.module.css
 │       │       └── Modal.tsx
-│       ├── main.tsx
 │       ├── puzzle
 │       │   ├── canvas
 │       │   │   ├── pickPiece.ts
 │       │   │   └── renderBoard.ts
+│       │   ├── config.ts
 │       │   ├── PuzzleManager.ts
 │       │   ├── shape.ts
 │       │   ├── SnapLogic.ts
@@ -245,14 +232,24 @@ npm run dev
 │       │       └── SetupScreen.tsx
 │       ├── styles
 │       │   └── global.css
+│       ├── App.tsx
+│       ├── main.tsx
 │       └── vite-env.d.ts
+├── .eslintcache
+├── .gitignore
+├── .prettierignore
+├── .prettierrc.yml
+├── CONTRIBUTORS.md
+├── eslint.config.ts
+├── index.html
+├── LICENSE.md
+├── package-lock.json
+├── package.json
+├── README.md
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
 ├── tsconfig.node.json
-├── update-phuzzle.sh
-└── vite.config.ts
-
 </details>
 ```
 

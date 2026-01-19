@@ -40,6 +40,8 @@ export function buildPiecePath(args: ShapeArgs): string {
   const bottomDir = edgeDir(edges.bottom);
   const leftDir = edgeDir(edges.left);
 
+  console.log("[buildPiecePath]", { tileW, tileH, pad, edges, kd, kwTop, kwSide });
+
   // Helpers: build a "knob" in the middle of an edge.
   // We approximate with 2 cubic curves that go out and come back.
   function topEdge(): string {
@@ -114,6 +116,8 @@ export function buildPiecePath(args: ShapeArgs): string {
   const d = [`M ${x0} ${y0}`, topEdge(), rightEdge(), bottomEdge(), leftEdge(), `Z`].join(
     " ",
   );
+
+  console.log("[buildPiecePath] result:", d.substring(0, 100) + "...");
 
   return d;
 }
