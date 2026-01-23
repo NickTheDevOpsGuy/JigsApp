@@ -248,10 +248,11 @@ npm run dev
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
 │   └── types
-│       └── canvas-confetti.d.ts
-├── test-results
-│   └── .last-run.json
+│       ├── canvas-confetti.d.ts
+│       └── vite-env.d.ts
 ├── .env.development
+├── .env.example
+├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
@@ -267,7 +268,6 @@ npm run dev
 ├── tsconfig.json
 ├── tsconfig.node.json
 └── vite.config.ts
-
 
 </details>
 ```
