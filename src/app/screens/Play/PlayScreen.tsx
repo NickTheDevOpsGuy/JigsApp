@@ -69,13 +69,15 @@ export function PlayScreen() {
     return clamp(tile, 56, 160);
   }
 
-  // Timer effect
+  // Timer effect - stops when complete
   useEffect(() => {
+    if (state?.isComplete) return; // Don't run timer if complete
+
     const interval = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [state?.isComplete]);
 
   // Initial setup: create manager once we know board size
   useEffect(() => {
