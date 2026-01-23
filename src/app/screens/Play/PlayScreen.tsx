@@ -8,6 +8,11 @@ import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { getAverageColor } from "@/puzzle/colorUtils";
+import {
+  savePuzzleState,
+  loadPuzzleState,
+  clearPuzzleState,
+} from "@/puzzle/puzzleStorage";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -89,10 +94,24 @@ export function PlayScreen() {
     boardSizeRef.current = { w: boardW, h: boardH };
 
     const pieceSize = computeTileSize(boardW, boardH);
+    const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
+
+    // Check for saved game state
+    const savedState = loadPuzzleState();
+    const hasSavedGame =
+      savedState &&
+      savedState.imageUrl === imageUrl &&
+      savedState.grid.rows === grid.rows &&
+      savedState.grid.cols === grid.cols;
+
+    // Restore elapsed time if we have a saved game
+    if (hasSavedGame && savedState) {
+      setElapsedSeconds(savedState.elapsedSeconds);
+    }
 
     const next = new PuzzleManager(
       {
-        imageUrl: localStorage.getItem(STORAGE_KEY) || "",
+        imageUrl,
         boardWidth: boardW,
         boardHeight: boardH,
         grid,
@@ -104,6 +123,9 @@ export function PlayScreen() {
           popMapRef.current.set(p.id, performance.now());
         },
         onPuzzleComplete: () => {
+          // Clear saved state on completion
+          clearPuzzleState();
+
           import("canvas-confetti").then((confetti) => {
             confetti.default({
               particleCount: 150,
@@ -115,9 +137,29 @@ export function PlayScreen() {
       },
     );
 
+    // Restore piece positions if we have a saved game
+    if (hasSavedGame && savedState) {
+      next.restoreFromSaved(savedState.pieces);
+    }
+
     setManager(next);
     setState(next.getState());
   }, [grid]);
+
+  // Auto-save puzzle state when pieces change (debounced)
+  useEffect(() => {
+    if (!state || state.isComplete) return;
+
+    const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
+    if (!imageUrl) return;
+
+    // Debounce saves to avoid excessive writes
+    const timeoutId = setTimeout(() => {
+      savePuzzleState(imageUrl, state.grid, state.pieces, elapsedSeconds);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [state, elapsedSeconds]);
 
   // Resize observer: keep canvas + manager board size synced
   useEffect(() => {
@@ -321,6 +363,13 @@ export function PlayScreen() {
     [manager],
   );
 
+  // Handle starting a new game (clears saved state and reloads)
+  const handleNewGame = useCallback(() => {
+    if (!confirm("Start a new game? Your current progress will be lost.")) return;
+    clearPuzzleState();
+    window.location.reload();
+  }, []);
+
   // Get tray pieces sorted by color
   const trayPieces = useMemo(() => {
     if (!state || !imgRef.current) return [];
@@ -377,6 +426,9 @@ export function PlayScreen() {
           }
         >
           Debug
+        </button>
+        <button className={styles.iconBtn} onClick={handleNewGame}>
+          New Game
         </button>
       </div>
 
