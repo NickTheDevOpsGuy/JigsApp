@@ -81,10 +81,6 @@ function TrayPieceThumb({ piece, image, grid, onClick }: TrayPieceThumbProps) {
 
     // Scale to fit thumbnail while maintaining aspect
     const scale = Math.min(thumbSize / piece.w, thumbSize / piece.h) * 0.9;
-    const drawW = piece.w * scale;
-    const drawH = piece.h * scale;
-    const drawX = (thumbSize - drawW) / 2;
-    const drawY = (thumbSize - drawH) / 2;
 
     // Create clipping path from piece shape
     let path: Path2D | null = null;

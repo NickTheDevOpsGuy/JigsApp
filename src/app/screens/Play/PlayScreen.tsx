@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import styles from "./PlayScreen.module.css";
 
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { PuzzleState, DragState, Piece } from "@/puzzle/types";
+import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
@@ -48,7 +48,6 @@ export function PlayScreen() {
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
-  const [drag, setDrag] = useState<DragState | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Track board size in CSS pixels
@@ -118,7 +117,6 @@ export function PlayScreen() {
 
     setManager(next);
     setState(next.getState());
-    setDrag(next.getDragState());
   }, [grid]);
 
   // Resize observer: keep canvas + manager board size synced
@@ -135,7 +133,6 @@ export function PlayScreen() {
       // Keep manager board size in CSS pixels
       manager.setBoardSize(boardW, boardH);
       setState(manager.getState());
-      setDrag(manager.getDragState());
     });
 
     ro.observe(el);
@@ -200,7 +197,6 @@ export function PlayScreen() {
 
       // keep react state reasonably fresh
       setState(st);
-      setDrag(manager.getDragState());
 
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -273,7 +269,6 @@ export function PlayScreen() {
 
         manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
         setState(manager.getState());
-        setDrag(manager.getDragState());
 
         // Capture pointer for smooth dragging
         canvas.setPointerCapture(e.pointerId);
@@ -295,7 +290,6 @@ export function PlayScreen() {
 
       const boardRect = boardRef.current.getBoundingClientRect();
       manager.pointerMove(e.clientX, e.clientY, boardRect);
-      setDrag(manager.getDragState());
     },
     [manager],
   );
@@ -306,7 +300,6 @@ export function PlayScreen() {
 
       manager.pointerUp();
       setState(manager.getState());
-      setDrag(manager.getDragState());
 
       // Release pointer capture
       canvasRef.current.releasePointerCapture(e.pointerId);
