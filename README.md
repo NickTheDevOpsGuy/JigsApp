@@ -258,6 +258,8 @@ npm run dev
 │   └── types
 │       ├── canvas-confetti.d.ts
 │       └── vite-env.d.ts
+├── test-results
+│   └── .last-run.json
 ├── .env.development
 ├── .env.example
 ├── .eslintcache
