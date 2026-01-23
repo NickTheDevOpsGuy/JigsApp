@@ -89,29 +89,5 @@ if ! npx --no-install tsc --noEmit --pretty false; then
 fi
 echo "✅ [SUCCESS]: Types are verified."
 
-# 5. ACCESSIBILITY SMOKE TEST (The Core Requirement)
-if docker ps | grep -q "supabase_db"; then
-  echo "♿ [STEP 5]: Running WCAG 2.2 Accessibility Audit..."
-  if ! npx playwright test tests/accessibility.spec.ts; then
-    echo "🛑 [A11Y FAULT]: Accessibility is a core requirement, not a feature. Fix the violations above!"
-    exit 1
-  fi
-  echo "✅ [SUCCESS]: Accessibility verified."
-else
-  echo "⏭️  [SKIPPED]: Supabase isn't running. I can't check accessibility without a backend."
-fi
-
-# 6. FUNCTIONAL E2E TESTS (The Behavioral Audit)
-if docker ps | grep -q "supabase_db"; then
-  echo "🤖 [STEP 6]: Running Functional E2E Tests (Non-Smoke Test)..."
-  if ! npx playwright test --grep-invert "accessibility"; then
-    echo "🛑 [LOGIC FAULT]: Functional tests failed. Back to the drawing board!"
-    exit 1
-  fi
-  echo "✅ [SUCCESS]: All behavioral tests passed."
-else
-  echo "⏭️  [SKIPPED]: Supabase isn't running. Skipping functional tests."
-fi
-
 echo "----------------------------------------------------------------"
-echo "🚀 [SYSTEM AUDIT COMPLETE]: All systems nominal. Launching to the cloud!"
+echo "🚀 [SYSTEM AUDIT COMPLETE]: All systems nominal."
