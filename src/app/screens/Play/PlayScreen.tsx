@@ -17,6 +17,9 @@ import {
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
 
+// Debug mode from environment variable
+const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
+
 function parseGrid(stored: string | null): { rows: number; cols: number } {
   if (!stored) return { rows: 4, cols: 4 }; // default
   const [r, c] = stored.split("x").map(Number);
@@ -47,6 +50,9 @@ export function PlayScreen() {
     showBounds: false,
     showIds: false,
   });
+
+  // Preview image visibility
+  const [showPreview, setShowPreview] = useState(false);
 
   // Grid from localStorage
   const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
@@ -414,19 +420,24 @@ export function PlayScreen() {
           </div>
         </div>
 
-        <button
-          className={styles.iconBtn}
-          onClick={() =>
-            setDebug((d) => ({
-              ...d,
-              showGrid: !d.showGrid,
-              showBounds: !d.showBounds,
-              showIds: !d.showIds,
-            }))
-          }
-        >
-          Debug
+        <button className={styles.iconBtn} onClick={() => setShowPreview((p) => !p)}>
+          {showPreview ? "Hide" : "Preview"}
         </button>
+        {SHOW_DEBUG && (
+          <button
+            className={styles.iconBtn}
+            onClick={() =>
+              setDebug((d) => ({
+                ...d,
+                showGrid: !d.showGrid,
+                showBounds: !d.showBounds,
+                showIds: !d.showIds,
+              }))
+            }
+          >
+            Debug
+          </button>
+        )}
         <button className={styles.iconBtn} onClick={handleNewGame}>
           New Game
         </button>
@@ -443,6 +454,17 @@ export function PlayScreen() {
             onPointerCancel={handlePointerUp}
             onContextMenu={handleContextMenu}
           />
+
+          {/* Reference preview image */}
+          {showPreview && imgRef.current && (
+            <div className={styles.previewOverlay}>
+              <img
+                src={imgRef.current.src}
+                alt="Puzzle preview"
+                className={styles.previewImage}
+              />
+            </div>
+          )}
         </div>
       </div>
 

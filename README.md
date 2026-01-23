@@ -37,8 +37,9 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 ### Gameplay Demo
 
-_(Replace with a GIF once you have gameplay)_  
-![Demo Placeholder](./Assets/Preview/preview.gif)
+[![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
+
+**[▶️ Play Now on Vercel](https://phuzzle.vercel.app/)**
 
 ---
 
@@ -104,7 +105,14 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 - [x] Drag-and-drop jigsaw pieces with rotation
 - [x] Middle-click to send pieces to the tray for organization
-- [x] Confetti when you complete the puzzle
+- [x] Piece tray with color-sorted organization
+- [x] Multiple difficulty levels (3×3 to 6×6 grids)
+- [x] Reference preview of completed image
+- [x] Progress counter showing pieces remaining
+- [x] Timer that stops on completion
+- [x] Auto-save progress across browser sessions
+- [x] "New Game" button to start fresh
+- [x] Confetti celebration when you complete the puzzle
 
 ---
 
@@ -248,10 +256,10 @@ npm run dev
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
 │   └── types
-│       └── canvas-confetti.d.ts
-├── test-results
-│   └── .last-run.json
+│       ├── canvas-confetti.d.ts
+│       └── vite-env.d.ts
 ├── .env.development
+├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
