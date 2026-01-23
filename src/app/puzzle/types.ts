@@ -65,8 +65,6 @@ export type Piece = {
 
   /**
    * Once a group is placed (board solved snap), we lock it.
-   * Option A still treats ALL groups as "solid" for collisions while dragging,
-   * but placed groups also cannot be dragged at all.
    */
   isPlaced: boolean;
 
@@ -81,12 +79,31 @@ export type Piece = {
 
   // SVG path for jigsaw silhouette in viewBox coordinates (0..w, 0..h)
   shapePath: string;
+
+  // Tray management
+  inTray: boolean;
+  edges: PieceEdges;
 };
+
+export type DragPreview =
+  | null
+  | {
+      kind: "board" | "neighbor";
+      groupId: string;
+      dx: number;
+      dy: number;
+      intoGroupId?: string;
+    };
 
 export type DragState = {
   activeId: PieceId | null;
   offsetX: number;
   offsetY: number;
+
+  /**
+   * Optional so older code can omit it, but PuzzleManager can still set it.
+   */
+  preview?: DragPreview;
 };
 
 export type PuzzleState = {

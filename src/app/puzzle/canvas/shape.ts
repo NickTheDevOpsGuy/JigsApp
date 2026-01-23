@@ -1,5 +1,5 @@
 // src/app/puzzle/shape.ts
-import type { EdgeType, PieceEdges } from "./types";
+import type { EdgeType, PieceEdges } from "../types";
 
 type ShapeArgs = {
   tileW: number;
