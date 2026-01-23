@@ -102,16 +102,9 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ### Completed
 
-- [x] App routes and screens (Menu, New Game/Setup, Play)
-- [x] Changed to using a canvas
-- [x] Custom image upload (PNG/JPG) with validation
-- [x] Persist selected image and render it in Play view
-- [x] PuzzleManager scaffolding (state + piece generation)
-- [x] Piece rendering with image slicing (each piece shows correct tile)
-- [x] Classic jigsaw piece shapes (tabs/blanks) with clipping/masking
-- [x] Drag-and-drop for shaped pieces
-- [x] Target-based snapping still works with shaped pieces
-- [x] Rotatable puzzle pieces with orientation-aware snapping
+- [x] Drag-and-drop jigsaw pieces with rotation
+- [x] Middle-click to send pieces to the tray for organization
+- [x] Confetti when you complete the puzzle
 
 ---
 
@@ -175,6 +168,7 @@ npm run dev
 <details>
 <summary>Click to expand file structure</summary>
 
+.
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -187,54 +181,91 @@ npm run dev
 │   │   └── Phuzzle.yml
 │   └── pull_request_template.md
 ├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── pre-push
+│   │   ├── pre-rebase
+│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
+├── .vite
+│   └── deps
+│       ├── _metadata.json
+│       └── package.json
+├── Assets
+│   └── Preview
+│       └── preview.gif
 ├── public
 │   └── favicon.svg
 ├── scripts
 │   └── precheck.sh
 ├── src
-│   └── app
-│       ├── assets
-│       │   └── ui
-│       │       └── phuzzle-logo-512.png
-│       ├── components
-│       │   ├── Button
-│       │   │   ├── Button.module.css
-│       │   │   └── Button.tsx
-│       │   ├── DropDown
-│       │   │   ├── Dropdown.module.css
-│       │   │   └── Dropdown.tsx
-│       │   └── Modal
-│       │       ├── Modal.module.css
-│       │       └── Modal.tsx
-│       ├── puzzle
-│       │   ├── canvas
-│       │   │   ├── pickPiece.ts
-│       │   │   └── renderBoard.ts
-│       │   ├── config.ts
-│       │   ├── PuzzleManager.ts
-│       │   ├── shape.ts
-│       │   ├── SnapLogic.ts
-│       │   └── types.ts
-│       ├── screens
-│       │   ├── Menu
-│       │   │   ├── MenuScreen.module.css
-│       │   │   └── MenuScreen.tsx
-│       │   ├── NewGame
-│       │   │   ├── NewGameScreen.module.css
-│       │   │   └── NewGameScreen.tsx
-│       │   ├── Play
-│       │   │   ├── PlayScreen.module.css
-│       │   │   └── PlayScreen.tsx
-│       │   └── Setup
-│       │       ├── SetupScreen.module.css
-│       │       └── SetupScreen.tsx
-│       ├── styles
-│       │   └── global.css
-│       ├── App.tsx
-│       ├── main.tsx
-│       └── vite-env.d.ts
+│   ├── app
+│   │   ├── assets
+│   │   │   └── ui
+│   │   │       └── phuzzle-logo-512.png
+│   │   ├── components
+│   │   │   ├── Button
+│   │   │   │   ├── Button.module.css
+│   │   │   │   └── Button.tsx
+│   │   │   ├── DropDown
+│   │   │   │   ├── Dropdown.module.css
+│   │   │   │   └── Dropdown.tsx
+│   │   │   ├── Modal
+│   │   │   │   ├── Modal.module.css
+│   │   │   │   └── Modal.tsx
+│   │   │   ├── PieceTray
+│   │   │   │   ├── PieceTray.module.css
+│   │   │   │   └── PieceTray.tsx
+│   │   │   └── Tray
+│   │   │       ├── Tray.module.css
+│   │   │       └── Tray.tsx
+│   │   ├── puzzle
+│   │   │   ├── canvas
+│   │   │   │   ├── pickPiece.ts
+│   │   │   │   ├── renderBoard.ts
+│   │   │   │   ├── renderTrayPiece.ts
+│   │   │   │   └── shape.ts
+│   │   │   ├── colorUtils.ts
+│   │   │   ├── config.ts
+│   │   │   ├── PuzzleManager.ts
+│   │   │   ├── shape.ts
+│   │   │   ├── SnapLogic.ts
+│   │   │   └── types.ts
+│   │   ├── screens
+│   │   │   ├── Menu
+│   │   │   │   ├── MenuScreen.module.css
+│   │   │   │   └── MenuScreen.tsx
+│   │   │   ├── NewGame
+│   │   │   │   ├── NewGameScreen.module.css
+│   │   │   │   └── NewGameScreen.tsx
+│   │   │   ├── Play
+│   │   │   │   ├── PlayScreen.module.css
+│   │   │   │   └── PlayScreen.tsx
+│   │   │   └── Setup
+│   │   │       ├── SetupScreen.module.css
+│   │   │       └── SetupScreen.tsx
+│   │   ├── styles
+│   │   │   └── global.css
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts
+│   └── types
+│       └── canvas-confetti.d.ts
+├── .env.development
 ├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
@@ -249,7 +280,8 @@ npm run dev
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
-├── tsconfig.node.json
+├── tsconfig.node.j
+
 </details>
 ```
 
