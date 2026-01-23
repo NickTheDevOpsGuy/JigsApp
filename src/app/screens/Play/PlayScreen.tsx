@@ -103,7 +103,7 @@ export function PlayScreen() {
           popMapRef.current.set(p.id, performance.now());
         },
         onPuzzleComplete: () => {
-          import('canvas-confetti').then((confetti) => {
+          import("canvas-confetti").then((confetti) => {
             confetti.default({
               particleCount: 150,
               spread: 70,

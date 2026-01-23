@@ -519,12 +519,12 @@ export class PuzzleManager {
       groupCounts.set(p.groupId, (groupCounts.get(p.groupId) || 0) + 1);
     }
     const largestGroupSize = Math.max(...groupCounts.values());
-    
+
     // Check if all pieces are in the same group and have correct rotation
     const firstPiece = allPieces[0];
-    const allSameGroup = allPieces.every(p => p.groupId === firstPiece.groupId);
-    const allCorrectRotation = allPieces.every(p => p.rotation === 0);
-    
+    const allSameGroup = allPieces.every((p) => p.groupId === firstPiece.groupId);
+    const allCorrectRotation = allPieces.every((p) => p.rotation === 0);
+
     // If all pieces merged into one group with correct rotation, puzzle is complete
     const isComplete = allSameGroup && allCorrectRotation && allPieces.length > 1;
 

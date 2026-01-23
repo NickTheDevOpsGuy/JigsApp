@@ -154,7 +154,7 @@ function drawPiece(
   // Draw the entire source image, scaled and positioned
   // The clip path will cut it to the jigsaw shape
   ctx.drawImage(img, imgX, imgY, imgW, imgH);
-  
+
   ctx.restore();
 
   // Outline

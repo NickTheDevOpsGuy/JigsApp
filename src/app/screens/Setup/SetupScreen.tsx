@@ -30,9 +30,7 @@ export function SetupScreen() {
 
     const existingGrid = localStorage.getItem(GRID_KEY);
     if (existingGrid) {
-      const idx = GRID_OPTIONS.findIndex(
-        (g) => `${g.rows}x${g.cols}` === existingGrid
-      );
+      const idx = GRID_OPTIONS.findIndex((g) => `${g.rows}x${g.cols}` === existingGrid);
       if (idx >= 0) setGridIndex(idx);
     }
   }, []);
