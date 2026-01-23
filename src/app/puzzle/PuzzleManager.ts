@@ -122,6 +122,52 @@ export class PuzzleManager {
     this.recomputeDerivedState();
   }
 
+  /**
+   * Restore piece positions from saved state.
+   * Call this after construction if you have saved state to restore.
+   */
+  restoreFromSaved(
+    savedPieces: Array<{
+      id: string;
+      x: number;
+      y: number;
+      z: number;
+      rotation: number;
+      isPlaced: boolean;
+      groupId: string;
+      inTray: boolean;
+    }>,
+  ): void {
+    // Create a map for quick lookup
+    const savedMap = new Map(savedPieces.map((p) => [p.id, p]));
+
+    // Update zCounter to be above all saved z values
+    const maxZ = Math.max(...savedPieces.map((p) => p.z), this.zCounter);
+    this.zCounter = maxZ + 1;
+
+    // Apply saved positions to pieces
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((piece) => {
+        const saved = savedMap.get(piece.id);
+        if (!saved) return piece;
+
+        return {
+          ...piece,
+          x: saved.x,
+          y: saved.y,
+          z: saved.z,
+          rotation: saved.rotation,
+          isPlaced: saved.isPlaced,
+          groupId: saved.groupId,
+          inTray: saved.inTray,
+        };
+      }),
+    };
+
+    this.recomputeDerivedState();
+  }
+
   // ---------------- Public API ----------------
 
   getState(): PuzzleState {
