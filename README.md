@@ -259,6 +259,7 @@ npm run dev
 │       ├── canvas-confetti.d.ts
 │       └── vite-env.d.ts
 ├── .env.development
+├── .env.example
 ├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
@@ -275,7 +276,6 @@ npm run dev
 ├── tsconfig.json
 ├── tsconfig.node.json
 └── vite.config.ts
-
 
 </details>
 ```

@@ -441,6 +441,24 @@ export function PlayScreen() {
         <button className={styles.iconBtn} onClick={handleNewGame}>
           New Game
         </button>
+        {SHOW_DEBUG && (
+          <button
+            className={styles.iconBtn}
+            onClick={() =>
+              setDebug((d) => ({
+                ...d,
+                showGrid: !d.showGrid,
+                showBounds: !d.showBounds,
+                showIds: !d.showIds,
+              }))
+            }
+          >
+            Debug
+          </button>
+        )}
+        <button className={styles.iconBtn} onClick={handleNewGame}>
+          New Game
+        </button>
       </div>
 
       <div className={styles.main}>
