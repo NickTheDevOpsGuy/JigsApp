@@ -4,23 +4,35 @@ import { useNavigate } from "react-router-dom";
 import styles from "./SetupScreen.module.css";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
+const GRID_KEY = "phuzzle:gridSize";
 
-/**
- * SetupScreen
- *
- * Upload + preview step.
- *
- * IMPORTANT:
- * - We store the image as a Data URL in localStorage.
- * - Do not store blob: URLs in localStorage, they break on refresh.
- */
+type GridOption = {
+  label: string;
+  rows: number;
+  cols: number;
+};
+
+const GRID_OPTIONS: GridOption[] = [
+  { label: "Easy (3×3 - 9 pieces)", rows: 3, cols: 3 },
+  { label: "Medium (4×4 - 16 pieces)", rows: 4, cols: 4 },
+  { label: "Hard (5×5 - 25 pieces)", rows: 5, cols: 5 },
+  { label: "Expert (6×6 - 36 pieces)", rows: 6, cols: 6 },
+];
+
 export function SetupScreen() {
   const nav = useNavigate();
   const [imgDataUrl, setImgDataUrl] = useState<string | null>(null);
+  const [gridIndex, setGridIndex] = useState(1); // Default to Medium
 
   useEffect(() => {
-    const existing = localStorage.getItem(STORAGE_KEY);
-    if (existing) setImgDataUrl(existing);
+    const existingImg = localStorage.getItem(STORAGE_KEY);
+    if (existingImg) setImgDataUrl(existingImg);
+
+    const existingGrid = localStorage.getItem(GRID_KEY);
+    if (existingGrid) {
+      const idx = GRID_OPTIONS.findIndex((g) => `${g.rows}x${g.cols}` === existingGrid);
+      if (idx >= 0) setGridIndex(idx);
+    }
   }, []);
 
   function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -68,7 +80,9 @@ export function SetupScreen() {
       return;
     }
 
+    const selected = GRID_OPTIONS[gridIndex];
     localStorage.setItem(STORAGE_KEY, imgDataUrl);
+    localStorage.setItem(GRID_KEY, `${selected.rows}x${selected.cols}`);
     nav("/play");
   }
 
@@ -90,6 +104,21 @@ export function SetupScreen() {
             accept="image/png,image/jpeg"
             onChange={onPickFile}
           />
+        </label>
+
+        <label className={styles.label}>
+          Difficulty
+          <select
+            className={styles.select}
+            value={gridIndex}
+            onChange={(e) => setGridIndex(Number(e.target.value))}
+          >
+            {GRID_OPTIONS.map((opt, i) => (
+              <option key={i} value={i}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </label>
 
         <div className={styles.preview}>

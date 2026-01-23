@@ -1,465 +1,405 @@
 // src/app/screens/Play/PlayScreen.tsx
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./PlayScreen.module.css";
 
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { Piece, PuzzleState } from "@/puzzle/types";
-
+import type { PuzzleState } from "@/puzzle/types";
+import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
-import { renderBoard, type PopMap, type DebugFlags } from "@/puzzle/canvas/renderBoard";
+import { PieceTray } from "@/components/PieceTray/PieceTray";
+import { getAverageColor } from "@/puzzle/colorUtils";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
+const GRID_KEY = "phuzzle:gridSize";
+
+function parseGrid(stored: string | null): { rows: number; cols: number } {
+  if (!stored) return { rows: 4, cols: 4 }; // default
+  const [r, c] = stored.split("x").map(Number);
+  if (r && c) return { rows: r, cols: c };
+  return { rows: 4, cols: 4 };
+}
+
+type DebugFlags = {
+  showGrid: boolean;
+  showBounds: boolean;
+  showIds: boolean;
+};
+
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
 
 export function PlayScreen() {
-  const nav = useNavigate();
-  const imgUrl = localStorage.getItem(STORAGE_KEY);
-
   const boardRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
 
-  const managerRef = useRef<PuzzleManager | null>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
-
-  const [state, setState] = useState<PuzzleState | null>(null);
-
-  // snap pop animation tracking
-  const popMapRef = useRef<PopMap>(new Map());
-
-  // RAF loop control
+  const popMapRef = useRef<Map<string, number>>(new Map());
   const rafRef = useRef<number | null>(null);
 
-  // cached 2d context
-  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
-
-  // Debug toggles (do not put in React state, we do not want rerenders)
-  const debugRef = useRef<DebugFlags>({
+  const [debug, setDebug] = useState<DebugFlags>({
     showGrid: false,
     showBounds: false,
     showIds: false,
   });
 
-  const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
-  const pieceSize = useMemo(() => ({ w: 72, h: 72 }), []);
+  // Grid from localStorage
+  const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
 
-  const assembledW = useMemo(() => grid.cols * pieceSize.w, [grid.cols, pieceSize.w]);
-  const assembledH = useMemo(() => grid.rows * pieceSize.h, [grid.rows, pieceSize.h]);
+  const [manager, setManager] = useState<PuzzleManager | null>(null);
+  const [state, setState] = useState<PuzzleState | null>(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-  function logMetrics(tag: string) {
-    const c = canvasRef.current;
-    const b = boardRef.current;
-    const img = imageRef.current;
+  // Track board size in CSS pixels
+  const boardSizeRef = useRef({ w: 900, h: 520 });
 
-    if (!c || !b) return;
+  // Helper: compute a tile size that makes the assembled puzzle fill the board nicely
+  function computeTileSize(boardW: number, boardH: number) {
+    // make the assembled puzzle about ~65% of board's smaller dimension
+    const targetFill = 0.65;
 
-    const rect = b.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
+    const tileFromW = (boardW * targetFill) / grid.cols;
+    const tileFromH = (boardH * targetFill) / grid.rows;
 
-    console.info(`[Phuzzle] ${tag}`, {
-      backingW: c.width,
-      backingH: c.height,
-      cssW: Math.round(rect.width),
-      cssH: Math.round(rect.height),
-      dpr,
-      img: img
-        ? { naturalW: img.naturalWidth, naturalH: img.naturalHeight }
-        : { naturalW: 0, naturalH: 0 },
-      debug: debugRef.current,
-    });
+    // Use the limiting axis so it fits both dimensions
+    const tile = Math.floor(Math.min(tileFromW, tileFromH));
+
+    // Clamp so it doesn't get ridiculous on tiny/huge screens
+    return clamp(tile, 56, 160);
   }
 
-  function ensureRaf() {
-    if (rafRef.current != null) return;
+  // Timer effect - stops when complete
+  useEffect(() => {
+    if (state?.isComplete) return; // Don't run timer if complete
+
+    const interval = setInterval(() => {
+      setElapsedSeconds((s) => s + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [state?.isComplete]);
+
+  // Initial setup: create manager once we know board size
+  useEffect(() => {
+    const el = boardRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const boardW = Math.max(320, Math.floor(rect.width));
+    const boardH = Math.max(240, Math.floor(rect.height));
+    boardSizeRef.current = { w: boardW, h: boardH };
+
+    const pieceSize = computeTileSize(boardW, boardH);
+
+    const next = new PuzzleManager(
+      {
+        imageUrl: localStorage.getItem(STORAGE_KEY) || "",
+        boardWidth: boardW,
+        boardHeight: boardH,
+        grid,
+        pieceWidth: pieceSize,
+        pieceHeight: pieceSize,
+      },
+      {
+        onPiecePlaced: (p) => {
+          popMapRef.current.set(p.id, performance.now());
+        },
+        onPuzzleComplete: () => {
+          import("canvas-confetti").then((confetti) => {
+            confetti.default({
+              particleCount: 150,
+              spread: 70,
+              origin: { y: 0.6 },
+            });
+          });
+        },
+      },
+    );
+
+    setManager(next);
+    setState(next.getState());
+  }, [grid]);
+
+  // Resize observer: keep canvas + manager board size synced
+  useEffect(() => {
+    const el = boardRef.current;
+    if (!el || !manager) return;
+
+    const ro = new ResizeObserver(() => {
+      const rect = el.getBoundingClientRect();
+      const boardW = Math.max(320, Math.floor(rect.width));
+      const boardH = Math.max(240, Math.floor(rect.height));
+      boardSizeRef.current = { w: boardW, h: boardH };
+
+      // Keep manager board size in CSS pixels
+      manager.setBoardSize(boardW, boardH);
+      setState(manager.getState());
+    });
+
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [manager]);
+
+  // Animation loop: draw canvas
+  useEffect(() => {
+    if (!manager) return;
 
     const tick = () => {
-      rafRef.current = null;
-
-      const mgr = managerRef.current;
-      const ctx = ctxRef.current;
-      const img = imageRef.current;
-      if (!mgr || !ctx || !img) return;
-
-      const s = mgr.getState();
-      const now = performance.now();
-
-      // Seed pop animations on justSnapped
-      for (const p of s.pieces) {
-        if (p.justSnapped && !popMapRef.current.has(p.id)) {
-          popMapRef.current.set(p.id, now);
-        }
+      const canvas = canvasRef.current;
+      const boardEl = boardRef.current;
+      const img = imgRef.current;
+      if (!canvas || !boardEl || !img) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
       }
 
-      // Cleanup finished pop animations
-      const popMap = popMapRef.current;
-      let anyAnimating = false;
+      const rect = boardEl.getBoundingClientRect();
+      const cssW = Math.max(1, Math.floor(rect.width));
+      const cssH = Math.max(1, Math.floor(rect.height));
+      const dpr = window.devicePixelRatio || 1;
 
-      for (const [id, start] of popMap) {
-        const t = now - start;
-        if (t < 170) {
-          anyAnimating = true;
-        } else {
-          popMap.delete(id);
-          mgr.clearJustSnapped(id);
-        }
+      // Size backing store
+      canvas.width = Math.floor(cssW * dpr);
+      canvas.height = Math.floor(cssH * dpr);
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
       }
 
-      // Draw
+      // Draw everything in CSS pixels
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const st = manager.getState();
+
+      // assembled dims are puzzle-space, based on tile sizes
+      const firstPiece = st.pieces[0];
+      if (!firstPiece) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      const assembledW = st.grid.cols * firstPiece.tileW;
+      const assembledH = st.grid.rows * firstPiece.tileH;
+
       renderBoard(
         ctx,
-        s,
+        st,
         img,
         assembledW,
         assembledH,
         popMapRef.current,
-        now,
-        debugRef.current,
+        performance.now(),
+        debug,
       );
 
-      // Continue drawing if dragging or animating
-      const dragActive = mgr.getDragState().activeId != null;
-      if (dragActive || anyAnimating) {
-        ensureRaf();
-      } else {
-        setState(mgr.getState());
-      }
+      // keep react state reasonably fresh
+      setState(st);
+
+      rafRef.current = requestAnimationFrame(tick);
     };
 
-    rafRef.current = window.requestAnimationFrame(tick);
-  }
-
-  // Initialize image + manager once
-  useEffect(() => {
-    if (!imgUrl) return;
-    if (managerRef.current) return;
-
-    const looksLikeDataUrl = imgUrl.startsWith("data:image/");
-    console.info("[Phuzzle] PlayScreen storage check", {
-      hasImgUrl: !!imgUrl,
-      prefix: imgUrl.slice(0, 30),
-      length: imgUrl.length,
-      looksLikeDataUrl,
-    });
-
-    const img = new Image();
-    img.src = imgUrl;
-
-    loadImageReliable(img)
-      .then(() => {
-        imageRef.current = img;
-
-        console.info("[Phuzzle] Image loaded", {
-          naturalW: img.naturalWidth,
-          naturalH: img.naturalHeight,
-        });
-
-        // placeholder sizes until ResizeObserver runs
-        const initialBoardWidth = 900;
-        const initialBoardHeight = 520;
-
-        managerRef.current = new PuzzleManager(
-          {
-            imageUrl: imgUrl,
-            boardWidth: initialBoardWidth,
-            boardHeight: initialBoardHeight,
-            grid,
-            pieceWidth: pieceSize.w,
-            pieceHeight: pieceSize.h,
-            pad: 18,
-            scatterPadding: 16,
-            snapTolerancePx: 18,
-            scatterStartYRatio: 0.3,
-            rotationStepDeg: 90,
-          },
-          {
-            onPuzzleComplete: (s) => console.log("[Phuzzle] puzzle complete", s),
-            onPiecePlaced: (p) => console.log("[Phuzzle] piece placed", p.id),
-          },
-        );
-
-        setState(managerRef.current.getState());
-        ensureRaf();
-      })
-      .catch((err) => {
-        console.error("[Phuzzle] Failed to load image", err);
-      });
-  }, [grid, imgUrl, pieceSize.w, pieceSize.h]);
-
-  // Setup canvas context + DPR resize
-  useEffect(() => {
-    const board = boardRef.current;
-    const canvas = canvasRef.current;
-    if (!board || !canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    ctxRef.current = ctx;
-
-    const resize = () => {
-      const b = boardRef.current;
-      const c = canvasRef.current;
-      const context = ctxRef.current;
-      if (!b || !c || !context) return;
-
-      const rect = b.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-
-      // Backing store in device pixels
-      const nextW = Math.max(1, Math.floor(rect.width * dpr));
-      const nextH = Math.max(1, Math.floor(rect.height * dpr));
-
-      // Only set if changed (avoids nuking context state constantly)
-      if (c.width !== nextW) c.width = nextW;
-      if (c.height !== nextH) c.height = nextH;
-
-      // Map drawing to CSS pixels
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      const mgr = managerRef.current;
-      if (mgr) {
-        mgr.setBoardSize(rect.width, rect.height);
-        setState(mgr.getState());
-      }
-
-      if (
-        debugRef.current.showGrid ||
-        debugRef.current.showBounds ||
-        debugRef.current.showIds
-      ) {
-        logMetrics("Canvas resized");
-      }
-
-      ensureRaf();
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
     };
+  }, [manager, debug]);
 
-    const ro = new ResizeObserver(() => resize());
-    ro.observe(board);
-
-    // Important: force initial sizing even if ResizeObserver has not fired yet
-    resize();
-
-    return () => ro.disconnect();
-  }, []);
-
-  // Pointer events on canvas
+  // Load image from localStorage
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const board = boardRef.current;
-    if (!canvas || !board) return;
-
-    function boardCoords(e: PointerEvent) {
-      const b = boardRef.current;
-      if (!b) return null;
-      const rect = b.getBoundingClientRect();
-      return { x: e.clientX - rect.left, y: e.clientY - rect.top, rect };
+    const dataUrl = localStorage.getItem(STORAGE_KEY);
+    if (!dataUrl) {
+      console.warn("No image in localStorage");
+      return;
     }
 
-    function onPointerDown(e: PointerEvent) {
-      const mgr = managerRef.current;
-      const ctx = ctxRef.current;
-      const b = boardRef.current;
-      const c = canvasRef.current;
-      if (!mgr || !ctx || !b || !c) return;
+    const img = new Image();
+    img.src = dataUrl;
+    img.onload = () => {
+      imgRef.current = img;
+    };
+  }, []);
 
-      const bc = boardCoords(e);
-      if (!bc) return;
+  // ========== POINTER EVENT HANDLERS ==========
 
-      // Right click rotate
-      if (e.button === 2) {
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (!manager || !canvasRef.current || !boardRef.current) return;
+
+      const canvas = canvasRef.current;
+      const boardRect = boardRef.current.getBoundingClientRect();
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Get CSS-space coordinates
+      const cssX = e.clientX - boardRect.left;
+      const cssY = e.clientY - boardRect.top;
+
+      const st = manager.getState();
+      // Only pick from pieces NOT in tray
+      const boardPieces = st.pieces.filter((p) => !p.inTray);
+
+      const pieceId = pickPieceId(ctx, boardPieces, cssX, cssY);
+
+      if (!pieceId) return;
+
+      // Middle click (button 1) = send to tray
+      if (e.button === 1) {
         e.preventDefault();
-        const id = pickPieceId(ctx, mgr.getState().pieces, bc.x, bc.y);
-        if (id) {
-          mgr.rotatePiece(id);
-          setState(mgr.getState());
-          ensureRaf();
-        }
+        manager.movePieceToTray(pieceId);
+        setState(manager.getState());
         return;
       }
 
-      if (e.button !== 0) return;
+      // Left click = start drag
+      if (e.button === 0) {
+        const piece = st.pieces.find((p) => p.id === pieceId);
+        if (!piece) return;
 
-      e.preventDefault();
-      c.setPointerCapture(e.pointerId);
+        // Create a fake rect for the piece (manager expects this)
+        const pieceRect = new DOMRect(
+          boardRect.left + piece.x,
+          boardRect.top + piece.y,
+          piece.w,
+          piece.h,
+        );
 
-      const id = pickPieceId(ctx, mgr.getState().pieces, bc.x, bc.y);
-      if (!id) return;
+        manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
+        setState(manager.getState());
 
-      const p = mgr.getState().pieces.find((pp) => pp.id === id) as Piece | undefined;
-      if (!p) return;
-
-      const pieceRect = new DOMRect(bc.rect.left + p.x, bc.rect.top + p.y, p.w, p.h);
-
-      mgr.pointerDown(id, e.clientX, e.clientY, pieceRect);
-      setState(mgr.getState());
-      ensureRaf();
-    }
-
-    function onPointerMove(e: PointerEvent) {
-      const mgr = managerRef.current;
-      const b = boardRef.current;
-      if (!mgr || !b) return;
-
-      const rect = b.getBoundingClientRect();
-      mgr.pointerMove(e.clientX, e.clientY, rect);
-      setState(mgr.getState());
-      ensureRaf();
-    }
-
-    function onPointerUp(e: PointerEvent) {
-      const mgr = managerRef.current;
-      const c = canvasRef.current;
-      if (!mgr || !c) return;
-
-      try {
-        c.releasePointerCapture(e.pointerId);
-      } catch {
-        // ignore
+        // Capture pointer for smooth dragging
+        canvas.setPointerCapture(e.pointerId);
       }
 
-      mgr.pointerUp();
-      setState(mgr.getState());
-      ensureRaf();
-    }
-
-    function onDblClick(e: MouseEvent) {
-      const mgr = managerRef.current;
-      const ctx = ctxRef.current;
-      const b = boardRef.current;
-      if (!mgr || !ctx || !b) return;
-
-      const rect = b.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const id = pickPieceId(ctx, mgr.getState().pieces, x, y);
-      if (id) {
-        mgr.rotatePiece(id);
-        setState(mgr.getState());
-        ensureRaf();
+      // Right click = rotate
+      if (e.button === 2) {
+        e.preventDefault();
+        manager.rotatePiece(pieceId);
+        setState(manager.getState());
       }
-    }
+    },
+    [manager],
+  );
 
-    function onContextMenu(e: MouseEvent) {
-      e.preventDefault();
-    }
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (!manager || !boardRef.current) return;
 
-    canvas.addEventListener("pointerdown", onPointerDown);
-    canvas.addEventListener("pointermove", onPointerMove);
-    canvas.addEventListener("pointerup", onPointerUp);
-    canvas.addEventListener("dblclick", onDblClick);
-    canvas.addEventListener("contextmenu", onContextMenu);
+      const boardRect = boardRef.current.getBoundingClientRect();
+      manager.pointerMove(e.clientX, e.clientY, boardRect);
+    },
+    [manager],
+  );
 
-    return () => {
-      canvas.removeEventListener("pointerdown", onPointerDown);
-      canvas.removeEventListener("pointermove", onPointerMove);
-      canvas.removeEventListener("pointerup", onPointerUp);
-      canvas.removeEventListener("dblclick", onDblClick);
-      canvas.removeEventListener("contextmenu", onContextMenu);
-    };
-  }, [assembledW, assembledH]);
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (!manager || !canvasRef.current) return;
 
-  if (!imgUrl) {
-    return (
-      <div className={styles.page}>
-        <header className={styles.topBar}>
-          <button className={styles.iconBtn} onClick={() => nav("/")}>
-            Back
-          </button>
-          <div className={styles.title}>Phuzzle</div>
-          <div />
-        </header>
+      manager.pointerUp();
+      setState(manager.getState());
 
-        <main className={styles.main}>
-          <section className={styles.board}>
-            No image selected. Go back and upload one.
-          </section>
-        </main>
-      </div>
-    );
-  }
+      // Release pointer capture
+      canvasRef.current.releasePointerCapture(e.pointerId);
+    },
+    [manager],
+  );
 
-  if (!state) {
-    return (
-      <div className={styles.page}>
-        <header className={styles.topBar}>
-          <button className={styles.iconBtn} onClick={() => nav("/")}>
-            Back
-          </button>
-          <div className={styles.title}>Phuzzle</div>
-          <div />
-        </header>
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent right-click menu
+  }, []);
 
-        <main className={styles.main}>
-          <section className={styles.board} ref={boardRef}>
-            <canvas ref={canvasRef} className={styles.canvas} />
-          </section>
-          <section className={styles.tray}>Loading…</section>
-        </main>
-      </div>
-    );
-  }
+  // Handle clicking a piece in the tray to bring it back to board
+  const handleTrayPieceClick = useCallback(
+    (pieceId: string) => {
+      if (!manager) return;
+      manager.movePieceFromTray(pieceId);
+      setState(manager.getState());
+    },
+    [manager],
+  );
+
+  // Get tray pieces sorted by color
+  const trayPieces = useMemo(() => {
+    if (!state || !imgRef.current) return [];
+
+    const inTray = state.pieces.filter((p) => p.inTray);
+    if (inTray.length === 0) return [];
+
+    const img = imgRef.current;
+
+    // Sort by average color (hue)
+    return [...inTray].sort((a, b) => {
+      const colorA = getAverageColor(img, a, state.grid);
+      const colorB = getAverageColor(img, b, state.grid);
+      return colorA.hue - colorB.hue;
+    });
+  }, [state]);
+
+  const placed = state?.placedCount ?? 0;
+  const total = state?.totalCount ?? 0;
+  const left = Math.max(0, total - placed);
+  const isComplete = state?.isComplete ?? false;
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className={styles.page}>
-      <header className={styles.topBar}>
-        <button className={styles.iconBtn} onClick={() => nav("/")}>
+      <div className={styles.topBar}>
+        <button className={styles.iconBtn} onClick={() => history.back()}>
           Back
         </button>
-
         <div className={styles.title}>Phuzzle</div>
+
+        <div className={styles.hud}>
+          <div className={styles.hudPill}>⏱ {formatTime(elapsedSeconds)}</div>
+          <div className={styles.hudPill}>🧩 {left} left</div>
+          <div className={isComplete ? styles.hudPillDone : styles.hudPillLive}>
+            {isComplete ? "Complete!" : "In progress"}
+          </div>
+        </div>
 
         <button
           className={styles.iconBtn}
-          onClick={() => {
-            // Toggle showGrid only (you can expand later)
-            debugRef.current = {
-              ...debugRef.current,
-              showGrid: !debugRef.current.showGrid,
-            };
-
-            console.info("[Phuzzle] Debug toggled", debugRef.current);
-
-            const mgr = managerRef.current;
-            if (mgr) {
-              console.info("[Phuzzle] Debug state", {
-                placed: mgr.getState().placedCount,
-                total: mgr.getState().totalCount,
-                drag: mgr.getDragState(),
-              });
-            }
-
-            logMetrics("Debug metrics");
-            ensureRaf();
-          }}
+          onClick={() =>
+            setDebug((d) => ({
+              ...d,
+              showGrid: !d.showGrid,
+              showBounds: !d.showBounds,
+              showIds: !d.showIds,
+            }))
+          }
         >
           Debug
         </button>
-      </header>
+      </div>
 
-      <main className={styles.main}>
-        <section className={styles.board} ref={boardRef}>
-          <canvas ref={canvasRef} className={styles.canvas} />
-        </section>
+      <div className={styles.main}>
+        <div className={styles.board} ref={boardRef}>
+          <canvas
+            className={styles.canvas}
+            ref={canvasRef}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onContextMenu={handleContextMenu}
+          />
+        </div>
+      </div>
 
-        <section className={styles.tray}>
-          Double click or right click to rotate. Snaps when position and rotation match.
-          <br />
-          Debug prints canvas size in console and can show a grid.
-        </section>
-      </main>
+      <PieceTray
+        pieces={trayPieces}
+        image={imgRef.current}
+        grid={state?.grid ?? grid}
+        onPieceClick={handleTrayPieceClick}
+      />
     </div>
   );
-}
-
-async function loadImageReliable(img: HTMLImageElement) {
-  try {
-    await img.decode();
-    return;
-  } catch {
-    // fall back
-  }
-
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
-    img.onerror = () => reject(new Error("image load failed"));
-  });
 }

@@ -81,12 +81,27 @@ export type Piece = {
 
   // SVG path for jigsaw silhouette in viewBox coordinates (0..w, 0..h)
   shapePath: string;
+
+  // Tray management
+  inTray: boolean;
+  edges: PieceEdges; // Store edge configuration for tray sorting
+};
+
+// "Magnet" preview for the currently dragged group.
+// Computed during dragging to show where the group would snap if released now.
+export type DragPreview = null | {
+  kind: "board" | "neighbor";
+  groupId: string;
+  dx: number;
+  dy: number;
+  intoGroupId?: string;
 };
 
 export type DragState = {
   activeId: PieceId | null;
   offsetX: number;
   offsetY: number;
+  preview: DragPreview;
 };
 
 export type PuzzleState = {

@@ -1,0 +1,95 @@
+/* src/app/components/Tray/Tray.module.css */
+
+.tray {
+  display: flex;
+  gap: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+  align-items: flex-start;
+}
+
+.traySection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.trayLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+}
+
+.trayGrid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.trayPiece {
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  background: white;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.trayPiece:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.trayPiece:active {
+  transform: translateY(0) scale(1);
+}
+
+.pieceSvg {
+  display: block;
+}
+
+.emptyTray {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+}
+
+.emptyTray p {
+  margin: 0;
+}
+
+/* Scrollbar styling */
+.tray::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tray::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.tray::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.tray::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}

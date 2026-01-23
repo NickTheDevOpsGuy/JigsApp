@@ -1,0 +1,75 @@
+/* src/app/components/PieceTray/PieceTray.module.css */
+
+.tray {
+  height: 120px;
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 0 12px 12px 12px;
+
+  font-size: 13px;
+  line-height: 1.35;
+  color: rgba(0, 0, 0, 0.75);
+  overflow: hidden;
+}
+
+.trayHeader {
+  padding: 8px 12px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.02);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trayHelp {
+  font-weight: 400;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.trayScroll {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 8px 12px;
+}
+
+.trayPieces {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+  align-items: center;
+}
+
+.trayPiece {
+  cursor: pointer;
+  border-radius: 4px;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.trayPiece:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.trayEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: rgba(0, 0, 0, 0.4);
+  font-style: italic;
+}
