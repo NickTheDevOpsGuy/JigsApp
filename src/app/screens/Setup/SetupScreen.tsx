@@ -6,6 +6,10 @@ import styles from "./SetupScreen.module.css";
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
 
+// Minimum image dimensions for a playable puzzle
+const MIN_IMAGE_SIZE = 200;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 type GridOption = {
   label: string;
   rows: number;
@@ -23,6 +27,8 @@ export function SetupScreen() {
   const nav = useNavigate();
   const [imgDataUrl, setImgDataUrl] = useState<string | null>(null);
   const [gridIndex, setGridIndex] = useState(1); // Default to Medium
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const existingImg = localStorage.getItem(STORAGE_KEY);
@@ -35,60 +41,119 @@ export function SetupScreen() {
     }
   }, []);
 
-  function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
+  function clearError() {
+    setError(null);
+  }
+
+  function validateImageDimensions(
+    dataUrl: string,
+  ): Promise<{ width: number; height: number }> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+
+      img.onload = () => {
+        resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      };
+
+      img.onerror = () => {
+        reject(new Error("Failed to load image. The file may be corrupted."));
+      };
+
+      img.src = dataUrl;
+    });
+  }
+
+  async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const okType = file.type === "image/png" || file.type === "image/jpeg";
-    if (!okType) {
-      alert("Please choose a PNG or JPG image.");
-      e.currentTarget.value = "";
-      return;
-    }
+    clearError();
+    setIsLoading(true);
 
-    const maxBytes = 10 * 1024 * 1024;
-    if (file.size > maxBytes) {
-      alert("That image is too large. Please choose one under 10 MB.");
-      e.currentTarget.value = "";
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result !== "string" || !result.startsWith("data:image/")) {
-        alert("Could not read that file as an image. Try another image.");
-        e.currentTarget.value = "";
-        return;
+    try {
+      // Check file type
+      const validTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+      if (!validTypes.includes(file.type)) {
+        throw new Error("Please choose a PNG, JPG, or WebP image.");
       }
 
-      setImgDataUrl(result);
-    };
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        throw new Error(
+          `Image is too large (${sizeMB}MB). Please choose one under 10MB.`,
+        );
+      }
 
-    reader.onerror = () => {
-      alert("Could not read that file. Try another image.");
+      // Read file as data URL
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          const result = reader.result;
+          if (typeof result !== "string" || !result.startsWith("data:image/")) {
+            reject(new Error("Could not read file as an image."));
+            return;
+          }
+          resolve(result);
+        };
+
+        reader.onerror = () => {
+          reject(new Error("Failed to read file. Please try another image."));
+        };
+
+        reader.readAsDataURL(file);
+      });
+
+      // Validate image dimensions
+      const { width, height } = await validateImageDimensions(dataUrl);
+
+      if (width < MIN_IMAGE_SIZE || height < MIN_IMAGE_SIZE) {
+        throw new Error(
+          `Image is too small (${width}×${height}px). Please use an image at least ${MIN_IMAGE_SIZE}×${MIN_IMAGE_SIZE}px.`,
+        );
+      }
+
+      // Check if image is very small for higher difficulties
+      const selected = GRID_OPTIONS[gridIndex];
+      const minForGrid = selected.cols * 50; // At least 50px per piece
+      if (width < minForGrid || height < minForGrid) {
+        // Just warn, don't block
+        console.warn(`Image may be too small for ${selected.label} difficulty`);
+      }
+
+      setImgDataUrl(dataUrl);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load image.";
+      setError(message);
       e.currentTarget.value = "";
-    };
-
-    reader.readAsDataURL(file);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function onStart() {
     if (!imgDataUrl) {
-      alert("Pick an image first.");
+      setError("Please select an image first.");
       return;
     }
 
     const selected = GRID_OPTIONS[gridIndex];
-    localStorage.setItem(STORAGE_KEY, imgDataUrl);
-    localStorage.setItem(GRID_KEY, `${selected.rows}x${selected.cols}`);
-    nav("/play");
+
+    try {
+      localStorage.setItem(STORAGE_KEY, imgDataUrl);
+      localStorage.setItem(GRID_KEY, `${selected.rows}x${selected.cols}`);
+      nav("/play");
+    } catch (err) {
+      // localStorage might be full or disabled
+      setError("Could not save image. Try a smaller image or clear browser storage.");
+    }
   }
 
   function onClear() {
     localStorage.removeItem(STORAGE_KEY);
     setImgDataUrl(null);
+    clearError();
   }
 
   return (
@@ -96,13 +161,23 @@ export function SetupScreen() {
       <div className={styles.card}>
         <h1 className={styles.title}>New Game</h1>
 
+        {error && (
+          <div className={styles.error}>
+            <span>{error}</span>
+            <button className={styles.errorClose} onClick={clearError}>
+              ×
+            </button>
+          </div>
+        )}
+
         <label className={styles.label}>
-          Choose a Photo (PNG/JPG)
+          Choose a Photo (PNG/JPG/WebP)
           <input
             className={styles.file}
             type="file"
-            accept="image/png,image/jpeg"
+            accept="image/png,image/jpeg,image/webp"
             onChange={onPickFile}
+            disabled={isLoading}
           />
         </label>
 
@@ -122,7 +197,9 @@ export function SetupScreen() {
         </label>
 
         <div className={styles.preview}>
-          {imgDataUrl ? (
+          {isLoading ? (
+            <div className={styles.previewEmpty}>Loading...</div>
+          ) : imgDataUrl ? (
             <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
           ) : (
             <div className={styles.previewEmpty}>Image Preview</div>
@@ -134,11 +211,20 @@ export function SetupScreen() {
             Back
           </button>
 
-          <button className={styles.secondary} onClick={onClear} type="button">
+          <button
+            className={styles.secondary}
+            onClick={onClear}
+            type="button"
+            disabled={isLoading}
+          >
             Clear
           </button>
 
-          <button className={styles.primary} onClick={onStart}>
+          <button
+            className={styles.primary}
+            onClick={onStart}
+            disabled={isLoading || !imgDataUrl}
+          >
             Start New Game
           </button>
         </div>
