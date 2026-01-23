@@ -95,7 +95,6 @@
   min-height: 0;
 
   display: flex;
-  flex-direction: row;
   gap: 12px;
   padding: 12px;
 }
@@ -125,7 +124,7 @@
 }
 
 .tray {
-  height: 120px;
+  width: clamp(220px, 26vw, 340px);
   flex-shrink: 0;
 
   display: flex;
@@ -139,6 +138,17 @@
   line-height: 1.35;
   color: rgba(0, 0, 0, 0.75);
   overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .tray {
+    width: auto;
+    height: 160px;
+  }
 }
 
 .trayHeader {
@@ -207,4 +217,15 @@
   border: none;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   margin: 10px 0;
+}
+
+@media (max-width: 900px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .tray {
+    width: auto;
+    min-height: 140px;
+  }
 }

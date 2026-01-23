@@ -7,6 +7,6 @@ export const PUZZLE_DEFAULTS = {
 
   // Progressive difficulty defaults
   // Keep rotation enabled by default; optionally unlock it later.
-  rotationEnabled: true,
+  rotationEnabled: false,
   rotationUnlockPlacedCount: 0,
 } as const;

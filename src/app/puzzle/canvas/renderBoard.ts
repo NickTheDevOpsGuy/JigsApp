@@ -57,11 +57,14 @@ export function renderBoard(
 
   if (debug.showGrid) drawGridOverlay(ctx, cssW, cssH);
 
+  // Get grid from state
+  const { cols, rows } = state.grid;
+
   // Draw order by z (lowest -> highest) - only pieces NOT in tray
   const pieces = [...state.pieces].filter((p) => !p.inTray).sort((a, b) => a.z - b.z);
 
   for (const p of pieces) {
-    drawPiece(ctx, p, img, assembledW, assembledH, popMap, nowMs, debug);
+    drawPiece(ctx, p, img, cols, rows, popMap, nowMs, debug);
   }
 }
 
@@ -69,8 +72,8 @@ function drawPiece(
   ctx: CanvasRenderingContext2D,
   p: Piece,
   img: HTMLImageElement,
-  assembledW: number,
-  assembledH: number,
+  cols: number,
+  rows: number,
   popMap: PopMap,
   nowMs: number,
   debug: DebugFlags,
@@ -124,39 +127,34 @@ function drawPiece(
   ctx.save();
   ctx.clip(path);
 
-  // Slice math - we need to draw a slice of the source image
-  // The source image gets divided into grid pieces
-  // Each piece shows its corresponding section of the source
-
   // Calculate which section of the SOURCE image this piece represents
   const sourceW = img.naturalWidth;
   const sourceH = img.naturalHeight;
 
-  // Calculate grid dimensions from assembled size and tile size
-  const cols = Math.round(assembledW / p.tileW);
-  const rows = Math.round(assembledH / p.tileH);
-
   const srcTileW = sourceW / cols;
   const srcTileH = sourceH / rows;
 
-  // Calculate the pad in source image coordinates
-  const srcPadX = (p.pad / p.tileW) * srcTileW;
-  const srcPadY = (p.pad / p.tileH) * srcTileH;
+  // Scale factors: how to scale source image to piece coordinates
+  const scaleX = p.tileW / srcTileW;
+  const scaleY = p.tileH / srcTileH;
 
-  // Source coordinates expanded by pad to include tab regions
-  const srcX = p.col * srcTileW - srcPadX;
-  const srcY = p.row * srcTileH - srcPadY;
-  const srcW = srcTileW + srcPadX * 2;
-  const srcH = srcTileH + srcPadY * 2;
+  // This tile's position in source image
+  const tileSrcX = p.col * srcTileW;
+  const tileSrcY = p.row * srcTileH;
 
-  // Destination: draw the full piece container (0,0 to w,h)
-  const destX = 0;
-  const destY = 0;
-  const destW = p.w;
-  const destH = p.h;
+  // Where should (0,0) of source image be drawn in piece-local coordinates?
+  // The tile's top-left should appear at (p.pad, p.pad) in piece coords
+  // So source (tileSrcX, tileSrcY) -> piece (p.pad, p.pad)
+  // Therefore source (0,0) -> piece (p.pad - tileSrcX * scaleX, p.pad - tileSrcY * scaleY)
+  const imgX = p.pad - tileSrcX * scaleX;
+  const imgY = p.pad - tileSrcY * scaleY;
+  const imgW = sourceW * scaleX;
+  const imgH = sourceH * scaleY;
 
-  // Draw the slice: (sourceX, sourceY, sourceW, sourceH, destX, destY, destW, destH)
-  ctx.drawImage(img, srcX, srcY, srcW, srcH, destX, destY, destW, destH);
+  // Draw the entire source image, scaled and positioned
+  // The clip path will cut it to the jigsaw shape
+  ctx.drawImage(img, imgX, imgY, imgW, imgH);
+  
   ctx.restore();
 
   // Outline

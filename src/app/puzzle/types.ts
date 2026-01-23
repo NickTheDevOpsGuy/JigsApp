@@ -65,6 +65,8 @@ export type Piece = {
 
   /**
    * Once a group is placed (board solved snap), we lock it.
+   * Option A still treats ALL groups as "solid" for collisions while dragging,
+   * but placed groups also cannot be dragged at all.
    */
   isPlaced: boolean;
 
@@ -82,9 +84,11 @@ export type Piece = {
 
   // Tray management
   inTray: boolean;
-  edges: PieceEdges;
+  edges: PieceEdges; // Store edge configuration for tray sorting
 };
 
+// "Magnet" preview for the currently dragged group.
+// Computed during dragging to show where the group would snap if released now.
 export type DragPreview = null | {
   kind: "board" | "neighbor";
   groupId: string;
@@ -97,11 +101,7 @@ export type DragState = {
   activeId: PieceId | null;
   offsetX: number;
   offsetY: number;
-
-  /**
-   * Optional so older code can omit it, but PuzzleManager can still set it.
-   */
-  preview?: DragPreview;
+  preview: DragPreview;
 };
 
 export type PuzzleState = {

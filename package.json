@@ -16,6 +16,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "canvas-confetti": "^1.9.4",
     "husky": "^9.1.7",
     "jiti": "^2.6.1",
     "prettier": "^3.7.4",

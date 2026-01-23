@@ -1,10 +1,23 @@
 // src/app/screens/Play/PlayScreen.tsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./PlayScreen.module.css";
 
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { PuzzleState, DragState } from "@/puzzle/types";
+import type { PuzzleState, DragState, Piece } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
+import { pickPieceId } from "@/puzzle/canvas/pickPiece";
+import { PieceTray } from "@/components/PieceTray/PieceTray";
+import { getAverageColor } from "@/puzzle/colorUtils";
+
+const STORAGE_KEY = "phuzzle:imageDataUrl";
+const GRID_KEY = "phuzzle:gridSize";
+
+function parseGrid(stored: string | null): { rows: number; cols: number } {
+  if (!stored) return { rows: 4, cols: 4 }; // default
+  const [r, c] = stored.split("x").map(Number);
+  if (r && c) return { rows: r, cols: c };
+  return { rows: 4, cols: 4 };
+}
 
 type DebugFlags = {
   showGrid: boolean;
@@ -30,19 +43,20 @@ export function PlayScreen() {
     showIds: false,
   });
 
-  // Your grid
-  const grid = useMemo(() => ({ rows: 4, cols: 5 }), []);
+  // Grid from localStorage
+  const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
   const [drag, setDrag] = useState<DragState | null>(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Track board size in CSS pixels
   const boardSizeRef = useRef({ w: 900, h: 520 });
 
   // Helper: compute a tile size that makes the assembled puzzle fill the board nicely
   function computeTileSize(boardW: number, boardH: number) {
-    // make the assembled puzzle about ~65% of board’s smaller dimension
+    // make the assembled puzzle about ~65% of board's smaller dimension
     const targetFill = 0.65;
 
     const tileFromW = (boardW * targetFill) / grid.cols;
@@ -51,9 +65,17 @@ export function PlayScreen() {
     // Use the limiting axis so it fits both dimensions
     const tile = Math.floor(Math.min(tileFromW, tileFromH));
 
-    // Clamp so it doesn’t get ridiculous on tiny/huge screens
+    // Clamp so it doesn't get ridiculous on tiny/huge screens
     return clamp(tile, 56, 160);
   }
+
+  // Timer effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsedSeconds((s) => s + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Initial setup: create manager once we know board size
   useEffect(() => {
@@ -69,20 +91,25 @@ export function PlayScreen() {
 
     const next = new PuzzleManager(
       {
-        imageUrl: "/phuzzle.png",
+        imageUrl: localStorage.getItem(STORAGE_KEY) || "",
         boardWidth: boardW,
         boardHeight: boardH,
         grid,
         pieceWidth: pieceSize,
         pieceHeight: pieceSize,
-        // keep your defaults inside PuzzleManager/config
       },
       {
         onPiecePlaced: (p) => {
           popMapRef.current.set(p.id, performance.now());
         },
         onPuzzleComplete: () => {
-          // confetti hook can go here if you want it
+          import('canvas-confetti').then((confetti) => {
+            confetti.default({
+              particleCount: 150,
+              spread: 70,
+              origin: { y: 0.6 },
+            });
+          });
         },
       },
     );
@@ -149,8 +176,14 @@ export function PlayScreen() {
       const st = manager.getState();
 
       // assembled dims are puzzle-space, based on tile sizes
-      const assembledW = st.grid.cols * st.pieces[0].tileW;
-      const assembledH = st.grid.rows * st.pieces[0].tileH;
+      const firstPiece = st.pieces[0];
+      if (!firstPiece) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      const assembledW = st.grid.cols * firstPiece.tileW;
+      const assembledH = st.grid.rows * firstPiece.tileH;
 
       renderBoard(
         ctx,
@@ -163,7 +196,7 @@ export function PlayScreen() {
         debug,
       );
 
-      // keep react state reasonably fresh (avoid re-render every frame if you want)
+      // keep react state reasonably fresh
       setState(st);
       setDrag(manager.getDragState());
 
@@ -177,18 +210,149 @@ export function PlayScreen() {
     };
   }, [manager, debug]);
 
-  // Load image once
+  // Load image from localStorage
   useEffect(() => {
+    const dataUrl = localStorage.getItem(STORAGE_KEY);
+    if (!dataUrl) {
+      console.warn("No image in localStorage");
+      return;
+    }
+
     const img = new Image();
-    img.src = "/phuzzle.png";
+    img.src = dataUrl;
     img.onload = () => {
       imgRef.current = img;
     };
   }, []);
 
+  // ========== POINTER EVENT HANDLERS ==========
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (!manager || !canvasRef.current || !boardRef.current) return;
+
+      const canvas = canvasRef.current;
+      const boardRect = boardRef.current.getBoundingClientRect();
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Get CSS-space coordinates
+      const cssX = e.clientX - boardRect.left;
+      const cssY = e.clientY - boardRect.top;
+
+      const st = manager.getState();
+      // Only pick from pieces NOT in tray
+      const boardPieces = st.pieces.filter((p) => !p.inTray);
+
+      const pieceId = pickPieceId(ctx, boardPieces, cssX, cssY);
+
+      if (!pieceId) return;
+
+      // Middle click (button 1) = send to tray
+      if (e.button === 1) {
+        e.preventDefault();
+        manager.movePieceToTray(pieceId);
+        setState(manager.getState());
+        return;
+      }
+
+      // Left click = start drag
+      if (e.button === 0) {
+        const piece = st.pieces.find((p) => p.id === pieceId);
+        if (!piece) return;
+
+        // Create a fake rect for the piece (manager expects this)
+        const pieceRect = new DOMRect(
+          boardRect.left + piece.x,
+          boardRect.top + piece.y,
+          piece.w,
+          piece.h,
+        );
+
+        manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
+        setState(manager.getState());
+        setDrag(manager.getDragState());
+
+        // Capture pointer for smooth dragging
+        canvas.setPointerCapture(e.pointerId);
+      }
+
+      // Right click = rotate
+      if (e.button === 2) {
+        e.preventDefault();
+        manager.rotatePiece(pieceId);
+        setState(manager.getState());
+      }
+    },
+    [manager],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (!manager || !boardRef.current) return;
+
+      const boardRect = boardRef.current.getBoundingClientRect();
+      manager.pointerMove(e.clientX, e.clientY, boardRect);
+      setDrag(manager.getDragState());
+    },
+    [manager],
+  );
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (!manager || !canvasRef.current) return;
+
+      manager.pointerUp();
+      setState(manager.getState());
+      setDrag(manager.getDragState());
+
+      // Release pointer capture
+      canvasRef.current.releasePointerCapture(e.pointerId);
+    },
+    [manager],
+  );
+
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent right-click menu
+  }, []);
+
+  // Handle clicking a piece in the tray to bring it back to board
+  const handleTrayPieceClick = useCallback(
+    (pieceId: string) => {
+      if (!manager) return;
+      manager.movePieceFromTray(pieceId);
+      setState(manager.getState());
+    },
+    [manager],
+  );
+
+  // Get tray pieces sorted by color
+  const trayPieces = useMemo(() => {
+    if (!state || !imgRef.current) return [];
+
+    const inTray = state.pieces.filter((p) => p.inTray);
+    if (inTray.length === 0) return [];
+
+    const img = imgRef.current;
+
+    // Sort by average color (hue)
+    return [...inTray].sort((a, b) => {
+      const colorA = getAverageColor(img, a, state.grid);
+      const colorB = getAverageColor(img, b, state.grid);
+      return colorA.hue - colorB.hue;
+    });
+  }, [state]);
+
   const placed = state?.placedCount ?? 0;
   const total = state?.totalCount ?? 0;
   const left = Math.max(0, total - placed);
+  const isComplete = state?.isComplete ?? false;
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className={styles.page}>
@@ -199,9 +363,11 @@ export function PlayScreen() {
         <div className={styles.title}>Phuzzle</div>
 
         <div className={styles.hud}>
-          <div className={styles.hudPill}>⏱ {Math.floor(performance.now() / 1000)}s</div>
+          <div className={styles.hudPill}>⏱ {formatTime(elapsedSeconds)}</div>
           <div className={styles.hudPill}>🧩 {left} left</div>
-          <div className={styles.hudPillLive}>In progress</div>
+          <div className={isComplete ? styles.hudPillDone : styles.hudPillLive}>
+            {isComplete ? "Complete!" : "In progress"}
+          </div>
         </div>
 
         <button
@@ -210,6 +376,8 @@ export function PlayScreen() {
             setDebug((d) => ({
               ...d,
               showGrid: !d.showGrid,
+              showBounds: !d.showBounds,
+              showIds: !d.showIds,
             }))
           }
         >
@@ -219,12 +387,24 @@ export function PlayScreen() {
 
       <div className={styles.main}>
         <div className={styles.board} ref={boardRef}>
-          <canvas className={styles.canvas} ref={canvasRef} />
+          <canvas
+            className={styles.canvas}
+            ref={canvasRef}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onContextMenu={handleContextMenu}
+          />
         </div>
-
-        {/* if you have a tray component, it should be rendered here.
-            your screenshot shows tray label but 0 pieces; that's logic, not CSS. */}
       </div>
+
+      <PieceTray
+        pieces={trayPieces}
+        image={imgRef.current}
+        grid={state?.grid ?? grid}
+        onPieceClick={handleTrayPieceClick}
+      />
     </div>
   );
 }

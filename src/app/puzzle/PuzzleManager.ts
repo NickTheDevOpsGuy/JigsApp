@@ -60,9 +60,16 @@ export class PuzzleManager {
   private tileW: number;
   private tileH: number;
 
-  // Solved puzzle origin (tile top-left coords)
-  private targetStartX: number = 0;
-  private targetStartY: number = 0;
+  /**
+   * Solved puzzle origin (tile top-left coords) in PUZZLE space.
+   *
+   * IMPORTANT:
+   * PlayScreen already centers + scales the assembled area via viewRef (offsetX/offsetY + scale).
+   * If we ALSO center targets inside PuzzleManager, we get a double-centering effect that makes
+   * the assembled area appear offset/squished.
+   */
+  private readonly targetStartX: number = 0;
+  private readonly targetStartY: number = 0;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {
@@ -94,8 +101,6 @@ export class PuzzleManager {
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
     this.zCounter = 10;
-
-    this.recomputeSolvedOrigin(grid);
 
     const pieces = this.createPieces({
       grid,
@@ -162,10 +167,6 @@ export class PuzzleManager {
   setBoardSize(boardWidth: number, boardHeight: number) {
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
-
-    // Re-center solved area and update targets
-    this.recomputeSolvedOrigin(this.state.grid);
-    this.recomputeAllTargets();
 
     // Clamp all pieces into view as groups
     const seen = new Set<string>();
@@ -506,19 +507,38 @@ export class PuzzleManager {
   }
 
   private recomputeDerivedState() {
-    const placedCount = this.state.pieces.filter((p) => p.isPlaced).length;
+    const allPieces = this.state.pieces;
+    if (allPieces.length === 0) {
+      this.state = { ...this.state, placedCount: 0, isComplete: false };
+      return;
+    }
+
+    // Count pieces in the largest group as "progress"
+    const groupCounts = new Map<string, number>();
+    for (const p of allPieces) {
+      groupCounts.set(p.groupId, (groupCounts.get(p.groupId) || 0) + 1);
+    }
+    const largestGroupSize = Math.max(...groupCounts.values());
+    
+    // Check if all pieces are in the same group and have correct rotation
+    const firstPiece = allPieces[0];
+    const allSameGroup = allPieces.every(p => p.groupId === firstPiece.groupId);
+    const allCorrectRotation = allPieces.every(p => p.rotation === 0);
+    
+    // If all pieces merged into one group with correct rotation, puzzle is complete
+    const isComplete = allSameGroup && allCorrectRotation && allPieces.length > 1;
 
     const prevComplete = this.state.isComplete;
-    const isComplete =
-      this.state.pieces.length > 0 && placedCount === this.state.pieces.length;
 
+    // placedCount shows how many are "locked in" - use largest group size
     this.state = {
       ...this.state,
-      placedCount,
+      placedCount: largestGroupSize,
       isComplete,
     };
 
     if (!prevComplete && isComplete) {
+      // Mark all as placed
       this.state = {
         ...this.state,
         pieces: this.state.pieces.map((p) => ({ ...p, isPlaced: true })),
@@ -655,27 +675,6 @@ export class PuzzleManager {
     if (right) out.push(right);
 
     return out;
-  }
-
-  // ---------------- Solved origin + targets ----------------
-
-  private recomputeSolvedOrigin(grid: GridSize) {
-    const assembledW = grid.cols * this.tileW;
-    const assembledH = grid.rows * this.tileH;
-
-    this.targetStartX = Math.max(0, (this.boardWidth - assembledW) / 2);
-    this.targetStartY = Math.max(0, (this.boardHeight - assembledH) / 2);
-  }
-
-  private recomputeAllTargets() {
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) => ({
-        ...p,
-        targetX: this.targetStartX + p.col * this.tileW,
-        targetY: this.targetStartY + p.row * this.tileH,
-      })),
-    };
   }
 
   // ---------------- Piece creation ----------------
