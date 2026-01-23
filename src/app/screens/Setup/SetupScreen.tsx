@@ -144,7 +144,7 @@ export function SetupScreen() {
       localStorage.setItem(STORAGE_KEY, imgDataUrl);
       localStorage.setItem(GRID_KEY, `${selected.rows}x${selected.cols}`);
       nav("/play");
-    } catch (err) {
+    } catch (_err) {
       // localStorage might be full or disabled
       setError("Could not save image. Try a smaller image or clear browser storage.");
     }
