@@ -326,11 +326,13 @@ export class PuzzleManager {
 
     // Check ALL pieces in the group are at correct position AND rotation
     const groupPieces = this.getGroupPieces(gid);
-    const allCorrect = groupPieces.length > 0 && groupPieces.every((p) => {
-      if (p.rotation !== 0) return false;
-      const tile = this.tilePos(p);
-      return Math.hypot(p.targetX - tile.x, p.targetY - tile.y) <= this.snapTolerancePx;
-    });
+    const allCorrect =
+      groupPieces.length > 0 &&
+      groupPieces.every((p) => {
+        if (p.rotation !== 0) return false;
+        const tile = this.tilePos(p);
+        return Math.hypot(p.targetX - tile.x, p.targetY - tile.y) <= this.snapTolerancePx;
+      });
 
     if (allCorrect) {
       this.state = {
@@ -359,8 +361,14 @@ export class PuzzleManager {
 
     // Get all pieces in the active group
     const groupPieces = this.getGroupPieces(gid);
-    
-    let best: null | { neighbor: Piece; groupPiece: Piece; dx: number; dy: number; dist: number } = null;
+
+    let best: null | {
+      neighbor: Piece;
+      groupPiece: Piece;
+      dx: number;
+      dy: number;
+      dist: number;
+    } = null;
 
     // Check all pieces in the group for potential neighbor snaps
     for (const groupPiece of groupPieces) {
@@ -384,7 +392,8 @@ export class PuzzleManager {
 
         const d = Math.hypot(moveDx, moveDy);
         if (d <= this.snapTolerancePx) {
-          if (!best || d < best.dist) best = { neighbor: n, groupPiece, dx: moveDx, dy: moveDy, dist: d };
+          if (!best || d < best.dist)
+            best = { neighbor: n, groupPiece, dx: moveDx, dy: moveDy, dist: d };
         }
       }
     }
@@ -405,7 +414,8 @@ export class PuzzleManager {
     };
 
     const mergedPieces = this.getGroupPieces(intoGroup);
-    const allCorrect = mergedPieces.length > 0 && mergedPieces.every((p) => this.isPieceCorrect(p));
+    const allCorrect =
+      mergedPieces.length > 0 && mergedPieces.every((p) => this.isPieceCorrect(p));
 
     if (allCorrect) {
       this.state = {
@@ -426,7 +436,12 @@ export class PuzzleManager {
    * The returned dx/dy is the *additional* delta that would be applied (on release)
    * to snap either to the board target or to a neighbor group.
    */
-  private computeDragPreview(activePiece: Piece, groupId: string, moveDx: number, moveDy: number) {
+  private computeDragPreview(
+    activePiece: Piece,
+    groupId: string,
+    moveDx: number,
+    moveDy: number,
+  ) {
     // Board snap preview (based on the active piece's tile position)
     const movedTileX = activePiece.x + moveDx + activePiece.pad;
     const movedTileY = activePiece.y + moveDy + activePiece.pad;
@@ -466,7 +481,8 @@ export class PuzzleManager {
 
       const d = Math.hypot(dxSnap, dySnap);
       if (d <= this.snapTolerancePx) {
-        if (!best || d < best.dist) best = { neighbor: n, dx: dxSnap, dy: dySnap, dist: d };
+        if (!best || d < best.dist)
+          best = { neighbor: n, dx: dxSnap, dy: dySnap, dist: d };
       }
     }
 
@@ -493,7 +509,8 @@ export class PuzzleManager {
     const placedCount = this.state.pieces.filter((p) => p.isPlaced).length;
 
     const prevComplete = this.state.isComplete;
-    const isComplete = this.state.pieces.length > 0 && placedCount === this.state.pieces.length;
+    const isComplete =
+      this.state.pieces.length > 0 && placedCount === this.state.pieces.length;
 
     this.state = {
       ...this.state,
@@ -680,7 +697,8 @@ export class PuzzleManager {
   private buildEdgesForGrid(grid: GridSize): PieceEdges[] {
     const edges: PieceEdges[] = [];
 
-    const randomTabOrBlank = (): "tab" | "blank" => (Math.random() < 0.5 ? "tab" : "blank");
+    const randomTabOrBlank = (): "tab" | "blank" =>
+      Math.random() < 0.5 ? "tab" : "blank";
     const opposite = (e: PieceEdges["top"]): PieceEdges["top"] => {
       if (e === "flat") return "flat";
       return e === "tab" ? "blank" : "tab";
@@ -694,8 +712,10 @@ export class PuzzleManager {
         const left: PieceEdges["left"] =
           c === 0 ? "flat" : opposite(edges[r * grid.cols + (c - 1)].right);
 
-        const right: PieceEdges["right"] = c === grid.cols - 1 ? "flat" : randomTabOrBlank();
-        const bottom: PieceEdges["bottom"] = r === grid.rows - 1 ? "flat" : randomTabOrBlank();
+        const right: PieceEdges["right"] =
+          c === grid.cols - 1 ? "flat" : randomTabOrBlank();
+        const bottom: PieceEdges["bottom"] =
+          r === grid.rows - 1 ? "flat" : randomTabOrBlank();
 
         edges.push({ top, right, bottom, left });
       }
@@ -731,7 +751,10 @@ export class PuzzleManager {
       const scatterMinX = scatterPadding;
       const scatterMaxX = Math.max(scatterPadding, this.boardWidth - w - scatterPadding);
 
-      const scatterMinY = Math.max(scatterPadding, Math.floor(this.boardHeight * this.scatterStartYRatio));
+      const scatterMinY = Math.max(
+        scatterPadding,
+        Math.floor(this.boardHeight * this.scatterStartYRatio),
+      );
       const scatterMaxY = Math.max(scatterMinY, this.boardHeight - h - scatterPadding);
 
       const x = this.rand(scatterMinX, scatterMaxX);

@@ -85,15 +85,13 @@ export type Piece = {
   edges: PieceEdges;
 };
 
-export type DragPreview =
-  | null
-  | {
-      kind: "board" | "neighbor";
-      groupId: string;
-      dx: number;
-      dy: number;
-      intoGroupId?: string;
-    };
+export type DragPreview = null | {
+  kind: "board" | "neighbor";
+  groupId: string;
+  dx: number;
+  dy: number;
+  intoGroupId?: string;
+};
 
 export type DragState = {
   activeId: PieceId | null;

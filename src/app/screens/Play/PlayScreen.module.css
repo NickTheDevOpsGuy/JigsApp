@@ -111,7 +111,7 @@
 
   /* Prominent border to showcase the board area */
   border: 3px solid #667eea;
-  box-shadow: 
+  box-shadow:
     0 0 0 1px rgba(102, 126, 234, 0.1),
     0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -175,7 +175,9 @@
 .trayPiece {
   cursor: pointer;
   border-radius: 4px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
   flex-shrink: 0;
 }
 

@@ -40,7 +40,9 @@ export function extractPieceColor(
   const imageData = ctx.getImageData(0, 0, size, size);
   const data = imageData.data;
 
-  let totalR = 0, totalG = 0, totalB = 0;
+  let totalR = 0,
+    totalG = 0,
+    totalB = 0;
   let count = 0;
 
   // Sample center region (avoid edges which may have transparency)
@@ -49,7 +51,8 @@ export function extractPieceColor(
     for (let x = margin; x < size - margin; x++) {
       const i = (y * size + x) * 4;
       const a = data[i + 3];
-      if (a > 128) { // Only count non-transparent pixels
+      if (a > 128) {
+        // Only count non-transparent pixels
         totalR += data[i];
         totalG += data[i + 1];
         totalB += data[i + 2];
