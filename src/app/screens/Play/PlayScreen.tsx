@@ -441,6 +441,9 @@ export function PlayScreen() {
         <button className={styles.iconBtn} onClick={handleNewGame}>
           New Game
         </button>
+        <button className={styles.iconBtn} onClick={handleNewGame}>
+          New Game
+        </button>
       </div>
 
       <div className={styles.main}>
