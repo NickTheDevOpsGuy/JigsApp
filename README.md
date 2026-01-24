@@ -25,6 +25,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 - [Extended Roadmap](#extended-roadmap)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
+- [Adding Sample Puzzles](#adding-sample-puzzles)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [Collaborators](#collaborators)
@@ -167,6 +168,22 @@ git clone https://github.com/NickTheDevOpsGuy/phuzzle.git
 ```bash
 npm run dev
 ```
+
+---
+
+## Adding Sample Puzzles
+
+Drop images into `src/app/assets/puzzles/<category>/`:
+```
+src/app/assets/puzzles/
+  animals/
+    my-new-image.jpg
+  nature/
+    landscape.png
+```
+
+Images are auto-discovered. Category = folder name, puzzle name = filename.
+
 
 ---
 
