@@ -1,5 +1,6 @@
 // src/app/screens/Play/PlayScreen.tsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
 
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
@@ -38,6 +39,7 @@ function clamp(n: number, min: number, max: number) {
 }
 
 export function PlayScreen() {
+  const navigate = useNavigate();
   const boardRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -407,8 +409,8 @@ export function PlayScreen() {
   return (
     <div className={styles.page}>
       <div className={styles.topBar}>
-        <button className={styles.iconBtn} onClick={() => history.back()}>
-          Back
+        <button className={styles.iconBtn} onClick={() => navigate("/")}>
+          Menu
         </button>
         <div className={styles.title}>Phuzzle</div>
 
@@ -422,24 +424,6 @@ export function PlayScreen() {
 
         <button className={styles.iconBtn} onClick={() => setShowPreview((p) => !p)}>
           {showPreview ? "Hide" : "Preview"}
-        </button>
-        {SHOW_DEBUG && (
-          <button
-            className={styles.iconBtn}
-            onClick={() =>
-              setDebug((d) => ({
-                ...d,
-                showGrid: !d.showGrid,
-                showBounds: !d.showBounds,
-                showIds: !d.showIds,
-              }))
-            }
-          >
-            Debug
-          </button>
-        )}
-        <button className={styles.iconBtn} onClick={handleNewGame}>
-          New Game
         </button>
         {SHOW_DEBUG && (
           <button

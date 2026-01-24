@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./SetupScreen.module.css";
+import { SAMPLE_PUZZLES, CATEGORIES, type SamplePuzzle } from "@/data/samplePuzzles";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -23,12 +24,19 @@ const GRID_OPTIONS: GridOption[] = [
   { label: "Expert (6×6 - 36 pieces)", rows: 6, cols: 6 },
 ];
 
+type ImageSource = "upload" | "gallery";
+
 export function SetupScreen() {
   const nav = useNavigate();
   const [imgDataUrl, setImgDataUrl] = useState<string | null>(null);
   const [gridIndex, setGridIndex] = useState(1); // Default to Medium
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Gallery state
+  const [imageSource, setImageSource] = useState<ImageSource>("gallery");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedPuzzle, setSelectedPuzzle] = useState<SamplePuzzle | null>(null);
 
   useEffect(() => {
     const existingImg = localStorage.getItem(STORAGE_KEY);
@@ -40,6 +48,11 @@ export function SetupScreen() {
       if (idx >= 0) setGridIndex(idx);
     }
   }, []);
+
+  const filteredPuzzles =
+    selectedCategory === "all"
+      ? SAMPLE_PUZZLES
+      : SAMPLE_PUZZLES.filter((p) => p.category === selectedCategory);
 
   function clearError() {
     setError(null);
@@ -63,12 +76,41 @@ export function SetupScreen() {
     });
   }
 
+  async function onSelectGalleryPuzzle(puzzle: SamplePuzzle) {
+    setSelectedPuzzle(puzzle);
+    clearError();
+    setIsLoading(true);
+
+    try {
+      // Fetch the image and convert to data URL
+      const response = await fetch(puzzle.fullImage);
+      if (!response.ok) throw new Error("Failed to load image");
+
+      const blob = await response.blob();
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error("Failed to read image"));
+        reader.readAsDataURL(blob);
+      });
+
+      setImgDataUrl(dataUrl);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load image.";
+      setError(message);
+      setSelectedPuzzle(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
     clearError();
     setIsLoading(true);
+    setSelectedPuzzle(null); // Clear gallery selection
 
     try {
       // Check file type
@@ -153,6 +195,7 @@ export function SetupScreen() {
   function onClear() {
     localStorage.removeItem(STORAGE_KEY);
     setImgDataUrl(null);
+    setSelectedPuzzle(null);
     clearError();
   }
 
@@ -170,16 +213,68 @@ export function SetupScreen() {
           </div>
         )}
 
-        <label className={styles.label}>
-          Choose a Photo (PNG/JPG/WebP)
-          <input
-            className={styles.file}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            onChange={onPickFile}
-            disabled={isLoading}
-          />
-        </label>
+        {/* Image source tabs */}
+        <div className={styles.tabs}>
+          <button
+            className={`${styles.tab} ${imageSource === "gallery" ? styles.tabActive : ""}`}
+            onClick={() => setImageSource("gallery")}
+          >
+            Gallery
+          </button>
+          <button
+            className={`${styles.tab} ${imageSource === "upload" ? styles.tabActive : ""}`}
+            onClick={() => setImageSource("upload")}
+          >
+            Upload
+          </button>
+        </div>
+
+        {imageSource === "gallery" ? (
+          <>
+            {/* Category filter */}
+            <div className={styles.categories}>
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  className={`${styles.categoryBtn} ${selectedCategory === cat.id ? styles.categoryBtnActive : ""}`}
+                  onClick={() => setSelectedCategory(cat.id)}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Gallery grid */}
+            <div className={styles.gallery}>
+              {filteredPuzzles.length === 0 ? (
+                <div className={styles.galleryEmpty}>No puzzles in this category yet</div>
+              ) : (
+                filteredPuzzles.map((puzzle) => (
+                  <button
+                    key={puzzle.id}
+                    className={`${styles.galleryItem} ${selectedPuzzle?.id === puzzle.id ? styles.galleryItemSelected : ""}`}
+                    onClick={() => onSelectGalleryPuzzle(puzzle)}
+                    disabled={isLoading}
+                  >
+                    <img src={puzzle.thumbnail} alt={puzzle.name} />
+                    <span className={styles.galleryItemName}>{puzzle.name}</span>
+                  </button>
+                ))
+              )}
+            </div>
+          </>
+        ) : (
+          <label className={styles.label}>
+            Choose a Photo (PNG/JPG/WebP)
+            <input
+              className={styles.file}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={onPickFile}
+              disabled={isLoading}
+            />
+          </label>
+        )}
 
         <label className={styles.label}>
           Difficulty
@@ -202,7 +297,7 @@ export function SetupScreen() {
           ) : imgDataUrl ? (
             <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
           ) : (
-            <div className={styles.previewEmpty}>Image Preview</div>
+            <div className={styles.previewEmpty}>Select an image above</div>
           )}
         </div>
 
