@@ -781,6 +781,63 @@ export class PuzzleManager {
     const total = grid.cols * grid.rows;
     const edges = this.buildEdgesForGrid(grid);
 
+    const w = tileW + pad * 2;
+    const h = tileH + pad * 2;
+
+    // Calculate scatter zone (below the solved area)
+    const scatterStartY = Math.max(
+      scatterPadding,
+      Math.floor(this.boardHeight * this.scatterStartYRatio),
+    );
+
+    const scatterZone = {
+      minX: scatterPadding,
+      maxX: Math.max(scatterPadding + w, this.boardWidth - scatterPadding),
+      minY: scatterStartY,
+      maxY: Math.max(scatterStartY + h, this.boardHeight - scatterPadding),
+    };
+
+    const zoneWidth = scatterZone.maxX - scatterZone.minX;
+    const zoneHeight = scatterZone.maxY - scatterZone.minY;
+
+    // Create a grid of possible positions to prevent overlap
+    // Add some spacing between pieces
+    const spacing = 8;
+    const cellW = w + spacing;
+    const cellH = h + spacing;
+
+    const gridCols = Math.max(1, Math.floor(zoneWidth / cellW));
+    const gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
+
+    // Generate all possible grid positions
+    const positions: Array<{ x: number; y: number }> = [];
+    for (let row = 0; row < gridRows; row++) {
+      for (let col = 0; col < gridCols; col++) {
+        // Add slight randomness within each cell for natural look
+        const jitterX = this.rand(0, Math.min(spacing * 2, cellW - w));
+        const jitterY = this.rand(0, Math.min(spacing * 2, cellH - h));
+
+        positions.push({
+          x: scatterZone.minX + col * cellW + jitterX,
+          y: scatterZone.minY + row * cellH + jitterY,
+        });
+      }
+    }
+
+    // Shuffle positions for randomness
+    for (let i = positions.length - 1; i > 0; i--) {
+      const j = this.rand(0, i);
+      [positions[i], positions[j]] = [positions[j], positions[i]];
+    }
+
+    // If we don't have enough grid positions, add random overflow positions
+    while (positions.length < total) {
+      positions.push({
+        x: this.rand(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
+        y: this.rand(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
+      });
+    }
+
     const pieces: Piece[] = [];
 
     for (let i = 0; i < total; i++) {
@@ -790,20 +847,10 @@ export class PuzzleManager {
       const targetX = this.targetStartX + col * tileW;
       const targetY = this.targetStartY + row * tileH;
 
-      const w = tileW + pad * 2;
-      const h = tileH + pad * 2;
-
-      const scatterMinX = scatterPadding;
-      const scatterMaxX = Math.max(scatterPadding, this.boardWidth - w - scatterPadding);
-
-      const scatterMinY = Math.max(
-        scatterPadding,
-        Math.floor(this.boardHeight * this.scatterStartYRatio),
-      );
-      const scatterMaxY = Math.max(scatterMinY, this.boardHeight - h - scatterPadding);
-
-      const x = this.rand(scatterMinX, scatterMaxX);
-      const y = this.rand(scatterMinY, scatterMaxY);
+      // Use pre-calculated position
+      const pos = positions[i];
+      const x = pos.x;
+      const y = pos.y;
 
       const shapePath = buildPiecePath({
         tileW,
