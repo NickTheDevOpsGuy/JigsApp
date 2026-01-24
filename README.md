@@ -174,6 +174,7 @@ npm run dev
 ## Adding Sample Puzzles
 
 Drop images into `src/app/assets/puzzles/<category>/`:
+
 ```
 src/app/assets/puzzles/
   animals/
@@ -183,7 +184,6 @@ src/app/assets/puzzles/
 ```
 
 Images are auto-discovered. Category = folder name, puzzle name = filename.
-
 
 ---
 
