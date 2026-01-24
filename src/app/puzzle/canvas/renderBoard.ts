@@ -71,7 +71,7 @@ export function renderBoard(
 
   // Determine dragged group
   const draggedGroupId = dragState?.activeId
-    ? state.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null
+    ? (state.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
     : null;
 
   // Draw order by z (lowest -> highest) - only pieces NOT in tray
@@ -103,7 +103,7 @@ function drawPiece(
   // Pop animation scale (draw-time)
   const start = popMap.get(p.id);
   const popScale = start ? snapPopScale(nowMs - start) : 1;
-  
+
   // Drag animation: slightly larger when dragging
   const dragScale = isDragging ? 1.03 : 1;
   const scale = popScale * dragScale;
@@ -194,7 +194,7 @@ function drawPiece(
   // Draw the entire source image, scaled and positioned
   // The clip path will cut it to the jigsaw shape
   ctx.drawImage(img, imgX, imgY, imgW, imgH);
-  
+
   ctx.restore();
 
   // Reset shadow before drawing outline
@@ -275,18 +275,22 @@ function drawCompletionGlow(
   const alpha = 0.08 * fadeOut * pulse;
 
   ctx.save();
-  
+
   // Golden glow overlay
   const gradient = ctx.createRadialGradient(
-    cssW / 2, cssH / 2, 0,
-    cssW / 2, cssH / 2, Math.max(cssW, cssH) / 2
+    cssW / 2,
+    cssH / 2,
+    0,
+    cssW / 2,
+    cssH / 2,
+    Math.max(cssW, cssH) / 2,
   );
   gradient.addColorStop(0, `rgba(255, 215, 0, ${alpha})`);
   gradient.addColorStop(1, `rgba(255, 215, 0, 0)`);
-  
+
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, cssW, cssH);
-  
+
   ctx.restore();
 }
 
