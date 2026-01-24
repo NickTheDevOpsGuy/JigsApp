@@ -19,8 +19,9 @@
 }
 
 .trayHeader {
-  padding: 8px 12px;
+  padding: 10px 14px;
   font-weight: 600;
+  font-size: 15px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   background: rgba(0, 0, 0, 0.02);
   flex-shrink: 0;
@@ -31,7 +32,7 @@
 
 .trayHelp {
   font-weight: 400;
-  font-size: 11px;
+  font-size: 13px;
   color: rgba(0, 0, 0, 0.5);
 }
 

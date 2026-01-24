@@ -201,15 +201,19 @@
 
 /* Gallery grid */
 .gallery {
+  --thumb: 108px; /* tweak 96–120 to taste */
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--thumb), 1fr));
+  grid-auto-rows: var(--thumb); /* KEY: rows get a real height */
   gap: 12px;
   max-height: 240px;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 8px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   border: 1px solid rgba(11, 99, 184, 0.15);
+  align-content: start; /* don’t stretch rows weirdly */
 }
 
 .galleryEmpty {
@@ -221,7 +225,8 @@
 }
 
 .galleryItem {
-  aspect-ratio: 1;
+  width: 100%;
+  height: 100%; /* KEY: fill the grid cell */
   border: 3px solid transparent;
   border-radius: 12px;
   overflow: hidden;
@@ -229,14 +234,16 @@
   background: white;
   padding: 0;
   position: relative;
+  display: block; /* keep it simple */
   transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 0; /* helps inside grid */
 }
 
 .galleryItem:hover {
   border-color: rgba(11, 99, 184, 0.5);
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.03); /* slightly less aggressive */
+  z-index: 2; /* sit above neighbors */
 }
 
 .galleryItem:disabled {
@@ -252,6 +259,7 @@
 .galleryItem img {
   width: 100%;
   height: 100%;
+  display: block; /* kills baseline gaps */
   object-fit: cover;
 }
 

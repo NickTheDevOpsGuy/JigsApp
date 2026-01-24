@@ -321,14 +321,17 @@ export class PuzzleManager {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
     if (this.groupIsPlaced(piece.groupId)) return;
+    if (piece.isPlaced) return; // Extra safety check
 
     const step = this.rotationStepDeg;
     const next = (piece.rotation + step) % 360;
+    const groupId = piece.groupId;
 
+    // Rotate ALL pieces in the group together
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, rotation: next } : p,
+        p.groupId === groupId ? { ...p, rotation: next } : p,
       ),
     };
 
