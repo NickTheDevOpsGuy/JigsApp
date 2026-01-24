@@ -1,5 +1,5 @@
 // src/app/puzzle/canvas/renderBoard.ts
-import type { Piece, PuzzleState } from "@/puzzle/types";
+import type { Piece, PuzzleState, DragState } from "@/puzzle/types";
 
 export type PopMap = Map<string, number>;
 
@@ -7,6 +7,13 @@ export type DebugFlags = {
   showGrid: boolean;
   showBounds: boolean;
   showIds: boolean;
+};
+
+export type AnimationState = {
+  draggedGroupId: string | null;
+  hoveredPieceId: string | null;
+  isComplete: boolean;
+  completedAtMs: number | null;
 };
 
 /**
@@ -28,6 +35,8 @@ export function renderBoard(
   popMap: PopMap,
   nowMs: number,
   debug: DebugFlags,
+  dragState?: DragState,
+  animState?: AnimationState,
 ) {
   const canvas = ctx.canvas;
 
@@ -60,11 +69,22 @@ export function renderBoard(
   // Get grid from state
   const { cols, rows } = state.grid;
 
+  // Determine dragged group
+  const draggedGroupId = dragState?.activeId
+    ? (state.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
+    : null;
+
   // Draw order by z (lowest -> highest) - only pieces NOT in tray
   const pieces = [...state.pieces].filter((p) => !p.inTray).sort((a, b) => a.z - b.z);
 
   for (const p of pieces) {
-    drawPiece(ctx, p, img, cols, rows, popMap, nowMs, debug);
+    const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
+    drawPiece(ctx, p, img, cols, rows, popMap, nowMs, debug, isDragging, animState);
+  }
+
+  // Completion glow effect
+  if (animState?.isComplete && animState.completedAtMs) {
+    drawCompletionGlow(ctx, cssW, cssH, nowMs - animState.completedAtMs);
   }
 }
 
@@ -77,10 +97,16 @@ function drawPiece(
   popMap: PopMap,
   nowMs: number,
   debug: DebugFlags,
+  isDragging: boolean,
+  _animState?: AnimationState,
 ) {
   // Pop animation scale (draw-time)
   const start = popMap.get(p.id);
-  const scale = start ? snapPopScale(nowMs - start) : 1;
+  const popScale = start ? snapPopScale(nowMs - start) : 1;
+
+  // Drag animation: slightly larger when dragging
+  const dragScale = isDragging ? 1.03 : 1;
+  const scale = popScale * dragScale;
 
   // Build path (piece-local viewBox coordinates: 0..w,0..h)
   let path: Path2D | null = null;
@@ -96,6 +122,20 @@ function drawPiece(
   }
 
   ctx.save();
+
+  // Drop shadow for dragged pieces
+  if (isDragging) {
+    ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 4;
+  } else if (!p.isPlaced) {
+    // Subtle shadow for unplaced pieces
+    ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+  }
 
   // Centered rotation + scale around piece center
   ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
@@ -157,9 +197,23 @@ function drawPiece(
 
   ctx.restore();
 
-  // Outline
-  ctx.strokeStyle = "rgba(0,0,0,0.25)";
-  ctx.lineWidth = 1;
+  // Reset shadow before drawing outline
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
+  // Outline - thicker for dragged pieces
+  if (isDragging) {
+    ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
+    ctx.lineWidth = 2;
+  } else if (p.isPlaced) {
+    ctx.strokeStyle = "rgba(0, 160, 80, 0.3)";
+    ctx.lineWidth = 1;
+  } else {
+    ctx.strokeStyle = "rgba(0,0,0,0.25)";
+    ctx.lineWidth = 1;
+  }
   ctx.stroke(path);
 
   if (debug.showBounds) {
@@ -178,17 +232,66 @@ function drawPiece(
 }
 
 function snapPopScale(tMs: number) {
-  // Quick up then back
+  // Quick up then back - satisfying snap feel
   if (tMs <= 0) return 1;
-  if (tMs >= 170) return 1;
+  if (tMs >= 200) return 1;
 
-  if (tMs < 90) {
-    const k = tMs / 90; // 0..1
-    return 1 + 0.08 * k;
+  if (tMs < 80) {
+    // Quick scale up
+    const k = tMs / 80;
+    return 1 + 0.1 * easeOutBack(k);
   }
 
-  const k = (tMs - 90) / 80; // 0..1
-  return 1.08 - 0.08 * k;
+  // Settle back down
+  const k = (tMs - 80) / 120;
+  return 1.1 - 0.1 * easeOutBounce(k);
+}
+
+// Easing functions for smooth animations
+function easeOutBack(t: number): number {
+  const c1 = 1.70158;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+}
+
+function easeOutBounce(t: number): number {
+  if (t < 0.5) {
+    return 2 * t * t;
+  }
+  return 1 - 2 * (1 - t) * (1 - t);
+}
+
+function drawCompletionGlow(
+  ctx: CanvasRenderingContext2D,
+  cssW: number,
+  cssH: number,
+  elapsedMs: number,
+) {
+  // Subtle pulsing glow that fades out after a few seconds
+  if (elapsedMs > 3000) return;
+
+  const fadeOut = Math.max(0, 1 - elapsedMs / 3000);
+  const pulse = 0.5 + 0.5 * Math.sin(elapsedMs / 200);
+  const alpha = 0.08 * fadeOut * pulse;
+
+  ctx.save();
+
+  // Golden glow overlay
+  const gradient = ctx.createRadialGradient(
+    cssW / 2,
+    cssH / 2,
+    0,
+    cssW / 2,
+    cssH / 2,
+    Math.max(cssW, cssH) / 2,
+  );
+  gradient.addColorStop(0, `rgba(255, 215, 0, ${alpha})`);
+  gradient.addColorStop(1, `rgba(255, 215, 0, 0)`);
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, cssW, cssH);
+
+  ctx.restore();
 }
 
 function drawDebugBackdrop(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {

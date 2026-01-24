@@ -56,6 +56,9 @@ export function PlayScreen() {
   // Preview image visibility
   const [showPreview, setShowPreview] = useState(false);
 
+  // Track completion time for animation
+  const completedAtRef = useRef<number | null>(null);
+
   // Grid from localStorage
   const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
 
@@ -234,6 +237,13 @@ export function PlayScreen() {
       const assembledW = st.grid.cols * firstPiece.tileW;
       const assembledH = st.grid.rows * firstPiece.tileH;
 
+      // Track completion time for glow animation
+      if (st.isComplete && !completedAtRef.current) {
+        completedAtRef.current = performance.now();
+      } else if (!st.isComplete) {
+        completedAtRef.current = null;
+      }
+
       renderBoard(
         ctx,
         st,
@@ -243,6 +253,13 @@ export function PlayScreen() {
         popMapRef.current,
         performance.now(),
         debug,
+        manager.getDragState(),
+        {
+          draggedGroupId: null,
+          hoveredPieceId: null,
+          isComplete: st.isComplete,
+          completedAtMs: completedAtRef.current,
+        },
       );
 
       // keep react state reasonably fresh
@@ -371,9 +388,9 @@ export function PlayScreen() {
     [manager],
   );
 
-  // Handle starting a new game (clears saved state and reloads)
+  // Handle starting a new puzzle (clears saved state and reloads)
   const handleNewGame = useCallback(() => {
-    if (!confirm("Start a new game? Your current progress will be lost.")) return;
+    if (!confirm("Start a new puzzle? Your current progress will be lost.")) return;
     clearPuzzleState();
     window.location.reload();
   }, []);
@@ -441,7 +458,7 @@ export function PlayScreen() {
           </button>
         )}
         <button className={styles.iconBtn} onClick={handleNewGame}>
-          New Game
+          Start New Puzzle
         </button>
       </div>
 
