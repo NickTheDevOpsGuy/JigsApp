@@ -206,6 +206,20 @@ npm run dev
 ├── src
 │   ├── app
 │   │   ├── assets
+│   │   │   ├── puzzles
+│   │   │   │   ├── animals
+│   │   │   │   │   ├── bear.png
+│   │   │   │   │   ├── frog.png
+│   │   │   │   │   ├── kitten.png
+│   │   │   │   │   └── rabbit.png
+│   │   │   │   ├── demo
+│   │   │   │   │   ├── blue_square_thumb.png
+│   │   │   │   │   ├── four_quadrants_thumb.png
+│   │   │   │   │   ├── green_triangle_thumb.png
+│   │   │   │   │   ├── red_circle_thumb.png
+│   │   │   │   │   ├── two_color_split_thumb.png
+│   │   │   │   │   └── yellow_star_thumb.png
+│   │   │   │   └── nature
 │   │   │   └── ui
 │   │   │       └── phuzzle-logo-512.png
 │   │   ├── components
@@ -224,6 +238,8 @@ npm run dev
 │   │   │   └── Tray
 │   │   │       ├── Tray.module.css
 │   │   │       └── Tray.tsx
+│   │   ├── data
+│   │   │   └── samplePuzzles.ts
 │   │   ├── puzzle
 │   │   │   ├── canvas
 │   │   │   │   ├── pickPiece.ts
