@@ -17,6 +17,7 @@ import {
   loadPuzzleState,
   clearPuzzleState,
 } from "@/puzzle/puzzleStorage";
+import { Menu, Eye, EyeOff, Plus, Clock, Puzzle, Bug } from "lucide-react";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -540,20 +541,28 @@ export function PlayScreen() {
     <div className={styles.page}>
       <div className={styles.topBar}>
         <Button size="sm" onClick={() => navigate("/")}>
-          Menu
+          <Menu size={16} />
+          <span className={styles.btnText}>Menu</span>
         </Button>
         <div className={styles.title}>Phuzzle</div>
 
         <div className={styles.hud}>
-          <div className={styles.hudPillTimer}>⏱ {formatTime(elapsedSeconds)}</div>
-          <div className={styles.hudPill}>🧩 {left} left</div>
+          <div className={styles.hudPillTimer}>
+            <Clock size={14} />
+            <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
+          </div>
+          <div className={styles.hudPill}>
+            <Puzzle size={14} />
+            <span>{left} left</span>
+          </div>
           <div className={isComplete ? styles.hudPillDone : styles.hudPillLive}>
             {isComplete ? "✓" : "..."}
           </div>
         </div>
 
         <Button size="sm" onClick={() => setShowPreview((p) => !p)}>
-          {showPreview ? "Hide" : "Preview"}
+          {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
+          <span className={styles.btnText}>{showPreview ? "Hide" : "Preview"}</span>
         </Button>
         {SHOW_DEBUG && (
           <Button
@@ -567,11 +576,13 @@ export function PlayScreen() {
               }))
             }
           >
-            Debug
+            <Bug size={16} />
+            <span className={styles.btnText}>Debug</span>
           </Button>
         )}
         <Button size="sm" variant="primary" onClick={() => setShowNewGameModal(true)}>
-          New Game
+          <Plus size={16} />
+          <span className={styles.btnText}>New Game</span>
         </Button>
       </div>
 

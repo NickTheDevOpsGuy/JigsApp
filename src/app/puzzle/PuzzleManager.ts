@@ -310,8 +310,11 @@ export class PuzzleManager {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
-    const snappedToBoard = this.trySnapActiveGroupToBoard();
-    if (!snappedToBoard) this.trySnapActiveGroupToNeighbor();
+    // Try board snap first
+    this.trySnapActiveGroupToBoard();
+
+    // ALWAYS try neighbor snap too - pieces at correct position should merge
+    this.trySnapActiveGroupToNeighbor();
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
     this.recomputeDerivedState();
@@ -374,13 +377,11 @@ export class PuzzleManager {
     const dx = firstPiece.targetX - tile.x;
     const dy = firstPiece.targetY - tile.y;
 
-    // Move all pieces in group by the offset
+    // Move all pieces in group by the offset (but don't mark as placed - that blocks merging)
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.groupId === groupId
-          ? { ...p, x: p.x + dx, y: p.y + dy, isPlaced: true, justSnapped: true }
-          : p,
+        p.groupId === groupId ? { ...p, x: p.x + dx, y: p.y + dy, justSnapped: true } : p,
       ),
     };
   }
@@ -432,14 +433,13 @@ export class PuzzleManager {
       });
 
     if (allCorrect) {
+      // Just mark as snapped, not placed (placed blocks further merging)
       this.state = {
         ...this.state,
         pieces: this.state.pieces.map((p) =>
-          p.groupId === gid ? { ...p, isPlaced: true, justSnapped: true } : p,
+          p.groupId === gid ? { ...p, justSnapped: true } : p,
         ),
       };
-      this.events.onPiecePlaced?.(this.findPiece(activeId) ?? active);
-      return true;
     }
 
     return true;
@@ -454,7 +454,9 @@ export class PuzzleManager {
 
     const gid = active.groupId;
 
-    if (this.groupIsPlaced(gid)) return false;
+    // Only block if the piece being dragged is placed (can't drag placed pieces anyway)
+    // Don't use groupIsPlaced - we want unplaced pieces to merge INTO placed groups
+    if (active.isPlaced) return false;
 
     // Get all pieces in the active group
     const groupPieces = this.getGroupPieces(gid);
@@ -496,7 +498,9 @@ export class PuzzleManager {
     }
 
     if (!best) return false;
-    if (this.wouldOverlapAnyOtherGroup(gid, best.dx, best.dy)) return false;
+
+    // Skip overlap check - we're merging with the neighbor group anyway
+    // The overlap is expected because pieces will occupy adjacent positions
 
     this.shiftGroup(gid, best.dx, best.dy);
 
@@ -521,22 +525,15 @@ export class PuzzleManager {
       const snapDx = firstPiece.targetX - tile.x;
       const snapDy = firstPiece.targetY - tile.y;
 
-      // Move entire group to correct position
+      // Move entire group to correct position (DON'T mark as placed - that prevents further merging)
       this.state = {
         ...this.state,
         pieces: this.state.pieces.map((p) =>
           p.groupId === intoGroup
-            ? {
-                ...p,
-                x: p.x + snapDx,
-                y: p.y + snapDy,
-                isPlaced: true,
-                justSnapped: true,
-              }
+            ? { ...p, x: p.x + snapDx, y: p.y + snapDy, justSnapped: true }
             : p,
         ),
       };
-      this.events.onPiecePlaced?.(firstPiece);
     }
 
     return true;
@@ -649,7 +646,7 @@ export class PuzzleManager {
     };
 
     if (!prevComplete && isComplete) {
-      // Mark all as placed
+      // Mark all as placed only when puzzle is COMPLETE
       this.state = {
         ...this.state,
         pieces: this.state.pieces.map((p) => ({ ...p, isPlaced: true })),

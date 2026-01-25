@@ -5,6 +5,7 @@ import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES, CATEGORIES, type SamplePuzzle } from "@/data/samplePuzzles";
 import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
+import { ArrowLeft, Trash2, Play } from "lucide-react";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -300,14 +301,19 @@ export function SetupScreen() {
         </div>
 
         <div className={styles.row}>
-          <Button onClick={() => nav("/")}>Back</Button>
+          <Button onClick={() => nav("/")}>
+            <ArrowLeft size={18} />
+            Back
+          </Button>
 
           <Button onClick={onClear} disabled={isLoading}>
+            <Trash2 size={18} />
             Clear
           </Button>
 
           <Button variant="primary" onClick={onStart} disabled={isLoading || !imgDataUrl}>
-            Start New Game
+            <Play size={18} />
+            Start
           </Button>
         </div>
       </div>
