@@ -510,18 +510,33 @@ export class PuzzleManager {
       ),
     };
 
+    // When pieces connect and rotation is 0, snap the whole group to final position
     const mergedPieces = this.getGroupPieces(intoGroup);
-    const allCorrect =
-      mergedPieces.length > 0 && mergedPieces.every((p) => this.isPieceCorrect(p));
+    const allRotationZero = mergedPieces.every((p) => p.rotation === 0);
 
-    if (allCorrect) {
+    if (allRotationZero && mergedPieces.length > 0) {
+      // Calculate offset to snap first piece to its target
+      const firstPiece = mergedPieces[0];
+      const tile = this.tilePos(firstPiece);
+      const snapDx = firstPiece.targetX - tile.x;
+      const snapDy = firstPiece.targetY - tile.y;
+
+      // Move entire group to correct position
       this.state = {
         ...this.state,
         pieces: this.state.pieces.map((p) =>
-          p.groupId === intoGroup ? { ...p, isPlaced: true, justSnapped: true } : p,
+          p.groupId === intoGroup
+            ? {
+                ...p,
+                x: p.x + snapDx,
+                y: p.y + snapDy,
+                isPlaced: true,
+                justSnapped: true,
+              }
+            : p,
         ),
       };
-      this.events.onPiecePlaced?.(best.neighbor);
+      this.events.onPiecePlaced?.(firstPiece);
     }
 
     return true;

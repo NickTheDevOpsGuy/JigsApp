@@ -502,11 +502,11 @@ export function PlayScreen() {
   // Modal state for new game confirmation
   const [showNewGameModal, setShowNewGameModal] = useState(false);
 
-  // Handle starting a new game (clears saved state and reloads)
+  // Handle starting a new game (clears saved state and navigates to setup)
   const handleNewGame = useCallback(() => {
     clearPuzzleState();
-    window.location.reload();
-  }, []);
+    navigate("/new");
+  }, [navigate]);
 
   // Get tray pieces sorted by color
   const trayPieces = useMemo(() => {
