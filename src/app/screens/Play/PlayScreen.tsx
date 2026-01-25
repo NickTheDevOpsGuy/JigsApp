@@ -28,6 +28,10 @@ import {
   Bug,
   Volume2,
   VolumeX,
+  Maximize,
+  Minimize,
+  Vibrate,
+  VolumeOff,
 } from "lucide-react";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
@@ -77,8 +81,35 @@ export function PlayScreen() {
   // Sound toggle
   const [soundEnabled, setSoundEnabled] = useState(soundManager.isEnabled());
 
+  // Haptics toggle
+  const [hapticsEnabled, setHapticsEnabled] = useState(soundManager.isHapticsEnabled());
+
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+
   // Track completion time for animation
   const completedAtRef = useRef<number | null>(null);
+
+  // Fullscreen toggle handler
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      pageRef.current?.requestFullscreen?.().catch((err) => {
+        console.warn("Fullscreen request failed:", err);
+      });
+    } else {
+      document.exitFullscreen?.();
+    }
+  }, []);
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
 
   // Grid from localStorage
   const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
@@ -559,7 +590,7 @@ export function PlayScreen() {
   };
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} ref={pageRef}>
       <div className={styles.topBar}>
         <Button size="sm" onClick={() => navigate("/")}>
           <Menu size={16} />
@@ -596,6 +627,25 @@ export function PlayScreen() {
           {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
           <span className={styles.btnText}>{soundEnabled ? "Sound" : "Muted"}</span>
         </Button>
+        <Button
+          size="sm"
+          onClick={() => {
+            const newEnabled = !soundManager.isHapticsEnabled();
+            soundManager.setHapticsEnabled(newEnabled);
+            setHapticsEnabled(newEnabled);
+            // Give immediate feedback if enabling
+            if (newEnabled && navigator.vibrate) {
+              navigator.vibrate(25);
+            }
+          }}
+        >
+          <Vibrate size={16} style={{ opacity: hapticsEnabled ? 1 : 0.4 }} />
+          <span className={styles.btnText}>{hapticsEnabled ? "Haptics" : "No Vibe"}</span>
+        </Button>
+        <Button size="sm" onClick={toggleFullscreen}>
+          {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+          <span className={styles.btnText}>{isFullscreen ? "Exit" : "Fullscreen"}</span>
+        </Button>
         {SHOW_DEBUG && (
           <Button
             size="sm"
@@ -614,7 +664,7 @@ export function PlayScreen() {
         )}
         <Button size="sm" variant="primary" onClick={() => setShowNewGameModal(true)}>
           <Plus size={16} />
-          <span className={styles.btnText}>New Puzzle</span>
+          <span className={styles.btnText}>New Game</span>
         </Button>
       </div>
 
@@ -623,9 +673,9 @@ export function PlayScreen() {
         isOpen={showNewGameModal}
         onClose={() => setShowNewGameModal(false)}
         onConfirm={handleNewGame}
-        title="Start New Puzzle?"
-        message="Your current progress will be lost. Are you sure you want to start a new puzzel?"
-        confirmText="New Puzzel"
+        title="Start New Game?"
+        message="Your current progress will be lost. Are you sure you want to start a new game?"
+        confirmText="New Game"
         cancelText="Keep Playing"
         variant="danger"
       />
