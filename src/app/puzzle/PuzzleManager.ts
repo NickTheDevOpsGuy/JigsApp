@@ -36,6 +36,7 @@ export type PuzzleManagerOptions = {
 
 export type PuzzleManagerEvents = {
   onPiecePlaced?: (piece: Piece) => void;
+  onPieceSnapped?: () => void;
   onPuzzleComplete?: (state: PuzzleState) => void;
 };
 
@@ -506,6 +507,9 @@ export class PuzzleManager {
 
     const intoGroup = best.neighbor.groupId;
     this.mergeGroups(gid, intoGroup);
+
+    // Fire snap event for sound
+    this.events.onPieceSnapped?.();
 
     this.state = {
       ...this.state,

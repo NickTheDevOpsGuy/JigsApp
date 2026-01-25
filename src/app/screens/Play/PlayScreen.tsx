@@ -17,7 +17,18 @@ import {
   loadPuzzleState,
   clearPuzzleState,
 } from "@/puzzle/puzzleStorage";
-import { Menu, Eye, EyeOff, Plus, Clock, Puzzle, Bug } from "lucide-react";
+import { soundManager } from "@/audio/sounds";
+import {
+  Menu,
+  Eye,
+  EyeOff,
+  Plus,
+  Clock,
+  Puzzle,
+  Bug,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -62,6 +73,9 @@ export function PlayScreen() {
 
   // Preview image visibility
   const [showPreview, setShowPreview] = useState(false);
+
+  // Sound toggle
+  const [soundEnabled, setSoundEnabled] = useState(soundManager.isEnabled());
 
   // Track completion time for animation
   const completedAtRef = useRef<number | null>(null);
@@ -139,10 +153,15 @@ export function PlayScreen() {
       {
         onPiecePlaced: (p) => {
           popMapRef.current.set(p.id, performance.now());
+          soundManager.play("place");
+        },
+        onPieceSnapped: () => {
+          soundManager.play("snap");
         },
         onPuzzleComplete: () => {
           // Clear saved state on completion
           clearPuzzleState();
+          soundManager.play("complete");
 
           import("canvas-confetti").then((confetti) => {
             confetti.default({
@@ -391,6 +410,7 @@ export function PlayScreen() {
         const piece = st.pieces.find((p) => p.id === pieceId);
         if (piece?.isPlaced) return;
         manager.rotatePiece(pieceId);
+        soundManager.play("rotate");
         setState(manager.getState());
       }
     },
@@ -466,6 +486,7 @@ export function PlayScreen() {
           const piece = st.pieces.find((p) => p.id === pieceId);
           if (!piece?.isPlaced) {
             manager.rotatePiece(pieceId);
+            soundManager.play("rotate");
           }
           lastTapRef.current = { time: 0, pieceId: null };
         } else {
@@ -564,6 +585,17 @@ export function PlayScreen() {
           {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
           <span className={styles.btnText}>{showPreview ? "Hide" : "Preview"}</span>
         </Button>
+        <Button
+          size="sm"
+          onClick={() => {
+            const newEnabled = !soundManager.isEnabled();
+            soundManager.setEnabled(newEnabled);
+            setSoundEnabled(newEnabled);
+          }}
+        >
+          {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          <span className={styles.btnText}>{soundEnabled ? "Sound" : "Muted"}</span>
+        </Button>
         {SHOW_DEBUG && (
           <Button
             size="sm"
@@ -582,7 +614,7 @@ export function PlayScreen() {
         )}
         <Button size="sm" variant="primary" onClick={() => setShowNewGameModal(true)}>
           <Plus size={16} />
-          <span className={styles.btnText}>New Game</span>
+          <span className={styles.btnText}>New Puzzle</span>
         </Button>
       </div>
 
@@ -591,9 +623,9 @@ export function PlayScreen() {
         isOpen={showNewGameModal}
         onClose={() => setShowNewGameModal(false)}
         onConfirm={handleNewGame}
-        title="Start New Game?"
-        message="Your current progress will be lost. Are you sure you want to start a new game?"
-        confirmText="New Game"
+        title="Start New Puzzle?"
+        message="Your current progress will be lost. Are you sure you want to start a new puzzel?"
+        confirmText="New Puzzel"
         cancelText="Keep Playing"
         variant="danger"
       />
