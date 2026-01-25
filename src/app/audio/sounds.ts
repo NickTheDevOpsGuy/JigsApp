@@ -222,10 +222,7 @@ declare global {
   }
 }
 
-AudioParam.prototype.exponentialDecayTo = function (
-  value: number,
-  endTime: number
-) {
+AudioParam.prototype.exponentialDecayTo = function (value: number, endTime: number) {
   this.exponentialRampToValueAtTime(Math.max(value, 0.0001), endTime);
 };
 
