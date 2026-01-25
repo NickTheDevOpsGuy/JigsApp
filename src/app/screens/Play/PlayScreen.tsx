@@ -639,7 +639,7 @@ export function PlayScreen() {
             }
           }}
         >
-          <Vibrate size={16} style={{ opacity: hapticsEnabled ? 1 : 0.4 }} />
+          {hapticsEnabled ? <Vibrate size={16} /> : <VolumeOff size={16} />}
           <span className={styles.btnText}>{hapticsEnabled ? "Haptics" : "No Vibe"}</span>
         </Button>
         <Button size="sm" onClick={toggleFullscreen}>
