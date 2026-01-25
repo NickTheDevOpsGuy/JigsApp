@@ -1,5 +1,6 @@
 // src/app/audio/sounds.ts
 // Sound effects using Web Audio API - no external files needed
+// Haptic feedback using Vibration API
 
 type SoundType = "snap" | "place" | "rotate" | "complete" | "pickup";
 
@@ -7,6 +8,7 @@ class SoundManager {
   private audioContext: AudioContext | null = null;
   private enabled: boolean = true;
   private volume: number = 0.3;
+  private hapticsEnabled: boolean = true;
 
   private getContext(): AudioContext | null {
     if (!this.audioContext) {
@@ -30,6 +32,15 @@ class SoundManager {
     return this.enabled;
   }
 
+  setHapticsEnabled(enabled: boolean) {
+    this.hapticsEnabled = enabled;
+    localStorage.setItem("phuzzle:hapticsEnabled", enabled ? "true" : "false");
+  }
+
+  isHapticsEnabled(): boolean {
+    return this.hapticsEnabled;
+  }
+
   setVolume(volume: number) {
     this.volume = Math.max(0, Math.min(1, volume));
     localStorage.setItem("phuzzle:soundVolume", this.volume.toString());
@@ -48,9 +59,28 @@ class SoundManager {
     if (volume !== null) {
       this.volume = parseFloat(volume);
     }
+    const haptics = localStorage.getItem("phuzzle:hapticsEnabled");
+    if (haptics !== null) {
+      this.hapticsEnabled = haptics === "true";
+    }
+  }
+
+  // Vibrate if supported and enabled
+  private vibrate(pattern: number | number[]) {
+    if (!this.hapticsEnabled) return;
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      try {
+        navigator.vibrate(pattern);
+      } catch {
+        // Vibration not supported or blocked
+      }
+    }
   }
 
   play(sound: SoundType) {
+    // Trigger haptic feedback (works even if sound is muted)
+    this.triggerHaptic(sound);
+
     if (!this.enabled) return;
 
     const ctx = this.getContext();
@@ -76,6 +106,32 @@ class SoundManager {
         break;
       case "complete":
         this.playComplete(ctx);
+        break;
+    }
+  }
+
+  // Trigger haptic feedback based on sound type
+  private triggerHaptic(sound: SoundType) {
+    switch (sound) {
+      case "pickup":
+        // Light tap
+        this.vibrate(10);
+        break;
+      case "snap":
+        // Satisfying click
+        this.vibrate(25);
+        break;
+      case "place":
+        // Heavier thunk
+        this.vibrate(40);
+        break;
+      case "rotate":
+        // Quick buzz
+        this.vibrate(15);
+        break;
+      case "complete":
+        // Celebration pattern: short-pause-short-pause-long
+        this.vibrate([50, 50, 50, 50, 100]);
         break;
     }
   }
