@@ -3,6 +3,11 @@ import React, { useRef, useEffect } from "react";
 import type { Piece, GridSize } from "@/puzzle/types";
 import styles from "./PieceTray.module.css";
 
+// Detect touch device
+const isTouchDevice = () =>
+  typeof window !== "undefined" &&
+  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
 type PieceTrayProps = {
   pieces: Piece[];
   image: HTMLImageElement | null;
@@ -11,15 +16,25 @@ type PieceTrayProps = {
 };
 
 export function PieceTray({ pieces, image, grid, onPieceClick }: PieceTrayProps) {
+  const isTouch = isTouchDevice();
+
+  const helpText = isTouch
+    ? "Long-press to store • Double-tap to rotate"
+    : "Middle-click to store • Right-click to rotate";
+
+  const emptyText = isTouch
+    ? "Long-press pieces to store them here"
+    : "Middle-click pieces to store them here";
+
   return (
     <div className={styles.tray}>
       <div className={styles.trayHeader}>
         <span>Piece Drawer ({pieces.length})</span>
-        <span className={styles.trayHelp}>Middle-click to store • Click to retrieve</span>
+        <span className={styles.trayHelp}>{helpText}</span>
       </div>
       <div className={styles.trayScroll}>
         {pieces.length === 0 ? (
-          <div className={styles.trayEmpty}>Middle-click pieces to store them here</div>
+          <div className={styles.trayEmpty}>{emptyText}</div>
         ) : (
           <div className={styles.trayPieces}>
             {pieces.map((piece) => (
