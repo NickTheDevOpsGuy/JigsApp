@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES, CATEGORIES, type SamplePuzzle } from "@/data/samplePuzzles";
+import { Button } from "@/components/Button/Button";
+import { Dropdown } from "@/components/DropDown/Dropdown";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -276,20 +278,16 @@ export function SetupScreen() {
           </label>
         )}
 
-        <label className={styles.label}>
-          Difficulty
-          <select
-            className={styles.select}
-            value={gridIndex}
-            onChange={(e) => setGridIndex(Number(e.target.value))}
-          >
-            {GRID_OPTIONS.map((opt, i) => (
-              <option key={i} value={i}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Dropdown
+          label="Difficulty"
+          value={gridIndex}
+          onChange={(val) => setGridIndex(Number(val))}
+          options={GRID_OPTIONS.map((opt, i) => ({
+            value: i,
+            label: opt.label,
+          }))}
+          fullWidth
+        />
 
         <div className={styles.preview}>
           {isLoading ? (
@@ -302,26 +300,15 @@ export function SetupScreen() {
         </div>
 
         <div className={styles.row}>
-          <button className={styles.secondary} onClick={() => nav("/")}>
-            Back
-          </button>
+          <Button onClick={() => nav("/")}>Back</Button>
 
-          <button
-            className={styles.secondary}
-            onClick={onClear}
-            type="button"
-            disabled={isLoading}
-          >
+          <Button onClick={onClear} disabled={isLoading}>
             Clear
-          </button>
+          </Button>
 
-          <button
-            className={styles.primary}
-            onClick={onStart}
-            disabled={isLoading || !imgDataUrl}
-          >
+          <Button variant="primary" onClick={onStart} disabled={isLoading || !imgDataUrl}>
             Start New Game
-          </button>
+          </Button>
         </div>
       </div>
     </div>

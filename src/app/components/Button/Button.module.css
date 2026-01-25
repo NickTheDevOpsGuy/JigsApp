@@ -1,1 +1,106 @@
 /* This is a comment */
+/* src/app/components/Button/Button.module.css */
+
+.button {
+  appearance: none;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.primary {
+  background: #0b63b8;
+  color: white;
+  border: 1px solid #0b63b8;
+}
+
+.primary:hover:not(:disabled) {
+  background: #0952a0;
+}
+
+.primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.secondary {
+  background: #ffffff;
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.secondary:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.secondary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.ghost {
+  background: transparent;
+  color: #0b63b8;
+  border: 1px solid transparent;
+}
+
+.ghost:hover:not(:disabled) {
+  background: rgba(11, 99, 184, 0.08);
+}
+
+.ghost:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Sizes */
+.sm {
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+.md {
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+.lg {
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 12px;
+}
+
+/* Full width */
+.fullWidth {
+  width: 100%;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .sm {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .md {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .lg {
+    padding: 10px 16px;
+    font-size: 15px;
+  }
+}

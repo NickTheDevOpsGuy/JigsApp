@@ -1,24 +1,30 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MenuScreen.module.css";
 
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
+import { Button } from "@/components/Button/Button";
+import { HowToPlayModal } from "@/components/HowToPlay";
 
 export function MenuScreen() {
   const nav = useNavigate();
+  const [showHelp, setShowHelp] = useState(false);
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
         <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
 
-        <button className={styles.secondary} onClick={() => alert("Hook up modal later")}>
+        <Button variant="secondary" onClick={() => setShowHelp(true)} fullWidth>
           How to Play
-        </button>
+        </Button>
 
-        <button className={styles.primary} onClick={() => nav("/new")}>
+        <Button variant="primary" onClick={() => nav("/new")} fullWidth>
           Choose Puzzle Photo
-        </button>
+        </Button>
       </div>
+
+      <HowToPlayModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
     </div>
   );
 }

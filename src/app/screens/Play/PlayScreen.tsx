@@ -8,6 +8,9 @@ import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
+import { Button } from "@/components/Button/Button";
+import { ConfirmModal } from "@/components/Modal/Modal";
+import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import {
   savePuzzleState,
@@ -46,6 +49,9 @@ export function PlayScreen() {
 
   const popMapRef = useRef<Map<string, number>>(new Map());
   const rafRef = useRef<number | null>(null);
+
+  // Tutorial for first-time users
+  const [showTutorial, dismissTutorial] = useShouldShowTutorial();
 
   const [debug, setDebug] = useState<DebugFlags>({
     showGrid: false,
@@ -301,6 +307,9 @@ export function PlayScreen() {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
+      // Reset transform to identity for hit testing in CSS pixel space
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+
       // Get CSS-space coordinates
       const cssX = e.clientX - boardRect.left;
       const cssY = e.clientY - boardRect.top;
@@ -321,10 +330,17 @@ export function PlayScreen() {
         return;
       }
 
-      // Left click = start drag
-      if (e.button === 0) {
+      // Touch or left click = start drag
+      // On touch devices, e.button is 0 but we should also check pointerType
+      const isTouch = e.pointerType === "touch";
+      const isLeftClick = e.button === 0;
+
+      if (isTouch || isLeftClick) {
         const piece = st.pieces.find((p) => p.id === pieceId);
         if (!piece) return;
+
+        // Prevent default to stop iOS from scrolling/zooming
+        e.preventDefault();
 
         // Create a fake rect for the piece (manager expects this)
         const pieceRect = new DOMRect(
@@ -338,12 +354,41 @@ export function PlayScreen() {
         setState(manager.getState());
 
         // Capture pointer for smooth dragging
-        canvas.setPointerCapture(e.pointerId);
+        try {
+          canvas.setPointerCapture(e.pointerId);
+        } catch {
+          // Some browsers don't support pointer capture
+        }
+
+        // Start long-press timer for mobile (send to tray)
+        if (isTouch) {
+          const longPressTimer = setTimeout(() => {
+            // Only trigger if we haven't moved much (still on same piece)
+            manager.pointerUp(); // Cancel drag
+            manager.movePieceToTray(pieceId);
+            setState(manager.getState());
+            try {
+              canvas.releasePointerCapture(e.pointerId);
+            } catch {
+              // Ignore
+            }
+          }, 500);
+
+          // Store timer to cancel on move/up
+          (
+            canvas as HTMLCanvasElement & {
+              longPressTimer?: ReturnType<typeof setTimeout>;
+            }
+          ).longPressTimer = longPressTimer;
+        }
       }
 
-      // Right click = rotate
+      // Right click = rotate (desktop)
       if (e.button === 2) {
         e.preventDefault();
+        // Don't rotate if already placed
+        const piece = st.pieces.find((p) => p.id === pieceId);
+        if (piece?.isPlaced) return;
         manager.rotatePiece(pieceId);
         setState(manager.getState());
       }
@@ -351,9 +396,27 @@ export function PlayScreen() {
     [manager],
   );
 
+  // Track for double-tap to rotate
+  const lastTapRef = useRef<{ time: number; pieceId: string | null }>({
+    time: 0,
+    pieceId: null,
+  });
+
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !boardRef.current) return;
+
+      // Cancel long-press on move
+      const canvas = e.currentTarget;
+      const timer = (
+        canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
+      ).longPressTimer;
+      if (timer) {
+        clearTimeout(timer);
+        (
+          canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
+        ).longPressTimer = undefined;
+      }
 
       const boardRect = boardRef.current.getBoundingClientRect();
       manager.pointerMove(e.clientX, e.clientY, boardRect);
@@ -365,11 +428,59 @@ export function PlayScreen() {
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current) return;
 
+      const canvas = canvasRef.current;
+
+      // Cancel long-press timer
+      const timer = (
+        canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
+      ).longPressTimer;
+      if (timer) {
+        clearTimeout(timer);
+        (
+          canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
+        ).longPressTimer = undefined;
+      }
+
+      // Check for double-tap to rotate (mobile)
+      const isTouch = e.pointerType === "touch";
+      const now = Date.now();
+      const boardRect = boardRef.current?.getBoundingClientRect();
+      const ctx = canvas.getContext("2d");
+
+      if (isTouch && boardRect && ctx) {
+        // Reset transform to identity for hit testing in CSS pixel space
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        const st = manager.getState();
+        const x = e.clientX - boardRect.left;
+        const y = e.clientY - boardRect.top;
+        const pieceId = pickPieceId(ctx, st.pieces, x, y);
+
+        if (
+          pieceId &&
+          lastTapRef.current.pieceId === pieceId &&
+          now - lastTapRef.current.time < 300
+        ) {
+          // Double tap detected - rotate (but not if placed)
+          const piece = st.pieces.find((p) => p.id === pieceId);
+          if (!piece?.isPlaced) {
+            manager.rotatePiece(pieceId);
+          }
+          lastTapRef.current = { time: 0, pieceId: null };
+        } else {
+          lastTapRef.current = { time: now, pieceId };
+        }
+      }
+
       manager.pointerUp();
       setState(manager.getState());
 
       // Release pointer capture
-      canvasRef.current.releasePointerCapture(e.pointerId);
+      try {
+        canvas.releasePointerCapture(e.pointerId);
+      } catch {
+        // Ignore - may not have capture
+      }
     },
     [manager],
   );
@@ -388,9 +499,11 @@ export function PlayScreen() {
     [manager],
   );
 
-  // Handle starting a new puzzle (clears saved state and reloads)
+  // Modal state for new game confirmation
+  const [showNewGameModal, setShowNewGameModal] = useState(false);
+
+  // Handle starting a new game (clears saved state and reloads)
   const handleNewGame = useCallback(() => {
-    if (!confirm("Start a new puzzle? Your current progress will be lost.")) return;
     clearPuzzleState();
     window.location.reload();
   }, []);
@@ -426,25 +539,25 @@ export function PlayScreen() {
   return (
     <div className={styles.page}>
       <div className={styles.topBar}>
-        <button className={styles.iconBtn} onClick={() => navigate("/")}>
+        <Button size="sm" onClick={() => navigate("/")}>
           Menu
-        </button>
+        </Button>
         <div className={styles.title}>Phuzzle</div>
 
         <div className={styles.hud}>
-          <div className={styles.hudPill}>⏱ {formatTime(elapsedSeconds)}</div>
+          <div className={styles.hudPillTimer}>⏱ {formatTime(elapsedSeconds)}</div>
           <div className={styles.hudPill}>🧩 {left} left</div>
           <div className={isComplete ? styles.hudPillDone : styles.hudPillLive}>
-            {isComplete ? "Complete!" : "In progress"}
+            {isComplete ? "✓" : "..."}
           </div>
         </div>
 
-        <button className={styles.iconBtn} onClick={() => setShowPreview((p) => !p)}>
+        <Button size="sm" onClick={() => setShowPreview((p) => !p)}>
           {showPreview ? "Hide" : "Preview"}
-        </button>
+        </Button>
         {SHOW_DEBUG && (
-          <button
-            className={styles.iconBtn}
+          <Button
+            size="sm"
             onClick={() =>
               setDebug((d) => ({
                 ...d,
@@ -455,12 +568,24 @@ export function PlayScreen() {
             }
           >
             Debug
-          </button>
+          </Button>
         )}
-        <button className={styles.iconBtn} onClick={handleNewGame}>
-          Start New Puzzle
-        </button>
+        <Button size="sm" variant="primary" onClick={() => setShowNewGameModal(true)}>
+          New Game
+        </Button>
       </div>
+
+      {/* New Game Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showNewGameModal}
+        onClose={() => setShowNewGameModal(false)}
+        onConfirm={handleNewGame}
+        title="Start New Game?"
+        message="Your current progress will be lost. Are you sure you want to start a new game?"
+        confirmText="New Game"
+        cancelText="Keep Playing"
+        variant="danger"
+      />
 
       <div className={styles.main}>
         <div className={styles.board} ref={boardRef}>
@@ -493,6 +618,11 @@ export function PlayScreen() {
         grid={state?.grid ?? grid}
         onPieceClick={handleTrayPieceClick}
       />
+
+      {/* First-time tutorial overlay */}
+      {showTutorial && <TutorialOverlay onComplete={dismissTutorial} />}
     </div>
   );
 }
+
+export default PlayScreen;
