@@ -194,21 +194,12 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 <summary>Click to expand file structure</summary>
 
 .
-├── assets
-│   ├── banner.png
-│   └── omegabot.png
-├── CHANGELOG.md
+├── Assets
+│   └── Preview
+│       └── preview.gif
 ├── CONTRIBUTORS.md
-├── data
-│   └── omegabot.db
-├── docs
-│   ├── commands.md
-│   ├── dev-notes.md
-│   ├── faq.md
-│   ├── setup-discord.md
-│   ├── setup-env.md
-│   └── transcripts.md
 ├── .env.example
+├── .eslintcache
 ├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
@@ -220,168 +211,107 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   └── question_discussion.yml
 │   ├── pull_request_template.md
 │   └── workflows
-│       └── OmegaBot.yml
+│       ├── Phuzzle.yml
+│       └── vercel-production.yml
 ├── .gitignore
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push
-├── LICENSE
-├── migrations
-│   └── 001_rps_stats.sql
+├── index.html
+├── LICENSE.md
 ├── package.json
 ├── .prettierignore
 ├── .prettierrc.yml
+├── public
+│   └── favicon.svg
 ├── README.md
 ├── scripts
 │   └── precheck.sh
 ├── src
-│   ├── bot.ts
-│   ├── commands
-│   │   ├── admin
-│   │   │   └── admin.ts
-│   │   ├── afk
-│   │   │   └── afk.ts
-│   │   ├── changelog
-│   │   │   └── changelog.ts
-│   │   ├── config
-│   │   │   └── config.ts
-│   │   ├── faq
-│   │   │   ├── faq.ts
-│   │   │   └── subcommands
-│   │   │       ├── add.ts
-│   │   │       ├── get.ts
-│   │   │       ├── list.ts
-│   │   │       └── remove.ts
-│   │   ├── fun
-│   │   │   ├── coinflipStore.test.ts
-│   │   │   ├── coinflipStore.ts
-│   │   │   ├── coinStore.ts
-│   │   │   ├── fun.ts
-│   │   │   └── subcommands
-│   │   │       ├── coinflipstats.ts
-│   │   │       ├── coinflip.ts
-│   │   │       ├── daily.ts
-│   │   │       ├── dice.ts
-│   │   │       ├── eightball.ts
-│   │   │       ├── joke
-│   │   │       │   ├── add.ts
-│   │   │       │   ├── index.ts
-│   │   │       │   ├── list.ts
-│   │   │       │   ├── random.ts
-│   │   │       │   └── remove.ts
-│   │   │       ├── leaderboard.ts
-│   │   │       ├── poll.ts
-│   │   │       ├── quote.ts
-│   │   │       ├── remind.ts
-│   │   │       ├── rps.ts
-│   │   │       ├── trivia.ts
-│   │   │       └── weather.ts
-│   │   ├── general
-│   │   │   └── ping.ts
-│   │   ├── github
-│   │   │   ├── gh.ts
-│   │   │   ├── pr.ts
-│   │   │   └── status.ts
-│   │   ├── help
-│   │   │   ├── helpText.ts
-│   │   │   └── help.ts
-│   │   ├── history
-│   │   │   └── history.ts
-│   │   ├── pagination
-│   │   │   └── pagination.ts
-│   │   ├── playback
-│   │   │   └── playback.ts
-│   │   ├── summary
-│   │   │   └── summary.ts
-│   │   └── timezone
-│   │       └── timezone.ts
-│   ├── config
-│   │   └── env.ts
-│   ├── registerCommands.ts
-│   ├── services
-│   │   ├── ai
-│   │   │   └── claudeService.ts
-│   │   ├── cache
-│   │   │   └── simpleCache.ts
-│   │   ├── config
-│   │   │   ├── guildConfigStore.ts
-│   │   │   ├── index.ts
+│   ├── app
+│   │   ├── App.tsx
+│   │   ├── assets
+│   │   │   ├── puzzles
+│   │   │   │   ├── animals
+│   │   │   │   │   ├── bear.png
+│   │   │   │   │   ├── frog.png
+│   │   │   │   │   ├── kitten.png
+│   │   │   │   │   └── rabbit.png
+│   │   │   │   └── demo
+│   │   │   │       ├── blue_square_thumb.png
+│   │   │   │       ├── four_quadrants_thumb.png
+│   │   │   │       ├── green_triangle_thumb.png
+│   │   │   │       ├── red_circle_thumb.png
+│   │   │   │       ├── two_color_split_thumb.png
+│   │   │   │       └── yellow_star_thumb.png
+│   │   │   └── ui
+│   │   │       └── phuzzle-logo-512.png
+│   │   ├── audio
+│   │   │   └── sounds.ts
+│   │   ├── components
+│   │   │   ├── Button
+│   │   │   │   ├── Button.module.css
+│   │   │   │   └── Button.tsx
+│   │   │   ├── DropDown
+│   │   │   │   ├── Dropdown.module.css
+│   │   │   │   └── Dropdown.tsx
+│   │   │   ├── HowToPlay
+│   │   │   │   ├── HowToPlayModal.tsx
+│   │   │   │   ├── HowToPlay.module.css
+│   │   │   │   ├── index.ts
+│   │   │   │   └── TutorialOverlay.tsx
+│   │   │   ├── Modal
+│   │   │   │   ├── Modal.module.css
+│   │   │   │   └── Modal.tsx
+│   │   │   ├── PieceTray
+│   │   │   │   ├── PieceTray.module.css
+│   │   │   │   └── PieceTray.tsx
+│   │   │   └── Tray
+│   │   │       ├── Tray.module.css
+│   │   │       └── Tray.tsx
+│   │   ├── data
+│   │   │   └── samplePuzzles.ts
+│   │   ├── main.tsx
+│   │   ├── puzzle
+│   │   │   ├── canvas
+│   │   │   │   ├── pickPiece.ts
+│   │   │   │   ├── renderBoard.ts
+│   │   │   │   ├── renderTrayPiece.ts
+│   │   │   │   └── shape.ts
+│   │   │   ├── colorUtils.ts
+│   │   │   ├── config.ts
+│   │   │   ├── PuzzleManager.ts
+│   │   │   ├── puzzleStorage.ts
+│   │   │   ├── shape.ts
+│   │   │   ├── SnapLogic.ts
 │   │   │   └── types.ts
-│   │   ├── database
-│   │   │   └── db.ts
-│   │   ├── discord
-│   │   │   ├── commandLoader.ts
-│   │   │   ├── commandMeta.ts
-│   │   │   ├── commandTypes.ts
-│   │   │   ├── cooldowns.ts
-│   │   │   ├── fetchChannelMessages.ts
-│   │   │   ├── interactionHandler.ts
-│   │   │   ├── safeReply.ts
-│   │   │   └── tracedInteractionHandler.ts
-│   │   ├── faq
-│   │   │   ├── faqService.ts
-│   │   │   ├── permissions.ts
-│   │   │   ├── services.test.ts
-│   │   │   ├── services.ts
-│   │   │   ├── _shared.ts
-│   │   │   ├── store.test.ts
-│   │   │   ├── store.ts
-│   │   │   └── types.ts
-│   │   ├── fun
-│   │   │   ├── funUsageStore.test.ts
-│   │   │   ├── funUsageStore.ts
-│   │   │   └── pollStore.ts
-│   │   ├── github
-│   │   │   ├── githubApi.ts
-│   │   │   ├── githubCache.ts
-│   │   │   ├── githubClient.ts
-│   │   │   ├── githubErrorMessage.ts
-│   │   │   ├── issueAssigneePollerState.ts
-│   │   │   ├── issueAssigneePoller.ts
-│   │   │   ├── lastSeenStore.ts
-│   │   │   ├── prFormatter.ts
-│   │   │   ├── prPoller.ts
-│   │   │   └── types.ts
-│   │   ├── joke
-│   │   │   └── jokeStore.ts
-│   │   ├── logging
-│   │   │   ├── index.ts
-│   │   │   └── requestContext.ts
-│   │   ├── reminders
-│   │   │   ├── index.ts
-│   │   │   ├── scheduler.ts
-│   │   │   ├── schema.ts
-│   │   │   └── store.ts
-│   │   ├── roles
-│   │   │   └── autoRoleHandler.ts
-│   │   ├── summary
-│   │   │   ├── llmSummary.ts
-│   │   │   ├── localSummary.ts
-│   │   │   └── summarizer.ts
-│   │   ├── time
-│   │   │   ├── formatTimestamp.ts
-│   │   │   └── validateTimezone.ts
-│   │   ├── timezone
-│   │   │   └── timezoneStore.ts
-│   │   ├── transcript
-│   │   │   ├── buildTranscript.ts
-│   │   │   └── defaults.ts
-│   │   ├── weather
-│   │   │   ├── forecast.ts
-│   │   │   └── types.ts
-│   │   └── welcome
-│   │       ├── welcomeHandler.ts
-│   │       └── welcomeMessage.ts
-│   ├── test
-│   │   └── dbTestUtils.ts
-│   ├── types
-│   │   └── discord-client.d.ts
-│   └── utils
-│       ├── colors.ts
-│       ├── interactions.ts
-│       └── logger.ts
+│   │   ├── screens
+│   │   │   ├── Menu
+│   │   │   │   ├── MenuScreen.module.css
+│   │   │   │   └── MenuScreen.tsx
+│   │   │   ├── NewGame
+│   │   │   │   ├── NewGameScreen.module.css
+│   │   │   │   └── NewGameScreen.tsx
+│   │   │   ├── Play
+│   │   │   │   ├── PlayScreen.module.css
+│   │   │   │   └── PlayScreen.tsx
+│   │   │   └── Setup
+│   │   │       ├── SetupScreen.module.css
+│   │   │       └── SetupScreen.tsx
+│   │   ├── styles
+│   │   │   └── global.css
+│   │   └── vite-env.d.ts
+│   └── types
+│       ├── canvas-confetti.d.ts
+│       └── vite-env.d.ts
+├── test-results
+│   └── .last-run.json
+├── tsconfig.app.json
+├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
-└── vitest.config.ts
+├── tsconfig.node.json
+├── vercel.json
+└── vite.config.ts
 
 </details>
 ```

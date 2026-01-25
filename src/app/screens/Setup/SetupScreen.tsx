@@ -313,7 +313,7 @@ export function SetupScreen() {
 
           <Button variant="primary" onClick={onStart} disabled={isLoading || !imgDataUrl}>
             <Play size={18} />
-            Start
+            Start Puzzel
           </Button>
         </div>
       </div>
