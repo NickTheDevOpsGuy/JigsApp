@@ -10,7 +10,6 @@ import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { Button } from "@/components/Button/Button";
 import { ConfirmModal } from "@/components/Modal/Modal";
-import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import {
   savePuzzleState,
@@ -461,11 +460,8 @@ export function PlayScreen() {
           lastTapRef.current.pieceId === pieceId &&
           now - lastTapRef.current.time < 300
         ) {
-          // Double tap detected - rotate (but not if placed)
-          const piece = st.pieces.find((p) => p.id === pieceId);
-          if (!piece?.isPlaced) {
-            manager.rotatePiece(pieceId);
-          }
+          // Double tap detected - rotate
+          manager.rotatePiece(pieceId);
           lastTapRef.current = { time: 0, pieceId: null };
         } else {
           lastTapRef.current = { time: now, pieceId };
