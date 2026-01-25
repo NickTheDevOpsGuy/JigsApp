@@ -5,6 +5,7 @@ import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES, CATEGORIES, type SamplePuzzle } from "@/data/samplePuzzles";
 import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
+import { ArrowLeft, Trash2, Play } from "lucide-react";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -34,7 +35,7 @@ export function SetupScreen() {
   const [gridIndex, setGridIndex] = useState(1); // Default to Medium
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  
   // Gallery state
   const [imageSource, setImageSource] = useState<ImageSource>("gallery");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -46,34 +47,33 @@ export function SetupScreen() {
 
     const existingGrid = localStorage.getItem(GRID_KEY);
     if (existingGrid) {
-      const idx = GRID_OPTIONS.findIndex((g) => `${g.rows}x${g.cols}` === existingGrid);
+      const idx = GRID_OPTIONS.findIndex(
+        (g) => `${g.rows}x${g.cols}` === existingGrid
+      );
       if (idx >= 0) setGridIndex(idx);
     }
   }, []);
 
-  const filteredPuzzles =
-    selectedCategory === "all"
-      ? SAMPLE_PUZZLES
-      : SAMPLE_PUZZLES.filter((p) => p.category === selectedCategory);
+  const filteredPuzzles = selectedCategory === "all" 
+    ? SAMPLE_PUZZLES 
+    : SAMPLE_PUZZLES.filter(p => p.category === selectedCategory);
 
   function clearError() {
     setError(null);
   }
 
-  function validateImageDimensions(
-    dataUrl: string,
-  ): Promise<{ width: number; height: number }> {
+  function validateImageDimensions(dataUrl: string): Promise<{ width: number; height: number }> {
     return new Promise((resolve, reject) => {
       const img = new Image();
-
+      
       img.onload = () => {
         resolve({ width: img.naturalWidth, height: img.naturalHeight });
       };
-
+      
       img.onerror = () => {
         reject(new Error("Failed to load image. The file may be corrupted."));
       };
-
+      
       img.src = dataUrl;
     });
   }
@@ -87,7 +87,7 @@ export function SetupScreen() {
       // Fetch the image and convert to data URL
       const response = await fetch(puzzle.fullImage);
       if (!response.ok) throw new Error("Failed to load image");
-
+      
       const blob = await response.blob();
       const dataUrl = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -124,15 +124,13 @@ export function SetupScreen() {
       // Check file size
       if (file.size > MAX_FILE_SIZE) {
         const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-        throw new Error(
-          `Image is too large (${sizeMB}MB). Please choose one under 10MB.`,
-        );
+        throw new Error(`Image is too large (${sizeMB}MB). Please choose one under 10MB.`);
       }
 
       // Read file as data URL
       const dataUrl = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
-
+        
         reader.onload = () => {
           const result = reader.result;
           if (typeof result !== "string" || !result.startsWith("data:image/")) {
@@ -141,20 +139,20 @@ export function SetupScreen() {
           }
           resolve(result);
         };
-
+        
         reader.onerror = () => {
           reject(new Error("Failed to read file. Please try another image."));
         };
-
+        
         reader.readAsDataURL(file);
       });
 
       // Validate image dimensions
       const { width, height } = await validateImageDimensions(dataUrl);
-
+      
       if (width < MIN_IMAGE_SIZE || height < MIN_IMAGE_SIZE) {
         throw new Error(
-          `Image is too small (${width}×${height}px). Please use an image at least ${MIN_IMAGE_SIZE}×${MIN_IMAGE_SIZE}px.`,
+          `Image is too small (${width}×${height}px). Please use an image at least ${MIN_IMAGE_SIZE}×${MIN_IMAGE_SIZE}px.`
         );
       }
 
@@ -167,6 +165,7 @@ export function SetupScreen() {
       }
 
       setImgDataUrl(dataUrl);
+      
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to load image.";
       setError(message);
@@ -183,7 +182,7 @@ export function SetupScreen() {
     }
 
     const selected = GRID_OPTIONS[gridIndex];
-
+    
     try {
       localStorage.setItem(STORAGE_KEY, imgDataUrl);
       localStorage.setItem(GRID_KEY, `${selected.rows}x${selected.cols}`);
@@ -209,9 +208,7 @@ export function SetupScreen() {
         {error && (
           <div className={styles.error}>
             <span>{error}</span>
-            <button className={styles.errorClose} onClick={clearError}>
-              ×
-            </button>
+            <button className={styles.errorClose} onClick={clearError}>×</button>
           </div>
         )}
 
@@ -300,14 +297,19 @@ export function SetupScreen() {
         </div>
 
         <div className={styles.row}>
-          <Button onClick={() => nav("/")}>Back</Button>
+          <Button onClick={() => nav("/")}>
+            <ArrowLeft size={18} />
+            Back
+          </Button>
 
           <Button onClick={onClear} disabled={isLoading}>
+            <Trash2 size={18} />
             Clear
           </Button>
 
           <Button variant="primary" onClick={onStart} disabled={isLoading || !imgDataUrl}>
-            Start New Game
+            <Play size={18} />
+            Start
           </Button>
         </div>
       </div>

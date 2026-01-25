@@ -31,9 +31,23 @@
 }
 
 .title {
-  font-weight: 700;
-  letter-spacing: 0.2px;
+  font-family: "Fredoka", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0.5px;
   white-space: nowrap;
+  color: #0b63b8;
+}
+
+/* Button text - hide on mobile */
+.btnText {
+  margin-left: 6px;
+}
+
+/* Timer with monospace digits */
+.timerText {
+  font-family: "SF Mono", "Roboto Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 .iconBtn {
@@ -127,7 +141,7 @@
     0 0 0 1px rgba(102, 126, 234, 0.1),
     0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-
+  
   /* Touch handling */
   touch-action: none;
   -webkit-overflow-scrolling: auto;
@@ -156,7 +170,7 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 10;
-
+  
   /* Make it slightly transparent so you can see through */
   opacity: 0.9;
   transition: opacity 0.2s ease;
@@ -292,6 +306,11 @@
 
   .title {
     display: none; /* Hide title on mobile */
+  }
+
+  /* Hide button text on mobile - show only icons */
+  .btnText {
+    display: none;
   }
 
   .iconBtn {

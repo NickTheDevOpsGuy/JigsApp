@@ -1,3 +1,6 @@
+/* Google Fonts - Inter for UI, Fredoka for logo/title */
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+
 html,
 body,
 #root {
@@ -8,14 +11,8 @@ body,
 body {
   margin: 0;
   background: #f3f7ff;
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Arial,
-    sans-serif;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Arial, sans-serif;
   color: #103257;
 }
 
@@ -30,4 +27,15 @@ button {
 img {
   max-width: 100%;
   display: block;
+}
+
+/* Utility class for playful/logo font */
+.font-display {
+  font-family: "Fredoka", system-ui, sans-serif;
+}
+
+/* Monospace for timer */
+.font-mono {
+  font-family: "SF Mono", "Roboto Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
 }

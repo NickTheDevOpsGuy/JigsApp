@@ -126,32 +126,30 @@ export class PuzzleManager {
    * Restore piece positions from saved state.
    * Call this after construction if you have saved state to restore.
    */
-  restoreFromSaved(
-    savedPieces: Array<{
-      id: string;
-      x: number;
-      y: number;
-      z: number;
-      rotation: number;
-      isPlaced: boolean;
-      groupId: string;
-      inTray: boolean;
-    }>,
-  ): void {
+  restoreFromSaved(savedPieces: Array<{
+    id: string;
+    x: number;
+    y: number;
+    z: number;
+    rotation: number;
+    isPlaced: boolean;
+    groupId: string;
+    inTray: boolean;
+  }>): void {
     // Create a map for quick lookup
-    const savedMap = new Map(savedPieces.map((p) => [p.id, p]));
-
+    const savedMap = new Map(savedPieces.map(p => [p.id, p]));
+    
     // Update zCounter to be above all saved z values
-    const maxZ = Math.max(...savedPieces.map((p) => p.z), this.zCounter);
+    const maxZ = Math.max(...savedPieces.map(p => p.z), this.zCounter);
     this.zCounter = maxZ + 1;
 
     // Apply saved positions to pieces
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((piece) => {
+      pieces: this.state.pieces.map(piece => {
         const saved = savedMap.get(piece.id);
         if (!saved) return piece;
-
+        
         return {
           ...piece,
           x: saved.x,
@@ -310,8 +308,11 @@ export class PuzzleManager {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
-    const snappedToBoard = this.trySnapActiveGroupToBoard();
-    if (!snappedToBoard) this.trySnapActiveGroupToNeighbor();
+    // Try board snap first
+    this.trySnapActiveGroupToBoard();
+    
+    // ALWAYS try neighbor snap too - pieces at correct position should merge
+    this.trySnapActiveGroupToNeighbor();
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
     this.recomputeDerivedState();
@@ -320,13 +321,13 @@ export class PuzzleManager {
   rotatePiece(pieceId: PieceId) {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
-
+    
     if (this.groupIsPlaced(piece.groupId)) return;
     if (piece.isPlaced) return;
 
     const groupPieces = this.getGroupPieces(piece.groupId);
     const isConnectedGroup = groupPieces.length > 1;
-
+    
     // Option D: If it's a connected group (2+ pieces) and rotation is already 0, lock it
     if (isConnectedGroup && piece.rotation === 0) {
       return;
@@ -361,9 +362,7 @@ export class PuzzleManager {
     const allCloseEnough = groupPieces.every((p) => {
       if (p.rotation !== 0) return false;
       const tile = this.tilePos(p);
-      return (
-        Math.hypot(p.targetX - tile.x, p.targetY - tile.y) <= this.snapTolerancePx * 3
-      ); // More lenient for rotation snap
+      return Math.hypot(p.targetX - tile.x, p.targetY - tile.y) <= this.snapTolerancePx * 3; // More lenient for rotation snap
     });
 
     if (!allCloseEnough) return;
@@ -373,13 +372,13 @@ export class PuzzleManager {
     const tile = this.tilePos(firstPiece);
     const dx = firstPiece.targetX - tile.x;
     const dy = firstPiece.targetY - tile.y;
-
-    // Move all pieces in group by the offset
+    
+    // Move all pieces in group by the offset (but don't mark as placed - that blocks merging)
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.groupId === groupId
-          ? { ...p, x: p.x + dx, y: p.y + dy, isPlaced: true, justSnapped: true }
+        p.groupId === groupId 
+          ? { ...p, x: p.x + dx, y: p.y + dy, justSnapped: true } 
           : p,
       ),
     };
@@ -432,14 +431,13 @@ export class PuzzleManager {
       });
 
     if (allCorrect) {
+      // Just mark as snapped, not placed (placed blocks further merging)
       this.state = {
         ...this.state,
         pieces: this.state.pieces.map((p) =>
-          p.groupId === gid ? { ...p, isPlaced: true, justSnapped: true } : p,
+          p.groupId === gid ? { ...p, justSnapped: true } : p,
         ),
       };
-      this.events.onPiecePlaced?.(this.findPiece(activeId) ?? active);
-      return true;
     }
 
     return true;
@@ -454,7 +452,9 @@ export class PuzzleManager {
 
     const gid = active.groupId;
 
-    if (this.groupIsPlaced(gid)) return false;
+    // Only block if the piece being dragged is placed (can't drag placed pieces anyway)
+    // Don't use groupIsPlaced - we want unplaced pieces to merge INTO placed groups
+    if (active.isPlaced) return false;
 
     // Get all pieces in the active group
     const groupPieces = this.getGroupPieces(gid);
@@ -496,8 +496,10 @@ export class PuzzleManager {
     }
 
     if (!best) return false;
-    if (this.wouldOverlapAnyOtherGroup(gid, best.dx, best.dy)) return false;
-
+    
+    // Skip overlap check - we're merging with the neighbor group anyway
+    // The overlap is expected because pieces will occupy adjacent positions
+    
     this.shiftGroup(gid, best.dx, best.dy);
 
     const intoGroup = best.neighbor.groupId;
@@ -513,30 +515,23 @@ export class PuzzleManager {
     // When pieces connect and rotation is 0, snap the whole group to final position
     const mergedPieces = this.getGroupPieces(intoGroup);
     const allRotationZero = mergedPieces.every((p) => p.rotation === 0);
-
+    
     if (allRotationZero && mergedPieces.length > 0) {
       // Calculate offset to snap first piece to its target
       const firstPiece = mergedPieces[0];
       const tile = this.tilePos(firstPiece);
       const snapDx = firstPiece.targetX - tile.x;
       const snapDy = firstPiece.targetY - tile.y;
-
-      // Move entire group to correct position
+      
+      // Move entire group to correct position (DON'T mark as placed - that prevents further merging)
       this.state = {
         ...this.state,
         pieces: this.state.pieces.map((p) =>
-          p.groupId === intoGroup
-            ? {
-                ...p,
-                x: p.x + snapDx,
-                y: p.y + snapDy,
-                isPlaced: true,
-                justSnapped: true,
-              }
+          p.groupId === intoGroup 
+            ? { ...p, x: p.x + snapDx, y: p.y + snapDy, justSnapped: true } 
             : p,
         ),
       };
-      this.events.onPiecePlaced?.(firstPiece);
     }
 
     return true;
@@ -630,12 +625,12 @@ export class PuzzleManager {
       groupCounts.set(p.groupId, (groupCounts.get(p.groupId) || 0) + 1);
     }
     const largestGroupSize = Math.max(...groupCounts.values());
-
+    
     // Check if all pieces are in the same group and have correct rotation
     const firstPiece = allPieces[0];
-    const allSameGroup = allPieces.every((p) => p.groupId === firstPiece.groupId);
-    const allCorrectRotation = allPieces.every((p) => p.rotation === 0);
-
+    const allSameGroup = allPieces.every(p => p.groupId === firstPiece.groupId);
+    const allCorrectRotation = allPieces.every(p => p.rotation === 0);
+    
     // If all pieces merged into one group with correct rotation, puzzle is complete
     const isComplete = allSameGroup && allCorrectRotation && allPieces.length > 1;
 
@@ -649,7 +644,7 @@ export class PuzzleManager {
     };
 
     if (!prevComplete && isComplete) {
-      // Mark all as placed
+      // Mark all as placed only when puzzle is COMPLETE
       this.state = {
         ...this.state,
         pieces: this.state.pieces.map((p) => ({ ...p, isPlaced: true })),
@@ -854,7 +849,7 @@ export class PuzzleManager {
       scatterPadding,
       Math.floor(this.boardHeight * this.scatterStartYRatio),
     );
-
+    
     const scatterZone = {
       minX: scatterPadding,
       maxX: Math.max(scatterPadding + w, this.boardWidth - scatterPadding),
@@ -870,10 +865,10 @@ export class PuzzleManager {
     const spacing = 8;
     const cellW = w + spacing;
     const cellH = h + spacing;
-
+    
     const gridCols = Math.max(1, Math.floor(zoneWidth / cellW));
     const gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
-
+    
     // Generate all possible grid positions
     const positions: Array<{ x: number; y: number }> = [];
     for (let row = 0; row < gridRows; row++) {
@@ -881,7 +876,7 @@ export class PuzzleManager {
         // Add slight randomness within each cell for natural look
         const jitterX = this.rand(0, Math.min(spacing * 2, cellW - w));
         const jitterY = this.rand(0, Math.min(spacing * 2, cellH - h));
-
+        
         positions.push({
           x: scatterZone.minX + col * cellW + jitterX,
           y: scatterZone.minY + row * cellH + jitterY,

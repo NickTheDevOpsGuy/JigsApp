@@ -5,6 +5,7 @@ import styles from "./MenuScreen.module.css";
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
 import { HowToPlayModal } from "@/components/HowToPlay";
+import { HelpCircle, Image } from "lucide-react";
 
 export function MenuScreen() {
   const nav = useNavigate();
@@ -16,10 +17,12 @@ export function MenuScreen() {
         <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
 
         <Button variant="secondary" onClick={() => setShowHelp(true)} fullWidth>
+          <HelpCircle size={18} />
           How to Play
         </Button>
 
         <Button variant="primary" onClick={() => nav("/new")} fullWidth>
+          <Image size={18} />
           Choose Puzzle Photo
         </Button>
       </div>
