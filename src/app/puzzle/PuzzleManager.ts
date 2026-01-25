@@ -320,8 +320,17 @@ export class PuzzleManager {
   rotatePiece(pieceId: PieceId) {
     const piece = this.findPiece(pieceId);
     if (!piece) return;
+
     if (this.groupIsPlaced(piece.groupId)) return;
-    if (piece.isPlaced) return; // Extra safety check
+    if (piece.isPlaced) return;
+
+    const groupPieces = this.getGroupPieces(piece.groupId);
+    const isConnectedGroup = groupPieces.length > 1;
+
+    // Option D: If it's a connected group (2+ pieces) and rotation is already 0, lock it
+    if (isConnectedGroup && piece.rotation === 0) {
+      return;
+    }
 
     const step = this.rotationStepDeg;
     const next = (piece.rotation + step) % 360;
@@ -335,7 +344,45 @@ export class PuzzleManager {
       ),
     };
 
+    // After rotation, check if the group is now correctly placed
+    if (next === 0) {
+      this.checkAndPlaceGroup(groupId);
+    }
+
     this.recomputeDerivedState();
+  }
+
+  /** Check if a group is at correct position with rotation 0, and mark as placed */
+  private checkAndPlaceGroup(groupId: string) {
+    const groupPieces = this.getGroupPieces(groupId);
+    if (groupPieces.length === 0) return;
+
+    // First check if all pieces are close enough to snap
+    const allCloseEnough = groupPieces.every((p) => {
+      if (p.rotation !== 0) return false;
+      const tile = this.tilePos(p);
+      return (
+        Math.hypot(p.targetX - tile.x, p.targetY - tile.y) <= this.snapTolerancePx * 3
+      ); // More lenient for rotation snap
+    });
+
+    if (!allCloseEnough) return;
+
+    // Snap the group to exact position
+    const firstPiece = groupPieces[0];
+    const tile = this.tilePos(firstPiece);
+    const dx = firstPiece.targetX - tile.x;
+    const dy = firstPiece.targetY - tile.y;
+
+    // Move all pieces in group by the offset
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.groupId === groupId
+          ? { ...p, x: p.x + dx, y: p.y + dy, isPlaced: true, justSnapped: true }
+          : p,
+      ),
+    };
   }
 
   clearJustSnapped(pieceId: PieceId) {

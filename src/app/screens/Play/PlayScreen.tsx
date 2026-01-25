@@ -10,6 +10,7 @@ import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { Button } from "@/components/Button/Button";
 import { ConfirmModal } from "@/components/Modal/Modal";
+import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import {
   savePuzzleState,
@@ -48,6 +49,9 @@ export function PlayScreen() {
 
   const popMapRef = useRef<Map<string, number>>(new Map());
   const rafRef = useRef<number | null>(null);
+
+  // Tutorial for first-time users
+  const [showTutorial, dismissTutorial] = useShouldShowTutorial();
 
   const [debug, setDebug] = useState<DebugFlags>({
     showGrid: false,
@@ -382,6 +386,9 @@ export function PlayScreen() {
       // Right click = rotate (desktop)
       if (e.button === 2) {
         e.preventDefault();
+        // Don't rotate if already placed
+        const piece = st.pieces.find((p) => p.id === pieceId);
+        if (piece?.isPlaced) return;
         manager.rotatePiece(pieceId);
         setState(manager.getState());
       }
@@ -454,8 +461,11 @@ export function PlayScreen() {
           lastTapRef.current.pieceId === pieceId &&
           now - lastTapRef.current.time < 300
         ) {
-          // Double tap detected - rotate
-          manager.rotatePiece(pieceId);
+          // Double tap detected - rotate (but not if placed)
+          const piece = st.pieces.find((p) => p.id === pieceId);
+          if (!piece?.isPlaced) {
+            manager.rotatePiece(pieceId);
+          }
           lastTapRef.current = { time: 0, pieceId: null };
         } else {
           lastTapRef.current = { time: now, pieceId };
@@ -608,6 +618,9 @@ export function PlayScreen() {
         grid={state?.grid ?? grid}
         onPieceClick={handleTrayPieceClick}
       />
+
+      {/* First-time tutorial overlay */}
+      {showTutorial && <TutorialOverlay onComplete={dismissTutorial} />}
     </div>
   );
 }
