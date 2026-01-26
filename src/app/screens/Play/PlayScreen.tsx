@@ -30,8 +30,10 @@ import {
   VolumeX,
   Maximize,
   Minimize,
-  Vibrate,
+  Smartphone,
   VolumeOff,
+  Pause,
+  Play,
 } from "lucide-react";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
@@ -88,6 +90,9 @@ export function PlayScreen() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
 
+  // Pause state
+  const [isPaused, setIsPaused] = useState(false);
+
   // Track completion time for animation
   const completedAtRef = useRef<number | null>(null);
 
@@ -136,15 +141,16 @@ export function PlayScreen() {
     return clamp(tile, 56, 160);
   }
 
-  // Timer effect - stops when complete
+  // Timer effect - stops when complete or paused
   useEffect(() => {
     if (state?.isComplete) return; // Don't run timer if complete
+    if (isPaused) return; // Don't run timer if paused
 
     const interval = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, [state?.isComplete]);
+  }, [state?.isComplete, isPaused]);
 
   // Initial setup: create manager once we know board size
   useEffect(() => {
@@ -592,80 +598,85 @@ export function PlayScreen() {
   return (
     <div className={styles.page} ref={pageRef}>
       <div className={styles.topBar}>
-        <Button size="sm" onClick={() => navigate("/")}>
-          <Menu size={16} />
-          <span className={styles.btnText}>Menu</span>
-        </Button>
-        <div className={styles.title}>Phuzzle</div>
+        <div className={styles.topBarLeft}>
+          <Button size="sm" onClick={() => navigate("/")}>
+            <Menu size={16} />
+            <span className={styles.btnText}>Menu</span>
+          </Button>
+          <div className={styles.title}>Phuzzle</div>
+        </div>
 
-        <div className={styles.hud}>
-          <div className={styles.hudPillTimer}>
-            <Clock size={14} />
-            <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
-          </div>
-          <div className={styles.hudPill}>
-            <Puzzle size={14} />
-            <span>{left} left</span>
-          </div>
-          <div className={isComplete ? styles.hudPillDone : styles.hudPillLive}>
-            {isComplete ? "✓" : "..."}
+        <div className={styles.topBarCenter}>
+          <div className={styles.hud}>
+            <div className={styles.hudPillTimer}>
+              <Clock size={14} />
+              <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => setIsPaused((p) => !p)}
+              disabled={isComplete}
+            >
+              {isPaused ? <Play size={16} /> : <Pause size={16} />}
+            </Button>
+            <div className={styles.hudPill}>
+              <Puzzle size={14} />
+              <span>{left} left</span>
+            </div>
           </div>
         </div>
 
-        <Button size="sm" onClick={() => setShowPreview((p) => !p)}>
-          {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
-          <span className={styles.btnText}>{showPreview ? "Hide" : "Preview"}</span>
-        </Button>
-        <Button
-          size="sm"
-          onClick={() => {
-            const newEnabled = !soundManager.isEnabled();
-            soundManager.setEnabled(newEnabled);
-            setSoundEnabled(newEnabled);
-          }}
-        >
-          {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-          <span className={styles.btnText}>{soundEnabled ? "Sound" : "Muted"}</span>
-        </Button>
-        <Button
-          size="sm"
-          onClick={() => {
-            const newEnabled = !soundManager.isHapticsEnabled();
-            soundManager.setHapticsEnabled(newEnabled);
-            setHapticsEnabled(newEnabled);
-            // Give immediate feedback if enabling
-            if (newEnabled && navigator.vibrate) {
-              navigator.vibrate(25);
-            }
-          }}
-        >
-          {hapticsEnabled ? <Vibrate size={16} /> : <VolumeOff size={16} />}
-          <span className={styles.btnText}>{hapticsEnabled ? "Haptics" : "No Vibe"}</span>
-        </Button>
-        <Button size="sm" onClick={toggleFullscreen}>
-          {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
-          <span className={styles.btnText}>{isFullscreen ? "Exit" : "Fullscreen"}</span>
-        </Button>
-        {SHOW_DEBUG && (
+        <div className={styles.topBarRight}>
+          <Button size="sm" onClick={() => setShowPreview((p) => !p)}>
+            {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
+            <span className={styles.btnText}>{showPreview ? "Hide" : "Preview"}</span>
+          </Button>
           <Button
             size="sm"
-            onClick={() =>
-              setDebug((d) => ({
-                ...d,
-                showGrid: !d.showGrid,
-                showBounds: !d.showBounds,
-                showIds: !d.showIds,
-              }))
-            }
+            onClick={() => {
+              const newEnabled = !soundManager.isEnabled();
+              soundManager.setEnabled(newEnabled);
+              setSoundEnabled(newEnabled);
+            }}
           >
-            <Bug size={16} />
-            <span className={styles.btnText}>Debug</span>
+            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
           </Button>
-        )}
-        <Button size="sm" variant="primary" onClick={() => setShowNewGameModal(true)}>
-          <Plus size={16} />
-          <span className={styles.btnText}>New Game</span>
-        </Button>
+          <Button
+            size="sm"
+            onClick={() => {
+              const newEnabled = !soundManager.isHapticsEnabled();
+              soundManager.setHapticsEnabled(newEnabled);
+              setHapticsEnabled(newEnabled);
+              if (newEnabled && navigator.vibrate) {
+                navigator.vibrate(25);
+              }
+            }}
+          >
+            {hapticsEnabled ? <Smartphone size={16} /> : <VolumeOff size={16} />}
+          </Button>
+          <Button size="sm" onClick={toggleFullscreen}>
+            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+          </Button>
+          {SHOW_DEBUG && (
+            <Button
+              size="sm"
+              onClick={() =>
+                setDebug((d) => ({
+                  ...d,
+                  showGrid: !d.showGrid,
+                  showBounds: !d.showBounds,
+                  showIds: !d.showIds,
+                }))
+              }
+            >
+              <Bug size={16} />
+            </Button>
+          )}
+          <Button size="sm" variant="primary" onClick={() => setShowNewGameModal(true)}>
+            <Plus size={16} />
+            <span className={styles.btnText}>New Puzzle</span>
+          </Button>
+        </div>
       </div>
 
       {/* New Game Confirmation Modal */}
@@ -700,6 +711,17 @@ export function PlayScreen() {
                 alt="Puzzle preview"
                 className={styles.previewImage}
               />
+            </div>
+          )}
+
+          {/* Pause overlay */}
+          {isPaused && (
+            <div className={styles.pauseOverlay} onClick={() => setIsPaused(false)}>
+              <div className={styles.pauseContent}>
+                <Pause size={64} />
+                <h2>Paused</h2>
+                <p>Click anywhere or press the Resume button to continue</p>
+              </div>
             </div>
           )}
         </div>

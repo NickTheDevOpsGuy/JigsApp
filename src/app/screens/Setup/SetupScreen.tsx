@@ -205,7 +205,7 @@ export function SetupScreen() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>New Game</h1>
+        <h1 className={styles.title}>New Puzzle</h1>
 
         {error && (
           <div className={styles.error}>
