@@ -157,13 +157,13 @@
   background: #ffffff;
   border-radius: 16px;
 
-  /* Prominent border to showcase the board area */
-  border: 3px solid #667eea;
+  /* Subtle border that blends with background */
+  border: 2px solid #e2e8f0;
   box-shadow:
-    0 0 0 1px rgba(102, 126, 234, 0.1),
-    0 4px 12px rgba(0, 0, 0, 0.08);
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.04);
   overflow: hidden;
-
+  
   /* Touch handling */
   touch-action: none;
   -webkit-overflow-scrolling: auto;
@@ -192,7 +192,7 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 10;
-
+  
   /* Make it slightly transparent so you can see through */
   opacity: 0.9;
   transition: opacity 0.2s ease;

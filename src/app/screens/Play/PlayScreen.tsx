@@ -12,29 +12,11 @@ import { Button } from "@/components/Button/Button";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { getAverageColor } from "@/puzzle/colorUtils";
-import {
-  savePuzzleState,
-  loadPuzzleState,
-  clearPuzzleState,
-} from "@/puzzle/puzzleStorage";
+import { savePuzzleState, loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
-import {
-  Menu,
-  Eye,
-  EyeOff,
-  Plus,
-  Clock,
-  Puzzle,
-  Bug,
-  Volume2,
-  VolumeX,
-  Maximize,
-  Minimize,
-  Smartphone,
-  VolumeOff,
-  Pause,
-  Play,
-} from "lucide-react";
+import { Menu, Eye, EyeOff, Plus, Clock, Puzzle, Bug, Volume2, VolumeX, Maximize, Minimize, Smartphone, VolumeOff, Pause, Play, Keyboard } from "lucide-react";
+import { useKeyboardShortcuts, ShortcutAction } from "@/hooks/useKeyboardShortcuts";
+import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -79,19 +61,22 @@ export function PlayScreen() {
 
   // Preview image visibility
   const [showPreview, setShowPreview] = useState(false);
-
+  
   // Sound toggle
   const [soundEnabled, setSoundEnabled] = useState(soundManager.isEnabled());
-
+  
   // Haptics toggle
   const [hapticsEnabled, setHapticsEnabled] = useState(soundManager.isHapticsEnabled());
-
+  
   // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
-
+  
   // Pause state
   const [isPaused, setIsPaused] = useState(false);
+  
+  // Shortcuts help modal
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   // Track completion time for animation
   const completedAtRef = useRef<number | null>(null);
@@ -115,6 +100,62 @@ export function PlayScreen() {
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
+
+  // Keyboard shortcuts handler
+  const handleShortcut = useCallback((action: ShortcutAction) => {
+    switch (action) {
+      case "pause":
+        if (!state?.isComplete) setIsPaused((p) => !p);
+        break;
+      case "escape":
+        if (showShortcuts) setShowShortcuts(false);
+        else if (showNewGameModal) setShowNewGameModal(false);
+        else if (isPaused) setIsPaused(false);
+        break;
+      case "preview":
+        setShowPreview((p) => !p);
+        break;
+      case "fullscreen":
+        toggleFullscreen();
+        break;
+      case "newGame":
+        setShowNewGameModal(true);
+        break;
+      case "toggleSound":
+        const newSoundEnabled = !soundManager.isEnabled();
+        soundManager.setEnabled(newSoundEnabled);
+        setSoundEnabled(newSoundEnabled);
+        break;
+      case "toggleHaptics":
+        const newHapticsEnabled = !soundManager.isHapticsEnabled();
+        soundManager.setHapticsEnabled(newHapticsEnabled);
+        setHapticsEnabled(newHapticsEnabled);
+        if (newHapticsEnabled && navigator.vibrate) {
+          navigator.vibrate(25);
+        }
+        break;
+      case "rotateCW":
+      case "rotateCCW":
+        // Rotate the last active piece or first unplaced piece
+        if (manager && state && !isPaused) {
+          const unplacedPiece = state.pieces.find((p) => !p.isPlaced);
+          if (unplacedPiece) {
+            manager.rotatePiece(unplacedPiece.id);
+            soundManager.play("rotate");
+            setState(manager.getState());
+          }
+        }
+        break;
+      case "showHelp":
+        setShowShortcuts((s) => !s);
+        break;
+    }
+  }, [state, isPaused, showShortcuts, showNewGameModal, manager, toggleFullscreen]);
+
+  useKeyboardShortcuts({
+    enabled: !showTutorial,
+    onAction: handleShortcut,
+  });
 
   // Grid from localStorage
   const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
@@ -145,7 +186,7 @@ export function PlayScreen() {
   useEffect(() => {
     if (state?.isComplete) return; // Don't run timer if complete
     if (isPaused) return; // Don't run timer if paused
-
+    
     const interval = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
     }, 1000);
@@ -167,8 +208,7 @@ export function PlayScreen() {
 
     // Check for saved game state
     const savedState = loadPuzzleState();
-    const hasSavedGame =
-      savedState &&
+    const hasSavedGame = savedState && 
       savedState.imageUrl === imageUrl &&
       savedState.grid.rows === grid.rows &&
       savedState.grid.cols === grid.cols;
@@ -199,8 +239,8 @@ export function PlayScreen() {
           // Clear saved state on completion
           clearPuzzleState();
           soundManager.play("complete");
-
-          import("canvas-confetti").then((confetti) => {
+          
+          import('canvas-confetti').then((confetti) => {
             confetti.default({
               particleCount: 150,
               spread: 70,
@@ -223,7 +263,7 @@ export function PlayScreen() {
   // Auto-save puzzle state when pieces change (debounced)
   useEffect(() => {
     if (!state || state.isComplete) return;
-
+    
     const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
     if (!imageUrl) return;
 
@@ -249,6 +289,7 @@ export function PlayScreen() {
       // Keep manager board size in CSS pixels
       manager.setBoardSize(boardW, boardH);
       setState(manager.getState());
+      
     });
 
     ro.observe(el);
@@ -327,6 +368,7 @@ export function PlayScreen() {
 
       // keep react state reasonably fresh
       setState(st);
+      
 
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -391,10 +433,13 @@ export function PlayScreen() {
       // On touch devices, e.button is 0 but we should also check pointerType
       const isTouch = e.pointerType === "touch";
       const isLeftClick = e.button === 0;
-
+      
       if (isTouch || isLeftClick) {
         const piece = st.pieces.find((p) => p.id === pieceId);
         if (!piece) return;
+
+        // Reset drag tracking
+        didDragRef.current = false;
 
         // Prevent default to stop iOS from scrolling/zooming
         e.preventDefault();
@@ -409,6 +454,7 @@ export function PlayScreen() {
 
         manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
         setState(manager.getState());
+        
 
         // Capture pointer for smooth dragging
         try {
@@ -432,11 +478,7 @@ export function PlayScreen() {
           }, 500);
 
           // Store timer to cancel on move/up
-          (
-            canvas as HTMLCanvasElement & {
-              longPressTimer?: ReturnType<typeof setTimeout>;
-            }
-          ).longPressTimer = longPressTimer;
+          (canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }).longPressTimer = longPressTimer;
         }
       }
 
@@ -454,11 +496,8 @@ export function PlayScreen() {
     [manager],
   );
 
-  // Track for double-tap to rotate
-  const lastTapRef = useRef<{ time: number; pieceId: string | null }>({
-    time: 0,
-    pieceId: null,
-  });
+  // Track for tap-to-rotate (did we actually drag or just tap?)
+  const didDragRef = useRef(false);
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -466,18 +505,18 @@ export function PlayScreen() {
 
       // Cancel long-press on move
       const canvas = e.currentTarget;
-      const timer = (
-        canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
-      ).longPressTimer;
+      const timer = (canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }).longPressTimer;
       if (timer) {
         clearTimeout(timer);
-        (
-          canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
-        ).longPressTimer = undefined;
+        (canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }).longPressTimer = undefined;
       }
+
+      // Mark that we dragged (moved more than a few pixels)
+      didDragRef.current = true;
 
       const boardRect = boardRef.current.getBoundingClientRect();
       manager.pointerMove(e.clientX, e.clientY, boardRect);
+      
     },
     [manager],
   );
@@ -489,23 +528,18 @@ export function PlayScreen() {
       const canvas = canvasRef.current;
 
       // Cancel long-press timer
-      const timer = (
-        canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
-      ).longPressTimer;
+      const timer = (canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }).longPressTimer;
       if (timer) {
         clearTimeout(timer);
-        (
-          canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
-        ).longPressTimer = undefined;
+        (canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }).longPressTimer = undefined;
       }
 
-      // Check for double-tap to rotate (mobile)
+      // Check for single-tap to rotate (mobile) - tap without dragging
       const isTouch = e.pointerType === "touch";
-      const now = Date.now();
       const boardRect = boardRef.current?.getBoundingClientRect();
       const ctx = canvas.getContext("2d");
-
-      if (isTouch && boardRect && ctx) {
+      
+      if (isTouch && boardRect && ctx && !didDragRef.current) {
         // Reset transform to identity for hit testing in CSS pixel space
         ctx.setTransform(1, 0, 0, 1, 0, 0);
 
@@ -514,25 +548,19 @@ export function PlayScreen() {
         const y = e.clientY - boardRect.top;
         const pieceId = pickPieceId(ctx, st.pieces, x, y);
 
-        if (
-          pieceId &&
-          lastTapRef.current.pieceId === pieceId &&
-          now - lastTapRef.current.time < 300
-        ) {
-          // Double tap detected - rotate (but not if placed)
+        // Single tap on a piece = rotate it
+        if (pieceId) {
           const piece = st.pieces.find((p) => p.id === pieceId);
-          if (!piece?.isPlaced) {
+          if (piece && !piece.isPlaced) {
             manager.rotatePiece(pieceId);
             soundManager.play("rotate");
           }
-          lastTapRef.current = { time: 0, pieceId: null };
-        } else {
-          lastTapRef.current = { time: now, pieceId };
         }
       }
 
       manager.pointerUp();
       setState(manager.getState());
+      
 
       // Release pointer capture
       try {
@@ -605,18 +633,14 @@ export function PlayScreen() {
           </Button>
           <div className={styles.title}>Phuzzle</div>
         </div>
-
+        
         <div className={styles.topBarCenter}>
           <div className={styles.hud}>
             <div className={styles.hudPillTimer}>
               <Clock size={14} />
               <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
             </div>
-            <Button
-              size="sm"
-              onClick={() => setIsPaused((p) => !p)}
-              disabled={isComplete}
-            >
+            <Button size="sm" onClick={() => setIsPaused((p) => !p)} disabled={isComplete}>
               {isPaused ? <Play size={16} /> : <Pause size={16} />}
             </Button>
             <div className={styles.hudPill}>
@@ -631,8 +655,8 @@ export function PlayScreen() {
             {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
             <span className={styles.btnText}>{showPreview ? "Hide" : "Preview"}</span>
           </Button>
-          <Button
-            size="sm"
+          <Button 
+            size="sm" 
             onClick={() => {
               const newEnabled = !soundManager.isEnabled();
               soundManager.setEnabled(newEnabled);
@@ -641,8 +665,8 @@ export function PlayScreen() {
           >
             {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
           </Button>
-          <Button
-            size="sm"
+          <Button 
+            size="sm" 
             onClick={() => {
               const newEnabled = !soundManager.isHapticsEnabled();
               soundManager.setHapticsEnabled(newEnabled);
@@ -653,6 +677,9 @@ export function PlayScreen() {
             }}
           >
             {hapticsEnabled ? <Smartphone size={16} /> : <VolumeOff size={16} />}
+          </Button>
+          <Button size="sm" onClick={() => setShowShortcuts(true)}>
+            <Keyboard size={16} />
           </Button>
           <Button size="sm" onClick={toggleFullscreen}>
             {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
@@ -702,7 +729,7 @@ export function PlayScreen() {
             onPointerCancel={handlePointerUp}
             onContextMenu={handleContextMenu}
           />
-
+          
           {/* Reference preview image */}
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>
@@ -713,7 +740,7 @@ export function PlayScreen() {
               />
             </div>
           )}
-
+          
           {/* Pause overlay */}
           {isPaused && (
             <div className={styles.pauseOverlay} onClick={() => setIsPaused(false)}>
@@ -733,6 +760,9 @@ export function PlayScreen() {
         grid={state?.grid ?? grid}
         onPieceClick={handleTrayPieceClick}
       />
+
+      {/* Keyboard shortcuts modal */}
+      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
 
       {/* First-time tutorial overlay */}
       {showTutorial && <TutorialOverlay onComplete={dismissTutorial} />}
