@@ -1,4 +1,3 @@
-// src/app/screens/Play/PlayScreen.tsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
@@ -59,6 +58,13 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
+function isTypingTarget(el: EventTarget | null) {
+  const t = el as HTMLElement | null;
+  if (!t) return false;
+  const tag = t.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t.isContentEditable;
+}
+
 export function PlayScreen() {
   const navigate = useNavigate();
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -95,6 +101,11 @@ export function PlayScreen() {
 
   // Track completion time for animation
   const completedAtRef = useRef<number | null>(null);
+
+  // Selection for keyboard controls
+  const selectedIdRef = useRef<string | null>(null);
+  const [, forceRerender] = useState(0);
+  const bump = () => forceRerender((n) => n + 1);
 
   // Fullscreen toggle handler
   const toggleFullscreen = useCallback(() => {
@@ -143,8 +154,8 @@ export function PlayScreen() {
 
   // Timer effect - stops when complete or paused
   useEffect(() => {
-    if (state?.isComplete) return; // Don't run timer if complete
-    if (isPaused) return; // Don't run timer if paused
+    if (state?.isComplete) return;
+    if (isPaused) return;
 
     const interval = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
@@ -176,6 +187,8 @@ export function PlayScreen() {
     // Restore elapsed time if we have a saved game
     if (hasSavedGame && savedState) {
       setElapsedSeconds(savedState.elapsedSeconds);
+    } else {
+      setElapsedSeconds(0);
     }
 
     const next = new PuzzleManager(
@@ -196,7 +209,6 @@ export function PlayScreen() {
           soundManager.play("snap");
         },
         onPuzzleComplete: () => {
-          // Clear saved state on completion
           clearPuzzleState();
           soundManager.play("complete");
 
@@ -217,7 +229,13 @@ export function PlayScreen() {
     }
 
     setManager(next);
-    setState(next.getState());
+    const st = next.getState();
+    setState(st);
+
+    // Set an initial selection if possible
+    const selectable = st.pieces.filter((p) => !p.inTray && !p.isPlaced);
+    selectedIdRef.current = selectable.length ? selectable[0].id : null;
+    bump();
   }, [grid]);
 
   // Auto-save puzzle state when pieces change (debounced)
@@ -227,7 +245,6 @@ export function PlayScreen() {
     const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
     if (!imageUrl) return;
 
-    // Debounce saves to avoid excessive writes
     const timeoutId = setTimeout(() => {
       savePuzzleState(imageUrl, state.grid, state.pieces, elapsedSeconds);
     }, 500);
@@ -246,7 +263,6 @@ export function PlayScreen() {
       const boardH = Math.max(240, Math.floor(rect.height));
       boardSizeRef.current = { w: boardW, h: boardH };
 
-      // Keep manager board size in CSS pixels
       manager.setBoardSize(boardW, boardH);
       setState(manager.getState());
     });
@@ -254,6 +270,133 @@ export function PlayScreen() {
     ro.observe(el);
     return () => ro.disconnect();
   }, [manager]);
+
+  // Keyboard controls
+  const getSelectable = useCallback(() => {
+    if (!manager) return [];
+    const st = manager.getState();
+    return st.pieces.filter((p) => !p.inTray && !p.isPlaced);
+  }, [manager]);
+
+  const selectCycle = useCallback(
+    (dir: 1 | -1) => {
+      if (!manager) return;
+      const pieces = getSelectable().sort((a, b) => b.z - a.z);
+      if (!pieces.length) {
+        selectedIdRef.current = null;
+        bump();
+        return;
+      }
+      const cur = selectedIdRef.current;
+      const idx = cur ? pieces.findIndex((p) => p.id === cur) : -1;
+      const next = pieces[(idx + dir + pieces.length) % pieces.length];
+      selectedIdRef.current = next.id;
+      bump();
+    },
+    [getSelectable, manager],
+  );
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!manager || !state) return;
+      if (isTypingTarget(e.target)) return;
+
+      // If a modal is open, let it handle keys
+      // (basic guard: if we show the new game modal it will capture focus anyway)
+      const isComplete = state.isComplete;
+
+      // Universal keys
+      if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        if (!isComplete) setIsPaused((p) => !p);
+        return;
+      }
+
+      if (e.key === "Escape") {
+        if (showPreview) setShowPreview(false);
+        if (isPaused) setIsPaused(false);
+        return;
+      }
+
+      // Stop here if puzzle is complete or paused
+      if (isComplete) return;
+      if (isPaused) return;
+
+      // Tab cycle selection
+      if (e.key === "Tab") {
+        e.preventDefault();
+        selectCycle(e.shiftKey ? -1 : 1);
+        return;
+      }
+
+      // Global toggles
+      if (e.key.toLowerCase() === "p") {
+        setShowPreview((p) => !p);
+        return;
+      }
+      if (e.key.toLowerCase() === "f") {
+        toggleFullscreen();
+        return;
+      }
+
+      const id = selectedIdRef.current;
+      if (!id) return;
+
+      const step = e.altKey || e.ctrlKey ? 25 : e.shiftKey ? 10 : 1;
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        manager.nudgeGroup(id, -step, 0);
+        setState(manager.getState());
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        manager.nudgeGroup(id, step, 0);
+        setState(manager.getState());
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        manager.nudgeGroup(id, 0, -step);
+        setState(manager.getState());
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        manager.nudgeGroup(id, 0, step);
+        setState(manager.getState());
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        manager.snapGroupNow(id);
+        setState(manager.getState());
+        return;
+      }
+
+      if (e.key.toLowerCase() === "r") {
+        e.preventDefault();
+        manager.rotateGroup(id);
+        soundManager.play("rotate");
+        setState(manager.getState());
+        return;
+      }
+
+      if (e.key.toLowerCase() === "t") {
+        e.preventDefault();
+        manager.sendToTray(id);
+        setState(manager.getState());
+        // pick next selection after tray
+        selectCycle(1);
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [manager, state, isPaused, showPreview, selectCycle, toggleFullscreen]);
 
   // Animation loop: draw canvas
   useEffect(() => {
@@ -290,7 +433,6 @@ export function PlayScreen() {
 
       const st = manager.getState();
 
-      // assembled dims are puzzle-space, based on tile sizes
       const firstPiece = st.pieces[0];
       if (!firstPiece) {
         rafRef.current = requestAnimationFrame(tick);
@@ -300,12 +442,16 @@ export function PlayScreen() {
       const assembledW = st.grid.cols * firstPiece.tileW;
       const assembledH = st.grid.rows * firstPiece.tileH;
 
-      // Track completion time for glow animation
       if (st.isComplete && !completedAtRef.current) {
         completedAtRef.current = performance.now();
       } else if (!st.isComplete) {
         completedAtRef.current = null;
       }
+
+      const dragState = manager.getDragState();
+      const draggedGroupId = dragState.activeId
+        ? (st.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
+        : null;
 
       renderBoard(
         ctx,
@@ -316,16 +462,15 @@ export function PlayScreen() {
         popMapRef.current,
         performance.now(),
         debug,
-        manager.getDragState(),
+        dragState,
         {
-          draggedGroupId: null,
-          hoveredPieceId: null,
+          draggedGroupId,
+          hoveredPieceId: selectedIdRef.current,
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
         },
       );
 
-      // keep react state reasonably fresh
       setState(st);
 
       rafRef.current = requestAnimationFrame(tick);
@@ -367,28 +512,30 @@ export function PlayScreen() {
       // Reset transform to identity for hit testing in CSS pixel space
       ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-      // Get CSS-space coordinates
       const cssX = e.clientX - boardRect.left;
       const cssY = e.clientY - boardRect.top;
 
       const st = manager.getState();
-      // Only pick from pieces NOT in tray
       const boardPieces = st.pieces.filter((p) => !p.inTray);
 
       const pieceId = pickPieceId(ctx, boardPieces, cssX, cssY);
-
       if (!pieceId) return;
+
+      // Always select what we clicked
+      selectedIdRef.current = pieceId;
+      bump();
 
       // Middle click (button 1) = send to tray
       if (e.button === 1) {
         e.preventDefault();
         manager.movePieceToTray(pieceId);
         setState(manager.getState());
+        // Advance selection
+        selectCycle(1);
         return;
       }
 
       // Touch or left click = start drag
-      // On touch devices, e.button is 0 but we should also check pointerType
       const isTouch = e.pointerType === "touch";
       const isLeftClick = e.button === 0;
 
@@ -396,10 +543,8 @@ export function PlayScreen() {
         const piece = st.pieces.find((p) => p.id === pieceId);
         if (!piece) return;
 
-        // Prevent default to stop iOS from scrolling/zooming
         e.preventDefault();
 
-        // Create a fake rect for the piece (manager expects this)
         const pieceRect = new DOMRect(
           boardRect.left + piece.x,
           boardRect.top + piece.y,
@@ -410,28 +555,25 @@ export function PlayScreen() {
         manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
         setState(manager.getState());
 
-        // Capture pointer for smooth dragging
         try {
           canvas.setPointerCapture(e.pointerId);
         } catch {
-          // Some browsers don't support pointer capture
+          // ignore
         }
 
-        // Start long-press timer for mobile (send to tray)
+        // Long-press timer for mobile (send to tray)
         if (isTouch) {
           const longPressTimer = setTimeout(() => {
-            // Only trigger if we haven't moved much (still on same piece)
-            manager.pointerUp(); // Cancel drag
+            manager.pointerUp();
             manager.movePieceToTray(pieceId);
             setState(manager.getState());
             try {
               canvas.releasePointerCapture(e.pointerId);
             } catch {
-              // Ignore
+              // ignore
             }
           }, 500);
 
-          // Store timer to cancel on move/up
           (
             canvas as HTMLCanvasElement & {
               longPressTimer?: ReturnType<typeof setTimeout>;
@@ -443,7 +585,6 @@ export function PlayScreen() {
       // Right click = rotate (desktop)
       if (e.button === 2) {
         e.preventDefault();
-        // Don't rotate if already placed
         const piece = st.pieces.find((p) => p.id === pieceId);
         if (piece?.isPlaced) return;
         manager.rotatePiece(pieceId);
@@ -451,7 +592,7 @@ export function PlayScreen() {
         setState(manager.getState());
       }
     },
-    [manager],
+    [manager, selectCycle],
   );
 
   // Track for double-tap to rotate
@@ -506,7 +647,6 @@ export function PlayScreen() {
       const ctx = canvas.getContext("2d");
 
       if (isTouch && boardRect && ctx) {
-        // Reset transform to identity for hit testing in CSS pixel space
         ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         const st = manager.getState();
@@ -519,7 +659,6 @@ export function PlayScreen() {
           lastTapRef.current.pieceId === pieceId &&
           now - lastTapRef.current.time < 300
         ) {
-          // Double tap detected - rotate (but not if placed)
           const piece = st.pieces.find((p) => p.id === pieceId);
           if (!piece?.isPlaced) {
             manager.rotatePiece(pieceId);
@@ -534,18 +673,17 @@ export function PlayScreen() {
       manager.pointerUp();
       setState(manager.getState());
 
-      // Release pointer capture
       try {
         canvas.releasePointerCapture(e.pointerId);
       } catch {
-        // Ignore - may not have capture
+        // ignore
       }
     },
     [manager],
   );
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent right-click menu
+    e.preventDefault();
   }, []);
 
   // Handle clicking a piece in the tray to bring it back to board
@@ -554,6 +692,8 @@ export function PlayScreen() {
       if (!manager) return;
       manager.movePieceFromTray(pieceId);
       setState(manager.getState());
+      selectedIdRef.current = pieceId;
+      bump();
     },
     [manager],
   );
@@ -576,7 +716,6 @@ export function PlayScreen() {
 
     const img = imgRef.current;
 
-    // Sort by average color (hue)
     return [...inTray].sort((a, b) => {
       const colorA = getAverageColor(img, a, state.grid);
       const colorB = getAverageColor(img, b, state.grid);
@@ -679,14 +818,13 @@ export function PlayScreen() {
         </div>
       </div>
 
-      {/* New Game Confirmation Modal */}
       <ConfirmModal
         isOpen={showNewGameModal}
         onClose={() => setShowNewGameModal(false)}
         onConfirm={handleNewGame}
-        title="Start New Game?"
-        message="Your current progress will be lost. Are you sure you want to start a new game?"
-        confirmText="New Game"
+        title="Start New Puzzle?"
+        message="Your current progress will be lost. Are you sure you want to start a new puzzle?"
+        confirmText="New Puzzle"
         cancelText="Keep Playing"
         variant="danger"
       />
@@ -703,7 +841,6 @@ export function PlayScreen() {
             onContextMenu={handleContextMenu}
           />
 
-          {/* Reference preview image */}
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>
               <img
@@ -714,13 +851,12 @@ export function PlayScreen() {
             </div>
           )}
 
-          {/* Pause overlay */}
           {isPaused && (
             <div className={styles.pauseOverlay} onClick={() => setIsPaused(false)}>
               <div className={styles.pauseContent}>
                 <Pause size={64} />
                 <h2>Paused</h2>
-                <p>Click anywhere or press the Resume button to continue</p>
+                <p>Click anywhere or press Space to continue</p>
               </div>
             </div>
           )}
@@ -734,7 +870,6 @@ export function PlayScreen() {
         onPieceClick={handleTrayPieceClick}
       />
 
-      {/* First-time tutorial overlay */}
       {showTutorial && <TutorialOverlay onComplete={dismissTutorial} />}
     </div>
   );
