@@ -154,8 +154,8 @@ export function PlayScreen() {
 
   // Timer effect - stops when complete or paused
   useEffect(() => {
-    if (state?.isComplete) return;
-    if (isPaused) return;
+    if (state?.isComplete) return; // Don't run timer if complete
+    if (isPaused) return; // Don't run timer if paused
 
     const interval = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
@@ -851,12 +851,13 @@ export function PlayScreen() {
             </div>
           )}
 
+          {/* Pause overlay */}
           {isPaused && (
             <div className={styles.pauseOverlay} onClick={() => setIsPaused(false)}>
               <div className={styles.pauseContent}>
                 <Pause size={64} />
                 <h2>Paused</h2>
-                <p>Click anywhere or press Space to continue</p>
+                <p>Click anywhere or press the Resume button to continue</p>
               </div>
             </div>
           )}
