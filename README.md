@@ -105,31 +105,43 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 ### Completed
 
 - [x] Drag-and-drop jigsaw pieces with rotation
-- [x] Middle-click to send pieces to the tray for organization
+- [x] Classic jigsaw piece shapes (interlocking tabs and slots)
+- [x] Piece snapping (to board position and to neighboring pieces)
+- [x] Piece merging (connected pieces move together)
+- [x] Middle-click to send pieces to the tray
 - [x] Piece tray with color-sorted organization
 - [x] Multiple difficulty levels (3×3 to 6×6 grids)
-- [x] Reference preview of completed image
+- [x] Reference preview overlay
 - [x] Progress counter showing pieces remaining
-- [x] Timer that stops on completion
+- [x] Timer with pause functionality
 - [x] Auto-save progress across browser sessions
-- [x] "New Game" button to start fresh
-- [x] Confetti celebration when you complete the puzzle
+- [x] Confetti celebration on completion
+- [x] Mobile support (touch drag, tap to rotate, long-press to tray)
+- [x] Sound effects (snap, rotate, place, complete)
+- [x] Haptic feedback on mobile
+- [x] Fullscreen mode
+- [x] Keyboard shortcuts (Tab to select, R to rotate, arrows to move)
+- [x] First-time tutorial overlay
+- [x] Sample puzzle gallery
+- [x] Custom fonts and icons (Inter, Fredoka, Lucide)
+- [x] Deployed on Vercel
 
 ---
 
-### In Progress / Planned
+### Planned
 
-- [ ] Reference preview of completed image (thumbnail overlay)
-- [ ] Error handling polish for invalid uploads (better UX)
-- [ ] Random scatter placement improvements (more natural spread)
-- [ ] Snapping logic MVP (snap tolerance, lock-in place)
-- [ ] Detect puzzle completion + win state
-- [ ] Multiple puzzle sizes (3×3, 4×4, 5×5…)
-- [ ] Mobile support (touch drag)
-- [ ] Save/Load game state
-- [ ] Slice image into grid tiles (real pieces)
-- [ ] Edge shaping or classic jigsaw cuts (later)
-- [ ] Added a puzzel draw to hold pieces for (later)
+- [ ] Dark mode
+- [ ] Undo/Redo
+- [ ] Ghost/hint preview for stuck players
+- [ ] Edge piece filter in tray
+- [ ] Zoom and pan for larger puzzles
+- [ ] Daily puzzle challenge
+- [ ] Share completed puzzle image
+- [ ] Player statistics dashboard
+- [ ] Achievements system
+- [ ] Import puzzle from URL
+- [ ] Camera capture for custom photos
+- [ ] PWA support (offline play)
 
 ---
 

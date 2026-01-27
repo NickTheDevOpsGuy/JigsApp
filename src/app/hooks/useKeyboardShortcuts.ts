@@ -12,6 +12,12 @@ export type ShortcutAction =
   | "toggleHaptics"
   | "rotateCW" // Rotate clockwise
   | "rotateCCW" // Rotate counter-clockwise
+  | "nextPiece" // Select next piece
+  | "prevPiece" // Select previous piece
+  | "moveUp" // Move piece up
+  | "moveDown" // Move piece down
+  | "moveLeft" // Move piece left
+  | "moveRight" // Move piece right
   | "showHelp"
   | "escape";
 
@@ -40,7 +46,13 @@ export function useKeyboardShortcuts({
 }: UseKeyboardShortcutsOptions) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!enabled) return;
+      // Debug logging
+      console.log("[Keyboard] Key pressed:", e.key, "enabled:", enabled);
+
+      if (!enabled) {
+        console.log("[Keyboard] Shortcuts disabled, ignoring");
+        return;
+      }
 
       // Don't trigger shortcuts when typing in inputs
       const target = e.target as HTMLElement;
@@ -49,11 +61,14 @@ export function useKeyboardShortcuts({
         target.tagName === "TEXTAREA" ||
         target.isContentEditable
       ) {
+        console.log("[Keyboard] In input field, ignoring");
         return;
       }
 
       const { mod, shift } = getModifiers(e);
       const key = e.key.toLowerCase();
+
+      console.log("[Keyboard] Processing key:", key, "mod:", mod, "shift:", shift);
 
       let action: ShortcutAction | null = null;
 
@@ -69,17 +84,36 @@ export function useKeyboardShortcuts({
         }
       }
       // R - Rotate piece clockwise
-      else if (key === "r" && !mod) {
+      else if (key === "r" && !mod && !shift) {
         action = "rotateCW";
       }
       // Shift+R - Rotate piece counter-clockwise
       else if (key === "r" && shift && !mod) {
         action = "rotateCCW";
       }
-      // Tab - Rotate (alternative)
-      else if (e.key === "Tab" && !mod) {
+      // Tab - Select next/previous piece
+      else if (e.key === "Tab" && !mod && !shift) {
         e.preventDefault(); // Prevent focus change
-        action = shift ? "rotateCCW" : "rotateCW";
+        action = "nextPiece";
+      }
+      // Shift+Tab - Select previous piece
+      else if (e.key === "Tab" && shift && !mod) {
+        e.preventDefault();
+        action = "prevPiece";
+      }
+      // Arrow keys - Move selected piece
+      else if (e.key === "ArrowUp" && !mod) {
+        e.preventDefault();
+        action = "moveUp";
+      } else if (e.key === "ArrowDown" && !mod) {
+        e.preventDefault();
+        action = "moveDown";
+      } else if (e.key === "ArrowLeft" && !mod) {
+        e.preventDefault();
+        action = "moveLeft";
+      } else if (e.key === "ArrowRight" && !mod) {
+        e.preventDefault();
+        action = "moveRight";
       }
       // V - Toggle preview
       else if (key === "v" && !mod) {
@@ -108,7 +142,10 @@ export function useKeyboardShortcuts({
       }
 
       if (action) {
+        console.log("[Keyboard] Dispatching action:", action);
         onAction(action);
+      } else {
+        console.log("[Keyboard] No action matched for key:", key);
       }
     },
     [enabled, onAction],
@@ -123,10 +160,11 @@ export function useKeyboardShortcuts({
 // Shortcut definitions for the help modal
 export const SHORTCUTS = [
   { keys: ["Space", "P"], action: "Pause / Resume" },
-  { keys: ["R"], action: "Rotate piece clockwise" },
-  { keys: ["Shift", "R"], action: "Rotate piece counter-clockwise" },
-  { keys: ["Tab"], action: "Rotate clockwise" },
-  { keys: ["Shift", "Tab"], action: "Rotate counter-clockwise" },
+  { keys: ["Tab"], action: "Select next piece" },
+  { keys: ["Shift+Tab"], action: "Select previous piece" },
+  { keys: ["R"], action: "Rotate selected piece" },
+  { keys: ["Shift+R"], action: "Rotate counter-clockwise" },
+  { keys: ["↑ ↓ ← →"], action: "Move selected piece" },
   { keys: ["V"], action: "Toggle preview" },
   { keys: ["F"], action: "Fullscreen" },
   { keys: ["M"], action: "Mute / Unmute sound" },

@@ -12,6 +12,7 @@ export type DebugFlags = {
 export type AnimationState = {
   draggedGroupId: string | null;
   hoveredPieceId: string | null;
+  selectedPieceId: string | null;
   isComplete: boolean;
   completedAtMs: number | null;
 };
@@ -98,8 +99,10 @@ function drawPiece(
   nowMs: number,
   debug: DebugFlags,
   isDragging: boolean,
-  _animState?: AnimationState,
+  animState?: AnimationState,
 ) {
+  const isSelected = animState?.selectedPieceId === p.id && !p.isPlaced;
+
   // Pop animation scale (draw-time)
   const start = popMap.get(p.id);
   const popScale = start ? snapPopScale(nowMs - start) : 1;
@@ -226,6 +229,18 @@ function drawPiece(
     ctx.fillStyle = "rgba(0,0,0,0.7)";
     ctx.font = "12px system-ui";
     ctx.fillText(p.id, 8, 16);
+  }
+
+  // Selection highlight (keyboard focus)
+  if (isSelected) {
+    ctx.strokeStyle = "#667eea";
+    ctx.lineWidth = 3;
+    ctx.stroke(path);
+
+    // Outer glow
+    ctx.strokeStyle = "rgba(102, 126, 234, 0.4)";
+    ctx.lineWidth = 6;
+    ctx.stroke(path);
   }
 
   ctx.restore();

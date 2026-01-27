@@ -356,6 +356,37 @@ export class PuzzleManager {
     this.recomputeDerivedState();
   }
 
+  /** Move a piece (and its group) by a delta amount */
+  movePieceBy(pieceId: PieceId, dx: number, dy: number) {
+    const piece = this.findPiece(pieceId);
+    if (!piece) return;
+
+    if (piece.isPlaced || piece.inTray) return;
+
+    const groupId = piece.groupId;
+
+    // Move ALL pieces in the group together
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.groupId === groupId ? { ...p, x: p.x + dx, y: p.y + dy } : p,
+      ),
+    };
+
+    // Temporarily set drag state so snap methods work
+    const oldDrag = { ...this.drag };
+    this.drag.activeId = pieceId;
+
+    // Try snapping (reuse existing logic)
+    this.trySnapActiveGroupToBoard();
+    this.trySnapActiveGroupToNeighbor();
+
+    // Restore drag state
+    this.drag = oldDrag;
+
+    this.recomputeDerivedState();
+  }
+
   /** Check if a group is at correct position with rotation 0, and mark as placed */
   private checkAndPlaceGroup(groupId: string) {
     const groupPieces = this.getGroupPieces(groupId);

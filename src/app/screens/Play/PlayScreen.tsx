@@ -99,6 +99,18 @@ export function PlayScreen() {
   // Shortcuts help modal
   const [showShortcuts, setShowShortcuts] = useState(false);
 
+  // Modal state for new game confirmation
+  const [showNewGameModal, setShowNewGameModal] = useState(false);
+
+  // Currently selected piece for keyboard controls
+  const [selectedPieceId, setSelectedPieceId] = useState<string | null>(null);
+  const selectedPieceIdRef = useRef<string | null>(null);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    selectedPieceIdRef.current = selectedPieceId;
+  }, [selectedPieceId]);
+
   // Track completion time for animation
   const completedAtRef = useRef<number | null>(null);
 
@@ -121,65 +133,6 @@ export function PlayScreen() {
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
-
-  // Keyboard shortcuts handler
-  const handleShortcut = useCallback(
-    (action: ShortcutAction) => {
-      switch (action) {
-        case "pause":
-          if (!state?.isComplete) setIsPaused((p) => !p);
-          break;
-        case "escape":
-          if (showShortcuts) setShowShortcuts(false);
-          else if (showNewGameModal) setShowNewGameModal(false);
-          else if (isPaused) setIsPaused(false);
-          break;
-        case "preview":
-          setShowPreview((p) => !p);
-          break;
-        case "fullscreen":
-          toggleFullscreen();
-          break;
-        case "newGame":
-          setShowNewGameModal(true);
-          break;
-        case "toggleSound":
-          const newSoundEnabled = !soundManager.isEnabled();
-          soundManager.setEnabled(newSoundEnabled);
-          setSoundEnabled(newSoundEnabled);
-          break;
-        case "toggleHaptics":
-          const newHapticsEnabled = !soundManager.isHapticsEnabled();
-          soundManager.setHapticsEnabled(newHapticsEnabled);
-          setHapticsEnabled(newHapticsEnabled);
-          if (newHapticsEnabled && navigator.vibrate) {
-            navigator.vibrate(25);
-          }
-          break;
-        case "rotateCW":
-        case "rotateCCW":
-          // Rotate the last active piece or first unplaced piece
-          if (manager && state && !isPaused) {
-            const unplacedPiece = state.pieces.find((p) => !p.isPlaced);
-            if (unplacedPiece) {
-              manager.rotatePiece(unplacedPiece.id);
-              soundManager.play("rotate");
-              setState(manager.getState());
-            }
-          }
-          break;
-        case "showHelp":
-          setShowShortcuts((s) => !s);
-          break;
-      }
-    },
-    [state, isPaused, showShortcuts, showNewGameModal, manager, toggleFullscreen],
-  );
-
-  useKeyboardShortcuts({
-    enabled: !showTutorial,
-    onAction: handleShortcut,
-  });
 
   // Grid from localStorage
   const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
@@ -216,6 +169,150 @@ export function PlayScreen() {
     }, 1000);
     return () => clearInterval(interval);
   }, [state?.isComplete, isPaused]);
+
+  // Keyboard shortcuts handler
+  const handleShortcut = useCallback(
+    (action: ShortcutAction) => {
+      console.log("[PlayScreen] handleShortcut called with:", action);
+
+      switch (action) {
+        case "pause":
+          if (!state?.isComplete) setIsPaused((p) => !p);
+          break;
+        case "escape":
+          if (showShortcuts) setShowShortcuts(false);
+          else if (showNewGameModal) setShowNewGameModal(false);
+          else if (isPaused) setIsPaused(false);
+          break;
+        case "preview":
+          setShowPreview((p) => !p);
+          break;
+        case "fullscreen":
+          toggleFullscreen();
+          break;
+        case "newGame":
+          setShowNewGameModal(true);
+          break;
+        case "toggleSound": {
+          const newSoundEnabled = !soundManager.isEnabled();
+          soundManager.setEnabled(newSoundEnabled);
+          setSoundEnabled(newSoundEnabled);
+          break;
+        }
+        case "toggleHaptics": {
+          const newHapticsEnabled = !soundManager.isHapticsEnabled();
+          soundManager.setHapticsEnabled(newHapticsEnabled);
+          setHapticsEnabled(newHapticsEnabled);
+          if (newHapticsEnabled && navigator.vibrate) {
+            navigator.vibrate(25);
+          }
+          break;
+        }
+        case "rotateCW":
+        case "rotateCCW":
+          // Rotate the selected piece (or first unplaced if none selected)
+          if (manager && state && !isPaused) {
+            const unplacedPieces = state.pieces.filter((p) => !p.isPlaced && !p.inTray);
+            let pieceToRotate = unplacedPieces.find((p) => p.id === selectedPieceId);
+
+            // If selected piece is placed or not found, use first unplaced
+            if (!pieceToRotate && unplacedPieces.length > 0) {
+              pieceToRotate = unplacedPieces[0];
+              setSelectedPieceId(pieceToRotate.id);
+            }
+
+            if (pieceToRotate) {
+              manager.rotatePiece(pieceToRotate.id);
+              soundManager.play("rotate");
+              setState(manager.getState());
+            }
+          }
+          break;
+        case "nextPiece":
+        case "prevPiece": {
+          console.log(
+            "[PlayScreen] nextPiece/prevPiece - state:",
+            !!state,
+            "isPaused:",
+            isPaused,
+          );
+          // Tab through unplaced pieces
+          if (state && !isPaused) {
+            const unplacedPieces = state.pieces.filter((p) => !p.isPlaced && !p.inTray);
+            console.log(
+              "[PlayScreen] unplacedPieces count:",
+              unplacedPieces.length,
+              "selectedPieceId:",
+              selectedPieceId,
+            );
+            if (unplacedPieces.length === 0) break;
+
+            const currentIndex = unplacedPieces.findIndex(
+              (p) => p.id === selectedPieceId,
+            );
+            let newIndex: number;
+
+            if (action === "nextPiece") {
+              newIndex =
+                currentIndex < 0 ? 0 : (currentIndex + 1) % unplacedPieces.length;
+            } else {
+              newIndex =
+                currentIndex < 0
+                  ? unplacedPieces.length - 1
+                  : (currentIndex - 1 + unplacedPieces.length) % unplacedPieces.length;
+            }
+
+            console.log(
+              "[PlayScreen] Setting selectedPieceId to:",
+              unplacedPieces[newIndex].id,
+            );
+            setSelectedPieceId(unplacedPieces[newIndex].id);
+          }
+          break;
+        }
+        case "moveUp":
+        case "moveDown":
+        case "moveLeft":
+        case "moveRight": {
+          // Move selected piece with arrow keys
+          if (manager && state && !isPaused && selectedPieceId) {
+            const piece = state.pieces.find((p) => p.id === selectedPieceId);
+            if (piece && !piece.isPlaced && !piece.inTray) {
+              const moveAmount = 20; // pixels per keypress
+              let dx = 0,
+                dy = 0;
+
+              if (action === "moveUp") dy = -moveAmount;
+              else if (action === "moveDown") dy = moveAmount;
+              else if (action === "moveLeft") dx = -moveAmount;
+              else if (action === "moveRight") dx = moveAmount;
+
+              manager.movePieceBy(selectedPieceId, dx, dy);
+              setState(manager.getState());
+            }
+          }
+          break;
+        }
+        case "showHelp":
+          setShowShortcuts((s) => !s);
+          break;
+      }
+    },
+    [
+      state,
+      isPaused,
+      showShortcuts,
+      showNewGameModal,
+      manager,
+      toggleFullscreen,
+      selectedPieceId,
+    ],
+  );
+
+  useKeyboardShortcuts({
+    enabled: !showTutorial,
+    onAction: handleShortcut,
+  });
 
   // Initial setup: create manager once we know board size
   useEffect(() => {
@@ -385,6 +482,7 @@ export function PlayScreen() {
         {
           draggedGroupId: null,
           hoveredPieceId: null,
+          selectedPieceId: selectedPieceIdRef.current,
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
         },
@@ -443,6 +541,9 @@ export function PlayScreen() {
       const pieceId = pickPieceId(ctx, boardPieces, cssX, cssY);
 
       if (!pieceId) return;
+
+      // Set selected piece for keyboard controls
+      setSelectedPieceId(pieceId);
 
       // Middle click (button 1) = send to tray
       if (e.button === 1) {
@@ -617,9 +718,6 @@ export function PlayScreen() {
     },
     [manager],
   );
-
-  // Modal state for new game confirmation
-  const [showNewGameModal, setShowNewGameModal] = useState(false);
 
   // Handle starting a new game (clears saved state and navigates to setup)
   const handleNewGame = useCallback(() => {
