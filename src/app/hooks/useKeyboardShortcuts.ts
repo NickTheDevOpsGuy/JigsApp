@@ -10,8 +10,8 @@ export type ShortcutAction =
   | "newGame"
   | "toggleSound"
   | "toggleHaptics"
-  | "rotateCW"      // Rotate clockwise
-  | "rotateCCW"     // Rotate counter-clockwise
+  | "rotateCW" // Rotate clockwise
+  | "rotateCCW" // Rotate counter-clockwise
   | "showHelp"
   | "escape";
 
@@ -26,7 +26,7 @@ interface UseKeyboardShortcutsOptions {
 function getModifiers(e: KeyboardEvent) {
   return {
     ctrl: e.ctrlKey,
-    meta: e.metaKey,    // Cmd on Mac
+    meta: e.metaKey, // Cmd on Mac
     alt: e.altKey,
     shift: e.shiftKey,
     // "mod" = Cmd on Mac, Ctrl on Windows/Linux
@@ -34,14 +34,21 @@ function getModifiers(e: KeyboardEvent) {
   };
 }
 
-export function useKeyboardShortcuts({ enabled = true, onAction }: UseKeyboardShortcutsOptions) {
+export function useKeyboardShortcuts({
+  enabled = true,
+  onAction,
+}: UseKeyboardShortcutsOptions) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!enabled) return;
 
       // Don't trigger shortcuts when typing in inputs
       const target = e.target as HTMLElement;
-      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
         return;
       }
 
@@ -104,7 +111,7 @@ export function useKeyboardShortcuts({ enabled = true, onAction }: UseKeyboardSh
         onAction(action);
       }
     },
-    [enabled, onAction]
+    [enabled, onAction],
   );
 
   useEffect(() => {
