@@ -23,10 +23,10 @@ export type AnimationState = {
  *
  * Canvas-only rendering pipeline.
  *
- * Key rules to avoid flicker:
+ * Key rules to avoid flicker and seams:
  * - Clear in BACKING STORE pixels using identity transform.
- * - Draw everything else in CSS pixels (PlayScreen sets ctx.setTransform(dpr,...)).
- * - Any overlay/backdrop/grid should use cssW/cssH (canvas.width / dpr).
+ * - Paint the backdrop in SCREEN SPACE (DPR only) so pan/zoom never reveals seams.
+ * - Pieces render in WORLD SPACE (PlayScreen applies pan+zoom before calling renderBoard).
  */
 export function renderBoard(
   ctx: CanvasRenderingContext2D,
@@ -45,24 +45,24 @@ export function renderBoard(
   // Real DPR (NOT affected by view scale)
   const realDpr = window.devicePixelRatio || 1;
 
-  // CSS size of the canvas (screen space)
+  // Canvas size in CSS pixels (screen space)
   const cssW = canvas.width / realDpr;
   const cssH = canvas.height / realDpr;
 
-  // 1) Clear/fill in backing pixels with identity transform
+  // 1) Clear/fill backing store with identity transform
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
 
-  // 2) Draw the backdrop in SCREEN space (ignores pan/zoom)
-  // This guarantees no seams/lines when panning/zooming.
+  // 2) Paint backdrop in SCREEN space (DPR only, ignores pan/zoom)
+  // This prevents thin seams/lines when panning or zooming.
   ctx.save();
   ctx.setTransform(realDpr, 0, 0, realDpr, 0, 0);
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, cssW, cssH);
-  if (debug.showGrid) drawGridOverlay(ctx, cssW, cssH);
+  if (debug?.showGrid) drawGridOverlay(ctx, cssW, cssH);
   ctx.restore();
 
   if (!img || img.naturalWidth === 0 || img.naturalHeight === 0) {
@@ -75,11 +75,6 @@ export function renderBoard(
     return;
   }
 
-  if (debug.showGrid) drawGridOverlay(ctx, cssW, cssH);
-
-  // Get grid from state
-  const { cols, rows } = state.grid;
-
   // Determine dragged group
   const draggedGroupId = dragState?.activeId
     ? (state.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
@@ -90,7 +85,18 @@ export function renderBoard(
 
   for (const p of pieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
-    drawPiece(ctx, p, img, cols, rows, popMap, nowMs, debug, isDragging, animState);
+    drawPiece(
+      ctx,
+      p,
+      img,
+      state.grid.cols,
+      state.grid.rows,
+      popMap,
+      nowMs,
+      debug,
+      isDragging,
+      animState,
+    );
   }
 
   // Completion glow effect
@@ -187,7 +193,7 @@ function drawPiece(
   const srcTileW = sourceW / cols;
   const srcTileH = sourceH / rows;
 
-  // Scale factors: notes how to scale source image to piece coordinates
+  // Scale factors: how to scale source image to piece coordinates
   const scaleX = p.tileW / srcTileW;
   const scaleY = p.tileH / srcTileH;
 
@@ -317,14 +323,6 @@ function drawCompletionGlow(
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, cssW, cssH);
 
-  ctx.restore();
-}
-
-function drawDebugBackdrop(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
-  // Keep the workspace pure white so panning/zooming never reveals gray.
-  ctx.save();
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, cssW, cssH);
   ctx.restore();
 }
 
