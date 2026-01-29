@@ -660,48 +660,36 @@ export class PuzzleManager {
   /**
    * When all pieces are merged into one group, automatically snap to the board position
    */
-  private trySnapCompletedPuzzleToBoard(groupId: string): void {
+  private trySnapCompletedPuzzleToBoard(_groupId: string): void {
     const allPieces = this.state.pieces;
-    const boardPieces = allPieces.filter((p) => !p.inTray);
 
-    // Find the largest group on the board
-    const groupCounts = new Map<string, number>();
-    for (const p of boardPieces) {
-      groupCounts.set(p.groupId, (groupCounts.get(p.groupId) || 0) + 1);
-    }
+    // All pieces must be on the board
+    if (allPieces.some((p) => p.inTray)) return;
 
-    // Find the group that contains all board pieces
-    let completeGroupId: string | null = null;
-    for (const [gid, count] of groupCounts) {
-      if (count === boardPieces.length) {
-        completeGroupId = gid;
-        break;
-      }
-    }
+    // All pieces must belong to the same group
+    const groupIds = new Set(allPieces.map((p) => p.groupId));
+    if (groupIds.size !== 1) return;
 
-    if (!completeGroupId) {
-      return;
-    }
-
+    const completeGroupId = groupIds.values().next().value as string;
     const groupPieces = this.getGroupPieces(completeGroupId);
+    if (groupPieces.length !== allPieces.length) return;
 
-    // Check all pieces are at rotation 0
-    if (!groupPieces.every((p) => p.rotation === 0)) return;
+    // All pieces must be correctly rotated
+    if (!groupPieces.every((p) => p.rotation === p.targetRotation)) return;
 
-    // Find any piece in the group to calculate the offset to target
-    const refPiece = groupPieces[0];
-    if (!refPiece) return;
+    // Snap the group exactly to its target board position
+    const ref = groupPieces[0];
+    if (!ref) return;
 
-    const refTile = this.tilePos(refPiece);
-    const dx = refPiece.targetX - refTile.x;
-    const dy = refPiece.targetY - refTile.y;
+    const refTile = this.tilePos(ref);
+    const dx = ref.targetX - refTile.x;
+    const dy = ref.targetY - refTile.y;
 
-    // Snap the entire group to the board position (unclamped to ensure exact positioning)
     if (dx !== 0 || dy !== 0) {
       this.shiftGroupUnclamped(completeGroupId, dx, dy);
     }
 
-    // Mark all pieces as placed
+    // Lock all pieces in place
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
@@ -709,8 +697,8 @@ export class PuzzleManager {
       ),
     };
 
-    // Fire placed event
-    this.events.onPiecePlaced?.(refPiece);
+    // Fire placed callback once (enough to trigger completion effects)
+    this.events.onPiecePlaced?.(ref);
   }
 
   private computeDragPreview(
