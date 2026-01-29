@@ -42,23 +42,32 @@ export function renderBoard(
 ) {
   const canvas = ctx.canvas;
 
-  // 1) Clear in backing pixels with identity transform (prevents "double vision" artifacts)
+  // Real DPR (NOT affected by view scale)
+  const realDpr = window.devicePixelRatio || 1;
+
+  // CSS size of the canvas (screen space)
+  const cssW = canvas.width / realDpr;
+  const cssH = canvas.height / realDpr;
+
+  // 1) Clear/fill in backing pixels with identity transform
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
 
-  // 2) Derive CSS-space size from current transform (PlayScreen should setTransform(dpr,...))
-  const t = ctx.getTransform();
-  const dpr = t.a || 1; // scaleX
-  const cssW = canvas.width / dpr;
-  const cssH = canvas.height / dpr;
-
-  // 3) Backdrop + optional overlays in CSS pixels
-  drawDebugBackdrop(ctx, cssW, cssH);
+  // 2) Draw the backdrop in SCREEN space (ignores pan/zoom)
+  // This guarantees no seams/lines when panning/zooming.
+  ctx.save();
+  ctx.setTransform(realDpr, 0, 0, realDpr, 0, 0);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, cssW, cssH);
+  if (debug.showGrid) drawGridOverlay(ctx, cssW, cssH);
+  ctx.restore();
 
   if (!img || img.naturalWidth === 0 || img.naturalHeight === 0) {
     ctx.save();
+    ctx.setTransform(realDpr, 0, 0, realDpr, 0, 0);
     ctx.fillStyle = "rgba(0,0,0,0.6)";
     ctx.font = "14px system-ui";
     ctx.fillText("Image not ready…", 16, 24);
@@ -178,7 +187,7 @@ function drawPiece(
   const srcTileW = sourceW / cols;
   const srcTileH = sourceH / rows;
 
-  // Scale factors: how to scale source image to piece coordinates
+  // Scale factors: notes how to scale source image to piece coordinates
   const scaleX = p.tileW / srcTileW;
   const scaleY = p.tileH / srcTileH;
 
@@ -187,9 +196,6 @@ function drawPiece(
   const tileSrcY = p.row * srcTileH;
 
   // Where should (0,0) of source image be drawn in piece-local coordinates?
-  // The tile's top-left should appear at (p.pad, p.pad) in piece coords
-  // So source (tileSrcX, tileSrcY) -> piece (p.pad, p.pad)
-  // Therefore source (0,0) -> piece (p.pad - tileSrcX * scaleX, p.pad - tileSrcY * scaleY)
   const imgX = p.pad - tileSrcX * scaleX;
   const imgY = p.pad - tileSrcY * scaleY;
   const imgW = sourceW * scaleX;
@@ -315,9 +321,9 @@ function drawCompletionGlow(
 }
 
 function drawDebugBackdrop(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
-  // Subtle background so you can see the canvas is alive (CSS pixel space)
+  // Keep the workspace pure white so panning/zooming never reveals gray.
   ctx.save();
-  ctx.fillStyle = "rgba(0,0,0,0.02)";
+  ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, cssW, cssH);
   ctx.restore();
 }
