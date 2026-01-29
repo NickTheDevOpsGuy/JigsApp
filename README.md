@@ -109,6 +109,8 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [x] Piece snapping (to board position and to neighboring pieces)
 - [x] Piece merging (connected pieces move together)
 - [x] Middle-click to send pieces to the tray
+- [x] Edge piece filter in tray
+- [x] Pieces automatically position to correct location after snapping together
 - [x] Piece tray with color-sorted organization
 - [x] Multiple difficulty levels (3×3 to 6×6 grids)
 - [x] Reference preview overlay
@@ -117,7 +119,7 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [x] Auto-save progress across browser sessions
 - [x] Confetti celebration on completion
 - [x] Mobile support (touch drag, tap to rotate, long-press to tray)
-- [x] Sound effects (snap, rotate, place, complete)
+- [x] Sound effects (snap, rotate, place, complete)e
 - [x] Haptic feedback on mobile
 - [x] Fullscreen mode
 - [x] Keyboard shortcuts (Tab to select, R to rotate, arrows to move)
@@ -133,7 +135,6 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 - [ ] Dark mode
 - [ ] Undo/Redo
 - [ ] Ghost/hint preview for stuck players
-- [ ] Edge piece filter in tray
 - [ ] Zoom and pan for larger puzzles
 - [ ] Daily puzzle challenge
 - [ ] Share completed puzzle image

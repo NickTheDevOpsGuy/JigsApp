@@ -15,6 +15,7 @@ export type AnimationState = {
   selectedPieceId: string | null;
   isComplete: boolean;
   completedAtMs: number | null;
+  justSnappedPieces: Set<string>; // Track pieces that just snapped for highlighting
 };
 
 /**
@@ -210,6 +211,10 @@ function drawPiece(
   if (isDragging) {
     ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
     ctx.lineWidth = 2;
+  } else if (p.justSnapped && animState?.justSnappedPieces.has(p.id)) {
+    // Blue highlight for pieces that just snapped
+    ctx.strokeStyle = "rgba(59, 130, 246, 0.8)";
+    ctx.lineWidth = 2.5;
   } else if (p.isPlaced) {
     ctx.strokeStyle = "rgba(0, 160, 80, 0.3)";
     ctx.lineWidth = 1;

@@ -1,5 +1,5 @@
 // src/app/components/PieceTray/PieceTray.tsx
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { Piece, GridSize } from "@/puzzle/types";
 import styles from "./PieceTray.module.css";
 
@@ -18,6 +18,16 @@ type PieceTrayProps = {
 export function PieceTray({ pieces, image, grid, onPieceClick }: PieceTrayProps) {
   const isTouch = isTouchDevice();
 
+  const [filter, setFilter] = useState<"all" | "edge">("all");
+
+  const filteredPieces = useMemo(() => {
+    if (filter === "all") return pieces;
+    return pieces.filter(
+      (p) =>
+        p.row === 0 || p.col === 0 || p.row === grid.rows - 1 || p.col === grid.cols - 1,
+    );
+  }, [pieces, filter, grid.rows, grid.cols]);
+
   const helpText = isTouch
     ? "Long-press to store • Double-tap to rotate"
     : "Middle-click to store • Right-click to rotate";
@@ -29,15 +39,38 @@ export function PieceTray({ pieces, image, grid, onPieceClick }: PieceTrayProps)
   return (
     <div className={styles.tray}>
       <div className={styles.trayHeader}>
-        <span>Piece Drawer ({pieces.length})</span>
+        <span>Piece Drawer ({filteredPieces.length})</span>
+
+        <div className={styles.trayFilters}>
+          <button
+            type="button"
+            className={filter === "all" ? styles.filterButtonActive : styles.filterButton}
+            onClick={() => setFilter("all")}
+            aria-pressed={filter === "all"}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            className={
+              filter === "edge" ? styles.filterButtonActive : styles.filterButton
+            }
+            onClick={() => setFilter("edge")}
+            aria-pressed={filter === "edge"}
+            title="Show only edge pieces"
+          >
+            Edge
+          </button>
+        </div>
+
         <span className={styles.trayHelp}>{helpText}</span>
       </div>
       <div className={styles.trayScroll}>
-        {pieces.length === 0 ? (
+        {filteredPieces.length === 0 ? (
           <div className={styles.trayEmpty}>{emptyText}</div>
         ) : (
           <div className={styles.trayPieces}>
-            {pieces.map((piece) => (
+            {filteredPieces.map((piece) => (
               <TrayPieceThumb
                 key={piece.id}
                 piece={piece}
