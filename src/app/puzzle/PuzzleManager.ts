@@ -191,11 +191,22 @@ export class PuzzleManager {
     if (!p) return;
     if (p.isPlaced) return;
 
-    // Temporarily treat as active for snap routines
-    this.drag = { ...this.drag, activeId: p.id };
-    this.trySnapActiveGroupToBoard();
-    this.trySnapActiveGroupToNeighbor();
-    this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
+    // Temporarily treat as active for snap routines.
+    // Unlike pointer drags, keyboard nudges don't build up a DragPreview,
+    // so we compute one from the current positions.
+    const prevDrag = this.drag;
+    const preview = this.computeDragPreview(p, p.groupId, 0, 0);
+    this.drag = { activeId: p.id, offsetX: 0, offsetY: 0, preview };
+
+    // Prefer board snap if we're close to a target cell; otherwise neighbor snap.
+    if (!this.trySnapActiveGroupToBoard()) {
+      this.trySnapActiveGroupToNeighbor();
+    }
+
+    // If we are already perfectly aligned, lock the group.
+    this.tryPlaceGroupIfCorrect(p.groupId);
+
+    this.drag = prevDrag;
     this.recomputeDerivedState();
   }
 
@@ -328,7 +339,10 @@ export class PuzzleManager {
       preview: this.computeDragPreview(active, gid, dx, dy),
     };
 
-    this.shiftGroup(gid, dx, dy);
+    // Free movement is clamped to keep pieces on-screen.
+    // Snapping should land exactly on the target position.
+    // We bypass clamping here so a near-edge group can still snap perfectly.
+    this.shiftGroupUnclamped(gid, dx, dy);
   }
 
   pointerUp() {
@@ -343,7 +357,7 @@ export class PuzzleManager {
     // Re-fetch the piece to get its current groupId (may have changed due to merging)
     const active = this.findPiece(activeId);
     if (active) {
-      this.trySnapCompletedPuzzleToBoard();
+      this.trySnapCompletedPuzzleToBoard(active.groupId);
     }
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
@@ -435,6 +449,60 @@ export class PuzzleManager {
     return true;
   }
 
+  /**
+   * Lock a group if every piece in the group is at its correct target position
+   * (within snap tolerance), all rotations are correct, and it does not overlap
+   * any other unplaced pieces.
+   *
+   * Why this exists:
+   * - Mouse/touch snapping uses DragPreview, so we know when to run board snap.
+   * - Keyboard nudges do not create a drag preview, so we need a way to "ask" the
+   *   manager to attempt a snap/placement from the current state.
+   * - Neighbor snaps can assemble a correct group away from its final position; if
+   *   we move it onto its targets, we should lock it.
+   */
+  private tryPlaceGroupIfCorrect(groupId: string): boolean {
+    const groupPieces = this.getGroupPieces(groupId);
+    if (groupPieces.length === 0) return false;
+
+    // Do not re-place already placed groups
+    if (groupPieces.every((p) => p.isPlaced)) return false;
+
+    // All pieces in the group must be correctly aligned and rotated
+    const allCorrect = groupPieces.every((p) => this.isPieceCorrect(p));
+    if (!allCorrect) return false;
+
+    // Ensure no overlap with OTHER unplaced pieces
+    for (const gp of groupPieces) {
+      const a = { x: gp.x, y: gp.y, w: gp.w, h: gp.h };
+      for (const other of this.state.pieces) {
+        if (other.inTray) continue;
+        if (other.groupId === groupId) continue;
+        if (other.isPlaced) continue;
+
+        const b = { x: other.x, y: other.y, w: other.w, h: other.h };
+        const overlaps =
+          a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+        if (overlaps) return false;
+      }
+    }
+
+    // Mark all pieces in this group as placed
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        p.groupId === groupId ? { ...p, isPlaced: true, justSnapped: true } : p,
+      ),
+    };
+
+    // Fire "placed" callbacks so the UI can play sounds/animations.
+    // We call once per piece to match how board-snapping behaves.
+    if (this.events.onPiecePlaced) {
+      for (const p of groupPieces) this.events.onPiecePlaced(p);
+    }
+    return true;
+  }
+
   private trySnapActiveGroupToNeighbor(): boolean {
     const activeId = this.drag.activeId;
     if (!activeId) return false;
@@ -502,38 +570,34 @@ export class PuzzleManager {
       ),
     };
 
-    // Move the merged group to its correct board position
-    // Re-fetch group pieces AFTER state update above
+    // Move the merged group to its correct board position.
+    // We do this so "snapping" also progresses the puzzle toward completion,
+    // not just relative alignment between groups.
     const mergedGroupPieces = this.getGroupPieces(intoGroup);
     if (
       mergedGroupPieces.length > 0 &&
-      mergedGroupPieces.every((p) => p.rotation === 0)
+      mergedGroupPieces.every((p) => p.rotation === p.targetRotation)
     ) {
       const refPiece = mergedGroupPieces[0];
       const refTile = this.tilePos(refPiece);
       const dx = refPiece.targetX - refTile.x;
       const dy = refPiece.targetY - refTile.y;
 
-      console.log(
-        "[Puzzle] Moving merged group",
-        intoGroup,
-        "to target, dx:",
-        dx,
-        "dy:",
-        dy,
-      );
-
       // Use unclamped shift to ensure pieces reach exact target position
-      if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+      if (dx !== 0 || dy !== 0) {
         this.shiftGroupUnclamped(intoGroup, dx, dy);
 
-        // After moving, check if we should auto-merge with neighbors at target
+        // After moving, pieces that were nearby might now be in snap range.
+        // Check if we should snap to any other groups that are also at target position.
         this.trySnapGroupToNeighborsAtTarget(intoGroup);
       }
     }
 
-    // After all snapping and moving, check if puzzle is complete
-    this.trySnapCompletedPuzzleToBoard();
+    // After merging, check if the puzzle is now complete
+    this.trySnapCompletedPuzzleToBoard(intoGroup);
+
+    // If the merged group is now exactly where it belongs, lock it.
+    this.tryPlaceGroupIfCorrect(intoGroup);
 
     return true;
   }
@@ -546,13 +610,9 @@ export class PuzzleManager {
     const groupPieces = this.getGroupPieces(groupId);
     if (groupPieces.length === 0) return;
 
-    console.log("[Puzzle] Checking for auto-merge opportunities for group:", groupId);
-
     // Check each piece in the group for neighbors
     for (const groupPiece of groupPieces) {
       const neighbors = this.getSolvedNeighbors(groupPiece);
-
-      console.log("[Puzzle] Piece", groupPiece.id, "has", neighbors.length, "neighbors");
 
       for (const n of neighbors) {
         // Skip if already in same group
@@ -575,24 +635,11 @@ export class PuzzleManager {
 
         const neighborDist = Math.hypot(n.targetX - nTile.x, n.targetY - nTile.y);
 
-        console.log("[Puzzle] Checking neighbor", n.id, "- distances:", {
-          groupPieceDist,
-          neighborDist,
-          groupPieceAtTarget: groupPieceDist <= 2,
-          neighborAtTarget: neighborDist <= 2,
-        });
-
         const groupPieceAtTarget = groupPieceDist <= 2;
         const neighborAtTarget = neighborDist <= 2;
 
         // If both at target, they should be merged
         if (groupPieceAtTarget && neighborAtTarget) {
-          console.log(
-            "[Puzzle] ✅ Auto-merging groups at target:",
-            groupId,
-            "and",
-            n.groupId,
-          );
           this.mergeGroups(n.groupId, groupId);
           this.state = {
             ...this.state,
@@ -613,87 +660,36 @@ export class PuzzleManager {
   /**
    * When all pieces are merged into one group, automatically snap to the board position
    */
-  private trySnapCompletedPuzzleToBoard(): void {
+  private trySnapCompletedPuzzleToBoard(_groupId: string): void {
     const allPieces = this.state.pieces;
 
-    // Only consider pieces on the board
-    const boardPieces = allPieces.filter((p) => !p.inTray);
-    if (boardPieces.length === 0) return;
+    // All pieces must be on the board
+    if (allPieces.some((p) => p.inTray)) return;
 
-    // FORCE MERGE: If pieces are at correct positions, merge them
-    for (const piece of boardPieces) {
-      if (piece.rotation !== 0) continue;
+    // All pieces must belong to the same group
+    const groupIds = new Set(allPieces.map((p) => p.groupId));
+    if (groupIds.size !== 1) return;
 
-      const neighbors = this.getSolvedNeighbors(piece);
-      for (const n of neighbors) {
-        if (n.groupId === piece.groupId) continue;
-        if (n.rotation !== 0) continue;
-
-        // Check if both are at target
-        const pieceTile = this.tilePos(piece);
-        const nTile = this.tilePos(n);
-
-        const pieceAtTarget =
-          Math.hypot(piece.targetX - pieceTile.x, piece.targetY - pieceTile.y) <= 2;
-        const nAtTarget = Math.hypot(n.targetX - nTile.x, n.targetY - nTile.y) <= 2;
-
-        if (pieceAtTarget && nAtTarget) {
-          console.log(
-            "[Puzzle] Force merging",
-            piece.id,
-            "and",
-            n.id,
-            "- both at target",
-          );
-          this.mergeGroups(n.groupId, piece.groupId);
-        }
-      }
-    }
-
-    // Find the largest group on the board
-    const groupCounts = new Map<string, number>();
-    for (const p of boardPieces) {
-      groupCounts.set(p.groupId, (groupCounts.get(p.groupId) || 0) + 1);
-    }
-
-    // Find the group that contains all board pieces
-    let completeGroupId: string | null = null;
-    for (const [gid, count] of groupCounts) {
-      if (count === boardPieces.length) {
-        completeGroupId = gid;
-        break;
-      }
-    }
-
-    console.log(
-      "[Puzzle] Completion check - groups:",
-      Object.fromEntries(groupCounts),
-      "complete:",
-      completeGroupId,
-    );
-
-    // If not all pieces are in one group, puzzle is not complete
-    if (!completeGroupId) return;
-
+    const completeGroupId = groupIds.values().next().value as string;
     const groupPieces = this.getGroupPieces(completeGroupId);
+    if (groupPieces.length !== allPieces.length) return;
 
-    // Check all pieces are at rotation 0
-    if (!groupPieces.every((p) => p.rotation === 0)) return;
+    // All pieces must be correctly rotated
+    if (!groupPieces.every((p) => p.rotation === p.targetRotation)) return;
 
-    console.log("[Puzzle] ✅ PUZZLE COMPLETE!");
+    // Snap the group exactly to its target board position
+    const ref = groupPieces[0];
+    if (!ref) return;
 
-    // Snap everything perfectly to targets (safety net)
-    for (const p of groupPieces) {
-      const tile = this.tilePos(p);
-      const dx = p.targetX - tile.x;
-      const dy = p.targetY - tile.y;
+    const refTile = this.tilePos(ref);
+    const dx = ref.targetX - refTile.x;
+    const dy = ref.targetY - refTile.y;
 
-      if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
-        this.shiftGroupUnclamped(p.groupId, dx, dy);
-      }
+    if (dx !== 0 || dy !== 0) {
+      this.shiftGroupUnclamped(completeGroupId, dx, dy);
     }
 
-    // Lock all pieces - puzzle is complete!
+    // Lock all pieces in place
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
@@ -701,12 +697,8 @@ export class PuzzleManager {
       ),
     };
 
-    // Fire completion event
-    if (groupPieces[0]) {
-      this.events.onPiecePlaced?.(groupPieces[0]);
-    }
-
-    this.recomputeDerivedState();
+    // Fire placed callback once (enough to trigger completion effects)
+    this.events.onPiecePlaced?.(ref);
   }
 
   private computeDragPreview(
@@ -789,12 +781,10 @@ export class PuzzleManager {
     // Only consider pieces NOT in tray for completion
     const boardPieces = allPieces.filter((p) => !p.inTray);
 
-    // Count pieces in the largest group as "progress"
-    const groupCounts = new Map<string, number>();
-    for (const p of boardPieces) {
-      groupCounts.set(p.groupId, (groupCounts.get(p.groupId) || 0) + 1);
-    }
-    const largestGroupSize = Math.max(...groupCounts.values(), 0);
+    // Progress is "how many pieces have been placed" (locked to their targets).
+    // This maps cleanly to the HUD's "pieces left" count and avoids depending
+    // on groupId merges.
+    const placedCount = boardPieces.filter((p) => p.isPlaced).length;
 
     // Completion: all board pieces merged into one group AND all are correct
     // (pieces in tray don't count - puzzle is complete when all board pieces are done)
@@ -803,42 +793,21 @@ export class PuzzleManager {
       return;
     }
 
-    const firstPiece = boardPieces[0];
-    const allSameGroup = boardPieces.every((p) => p.groupId === firstPiece.groupId);
+    // A group becomes "placed" (locked) as soon as it is perfectly aligned to
+    // the board targets. We track progress via `isPlaced` and drive the HUD from
+    // that (so "pieces left" behaves intuitively).
     const allCorrect = boardPieces.every((p) => this.isPieceCorrect(p));
     const noTrayPieces = boardPieces.length === allPieces.length;
-    const isComplete = allSameGroup && allCorrect && noTrayPieces;
 
-    // Debug logging
-    if (largestGroupSize === allPieces.length) {
-      console.log("[Puzzle] Completion check:", {
-        allSameGroup,
-        allCorrect,
-        noTrayPieces,
-        isComplete,
-        boardPiecesCount: boardPieces.length,
-        allPiecesCount: allPieces.length,
-      });
-      if (!allCorrect) {
-        // Log which pieces are not correct
-        for (const p of boardPieces) {
-          const tile = this.tilePos(p);
-          const dist = Math.hypot(p.targetX - tile.x, p.targetY - tile.y);
-          const rotOk = p.rotation === p.targetRotation;
-          if (!rotOk || dist > this.snapTolerancePx) {
-            console.log(
-              `[Puzzle] Piece ${p.id} NOT correct: rotation=${p.rotation} (target=${p.targetRotation}), dist=${dist.toFixed(1)} (tolerance=${this.snapTolerancePx})`,
-            );
-          }
-        }
-      }
-    }
+    // Win condition: all pieces are on the board, they are all correct, and they
+    // have all been locked in place.
+    const isComplete = noTrayPieces && allCorrect && placedCount === allPieces.length;
 
     const prevComplete = this.state.isComplete;
 
     this.state = {
       ...this.state,
-      placedCount: largestGroupSize,
+      placedCount,
       isComplete,
     };
 
