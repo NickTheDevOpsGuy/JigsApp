@@ -812,6 +812,7 @@ export class PuzzleManager {
     };
 
     if (!prevComplete && isComplete) {
+      console.log("[Puzzle] PUZZLE COMPLETE! Firing onPuzzleComplete event");
       this.state = {
         ...this.state,
         pieces: this.state.pieces.map((p) => ({ ...p, isPlaced: true })),
