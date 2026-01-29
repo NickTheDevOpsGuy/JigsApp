@@ -104,32 +104,50 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ### Completed
 
-- [x] Drag-and-drop jigsaw pieces with rotation
-- [x] Middle-click to send pieces to the tray for organization
-- [x] Piece tray with color-sorted organization
-- [x] Multiple difficulty levels (3×3 to 6×6 grids)
-- [x] Reference preview of completed image
-- [x] Progress counter showing pieces remaining
-- [x] Timer that stops on completion
-- [x] Auto-save progress across browser sessions
-- [x] "New Game" button to start fresh
-- [x] Confetti celebration when you complete the puzzle
+- **Core gameplay**
+  - Drag-and-drop jigsaw pieces with rotation
+  - Interlocking jigsaw shapes (tabs and blanks)
+  - Smart snapping (board + neighbor snapping)
+  - Piece merging (connected pieces move as a group)
+
+- **Gameplay tools**
+  - Piece tray (middle-click to store, color-sorted)
+  - Reference preview overlay
+  - Progress counter and win detection
+  - Timer with pause support
+
+- **Controls & accessibility**
+  - Mouse, touch, and keyboard support
+  - Keyboard shortcuts (Tab select, arrows move, R rotate)
+  - Mobile gestures (tap to rotate, long-press to tray)
+
+- **Polish & UX**
+  - Auto-save across sessions
+  - Sound effects and haptics
+  - Confetti celebration on completion
+  - Fullscreen mode
+
+- **Content & delivery**
+  - Sample puzzle gallery
+  - Multiple difficulty levels (3×3–6×6)
+  - Deployed on Vercel
 
 ---
 
-### In Progress / Planned
+### Planned
 
-- [ ] Reference preview of completed image (thumbnail overlay)
-- [ ] Error handling polish for invalid uploads (better UX)
-- [ ] Random scatter placement improvements (more natural spread)
-- [ ] Snapping logic MVP (snap tolerance, lock-in place)
-- [ ] Detect puzzle completion + win state
-- [ ] Multiple puzzle sizes (3×3, 4×4, 5×5…)
-- [ ] Mobile support (touch drag)
-- [ ] Save/Load game state
-- [ ] Slice image into grid tiles (real pieces)
-- [ ] Edge shaping or classic jigsaw cuts (later)
-- [ ] Added a puzzel draw to hold pieces for (later)
+- [ ] Dark mode
+- [ ] Undo/Redo
+- [ ] Ghost/hint preview for stuck players
+- [ ] Edge piece filter in tray
+- [ ] Zoom and pan for larger puzzles
+- [ ] Daily puzzle challenge
+- [ ] Share completed puzzle image
+- [ ] Player statistics dashboard
+- [ ] Achievements system
+- [ ] Import puzzle from URL
+- [ ] Camera capture for custom photos
+- [ ] PWA support (offline play)
 
 ---
 
@@ -194,13 +212,6 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 <summary>Click to expand file structure</summary>
 
 .
-├── Assets
-│   └── Preview
-│       └── preview.gif
-├── CONTRIBUTORS.md
-├── .env.example
-├── .eslintcache
-├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -209,27 +220,26 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   ├── enhancement_refactor.yml
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
-│   ├── pull_request_template.md
-│   └── workflows
-│       ├── Phuzzle.yml
-│       └── vercel-production.yml
-├── .gitignore
+│   ├── workflows
+│   │   ├── Phuzzle.yml
+│   │   └── vercel-production.yml
+│   └── pull_request_template.md
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push
-├── index.html
-├── LICENSE.md
-├── package.json
-├── .prettierignore
-├── .prettierrc.yml
+├── .vite
+│   └── deps
+│       ├── _metadata.json
+│       └── package.json
+├── Assets
+│   └── Preview
+│       └── preview.gif
 ├── public
 │   └── favicon.svg
-├── README.md
 ├── scripts
 │   └── precheck.sh
 ├── src
 │   ├── app
-│   │   ├── App.tsx
 │   │   ├── assets
 │   │   │   ├── puzzles
 │   │   │   │   ├── animals
@@ -237,13 +247,14 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── frog.png
 │   │   │   │   │   ├── kitten.png
 │   │   │   │   │   └── rabbit.png
-│   │   │   │   └── demo
-│   │   │   │       ├── blue_square_thumb.png
-│   │   │   │       ├── four_quadrants_thumb.png
-│   │   │   │       ├── green_triangle_thumb.png
-│   │   │   │       ├── red_circle_thumb.png
-│   │   │   │       ├── two_color_split_thumb.png
-│   │   │   │       └── yellow_star_thumb.png
+│   │   │   │   ├── demo
+│   │   │   │   │   ├── blue_square_thumb.png
+│   │   │   │   │   ├── four_quadrants_thumb.png
+│   │   │   │   │   ├── green_triangle_thumb.png
+│   │   │   │   │   ├── red_circle_thumb.png
+│   │   │   │   │   ├── two_color_split_thumb.png
+│   │   │   │   │   └── yellow_star_thumb.png
+│   │   │   │   └── nature
 │   │   │   └── ui
 │   │   │       └── phuzzle-logo-512.png
 │   │   ├── audio
@@ -256,8 +267,8 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
 │   │   │   ├── HowToPlay
-│   │   │   │   ├── HowToPlayModal.tsx
 │   │   │   │   ├── HowToPlay.module.css
+│   │   │   │   ├── HowToPlayModal.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── TutorialOverlay.tsx
 │   │   │   ├── Modal
@@ -266,12 +277,16 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   │   ├── PieceTray
 │   │   │   │   ├── PieceTray.module.css
 │   │   │   │   └── PieceTray.tsx
+│   │   │   ├── ShortcutsModal
+│   │   │   │   ├── ShortcutsModal.module.css
+│   │   │   │   └── ShortcutsModal.tsx
 │   │   │   └── Tray
 │   │   │       ├── Tray.module.css
 │   │   │       └── Tray.tsx
 │   │   ├── data
 │   │   │   └── samplePuzzles.ts
-│   │   ├── main.tsx
+│   │   ├── hooks
+│   │   │   └── useKeyboardShortcuts.ts
 │   │   ├── puzzle
 │   │   │   ├── canvas
 │   │   │   │   ├── pickPiece.ts
@@ -300,12 +315,25 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   │       └── SetupScreen.tsx
 │   │   ├── styles
 │   │   │   └── global.css
+│   │   ├── App.tsx
+│   │   ├── main.tsx
 │   │   └── vite-env.d.ts
 │   └── types
 │       ├── canvas-confetti.d.ts
 │       └── vite-env.d.ts
-├── test-results
-│   └── .last-run.json
+├── .env.development
+├── .env.example
+├── .eslintcache
+├── .gitignore
+├── .prettierignore
+├── .prettierrc.yml
+├── CONTRIBUTORS.md
+├── eslint.config.ts
+├── index.html
+├── LICENSE.md
+├── package-lock.json
+├── package.json
+├── README.md
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json

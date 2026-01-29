@@ -28,5 +28,5 @@
       "@types/*": ["src/app/types/*"]
     }
   },
-  "include": ["src", "../WebDev/src/context"]
+  "include": ["src"]
 }
