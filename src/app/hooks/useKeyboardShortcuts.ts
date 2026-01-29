@@ -76,12 +76,16 @@ export function useKeyboardShortcuts({
       if (e.key === "Escape") {
         action = "escape";
       }
-      // Space or P - Pause/Resume
-      else if (key === " " || key === "p") {
+      // Space - Pause/Resume
+      else if (key === " ") {
         if (!mod) {
           e.preventDefault(); // Prevent space scrolling
           action = "pause";
         }
+      }
+      // P - Toggle preview
+      else if (key === "p" && !mod) {
+        action = "preview";
       }
       // R - Rotate piece clockwise
       else if (key === "r" && !mod && !shift) {
@@ -114,10 +118,6 @@ export function useKeyboardShortcuts({
       } else if (e.key === "ArrowRight" && !mod) {
         e.preventDefault();
         action = "moveRight";
-      }
-      // V - Toggle preview
-      else if (key === "v" && !mod) {
-        action = "preview";
       }
       // F - Fullscreen
       else if (key === "f" && !mod) {
@@ -159,13 +159,13 @@ export function useKeyboardShortcuts({
 
 // Shortcut definitions for the help modal
 export const SHORTCUTS = [
-  { keys: ["Space", "P"], action: "Pause / Resume" },
+  { keys: ["Space"], action: "Pause / Resume" },
   { keys: ["Tab"], action: "Select next piece" },
   { keys: ["Shift+Tab"], action: "Select previous piece" },
   { keys: ["R"], action: "Rotate selected piece" },
   { keys: ["Shift+R"], action: "Rotate counter-clockwise" },
   { keys: ["↑ ↓ ← →"], action: "Move selected piece" },
-  { keys: ["V"], action: "Toggle preview" },
+  { keys: ["P"], action: "Toggle preview" },
   { keys: ["F"], action: "Fullscreen" },
   { keys: ["M"], action: "Mute / Unmute sound" },
   { keys: ["H"], action: "Toggle haptics" },
