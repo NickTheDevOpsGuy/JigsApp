@@ -132,6 +132,17 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
   - Multiple difficulty levels (3×3–6×6)
   - Deployed on Vercel
 
+- **Rendering Architecture**
+
+- Dual-space rendering model
+  - Screen space for backdrop and overlays
+    -World space for puzzle transforms
+- DPR-aware canvas clearing to prevent subpixel artifacts
+- Path2D-based piece silhouettes for pixel-accurate clipping
+- Deterministic draw ordering via z-index sorting
+
+Deterministic draw ordering via z-index sorting
+
 ---
 
 ### Planned

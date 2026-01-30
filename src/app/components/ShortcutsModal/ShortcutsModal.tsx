@@ -1,4 +1,3 @@
-// src/app/components/ShortcutsModal/ShortcutsModal.tsx
 import React from "react";
 import { X, Keyboard } from "lucide-react";
 import { SHORTCUTS } from "@/hooks/useKeyboardShortcuts";
@@ -66,6 +65,27 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
                   </td>
                   <td className={styles.action}>Send to tray</td>
                 </tr>
+
+                <tr>
+                  <td className={styles.keys}>
+                    <kbd className={styles.key}>Wheel</kbd> / Trackpad Scroll
+                  </td>
+                  <td className={styles.action}>Pan view</td>
+                </tr>
+                <tr>
+                  <td className={styles.keys}>
+                    <kbd className={styles.key}>Ctrl</kbd> +{" "}
+                    <kbd className={styles.key}>Wheel</kbd>
+                  </td>
+                  <td className={styles.action}>Zoom view</td>
+                </tr>
+                <tr>
+                  <td className={styles.keys}>
+                    <kbd className={styles.key}>Shift</kbd> + Drag
+                  </td>
+                  <td className={styles.action}>Pan view</td>
+                </tr>
+
                 <tr>
                   <td className={styles.keys}>
                     <kbd className={styles.key}>Double Tap</kbd>
@@ -93,7 +113,6 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
   );
 }
 
-// Format key names for display
 function formatKey(key: string): string {
   const keyMap: Record<string, string> = {
     " ": "Space",
@@ -102,6 +121,10 @@ function formatKey(key: string): string {
     Tab: "⇥ Tab",
     Esc: "Esc",
     Escape: "Esc",
+    Ctrl: "Ctrl",
+    Control: "Ctrl",
+    Cmd: "Cmd",
+    Meta: "Cmd",
     F1: "F1",
   };
   return keyMap[key] || key.toUpperCase();
