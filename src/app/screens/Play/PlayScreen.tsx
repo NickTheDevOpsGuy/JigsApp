@@ -45,7 +45,7 @@ const GRID_KEY = "phuzzle:gridSize";
 const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
 
 function parseGrid(stored: string | null): { rows: number; cols: number } {
-  if (!stored) return { rows: 4, cols: 4 }; // default
+  if (!stored) return { rows: 4, cols: 4 };
   const [r, c] = stored.split("x").map(Number);
   if (r && c) return { rows: r, cols: c };
   return { rows: 4, cols: 4 };
@@ -74,6 +74,71 @@ type ViewState = {
   panY: number; // CSS px
 };
 
+type WorldBounds = {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+};
+
+function getWorldBounds(st: PuzzleState): WorldBounds {
+  // Use on-board pieces only, because tray pieces are not visible on the board.
+  const pieces = st.pieces.filter((p) => !p.inTray);
+
+  if (pieces.length === 0) {
+    return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+  }
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const p of pieces) {
+    minX = Math.min(minX, p.x);
+    minY = Math.min(minY, p.y);
+    maxX = Math.max(maxX, p.x + p.w);
+    maxY = Math.max(maxY, p.y + p.h);
+  }
+
+  return { minX, minY, maxX, maxY };
+}
+
+function clampViewToBounds(
+  next: ViewState,
+  viewportW: number,
+  viewportH: number,
+  bounds: WorldBounds,
+  marginPx: number,
+): ViewState {
+  const s = next.scale;
+
+  // Ensure some part of the bounds stays visible.
+  // Constraints:
+  // minX*s + panX <= viewportW - margin
+  // maxX*s + panX >= margin
+  // Solve for panX range:
+  // panX <= viewportW - margin - minX*s
+  // panX >= margin - maxX*s
+  const panMinX = marginPx - bounds.maxX * s;
+  const panMaxX = viewportW - marginPx - bounds.minX * s;
+
+  const panMinY = marginPx - bounds.maxY * s;
+  const panMaxY = viewportH - marginPx - bounds.minY * s;
+
+  let panX = next.panX;
+  let panY = next.panY;
+
+  // If content is smaller than viewport (range inverted), gently center it.
+  if (panMinX > panMaxX) panX = (panMinX + panMaxX) / 2;
+  else panX = clamp(panX, panMinX, panMaxX);
+
+  if (panMinY > panMaxY) panY = (panMinY + panMaxY) / 2;
+  else panY = clamp(panY, panMinY, panMaxY);
+
+  return { ...next, panX, panY };
+}
+
 export function PlayScreen() {
   const navigate = useNavigate();
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -99,7 +164,7 @@ export function PlayScreen() {
     viewRef.current = view;
   }, [view]);
 
-  // Shift-to-pan state (Space is pause)
+  // Shift-to-pan state (Space is reserved for pause)
   const shiftHeldRef = useRef(false);
   const isPanningRef = useRef(false);
   const panStartRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(
@@ -158,14 +223,12 @@ export function PlayScreen() {
 
   // Listen for fullscreen changes
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
+    const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  // Track Shift held for panning
+  // Track Shift held for panning (Space is pause in shortcuts)
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (isTypingTarget(e.target)) return;
@@ -187,6 +250,11 @@ export function PlayScreen() {
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
+  const stateRef = useRef<PuzzleState | null>(null);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Track board size in CSS pixels
@@ -194,23 +262,19 @@ export function PlayScreen() {
 
   // Helper: compute a tile size that makes the assembled puzzle fill the board nicely
   function computeTileSize(boardW: number, boardH: number) {
-    // make the assembled puzzle about ~65% of board's smaller dimension
     const targetFill = 0.65;
 
     const tileFromW = (boardW * targetFill) / grid.cols;
     const tileFromH = (boardH * targetFill) / grid.rows;
 
-    // Use the limiting axis so it fits both dimensions
     const tile = Math.floor(Math.min(tileFromW, tileFromH));
-
-    // Clamp so it doesn't get ridiculous on tiny/huge screens
     return clamp(tile, 56, 160);
   }
 
   // Timer effect - stops when complete or paused
   useEffect(() => {
-    if (state?.isComplete) return; // Don't run timer if complete
-    if (isPaused) return; // Don't run timer if paused
+    if (state?.isComplete) return;
+    if (isPaused) return;
 
     const interval = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
@@ -249,9 +313,7 @@ export function PlayScreen() {
           const newHapticsEnabled = !soundManager.isHapticsEnabled();
           soundManager.setHapticsEnabled(newHapticsEnabled);
           setHapticsEnabled(newHapticsEnabled);
-          if (newHapticsEnabled && navigator.vibrate) {
-            navigator.vibrate(25);
-          }
+          if (newHapticsEnabled && navigator.vibrate) navigator.vibrate(25);
           break;
         }
         case "rotateCW":
@@ -304,16 +366,15 @@ export function PlayScreen() {
           if (manager && state && !isPaused && selectedPieceId) {
             const piece = state.pieces.find((p) => p.id === selectedPieceId);
             if (piece && !piece.isPlaced && !piece.inTray) {
-              const moveAmount = 20; // pixels per keypress
-              let dx = 0,
-                dy = 0;
+              const moveAmount = 20;
+              let dx = 0;
+              let dy = 0;
 
               if (action === "moveUp") dy = -moveAmount;
               else if (action === "moveDown") dy = moveAmount;
               else if (action === "moveLeft") dx = -moveAmount;
               else if (action === "moveRight") dx = moveAmount;
 
-              // Keyboard nudges should be in world space (not affected by view)
               manager.nudgeGroup(selectedPieceId, dx, dy);
               setState(manager.getState());
             }
@@ -362,11 +423,8 @@ export function PlayScreen() {
       savedState.grid.rows === grid.rows &&
       savedState.grid.cols === grid.cols;
 
-    if (hasSavedGame && savedState) {
-      setElapsedSeconds(savedState.elapsedSeconds);
-    } else {
-      setElapsedSeconds(0);
-    }
+    if (hasSavedGame && savedState) setElapsedSeconds(savedState.elapsedSeconds);
+    else setElapsedSeconds(0);
 
     const next = new PuzzleManager(
       {
@@ -443,6 +501,11 @@ export function PlayScreen() {
 
       manager.setBoardSize(boardW, boardH);
       setState(manager.getState());
+
+      // Clamp view on resize so you never end up "out of bounds"
+      const st = manager.getState();
+      const bounds = getWorldBounds(st);
+      setView((v) => clampViewToBounds(v, boardW, boardH, bounds, 48));
     });
 
     ro.observe(el);
@@ -452,13 +515,10 @@ export function PlayScreen() {
   // Helpers: convert between screen (CSS) coords and world coords
   const screenToWorld = useCallback((cssX: number, cssY: number) => {
     const { scale, panX, panY } = viewRef.current;
-    return {
-      x: (cssX - panX) / scale,
-      y: (cssY - panY) / scale,
-    };
+    return { x: (cssX - panX) / scale, y: (cssY - panY) / scale };
   }, []);
 
-  // Helper: feed PuzzleManager pointer APIs “virtual client coords” that stay correct under zoom/pan
+  // Helper: feed PuzzleManager pointer APIs "virtual client coords" that stay correct under zoom/pan
   const toVirtualClient = useCallback(
     (clientX: number, clientY: number, boardRect: DOMRect) => {
       const { scale, panX, panY } = viewRef.current;
@@ -473,7 +533,7 @@ export function PlayScreen() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const board = boardRef.current;
-    if (!canvas || !board) return;
+    if (!canvas || !board || !manager) return;
 
     const onWheel = (e: WheelEvent) => {
       if (isTypingTarget(e.target)) return;
@@ -483,8 +543,11 @@ export function PlayScreen() {
       const cssY = e.clientY - rect.top;
 
       const cur = viewRef.current;
+      const st = manager.getState();
+      const bounds = getWorldBounds(st);
+      const margin = 48;
 
-      // ctrlKey is how trackpad pinch usually appears as “wheel zoom”
+      // Zoom on ctrlKey (trackpad pinch)
       if (e.ctrlKey) {
         e.preventDefault();
 
@@ -496,22 +559,32 @@ export function PlayScreen() {
         const nextPanX = cssX - world.x * nextScale;
         const nextPanY = cssY - world.y * nextScale;
 
-        setView({ scale: nextScale, panX: nextPanX, panY: nextPanY });
+        const clamped = clampViewToBounds(
+          { scale: nextScale, panX: nextPanX, panY: nextPanY },
+          rect.width,
+          rect.height,
+          bounds,
+          margin,
+        );
+
+        setView(clamped);
         return;
       }
 
-      // Otherwise pan with wheel/trackpad scroll
+      // Pan with wheel/trackpad scroll
       e.preventDefault();
-      setView((v) => ({
-        ...v,
-        panX: v.panX - e.deltaX,
-        panY: v.panY - e.deltaY,
-      }));
+      const next = {
+        scale: cur.scale,
+        panX: cur.panX - e.deltaX,
+        panY: cur.panY - e.deltaY,
+      };
+
+      setView(clampViewToBounds(next, rect.width, rect.height, bounds, margin));
     };
 
     canvas.addEventListener("wheel", onWheel, { passive: false });
     return () => canvas.removeEventListener("wheel", onWheel);
-  }, [screenToWorld]);
+  }, [manager, screenToWorld]);
 
   // Animation loop: draw canvas
   useEffect(() => {
@@ -531,7 +604,6 @@ export function PlayScreen() {
       const cssH = Math.max(1, Math.floor(rect.height));
       const dpr = window.devicePixelRatio || 1;
 
-      // Size backing store
       canvas.width = Math.floor(cssW * dpr);
       canvas.height = Math.floor(cssH * dpr);
       canvas.style.width = `${cssW}px`;
@@ -543,14 +615,9 @@ export function PlayScreen() {
         return;
       }
 
-      // Draw in CSS pixels
+      // Draw everything in CSS pixels, then apply view transform in CSS space
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Force a solid white background in SCREEN space every frame
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, cssW, cssH);
-
-      // Apply view transform (pan/zoom) after painting background
       const { scale, panX, panY } = viewRef.current;
       ctx.translate(panX, panY);
       ctx.scale(scale, scale);
@@ -566,11 +633,9 @@ export function PlayScreen() {
       const assembledW = st.grid.cols * firstPiece.tileW;
       const assembledH = st.grid.rows * firstPiece.tileH;
 
-      if (st.isComplete && !completedAtRef.current) {
+      if (st.isComplete && !completedAtRef.current)
         completedAtRef.current = performance.now();
-      } else if (!st.isComplete) {
-        completedAtRef.current = null;
-      }
+      else if (!st.isComplete) completedAtRef.current = null;
 
       const dragState = manager.getDragState();
       const draggedGroupId = dragState.activeId
@@ -635,7 +700,7 @@ export function PlayScreen() {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      // Shift + drag = pan mode (do not pick pieces)
+      // Shift + drag = pan mode (Space is pause)
       if (shiftHeldRef.current && e.button === 0) {
         e.preventDefault();
         isPanningRef.current = true;
@@ -688,7 +753,7 @@ export function PlayScreen() {
 
         e.preventDefault();
 
-        // Feed PuzzleManager “virtual client coords” so it stays correct under view transforms
+        // Feed PuzzleManager "virtual client coords" so it stays correct under view transforms
         const { vx, vy } = toVirtualClient(e.clientX, e.clientY, boardRect);
 
         const pieceRect = new DOMRect(
@@ -745,16 +810,24 @@ export function PlayScreen() {
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !boardRef.current) return;
 
-      // If panning, update view and bail
+      const boardRect = boardRef.current.getBoundingClientRect();
+
+      // If panning, update view and clamp
       if (isPanningRef.current && panStartRef.current) {
         e.preventDefault();
         const dx = e.clientX - panStartRef.current.x;
         const dy = e.clientY - panStartRef.current.y;
-        setView({
+
+        const st = manager.getState();
+        const bounds = getWorldBounds(st);
+
+        const next = {
           scale: viewRef.current.scale,
           panX: panStartRef.current.panX + dx,
           panY: panStartRef.current.panY + dy,
-        });
+        };
+
+        setView(clampViewToBounds(next, boardRect.width, boardRect.height, bounds, 48));
         return;
       }
 
@@ -770,9 +843,7 @@ export function PlayScreen() {
         ).longPressTimer = undefined;
       }
 
-      const boardRect = boardRef.current.getBoundingClientRect();
       const { vx, vy } = toVirtualClient(e.clientX, e.clientY, boardRect);
-
       manager.pointerMove(vx, vy, boardRect);
     },
     [manager, toVirtualClient],
@@ -960,9 +1031,7 @@ export function PlayScreen() {
               const newEnabled = !soundManager.isHapticsEnabled();
               soundManager.setHapticsEnabled(newEnabled);
               setHapticsEnabled(newEnabled);
-              if (newEnabled && navigator.vibrate) {
-                navigator.vibrate(25);
-              }
+              if (newEnabled && navigator.vibrate) navigator.vibrate(25);
             }}
           >
             {hapticsEnabled ? <Smartphone size={16} /> : <VolumeOff size={16} />}

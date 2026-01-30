@@ -1,108 +1,72 @@
-/* src/app/components/ShortcutsModal/ShortcutsModal.module.css */
-
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.15s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  z-index: 9999;
 }
 
 .modal {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 480px;
-  width: 90%;
-  max-height: 85vh;
+  width: min(720px, calc(100vw - 24px));
+  max-height: min(820px, calc(100vh - 24px));
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.2s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid #eee;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .titleRow {
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: #0b63b8;
+  gap: 10px;
+  color: #2563eb;
 }
 
 .titleRow h2 {
+  font-size: 16px;
   margin: 0;
-  font-family: "Fredoka", sans-serif;
-  font-size: 1.4rem;
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: 0.2px;
 }
 
 .closeBtn {
-  background: none;
-  border: none;
-  padding: 8px;
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  color: #666;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  padding: 6px;
+  border-radius: 10px;
 }
 
 .closeBtn:hover {
-  background: #f0f0f0;
-  color: #333;
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .content {
-  padding: 20px 24px;
-  overflow-y: auto;
+  padding: 14px 18px 18px;
+  overflow: auto;
 }
 
+/* ---- Tables ---- */
 .table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* important: stable column widths, no overlap */
 }
 
 .table tr {
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.table tr:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .table td {
@@ -110,91 +74,77 @@
   vertical-align: middle;
 }
 
+/* Left column (keys) */
 .keys {
-  white-space: nowrap;
-  width: 45%;
+  width: 46%;
+  padding-right: 14px;
+  white-space: normal; /* allow wrapping */
+  overflow-wrap: anywhere; /* prevent run-together on small widths */
 }
 
+/* Right column (action) */
 .action {
-  color: #555;
-  font-size: 0.95rem;
+  width: 54%;
+  color: rgba(0, 0, 0, 0.72);
+  font-size: 14px;
+  line-height: 1.25;
+  white-space: normal;
 }
 
+/* ---- Keycaps and inline layout ---- */
 .key {
-  display: inline-block;
-  background: linear-gradient(180deg, #f8f8f8 0%, #e8e8e8 100%);
-  border: 1px solid #ccc;
-  border-bottom-width: 2px;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-family: "SF Mono", "Roboto Mono", Consolas, monospace;
-  font-size: 0.85rem;
-  color: #333;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  margin-right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  min-height: 22px;
+  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  margin-right: 6px; /* space after each kbd */
 }
 
+/* ensures "or" has breathing room */
 .separator {
-  color: #999;
-  font-size: 0.8rem;
-  margin: 0 6px;
+  margin: 0 8px 0 2px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
 }
 
+/* This is the missing piece: if keys cell contains plain text like "+ Drag" or "/ Trackpad Scroll"
+   we want it to wrap and keep spacing nicely instead of mashing. */
+.keys {
+  line-height: 1.25;
+}
+
+/* Optional: make the "Mouse / Touch Controls" header breathe */
 .mouseSection {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
+  margin-top: 14px;
 }
 
 .mouseSection h3 {
-  margin: 0 0 16px 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #333;
+  margin: 14px 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.7);
 }
 
 .footer {
-  padding: 16px 24px;
-  background: #f8f9fa;
-  border-top: 1px solid #eee;
-  text-align: center;
+  padding: 10px 18px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: center;
 }
 
 .hint {
-  color: #666;
-  font-size: 0.9rem;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .hint .key {
-  font-size: 0.75rem;
-  padding: 2px 8px;
-}
-
-/* Mobile adjustments */
-@media (max-width: 500px) {
-  .modal {
-    max-height: 90vh;
-    border-radius: 12px;
-  }
-
-  .header {
-    padding: 16px 20px;
-  }
-
-  .content {
-    padding: 16px 20px;
-  }
-
-  .titleRow h2 {
-    font-size: 1.2rem;
-  }
-
-  .key {
-    padding: 3px 8px;
-    font-size: 0.8rem;
-  }
-
-  .action {
-    font-size: 0.9rem;
-  }
+  margin: 0 4px;
 }
