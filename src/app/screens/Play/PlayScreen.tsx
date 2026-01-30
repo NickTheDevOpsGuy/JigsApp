@@ -892,10 +892,10 @@ export function PlayScreen() {
     const url = encodeURIComponent(window.location.origin);
 
     return {
-      twitter: `https://twitter.com/intent/tweet?text=${text}&hashtags=Phuzzle`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`,
-      reddit: `https://reddit.com/submit?title=${text}`,
-      whatsapp: `https://wa.me/?text=${text}%20${url}`,
+      twitter: `https://twitter.com/intent/tweet?text=${text}%20${hashtag}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}%20${hashtag}`,
+      reddit: `https://reddit.com/submit?title=${text}%20${hashtag}`,
+      whatsapp: `https://wa.me/?text=${text}%20${hashtag}%20${url}`,
     };
   }, [getShareText]);
 
