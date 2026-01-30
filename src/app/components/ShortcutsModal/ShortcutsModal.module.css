@@ -150,7 +150,11 @@
 }
 
 @media (max-width: 480px) {
-  .keys { width: 56%; }
-  .action { width: 44%; font-size: 13px; }
+  .keys {
+    width: 56%;
+  }
+  .action {
+    width: 44%;
+    font-size: 13px;
+  }
 }
-
