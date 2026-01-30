@@ -36,36 +36,6 @@
   color: rgba(0, 0, 0, 0.5);
 }
 
-.trayFilters {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.filterButton {
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  background: rgba(0, 0, 0, 0.02);
-  color: rgba(0, 0, 0, 0.7);
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
-}
-
-.filterButton:hover {
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.filterButtonActive {
-  border-color: rgba(0, 0, 0, 0.28);
-  background: rgba(0, 0, 0, 0.1);
-  color: rgba(0, 0, 0, 0.85);
-}
-
 .trayScroll {
   flex: 1;
   overflow-x: auto;

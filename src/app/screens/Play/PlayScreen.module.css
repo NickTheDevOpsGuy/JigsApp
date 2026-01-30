@@ -7,10 +7,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-
-  /* Make the whole play screen white so panning shows white, not grey */
-  background: #ffffff;
-
+  background: #f6f8fb;
   /* Prevent pull-to-refresh and overscroll */
   overscroll-behavior: none;
   overflow: hidden;
@@ -172,15 +169,11 @@
   -webkit-overflow-scrolling: auto;
 }
 
-/* Make sure any transparent parts of the canvas still appear white */
 .canvas {
   width: 100%;
   height: 100%;
   display: block;
   touch-action: none;
-
-  background: #ffffff;
-
   /* iOS specific fixes */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -409,7 +402,7 @@
 
 /* Fullscreen mode adjustments */
 .page:fullscreen {
-  background: #ffffff;
+  background: #f3f7ff;
 }
 
 .page:fullscreen .topBar {
@@ -417,7 +410,7 @@
 }
 
 .page:-webkit-full-screen {
-  background: #ffffff;
+  background: #f3f7ff;
 }
 
 .page:-webkit-full-screen .topBar {
@@ -518,6 +511,61 @@
   font-size: 1.25rem;
   opacity: 0.9;
   margin: 0 0 1.5rem 0;
+}
+
+.shareSection {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.shareLabel {
+  font-size: 0.9rem !important;
+  opacity: 0.7 !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.socialButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.socialBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 1.25rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.socialBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.shareButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.shareHint {
+  font-size: 0.75rem !important;
+  opacity: 0.5 !important;
+  margin: 0 !important;
 }
 
 .completeActions {

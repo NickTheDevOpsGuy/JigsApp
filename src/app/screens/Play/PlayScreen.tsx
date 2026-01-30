@@ -34,6 +34,10 @@ import {
   Pause,
   Play,
   Keyboard,
+  Download,
+  Share2,
+  Copy,
+  Check,
 } from "lucide-react";
 import { useKeyboardShortcuts, ShortcutAction } from "@/hooks/useKeyboardShortcuts";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
@@ -45,7 +49,7 @@ const GRID_KEY = "phuzzle:gridSize";
 const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
 
 function parseGrid(stored: string | null): { rows: number; cols: number } {
-  if (!stored) return { rows: 4, cols: 4 };
+  if (!stored) return { rows: 4, cols: 4 }; // default
   const [r, c] = stored.split("x").map(Number);
   if (r && c) return { rows: r, cols: c };
   return { rows: 4, cols: 4 };
@@ -68,77 +72,6 @@ function isTypingTarget(el: EventTarget | null) {
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t.isContentEditable;
 }
 
-type ViewState = {
-  scale: number; // 1 = normal
-  panX: number; // CSS px
-  panY: number; // CSS px
-};
-
-type WorldBounds = {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-};
-
-function getWorldBounds(st: PuzzleState): WorldBounds {
-  // Use on-board pieces only, because tray pieces are not visible on the board.
-  const pieces = st.pieces.filter((p) => !p.inTray);
-
-  if (pieces.length === 0) {
-    return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
-  }
-
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-
-  for (const p of pieces) {
-    minX = Math.min(minX, p.x);
-    minY = Math.min(minY, p.y);
-    maxX = Math.max(maxX, p.x + p.w);
-    maxY = Math.max(maxY, p.y + p.h);
-  }
-
-  return { minX, minY, maxX, maxY };
-}
-
-function clampViewToBounds(
-  next: ViewState,
-  viewportW: number,
-  viewportH: number,
-  bounds: WorldBounds,
-  marginPx: number,
-): ViewState {
-  const s = next.scale;
-
-  // Ensure some part of the bounds stays visible.
-  // Constraints:
-  // minX*s + panX <= viewportW - margin
-  // maxX*s + panX >= margin
-  // Solve for panX range:
-  // panX <= viewportW - margin - minX*s
-  // panX >= margin - maxX*s
-  const panMinX = marginPx - bounds.maxX * s;
-  const panMaxX = viewportW - marginPx - bounds.minX * s;
-
-  const panMinY = marginPx - bounds.maxY * s;
-  const panMaxY = viewportH - marginPx - bounds.minY * s;
-
-  let panX = next.panX;
-  let panY = next.panY;
-
-  // If content is smaller than viewport (range inverted), gently center it.
-  if (panMinX > panMaxX) panX = (panMinX + panMaxX) / 2;
-  else panX = clamp(panX, panMinX, panMaxX);
-
-  if (panMinY > panMaxY) panY = (panMinY + panMaxY) / 2;
-  else panY = clamp(panY, panMinY, panMaxY);
-
-  return { ...next, panX, panY };
-}
-
 export function PlayScreen() {
   const navigate = useNavigate();
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -156,23 +89,6 @@ export function PlayScreen() {
     showBounds: false,
     showIds: false,
   });
-
-  // View transform (zoom/pan)
-  const [view, setView] = useState<ViewState>({ scale: 1, panX: 0, panY: 0 });
-  const viewRef = useRef<ViewState>({ scale: 1, panX: 0, panY: 0 });
-  useEffect(() => {
-    viewRef.current = view;
-  }, [view]);
-
-  // Shift-to-pan state (Space is reserved for pause)
-  const shiftHeldRef = useRef(false);
-  const isPanningRef = useRef(false);
-  const panStartRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(
-    null,
-  );
-
-  // Track completion time for animation
-  const completedAtRef = useRef<number | null>(null);
 
   // Preview image visibility
   const [showPreview, setShowPreview] = useState(false);
@@ -205,10 +121,16 @@ export function PlayScreen() {
     selectedPieceIdRef.current = selectedPieceId;
   }, [selectedPieceId]);
 
-  // Selection for keyboard controls (separate ref used by HUD)
+  // Track completion time for animation
+  const completedAtRef = useRef<number | null>(null);
+
+  // Selection for keyboard controls
   const selectedIdRef = useRef<string | null>(null);
   const [, forceRerender] = useState(0);
   const bump = () => forceRerender((n) => n + 1);
+
+  // Track for tap-to-rotate (did we actually drag or just tap?)
+  const didDragRef = useRef(false);
 
   // Fullscreen toggle handler
   const toggleFullscreen = useCallback(() => {
@@ -223,26 +145,11 @@ export function PlayScreen() {
 
   // Listen for fullscreen changes
   useEffect(() => {
-    const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
-
-  // Track Shift held for panning (Space is pause in shortcuts)
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (isTypingTarget(e.target)) return;
-      if (e.key === "Shift") shiftHeldRef.current = true;
-    };
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "Shift") shiftHeldRef.current = false;
-    };
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
-    };
   }, []);
 
   // Grid from localStorage
@@ -250,11 +157,6 @@ export function PlayScreen() {
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
-  const stateRef = useRef<PuzzleState | null>(null);
-  useEffect(() => {
-    stateRef.current = state;
-  }, [state]);
-
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Track board size in CSS pixels
@@ -262,19 +164,23 @@ export function PlayScreen() {
 
   // Helper: compute a tile size that makes the assembled puzzle fill the board nicely
   function computeTileSize(boardW: number, boardH: number) {
+    // make the assembled puzzle about ~65% of board's smaller dimension
     const targetFill = 0.65;
 
     const tileFromW = (boardW * targetFill) / grid.cols;
     const tileFromH = (boardH * targetFill) / grid.rows;
 
+    // Use the limiting axis so it fits both dimensions
     const tile = Math.floor(Math.min(tileFromW, tileFromH));
+
+    // Clamp so it doesn't get ridiculous on tiny/huge screens
     return clamp(tile, 56, 160);
   }
 
   // Timer effect - stops when complete or paused
   useEffect(() => {
-    if (state?.isComplete) return;
-    if (isPaused) return;
+    if (state?.isComplete) return; // Don't run timer if complete
+    if (isPaused) return; // Don't run timer if paused
 
     const interval = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
@@ -313,15 +219,19 @@ export function PlayScreen() {
           const newHapticsEnabled = !soundManager.isHapticsEnabled();
           soundManager.setHapticsEnabled(newHapticsEnabled);
           setHapticsEnabled(newHapticsEnabled);
-          if (newHapticsEnabled && navigator.vibrate) navigator.vibrate(25);
+          if (newHapticsEnabled && navigator.vibrate) {
+            navigator.vibrate(25);
+          }
           break;
         }
         case "rotateCW":
         case "rotateCCW":
+          // Rotate the selected piece (or first unplaced if none selected)
           if (manager && state && !isPaused) {
             const unplacedPieces = state.pieces.filter((p) => !p.isPlaced && !p.inTray);
             let pieceToRotate = unplacedPieces.find((p) => p.id === selectedPieceId);
 
+            // If selected piece is placed or not found, use first unplaced
             if (!pieceToRotate && unplacedPieces.length > 0) {
               pieceToRotate = unplacedPieces[0];
               setSelectedPieceId(pieceToRotate.id);
@@ -336,6 +246,7 @@ export function PlayScreen() {
           break;
         case "nextPiece":
         case "prevPiece": {
+          // Tab through unplaced pieces
           if (state && !isPaused) {
             const unplacedPieces = state.pieces.filter((p) => !p.isPlaced && !p.inTray);
             if (unplacedPieces.length === 0) break;
@@ -363,12 +274,13 @@ export function PlayScreen() {
         case "moveDown":
         case "moveLeft":
         case "moveRight": {
+          // Move selected piece with arrow keys
           if (manager && state && !isPaused && selectedPieceId) {
             const piece = state.pieces.find((p) => p.id === selectedPieceId);
             if (piece && !piece.isPlaced && !piece.inTray) {
-              const moveAmount = 20;
-              let dx = 0;
-              let dy = 0;
+              const moveAmount = 20; // pixels per keypress
+              let dx = 0,
+                dy = 0;
 
               if (action === "moveUp") dy = -moveAmount;
               else if (action === "moveDown") dy = moveAmount;
@@ -376,6 +288,7 @@ export function PlayScreen() {
               else if (action === "moveRight") dx = moveAmount;
 
               manager.nudgeGroup(selectedPieceId, dx, dy);
+              manager.snapGroupNow(selectedPieceId);
               setState(manager.getState());
             }
           }
@@ -423,8 +336,12 @@ export function PlayScreen() {
       savedState.grid.rows === grid.rows &&
       savedState.grid.cols === grid.cols;
 
-    if (hasSavedGame && savedState) setElapsedSeconds(savedState.elapsedSeconds);
-    else setElapsedSeconds(0);
+    // Restore elapsed time if we have a saved game
+    if (hasSavedGame && savedState) {
+      setElapsedSeconds(savedState.elapsedSeconds);
+    } else {
+      setElapsedSeconds(0);
+    }
 
     const next = new PuzzleManager(
       {
@@ -458,6 +375,7 @@ export function PlayScreen() {
       },
     );
 
+    // Restore piece positions if we have a saved game
     if (hasSavedGame && savedState) {
       next.restoreFromSaved(savedState.pieces);
     }
@@ -466,12 +384,10 @@ export function PlayScreen() {
     const st = next.getState();
     setState(st);
 
+    // Set an initial selection if possible
     const selectable = st.pieces.filter((p) => !p.inTray && !p.isPlaced);
     selectedIdRef.current = selectable.length ? selectable[0].id : null;
     bump();
-
-    // Reset view on new manager init
-    setView({ scale: 1, panX: 0, panY: 0 });
   }, [grid]);
 
   // Auto-save puzzle state when pieces change (debounced)
@@ -501,90 +417,142 @@ export function PlayScreen() {
 
       manager.setBoardSize(boardW, boardH);
       setState(manager.getState());
-
-      // Clamp view on resize so you never end up "out of bounds"
-      const st = manager.getState();
-      const bounds = getWorldBounds(st);
-      setView((v) => clampViewToBounds(v, boardW, boardH, bounds, 48));
     });
 
     ro.observe(el);
     return () => ro.disconnect();
   }, [manager]);
 
-  // Helpers: convert between screen (CSS) coords and world coords
-  const screenToWorld = useCallback((cssX: number, cssY: number) => {
-    const { scale, panX, panY } = viewRef.current;
-    return { x: (cssX - panX) / scale, y: (cssY - panY) / scale };
-  }, []);
+  // Keyboard controls
+  const getSelectable = useCallback(() => {
+    if (!manager) return [];
+    const st = manager.getState();
+    return st.pieces.filter((p) => !p.inTray && !p.isPlaced);
+  }, [manager]);
 
-  // Helper: feed PuzzleManager pointer APIs "virtual client coords" that stay correct under zoom/pan
-  const toVirtualClient = useCallback(
-    (clientX: number, clientY: number, boardRect: DOMRect) => {
-      const { scale, panX, panY } = viewRef.current;
-      const vx = (clientX - boardRect.left - panX) / scale + boardRect.left;
-      const vy = (clientY - boardRect.top - panY) / scale + boardRect.top;
-      return { vx, vy };
+  const selectCycle = useCallback(
+    (dir: 1 | -1) => {
+      if (!manager) return;
+      const pieces = getSelectable().sort((a, b) => b.z - a.z);
+      if (!pieces.length) {
+        selectedIdRef.current = null;
+        bump();
+        return;
+      }
+      const cur = selectedIdRef.current;
+      const idx = cur ? pieces.findIndex((p) => p.id === cur) : -1;
+      const next = pieces[(idx + dir + pieces.length) % pieces.length];
+      selectedIdRef.current = next.id;
+      bump();
     },
-    [],
+    [getSelectable, manager],
   );
 
-  // Mouse wheel: pan (normal) / zoom (ctrlKey pinch)
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const board = boardRef.current;
-    if (!canvas || !board || !manager) return;
-
-    const onWheel = (e: WheelEvent) => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!manager || !state) return;
       if (isTypingTarget(e.target)) return;
 
-      const rect = board.getBoundingClientRect();
-      const cssX = e.clientX - rect.left;
-      const cssY = e.clientY - rect.top;
+      // If a modal is open, let it handle keys
+      // (basic guard: if we show the new game modal it will capture focus anyway)
+      const isComplete = state.isComplete;
 
-      const cur = viewRef.current;
-      const st = manager.getState();
-      const bounds = getWorldBounds(st);
-      const margin = 48;
-
-      // Zoom on ctrlKey (trackpad pinch)
-      if (e.ctrlKey) {
+      // Universal keys
+      if (e.key === " " || e.code === "Space") {
         e.preventDefault();
-
-        const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-        const nextScale = clamp(cur.scale * zoomFactor, 0.5, 3);
-
-        // zoom toward cursor
-        const world = screenToWorld(cssX, cssY);
-        const nextPanX = cssX - world.x * nextScale;
-        const nextPanY = cssY - world.y * nextScale;
-
-        const clamped = clampViewToBounds(
-          { scale: nextScale, panX: nextPanX, panY: nextPanY },
-          rect.width,
-          rect.height,
-          bounds,
-          margin,
-        );
-
-        setView(clamped);
+        if (!isComplete) setIsPaused((p) => !p);
         return;
       }
 
-      // Pan with wheel/trackpad scroll
-      e.preventDefault();
-      const next = {
-        scale: cur.scale,
-        panX: cur.panX - e.deltaX,
-        panY: cur.panY - e.deltaY,
-      };
+      if (e.key === "Escape") {
+        if (showPreview) setShowPreview(false);
+        if (isPaused) setIsPaused(false);
+        return;
+      }
 
-      setView(clampViewToBounds(next, rect.width, rect.height, bounds, margin));
+      // Stop here if puzzle is complete or paused
+      if (isComplete) return;
+      if (isPaused) return;
+
+      // Tab cycle selection
+      if (e.key === "Tab") {
+        e.preventDefault();
+        selectCycle(e.shiftKey ? -1 : 1);
+        return;
+      }
+
+      // Global toggles
+      if (e.key.toLowerCase() === "p") {
+        setShowPreview((p) => !p);
+        return;
+      }
+      if (e.key.toLowerCase() === "f") {
+        toggleFullscreen();
+        return;
+      }
+
+      const id = selectedIdRef.current;
+      if (!id) return;
+
+      const step = e.altKey || e.ctrlKey ? 25 : e.shiftKey ? 10 : 1;
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        manager.nudgeGroup(id, -step, 0);
+        manager.snapGroupNow(id);
+        setState(manager.getState());
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        manager.nudgeGroup(id, step, 0);
+        manager.snapGroupNow(id);
+        setState(manager.getState());
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        manager.nudgeGroup(id, 0, -step);
+        manager.snapGroupNow(id);
+        setState(manager.getState());
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        manager.nudgeGroup(id, 0, step);
+        manager.snapGroupNow(id);
+        setState(manager.getState());
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        manager.snapGroupNow(id);
+        setState(manager.getState());
+        return;
+      }
+
+      if (e.key.toLowerCase() === "r") {
+        e.preventDefault();
+        manager.rotateGroup(id);
+        soundManager.play("rotate");
+        setState(manager.getState());
+        return;
+      }
+
+      if (e.key.toLowerCase() === "t") {
+        e.preventDefault();
+        manager.sendToTray(id);
+        setState(manager.getState());
+        // pick next selection after tray
+        selectCycle(1);
+        return;
+      }
     };
 
-    canvas.addEventListener("wheel", onWheel, { passive: false });
-    return () => canvas.removeEventListener("wheel", onWheel);
-  }, [manager, screenToWorld]);
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [manager, state, isPaused, showPreview, selectCycle, toggleFullscreen]);
 
   // Animation loop: draw canvas
   useEffect(() => {
@@ -604,6 +572,7 @@ export function PlayScreen() {
       const cssH = Math.max(1, Math.floor(rect.height));
       const dpr = window.devicePixelRatio || 1;
 
+      // Size backing store
       canvas.width = Math.floor(cssW * dpr);
       canvas.height = Math.floor(cssH * dpr);
       canvas.style.width = `${cssW}px`;
@@ -615,12 +584,8 @@ export function PlayScreen() {
         return;
       }
 
-      // Draw everything in CSS pixels, then apply view transform in CSS space
+      // Draw everything in CSS pixels
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      const { scale, panX, panY } = viewRef.current;
-      ctx.translate(panX, panY);
-      ctx.scale(scale, scale);
 
       const st = manager.getState();
 
@@ -633,9 +598,11 @@ export function PlayScreen() {
       const assembledW = st.grid.cols * firstPiece.tileW;
       const assembledH = st.grid.rows * firstPiece.tileH;
 
-      if (st.isComplete && !completedAtRef.current)
+      if (st.isComplete && !completedAtRef.current) {
         completedAtRef.current = performance.now();
-      else if (!st.isComplete) completedAtRef.current = null;
+      } else if (!st.isComplete) {
+        completedAtRef.current = null;
+      }
 
       const dragState = manager.getDragState();
       const draggedGroupId = dragState.activeId
@@ -655,10 +622,9 @@ export function PlayScreen() {
         {
           draggedGroupId,
           hoveredPieceId: selectedIdRef.current,
+          selectedPieceId: selectedPieceIdRef.current,
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
-          selectedPieceId: selectedIdRef.current,
-          justSnappedPieces: new Set<string>(),
         },
       );
 
@@ -700,39 +666,21 @@ export function PlayScreen() {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      // Shift + drag = pan mode (Space is pause)
-      if (shiftHeldRef.current && e.button === 0) {
-        e.preventDefault();
-        isPanningRef.current = true;
-        panStartRef.current = {
-          x: e.clientX,
-          y: e.clientY,
-          panX: viewRef.current.panX,
-          panY: viewRef.current.panY,
-        };
-        try {
-          canvas.setPointerCapture(e.pointerId);
-        } catch {
-          // ignore
-        }
-        return;
-      }
-
-      // Hit testing in WORLD coords
+      // Reset transform to identity for hit testing in CSS pixel space
       ctx.setTransform(1, 0, 0, 1, 0, 0);
 
       const cssX = e.clientX - boardRect.left;
       const cssY = e.clientY - boardRect.top;
-      const world = screenToWorld(cssX, cssY);
 
       const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
 
-      const pieceId = pickPieceId(ctx, boardPieces, world.x, world.y);
+      const pieceId = pickPieceId(ctx, boardPieces, cssX, cssY);
       if (!pieceId) return;
 
       // Always select what we clicked
       selectedIdRef.current = pieceId;
+      setSelectedPieceId(pieceId);
       bump();
 
       // Middle click (button 1) = send to tray
@@ -740,6 +688,8 @@ export function PlayScreen() {
         e.preventDefault();
         manager.movePieceToTray(pieceId);
         setState(manager.getState());
+        // Advance selection
+        selectCycle(1);
         return;
       }
 
@@ -751,10 +701,10 @@ export function PlayScreen() {
         const piece = st.pieces.find((p) => p.id === pieceId);
         if (!piece) return;
 
-        e.preventDefault();
+        // Reset drag tracking for tap detection
+        didDragRef.current = false;
 
-        // Feed PuzzleManager "virtual client coords" so it stays correct under view transforms
-        const { vx, vy } = toVirtualClient(e.clientX, e.clientY, boardRect);
+        e.preventDefault();
 
         const pieceRect = new DOMRect(
           boardRect.left + piece.x,
@@ -763,7 +713,7 @@ export function PlayScreen() {
           piece.h,
         );
 
-        manager.pointerDown(pieceId, vx, vy, pieceRect);
+        manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
         setState(manager.getState());
 
         try {
@@ -803,33 +753,12 @@ export function PlayScreen() {
         setState(manager.getState());
       }
     },
-    [manager, screenToWorld, toVirtualClient],
+    [manager, selectCycle],
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !boardRef.current) return;
-
-      const boardRect = boardRef.current.getBoundingClientRect();
-
-      // If panning, update view and clamp
-      if (isPanningRef.current && panStartRef.current) {
-        e.preventDefault();
-        const dx = e.clientX - panStartRef.current.x;
-        const dy = e.clientY - panStartRef.current.y;
-
-        const st = manager.getState();
-        const bounds = getWorldBounds(st);
-
-        const next = {
-          scale: viewRef.current.scale,
-          panX: panStartRef.current.panX + dx,
-          panY: panStartRef.current.panY + dy,
-        };
-
-        setView(clampViewToBounds(next, boardRect.width, boardRect.height, bounds, 48));
-        return;
-      }
 
       // Cancel long-press on move
       const canvas = e.currentTarget;
@@ -843,35 +772,20 @@ export function PlayScreen() {
         ).longPressTimer = undefined;
       }
 
-      const { vx, vy } = toVirtualClient(e.clientX, e.clientY, boardRect);
-      manager.pointerMove(vx, vy, boardRect);
-    },
-    [manager, toVirtualClient],
-  );
+      // Mark that we dragged (moved more than a few pixels)
+      didDragRef.current = true;
 
-  // Track for tap-to-rotate (mobile)
-  const lastTapRef = useRef<{ pieceId: string | null; time: number }>({
-    pieceId: null,
-    time: 0,
-  });
+      const boardRect = boardRef.current.getBoundingClientRect();
+      manager.pointerMove(e.clientX, e.clientY, boardRect);
+    },
+    [manager],
+  );
 
   const handlePointerUp = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current) return;
 
       const canvas = canvasRef.current;
-
-      // End panning if we were panning
-      if (isPanningRef.current) {
-        isPanningRef.current = false;
-        panStartRef.current = null;
-        try {
-          canvas.releasePointerCapture(e.pointerId);
-        } catch {
-          // ignore
-        }
-        return;
-      }
 
       // Cancel long-press timer
       const timer = (
@@ -884,37 +798,26 @@ export function PlayScreen() {
         ).longPressTimer = undefined;
       }
 
-      // Check for double-tap rotate (mobile)
+      // Check for single-tap to rotate (mobile) - tap without dragging
       const isTouch = e.pointerType === "touch";
       const boardRect = boardRef.current?.getBoundingClientRect();
       const ctx = canvas.getContext("2d");
 
-      if (isTouch && boardRect && ctx) {
+      if (isTouch && boardRect && ctx && !didDragRef.current) {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         const st = manager.getState();
-        const cssX = e.clientX - boardRect.left;
-        const cssY = e.clientY - boardRect.top;
-        const world = screenToWorld(cssX, cssY);
+        const x = e.clientX - boardRect.left;
+        const y = e.clientY - boardRect.top;
+        const pieceId = pickPieceId(ctx, st.pieces, x, y);
 
-        const pieceId = pickPieceId(
-          ctx,
-          st.pieces.filter((p) => !p.inTray),
-          world.x,
-          world.y,
-        );
-
-        const now = performance.now();
+        // Single tap on a piece = rotate it
         if (pieceId) {
-          const last = lastTapRef.current;
-          if (last.pieceId === pieceId && now - last.time < 300) {
-            const piece = st.pieces.find((p) => p.id === pieceId);
-            if (piece && !piece.isPlaced) {
-              manager.rotatePiece(pieceId);
-              soundManager.play("rotate");
-            }
+          const piece = st.pieces.find((p) => p.id === pieceId);
+          if (piece && !piece.isPlaced) {
+            manager.rotatePiece(pieceId);
+            soundManager.play("rotate");
           }
-          lastTapRef.current = { pieceId, time: now };
         }
       }
 
@@ -927,7 +830,7 @@ export function PlayScreen() {
         // ignore
       }
     },
-    [manager, screenToWorld],
+    [manager],
   );
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
@@ -941,6 +844,7 @@ export function PlayScreen() {
       manager.movePieceFromTray(pieceId);
       setState(manager.getState());
       selectedIdRef.current = pieceId;
+      setSelectedPieceId(pieceId);
       bump();
     },
     [manager],
@@ -951,6 +855,116 @@ export function PlayScreen() {
     clearPuzzleState();
     navigate("/new");
   }, [navigate]);
+
+  // Helper to format time
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // State for copy feedback
+  const [copied, setCopied] = useState(false);
+
+  // Generate share text
+  const getShareText = useCallback(() => {
+    const timeStr = formatTime(elapsedSeconds);
+    const pieceCount = state?.totalCount ?? 0;
+    return `🧩 I completed a ${pieceCount}-piece Phuzzle in ${timeStr}! Can you beat my time?`;
+  }, [elapsedSeconds, state?.totalCount]);
+
+  // Copy results to clipboard
+  const handleCopyResults = useCallback(async () => {
+    const text = getShareText() + " #Phuzzle";
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  }, [getShareText]);
+
+  // Social share URLs
+  const shareUrls = useMemo(() => {
+    const text = encodeURIComponent(getShareText());
+    const hashtag = encodeURIComponent("#Phuzzle");
+    const url = encodeURIComponent(window.location.origin);
+
+    return {
+      twitter: `https://twitter.com/intent/tweet?text=${text}&hashtags=Phuzzle`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`,
+      reddit: `https://reddit.com/submit?title=${text}`,
+      whatsapp: `https://wa.me/?text=${text}%20${url}`,
+    };
+  }, [getShareText]);
+
+  // Open share URL in popup
+  const openShareWindow = useCallback((url: string) => {
+    window.open(url, "_blank", "width=600,height=400,menubar=no,toolbar=no");
+  }, []);
+
+  // Native share (mobile/supported browsers)
+  const handleNativeShare = useCallback(async () => {
+    const text = getShareText();
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Phuzzle",
+          text: text,
+          url: window.location.origin,
+        });
+      } catch (err) {
+        console.log("Share cancelled or failed:", err);
+      }
+    }
+  }, [getShareText]);
+
+  // Download completion image
+  const handleDownloadImage = useCallback(() => {
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img) return;
+
+    // Create a new canvas for the share image
+    const shareCanvas = document.createElement("canvas");
+    const padding = 40;
+    const textHeight = 80;
+    shareCanvas.width = canvas.width + padding * 2;
+    shareCanvas.height = canvas.height + padding * 2 + textHeight;
+
+    const ctx = shareCanvas.getContext("2d");
+    if (!ctx) return;
+
+    // Background
+    ctx.fillStyle = "#1a1a2e";
+    ctx.fillRect(0, 0, shareCanvas.width, shareCanvas.height);
+
+    // Draw the puzzle
+    ctx.drawImage(canvas, padding, padding);
+
+    // Add text at bottom
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 32px system-ui, sans-serif";
+    ctx.textAlign = "center";
+
+    const timeStr = formatTime(elapsedSeconds);
+    const pieceCount = state?.totalCount ?? 0;
+    ctx.fillText(
+      `🧩 Phuzzle - ${pieceCount} pieces in ${timeStr}`,
+      shareCanvas.width / 2,
+      shareCanvas.height - textHeight / 2 + 10,
+    );
+
+    // Download
+    const link = document.createElement("a");
+    link.download = `phuzzle-${timeStr.replace(":", "m")}s.png`;
+    link.href = shareCanvas.toDataURL("image/png");
+    link.click();
+  }, [elapsedSeconds, state?.totalCount]);
+
+  // Check if native share is available
+  const canNativeShare = typeof navigator !== "undefined" && !!navigator.share;
 
   // Get tray pieces sorted by color
   const trayPieces = useMemo(() => {
@@ -972,12 +986,6 @@ export function PlayScreen() {
   const total = state?.totalCount ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
 
   return (
     <div className={styles.page} ref={pageRef}>
@@ -1031,7 +1039,9 @@ export function PlayScreen() {
               const newEnabled = !soundManager.isHapticsEnabled();
               soundManager.setHapticsEnabled(newEnabled);
               setHapticsEnabled(newEnabled);
-              if (newEnabled && navigator.vibrate) navigator.vibrate(25);
+              if (newEnabled && navigator.vibrate) {
+                navigator.vibrate(25);
+              }
             }}
           >
             {hapticsEnabled ? <Smartphone size={16} /> : <VolumeOff size={16} />}
@@ -1097,12 +1107,92 @@ export function PlayScreen() {
             </div>
           )}
 
+          {/* Pause overlay */}
           {isPaused && (
             <div className={styles.pauseOverlay} onClick={() => setIsPaused(false)}>
               <div className={styles.pauseContent}>
                 <Pause size={64} />
                 <h2>Paused</h2>
                 <p>Click anywhere or press the Resume button to continue</p>
+              </div>
+            </div>
+          )}
+
+          {/* Completion overlay */}
+          {isComplete && (
+            <div className={styles.completeOverlay}>
+              <div className={styles.completeContent}>
+                <h2>🎉 Complete!</h2>
+                <p>Finished in {formatTime(elapsedSeconds)}</p>
+
+                <div className={styles.shareSection}>
+                  <p className={styles.shareLabel}>Share your result:</p>
+
+                  {/* Social buttons */}
+                  <div className={styles.socialButtons}>
+                    <button
+                      className={styles.socialBtn}
+                      onClick={() => openShareWindow(shareUrls.twitter)}
+                      title="Share on X/Twitter"
+                    >
+                      𝕏
+                    </button>
+                    <button
+                      className={styles.socialBtn}
+                      onClick={() => openShareWindow(shareUrls.facebook)}
+                      title="Share on Facebook"
+                    >
+                      f
+                    </button>
+                    <button
+                      className={styles.socialBtn}
+                      onClick={() => openShareWindow(shareUrls.reddit)}
+                      title="Share on Reddit"
+                    >
+                      ⬆
+                    </button>
+                    <button
+                      className={styles.socialBtn}
+                      onClick={() => openShareWindow(shareUrls.whatsapp)}
+                      title="Share on WhatsApp"
+                    >
+                      💬
+                    </button>
+                  </div>
+
+                  {/* Utility buttons */}
+                  <div className={styles.shareButtons}>
+                    <Button size="sm" onClick={handleDownloadImage}>
+                      <Download size={16} />
+                      Download
+                    </Button>
+                    <Button size="sm" onClick={handleCopyResults}>
+                      {copied ? <Check size={16} /> : <Copy size={16} />}
+                      {copied ? "Copied!" : "Copy"}
+                    </Button>
+                    {canNativeShare && (
+                      <Button size="sm" onClick={handleNativeShare}>
+                        <Share2 size={16} />
+                        More
+                      </Button>
+                    )}
+                  </div>
+
+                  <p className={styles.shareHint}>
+                    For LinkedIn: Download image + Copy text, then post manually
+                  </p>
+                </div>
+
+                <div className={styles.completeActions}>
+                  <Button variant="primary" onClick={handleNewGame}>
+                    <Plus size={16} />
+                    New Puzzle
+                  </Button>
+                  <Button variant="secondary" onClick={() => navigate("/")}>
+                    <Menu size={16} />
+                    Menu
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -1116,9 +1206,10 @@ export function PlayScreen() {
         onPieceClick={handleTrayPieceClick}
       />
 
-      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
-
       {showTutorial && <TutorialOverlay onComplete={dismissTutorial} />}
+
+      {/* Keyboard shortcuts modal */}
+      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </div>
   );
 }
