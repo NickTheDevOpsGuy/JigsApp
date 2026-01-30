@@ -15,7 +15,6 @@ export type AnimationState = {
   selectedPieceId: string | null;
   isComplete: boolean;
   completedAtMs: number | null;
-  justSnappedPieces: Set<string>; // Track pieces that just snapped for highlighting
 };
 
 /**
@@ -23,10 +22,10 @@ export type AnimationState = {
  *
  * Canvas-only rendering pipeline.
  *
- * Key rules to avoid flicker and seams:
+ * Key rules to avoid flicker:
  * - Clear in BACKING STORE pixels using identity transform.
- * - Paint the backdrop in SCREEN SPACE (DPR only) so pan/zoom never reveals seams.
- * - Pieces render in WORLD SPACE (PlayScreen applies pan+zoom before calling renderBoard).
+ * - Draw everything else in CSS pixels (PlayScreen sets ctx.setTransform(dpr,...)).
+ * - Any overlay/backdrop/grid should use cssW/cssH (canvas.width / dpr).
  */
 export function renderBoard(
   ctx: CanvasRenderingContext2D,
@@ -42,38 +41,34 @@ export function renderBoard(
 ) {
   const canvas = ctx.canvas;
 
-  // Real DPR (NOT affected by view scale)
-  const realDpr = window.devicePixelRatio || 1;
-
-  // Canvas size in CSS pixels (screen space)
-  const cssW = canvas.width / realDpr;
-  const cssH = canvas.height / realDpr;
-
-  // 1) Clear/fill backing store with identity transform
+  // 1) Clear in backing pixels with identity transform (prevents "double vision" artifacts)
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
 
-  // 2) Paint backdrop in SCREEN space (DPR only, ignores pan/zoom)
-  // This prevents thin seams/lines when panning or zooming.
-  ctx.save();
-  ctx.setTransform(realDpr, 0, 0, realDpr, 0, 0);
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, cssW, cssH);
-  if (debug?.showGrid) drawGridOverlay(ctx, cssW, cssH);
-  ctx.restore();
+  // 2) Derive CSS-space size from current transform (PlayScreen should setTransform(dpr,...))
+  const t = ctx.getTransform();
+  const dpr = t.a || 1; // scaleX
+  const cssW = canvas.width / dpr;
+  const cssH = canvas.height / dpr;
+
+  // 3) Backdrop + optional overlays in CSS pixels
+  drawDebugBackdrop(ctx, cssW, cssH);
 
   if (!img || img.naturalWidth === 0 || img.naturalHeight === 0) {
     ctx.save();
-    ctx.setTransform(realDpr, 0, 0, realDpr, 0, 0);
     ctx.fillStyle = "rgba(0,0,0,0.6)";
     ctx.font = "14px system-ui";
     ctx.fillText("Image not ready…", 16, 24);
     ctx.restore();
     return;
   }
+
+  if (debug.showGrid) drawGridOverlay(ctx, cssW, cssH);
+
+  // Get grid from state
+  const { cols, rows } = state.grid;
 
   // Determine dragged group
   const draggedGroupId = dragState?.activeId
@@ -85,18 +80,7 @@ export function renderBoard(
 
   for (const p of pieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
-    drawPiece(
-      ctx,
-      p,
-      img,
-      state.grid.cols,
-      state.grid.rows,
-      popMap,
-      nowMs,
-      debug,
-      isDragging,
-      animState,
-    );
+    drawPiece(ctx, p, img, cols, rows, popMap, nowMs, debug, isDragging, animState);
   }
 
   // Completion glow effect
@@ -202,6 +186,9 @@ function drawPiece(
   const tileSrcY = p.row * srcTileH;
 
   // Where should (0,0) of source image be drawn in piece-local coordinates?
+  // The tile's top-left should appear at (p.pad, p.pad) in piece coords
+  // So source (tileSrcX, tileSrcY) -> piece (p.pad, p.pad)
+  // Therefore source (0,0) -> piece (p.pad - tileSrcX * scaleX, p.pad - tileSrcY * scaleY)
   const imgX = p.pad - tileSrcX * scaleX;
   const imgY = p.pad - tileSrcY * scaleY;
   const imgW = sourceW * scaleX;
@@ -223,10 +210,6 @@ function drawPiece(
   if (isDragging) {
     ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
     ctx.lineWidth = 2;
-  } else if (p.justSnapped && animState?.justSnappedPieces.has(p.id)) {
-    // Blue highlight for pieces that just snapped
-    ctx.strokeStyle = "rgba(59, 130, 246, 0.8)";
-    ctx.lineWidth = 2.5;
   } else if (p.isPlaced) {
     ctx.strokeStyle = "rgba(0, 160, 80, 0.3)";
     ctx.lineWidth = 1;
@@ -323,6 +306,14 @@ function drawCompletionGlow(
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, cssW, cssH);
 
+  ctx.restore();
+}
+
+function drawDebugBackdrop(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
+  // Subtle background so you can see the canvas is alive (CSS pixel space)
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.02)";
+  ctx.fillRect(0, 0, cssW, cssH);
   ctx.restore();
 }
 

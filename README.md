@@ -104,44 +104,27 @@ A calm, focused puzzle experience you can open anytime — part mindfulness, par
 
 ### Completed
 
-- **Core gameplay**
-  - Drag-and-drop jigsaw pieces with rotation
-  - Interlocking jigsaw shapes (tabs and blanks)
-  - Smart snapping (board + neighbor snapping)
-  - Piece merging (connected pieces move as a group)
-
-- **Gameplay tools**
-  - Piece tray (middle-click to store, color-sorted)
-  - Reference preview overlay
-  - Progress counter and win detection
-  - Timer with pause support
-
-- **Controls & accessibility**
-  - Mouse, touch, and keyboard support
-  - Keyboard shortcuts (Tab select, arrows move, R rotate)
-  - Mobile gestures (tap to rotate, long-press to tray)
-
-- **Polish & UX**
-  - Auto-save across sessions
-  - Sound effects and haptics
-  - Confetti celebration on completion
-  - Fullscreen mode
-
-- **Content & delivery**
-  - Sample puzzle gallery
-  - Multiple difficulty levels (3×3–6×6)
-  - Deployed on Vercel
-
-- **Rendering Architecture**
-
-- Dual-space rendering model
-  - Screen space for backdrop and overlays
-    -World space for puzzle transforms
-- DPR-aware canvas clearing to prevent subpixel artifacts
-- Path2D-based piece silhouettes for pixel-accurate clipping
-- Deterministic draw ordering via z-index sorting
-
-Deterministic draw ordering via z-index sorting
+- [x] Drag-and-drop jigsaw pieces with rotation
+- [x] Classic jigsaw piece shapes (interlocking tabs and slots)
+- [x] Piece snapping (to board position and to neighboring pieces)
+- [x] Piece merging (connected pieces move together)
+- [x] Middle-click to send pieces to the tray
+- [x] Piece tray with color-sorted organization
+- [x] Multiple difficulty levels (3×3 to 6×6 grids)
+- [x] Reference preview overlay
+- [x] Progress counter showing pieces remaining
+- [x] Timer with pause functionality
+- [x] Auto-save progress across browser sessions
+- [x] Confetti celebration on completion
+- [x] Mobile support (touch drag, tap to rotate, long-press to tray)
+- [x] Sound effects (snap, rotate, place, complete)
+- [x] Haptic feedback on mobile
+- [x] Fullscreen mode
+- [x] Keyboard shortcuts (Tab to select, R to rotate, arrows to move)
+- [x] First-time tutorial overlay
+- [x] Sample puzzle gallery
+- [x] Custom fonts and icons (Inter, Fredoka, Lucide)
+- [x] Deployed on Vercel
 
 ---
 
@@ -223,6 +206,13 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 <summary>Click to expand file structure</summary>
 
 .
+├── Assets
+│   └── Preview
+│       └── preview.gif
+├── CONTRIBUTORS.md
+├── .env.example
+├── .eslintcache
+├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -231,26 +221,27 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   ├── enhancement_refactor.yml
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
-│   ├── workflows
-│   │   ├── Phuzzle.yml
-│   │   └── vercel-production.yml
-│   └── pull_request_template.md
+│   ├── pull_request_template.md
+│   └── workflows
+│       ├── Phuzzle.yml
+│       └── vercel-production.yml
+├── .gitignore
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push
-├── .vite
-│   └── deps
-│       ├── _metadata.json
-│       └── package.json
-├── Assets
-│   └── Preview
-│       └── preview.gif
+├── index.html
+├── LICENSE.md
+├── package.json
+├── .prettierignore
+├── .prettierrc.yml
 ├── public
 │   └── favicon.svg
+├── README.md
 ├── scripts
 │   └── precheck.sh
 ├── src
 │   ├── app
+│   │   ├── App.tsx
 │   │   ├── assets
 │   │   │   ├── puzzles
 │   │   │   │   ├── animals
@@ -258,14 +249,13 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── frog.png
 │   │   │   │   │   ├── kitten.png
 │   │   │   │   │   └── rabbit.png
-│   │   │   │   ├── demo
-│   │   │   │   │   ├── blue_square_thumb.png
-│   │   │   │   │   ├── four_quadrants_thumb.png
-│   │   │   │   │   ├── green_triangle_thumb.png
-│   │   │   │   │   ├── red_circle_thumb.png
-│   │   │   │   │   ├── two_color_split_thumb.png
-│   │   │   │   │   └── yellow_star_thumb.png
-│   │   │   │   └── nature
+│   │   │   │   └── demo
+│   │   │   │       ├── blue_square_thumb.png
+│   │   │   │       ├── four_quadrants_thumb.png
+│   │   │   │       ├── green_triangle_thumb.png
+│   │   │   │       ├── red_circle_thumb.png
+│   │   │   │       ├── two_color_split_thumb.png
+│   │   │   │       └── yellow_star_thumb.png
 │   │   │   └── ui
 │   │   │       └── phuzzle-logo-512.png
 │   │   ├── audio
@@ -278,8 +268,8 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
 │   │   │   ├── HowToPlay
-│   │   │   │   ├── HowToPlay.module.css
 │   │   │   │   ├── HowToPlayModal.tsx
+│   │   │   │   ├── HowToPlay.module.css
 │   │   │   │   ├── index.ts
 │   │   │   │   └── TutorialOverlay.tsx
 │   │   │   ├── Modal
@@ -288,16 +278,12 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   │   ├── PieceTray
 │   │   │   │   ├── PieceTray.module.css
 │   │   │   │   └── PieceTray.tsx
-│   │   │   ├── ShortcutsModal
-│   │   │   │   ├── ShortcutsModal.module.css
-│   │   │   │   └── ShortcutsModal.tsx
 │   │   │   └── Tray
 │   │   │       ├── Tray.module.css
 │   │   │       └── Tray.tsx
 │   │   ├── data
 │   │   │   └── samplePuzzles.ts
-│   │   ├── hooks
-│   │   │   └── useKeyboardShortcuts.ts
+│   │   ├── main.tsx
 │   │   ├── puzzle
 │   │   │   ├── canvas
 │   │   │   │   ├── pickPiece.ts
@@ -326,25 +312,12 @@ Images are auto-discovered. Category = folder name, puzzle name = filename.
 │   │   │       └── SetupScreen.tsx
 │   │   ├── styles
 │   │   │   └── global.css
-│   │   ├── App.tsx
-│   │   ├── main.tsx
 │   │   └── vite-env.d.ts
 │   └── types
 │       ├── canvas-confetti.d.ts
 │       └── vite-env.d.ts
-├── .env.development
-├── .env.example
-├── .eslintcache
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── CONTRIBUTORS.md
-├── eslint.config.ts
-├── index.html
-├── LICENSE.md
-├── package-lock.json
-├── package.json
-├── README.md
+├── test-results
+│   └── .last-run.json
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json

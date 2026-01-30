@@ -15,6 +15,7 @@ type ButtonProps = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   type?: "button" | "submit" | "reset";
   className?: string;
+  title?: string;
 };
 
 export function Button({
@@ -26,6 +27,7 @@ export function Button({
   onClick,
   type = "button",
   className = "",
+  title,
 }: ButtonProps) {
   const classNames = [
     styles.button,
@@ -38,7 +40,13 @@ export function Button({
     .join(" ");
 
   return (
-    <button type={type} className={classNames} disabled={disabled} onClick={onClick}>
+    <button
+      type={type}
+      className={classNames}
+      disabled={disabled}
+      onClick={onClick}
+      title={title}
+    >
       {children}
     </button>
   );
