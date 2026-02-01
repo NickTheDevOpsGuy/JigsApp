@@ -107,10 +107,7 @@ export class PuzzleManager {
   private isPieceCorrect(p: Piece) {
     if (p.rotation !== p.targetRotation) return false;
     const tile = this.tilePos(p);
-    return (
-      p.targetX === Math.round(tile.x) &&
-      p.targetY === Math.round(tile.y)
-    );
+    return p.targetX === Math.round(tile.x) && p.targetY === Math.round(tile.y);
   }
 
   private recomputeDerivedState() {
@@ -216,9 +213,7 @@ export class PuzzleManager {
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.groupId === groupId
-          ? { ...p, x: p.x + clamped.dx, y: p.y + clamped.dy }
-          : p,
+        p.groupId === groupId ? { ...p, x: p.x + clamped.dx, y: p.y + clamped.dy } : p,
       ),
     };
   }
@@ -239,7 +234,9 @@ export class PuzzleManager {
 
   private wouldOverlapAnyOtherGroup(groupId: string, dx: number, dy: number): boolean {
     const groupPieces = this.getGroupPieces(groupId);
-    const otherPieces = this.state.pieces.filter((p) => p.groupId !== groupId && !p.inTray);
+    const otherPieces = this.state.pieces.filter(
+      (p) => p.groupId !== groupId && !p.inTray,
+    );
 
     for (const gp of groupPieces) {
       const gpX = gp.x + dx;
@@ -407,7 +404,12 @@ export class PuzzleManager {
     this.recomputeDerivedState();
   }
 
-  public pointerDown(pieceId: string, clientX: number, clientY: number, pieceRect: DOMRect) {
+  public pointerDown(
+    pieceId: string,
+    clientX: number,
+    clientY: number,
+    pieceRect: DOMRect,
+  ) {
     const piece = this.findPiece(pieceId);
     if (!piece || piece.isPlaced) return;
 
@@ -418,7 +420,7 @@ export class PuzzleManager {
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.groupId === piece.groupId ? { ...p, z: newZ } : p
+        p.groupId === piece.groupId ? { ...p, z: newZ } : p,
       ),
     };
 
@@ -479,7 +481,7 @@ export class PuzzleManager {
 
   public restoreFromSaved(savedPieces: SavedPiece[]) {
     // Restore piece positions from saved state
-    const pieceMap = new Map(savedPieces.map(p => [p.id, p]));
+    const pieceMap = new Map(savedPieces.map((p) => [p.id, p]));
 
     this.state = {
       ...this.state,
