@@ -75,7 +75,5 @@ export function mergeGroups(pieces: Piece[], groupA: string, groupB: string): vo
  * Normalize rotation to 0, 90, 180, 270
  */
 function normalizeRotation(deg: number): number {
-  let d = ((deg % 360) + 360) % 360;
-  if (d === 360) d = 0;
-  return d;
+  return ((Math.round(deg) % 360) + 360) % 360;
 }
