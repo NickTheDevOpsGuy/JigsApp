@@ -9,6 +9,11 @@
 A cozy, modern jigsaw puzzle game built with React.  
 Upload an image, break it into pieces, and snap them together piece by piece.
 
+## ▶️ Play Phuzzle
+
+👉 **https://phuzzle.vercel.app/**  
+No install required. Works on desktop and mobile.
+
 ---
 
 ## Table of Contents
@@ -25,14 +30,6 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 - [Contributing](#-contributing)
 - [Team](#-team)
 - [License](#-license)
-
----
-
-## Preview
-
-### Gameplay Demo
-
-[![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
 
 ---
 
@@ -91,11 +88,12 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Mobile Support
 
-- Touch drag
-- Tap to rotate
+- Touch drag with inertia-safe snapping
+- **Single-tap to rotate** (no double-tap ambiguity)
 - Long-press to send pieces to the tray
-- Haptic feedback
-- Mobile-safe layouts and gestures
+- Haptic feedback for snap, rotate, and placement
+- Mobile-safe layouts with large hit targets
+- Touch-specific tutorial hints on first launch
 
 ### Accessibility & Controls
 
