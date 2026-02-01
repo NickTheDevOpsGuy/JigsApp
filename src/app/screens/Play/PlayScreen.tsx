@@ -7,7 +7,7 @@ import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { ConfirmModal } from "@/components/Modal/Modal";
-import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
+import { HowToPlayModal, useShouldShowTutorial } from "@/components/HowToPlay";
 import {
   savePuzzleState,
   loadPuzzleState,
@@ -877,7 +877,7 @@ export function PlayScreen() {
         isCoarsePointer={isCoarsePointer}
       />
 
-      {showTutorial && <TutorialOverlay onComplete={dismissTutorial} />}
+      {showTutorial && <HowToPlayModal isOpen={showTutorial} onClose={dismissTutorial} />}
 
       {/* Keyboard shortcuts modal */}
       <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />

@@ -97,9 +97,9 @@ $RECYCLE.BIN/
 # Prettier temp files
 .prettier/
 
-# TypeScript incremental / tooling
-.tsbuildinfo
-*.tsbuildinfo
-
+# =========================
 # Vite / tooling temp
+# =========================
 .vite/
+vite.config.*.timestamp*
+*.local
