@@ -1,3 +1,9 @@
+![CI](https://github.com/NickTheDevOpsGuy/phuzzle/actions/workflows/Phuzzle.yml/badge.svg?branch=main)
+![React](https://img.shields.io/badge/Built%20with-React-61DAFB?logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Powered%20by-Vite-646CFF?logo=vite&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 # 🧩 Phuzzle
 
 A cozy, modern jigsaw puzzle game built with React.  
@@ -5,12 +11,6 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 - [Play it live](https://phuzzle.vercel.app)
 - [Source code](https://github.com/NickTheDevOpsGuy/phuzzle)
-
-![CI](https://github.com/NickTheDevOpsGuy/phuzzle/actions/workflows/Phuzzle.yml/badge.svg?branch=main)
-![React](https://img.shields.io/badge/Built%20with-React-61DAFB?logo=react&logoColor=black)
-![Vite](https://img.shields.io/badge/Powered%20by-Vite-646CFF?logo=vite&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ---
 
