@@ -9,7 +9,11 @@ import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { HowToPlayModal, useShouldShowTutorial } from "@/components/HowToPlay";
-import { savePuzzleState, loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
+import {
+  savePuzzleState,
+  loadPuzzleState,
+  clearPuzzleState,
+} from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { useKeyboardShortcuts, ShortcutAction } from "@/hooks/useKeyboardShortcuts";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
@@ -72,7 +76,11 @@ export function PlayScreen() {
   const haptics = useHaptics();
 
   // UI state
-  const [debug, setDebug] = useState<DebugFlags>({ showGrid: false, showBounds: false, showIds: false });
+  const [debug, setDebug] = useState<DebugFlags>({
+    showGrid: false,
+    showBounds: false,
+    showIds: false,
+  });
   const [showPreview, setShowPreview] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -126,13 +134,16 @@ export function PlayScreen() {
   );
 
   // Compute tile size helper
-  const computeTileSize = useCallback((boardW: number, boardH: number) => {
-    const targetFill = 0.65;
-    const tileFromW = (boardW * targetFill) / grid.cols;
-    const tileFromH = (boardH * targetFill) / grid.rows;
-    const tile = Math.floor(Math.min(tileFromW, tileFromH));
-    return clamp(tile, 56, 160);
-  }, [grid]);
+  const computeTileSize = useCallback(
+    (boardW: number, boardH: number) => {
+      const targetFill = 0.65;
+      const tileFromW = (boardW * targetFill) / grid.cols;
+      const tileFromH = (boardH * targetFill) / grid.rows;
+      const tile = Math.floor(Math.min(tileFromW, tileFromH));
+      return clamp(tile, 56, 160);
+    },
+    [grid],
+  );
 
   // Timer effect
   useEffect(() => {
@@ -142,75 +153,89 @@ export function PlayScreen() {
   }, [state?.isComplete, isPaused]);
 
   // Keyboard shortcut handler
-  const handleShortcut = useCallback((action: ShortcutAction) => {
-    switch (action) {
-      case "pause":
-        if (!state?.isComplete) setIsPaused((p) => !p);
-        break;
-      case "escape":
-        if (showShortcuts) setShowShortcuts(false);
-        else if (showNewGameModal) setShowNewGameModal(false);
-        else if (isPaused) setIsPaused(false);
-        break;
-      case "preview":
-        setShowPreview((p) => !p);
-        break;
-      case "fullscreen":
-        toggleFullscreen();
-        break;
-      case "newGame":
-        setShowNewGameModal(true);
-        break;
-      case "toggleSound":
-        toggleSound();
-        break;
-      case "toggleHaptics":
-        toggleHaptics();
-        break;
-      case "rotateCW":
-      case "rotateCCW":
-        if (manager && state && !isPaused) {
-          const unplaced = state.pieces.filter((p) => !p.isPlaced && !p.inTray);
-          let piece = unplaced.find((p) => p.id === selectedPieceId);
-          if (!piece && unplaced.length > 0) {
-            piece = unplaced[0];
-            setSelectedPieceId(piece.id);
+  const handleShortcut = useCallback(
+    (action: ShortcutAction) => {
+      switch (action) {
+        case "pause":
+          if (!state?.isComplete) setIsPaused((p) => !p);
+          break;
+        case "escape":
+          if (showShortcuts) setShowShortcuts(false);
+          else if (showNewGameModal) setShowNewGameModal(false);
+          else if (isPaused) setIsPaused(false);
+          break;
+        case "preview":
+          setShowPreview((p) => !p);
+          break;
+        case "fullscreen":
+          toggleFullscreen();
+          break;
+        case "newGame":
+          setShowNewGameModal(true);
+          break;
+        case "toggleSound":
+          toggleSound();
+          break;
+        case "toggleHaptics":
+          toggleHaptics();
+          break;
+        case "rotateCW":
+        case "rotateCCW":
+          if (manager && state && !isPaused) {
+            const unplaced = state.pieces.filter((p) => !p.isPlaced && !p.inTray);
+            let piece = unplaced.find((p) => p.id === selectedPieceId);
+            if (!piece && unplaced.length > 0) {
+              piece = unplaced[0];
+              setSelectedPieceId(piece.id);
+            }
+            if (piece) {
+              manager.rotatePiece(piece.id);
+              soundManager.play("rotate");
+              setState(manager.getState());
+            }
           }
-          if (piece) {
-            manager.rotatePiece(piece.id);
-            soundManager.play("rotate");
-            setState(manager.getState());
+          break;
+        case "nextPiece":
+          selectCycle(1);
+          break;
+        case "prevPiece":
+          selectCycle(-1);
+          break;
+        case "moveUp":
+        case "moveDown":
+        case "moveLeft":
+        case "moveRight": {
+          if (manager && state && !isPaused && selectedPieceId) {
+            const piece = state.pieces.find((p) => p.id === selectedPieceId);
+            if (piece && !piece.isPlaced && !piece.inTray) {
+              const amt = 20;
+              const dx = action === "moveLeft" ? -amt : action === "moveRight" ? amt : 0;
+              const dy = action === "moveUp" ? -amt : action === "moveDown" ? amt : 0;
+              manager.nudgeGroup(selectedPieceId, dx, dy);
+              manager.snapGroupNow(selectedPieceId);
+              setState(manager.getState());
+            }
           }
+          break;
         }
-        break;
-      case "nextPiece":
-        selectCycle(1);
-        break;
-      case "prevPiece":
-        selectCycle(-1);
-        break;
-      case "moveUp":
-      case "moveDown":
-      case "moveLeft":
-      case "moveRight": {
-        if (manager && state && !isPaused && selectedPieceId) {
-          const piece = state.pieces.find((p) => p.id === selectedPieceId);
-          if (piece && !piece.isPlaced && !piece.inTray) {
-            const amt = 20;
-            const dx = action === "moveLeft" ? -amt : action === "moveRight" ? amt : 0;
-            const dy = action === "moveUp" ? -amt : action === "moveDown" ? amt : 0;
-            manager.nudgeGroup(selectedPieceId, dx, dy);
-            manager.snapGroupNow(selectedPieceId);
-            setState(manager.getState());
-          }
-        }
-        break;
+        case "showHelp":
+          setShowShortcuts((s) => !s);
+          break;
       }
-      case "showHelp":
-        setShowShortcuts((s) => !s);
-        break;
-    }
-  }, [state, isPaused, showShortcuts, showNewGameModal, manager, toggleFullscreen, selectedPieceId, toggleSound, toggleHaptics, selectCycle]);
+    },
+    [
+      state,
+      isPaused,
+      showShortcuts,
+      showNewGameModal,
+      manager,
+      toggleFullscreen,
+      selectedPieceId,
+      toggleSound,
+      toggleHaptics,
+      selectCycle,
+    ],
+  );
 
   useKeyboardShortcuts({ enabled: !showTutorial, onAction: handleShortcut });
 
@@ -228,9 +253,10 @@ export function PlayScreen() {
     const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
 
     const savedState = loadPuzzleState();
-    const hasSaved = savedState?.imageUrl === imageUrl &&
-                     savedState?.grid.rows === grid.rows &&
-                     savedState?.grid.cols === grid.cols;
+    const hasSaved =
+      savedState?.imageUrl === imageUrl &&
+      savedState?.grid.rows === grid.rows &&
+      savedState?.grid.cols === grid.cols;
 
     if (hasSaved && savedState) {
       setElapsedSeconds(savedState.elapsedSeconds);
@@ -239,7 +265,14 @@ export function PlayScreen() {
     }
 
     const mgr = new PuzzleManager(
-      { imageUrl, boardWidth: boardW, boardHeight: boardH, grid, pieceWidth: pieceSize, pieceHeight: pieceSize },
+      {
+        imageUrl,
+        boardWidth: boardW,
+        boardHeight: boardH,
+        grid,
+        pieceWidth: pieceSize,
+        pieceHeight: pieceSize,
+      },
       {
         onPiecePlaced: (p) => {
           popMapRef.current.set(p.id, performance.now());
@@ -249,7 +282,9 @@ export function PlayScreen() {
         onPuzzleComplete: () => {
           clearPuzzleState();
           soundManager.play("complete");
-          import("canvas-confetti").then((c) => c.default({ particleCount: 150, spread: 70, origin: { y: 0.6 } }));
+          import("canvas-confetti").then((c) =>
+            c.default({ particleCount: 150, spread: 70, origin: { y: 0.6 } }),
+          );
         },
       },
     );
@@ -377,14 +412,17 @@ export function PlayScreen() {
     });
 
   // Tray piece click
-  const handleTrayPieceClick = useCallback((pieceId: string) => {
-    if (!manager) return;
-    manager.movePieceFromTray(pieceId);
-    setState(manager.getState());
-    selectedIdRef.current = pieceId;
-    setSelectedPieceId(pieceId);
-    bump();
-  }, [manager]);
+  const handleTrayPieceClick = useCallback(
+    (pieceId: string) => {
+      if (!manager) return;
+      manager.movePieceFromTray(pieceId);
+      setState(manager.getState());
+      selectedIdRef.current = pieceId;
+      setSelectedPieceId(pieceId);
+      bump();
+    },
+    [manager],
+  );
 
   // New game handler
   const handleNewGame = useCallback(() => {
@@ -459,7 +497,14 @@ export function PlayScreen() {
             onToggleHaptics={toggleHaptics}
             onToggleFullscreen={toggleFullscreen}
             onShowShortcuts={() => setShowShortcuts(true)}
-            onToggleDebug={() => setDebug((d) => ({ ...d, showGrid: !d.showGrid, showBounds: !d.showBounds, showIds: !d.showIds }))}
+            onToggleDebug={() =>
+              setDebug((d) => ({
+                ...d,
+                showGrid: !d.showGrid,
+                showBounds: !d.showBounds,
+                showIds: !d.showIds,
+              }))
+            }
           />
           <div className={styles.title}>Phuzzle</div>
         </div>
@@ -484,7 +529,14 @@ export function PlayScreen() {
           onToggleSound={toggleSound}
           onToggleFullscreen={toggleFullscreen}
           onShowShortcuts={() => setShowShortcuts(true)}
-          onToggleDebug={() => setDebug((d) => ({ ...d, showGrid: !d.showGrid, showBounds: !d.showBounds, showIds: !d.showIds }))}
+          onToggleDebug={() =>
+            setDebug((d) => ({
+              ...d,
+              showGrid: !d.showGrid,
+              showBounds: !d.showBounds,
+              showIds: !d.showIds,
+            }))
+          }
           onNewPuzzle={() => setShowNewGameModal(true)}
         />
       </div>
@@ -514,7 +566,11 @@ export function PlayScreen() {
 
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>
-              <img src={imgRef.current.src} alt="Puzzle preview" className={styles.previewImage} />
+              <img
+                src={imgRef.current.src}
+                alt="Puzzle preview"
+                className={styles.previewImage}
+              />
             </div>
           )}
 

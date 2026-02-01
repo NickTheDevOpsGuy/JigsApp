@@ -28,7 +28,8 @@ export function SetupScreen() {
     handleFileSelect,
   } = useImageSelection();
 
-  const { gridIndex, setGridIndex, selectedGrid, gridOptions, saveGrid } = useGridSettings();
+  const { gridIndex, setGridIndex, selectedGrid, gridOptions, saveGrid } =
+    useGridSettings();
 
   // Load existing image on mount
   useEffect(() => {
