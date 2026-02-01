@@ -4,14 +4,14 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-# 🧩 Phuzzle
+# Phuzzle
 
 A cozy, modern jigsaw puzzle game built with React.  
 Upload an image, break it into pieces, and snap them together piece by piece.
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
 - [Preview](#preview)
 - [What is Phuzzle?](#-what-is-phuzzle)
@@ -34,11 +34,9 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 [![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
 
-- [Play it live](https://phuzzle.vercel.app) 
-
 ---
 
-## ✨ What is Phuzzle?
+## What is Phuzzle?
 
 Phuzzle is a fully interactive jigsaw puzzle experience focused on:
 
@@ -70,7 +68,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ---
 
-## 🎮 Features
+## Features
 
 ### Core Gameplay
 - Drag-and-drop jigsaw pieces with rotation
@@ -190,7 +188,7 @@ Category = folder name, puzzle name = filename.
 
 ---
 
-## 🗂️ Project Structure
+## Project Structure
 
 <details>
 <summary>📁 Click to expand file structure</summary>
@@ -350,9 +348,9 @@ Category = folder name, puzzle name = filename.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-We love help.
+We [b]love[/b] help.
 
 If you want to:
 
@@ -367,7 +365,7 @@ No gatekeeping. No ego. Just building something fun together.
 
 ---
 
-## 🦝 Team
+## Team
 
 Built by:
 - **Nick**
@@ -381,6 +379,6 @@ Different strengths, shared ownership, great teamwork.
 
 ---
 
-## 📜 License
+## License
 
 MIT License. See [LICENSE.md](./LICENSE.md).
