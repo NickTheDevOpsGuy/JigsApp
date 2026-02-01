@@ -8,6 +8,7 @@ import type { HapticKind } from "./useHaptics";
 
 type CanvasWithLongPress = HTMLCanvasElement & {
   longPressTimer?: ReturnType<typeof setTimeout>;
+  longPressFired?: boolean;
 };
 
 export function usePointerHandlers(args: {
@@ -35,11 +36,36 @@ export function usePointerHandlers(args: {
     haptic,
   } = args;
 
+  const canRotatePiece = useCallback(
+    (pid: PieceId) => {
+      if (!manager) return false;
+
+      const st = manager.getState();
+      const piece = st.pieces.find((p) => p.id === pid);
+      if (!piece) return false;
+
+      // Hard lock: placed pieces never rotate
+      if (piece.isPlaced) return false;
+
+      // Pieces in tray should not rotate from board interactions
+      if (piece.inTray) return false;
+
+      // If a piece is merged into a group, rotating it would desync the group
+      const groupSize = st.pieces.filter((p) => p.groupId === piece.groupId).length;
+      if (groupSize > 1) return false;
+
+      return true;
+    },
+    [manager],
+  );
+
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current || !boardRef.current) return;
 
       const canvas = canvasRef.current as CanvasWithLongPress;
+      canvas.longPressFired = false;
+
       const boardRect = boardRef.current.getBoundingClientRect();
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
@@ -99,9 +125,16 @@ export function usePointerHandlers(args: {
         // Long-press on touch to send to tray
         if (isTouch) {
           canvas.longPressTimer = setTimeout(() => {
+            canvas.longPressFired = true;
+
+            // End any active drag cleanly before moving to tray
             manager.pointerUp();
             manager.movePieceToTray(pieceId);
             setState(manager.getState());
+
+            // Prevent the subsequent pointerUp from being treated as a "tap to rotate"
+            didDragRef.current = true;
+
             try {
               canvas.releasePointerCapture(e.pointerId);
             } catch {
@@ -114,8 +147,9 @@ export function usePointerHandlers(args: {
       // Right click = rotate (desktop)
       if (e.button === 2) {
         e.preventDefault();
-        const piece = st.pieces.find((p) => p.id === pieceId);
-        if (piece?.isPlaced) return;
+
+        if (!canRotatePiece(pieceId)) return;
+
         manager.rotatePiece(pieceId);
         soundManager.play("rotate");
         haptic?.("rotate");
@@ -133,6 +167,7 @@ export function usePointerHandlers(args: {
       selectCycle,
       setState,
       haptic,
+      canRotatePiece,
     ],
   );
 
@@ -165,6 +200,13 @@ export function usePointerHandlers(args: {
         canvas.longPressTimer = undefined;
       }
 
+      // If a long-press action fired, do not treat this as a "tap to rotate"
+      if (canvas.longPressFired) {
+        canvas.longPressFired = false;
+        didDragRef.current = false;
+        return;
+      }
+
       const isTouch = e.pointerType === "touch";
       const boardRect = boardRef.current?.getBoundingClientRect();
       const ctx = canvas.getContext("2d");
@@ -172,22 +214,27 @@ export function usePointerHandlers(args: {
       // Single tap to rotate on touch (tap without dragging)
       if (isTouch && boardRect && ctx && !didDragRef.current) {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+
         const st = manager.getState();
         const x = e.clientX - boardRect.left;
         const y = e.clientY - boardRect.top;
-        const pid = pickPieceId(ctx, st.pieces, x, y);
-        if (pid) {
-          const piece = st.pieces.find((p) => p.id === pid);
-          if (piece && !piece.isPlaced) {
-            manager.rotatePiece(pid);
-            soundManager.play("rotate");
-            haptic?.("rotate");
-          }
+
+        // Only consider board pieces for tap-rotate (tray pieces should not be hittable here)
+        const boardPieces = st.pieces.filter((p) => !p.inTray);
+        const pid = pickPieceId(ctx, boardPieces, x, y);
+
+        if (pid && canRotatePiece(pid)) {
+          manager.rotatePiece(pid);
+          soundManager.play("rotate");
+          haptic?.("rotate");
         }
       }
 
       manager.pointerUp();
       setState(manager.getState());
+
+      // Reset drag marker for next interaction
+      didDragRef.current = false;
 
       try {
         canvas.releasePointerCapture(e.pointerId);
@@ -195,7 +242,7 @@ export function usePointerHandlers(args: {
         // ignore
       }
     },
-    [manager, canvasRef, boardRef, didDragRef, setState, haptic],
+    [manager, canvasRef, boardRef, didDragRef, setState, haptic, canRotatePiece],
   );
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {

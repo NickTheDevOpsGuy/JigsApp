@@ -55,6 +55,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 ## User Stories
 
 ### Players want:
+
 - To upload an image and instantly generate a puzzle
 - Smooth, intuitive drag-and-drop
 - Pieces that snap when correctly aligned
@@ -62,6 +63,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - A relaxing, clutter-free experience
 
 ### Developers want:
+
 - Predictable puzzle-generation logic
 - A structure that supports expansion
 - A roadmap that welcomes contribution
@@ -71,6 +73,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 ## Features
 
 ### Core Gameplay
+
 - Drag-and-drop jigsaw pieces with rotation
 - Classic interlocking jigsaw piece shapes
 - Board and neighbor snapping
@@ -78,6 +81,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Multiple difficulty levels (3×3 to 6×6 grids)
 
 ### UX & Polish
+
 - Reference image preview overlay
 - Progress counter and timer (with pause)
 - Confetti celebration on completion 🎉
@@ -86,6 +90,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Custom fonts and icons (Inter, Fredoka, Lucide)
 
 ### Mobile Support
+
 - Touch drag
 - Tap to rotate
 - Long-press to send pieces to the tray
@@ -93,11 +98,13 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Mobile-safe layouts and gestures
 
 ### Accessibility & Controls
+
 - Keyboard shortcuts (Tab, arrows, R to rotate)
 - First-time tutorial overlay
 - Designed for relaxed, low-pressure play
 
 ### Persistence
+
 - Auto-save puzzle progress
 - Resume across browser sessions
 
@@ -107,23 +114,23 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed
 
-- Drag-and-drop pieces with rotation  
-- Interlocking piece shapes  
-- Board + neighbor snapping  
-- Piece merging and group movement  
-- Tray system with color sorting  
-- Multiple difficulty levels  
-- Reference preview overlay  
-- Progress counter and timer  
-- Auto-save  
-- Confetti celebration  
-- Mobile support with haptics  
-- Sound effects  
-- Fullscreen mode  
-- Keyboard shortcuts  
-- Tutorial overlay  
-- Sample puzzle gallery  
-- Vercel deployment  
+- Drag-and-drop pieces with rotation
+- Interlocking piece shapes
+- Board + neighbor snapping
+- Piece merging and group movement
+- Tray system with color sorting
+- Multiple difficulty levels
+- Reference preview overlay
+- Progress counter and timer
+- Auto-save
+- Confetti celebration
+- Mobile support with haptics
+- Sound effects
+- Fullscreen mode
+- Keyboard shortcuts
+- Tutorial overlay
+- Sample puzzle gallery
+- Vercel deployment
 
 ### Planned
 
@@ -143,14 +150,14 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ## Tech Stack
 
-| Category | Tools |
-|--------|------|
-| Framework | React |
-| Language | TypeScript |
-| Build | Vite |
-| Rendering | HTML Canvas |
-| CI/CD | GitHub Actions |
-| Hosting | Vercel |
+| Category  | Tools          |
+| --------- | -------------- |
+| Framework | React          |
+| Language  | TypeScript     |
+| Build     | Vite           |
+| Rendering | HTML Canvas    |
+| CI/CD     | GitHub Actions |
+| Hosting   | Vercel         |
 
 ---
 
@@ -368,6 +375,7 @@ No gatekeeping. No ego. Just building something fun together.
 ## Team
 
 Built by:
+
 - **Nick**
 - **Vinay**
 - **Hannah**

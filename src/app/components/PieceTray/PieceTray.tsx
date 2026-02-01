@@ -2,6 +2,7 @@
 import React, { useMemo, useState } from "react";
 import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
+import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
 import styles from "./PieceTray.module.css";
 
 type TraySection = "all" | "corners" | "edges" | "center";
@@ -50,6 +51,7 @@ export function PieceTray({ pieces, image, grid, onPieceClick, isCoarsePointer }
 
   const byGrid = (a: Piece, b: Piece) =>
     a.row - b.row || a.col - b.col || a.id.localeCompare(b.id);
+
   const byHue = (a: Piece, b: Piece) => {
     const ha = hueById.get(a.id);
     const hb = hueById.get(b.id);
@@ -88,6 +90,31 @@ export function PieceTray({ pieces, image, grid, onPieceClick, isCoarsePointer }
   const emptyText = isCoarsePointer
     ? "Long-press pieces to store them here"
     : "Middle-click pieces to store them here";
+
+  // Generate jigsaw-shaped thumbnails using the same clip path as the board renderer.
+  // Memoized so the tray stays snappy.
+  const thumbsById = useMemo(() => {
+    const m = new Map<string, string>();
+    if (!image) return m;
+
+    for (const p of displayed) {
+      // Fit piece bounding box into the 56px thumb box (with a little breathing room)
+      const box = 56;
+      const padding = 6;
+      const maxW = box - padding;
+      const maxH = box - padding;
+
+      const scale = Math.min(maxW / p.w, maxH / p.h);
+
+      const assembledW = grid.cols * p.tileW;
+      const assembledH = grid.rows * p.tileH;
+
+      const c = renderTrayPiece(p, image, assembledW, assembledH, scale);
+      m.set(p.id, c.toDataURL("image/png"));
+    }
+
+    return m;
+  }, [displayed, image, grid]);
 
   return (
     <div className={styles.tray}>
@@ -128,7 +155,7 @@ export function PieceTray({ pieces, image, grid, onPieceClick, isCoarsePointer }
           </button>
         </div>
 
-        <div className={styles.sort} aria-label="Tray sort">
+        <div className={styles.segment} aria-label="Sort mode">
           <button
             type="button"
             className={sortMode === "grid" ? styles.active : undefined}
@@ -140,41 +167,42 @@ export function PieceTray({ pieces, image, grid, onPieceClick, isCoarsePointer }
             type="button"
             className={sortMode === "color" ? styles.active : undefined}
             onClick={() => setSortMode("color")}
+            disabled={!image}
+            title={!image ? "Load an image to enable color sorting" : undefined}
           >
             Color
           </button>
         </div>
       </div>
 
-      <div className={styles.scroller}>
+      <div className={styles.scroller} role="list">
         {displayed.length === 0 ? (
           <div className={styles.empty}>{emptyText}</div>
         ) : (
-          displayed.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              className={styles.pieceButton}
-              onClick={() => onPieceClick(p.id)}
-              aria-label={`Place piece ${p.id}`}
-            >
-              <div className={styles.thumbWrap}>
-                {/* Render via background-position on the wrapper so we don't need a canvas here */}
-                <div
-                  className={styles.thumb}
-                  style={
-                    image
-                      ? {
-                          backgroundImage: `url(${image.src})`,
-                          backgroundSize: `${grid.cols * p.tileW}px ${grid.rows * p.tileH}px`,
-                          backgroundPosition: `${-p.col * p.tileW}px ${-p.row * p.tileH}px`,
-                        }
-                      : undefined
-                  }
-                />
-              </div>
-            </button>
-          ))
+          <div className={styles.row}>
+            {displayed.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className={styles.pieceButton}
+                onClick={() => onPieceClick(p.id)}
+                aria-label={`Place piece ${p.id}`}
+              >
+                <div className={styles.thumbWrap}>
+                  {image ? (
+                    <img
+                      className={styles.thumbImg}
+                      src={thumbsById.get(p.id)}
+                      alt=""
+                      draggable={false}
+                    />
+                  ) : (
+                    <div className={styles.thumbFallback} />
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
         )}
       </div>
     </div>
