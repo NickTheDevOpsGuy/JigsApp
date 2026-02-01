@@ -174,25 +174,25 @@
     font-size: 20px;
   }
 
-.tutorialStep {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
+  .tutorialStep {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
 
   .stepText {
     font-size: 13px;
   }
-    .stepContent {
+  .stepContent {
     gap: 4px;
   }
 }
 
 .tutorialSubtitle {
-margin: 8px 0 14px 0;
-opacity: 0.8;
-font-size: 14px;
-line-height: 1.4;
+  margin: 8px 0 14px 0;
+  opacity: 0.8;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .stepContent {
@@ -212,7 +212,7 @@ line-height: 1.4;
 
 /* Normalize paragraph spacing so it doesn’t look cramped */
 .stepContent p {
-  margin: 0;            /* prevent default huge margins */
+  margin: 0; /* prevent default huge margins */
   line-height: 1.35;
   opacity: 0.9;
 }
