@@ -38,6 +38,7 @@ pnpm-debug.log*
 ._*
 .Spotlight-V100
 .Trashes
+*.zip
 
 # Windows
 Thumbs.db
