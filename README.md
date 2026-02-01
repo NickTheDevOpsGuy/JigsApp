@@ -105,9 +105,10 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-### ✅ Completed
+### Completed
+
 - Drag-and-drop pieces with rotation  
 - Interlocking piece shapes  
 - Board + neighbor snapping  
@@ -126,7 +127,8 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Sample puzzle gallery  
 - Vercel deployment  
 
-### 🔜 Planned
+### Planned
+
 - Dark mode
 - Undo / Redo
 - Ghost / hint preview
@@ -141,7 +143,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Category | Tools |
 |--------|------|
@@ -154,7 +156,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
 git clone https://github.com/NickTheDevOpsGuy/phuzzle.git
@@ -165,7 +167,7 @@ npm run dev
 
 ---
 
-## 🧩 Adding Sample Puzzles
+## Adding Sample Puzzles
 
 Drop images into:
 
@@ -190,6 +192,7 @@ Category = folder name, puzzle name = filename.
 
 ## 🗂️ Project Structure
 
+<details>
 <summary>📁 Click to expand file structure</summary>
 
 ```plaintext
