@@ -203,6 +203,7 @@ Category = folder name, puzzle name = filename.
 .
 ├── CONTRIBUTORS.md
 ├── .env.example
+├── .eslintcache
 ├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
@@ -241,13 +242,18 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── frog.png
 │   │   │   │   │   ├── kitten.png
 │   │   │   │   │   └── rabbit.png
-│   │   │   │   └── demo
-│   │   │   │       ├── blue_square_thumb.png
-│   │   │   │       ├── four_quadrants_thumb.png
-│   │   │   │       ├── green_triangle_thumb.png
-│   │   │   │       ├── red_circle_thumb.png
-│   │   │   │       ├── two_color_split_thumb.png
-│   │   │   │       └── yellow_star_thumb.png
+│   │   │   │   ├── demo
+│   │   │   │   │   ├── blue_square_thumb.png
+│   │   │   │   │   ├── four_quadrants_thumb.png
+│   │   │   │   │   ├── green_triangle_thumb.png
+│   │   │   │   │   ├── red_circle_thumb.png
+│   │   │   │   │   ├── two_color_split_thumb.png
+│   │   │   │   │   └── yellow_star_thumb.png
+│   │   │   │   └── food
+│   │   │   │       ├── charcuterie_board.png
+│   │   │   │       ├── curries_and_rice.png
+│   │   │   │       ├── fruit_platter.png
+│   │   │   │       └── pasta_dishes.png
 │   │   │   └── ui
 │   │   │       └── phuzzle-logo-512.png
 │   │   ├── audio
@@ -312,16 +318,26 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── PlayHUD.tsx
 │   │   │   │   │   └── TopBarButtons.tsx
 │   │   │   │   ├── hooks
+│   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── useCoarsePointer.ts
+│   │   │   │   │   ├── useDownloadImage.ts
+│   │   │   │   │   ├── useFullscreen.ts
+│   │   │   │   │   ├── useGameTimer.ts
 │   │   │   │   │   ├── useHaptics.ts
 │   │   │   │   │   ├── useInputHints.ts
+│   │   │   │   │   ├── usePieceSelection.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── usePuzzleLifecycle.ts
-│   │   │   │   │   └── useShareResults.ts
+│   │   │   │   │   ├── useShareResults.ts
+│   │   │   │   │   └── useSoundSettings.ts
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
 │   │   │   │   └── playUtils.ts
 │   │   │   └── Setup
+│   │   │       ├── hooks
+│   │   │       │   ├── index.ts
+│   │   │       │   ├── useGridSettings.ts
+│   │   │       │   └── useImageSelection.ts
 │   │   │       ├── SetupScreen.module.css
 │   │   │       └── SetupScreen.tsx
 │   │   ├── styles
