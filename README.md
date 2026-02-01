@@ -9,9 +9,6 @@
 A cozy, modern jigsaw puzzle game built with React.  
 Upload an image, break it into pieces, and snap them together piece by piece.
 
-- [Play it live](https://phuzzle.vercel.app) 
-- [Source code](https://github.com/NickTheDevOpsGuy/phuzzle)
-
 ---
 
 ## 📑 Table of Contents
@@ -37,7 +34,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 [![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
 
-**▶️ Play Now:** https://phuzzle.vercel.app/
+- [Play it live](https://phuzzle.vercel.app) 
 
 ---
 
