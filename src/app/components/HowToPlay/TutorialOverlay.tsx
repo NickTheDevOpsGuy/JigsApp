@@ -26,90 +26,76 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
     <div className={styles.overlay}>
       <div className={styles.tutorialCard}>
         <div className={styles.tutorialIcon}>🧩</div>
+        <h2 className={styles.tutorialTitle}>Welcome to Phuzzle!</h2>
 
-        {isTouch ? (
-          <>
-            <h2 className={styles.tutorialTitle}>How to Play on Mobile</h2>
+        <p className={styles.tutorialIntro}>
+          Drag and drop pieces to assemble the puzzle.
+          <br />
+          Match all pieces to complete the image.
+        </p>
 
-            <div className={styles.tutorialSteps}>
-              <div className={styles.tutorialStep}>
-                <span className={styles.stepIcon}>👉</span>
-                <span className={styles.stepText}>
-                  <strong>Drag</strong> pieces to move them
-                </span>
-              </div>
-
-              <div className={styles.tutorialStep}>
-                <span className={styles.stepIcon}>🔄</span>
-                <span className={styles.stepText}>
-                  <strong>Tap</strong> a piece to rotate it
-                </span>
-              </div>
-
-              <div className={styles.tutorialStep}>
-                <span className={styles.stepIcon}>📥</span>
-                <span className={styles.stepText}>
-                  <strong>Long-press</strong> to send a piece to the drawer
-                </span>
-              </div>
-
-              <div className={styles.tutorialStep}>
-                <span className={styles.stepIcon}>✨</span>
-                <span className={styles.stepText}>
-                  Pieces <strong>snap together</strong> when aligned
-                </span>
-              </div>
+        <div className={styles.tutorialSteps}>
+          {/* Moving */}
+          <div className={styles.tutorialStep}>
+            <span className={styles.stepIcon}>👆</span>
+            <div className={styles.stepContent}>
+              <strong>Moving Pieces</strong>
+              <p>
+                {isTouch
+                  ? "Touch and drag pieces to move them around the board."
+                  : "Click and drag pieces to move them around the board."}
+              </p>
             </div>
-          </>
-        ) : (
-          <>
-            <h2 className={styles.tutorialTitle}>How to Play</h2>
+          </div>
 
-            <div className={styles.tutorialSteps}>
-              <div className={styles.tutorialStep}>
-                <span className={styles.stepIcon}>🖱️</span>
-                <span className={styles.stepText}>
-                  <strong>Click & drag</strong> pieces to move them
-                </span>
-              </div>
-
-              <div className={styles.tutorialStep}>
-                <span className={styles.stepIcon}>🔄</span>
-                <span className={styles.stepText}>
-                  <strong>Right-click</strong> to rotate a piece
-                </span>
-              </div>
-
-              <div className={styles.tutorialStep}>
-                <span className={styles.stepIcon}>📥</span>
-                <span className={styles.stepText}>
-                  <strong>Middle-click</strong> to send a piece to the drawer
-                </span>
-              </div>
-
-              <div className={styles.tutorialStep}>
-                <span className={styles.stepIcon}>⌨️</span>
-                <span className={styles.stepText}>
-                  Use <strong>keyboard shortcuts</strong> to move and rotate pieces
-                </span>
-              </div>
-
-              <div className={styles.tutorialStep}>
-                <span className={styles.stepIcon}>✨</span>
-                <span className={styles.stepText}>
-                  Pieces <strong>snap together</strong> when aligned
-                </span>
-              </div>
+          {/* Rotating */}
+          <div className={styles.tutorialStep}>
+            <span className={styles.stepIcon}>🔄</span>
+            <div className={styles.stepContent}>
+              <strong>Rotating Pieces</strong>
+              <p>
+                {isTouch
+                  ? "Single-tap a piece to rotate it 90°."
+                  : "Right-click a piece to rotate it 90°."}
+              </p>
             </div>
-          </>
-        )}
+          </div>
+
+          {/* Tray */}
+          <div className={styles.tutorialStep}>
+            <span className={styles.stepIcon}>📥</span>
+            <div className={styles.stepContent}>
+              <strong>Piece Drawer</strong>
+              <p>
+                {isTouch
+                  ? "Long-press a piece to send it to the drawer."
+                  : "Middle-click a piece to send it to the drawer."}
+              </p>
+              <p>Tap a piece in the drawer to bring it back to the board.</p>
+            </div>
+          </div>
+
+          {/* Tips */}
+          <div className={styles.tutorialStep}>
+            <span className={styles.stepIcon}>✨</span>
+            <div className={styles.stepContent}>
+              <strong>Tips</strong>
+              <ul>
+                <li>Start with edge and corner pieces</li>
+                <li>Group pieces by color or pattern</li>
+                <li>Use Preview to see the full image</li>
+                <li>Pieces snap together when aligned correctly</li>
+              </ul>
+            </div>
+          </div>
+        </div>
 
         <div className={styles.tutorialFooter}>
           <Button variant="primary" onClick={handleDismiss} fullWidth>
             Start Puzzling!
           </Button>
           <button className={styles.skipLink} onClick={handleDismiss}>
-            Don&apos;t show this again
+            Don’t show this again
           </button>
         </div>
       </div>

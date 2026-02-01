@@ -174,11 +174,63 @@
     font-size: 20px;
   }
 
-  .tutorialStep {
-    padding: 10px;
-  }
+.tutorialStep {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
 
   .stepText {
     font-size: 13px;
   }
+    .stepContent {
+    gap: 4px;
+  }
+}
+
+.tutorialSubtitle {
+margin: 8px 0 14px 0;
+opacity: 0.8;
+font-size: 14px;
+line-height: 1.4;
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* this creates the “return” spacing */
+  min-width: 0;
+}
+
+/* Make the title feel like a header */
+.stepContent strong {
+  display: block;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* Normalize paragraph spacing so it doesn’t look cramped */
+.stepContent p {
+  margin: 0;            /* prevent default huge margins */
+  line-height: 1.35;
+  opacity: 0.9;
+}
+
+/* Tips list spacing */
+.stepContent ul {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.35;
+}
+
+.stepContent li {
+  margin: 2px 0;
+}
+
+/* Optional: intro spacing */
+.tutorialIntro {
+  margin: 10px 0 14px 0;
+  line-height: 1.4;
+  opacity: 0.9;
 }
