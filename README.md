@@ -350,7 +350,7 @@ Category = folder name, puzzle name = filename.
 
 ## Contributing
 
-We [b]love[/b] help.
+We <strong>love help</strong>.
 
 If you want to:
 
