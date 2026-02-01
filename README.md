@@ -9,8 +9,35 @@
 A cozy, modern jigsaw puzzle game built with React.  
 Upload an image, break it into pieces, and snap them together piece by piece.
 
-- [Play it live](https://phuzzle.vercel.app)
+- [Play it live](https://phuzzle.vercel.app) 
 - [Source code](https://github.com/NickTheDevOpsGuy/phuzzle)
+
+---
+
+## 📑 Table of Contents
+
+- [Preview](#preview)
+- [What is Phuzzle?](#-what-is-phuzzle)
+- [User Stories](#user-stories)
+- [Features](#-features)
+- [Roadmap](#-roadmap)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+- [Adding Sample Puzzles](#-adding-sample-puzzles)
+- [Project Structure](#-project-structure)
+- [Contributing](#-contributing)
+- [Team](#-team)
+- [License](#-license)
+
+---
+
+## Preview
+
+### Gameplay Demo
+
+[![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
+
+**▶️ Play Now:** https://phuzzle.vercel.app/
 
 ---
 
@@ -25,8 +52,24 @@ Phuzzle is a fully interactive jigsaw puzzle experience focused on:
 
 It started as a small side project and evolved into a surprisingly deep puzzle engine with strong UX polish.
 
-**Goal:**  
+**Purpose:**  
 A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
+
+---
+
+## User Stories
+
+### Players want:
+- To upload an image and instantly generate a puzzle
+- Smooth, intuitive drag-and-drop
+- Pieces that snap when correctly aligned
+- A reference image for guidance
+- A relaxing, clutter-free experience
+
+### Developers want:
+- Predictable puzzle-generation logic
+- A structure that supports expansion
+- A roadmap that welcomes contribution
 
 ---
 
@@ -68,19 +111,20 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 ## 🗺️ Roadmap
 
 ### ✅ Completed
-- Core drag / rotate / snap mechanics  
+- Drag-and-drop pieces with rotation  
 - Interlocking piece shapes  
+- Board + neighbor snapping  
 - Piece merging and group movement  
 - Tray system with color sorting  
 - Multiple difficulty levels  
-- Reference preview  
-- Timer and progress tracking  
+- Reference preview overlay  
+- Progress counter and timer  
 - Auto-save  
 - Confetti celebration  
 - Mobile support with haptics  
 - Sound effects  
 - Fullscreen mode  
-- Keyboard navigation  
+- Keyboard shortcuts  
 - Tutorial overlay  
 - Sample puzzle gallery  
 - Vercel deployment  
@@ -124,19 +168,202 @@ npm run dev
 
 ---
 
+## 🧩 Adding Sample Puzzles
+
+Drop images into:
+
+```
+src/app/assets/puzzles/<category>/
+```
+
+Example:
+
+```
+src/app/assets/puzzles/
+  animals/
+    kitten.png
+  nature/
+    mountain.jpg
+```
+
+Images are auto-discovered.  
+Category = folder name, puzzle name = filename.
+
+---
+
+## 🗂️ Project Structure
+
+<summary>📁 Click to expand file structure</summary>
+
+```plaintext
+
+.
+├── .github
+│   ├── ISSUE_TEMPLATE
+│   │   ├── bug.yml
+│   │   ├── config.yml
+│   │   ├── documentation.yml
+│   │   ├── enhancement_refactor.yml
+│   │   ├── feature_request.yml
+│   │   └── question_discussion.yml
+│   ├── workflows
+│   │   ├── CODEOWNERS
+│   │   ├── Phuzzle.yml
+│   │   └── vercel-production.yml
+│   └── pull_request_template.md
+├── .husky
+│   ├── pre-commit
+│   └── pre-push
+├── .vite
+│   └── deps
+│       ├── _metadata.json
+│       └── package.json
+├── Assets
+│   └── Preview
+│       └── preview.gif
+├── public
+│   └── favicon.svg
+├── scripts
+│   └── precheck.sh
+├── src
+│   ├── app
+│   │   ├── assets
+│   │   │   ├── puzzles
+│   │   │   │   ├── animals
+│   │   │   │   │   ├── bear.png
+│   │   │   │   │   ├── frog.png
+│   │   │   │   │   ├── kitten.png
+│   │   │   │   │   └── rabbit.png
+│   │   │   │   ├── demo
+│   │   │   │   │   ├── blue_square_thumb.png
+│   │   │   │   │   ├── four_quadrants_thumb.png
+│   │   │   │   │   ├── green_triangle_thumb.png
+│   │   │   │   │   ├── red_circle_thumb.png
+│   │   │   │   │   ├── two_color_split_thumb.png
+│   │   │   │   │   └── yellow_star_thumb.png
+│   │   │   │   └── nature
+│   │   │   └── ui
+│   │   │       └── phuzzle-logo-512.png
+│   │   ├── audio
+│   │   │   └── sounds.ts
+│   │   ├── components
+│   │   │   ├── Button
+│   │   │   │   ├── Button.module.css
+│   │   │   │   └── Button.tsx
+│   │   │   ├── DropDown
+│   │   │   │   ├── Dropdown.module.css
+│   │   │   │   └── Dropdown.tsx
+│   │   │   ├── HowToPlay
+│   │   │   │   ├── HowToPlay.module.css
+│   │   │   │   ├── HowToPlayModal.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── TutorialOverlay.tsx
+│   │   │   ├── Modal
+│   │   │   │   ├── Modal.module.css
+│   │   │   │   └── Modal.tsx
+│   │   │   ├── PieceTray
+│   │   │   │   ├── PieceTray.module.css
+│   │   │   │   └── PieceTray.tsx
+│   │   │   ├── ShortcutsModal
+│   │   │   │   ├── ShortcutsModal.module.css
+│   │   │   │   └── ShortcutsModal.tsx
+│   │   │   └── Tray
+│   │   │       ├── Tray.module.css
+│   │   │       └── Tray.tsx
+│   │   ├── data
+│   │   │   └── samplePuzzles.ts
+│   │   ├── hooks
+│   │   │   └── useKeyboardShortcuts.ts
+│   │   ├── puzzle
+│   │   │   ├── canvas
+│   │   │   │   ├── pickPiece.ts
+│   │   │   │   ├── renderBoard.ts
+│   │   │   │   ├── renderTrayPiece.ts
+│   │   │   │   └── shape.ts
+│   │   │   ├── factories
+│   │   │   │   └── createInitialPieces.ts
+│   │   │   ├── colorUtils.ts
+│   │   │   ├── config.ts
+│   │   │   ├── PuzzleManager.ts
+│   │   │   ├── puzzleStorage.ts
+│   │   │   ├── shape.ts
+│   │   │   ├── SnapLogic.ts
+│   │   │   └── types.ts
+│   │   ├── screens
+│   │   │   ├── Menu
+│   │   │   │   ├── MenuScreen.module.css
+│   │   │   │   └── MenuScreen.tsx
+│   │   │   ├── NewGame
+│   │   │   │   ├── NewGameScreen.module.css
+│   │   │   │   └── NewGameScreen.tsx
+│   │   │   ├── Play
+│   │   │   │   ├── components
+│   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── HeaderMenu.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── PauseOverlay.tsx
+│   │   │   │   │   ├── PlayHUD.tsx
+│   │   │   │   │   └── TopBarButtons.tsx
+│   │   │   │   ├── hooks
+│   │   │   │   │   ├── useCoarsePointer.ts
+│   │   │   │   │   ├── useHaptics.ts
+│   │   │   │   │   ├── useInputHints.ts
+│   │   │   │   │   ├── usePointerHandlers.ts
+│   │   │   │   │   ├── usePuzzleLifecycle.ts
+│   │   │   │   │   └── useShareResults.ts
+│   │   │   │   ├── PlayScreen.module.css
+│   │   │   │   ├── PlayScreen.tsx
+│   │   │   │   └── playUtils.ts
+│   │   │   └── Setup
+│   │   │       ├── SetupScreen.module.css
+│   │   │       └── SetupScreen.tsx
+│   │   ├── styles
+│   │   │   └── global.css
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts
+│   └── types
+│       ├── canvas-confetti.d.ts
+│       └── vite-env.d.ts
+├── .env.development
+├── .env.example
+├── .gitignore
+├── .prettierignore
+├── .prettierrc.yml
+├── CONTRIBUTORS.md
+├── eslint.config.ts
+├── index.html
+├── LICENSE.md
+├── package-lock.json
+├── package.json
+├── README.md
+├── tsconfig.app.json
+├── tsconfig.app.tsbuildinfo
+├── tsconfig.json
+├── tsconfig.node.json
+├── vercel.json
+└── vite.config.ts
+
+```
+
+</details>
+
+---
+
 ## 🤝 Contributing
 
 We love help.
 
 If you want to:
-- fix a bug
+
+- fix bugs
 - improve performance
 - add features
 - learn how puzzle engines work
 
 **DM us** to join the Discord and get involved.
 
-This project is built collaboratively with care, curiosity, and zero ego.
+No gatekeeping. No ego. Just building something fun together.
 
 ---
 
@@ -146,6 +373,9 @@ Built by:
 - **Nick**
 - **Vinay**
 - **Hannah**
+
+With help from the wider community ❤️  
+See all contributors here → **[CONTRIBUTORS.md](./CONTRIBUTORS.md)**
 
 Different strengths, shared ownership, great teamwork.
 
