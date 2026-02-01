@@ -1,148 +1,182 @@
 // src/app/components/PieceTray/PieceTray.tsx
-import React, { useRef, useEffect } from "react";
-import type { Piece, GridSize } from "@/puzzle/types";
+import React, { useMemo, useState } from "react";
+import type { Piece } from "@/puzzle/types";
+import { getAverageColor } from "@/puzzle/colorUtils";
 import styles from "./PieceTray.module.css";
 
-// Detect touch device
-const isTouchDevice = () =>
-  typeof window !== "undefined" &&
-  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+type TraySection = "all" | "corners" | "edges" | "center";
+type SortMode = "grid" | "color";
 
-type PieceTrayProps = {
+type Props = {
   pieces: Piece[];
   image: HTMLImageElement | null;
-  grid: GridSize;
+  grid: { rows: number; cols: number };
   onPieceClick: (pieceId: string) => void;
+  isCoarsePointer: boolean;
 };
 
-export function PieceTray({ pieces, image, grid, onPieceClick }: PieceTrayProps) {
-  const isTouch = isTouchDevice();
+function isCorner(p: Piece, grid: { rows: number; cols: number }) {
+  const lastRow = grid.rows - 1;
+  const lastCol = grid.cols - 1;
+  return (
+    (p.row === 0 && p.col === 0) ||
+    (p.row === 0 && p.col === lastCol) ||
+    (p.row === lastRow && p.col === 0) ||
+    (p.row === lastRow && p.col === lastCol)
+  );
+}
 
-  const helpText = isTouch
-    ? "Long-press to store • Double-tap to rotate"
+function isEdge(p: Piece, grid: { rows: number; cols: number }) {
+  const lastRow = grid.rows - 1;
+  const lastCol = grid.cols - 1;
+  if (isCorner(p, grid)) return false;
+  return p.row === 0 || p.row === lastRow || p.col === 0 || p.col === lastCol;
+}
+
+export function PieceTray({ pieces, image, grid, onPieceClick, isCoarsePointer }: Props) {
+  const [section, setSection] = useState<TraySection>("all");
+  const [sortMode, setSortMode] = useState<SortMode>("grid");
+
+  // Precompute hue for stable-ish sorting.
+  const hueById = useMemo(() => {
+    const m = new Map<string, number>();
+    if (!image) return m;
+    for (const p of pieces) {
+      const c = getAverageColor(image, p, grid);
+      m.set(p.id, c.hue);
+    }
+    return m;
+  }, [image, pieces, grid]);
+
+  const byGrid = (a: Piece, b: Piece) =>
+    a.row - b.row || a.col - b.col || a.id.localeCompare(b.id);
+  const byHue = (a: Piece, b: Piece) => {
+    const ha = hueById.get(a.id);
+    const hb = hueById.get(b.id);
+    if (ha == null && hb == null) return byGrid(a, b);
+    if (ha == null) return 1;
+    if (hb == null) return -1;
+    return ha - hb || byGrid(a, b);
+  };
+
+  const sortPieces = (arr: Piece[]) => {
+    const next = [...arr];
+    if (sortMode === "color" && image) next.sort(byHue);
+    else next.sort(byGrid);
+    return next;
+  };
+
+  const sections = useMemo(() => {
+    const corners = pieces.filter((p) => isCorner(p, grid));
+    const edges = pieces.filter((p) => isEdge(p, grid));
+    const center = pieces.filter((p) => !isCorner(p, grid) && !isEdge(p, grid));
+
+    return {
+      all: sortPieces(pieces),
+      corners: sortPieces(corners),
+      edges: sortPieces(edges),
+      center: sortPieces(center),
+    };
+  }, [pieces, grid, sortMode, image, hueById]);
+
+  const displayed = sections[section];
+
+  const helpText = isCoarsePointer
+    ? "Long-press to store • Tap to rotate"
     : "Middle-click to store • Right-click to rotate";
 
-  const emptyText = isTouch
+  const emptyText = isCoarsePointer
     ? "Long-press pieces to store them here"
     : "Middle-click pieces to store them here";
 
   return (
     <div className={styles.tray}>
-      <div className={styles.trayHeader}>
-        <span>Piece Drawer ({pieces.length})</span>
-        <span className={styles.trayHelp}>{helpText}</span>
+      <div className={styles.header}>
+        <div className={styles.title}>Piece Drawer ({pieces.length})</div>
+        <div className={styles.help}>{helpText}</div>
       </div>
-      <div className={styles.trayScroll}>
-        {pieces.length === 0 ? (
-          <div className={styles.trayEmpty}>{emptyText}</div>
+
+      <div className={styles.controls}>
+        <div className={styles.segment} aria-label="Tray section">
+          <button
+            type="button"
+            className={section === "all" ? styles.active : undefined}
+            onClick={() => setSection("all")}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            className={section === "edges" ? styles.active : undefined}
+            onClick={() => setSection("edges")}
+          >
+            Edges
+          </button>
+          <button
+            type="button"
+            className={section === "center" ? styles.active : undefined}
+            onClick={() => setSection("center")}
+          >
+            Center
+          </button>
+          <button
+            type="button"
+            className={section === "corners" ? styles.active : undefined}
+            onClick={() => setSection("corners")}
+          >
+            Corners
+          </button>
+        </div>
+
+        <div className={styles.sort} aria-label="Tray sort">
+          <button
+            type="button"
+            className={sortMode === "grid" ? styles.active : undefined}
+            onClick={() => setSortMode("grid")}
+          >
+            Grid
+          </button>
+          <button
+            type="button"
+            className={sortMode === "color" ? styles.active : undefined}
+            onClick={() => setSortMode("color")}
+          >
+            Color
+          </button>
+        </div>
+      </div>
+
+      <div className={styles.scroller}>
+        {displayed.length === 0 ? (
+          <div className={styles.empty}>{emptyText}</div>
         ) : (
-          <div className={styles.trayPieces}>
-            {pieces.map((piece) => (
-              <TrayPieceThumb
-                key={piece.id}
-                piece={piece}
-                image={image}
-                grid={grid}
-                onClick={() => onPieceClick(piece.id)}
-              />
-            ))}
-          </div>
+          displayed.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              className={styles.pieceButton}
+              onClick={() => onPieceClick(p.id)}
+              aria-label={`Place piece ${p.id}`}
+            >
+              <div className={styles.thumbWrap}>
+                {/* Render via background-position on the wrapper so we don't need a canvas here */}
+                <div
+                  className={styles.thumb}
+                  style={
+                    image
+                      ? {
+                          backgroundImage: `url(${image.src})`,
+                          backgroundSize: `${grid.cols * p.tileW}px ${grid.rows * p.tileH}px`,
+                          backgroundPosition: `${-p.col * p.tileW}px ${-p.row * p.tileH}px`,
+                        }
+                      : undefined
+                  }
+                />
+              </div>
+            </button>
+          ))
         )}
       </div>
     </div>
-  );
-}
-
-type TrayPieceThumbProps = {
-  piece: Piece;
-  image: HTMLImageElement | null;
-  grid: GridSize;
-  onClick: () => void;
-};
-
-function TrayPieceThumb({ piece, image, grid, onClick }: TrayPieceThumbProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // Thumbnail size
-  const thumbSize = 64;
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !image || image.naturalWidth === 0) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = thumbSize * dpr;
-    canvas.height = thumbSize * dpr;
-    canvas.style.width = `${thumbSize}px`;
-    canvas.style.height = `${thumbSize}px`;
-
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, thumbSize, thumbSize);
-
-    // Calculate source region
-    const srcTileW = image.naturalWidth / grid.cols;
-    const srcTileH = image.naturalHeight / grid.rows;
-
-    const srcPadX = (piece.pad / piece.tileW) * srcTileW;
-    const srcPadY = (piece.pad / piece.tileH) * srcTileH;
-
-    const srcX = piece.col * srcTileW - srcPadX;
-    const srcY = piece.row * srcTileH - srcPadY;
-    const srcW = srcTileW + srcPadX * 2;
-    const srcH = srcTileH + srcPadY * 2;
-
-    // Scale to fit thumbnail while maintaining aspect
-    const scale = Math.min(thumbSize / piece.w, thumbSize / piece.h) * 0.9;
-
-    // Create clipping path from piece shape
-    let path: Path2D | null = null;
-    try {
-      if (piece.shapePath) {
-        path = new Path2D(piece.shapePath);
-      }
-    } catch {
-      path = null;
-    }
-
-    ctx.save();
-
-    // Center and scale
-    ctx.translate(thumbSize / 2, thumbSize / 2);
-    ctx.scale(scale, scale);
-    ctx.translate(-piece.w / 2, -piece.h / 2);
-
-    // Clip to piece shape
-    if (path) {
-      ctx.clip(path);
-    }
-
-    // Draw the image slice
-    ctx.drawImage(image, srcX, srcY, srcW, srcH, 0, 0, piece.w, piece.h);
-
-    ctx.restore();
-
-    // Draw outline
-    if (path) {
-      ctx.save();
-      ctx.translate(thumbSize / 2, thumbSize / 2);
-      ctx.scale(scale, scale);
-      ctx.translate(-piece.w / 2, -piece.h / 2);
-      ctx.strokeStyle = "rgba(0,0,0,0.3)";
-      ctx.lineWidth = 1 / scale;
-      ctx.stroke(path);
-      ctx.restore();
-    }
-  }, [piece, image, grid]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className={styles.trayPiece}
-      onClick={onClick}
-      title={`Piece ${piece.id} (row ${piece.row + 1}, col ${piece.col + 1})`}
-    />
   );
 }

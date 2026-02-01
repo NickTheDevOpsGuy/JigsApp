@@ -4,10 +4,23 @@ import { Modal } from "@/components/Modal/Modal";
 import { Button } from "@/components/Button/Button";
 import styles from "./HowToPlay.module.css";
 
-// Detect touch device
-const isTouchDevice = () =>
-  typeof window !== "undefined" &&
-  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+// Detect touch-first devices. We lean toward "touch" when uncertain to avoid
+// showing mouse-only tips (right-click) on mobile.
+const isTouchDevice = () => {
+  if (typeof window === "undefined") return false;
+  try {
+    return (
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0 ||
+      // Prefer treating "hover: none" and coarse pointers as touch.
+      window.matchMedia?.("(hover: none)").matches ||
+      window.matchMedia?.("(pointer: coarse)").matches ||
+      /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    );
+  } catch {
+    return false;
+  }
+};
 
 type HowToPlayModalProps = {
   isOpen: boolean;

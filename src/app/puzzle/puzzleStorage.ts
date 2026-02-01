@@ -8,7 +8,7 @@ const PUZZLE_STATE_KEY = "phuzzle:puzzleState";
  * Minimal piece data needed to restore state.
  * We don't save shapePath (regenerated) or dimensions (computed from grid).
  */
-type SavedPiece = {
+export type SavedPiece = {
   id: string;
   row: number;
   col: number;

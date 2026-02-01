@@ -198,3 +198,17 @@
     font-size: 0.9rem;
   }
 }
+
+.navNote {
+  margin: 12px 0 0 0;
+  padding: 10px 12px;
+  background: rgba(59, 130, 246, 0.08);
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.navNote strong {
+  color: #1d4ed8;
+}

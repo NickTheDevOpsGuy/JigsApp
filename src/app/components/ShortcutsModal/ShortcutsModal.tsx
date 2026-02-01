@@ -68,7 +68,7 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
                 </tr>
                 <tr>
                   <td className={styles.keys}>
-                    <kbd className={styles.key}>Double Tap</kbd>
+                    <kbd className={styles.key}>Tap</kbd>
                   </td>
                   <td className={styles.action}>Rotate piece (touch)</td>
                 </tr>
@@ -80,6 +80,31 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div className={styles.mouseSection}>
+            <h3>Navigation Tips</h3>
+            <table className={styles.table}>
+              <tbody>
+                <tr>
+                  <td className={styles.keys}>
+                    <kbd className={styles.key}>Scroll Wheel</kbd>
+                  </td>
+                  <td className={styles.action}>Scroll page (no zoom)</td>
+                </tr>
+                <tr>
+                  <td className={styles.keys}>
+                    <kbd className={styles.key}>Pinch</kbd>
+                  </td>
+                  <td className={styles.action}>Browser zoom (touch)</td>
+                </tr>
+              </tbody>
+            </table>
+            <p className={styles.navNote}>
+              💡 <strong>Tip:</strong> The puzzle board fits your screen. Use the piece
+              tray at the bottom to organize pieces, and use the arrow keys to nudge
+              selected pieces.
+            </p>
           </div>
         </div>
 
