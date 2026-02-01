@@ -1,7 +1,7 @@
 /* src/app/components/PieceTray/PieceTray.module.css */
 
 .tray {
-  height: 120px;
+  height: 150px;
   flex-shrink: 0;
 
   display: flex;
@@ -18,10 +18,10 @@
   overflow: hidden;
 }
 
-.trayHeader {
-  padding: 10px 14px;
+.header {
+  padding: 8px 14px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   background: rgba(0, 0, 0, 0.02);
   flex-shrink: 0;
@@ -30,42 +30,106 @@
   align-items: center;
 }
 
-.trayHelp {
+.title {
+  font-weight: 600;
+}
+
+.help {
   font-weight: 400;
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(0, 0, 0, 0.5);
 }
 
-.trayScroll {
+.controls {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(248, 250, 252, 0.95);
+}
+
+.segment,
+.sort {
+  display: flex;
+  gap: 4px;
+}
+
+.segment button,
+.sort button {
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #ffffff;
+  color: rgba(17, 24, 39, 0.85);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.segment button:hover,
+.sort button:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.segment button.active,
+.sort button.active {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.5);
+  color: rgba(29, 78, 216, 1);
+}
+
+.scroller {
   flex: 1;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 8px 12px;
-}
-
-.trayPieces {
   display: flex;
   gap: 8px;
-  height: 100%;
   align-items: center;
 }
 
-.trayPiece {
+.pieceButton {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 2px;
   cursor: pointer;
-  border-radius: 4px;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+  border-radius: 6px;
+  transition: all 0.15s ease;
   flex-shrink: 0;
-  background: rgba(0, 0, 0, 0.02);
 }
 
-.trayPiece:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.pieceButton:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: scale(1.08);
 }
 
-.trayEmpty {
+.pieceButton:active {
+  transform: scale(0.98);
+}
+
+.thumbWrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.thumb {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+}
+
+.empty {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,4 +137,38 @@
   height: 100%;
   color: rgba(0, 0, 0, 0.4);
   font-style: italic;
+  font-size: 13px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .tray {
+    margin: 0 8px 8px 8px;
+    height: 130px;
+  }
+
+  .header {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .help {
+    display: none;
+  }
+
+  .controls {
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  .segment button,
+  .sort button {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .thumbWrap {
+    width: 48px;
+    height: 48px;
+  }
 }

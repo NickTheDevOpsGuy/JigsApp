@@ -1,12 +1,5 @@
-import type {
-  DragState,
-  GridSize,
-  Piece,
-  PieceEdges,
-  PieceId,
-  PuzzleState,
-} from "./types";
-import { buildPiecePath } from "./shape";
+import type { DragState, GridSize, Piece, PieceId, PuzzleState } from "./types";
+import { createInitialPieces } from "./factories/createInitialPieces";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
@@ -93,12 +86,18 @@ export class PuzzleManager {
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
     this.zCounter = 10;
 
-    const pieces = this.createPieces({
+    const pieces = createInitialPieces({
       grid,
+      boardWidth: this.boardWidth,
+      boardHeight: this.boardHeight,
       scatterPadding,
       pad,
       tileW: pieceWidth,
       tileH: pieceHeight,
+      scatterStartYRatio: this.scatterStartYRatio,
+      rotationStepDeg: this.rotationStepDeg,
+      targetStartX: this.targetStartX,
+      targetStartY: this.targetStartY,
     });
 
     this.state = {
@@ -492,6 +491,15 @@ export class PuzzleManager {
 
     const intoGroup = best.neighbor.groupId;
     this.mergeGroups(gid, intoGroup);
+    // After merging, align merged group toward board target using reference piece
+    const ref = this.getGroupPieces(intoGroup)[0];
+    if (ref) {
+      const tile = this.tilePos(ref);
+      const dxBoard = ref.targetX - tile.x;
+      const dyBoard = ref.targetY - tile.y;
+      // Move group closer to its solved board position
+      this.shiftGroupUnclamped(intoGroup, dxBoard, dyBoard);
+    }
 
     this.events.onPieceSnapped?.();
 
@@ -502,11 +510,54 @@ export class PuzzleManager {
       ),
     };
 
-    // After merging, check if the puzzle is now complete
-    // If all pieces are in one group, snap the whole thing to the board target position
-    this.trySnapCompletedPuzzleToBoard(intoGroup);
+    // After merging, try to snap the merged group to board target position
+    this.trySnapMergedGroupToBoard(intoGroup);
 
     return true;
+  }
+
+  /**
+   * After pieces merge, snap the merged group to its correct board position
+   * if all pieces in the group are at rotation 0 and would land at valid targets.
+   */
+  private trySnapMergedGroupToBoard(groupId: string): void {
+    const groupPieces = this.getGroupPieces(groupId);
+    if (groupPieces.length === 0) return;
+
+    // All pieces must be at rotation 0
+    if (!groupPieces.every((p) => p.rotation === 0)) return;
+
+    // Use first piece as reference to calculate offset to target
+    const refPiece = groupPieces[0];
+    const refTile = this.tilePos(refPiece);
+    const dx = refPiece.targetX - refTile.x;
+    const dy = refPiece.targetY - refTile.y;
+
+    // If already at target, nothing to do
+    if (dx === 0 && dy === 0) return;
+
+    // Check if moving would overlap with other groups
+    if (this.wouldOverlapAnyOtherGroup(groupId, dx, dy)) return;
+
+    // Snap the group to target position
+    this.shiftGroup(groupId, dx, dy);
+
+    // Check if all pieces are now correctly placed
+    const allCorrect = groupPieces.every((p) => {
+      const tile = this.tilePos(p);
+      return Math.hypot(p.targetX - tile.x, p.targetY - tile.y) < 1;
+    });
+
+    if (allCorrect) {
+      // Mark all pieces as placed
+      this.state = {
+        ...this.state,
+        pieces: this.state.pieces.map((p) =>
+          p.groupId === groupId ? { ...p, isPlaced: true, justSnapped: true } : p,
+        ),
+      };
+      this.events.onPiecePlaced?.(refPiece);
+    }
   }
 
   /**
@@ -878,151 +929,5 @@ export class PuzzleManager {
 
   private rand(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  private randRotation(): number {
-    const steps = 360 / this.rotationStepDeg;
-    const k = this.rand(0, steps - 1);
-    return (k * this.rotationStepDeg) % 360;
-  }
-
-  private buildEdgesForGrid(grid: GridSize): PieceEdges[] {
-    const edges: PieceEdges[] = [];
-
-    const randomTabOrBlank = (): "tab" | "blank" =>
-      Math.random() < 0.5 ? "tab" : "blank";
-    const opposite = (e: PieceEdges["top"]): PieceEdges["top"] => {
-      if (e === "flat") return "flat";
-      return e === "tab" ? "blank" : "tab";
-    };
-
-    for (let r = 0; r < grid.rows; r++) {
-      for (let c = 0; c < grid.cols; c++) {
-        const top: PieceEdges["top"] =
-          r === 0 ? "flat" : opposite(edges[(r - 1) * grid.cols + c].bottom);
-
-        const left: PieceEdges["left"] =
-          c === 0 ? "flat" : opposite(edges[r * grid.cols + (c - 1)].right);
-
-        const right: PieceEdges["right"] =
-          c === grid.cols - 1 ? "flat" : randomTabOrBlank();
-        const bottom: PieceEdges["bottom"] =
-          r === grid.rows - 1 ? "flat" : randomTabOrBlank();
-
-        edges.push({ top, right, bottom, left });
-      }
-    }
-
-    return edges;
-  }
-
-  private createPieces(args: {
-    grid: GridSize;
-    scatterPadding: number;
-    pad: number;
-    tileW: number;
-    tileH: number;
-  }): Piece[] {
-    const { grid, scatterPadding, pad, tileW, tileH } = args;
-
-    const total = grid.cols * grid.rows;
-    const edges = this.buildEdgesForGrid(grid);
-
-    const w = tileW + pad * 2;
-    const h = tileH + pad * 2;
-
-    const scatterStartY = Math.max(
-      scatterPadding,
-      Math.floor(this.boardHeight * this.scatterStartYRatio),
-    );
-
-    const scatterZone = {
-      minX: scatterPadding,
-      maxX: Math.max(scatterPadding + w, this.boardWidth - scatterPadding),
-      minY: scatterStartY,
-      maxY: Math.max(scatterStartY + h, this.boardHeight - scatterPadding),
-    };
-
-    const zoneWidth = scatterZone.maxX - scatterZone.minX;
-    const zoneHeight = scatterZone.maxY - scatterZone.minY;
-
-    const spacing = 8;
-    const cellW = w + spacing;
-    const cellH = h + spacing;
-
-    const gridCols = Math.max(1, Math.floor(zoneWidth / cellW));
-    const gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
-
-    const positions: Array<{ x: number; y: number }> = [];
-    for (let row = 0; row < gridRows; row++) {
-      for (let col = 0; col < gridCols; col++) {
-        const jitterX = this.rand(0, Math.min(spacing * 2, cellW - w));
-        const jitterY = this.rand(0, Math.min(spacing * 2, cellH - h));
-
-        positions.push({
-          x: scatterZone.minX + col * cellW + jitterX,
-          y: scatterZone.minY + row * cellH + jitterY,
-        });
-      }
-    }
-
-    for (let i = positions.length - 1; i > 0; i--) {
-      const j = this.rand(0, i);
-      [positions[i], positions[j]] = [positions[j], positions[i]];
-    }
-
-    while (positions.length < total) {
-      positions.push({
-        x: this.rand(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
-        y: this.rand(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
-      });
-    }
-
-    const pieces: Piece[] = [];
-
-    for (let i = 0; i < total; i++) {
-      const col = i % grid.cols;
-      const row = Math.floor(i / grid.cols);
-
-      const targetX = this.targetStartX + col * tileW;
-      const targetY = this.targetStartY + row * tileH;
-
-      const pos = positions[i];
-      const x = pos.x;
-      const y = pos.y;
-
-      const shapePath = buildPiecePath({
-        tileW,
-        tileH,
-        pad,
-        edges: edges[i],
-      });
-
-      pieces.push({
-        id: `p${i + 1}`,
-        row,
-        col,
-        x,
-        y,
-        z: 1,
-        w,
-        h,
-        tileW,
-        tileH,
-        pad,
-        targetX,
-        targetY,
-        rotation: this.randRotation(),
-        targetRotation: 0,
-        isPlaced: false,
-        groupId: `g${i + 1}`,
-        justSnapped: false,
-        shapePath,
-        edges: edges[i],
-        inTray: false,
-      });
-    }
-
-    return pieces;
   }
 }

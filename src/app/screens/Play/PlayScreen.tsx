@@ -5,42 +5,30 @@ import styles from "./PlayScreen.module.css";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
-import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
-import { Button } from "@/components/Button/Button";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
-import { getAverageColor } from "@/puzzle/colorUtils";
 import {
   savePuzzleState,
   loadPuzzleState,
   clearPuzzleState,
 } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
-import {
-  Menu,
-  Eye,
-  EyeOff,
-  Plus,
-  Clock,
-  Puzzle,
-  Bug,
-  Volume2,
-  VolumeX,
-  Maximize,
-  Minimize,
-  Smartphone,
-  VolumeOff,
-  Pause,
-  Play,
-  Keyboard,
-  Download,
-  Share2,
-  Copy,
-  Check,
-} from "lucide-react";
 import { useKeyboardShortcuts, ShortcutAction } from "@/hooks/useKeyboardShortcuts";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
+
+import { clamp, formatTime, isTypingTarget } from "./playUtils";
+import { useShareResults } from "./hooks/useShareResults";
+import { usePointerHandlers } from "./hooks/usePointerHandlers";
+import { useHaptics } from "./hooks/useHaptics";
+import { useCoarsePointer } from "./hooks/useCoarsePointer";
+import {
+  PlayHUD,
+  CompletionOverlay,
+  PauseOverlay,
+  TopBarButtons,
+  HeaderMenu,
+} from "./components";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -61,17 +49,6 @@ type DebugFlags = {
   showIds: boolean;
 };
 
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
-
-function isTypingTarget(el: EventTarget | null) {
-  const t = el as HTMLElement | null;
-  if (!t) return false;
-  const tag = t.tagName;
-  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t.isContentEditable;
-}
-
 export function PlayScreen() {
   const navigate = useNavigate();
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -80,6 +57,9 @@ export function PlayScreen() {
 
   const popMapRef = useRef<Map<string, number>>(new Map());
   const rafRef = useRef<number | null>(null);
+
+  // Detect touch/coarse pointer devices
+  const isCoarsePointer = useCoarsePointer();
 
   // Tutorial for first-time users
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
@@ -657,185 +637,21 @@ export function PlayScreen() {
 
   // ========== POINTER EVENT HANDLERS ==========
 
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!manager || !canvasRef.current || !boardRef.current) return;
+  const haptics = useHaptics();
 
-      const canvas = canvasRef.current;
-      const boardRect = boardRef.current.getBoundingClientRect();
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      // Reset transform to identity for hit testing in CSS pixel space
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-      const cssX = e.clientX - boardRect.left;
-      const cssY = e.clientY - boardRect.top;
-
-      const st = manager.getState();
-      const boardPieces = st.pieces.filter((p) => !p.inTray);
-
-      const pieceId = pickPieceId(ctx, boardPieces, cssX, cssY);
-      if (!pieceId) return;
-
-      // Always select what we clicked
-      selectedIdRef.current = pieceId;
-      setSelectedPieceId(pieceId);
-      bump();
-
-      // Middle click (button 1) = send to tray
-      if (e.button === 1) {
-        e.preventDefault();
-        manager.movePieceToTray(pieceId);
-        setState(manager.getState());
-        // Advance selection
-        selectCycle(1);
-        return;
-      }
-
-      // Touch or left click = start drag
-      const isTouch = e.pointerType === "touch";
-      const isLeftClick = e.button === 0;
-
-      if (isTouch || isLeftClick) {
-        const piece = st.pieces.find((p) => p.id === pieceId);
-        if (!piece) return;
-
-        // Reset drag tracking for tap detection
-        didDragRef.current = false;
-
-        e.preventDefault();
-
-        const pieceRect = new DOMRect(
-          boardRect.left + piece.x,
-          boardRect.top + piece.y,
-          piece.w,
-          piece.h,
-        );
-
-        manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
-        setState(manager.getState());
-
-        try {
-          canvas.setPointerCapture(e.pointerId);
-        } catch {
-          // ignore
-        }
-
-        // Long-press timer for mobile (send to tray)
-        if (isTouch) {
-          const longPressTimer = setTimeout(() => {
-            manager.pointerUp();
-            manager.movePieceToTray(pieceId);
-            setState(manager.getState());
-            try {
-              canvas.releasePointerCapture(e.pointerId);
-            } catch {
-              // ignore
-            }
-          }, 500);
-
-          (
-            canvas as HTMLCanvasElement & {
-              longPressTimer?: ReturnType<typeof setTimeout>;
-            }
-          ).longPressTimer = longPressTimer;
-        }
-      }
-
-      // Right click = rotate (desktop)
-      if (e.button === 2) {
-        e.preventDefault();
-        const piece = st.pieces.find((p) => p.id === pieceId);
-        if (piece?.isPlaced) return;
-        manager.rotatePiece(pieceId);
-        soundManager.play("rotate");
-        setState(manager.getState());
-      }
-    },
-    [manager, selectCycle],
-  );
-
-  const handlePointerMove = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!manager || !boardRef.current) return;
-
-      // Cancel long-press on move
-      const canvas = e.currentTarget;
-      const timer = (
-        canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
-      ).longPressTimer;
-      if (timer) {
-        clearTimeout(timer);
-        (
-          canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
-        ).longPressTimer = undefined;
-      }
-
-      // Mark that we dragged (moved more than a few pixels)
-      didDragRef.current = true;
-
-      const boardRect = boardRef.current.getBoundingClientRect();
-      manager.pointerMove(e.clientX, e.clientY, boardRect);
-    },
-    [manager],
-  );
-
-  const handlePointerUp = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!manager || !canvasRef.current) return;
-
-      const canvas = canvasRef.current;
-
-      // Cancel long-press timer
-      const timer = (
-        canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
-      ).longPressTimer;
-      if (timer) {
-        clearTimeout(timer);
-        (
-          canvas as HTMLCanvasElement & { longPressTimer?: ReturnType<typeof setTimeout> }
-        ).longPressTimer = undefined;
-      }
-
-      // Check for single-tap to rotate (mobile) - tap without dragging
-      const isTouch = e.pointerType === "touch";
-      const boardRect = boardRef.current?.getBoundingClientRect();
-      const ctx = canvas.getContext("2d");
-
-      if (isTouch && boardRect && ctx && !didDragRef.current) {
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-        const st = manager.getState();
-        const x = e.clientX - boardRect.left;
-        const y = e.clientY - boardRect.top;
-        const pieceId = pickPieceId(ctx, st.pieces, x, y);
-
-        // Single tap on a piece = rotate it
-        if (pieceId) {
-          const piece = st.pieces.find((p) => p.id === pieceId);
-          if (piece && !piece.isPlaced) {
-            manager.rotatePiece(pieceId);
-            soundManager.play("rotate");
-          }
-        }
-      }
-
-      manager.pointerUp();
-      setState(manager.getState());
-
-      try {
-        canvas.releasePointerCapture(e.pointerId);
-      } catch {
-        // ignore
-      }
-    },
-    [manager],
-  );
-
-  const handleContextMenu = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-  }, []);
+  const { handlePointerDown, handlePointerMove, handlePointerUp, handleContextMenu } =
+    usePointerHandlers({
+      manager,
+      canvasRef,
+      boardRef,
+      setState,
+      selectCycle,
+      setSelectedPieceId,
+      selectedIdRef,
+      bump,
+      didDragRef,
+      haptic: haptics.vibrate,
+    });
 
   // Handle clicking a piece in the tray to bring it back to board
   const handleTrayPieceClick = useCallback(
@@ -856,69 +672,7 @@ export function PlayScreen() {
     navigate("/new");
   }, [navigate]);
 
-  // Helper to format time
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  // State for copy feedback
-  const [copied, setCopied] = useState(false);
-
-  // Generate share text
-  const getShareText = useCallback(() => {
-    const timeStr = formatTime(elapsedSeconds);
-    const pieceCount = state?.totalCount ?? 0;
-    return `🧩 I completed a ${pieceCount}-piece Phuzzle in ${timeStr}! Can you beat my time?`;
-  }, [elapsedSeconds, state?.totalCount]);
-
-  // Copy results to clipboard
-  const handleCopyResults = useCallback(async () => {
-    const text = getShareText() + " #Phuzzle";
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  }, [getShareText]);
-
-  // Social share URLs
-  const shareUrls = useMemo(() => {
-    const text = encodeURIComponent(getShareText());
-    const hashtag = encodeURIComponent("#Phuzzle");
-    const url = encodeURIComponent(window.location.origin);
-
-    return {
-      twitter: `https://twitter.com/intent/tweet?text=${text}%20${hashtag}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}%20${hashtag}`,
-      reddit: `https://reddit.com/submit?title=${text}%20${hashtag}`,
-      whatsapp: `https://wa.me/?text=${text}%20${hashtag}%20${url}`,
-    };
-  }, [getShareText]);
-
-  // Open share URL in popup
-  const openShareWindow = useCallback((url: string) => {
-    window.open(url, "_blank", "width=600,height=400,menubar=no,toolbar=no");
-  }, []);
-
-  // Native share (mobile/supported browsers)
-  const handleNativeShare = useCallback(async () => {
-    const text = getShareText();
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Phuzzle",
-          text: text,
-          url: window.location.origin,
-        });
-      } catch (err) {
-        console.log("Share cancelled or failed:", err);
-      }
-    }
-  }, [getShareText]);
+  const share = useShareResults({ elapsedSeconds, state });
 
   // Download completion image
   const handleDownloadImage = useCallback(() => {
@@ -964,22 +718,12 @@ export function PlayScreen() {
   }, [elapsedSeconds, state?.totalCount]);
 
   // Check if native share is available
-  const canNativeShare = typeof navigator !== "undefined" && !!navigator.share;
+  const canNativeShare = share.canNativeShare;
 
-  // Get tray pieces sorted by color
+  // Tray pieces (PieceTray handles sorting and sectioning)
   const trayPieces = useMemo(() => {
-    if (!state || !imgRef.current) return [];
-
-    const inTray = state.pieces.filter((p) => p.inTray);
-    if (inTray.length === 0) return [];
-
-    const img = imgRef.current;
-
-    return [...inTray].sort((a, b) => {
-      const colorA = getAverageColor(img, a, state.grid);
-      const colorB = getAverageColor(img, b, state.grid);
-      return colorA.hue - colorB.hue;
-    });
+    if (!state) return [];
+    return state.pieces.filter((p) => p.inTray);
   }, [state]);
 
   const placed = state?.placedCount ?? 0;
@@ -991,51 +735,29 @@ export function PlayScreen() {
     <div className={styles.page} ref={pageRef}>
       <div className={styles.topBar}>
         <div className={styles.topBarLeft}>
-          <Button size="sm" onClick={() => navigate("/")}>
-            <Menu size={16} />
-            <span className={styles.btnText}>Menu</span>
-          </Button>
-          <div className={styles.title}>Phuzzle</div>
-        </div>
-
-        <div className={styles.topBarCenter}>
-          <div className={styles.hud}>
-            <div className={styles.hudPillTimer}>
-              <Clock size={14} />
-              <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
-            </div>
-            <Button
-              size="sm"
-              onClick={() => setIsPaused((p) => !p)}
-              disabled={isComplete}
-            >
-              {isPaused ? <Play size={16} /> : <Pause size={16} />}
-            </Button>
-            <div className={styles.hudPill}>
-              <Puzzle size={14} />
-              <span>{left} left</span>
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.topBarRight}>
-          <Button size="sm" onClick={() => setShowPreview((p) => !p)}>
-            {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
-            <span className={styles.btnText}>{showPreview ? "Hide" : "Preview"}</span>
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => {
+          <HeaderMenu
+            title="Phuzzle"
+            showPreview={showPreview}
+            soundEnabled={soundEnabled}
+            hapticsEnabled={hapticsEnabled}
+            isFullscreen={isFullscreen}
+            canShowHaptics={
+              isCoarsePointer &&
+              typeof navigator !== "undefined" &&
+              typeof navigator.vibrate === "function"
+            }
+            canShowFullscreen={!!document.fullscreenEnabled}
+            canShowShortcuts={!isCoarsePointer}
+            canShowDebug={SHOW_DEBUG}
+            debug={debug}
+            onNewPuzzle={() => setShowNewGameModal(true)}
+            onTogglePreview={() => setShowPreview((p) => !p)}
+            onToggleSound={() => {
               const newEnabled = !soundManager.isEnabled();
               soundManager.setEnabled(newEnabled);
               setSoundEnabled(newEnabled);
             }}
-          >
-            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => {
+            onToggleHaptics={() => {
               const newEnabled = !soundManager.isHapticsEnabled();
               soundManager.setHapticsEnabled(newEnabled);
               setHapticsEnabled(newEnabled);
@@ -1043,35 +765,54 @@ export function PlayScreen() {
                 navigator.vibrate(25);
               }
             }}
-          >
-            {hapticsEnabled ? <Smartphone size={16} /> : <VolumeOff size={16} />}
-          </Button>
-          <Button size="sm" onClick={() => setShowShortcuts(true)}>
-            <Keyboard size={16} />
-          </Button>
-          <Button size="sm" onClick={toggleFullscreen}>
-            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
-          </Button>
-          {SHOW_DEBUG && (
-            <Button
-              size="sm"
-              onClick={() =>
-                setDebug((d) => ({
-                  ...d,
-                  showGrid: !d.showGrid,
-                  showBounds: !d.showBounds,
-                  showIds: !d.showIds,
-                }))
-              }
-            >
-              <Bug size={16} />
-            </Button>
-          )}
-          <Button size="sm" variant="primary" onClick={() => setShowNewGameModal(true)}>
-            <Plus size={16} />
-            <span className={styles.btnText}>New Puzzle</span>
-          </Button>
+            onToggleFullscreen={toggleFullscreen}
+            onShowShortcuts={() => setShowShortcuts(true)}
+            onToggleDebug={() =>
+              setDebug((d) => ({
+                ...d,
+                showGrid: !d.showGrid,
+                showBounds: !d.showBounds,
+                showIds: !d.showIds,
+              }))
+            }
+          />
+          <div className={styles.title}>Phuzzle</div>
         </div>
+
+        <div className={styles.topBarCenter}>
+          <PlayHUD
+            elapsedSeconds={elapsedSeconds}
+            piecesLeft={left}
+            isPaused={isPaused}
+            isComplete={isComplete}
+            onTogglePause={() => setIsPaused((p) => !p)}
+          />
+        </div>
+
+        <TopBarButtons
+          showPreview={showPreview}
+          soundEnabled={soundEnabled}
+          isFullscreen={isFullscreen}
+          showDebug={SHOW_DEBUG}
+          isCoarsePointer={isCoarsePointer}
+          onTogglePreview={() => setShowPreview((p) => !p)}
+          onToggleSound={() => {
+            const newEnabled = !soundManager.isEnabled();
+            soundManager.setEnabled(newEnabled);
+            setSoundEnabled(newEnabled);
+          }}
+          onToggleFullscreen={toggleFullscreen}
+          onShowShortcuts={() => setShowShortcuts(true)}
+          onToggleDebug={() =>
+            setDebug((d) => ({
+              ...d,
+              showGrid: !d.showGrid,
+              showBounds: !d.showBounds,
+              showIds: !d.showIds,
+            }))
+          }
+          onNewPuzzle={() => setShowNewGameModal(true)}
+        />
       </div>
 
       <ConfirmModal
@@ -1108,93 +849,22 @@ export function PlayScreen() {
           )}
 
           {/* Pause overlay */}
-          {isPaused && (
-            <div className={styles.pauseOverlay} onClick={() => setIsPaused(false)}>
-              <div className={styles.pauseContent}>
-                <Pause size={64} />
-                <h2>Paused</h2>
-                <p>Click anywhere or press the Resume button to continue</p>
-              </div>
-            </div>
-          )}
+          {isPaused && <PauseOverlay onResume={() => setIsPaused(false)} />}
 
           {/* Completion overlay */}
           {isComplete && (
-            <div className={styles.completeOverlay}>
-              <div className={styles.completeContent}>
-                <h2>🎉 Complete!</h2>
-                <p>Finished in {formatTime(elapsedSeconds)}</p>
-
-                <div className={styles.shareSection}>
-                  <p className={styles.shareLabel}>Share your result:</p>
-
-                  {/* Social buttons */}
-                  <div className={styles.socialButtons}>
-                    <button
-                      className={styles.socialBtn}
-                      onClick={() => openShareWindow(shareUrls.twitter)}
-                      title="Share on X/Twitter"
-                    >
-                      𝕏
-                    </button>
-                    <button
-                      className={styles.socialBtn}
-                      onClick={() => openShareWindow(shareUrls.facebook)}
-                      title="Share on Facebook"
-                    >
-                      f
-                    </button>
-                    <button
-                      className={styles.socialBtn}
-                      onClick={() => openShareWindow(shareUrls.reddit)}
-                      title="Share on Reddit"
-                    >
-                      ⬆
-                    </button>
-                    <button
-                      className={styles.socialBtn}
-                      onClick={() => openShareWindow(shareUrls.whatsapp)}
-                      title="Share on WhatsApp"
-                    >
-                      💬
-                    </button>
-                  </div>
-
-                  {/* Utility buttons */}
-                  <div className={styles.shareButtons}>
-                    <Button size="sm" onClick={handleDownloadImage}>
-                      <Download size={16} />
-                      Download
-                    </Button>
-                    <Button size="sm" onClick={handleCopyResults}>
-                      {copied ? <Check size={16} /> : <Copy size={16} />}
-                      {copied ? "Copied!" : "Copy"}
-                    </Button>
-                    {canNativeShare && (
-                      <Button size="sm" onClick={handleNativeShare}>
-                        <Share2 size={16} />
-                        More
-                      </Button>
-                    )}
-                  </div>
-
-                  <p className={styles.shareHint}>
-                    For LinkedIn: Download image + Copy text, then post manually
-                  </p>
-                </div>
-
-                <div className={styles.completeActions}>
-                  <Button variant="primary" onClick={handleNewGame}>
-                    <Plus size={16} />
-                    New Puzzle
-                  </Button>
-                  <Button variant="secondary" onClick={() => navigate("/")}>
-                    <Menu size={16} />
-                    Menu
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <CompletionOverlay
+              elapsedSeconds={elapsedSeconds}
+              shareUrls={share.shareUrls}
+              copied={share.copied}
+              canNativeShare={canNativeShare}
+              onOpenShareWindow={share.openShareWindow}
+              onCopyResults={share.handleCopyResults}
+              onNativeShare={share.handleNativeShare}
+              onDownloadImage={handleDownloadImage}
+              onNewPuzzle={handleNewGame}
+              onMenu={() => navigate("/")}
+            />
           )}
         </div>
       </div>
@@ -1204,6 +874,7 @@ export function PlayScreen() {
         image={imgRef.current}
         grid={state?.grid ?? grid}
         onPieceClick={handleTrayPieceClick}
+        isCoarsePointer={isCoarsePointer}
       />
 
       {showTutorial && <TutorialOverlay onComplete={dismissTutorial} />}
