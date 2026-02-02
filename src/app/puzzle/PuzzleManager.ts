@@ -41,6 +41,9 @@ export class PuzzleManager {
   private scatterStartYRatio: number;
   private rotationStepDeg: 90 | 180;
 
+  /** When true, pieces that snap to correct position become locked (cannot be moved). */
+  private pieceLockingEnabled: boolean = false;
+
   private pad: number;
   private tileW: number;
   private tileH: number;
@@ -292,6 +295,14 @@ export class PuzzleManager {
     return this.state;
   }
 
+  setPieceLockingEnabled(enabled: boolean): void {
+    this.pieceLockingEnabled = enabled;
+  }
+
+  getPieceLockingEnabled(): boolean {
+    return this.pieceLockingEnabled;
+  }
+
   getDragState(): DragState {
     return this.drag;
   }
@@ -302,20 +313,20 @@ export class PuzzleManager {
 
   public nudgeGroup(pieceId: string, dx: number, dy: number) {
     const p = this.findPiece(pieceId);
-    if (!p || p.isPlaced) return;
+    if (!p || p.isPlaced || p.locked) return;
     this.shiftGroup(p.groupId, dx, dy);
     this.recomputeDerivedState();
   }
 
   public rotateGroup(pieceId: string) {
     const p = this.findPiece(pieceId);
-    if (!p || p.isPlaced) return;
+    if (!p || p.isPlaced || p.locked) return;
     this.rotatePiece(pieceId);
   }
 
   public rotatePiece(pieceId: string) {
     const piece = this.findPiece(pieceId);
-    if (!piece || piece.isPlaced) return;
+    if (!piece || piece.isPlaced || piece.locked) return;
 
     // Rotate all pieces in the group
     this.state = {
@@ -332,11 +343,11 @@ export class PuzzleManager {
 
   public snapGroupNow(pieceId: string) {
     const p = this.findPiece(pieceId);
-    if (!p || p.isPlaced) return;
+    if (!p || p.isPlaced || p.locked) return;
 
     this.drag = { ...this.drag, activeId: p.id };
-    this.trySnapActiveGroupToBoard();
     this.trySnapActiveGroupToNeighbor();
+    this.trySnapActiveGroupToBoard();
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
     this.recomputeDerivedState();
   }
@@ -348,7 +359,7 @@ export class PuzzleManager {
 
   movePieceToTray(pieceId: string) {
     const piece = this.findPiece(pieceId);
-    if (!piece || piece.isPlaced) return;
+    if (!piece || piece.isPlaced || piece.locked) return;
 
     const groupPieces = this.getGroupPieces(piece.groupId);
     if (groupPieces.length > 1) return;
@@ -411,7 +422,7 @@ export class PuzzleManager {
     pieceRect: DOMRect,
   ) {
     const piece = this.findPiece(pieceId);
-    if (!piece || piece.isPlaced) return;
+    if (!piece || piece.isPlaced || piece.locked) return;
 
     // Bring group to front
     this.zCounter += 1;
@@ -464,9 +475,10 @@ export class PuzzleManager {
   public pointerUp() {
     if (!this.drag.activeId) return;
 
-    // Try to snap
-    this.trySnapActiveGroupToBoard();
+    // Try neighbor snap first (connect pieces), then board snap (align to grid).
+    // Order matters: board-then-neighbor could undo the board snap by aligning to a floating neighbor.
     this.trySnapActiveGroupToNeighbor();
+    this.trySnapActiveGroupToBoard();
 
     // Clear drag state
     this.drag = {
@@ -496,6 +508,7 @@ export class PuzzleManager {
             rotation: saved.rotation,
             groupId: saved.groupId,
             isPlaced: saved.isPlaced,
+            locked: saved.locked ?? false,
             inTray: saved.inTray,
           };
         }
@@ -531,10 +544,13 @@ export class PuzzleManager {
 
     // Mark as snapped for visual feedback, but don't set isPlaced
     // (isPlaced is only set when entire puzzle is complete)
+    // When piece locking is enabled, lock all pieces in the snapped group
     this.state = {
       ...this.state,
       pieces: this.state.pieces.map((p) =>
-        p.groupId === gid ? { ...p, justSnapped: true } : p,
+        p.groupId === gid
+          ? { ...p, justSnapped: true, locked: this.pieceLockingEnabled || p.locked }
+          : p,
       ),
     };
     this.events.onPiecePlaced?.(active);
@@ -579,6 +595,16 @@ export class PuzzleManager {
 
     this.shiftGroupUnclamped(gid, Math.round(best.dx), Math.round(best.dy));
     this.mergeGroups(gid, best.into);
+
+    // When piece locking is enabled, lock all pieces in the merged group
+    if (this.pieceLockingEnabled) {
+      this.state = {
+        ...this.state,
+        pieces: this.state.pieces.map((p) =>
+          p.groupId === best.into ? { ...p, locked: true } : p,
+        ),
+      };
+    }
 
     this.trySnapMergedGroupToBoard(best.into);
     this.events.onPieceSnapped?.();

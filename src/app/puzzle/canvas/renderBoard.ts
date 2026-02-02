@@ -213,6 +213,9 @@ function drawPiece(
   } else if (p.isPlaced) {
     ctx.strokeStyle = "rgba(0, 160, 80, 0.3)";
     ctx.lineWidth = 1;
+  } else if (p.locked) {
+    ctx.strokeStyle = "rgba(0, 160, 80, 0.4)";
+    ctx.lineWidth = 1.5;
   } else {
     ctx.strokeStyle = "rgba(0,0,0,0.25)";
     ctx.lineWidth = 1;
