@@ -28,11 +28,32 @@ function _clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(n, max));
 }
 
+const UNDO_HISTORY_LIMIT = 30;
+
+function piecesToSaved(pieces: Piece[]): SavedPiece[] {
+  return pieces.map((p) => ({
+    id: p.id,
+    row: p.row,
+    col: p.col,
+    x: p.x,
+    y: p.y,
+    z: p.z,
+    rotation: p.rotation,
+    isPlaced: p.isPlaced,
+    locked: p.locked,
+    groupId: p.groupId,
+    inTray: p.inTray,
+  }));
+}
+
 export class PuzzleManager {
   private state: PuzzleState;
   private drag: DragState;
   private zCounter: number;
   private events: PuzzleManagerEvents;
+
+  private undoHistory: SavedPiece[][] = [];
+  private readonly undoHistoryLimit = UNDO_HISTORY_LIMIT;
 
   private boardWidth: number;
   private boardHeight: number;
@@ -295,6 +316,28 @@ export class PuzzleManager {
     return this.state;
   }
 
+  /** Save current piece state before a user action (for undo). */
+  pushUndoState(): void {
+    if (this.state.isComplete) return;
+    const snapshot = piecesToSaved(this.state.pieces);
+    this.undoHistory.push(snapshot);
+    if (this.undoHistory.length > this.undoHistoryLimit) {
+      this.undoHistory.shift();
+    }
+  }
+
+  /** Restore previous piece state. Returns true if undo was performed. */
+  undo(): boolean {
+    if (this.undoHistory.length === 0 || this.state.isComplete) return false;
+    const snapshot = this.undoHistory.pop()!;
+    this.restoreFromSaved(snapshot);
+    return true;
+  }
+
+  canUndo(): boolean {
+    return this.undoHistory.length > 0 && !this.state.isComplete;
+  }
+
   setPieceLockingEnabled(enabled: boolean): void {
     this.pieceLockingEnabled = enabled;
   }
@@ -314,6 +357,7 @@ export class PuzzleManager {
   public nudgeGroup(pieceId: string, dx: number, dy: number) {
     const p = this.findPiece(pieceId);
     if (!p || p.isPlaced || p.locked) return;
+    this.pushUndoState();
     this.shiftGroup(p.groupId, dx, dy);
     this.recomputeDerivedState();
   }
@@ -328,6 +372,8 @@ export class PuzzleManager {
     const piece = this.findPiece(pieceId);
     if (!piece || piece.isPlaced || piece.locked) return;
 
+    this.pushUndoState();
+
     // Rotate all pieces in the group
     this.state = {
       ...this.state,
@@ -341,10 +387,12 @@ export class PuzzleManager {
     };
   }
 
-  public snapGroupNow(pieceId: string) {
+  /** @param skipPush - when true, caller already pushed (e.g. nudgeGroup) */
+  public snapGroupNow(pieceId: string, skipPush = false) {
     const p = this.findPiece(pieceId);
     if (!p || p.isPlaced || p.locked) return;
 
+    if (!skipPush) this.pushUndoState();
     this.drag = { ...this.drag, activeId: p.id };
     this.trySnapActiveGroupToNeighbor();
     this.trySnapActiveGroupToBoard();
@@ -361,6 +409,8 @@ export class PuzzleManager {
     const piece = this.findPiece(pieceId);
     if (!piece || piece.isPlaced || piece.locked) return;
 
+    this.pushUndoState();
+
     const groupPieces = this.getGroupPieces(piece.groupId);
     if (groupPieces.length > 1) return;
 
@@ -375,6 +425,8 @@ export class PuzzleManager {
   movePieceFromTray(pieceId: string) {
     const piece = this.findPiece(pieceId);
     if (!piece || !piece.inTray) return;
+
+    this.pushUndoState();
 
     const x = this.rand(16, Math.max(16, this.boardWidth - piece.w - 16));
     const y = this.rand(16, Math.max(16, this.boardHeight - piece.h - 16));
@@ -423,6 +475,8 @@ export class PuzzleManager {
   ) {
     const piece = this.findPiece(pieceId);
     if (!piece || piece.isPlaced || piece.locked) return;
+
+    this.pushUndoState();
 
     // Bring group to front
     this.zCounter += 1;

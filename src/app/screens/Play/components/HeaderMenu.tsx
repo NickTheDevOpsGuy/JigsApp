@@ -14,6 +14,8 @@ type DebugFlags = {
 export type HeaderMenuProps = {
   title?: string;
 
+  canUndo: boolean;
+  onUndo: () => void;
   showPreview: boolean;
   soundEnabled: boolean;
   hapticsEnabled: boolean;
@@ -106,6 +108,18 @@ export function HeaderMenu(props: HeaderMenuProps) {
             }}
           >
             New puzzle
+          </button>
+
+          <button
+            className={styles.headerMenuItem}
+            role="menuitem"
+            disabled={!props.canUndo}
+            onClick={() => {
+              setOpen(false);
+              props.onUndo();
+            }}
+          >
+            Undo
           </button>
 
           <div className={styles.headerMenuDivider} />

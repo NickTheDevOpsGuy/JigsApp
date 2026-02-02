@@ -19,6 +19,7 @@ export type ShortcutAction =
   | "moveDown" // Move piece down
   | "moveLeft" // Move piece left
   | "moveRight" // Move piece right
+  | "undo"
   | "showHelp"
   | "escape";
 
@@ -145,6 +146,11 @@ export function useKeyboardShortcuts({
         e.preventDefault();
         action = "showHelp";
       }
+      // Ctrl/Cmd+Z - Undo
+      else if (key === "z" && mod && !shift) {
+        e.preventDefault();
+        action = "undo";
+      }
 
       if (action) {
         console.log("[Keyboard] Dispatching action:", action);
@@ -164,6 +170,7 @@ export function useKeyboardShortcuts({
 
 // Shortcut definitions for the help modal
 export const SHORTCUTS = [
+  { keys: ["Ctrl+Z", "⌘Z"], action: "Undo last move" },
   { keys: ["Space"], action: "Pause / Resume" },
   { keys: ["Tab"], action: "Select next piece" },
   { keys: ["Shift+Tab"], action: "Select previous piece" },

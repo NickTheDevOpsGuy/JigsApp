@@ -128,6 +128,8 @@ function formatKey(key: string): string {
     Esc: "Esc",
     Escape: "Esc",
     F1: "F1",
+    "Ctrl+Z": "Ctrl+Z",
+    "⌘Z": "⌘ Z",
   };
   return keyMap[key] || key.toUpperCase();
 }
