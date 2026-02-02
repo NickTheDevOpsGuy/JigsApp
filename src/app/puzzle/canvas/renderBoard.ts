@@ -15,6 +15,8 @@ export type AnimationState = {
   selectedPieceId: string | null;
   isComplete: boolean;
   completedAtMs: number | null;
+  /** When true, show semi-transparent ghosts at correct positions for misplaced pieces */
+  showGhostHint?: boolean;
 };
 
 /**
@@ -70,6 +72,11 @@ export function renderBoard(
   // Get grid from state
   const { cols, rows } = state.grid;
 
+  // Ghost hint: draw misplaced pieces at their target positions (before real pieces)
+  if (animState?.showGhostHint && !state.isComplete) {
+    drawGhostHints(ctx, state.pieces, img, cols, rows);
+  }
+
   // Determine dragged group
   const draggedGroupId = dragState?.activeId
     ? (state.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
@@ -86,6 +93,49 @@ export function renderBoard(
   // Completion glow effect
   if (animState?.isComplete && animState.completedAtMs) {
     drawCompletionGlow(ctx, cssW, cssH, nowMs - animState.completedAtMs);
+  }
+}
+
+/**
+ * Draw semi-transparent ghosts at correct positions for misplaced pieces.
+ * Helps users see where pieces belong when stuck.
+ */
+function drawGhostHints(
+  ctx: CanvasRenderingContext2D,
+  pieces: Piece[],
+  img: HTMLImageElement,
+  cols: number,
+  rows: number,
+) {
+  const popMap = new Map<string, number>();
+  const nowMs = performance.now();
+  const debug: DebugFlags = { showGrid: false, showBounds: false, showIds: false };
+
+  for (const p of pieces) {
+    // Skip pieces already at correct position
+    if (p.isPlaced) continue;
+
+    const tileX = p.x + p.pad;
+    const tileY = p.y + p.pad;
+    const atTarget =
+      Math.round(tileX) === p.targetX &&
+      Math.round(tileY) === p.targetY &&
+      p.rotation === p.targetRotation;
+
+    if (atTarget) continue;
+
+    // Ghost at target position with target rotation
+    const ghostPiece: Piece = {
+      ...p,
+      x: p.targetX - p.pad,
+      y: p.targetY - p.pad,
+      rotation: p.targetRotation,
+    };
+
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    drawPiece(ctx, ghostPiece, img, cols, rows, popMap, nowMs, debug, false);
+    ctx.restore();
   }
 }
 

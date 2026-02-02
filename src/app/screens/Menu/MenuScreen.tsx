@@ -4,7 +4,7 @@ import styles from "./MenuScreen.module.css";
 
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
-import { HowToPlayModal } from "@/components/HowToPlay";
+import { TutorialOverlay } from "@/components/HowToPlay";
 import { HelpCircle, Image } from "lucide-react";
 
 export function MenuScreen() {
@@ -27,7 +27,7 @@ export function MenuScreen() {
         </Button>
       </div>
 
-      <HowToPlayModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      <TutorialOverlay isOpen={showHelp} onComplete={() => setShowHelp(false)} />
     </div>
   );
 }

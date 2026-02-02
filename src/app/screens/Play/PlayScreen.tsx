@@ -33,6 +33,7 @@ import {
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
 const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
+const GHOST_HINT_KEY = "phuzzle:ghostHint";
 
 // Debug mode from environment variable
 const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
@@ -94,6 +95,15 @@ export function PlayScreen() {
   const [pieceLockingEnabled, setPieceLockingEnabled] = useState(() => {
     try {
       return localStorage.getItem(PIECE_LOCKING_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  // Ghost hint: show semi-transparent preview of where pieces belong
+  const [showGhostHint, setShowGhostHint] = useState(() => {
+    try {
+      return localStorage.getItem(GHOST_HINT_KEY) === "true";
     } catch {
       return false;
     }
@@ -192,6 +202,9 @@ export function PlayScreen() {
           break;
         case "preview":
           setShowPreview((p) => !p);
+          break;
+        case "toggleGhostHint":
+          setShowGhostHint((g) => !g);
           break;
         case "fullscreen":
           toggleFullscreen();
@@ -395,6 +408,15 @@ export function PlayScreen() {
       // ignore
     }
   }, [pieceLockingEnabled]);
+
+  // Persist ghost hint preference
+  useEffect(() => {
+    try {
+      localStorage.setItem(GHOST_HINT_KEY, showGhostHint ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [showGhostHint]);
 
   // Auto-save puzzle state when pieces change (debounced)
   useEffect(() => {
@@ -631,6 +653,7 @@ export function PlayScreen() {
           selectedPieceId: selectedPieceIdRef.current,
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
+          showGhostHint,
         },
       );
 
@@ -767,6 +790,7 @@ export function PlayScreen() {
             soundEnabled={soundEnabled}
             hapticsEnabled={hapticsEnabled}
             pieceLockingEnabled={pieceLockingEnabled}
+            showGhostHint={showGhostHint}
             isFullscreen={isFullscreen}
             canShowHaptics={
               isCoarsePointer &&
@@ -793,6 +817,7 @@ export function PlayScreen() {
               }
             }}
             onTogglePieceLocking={() => setPieceLockingEnabled((p) => !p)}
+            onToggleGhostHint={() => setShowGhostHint((g) => !g)}
             onToggleFullscreen={toggleFullscreen}
             onShowShortcuts={() => setShowShortcuts(true)}
             onToggleDebug={() =>
@@ -905,7 +930,7 @@ export function PlayScreen() {
         isCoarsePointer={isCoarsePointer}
       />
 
-      {showTutorial && <TutorialOverlay onComplete={dismissTutorial} />}
+      <TutorialOverlay isOpen={showTutorial} onComplete={dismissTutorial} showSkipLink />
 
       {/* Keyboard shortcuts modal */}
       <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
