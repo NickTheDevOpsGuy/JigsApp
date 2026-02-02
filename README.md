@@ -204,134 +204,140 @@ Category = folder name, puzzle name = filename.
 
 .
 ├── .github
-│   ├── ISSUE_TEMPLATE
-│   │   ├── bug.yml
-│   │   ├── config.yml
-│   │   ├── documentation.yml
-│   │   ├── enhancement_refactor.yml
-│   │   ├── feature_request.yml
-│   │   └── question_discussion.yml
-│   ├── workflows
-│   │   ├── CODEOWNERS
-│   │   ├── Phuzzle.yml
-│   │   └── vercel-production.yml
-│   └── pull_request_template.md
+│   ├── ISSUE_TEMPLATE
+│   │   ├── bug.yml
+│   │   ├── config.yml
+│   │   ├── documentation.yml
+│   │   ├── enhancement_refactor.yml
+│   │   ├── feature_request.yml
+│   │   └── question_discussion.yml
+│   ├── workflows
+│   │   ├── CODEOWNERS
+│   │   ├── Phuzzle.yml
+│   │   └── vercel-production.yml
+│   └── pull_request_template.md
 ├── .husky
-│   ├── pre-commit
-│   └── pre-push
+│   ├── pre-commit
+│   └── pre-push
 ├── .vite
-│   └── deps
-│       ├── _metadata.json
-│       └── package.json
-├── Assets
-│   └── Preview
-│       └── preview.gif
+│   └── deps
+│       ├── _metadata.json
+│       └── package.json
 ├── public
-│   └── favicon.svg
+│   └── favicon.svg
 ├── scripts
-│   └── precheck.sh
+│   └── precheck.sh
 ├── src
-│   ├── app
-│   │   ├── assets
-│   │   │   ├── puzzles
-│   │   │   │   ├── animals
-│   │   │   │   │   ├── bear.png
-│   │   │   │   │   ├── frog.png
-│   │   │   │   │   ├── kitten.png
-│   │   │   │   │   └── rabbit.png
-│   │   │   │   ├── demo
-│   │   │   │   │   ├── blue_square_thumb.png
-│   │   │   │   │   ├── four_quadrants_thumb.png
-│   │   │   │   │   ├── green_triangle_thumb.png
-│   │   │   │   │   ├── red_circle_thumb.png
-│   │   │   │   │   ├── two_color_split_thumb.png
-│   │   │   │   │   └── yellow_star_thumb.png
-│   │   │   │   └── nature
-│   │   │   └── ui
-│   │   │       └── phuzzle-logo-512.png
-│   │   ├── audio
-│   │   │   └── sounds.ts
-│   │   ├── components
-│   │   │   ├── Button
-│   │   │   │   ├── Button.module.css
-│   │   │   │   └── Button.tsx
-│   │   │   ├── DropDown
-│   │   │   │   ├── Dropdown.module.css
-│   │   │   │   └── Dropdown.tsx
-│   │   │   ├── HowToPlay
-│   │   │   │   ├── HowToPlay.module.css
-│   │   │   │   ├── HowToPlayModal.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   └── TutorialOverlay.tsx
-│   │   │   ├── Modal
-│   │   │   │   ├── Modal.module.css
-│   │   │   │   └── Modal.tsx
-│   │   │   ├── PieceTray
-│   │   │   │   ├── PieceTray.module.css
-│   │   │   │   └── PieceTray.tsx
-│   │   │   ├── ShortcutsModal
-│   │   │   │   ├── ShortcutsModal.module.css
-│   │   │   │   └── ShortcutsModal.tsx
-│   │   │   └── Tray
-│   │   │       ├── Tray.module.css
-│   │   │       └── Tray.tsx
-│   │   ├── data
-│   │   │   └── samplePuzzles.ts
-│   │   ├── hooks
-│   │   │   └── useKeyboardShortcuts.ts
-│   │   ├── puzzle
-│   │   │   ├── canvas
-│   │   │   │   ├── pickPiece.ts
-│   │   │   │   ├── renderBoard.ts
-│   │   │   │   ├── renderTrayPiece.ts
-│   │   │   │   └── shape.ts
-│   │   │   ├── factories
-│   │   │   │   └── createInitialPieces.ts
-│   │   │   ├── colorUtils.ts
-│   │   │   ├── config.ts
-│   │   │   ├── PuzzleManager.ts
-│   │   │   ├── puzzleStorage.ts
-│   │   │   ├── shape.ts
-│   │   │   ├── SnapLogic.ts
-│   │   │   └── types.ts
-│   │   ├── screens
-│   │   │   ├── Menu
-│   │   │   │   ├── MenuScreen.module.css
-│   │   │   │   └── MenuScreen.tsx
-│   │   │   ├── NewGame
-│   │   │   │   ├── NewGameScreen.module.css
-│   │   │   │   └── NewGameScreen.tsx
-│   │   │   ├── Play
-│   │   │   │   ├── components
-│   │   │   │   │   ├── CompletionOverlay.tsx
-│   │   │   │   │   ├── HeaderMenu.tsx
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── PauseOverlay.tsx
-│   │   │   │   │   ├── PlayHUD.tsx
-│   │   │   │   │   └── TopBarButtons.tsx
-│   │   │   │   ├── hooks
-│   │   │   │   │   ├── useCoarsePointer.ts
-│   │   │   │   │   ├── useHaptics.ts
-│   │   │   │   │   ├── useInputHints.ts
-│   │   │   │   │   ├── usePointerHandlers.ts
-│   │   │   │   │   ├── usePuzzleLifecycle.ts
-│   │   │   │   │   └── useShareResults.ts
-│   │   │   │   ├── PlayScreen.module.css
-│   │   │   │   ├── PlayScreen.tsx
-│   │   │   │   └── playUtils.ts
-│   │   │   └── Setup
-│   │   │       ├── SetupScreen.module.css
-│   │   │       └── SetupScreen.tsx
-│   │   ├── styles
-│   │   │   └── global.css
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   └── vite-env.d.ts
-│   └── types
-│       ├── canvas-confetti.d.ts
-│       └── vite-env.d.ts
+│   ├── app
+│   │   ├── assets
+│   │   │   ├── puzzles
+│   │   │   │   ├── animals
+│   │   │   │   │   ├── cat.png
+│   │   │   │   │   ├── dog.png
+│   │   │   │   │   ├── fox.png
+│   │   │   │   │   ├── porcupine.png
+│   │   │   │   │   ├── redpanda.png
+│   │   │   │   │   └── turtle.png
+│   │   │   │   ├── flowers
+│   │   │   │   │   ├── daisy.png
+│   │   │   │   │   ├── flower_bed.png
+│   │   │   │   │   ├── lavender.png
+│   │   │   │   │   └── sunflower.png
+│   │   │   │   ├── food
+│   │   │   │   │   ├── charcuterie_board.png
+│   │   │   │   │   ├── curries_and_rice.png
+│   │   │   │   │   ├── fruit_platter.png
+│   │   │   │   │   └── pasta_dishes.png
+│   │   │   │   └── landscapes
+│   │   │   │       ├── moutains.png
+│   │   │   │       ├── stream.png
+│   │   │   │       └── waterfall.png
+│   │   │   └── ui
+│   │   │       └── phuzzle-logo-512.png
+│   │   ├── audio
+│   │   │   └── sounds.ts
+│   │   ├── components
+│   │   │   ├── Button
+│   │   │   │   ├── Button.module.css
+│   │   │   │   └── Button.tsx
+│   │   │   ├── DropDown
+│   │   │   │   ├── Dropdown.module.css
+│   │   │   │   └── Dropdown.tsx
+│   │   │   ├── HowToPlay
+│   │   │   │   ├── HowToPlay.module.css
+│   │   │   │   ├── HowToPlayModal.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── TutorialOverlay.tsx
+│   │   │   ├── Modal
+│   │   │   │   ├── Modal.module.css
+│   │   │   │   └── Modal.tsx
+│   │   │   ├── PieceTray
+│   │   │   │   ├── PieceTray.module.css
+│   │   │   │   └── PieceTray.tsx
+│   │   │   ├── ShortcutsModal
+│   │   │   │   ├── ShortcutsModal.module.css
+│   │   │   │   └── ShortcutsModal.tsx
+│   │   │   └── Tray
+│   │   │       ├── Tray.module.css
+│   │   │       └── Tray.tsx
+│   │   ├── data
+│   │   │   └── samplePuzzles.ts
+│   │   ├── hooks
+│   │   │   └── useKeyboardShortcuts.ts
+│   │   ├── puzzle
+│   │   │   ├── canvas
+│   │   │   │   ├── pickPiece.ts
+│   │   │   │   ├── renderBoard.ts
+│   │   │   │   ├── renderTrayPiece.ts
+│   │   │   │   └── shape.ts
+│   │   │   ├── factories
+│   │   │   │   └── createInitialPieces.ts
+│   │   │   ├── colorUtils.ts
+│   │   │   ├── config.ts
+│   │   │   ├── PuzzleManager.ts
+│   │   │   ├── puzzleStorage.ts
+│   │   │   ├── shape.ts
+│   │   │   ├── SnapLogic.ts
+│   │   │   └── types.ts
+│   │   ├── screens
+│   │   │   ├── Menu
+│   │   │   │   ├── MenuScreen.module.css
+│   │   │   │   └── MenuScreen.tsx
+│   │   │   ├── NewGame
+│   │   │   │   ├── NewGameScreen.module.css
+│   │   │   │   └── NewGameScreen.tsx
+│   │   │   ├── Play
+│   │   │   │   ├── components
+│   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── HeaderMenu.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── PauseOverlay.tsx
+│   │   │   │   │   ├── PlayHUD.tsx
+│   │   │   │   │   └── TopBarButtons.tsx
+│   │   │   │   ├── hooks
+│   │   │   │   │   ├── useCoarsePointer.ts
+│   │   │   │   │   ├── useHaptics.ts
+│   │   │   │   │   ├── useInputHints.ts
+│   │   │   │   │   ├── usePointerHandlers.ts
+│   │   │   │   │   ├── usePuzzleLifecycle.ts
+│   │   │   │   │   └── useShareResults.ts
+│   │   │   │   ├── PlayScreen.module.css
+│   │   │   │   ├── PlayScreen.tsx
+│   │   │   │   └── playUtils.ts
+│   │   │   └── Setup
+│   │   │       ├── SetupScreen.module.css
+│   │   │       └── SetupScreen.tsx
+│   │   ├── styles
+│   │   │   └── global.css
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts
+│   └── types
+│       ├── canvas-confetti.d.ts
+│       └── vite-env.d.ts
 ├── .env.development
 ├── .env.example
+├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
