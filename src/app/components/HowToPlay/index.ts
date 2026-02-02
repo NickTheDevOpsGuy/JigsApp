@@ -1,2 +1,3 @@
 // src/app/components/HowToPlay/index.ts
-export { HowToPlayModal, useShouldShowTutorial, resetTutorial } from "./HowToPlayModal";
+export { HowToPlayModal } from "./HowToPlayModal";
+export { TutorialOverlay, useShouldShowTutorial, resetTutorial } from "./TutorialOverlay";

@@ -1,10 +1,8 @@
 // src/app/components/HowToPlay/HowToPlayModal.tsx
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Modal } from "@/components/Modal/Modal";
 import { Button } from "@/components/Button/Button";
 import styles from "./HowToPlay.module.css";
-
-const TUTORIAL_SEEN_KEY = "phuzzle:tutorialSeen";
 
 // Detect touch-first devices. We lean toward "touch" when uncertain to avoid
 // showing mouse-only tips (right-click) on mobile.
@@ -14,6 +12,7 @@ const isTouchDevice = () => {
     return (
       "ontouchstart" in window ||
       navigator.maxTouchPoints > 0 ||
+      // Prefer treating "hover: none" and coarse pointers as touch.
       window.matchMedia?.("(hover: none)").matches ||
       window.matchMedia?.("(pointer: coarse)").matches ||
       /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
@@ -23,35 +22,6 @@ const isTouchDevice = () => {
   }
 };
 
-/**
- * Hook to check if tutorial should be shown (first-time users).
- * Returns [shouldShow, dismiss] tuple.
- */
-export function useShouldShowTutorial(): [boolean, () => void] {
-  const [shouldShow, setShouldShow] = useState(false);
-
-  useEffect(() => {
-    const seen = localStorage.getItem(TUTORIAL_SEEN_KEY);
-    if (!seen) {
-      setShouldShow(true);
-    }
-  }, []);
-
-  const dismiss = () => {
-    localStorage.setItem(TUTORIAL_SEEN_KEY, "true");
-    setShouldShow(false);
-  };
-
-  return [shouldShow, dismiss];
-}
-
-/**
- * Utility to reset tutorial (for testing).
- */
-export function resetTutorial() {
-  localStorage.removeItem(TUTORIAL_SEEN_KEY);
-}
-
 type HowToPlayModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -60,14 +30,8 @@ type HowToPlayModalProps = {
 export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
   const isTouch = isTouchDevice();
 
-  const handleClose = () => {
-    // Mark as seen when closing
-    localStorage.setItem(TUTORIAL_SEEN_KEY, "true");
-    onClose();
-  };
-
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="How to Play">
+    <Modal isOpen={isOpen} onClose={onClose} title="How to Play">
       <div className={styles.content}>
         <p className={styles.intro}>
           Drag and drop pieces to assemble the puzzle. Match all pieces to complete the
@@ -86,7 +50,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
           <h3 className={styles.sectionTitle}>🔄 Rotating Pieces</h3>
           <p>
             {isTouch
-              ? "Tap a piece to rotate it 90°."
+              ? "Double-tap a piece to rotate it 90°."
               : "Right-click a piece to rotate it 90°."}
           </p>
         </div>
@@ -112,7 +76,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
         </div>
 
         <div className={styles.actions}>
-          <Button variant="primary" onClick={handleClose} fullWidth>
+          <Button variant="primary" onClick={onClose} fullWidth>
             Got it!
           </Button>
         </div>
