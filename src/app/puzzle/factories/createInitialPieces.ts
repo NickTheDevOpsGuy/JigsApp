@@ -165,6 +165,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
       rotation: randRotation(rotationStepDeg),
       targetRotation: 0,
       isPlaced: false,
+      locked: false,
       groupId: `g${i + 1}`,
       justSnapped: false,
       shapePath,

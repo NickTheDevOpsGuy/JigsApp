@@ -32,6 +32,7 @@ import {
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
+const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
 
 // Debug mode from environment variable
 const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
@@ -88,6 +89,15 @@ export function PlayScreen() {
 
   // Shortcuts help modal
   const [showShortcuts, setShowShortcuts] = useState(false);
+
+  // Piece locking: when enabled, snapped pieces become locked (cannot be moved)
+  const [pieceLockingEnabled, setPieceLockingEnabled] = useState(() => {
+    try {
+      return localStorage.getItem(PIECE_LOCKING_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
 
   // Modal state for new game confirmation
   const [showNewGameModal, setShowNewGameModal] = useState(false);
@@ -206,14 +216,16 @@ export function PlayScreen() {
         }
         case "rotateCW":
         case "rotateCCW":
-          // Rotate the selected piece (or first unplaced if none selected)
+          // Rotate the selected piece (or first movable if none selected)
           if (manager && state && !isPaused) {
-            const unplacedPieces = state.pieces.filter((p) => !p.isPlaced && !p.inTray);
-            let pieceToRotate = unplacedPieces.find((p) => p.id === selectedPieceId);
+            const movablePieces = state.pieces.filter(
+              (p) => !p.isPlaced && !p.inTray && !p.locked,
+            );
+            let pieceToRotate = movablePieces.find((p) => p.id === selectedPieceId);
 
-            // If selected piece is placed or not found, use first unplaced
-            if (!pieceToRotate && unplacedPieces.length > 0) {
-              pieceToRotate = unplacedPieces[0];
+            // If selected piece is placed/locked or not found, use first movable
+            if (!pieceToRotate && movablePieces.length > 0) {
+              pieceToRotate = movablePieces[0];
               setSelectedPieceId(pieceToRotate.id);
             }
 
@@ -226,27 +238,29 @@ export function PlayScreen() {
           break;
         case "nextPiece":
         case "prevPiece": {
-          // Tab through unplaced pieces
+          // Tab through movable pieces (not placed, not in tray, not locked)
           if (state && !isPaused) {
-            const unplacedPieces = state.pieces.filter((p) => !p.isPlaced && !p.inTray);
-            if (unplacedPieces.length === 0) break;
+            const movablePieces = state.pieces.filter(
+              (p) => !p.isPlaced && !p.inTray && !p.locked,
+            );
+            if (movablePieces.length === 0) break;
 
-            const currentIndex = unplacedPieces.findIndex(
+            const currentIndex = movablePieces.findIndex(
               (p) => p.id === selectedPieceId,
             );
             let newIndex: number;
 
             if (action === "nextPiece") {
               newIndex =
-                currentIndex < 0 ? 0 : (currentIndex + 1) % unplacedPieces.length;
+                currentIndex < 0 ? 0 : (currentIndex + 1) % movablePieces.length;
             } else {
               newIndex =
                 currentIndex < 0
-                  ? unplacedPieces.length - 1
-                  : (currentIndex - 1 + unplacedPieces.length) % unplacedPieces.length;
+                  ? movablePieces.length - 1
+                  : (currentIndex - 1 + movablePieces.length) % movablePieces.length;
             }
 
-            setSelectedPieceId(unplacedPieces[newIndex].id);
+            setSelectedPieceId(movablePieces[newIndex].id);
           }
           break;
         }
@@ -257,7 +271,7 @@ export function PlayScreen() {
           // Move selected piece with arrow keys
           if (manager && state && !isPaused && selectedPieceId) {
             const piece = state.pieces.find((p) => p.id === selectedPieceId);
-            if (piece && !piece.isPlaced && !piece.inTray) {
+            if (piece && !piece.isPlaced && !piece.inTray && !piece.locked) {
               const moveAmount = 20; // pixels per keypress
               let dx = 0,
                 dy = 0;
@@ -360,15 +374,30 @@ export function PlayScreen() {
       next.restoreFromSaved(savedState.pieces);
     }
 
+    next.setPieceLockingEnabled(pieceLockingEnabled);
     setManager(next);
     const st = next.getState();
     setState(st);
 
-    // Set an initial selection if possible
-    const selectable = st.pieces.filter((p) => !p.inTray && !p.isPlaced);
+    // Set an initial selection if possible (prefer movable pieces)
+    const selectable = st.pieces.filter((p) => !p.inTray && !p.isPlaced && !p.locked);
     selectedIdRef.current = selectable.length ? selectable[0].id : null;
     bump();
   }, [grid]);
+
+  // Sync piece locking to manager when it changes (manager may be recreated with grid)
+  useEffect(() => {
+    manager?.setPieceLockingEnabled(pieceLockingEnabled);
+  }, [manager, pieceLockingEnabled]);
+
+  // Persist piece locking preference
+  useEffect(() => {
+    try {
+      localStorage.setItem(PIECE_LOCKING_KEY, pieceLockingEnabled ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [pieceLockingEnabled]);
 
   // Auto-save puzzle state when pieces change (debounced)
   useEffect(() => {
@@ -740,6 +769,7 @@ export function PlayScreen() {
             showPreview={showPreview}
             soundEnabled={soundEnabled}
             hapticsEnabled={hapticsEnabled}
+            pieceLockingEnabled={pieceLockingEnabled}
             isFullscreen={isFullscreen}
             canShowHaptics={
               isCoarsePointer &&
@@ -765,6 +795,7 @@ export function PlayScreen() {
                 navigator.vibrate(25);
               }
             }}
+            onTogglePieceLocking={() => setPieceLockingEnabled((p) => !p)}
             onToggleFullscreen={toggleFullscreen}
             onShowShortcuts={() => setShowShortcuts(true)}
             onToggleDebug={() =>

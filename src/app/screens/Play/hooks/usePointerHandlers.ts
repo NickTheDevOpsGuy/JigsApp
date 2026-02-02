@@ -57,6 +57,9 @@ export function usePointerHandlers(args: {
       // Hard lock: placed pieces never rotate
       if (piece.isPlaced) return false;
 
+      // User lock: locked pieces cannot be rotated
+      if (piece.locked) return false;
+
       // Pieces in tray should not rotate from board interactions
       if (piece.inTray) return false;
 
@@ -108,6 +111,10 @@ export function usePointerHandlers(args: {
       const boardPieces = st.pieces.filter((p) => !p.inTray);
       const pieceId = pickPieceId(ctx, boardPieces, cssX, cssY);
       if (!pieceId) return;
+
+      // Locked pieces cannot be interacted with (no select, drag, or long-press)
+      const piece = st.pieces.find((p) => p.id === pieceId);
+      if (piece?.locked) return;
 
       // Select what we clicked
       selectedIdRef.current = pieceId;

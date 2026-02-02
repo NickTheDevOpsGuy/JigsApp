@@ -17,6 +17,7 @@ export type HeaderMenuProps = {
   showPreview: boolean;
   soundEnabled: boolean;
   hapticsEnabled: boolean;
+  pieceLockingEnabled: boolean;
   isFullscreen: boolean;
 
   canShowHaptics: boolean;
@@ -30,6 +31,7 @@ export type HeaderMenuProps = {
   onTogglePreview: () => void;
   onToggleSound: () => void;
   onToggleHaptics: () => void;
+  onTogglePieceLocking: () => void;
   onToggleFullscreen: () => void;
   onShowShortcuts: () => void;
   onToggleDebug: () => void;
@@ -135,6 +137,17 @@ export function HeaderMenu(props: HeaderMenuProps) {
           >
             <ThemeToggle variant="menuItem" />
           </div>
+
+          <button
+            className={styles.headerMenuItem}
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              props.onTogglePieceLocking();
+            }}
+          >
+            {props.pieceLockingEnabled ? "Lock pieces: on" : "Lock pieces: off"}
+          </button>
 
           {props.canShowHaptics && (
             <button
