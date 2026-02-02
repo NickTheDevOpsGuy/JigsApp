@@ -202,7 +202,13 @@ export function SetupScreen() {
       return;
     }
 
-    if (isCustom && (customRows < MIN_GRID || customRows > MAX_GRID || customCols < MIN_GRID || customCols > MAX_GRID)) {
+    if (
+      isCustom &&
+      (customRows < MIN_GRID ||
+        customRows > MAX_GRID ||
+        customCols < MIN_GRID ||
+        customCols > MAX_GRID)
+    ) {
       setError(`Grid must be ${MIN_GRID}–${MAX_GRID} rows and columns.`);
       return;
     }
