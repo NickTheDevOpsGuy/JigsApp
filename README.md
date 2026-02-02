@@ -204,7 +204,7 @@ Category = folder name, puzzle name = filename.
 
 ```plaintext
 
-.
+..
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -243,9 +243,6 @@ Category = folder name, puzzle name = filename.
 │   └── deps
 │       ├── _metadata.json
 │       └── package.json
-├── Assets
-│   └── Preview
-│       └── preview.gif
 ├── public
 │   └── favicon.svg
 ├── scripts
@@ -257,11 +254,21 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── animals
 │   │   │   │   │   ├── bear.png
 │   │   │   │   │   └── rabbit.png
-│   │   │   │   └── demo
-│   │   │   │       ├── blue_square_thumb.png
-│   │   │   │       ├── green_triangle_thumb.png
-│   │   │   │       ├── red_circle_thumb.png
-│   │   │   │       └── yellow_star_thumb.png
+│   │   │   │   ├── demo
+│   │   │   │   │   ├── blue_square_thumb.png
+│   │   │   │   │   ├── green_triangle_thumb.png
+│   │   │   │   │   ├── red_circle_thumb.png
+│   │   │   │   │   └── yellow_star_thumb.png
+│   │   │   │   ├── flowers
+│   │   │   │   │   ├── daisy.png
+│   │   │   │   │   ├── flower_bed.png
+│   │   │   │   │   ├── lavender.png
+│   │   │   │   │   └── sunflower.png
+│   │   │   │   └── food
+│   │   │   │       ├── charcuterie_board.png
+│   │   │   │       ├── curries_and_rice.png
+│   │   │   │       ├── fruit_platter.png
+│   │   │   │       └── pasta_dishes.png
 │   │   │   └── ui
 │   │   │       └── phuzzle-logo-512.png
 │   │   ├── audio
@@ -274,9 +281,8 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
 │   │   │   ├── HowToPlay
-│   │   │   │   ├── HowToPlay.module.css
-│   │   │   │   ├── HowToPlayModal.tsx
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── TutorialOverlay.module.css
 │   │   │   │   └── TutorialOverlay.tsx
 │   │   │   ├── Modal
 │   │   │   │   ├── Modal.module.css
@@ -367,7 +373,6 @@ Category = folder name, puzzle name = filename.
 ├── tsconfig.json
 ├── tsconfig.node.json
 ├── vercel.json
-└── vite.config.ts
 
 ```
 

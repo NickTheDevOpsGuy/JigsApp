@@ -10,6 +10,7 @@ export type ShortcutAction =
   | "newGame"
   | "toggleSound"
   | "toggleHaptics"
+  | "toggleGhostHint"
   | "rotateCW" // Rotate clockwise
   | "rotateCCW" // Rotate counter-clockwise
   | "nextPiece" // Select next piece
@@ -135,6 +136,10 @@ export function useKeyboardShortcuts({
       else if (key === "h" && !mod) {
         action = "toggleHaptics";
       }
+      // G - Toggle ghost hint
+      else if (key === "g" && !mod) {
+        action = "toggleGhostHint";
+      }
       // ? or F1 - Show help
       else if ((key === "?" || e.key === "F1") && !mod) {
         e.preventDefault();
@@ -169,6 +174,7 @@ export const SHORTCUTS = [
   { keys: ["F"], action: "Fullscreen" },
   { keys: ["M"], action: "Mute / Unmute sound" },
   { keys: ["H"], action: "Toggle haptics" },
+  { keys: ["G"], action: "Toggle ghost hint" },
   { keys: ["N"], action: "New puzzle" },
   { keys: ["?", "F1"], action: "Show shortcuts" },
   { keys: ["Esc"], action: "Close / Unpause" },

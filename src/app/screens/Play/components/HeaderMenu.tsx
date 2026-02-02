@@ -18,6 +18,7 @@ export type HeaderMenuProps = {
   soundEnabled: boolean;
   hapticsEnabled: boolean;
   pieceLockingEnabled: boolean;
+  showGhostHint: boolean;
   isFullscreen: boolean;
 
   canShowHaptics: boolean;
@@ -32,6 +33,7 @@ export type HeaderMenuProps = {
   onToggleSound: () => void;
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
+  onToggleGhostHint: () => void;
   onToggleFullscreen: () => void;
   onShowShortcuts: () => void;
   onToggleDebug: () => void;
@@ -108,6 +110,93 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
           <div className={styles.headerMenuDivider} />
 
+          <div className={styles.headerMenuSection}>Settings</div>
+          {/* Toggles in alphabetical order */}
+          {props.canShowDebug && (
+            <button
+              className={styles.headerMenuItem}
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                props.onToggleDebug();
+              }}
+            >
+              Debug overlay
+            </button>
+          )}
+
+          {props.canShowFullscreen && (
+            <button
+              className={styles.headerMenuItem}
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                props.onToggleFullscreen();
+              }}
+            >
+              {props.isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+            </button>
+          )}
+
+          <button
+            className={styles.headerMenuItem}
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              props.onToggleGhostHint();
+            }}
+          >
+            {props.showGhostHint ? "Ghost hint: on" : "Ghost hint: off"}
+          </button>
+
+          {props.canShowHaptics && (
+            <button
+              className={styles.headerMenuItem}
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                props.onToggleHaptics();
+              }}
+            >
+              {props.hapticsEnabled ? "Haptics: on" : "Haptics: off"}
+            </button>
+          )}
+
+          <div className={styles.headerMenuDivider} />
+
+          <div className={styles.headerMenuSection}>Help</div>
+          {props.canShowShortcuts && (
+            <button
+              className={styles.headerMenuItem}
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                props.onShowShortcuts();
+              }}
+            >
+              Keyboard shortcuts
+            </button>
+          )}
+
+          <div
+            className={styles.headerMenuToggle}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <ThemeToggle variant="menuItem" />
+          </div>
+
+          <button
+            className={styles.headerMenuItem}
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              props.onTogglePieceLocking();
+            }}
+          >
+            {props.pieceLockingEnabled ? "Lock pieces: on" : "Lock pieces: off"}
+          </button>
+
           <button
             className={styles.headerMenuItem}
             role="menuitem"
@@ -129,77 +218,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
           >
             {props.soundEnabled ? "Sound: on" : "Sound: off"}
           </button>
-
-          <div
-            className={styles.headerMenuToggle}
-            role="menuitem"
-            onClick={() => setOpen(false)}
-          >
-            <ThemeToggle variant="menuItem" />
-          </div>
-
-          <button
-            className={styles.headerMenuItem}
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              props.onTogglePieceLocking();
-            }}
-          >
-            {props.pieceLockingEnabled ? "Lock pieces: on" : "Lock pieces: off"}
-          </button>
-
-          {props.canShowHaptics && (
-            <button
-              className={styles.headerMenuItem}
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                props.onToggleHaptics();
-              }}
-            >
-              {props.hapticsEnabled ? "Haptics: on" : "Haptics: off"}
-            </button>
-          )}
-
-          {props.canShowShortcuts && (
-            <button
-              className={styles.headerMenuItem}
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                props.onShowShortcuts();
-              }}
-            >
-              Keyboard shortcuts
-            </button>
-          )}
-
-          {props.canShowFullscreen && (
-            <button
-              className={styles.headerMenuItem}
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                props.onToggleFullscreen();
-              }}
-            >
-              {props.isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-            </button>
-          )}
-
-          {props.canShowDebug && (
-            <button
-              className={styles.headerMenuItem}
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                props.onToggleDebug();
-              }}
-            >
-              Debug overlay
-            </button>
-          )}
         </div>
       )}
     </div>
