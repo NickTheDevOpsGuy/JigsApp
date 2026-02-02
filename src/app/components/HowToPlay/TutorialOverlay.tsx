@@ -57,6 +57,15 @@ export function TutorialOverlay({
         </p>
 
         <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>📐 Rows & Columns</h3>
+          <p>
+            When creating a puzzle, <strong>rows</strong> and <strong>columns</strong> set
+            how many pieces the image is split into. A 4×4 grid = 16 pieces; 6×6 = 36
+            pieces. More pieces = harder puzzle.
+          </p>
+        </div>
+
+        <div className={styles.section}>
           <h3 className={styles.sectionTitle}>🧩 Moving Pieces</h3>
           <p>
             {isTouch ? "Touch and drag" : "Click and drag"} pieces to move them around the

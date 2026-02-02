@@ -141,6 +141,45 @@
   color: var(--color-text-secondary);
 }
 
+.customGrid {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.customGridLabel {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.customGridInput {
+  height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 16px;
+}
+
+.customGridInput:focus {
+  outline: none;
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
+}
+
+.customGridTimes {
+  align-self: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-brand-primary);
+  padding-bottom: 8px;
+}
+
 /* Tabs for Gallery/Upload */
 .tabs {
   display: flex;

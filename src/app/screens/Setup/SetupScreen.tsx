@@ -25,7 +25,11 @@ const GRID_OPTIONS: GridOption[] = [
   { label: "Medium (4×4 - 16 pieces)", rows: 4, cols: 4 },
   { label: "Hard (5×5 - 25 pieces)", rows: 5, cols: 5 },
   { label: "Expert (6×6 - 36 pieces)", rows: 6, cols: 6 },
+  { label: "Custom", rows: 0, cols: 0 },
 ];
+
+const MIN_GRID = 2;
+const MAX_GRID = 12;
 
 type ImageSource = "upload" | "gallery";
 
@@ -40,6 +44,8 @@ export function SetupScreen() {
   const [imageSource, setImageSource] = useState<ImageSource>("gallery");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedPuzzle, setSelectedPuzzle] = useState<SamplePuzzle | null>(null);
+  const [customRows, setCustomRows] = useState(5);
+  const [customCols, setCustomCols] = useState(5);
 
   useEffect(() => {
     const existingImg = localStorage.getItem(STORAGE_KEY);
@@ -47,10 +53,25 @@ export function SetupScreen() {
 
     const existingGrid = localStorage.getItem(GRID_KEY);
     if (existingGrid) {
-      const idx = GRID_OPTIONS.findIndex((g) => `${g.rows}x${g.cols}` === existingGrid);
-      if (idx >= 0) setGridIndex(idx);
+      const idx = GRID_OPTIONS.findIndex(
+        (g) => g.rows > 0 && `${g.rows}x${g.cols}` === existingGrid,
+      );
+      if (idx >= 0) {
+        setGridIndex(idx);
+      } else {
+        const [r, c] = existingGrid.split("x").map(Number);
+        if (r >= MIN_GRID && r <= MAX_GRID && c >= MIN_GRID && c <= MAX_GRID) {
+          setGridIndex(GRID_OPTIONS.length - 1); // Custom
+          setCustomRows(r);
+          setCustomCols(c);
+        }
+      }
     }
   }, []);
+
+  const isCustom = gridIndex === GRID_OPTIONS.length - 1;
+  const effectiveRows = isCustom ? customRows : GRID_OPTIONS[gridIndex].rows;
+  const effectiveCols = isCustom ? customCols : GRID_OPTIONS[gridIndex].cols;
 
   const filteredPuzzles =
     selectedCategory === "all"
@@ -160,11 +181,9 @@ export function SetupScreen() {
       }
 
       // Check if image is very small for higher difficulties
-      const selected = GRID_OPTIONS[gridIndex];
-      const minForGrid = selected.cols * 50; // At least 50px per piece
+      const minForGrid = effectiveCols * 50; // At least 50px per piece
       if (width < minForGrid || height < minForGrid) {
-        // Just warn, don't block
-        console.warn(`Image may be too small for ${selected.label} difficulty`);
+        console.warn(`Image may be too small for ${effectiveRows}×${effectiveCols} grid`);
       }
 
       setImgDataUrl(dataUrl);
@@ -183,11 +202,14 @@ export function SetupScreen() {
       return;
     }
 
-    const selected = GRID_OPTIONS[gridIndex];
+    if (isCustom && (customRows < MIN_GRID || customRows > MAX_GRID || customCols < MIN_GRID || customCols > MAX_GRID)) {
+      setError(`Grid must be ${MIN_GRID}–${MAX_GRID} rows and columns.`);
+      return;
+    }
 
     try {
       localStorage.setItem(STORAGE_KEY, imgDataUrl);
-      localStorage.setItem(GRID_KEY, `${selected.rows}x${selected.cols}`);
+      localStorage.setItem(GRID_KEY, `${effectiveRows}x${effectiveCols}`);
       nav("/play");
     } catch {
       // localStorage might be full or disabled
@@ -285,10 +307,51 @@ export function SetupScreen() {
           onChange={(val) => setGridIndex(Number(val))}
           options={GRID_OPTIONS.map((opt, i) => ({
             value: i,
-            label: opt.label,
+            label:
+              opt.rows > 0
+                ? opt.label
+                : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
           }))}
           fullWidth
         />
+
+        {isCustom && (
+          <div className={styles.customGrid}>
+            <label className={styles.customGridLabel}>
+              Rows
+              <input
+                type="number"
+                min={MIN_GRID}
+                max={MAX_GRID}
+                value={customRows}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value, 10);
+                  setCustomRows(
+                    isNaN(v) ? MIN_GRID : Math.min(MAX_GRID, Math.max(MIN_GRID, v)),
+                  );
+                }}
+                className={styles.customGridInput}
+              />
+            </label>
+            <span className={styles.customGridTimes}>×</span>
+            <label className={styles.customGridLabel}>
+              Cols
+              <input
+                type="number"
+                min={MIN_GRID}
+                max={MAX_GRID}
+                value={customCols}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value, 10);
+                  setCustomCols(
+                    isNaN(v) ? MIN_GRID : Math.min(MAX_GRID, Math.max(MIN_GRID, v)),
+                  );
+                }}
+                className={styles.customGridInput}
+              />
+            </label>
+          </div>
+        )}
 
         <div className={styles.preview}>
           {isLoading ? (
