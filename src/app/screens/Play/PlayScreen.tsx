@@ -292,12 +292,18 @@ export function PlayScreen() {
               else if (action === "moveRight") dx = moveAmount;
 
               manager.nudgeGroup(selectedPieceId, dx, dy);
-              manager.snapGroupNow(selectedPieceId);
+              manager.snapGroupNow(selectedPieceId, true); // skipPush - nudgeGroup already pushed
               setState(manager.getState());
             }
           }
           break;
         }
+        case "undo":
+          if (manager && manager.canUndo() && !isPaused && !state?.isComplete) {
+            manager.undo();
+            setState(manager.getState());
+          }
+          break;
         case "showHelp":
           setShowShortcuts((s) => !s);
           break;
@@ -527,35 +533,35 @@ export function PlayScreen() {
       if (e.key === "ArrowLeft") {
         e.preventDefault();
         manager.nudgeGroup(id, -step, 0);
-        manager.snapGroupNow(id);
+        manager.snapGroupNow(id, true); // skipPush - nudgeGroup already pushed
         setState(manager.getState());
         return;
       }
       if (e.key === "ArrowRight") {
         e.preventDefault();
         manager.nudgeGroup(id, step, 0);
-        manager.snapGroupNow(id);
+        manager.snapGroupNow(id, true);
         setState(manager.getState());
         return;
       }
       if (e.key === "ArrowUp") {
         e.preventDefault();
         manager.nudgeGroup(id, 0, -step);
-        manager.snapGroupNow(id);
+        manager.snapGroupNow(id, true);
         setState(manager.getState());
         return;
       }
       if (e.key === "ArrowDown") {
         e.preventDefault();
         manager.nudgeGroup(id, 0, step);
-        manager.snapGroupNow(id);
+        manager.snapGroupNow(id, true);
         setState(manager.getState());
         return;
       }
 
       if (e.key === "Enter") {
         e.preventDefault();
-        manager.snapGroupNow(id);
+        manager.snapGroupNow(id); // push - Enter alone is a distinct action
         setState(manager.getState());
         return;
       }
@@ -786,6 +792,13 @@ export function PlayScreen() {
         <div className={styles.topBarLeft}>
           <HeaderMenu
             title="Phuzzle"
+            canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
+            onUndo={() => {
+              if (manager?.canUndo()) {
+                manager.undo();
+                setState(manager.getState());
+              }
+            }}
             showPreview={showPreview}
             soundEnabled={soundEnabled}
             hapticsEnabled={hapticsEnabled}

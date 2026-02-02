@@ -336,7 +336,7 @@ export function usePointerHandlers(args: {
             const pid = pickPieceId(ctx, boardPieces, x, y);
 
             if (pid && canRotatePiece(pid)) {
-              manager.rotatePiece(pid);
+              manager.rotatePiece(pid); // tap: no pointerDown, so rotatePiece pushes
               soundManager.play("rotate");
               haptic?.("rotate");
               setState(manager.getState());
