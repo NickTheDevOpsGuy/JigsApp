@@ -238,6 +238,9 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── porcupine.png
 │   │   │   │   │   ├── redpanda.png
 │   │   │   │   │   └── turtle.png
+│   │   │   │   ├── cartoon
+│   │   │   │   │   ├── bear.png
+│   │   │   │   │   └── rabbit.png
 │   │   │   │   ├── flowers
 │   │   │   │   │   ├── daisy.png
 │   │   │   │   │   ├── flower_bed.png
@@ -353,7 +356,6 @@ Category = folder name, puzzle name = filename.
 ├── tsconfig.json
 ├── tsconfig.node.json
 ├── vercel.json
-└── vite.config.ts
 
 ```
 
