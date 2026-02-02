@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/Button/Button";
+import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import styles from "../PlayScreen.module.css";
 
 type DebugFlags = {
@@ -126,6 +127,14 @@ export function HeaderMenu(props: HeaderMenuProps) {
           >
             {props.soundEnabled ? "Sound: on" : "Sound: off"}
           </button>
+
+          <div
+            className={styles.headerMenuToggle}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <ThemeToggle variant="menuItem" />
+          </div>
 
           {props.canShowHaptics && (
             <button

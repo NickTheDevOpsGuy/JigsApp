@@ -26,45 +26,90 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
     <div className={styles.overlay}>
       <div className={styles.tutorialCard}>
         <div className={styles.tutorialIcon}>🧩</div>
-        <h2 className={styles.tutorialTitle}>Welcome to Phuzzle!</h2>
 
-        <div className={styles.tutorialSteps}>
-          <div className={styles.tutorialStep}>
-            <span className={styles.stepIcon}>👆</span>
-            <span className={styles.stepText}>
-              <strong>{isTouch ? "Drag" : "Click & drag"}</strong> pieces to move them
-            </span>
-          </div>
+        {isTouch ? (
+          <>
+            <h2 className={styles.tutorialTitle}>How to Play on Mobile</h2>
 
-          <div className={styles.tutorialStep}>
-            <span className={styles.stepIcon}>🔄</span>
-            <span className={styles.stepText}>
-              <strong>{isTouch ? "Double-tap" : "Right-click"}</strong> to rotate pieces
-            </span>
-          </div>
+            <div className={styles.tutorialSteps}>
+              <div className={styles.tutorialStep}>
+                <span className={styles.stepIcon}>👉</span>
+                <span className={styles.stepText}>
+                  <strong>Drag</strong> pieces to move them
+                </span>
+              </div>
 
-          <div className={styles.tutorialStep}>
-            <span className={styles.stepIcon}>📥</span>
-            <span className={styles.stepText}>
-              <strong>{isTouch ? "Long-press" : "Middle-click"}</strong> to store pieces
-              in the drawer
-            </span>
-          </div>
+              <div className={styles.tutorialStep}>
+                <span className={styles.stepIcon}>🔄</span>
+                <span className={styles.stepText}>
+                  <strong>Tap</strong> a piece to rotate it
+                </span>
+              </div>
 
-          <div className={styles.tutorialStep}>
-            <span className={styles.stepIcon}>✨</span>
-            <span className={styles.stepText}>
-              Pieces <strong>snap together</strong> when correctly aligned
-            </span>
-          </div>
-        </div>
+              <div className={styles.tutorialStep}>
+                <span className={styles.stepIcon}>📥</span>
+                <span className={styles.stepText}>
+                  <strong>Long-press</strong> to send a piece to the drawer
+                </span>
+              </div>
+
+              <div className={styles.tutorialStep}>
+                <span className={styles.stepIcon}>✨</span>
+                <span className={styles.stepText}>
+                  Pieces <strong>snap together</strong> when aligned
+                </span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 className={styles.tutorialTitle}>How to Play</h2>
+
+            <div className={styles.tutorialSteps}>
+              <div className={styles.tutorialStep}>
+                <span className={styles.stepIcon}>🖱️</span>
+                <span className={styles.stepText}>
+                  <strong>Click & drag</strong> pieces to move them
+                </span>
+              </div>
+
+              <div className={styles.tutorialStep}>
+                <span className={styles.stepIcon}>🔄</span>
+                <span className={styles.stepText}>
+                  <strong>Right-click</strong> to rotate a piece
+                </span>
+              </div>
+
+              <div className={styles.tutorialStep}>
+                <span className={styles.stepIcon}>📥</span>
+                <span className={styles.stepText}>
+                  <strong>Middle-click</strong> to send a piece to the drawer
+                </span>
+              </div>
+
+              <div className={styles.tutorialStep}>
+                <span className={styles.stepIcon}>⌨️</span>
+                <span className={styles.stepText}>
+                  Use <strong>keyboard shortcuts</strong> to move and rotate pieces
+                </span>
+              </div>
+
+              <div className={styles.tutorialStep}>
+                <span className={styles.stepIcon}>✨</span>
+                <span className={styles.stepText}>
+                  Pieces <strong>snap together</strong> when aligned
+                </span>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className={styles.tutorialFooter}>
           <Button variant="primary" onClick={handleDismiss} fullWidth>
             Start Puzzling!
           </Button>
           <button className={styles.skipLink} onClick={handleDismiss}>
-            Don't show this again
+            Don&apos;t show this again
           </button>
         </div>
       </div>

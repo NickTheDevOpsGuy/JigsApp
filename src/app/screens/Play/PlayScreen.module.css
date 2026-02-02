@@ -1,14 +1,12 @@
-/* src/app/screens/Play/PlayScreen.module.css */
+/* src/app/screens/Play/PlayScreen.module.css - Dark Mode Support */
 
 .page {
-  /* Fix for iOS 100vh issue */
   min-height: 100vh;
-  min-height: 100dvh; /* Dynamic viewport height - works on modern iOS */
+  min-height: 100dvh;
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #f6f8fb;
-  /* Prevent pull-to-refresh and overscroll */
+  background: var(--color-bg-primary);
   overscroll-behavior: none;
   overflow: hidden;
 }
@@ -16,18 +14,14 @@
 .topBar {
   height: 56px;
   flex-shrink: 0;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 10px;
-
   padding: 0 12px;
-  /* iOS safe area for notch */
   padding-top: env(safe-area-inset-top, 0);
-  background: #ffffff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .topBarLeft {
@@ -58,15 +52,13 @@
   font-size: 20px;
   letter-spacing: 0.5px;
   white-space: nowrap;
-  color: #0b63b8;
+  color: var(--color-brand-primary);
 }
 
-/* Button text - hide on mobile */
 .btnText {
   margin-left: 6px;
 }
 
-/* Timer with monospace digits */
 .timerText {
   font-family: "SF Mono", "Roboto Mono", Consolas, monospace;
   font-variant-numeric: tabular-nums;
@@ -74,27 +66,26 @@
 
 .iconBtn {
   appearance: none;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: #ffffff;
-  color: #111;
-
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
   padding: 8px 10px;
   border-radius: 10px;
-
   font-size: 14px;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.15s ease;
 }
 
 .iconBtn:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--color-bg-card);
+  border-color: var(--color-brand-primary);
 }
 
 .iconBtn:active {
   transform: translateY(1px);
 }
 
-/* HUD area in the header */
 .hud {
   display: flex;
   align-items: center;
@@ -109,9 +100,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 13px;
@@ -124,25 +114,21 @@
 
 .hudPillLive {
   composes: hudPill;
-  background: rgba(255, 196, 0, 0.12);
-  border-color: rgba(255, 196, 0, 0.25);
+  background: var(--color-hud-live-bg);
+  border-color: var(--color-hud-live-border);
+  color: var(--color-text-primary);
 }
 
 .hudPillDone {
   composes: hudPill;
-  background: rgba(0, 160, 80, 0.12);
-  border-color: rgba(0, 160, 80, 0.25);
+  background: var(--color-hud-done-bg);
+  border-color: var(--color-hud-done-border);
+  color: var(--color-text-primary);
 }
 
-/*
-  CRITICAL:
-  - flex: 1 gives height
-  - min-height: 0 prevents flex children from collapsing the board
-*/
 .main {
   flex: 1;
   min-height: 0;
-
   display: flex;
   gap: 12px;
   padding: 12px;
@@ -152,19 +138,12 @@
   flex: 1;
   min-width: 0;
   min-height: 240px;
-
   position: relative;
-  background: #ffffff;
+  background: var(--color-bg-elevated);
   border-radius: 16px;
-
-  /* Subtle border that blends with background */
-  border: 2px solid #e2e8f0;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.06),
-    0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
-
-  /* Touch handling */
   touch-action: none;
   -webkit-overflow-scrolling: auto;
 }
@@ -174,26 +153,22 @@
   height: 100%;
   display: block;
   touch-action: none;
-  /* iOS specific fixes */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Reference preview overlay */
 .previewOverlay {
   position: absolute;
   bottom: 12px;
   right: 12px;
-  background: #ffffff;
+  background: var(--color-bg-elevated);
   border-radius: 8px;
   padding: 4px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
   z-index: 10;
-
-  /* Make it slightly transparent so you can see through */
   opacity: 0.9;
   transition: opacity 0.2s ease;
 }
@@ -213,17 +188,14 @@
 .tray {
   width: clamp(220px, 26vw, 340px);
   flex-shrink: 0;
-
   display: flex;
   flex-direction: column;
-
-  background: #ffffff;
+  background: var(--color-bg-elevated);
   border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-
+  border: 1px solid var(--color-border);
   font-size: 13px;
   line-height: 1.35;
-  color: rgba(0, 0, 0, 0.75);
+  color: var(--color-text-secondary);
   overflow: hidden;
 }
 
@@ -231,7 +203,6 @@
   .main {
     flex-direction: column;
   }
-
   .tray {
     width: auto;
     height: 160px;
@@ -241,8 +212,8 @@
 .trayHeader {
   padding: 8px 12px;
   font-weight: 600;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-card);
   flex-shrink: 0;
   display: flex;
   justify-content: space-between;
@@ -252,7 +223,7 @@
 .trayHelp {
   font-weight: 400;
   font-size: 11px;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--color-text-muted);
 }
 
 .trayScroll {
@@ -280,7 +251,7 @@
 
 .trayPiece:hover {
   transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .trayEmpty {
@@ -288,36 +259,25 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
 .debugInfo {
   padding: 6px 12px;
   font-size: 11px;
-  color: rgba(0, 0, 0, 0.5);
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  background: rgba(0, 0, 0, 0.02);
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-card);
 }
 
 .tray hr {
   border: none;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--color-border);
   margin: 10px 0;
 }
 
-@media (max-width: 900px) {
-  .main {
-    flex-direction: column;
-  }
-
-  .tray {
-    width: auto;
-    min-height: 140px;
-  }
-}
-
-/* Mobile-specific styles */
+/* Mobile */
 @media (max-width: 600px) {
   .topBar {
     height: 48px;
@@ -325,66 +285,54 @@
     padding-top: env(safe-area-inset-top, 0);
     gap: 4px;
   }
-
   .title {
-    display: none; /* Hide title on mobile */
+    display: none;
   }
-
-  /* Hide button text on mobile - show only icons */
   .btnText {
     display: none;
   }
-
   .iconBtn {
     padding: 6px 8px;
     font-size: 12px;
     border-radius: 8px;
   }
-
   .hud {
     gap: 4px;
   }
-
   .hudPill {
     padding: 4px 8px;
     font-size: 11px;
     gap: 4px;
   }
-
-  /* Hide timer on very small screens */
   .hudPillTimer {
     display: none;
   }
-
   .main {
     padding: 8px;
     gap: 8px;
   }
-
   .board {
     min-height: 200px;
     border-width: 2px;
     border-radius: 12px;
   }
-
   .previewOverlay {
     bottom: 8px;
     right: 8px;
   }
-
   .previewImage {
     width: 80px;
     height: 80px;
   }
 }
 
-/* Touch hint for mobile */
+/* Touch hint */
 .touchHint {
   position: absolute;
   bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--color-overlay-hint);
   color: white;
   padding: 6px 12px;
   border-radius: 20px;
@@ -400,28 +348,22 @@
   opacity: 1;
 }
 
-/* Fullscreen mode adjustments */
-.page:fullscreen {
-  background: #f3f7ff;
-}
-
-.page:fullscreen .topBar {
-  background: rgba(255, 255, 255, 0.95);
-}
-
+/* Fullscreen */
+.page:fullscreen,
 .page:-webkit-full-screen {
-  background: #f3f7ff;
+  background: var(--color-bg-primary);
 }
 
+.page:fullscreen .topBar,
 .page:-webkit-full-screen .topBar {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-bg-elevated);
 }
 
 /* Pause overlay */
 .pauseOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: var(--color-overlay-strong);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -468,7 +410,7 @@
 .completeOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: var(--color-overlay-strong);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -500,11 +442,15 @@
   font-size: 3rem;
   margin: 0 0 0.5rem 0;
   font-weight: 600;
-  background: linear-gradient(135deg, #ffd700, #ffec8b);
+  background: linear-gradient(
+    135deg,
+    var(--color-complete-gradient-start),
+    var(--color-complete-gradient-end)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 20px rgba(255, 215, 0, 0.5);
+  text-shadow: 0 2px 20px var(--color-complete-text-shadow);
 }
 
 .completeContent p {
@@ -516,7 +462,7 @@
 .shareSection {
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-overlay-content);
   border-radius: 12px;
 }
 
@@ -538,7 +484,7 @@
   height: 44px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--color-overlay-content-hover);
   color: white;
   font-size: 1.25rem;
   font-weight: bold;
@@ -550,7 +496,7 @@
 }
 
 .socialBtn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--color-overlay-content-active);
   transform: scale(1.1);
 }
 
@@ -574,7 +520,7 @@
   justify-content: center;
 }
 
-/* Hamburger menu styles */
+/* Hamburger menu */
 .headerMenuWrap {
   position: relative;
 }
@@ -585,10 +531,10 @@
   left: 0;
   margin-top: 4px;
   min-width: 200px;
-  background: white;
+  background: var(--color-bg-elevated);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
   padding: 8px 0;
   z-index: 1000;
   animation: menuFadeIn 0.15s ease;
@@ -613,21 +559,28 @@
   background: none;
   text-align: left;
   font-size: 14px;
-  color: #1f2937;
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: background 0.15s ease;
 }
 
 .headerMenuItem:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-card);
 }
 
 .headerMenuItem:active {
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--color-brand-light);
 }
 
 .headerMenuDivider {
   height: 1px;
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--color-border);
   margin: 8px 0;
+}
+
+.headerMenuToggle {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: default;
 }

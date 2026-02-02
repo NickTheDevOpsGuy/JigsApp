@@ -1,6 +1,114 @@
 /* Google Fonts - Inter for UI, Fredoka for logo/title */
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap");
 
+/* ============================================
+   CSS Variables for Theme
+   ============================================ */
+:root {
+  /* Light theme colors */
+  --color-bg-primary: #f3f7ff;
+  --color-bg-secondary: #dff1ff;
+  --color-bg-card: #eef8ff;
+  --color-bg-elevated: #ffffff;
+
+  --color-text-primary: #103257;
+  --color-text-secondary: #0b2e52;
+  --color-text-muted: #5a7a9b;
+
+  --color-brand-primary: #0b63b8;
+  --color-brand-hover: #0952a0;
+  --color-brand-light: #dff1ff;
+
+  --color-border: rgba(11, 99, 184, 0.2);
+  --color-border-strong: rgba(11, 99, 184, 0.35);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.15);
+
+  /* Puzzle-specific */
+  --color-tray-bg: rgba(255, 255, 255, 0.95);
+  --color-piece-shadow: rgba(0, 0, 0, 0.15);
+
+  /* Overlays & overlays */
+  --color-overlay: rgba(0, 0, 0, 0.7);
+  --color-overlay-strong: rgba(0, 0, 0, 0.85);
+  --color-overlay-hint: rgba(0, 0, 0, 0.8);
+  --color-overlay-content: rgba(255, 255, 255, 0.1);
+  --color-overlay-content-hover: rgba(255, 255, 255, 0.15);
+  --color-overlay-content-active: rgba(255, 255, 255, 0.25);
+  --color-complete-gradient-start: #ffd700;
+  --color-complete-gradient-end: #ffec8b;
+  --color-complete-text-shadow: rgba(255, 215, 0, 0.5);
+  --color-hud-live-bg: rgba(255, 196, 0, 0.15);
+  --color-hud-live-border: rgba(255, 196, 0, 0.3);
+  --color-hud-done-bg: rgba(0, 200, 100, 0.15);
+  --color-hud-done-border: rgba(0, 200, 100, 0.3);
+
+  /* Focus/selection ring */
+  --color-focus-ring: rgba(11, 99, 184, 0.3);
+
+  /* Error state */
+  --color-error: #dc2626;
+  --color-error-hover: #991b1b;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
+}
+
+[data-theme="dark"] {
+  /* Dark theme colors */
+  --color-bg-primary: #0a0e14;
+  --color-bg-secondary: #0f1419;
+  --color-bg-card: #151b23;
+  --color-bg-elevated: #1a2128;
+
+  --color-text-primary: #e6edf3;
+  --color-text-secondary: #c9d1d9;
+  --color-text-muted: #8b949e;
+
+  --color-brand-primary: #4a9ff5;
+  --color-brand-hover: #58a6f7;
+  --color-brand-light: #1c3a5c;
+
+  --color-border: rgba(74, 159, 245, 0.2);
+  --color-border-strong: rgba(74, 159, 245, 0.35);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.6);
+
+  /* Puzzle-specific */
+  --color-tray-bg: rgba(21, 27, 35, 0.95);
+  --color-piece-shadow: rgba(0, 0, 0, 0.5);
+
+  /* Overlays & overlays */
+  --color-overlay: rgba(0, 0, 0, 0.8);
+  --color-overlay-strong: rgba(0, 0, 0, 0.9);
+  --color-overlay-hint: rgba(0, 0, 0, 0.85);
+  --color-overlay-content: rgba(255, 255, 255, 0.08);
+  --color-overlay-content-hover: rgba(255, 255, 255, 0.12);
+  --color-overlay-content-active: rgba(255, 255, 255, 0.2);
+  --color-complete-gradient-start: #ffd700;
+  --color-complete-gradient-end: #ffec8b;
+  --color-complete-text-shadow: rgba(255, 215, 0, 0.5);
+  --color-hud-live-bg: rgba(255, 196, 0, 0.2);
+  --color-hud-live-border: rgba(255, 196, 0, 0.4);
+  --color-hud-done-bg: rgba(0, 200, 100, 0.2);
+  --color-hud-done-border: rgba(0, 200, 100, 0.4);
+
+  /* Focus/selection ring */
+  --color-focus-ring: rgba(74, 159, 245, 0.3);
+
+  /* Error state */
+  --color-error: #f87171;
+  --color-error-hover: #fca5a5;
+  --color-error-bg: rgba(248, 113, 113, 0.15);
+  --color-error-border: rgba(248, 113, 113, 0.35);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
 html,
 body,
 #root {
@@ -10,7 +118,7 @@ body,
 
 body {
   margin: 0;
-  background: #f3f7ff;
+  background: var(--color-bg-primary);
   font-family:
     "Inter",
     system-ui,
@@ -20,7 +128,10 @@ body {
     Roboto,
     Arial,
     sans-serif;
-  color: #103257;
+  color: var(--color-text-primary);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 #root {
@@ -36,7 +147,11 @@ img {
   display: block;
 }
 
-/* Utility class for playful/logo font */
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* Playful/logo font */
 .font-display {
   font-family: "Fredoka", system-ui, sans-serif;
 }
@@ -45,4 +160,17 @@ img {
 .font-mono {
   font-family: "SF Mono", "Roboto Mono", Consolas, monospace;
   font-variant-numeric: tabular-nums;
+}
+
+/* Theme transition */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: ease;
+  transition-duration: 0.2s;
+}
+
+/* Disable transitions for images and canvas */
+img,
+canvas {
+  transition: none !important;
 }

@@ -1,16 +1,16 @@
-/* This is a comment */
 /* src/app/components/Modal/Modal.module.css */
 
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
   z-index: 1000;
   animation: fadeIn 0.15s ease;
+  backdrop-filter: blur(4px);
 }
 
 @keyframes fadeIn {
@@ -23,14 +23,15 @@
 }
 
 .modal {
-  background: white;
+  background: var(--color-bg-elevated);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
   max-width: 420px;
   width: 100%;
   max-height: 90vh;
   overflow: auto;
   animation: slideUp 0.2s ease;
+  border: 1px solid var(--color-border);
 }
 
 @keyframes slideUp {
@@ -48,85 +49,43 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .title {
-  margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  color: #111;
+  color: var(--color-text-primary);
+  margin: 0;
 }
 
-.closeBtn {
+.closeButton {
   appearance: none;
   background: none;
   border: none;
-  font-size: 24px;
-  color: rgba(0, 0, 0, 0.5);
+  padding: 4px;
   cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: var(--color-text-muted);
   border-radius: 8px;
   transition: all 0.15s ease;
 }
 
-.closeBtn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: rgba(0, 0, 0, 0.8);
+.closeButton:hover {
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
 }
 
 .content {
-  padding: 20px;
+  padding: 24px;
+  color: var(--color-text-secondary);
 }
 
-.message {
-  margin: 0 0 20px;
-  color: #333;
-  line-height: 1.5;
-}
-
-.actions {
+.footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-card);
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-}
-
-.dangerBtn {
-  background: #dc2626 !important;
-  border-color: #dc2626 !important;
-}
-
-.dangerBtn:hover:not(:disabled) {
-  background: #b91c1c !important;
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  .modal {
-    max-width: 100%;
-    border-radius: 12px;
-  }
-
-  .header {
-    padding: 14px 16px;
-  }
-
-  .title {
-    font-size: 16px;
-  }
-
-  .content {
-    padding: 16px;
-  }
-
-  .actions {
-    flex-direction: column-reverse;
-  }
 }

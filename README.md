@@ -11,7 +11,8 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 ## ▶️ Play Phuzzle
 
-👉 **https://phuzzle.vercel.app/**  
+👉 **https://phuzzle.vercel.app/**
+
 No install required. Works on desktop and mobile.
 
 ---
@@ -79,12 +80,15 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### UX & Polish
 
+- Added a toggle in the hamburger menu to switch between light and dark mode
 - Reference image preview overlay
 - Progress counter and timer (with pause)
 - Confetti celebration on completion 🎉
 - Sound effects (snap, rotate, place, complete)
 - Fullscreen mode
 - Custom fonts and icons (Inter, Fredoka, Lucide)
+
+### Mobile Support
 
 ### Mobile Support
 
@@ -201,10 +205,6 @@ Category = folder name, puzzle name = filename.
 ```plaintext
 
 .
-├── CONTRIBUTORS.md
-├── .env.example
-├── .eslintcache
-├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -213,47 +213,55 @@ Category = folder name, puzzle name = filename.
 │   │   ├── enhancement_refactor.yml
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
-│   ├── pull_request_template.md
-│   └── workflows
-│       ├── CODEOWNERS
-│       ├── Phuzzle.yml
-│       └── vercel-production.yml
-├── .gitignore
+│   ├── workflows
+│   │   ├── CODEOWNERS
+│   │   ├── Phuzzle.yml
+│   │   └── vercel-production.yml
+│   └── pull_request_template.md
 ├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── pre-push
+│   │   ├── pre-rebase
+│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
-├── index.html
-├── LICENSE.md
-├── package.json
-├── .prettierignore
-├── .prettierrc.yml
+├── .vite
+│   └── deps
+│       ├── _metadata.json
+│       └── package.json
+├── Assets
+│   └── Preview
+│       └── preview.gif
 ├── public
 │   └── favicon.svg
-├── README.md
 ├── scripts
 │   └── precheck.sh
 ├── src
 │   ├── app
-│   │   ├── App.tsx
 │   │   ├── assets
 │   │   │   ├── puzzles
 │   │   │   │   ├── animals
 │   │   │   │   │   ├── bear.png
-│   │   │   │   │   ├── frog.png
-│   │   │   │   │   ├── kitten.png
 │   │   │   │   │   └── rabbit.png
-│   │   │   │   ├── demo
-│   │   │   │   │   ├── blue_square_thumb.png
-│   │   │   │   │   ├── four_quadrants_thumb.png
-│   │   │   │   │   ├── green_triangle_thumb.png
-│   │   │   │   │   ├── red_circle_thumb.png
-│   │   │   │   │   ├── two_color_split_thumb.png
-│   │   │   │   │   └── yellow_star_thumb.png
-│   │   │   │   └── food
-│   │   │   │       ├── charcuterie_board.png
-│   │   │   │       ├── curries_and_rice.png
-│   │   │   │       ├── fruit_platter.png
-│   │   │   │       └── pasta_dishes.png
+│   │   │   │   └── demo
+│   │   │   │       ├── blue_square_thumb.png
+│   │   │   │       ├── green_triangle_thumb.png
+│   │   │   │       ├── red_circle_thumb.png
+│   │   │   │       └── yellow_star_thumb.png
 │   │   │   └── ui
 │   │   │       └── phuzzle-logo-512.png
 │   │   ├── audio
@@ -266,8 +274,8 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
 │   │   │   ├── HowToPlay
-│   │   │   │   ├── HowToPlayModal.tsx
 │   │   │   │   ├── HowToPlay.module.css
+│   │   │   │   ├── HowToPlayModal.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── TutorialOverlay.tsx
 │   │   │   ├── Modal
@@ -279,24 +287,27 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── ShortcutsModal
 │   │   │   │   ├── ShortcutsModal.module.css
 │   │   │   │   └── ShortcutsModal.tsx
+│   │   │   ├── ThemeToggle
+│   │   │   │   ├── ThemeToggle.module.css
+│   │   │   │   └── ThemeToggle.tsx
 │   │   │   └── Tray
 │   │   │       ├── Tray.module.css
 │   │   │       └── Tray.tsx
 │   │   ├── data
 │   │   │   └── samplePuzzles.ts
 │   │   ├── hooks
-│   │   │   └── useKeyboardShortcuts.ts
-│   │   ├── main.tsx
+│   │   │   ├── useKeyboardShortcuts.ts
+│   │   │   └── useTheme.tsx
 │   │   ├── puzzle
 │   │   │   ├── canvas
 │   │   │   │   ├── pickPiece.ts
 │   │   │   │   ├── renderBoard.ts
 │   │   │   │   ├── renderTrayPiece.ts
 │   │   │   │   └── shape.ts
-│   │   │   ├── colorUtils.ts
-│   │   │   ├── config.ts
 │   │   │   ├── factories
 │   │   │   │   └── createInitialPieces.ts
+│   │   │   ├── colorUtils.ts
+│   │   │   ├── config.ts
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleStorage.ts
 │   │   │   ├── shape.ts
@@ -318,34 +329,39 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── PlayHUD.tsx
 │   │   │   │   │   └── TopBarButtons.tsx
 │   │   │   │   ├── hooks
-│   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── useCoarsePointer.ts
-│   │   │   │   │   ├── useDownloadImage.ts
-│   │   │   │   │   ├── useFullscreen.ts
-│   │   │   │   │   ├── useGameTimer.ts
 │   │   │   │   │   ├── useHaptics.ts
 │   │   │   │   │   ├── useInputHints.ts
-│   │   │   │   │   ├── usePieceSelection.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── usePuzzleLifecycle.ts
-│   │   │   │   │   ├── useShareResults.ts
-│   │   │   │   │   └── useSoundSettings.ts
+│   │   │   │   │   └── useShareResults.ts
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
 │   │   │   │   └── playUtils.ts
 │   │   │   └── Setup
-│   │   │       ├── hooks
-│   │   │       │   ├── index.ts
-│   │   │       │   ├── useGridSettings.ts
-│   │   │       │   └── useImageSelection.ts
 │   │   │       ├── SetupScreen.module.css
 │   │   │       └── SetupScreen.tsx
 │   │   ├── styles
 │   │   │   └── global.css
+│   │   ├── App.tsx
+│   │   ├── main.tsx
 │   │   └── vite-env.d.ts
 │   └── types
 │       ├── canvas-confetti.d.ts
 │       └── vite-env.d.ts
+├── .env.development
+├── .env.example
+├── .eslintcache
+├── .gitignore
+├── .prettierignore
+├── .prettierrc.yml
+├── CONTRIBUTORS.md
+├── eslint.config.ts
+├── index.html
+├── LICENSE.md
+├── package-lock.json
+├── package.json
+├── README.md
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
