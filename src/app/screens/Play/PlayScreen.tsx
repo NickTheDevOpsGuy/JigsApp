@@ -245,14 +245,11 @@ export function PlayScreen() {
             );
             if (movablePieces.length === 0) break;
 
-            const currentIndex = movablePieces.findIndex(
-              (p) => p.id === selectedPieceId,
-            );
+            const currentIndex = movablePieces.findIndex((p) => p.id === selectedPieceId);
             let newIndex: number;
 
             if (action === "nextPiece") {
-              newIndex =
-                currentIndex < 0 ? 0 : (currentIndex + 1) % movablePieces.length;
+              newIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % movablePieces.length;
             } else {
               newIndex =
                 currentIndex < 0
