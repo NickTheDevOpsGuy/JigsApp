@@ -252,9 +252,6 @@ export function PlayScreen() {
       ? getBestTime(state.grid.rows, state.grid.cols)
       : null;
 
-  const isCountdownExpired =
-    timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused;
-
   return (
     <div className={styles.page} ref={pageRef}>
       <div className={styles.topBar}>
@@ -358,8 +355,14 @@ export function PlayScreen() {
           {isPaused && (
             <PauseOverlay
               onResume={() => setIsPaused(false)}
-              isCountdownExpired={isCountdownExpired}
-              onNewPuzzle={isCountdownExpired ? handleNewGame : undefined}
+              isCountdownExpired={
+                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
+              }
+              onNewPuzzle={
+                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
+                  ? handleNewGame
+                  : undefined
+              }
             />
           )}
           {isComplete && (
