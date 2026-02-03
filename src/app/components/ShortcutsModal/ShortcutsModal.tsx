@@ -62,21 +62,15 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
                 </tr>
                 <tr>
                   <td className={styles.keys}>
-                    <kbd className={styles.key}>Middle Click</kbd>
+                    <kbd className={styles.key}>Drag</kbd> to drawer
                   </td>
-                  <td className={styles.action}>Send to tray</td>
+                  <td className={styles.action}>Store piece (desktop & touch)</td>
                 </tr>
                 <tr>
                   <td className={styles.keys}>
                     <kbd className={styles.key}>Tap</kbd>
                   </td>
                   <td className={styles.action}>Rotate piece (touch)</td>
-                </tr>
-                <tr>
-                  <td className={styles.keys}>
-                    <kbd className={styles.key}>Long Press</kbd>
-                  </td>
-                  <td className={styles.action}>Send to tray (touch)</td>
                 </tr>
               </tbody>
             </table>

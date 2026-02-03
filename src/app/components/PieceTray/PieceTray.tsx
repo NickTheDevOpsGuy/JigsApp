@@ -1,5 +1,5 @@
 // src/app/components/PieceTray/PieceTray.tsx
-import React, { useMemo, useState } from "react";
+import React, { forwardRef, useMemo, useState } from "react";
 import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
@@ -34,7 +34,10 @@ function isEdge(p: Piece, grid: { rows: number; cols: number }) {
   return p.row === 0 || p.row === lastRow || p.col === 0 || p.col === lastCol;
 }
 
-export function PieceTray({ pieces, image, grid, onPieceClick, isCoarsePointer }: Props) {
+export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
+  { pieces, image, grid, onPieceClick, isCoarsePointer },
+  ref,
+) {
   const [section, setSection] = useState<TraySection>("all");
   const [sortMode, setSortMode] = useState<SortMode>("grid");
 
@@ -83,13 +86,8 @@ export function PieceTray({ pieces, image, grid, onPieceClick, isCoarsePointer }
 
   const displayed = sections[section];
 
-  const helpText = isCoarsePointer
-    ? "Long-press to store • Tap to rotate"
-    : "Middle-click to store • Right-click to rotate";
-
-  const emptyText = isCoarsePointer
-    ? "Long-press pieces to store them here"
-    : "Middle-click pieces to store them here";
+  const helpText = "Drag pieces here to store • Tap to place";
+  const emptyText = "Drag pieces here to store them";
 
   // Generate jigsaw-shaped thumbnails using the same clip path as the board renderer.
   // Memoized so the tray stays snappy.
@@ -117,7 +115,7 @@ export function PieceTray({ pieces, image, grid, onPieceClick, isCoarsePointer }
   }, [displayed, image, grid]);
 
   return (
-    <div className={styles.tray}>
+    <div className={styles.tray} ref={ref}>
       <div className={styles.header}>
         <div className={styles.title}>Piece Drawer ({pieces.length})</div>
         <div className={styles.help}>{helpText}</div>
@@ -207,4 +205,4 @@ export function PieceTray({ pieces, image, grid, onPieceClick, isCoarsePointer }
       </div>
     </div>
   );
-}
+});

@@ -1,6 +1,7 @@
 import type { DragState, GridSize, Piece, PuzzleState } from "./types";
 import { createInitialPieces } from "./factories/createInitialPieces";
 import type { SavedPiece } from "./puzzleStorage";
+import { UndoManager } from "./undoManager";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
@@ -30,30 +31,13 @@ function _clamp(n: number, min: number, max: number) {
 
 const UNDO_HISTORY_LIMIT = 30;
 
-function piecesToSaved(pieces: Piece[]): SavedPiece[] {
-  return pieces.map((p) => ({
-    id: p.id,
-    row: p.row,
-    col: p.col,
-    x: p.x,
-    y: p.y,
-    z: p.z,
-    rotation: p.rotation,
-    isPlaced: p.isPlaced,
-    locked: p.locked,
-    groupId: p.groupId,
-    inTray: p.inTray,
-  }));
-}
-
 export class PuzzleManager {
   private state: PuzzleState;
   private drag: DragState;
   private zCounter: number;
   private events: PuzzleManagerEvents;
 
-  private undoHistory: SavedPiece[][] = [];
-  private readonly undoHistoryLimit = UNDO_HISTORY_LIMIT;
+  private readonly undoManager = new UndoManager(UNDO_HISTORY_LIMIT);
 
   private boardWidth: number;
   private boardHeight: number;
@@ -319,23 +303,20 @@ export class PuzzleManager {
   /** Save current piece state before a user action (for undo). */
   pushUndoState(): void {
     if (this.state.isComplete) return;
-    const snapshot = piecesToSaved(this.state.pieces);
-    this.undoHistory.push(snapshot);
-    if (this.undoHistory.length > this.undoHistoryLimit) {
-      this.undoHistory.shift();
-    }
+    this.undoManager.push(this.state.pieces);
   }
 
   /** Restore previous piece state. Returns true if undo was performed. */
   undo(): boolean {
-    if (this.undoHistory.length === 0 || this.state.isComplete) return false;
-    const snapshot = this.undoHistory.pop()!;
+    if (!this.undoManager.canUndo() || this.state.isComplete) return false;
+    const snapshot = this.undoManager.pop();
+    if (!snapshot) return false;
     this.restoreFromSaved(snapshot);
     return true;
   }
 
   canUndo(): boolean {
-    return this.undoHistory.length > 0 && !this.state.isComplete;
+    return this.undoManager.canUndo() && !this.state.isComplete;
   }
 
   setPieceLockingEnabled(enabled: boolean): void {

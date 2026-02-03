@@ -1,5 +1,6 @@
 // src/app/puzzle/canvas/renderBoard.ts
 import type { Piece, PuzzleState, DragState } from "@/puzzle/types";
+import { snapPopScale, drawDebugBackdrop, drawGridOverlay } from "./renderBoardHelpers";
 
 export type PopMap = Map<string, number>;
 
@@ -299,36 +300,6 @@ function drawPiece(
   ctx.restore();
 }
 
-function snapPopScale(tMs: number) {
-  // Quick up then back - satisfying snap feel
-  if (tMs <= 0) return 1;
-  if (tMs >= 200) return 1;
-
-  if (tMs < 80) {
-    // Quick scale up
-    const k = tMs / 80;
-    return 1 + 0.1 * easeOutBack(k);
-  }
-
-  // Settle back down
-  const k = (tMs - 80) / 120;
-  return 1.1 - 0.1 * easeOutBounce(k);
-}
-
-// Easing functions for smooth animations
-function easeOutBack(t: number): number {
-  const c1 = 1.70158;
-  const c3 = c1 + 1;
-  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-}
-
-function easeOutBounce(t: number): number {
-  if (t < 0.5) {
-    return 2 * t * t;
-  }
-  return 1 - 2 * (1 - t) * (1 - t);
-}
-
 function drawCompletionGlow(
   ctx: CanvasRenderingContext2D,
   cssW: number,
@@ -359,34 +330,5 @@ function drawCompletionGlow(
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, cssW, cssH);
 
-  ctx.restore();
-}
-
-function drawDebugBackdrop(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
-  // Subtle background so you can see the canvas is alive (CSS pixel space)
-  ctx.save();
-  ctx.fillStyle = "rgba(0,0,0,0.02)";
-  ctx.fillRect(0, 0, cssW, cssH);
-  ctx.restore();
-}
-
-function drawGridOverlay(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
-  ctx.save();
-  ctx.strokeStyle = "rgba(0,0,0,0.05)";
-  ctx.lineWidth = 1;
-
-  const step = 40;
-  for (let x = 0; x <= cssW; x += step) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, cssH);
-    ctx.stroke();
-  }
-  for (let y = 0; y <= cssH; y += step) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(cssW, y);
-    ctx.stroke();
-  }
   ctx.restore();
 }

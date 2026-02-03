@@ -85,11 +85,9 @@ export function TutorialOverlay({
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>📥 Piece Drawer</h3>
           <p>
-            {isTouch
-              ? "Long-press a piece to send it to the drawer for later."
-              : "Middle-click a piece to send it to the drawer for later."}
+            Drag pieces to the drawer to store them for later. Tap pieces in the drawer to
+            bring them back to the board.
           </p>
-          <p>Tap pieces in the drawer to bring them back to the board.</p>
         </div>
 
         <div className={styles.section}>
