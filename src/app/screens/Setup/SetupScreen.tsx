@@ -7,18 +7,8 @@ import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
 import { ArrowLeft, Trash2, Play } from "lucide-react";
 import { useImagePicker, useGridConfig, GRID_OPTIONS } from "./hooks";
-import { useTimeModeConfig } from "@/screens/Play/hooks/useTimeModeConfig";
-import { COUNTDOWN_OPTIONS, type TimeMode } from "@/screens/Play/timeMode";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
-
-const TIME_MODE_LABELS: Record<TimeMode, string> = {
-  elapsed: "Elapsed (count up)",
-  countdown: "Countdown",
-  active: "Active only (pauses when idle)",
-  relaxed: "Relaxed (timer hidden)",
-  best: "Best time",
-};
 
 type ImageSource = "upload" | "gallery";
 
@@ -51,9 +41,6 @@ export function SetupScreen() {
     minGrid,
     maxGrid,
   } = useGridConfig();
-
-  const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
-    useTimeModeConfig();
 
   // Load existing image on mount
   useEffect(() => {

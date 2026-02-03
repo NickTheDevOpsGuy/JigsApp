@@ -2,7 +2,6 @@ export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
 export const GHOST_HINT_KEY = "phuzzle:ghostHint";
-export { TIME_MODE_KEY, COUNTDOWN_MINUTES_KEY } from "./timeMode";
 
 export const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
 

@@ -32,5 +32,4 @@ export type PointerHandlersContext = {
   setState: (st: PuzzleState) => void;
   haptic?: (kind: HapticKind) => void;
   onDragPreview?: (state: DragPreviewState) => void;
-  onPieceInteraction?: () => void;
 };

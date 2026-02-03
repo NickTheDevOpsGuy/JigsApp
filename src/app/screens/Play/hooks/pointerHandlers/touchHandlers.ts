@@ -44,8 +44,6 @@ export function handleTouchDown(
     piece.h,
   );
 
-  ctx.onPieceInteraction?.();
-
   try {
     canvas.setPointerCapture(e.pointerId);
   } catch {
@@ -78,7 +76,6 @@ export function handleTouchMove(
   }
 
   if (canvas.touchDragStarted) {
-    ctx.onPieceInteraction?.();
     const boardRect = boardRef.current.getBoundingClientRect();
     manager.pointerMove(e.clientX, e.clientY, boardRect);
     dragLog("move", {
@@ -137,12 +134,10 @@ export function handleTouchUp(
         soundManager.play("rotate");
         haptic?.("rotate");
         setState(manager.getState());
-        ctx.onPieceInteraction?.();
       }
     }
   } else {
     // Touch drag end: check for drop on tray
-    ctx.onPieceInteraction?.();
     onDragPreview?.(null);
     finishDragWithTrayCheck(
       manager,

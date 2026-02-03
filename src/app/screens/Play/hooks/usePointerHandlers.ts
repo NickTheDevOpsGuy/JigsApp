@@ -29,7 +29,6 @@ export function usePointerHandlers(args: {
   setState: (st: PuzzleState) => void;
   haptic?: (kind: HapticKind) => void;
   onDragPreview?: (state: DragPreviewState) => void;
-  onPieceInteraction?: () => void;
 }) {
   const {
     manager,
@@ -44,7 +43,6 @@ export function usePointerHandlers(args: {
     setState,
     haptic,
     onDragPreview,
-    onPieceInteraction,
   } = args;
 
   const canRotatePiece = useCallback(
@@ -88,7 +86,6 @@ export function usePointerHandlers(args: {
     setState,
     haptic,
     onDragPreview,
-    onPieceInteraction,
   };
 
   const handlePointerDown = useCallback(

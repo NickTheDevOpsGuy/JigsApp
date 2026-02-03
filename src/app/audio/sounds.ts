@@ -194,35 +194,30 @@ class SoundManager {
     });
   }
 
-  private playToneWithRamp(
-    ctx: AudioContext,
-    opts: { freq: number; vol: number; start: number; rampUp: number; duration: number },
-  ) {
-    const { freq, vol, start, rampUp, duration } = opts;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.value = freq;
-    osc.type = "sine";
-    gain.gain.setValueAtTime(0, start);
-    gain.gain.linearRampToValueAtTime(vol, start + rampUp);
-    gain.gain.exponentialDecayTo(0.001, start + duration);
-    osc.start(start);
-    osc.stop(start + duration);
-  }
-
   private playComplete(ctx: AudioContext) {
     const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
     const step = 0.15;
-    const base = ctx.currentTime;
     notes.forEach((freq, i) => {
-      this.playToneWithRamp(ctx, {
+      const start = ctx.currentTime + i * step;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = "sine";
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(this.volume * 0.4, start + 0.02);
+      gain.gain.exponentialDecayTo(0.001, start + step + 0.1);
+      osc.start(start);
+      osc.stop(start + step + 0.1);
+    });
+    const chordTime = ctx.currentTime + notes.length * step;
+    [523.25, 659.25, 783.99].forEach((freq) => {
+      this.playTone(ctx, {
         freq,
-        vol: this.volume * 0.4,
-        start: base + i * step,
-        rampUp: 0.02,
-        duration: step + 0.1,
+        vol: this.volume * 0.3,
+        duration: 0.5,
+        start: chordTime,
       });
     });
     const chordTime = base + notes.length * step;

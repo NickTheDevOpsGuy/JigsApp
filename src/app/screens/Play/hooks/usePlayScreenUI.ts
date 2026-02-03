@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { soundManager } from "@/audio/sounds";
 import { PIECE_LOCKING_KEY, GHOST_HINT_KEY, type DebugFlags } from "../playScreenUtils";
-import { useTimeModeConfig } from "./useTimeModeConfig";
 
 export function usePlayScreenUI() {
   const [pieceLockingEnabled, setPieceLockingEnabled] = useState(() => {
@@ -38,9 +37,6 @@ export function usePlayScreenUI() {
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showNewGameModal, setShowNewGameModal] = useState(false);
   const [selectedPieceId, setSelectedPieceId] = useState<string | null>(null);
-
-  const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
-    useTimeModeConfig();
 
   const pageRef = useRef<HTMLDivElement>(null);
   const selectedIdRef = useRef<string | null>(null);
@@ -111,10 +107,6 @@ export function usePlayScreenUI() {
   return {
     pieceLockingEnabled,
     setPieceLockingEnabled,
-    timeMode,
-    setTimeMode,
-    countdownMinutes,
-    setCountdownMinutes,
     showGhostHint,
     setShowGhostHint,
     debug,

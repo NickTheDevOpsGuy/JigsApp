@@ -202,24 +202,6 @@ Category = folder name, puzzle name = filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
-│   ├── _
-│   │   ├── .gitignore
-│   │   ├── applypatch-msg
-│   │   ├── commit-msg
-│   │   ├── h
-│   │   ├── husky.sh
-│   │   ├── post-applypatch
-│   │   ├── post-checkout
-│   │   ├── post-commit
-│   │   ├── post-merge
-│   │   ├── post-rewrite
-│   │   ├── pre-applypatch
-│   │   ├── pre-auto-gc
-│   │   ├── pre-commit
-│   │   ├── pre-merge-commit
-│   │   ├── pre-push
-│   │   ├── pre-rebase
-│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
 ├── .vite
@@ -336,7 +318,6 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── usePlayScreenAnimation.ts
 │   │   │   │   │   ├── usePlayScreenManager.ts
 │   │   │   │   │   ├── usePlayScreenShortcuts.ts
-│   │   │   │   │   ├── usePlayScreenTimer.ts
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── usePuzzleLifecycle.ts
@@ -345,8 +326,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
 │   │   │   │   ├── playScreenUtils.ts
-│   │   │   │   ├── playUtils.ts
-│   │   │   │   └── timeMode.ts
+│   │   │   │   └── playUtils.ts
 │   │   │   └── Setup
 │   │   │       ├── hooks
 │   │   │       │   ├── index.ts

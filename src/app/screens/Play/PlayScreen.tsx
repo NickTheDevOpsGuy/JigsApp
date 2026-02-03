@@ -9,9 +9,7 @@ import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
-import { getBestTime } from "./timeMode";
 import { usePlayScreenManager } from "./hooks/usePlayScreenManager";
-import { usePlayScreenTimer } from "./hooks/usePlayScreenTimer";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
 import { usePlayScreenAnimation } from "./hooks/usePlayScreenAnimation";
@@ -37,10 +35,6 @@ export function PlayScreen() {
   const {
     pieceLockingEnabled,
     setPieceLockingEnabled,
-    timeMode,
-    setTimeMode,
-    countdownMinutes,
-    setCountdownMinutes,
     showGhostHint,
     setShowGhostHint,
     debug,
@@ -69,18 +63,7 @@ export function PlayScreen() {
     toggleDebug,
   } = ui;
 
-  const lastInteractionRef = React.useRef<number>(0);
-  const onPieceInteraction = React.useCallback(() => {
-    lastInteractionRef.current = performance.now();
-  }, []);
-
-  const managerResult = usePlayScreenManager(
-    grid,
-    pieceLockingEnabled,
-    onPieceInteraction,
-    timeMode,
-    countdownMinutes,
-  );
+  const managerResult = usePlayScreenManager(grid, pieceLockingEnabled);
   const {
     manager,
     state,
@@ -94,16 +77,6 @@ export function PlayScreen() {
     imgRef,
     popMapRef,
   } = managerResult;
-
-  usePlayScreenTimer({
-    state,
-    isPaused,
-    setIsPaused,
-    timeMode,
-    elapsedSeconds,
-    setElapsedSeconds,
-    lastInteractionRef,
-  });
 
   const isCoarsePointer = useCoarsePointer();
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
@@ -155,6 +128,12 @@ export function PlayScreen() {
   });
 
   useEffect(() => {
+    if (state?.isComplete || isPaused) return;
+    const id = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [state?.isComplete, isPaused, setElapsedSeconds]);
+
+  useEffect(() => {
     if (!state || state.isComplete) return;
     const url = localStorage.getItem(STORAGE_KEY) || "";
     if (!url) return;
@@ -195,7 +174,6 @@ export function PlayScreen() {
     didDragRef,
     haptic: haptics.vibrate,
     onDragPreview: setDragPreview,
-    onPieceInteraction,
   });
 
   usePlayScreenAnimation({
@@ -352,19 +330,7 @@ export function PlayScreen() {
               />
             </div>
           )}
-          {isPaused && (
-            <PauseOverlay
-              onResume={() => setIsPaused(false)}
-              isCountdownExpired={
-                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
-              }
-              onNewPuzzle={
-                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
-                  ? handleNewGame
-                  : undefined
-              }
-            />
-          )}
+          {isPaused && <PauseOverlay onResume={() => setIsPaused(false)} />}
           {isComplete && (
             <CompletionOverlay
               elapsedSeconds={elapsedSeconds}
