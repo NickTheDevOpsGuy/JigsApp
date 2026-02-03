@@ -481,6 +481,15 @@
   font-weight: 600;
 }
 
+.dailyBadge {
+  color: var(--color-brand-primary);
+  font-weight: 600;
+}
+
+.streak {
+  color: #f59e0b;
+}
+
 .shareSection {
   margin-bottom: 1.5rem;
   padding: 1rem;

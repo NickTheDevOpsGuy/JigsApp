@@ -21,6 +21,12 @@
   margin-bottom: 8px;
 }
 
+.dailyHint {
+  margin: -8px 0 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
 .title {
   margin: 0 0 6px;
   font-size: 20px;

@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Menu, Download, Share2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
 import { setBestTime } from "../timeMode";
+import { recordDailyCompletion, DAILY_DATE_KEY } from "@/daily/dailyPuzzle";
 
 interface ShareUrls {
   twitter: string;
@@ -16,6 +17,7 @@ interface CompletionOverlayProps {
   elapsedSeconds: number;
   grid?: { rows: number; cols: number };
   isNewBest?: boolean;
+  isDaily?: boolean;
   shareUrls: ShareUrls;
   copied: boolean;
   canNativeShare: boolean;
@@ -31,6 +33,7 @@ export function CompletionOverlay({
   elapsedSeconds,
   grid,
   isNewBest = false,
+  isDaily = false,
   shareUrls,
   copied,
   canNativeShare,
@@ -41,11 +44,25 @@ export function CompletionOverlay({
   onNewPuzzle,
   onMenu,
 }: CompletionOverlayProps) {
+  const [streak, setStreak] = useState<number>(0);
+
   useEffect(() => {
     if (isNewBest && grid) {
       setBestTime(grid.rows, grid.cols, elapsedSeconds);
     }
   }, [isNewBest, grid, elapsedSeconds]);
+
+  useEffect(() => {
+    if (isDaily) {
+      const newStreak = recordDailyCompletion(elapsedSeconds);
+      setStreak(newStreak);
+      try {
+        localStorage.removeItem(DAILY_DATE_KEY);
+      } catch {
+        // ignore
+      }
+    }
+  }, [isDaily, elapsedSeconds]);
 
   return (
     <div className={styles.completeOverlay}>
@@ -54,6 +71,14 @@ export function CompletionOverlay({
         <p>
           Finished in {formatTime(elapsedSeconds)}
           {isNewBest && <span className={styles.newBest}> — New best!</span>}
+          {isDaily && (
+            <span className={styles.dailyBadge}>
+              — Daily completed!
+              {streak > 0 && (
+                <span className={styles.streak}> {streak} day streak 🔥</span>
+              )}
+            </span>
+          )}
         </p>
 
         <div className={styles.shareSection}>

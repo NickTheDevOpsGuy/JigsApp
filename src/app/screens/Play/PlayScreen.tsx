@@ -10,6 +10,7 @@ import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { getBestTime } from "./timeMode";
+import { isDailyPuzzleSession } from "@/daily/dailyPuzzle";
 import { usePlayScreenManager } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
@@ -372,6 +373,7 @@ export function PlayScreen() {
                 state?.grid != null &&
                 (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
               }
+              isDaily={isDailyPuzzleSession()}
               shareUrls={share.shareUrls}
               copied={share.copied}
               canNativeShare={share.canNativeShare}
