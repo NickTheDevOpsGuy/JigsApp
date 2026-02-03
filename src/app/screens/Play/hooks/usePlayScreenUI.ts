@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { soundManager } from "@/audio/sounds";
-import {
-  PIECE_LOCKING_KEY,
-  GHOST_HINT_KEY,
-  type DebugFlags,
-} from "../playScreenUtils";
+import { PIECE_LOCKING_KEY, GHOST_HINT_KEY, type DebugFlags } from "../playScreenUtils";
 import { useTimeModeConfig } from "./useTimeModeConfig";
 
 export function usePlayScreenUI() {

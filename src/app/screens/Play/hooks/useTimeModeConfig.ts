@@ -47,9 +47,7 @@ export function useTimeModeConfig() {
   }, []);
 
   const setCountdownMinutes = useCallback((mins: number | ((m: number) => number)) => {
-    setCountdownMinutesState((prev) =>
-      typeof mins === "function" ? mins(prev) : mins,
-    );
+    setCountdownMinutesState((prev) => (typeof mins === "function" ? mins(prev) : mins));
   }, []);
 
   return {

@@ -6,7 +6,10 @@ export function getGroupBounds(pieces: Piece[], groupId: string): GroupBounds | 
   const ps = pieces.filter((p) => p.groupId === groupId);
   if (!ps.length) return null;
 
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
   for (const p of ps) {
     minX = Math.min(minX, p.x);
     minY = Math.min(minY, p.y);

@@ -12,7 +12,14 @@ export function usePlayScreenTimer(args: {
   setElapsedSeconds: React.Dispatch<React.SetStateAction<number>>;
   lastInteractionRef: React.MutableRefObject<number>;
 }) {
-  const { state, isPaused, setIsPaused, timeMode, setElapsedSeconds, lastInteractionRef } = args;
+  const {
+    state,
+    isPaused,
+    setIsPaused,
+    timeMode,
+    setElapsedSeconds,
+    lastInteractionRef,
+  } = args;
 
   useEffect(() => {
     if (

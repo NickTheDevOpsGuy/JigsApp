@@ -68,8 +68,20 @@ export function buildMenuItems(
   };
 
   return [
-    { id: "home", section: "nav", visible: true, label: "Home", onClick: closeAnd(() => navigate("/")) },
-    { id: "new", section: "nav", visible: true, label: "New puzzle", onClick: closeAnd(props.onNewPuzzle) },
+    {
+      id: "home",
+      section: "nav",
+      visible: true,
+      label: "Home",
+      onClick: closeAnd(() => navigate("/")),
+    },
+    {
+      id: "new",
+      section: "nav",
+      visible: true,
+      label: "New puzzle",
+      onClick: closeAnd(props.onNewPuzzle),
+    },
     {
       id: "undo",
       section: "nav",
@@ -112,7 +124,9 @@ export function buildMenuItems(
       label: `Countdown: ${props.countdownMinutes} min`,
       sortKey: "Countdown",
       onClick: closeAnd(() => {
-        const idx = COUNTDOWN_OPTIONS.indexOf(props.countdownMinutes as (typeof COUNTDOWN_OPTIONS)[number]);
+        const idx = COUNTDOWN_OPTIONS.indexOf(
+          props.countdownMinutes as (typeof COUNTDOWN_OPTIONS)[number],
+        );
         const i = idx >= 0 ? idx : 0;
         props.setCountdownMinutes(COUNTDOWN_OPTIONS[(i + 1) % COUNTDOWN_OPTIONS.length]);
       }),
