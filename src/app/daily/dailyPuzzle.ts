@@ -58,7 +58,13 @@ export function getTodayDailyPuzzle(): {
   if (!result) {
     const fallback = SAMPLE_PUZZLES[0];
     return {
-      puzzle: fallback ?? { id: "", name: "—", category: "", thumbnail: "", fullImage: "" },
+      puzzle: fallback ?? {
+        id: "",
+        name: "—",
+        category: "",
+        thumbnail: "",
+        fullImage: "",
+      },
       grid: { rows: 4, cols: 4 },
     };
   }
@@ -66,7 +72,10 @@ export function getTodayDailyPuzzle(): {
 }
 
 /** Start the daily puzzle: set storage and return config for navigation */
-export function startDailyPuzzle(): { imageUrl: string; grid: { rows: number; cols: number } } | null {
+export function startDailyPuzzle(): {
+  imageUrl: string;
+  grid: { rows: number; cols: number };
+} | null {
   const config = getDailyPuzzleForDate(getTodayDateString());
   if (!config) return null;
 
@@ -109,7 +118,9 @@ export function recordDailyCompletion(elapsedSeconds: number): number {
 /** Check if today's daily is already completed */
 export function isTodayDailyCompleted(): boolean {
   try {
-    return localStorage.getItem(`${DAILY_PREFIX}${getTodayDateString()}:completed`) === "true";
+    return (
+      localStorage.getItem(`${DAILY_PREFIX}${getTodayDateString()}:completed`) === "true"
+    );
   } catch {
     return false;
   }

@@ -109,6 +109,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Resume across browser sessions
 
 ### Daily Challenge
+
 - Same puzzle for everyone each day (deterministic, no backend)
 - Streak tracking for consecutive days completed
 - One-tap start from the menu

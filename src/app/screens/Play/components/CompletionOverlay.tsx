@@ -4,10 +4,7 @@ import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
 import { setBestTime } from "../timeMode";
-import {
-  recordDailyCompletion,
-  DAILY_DATE_KEY,
-} from "@/daily/dailyPuzzle";
+import { recordDailyCompletion, DAILY_DATE_KEY } from "@/daily/dailyPuzzle";
 
 interface ShareUrls {
   twitter: string;
