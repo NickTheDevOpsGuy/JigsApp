@@ -217,24 +217,6 @@ Category = folder name, puzzle name = filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
-│   ├── _
-│   │   ├── .gitignore
-│   │   ├── applypatch-msg
-│   │   ├── commit-msg
-│   │   ├── h
-│   │   ├── husky.sh
-│   │   ├── post-applypatch
-│   │   ├── post-checkout
-│   │   ├── post-commit
-│   │   ├── post-merge
-│   │   ├── post-rewrite
-│   │   ├── pre-applypatch
-│   │   ├── pre-auto-gc
-│   │   ├── pre-commit
-│   │   ├── pre-merge-commit
-│   │   ├── pre-push
-│   │   ├── pre-rebase
-│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
 ├── .vite
@@ -316,7 +298,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleStorage.ts
 │   │   │   ├── shape.ts
-│   │   │   ├── SnapLogic.ts
+│   │   │   ├── snapLogic.ts
 │   │   │   ├── types.ts
 │   │   │   └── undoManager.ts
 │   │   ├── screens
@@ -329,6 +311,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── Play
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── DragPreview.tsx
 │   │   │   │   │   ├── HeaderMenu.tsx
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── PauseOverlay.tsx
@@ -336,11 +319,13 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   └── TopBarButtons.tsx
 │   │   │   │   ├── hooks
 │   │   │   │   │   ├── pointerHandlers
+│   │   │   │   │   │   ├── dragLog.ts
 │   │   │   │   │   │   ├── mouseHandlers.ts
 │   │   │   │   │   │   ├── shared.ts
 │   │   │   │   │   │   ├── touchHandlers.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── useCoarsePointer.ts
+│   │   │   │   │   ├── useDownloadImage.ts
 │   │   │   │   │   ├── useHaptics.ts
 │   │   │   │   │   ├── useInputHints.ts
 │   │   │   │   │   ├── usePlayScreenAnimation.ts
@@ -355,6 +340,10 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── playScreenUtils.ts
 │   │   │   │   └── playUtils.ts
 │   │   │   └── Setup
+│   │   │       ├── hooks
+│   │   │       │   ├── index.ts
+│   │   │       │   ├── useGridConfig.ts
+│   │   │       │   └── useImagePicker.ts
 │   │   │       ├── SetupScreen.module.css
 │   │   │       └── SetupScreen.tsx
 │   │   ├── styles

@@ -78,8 +78,12 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const total = grid.cols * grid.rows;
   const edges = buildEdgesForGrid(grid);
 
-  const w = tileW + pad * 2;
-  const h = tileH + pad * 2;
+  // Tabs/blanks extend ~22% beyond tile edge (see shape.ts knobDepth). Pad must exceed that or shapes get clipped.
+  const minPad = Math.ceil(Math.min(tileW, tileH) * 0.22);
+  const effectivePad = Math.max(pad, minPad);
+
+  const w = tileW + effectivePad * 2;
+  const h = tileH + effectivePad * 2;
 
   const scatterStartY = Math.max(
     scatterPadding,
@@ -144,7 +148,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     const shapePath = buildPiecePath({
       tileW,
       tileH,
-      pad,
+      pad: effectivePad,
       edges: edges[i],
     });
 
@@ -159,7 +163,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
       h,
       tileW,
       tileH,
-      pad,
+      pad: effectivePad,
       targetX,
       targetY,
       rotation: randRotation(rotationStepDeg),

@@ -136,137 +136,89 @@ class SoundManager {
     }
   }
 
-  // Soft click when picking up a piece
+  private playTone(
+    ctx: AudioContext,
+    opts: {
+      freq: number;
+      type?: OscillatorType;
+      vol: number;
+      duration: number;
+      start?: number;
+      freqRamp?: { to: number; at: number };
+    },
+  ) {
+    const start = opts.start ?? ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = opts.type ?? "sine";
+    osc.frequency.setValueAtTime(opts.freq, start);
+    if (opts.freqRamp) {
+      osc.frequency.exponentialRampToValueAtTime(
+        opts.freqRamp.to,
+        start + opts.freqRamp.at,
+      );
+    }
+    gain.gain.setValueAtTime(opts.vol, start);
+    gain.gain.exponentialDecayTo(0.001, start + opts.duration);
+    osc.start(start);
+    osc.stop(start + opts.duration);
+  }
+
   private playPickup(ctx: AudioContext) {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.frequency.value = 800;
-    osc.type = "sine";
-
-    gain.gain.setValueAtTime(this.volume * 0.15, ctx.currentTime);
-    gain.gain.exponentialDecayTo(0.001, ctx.currentTime + 0.05);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.05);
+    this.playTone(ctx, { freq: 800, vol: this.volume * 0.15, duration: 0.05 });
   }
 
-  // Satisfying click when pieces snap together
   private playSnap(ctx: AudioContext) {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.frequency.value = 1200;
-    osc.type = "sine";
-
-    gain.gain.setValueAtTime(this.volume * 0.4, ctx.currentTime);
-    gain.gain.exponentialDecayTo(0.001, ctx.currentTime + 0.1);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.1);
-
-    // Add a second tone for richness
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-
-    osc2.connect(gain2);
-    gain2.connect(ctx.destination);
-
-    osc2.frequency.value = 1800;
-    osc2.type = "sine";
-
-    gain2.gain.setValueAtTime(this.volume * 0.2, ctx.currentTime);
-    gain2.gain.exponentialDecayTo(0.001, ctx.currentTime + 0.08);
-
-    osc2.start(ctx.currentTime);
-    osc2.stop(ctx.currentTime + 0.08);
+    this.playTone(ctx, { freq: 1200, vol: this.volume * 0.4, duration: 0.1 });
+    this.playTone(ctx, { freq: 1800, vol: this.volume * 0.2, duration: 0.08 });
   }
 
-  // Heavier thunk when piece locks to board position
   private playPlace(ctx: AudioContext) {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.frequency.setValueAtTime(400, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.1);
-    osc.type = "triangle";
-
-    gain.gain.setValueAtTime(this.volume * 0.5, ctx.currentTime);
-    gain.gain.exponentialDecayTo(0.001, ctx.currentTime + 0.15);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.15);
+    this.playTone(ctx, {
+      freq: 400,
+      type: "triangle",
+      vol: this.volume * 0.5,
+      duration: 0.15,
+      freqRamp: { to: 200, at: 0.1 },
+    });
   }
 
-  // Soft whoosh for rotation
   private playRotate(ctx: AudioContext) {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.frequency.setValueAtTime(300, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.1);
-    osc.type = "sine";
-
-    gain.gain.setValueAtTime(this.volume * 0.2, ctx.currentTime);
-    gain.gain.exponentialDecayTo(0.001, ctx.currentTime + 0.1);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.1);
+    this.playTone(ctx, {
+      freq: 300,
+      vol: this.volume * 0.2,
+      duration: 0.1,
+      freqRamp: { to: 600, at: 0.1 },
+    });
   }
 
-  // Celebration fanfare for puzzle completion
   private playComplete(ctx: AudioContext) {
     const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
-    const duration = 0.15;
-
+    const step = 0.15;
     notes.forEach((freq, i) => {
+      const start = ctx.currentTime + i * step;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-
       osc.connect(gain);
       gain.connect(ctx.destination);
-
       osc.frequency.value = freq;
       osc.type = "sine";
-
-      const startTime = ctx.currentTime + i * duration;
-      gain.gain.setValueAtTime(0, startTime);
-      gain.gain.linearRampToValueAtTime(this.volume * 0.4, startTime + 0.02);
-      gain.gain.exponentialDecayTo(0.001, startTime + duration + 0.1);
-
-      osc.start(startTime);
-      osc.stop(startTime + duration + 0.1);
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(this.volume * 0.4, start + 0.02);
+      gain.gain.exponentialDecayTo(0.001, start + step + 0.1);
+      osc.start(start);
+      osc.stop(start + step + 0.1);
     });
-
-    // Add a final chord
-    const chordTime = ctx.currentTime + notes.length * duration;
+    const chordTime = ctx.currentTime + notes.length * step;
     [523.25, 659.25, 783.99].forEach((freq) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.frequency.value = freq;
-      osc.type = "sine";
-
-      gain.gain.setValueAtTime(this.volume * 0.3, chordTime);
-      gain.gain.exponentialDecayTo(0.001, chordTime + 0.5);
-
-      osc.start(chordTime);
-      osc.stop(chordTime + 0.5);
+      this.playTone(ctx, {
+        freq,
+        vol: this.volume * 0.3,
+        duration: 0.5,
+        start: chordTime,
+      });
     });
   }
 }

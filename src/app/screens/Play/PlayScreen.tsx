@@ -8,17 +8,18 @@ import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
-import { formatTime } from "./playUtils";
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { usePlayScreenManager } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
 import { usePlayScreenAnimation } from "./hooks/usePlayScreenAnimation";
 import { useShareResults } from "./hooks/useShareResults";
+import { useDownloadImage } from "./hooks/useDownloadImage";
 import { usePointerHandlers } from "./hooks/usePointerHandlers";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import {
+  DragPreview,
   PlayHUD,
   CompletionOverlay,
   PauseOverlay,
@@ -145,20 +146,35 @@ export function PlayScreen() {
 
   const haptics = useHaptics();
   const didDragRef = React.useRef(false);
-  const { handlePointerDown, handlePointerMove, handlePointerUp, handleContextMenu } =
-    usePointerHandlers({
-      manager,
-      canvasRef,
-      boardRef,
-      trayRef,
-      setState,
-      selectCycle,
-      setSelectedPieceId,
-      selectedIdRef,
-      bump,
-      didDragRef,
-      haptic: haptics.vibrate,
-    });
+  const [dragPreview, setDragPreview] = React.useState<{
+    clientX: number;
+    clientY: number;
+    pieceId: string;
+  } | null>(null);
+  const dragPreviewPieceIdRef = React.useRef<string | null>(null);
+  dragPreviewPieceIdRef.current = dragPreview?.pieceId ?? null;
+
+  const {
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handlePointerCancel,
+    handleLostPointerCapture,
+    handleContextMenu,
+  } = usePointerHandlers({
+    manager,
+    canvasRef,
+    boardRef,
+    trayRef,
+    setState,
+    selectCycle,
+    setSelectedPieceId,
+    selectedIdRef,
+    bump,
+    didDragRef,
+    haptic: haptics.vibrate,
+    onDragPreview: setDragPreview,
+  });
 
   usePlayScreenAnimation({
     manager,
@@ -168,6 +184,7 @@ export function PlayScreen() {
     imgRef,
     popMapRef,
     selectedIdRef,
+    dragPreviewPieceIdRef,
     debug,
     showGhostHint,
   });
@@ -190,39 +207,19 @@ export function PlayScreen() {
   }, [navigate]);
 
   const share = useShareResults({ elapsedSeconds, state });
-
-  const handleDownloadImage = useCallback(() => {
-    const canvas = canvasRef.current;
-    const img = imgRef.current;
-    if (!canvas || !img) return;
-    const shareCanvas = document.createElement("canvas");
-    const padding = 40;
-    const textHeight = 80;
-    shareCanvas.width = canvas.width + padding * 2;
-    shareCanvas.height = canvas.height + padding * 2 + textHeight;
-    const ctx = shareCanvas.getContext("2d");
-    if (!ctx) return;
-    ctx.fillStyle = "#1a1a2e";
-    ctx.fillRect(0, 0, shareCanvas.width, shareCanvas.height);
-    ctx.drawImage(canvas, padding, padding);
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 32px system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(
-      `🧩 Phuzzle - ${state?.totalCount ?? 0} pieces in ${formatTime(elapsedSeconds)}`,
-      shareCanvas.width / 2,
-      shareCanvas.height - textHeight / 2 + 10,
-    );
-    const link = document.createElement("a");
-    link.download = `phuzzle-${formatTime(elapsedSeconds).replace(":", "m")}s.png`;
-    link.href = shareCanvas.toDataURL("image/png");
-    link.click();
-  }, [elapsedSeconds, state?.totalCount, canvasRef, imgRef]);
+  const handleDownloadImage = useDownloadImage({
+    canvasRef,
+    imgRef,
+    state,
+    elapsedSeconds,
+  });
 
   const trayPieces = useMemo(
     () => (state ? state.pieces.filter((p) => p.inTray) : []),
     [state],
   );
+  const dragPreviewPiece =
+    dragPreview && state ? state.pieces.find((p) => p.id === dragPreview.pieceId) : null;
   const placed = state?.placedCount ?? 0;
   const total = state?.totalCount ?? 0;
   const left = Math.max(0, total - placed);
@@ -357,6 +354,16 @@ export function PlayScreen() {
       />
 
       <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
+
+      {dragPreviewPiece && dragPreview && imgRef.current && (
+        <DragPreview
+          clientX={dragPreview.clientX}
+          clientY={dragPreview.clientY}
+          piece={dragPreviewPiece}
+          image={imgRef.current}
+          grid={state!.grid}
+        />
+      )}
     </div>
   );
 }

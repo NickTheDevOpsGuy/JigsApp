@@ -20,73 +20,85 @@ export function usePlayScreenManager(
   const [state, setState] = useState<PuzzleState | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-  // Initial setup: create manager. Board size = assembled puzzle dimensions.
+  // Initial setup: create manager with square tiles
   useEffect(() => {
     const mainEl = mainRef.current;
     const boardEl = boardRef.current;
     if (!mainEl || !boardEl) return;
 
-    const rect = mainEl.getBoundingClientRect();
-    const availW = Math.max(320, Math.floor(rect.width));
-    const availH = Math.max(240, Math.floor(rect.height));
-
-    const pieceSize = computeTileSize(availW, availH, grid);
-    const boardW = grid.cols * pieceSize;
-    const boardH = grid.rows * pieceSize;
-
-    boardEl.style.width = `${boardW}px`;
-    boardEl.style.height = `${boardH}px`;
     const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
+    if (!imageUrl) return;
 
-    const savedState = loadPuzzleState();
-    const hasSavedGame =
-      savedState &&
-      savedState.imageUrl === imageUrl &&
-      savedState.grid.rows === grid.rows &&
-      savedState.grid.cols === grid.cols;
+    // Load image
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = () => {
+      imgRef.current = img;
 
-    if (hasSavedGame && savedState) {
-      setElapsedSeconds(savedState.elapsedSeconds);
-    } else {
-      setElapsedSeconds(0);
-    }
+      const rect = mainEl.getBoundingClientRect();
+      const availW = Math.max(400, Math.floor(rect.width) - 24);
+      const availH = Math.max(400, Math.floor(rect.height) - 24);
 
-    const next = new PuzzleManager(
-      {
-        imageUrl,
-        boardWidth: boardW,
-        boardHeight: boardH,
-        grid,
-        pieceWidth: pieceSize,
-        pieceHeight: pieceSize,
-      },
-      {
-        onPiecePlaced: (p) => {
-          popMapRef.current.set(p.id, performance.now());
-          soundManager.play("place");
+      // Compute square tile size
+      const pieceSize = computeTileSize(availW, availH, grid);
+
+      // Board: at least puzzle size, use 88% of available so it stays consistently large
+      const boardW = Math.max(grid.cols * pieceSize, Math.floor(availW * 0.88));
+      const boardH = Math.max(grid.rows * pieceSize, Math.floor(availH * 0.88));
+
+      boardEl.style.width = `${boardW}px`;
+      boardEl.style.height = `${boardH}px`;
+
+      const savedState = loadPuzzleState();
+      const hasSavedGame =
+        savedState &&
+        savedState.imageUrl === imageUrl &&
+        savedState.grid.rows === grid.rows &&
+        savedState.grid.cols === grid.cols;
+
+      if (hasSavedGame && savedState) {
+        setElapsedSeconds(savedState.elapsedSeconds);
+      } else {
+        setElapsedSeconds(0);
+      }
+
+      const next = new PuzzleManager(
+        {
+          imageUrl,
+          boardWidth: boardW,
+          boardHeight: boardH,
+          grid,
+          pieceWidth: pieceSize,
+          pieceHeight: pieceSize,
         },
-        onPieceSnapped: () => soundManager.play("snap"),
-        onPuzzleComplete: () => {
-          clearPuzzleState();
-          soundManager.play("complete");
-          import("canvas-confetti").then((confetti) => {
-            confetti.default({
-              particleCount: 150,
-              spread: 70,
-              origin: { y: 0.6 },
+        {
+          onPiecePlaced: (p) => {
+            popMapRef.current.set(p.id, performance.now());
+            soundManager.play("place");
+          },
+          onPieceSnapped: () => soundManager.play("snap"),
+          onPuzzleComplete: () => {
+            clearPuzzleState();
+            soundManager.play("complete");
+            import("canvas-confetti").then((confetti) => {
+              confetti.default({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+              });
             });
-          });
+          },
         },
-      },
-    );
+      );
 
-    if (hasSavedGame && savedState) {
-      next.restoreFromSaved(savedState.pieces);
-    }
+      if (hasSavedGame && savedState) {
+        next.restoreFromSaved(savedState.pieces);
+      }
 
-    next.setPieceLockingEnabled(pieceLockingEnabled);
-    setManager(next);
-    setState(next.getState());
+      next.setPieceLockingEnabled(pieceLockingEnabled);
+      setManager(next);
+      setState(next.getState());
+    };
   }, [grid, pieceLockingEnabled]);
 
   useEffect(() => {
@@ -109,17 +121,6 @@ export function usePlayScreenManager(
     ro.observe(boardEl);
     return () => ro.disconnect();
   }, [manager]);
-
-  // Load image
-  useEffect(() => {
-    const dataUrl = localStorage.getItem(STORAGE_KEY);
-    if (!dataUrl) return;
-    const img = new Image();
-    img.src = dataUrl;
-    img.onload = () => {
-      imgRef.current = img;
-    };
-  }, []);
 
   return {
     manager,

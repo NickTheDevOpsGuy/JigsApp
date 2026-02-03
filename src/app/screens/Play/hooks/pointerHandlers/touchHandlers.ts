@@ -5,6 +5,7 @@ import type { CanvasWithTouch } from "./types";
 import { TAP_DRAG_THRESHOLD_PX } from "./types";
 import type { PointerHandlersContext } from "./types";
 import { finishDragWithTrayCheck } from "./shared";
+import { dragLog } from "./dragLog";
 
 export function resetTouchState(canvas: CanvasWithTouch): void {
   canvas.touchStartX = undefined;
@@ -34,6 +35,8 @@ export function handleTouchDown(
   canvas.touchStartY = e.clientY;
   canvas.touchDragStarted = false;
   canvas.pendingPieceId = pieceId;
+  dragLog("down", { pieceId, x: e.clientX, y: e.clientY, pointerId: e.pointerId });
+
   canvas.pendingPieceRect = new DOMRect(
     boardRect.left + piece.x,
     boardRect.top + piece.y,
@@ -75,6 +78,23 @@ export function handleTouchMove(
   if (canvas.touchDragStarted) {
     const boardRect = boardRef.current.getBoundingClientRect();
     manager.pointerMove(e.clientX, e.clientY, boardRect);
+    dragLog("move", {
+      x: e.clientX,
+      y: e.clientY,
+      activeId: manager.getDragState().activeId,
+    });
+    const { onDragPreview } = ctx;
+    const activeId = manager.getDragState().activeId;
+    if (activeId && onDragPreview) {
+      const st = manager.getState();
+      const piece = st.pieces.find((p) => p.id === activeId);
+      const groupSize = piece
+        ? st.pieces.filter((p) => p.groupId === piece.groupId).length
+        : 0;
+      if (groupSize === 1) {
+        onDragPreview({ clientX: e.clientX, clientY: e.clientY, pieceId: activeId });
+      }
+    }
   }
   return true;
 }
@@ -85,12 +105,20 @@ export function handleTouchUp(
   canRotatePiece: (pid: string) => boolean,
   isPointerOverTray: (x: number, y: number) => boolean,
 ): void {
-  const { manager, boardRef, canvasRef, setState, haptic, selectCycle } = ctx;
+  const { manager, boardRef, canvasRef, setState, haptic, selectCycle, onDragPreview } =
+    ctx;
   if (!manager || !canvasRef.current) return;
 
   const canvas = canvasRef.current as CanvasWithTouch;
   const boardRect = boardRef.current?.getBoundingClientRect();
   const ctx2d = canvas.getContext("2d");
+
+  dragLog("up", {
+    x: e.clientX,
+    y: e.clientY,
+    activeId: manager.getDragState().activeId,
+    pointerId: e.pointerId,
+  });
 
   if (!dragStarted(canvas)) {
     // Touch tap: rotate
@@ -110,6 +138,7 @@ export function handleTouchUp(
     }
   } else {
     // Touch drag end: check for drop on tray
+    onDragPreview?.(null);
     finishDragWithTrayCheck(
       manager,
       e.clientX,

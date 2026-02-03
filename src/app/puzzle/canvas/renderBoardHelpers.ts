@@ -3,6 +3,8 @@
  * Extracted to keep renderBoard.ts focused on the main rendering pipeline.
  */
 
+import type { Piece } from "@/puzzle/types";
+
 export function snapPopScale(tMs: number): number {
   if (tMs <= 0) return 1;
   if (tMs >= 200) return 1;
@@ -61,4 +63,85 @@ export function drawGridOverlay(
     ctx.stroke();
   }
   ctx.restore();
+}
+
+export function applyPieceShadow(
+  ctx: CanvasRenderingContext2D,
+  isDragging: boolean,
+  isPlaced: boolean,
+): void {
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  if (isDragging) {
+    ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 4;
+  } else if (!isPlaced) {
+    ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+  }
+}
+
+export function clearPieceShadow(ctx: CanvasRenderingContext2D): void {
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+}
+
+export type ImageSourceRect = {
+  srcX: number;
+  srcY: number;
+  srcW: number;
+  srcH: number;
+  destX: number;
+  destY: number;
+  destW: number;
+  destH: number;
+};
+
+export function computeImageSourceRect(
+  p: Piece,
+  img: HTMLImageElement,
+  cols: number,
+  rows: number,
+): ImageSourceRect {
+  const sourceW = img.naturalWidth;
+  const sourceH = img.naturalHeight;
+  const srcTileW = sourceW / cols;
+  const srcTileH = sourceH / rows;
+  const srcPadX = (p.pad / p.tileW) * srcTileW;
+  const srcPadY = (p.pad / p.tileH) * srcTileH;
+  let srcX = p.col * srcTileW - srcPadX;
+  let srcY = p.row * srcTileH - srcPadY;
+  let srcW = srcTileW + srcPadX * 2;
+  let srcH = srcTileH + srcPadY * 2;
+  let destX = 0;
+  let destY = 0;
+  let destW = p.w;
+  let destH = p.h;
+  if (srcX < 0) {
+    destX = (-srcX / srcW) * p.w;
+    destW = p.w - destX;
+    srcW = srcW + srcX;
+    srcX = 0;
+  }
+  if (srcY < 0) {
+    destY = (-srcY / srcH) * p.h;
+    destH = p.h - destY;
+    srcH = srcH + srcY;
+    srcY = 0;
+  }
+  if (srcX + srcW > sourceW) {
+    destW *= (sourceW - srcX) / srcW;
+    srcW = sourceW - srcX;
+  }
+  if (srcY + srcH > sourceH) {
+    destH *= (sourceH - srcY) / srcH;
+    srcH = sourceH - srcY;
+  }
+  return { srcX, srcY, srcW, srcH, destX, destY, destW, destH };
 }

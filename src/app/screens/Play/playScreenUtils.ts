@@ -17,18 +17,31 @@ export function computeTileSize(
   availH: number,
   grid: { rows: number; cols: number },
 ): number {
-  const pieceCount = grid.rows * grid.cols;
+  // Calculate max tile size that fits the available space
   const tileFromW = availW / grid.cols;
   const tileFromH = availH / grid.rows;
   let tile = Math.floor(Math.min(tileFromW, tileFromH));
 
-  if (pieceCount > 25) {
-    const scale = Math.sqrt(25) / Math.sqrt(pieceCount);
-    tile = Math.floor(tile * scale);
+  // Set size ranges based on difficulty - larger pieces for easier puzzles
+  const pieceCount = grid.rows * grid.cols;
+  let minTile: number;
+  let maxTile: number;
+
+  if (pieceCount <= 9) {
+    minTile = 100;
+    maxTile = 200;
+  } else if (pieceCount <= 16) {
+    minTile = 80;
+    maxTile = 160;
+  } else if (pieceCount <= 25) {
+    minTile = 60;
+    maxTile = 120;
+  } else {
+    minTile = 50;
+    maxTile = 100;
   }
 
-  const minTile = pieceCount > 36 ? 36 : pieceCount > 16 ? 44 : 56;
-  return Math.max(minTile, Math.min(160, tile));
+  return Math.max(minTile, Math.min(maxTile, tile));
 }
 
 export type DebugFlags = {

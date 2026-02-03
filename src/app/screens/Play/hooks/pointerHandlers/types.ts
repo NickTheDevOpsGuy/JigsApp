@@ -13,6 +13,12 @@ export type CanvasWithTouch = HTMLCanvasElement & {
 
 export const TAP_DRAG_THRESHOLD_PX = 6;
 
+export type DragPreviewState = {
+  clientX: number;
+  clientY: number;
+  pieceId: PieceId;
+} | null;
+
 export type PointerHandlersContext = {
   manager: PuzzleManager | null;
   boardRef: React.RefObject<HTMLDivElement | null>;
@@ -25,4 +31,5 @@ export type PointerHandlersContext = {
   selectCycle: (dir: 1 | -1) => void;
   setState: (st: PuzzleState) => void;
   haptic?: (kind: HapticKind) => void;
+  onDragPreview?: (state: DragPreviewState) => void;
 };

@@ -12,6 +12,7 @@ export function usePlayScreenAnimation(args: {
   imgRef: React.RefObject<HTMLImageElement | null>;
   popMapRef: React.RefObject<Map<string, number>>;
   selectedIdRef: React.RefObject<string | null>;
+  dragPreviewPieceIdRef: React.RefObject<string | null>;
   debug: DebugFlags;
   showGhostHint: boolean;
 }) {
@@ -23,15 +24,20 @@ export function usePlayScreenAnimation(args: {
     imgRef,
     popMapRef,
     selectedIdRef,
+    dragPreviewPieceIdRef,
     debug,
     showGhostHint,
   } = args;
 
   const rafRef = useRef<number | null>(null);
   const completedAtRef = useRef<number | null>(null);
+  const pieceCacheRef = useRef<Map<string, HTMLCanvasElement>>(new Map());
+  const lastCompleteRef = useRef<boolean>(false);
+  const lastPieceCountRef = useRef<number>(0);
 
   useEffect(() => {
     if (!manager) return;
+    pieceCacheRef.current.clear();
     const tick = () => {
       const canvas = canvasRef.current;
       const boardEl = boardRef.current;
@@ -44,15 +50,24 @@ export function usePlayScreenAnimation(args: {
       const cssW = Math.max(1, Math.floor(rect.width));
       const cssH = Math.max(1, Math.floor(rect.height));
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(cssW * dpr);
-      canvas.height = Math.floor(cssH * dpr);
-      canvas.style.width = `${cssW}px`;
-      canvas.style.height = `${cssH}px`;
-      const ctx = canvas.getContext("2d");
+
+      // Only resize canvas if dimensions changed
+      const targetW = Math.floor(cssW * dpr);
+      const targetH = Math.floor(cssH * dpr);
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+        canvas.style.width = `${cssW}px`;
+        canvas.style.height = `${cssH}px`;
+      }
+
+      const ctx = canvas.getContext("2d", { willReadFrequently: false });
       if (!ctx) {
         rafRef.current = requestAnimationFrame(tick);
         return;
       }
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const st = manager.getState();
       const firstPiece = st.pieces[0];
@@ -70,6 +85,7 @@ export function usePlayScreenAnimation(args: {
         ? (st.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
         : null;
       const popMap = popMapRef.current ?? new Map<string, number>();
+      const pieceCache = pieceCacheRef.current;
       renderBoard(
         ctx,
         st,
@@ -87,9 +103,23 @@ export function usePlayScreenAnimation(args: {
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
           showGhostHint,
+          dragPreviewPieceId: dragPreviewPieceIdRef.current,
         },
+        pieceCache,
       );
-      setState(st);
+
+      // Only update React state when something meaningful changes
+      // (completion status or placed piece count)
+      const placedCount = st.pieces.filter((p) => p.isPlaced).length;
+      if (
+        st.isComplete !== lastCompleteRef.current ||
+        placedCount !== lastPieceCountRef.current
+      ) {
+        lastCompleteRef.current = st.isComplete;
+        lastPieceCountRef.current = placedCount;
+        setState(st);
+      }
+
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);

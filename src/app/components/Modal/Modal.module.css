@@ -81,6 +81,17 @@
   color: var(--color-text-secondary);
 }
 
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.message {
+  margin: 0 0 4px 0;
+}
+
 .footer {
   padding: 16px 24px;
   border-top: 1px solid var(--color-border);

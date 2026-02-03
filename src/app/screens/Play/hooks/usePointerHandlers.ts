@@ -1,10 +1,10 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PieceId, PuzzleState } from "@/puzzle/types";
 import type { HapticKind } from "./useHaptics";
-import type { CanvasWithTouch } from "./pointerHandlers/types";
+import type { CanvasWithTouch, DragPreviewState } from "./pointerHandlers/types";
 import {
   handleTouchDown,
   handleTouchMove,
@@ -28,6 +28,7 @@ export function usePointerHandlers(args: {
   selectCycle: (dir: 1 | -1) => void;
   setState: (st: PuzzleState) => void;
   haptic?: (kind: HapticKind) => void;
+  onDragPreview?: (state: DragPreviewState) => void;
 }) {
   const {
     manager,
@@ -41,6 +42,7 @@ export function usePointerHandlers(args: {
     selectCycle,
     setState,
     haptic,
+    onDragPreview,
   } = args;
 
   const canRotatePiece = useCallback(
@@ -83,6 +85,7 @@ export function usePointerHandlers(args: {
     selectCycle,
     setState,
     haptic,
+    onDragPreview,
   };
 
   const handlePointerDown = useCallback(
@@ -179,5 +182,65 @@ export function usePointerHandlers(args: {
     e.preventDefault();
   }, []);
 
-  return { handlePointerDown, handlePointerMove, handlePointerUp, handleContextMenu };
+  const handlePointerCancel = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (!manager || !canvasRef.current) return;
+      const canvas = canvasRef.current as CanvasWithTouch;
+      // ensure drag state clears even if the browser cancels the pointer sequence
+      try {
+        // release capture if we had it
+        canvas.releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+      onDragPreview?.(null);
+      manager.pointerUp();
+      setState(manager.getState());
+      // reset touch bookkeeping to avoid "stuck" drags
+      if (e.pointerType === "touch") {
+        canvas.touchStartX = undefined;
+        canvas.touchStartY = undefined;
+        canvas.touchDragStarted = false;
+        canvas.pendingPieceId = null;
+        canvas.pendingPieceRect = null;
+      }
+    },
+    [manager, canvasRef, onDragPreview, setState],
+  );
+
+  const handleLostPointerCapture = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      // treat as cancel
+      handlePointerCancel(e);
+    },
+    [handlePointerCancel],
+  );
+
+  // Safety net: if pointerup happens off the canvas, still end the drag.
+  useEffect(() => {
+    const onWinUp = (ev: PointerEvent) => {
+      if (!manager) return;
+      const activeId = manager.getDragState().activeId;
+      if (!activeId) return;
+      onDragPreview?.(null);
+      manager.pointerUp();
+      setState(manager.getState());
+    };
+
+    window.addEventListener("pointerup", onWinUp);
+    window.addEventListener("pointercancel", onWinUp);
+    return () => {
+      window.removeEventListener("pointerup", onWinUp);
+      window.removeEventListener("pointercancel", onWinUp);
+    };
+  }, [manager, onDragPreview, setState]);
+
+  return {
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handlePointerCancel,
+    handleLostPointerCapture,
+    handleContextMenu,
+  };
 }
