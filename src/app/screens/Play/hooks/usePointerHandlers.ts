@@ -218,7 +218,7 @@ export function usePointerHandlers(args: {
 
   // Safety net: if pointerup happens off the canvas, still end the drag.
   useEffect(() => {
-    const onWinUp = (ev: PointerEvent) => {
+    const onWinUp = (_ev: PointerEvent) => {
       if (!manager) return;
       const activeId = manager.getDragState().activeId;
       if (!activeId) return;

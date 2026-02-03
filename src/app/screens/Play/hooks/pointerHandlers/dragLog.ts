@@ -13,6 +13,5 @@ export function dragLog(
   if (event === "move" && now - lastMoveMs < 80) return;
   if (event === "move") lastMoveMs = now;
 
-  // eslint-disable-next-line no-console
   console.debug(`[drag:${event}]`, data);
 }

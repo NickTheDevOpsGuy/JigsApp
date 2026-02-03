@@ -20,7 +20,7 @@ export function computeTileSize(
   // Calculate max tile size that fits the available space
   const tileFromW = availW / grid.cols;
   const tileFromH = availH / grid.rows;
-  let tile = Math.floor(Math.min(tileFromW, tileFromH));
+  const tile = Math.floor(Math.min(tileFromW, tileFromH));
 
   // Set size ranges based on difficulty - larger pieces for easier puzzles
   const pieceCount = grid.rows * grid.cols;

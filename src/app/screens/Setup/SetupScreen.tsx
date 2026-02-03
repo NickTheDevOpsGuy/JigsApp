@@ -37,8 +37,6 @@ export function SetupScreen() {
     customCols,
     setCustomCols,
     isCustom,
-    effectiveRows,
-    effectiveCols,
     saveGrid,
     minGrid,
     maxGrid,

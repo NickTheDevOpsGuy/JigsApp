@@ -305,7 +305,8 @@ export function PlayScreen() {
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
+            onLostPointerCapture={handleLostPointerCapture}
             onContextMenu={handleContextMenu}
           />
           {showPreview && imgRef.current && (
