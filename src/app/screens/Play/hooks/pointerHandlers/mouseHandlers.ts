@@ -13,7 +13,7 @@ export function handleMouseDown(
   piece: { x: number; y: number; w: number; h: number },
   canRotatePiece: (pid: string) => boolean,
 ): boolean {
-  const { manager, canvasRef, didDragRef, setState, haptic } = ctx;
+  const { manager, canvasRef, didDragRef, setState, haptic, onPieceInteraction } = ctx;
   if (!manager) return false;
 
   // Right click = rotate (desktop)
@@ -21,6 +21,7 @@ export function handleMouseDown(
     e.preventDefault();
     if (!canRotatePiece(pieceId)) return false;
 
+    onPieceInteraction?.();
     manager.rotatePiece(pieceId);
     soundManager.play("rotate");
     haptic?.("rotate");
@@ -43,6 +44,7 @@ export function handleMouseDown(
       piece.h,
     );
 
+    onPieceInteraction?.();
     manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
     dragLog("down", { pieceId, x: e.clientX, y: e.clientY, pointerId: e.pointerId });
     setState(manager.getState());
@@ -62,10 +64,11 @@ export function handleMouseMove(
   e: React.PointerEvent<HTMLCanvasElement>,
   ctx: PointerHandlersContext,
 ): void {
-  const { manager, boardRef, didDragRef, onDragPreview } = ctx;
+  const { manager, boardRef, didDragRef, onDragPreview, onPieceInteraction } = ctx;
   if (!manager || !boardRef.current) return;
 
   didDragRef.current = true;
+  onPieceInteraction?.();
   const boardRect = boardRef.current.getBoundingClientRect();
   manager.pointerMove(e.clientX, e.clientY, boardRect);
   dragLog("move", {
@@ -92,11 +95,20 @@ export function handleMouseUp(
   ctx: PointerHandlersContext,
   isPointerOverTray: (x: number, y: number) => boolean,
 ): void {
-  const { manager, canvasRef, didDragRef, setState, selectCycle, onDragPreview } = ctx;
+  const {
+    manager,
+    canvasRef,
+    didDragRef,
+    setState,
+    selectCycle,
+    onDragPreview,
+    onPieceInteraction,
+  } = ctx;
   if (!manager || !canvasRef.current) return;
 
   const canvas = canvasRef.current as CanvasWithTouch;
 
+  onPieceInteraction?.();
   onDragPreview?.(null);
   dragLog("up", {
     x: e.clientX,

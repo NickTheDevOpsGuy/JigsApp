@@ -22,13 +22,14 @@ export function handleTouchDown(
   boardRect: DOMRect,
   piece: { x: number; y: number; w: number; h: number },
 ): void {
-  const { manager, canvasRef, didDragRef } = ctx;
+  const { manager, canvasRef, didDragRef, onPieceInteraction } = ctx;
   if (!manager) return;
 
   const canvas = canvasRef.current as CanvasWithTouch;
   if (!canvas) return;
 
   didDragRef.current = false;
+  onPieceInteraction?.();
   e.preventDefault();
 
   canvas.touchStartX = e.clientX;
@@ -71,11 +72,13 @@ export function handleTouchMove(
   if (!canvas.touchDragStarted && dist >= TAP_DRAG_THRESHOLD_PX) {
     canvas.touchDragStarted = true;
     didDragRef.current = true;
+    ctx.onPieceInteraction?.();
     manager.pointerDown(pendingId, sx, sy, pendingRect);
     setState(manager.getState());
   }
 
   if (canvas.touchDragStarted) {
+    ctx.onPieceInteraction?.();
     const boardRect = boardRef.current.getBoundingClientRect();
     manager.pointerMove(e.clientX, e.clientY, boardRect);
     dragLog("move", {
@@ -105,14 +108,23 @@ export function handleTouchUp(
   canRotatePiece: (pid: string) => boolean,
   isPointerOverTray: (x: number, y: number) => boolean,
 ): void {
-  const { manager, boardRef, canvasRef, setState, haptic, selectCycle, onDragPreview } =
-    ctx;
+  const {
+    manager,
+    boardRef,
+    canvasRef,
+    setState,
+    haptic,
+    selectCycle,
+    onDragPreview,
+    onPieceInteraction,
+  } = ctx;
   if (!manager || !canvasRef.current) return;
 
   const canvas = canvasRef.current as CanvasWithTouch;
   const boardRect = boardRef.current?.getBoundingClientRect();
   const ctx2d = canvas.getContext("2d");
 
+  onPieceInteraction?.();
   dragLog("up", {
     x: e.clientX,
     y: e.clientY,
@@ -130,6 +142,7 @@ export function handleTouchUp(
       const boardPieces = st.pieces.filter((p) => !p.inTray);
       const pid = pickPieceId(ctx2d, boardPieces, x, y);
       if (pid && canRotatePiece(pid)) {
+        onPieceInteraction?.();
         manager.rotatePiece(pid);
         soundManager.play("rotate");
         haptic?.("rotate");

@@ -220,15 +220,6 @@ class SoundManager {
         start: chordTime,
       });
     });
-    const chordTime = base + notes.length * step;
-    [523.25, 659.25, 783.99].forEach((freq) =>
-      this.playTone(ctx, {
-        freq,
-        vol: this.volume * 0.3,
-        duration: 0.5,
-        start: chordTime,
-      }),
-    );
   }
 }
 

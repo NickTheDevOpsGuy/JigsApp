@@ -2,6 +2,11 @@ import type { DragState, GridSize, Piece, PuzzleState } from "./types";
 import { createInitialPieces } from "./factories/createInitialPieces";
 import type { SavedPiece } from "./puzzleStorage";
 import { UndoManager } from "./undoManager";
+import {
+  getGroupBounds as getGroupBoundsUtil,
+  wouldOverlapAnyOtherGroup as wouldOverlapUtil,
+  getSolvedNeighbors as getSolvedNeighborsUtil,
+} from "./groupUtils";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;

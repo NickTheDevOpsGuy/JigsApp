@@ -1,13 +1,18 @@
+import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { STORAGE_KEY, computeTileSize } from "../playScreenUtils";
+import type { TimeMode } from "../timeMode";
 
 export function usePlayScreenManager(
   grid: { rows: number; cols: number },
   pieceLockingEnabled: boolean,
+  timeMode: TimeMode,
+  countdownMinutes: number,
+  lastInteractionRef: MutableRefObject<number>,
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -59,7 +64,8 @@ export function usePlayScreenManager(
       if (hasSavedGame && savedState) {
         setElapsedSeconds(savedState.elapsedSeconds);
       } else {
-        setElapsedSeconds(0);
+        const isCountdown = timeMode === "countdown";
+        setElapsedSeconds(isCountdown ? countdownMinutes * 60 : 0);
       }
 
       const next = new PuzzleManager(
@@ -73,10 +79,14 @@ export function usePlayScreenManager(
         },
         {
           onPiecePlaced: (p) => {
+            lastInteractionRef.current = performance.now();
             popMapRef.current.set(p.id, performance.now());
             soundManager.play("place");
           },
-          onPieceSnapped: () => soundManager.play("snap"),
+          onPieceSnapped: () => {
+            lastInteractionRef.current = performance.now();
+            soundManager.play("snap");
+          },
           onPuzzleComplete: () => {
             clearPuzzleState();
             soundManager.play("complete");
@@ -99,7 +109,7 @@ export function usePlayScreenManager(
       setManager(next);
       setState(next.getState());
     };
-  }, [grid, pieceLockingEnabled]);
+  }, [grid, pieceLockingEnabled, timeMode, countdownMinutes, lastInteractionRef]);
 
   useEffect(() => {
     manager?.setPieceLockingEnabled(pieceLockingEnabled);

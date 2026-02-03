@@ -186,7 +186,6 @@ Category = folder name, puzzle name = filename.
 <summary>📁 Click to expand file structure</summary>
 
 ```plaintext
-
 .
 ├── .github
 │   ├── ISSUE_TEMPLATE
@@ -318,6 +317,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── usePlayScreenAnimation.ts
 │   │   │   │   │   ├── usePlayScreenManager.ts
 │   │   │   │   │   ├── usePlayScreenShortcuts.ts
+│   │   │   │   │   ├── usePlayScreenTimer.ts
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── usePuzzleLifecycle.ts
@@ -326,7 +326,8 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
 │   │   │   │   ├── playScreenUtils.ts
-│   │   │   │   └── playUtils.ts
+│   │   │   │   ├── playUtils.ts
+│   │   │   │   └── timeMode.ts
 │   │   │   └── Setup
 │   │   │       ├── hooks
 │   │   │       │   ├── index.ts
@@ -359,7 +360,6 @@ Category = folder name, puzzle name = filename.
 ├── tsconfig.json
 ├── tsconfig.node.json
 ├── vercel.json
-└── vite.config.ts
 
 ```
 
