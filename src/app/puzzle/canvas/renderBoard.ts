@@ -1,5 +1,13 @@
 // src/app/puzzle/canvas/renderBoard.ts
 import type { Piece, PuzzleState, DragState } from "@/puzzle/types";
+import {
+  snapPopScale,
+  drawDebugBackdrop,
+  drawGridOverlay,
+  applyPieceShadow,
+  clearPieceShadow,
+  computeImageSourceRect,
+} from "./renderBoardHelpers";
 
 export type PopMap = Map<string, number>;
 
@@ -17,7 +25,12 @@ export type AnimationState = {
   completedAtMs: number | null;
   /** When true, show semi-transparent ghosts at correct positions for misplaced pieces */
   showGhostHint?: boolean;
+  /** When set, this piece is drawn in a DOM overlay instead of on canvas (for drag-to-tray) */
+  dragPreviewPieceId?: string | null;
 };
+
+/** Cache for pre-rendered pieces - clip at (0,0) gives crisp edges, avoids blocky look when moving */
+export type PieceCache = Map<string, HTMLCanvasElement>;
 
 /**
  * renderBoard
@@ -40,6 +53,7 @@ export function renderBoard(
   debug: DebugFlags,
   dragState?: DragState,
   animState?: AnimationState,
+  pieceCache?: PieceCache,
 ) {
   const canvas = ctx.canvas;
 
@@ -83,11 +97,27 @@ export function renderBoard(
     : null;
 
   // Draw order by z (lowest -> highest) - only pieces NOT in tray
-  const pieces = [...state.pieces].filter((p) => !p.inTray).sort((a, b) => a.z - b.z);
+  const pieces = [...state.pieces]
+    .filter((p) => !p.inTray)
+    .filter((p) => p.id !== animState?.dragPreviewPieceId)
+    .sort((a, b) => a.z - b.z);
 
   for (const p of pieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
-    drawPiece(ctx, p, img, cols, rows, popMap, nowMs, debug, isDragging, animState);
+    drawPiece(
+      ctx,
+      p,
+      img,
+      cols,
+      rows,
+      popMap,
+      nowMs,
+      debug,
+      isDragging,
+      animState,
+      pieceCache,
+      dpr,
+    );
   }
 
   // Completion glow effect
@@ -134,7 +164,21 @@ function drawGhostHints(
 
     ctx.save();
     ctx.globalAlpha = 0.35;
-    drawPiece(ctx, ghostPiece, img, cols, rows, popMap, nowMs, debug, false);
+    const ghostDpr = ctx.getTransform().a || 1;
+    drawPiece(
+      ctx,
+      ghostPiece,
+      img,
+      cols,
+      rows,
+      popMap,
+      nowMs,
+      debug,
+      false,
+      undefined,
+      undefined,
+      ghostDpr,
+    );
     ctx.restore();
   }
 }
@@ -150,120 +194,213 @@ function drawPiece(
   debug: DebugFlags,
   isDragging: boolean,
   animState?: AnimationState,
+  pieceCache?: PieceCache,
+  dpr: number = 1,
 ) {
   const isSelected = animState?.selectedPieceId === p.id && !p.isPlaced;
 
-  // Pop animation scale (draw-time)
   const start = popMap.get(p.id);
   const popScale = start ? snapPopScale(nowMs - start) : 1;
+  const scale = popScale;
 
-  // Drag animation: slightly larger when dragging
-  const dragScale = isDragging ? 1.03 : 1;
-  const scale = popScale * dragScale;
-
-  // Build path (piece-local viewBox coordinates: 0..w,0..h)
   let path: Path2D | null = null;
   try {
-    if (!p.shapePath || p.shapePath.length === 0) {
-      console.warn(`[Phuzzle] Piece ${p.id} has empty shapePath`);
-    } else {
+    if (p.shapePath && p.shapePath.length > 0) {
       path = new Path2D(p.shapePath);
     }
-  } catch (err) {
-    console.error(`[Phuzzle] Failed to parse shapePath for ${p.id}:`, p.shapePath, err);
+  } catch {
     path = null;
   }
 
-  ctx.save();
-
-  // Drop shadow for dragged pieces
-  if (isDragging) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetX = 4;
-    ctx.shadowOffsetY = 4;
-  } else if (!p.isPlaced) {
-    // Subtle shadow for unplaced pieces
-    ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-  }
-
-  // Centered rotation + scale around piece center
-  ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
-  ctx.rotate((p.rotation * Math.PI) / 180);
-  ctx.scale(scale, scale);
-
-  // Move to top-left of piece-local space
-  ctx.translate(-p.w / 2, -p.h / 2);
-
   if (!path) {
-    // Fallback: draw a rect so the piece is still visible if path is bad
+    ctx.save();
     ctx.fillStyle = "rgba(0, 120, 255, 0.10)";
     ctx.strokeStyle = "rgba(0, 0, 0, 0.35)";
     ctx.lineWidth = 2;
-    ctx.fillRect(0, 0, p.w, p.h);
-    ctx.strokeRect(0, 0, p.w, p.h);
-
-    if (debug.showIds) {
-      ctx.fillStyle = "rgba(0,0,0,0.7)";
-      ctx.font = "12px system-ui";
-      ctx.fillText(p.id, 8, 16);
-    }
-
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+    ctx.strokeRect(p.x, p.y, p.w, p.h);
     ctx.restore();
     return;
   }
 
-  // Clip to silhouette then draw image slice
+  // Use cached pre-rendered piece when available - rotation baked in, rendered at dpr for crisp edges
+  const cacheKey = `${p.id}_r${p.rotation}_d${dpr}`;
+  const rot90 = p.rotation === 90 || p.rotation === 270;
+  const cacheW = rot90 ? Math.ceil(p.h) : Math.ceil(p.w);
+  const cacheH = rot90 ? Math.ceil(p.w) : Math.ceil(p.h);
+  const cachePxW = Math.ceil(cacheW * dpr);
+  const cachePxH = Math.ceil(cacheH * dpr);
+  const cached = pieceCache?.get(cacheKey);
+  if (cached && cached.width === cachePxW && cached.height === cachePxH) {
+    drawCachedPiece(
+      ctx,
+      p,
+      cached,
+      cacheW,
+      cacheH,
+      cachePxW,
+      cachePxH,
+      scale,
+      isDragging,
+      isSelected,
+      path,
+      dpr,
+    );
+    return;
+  }
+
+  // Cache miss: render piece at dpr resolution with rotation baked in
+  let cacheCanvas: HTMLCanvasElement | null = cached ?? null;
+  if (!cacheCanvas && pieceCache) {
+    const off = document.createElement("canvas");
+    off.width = cachePxW;
+    off.height = cachePxH;
+    const offCtx = off.getContext("2d");
+    if (offCtx) {
+      const rect = computeImageSourceRect(p, img, cols, rows);
+      offCtx.imageSmoothingEnabled = true;
+      offCtx.imageSmoothingQuality = "high";
+      offCtx.scale(dpr, dpr);
+      offCtx.translate(cacheW / 2, cacheH / 2);
+      offCtx.rotate((p.rotation * Math.PI) / 180);
+      offCtx.translate(-p.w / 2, -p.h / 2);
+      offCtx.save();
+      offCtx.clip(path);
+      offCtx.drawImage(
+        img,
+        rect.srcX,
+        rect.srcY,
+        rect.srcW,
+        rect.srcH,
+        rect.destX,
+        rect.destY,
+        rect.destW,
+        rect.destH,
+      );
+      offCtx.restore();
+      pieceCache.set(cacheKey, off);
+      cacheCanvas = off;
+    }
+  }
+
+  if (cacheCanvas) {
+    drawCachedPiece(
+      ctx,
+      p,
+      cacheCanvas,
+      cacheW,
+      cacheH,
+      cachePxW,
+      cachePxH,
+      scale,
+      isDragging,
+      isSelected,
+      path,
+      dpr,
+    );
+    return;
+  }
+
+  // Fallback: draw directly (for ghosts when no cache, or when cache creation fails)
+  const rect = computeImageSourceRect(p, img, cols, rows);
   ctx.save();
+  applyPieceShadow(ctx, isDragging, p.isPlaced);
+  ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
+  ctx.rotate((p.rotation * Math.PI) / 180);
+  ctx.scale(scale, scale);
+  ctx.translate(-p.w / 2, -p.h / 2);
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
   ctx.clip(path);
-
-  // Calculate which section of the SOURCE image this piece represents
-  const sourceW = img.naturalWidth;
-  const sourceH = img.naturalHeight;
-
-  const srcTileW = sourceW / cols;
-  const srcTileH = sourceH / rows;
-
-  // Scale factors: how to scale source image to piece coordinates
-  const scaleX = p.tileW / srcTileW;
-  const scaleY = p.tileH / srcTileH;
-
-  // This tile's position in source image
-  const tileSrcX = p.col * srcTileW;
-  const tileSrcY = p.row * srcTileH;
-
-  // Where should (0,0) of source image be drawn in piece-local coordinates?
-  // The tile's top-left should appear at (p.pad, p.pad) in piece coords
-  // So source (tileSrcX, tileSrcY) -> piece (p.pad, p.pad)
-  // Therefore source (0,0) -> piece (p.pad - tileSrcX * scaleX, p.pad - tileSrcY * scaleY)
-  const imgX = p.pad - tileSrcX * scaleX;
-  const imgY = p.pad - tileSrcY * scaleY;
-  const imgW = sourceW * scaleX;
-  const imgH = sourceH * scaleY;
-
-  // Draw the entire source image, scaled and positioned
-  // The clip path will cut it to the jigsaw shape
-  ctx.drawImage(img, imgX, imgY, imgW, imgH);
-
+  ctx.drawImage(
+    img,
+    rect.srcX,
+    rect.srcY,
+    rect.srcW,
+    rect.srcH,
+    rect.destX,
+    rect.destY,
+    rect.destW,
+    rect.destH,
+  );
   ctx.restore();
+  clearPieceShadow(ctx);
+  strokePieceOutline(ctx, path, isDragging, isSelected, p.isPlaced, p.locked);
+  if (debug.showBounds) {
+    ctx.strokeStyle = "rgba(255,0,0,0.35)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, p.w, p.h);
+  }
+  if (debug.showIds) {
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
+    ctx.font = "12px system-ui";
+    ctx.fillText(p.id, 8, 16);
+  }
+  if (isSelected) {
+    ctx.strokeStyle = "#667eea";
+    ctx.lineWidth = 3;
+    ctx.stroke(path);
+    ctx.strokeStyle = "rgba(102, 126, 234, 0.4)";
+    ctx.lineWidth = 6;
+    ctx.stroke(path);
+  }
+  ctx.restore();
+}
 
-  // Reset shadow before drawing outline
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 0;
+function drawCachedPiece(
+  ctx: CanvasRenderingContext2D,
+  p: Piece,
+  cacheCanvas: HTMLCanvasElement,
+  cacheW: number,
+  cacheH: number,
+  cachePxW: number,
+  cachePxH: number,
+  scale: number,
+  isDragging: boolean,
+  isSelected: boolean,
+  path: Path2D,
+  dpr: number,
+) {
+  ctx.save();
+  applyPieceShadow(ctx, isDragging, p.isPlaced);
+  let cx = p.x + p.w / 2;
+  let cy = p.y + p.h / 2;
+  if (isDragging) {
+    cx = Math.round(cx * dpr) / dpr;
+    cy = Math.round(cy * dpr) / dpr;
+  }
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+  ctx.translate(-cacheW / 2, -cacheH / 2);
+  ctx.drawImage(cacheCanvas, 0, 0, cachePxW, cachePxH, 0, 0, cacheW, cacheH);
+  clearPieceShadow(ctx);
+  if (isDragging || isSelected) {
+    ctx.translate(cacheW / 2, cacheH / 2);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.translate(-p.w / 2, -p.h / 2);
+    ctx.strokeStyle = isDragging ? "rgba(102, 126, 234, 0.6)" : "#667eea";
+    ctx.lineWidth = isDragging ? 2 : 3;
+    ctx.stroke(path);
+  }
+  ctx.restore();
+}
 
-  // Outline - thicker for dragged pieces
+function strokePieceOutline(
+  ctx: CanvasRenderingContext2D,
+  path: Path2D,
+  isDragging: boolean,
+  isSelected: boolean,
+  isPlaced: boolean,
+  locked: boolean,
+) {
   if (isDragging) {
     ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
     ctx.lineWidth = 2;
-  } else if (p.isPlaced) {
+  } else if (isPlaced) {
     ctx.strokeStyle = "rgba(0, 160, 80, 0.3)";
     ctx.lineWidth = 1;
-  } else if (p.locked) {
+  } else if (locked) {
     ctx.strokeStyle = "rgba(0, 160, 80, 0.4)";
     ctx.lineWidth = 1.5;
   } else {
@@ -271,62 +408,6 @@ function drawPiece(
     ctx.lineWidth = 1;
   }
   ctx.stroke(path);
-
-  if (debug.showBounds) {
-    ctx.strokeStyle = "rgba(255,0,0,0.35)";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(0, 0, p.w, p.h);
-  }
-
-  if (debug.showIds) {
-    ctx.fillStyle = "rgba(0,0,0,0.7)";
-    ctx.font = "12px system-ui";
-    ctx.fillText(p.id, 8, 16);
-  }
-
-  // Selection highlight (keyboard focus)
-  if (isSelected) {
-    ctx.strokeStyle = "#667eea";
-    ctx.lineWidth = 3;
-    ctx.stroke(path);
-
-    // Outer glow
-    ctx.strokeStyle = "rgba(102, 126, 234, 0.4)";
-    ctx.lineWidth = 6;
-    ctx.stroke(path);
-  }
-
-  ctx.restore();
-}
-
-function snapPopScale(tMs: number) {
-  // Quick up then back - satisfying snap feel
-  if (tMs <= 0) return 1;
-  if (tMs >= 200) return 1;
-
-  if (tMs < 80) {
-    // Quick scale up
-    const k = tMs / 80;
-    return 1 + 0.1 * easeOutBack(k);
-  }
-
-  // Settle back down
-  const k = (tMs - 80) / 120;
-  return 1.1 - 0.1 * easeOutBounce(k);
-}
-
-// Easing functions for smooth animations
-function easeOutBack(t: number): number {
-  const c1 = 1.70158;
-  const c3 = c1 + 1;
-  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-}
-
-function easeOutBounce(t: number): number {
-  if (t < 0.5) {
-    return 2 * t * t;
-  }
-  return 1 - 2 * (1 - t) * (1 - t);
 }
 
 function drawCompletionGlow(
@@ -359,34 +440,5 @@ function drawCompletionGlow(
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, cssW, cssH);
 
-  ctx.restore();
-}
-
-function drawDebugBackdrop(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
-  // Subtle background so you can see the canvas is alive (CSS pixel space)
-  ctx.save();
-  ctx.fillStyle = "rgba(0,0,0,0.02)";
-  ctx.fillRect(0, 0, cssW, cssH);
-  ctx.restore();
-}
-
-function drawGridOverlay(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
-  ctx.save();
-  ctx.strokeStyle = "rgba(0,0,0,0.05)";
-  ctx.lineWidth = 1;
-
-  const step = 40;
-  for (let x = 0; x <= cssW; x += step) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, cssH);
-    ctx.stroke();
-  }
-  for (let y = 0; y <= cssH; y += step) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(cssW, y);
-    ctx.stroke();
-  }
   ctx.restore();
 }

@@ -4,6 +4,7 @@ import type { Piece } from "@/puzzle/types";
 /**
  * Render a single piece to a small canvas for use in the tray.
  * Returns an offscreen canvas that can be drawn or converted to data URL.
+ * Applies piece.rotation so the preview matches the board (e.g. drag preview).
  */
 export function renderTrayPiece(
   piece: Piece,
@@ -12,9 +13,11 @@ export function renderTrayPiece(
   assembledH: number,
   scale: number = 0.5,
 ): HTMLCanvasElement {
+  // Canvas must fit rotated piece: 90°/270° swaps w/h
+  const baseSize = Math.max(piece.w, piece.h);
   const canvas = document.createElement("canvas");
-  canvas.width = Math.ceil(piece.w * scale);
-  canvas.height = Math.ceil(piece.h * scale);
+  canvas.width = Math.ceil(baseSize * scale);
+  canvas.height = Math.ceil(baseSize * scale);
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
@@ -38,6 +41,13 @@ export function renderTrayPiece(
     return canvas;
   }
 
+  // Apply rotation around piece center (same as renderBoard)
+  const cx = baseSize / 2;
+  const cy = baseSize / 2;
+  ctx.translate(cx, cy);
+  ctx.rotate((piece.rotation * Math.PI) / 180);
+  ctx.translate(-piece.w / 2, -piece.h / 2);
+
   ctx.save();
   ctx.clip(path);
 
@@ -53,13 +63,35 @@ export function renderTrayPiece(
 
   const srcPadX = (piece.pad / piece.tileW) * srcTileW;
   const srcPadY = (piece.pad / piece.tileH) * srcTileH;
-
-  const srcX = piece.col * srcTileW - srcPadX;
-  const srcY = piece.row * srcTileH - srcPadY;
-  const srcW = srcTileW + srcPadX * 2;
-  const srcH = srcTileH + srcPadY * 2;
-
-  ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, piece.w, piece.h);
+  let srcX = piece.col * srcTileW - srcPadX;
+  let srcY = piece.row * srcTileH - srcPadY;
+  let srcW = srcTileW + srcPadX * 2;
+  let srcH = srcTileH + srcPadY * 2;
+  let destX = 0;
+  let destY = 0;
+  let destW = piece.w;
+  let destH = piece.h;
+  if (srcX < 0) {
+    destX = (-srcX / srcW) * piece.w;
+    destW = piece.w - destX;
+    srcW = srcW + srcX;
+    srcX = 0;
+  }
+  if (srcY < 0) {
+    destY = (-srcY / srcH) * piece.h;
+    destH = piece.h - destY;
+    srcH = srcH + srcY;
+    srcY = 0;
+  }
+  if (srcX + srcW > sourceW) {
+    destW *= (sourceW - srcX) / srcW;
+    srcW = sourceW - srcX;
+  }
+  if (srcY + srcH > sourceH) {
+    destH *= (sourceH - srcY) / srcH;
+    srcH = sourceH - srcY;
+  }
+  ctx.drawImage(img, srcX, srcY, srcW, srcH, destX, destY, destW, destH);
   ctx.restore();
 
   // Draw outline

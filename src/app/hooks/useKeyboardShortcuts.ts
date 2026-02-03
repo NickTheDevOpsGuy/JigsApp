@@ -19,6 +19,8 @@ export type ShortcutAction =
   | "moveDown" // Move piece down
   | "moveLeft" // Move piece left
   | "moveRight" // Move piece right
+  | "sendToTray"
+  | "snap"
   | "undo"
   | "showHelp"
   | "escape";
@@ -48,30 +50,19 @@ export function useKeyboardShortcuts({
 }: UseKeyboardShortcutsOptions) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      // Debug logging
-      console.log("[Keyboard] Key pressed:", e.key, "enabled:", enabled);
+      if (!enabled) return;
 
-      if (!enabled) {
-        console.log("[Keyboard] Shortcuts disabled, ignoring");
-        return;
-      }
-
-      // Don't trigger shortcuts when typing in inputs
       const target = e.target as HTMLElement;
       if (
         target.tagName === "INPUT" ||
         target.tagName === "TEXTAREA" ||
         target.isContentEditable
       ) {
-        console.log("[Keyboard] In input field, ignoring");
         return;
       }
 
       const { mod, shift } = getModifiers(e);
       const key = e.key.toLowerCase();
-
-      console.log("[Keyboard] Processing key:", key, "mod:", mod, "shift:", shift);
-
       let action: ShortcutAction | null = null;
 
       // Escape - close modals, unpause
@@ -141,6 +132,16 @@ export function useKeyboardShortcuts({
       else if (key === "g" && !mod) {
         action = "toggleGhostHint";
       }
+      // T - Send selected piece to tray
+      else if (key === "t" && !mod) {
+        e.preventDefault();
+        action = "sendToTray";
+      }
+      // Enter - Snap selected piece
+      else if (e.key === "Enter" && !mod) {
+        e.preventDefault();
+        action = "snap";
+      }
       // ? or F1 - Show help
       else if ((key === "?" || e.key === "F1") && !mod) {
         e.preventDefault();
@@ -152,12 +153,7 @@ export function useKeyboardShortcuts({
         action = "undo";
       }
 
-      if (action) {
-        console.log("[Keyboard] Dispatching action:", action);
-        onAction(action);
-      } else {
-        console.log("[Keyboard] No action matched for key:", key);
-      }
+      if (action) onAction(action);
     },
     [enabled, onAction],
   );

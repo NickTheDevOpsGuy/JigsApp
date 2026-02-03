@@ -1,79 +1,57 @@
-import type { Piece, GridSize } from "./types";
+// Snap logic utilities for PuzzleManager
+import type { Piece } from "./types";
 
-/**
- * SnapLogic
- *
- * Pure logic helpers for snapping behavior.
- * No DOM, no canvas, no side effects.
- *
- * PuzzleManager calls into these functions to decide:
- * - should a piece snap to the board?
- * - should it snap to a neighbor?
- * - should groups merge?
- */
+export type SnapContext = {
+  snapTolerancePx: number;
+  tileW: number;
+  tileH: number;
+};
 
-export type SnapResult =
-  | { kind: "none" }
-  | { kind: "board"; pieceId: string }
-  | { kind: "neighbor"; a: string; b: string };
+export type TilePos = { x: number; y: number };
 
-export function trySnapToBoard(piece: Piece, snapTolerancePx: number): boolean {
-  const dx = Math.abs(piece.x + piece.pad - piece.targetX);
-  const dy = Math.abs(piece.y + piece.pad - piece.targetY);
-  const dr = normalizeRotation(piece.rotation - piece.targetRotation);
-
-  return dx <= snapTolerancePx && dy <= snapTolerancePx && dr === 0;
+export function getTilePos(piece: Piece, pad: number): TilePos {
+  return {
+    x: piece.x + pad,
+    y: piece.y + pad,
+  };
 }
 
-/**
- * Try snapping piece A to piece B.
- * Only works if:
- * - they are grid neighbors
- * - rotations match
- * - relative position is within tolerance
- */
-export function trySnapToNeighbor(
-  a: Piece,
-  b: Piece,
-  grid: GridSize,
-  snapTolerancePx: number,
+export function computeSnapDelta(piece: Piece, pad: number): { dx: number; dy: number } {
+  const tile = getTilePos(piece, pad);
+  return {
+    dx: piece.targetX - tile.x,
+    dy: piece.targetY - tile.y,
+  };
+}
+
+export function isWithinSnapTolerance(
+  dx: number,
+  dy: number,
+  tolerance: number,
 ): boolean {
-  if (a.rotation !== b.rotation) return false;
-
-  const dRow = a.row - b.row;
-  const dCol = a.col - b.col;
-
-  // must be cardinal neighbors
-  if (Math.abs(dRow) + Math.abs(dCol) !== 1) return false;
-
-  const expectedDx = (a.col - b.col) * a.tileW;
-  const expectedDy = (a.row - b.row) * a.tileH;
-
-  const actualDx = a.x + a.pad - (b.x + b.pad);
-  const actualDy = a.y + a.pad - (b.y + b.pad);
-
-  const dxErr = Math.abs(actualDx - expectedDx);
-  const dyErr = Math.abs(actualDy - expectedDy);
-
-  return dxErr <= snapTolerancePx && dyErr <= snapTolerancePx;
+  return Math.hypot(dx, dy) <= tolerance;
 }
 
-/**
- * Merge two groups by assigning the same groupId.
- */
-export function mergeGroups(pieces: Piece[], groupA: string, groupB: string): void {
-  if (groupA === groupB) return;
+export function computeNeighborSnapDelta(
+  groupPiece: Piece,
+  neighbor: Piece,
+  tileW: number,
+  tileH: number,
+  pad: number,
+): { dx: number; dy: number; dist: number } {
+  const gpTile = getTilePos(groupPiece, pad);
+  const nTile = getTilePos(neighbor, pad);
 
-  for (const p of pieces) {
-    if (p.groupId === groupB) {
-      p.groupId = groupA;
-    }
-  }
+  const expectedDx = (neighbor.col - groupPiece.col) * tileW;
+  const expectedDy = (neighbor.row - groupPiece.row) * tileH;
+
+  const dx = nTile.x - expectedDx - gpTile.x;
+  const dy = nTile.y - expectedDy - gpTile.y;
+  const dist = Math.hypot(dx, dy);
+
+  return { dx, dy, dist };
 }
 
-/**
- * Normalize rotation to 0, 90, 180, 270
- */
-function normalizeRotation(deg: number): number {
-  return ((Math.round(deg) % 360) + 360) % 360;
+export function allPiecesRotationZero(pieces: Piece[]): boolean {
+  return pieces.every((p) => p.rotation === 0);
 }

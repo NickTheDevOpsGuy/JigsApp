@@ -9,12 +9,6 @@
 A cozy, modern jigsaw puzzle game built with React.  
 Upload an image, break it into pieces, and snap them together piece by piece.
 
-## ▶️ Play Phuzzle
-
-👉 **https://phuzzle.vercel.app/**
-
-No install required. Works on desktop and mobile.
-
 ---
 
 ## Table of Contents
@@ -31,6 +25,14 @@ No install required. Works on desktop and mobile.
 - [Contributing](#-contributing)
 - [Team](#-team)
 - [License](#-license)
+
+---
+
+## Preview
+
+### Gameplay Demo
+
+[![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
 
 ---
 
@@ -80,7 +82,6 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### UX & Polish
 
-- Added a toggle in the hamburger menu to switch between light and dark mode
 - Reference image preview overlay
 - Progress counter and timer (with pause)
 - Confetti celebration on completion 🎉
@@ -90,14 +91,11 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Mobile Support
 
-### Mobile Support
-
-- Touch drag with inertia-safe snapping
-- **Single-tap to rotate** (no double-tap ambiguity)
+- Touch drag
+- Tap to rotate
 - Long-press to send pieces to the tray
-- Haptic feedback for snap, rotate, and placement
-- Mobile-safe layouts with large hit targets
-- Touch-specific tutorial hints on first launch
+- Haptic feedback
+- Mobile-safe layouts and gestures
 
 ### Accessibility & Controls
 
@@ -204,7 +202,7 @@ Category = folder name, puzzle name = filename.
 
 ```plaintext
 
-..
+.
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -219,24 +217,6 @@ Category = folder name, puzzle name = filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
-│   ├── _
-│   │   ├── .gitignore
-│   │   ├── applypatch-msg
-│   │   ├── commit-msg
-│   │   ├── h
-│   │   ├── husky.sh
-│   │   ├── post-applypatch
-│   │   ├── post-checkout
-│   │   ├── post-commit
-│   │   ├── post-merge
-│   │   ├── post-rewrite
-│   │   ├── pre-applypatch
-│   │   ├── pre-auto-gc
-│   │   ├── pre-commit
-│   │   ├── pre-merge-commit
-│   │   ├── pre-push
-│   │   ├── pre-rebase
-│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
 ├── .vite
@@ -308,6 +288,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── canvas
 │   │   │   │   ├── pickPiece.ts
 │   │   │   │   ├── renderBoard.ts
+│   │   │   │   ├── renderBoardHelpers.ts
 │   │   │   │   ├── renderTrayPiece.ts
 │   │   │   │   └── shape.ts
 │   │   │   ├── factories
@@ -317,8 +298,9 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleStorage.ts
 │   │   │   ├── shape.ts
-│   │   │   ├── SnapLogic.ts
-│   │   │   └── types.ts
+│   │   │   ├── snapLogic.ts
+│   │   │   ├── types.ts
+│   │   │   └── undoManager.ts
 │   │   ├── screens
 │   │   │   ├── Menu
 │   │   │   │   ├── MenuScreen.module.css
@@ -329,22 +311,39 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── Play
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── DragPreview.tsx
 │   │   │   │   │   ├── HeaderMenu.tsx
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── PauseOverlay.tsx
 │   │   │   │   │   ├── PlayHUD.tsx
 │   │   │   │   │   └── TopBarButtons.tsx
 │   │   │   │   ├── hooks
+│   │   │   │   │   ├── pointerHandlers
+│   │   │   │   │   │   ├── dragLog.ts
+│   │   │   │   │   │   ├── mouseHandlers.ts
+│   │   │   │   │   │   ├── shared.ts
+│   │   │   │   │   │   ├── touchHandlers.ts
+│   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── useCoarsePointer.ts
+│   │   │   │   │   ├── useDownloadImage.ts
 │   │   │   │   │   ├── useHaptics.ts
 │   │   │   │   │   ├── useInputHints.ts
+│   │   │   │   │   ├── usePlayScreenAnimation.ts
+│   │   │   │   │   ├── usePlayScreenManager.ts
+│   │   │   │   │   ├── usePlayScreenShortcuts.ts
+│   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── usePuzzleLifecycle.ts
 │   │   │   │   │   └── useShareResults.ts
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
+│   │   │   │   ├── playScreenUtils.ts
 │   │   │   │   └── playUtils.ts
 │   │   │   └── Setup
+│   │   │       ├── hooks
+│   │   │       │   ├── index.ts
+│   │   │       │   ├── useGridConfig.ts
+│   │   │       │   └── useImagePicker.ts
 │   │   │       ├── SetupScreen.module.css
 │   │   │       └── SetupScreen.tsx
 │   │   ├── styles
@@ -373,6 +372,7 @@ Category = folder name, puzzle name = filename.
 ├── tsconfig.json
 ├── tsconfig.node.json
 ├── vercel.json
+└── vite.config.ts
 
 ```
 
