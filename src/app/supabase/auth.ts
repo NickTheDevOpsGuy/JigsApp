@@ -4,7 +4,9 @@ import { supabase } from "./client";
 export async function ensureSignedIn(): Promise<string | null> {
   if (!supabase) return null;
 
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (session?.user?.id) return session.user.id;
 
   const { data, error } = await supabase.auth.signInAnonymously();
@@ -17,6 +19,8 @@ export async function ensureSignedIn(): Promise<string | null> {
 
 export async function getUserId(): Promise<string | null> {
   if (!supabase) return null;
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   return session?.user?.id ?? null;
 }

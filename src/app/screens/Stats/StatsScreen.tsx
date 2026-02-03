@@ -28,9 +28,9 @@ function formatTime(seconds: number): string {
 
 export function StatsScreen() {
   const nav = useNavigate();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "leaderboard" | "achievements">(
-    "dashboard",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "dashboard" | "leaderboard" | "achievements"
+  >("dashboard");
   const [stats, setStats] = useState<{
     puzzlesCompleted: number;
     totalPlayTimeSeconds: number;
@@ -42,7 +42,14 @@ export function StatsScreen() {
     { rank: number; elapsedSeconds: number; displayName: string }[]
   >([]);
   const [achievements, setAchievements] = useState<
-    { id: string; name: string; description: string; icon: string; unlocked: boolean; unlockedAt: string | null }[]
+    {
+      id: string;
+      name: string;
+      description: string;
+      icon: string;
+      unlocked: boolean;
+      unlockedAt: string | null;
+    }[]
   >([]);
   const [loading, setLoading] = useState(true);
 
@@ -71,18 +78,19 @@ export function StatsScreen() {
         <div className={styles.card}>
           <h1 className={styles.title}>Stats & Leaderboards</h1>
           <p className={styles.placeholder}>
-            Connect Supabase to track your stats, compete on leaderboards, and unlock achievements.
+            Connect Supabase to track your stats, compete on leaderboards, and unlock
+            achievements.
           </p>
           <p className={styles.hint}>
             Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment.
           </p>
           <p className={styles.debug}>
-            VITE_SUPABASE_URL: {status.url ? "✓ set" : "✗ missing"} · VITE_SUPABASE_ANON_KEY:{" "}
-            {status.key ? "✓ set" : "✗ missing"}
+            VITE_SUPABASE_URL: {status.url ? "✓ set" : "✗ missing"} ·
+            VITE_SUPABASE_ANON_KEY: {status.key ? "✓ set" : "✗ missing"}
           </p>
           <p className={styles.hint}>
-            Local: add to .env.development and restart dev server. Vercel: add in project Settings
-            → Environment Variables, then redeploy.
+            Local: add to .env.development and restart dev server. Vercel: add in project
+            Settings → Environment Variables, then redeploy.
           </p>
           <Button onClick={() => nav("/")}>
             <ArrowLeft size={18} />
@@ -137,7 +145,9 @@ export function StatsScreen() {
                 <h2>Your Statistics</h2>
                 <div className={styles.statsGrid}>
                   <div className={styles.statCard}>
-                    <span className={styles.statValue}>{stats?.puzzlesCompleted ?? 0}</span>
+                    <span className={styles.statValue}>
+                      {stats?.puzzlesCompleted ?? 0}
+                    </span>
                     <span className={styles.statLabel}>Puzzles completed</span>
                   </div>
                   <div className={styles.statCard}>
@@ -151,7 +161,9 @@ export function StatsScreen() {
                     <span className={styles.statLabel}>Current streak</span>
                   </div>
                   <div className={styles.statCard}>
-                    <span className={styles.statValue}>{stats?.bestDailyStreak ?? 0}</span>
+                    <span className={styles.statValue}>
+                      {stats?.bestDailyStreak ?? 0}
+                    </span>
                     <span className={styles.statLabel}>Best streak</span>
                   </div>
                 </div>
@@ -169,7 +181,9 @@ export function StatsScreen() {
                       <li key={entry.rank} className={styles.leaderboardItem}>
                         <span className={styles.rank}>#{entry.rank}</span>
                         <span className={styles.player}>{entry.displayName}</span>
-                        <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
+                        <span className={styles.time}>
+                          {formatTime(entry.elapsedSeconds)}
+                        </span>
                       </li>
                     ))}
                   </ol>

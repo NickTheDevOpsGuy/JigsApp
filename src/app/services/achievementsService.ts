@@ -29,7 +29,8 @@ export async function checkAndUnlockAchievements(args: {
   const newlyUnlocked: string[] = [];
 
   const last = args.lastCompletion;
-  const speedDemon = last && last.grid.rows === 3 && last.grid.cols === 3 && last.elapsedSeconds < 60;
+  const speedDemon =
+    last && last.grid.rows === 3 && last.grid.cols === 3 && last.elapsedSeconds < 60;
   const expertGrid = last && last.grid.rows === 6 && last.grid.cols === 6;
 
   const toCheck: { id: string; condition: boolean }[] = [

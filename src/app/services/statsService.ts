@@ -44,7 +44,8 @@ export async function recordCompletion(args: {
 
   const updates = {
     puzzles_completed: (existing?.puzzles_completed ?? 0) + 1,
-    total_play_time_seconds: (existing?.total_play_time_seconds ?? 0) + args.elapsedSeconds,
+    total_play_time_seconds:
+      (existing?.total_play_time_seconds ?? 0) + args.elapsedSeconds,
     daily_streak: newStreak,
     best_daily_streak: Math.max(prevBest, newStreak),
     last_played_at: new Date().toISOString(),

@@ -46,7 +46,8 @@ export function MenuScreen() {
             </span>
             {hasDaily && !todayCompleted && (
               <span className={styles.actionHint}>
-                {dailyConfig.puzzle.name} · {dailyConfig.grid.rows}×{dailyConfig.grid.cols}
+                {dailyConfig.puzzle.name} · {dailyConfig.grid.rows}×
+                {dailyConfig.grid.cols}
               </span>
             )}
           </Button>
