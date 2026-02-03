@@ -108,6 +108,11 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Auto-save puzzle progress
 - Resume across browser sessions
 
+### Daily Challenge
+- Same puzzle for everyone each day (deterministic, no backend)
+- Streak tracking for consecutive days completed
+- One-tap start from the menu
+
 ---
 
 ## Roadmap
@@ -119,6 +124,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Ghost / hint preview
 - Share completed puzzle image
 - Time modes (elapsed, countdown, active-only, relaxed, best time)
+- Daily puzzle challenge
 
 ### Planned
 
@@ -186,6 +192,7 @@ Category = folder name, puzzle name = filename.
 <summary>📁 Click to expand file structure</summary>
 
 ```plaintext
+
 .
 ├── .github
 │   ├── ISSUE_TEMPLATE
@@ -263,6 +270,8 @@ Category = folder name, puzzle name = filename.
 │   │   │   └── Tray
 │   │   │       ├── Tray.module.css
 │   │   │       └── Tray.tsx
+│   │   ├── daily
+│   │   │   └── dailyPuzzle.ts
 │   │   ├── data
 │   │   │   └── samplePuzzles.ts
 │   │   ├── hooks
@@ -360,6 +369,7 @@ Category = folder name, puzzle name = filename.
 ├── tsconfig.json
 ├── tsconfig.node.json
 ├── vercel.json
+└── vite.config.ts
 
 ```
 

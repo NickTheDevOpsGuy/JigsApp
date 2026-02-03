@@ -79,6 +79,7 @@ export function SetupScreen() {
     try {
       localStorage.setItem(STORAGE_KEY, imgDataUrl);
       saveGrid();
+      localStorage.removeItem("phuzzle:dailyDate");
       nav("/play");
     } catch {
       console.error("Could not save to localStorage");
