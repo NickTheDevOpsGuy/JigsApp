@@ -26,8 +26,11 @@ Brief description of what this PR does and why.
 
 ## How to Test
 
-<!-- Instructions on how to test the changes made in this PR -->
-<!-- Provide detailed steps to verify the functionality -->
+1. Check out my changes
+2. Run `npm i`
+3. Run `npm run build`
+4. Run `npm dev:host`
+5. Test on both mobile and desktop
 
 ## Screenshots (if applicable)
 
