@@ -25,6 +25,7 @@ export function handleMouseDown(
     soundManager.play("rotate");
     haptic?.("rotate");
     setState(manager.getState());
+    ctx.onPieceInteraction?.();
     return true;
   }
 
@@ -46,6 +47,7 @@ export function handleMouseDown(
     manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
     dragLog("down", { pieceId, x: e.clientX, y: e.clientY, pointerId: e.pointerId });
     setState(manager.getState());
+    ctx.onPieceInteraction?.();
 
     try {
       canvas.setPointerCapture(e.pointerId);
@@ -66,6 +68,7 @@ export function handleMouseMove(
   if (!manager || !boardRef.current) return;
 
   didDragRef.current = true;
+  ctx.onPieceInteraction?.();
   const boardRect = boardRef.current.getBoundingClientRect();
   manager.pointerMove(e.clientX, e.clientY, boardRect);
   dragLog("move", {
@@ -97,6 +100,7 @@ export function handleMouseUp(
 
   const canvas = canvasRef.current as CanvasWithTouch;
 
+  ctx.onPieceInteraction?.();
   onDragPreview?.(null);
   dragLog("up", {
     x: e.clientX,

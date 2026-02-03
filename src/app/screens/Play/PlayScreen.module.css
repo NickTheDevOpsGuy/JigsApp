@@ -112,6 +112,17 @@
   composes: hudPill;
 }
 
+.hudPillTimer.timerLow {
+  color: var(--color-error, #c53030);
+  border-color: var(--color-error, #c53030);
+}
+
+.timerSuffix {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-left: 4px;
+}
+
 .hudPillLive {
   composes: hudPill;
   background: var(--color-hud-live-bg);
@@ -463,6 +474,11 @@
   font-size: 1.25rem;
   opacity: 0.9;
   margin: 0 0 1.5rem 0;
+}
+
+.newBest {
+  color: #fbbf24;
+  font-weight: 600;
 }
 
 .shareSection {

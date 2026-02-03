@@ -2,12 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
+import type { TimeMode } from "../timeMode";
 import { soundManager } from "@/audio/sounds";
 import { STORAGE_KEY, computeTileSize } from "../playScreenUtils";
 
 export function usePlayScreenManager(
   grid: { rows: number; cols: number },
   pieceLockingEnabled: boolean,
+  onPieceInteraction?: () => void,
+  timeMode: TimeMode = "elapsed",
+  countdownMinutes: number = 10,
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -59,7 +63,7 @@ export function usePlayScreenManager(
       if (hasSavedGame && savedState) {
         setElapsedSeconds(savedState.elapsedSeconds);
       } else {
-        setElapsedSeconds(0);
+        setElapsedSeconds(timeMode === "countdown" ? countdownMinutes * 60 : 0);
       }
 
       const next = new PuzzleManager(
@@ -75,8 +79,12 @@ export function usePlayScreenManager(
           onPiecePlaced: (p) => {
             popMapRef.current.set(p.id, performance.now());
             soundManager.play("place");
+            onPieceInteraction?.();
           },
-          onPieceSnapped: () => soundManager.play("snap"),
+          onPieceSnapped: () => {
+            soundManager.play("snap");
+            onPieceInteraction?.();
+          },
           onPuzzleComplete: () => {
             clearPuzzleState();
             soundManager.play("complete");
@@ -99,7 +107,7 @@ export function usePlayScreenManager(
       setManager(next);
       setState(next.getState());
     };
-  }, [grid, pieceLockingEnabled]);
+  }, [grid, pieceLockingEnabled, timeMode, countdownMinutes, onPieceInteraction]);
 
   useEffect(() => {
     manager?.setPieceLockingEnabled(pieceLockingEnabled);

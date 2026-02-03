@@ -2,6 +2,11 @@ import type { DragState, GridSize, Piece, PuzzleState } from "./types";
 import { createInitialPieces } from "./factories/createInitialPieces";
 import type { SavedPiece } from "./puzzleStorage";
 import { UndoManager } from "./undoManager";
+import {
+  getGroupBounds as getGroupBoundsUtil,
+  wouldOverlapAnyOtherGroup as wouldOverlapUtil,
+  getSolvedNeighbors as getSolvedNeighborsUtil,
+} from "./groupUtils";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
@@ -204,22 +209,7 @@ export class PuzzleManager {
   }
 
   private getGroupBounds(groupId: string) {
-    const ps = this.getGroupPieces(groupId);
-    if (!ps.length) return null;
-
-    let minX = Infinity,
-      minY = Infinity,
-      maxX = -Infinity,
-      maxY = -Infinity;
-
-    for (const p of ps) {
-      minX = Math.min(minX, p.x);
-      minY = Math.min(minY, p.y);
-      maxX = Math.max(maxX, p.x + p.w);
-      maxY = Math.max(maxY, p.y + p.h);
-    }
-
-    return { minX, minY, maxX, maxY };
+    return getGroupBoundsUtil(this.state.pieces, groupId);
   }
 
   private shiftGroup(groupId: string, dx: number, dy: number) {
@@ -246,41 +236,11 @@ export class PuzzleManager {
   }
 
   private wouldOverlapAnyOtherGroup(groupId: string, dx: number, dy: number): boolean {
-    const groupPieces = this.getGroupPieces(groupId);
-    const otherPieces = this.state.pieces.filter(
-      (p) => p.groupId !== groupId && !p.inTray,
-    );
-
-    for (const gp of groupPieces) {
-      const gpX = gp.x + dx;
-      const gpY = gp.y + dy;
-      const gpRight = gpX + gp.w;
-      const gpBottom = gpY + gp.h;
-
-      for (const op of otherPieces) {
-        const opRight = op.x + op.w;
-        const opBottom = op.y + op.h;
-
-        // Check for overlap
-        if (!(gpRight <= op.x || gpX >= opRight || gpBottom <= op.y || gpY >= opBottom)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return wouldOverlapUtil(this.state.pieces, groupId, dx, dy);
   }
 
   private getSolvedNeighbors(piece: Piece): Piece[] {
-    const byRC = (r: number, c: number) =>
-      this.state.pieces.find((p) => p.row === r && p.col === c) ?? null;
-
-    return [
-      byRC(piece.row - 1, piece.col),
-      byRC(piece.row + 1, piece.col),
-      byRC(piece.row, piece.col - 1),
-      byRC(piece.row, piece.col + 1),
-    ].filter(Boolean) as Piece[];
+    return getSolvedNeighborsUtil(this.state.pieces, piece);
   }
 
   private mergeGroups(from: string, into: string) {

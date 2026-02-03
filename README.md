@@ -114,33 +114,18 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed
 
-- Drag-and-drop pieces with rotation
-- Interlocking piece shapes
-- Board + neighbor snapping
-- Piece merging and group movement
-- Tray system with color sorting
-- Multiple difficulty levels
-- Reference preview overlay
-- Progress counter and timer
-- Auto-save
-- Confetti celebration
-- Mobile support with haptics
-- Sound effects
-- Fullscreen mode
-- Keyboard shortcuts
-- Tutorial overlay
-- Sample puzzle gallery
-- Vercel deployment
+- Dark mode
+- Undo
+- Ghost / hint preview
+- Share completed puzzle image
+- Time modes (elapsed, countdown, active-only, relaxed, best time)
 
 ### Planned
 
-- Dark mode
-- Undo / Redo
-- Ghost / hint preview
+- Redo
 - Edge-piece filtering
 - Zoom and pan for large puzzles
 - Daily puzzle challenge
-- Share completed puzzle image
 - Player stats and achievements
 - Import puzzle from URL
 - Camera capture for custom photos
@@ -217,6 +202,24 @@ Category = folder name, puzzle name = filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── pre-push
+│   │   ├── pre-rebase
+│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
 ├── .vite
@@ -295,6 +298,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   └── createInitialPieces.ts
 │   │   │   ├── colorUtils.ts
 │   │   │   ├── config.ts
+│   │   │   ├── groupUtils.ts
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleStorage.ts
 │   │   │   ├── shape.ts
@@ -313,6 +317,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── CompletionOverlay.tsx
 │   │   │   │   │   ├── DragPreview.tsx
 │   │   │   │   │   ├── HeaderMenu.tsx
+│   │   │   │   │   ├── headerMenuConfig.tsx
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── PauseOverlay.tsx
 │   │   │   │   │   ├── PlayHUD.tsx
@@ -331,14 +336,17 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── usePlayScreenAnimation.ts
 │   │   │   │   │   ├── usePlayScreenManager.ts
 │   │   │   │   │   ├── usePlayScreenShortcuts.ts
+│   │   │   │   │   ├── usePlayScreenTimer.ts
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── usePuzzleLifecycle.ts
-│   │   │   │   │   └── useShareResults.ts
+│   │   │   │   │   ├── useShareResults.ts
+│   │   │   │   │   └── useTimeModeConfig.ts
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
 │   │   │   │   ├── playScreenUtils.ts
-│   │   │   │   └── playUtils.ts
+│   │   │   │   ├── playUtils.ts
+│   │   │   │   └── timeMode.ts
 │   │   │   └── Setup
 │   │   │       ├── hooks
 │   │   │       │   ├── index.ts
@@ -356,7 +364,6 @@ Category = folder name, puzzle name = filename.
 │       └── vite-env.d.ts
 ├── .env.development
 ├── .env.example
-├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
