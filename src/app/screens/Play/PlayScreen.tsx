@@ -9,10 +9,13 @@ import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
+import { getBestTime } from "./timeMode";
 import { usePlayScreenManager } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
 import { usePlayScreenAnimation } from "./hooks/usePlayScreenAnimation";
+import { usePlayScreenTimer } from "./hooks/usePlayScreenTimer";
+import { useTimeModeConfig } from "./hooks/useTimeModeConfig";
 import { useShareResults } from "./hooks/useShareResults";
 import { useDownloadImage } from "./hooks/useDownloadImage";
 import { usePointerHandlers } from "./hooks/usePointerHandlers";
@@ -63,7 +66,17 @@ export function PlayScreen() {
     toggleDebug,
   } = ui;
 
-  const managerResult = usePlayScreenManager(grid, pieceLockingEnabled);
+  const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
+    useTimeModeConfig();
+  const lastInteractionRef = React.useRef(performance.now());
+
+  const managerResult = usePlayScreenManager(
+    grid,
+    pieceLockingEnabled,
+    timeMode,
+    countdownMinutes,
+    lastInteractionRef,
+  );
   const {
     manager,
     state,
@@ -127,11 +140,15 @@ export function PlayScreen() {
     selectedIdRef,
   });
 
-  useEffect(() => {
-    if (state?.isComplete || isPaused) return;
-    const id = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
-    return () => clearInterval(id);
-  }, [state?.isComplete, isPaused, setElapsedSeconds]);
+  usePlayScreenTimer({
+    state,
+    isPaused,
+    setIsPaused,
+    timeMode,
+    elapsedSeconds,
+    setElapsedSeconds,
+    lastInteractionRef,
+  });
 
   useEffect(() => {
     if (!state || state.isComplete) return;
@@ -174,6 +191,9 @@ export function PlayScreen() {
     didDragRef,
     haptic: haptics.vibrate,
     onDragPreview: setDragPreview,
+    onPieceInteraction: () => {
+      lastInteractionRef.current = performance.now();
+    },
   });
 
   usePlayScreenAnimation({
@@ -192,6 +212,7 @@ export function PlayScreen() {
   const handleTrayPieceClick = useCallback(
     (pieceId: string) => {
       if (!manager) return;
+      lastInteractionRef.current = performance.now();
       manager.movePieceFromTray(pieceId);
       setState(manager.getState());
       selectedIdRef.current = pieceId;
@@ -224,6 +245,10 @@ export function PlayScreen() {
   const total = state?.totalCount ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
+  const bestTimeSeconds =
+    timeMode === "best" && state?.grid
+      ? getBestTime(state.grid.rows, state.grid.cols)
+      : null;
 
   return (
     <div className={styles.page} ref={pageRef}>
@@ -238,6 +263,10 @@ export function PlayScreen() {
                 setState(manager.getState());
               }
             }}
+            timeMode={timeMode}
+            setTimeMode={setTimeMode}
+            countdownMinutes={countdownMinutes}
+            setCountdownMinutes={setCountdownMinutes}
             showPreview={showPreview}
             soundEnabled={soundEnabled}
             hapticsEnabled={hapticsEnabled}
@@ -268,6 +297,9 @@ export function PlayScreen() {
             piecesLeft={left}
             isPaused={isPaused}
             isComplete={isComplete}
+            timeMode={timeMode}
+            countdownMinutes={countdownMinutes}
+            bestTimeSeconds={bestTimeSeconds}
             onTogglePause={() => setIsPaused((p) => !p)}
           />
         </div>
@@ -318,10 +350,28 @@ export function PlayScreen() {
               />
             </div>
           )}
-          {isPaused && <PauseOverlay onResume={() => setIsPaused(false)} />}
+          {isPaused && (
+            <PauseOverlay
+              onResume={() => setIsPaused(false)}
+              isCountdownExpired={
+                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
+              }
+              onNewPuzzle={
+                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
+                  ? handleNewGame
+                  : undefined
+              }
+            />
+          )}
           {isComplete && (
             <CompletionOverlay
               elapsedSeconds={elapsedSeconds}
+              grid={state?.grid}
+              isNewBest={
+                timeMode === "best" &&
+                state?.grid != null &&
+                (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
+              }
               shareUrls={share.shareUrls}
               copied={share.copied}
               canNativeShare={share.canNativeShare}

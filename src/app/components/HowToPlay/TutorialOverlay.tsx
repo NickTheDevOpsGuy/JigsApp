@@ -91,6 +91,32 @@ export function TutorialOverlay({
         </div>
 
         <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>⏱ Time Modes</h3>
+          <p>
+            Choose how time is tracked from the <strong>Menu</strong> (☰) → Settings:
+          </p>
+          <ul className={styles.tips}>
+            <li>
+              <strong>Elapsed:</strong> Timer counts up from zero (default).
+            </li>
+            <li>
+              <strong>Countdown:</strong> Race against the clock—finish before time runs
+              out!
+            </li>
+            <li>
+              <strong>Active only:</strong> Timer pauses when you stop moving pieces—great
+              for multitasking.
+            </li>
+            <li>
+              <strong>Relaxed:</strong> Timer hidden—no pressure, just puzzle.
+            </li>
+            <li>
+              <strong>Best time:</strong> Track your personal best for each grid size.
+            </li>
+          </ul>
+        </div>
+
+        <div className={styles.section}>
           <h3 className={styles.sectionTitle}>📋 Menu Options</h3>
           <p>
             Open the <strong>Menu</strong> (☰) for helpful options:
