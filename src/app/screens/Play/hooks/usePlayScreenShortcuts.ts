@@ -46,7 +46,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
     setHapticsEnabled,
     toggleFullscreen,
     selectCycle,
-    selectedIdRef,
+    selectedIdRef: _selectedIdRef,
   } = args;
 
   const handleShortcut = useCallback(

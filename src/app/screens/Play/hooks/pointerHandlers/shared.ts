@@ -1,5 +1,4 @@
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { PointerHandlersContext } from "./types";
 
 export function finishDragWithTrayCheck(
   manager: PuzzleManager,

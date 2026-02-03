@@ -60,7 +60,7 @@ export function handleMouseMove(
   e: React.PointerEvent<HTMLCanvasElement>,
   ctx: PointerHandlersContext,
 ): void {
-  const { manager, boardRef, didDragRef, setState } = ctx;
+  const { manager, boardRef, didDragRef } = ctx;
   if (!manager || !boardRef.current) return;
 
   didDragRef.current = true;

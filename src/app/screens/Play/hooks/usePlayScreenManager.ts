@@ -1,18 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
-import {
-  savePuzzleState,
-  loadPuzzleState,
-  clearPuzzleState,
-} from "@/puzzle/puzzleStorage";
+import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
-import {
-  STORAGE_KEY,
-  GRID_KEY,
-  PIECE_LOCKING_KEY,
-  computeTileSize,
-} from "../playScreenUtils";
+import { STORAGE_KEY, computeTileSize } from "../playScreenUtils";
 
 export function usePlayScreenManager(
   grid: { rows: number; cols: number },

@@ -163,7 +163,6 @@ export function usePointerHandlers(args: {
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current) return;
 
-      const canvas = canvasRef.current as CanvasWithTouch;
       const isTouch = e.pointerType === "touch";
 
       if (isTouch) {

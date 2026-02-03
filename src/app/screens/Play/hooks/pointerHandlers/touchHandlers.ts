@@ -21,7 +21,7 @@ export function handleTouchDown(
   boardRect: DOMRect,
   piece: { x: number; y: number; w: number; h: number },
 ): void {
-  const { manager, canvasRef, didDragRef, setState } = ctx;
+  const { manager, canvasRef, didDragRef } = ctx;
   if (!manager) return;
 
   const canvas = canvasRef.current as CanvasWithTouch;

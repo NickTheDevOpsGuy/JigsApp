@@ -35,7 +35,7 @@ function isEdge(p: Piece, grid: { rows: number; cols: number }) {
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
-  { pieces, image, grid, onPieceClick, isCoarsePointer },
+  { pieces, image, grid, onPieceClick },
   ref,
 ) {
   const [section, setSection] = useState<TraySection>("all");

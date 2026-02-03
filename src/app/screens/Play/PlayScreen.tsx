@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
 
-import type { PuzzleState } from "@/puzzle/types";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
