@@ -7,11 +7,7 @@ import { Button } from "@/components/Button/Button";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { HelpCircle, Image, Calendar, BarChart3 } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
-import {
-  startDailyPuzzle,
-  isTodayDailyCompleted,
-  getTodayDailyPuzzle,
-} from "@/daily/dailyPuzzle";
+import { startDailyPuzzle, isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 
 export function MenuScreen() {
@@ -19,7 +15,6 @@ export function MenuScreen() {
   const [showHelp, setShowHelp] = useState(false);
 
   const todayCompleted = isTodayDailyCompleted();
-  const dailyConfig = getTodayDailyPuzzle();
   const hasDaily = SAMPLE_PUZZLES.length > 0;
 
   const handleDailyPuzzle = () => {
@@ -44,12 +39,6 @@ export function MenuScreen() {
             <span className={styles.actionLabel}>
               {todayCompleted ? "Today's Puzzle ✓" : "Today's Puzzle"}
             </span>
-            {hasDaily && !todayCompleted && (
-              <span className={styles.actionHint}>
-                {dailyConfig.puzzle.name} · {dailyConfig.grid.rows}×
-                {dailyConfig.grid.cols}
-              </span>
-            )}
           </Button>
 
           <Button

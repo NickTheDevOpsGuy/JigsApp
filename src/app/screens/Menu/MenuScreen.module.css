@@ -39,12 +39,6 @@
   font-size: 14px;
 }
 
-.actionHint {
-  font-size: 11px;
-  opacity: 0.85;
-  font-weight: 400;
-}
-
 @media (max-width: 380px) {
   .actionsGrid {
     grid-template-columns: 1fr;
