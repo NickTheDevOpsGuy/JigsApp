@@ -121,11 +121,15 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 ### Completed
 
 - Dark mode
+- Daily Challenge
 - Undo
 - Ghost / hint preview
 - Share completed puzzle image
 - Time modes (elapsed, countdown, active-only, relaxed, best time)
 - Daily puzzle challenge
+- Player statistics dashboard (Supabase)
+- Leaderboards (daily puzzle)
+- Achievements system
 
 ### Planned
 
@@ -209,6 +213,7 @@ Category = folder name, puzzle name = filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
+
 │   ├── pre-commit
 │   └── pre-push
 ├── .vite
@@ -274,6 +279,7 @@ Category = folder name, puzzle name = filename.
 │   │   ├── daily
 │   │   │   └── dailyPuzzle.ts
 │   │   ├── data
+│   │   │   ├── achievements.ts
 │   │   │   └── samplePuzzles.ts
 │   │   ├── hooks
 │   │   │   ├── useKeyboardShortcuts.ts
@@ -338,21 +344,36 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── playScreenUtils.ts
 │   │   │   │   ├── playUtils.ts
 │   │   │   │   └── timeMode.ts
-│   │   │   └── Setup
-│   │   │       ├── hooks
-│   │   │       │   ├── index.ts
-│   │   │       │   ├── useGridConfig.ts
-│   │   │       │   └── useImagePicker.ts
-│   │   │       ├── SetupScreen.module.css
-│   │   │       └── SetupScreen.tsx
+│   │   │   ├── Setup
+│   │   │   │   ├── hooks
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── useGridConfig.ts
+│   │   │   │   │   └── useImagePicker.ts
+│   │   │   │   ├── SetupScreen.module.css
+│   │   │   │   └── SetupScreen.tsx
+│   │   │   └── Stats
+│   │   │       ├── StatsScreen.module.css
+│   │   │       └── StatsScreen.tsx
+│   │   ├── services
+│   │   │   ├── achievementsService.ts
+│   │   │   ├── leaderboardService.ts
+│   │   │   └── statsService.ts
 │   │   ├── styles
 │   │   │   └── global.css
+│   │   ├── supabase
+│   │   │   ├── auth.ts
+│   │   │   ├── client.ts
+│   │   │   └── types.ts
 │   │   ├── App.tsx
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
 │   └── types
 │       ├── canvas-confetti.d.ts
 │       └── vite-env.d.ts
+├── supabase
+│   ├── migrations
+│   │   └── 001_initial_schema.sql
+│   └── README.md
 ├── .env.development
 ├── .env.example
 ├── .gitignore

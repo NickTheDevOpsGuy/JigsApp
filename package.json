@@ -17,6 +17,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.94.0",
     "canvas-confetti": "^1.9.4",
     "husky": "^9.1.7",
     "jiti": "^2.6.1",

@@ -4,7 +4,13 @@ import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
 import { setBestTime } from "../timeMode";
-import { recordDailyCompletion, DAILY_DATE_KEY } from "@/daily/dailyPuzzle";
+import {
+  recordDailyCompletion,
+  DAILY_DATE_KEY,
+  getCurrentStreak,
+} from "@/daily/dailyPuzzle";
+import { recordCompletion } from "@/services/statsService";
+import { checkAndUnlockAchievements } from "@/services/achievementsService";
 
 interface ShareUrls {
   twitter: string;
@@ -63,6 +69,28 @@ export function CompletionOverlay({
       }
     }
   }, [isDaily, elapsedSeconds]);
+
+  useEffect(() => {
+    if (!grid) return;
+    const run = async () => {
+      const dailyStreak = isDaily ? getCurrentStreak() : 0;
+      const stats = await recordCompletion({
+        elapsedSeconds,
+        grid,
+        isDaily: !!isDaily,
+        dailyStreak,
+      });
+      if (stats) {
+        await checkAndUnlockAchievements({
+          puzzlesCompleted: stats.puzzlesCompleted,
+          dailyStreak: stats.dailyStreak,
+          bestDailyStreak: stats.bestDailyStreak,
+          lastCompletion: { elapsedSeconds, grid },
+        });
+      }
+    };
+    run();
+  }, [elapsedSeconds, grid, isDaily]);
 
   return (
     <div className={styles.completeOverlay}>
