@@ -5,8 +5,9 @@ import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/samplePuzzles";
 import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
-import { ArrowLeft, Trash2, Play } from "lucide-react";
+import { ArrowLeft, Trash2, Play, Camera } from "lucide-react";
 import { useImagePicker, useGridConfig, GRID_OPTIONS } from "./hooks";
+import { CameraCapture } from "./components/CameraCapture";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
 import { COUNTDOWN_OPTIONS, type TimeMode } from "../Play/timeMode";
 
@@ -20,7 +21,7 @@ const TIME_MODE_LABELS: Record<TimeMode, string> = {
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 
-type ImageSource = "upload" | "gallery";
+type ImageSource = "gallery" | "upload" | "camera";
 
 export function SetupScreen() {
   const nav = useNavigate();
@@ -36,6 +37,7 @@ export function SetupScreen() {
     clearError,
     selectGalleryPuzzle,
     pickFile,
+    setFromBlob,
     clearImage,
   } = useImagePicker();
 
@@ -119,6 +121,13 @@ export function SetupScreen() {
           >
             Upload
           </button>
+          <button
+            className={`${styles.tab} ${imageSource === "camera" ? styles.tabActive : ""}`}
+            onClick={() => setImageSource("camera")}
+          >
+            <Camera size={16} />
+            Camera
+          </button>
         </div>
 
         {imageSource === "gallery" ? (
@@ -153,7 +162,7 @@ export function SetupScreen() {
               )}
             </div>
           </>
-        ) : (
+        ) : imageSource === "upload" ? (
           <label className={styles.label}>
             Choose a Photo (PNG/JPG/WebP)
             <input
@@ -164,6 +173,8 @@ export function SetupScreen() {
               disabled={isLoading}
             />
           </label>
+        ) : (
+          <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
         )}
 
         <Dropdown
