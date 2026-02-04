@@ -1,16 +1,17 @@
 /**
  * Daily Puzzle - deterministic puzzle selection from date.
  * Same date = same puzzle for everyone (client-only, no backend).
+ * User chooses difficulty (grid size) - same image, different piece counts.
  */
 
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import type { SamplePuzzle } from "@/data/samplePuzzles";
 
-const GRID_OPTIONS = [
-  { rows: 3, cols: 3 },
-  { rows: 4, cols: 4 },
-  { rows: 5, cols: 5 },
-  { rows: 6, cols: 6 },
+export const GRID_OPTIONS = [
+  { rows: 3, cols: 3, label: "Easy", pieces: 9 },
+  { rows: 4, cols: 4, label: "Medium", pieces: 16 },
+  { rows: 5, cols: 5, label: "Hard", pieces: 25 },
+  { rows: 6, cols: 6, label: "Expert", pieces: 36 },
 ] as const;
 
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";
@@ -32,54 +33,28 @@ export function getTodayDateString(): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** Get the puzzle and grid for a given date (deterministic) */
-export function getDailyPuzzleForDate(dateStr: string): {
-  puzzle: SamplePuzzle;
-  grid: { rows: number; cols: number };
-} | null {
+/** Get the puzzle for a given date (deterministic). Grid is chosen by user. */
+export function getDailyPuzzleForDate(dateStr: string): SamplePuzzle | null {
   const puzzles = SAMPLE_PUZZLES;
   if (puzzles.length === 0) return null;
 
   const puzzleIndex = hash(dateStr) % puzzles.length;
-  const gridIndex = hash(dateStr + ":grid") % GRID_OPTIONS.length;
-
-  return {
-    puzzle: puzzles[puzzleIndex],
-    grid: { ...GRID_OPTIONS[gridIndex] },
-  };
+  return puzzles[puzzleIndex];
 }
 
-/** Get today's daily puzzle config, or default if no puzzles available */
-export function getTodayDailyPuzzle(): {
-  puzzle: SamplePuzzle;
-  grid: { rows: number; cols: number };
-} {
-  const result = getDailyPuzzleForDate(getTodayDateString());
-  if (!result) {
-    const fallback = SAMPLE_PUZZLES[0];
-    return {
-      puzzle: fallback ?? {
-        id: "",
-        name: "—",
-        category: "",
-        thumbnail: "",
-        fullImage: "",
-      },
-      grid: { rows: 4, cols: 4 },
-    };
-  }
-  return result;
+/** Get today's daily puzzle (image only). User picks difficulty. */
+export function getTodayDailyPuzzle(): SamplePuzzle | null {
+  return getDailyPuzzleForDate(getTodayDateString());
 }
 
-/** Start the daily puzzle: set storage and return config for navigation */
-export function startDailyPuzzle(): {
+/** Start the daily puzzle with user-chosen grid size */
+export function startDailyPuzzle(grid: { rows: number; cols: number }): {
   imageUrl: string;
   grid: { rows: number; cols: number };
 } | null {
-  const config = getDailyPuzzleForDate(getTodayDateString());
-  if (!config) return null;
+  const puzzle = getDailyPuzzleForDate(getTodayDateString());
+  if (!puzzle) return null;
 
-  const { puzzle, grid } = config;
   const dateStr = getTodayDateString();
 
   try {

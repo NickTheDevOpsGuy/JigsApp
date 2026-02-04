@@ -240,6 +240,10 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── Button
 │   │   │   │   ├── Button.module.css
 │   │   │   │   └── Button.tsx
+│   │   │   ├── DailyDifficultyModal
+│   │   │   │   ├── DailyDifficultyModal.module.css
+│   │   │   │   ├── DailyDifficultyModal.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── DropDown
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
@@ -412,13 +416,21 @@ No gatekeeping. No ego. Just building something fun together.
 
 ---
 
-## Team
+Team
 
 Built by:
 
-- **Nick**
-- **Vinay**
-- **Hannah**
+Nick
+• GitHub: https://github.com/NickTheDevOpsGuy
+• LinkedIn: https://www.linkedin.com/in/nicholas-a-clark/
+
+Vinay
+• GitHub: https://github.com/v-gajjar
+• LinkedIn: https://www.linkedin.com/in/vinaygajjar/
+
+Hannah
+• GitHub: https://github.com/hannahro15
+• LinkedIn: https://www.linkedin.com/in/hannaholbrich/
 
 With help from the wider community ❤️  
 See all contributors here → **[CONTRIBUTORS.md](./CONTRIBUTORS.md)**
