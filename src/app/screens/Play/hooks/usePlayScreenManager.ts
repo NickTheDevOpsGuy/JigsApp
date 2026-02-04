@@ -41,15 +41,25 @@ export function usePlayScreenManager(
       imgRef.current = img;
 
       const rect = mainEl.getBoundingClientRect();
-      const availW = Math.max(400, Math.floor(rect.width) - 24);
-      const availH = Math.max(400, Math.floor(rect.height) - 24);
+      const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
+      const isMobile = viewportW < 600;
+      const minAvail = isMobile ? 260 : 400;
+      const availW = Math.max(minAvail, Math.floor(rect.width) - 24);
+      const availH = Math.max(minAvail, Math.floor(rect.height) - 24);
 
-      // Compute square tile size
-      const pieceSize = computeTileSize(availW, availH, grid);
+      // Compute square tile size (smaller on mobile for better fit)
+      const pieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-      // Board: at least puzzle size, use 88% of available so it stays consistently large
-      const boardW = Math.max(grid.cols * pieceSize, Math.floor(availW * 0.88));
-      const boardH = Math.max(grid.rows * pieceSize, Math.floor(availH * 0.88));
+      // Board: fit puzzle; on mobile cap to available space so it doesn't overflow
+      const minBoardW = grid.cols * pieceSize;
+      const minBoardH = grid.rows * pieceSize;
+      const fillRatio = isMobile ? 0.95 : 0.88;
+      let boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
+      let boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
+      if (isMobile) {
+        boardW = Math.min(boardW, Math.max(minBoardW, Math.floor(rect.width) - 16));
+        boardH = Math.min(boardH, Math.max(minBoardH, Math.floor(rect.height) - 16));
+      }
 
       boardEl.style.width = `${boardW}px`;
       boardEl.style.height = `${boardH}px`;
