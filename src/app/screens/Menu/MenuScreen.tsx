@@ -1,20 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MenuScreen.module.css";
 
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
 import { TutorialOverlay } from "@/components/HowToPlay";
-import { HelpCircle, Image, Calendar, BarChart3 } from "lucide-react";
+import { WhatsNewModal } from "@/components/WhatsNew";
+import { HelpCircle, Image, Calendar, BarChart3, Sparkles } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { startDailyPuzzle, isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
+import { shouldShowChangelog } from "@/data/changelog";
 
 export function MenuScreen() {
   const nav = useNavigate();
   const [showHelp, setShowHelp] = useState(false);
+  const [showWhatsNew, setShowWhatsNew] = useState(false);
 
   const todayCompleted = isTodayDailyCompleted();
+
+  useEffect(() => {
+    if (shouldShowChangelog()) setShowWhatsNew(true);
+  }, []);
   const hasDaily = SAMPLE_PUZZLES.length > 0;
 
   const handleDailyPuzzle = () => {
@@ -67,10 +74,20 @@ export function MenuScreen() {
             <BarChart3 size={20} />
             <span className={styles.actionLabel}>Stats</span>
           </Button>
+
+          <Button
+            variant="secondary"
+            onClick={() => setShowWhatsNew(true)}
+            className={styles.whatsNewCard}
+          >
+            <Sparkles size={20} />
+            <span className={styles.actionLabel}>What&apos;s New</span>
+          </Button>
         </div>
       </div>
 
       <TutorialOverlay isOpen={showHelp} onComplete={() => setShowHelp(false)} />
+      <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
     </div>
   );
 }

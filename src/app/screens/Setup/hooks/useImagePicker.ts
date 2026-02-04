@@ -72,6 +72,32 @@ export function useImagePicker() {
     }
   };
 
+  const setFromBlob = async (blob: Blob): Promise<boolean> => {
+    clearError();
+    setIsLoading(true);
+    setSelectedPuzzle(null);
+
+    try {
+      const dataUrl = await readBlobAsDataUrl(blob);
+      const { width, height } = await validateImageDimensions(dataUrl);
+
+      if (width < MIN_IMAGE_SIZE || height < MIN_IMAGE_SIZE) {
+        throw new Error(
+          `Image is too small (${width}×${height}px). Please use at least ${MIN_IMAGE_SIZE}×${MIN_IMAGE_SIZE}px.`,
+        );
+      }
+
+      setImgDataUrl(dataUrl);
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load image.";
+      setError(message);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const pickFile = async (file: File): Promise<boolean> => {
     clearError();
     setIsLoading(true);
@@ -124,6 +150,7 @@ export function useImagePicker() {
     clearError,
     selectGalleryPuzzle,
     pickFile,
+    setFromBlob,
     clearImage,
   };
 }

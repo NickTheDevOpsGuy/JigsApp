@@ -1,0 +1,29 @@
+.content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.section {
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--color-brand-primary);
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.item {
+  margin-bottom: 0.35rem;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.actions {
+  margin-top: 1.5rem;
+}
