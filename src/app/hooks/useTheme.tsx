@@ -1,5 +1,12 @@
 // src/app/hooks/useTheme.tsx
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  ReactNode,
+} from "react";
 
 export type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
 
@@ -25,25 +32,50 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const STORAGE_KEY = "phuzzle-theme";
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-    if (stored && THEMES.includes(stored)) return stored;
-    if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
+function getStoredTheme(): Theme {
+  if (typeof window === "undefined") return "light";
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored && THEMES.includes(stored as Theme)) return stored as Theme;
+  } catch {
+    // localStorage might not be available
+  }
+  return "light";
+}
+
+function applyThemeClass(theme: Theme) {
+  if (typeof document === "undefined") return;
+  // Remove all theme classes first
+  THEMES.forEach((t) => {
+    document.documentElement.classList.remove(`theme-${t}`);
   });
+  // Add the current theme class
+  document.documentElement.classList.add(`theme-${theme}`);
+  console.log("[Theme] Applied:", theme, "Classes:", document.documentElement.className);
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>(getStoredTheme);
+
+  // Apply theme immediately (before paint) and persist
+  useLayoutEffect(() => {
+    applyThemeClass(theme);
+  }, [theme]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, theme);
-    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem(STORAGE_KEY, theme);
+    } catch {
+      // localStorage might not be available
+    }
   }, [theme]);
 
   const setTheme = (t: Theme) => setThemeState(t);
   const cycleTheme = () => {
-    const i = THEMES.indexOf(theme);
-    setThemeState(THEMES[(i + 1) % THEMES.length]);
+    setThemeState((currentTheme) => {
+      const i = THEMES.indexOf(currentTheme);
+      return THEMES[(i + 1) % THEMES.length];
+    });
   };
 
   return (

@@ -9,9 +9,13 @@ type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
 
 function getTheme(): Theme {
   if (typeof document === "undefined") return "light";
-  const t = document.documentElement.getAttribute("data-theme");
-  const themes: Theme[] = ["light", "dark", "space", "ocean", "forest", "sunset"];
-  return themes.includes(t as Theme) ? (t as Theme) : "light";
+  const classList = document.documentElement.classList;
+  if (classList.contains("theme-space")) return "space";
+  if (classList.contains("theme-ocean")) return "ocean";
+  if (classList.contains("theme-forest")) return "forest";
+  if (classList.contains("theme-sunset")) return "sunset";
+  if (classList.contains("theme-dark")) return "dark";
+  return "light";
 }
 
 class SoundManager {
@@ -222,7 +226,7 @@ class SoundManager {
         start: t + 0.03,
       });
     } else if (theme === "sunset") {
-      // Warm glow: soft triangle with gentle sustain
+      // Sunset: warm glow, soft triangle with gentle sustain
       this.playTone(ctx, {
         freq: 520,
         type: "triangle",
@@ -230,6 +234,7 @@ class SoundManager {
         duration: 0.1,
       });
     } else {
+      // Light/dark: default
       this.playTone(ctx, { freq: 800, vol: this.volume * 0.15, duration: 0.05 });
     }
   }
@@ -286,7 +291,7 @@ class SoundManager {
         start: t + 0.02,
       });
     } else if (theme === "sunset") {
-      // Warm click: rounded triangle
+      // Sunset: warm click, rounded triangle
       this.playTone(ctx, {
         freq: 880,
         type: "triangle",
@@ -302,8 +307,14 @@ class SoundManager {
         start: t + 0.02,
       });
     } else {
-      this.playTone(ctx, { freq: 1200, vol: this.volume * 0.4, duration: 0.1 });
-      this.playTone(ctx, { freq: 1800, vol: this.volume * 0.2, duration: 0.08 });
+      // Light/dark: default
+      this.playTone(ctx, { freq: 1200, vol: this.volume * 0.4, duration: 0.1, start: t });
+      this.playTone(ctx, {
+        freq: 1800,
+        vol: this.volume * 0.2,
+        duration: 0.08,
+        start: t + 0.02,
+      });
     }
   }
 
@@ -337,7 +348,7 @@ class SoundManager {
         freqRamp: { to: 140, at: 0.12 },
       });
     } else if (theme === "sunset") {
-      // Warm settle: cozy drop
+      // Sunset: warm settle, cozy drop
       this.playTone(ctx, {
         freq: 330,
         type: "triangle",
@@ -346,6 +357,7 @@ class SoundManager {
         freqRamp: { to: 165, at: 0.11 },
       });
     } else {
+      // Light/dark: default
       this.playTone(ctx, {
         freq: 400,
         type: "triangle",
@@ -358,7 +370,6 @@ class SoundManager {
 
   private playRotate(ctx: AudioContext) {
     const theme = getTheme();
-    const t = ctx.currentTime;
     if (theme === "space") {
       // Servo whir: ascending square
       this.playTone(ctx, {
@@ -387,7 +398,7 @@ class SoundManager {
         freqRamp: { to: 440, at: 0.07 },
       });
     } else if (theme === "sunset") {
-      // Gentle turn: warm triangle sweep
+      // Sunset: gentle turn, warm triangle sweep
       this.playTone(ctx, {
         freq: 260,
         type: "triangle",
@@ -396,6 +407,7 @@ class SoundManager {
         freqRamp: { to: 520, at: 0.08 },
       });
     } else {
+      // Light/dark: default
       this.playTone(ctx, {
         freq: 300,
         vol: this.volume * 0.2,
@@ -462,7 +474,7 @@ class SoundManager {
         osc.stop(start + step + 0.14);
       });
     } else if (theme === "sunset") {
-      // Golden hour: warm triangle chord
+      // Sunset: golden hour, warm triangle chord
       const notes = [392, 493.88, 587.33, 783.99]; // G4, B4, D5, G5
       const step = 0.17;
       notes.forEach((freq, i) => {
@@ -480,6 +492,7 @@ class SoundManager {
         osc.stop(start + step + 0.12);
       });
     } else {
+      // Light/dark: default celebration
       const notes = [523.25, 659.25, 783.99, 1046.5];
       const step = 0.15;
       notes.forEach((freq, i) => {

@@ -240,6 +240,10 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── Button
 │   │   │   │   ├── Button.module.css
 │   │   │   │   └── Button.tsx
+│   │   │   ├── DailyDifficultyModal
+│   │   │   │   ├── DailyDifficultyModal.module.css
+│   │   │   │   ├── DailyDifficultyModal.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── DropDown
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
@@ -370,7 +374,6 @@ Category = folder name, puzzle name = filename.
 │   └── README.md
 ├── .env.development
 ├── .env.example
-├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
@@ -381,7 +384,6 @@ Category = folder name, puzzle name = filename.
 ├── package-lock.json
 ├── package.json
 ├── README.md
-├── src.zip
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
