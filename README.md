@@ -370,6 +370,7 @@ Category = folder name, puzzle name = filename.
 │   └── README.md
 ├── .env.development
 ├── .env.example
+├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml

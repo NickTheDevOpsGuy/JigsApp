@@ -12,33 +12,54 @@ export function parseGrid(stored: string | null): { rows: number; cols: number }
   return { rows: 4, cols: 4 };
 }
 
+const MOBILE_BREAKPOINT = 600;
+
 export function computeTileSize(
   availW: number,
   availH: number,
   grid: { rows: number; cols: number },
+  viewportWidth: number = 1024,
 ): number {
   // Calculate max tile size that fits the available space
   const tileFromW = availW / grid.cols;
   const tileFromH = availH / grid.rows;
   const tile = Math.floor(Math.min(tileFromW, tileFromH));
 
-  // Set size ranges based on difficulty - larger pieces for easier puzzles
+  const isMobile = viewportWidth < MOBILE_BREAKPOINT;
   const pieceCount = grid.rows * grid.cols;
+
+  // Mobile: smaller pieces so puzzle fits on screen; desktop: larger for easier play
   let minTile: number;
   let maxTile: number;
 
-  if (pieceCount <= 9) {
-    minTile = 100;
-    maxTile = 200;
-  } else if (pieceCount <= 16) {
-    minTile = 80;
-    maxTile = 160;
-  } else if (pieceCount <= 25) {
-    minTile = 60;
-    maxTile = 120;
+  if (isMobile) {
+    if (pieceCount <= 9) {
+      minTile = 50;
+      maxTile = 90;
+    } else if (pieceCount <= 16) {
+      minTile = 45;
+      maxTile = 80;
+    } else if (pieceCount <= 25) {
+      minTile = 40;
+      maxTile = 70;
+    } else {
+      minTile = 35;
+      maxTile = 60;
+    }
   } else {
-    minTile = 50;
-    maxTile = 100;
+    if (pieceCount <= 9) {
+      minTile = 100;
+      maxTile = 200;
+    } else if (pieceCount <= 16) {
+      minTile = 80;
+      maxTile = 160;
+    } else if (pieceCount <= 25) {
+      minTile = 60;
+      maxTile = 120;
+    } else {
+      minTile = 50;
+      maxTile = 100;
+    }
   }
 
   return Math.max(minTile, Math.min(maxTile, tile));
