@@ -166,7 +166,7 @@ export function buildMenuItems(
       section: "settings",
       visible: true,
       label: "",
-      sortKey: "Dark mode",
+      sortKey: "Theme",
       onClick: () => setOpen(false),
       isTheme: true,
     },

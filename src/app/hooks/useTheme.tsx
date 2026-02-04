@@ -1,11 +1,23 @@
 // src/app/hooks/useTheme.tsx
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
+
+export const THEMES: Theme[] = ["light", "dark", "space", "ocean", "forest", "sunset"];
+
+export const THEME_LABELS: Record<Theme, string> = {
+  light: "Light",
+  dark: "Dark",
+  space: "Space",
+  ocean: "Ocean",
+  forest: "Forest",
+  sunset: "Sunset",
+};
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
+  cycleTheme: () => void;
   isDark: boolean;
 }
 
@@ -14,33 +26,35 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const STORAGE_KEY = "phuzzle-theme";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Check localStorage first
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "light" || stored === "dark") return stored;
-
-    // Check system preference
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+    if (stored && THEMES.includes(stored)) return stored;
     if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
       return "dark";
     }
-
     return "light";
   });
 
   useEffect(() => {
-    // Save to localStorage
     localStorage.setItem(STORAGE_KEY, theme);
-
-    // Apply to document
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  const setTheme = (t: Theme) => setThemeState(t);
+  const cycleTheme = () => {
+    const i = THEMES.indexOf(theme);
+    setThemeState(THEMES[(i + 1) % THEMES.length]);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isDark: theme === "dark" }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        setTheme,
+        cycleTheme,
+        isDark: ["dark", "space", "ocean", "forest", "sunset"].includes(theme),
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

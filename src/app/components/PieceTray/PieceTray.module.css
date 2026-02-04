@@ -95,6 +95,12 @@
   align-items: center;
 }
 
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .pieceButton {
   appearance: none;
   border: none;
@@ -162,16 +168,16 @@
   font-size: 13px;
 }
 
-/* Mobile adjustments */
+/* Mobile adjustments - compact for more board space */
 @media (max-width: 600px) {
   .tray {
-    margin: 0 8px 8px 8px;
-    height: 130px;
+    margin: 0 6px 6px 6px;
+    height: 96px;
   }
 
   .header {
-    padding: 6px 10px;
-    font-size: 13px;
+    padding: 4px 8px;
+    font-size: 12px;
   }
 
   .help {
@@ -179,18 +185,18 @@
   }
 
   .controls {
-    padding: 4px 8px;
-    gap: 6px;
+    padding: 3px 6px;
+    gap: 4px;
   }
 
   .segment button,
   .sort button {
-    padding: 4px 8px;
-    font-size: 11px;
+    padding: 3px 6px;
+    font-size: 10px;
   }
 
   .thumbWrap {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
   }
 }

@@ -1,6 +1,6 @@
 // src/app/components/ThemeToggle/ThemeToggle.tsx
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "@/hooks/useTheme";
+import { Palette } from "lucide-react";
+import { useTheme, THEME_LABELS } from "@/hooks/useTheme";
 import styles from "./ThemeToggle.module.css";
 
 type ThemeToggleProps = {
@@ -9,25 +9,19 @@ type ThemeToggleProps = {
 };
 
 export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, cycleTheme } = useTheme();
 
   const className = variant === "menuItem" ? styles.toggleMenuItem : styles.toggle;
 
   return (
     <button
       className={className}
-      onClick={toggleTheme}
-      title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      onClick={cycleTheme}
+      title={`Theme: ${THEME_LABELS[theme]} (tap to change)`}
+      aria-label={`Theme: ${THEME_LABELS[theme]}, tap to cycle`}
     >
-      {theme === "light" ? (
-        <Moon size={variant === "menuItem" ? 18 : 20} />
-      ) : (
-        <Sun size={variant === "menuItem" ? 18 : 20} />
-      )}
-      {variant === "menuItem" && (
-        <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
-      )}
+      <Palette size={variant === "menuItem" ? 18 : 20} />
+      {variant === "menuItem" && <span>Theme: {THEME_LABELS[theme]}</span>}
     </button>
   );
 }

@@ -43,7 +43,7 @@ export function usePlayScreenManager(
       const rect = mainEl.getBoundingClientRect();
       const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
       const isMobile = viewportW < 600;
-      const minAvail = isMobile ? 260 : 400;
+      const minAvail = isMobile ? 240 : 400;
       const availW = Math.max(minAvail, Math.floor(rect.width) - 24);
       const availH = Math.max(minAvail, Math.floor(rect.height) - 24);
 
@@ -53,7 +53,7 @@ export function usePlayScreenManager(
       // Board: fit puzzle; on mobile cap to available space so it doesn't overflow
       const minBoardW = grid.cols * pieceSize;
       const minBoardH = grid.rows * pieceSize;
-      const fillRatio = isMobile ? 0.95 : 0.88;
+      const fillRatio = isMobile ? 0.92 : 0.88;
       let boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
       let boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
       if (isMobile) {

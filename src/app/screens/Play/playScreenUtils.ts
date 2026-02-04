@@ -33,18 +33,19 @@ export function computeTileSize(
   let maxTile: number;
 
   if (isMobile) {
+    // Much smaller pieces on mobile so full puzzle fits on screen; scales down with difficulty
     if (pieceCount <= 9) {
-      minTile = 50;
-      maxTile = 90;
+      minTile = 32;
+      maxTile = 52;
     } else if (pieceCount <= 16) {
-      minTile = 45;
-      maxTile = 80;
+      minTile = 28;
+      maxTile = 44;
     } else if (pieceCount <= 25) {
-      minTile = 40;
-      maxTile = 70;
+      minTile = 24;
+      maxTile = 38;
     } else {
-      minTile = 35;
-      maxTile = 60;
+      minTile = 20;
+      maxTile = 32;
     }
   } else {
     if (pieceCount <= 9) {
