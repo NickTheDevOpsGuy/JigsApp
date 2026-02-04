@@ -374,6 +374,7 @@ Category = folder name, puzzle name = filename.
 │   └── README.md
 ├── .env.development
 ├── .env.example
+├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
@@ -384,6 +385,7 @@ Category = folder name, puzzle name = filename.
 ├── package-lock.json
 ├── package.json
 ├── README.md
+├── src.zip
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
