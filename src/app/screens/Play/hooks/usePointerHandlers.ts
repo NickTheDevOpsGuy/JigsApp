@@ -79,6 +79,7 @@ export function usePointerHandlers(args: {
   );
 
   const touchPendingRef = useRef(false);
+  const activeTouchIdRef = useRef<number | null>(null);
   const clearTouchPending = useCallback(() => {
     touchPendingRef.current = false;
   }, []);
@@ -115,11 +116,60 @@ export function usePointerHandlers(args: {
     clearTouchPending,
   };
 
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLElement>) => {
+      if (!manager || !canvasRef.current || !boardRef.current || e.touches.length === 0)
+        return;
+
+      const touch = e.touches[0];
+      const canvas = canvasRef.current as CanvasWithTouch;
+      const boardRect = boardRef.current.getBoundingClientRect();
+      const ctx2d = canvas.getContext("2d");
+      if (!ctx2d) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const cssX = touch.clientX - boardRect.left;
+      const cssY = touch.clientY - boardRect.top;
+
+      const st = manager.getState();
+      const boardPieces = st.pieces.filter((p) => !p.inTray);
+      const pieceId = pickPieceId(ctx2d, boardPieces, cssX, cssY);
+      if (!pieceId) return;
+
+      const piece = st.pieces.find((p) => p.id === pieceId);
+      if (!piece || piece.locked) return;
+
+      e.preventDefault();
+      activeTouchIdRef.current = touch.identifier;
+      selectedIdRef.current = pieceId;
+      setSelectedPieceId(pieceId);
+      bump();
+      touchPendingRef.current = true;
+      handleTouchDown(
+        {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+          pointerId: touch.identifier,
+          preventDefault: () => e.preventDefault(),
+        } as React.PointerEvent<Element>,
+        ctx,
+        pieceId,
+        boardRect,
+        piece,
+      );
+    },
+    [manager, boardRef, canvasRef, selectedIdRef, setSelectedPieceId, bump],
+  );
+
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
       if (!manager || !canvasRef.current || !boardRef.current) return;
 
       const canvas = canvasRef.current as CanvasWithTouch;
+      // Skip if we already handled this touch via touchstart (touch events fire first on iOS)
+      if (e.pointerType === "touch" && canvas.pendingPieceId) return;
+
       const boardRect = boardRef.current.getBoundingClientRect();
       const ctx2d = canvas.getContext("2d");
       if (!ctx2d) return;
@@ -326,13 +376,107 @@ export function usePointerHandlers(args: {
       }
     };
 
+    const onTouchMove = (ev: TouchEvent) => {
+      const canvas = canvasRef.current as CanvasWithTouch | null;
+      if (!canvas?.pendingPieceId || activeTouchIdRef.current == null) return;
+      const touch = Array.from(ev.touches).find(
+        (t) => t.identifier === activeTouchIdRef.current,
+      );
+      if (!touch) return;
+      ev.preventDefault();
+      const freshCtx = {
+        manager: managerRef.current,
+        boardRef,
+        canvasRef,
+        trayRef,
+        selectedIdRef,
+        setSelectedPieceId,
+        bump,
+        didDragRef,
+        selectCycle,
+        setState: stateSetterRef.current,
+        haptic: hapticRef.current,
+        onDragPreview: dragPreviewRef.current,
+        onPieceInteraction: onPieceInteractionRef.current,
+        clearTouchPending,
+      };
+      handleTouchMove(
+        {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+          pointerId: touch.identifier,
+        } as PointerEvent,
+        freshCtx,
+        canvas,
+      );
+    };
+
+    const onTouchEnd = (ev: TouchEvent) => {
+      const canvas = canvasRef.current as CanvasWithTouch | null;
+      const mgr = managerRef.current;
+      if (!canvas || !mgr) return;
+      const tid = activeTouchIdRef.current;
+      if (tid == null) return;
+      const touch = Array.from(ev.changedTouches).find((t) => t.identifier === tid);
+      if (!touch) return;
+
+      const hadDrag = canvas.touchDragStarted;
+      const hadPending = !!canvas.pendingPieceId;
+      activeTouchIdRef.current = null;
+      if (!hadPending && !mgr.getDragState().activeId) return;
+
+      ev.preventDefault();
+      touchPendingRef.current = false;
+      if (hadDrag) {
+        dragPreviewRef.current?.(null);
+        finishDragWithTrayCheck(
+          mgr,
+          touch.clientX,
+          touch.clientY,
+          isPointerOverTray,
+          selectCycle,
+        );
+        stateSetterRef.current(mgr.getState());
+      } else if (hadPending && boardRef.current) {
+        const boardRect = boardRef.current.getBoundingClientRect();
+        const ctx2d = canvas.getContext("2d");
+        if (ctx2d) {
+          const dpr = window.devicePixelRatio || 1;
+          ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+          const x = touch.clientX - boardRect.left;
+          const y = touch.clientY - boardRect.top;
+          const st = mgr.getState();
+          const boardPieces = st.pieces.filter((p) => !p.inTray);
+          const pid = pickPieceId(ctx2d, boardPieces, x, y);
+          if (pid && canRotatePiece(pid)) {
+            mgr.rotatePiece(pid);
+            soundManager.play("rotate");
+            stateSetterRef.current(mgr.getState());
+          }
+        }
+      }
+      resetTouchState(canvas);
+    };
+
     document.addEventListener("pointermove", onDocMove, { capture: true });
     document.addEventListener("pointerup", onDocUp, { capture: true });
     document.addEventListener("pointercancel", onDocUp, { capture: true });
+    document.addEventListener("touchmove", onTouchMove, {
+      capture: true,
+      passive: false,
+    });
+    document.addEventListener("touchend", onTouchEnd, { capture: true, passive: false });
+    document.addEventListener("touchcancel", onTouchEnd, {
+      capture: true,
+      passive: false,
+    });
     return () => {
       document.removeEventListener("pointermove", onDocMove, { capture: true });
       document.removeEventListener("pointerup", onDocUp, { capture: true });
       document.removeEventListener("pointercancel", onDocUp, { capture: true });
+      document.removeEventListener("touchmove", onTouchMove, { capture: true });
+      document.removeEventListener("touchend", onTouchEnd, { capture: true });
+      document.removeEventListener("touchcancel", onTouchEnd, { capture: true });
     };
   }, [
     manager,
@@ -375,5 +519,6 @@ export function usePointerHandlers(args: {
     handlePointerCancel,
     handleLostPointerCapture,
     handleContextMenu,
+    handleTouchStart,
   };
 }
