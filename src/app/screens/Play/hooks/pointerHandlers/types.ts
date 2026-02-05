@@ -33,4 +33,5 @@ export type PointerHandlersContext = {
   haptic?: (kind: HapticKind) => void;
   onDragPreview?: (state: DragPreviewState) => void;
   onPieceInteraction?: () => void;
+  clearTouchPending?: () => void;
 };

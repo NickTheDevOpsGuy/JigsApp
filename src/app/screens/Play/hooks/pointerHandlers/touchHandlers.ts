@@ -53,31 +53,36 @@ export function handleTouchDown(
 }
 
 export function handleTouchMove(
-  e: React.PointerEvent<HTMLCanvasElement>,
+  e: React.PointerEvent<HTMLCanvasElement> | PointerEvent,
   ctx: PointerHandlersContext,
+  canvas?: CanvasWithTouch,
 ): boolean {
-  const { manager, boardRef, didDragRef, setState } = ctx;
+  const { manager, boardRef, canvasRef, didDragRef, setState } = ctx;
   if (!manager || !boardRef.current) return false;
 
-  const canvas = e.currentTarget as CanvasWithTouch;
-  const sx = canvas.touchStartX;
-  const sy = canvas.touchStartY;
-  const pendingId = canvas.pendingPieceId;
-  const pendingRect = canvas.pendingPieceRect;
+  const canvasEl =
+    canvas ??
+    (e.currentTarget as CanvasWithTouch) ??
+    (canvasRef?.current as CanvasWithTouch);
+  if (!canvasEl) return false;
+  const sx = canvasEl.touchStartX;
+  const sy = canvasEl.touchStartY;
+  const pendingId = canvasEl.pendingPieceId;
+  const pendingRect = canvasEl.pendingPieceRect;
 
   if (sx == null || sy == null || !pendingId || !pendingRect) return false;
 
   const dist = Math.hypot(e.clientX - sx, e.clientY - sy);
 
-  if (!canvas.touchDragStarted && dist >= TAP_DRAG_THRESHOLD_PX) {
-    canvas.touchDragStarted = true;
+  if (!canvasEl.touchDragStarted && dist >= TAP_DRAG_THRESHOLD_PX) {
+    canvasEl.touchDragStarted = true;
     didDragRef.current = true;
     ctx.onPieceInteraction?.();
     manager.pointerDown(pendingId, sx, sy, pendingRect);
     setState(manager.getState());
   }
 
-  if (canvas.touchDragStarted) {
+  if (canvasEl.touchDragStarted) {
     ctx.onPieceInteraction?.();
     const boardRect = boardRef.current.getBoundingClientRect();
     manager.pointerMove(e.clientX, e.clientY, boardRect);
@@ -164,6 +169,7 @@ export function handleTouchUp(
   }
 
   resetTouchState(canvas);
+  ctx.clearTouchPending?.();
   try {
     canvas.releasePointerCapture(e.pointerId);
   } catch {
