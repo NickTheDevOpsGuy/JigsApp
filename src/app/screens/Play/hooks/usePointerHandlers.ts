@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
@@ -9,7 +9,9 @@ import {
   handleTouchDown,
   handleTouchMove,
   handleTouchUp,
+  resetTouchState,
 } from "./pointerHandlers/touchHandlers";
+import { finishDragWithTrayCheck } from "./pointerHandlers/shared";
 import {
   handleMouseDown,
   handleMouseMove,
@@ -75,6 +77,11 @@ export function usePointerHandlers(args: {
     [trayRef],
   );
 
+  const touchPendingRef = useRef(false);
+  const clearTouchPending = useCallback(() => {
+    touchPendingRef.current = false;
+  }, []);
+
   const ctx = {
     manager,
     boardRef,
@@ -89,6 +96,7 @@ export function usePointerHandlers(args: {
     haptic,
     onDragPreview,
     onPieceInteraction,
+    clearTouchPending,
   };
 
   const handlePointerDown = useCallback(
@@ -121,6 +129,7 @@ export function usePointerHandlers(args: {
       const isLeftClick = e.button === 0;
 
       if (isTouch && piece) {
+        touchPendingRef.current = true;
         handleTouchDown(e, ctx, pieceId, boardRect, piece);
         return;
       }
@@ -220,9 +229,57 @@ export function usePointerHandlers(args: {
     [handlePointerCancel],
   );
 
-  // Safety net: if pointerup happens off the canvas, still end the drag.
+  // Document-level listeners for mobile: iOS Safari often doesn't deliver pointermove/up
+  // to the canvas even with setPointerCapture. Capture phase ensures we get events.
   useEffect(() => {
-    const onWinUp = (_ev: PointerEvent) => {
+    if (!manager) return;
+
+    const onDocMove = (ev: PointerEvent) => {
+      if (ev.pointerType !== "touch") return;
+      const canvas = canvasRef.current as CanvasWithTouch | null;
+      if (!canvas?.pendingPieceId) return;
+      if (ev.target === canvas) return;
+      handleTouchMove(ev, ctx, canvas);
+    };
+
+    const onDocUp = (ev: PointerEvent) => {
+      if (ev.pointerType !== "touch") return;
+      const canvas = canvasRef.current as CanvasWithTouch | null;
+      if (!canvas) return;
+      if (!canvas.pendingPieceId && !manager.getDragState().activeId) return;
+      touchPendingRef.current = false;
+      if (ev.target !== canvas) {
+        onDragPreview?.(null);
+        finishDragWithTrayCheck(
+          manager,
+          ev.clientX,
+          ev.clientY,
+          isPointerOverTray,
+          selectCycle,
+        );
+        setState(manager.getState());
+        resetTouchState(canvas);
+        try {
+          canvas.releasePointerCapture(ev.pointerId);
+        } catch {
+          /* ignore */
+        }
+      }
+    };
+
+    document.addEventListener("pointermove", onDocMove, { capture: true });
+    document.addEventListener("pointerup", onDocUp, { capture: true });
+    document.addEventListener("pointercancel", onDocUp, { capture: true });
+    return () => {
+      document.removeEventListener("pointermove", onDocMove, { capture: true });
+      document.removeEventListener("pointerup", onDocUp, { capture: true });
+      document.removeEventListener("pointercancel", onDocUp, { capture: true });
+    };
+  }, [manager, canvasRef, onDragPreview, setState, isPointerOverTray, selectCycle]);
+
+  // Safety net: pointerup/pointercancel on window when drag is active (e.g. release outside canvas)
+  useEffect(() => {
+    const onWinUp = () => {
       if (!manager) return;
       const activeId = manager.getDragState().activeId;
       if (!activeId) return;
@@ -230,7 +287,6 @@ export function usePointerHandlers(args: {
       manager.pointerUp();
       setState(manager.getState());
     };
-
     window.addEventListener("pointerup", onWinUp);
     window.addEventListener("pointercancel", onWinUp);
     return () => {
