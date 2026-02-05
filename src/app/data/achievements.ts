@@ -60,16 +60,4 @@ export const ACHIEVEMENT_DEFS: AchievementDef[] = [
     description: "Complete a 6×6 puzzle",
     icon: "🎯",
   },
-  {
-    id: "top_10_daily",
-    name: "Top 10",
-    description: "Reach top 10 on today's daily leaderboard",
-    icon: "🥇",
-  },
-  {
-    id: "first_place_daily",
-    name: "Champion",
-    description: "Take #1 on today's daily leaderboard",
-    icon: "👑",
-  },
 ];

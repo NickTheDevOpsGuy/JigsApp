@@ -200,6 +200,24 @@ Category = folder name, puzzle name = filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── pre-push
+│   │   ├── pre-rebase
+│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
 ├── .vite
@@ -350,7 +368,6 @@ Category = folder name, puzzle name = filename.
 │   │   ├── services
 │   │   │   ├── achievementsService.ts
 │   │   │   ├── leaderboardService.ts
-│   │   │   ├── profileService.ts
 │   │   │   └── statsService.ts
 │   │   ├── styles
 │   │   │   └── global.css
@@ -366,8 +383,7 @@ Category = folder name, puzzle name = filename.
 │       └── vite-env.d.ts
 ├── supabase
 │   ├── migrations
-│   │   ├── 001_initial_schema.sql
-│   │   └── 002_profiles_and_leaderboard_indexes.sql
+│   │   └── 001_initial_schema.sql
 │   └── README.md
 ├── .env.development
 ├── .env.example
