@@ -93,3 +93,44 @@ export async function getMyStats(): Promise<PlayerStatsData | null> {
     lastPlayedAt: data.last_played_at,
   };
 }
+
+export type CompletionHistoryEntry = {
+  date: string;
+  elapsedSeconds: number;
+  gridRows: number;
+  gridCols: number;
+  isDaily: boolean;
+};
+
+/** Fetch current user's completion history for the last N days. */
+export async function getMyCompletionHistory(
+  days = 30,
+): Promise<CompletionHistoryEntry[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  const userId = await ensureSignedIn();
+  if (!userId) return [];
+
+  const endDate = new Date().toISOString().slice(0, 10);
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  const startStr = startDate.toISOString().slice(0, 10);
+
+  const { data, error } = await supabase!
+    .from("completions")
+    .select("puzzle_date, elapsed_seconds, grid_rows, grid_cols, is_daily")
+    .eq("user_id", userId)
+    .gte("puzzle_date", startStr)
+    .lte("puzzle_date", endDate)
+    .order("puzzle_date", { ascending: true });
+
+  if (error) return [];
+
+  return (data ?? []).map((r) => ({
+    date: r.puzzle_date,
+    elapsedSeconds: r.elapsed_seconds,
+    gridRows: r.grid_rows,
+    gridCols: r.grid_cols,
+    isDaily: r.is_daily,
+  }));
+}

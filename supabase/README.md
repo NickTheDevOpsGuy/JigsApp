@@ -16,9 +16,12 @@ VITE_SUPABASE_URL=https://xxxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-## 3. Run the migration
+## 3. Run the migrations
 
-In the Supabase dashboard: **SQL Editor** → New query → paste the contents of `migrations/001_initial_schema.sql` → Run.
+In the Supabase dashboard: **SQL Editor** → New query → paste and run each migration in order:
+
+1. `migrations/001_initial_schema.sql`
+2. `migrations/002_profiles_and_leaderboard_indexes.sql`
 
 Or use the Supabase CLI:
 
@@ -35,3 +38,4 @@ In **Authentication > Providers**, enable **Anonymous sign-ins**. This lets user
 - **player_stats** – One row per user: puzzles completed, play time, streaks
 - **completions** – Each puzzle completion for leaderboards
 - **user_achievements** – Unlocked achievements per user
+- **profiles** – Optional display names for leaderboards
