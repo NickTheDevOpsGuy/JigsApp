@@ -22,6 +22,9 @@ export function usePlayScreenManager(
   const mainRef = useRef<HTMLDivElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const popMapRef = useRef<Map<string, number>>(new Map());
+  const snapFromMapRef = useRef<
+    Map<string, { fromX: number; fromY: number; startMs: number }>
+  >(new Map());
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
@@ -58,10 +61,10 @@ export function usePlayScreenManager(
       const pieceCount = grid.rows * grid.cols;
       const mobileMax =
         pieceCount >= 36
-          ? 28 // 6x6+
+          ? 22 // 6x6+
           : pieceCount >= 25
-            ? 32 // 5x5+
-            : 38; // 4x4 and lower
+            ? 24 // 5x5+
+            : 28; // 4x4 and lower
 
       const pieceSize = isMobile ? Math.min(basePieceSize, mobileMax) : basePieceSize;
 
@@ -99,13 +102,27 @@ export function usePlayScreenManager(
           pieceHeight: pieceSize,
         },
         {
-          onPiecePlaced: (p) => {
+          onBeforeSnap: (pieces) => {
+            const now = performance.now();
+            const map = snapFromMapRef.current;
+            for (const p of pieces) {
+              map.set(p.id, { fromX: p.x, fromY: p.y, startMs: now });
+            }
+          },
+          onPiecePlaced: (p, groupPieces) => {
             lastInteractionRef.current = performance.now();
-            popMapRef.current.set(p.id, performance.now());
+            const now = performance.now();
+            for (const gp of groupPieces) {
+              popMapRef.current.set(gp.id, now);
+            }
             soundManager.play("place");
           },
-          onPieceSnapped: () => {
+          onPieceSnapped: (pieceIds) => {
             lastInteractionRef.current = performance.now();
+            const now = performance.now();
+            for (const id of pieceIds) {
+              popMapRef.current.set(id, now);
+            }
             soundManager.play("snap");
           },
           onPuzzleComplete: () => {
@@ -167,5 +184,6 @@ export function usePlayScreenManager(
     mainRef,
     imgRef,
     popMapRef,
+    snapFromMapRef,
   };
 }

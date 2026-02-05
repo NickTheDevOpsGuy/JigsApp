@@ -29,6 +29,22 @@ export function easeOutBounce(t: number): number {
   return 1 - 2 * (1 - t) * (1 - t);
 }
 
+export function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+/** Interpolate from start to end over durationMs, returns current value at elapsedMs */
+export function interpolateSnapPosition(
+  from: number,
+  to: number,
+  elapsedMs: number,
+  durationMs: number = 180,
+): number {
+  if (elapsedMs >= durationMs) return to;
+  const k = Math.min(1, elapsedMs / durationMs);
+  return from + (to - from) * easeOutCubic(k);
+}
+
 export function drawDebugBackdrop(
   ctx: CanvasRenderingContext2D,
   cssW: number,

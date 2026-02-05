@@ -91,6 +91,7 @@ export function PlayScreen() {
     mainRef,
     imgRef,
     popMapRef,
+    snapFromMapRef,
   } = managerResult;
 
   const isCoarsePointer = useCoarsePointer();
@@ -205,6 +206,7 @@ export function PlayScreen() {
     canvasRef,
     imgRef,
     popMapRef,
+    snapFromMapRef,
     selectedIdRef,
     dragPreviewPieceIdRef,
     debug,
