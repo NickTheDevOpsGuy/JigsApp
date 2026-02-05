@@ -100,8 +100,9 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const zoneWidth = scatterZone.maxX - scatterZone.minX;
   const zoneHeight = scatterZone.maxY - scatterZone.minY;
 
-  // Spacing between pieces: larger = more spread out (avoids piling)
-  const spacing = Math.max(16, Math.min(tileW, tileH) * 0.35);
+  // Spacing between pieces: larger = more spread out (avoids piling on top of each other)
+  const tileSize = Math.min(tileW, tileH);
+  const spacing = Math.max(24, Math.floor(tileSize * 0.6));
   const cellW = w + spacing;
   const cellH = h + spacing;
 
@@ -109,7 +110,11 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
 
   const positions: Array<{ x: number; y: number }> = [];
-  const maxJitter = Math.min(Math.floor(spacing * 0.5), cellW - w, cellH - h);
+  const maxJitter = Math.min(
+    Math.floor(spacing * 0.4),
+    Math.max(0, cellW - w - 4),
+    Math.max(0, cellH - h - 4),
+  );
   for (let row = 0; row < gridRows; row++) {
     for (let col = 0; col < gridCols; col++) {
       const jitterX = maxJitter > 0 ? randInt(0, maxJitter) : 0;
@@ -129,7 +134,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   }
 
   // If there are fewer cells than pieces, add random positions with overlap avoidance.
-  const minGap = Math.max(8, Math.floor(spacing * 0.5));
+  const minGap = Math.max(16, Math.floor(spacing * 0.75));
   while (positions.length < total) {
     let attempts = 0;
     const maxAttempts = 100;

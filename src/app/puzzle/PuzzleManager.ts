@@ -71,10 +71,10 @@ export class PuzzleManager {
       grid,
       pieceWidth,
       pieceHeight,
-      scatterPadding = 24,
+      scatterPadding = 20,
       pad = 18,
       snapTolerancePx = 80,
-      scatterStartYRatio = 0.3,
+      scatterStartYRatio = 0.18,
       rotationStepDeg = 90,
     } = options;
 
