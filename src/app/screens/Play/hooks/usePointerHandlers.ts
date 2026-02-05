@@ -116,7 +116,7 @@ export function usePointerHandlers(args: {
   };
 
   const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLElement>) => {
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current || !boardRef.current) return;
 
       const canvas = canvasRef.current as CanvasWithTouch;
@@ -176,7 +176,7 @@ export function usePointerHandlers(args: {
   );
 
   const handlePointerMove = useCallback(
-    (e: React.PointerEvent<HTMLElement>) => {
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !boardRef.current) return;
 
       const isTouch = e.pointerType === "touch";
@@ -192,7 +192,7 @@ export function usePointerHandlers(args: {
   );
 
   const handlePointerUp = useCallback(
-    (e: React.PointerEvent<HTMLElement>) => {
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current) return;
 
       const isTouch = e.pointerType === "touch";
@@ -212,7 +212,7 @@ export function usePointerHandlers(args: {
   }, []);
 
   const handlePointerCancel = useCallback(
-    (e: React.PointerEvent<HTMLElement>) => {
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current) return;
       const canvas = canvasRef.current as CanvasWithTouch;
       // ensure drag state clears even if the browser cancels the pointer sequence
@@ -238,7 +238,7 @@ export function usePointerHandlers(args: {
   );
 
   const handleLostPointerCapture = useCallback(
-    (e: React.PointerEvent<HTMLElement>) => {
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
       // treat as cancel
       handlePointerCancel(e);
     },

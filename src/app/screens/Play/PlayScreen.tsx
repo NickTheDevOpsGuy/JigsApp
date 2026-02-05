@@ -335,17 +335,17 @@ export function PlayScreen() {
       />
 
       <div className={styles.main} ref={mainRef}>
-        <div
-          className={styles.board}
-          ref={boardRef}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerCancel}
-          onLostPointerCapture={handleLostPointerCapture}
-          onContextMenu={handleContextMenu}
-        >
-          <canvas className={styles.canvas} ref={canvasRef} />
+        <div className={styles.board} ref={boardRef}>
+          <canvas
+            className={styles.canvas}
+            ref={canvasRef}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
+            onLostPointerCapture={handleLostPointerCapture}
+            onContextMenu={handleContextMenu}
+          />
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>
               <img
