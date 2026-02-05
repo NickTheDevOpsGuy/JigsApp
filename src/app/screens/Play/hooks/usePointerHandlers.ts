@@ -396,7 +396,6 @@ export function usePointerHandlers(args: {
       setState(manager.getState());
       resetTouchState(canvas);
       clearTouchPending();
-      soundManager.stop?.("pickup");
     };
 
     window.addEventListener("pointerup", onWinUp);
