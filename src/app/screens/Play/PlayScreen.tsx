@@ -176,6 +176,8 @@ export function PlayScreen() {
   const {
     handlePointerDown,
     handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
     handlePointerMove,
     handlePointerUp,
     handlePointerCancel,
@@ -350,6 +352,9 @@ export function PlayScreen() {
           <div
             className={styles.touchOverlay}
             onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
             aria-hidden
           />
           {showPreview && imgRef.current && (
