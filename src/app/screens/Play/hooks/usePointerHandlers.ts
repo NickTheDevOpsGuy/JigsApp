@@ -9,7 +9,6 @@ import { soundManager } from "@/audio/sounds";
 import {
   handleTouchDown,
   handleTouchMove,
-  handleTouchUp,
   resetTouchState,
 } from "./pointerHandlers/touchHandlers";
 import { finishDragWithTrayCheck } from "./pointerHandlers/shared";
