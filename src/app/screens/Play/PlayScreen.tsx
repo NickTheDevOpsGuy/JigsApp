@@ -175,6 +175,7 @@ export function PlayScreen() {
 
   const {
     handlePointerDown,
+    handleTouchStart,
     handlePointerMove,
     handlePointerUp,
     handlePointerCancel,
@@ -338,6 +339,7 @@ export function PlayScreen() {
         <div
           className={styles.board}
           ref={boardRef}
+          onTouchStart={handleTouchStart}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
