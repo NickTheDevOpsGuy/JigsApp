@@ -336,12 +336,10 @@ export function PlayScreen() {
       />
 
       <div className={styles.main} ref={mainRef}>
-        <div className={styles.board} ref={boardRef} onContextMenu={handleContextMenu}>
-          <canvas className={styles.canvas} ref={canvasRef} />
-          {/* Touch overlay: divs receive touch events reliably on iOS; canvas does not */}
-          <div
-            className={styles.touchOverlay}
-            onTouchStart={handleTouchStart}
+        <div className={styles.board} ref={boardRef}>
+          <canvas
+            className={styles.canvas}
+            ref={canvasRef}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
@@ -349,8 +347,13 @@ export function PlayScreen() {
             onLostPointerCapture={handleLostPointerCapture}
             onContextMenu={handleContextMenu}
           />
+          <div
+            className={styles.touchOverlay}
+            onTouchStart={handleTouchStart}
+            aria-hidden
+          />
           {showPreview && imgRef.current && (
-            <div className={styles.previewOverlay} onContextMenu={handleContextMenu}>
+            <div className={styles.previewOverlay}>
               <img
                 src={imgRef.current.src}
                 alt="Puzzle preview"
