@@ -607,10 +607,21 @@ export class PuzzleManager {
 
     const dx = ref.targetX - tile.x;
     const dy = ref.targetY - tile.y;
+    if (dx === 0 && dy === 0) return;
 
+    // Capture positions before shift for snap-to-position animation
+    this.events.onBeforeSnap?.(groupPieces);
     // Skip overlap check: adjacent pieces have overlapping bounding boxes (pad),
     // but correct board positions form a valid grid. Blocking would prevent moving to board.
     this.shiftGroupUnclamped(groupId, Math.round(dx), Math.round(dy));
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      (p) => ({
+        justSnapped: true,
+        locked: this.pieceLockingEnabled || p.locked,
+      }),
+    );
+    this.events.onPiecePlaced?.(ref, groupPieces);
   }
 
   private rand(min: number, max: number) {

@@ -91,11 +91,13 @@ export function usePlayScreenAnimation(args: {
       const nowMs = performance.now();
       const popMap = popMapRef.current ?? new Map<string, number>();
       const snapFromMap = snapFromMapRef.current;
-      // Clean up expired snap-from entries (animation duration ~200ms)
+      // Clean up expired snap-from entries (animation duration ~220ms)
       if (snapFromMap) {
+        const toDelete: string[] = [];
         for (const [id, entry] of snapFromMap.entries()) {
-          if (nowMs - entry.startMs > 220) snapFromMap.delete(id);
+          if (nowMs - entry.startMs > 280) toDelete.push(id);
         }
+        for (const id of toDelete) snapFromMap.delete(id);
       }
       const pieceCache = pieceCacheRef.current;
       renderBoard(
