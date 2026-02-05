@@ -71,7 +71,7 @@ export class PuzzleManager {
       pieceHeight,
       scatterPadding = 24,
       pad = 18,
-      snapTolerancePx = 40,
+      snapTolerancePx = 65,
       scatterStartYRatio = 0.3,
       rotationStepDeg = 90,
     } = options;
@@ -525,8 +525,8 @@ export class PuzzleManager {
     const dy = active.targetY - activeTile.y;
 
     if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
-    if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
-
+    // Skip overlap check: adjacent pieces have overlapping bounding boxes (pad),
+    // but correct board positions form a valid grid. Blocking would prevent snapping.
     this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
 
     this.updatePieces(
@@ -602,8 +602,8 @@ export class PuzzleManager {
     const dx = ref.targetX - tile.x;
     const dy = ref.targetY - tile.y;
 
-    if (this.wouldOverlapAnyOtherGroup(groupId, dx, dy)) return;
-
+    // Skip overlap check: adjacent pieces have overlapping bounding boxes (pad),
+    // but correct board positions form a valid grid. Blocking would prevent moving to board.
     this.shiftGroupUnclamped(groupId, Math.round(dx), Math.round(dy));
   }
 

@@ -1,7 +1,7 @@
 export const PUZZLE_DEFAULTS = {
   scatterPadding: 24,
   pad: 18,
-  snapTolerancePx: 40,
+  snapTolerancePx: 65,
   scatterStartYRatio: 0.3,
   rotationStepDeg: 90 as const,
 
