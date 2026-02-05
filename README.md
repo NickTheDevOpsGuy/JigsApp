@@ -200,6 +200,24 @@ Category = folder name, puzzle name = filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── pre-push
+│   │   ├── pre-rebase
+│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
 ├── .vite
@@ -217,11 +235,6 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── animals
 │   │   │   │   │   ├── bear.png
 │   │   │   │   │   └── rabbit.png
-│   │   │   │   ├── demo
-│   │   │   │   │   ├── blue_square_thumb.png
-│   │   │   │   │   ├── green_triangle_thumb.png
-│   │   │   │   │   ├── red_circle_thumb.png
-│   │   │   │   │   └── yellow_star_thumb.png
 │   │   │   │   ├── flowers
 │   │   │   │   │   ├── daisy.png
 │   │   │   │   │   ├── flower_bed.png
@@ -294,7 +307,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleStorage.ts
 │   │   │   ├── shape.ts
-│   │   │   ├── snapLogic.ts
+│   │   │   ├── SnapLogic.ts
 │   │   │   ├── types.ts
 │   │   │   └── undoManager.ts
 │   │   ├── screens
@@ -385,7 +398,6 @@ Category = folder name, puzzle name = filename.
 ├── package-lock.json
 ├── package.json
 ├── README.md
-├── src.zip
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
