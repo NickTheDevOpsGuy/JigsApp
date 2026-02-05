@@ -100,7 +100,8 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const zoneWidth = scatterZone.maxX - scatterZone.minX;
   const zoneHeight = scatterZone.maxY - scatterZone.minY;
 
-  const spacing = 8;
+  // Spacing between pieces: larger = more spread out (avoids piling)
+  const spacing = Math.max(16, Math.min(tileW, tileH) * 0.35);
   const cellW = w + spacing;
   const cellH = h + spacing;
 
@@ -108,10 +109,11 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
 
   const positions: Array<{ x: number; y: number }> = [];
+  const maxJitter = Math.min(Math.floor(spacing * 0.5), cellW - w, cellH - h);
   for (let row = 0; row < gridRows; row++) {
     for (let col = 0; col < gridCols; col++) {
-      const jitterX = randInt(0, Math.min(spacing * 2, cellW - w));
-      const jitterY = randInt(0, Math.min(spacing * 2, cellH - h));
+      const jitterX = maxJitter > 0 ? randInt(0, maxJitter) : 0;
+      const jitterY = maxJitter > 0 ? randInt(0, maxJitter) : 0;
 
       positions.push({
         x: scatterZone.minX + col * cellW + jitterX,
@@ -126,12 +128,34 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     [positions[i], positions[j]] = [positions[j], positions[i]];
   }
 
-  // If there are fewer cells than pieces, add random positions.
+  // If there are fewer cells than pieces, add random positions with overlap avoidance.
+  const minGap = Math.max(8, Math.floor(spacing * 0.5));
   while (positions.length < total) {
-    positions.push({
-      x: randInt(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
-      y: randInt(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
-    });
+    let attempts = 0;
+    const maxAttempts = 100;
+    let placed = false;
+    while (!placed && attempts < maxAttempts) {
+      const candidate = {
+        x: randInt(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
+        y: randInt(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
+      };
+      const tooClose = positions.some(
+        (p) =>
+          Math.abs(p.x - candidate.x) < w + minGap &&
+          Math.abs(p.y - candidate.y) < h + minGap,
+      );
+      if (!tooClose) {
+        positions.push(candidate);
+        placed = true;
+      }
+      attempts++;
+    }
+    if (!placed) {
+      positions.push({
+        x: randInt(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
+        y: randInt(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
+      });
+    }
   }
 
   const pieces: Piece[] = [];
