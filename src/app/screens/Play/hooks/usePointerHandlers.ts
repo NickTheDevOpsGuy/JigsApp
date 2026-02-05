@@ -1,3 +1,5 @@
+// src/app/screens/Play/hooks/usePointerHandlers.ts
+
 import { useCallback, useRef } from "react";
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
@@ -21,7 +23,7 @@ export function usePointerHandlers(args: {
   selectCycle: (dir: 1 | -1) => void;
   setState: (st: PuzzleState) => void;
   haptic?: (kind: HapticKind) => void;
-  onDragPreview?: (state: DragPreviewState) => void;
+  onDragPreview?: (state: DragPreviewState | null) => void;
   onPieceInteraction?: () => void;
 }) {
   const {
@@ -84,16 +86,21 @@ export function usePointerHandlers(args: {
       const boardRect = boardRef.current.getBoundingClientRect();
       const ctx2d = canvas.getContext("2d");
       if (!ctx2d) return null;
+
       const dpr = window.devicePixelRatio || 1;
       ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+
       const x = clientX - boardRect.left;
       const y = clientY - boardRect.top;
+
       const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
       const pieceId = pickPieceId(ctx2d, boardPieces, x, y);
       if (!pieceId) return null;
+
       const piece = st.pieces.find((p) => p.id === pieceId);
       if (!piece || piece.locked) return null;
+
       return { pieceId, piece };
     },
     [manager, canvasRef, boardRef],
@@ -103,13 +110,15 @@ export function usePointerHandlers(args: {
     (clientX: number, clientY: number) => {
       if (!manager) return;
       const overTray = isPointerOverTray(clientX, clientY);
+
       if (overTray) {
         const activeId = manager.getDragState().activeId;
         if (activeId) {
-          manager.sendPieceToTray(activeId);
+          manager.sendToTray(activeId);
           selectCycle(1);
         }
       }
+
       manager.pointerUp();
     },
     [manager, isPointerOverTray, selectCycle],
@@ -167,6 +176,7 @@ export function usePointerHandlers(args: {
         e.touches.length === 0
       )
         return;
+
       const touch = e.touches[0];
       const start = touchStartRef.current;
       const dist = Math.hypot(touch.clientX - start.x, touch.clientY - start.y);
@@ -278,7 +288,7 @@ export function usePointerHandlers(args: {
         try {
           canvasRef.current.setPointerCapture(e.pointerId);
         } catch {
-          /* ignore releasePointerCapture errors */
+          /* ignore */
         }
       }
     },
