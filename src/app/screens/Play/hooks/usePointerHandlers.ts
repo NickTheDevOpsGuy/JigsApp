@@ -7,7 +7,6 @@ import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PieceId, PuzzleState } from "@/puzzle/types";
 import type { HapticKind } from "./useHaptics";
 import type { CanvasWithTouch, DragPreviewState } from "./pointerHandlers/types";
-import { soundManager } from "@/audio/sounds";
 import {
   handleTouchDown,
   handleTouchMove,
