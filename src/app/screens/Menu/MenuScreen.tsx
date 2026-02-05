@@ -31,15 +31,6 @@ export function MenuScreen() {
     nav("/play");
   };
 
-  useEffect(() => {
-    if (searchParams.get("daily") === "1" && hasDaily) {
-      clearPuzzleState();
-      startDailyPuzzle();
-      nav("/play");
-      setSearchParams({}, { replace: true });
-    }
-  }, [searchParams, hasDaily, setSearchParams, nav]);
-
   return (
     <div className={styles.page}>
       <div className={styles.card}>

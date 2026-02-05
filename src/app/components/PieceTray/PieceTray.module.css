@@ -165,8 +165,8 @@
 /* Mobile adjustments */
 @media (max-width: 600px) {
   .tray {
-    margin: 0 6px 6px 6px;
-    height: 80px;
+    margin: 0 8px 8px 8px;
+    height: 130px;
   }
 
   .header {
