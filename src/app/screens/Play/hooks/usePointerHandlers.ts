@@ -128,11 +128,10 @@ export function usePointerHandlers(args: {
   const handleTouchStart = useCallback(
     (e: React.TouchEvent<HTMLElement>) => {
       if (!manager || !boardRef.current || e.touches.length === 0) return;
+      e.preventDefault();
       const touch = e.touches[0];
       const picked = pickPiece(touch.clientX, touch.clientY);
       if (!picked) return;
-
-      e.preventDefault();
       const { pieceId, piece } = picked;
       const boardRect = boardRef.current.getBoundingClientRect();
 
