@@ -43,8 +43,8 @@ export function computeTileSize(
       minTile = 18;
       maxTile = 24;
     } else if (pieceCount <= 35) {
-      minTile = 16;
-      maxTile = 20;
+      minTile = 14;
+      maxTile = 18;
     } else {
       minTile = 14;
       maxTile = 18;
