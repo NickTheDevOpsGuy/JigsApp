@@ -18,7 +18,6 @@ export function MenuScreen() {
   const nav = useNavigate();
   const [showHelp, setShowHelp] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
-  const [showDailyModal, setShowDailyModal] = useState(false);
 
   const todayCompleted = isTodayDailyCompleted();
 
