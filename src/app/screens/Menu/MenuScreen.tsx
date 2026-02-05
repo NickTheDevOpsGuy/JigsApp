@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./MenuScreen.module.css";
 
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
@@ -15,6 +15,7 @@ import { shouldShowChangelog } from "@/data/changelog";
 
 export function MenuScreen() {
   const nav = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showHelp, setShowHelp] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
@@ -25,6 +26,13 @@ export function MenuScreen() {
   useEffect(() => {
     if (shouldShowChangelog()) setShowWhatsNew(true);
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get("daily") === "1" && hasDaily) {
+      setShowDailyModal(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, hasDaily, setSearchParams]);
 
   return (
     <div className={styles.page}>

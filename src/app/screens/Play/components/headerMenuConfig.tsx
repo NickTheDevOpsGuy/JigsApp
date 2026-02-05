@@ -11,6 +11,7 @@ export type HeaderMenuProps = {
   title?: string;
   canUndo: boolean;
   onUndo: () => void;
+  onTodayPuzzle?: () => void;
   timeMode: TimeMode;
   setTimeMode: (m: TimeMode | ((prev: TimeMode) => TimeMode)) => void;
   countdownMinutes: number;
@@ -74,6 +75,13 @@ export function buildMenuItems(
       visible: true,
       label: "Home",
       onClick: closeAnd(() => navigate("/")),
+    },
+    {
+      id: "today",
+      section: "nav",
+      visible: !!props.onTodayPuzzle,
+      label: "Today's puzzle",
+      onClick: closeAnd(props.onTodayPuzzle!),
     },
     {
       id: "new",
