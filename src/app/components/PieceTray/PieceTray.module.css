@@ -162,16 +162,17 @@
   font-size: 13px;
 }
 
-/* Mobile adjustments */
+/* Mobile adjustments - smaller tray to free space for puzzle */
 @media (max-width: 600px) {
   .tray {
     margin: 0 8px 8px 8px;
-    height: 130px;
+    height: 100px;
+    border-radius: 12px;
   }
 
   .header {
     padding: 6px 10px;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .help {
@@ -190,7 +191,7 @@
   }
 
   .thumbWrap {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
   }
 }
