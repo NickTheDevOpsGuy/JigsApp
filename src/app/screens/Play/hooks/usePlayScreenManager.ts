@@ -56,13 +56,13 @@ export function usePlayScreenManager(
       // Mobile cap based on difficulty so higher grids shrink naturally
       const pieceCount = grid.rows * grid.cols;
       const mobileMax =
-        pieceCount >= 36 ? 44 : // 6x6+
-        pieceCount >= 25 ? 50 : // 5x5+
-        56; // 4x4 and lower
+        pieceCount >= 36
+          ? 44 // 6x6+
+          : pieceCount >= 25
+            ? 50 // 5x5+
+            : 56; // 4x4 and lower
 
-      const pieceSize = isMobile
-        ? Math.min(basePieceSize, mobileMax)
-        : basePieceSize;
+      const pieceSize = isMobile ? Math.min(basePieceSize, mobileMax) : basePieceSize;
 
       // Board sizing
       const minBoardW = grid.cols * pieceSize;
