@@ -46,25 +46,24 @@ export function usePlayScreenManager(
       const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
       const isMobile = viewportW < 600;
 
-      // Use real available space. On mobile, reserve room for tray below the board.
+      // Use real available space. Do not force a minimum on mobile.
       const padding = isMobile ? 12 : 24;
-      const trayReserve = isMobile ? 104 : 0; // tray height (80) + gap + padding
       const availW = Math.max(0, Math.floor(rect.width) - padding);
-      const availH = Math.max(0, Math.floor(rect.height) - padding - trayReserve);
+      const availH = Math.max(0, Math.floor(rect.height) - padding);
 
       // Base size from existing helper
       const basePieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-      // Mobile cap by difficulty – keep pieces small so puzzle fits on screen
+      // Mobile cap by difficulty so higher grids shrink naturally
       const pieceCount = grid.rows * grid.cols;
       const mobileMax =
-        pieceCount >= 36
-          ? 34 // 6x6+
-          : pieceCount >= 25
-            ? 38 // 5x5+
-            : 44; // 4x4 and lower
+        pieceCount >= 36 ? 44 : // 6x6+
+        pieceCount >= 25 ? 50 : // 5x5+
+        56; // 4x4 and lower
 
-      const pieceSize = isMobile ? Math.min(basePieceSize, mobileMax) : basePieceSize;
+      const pieceSize = isMobile
+        ? Math.min(basePieceSize, mobileMax)
+        : basePieceSize;
 
       const minBoardW = grid.cols * pieceSize;
       const minBoardH = grid.rows * pieceSize;
@@ -144,8 +143,10 @@ export function usePlayScreenManager(
 
     const ro = new ResizeObserver(() => {
       const rect = boardEl.getBoundingClientRect();
-      const w = Math.max(320, Math.floor(rect.width));
-      const h = Math.max(240, Math.floor(rect.height));
+      // IMPORTANT: keep manager board size in sync with real DOM size.
+      // Avoid hard-coded minimums that can cause hit-testing mismatches on mobile.
+      const w = Math.max(1, Math.floor(rect.width));
+      const h = Math.max(1, Math.floor(rect.height));
       manager.setBoardSize(w, h);
       setState(manager.getState());
     });
