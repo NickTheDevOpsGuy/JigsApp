@@ -34,17 +34,17 @@ export function computeTileSize(
 
   if (isMobile) {
     if (pieceCount <= 9) {
-      minTile = 50;
-      maxTile = 90;
+      minTile = 38;
+      maxTile = 58;
     } else if (pieceCount <= 16) {
-      minTile = 45;
-      maxTile = 80;
+      minTile = 32;
+      maxTile = 50;
     } else if (pieceCount <= 25) {
-      minTile = 40;
-      maxTile = 70;
+      minTile = 28;
+      maxTile = 44;
     } else {
-      minTile = 35;
-      maxTile = 60;
+      minTile = 24;
+      maxTile = 38;
     }
   } else {
     if (pieceCount <= 9) {

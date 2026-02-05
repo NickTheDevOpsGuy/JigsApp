@@ -46,22 +46,23 @@ export function usePlayScreenManager(
       const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
       const isMobile = viewportW < 600;
 
-      // Use real available space. Do not force a minimum on mobile.
+      // Use real available space. On mobile, reserve room for tray below the board.
       const padding = isMobile ? 12 : 24;
+      const trayReserve = isMobile ? 120 : 0; // tray height + gap + padding
       const availW = Math.max(0, Math.floor(rect.width) - padding);
-      const availH = Math.max(0, Math.floor(rect.height) - padding);
+      const availH = Math.max(0, Math.floor(rect.height) - padding - trayReserve);
 
       // Base size from existing helper
       const basePieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-      // Mobile cap by difficulty so higher grids shrink naturally
+      // Mobile cap by difficulty – keep pieces small so puzzle fits on screen
       const pieceCount = grid.rows * grid.cols;
       const mobileMax =
         pieceCount >= 36
-          ? 44 // 6x6+
+          ? 34 // 6x6+
           : pieceCount >= 25
-            ? 50 // 5x5+
-            : 56; // 4x4 and lower
+            ? 38 // 5x5+
+            : 44; // 4x4 and lower
 
       const pieceSize = isMobile ? Math.min(basePieceSize, mobileMax) : basePieceSize;
 
