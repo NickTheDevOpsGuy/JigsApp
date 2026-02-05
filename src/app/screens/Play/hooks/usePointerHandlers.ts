@@ -83,6 +83,21 @@ export function usePointerHandlers(args: {
     touchPendingRef.current = false;
   }, []);
 
+  // Use refs for values needed in document listeners to avoid stale closures
+  const managerRef = useRef(manager);
+  const stateSetterRef = useRef(setState);
+  const dragPreviewRef = useRef(onDragPreview);
+  const hapticRef = useRef(haptic);
+  const onPieceInteractionRef = useRef(onPieceInteraction);
+
+  useEffect(() => {
+    managerRef.current = manager;
+    stateSetterRef.current = setState;
+    dragPreviewRef.current = onDragPreview;
+    hapticRef.current = haptic;
+    onPieceInteractionRef.current = onPieceInteraction;
+  });
+
   const ctx = {
     manager,
     boardRef,
@@ -239,29 +254,50 @@ export function usePointerHandlers(args: {
       if (ev.pointerType !== "touch") return;
       const canvas = canvasRef.current as CanvasWithTouch | null;
       if (!canvas?.pendingPieceId) return;
-      handleTouchMove(ev, ctx, canvas);
+
+      // Build fresh ctx with current refs
+      const freshCtx = {
+        manager: managerRef.current,
+        boardRef,
+        canvasRef,
+        trayRef,
+        selectedIdRef,
+        setSelectedPieceId,
+        bump,
+        didDragRef,
+        selectCycle,
+        setState: stateSetterRef.current,
+        haptic: hapticRef.current,
+        onDragPreview: dragPreviewRef.current,
+        onPieceInteraction: onPieceInteractionRef.current,
+        clearTouchPending,
+      };
+      handleTouchMove(ev, freshCtx, canvas);
     };
 
     const onDocUp = (ev: PointerEvent) => {
       if (ev.pointerType !== "touch") return;
       const canvas = canvasRef.current as CanvasWithTouch | null;
-      if (!canvas) return;
+      const mgr = managerRef.current;
+      if (!canvas || !mgr) return;
+
       const hadDrag = canvas.touchDragStarted;
       const hadPending = !!canvas.pendingPieceId;
-      if (!hadPending && !manager.getDragState().activeId) return;
+      if (!hadPending && !mgr.getDragState().activeId) return;
+
       touchPendingRef.current = false;
       if (hadDrag) {
         ev.preventDefault();
         ev.stopPropagation();
-        onDragPreview?.(null);
+        dragPreviewRef.current?.(null);
         finishDragWithTrayCheck(
-          manager,
+          mgr,
           ev.clientX,
           ev.clientY,
           isPointerOverTray,
           selectCycle,
         );
-        setState(manager.getState());
+        stateSetterRef.current(mgr.getState());
       } else if (hadPending && boardRef.current) {
         ev.preventDefault();
         ev.stopPropagation();
@@ -272,13 +308,13 @@ export function usePointerHandlers(args: {
           ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
           const x = ev.clientX - boardRect.left;
           const y = ev.clientY - boardRect.top;
-          const st = manager.getState();
+          const st = mgr.getState();
           const boardPieces = st.pieces.filter((p) => !p.inTray);
           const pid = pickPieceId(ctx2d, boardPieces, x, y);
           if (pid && canRotatePiece(pid)) {
-            manager.rotatePiece(pid);
+            mgr.rotatePiece(pid);
             soundManager.play("rotate");
-            setState(manager.getState());
+            stateSetterRef.current(mgr.getState());
           }
         }
       }
@@ -302,22 +338,27 @@ export function usePointerHandlers(args: {
     manager,
     canvasRef,
     boardRef,
-    onDragPreview,
-    setState,
+    trayRef,
+    selectedIdRef,
+    setSelectedPieceId,
+    bump,
+    didDragRef,
     isPointerOverTray,
     selectCycle,
     canRotatePiece,
+    clearTouchPending,
   ]);
 
   // Safety net: pointerup/pointercancel on window when drag is active (e.g. release outside canvas)
   useEffect(() => {
     const onWinUp = () => {
-      if (!manager) return;
-      const activeId = manager.getDragState().activeId;
+      const mgr = managerRef.current;
+      if (!mgr) return;
+      const activeId = mgr.getDragState().activeId;
       if (!activeId) return;
-      onDragPreview?.(null);
-      manager.pointerUp();
-      setState(manager.getState());
+      dragPreviewRef.current?.(null);
+      mgr.pointerUp();
+      stateSetterRef.current(mgr.getState());
     };
     window.addEventListener("pointerup", onWinUp);
     window.addEventListener("pointercancel", onWinUp);
@@ -325,7 +366,7 @@ export function usePointerHandlers(args: {
       window.removeEventListener("pointerup", onWinUp);
       window.removeEventListener("pointercancel", onWinUp);
     };
-  }, [manager, onDragPreview, setState]);
+  }, []);
 
   return {
     handlePointerDown,
