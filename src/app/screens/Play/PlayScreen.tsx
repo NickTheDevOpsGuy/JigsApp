@@ -335,7 +335,7 @@ export function PlayScreen() {
       />
 
       <div className={styles.main} ref={mainRef}>
-        <div className={styles.board} ref={boardRef}>
+        <div className={styles.board} ref={boardRef} onContextMenu={handleContextMenu}>
           <canvas
             className={styles.canvas}
             ref={canvasRef}
@@ -347,7 +347,7 @@ export function PlayScreen() {
             onContextMenu={handleContextMenu}
           />
           {showPreview && imgRef.current && (
-            <div className={styles.previewOverlay}>
+            <div className={styles.previewOverlay} onContextMenu={handleContextMenu}>
               <img
                 src={imgRef.current.src}
                 alt="Puzzle preview"
