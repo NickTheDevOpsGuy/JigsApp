@@ -179,6 +179,19 @@
   backface-visibility: hidden;
 }
 
+/* Overlay for touch: divs receive touch events reliably on iOS Safari; canvas often does not */
+.touchOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: default;
+}
+
 .previewOverlay {
   position: absolute;
   bottom: 12px;

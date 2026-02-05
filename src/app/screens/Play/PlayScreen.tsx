@@ -175,6 +175,7 @@ export function PlayScreen() {
 
   const {
     handlePointerDown,
+    handleTouchStart,
     handlePointerMove,
     handlePointerUp,
     handlePointerCancel,
@@ -336,9 +337,11 @@ export function PlayScreen() {
 
       <div className={styles.main} ref={mainRef}>
         <div className={styles.board} ref={boardRef} onContextMenu={handleContextMenu}>
-          <canvas
-            className={styles.canvas}
-            ref={canvasRef}
+          <canvas className={styles.canvas} ref={canvasRef} />
+          {/* Touch overlay: divs receive touch events reliably on iOS; canvas does not */}
+          <div
+            className={styles.touchOverlay}
+            onTouchStart={handleTouchStart}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
