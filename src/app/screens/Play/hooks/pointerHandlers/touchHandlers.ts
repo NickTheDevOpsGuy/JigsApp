@@ -16,7 +16,7 @@ export function resetTouchState(canvas: CanvasWithTouch): void {
 }
 
 export function handleTouchDown(
-  e: React.PointerEvent<HTMLCanvasElement>,
+  e: React.PointerEvent<Element>,
   ctx: PointerHandlersContext,
   pieceId: string,
   boardRect: DOMRect,
@@ -53,7 +53,7 @@ export function handleTouchDown(
 }
 
 export function handleTouchMove(
-  e: React.PointerEvent<HTMLCanvasElement> | PointerEvent,
+  e: React.PointerEvent<Element> | PointerEvent,
   ctx: PointerHandlersContext,
   canvas?: CanvasWithTouch,
 ): boolean {
@@ -62,8 +62,8 @@ export function handleTouchMove(
 
   const canvasEl =
     canvas ??
-    (e.currentTarget as CanvasWithTouch) ??
-    (canvasRef?.current as CanvasWithTouch);
+    (canvasRef?.current as CanvasWithTouch) ??
+    (e.currentTarget as CanvasWithTouch);
   if (!canvasEl) return false;
   const sx = canvasEl.touchStartX;
   const sy = canvasEl.touchStartY;
@@ -108,7 +108,7 @@ export function handleTouchMove(
 }
 
 export function handleTouchUp(
-  e: React.PointerEvent<HTMLCanvasElement>,
+  e: React.PointerEvent<Element>,
   ctx: PointerHandlersContext,
   canRotatePiece: (pid: string) => boolean,
   isPointerOverTray: (x: number, y: number) => boolean,

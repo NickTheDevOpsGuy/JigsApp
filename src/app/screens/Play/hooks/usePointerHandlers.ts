@@ -5,6 +5,7 @@ import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PieceId, PuzzleState } from "@/puzzle/types";
 import type { HapticKind } from "./useHaptics";
 import type { CanvasWithTouch, DragPreviewState } from "./pointerHandlers/types";
+import { soundManager } from "@/audio/sounds";
 import {
   handleTouchDown,
   handleTouchMove,
@@ -100,7 +101,7 @@ export function usePointerHandlers(args: {
   };
 
   const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       if (!manager || !canvasRef.current || !boardRef.current) return;
 
       const canvas = canvasRef.current as CanvasWithTouch;
@@ -160,7 +161,7 @@ export function usePointerHandlers(args: {
   );
 
   const handlePointerMove = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       if (!manager || !boardRef.current) return;
 
       const isTouch = e.pointerType === "touch";
@@ -176,7 +177,7 @@ export function usePointerHandlers(args: {
   );
 
   const handlePointerUp = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       if (!manager || !canvasRef.current) return;
 
       const isTouch = e.pointerType === "touch";
@@ -196,7 +197,7 @@ export function usePointerHandlers(args: {
   }, []);
 
   const handlePointerCancel = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       if (!manager || !canvasRef.current) return;
       const canvas = canvasRef.current as CanvasWithTouch;
       // ensure drag state clears even if the browser cancels the pointer sequence
@@ -222,7 +223,7 @@ export function usePointerHandlers(args: {
   );
 
   const handleLostPointerCapture = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       // treat as cancel
       handlePointerCancel(e);
     },
@@ -238,7 +239,6 @@ export function usePointerHandlers(args: {
       if (ev.pointerType !== "touch") return;
       const canvas = canvasRef.current as CanvasWithTouch | null;
       if (!canvas?.pendingPieceId) return;
-      if (ev.target === canvas) return;
       handleTouchMove(ev, ctx, canvas);
     };
 
@@ -246,9 +246,13 @@ export function usePointerHandlers(args: {
       if (ev.pointerType !== "touch") return;
       const canvas = canvasRef.current as CanvasWithTouch | null;
       if (!canvas) return;
-      if (!canvas.pendingPieceId && !manager.getDragState().activeId) return;
+      const hadDrag = canvas.touchDragStarted;
+      const hadPending = !!canvas.pendingPieceId;
+      if (!hadPending && !manager.getDragState().activeId) return;
       touchPendingRef.current = false;
-      if (ev.target !== canvas) {
+      if (hadDrag) {
+        ev.preventDefault();
+        ev.stopPropagation();
         onDragPreview?.(null);
         finishDragWithTrayCheck(
           manager,
@@ -258,12 +262,31 @@ export function usePointerHandlers(args: {
           selectCycle,
         );
         setState(manager.getState());
-        resetTouchState(canvas);
-        try {
-          canvas.releasePointerCapture(ev.pointerId);
-        } catch {
-          /* ignore */
+      } else if (hadPending && boardRef.current) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const boardRect = boardRef.current.getBoundingClientRect();
+        const ctx2d = canvas.getContext("2d");
+        if (ctx2d) {
+          const dpr = window.devicePixelRatio || 1;
+          ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+          const x = ev.clientX - boardRect.left;
+          const y = ev.clientY - boardRect.top;
+          const st = manager.getState();
+          const boardPieces = st.pieces.filter((p) => !p.inTray);
+          const pid = pickPieceId(ctx2d, boardPieces, x, y);
+          if (pid && canRotatePiece(pid)) {
+            manager.rotatePiece(pid);
+            soundManager.play("rotate");
+            setState(manager.getState());
+          }
         }
+      }
+      resetTouchState(canvas);
+      try {
+        canvas.releasePointerCapture(ev.pointerId);
+      } catch {
+        /* ignore */
       }
     };
 
@@ -275,7 +298,16 @@ export function usePointerHandlers(args: {
       document.removeEventListener("pointerup", onDocUp, { capture: true });
       document.removeEventListener("pointercancel", onDocUp, { capture: true });
     };
-  }, [manager, canvasRef, onDragPreview, setState, isPointerOverTray, selectCycle]);
+  }, [
+    manager,
+    canvasRef,
+    boardRef,
+    onDragPreview,
+    setState,
+    isPointerOverTray,
+    selectCycle,
+    canRotatePiece,
+  ]);
 
   // Safety net: pointerup/pointercancel on window when drag is active (e.g. release outside canvas)
   useEffect(() => {

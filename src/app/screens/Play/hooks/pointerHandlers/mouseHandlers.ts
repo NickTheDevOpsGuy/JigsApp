@@ -6,7 +6,7 @@ import { finishDragWithTrayCheck } from "./shared";
 import { dragLog } from "./dragLog";
 
 export function handleMouseDown(
-  e: React.PointerEvent<HTMLCanvasElement>,
+  e: React.PointerEvent<Element>,
   ctx: PointerHandlersContext,
   pieceId: string,
   boardRect: DOMRect,
@@ -61,7 +61,7 @@ export function handleMouseDown(
 }
 
 export function handleMouseMove(
-  e: React.PointerEvent<HTMLCanvasElement>,
+  e: React.PointerEvent<Element>,
   ctx: PointerHandlersContext,
 ): void {
   const { manager, boardRef, didDragRef, onDragPreview, onPieceInteraction } = ctx;
@@ -91,7 +91,7 @@ export function handleMouseMove(
 }
 
 export function handleMouseUp(
-  e: React.PointerEvent<HTMLCanvasElement>,
+  e: React.PointerEvent<Element>,
   ctx: PointerHandlersContext,
   isPointerOverTray: (x: number, y: number) => boolean,
 ): void {
