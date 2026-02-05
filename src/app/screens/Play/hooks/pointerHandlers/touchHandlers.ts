@@ -135,10 +135,11 @@ export function handleTouchUp(
   if (!dragStarted(canvas)) {
     // Touch tap: rotate
     if (boardRect && ctx2d) {
-      ctx2d.setTransform(1, 0, 0, 1, 0, 0);
-      const st = manager.getState();
+      const dpr = window.devicePixelRatio || 1;
+      ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
       const x = e.clientX - boardRect.left;
       const y = e.clientY - boardRect.top;
+      const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
       const pid = pickPieceId(ctx2d, boardPieces, x, y);
       if (pid && canRotatePiece(pid)) {

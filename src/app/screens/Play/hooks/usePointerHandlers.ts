@@ -100,7 +100,8 @@ export function usePointerHandlers(args: {
       const ctx2d = canvas.getContext("2d");
       if (!ctx2d) return;
 
-      ctx2d.setTransform(1, 0, 0, 1, 0, 0);
+      const dpr = window.devicePixelRatio || 1;
+      ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
       const cssX = e.clientX - boardRect.left;
       const cssY = e.clientY - boardRect.top;
 
