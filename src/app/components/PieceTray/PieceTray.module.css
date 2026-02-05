@@ -172,7 +172,7 @@
 @media (max-width: 600px) {
   .tray {
     margin: 0 6px 6px 6px;
-    height: 96px;
+    height: 80px;
   }
 
   .header {
