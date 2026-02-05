@@ -61,14 +61,14 @@ export function usePlayScreenManager(
       const pieceCount = grid.rows * grid.cols;
       const mobileMax =
         pieceCount >= 36
-          ? 16 // 6x6+
+          ? 14 // 6x6+
           : pieceCount >= 26
-            ? 18 // 5x5–5x7, 7x5 (35 pieces)
+            ? 16 // 5x5–5x7, 7x5 (35 pieces)
             : pieceCount >= 17
-              ? 24 // 4x4, 5x5
+              ? 18 // 4x4, 5x5
               : pieceCount >= 10
-                ? 26 // 4x4
-                : 24; // 3x3 (9 pieces)
+                ? 20 // 4x4
+                : 18; // 3x3 (9 pieces)
 
       const pieceSize = isMobile ? Math.min(basePieceSize, mobileMax) : basePieceSize;
 
