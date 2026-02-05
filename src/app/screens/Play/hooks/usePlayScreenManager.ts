@@ -48,7 +48,7 @@ export function usePlayScreenManager(
 
       // Use real available space. On mobile, reserve room for tray below the board.
       const padding = isMobile ? 12 : 24;
-      const trayReserve = isMobile ? 120 : 0; // tray height + gap + padding
+      const trayReserve = isMobile ? 104 : 0; // tray height (80) + gap + padding
       const availW = Math.max(0, Math.floor(rect.width) - padding);
       const availH = Math.max(0, Math.floor(rect.height) - padding - trayReserve);
 
