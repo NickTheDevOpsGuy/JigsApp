@@ -34,31 +34,37 @@ export function computeTileSize(
 
   if (isMobile) {
     if (pieceCount <= 9) {
-      minTile = 22;
-      maxTile = 32;
+      minTile = 18;
+      maxTile = 26;
     } else if (pieceCount <= 16) {
       minTile = 20;
       maxTile = 28;
     } else if (pieceCount <= 25) {
       minTile = 18;
       maxTile = 24;
-    } else {
+    } else if (pieceCount <= 35) {
       minTile = 16;
-      maxTile = 22;
+      maxTile = 20;
+    } else {
+      minTile = 14;
+      maxTile = 18;
     }
   } else {
     if (pieceCount <= 9) {
-      minTile = 100;
-      maxTile = 200;
+      minTile = 70;
+      maxTile = 140;
     } else if (pieceCount <= 16) {
       minTile = 80;
       maxTile = 160;
     } else if (pieceCount <= 25) {
       minTile = 60;
       maxTile = 120;
+    } else if (pieceCount <= 35) {
+      minTile = 45;
+      maxTile = 85;
     } else {
-      minTile = 50;
-      maxTile = 100;
+      minTile = 40;
+      maxTile = 70;
     }
   }
 
