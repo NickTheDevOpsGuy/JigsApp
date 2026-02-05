@@ -134,9 +134,8 @@ export function usePlayScreenManager(
       }
 
       // Desktop / non-mobile sizing (keep your original feel)
-      const fillRatio = 0.88;
-      const boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
-      const boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
+      const boardW = Math.max(Math.floor(availW), minBoardW);
+      const boardH = Math.max(Math.floor(availH), minBoardH);
 
       boardEl.style.width = `${boardW}px`;
       boardEl.style.height = `${boardH}px`;
