@@ -33,10 +33,12 @@ export function MenuScreen() {
 
   useEffect(() => {
     if (searchParams.get("daily") === "1" && hasDaily) {
-      setShowDailyModal(true);
+      clearPuzzleState();
+      startDailyPuzzle();
+      nav("/play");
       setSearchParams({}, { replace: true });
     }
-  }, [searchParams, hasDaily, setSearchParams]);
+  }, [searchParams, hasDaily, setSearchParams, nav]);
 
   return (
     <div className={styles.page}>

@@ -247,7 +247,7 @@ export function usePointerHandlers(args: {
 
   // === MOUSE/POINTER HANDLERS ===
   const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       if (e.pointerType === "touch") return; // Touch handled separately
       if (!manager || !canvasRef.current || !boardRef.current) return;
 
@@ -286,7 +286,7 @@ export function usePointerHandlers(args: {
         setState(manager.getState());
         didDragRef.current = false;
         try {
-          canvasRef.current.setPointerCapture(e.pointerId);
+          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
         } catch {
           /* ignore */
         }
@@ -308,7 +308,7 @@ export function usePointerHandlers(args: {
   );
 
   const handlePointerMove = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       if (e.pointerType === "touch") return;
       if (!manager || !boardRef.current) return;
       if (!manager.getDragState().activeId) return;
@@ -334,7 +334,7 @@ export function usePointerHandlers(args: {
   );
 
   const handlePointerUp = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       if (e.pointerType === "touch") return;
       if (!manager || !canvasRef.current) return;
 
@@ -344,7 +344,7 @@ export function usePointerHandlers(args: {
       didDragRef.current = false;
 
       try {
-        canvasRef.current.releasePointerCapture(e.pointerId);
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
       } catch {
         /* ignore */
       }
@@ -353,7 +353,7 @@ export function usePointerHandlers(args: {
   );
 
   const handlePointerCancel = useCallback(
-    (_e: React.PointerEvent<HTMLCanvasElement>) => {
+    (_e: React.PointerEvent<HTMLElement>) => {
       if (!manager) return;
       onDragPreview?.(null);
       manager.pointerUp();
