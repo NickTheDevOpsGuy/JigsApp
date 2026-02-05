@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import { ensureSignedIn } from "@/supabase/auth";
 import { ACHIEVEMENT_DEFS } from "@/data/achievements";
 import type { AchievementDef } from "@/data/achievements";
+import { getMyDailyRank } from "./leaderboardService";
 
 export type AchievementWithUnlock = AchievementDef & {
   unlocked: boolean;
@@ -13,7 +14,11 @@ export async function checkAndUnlockAchievements(args: {
   puzzlesCompleted: number;
   dailyStreak: number;
   bestDailyStreak: number;
-  lastCompletion?: { elapsedSeconds: number; grid: { rows: number; cols: number } };
+  lastCompletion?: {
+    elapsedSeconds: number;
+    grid: { rows: number; cols: number };
+    isDaily?: boolean;
+  };
 }): Promise<string[]> {
   if (!isSupabaseConfigured()) return [];
 
@@ -33,6 +38,12 @@ export async function checkAndUnlockAchievements(args: {
     last && last.grid.rows === 3 && last.grid.cols === 3 && last.elapsedSeconds < 60;
   const expertGrid = last && last.grid.rows === 6 && last.grid.cols === 6;
 
+  let dailyRank: number | null = null;
+  if (args.lastCompletion?.isDaily) {
+    const rankInfo = await getMyDailyRank();
+    dailyRank = rankInfo?.rank ?? null;
+  }
+
   const toCheck: { id: string; condition: boolean }[] = [
     { id: "first_puzzle", condition: args.puzzlesCompleted >= 1 },
     { id: "five_puzzles", condition: args.puzzlesCompleted >= 5 },
@@ -43,6 +54,8 @@ export async function checkAndUnlockAchievements(args: {
     { id: "daily_streak_30", condition: args.bestDailyStreak >= 30 },
     { id: "speed_demon", condition: !!speedDemon },
     { id: "expert_grid", condition: !!expertGrid },
+    { id: "top_10_daily", condition: dailyRank != null && dailyRank <= 10 },
+    { id: "first_place_daily", condition: dailyRank === 1 },
   ];
 
   for (const { id, condition } of toCheck) {

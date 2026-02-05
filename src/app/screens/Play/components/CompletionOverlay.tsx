@@ -85,7 +85,7 @@ export function CompletionOverlay({
           puzzlesCompleted: stats.puzzlesCompleted,
           dailyStreak: stats.dailyStreak,
           bestDailyStreak: stats.bestDailyStreak,
-          lastCompletion: { elapsedSeconds, grid },
+          lastCompletion: { elapsedSeconds, grid, isDaily: !!isDaily },
         });
       }
     };
