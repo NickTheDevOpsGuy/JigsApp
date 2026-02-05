@@ -48,9 +48,10 @@ export function usePlayScreenManager(
       const rect = mainEl.getBoundingClientRect();
       const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
       const isMobile = viewportW < 600;
+      const isSmallPhone = viewportW < 380;
 
-      // Use real available space. Do not force a minimum on mobile.
-      const padding = isMobile ? 12 : 24;
+      // Use real available space. Tighter padding on small phones (iPhone SE etc.)
+      const padding = isSmallPhone ? 8 : isMobile ? 12 : 24;
       const availW = Math.max(0, Math.floor(rect.width) - padding);
       const availH = Math.max(0, Math.floor(rect.height) - padding);
 
@@ -70,7 +71,12 @@ export function usePlayScreenManager(
                 ? 20 // 4x4
                 : 18; // 3x3 (9 pieces)
 
-      const pieceSize = isMobile ? Math.min(basePieceSize, mobileMax) : basePieceSize;
+      const smallPhoneMax =
+        pieceCount >= 36 ? 12 : pieceCount >= 26 ? 12 : pieceCount >= 17 ? 14 : 16;
+      const effectiveMobileMax = isSmallPhone ? smallPhoneMax : mobileMax;
+      const pieceSize = isMobile
+        ? Math.min(basePieceSize, effectiveMobileMax)
+        : basePieceSize;
 
       const minBoardW = grid.cols * pieceSize;
       const minBoardH = grid.rows * pieceSize;

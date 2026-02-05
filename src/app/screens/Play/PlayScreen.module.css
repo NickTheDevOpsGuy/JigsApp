@@ -353,6 +353,35 @@
   }
 }
 
+/* Small phones: iPhone SE, 12/13 mini (~320–380px) */
+@media (max-width: 380px) {
+  .topBar {
+    height: 44px;
+    padding: 0 6px;
+    gap: 2px;
+  }
+  .hudPill {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  .main {
+    padding: 4px;
+    gap: 4px;
+  }
+  .board {
+    min-height: 200px;
+    border-radius: 10px;
+  }
+  .previewOverlay {
+    bottom: 6px;
+    right: 6px;
+  }
+  .previewImage {
+    width: 64px;
+    height: 64px;
+  }
+}
+
 /* Touch hint */
 .touchHint {
   position: absolute;
