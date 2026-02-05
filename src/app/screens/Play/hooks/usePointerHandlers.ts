@@ -66,19 +66,16 @@ export function usePointerHandlers(args: {
     onPieceInteractionRef.current = onPieceInteraction;
   });
 
-  const canRotatePiece = useCallback(
-    (pid: PieceId) => {
-      const mgr = managerRef.current;
-      if (!mgr) return false;
-      const st = mgr.getState();
-      const piece = st.pieces.find((p) => p.id === pid);
-      if (!piece) return false;
-      if (piece.isPlaced || piece.locked || piece.inTray) return false;
-      const groupSize = st.pieces.filter((p) => p.groupId === piece.groupId).length;
-      return groupSize === 1;
-    },
-    [],
-  );
+  const canRotatePiece = useCallback((pid: PieceId) => {
+    const mgr = managerRef.current;
+    if (!mgr) return false;
+    const st = mgr.getState();
+    const piece = st.pieces.find((p) => p.id === pid);
+    if (!piece) return false;
+    if (piece.isPlaced || piece.locked || piece.inTray) return false;
+    const groupSize = st.pieces.filter((p) => p.groupId === piece.groupId).length;
+    return groupSize === 1;
+  }, []);
 
   const isPointerOverTray = useCallback(
     (clientX: number, clientY: number) => {
@@ -102,22 +99,34 @@ export function usePointerHandlers(args: {
   }, []);
 
   // Build ctx that uses refs for values that change
-  const getCtx = useCallback(() => ({
-    manager: managerRef.current,
-    boardRef,
-    canvasRef,
-    trayRef,
-    selectedIdRef,
-    setSelectedPieceId,
-    bump,
-    didDragRef,
-    selectCycle: selectCycleRef.current,
-    setState: setStateRef.current,
-    haptic: hapticRef.current,
-    onDragPreview: onDragPreviewRef.current,
-    onPieceInteraction: onPieceInteractionRef.current,
-    clearTouchPending,
-  }), [boardRef, canvasRef, trayRef, selectedIdRef, setSelectedPieceId, bump, didDragRef, clearTouchPending]);
+  const getCtx = useCallback(
+    () => ({
+      manager: managerRef.current,
+      boardRef,
+      canvasRef,
+      trayRef,
+      selectedIdRef,
+      setSelectedPieceId,
+      bump,
+      didDragRef,
+      selectCycle: selectCycleRef.current,
+      setState: setStateRef.current,
+      haptic: hapticRef.current,
+      onDragPreview: onDragPreviewRef.current,
+      onPieceInteraction: onPieceInteractionRef.current,
+      clearTouchPending,
+    }),
+    [
+      boardRef,
+      canvasRef,
+      trayRef,
+      selectedIdRef,
+      setSelectedPieceId,
+      bump,
+      didDragRef,
+      clearTouchPending,
+    ],
+  );
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent<HTMLElement>) => {
@@ -192,18 +201,19 @@ export function usePointerHandlers(args: {
       const isLeftClick = e.button === 0;
       if (isLeftClick || e.button === 2) {
         if (piece) {
-          handleMouseDown(
-            e,
-            getCtx(),
-            pieceId,
-            boardRect,
-            piece,
-            canRotatePiece,
-          );
+          handleMouseDown(e, getCtx(), pieceId, boardRect, piece, canRotatePiece);
         }
       }
     },
-    [boardRef, canvasRef, selectedIdRef, setSelectedPieceId, bump, canRotatePiece, getCtx],
+    [
+      boardRef,
+      canvasRef,
+      selectedIdRef,
+      setSelectedPieceId,
+      bump,
+      canRotatePiece,
+      getCtx,
+    ],
   );
 
   const handlePointerMove = useCallback(
