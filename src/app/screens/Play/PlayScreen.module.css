@@ -332,9 +332,6 @@
     font-size: 11px;
     gap: 4px;
   }
-  .hudPillTimer {
-    display: none;
-  }
   .main {
     padding: 4px;
     gap: 6px;

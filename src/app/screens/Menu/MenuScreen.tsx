@@ -6,6 +6,7 @@ import styles from "./MenuScreen.module.css";
 
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
+import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { WhatsNewModal } from "@/components/WhatsNew";
 import { HelpCircle, Image, Calendar, BarChart3, Sparkles } from "lucide-react";
@@ -24,13 +25,6 @@ export function MenuScreen() {
   useEffect(() => {
     if (shouldShowChangelog()) setShowWhatsNew(true);
   }, []);
-  const hasDaily = SAMPLE_PUZZLES.length > 0;
-
-  const handleDailyPuzzle = () => {
-    clearPuzzleState();
-    startDailyPuzzle();
-    nav("/play");
-  };
 
   const hasDaily = SAMPLE_PUZZLES.length > 0;
 
@@ -43,7 +37,9 @@ export function MenuScreen() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
+        <div className={styles.header}>
+          <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
+        </div>
 
         <div className={styles.actionsGrid}>
           <Button
@@ -85,6 +81,7 @@ export function MenuScreen() {
             <span className={styles.actionLabel}>Stats</span>
           </Button>
 
+          <ThemeToggle variant="card" />
           <Button
             variant="secondary"
             onClick={() => setShowWhatsNew(true)}
