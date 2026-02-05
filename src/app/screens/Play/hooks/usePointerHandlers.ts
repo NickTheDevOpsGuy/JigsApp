@@ -8,7 +8,6 @@ import type { CanvasWithTouch, DragPreviewState } from "./pointerHandlers/types"
 import {
   handleTouchDown,
   handleTouchMove,
-  handleTouchUp,
   resetTouchState,
 } from "./pointerHandlers/touchHandlers";
 import { soundManager } from "@/audio/sounds";
