@@ -24,6 +24,13 @@ export function MenuScreen() {
   useEffect(() => {
     if (shouldShowChangelog()) setShowWhatsNew(true);
   }, []);
+  const hasDaily = SAMPLE_PUZZLES.length > 0;
+
+  const handleDailyPuzzle = () => {
+    clearPuzzleState();
+    startDailyPuzzle();
+    nav("/play");
+  };
 
   const hasDaily = SAMPLE_PUZZLES.length > 0;
 
