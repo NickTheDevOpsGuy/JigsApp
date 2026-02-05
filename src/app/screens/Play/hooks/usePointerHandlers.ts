@@ -2,7 +2,7 @@ import { useCallback, useRef } from "react";
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { PieceId, PuzzleState } from "@/puzzle/types";
+import type { Piece, PieceId, PuzzleState } from "@/puzzle/types";
 import type { HapticKind } from "./useHaptics";
 import type { DragPreviewState } from "./pointerHandlers/types";
 import { soundManager } from "@/audio/sounds";
@@ -78,7 +78,7 @@ export function usePointerHandlers(args: {
   );
 
   const pickPiece = useCallback(
-    (clientX: number, clientY: number): { pieceId: string; piece: any } | null => {
+    (clientX: number, clientY: number): { pieceId: string; piece: Piece } | null => {
       if (!manager || !canvasRef.current || !boardRef.current) return null;
       const canvas = canvasRef.current;
       const boardRect = boardRef.current.getBoundingClientRect();
@@ -277,7 +277,9 @@ export function usePointerHandlers(args: {
         didDragRef.current = false;
         try {
           canvasRef.current.setPointerCapture(e.pointerId);
-        } catch {}
+        } catch {
+          /* ignore releasePointerCapture errors */
+        }
       }
     },
     [
@@ -333,13 +335,15 @@ export function usePointerHandlers(args: {
 
       try {
         canvasRef.current.releasePointerCapture(e.pointerId);
-      } catch {}
+      } catch {
+        /* ignore */
+      }
     },
     [manager, canvasRef, onDragPreview, finishDrag, setState, didDragRef],
   );
 
   const handlePointerCancel = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (_e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager) return;
       onDragPreview?.(null);
       manager.pointerUp();
