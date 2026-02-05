@@ -14,17 +14,8 @@
   box-shadow: var(--shadow-lg);
 }
 
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
 .logo {
-  flex: 1;
-  min-width: 0;
+  margin-bottom: 24px;
 }
 
 .actionsGrid {

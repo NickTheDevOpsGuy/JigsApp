@@ -16,7 +16,7 @@ export default [
   ...tseslint.configs.recommended,
 
   {
-    files: ["**/*.ts", "**/*.tsx"],
+    files: ["**/*.ts"],
 
     languageOptions: {
       ecmaVersion: 2020,

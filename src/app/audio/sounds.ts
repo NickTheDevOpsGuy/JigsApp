@@ -1,22 +1,8 @@
 // src/app/audio/sounds.ts
 // Sound effects using Web Audio API - no external files needed
 // Haptic feedback using Vibration API
-// Theme-specific sound variants
 
 type SoundType = "snap" | "place" | "rotate" | "complete" | "pickup";
-
-type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
-
-function getTheme(): Theme {
-  if (typeof document === "undefined") return "light";
-  const classList = document.documentElement.classList;
-  if (classList.contains("theme-space")) return "space";
-  if (classList.contains("theme-ocean")) return "ocean";
-  if (classList.contains("theme-forest")) return "forest";
-  if (classList.contains("theme-sunset")) return "sunset";
-  if (classList.contains("theme-dark")) return "dark";
-  return "light";
-}
 
 class SoundManager {
   private audioContext: AudioContext | null = null;
@@ -181,344 +167,59 @@ class SoundManager {
   }
 
   private playPickup(ctx: AudioContext) {
-    const theme = getTheme();
-    const t = ctx.currentTime;
-    if (theme === "space") {
-      // Sci-fi blip: soft square wave with quick decay
-      this.playTone(ctx, {
-        freq: 480,
-        type: "square",
-        vol: this.volume * 0.08,
-        duration: 0.06,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 720,
-        type: "square",
-        vol: this.volume * 0.06,
-        duration: 0.05,
-        start: t + 0.02,
-      });
-    } else if (theme === "ocean") {
-      // Bubble pop: bright sine that rises
-      this.playTone(ctx, {
-        freq: 600,
-        type: "sine",
-        vol: this.volume * 0.1,
-        duration: 0.08,
-        start: t,
-        freqRamp: { to: 1200, at: 0.04 },
-      });
-    } else if (theme === "forest") {
-      // Leaf rustle: two soft chirps
-      this.playTone(ctx, {
-        freq: 880,
-        type: "sine",
-        vol: this.volume * 0.1,
-        duration: 0.04,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 1100,
-        type: "sine",
-        vol: this.volume * 0.08,
-        duration: 0.035,
-        start: t + 0.03,
-      });
-    } else if (theme === "sunset") {
-      // Sunset: warm glow, soft triangle with gentle sustain
-      this.playTone(ctx, {
-        freq: 520,
-        type: "triangle",
-        vol: this.volume * 0.12,
-        duration: 0.1,
-      });
-    } else {
-      // Light/dark: default
-      this.playTone(ctx, { freq: 800, vol: this.volume * 0.15, duration: 0.05 });
-    }
+    this.playTone(ctx, { freq: 800, vol: this.volume * 0.15, duration: 0.05 });
   }
 
   private playSnap(ctx: AudioContext) {
-    const theme = getTheme();
-    const t = ctx.currentTime;
-    if (theme === "space") {
-      // Laser lock: crisp square-wave ping
-      this.playTone(ctx, {
-        freq: 660,
-        type: "square",
-        vol: this.volume * 0.25,
-        duration: 0.08,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 1320,
-        type: "square",
-        vol: this.volume * 0.2,
-        duration: 0.1,
-        start: t + 0.02,
-      });
-    } else if (theme === "ocean") {
-      // Water droplet: clean sine pair
-      this.playTone(ctx, {
-        freq: 880,
-        type: "sine",
-        vol: this.volume * 0.32,
-        duration: 0.07,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 1760,
-        type: "sine",
-        vol: this.volume * 0.18,
-        duration: 0.06,
-        start: t + 0.015,
-      });
-    } else if (theme === "forest") {
-      // Twig snap: woody mid-range
-      this.playTone(ctx, {
-        freq: 660,
-        type: "sine",
-        vol: this.volume * 0.35,
-        duration: 0.06,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 990,
-        type: "sine",
-        vol: this.volume * 0.22,
-        duration: 0.08,
-        start: t + 0.02,
-      });
-    } else if (theme === "sunset") {
-      // Sunset: warm click, rounded triangle
-      this.playTone(ctx, {
-        freq: 880,
-        type: "triangle",
-        vol: this.volume * 0.3,
-        duration: 0.09,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 1320,
-        type: "triangle",
-        vol: this.volume * 0.18,
-        duration: 0.07,
-        start: t + 0.02,
-      });
-    } else {
-      // Light/dark: default
-      this.playTone(ctx, { freq: 1200, vol: this.volume * 0.4, duration: 0.1, start: t });
-      this.playTone(ctx, {
-        freq: 1800,
-        vol: this.volume * 0.2,
-        duration: 0.08,
-        start: t + 0.02,
-      });
-    }
+    this.playTone(ctx, { freq: 1200, vol: this.volume * 0.4, duration: 0.1 });
+    this.playTone(ctx, { freq: 1800, vol: this.volume * 0.2, duration: 0.08 });
   }
 
   private playPlace(ctx: AudioContext) {
-    const theme = getTheme();
-    if (theme === "space") {
-      // Deep thunk: magnetic clamp
-      this.playTone(ctx, {
-        freq: 220,
-        type: "square",
-        vol: this.volume * 0.3,
-        duration: 0.2,
-        freqRamp: { to: 80, at: 0.15 },
-      });
-    } else if (theme === "ocean") {
-      // Plop: water settling
-      this.playTone(ctx, {
-        freq: 440,
-        type: "sine",
-        vol: this.volume * 0.4,
-        duration: 0.16,
-        freqRamp: { to: 180, at: 0.12 },
-      });
-    } else if (theme === "forest") {
-      // Soft thud: mossy landing
-      this.playTone(ctx, {
-        freq: 280,
-        type: "sine",
-        vol: this.volume * 0.38,
-        duration: 0.18,
-        freqRamp: { to: 140, at: 0.12 },
-      });
-    } else if (theme === "sunset") {
-      // Sunset: warm settle, cozy drop
-      this.playTone(ctx, {
-        freq: 330,
-        type: "triangle",
-        vol: this.volume * 0.42,
-        duration: 0.17,
-        freqRamp: { to: 165, at: 0.11 },
-      });
-    } else {
-      // Light/dark: default
-      this.playTone(ctx, {
-        freq: 400,
-        type: "triangle",
-        vol: this.volume * 0.5,
-        duration: 0.15,
-        freqRamp: { to: 200, at: 0.1 },
-      });
-    }
+    this.playTone(ctx, {
+      freq: 400,
+      type: "triangle",
+      vol: this.volume * 0.5,
+      duration: 0.15,
+      freqRamp: { to: 200, at: 0.1 },
+    });
   }
 
   private playRotate(ctx: AudioContext) {
-    const theme = getTheme();
-    if (theme === "space") {
-      // Servo whir: ascending square
-      this.playTone(ctx, {
-        freq: 200,
-        type: "square",
-        vol: this.volume * 0.12,
-        duration: 0.1,
-        freqRamp: { to: 500, at: 0.08 },
-      });
-    } else if (theme === "ocean") {
-      // Swirl: quick sine sweep
-      this.playTone(ctx, {
-        freq: 400,
-        type: "sine",
-        vol: this.volume * 0.15,
-        duration: 0.08,
-        freqRamp: { to: 800, at: 0.06 },
-      });
-    } else if (theme === "forest") {
-      // Branch creak: low-to-mid
-      this.playTone(ctx, {
-        freq: 220,
-        type: "sine",
-        vol: this.volume * 0.16,
-        duration: 0.09,
-        freqRamp: { to: 440, at: 0.07 },
-      });
-    } else if (theme === "sunset") {
-      // Sunset: gentle turn, warm triangle sweep
-      this.playTone(ctx, {
-        freq: 260,
-        type: "triangle",
-        vol: this.volume * 0.18,
-        duration: 0.1,
-        freqRamp: { to: 520, at: 0.08 },
-      });
-    } else {
-      // Light/dark: default
-      this.playTone(ctx, {
-        freq: 300,
-        vol: this.volume * 0.2,
-        duration: 0.1,
-        freqRamp: { to: 600, at: 0.1 },
-      });
-    }
+    this.playTone(ctx, {
+      freq: 300,
+      vol: this.volume * 0.2,
+      duration: 0.1,
+      freqRamp: { to: 600, at: 0.1 },
+    });
   }
 
   private playComplete(ctx: AudioContext) {
-    const theme = getTheme();
-    if (theme === "space") {
-      // Sci-fi victory: minor arpeggio, square wave
-      const notes = [349.23, 415.3, 523.25, 698.46]; // F4, G#4, C5, F5
-      const step = 0.2;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "square";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.22, start + 0.02);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.15);
-        osc.start(start);
-        osc.stop(start + step + 0.15);
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+    const step = 0.15;
+    notes.forEach((freq, i) => {
+      const start = ctx.currentTime + i * step;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = "sine";
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(this.volume * 0.4, start + 0.02);
+      gain.gain.exponentialDecayTo(0.001, start + step + 0.1);
+      osc.start(start);
+      osc.stop(start + step + 0.1);
+    });
+    const chordTime = ctx.currentTime + notes.length * step;
+    [523.25, 659.25, 783.99].forEach((freq) => {
+      this.playTone(ctx, {
+        freq,
+        vol: this.volume * 0.3,
+        duration: 0.5,
+        start: chordTime,
       });
-    } else if (theme === "ocean") {
-      // Wave crest: bright major arpeggio
-      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
-      const step = 0.16;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "sine";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.4, start + 0.025);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.12);
-        osc.start(start);
-        osc.stop(start + step + 0.12);
-      });
-    } else if (theme === "forest") {
-      // Birdsong finish: natural major
-      const notes = [392, 523.25, 659.25, 1046.5]; // G4, C5, E5, C6
-      const step = 0.18;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "sine";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.36, start + 0.03);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.14);
-        osc.start(start);
-        osc.stop(start + step + 0.14);
-      });
-    } else if (theme === "sunset") {
-      // Sunset: golden hour, warm triangle chord
-      const notes = [392, 493.88, 587.33, 783.99]; // G4, B4, D5, G5
-      const step = 0.17;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "triangle";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.38, start + 0.025);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.12);
-        osc.start(start);
-        osc.stop(start + step + 0.12);
-      });
-    } else {
-      // Light/dark: default celebration
-      const notes = [523.25, 659.25, 783.99, 1046.5];
-      const step = 0.15;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "sine";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.4, start + 0.02);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.1);
-        osc.start(start);
-        osc.stop(start + step + 0.1);
-      });
-      const chordTime = ctx.currentTime + notes.length * step;
-      [523.25, 659.25, 783.99].forEach((freq) => {
-        this.playTone(ctx, {
-          freq,
-          vol: this.volume * 0.3,
-          duration: 0.5,
-          start: chordTime,
-        });
-      });
-    }
+    });
   }
 }
 

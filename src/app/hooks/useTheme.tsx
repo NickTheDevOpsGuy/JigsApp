@@ -1,30 +1,11 @@
 // src/app/hooks/useTheme.tsx
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useState,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-export type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
-
-export const THEMES: Theme[] = ["light", "dark", "space", "ocean", "forest", "sunset"];
-
-export const THEME_LABELS: Record<Theme, string> = {
-  light: "Light",
-  dark: "Dark",
-  space: "Space",
-  ocean: "Ocean",
-  forest: "Forest",
-  sunset: "Sunset",
-};
+type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
-  cycleTheme: () => void;
+  toggleTheme: () => void;
   isDark: boolean;
 }
 
@@ -32,61 +13,34 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const STORAGE_KEY = "phuzzle-theme";
 
-function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "light";
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && THEMES.includes(stored as Theme)) return stored as Theme;
-  } catch {
-    // localStorage might not be available
-  }
-  return "light";
-}
-
-function applyThemeClass(theme: Theme) {
-  if (typeof document === "undefined") return;
-  // Remove all theme classes first
-  THEMES.forEach((t) => {
-    document.documentElement.classList.remove(`theme-${t}`);
-  });
-  // Add the current theme class
-  document.documentElement.classList.add(`theme-${theme}`);
-  console.log("[Theme] Applied:", theme, "Classes:", document.documentElement.className);
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getStoredTheme);
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Check localStorage first
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === "light" || stored === "dark") return stored;
 
-  // Apply theme immediately (before paint) and persist
-  useLayoutEffect(() => {
-    applyThemeClass(theme);
-  }, [theme]);
+    // Check system preference
+    if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
+      return "dark";
+    }
+
+    return "light";
+  });
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, theme);
-    } catch {
-      // localStorage might not be available
-    }
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEY, theme);
+
+    // Apply to document
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  const setTheme = (t: Theme) => setThemeState(t);
-  const cycleTheme = () => {
-    setThemeState((currentTheme) => {
-      const i = THEMES.indexOf(currentTheme);
-      return THEMES[(i + 1) % THEMES.length];
-    });
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
   return (
-    <ThemeContext.Provider
-      value={{
-        theme,
-        setTheme,
-        cycleTheme,
-        isDark: ["dark", "space", "ocean", "forest", "sunset"].includes(theme),
-      }}
-    >
+    <ThemeContext.Provider value={{ theme, toggleTheme, isDark: theme === "dark" }}>
       {children}
     </ThemeContext.Provider>
   );
