@@ -165,6 +165,7 @@ export function PlayScreen() {
 
   const haptics = useHaptics();
   const didDragRef = React.useRef(false);
+  const overlayRef = React.useRef<HTMLDivElement>(null);
   const [dragPreview, setDragPreview] = React.useState<{
     clientX: number;
     clientY: number;
@@ -175,9 +176,6 @@ export function PlayScreen() {
 
   const {
     handlePointerDown,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
     handlePointerMove,
     handlePointerUp,
     handlePointerCancel,
@@ -188,6 +186,7 @@ export function PlayScreen() {
     canvasRef,
     boardRef,
     trayRef,
+    overlayRef,
     setState,
     selectCycle,
     setSelectedPieceId,
@@ -341,11 +340,8 @@ export function PlayScreen() {
         <div className={styles.board} ref={boardRef}>
           <canvas className={styles.canvas} ref={canvasRef} />
           <div
+            ref={overlayRef}
             className={styles.touchOverlay}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onTouchCancel={handleTouchEnd}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}

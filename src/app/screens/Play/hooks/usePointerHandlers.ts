@@ -1,6 +1,6 @@
 // src/app/screens/Play/hooks/usePointerHandlers.ts
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
@@ -16,6 +16,7 @@ export function usePointerHandlers(args: {
   boardRef: React.RefObject<HTMLDivElement | null>;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   trayRef: React.RefObject<HTMLDivElement | null>;
+  overlayRef: React.RefObject<HTMLDivElement | null>;
   selectedIdRef: React.MutableRefObject<PieceId | null>;
   setSelectedPieceId: (id: PieceId | null) => void;
   bump: () => void;
@@ -31,6 +32,7 @@ export function usePointerHandlers(args: {
     boardRef,
     canvasRef,
     trayRef,
+    overlayRef,
     selectedIdRef,
     setSelectedPieceId,
     bump,
@@ -367,6 +369,47 @@ export function usePointerHandlers(args: {
     e.preventDefault();
   }, []);
 
+  // iOS Safari uses passive touch listeners by default, so preventDefault() is ignored.
+  // Attach native listeners with passive: false so touch handling works on iPhone.
+  const touchHandlersRef = useRef({
+    touchStart: handleTouchStart,
+    touchMove: handleTouchMove,
+    touchEnd: handleTouchEnd,
+  });
+  touchHandlersRef.current = {
+    touchStart: handleTouchStart,
+    touchMove: handleTouchMove,
+    touchEnd: handleTouchEnd,
+  };
+
+  useEffect(() => {
+    const el = overlayRef.current;
+    if (!el) return;
+
+    const opts: AddEventListenerOptions = { passive: false };
+    const onTouchStart = (e: Event) => {
+      touchHandlersRef.current.touchStart(e as unknown as React.TouchEvent<HTMLElement>);
+    };
+    const onTouchMove = (e: Event) => {
+      touchHandlersRef.current.touchMove(e as unknown as React.TouchEvent<HTMLElement>);
+    };
+    const onTouchEnd = (e: Event) => {
+      touchHandlersRef.current.touchEnd(e as unknown as React.TouchEvent<HTMLElement>);
+    };
+
+    el.addEventListener("touchstart", onTouchStart, opts);
+    el.addEventListener("touchmove", onTouchMove, opts);
+    el.addEventListener("touchend", onTouchEnd, opts);
+    el.addEventListener("touchcancel", onTouchEnd, opts);
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart, opts);
+      el.removeEventListener("touchmove", onTouchMove, opts);
+      el.removeEventListener("touchend", onTouchEnd, opts);
+      el.removeEventListener("touchcancel", onTouchEnd, opts);
+    };
+  }, [overlayRef]);
+
   return {
     handlePointerDown,
     handlePointerMove,
@@ -374,8 +417,5 @@ export function usePointerHandlers(args: {
     handlePointerCancel,
     handleLostPointerCapture: handlePointerCancel,
     handleContextMenu,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
   };
 }
