@@ -353,7 +353,16 @@ export function PlayScreen() {
           onLostPointerCapture={handleLostPointerCapture}
           onContextMenu={handleContextMenu}
         >
-          <canvas className={styles.canvas} ref={canvasRef} />
+          <canvas
+            className={styles.canvas}
+            ref={canvasRef}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
+            onLostPointerCapture={handleLostPointerCapture}
+            onContextMenu={handleContextMenu}
+          />
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>
               <img
