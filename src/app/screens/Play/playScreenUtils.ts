@@ -36,38 +36,41 @@ export function computeTileSize(
   let maxTile: number;
 
   if (isSmallPhone) {
+    // Small phones still need reasonably large tiles for low piece counts.
     if (pieceCount <= 9) {
-      minTile = 12;
-      maxTile = 16;
+      minTile = 40;
+      maxTile = 110;
     } else if (pieceCount <= 16) {
-      minTile = 12;
-      maxTile = 16;
+      minTile = 32;
+      maxTile = 90;
     } else if (pieceCount <= 25) {
-      minTile = 10;
-      maxTile = 14;
-    } else if (pieceCount <= 35) {
-      minTile = 10;
-      maxTile = 12;
+      minTile = 26;
+      maxTile = 72;
+    } else if (pieceCount <= 36) {
+      minTile = 22;
+      maxTile = 60;
     } else {
-      minTile = 8;
-      maxTile = 12;
+      minTile = 18;
+      maxTile = 48;
     }
   } else if (isMobile) {
+    // Mobile: let the available board space drive sizing.
+    // The previous caps (20px-ish) made pieces comically tiny on phones.
     if (pieceCount <= 9) {
-      minTile = 14;
-      maxTile = 20;
+      minTile = 48;
+      maxTile = 140;
     } else if (pieceCount <= 16) {
-      minTile = 16;
-      maxTile = 22;
+      minTile = 36;
+      maxTile = 110;
     } else if (pieceCount <= 25) {
-      minTile = 14;
-      maxTile = 18;
-    } else if (pieceCount <= 35) {
-      minTile = 12;
-      maxTile = 16;
+      minTile = 30;
+      maxTile = 90;
+    } else if (pieceCount <= 36) {
+      minTile = 24;
+      maxTile = 75;
     } else {
-      minTile = 10;
-      maxTile = 14;
+      minTile = 20;
+      maxTile = 60;
     }
   } else {
     if (pieceCount <= 9) {
@@ -79,7 +82,7 @@ export function computeTileSize(
     } else if (pieceCount <= 25) {
       minTile = 45;
       maxTile = 90;
-    } else if (pieceCount <= 35) {
+    } else if (pieceCount <= 36) {
       minTile = 35;
       maxTile = 65;
     } else {

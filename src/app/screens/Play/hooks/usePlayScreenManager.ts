@@ -55,28 +55,10 @@ export function usePlayScreenManager(
       const availW = Math.max(0, Math.floor(rect.width) - padding);
       const availH = Math.max(0, Math.floor(rect.height) - padding);
 
-      // Base size from existing helper
-      const basePieceSize = computeTileSize(availW, availH, grid, viewportW);
-
-      // Mobile cap by difficulty so higher grids shrink naturally
-      const pieceCount = grid.rows * grid.cols;
-      const mobileMax =
-        pieceCount >= 36
-          ? 14 // 6x6+
-          : pieceCount >= 26
-            ? 16 // 5x5–5x7, 7x5 (35 pieces)
-            : pieceCount >= 17
-              ? 18 // 4x4, 5x5
-              : pieceCount >= 10
-                ? 20 // 4x4
-                : 18; // 3x3 (9 pieces)
-
-      const smallPhoneMax =
-        pieceCount >= 36 ? 12 : pieceCount >= 26 ? 12 : pieceCount >= 17 ? 14 : 16;
-      const effectiveMobileMax = isSmallPhone ? smallPhoneMax : mobileMax;
-      const pieceSize = isMobile
-        ? Math.min(basePieceSize, effectiveMobileMax)
-        : basePieceSize;
+      // Compute a square tile size that fits the available space.
+      // Do not artificially cap on mobile: the board size is derived from this value,
+      // and overly-small caps create a huge empty board with tiny pieces.
+      const pieceSize = computeTileSize(availW, availH, grid, viewportW);
 
       const minBoardW = grid.cols * pieceSize;
       const minBoardH = grid.rows * pieceSize;
