@@ -49,11 +49,28 @@ export function usePlayScreenManager(
       const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
       const isMobile = viewportW < 600;
 
-      const minAvail = isMobile ? 260 : 400;
-      const availW = Math.max(minAvail, Math.floor(rect.width) - 24);
-      const availH = Math.max(minAvail, Math.floor(rect.height) - 24);
+      // Use real available space. Do not force a minimum on mobile.
+      const padding = isMobile ? 12 : 24;
+      const availW = Math.max(0, Math.floor(rect.width) - padding);
+      const availH = Math.max(0, Math.floor(rect.height) - padding);
 
-      const pieceSize = computeTileSize(availW, availH, grid, viewportW);
+      // Base size from existing helper
+      const basePieceSize = computeTileSize(availW, availH, grid, viewportW);
+
+      // Mobile cap by difficulty so higher grids shrink naturally
+      const pieceCount = grid.rows * grid.cols;
+      const mobileMax =
+        pieceCount >= 36
+          ? 14 // 6x6+
+          : pieceCount >= 26
+            ? 16 // 5x5–5x7, 7x5 (35 pieces)
+            : pieceCount >= 17
+              ? 18 // 4x4, 5x5
+              : pieceCount >= 10
+                ? 20 // 4x4
+                : 18; // 3x3 (9 pieces)
+
+      const pieceSize = isMobile ? Math.min(basePieceSize, mobileMax) : basePieceSize;
 
       const minBoardW = grid.cols * pieceSize;
       const minBoardH = grid.rows * pieceSize;
