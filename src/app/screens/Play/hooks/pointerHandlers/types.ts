@@ -11,7 +11,15 @@ export type CanvasWithTouch = HTMLCanvasElement & {
   pendingPieceRect?: DOMRect | null;
 };
 
-export const TAP_DRAG_THRESHOLD_PX = 6;
+/**
+ * iOS Safari has a bit of finger jitter even on a "tap".
+ * If this threshold is too low, taps get interpreted as drags,
+ * which prevents tap-to-rotate from ever firing.
+ *
+ * 12px is a good default for phones. If taps still turn into drags,
+ * try 14–16.
+ */
+export const TAP_DRAG_THRESHOLD_PX = 12;
 
 export type DragPreviewState = {
   clientX: number;
