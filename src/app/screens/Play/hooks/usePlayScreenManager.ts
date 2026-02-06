@@ -1,22 +1,12 @@
 import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { PuzzleState } from "@/puzzle/types";
+import type { Piece, PuzzleState } from "@/puzzle/types";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
-import { STORAGE_KEY } from "../playScreenUtils";
+import { STORAGE_KEY, computeTileSize } from "../playScreenUtils";
 import type { TimeMode } from "../timeMode";
-
-/**
- * Mobile-first tile sizing.
- * These values are intentionally large for touch accuracy.
- */
-function getTileSize(viewportWidth: number) {
-  if (viewportWidth <= 390) return 88; // iPhone SE / Mini
-  if (viewportWidth <= 430) return 96; // iPhone Pro / Max
-  if (viewportWidth <= 768) return 104; // tablets
-  return 90; // desktop default
-}
+import type { SnapFromMap } from "@/puzzle/canvas/renderBoard";
 
 export function usePlayScreenManager(
   grid: { rows: number; cols: number },
@@ -31,15 +21,22 @@ export function usePlayScreenManager(
   const mainRef = useRef<HTMLDivElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
+  // Pop animation timestamps (piece placed)
+  const popMapRef = useRef<Map<string, number>>(new Map());
+
+  // Snap-from animation cache used by renderBoard()
+  const snapFromMapRef = useRef<SnapFromMap>(new Map());
+
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   useEffect(() => {
+    const mainEl = mainRef.current;
     const boardEl = boardRef.current;
-    if (!boardEl) return;
+    if (!mainEl || !boardEl) return;
 
-    const imageUrl = localStorage.getItem(STORAGE_KEY);
+    const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
     if (!imageUrl) return;
 
     const img = new Image();
@@ -48,15 +45,30 @@ export function usePlayScreenManager(
     img.onload = () => {
       imgRef.current = img;
 
-      const viewportWidth = window.innerWidth;
-      const tileSize = getTileSize(viewportWidth);
+      const rect = mainEl.getBoundingClientRect();
+      const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
+      const isMobile = viewportW < 600;
 
-      // 🔒 Board size is derived ONLY from tile size
-      const boardWidth = grid.cols * tileSize;
-      const boardHeight = grid.rows * tileSize;
+      const minAvail = isMobile ? 260 : 400;
+      const availW = Math.max(minAvail, Math.floor(rect.width) - 24);
+      const availH = Math.max(minAvail, Math.floor(rect.height) - 24);
 
-      boardEl.style.width = `${boardWidth}px`;
-      boardEl.style.height = `${boardHeight}px`;
+      const pieceSize = computeTileSize(availW, availH, grid, viewportW);
+
+      const minBoardW = grid.cols * pieceSize;
+      const minBoardH = grid.rows * pieceSize;
+
+      const fillRatio = isMobile ? 0.95 : 0.88;
+      let boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
+      let boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
+
+      if (isMobile) {
+        boardW = Math.min(boardW, Math.max(minBoardW, Math.floor(rect.width) - 16));
+        boardH = Math.min(boardH, Math.max(minBoardH, Math.floor(rect.height) - 16));
+      }
+
+      boardEl.style.width = `${boardW}px`;
+      boardEl.style.height = `${boardH}px`;
 
       const savedState = loadPuzzleState();
       const hasSavedGame =
@@ -65,35 +77,60 @@ export function usePlayScreenManager(
         savedState.grid.rows === grid.rows &&
         savedState.grid.cols === grid.cols;
 
-      setElapsedSeconds(
-        hasSavedGame
-          ? savedState.elapsedSeconds
-          : timeMode === "countdown"
-            ? countdownMinutes * 60
-            : 0,
-      );
+      if (hasSavedGame && savedState) {
+        setElapsedSeconds(savedState.elapsedSeconds);
+      } else {
+        const isCountdown = timeMode === "countdown";
+        setElapsedSeconds(isCountdown ? countdownMinutes * 60 : 0);
+      }
+
+      // Reset animation caches when creating a new manager
+      popMapRef.current.clear();
+      snapFromMapRef.current.clear();
 
       const next = new PuzzleManager(
         {
           imageUrl,
-          boardWidth,
-          boardHeight,
+          boardWidth: boardW,
+          boardHeight: boardH,
           grid,
-          pieceWidth: tileSize,
-          pieceHeight: tileSize,
+          pieceWidth: pieceSize,
+          pieceHeight: pieceSize,
         },
         {
-          onPiecePlaced: () => {
+          onPiecePlaced: (piece) => {
             lastInteractionRef.current = performance.now();
+            popMapRef.current.set(piece.id, performance.now());
             soundManager.play("place");
           },
+
+          // Capture "from" positions BEFORE the snap occurs (for smooth snap animation)
+          onBeforeSnap: (pieces: Piece[]) => {
+            const now = performance.now();
+            for (const p of pieces) {
+              snapFromMapRef.current.set(p.id, {
+                fromX: p.x,
+                fromY: p.y,
+                startMs: now,
+              });
+            }
+          },
+
           onPieceSnapped: () => {
             lastInteractionRef.current = performance.now();
             soundManager.play("snap");
           },
+
           onPuzzleComplete: () => {
             clearPuzzleState();
             soundManager.play("complete");
+            import("canvas-confetti").then((confetti) => {
+              confetti.default({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+              });
+            });
           },
         },
       );
@@ -112,6 +149,22 @@ export function usePlayScreenManager(
     manager?.setPieceLockingEnabled(pieceLockingEnabled);
   }, [manager, pieceLockingEnabled]);
 
+  useEffect(() => {
+    const boardEl = boardRef.current;
+    if (!boardEl || !manager) return;
+
+    const ro = new ResizeObserver(() => {
+      const rect = boardEl.getBoundingClientRect();
+      const w = Math.max(320, Math.floor(rect.width));
+      const h = Math.max(240, Math.floor(rect.height));
+      manager.setBoardSize(w, h);
+      setState(manager.getState());
+    });
+
+    ro.observe(boardEl);
+    return () => ro.disconnect();
+  }, [manager]);
+
   return {
     manager,
     state,
@@ -123,5 +176,7 @@ export function usePlayScreenManager(
     trayRef,
     mainRef,
     imgRef,
+    popMapRef,
+    snapFromMapRef,
   };
 }
