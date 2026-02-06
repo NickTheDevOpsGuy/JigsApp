@@ -102,15 +102,15 @@ export function usePointerHandlers(args: {
       if (!manager || !canvasRef.current || !boardRef.current) return;
 
       const canvas = canvasRef.current as CanvasWithTouch;
-      const boardRect = boardRef.current.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
       const ctx2d = canvas.getContext("2d");
       if (!ctx2d) return;
 
       const dpr = window.devicePixelRatio || 1;
       ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const cssX = e.clientX - boardRect.left;
-      const cssY = e.clientY - boardRect.top;
+      const cssX = e.clientX - canvasRect.left;
+      const cssY = e.clientY - canvasRect.top;
 
       const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
@@ -127,11 +127,11 @@ export function usePointerHandlers(args: {
       if (e.pointerType === "touch") {
         e.preventDefault();
         touchPendingRef.current = true;
-        handleTouchDown(e, ctx, pieceId, boardRect, piece);
+        handleTouchDown(e, ctx, pieceId, canvasRect, piece);
         return;
       }
 
-      handleMouseDown(e, ctx, pieceId, boardRect, piece, canRotatePiece);
+      handleMouseDown(e, ctx, pieceId, canvasRect, piece, canRotatePiece);
     },
     [manager, boardRef, canvasRef, bump, canRotatePiece],
   );

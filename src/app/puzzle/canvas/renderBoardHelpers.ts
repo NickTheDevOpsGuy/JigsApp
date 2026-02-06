@@ -38,7 +38,7 @@ export function interpolateSnapPosition(
   from: number,
   to: number,
   elapsedMs: number,
-  durationMs: number = 220,
+  durationMs: number = 280,
 ): number {
   if (elapsedMs >= durationMs) return to;
   const k = Math.min(1, elapsedMs / durationMs);

@@ -95,8 +95,7 @@ export function handleTouchUp(
   canRotatePiece: (pid: string) => boolean,
   isPointerOverTray: (x: number, y: number) => boolean,
 ): void {
-  const { manager, boardRef, canvasRef, setState, haptic, selectCycle, onDragPreview } =
-    ctx;
+  const { manager, canvasRef, setState, haptic, selectCycle, onDragPreview } = ctx;
   if (!manager || !canvasRef.current) return;
 
   const canvas = canvasRef.current as CanvasWithTouch;
@@ -110,13 +109,13 @@ export function handleTouchUp(
   const isTap = duration < 180 && dist < 14 && manager.getDragState().activeId == null;
 
   if (isTap) {
-    const boardRect = boardRef.current?.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
     const ctx2d = canvas.getContext("2d");
-    if (boardRect && ctx2d) {
+    if (ctx2d) {
       const dpr = window.devicePixelRatio || 1;
       ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const x = e.clientX - boardRect.left;
-      const y = e.clientY - boardRect.top;
+      const x = e.clientX - canvasRect.left;
+      const y = e.clientY - canvasRect.top;
       const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
       const pid = pickPieceId(ctx2d, boardPieces, x, y);

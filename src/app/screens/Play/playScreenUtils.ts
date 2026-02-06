@@ -36,58 +36,58 @@ export function computeTileSize(
   let maxTile: number;
 
   if (isSmallPhone) {
-    // Small phones still need reasonably large tiles for low piece counts.
+    // Small phones: larger tiles for better touch targets
     if (pieceCount <= 9) {
-      minTile = 40;
-      maxTile = 110;
+      minTile = 52;
+      maxTile = 120;
     } else if (pieceCount <= 16) {
-      minTile = 32;
-      maxTile = 90;
+      minTile = 42;
+      maxTile = 100;
     } else if (pieceCount <= 25) {
-      minTile = 26;
-      maxTile = 72;
+      minTile = 34;
+      maxTile = 82;
     } else if (pieceCount <= 36) {
-      minTile = 22;
-      maxTile = 60;
+      minTile = 28;
+      maxTile = 68;
     } else {
-      minTile = 18;
-      maxTile = 48;
+      minTile = 24;
+      maxTile = 54;
     }
   } else if (isMobile) {
-    // Mobile: let the available board space drive sizing.
-    // The previous caps (20px-ish) made pieces comically tiny on phones.
+    // Mobile: generous sizing for touch
     if (pieceCount <= 9) {
-      minTile = 48;
-      maxTile = 140;
+      minTile = 60;
+      maxTile = 150;
     } else if (pieceCount <= 16) {
-      minTile = 36;
-      maxTile = 110;
+      minTile = 48;
+      maxTile = 120;
     } else if (pieceCount <= 25) {
-      minTile = 30;
-      maxTile = 90;
+      minTile = 40;
+      maxTile = 100;
     } else if (pieceCount <= 36) {
-      minTile = 24;
-      maxTile = 75;
+      minTile = 32;
+      maxTile = 85;
     } else {
-      minTile = 20;
-      maxTile = 60;
+      minTile = 26;
+      maxTile = 68;
     }
   } else {
+    // Desktop: larger pieces for comfortable play
     if (pieceCount <= 9) {
-      minTile = 50;
-      maxTile = 100;
+      minTile = 65;
+      maxTile = 120;
     } else if (pieceCount <= 16) {
-      minTile = 55;
-      maxTile = 110;
+      minTile = 65;
+      maxTile = 125;
     } else if (pieceCount <= 25) {
-      minTile = 45;
-      maxTile = 90;
+      minTile = 52;
+      maxTile = 100;
     } else if (pieceCount <= 36) {
-      minTile = 35;
-      maxTile = 65;
+      minTile = 42;
+      maxTile = 78;
     } else {
-      minTile = 30;
-      maxTile = 55;
+      minTile = 36;
+      maxTile = 62;
     }
   }
 
