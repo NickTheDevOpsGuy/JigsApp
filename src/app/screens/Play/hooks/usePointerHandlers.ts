@@ -344,6 +344,106 @@ export function usePointerHandlers(args: {
     e.preventDefault();
   }, []);
 
+  // Native touch handlers for iOS/iPad fallback
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLElement>) => {
+      if (!manager || !canvasRef.current || !boardRef.current) return;
+      if (e.touches.length === 0) return;
+
+      const touch = e.touches[0];
+      const picked = pickPiece(touch.clientX, touch.clientY);
+      if (!picked) return;
+
+      const { pieceId, piece, rect } = picked;
+
+      e.preventDefault();
+
+      selectedIdRef.current = pieceId;
+      setSelectedPieceId(pieceId);
+      bump();
+      onPieceInteraction?.();
+
+      touchRef.current = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        pieceId,
+        pieceRect: new DOMRect(
+          rect.left + piece.x,
+          rect.top + piece.y,
+          piece.w,
+          piece.h,
+        ),
+        isDragging: false,
+      };
+      didDragRef.current = false;
+    },
+    [manager, canvasRef, boardRef, pickPiece, selectedIdRef, setSelectedPieceId, bump, onPieceInteraction, didDragRef],
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLElement>) => {
+      if (!manager || !boardRef.current) return;
+      const touch = touchRef.current;
+      if (!touch) return;
+      if (e.touches.length === 0) return;
+
+      const t = e.touches[0];
+      const dist = Math.hypot(t.clientX - touch.startX, t.clientY - touch.startY);
+
+      if (!touch.isDragging && dist >= TAP_THRESHOLD) {
+        touch.isDragging = true;
+        didDragRef.current = true;
+        manager.pointerDown(touch.pieceId, touch.startX, touch.startY, touch.pieceRect);
+        soundManager.play("pickup");
+      }
+
+      if (touch.isDragging) {
+        e.preventDefault();
+        const boardRect = boardRef.current.getBoundingClientRect();
+        manager.pointerMove(t.clientX, t.clientY, boardRect);
+        onPieceInteraction?.();
+
+        const activeId = manager.getDragState().activeId;
+        if (activeId && onDragPreview) {
+          const st = manager.getState();
+          const p = st.pieces.find((pc) => pc.id === activeId);
+          const groupSize = p ? st.pieces.filter((pc) => pc.groupId === p.groupId).length : 0;
+          if (groupSize === 1) {
+            onDragPreview({ clientX: t.clientX, clientY: t.clientY, pieceId: activeId });
+          }
+        }
+      }
+    },
+    [manager, boardRef, didDragRef, onPieceInteraction, onDragPreview],
+  );
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent<HTMLElement>) => {
+      if (!manager) return;
+      const touch = touchRef.current;
+      touchRef.current = null;
+      if (!touch) return;
+
+      const t = e.changedTouches[0];
+      if (!t) return;
+
+      onDragPreview?.(null);
+
+      if (touch.isDragging) {
+        finishDrag(t.clientX, t.clientY);
+        setState(manager.getState());
+      } else {
+        if (canRotate(touch.pieceId)) {
+          manager.rotatePiece(touch.pieceId);
+          soundManager.play("rotate");
+          haptic?.("rotate");
+          setState(manager.getState());
+        }
+      }
+    },
+    [manager, onDragPreview, finishDrag, setState, canRotate, haptic],
+  );
+
   return {
     handlePointerDown,
     handlePointerMove,
@@ -351,5 +451,9 @@ export function usePointerHandlers(args: {
     handlePointerCancel,
     handleLostPointerCapture: handlePointerCancel,
     handleContextMenu,
+    // Native touch for iOS/iPad
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
   };
 }
