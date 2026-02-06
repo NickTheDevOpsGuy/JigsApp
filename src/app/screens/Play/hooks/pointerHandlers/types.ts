@@ -6,29 +6,26 @@ import type { HapticKind } from "../useHaptics";
 export type CanvasWithTouch = HTMLCanvasElement & {
   touchStartX?: number;
   touchStartY?: number;
+  touchStartTime?: number; // needed for iOS tap vs drag
   touchDragStarted?: boolean;
   pendingPieceId?: PieceId | null;
   pendingPieceRect?: DOMRect | null;
 };
 
-/**
- * iOS Safari has a bit of finger jitter even on a "tap".
- * If this threshold is too low, taps get interpreted as drags,
- * which prevents tap-to-rotate from ever firing.
- *
- * 12px is a good default for phones. If taps still turn into drags,
- * try 14–16.
- */
-export const TAP_DRAG_THRESHOLD_PX = 12;
+export type DragPreviewState =
+  | {
+      clientX: number;
+      clientY: number;
+      pieceId: PieceId;
+    }
+  | null;
 
-export type DragPreviewState = {
-  clientX: number;
-  clientY: number;
-  pieceId: PieceId;
-} | null;
+// iOS tap jitter threshold
+export const TAP_DRAG_THRESHOLD_PX = 12;
 
 export type PointerHandlersContext = {
   manager: PuzzleManager | null;
+  managerRef: React.MutableRefObject<PuzzleManager | null>;
   boardRef: React.RefObject<HTMLDivElement | null>;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   trayRef: React.RefObject<HTMLDivElement | null>;
