@@ -21,7 +21,6 @@ import { useTimeModeConfig } from "./hooks/useTimeModeConfig";
 import { useShareResults } from "./hooks/useShareResults";
 import { useDownloadImage } from "./hooks/useDownloadImage";
 import { usePointerHandlers } from "./hooks/usePointerHandlers";
-import { useTouchHandlers } from "./hooks/useTouchHandlers";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import {
@@ -175,24 +174,6 @@ export function PlayScreen() {
   const dragPreviewPieceIdRef = React.useRef<string | null>(null);
   dragPreviewPieceIdRef.current = dragPreview?.pieceId ?? null;
 
-  const { activeTouchIdRef } = useTouchHandlers({
-    manager,
-    boardRef,
-    canvasRef,
-    trayRef,
-    setSelectedPieceId,
-    selectedIdRef,
-    bump,
-    didDragRef,
-    setState,
-    selectCycle,
-    haptic: haptics.vibrate,
-    onDragPreview: setDragPreview,
-    onPieceInteraction: () => {
-      lastInteractionRef.current = performance.now();
-    },
-  });
-
   const {
     handlePointerDown,
     handlePointerMove,
@@ -216,7 +197,6 @@ export function PlayScreen() {
     onPieceInteraction: () => {
       lastInteractionRef.current = performance.now();
     },
-    touchHandledByNativeRef: activeTouchIdRef,
   });
 
   usePlayScreenAnimation({

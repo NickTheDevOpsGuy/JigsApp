@@ -13,6 +13,8 @@ export function parseGrid(stored: string | null): { rows: number; cols: number }
 }
 
 const MOBILE_BREAKPOINT = 600;
+/** Small phones: iPhone SE, 12/13 mini, etc. (~320–380px width) */
+const SMALL_PHONE_BREAKPOINT = 380;
 
 export function computeTileSize(
   availW: number,
@@ -25,14 +27,34 @@ export function computeTileSize(
   const tileFromH = availH / grid.rows;
   const tile = Math.floor(Math.min(tileFromW, tileFromH));
 
+  const isSmallPhone = viewportWidth < SMALL_PHONE_BREAKPOINT;
   const isMobile = viewportWidth < MOBILE_BREAKPOINT;
   const pieceCount = grid.rows * grid.cols;
 
-  // Mobile: smaller pieces so puzzle fits on screen; desktop: larger for easier play
+  // Small phone: tightest sizing for iPhone SE etc.; mobile: standard; desktop: larger
   let minTile: number;
   let maxTile: number;
 
-  if (isMobile) {
+  if (isSmallPhone) {
+    // Small phones: larger tiles for better touch targets
+    if (pieceCount <= 9) {
+      minTile = 52;
+      maxTile = 120;
+    } else if (pieceCount <= 16) {
+      minTile = 42;
+      maxTile = 100;
+    } else if (pieceCount <= 25) {
+      minTile = 34;
+      maxTile = 82;
+    } else if (pieceCount <= 36) {
+      minTile = 28;
+      maxTile = 68;
+    } else {
+      minTile = 24;
+      maxTile = 54;
+    }
+  } else if (isMobile) {
+    // Mobile: generous sizing for touch
     if (pieceCount <= 9) {
       minTile = 60;
       maxTile = 150;
