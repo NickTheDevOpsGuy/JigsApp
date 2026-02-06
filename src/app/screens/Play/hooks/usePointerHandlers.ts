@@ -142,21 +142,14 @@ export function usePointerHandlers(args: {
           startX: e.clientX,
           startY: e.clientY,
           pieceId,
-          pieceRect: new DOMRect(
-            rect.left + piece.x,
-            rect.top + piece.y,
-            piece.w,
-            piece.h,
-          ),
+          pieceRect: new DOMRect(rect.left + piece.x, rect.top + piece.y, piece.w, piece.h),
           isDragging: false,
         };
         didDragRef.current = false;
 
         try {
           (e.target as HTMLElement).setPointerCapture(e.pointerId);
-        } catch {
-          /* ignore */
-        }
+        } catch { /* ignore */ }
         return;
       }
 
@@ -175,12 +168,7 @@ export function usePointerHandlers(args: {
       // MOUSE: left-click = immediate drag
       if (e.button === 0) {
         e.preventDefault();
-        const pieceRect = new DOMRect(
-          rect.left + piece.x,
-          rect.top + piece.y,
-          piece.w,
-          piece.h,
-        );
+        const pieceRect = new DOMRect(rect.left + piece.x, rect.top + piece.y, piece.w, piece.h);
         manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
         soundManager.play("pickup");
         setState(manager.getState());
@@ -188,25 +176,10 @@ export function usePointerHandlers(args: {
 
         try {
           (e.target as HTMLElement).setPointerCapture(e.pointerId);
-        } catch {
-          /* ignore */
-        }
+        } catch { /* ignore */ }
       }
     },
-    [
-      manager,
-      canvasRef,
-      boardRef,
-      pickPiece,
-      selectedIdRef,
-      setSelectedPieceId,
-      bump,
-      onPieceInteraction,
-      canRotate,
-      haptic,
-      setState,
-      didDragRef,
-    ],
+    [manager, canvasRef, boardRef, pickPiece, selectedIdRef, setSelectedPieceId, bump, onPieceInteraction, canRotate, haptic, setState, didDragRef],
   );
 
   // POINTER MOVE
@@ -240,15 +213,9 @@ export function usePointerHandlers(args: {
           if (activeId && onDragPreview) {
             const st = manager.getState();
             const p = st.pieces.find((pc) => pc.id === activeId);
-            const groupSize = p
-              ? st.pieces.filter((pc) => pc.groupId === p.groupId).length
-              : 0;
+            const groupSize = p ? st.pieces.filter((pc) => pc.groupId === p.groupId).length : 0;
             if (groupSize === 1) {
-              onDragPreview({
-                clientX: e.clientX,
-                clientY: e.clientY,
-                pieceId: activeId,
-              });
+              onDragPreview({ clientX: e.clientX, clientY: e.clientY, pieceId: activeId });
             }
           }
         }
@@ -266,9 +233,7 @@ export function usePointerHandlers(args: {
       if (activeId && onDragPreview) {
         const st = manager.getState();
         const p = st.pieces.find((pc) => pc.id === activeId);
-        const groupSize = p
-          ? st.pieces.filter((pc) => pc.groupId === p.groupId).length
-          : 0;
+        const groupSize = p ? st.pieces.filter((pc) => pc.groupId === p.groupId).length : 0;
         if (groupSize === 1) {
           onDragPreview({ clientX: e.clientX, clientY: e.clientY, pieceId: activeId });
         }
@@ -307,9 +272,7 @@ export function usePointerHandlers(args: {
 
         try {
           (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-        } catch {
-          /* ignore */
-        }
+        } catch { /* ignore */ }
         return;
       }
 
@@ -321,9 +284,7 @@ export function usePointerHandlers(args: {
 
       try {
         (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-      } catch {
-        /* ignore */
-      }
+      } catch { /* ignore */ }
     },
     [manager, onDragPreview, finishDrag, setState, canRotate, haptic, didDragRef],
   );
