@@ -12,13 +12,11 @@ export type CanvasWithTouch = HTMLCanvasElement & {
   pendingPieceRect?: DOMRect | null;
 };
 
-export type DragPreviewState =
-  | {
-      clientX: number;
-      clientY: number;
-      pieceId: PieceId;
-    }
-  | null;
+export type DragPreviewState = {
+  clientX: number;
+  clientY: number;
+  pieceId: PieceId;
+} | null;
 
 // iOS tap jitter threshold
 export const TAP_DRAG_THRESHOLD_PX = 12;

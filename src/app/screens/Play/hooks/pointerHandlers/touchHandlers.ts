@@ -59,15 +59,19 @@ export function handleTouchMove(
   if (!manager || !boardRef.current) return false;
 
   const c = canvas ?? (ctx.canvasRef.current as CanvasWithTouch);
-  if (!c?.pendingPieceId || c.touchStartX == null || c.touchStartY == null)
-    return false;
+  if (!c?.pendingPieceId || c.touchStartX == null || c.touchStartY == null) return false;
 
   const dist = Math.hypot(e.clientX - c.touchStartX, e.clientY - c.touchStartY);
 
   if (!c.touchDragStarted && dist >= TAP_DRAG_THRESHOLD_PX) {
     c.touchDragStarted = true;
     didDragRef.current = true;
-    manager.pointerDown(c.pendingPieceId, c.touchStartX, c.touchStartY, c.pendingPieceRect!);
+    manager.pointerDown(
+      c.pendingPieceId,
+      c.touchStartX,
+      c.touchStartY,
+      c.pendingPieceRect!,
+    );
     setState(manager.getState());
     soundManager.play("pickup");
   }
@@ -91,15 +95,8 @@ export function handleTouchUp(
   canRotatePiece: (pid: string) => boolean,
   isPointerOverTray: (x: number, y: number) => boolean,
 ): void {
-  const {
-    manager,
-    boardRef,
-    canvasRef,
-    setState,
-    haptic,
-    selectCycle,
-    onDragPreview,
-  } = ctx;
+  const { manager, boardRef, canvasRef, setState, haptic, selectCycle, onDragPreview } =
+    ctx;
   if (!manager || !canvasRef.current) return;
 
   const canvas = canvasRef.current as CanvasWithTouch;
@@ -110,10 +107,7 @@ export function handleTouchUp(
   const dy = Math.abs(e.clientY - (canvas.touchStartY ?? e.clientY));
   const dist = Math.hypot(dx, dy);
 
-  const isTap =
-    duration < 180 &&
-    dist < 14 &&
-    manager.getDragState().activeId == null;
+  const isTap = duration < 180 && dist < 14 && manager.getDragState().activeId == null;
 
   if (isTap) {
     const boardRect = boardRef.current?.getBoundingClientRect();
