@@ -31,6 +31,8 @@ export function usePointerHandlers(args: {
   haptic?: (kind: HapticKind) => void;
   onDragPreview?: (state: DragPreviewState | null) => void;
   onPieceInteraction?: () => void;
+  /** When set, touch events are handled by native listeners (useTouchHandlers) - skip pointer handling for touch */
+  touchHandledByNativeRef?: React.MutableRefObject<number | null>;
 }) {
   const {
     manager,
@@ -46,6 +48,7 @@ export function usePointerHandlers(args: {
     haptic,
     onDragPreview,
     onPieceInteraction,
+    touchHandledByNativeRef,
   } = args;
 
   const managerRef = useRef<PuzzleManager | null>(null);
@@ -101,6 +104,9 @@ export function usePointerHandlers(args: {
     (e: React.PointerEvent<HTMLElement>) => {
       if (!manager || !canvasRef.current || !boardRef.current) return;
 
+      // Touch is handled by native listeners (useTouchHandlers) for iOS compatibility
+      if (e.pointerType === "touch" && touchHandledByNativeRef?.current != null) return;
+
       const canvas = canvasRef.current as CanvasWithTouch;
       const canvasRect = canvas.getBoundingClientRect();
       const ctx2d = canvas.getContext("2d");
@@ -133,12 +139,14 @@ export function usePointerHandlers(args: {
 
       handleMouseDown(e, ctx, pieceId, canvasRect, piece, canRotatePiece);
     },
-    [manager, boardRef, canvasRef, bump, canRotatePiece],
+    [manager, boardRef, canvasRef, bump, canRotatePiece, touchHandledByNativeRef],
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
       if (!manager || !boardRef.current) return;
+
+      if (e.pointerType === "touch" && touchHandledByNativeRef?.current != null) return;
 
       if (e.pointerType === "touch") {
         const canvas = canvasRef.current as CanvasWithTouch | null;
@@ -150,12 +158,14 @@ export function usePointerHandlers(args: {
 
       handleMouseMove(e, ctx);
     },
-    [manager, boardRef, canvasRef],
+    [manager, boardRef, canvasRef, touchHandledByNativeRef],
   );
 
   const handlePointerUp = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
       if (!manager || !canvasRef.current) return;
+
+      if (e.pointerType === "touch" && touchHandledByNativeRef?.current != null) return;
 
       if (e.pointerType === "touch") {
         handleTouchUp(e, ctx, canRotatePiece, isPointerOverTray);
@@ -164,7 +174,7 @@ export function usePointerHandlers(args: {
 
       handleMouseUp(e, ctx, isPointerOverTray);
     },
-    [manager, canvasRef, canRotatePiece, isPointerOverTray],
+    [manager, canvasRef, canRotatePiece, isPointerOverTray, touchHandledByNativeRef],
   );
 
   const handlePointerCancel = useCallback(
