@@ -195,7 +195,7 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
   );
 
   const handlePointerCancel = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
+    (_e: React.PointerEvent<HTMLDivElement>) => {
       if (!manager || !canvasRef.current) return;
       const canvas = canvasRef.current as HTMLCanvasElement & {
         touchStartX?: number;

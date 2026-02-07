@@ -1,5 +1,4 @@
 import { Modal } from "@/components/Modal/Modal";
-import { Button } from "@/components/Button/Button";
 import {
   getDailyPuzzleForDate,
   getTodayDateString,
