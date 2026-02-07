@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Menu, Download, Share2, Copy, Check } from "lucide-react";
+import { Plus, Menu, Download, Share2, Copy, Check, Trophy } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
@@ -8,8 +8,10 @@ import {
   recordDailyCompletion,
   DAILY_DATE_KEY,
   getCurrentStreak,
+  getTodayDateString,
 } from "@/daily/dailyPuzzle";
 import { recordCompletion } from "@/services/statsService";
+import { getDailyRankForTime } from "@/services/leaderboardService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
 
 interface ShareUrls {
@@ -33,6 +35,7 @@ interface CompletionOverlayProps {
   onDownloadImage: () => void;
   onNewPuzzle: () => void;
   onMenu: () => void;
+  onViewLeaderboard?: () => void;
 }
 
 export function CompletionOverlay({
@@ -49,8 +52,10 @@ export function CompletionOverlay({
   onDownloadImage,
   onNewPuzzle,
   onMenu,
+  onViewLeaderboard,
 }: CompletionOverlayProps) {
   const [streak, setStreak] = useState<number>(0);
+  const [dailyRank, setDailyRank] = useState<number | null>(null);
 
   useEffect(() => {
     if (isNewBest && grid) {
@@ -88,6 +93,10 @@ export function CompletionOverlay({
           lastCompletion: { elapsedSeconds, grid },
         });
       }
+      if (isDaily) {
+        const rank = await getDailyRankForTime(getTodayDateString(), elapsedSeconds);
+        setDailyRank(rank);
+      }
     };
     run();
   }, [elapsedSeconds, grid, isDaily]);
@@ -104,6 +113,9 @@ export function CompletionOverlay({
               — Daily completed!
               {streak > 0 && (
                 <span className={styles.streak}> {streak} day streak 🔥</span>
+              )}
+              {dailyRank != null && (
+                <span className={styles.streak}> · Rank #{dailyRank}</span>
               )}
             </span>
           )}
@@ -172,6 +184,12 @@ export function CompletionOverlay({
             <Plus size={16} />
             New Puzzle
           </Button>
+          {onViewLeaderboard && (
+            <Button variant="secondary" onClick={onViewLeaderboard}>
+              <Trophy size={16} />
+              Leaderboard
+            </Button>
+          )}
           <Button variant="secondary" onClick={onMenu}>
             <Menu size={16} />
             Menu

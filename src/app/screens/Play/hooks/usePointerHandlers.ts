@@ -207,7 +207,8 @@ export function usePointerHandlers(args: {
 
       if (!d.dragging) return;
 
-      const r = boardRef.current.getBoundingClientRect();
+      const r = canvasRef.current?.getBoundingClientRect();
+      if (!r) return;
       manager.pointerMove(e.clientX, e.clientY, r);
       onPieceInteraction?.();
 
@@ -227,6 +228,7 @@ export function usePointerHandlers(args: {
     [
       manager,
       boardRef,
+      canvasRef,
       didDragRef,
       onPieceInteraction,
       onDragPreview,
@@ -296,8 +298,16 @@ export function usePointerHandlers(args: {
   useEffect(() => {
     if (!isTouchDevice) return;
 
-    const boardEl = argsRef.current.boardRef.current;
-    if (!boardEl) return;
+    let cancelled = false;
+    let removeListeners: (() => void) | null = null;
+
+    const attach = () => {
+      if (cancelled) return;
+      const boardEl = argsRef.current.boardRef.current;
+      if (!boardEl) {
+        requestAnimationFrame(attach);
+        return;
+      }
 
     type TouchDrag = {
       touchId: number;
@@ -326,6 +336,8 @@ export function usePointerHandlers(args: {
 
       const canvas = canvasRef.current;
       const canvasRect = canvas.getBoundingClientRect();
+      if (canvasRect.width < 10 || canvasRect.height < 10) return;
+
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
@@ -390,7 +402,8 @@ export function usePointerHandlers(args: {
 
       if (t.dragging) {
         e.preventDefault();
-        const r = boardRef.current.getBoundingClientRect();
+        const r = argsRef.current.canvasRef.current?.getBoundingClientRect();
+        if (!r) return;
         manager.pointerMove(touch.clientX, touch.clientY, r);
         argsRef.current.onPieceInteraction?.();
 
@@ -483,11 +496,18 @@ export function usePointerHandlers(args: {
     document.addEventListener("touchend", handleTouchEnd, opts);
     document.addEventListener("touchcancel", handleTouchCancel, opts);
 
-    return () => {
+    removeListeners = () => {
       boardEl.removeEventListener("touchstart", handleTouchStart, opts);
       document.removeEventListener("touchmove", handleTouchMove, opts);
       document.removeEventListener("touchend", handleTouchEnd, opts);
       document.removeEventListener("touchcancel", handleTouchCancel, opts);
+    };
+    };
+    attach();
+
+    return () => {
+      cancelled = true;
+      removeListeners?.();
     };
   }, [isTouchDevice]);
 

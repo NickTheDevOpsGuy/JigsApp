@@ -5,7 +5,10 @@ import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
 import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client";
 import { getMyStats } from "@/services/statsService";
-import { getDailyLeaderboard } from "@/services/leaderboardService";
+import {
+  getDailyLeaderboard,
+  getGridLeaderboard,
+} from "@/services/leaderboardService";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString } from "@/daily/dailyPuzzle";
 
@@ -41,6 +44,9 @@ export function StatsScreen() {
   const [leaderboard, setLeaderboard] = useState<
     { rank: number; elapsedSeconds: number; displayName: string }[]
   >([]);
+  const [gridLeaderboards, setGridLeaderboards] = useState<
+    Record<string, { rank: number; elapsedSeconds: number; displayName: string }[]>
+  >({});
   const [achievements, setAchievements] = useState<
     {
       id: string;
@@ -64,8 +70,16 @@ export function StatsScreen() {
       const [s, a] = await Promise.all([getMyStats(), getMyAchievements()]);
       setStats(s ?? null);
       setAchievements(a);
-      const lb = await getDailyLeaderboard(getTodayDateString());
+      const [lb, lb4, lb6] = await Promise.all([
+        getDailyLeaderboard(getTodayDateString()),
+        getGridLeaderboard(4, 4, 5),
+        getGridLeaderboard(6, 6, 5),
+      ]);
       setLeaderboard(lb);
+      setGridLeaderboards({
+        "4x4": lb4,
+        "6x6": lb6,
+      });
       setLoading(false);
     };
     load();
@@ -188,6 +202,31 @@ export function StatsScreen() {
                     ))}
                   </ol>
                 )}
+
+                <h3 className={styles.subsectionTitle}>Best times by grid</h3>
+                {(["4x4", "6x6"] as const).map((grid) => {
+                  const entries = gridLeaderboards[grid] ?? [];
+                  return (
+                    <div key={grid} className={styles.gridLeaderboard}>
+                      <h4>{grid} grid</h4>
+                      {entries.length === 0 ? (
+                        <p className={styles.empty}>No completions yet</p>
+                      ) : (
+                        <ol className={styles.leaderboard}>
+                          {entries.map((entry) => (
+                            <li key={`${grid}-${entry.rank}`} className={styles.leaderboardItem}>
+                              <span className={styles.rank}>#{entry.rank}</span>
+                              <span className={styles.player}>{entry.displayName}</span>
+                              <span className={styles.time}>
+                                {formatTime(entry.elapsedSeconds)}
+                              </span>
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 

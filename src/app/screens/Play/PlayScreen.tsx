@@ -387,6 +387,7 @@ export function PlayScreen() {
               onDownloadImage={handleDownloadImage}
               onNewPuzzle={handleNewGame}
               onMenu={() => navigate("/")}
+              onViewLeaderboard={() => navigate("/stats")}
             />
           )}
         </div>

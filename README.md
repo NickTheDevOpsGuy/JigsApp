@@ -200,33 +200,12 @@ Category = folder name, puzzle name = filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
-│   ├── _
-│   │   ├── .gitignore
-│   │   ├── applypatch-msg
-│   │   ├── commit-msg
-│   │   ├── h
-│   │   ├── husky.sh
-│   │   ├── post-applypatch
-│   │   ├── post-checkout
-│   │   ├── post-commit
-│   │   ├── post-merge
-│   │   ├── post-rewrite
-│   │   ├── pre-applypatch
-│   │   ├── pre-auto-gc
-│   │   ├── pre-commit
-│   │   ├── pre-merge-commit
-│   │   ├── pre-push
-│   │   ├── pre-rebase
-│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
-├── .vite
-│   └── deps
-│       ├── _metadata.json
-│       └── package.json
 ├── public
 │   └── favicon.svg
 ├── scripts
+│   ├── create-mvp2-issues.sh
 │   └── precheck.sh
 ├── src
 │   ├── app
@@ -381,7 +360,6 @@ Category = folder name, puzzle name = filename.
 │   ├── migrations
 │   │   └── 001_initial_schema.sql
 │   └── README.md
-├── .env.development
 ├── .env.example
 ├── .eslintcache
 ├── .gitignore
