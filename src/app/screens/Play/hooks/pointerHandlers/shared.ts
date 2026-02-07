@@ -8,20 +8,22 @@ export function finishDragWithTrayCheck(
   selectCycle: (dir: 1 | -1) => void,
 ): void {
   const activeId = manager.getDragState().activeId;
-  if (activeId && isPointerOverTray(clientX, clientY)) {
+  const overTray = Boolean(activeId) && isPointerOverTray(clientX, clientY);
+
+  if (activeId && overTray) {
     const st = manager.getState();
     const piece = st.pieces.find((p) => p.id === activeId);
     const groupSize = piece
       ? st.pieces.filter((p) => p.groupId === piece.groupId).length
       : 0;
+
     if (groupSize === 1) {
-      manager.pointerUp();
+      manager.cancelDrag();
       manager.sendToTray(activeId);
       selectCycle(1);
-    } else {
-      manager.pointerUp();
+      return;
     }
-  } else {
-    manager.pointerUp();
   }
+
+  manager.pointerUp();
 }

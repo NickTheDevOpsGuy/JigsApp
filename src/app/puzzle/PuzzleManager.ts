@@ -295,6 +295,16 @@ export class PuzzleManager {
     return this.drag;
   }
 
+  /**
+   * Cancel an in-progress drag WITHOUT running snap logic.
+   * Useful for tray drops on mobile where snap-on-pointerUp can interfere.
+   */
+  cancelDrag(): void {
+    if (!this.drag.activeId) return;
+    this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
+    this.recomputeDerivedState();
+  }
+
   public getPiece(id: string) {
     return this.findPiece(id);
   }
