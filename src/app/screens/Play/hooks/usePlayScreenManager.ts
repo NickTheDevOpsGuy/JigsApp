@@ -48,24 +48,29 @@ export function usePlayScreenManager(
       const rect = mainEl.getBoundingClientRect();
       const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
       const isMobile = viewportW < 600;
-      const isSmallPhone = viewportW < 380;
 
-      // Use real available space. Tighter padding on small phones (iPhone SE etc.)
-      const padding = isSmallPhone ? 8 : isMobile ? 12 : 24;
-      // Guard against transient 0px measurements during initial layout.
-      // If we compute sizes off of 0px, pieces end up tiny and the puzzle becomes unplayable.
-      const minAvail = isMobile ? 280 : 420;
-      const availW = Math.max(minAvail, Math.floor(rect.width) - padding);
-      const availH = Math.max(minAvail, Math.floor(rect.height) - padding);
+      // Use real available space. Do not force a minimum on mobile.
+      const padding = isMobile ? 12 : 24;
+      const availW = Math.max(0, Math.floor(rect.width) - padding);
+      const availH = Math.max(0, Math.floor(rect.height) - padding);
 
       // Base size from existing helper
       const basePieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-      // IMPORTANT:
-      // Do not cap tile size on mobile. computeTileSize already clamps to sensible
-      // min/max values per device and grid. Capping here was making pieces
-      // comically small and broke snapping / dragging on iPhone.
-      const pieceSize = basePieceSize;
+      // Mobile cap by difficulty so higher grids shrink naturally
+      const pieceCount = grid.rows * grid.cols;
+      const mobileMax =
+        pieceCount >= 36
+          ? 18 // 6x6+
+          : pieceCount >= 26
+            ? 20 // 5x5–5x7, 7x5
+            : pieceCount >= 17
+              ? 24 // 4x4, 5x5
+              : pieceCount >= 10
+                ? 26 // 4x4
+                : 24; // 3x3 (9 pieces)
+
+      const pieceSize = isMobile ? Math.min(basePieceSize, mobileMax) : basePieceSize;
 
       const minBoardW = grid.cols * pieceSize;
       const minBoardH = grid.rows * pieceSize;
