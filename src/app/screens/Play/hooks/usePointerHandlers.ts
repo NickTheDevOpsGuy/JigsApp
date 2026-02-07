@@ -62,7 +62,8 @@ export function usePointerHandlers(args: {
       if (!manager) return false;
       const st = manager.getState();
       const piece = st.pieces.find((p) => p.id === pid);
-      if (!piece || piece.isPlaced || piece.inTray) return false;
+      if (!piece) return false;
+      if (piece.isPlaced || piece.inTray) return false;
       return st.pieces.filter((p) => p.groupId === piece.groupId).length === 1;
     },
     [manager],
@@ -73,6 +74,7 @@ export function usePointerHandlers(args: {
     clientY: number,
   ): { pieceId: PieceId; piece: Piece; boardRect: DOMRect } | null => {
     if (!manager || !canvasRef.current || !boardRef.current) return null;
+
     const canvas = canvasRef.current;
     const boardRect = boardRef.current.getBoundingClientRect();
     const ctx = canvas.getContext("2d");
@@ -90,7 +92,7 @@ export function usePointerHandlers(args: {
     if (!pieceId) return null;
 
     const piece = st.pieces.find((p) => p.id === pieceId);
-    if (!piece || piece.locked) return null;
+    if (!piece) return null;
 
     return { pieceId, piece, boardRect };
   };
@@ -112,6 +114,7 @@ export function usePointerHandlers(args: {
       setSelectedPieceId(pieceId);
       bump();
 
+      // Right click = rotate (desktop)
       if (e.pointerType !== "touch" && e.button === 2) {
         if (canRotatePiece(pieceId)) {
           manager.rotatePiece(pieceId);
@@ -122,6 +125,7 @@ export function usePointerHandlers(args: {
         return;
       }
 
+      // Middle click = send to tray
       if (e.pointerType !== "touch" && e.button === 1) {
         manager.sendToTray(pieceId);
         setState(manager.getState());
@@ -138,6 +142,7 @@ export function usePointerHandlers(args: {
         piece.h,
       );
 
+      // Mouse drag starts immediately
       if (e.pointerType !== "touch") {
         manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
         soundManager.play("pickup");
@@ -146,6 +151,7 @@ export function usePointerHandlers(args: {
         return;
       }
 
+      // Touch: wait for threshold
       pendingTouchRef.current = {
         pointerId: e.pointerId,
         startX: e.clientX,
@@ -184,6 +190,7 @@ export function usePointerHandlers(args: {
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !boardRef.current || !canvasRef.current) return;
+
       const canvas = canvasRef.current as CanvasWithLongPress;
 
       if (e.pointerType === "touch") {
@@ -222,6 +229,7 @@ export function usePointerHandlers(args: {
   const handlePointerUp = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current) return;
+
       const canvas = canvasRef.current as CanvasWithLongPress;
       clearLongPress(canvas);
 
