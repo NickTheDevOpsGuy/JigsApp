@@ -55,6 +55,15 @@
   padding: 16px;
 }
 
+.helpMenuCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  padding: 16px;
+}
+
 .actionLabel {
   font-weight: 600;
   font-size: 14px;

@@ -1,3 +1,7 @@
+/**
+ * Touch handlers for piece drag/rotate.
+ * Uses pointer events (pointerType === "touch") - works on both iOS and Android.
+ */
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import { soundManager } from "@/audio/sounds";

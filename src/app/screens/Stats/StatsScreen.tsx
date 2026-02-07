@@ -2,12 +2,23 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BarChart3, Trophy, Award } from "lucide-react";
 import { Button } from "@/components/Button/Button";
+import { Dropdown } from "@/components/DropDown/Dropdown";
 import styles from "./StatsScreen.module.css";
 import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client";
 import { getMyStats } from "@/services/statsService";
 import { getDailyLeaderboard, getGridLeaderboard } from "@/services/leaderboardService";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString } from "@/daily/dailyPuzzle";
+
+type LeaderboardView = "daily" | "3x3" | "4x4" | "5x5" | "6x6";
+
+const LEADERBOARD_OPTIONS: { value: LeaderboardView; label: string }[] = [
+  { value: "daily", label: "Today's Daily Puzzle" },
+  { value: "3x3", label: "3×3 grid" },
+  { value: "4x4", label: "4×4 grid" },
+  { value: "5x5", label: "5×5 grid" },
+  { value: "6x6", label: "6×6 grid" },
+];
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -31,6 +42,7 @@ export function StatsScreen() {
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "leaderboard" | "achievements"
   >("dashboard");
+  const [leaderboardView, setLeaderboardView] = useState<LeaderboardView>("daily");
   const [stats, setStats] = useState<{
     puzzlesCompleted: number;
     totalPlayTimeSeconds: number;
@@ -38,12 +50,18 @@ export function StatsScreen() {
     bestDailyStreak: number;
     lastPlayedAt: string | null;
   } | null>(null);
-  const [leaderboard, setLeaderboard] = useState<
-    { rank: number; elapsedSeconds: number; displayName: string }[]
-  >([]);
   const [gridLeaderboards, setGridLeaderboards] = useState<
-    Record<string, { rank: number; elapsedSeconds: number; displayName: string }[]>
-  >({});
+    Record<
+      LeaderboardView,
+      { rank: number; elapsedSeconds: number; displayName: string }[]
+    >
+  >({
+    daily: [],
+    "3x3": [],
+    "4x4": [],
+    "5x5": [],
+    "6x6": [],
+  });
   const [achievements, setAchievements] = useState<
     {
       id: string;
@@ -67,14 +85,18 @@ export function StatsScreen() {
       const [s, a] = await Promise.all([getMyStats(), getMyAchievements()]);
       setStats(s ?? null);
       setAchievements(a);
-      const [lb, lb4, lb6] = await Promise.all([
+      const [lb, lb3, lb4, lb5, lb6] = await Promise.all([
         getDailyLeaderboard(getTodayDateString()),
-        getGridLeaderboard(4, 4, 5),
-        getGridLeaderboard(6, 6, 5),
+        getGridLeaderboard(3, 3, 10),
+        getGridLeaderboard(4, 4, 10),
+        getGridLeaderboard(5, 5, 10),
+        getGridLeaderboard(6, 6, 10),
       ]);
-      setLeaderboard(lb);
       setGridLeaderboards({
+        daily: lb,
+        "3x3": lb3,
         "4x4": lb4,
+        "5x5": lb5,
         "6x6": lb6,
       });
       setLoading(false);
@@ -183,50 +205,37 @@ export function StatsScreen() {
 
             {activeTab === "leaderboard" && (
               <div className={styles.section}>
-                <h2>Today&apos;s Daily Puzzle</h2>
-                {leaderboard.length === 0 ? (
-                  <p className={styles.empty}>No completions yet. Be the first!</p>
-                ) : (
-                  <ol className={styles.leaderboard}>
-                    {leaderboard.map((entry) => (
-                      <li key={entry.rank} className={styles.leaderboardItem}>
-                        <span className={styles.rank}>#{entry.rank}</span>
-                        <span className={styles.player}>{entry.displayName}</span>
-                        <span className={styles.time}>
-                          {formatTime(entry.elapsedSeconds)}
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-
-                <h3 className={styles.subsectionTitle}>Best times by grid</h3>
-                {(["4x4", "6x6"] as const).map((grid) => {
-                  const entries = gridLeaderboards[grid] ?? [];
-                  return (
-                    <div key={grid} className={styles.gridLeaderboard}>
-                      <h4>{grid} grid</h4>
-                      {entries.length === 0 ? (
-                        <p className={styles.empty}>No completions yet</p>
-                      ) : (
-                        <ol className={styles.leaderboard}>
-                          {entries.map((entry) => (
-                            <li
-                              key={`${grid}-${entry.rank}`}
-                              className={styles.leaderboardItem}
-                            >
-                              <span className={styles.rank}>#{entry.rank}</span>
-                              <span className={styles.player}>{entry.displayName}</span>
-                              <span className={styles.time}>
-                                {formatTime(entry.elapsedSeconds)}
-                              </span>
-                            </li>
-                          ))}
-                        </ol>
-                      )}
-                    </div>
+                <h2>Leaderboard</h2>
+                <Dropdown
+                  label="View"
+                  value={leaderboardView}
+                  onChange={(val) => setLeaderboardView(val as LeaderboardView)}
+                  options={LEADERBOARD_OPTIONS}
+                  fullWidth
+                />
+                {(() => {
+                  const entries = gridLeaderboards[leaderboardView] ?? [];
+                  return entries.length === 0 ? (
+                    <p className={styles.empty}>
+                      No completions yet.
+                      {leaderboardView === "daily"
+                        ? " Be the first!"
+                        : " Complete a puzzle to appear here."}
+                    </p>
+                  ) : (
+                    <ol className={styles.leaderboard}>
+                      {entries.map((entry) => (
+                        <li key={entry.rank} className={styles.leaderboardItem}>
+                          <span className={styles.rank}>#{entry.rank}</span>
+                          <span className={styles.player}>{entry.displayName}</span>
+                          <span className={styles.time}>
+                            {formatTime(entry.elapsedSeconds)}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
                   );
-                })}
+                })()}
               </div>
             )}
 

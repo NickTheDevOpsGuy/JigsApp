@@ -67,7 +67,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Drag-and-drop jigsaw pieces with rotation
 - Classic interlocking piece shapes with board and neighbor snapping
 - Group merging — connected pieces move together
-- Multiple difficulty levels (3×3 to 6×6 grids)
+- Multiple difficulty levels (3×3 to 6×6 grids, plus custom rows/columns)
 - Image sources: gallery, file upload, or camera capture
 
 ### UX & Polish
@@ -91,14 +91,14 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 - Daily puzzle — same for everyone, streak tracking
 - Player statistics dashboard (Supabase)
-- Leaderboards for daily puzzle times
+- Leaderboards with dropdown (Today's Daily, 3×3, 4×4, 5×5, 6×6)
 - Achievements system
 - Share completed puzzle image
 
 ### Accessibility & Controls
 
 - Keyboard shortcuts (Tab, arrows, R to rotate)
-- First-time tutorial overlay
+- First-time tutorial overlay · Help dropdown (How to Play, Keyboard shortcuts)
 - Undo · Ghost hint · Lock pieces (optional)
 - Designed for relaxed, low-pressure play
 
@@ -238,6 +238,9 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── DropDown
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
+│   │   │   ├── HelpMenu
+│   │   │   │   ├── HelpMenu.module.css
+│   │   │   │   └── HelpMenu.tsx
 │   │   │   ├── HowToPlay
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── TutorialOverlay.module.css

@@ -9,8 +9,10 @@ import { Button } from "@/components/Button/Button";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { WhatsNewModal } from "@/components/WhatsNew";
+import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
+import { HelpMenu } from "@/components/HelpMenu/HelpMenu";
 import { DailyPuzzleModal } from "@/components/DailyPuzzleModal/DailyPuzzleModal";
-import { HelpCircle, Image, Calendar, BarChart3, Sparkles } from "lucide-react";
+import { Image, Calendar, BarChart3, Sparkles, Camera } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
@@ -19,6 +21,7 @@ export function MenuScreen() {
   const nav = useNavigate();
   const [showHelp, setShowHelp] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
 
   const todayCompleted = isTodayDailyCompleted();
@@ -63,13 +66,20 @@ export function MenuScreen() {
           </Button>
 
           <Button
-            variant="secondary"
-            onClick={() => setShowHelp(true)}
+            variant="primary"
+            onClick={() => nav("/new?source=camera")}
             className={styles.actionCard}
           >
-            <HelpCircle size={20} />
-            <span className={styles.actionLabel}>How to Play</span>
+            <Camera size={24} />
+            <span className={styles.actionLabel}>Take Photo</span>
           </Button>
+
+          <HelpMenu
+            variant="default"
+            className={styles.helpMenuCard}
+            onShowHowToPlay={() => setShowHelp(true)}
+            onShowShortcuts={() => setShowShortcuts(true)}
+          />
 
           <Button
             variant="secondary"
@@ -93,6 +103,7 @@ export function MenuScreen() {
       </div>
 
       <TutorialOverlay isOpen={showHelp} onComplete={() => setShowHelp(false)} />
+      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
       <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <DailyPuzzleModal
         isOpen={showDailyModal}
