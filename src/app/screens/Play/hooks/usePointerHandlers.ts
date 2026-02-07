@@ -106,6 +106,11 @@ export function usePointerHandlers(args: {
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current || !boardRef.current) return;
 
+      // Prevent default for touch to stop scrolling
+      if (e.pointerType === "touch") {
+        e.preventDefault();
+      }
+
       const canvas = canvasRef.current as CanvasWithTouch;
       const boardRect = boardRef.current.getBoundingClientRect();
       const ctx2d = canvas.getContext("2d");
@@ -132,7 +137,6 @@ export function usePointerHandlers(args: {
       if (!piece || piece.locked) return;
 
       if (e.pointerType === "touch") {
-        e.preventDefault();
         handleTouchDown(e, ctx, pieceId, boardRect, piece);
         return;
       }

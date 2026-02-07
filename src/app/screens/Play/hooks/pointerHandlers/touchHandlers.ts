@@ -34,7 +34,6 @@ export function handleTouchDown(
 
   didDragRef.current = false;
   onPieceInteraction?.();
-  e.preventDefault();
 
   canvas.touchStartX = e.clientX;
   canvas.touchStartY = e.clientY;
