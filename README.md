@@ -185,7 +185,7 @@ Category = folder name, puzzle name = filename.
 
 ```plaintext
 
-.
+
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -232,6 +232,9 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── Button
 │   │   │   │   ├── Button.module.css
 │   │   │   │   └── Button.tsx
+│   │   │   ├── DailyPuzzleModal
+│   │   │   │   ├── DailyPuzzleModal.module.css
+│   │   │   │   └── DailyPuzzleModal.tsx
 │   │   │   ├── DropDown
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
@@ -361,7 +364,6 @@ Category = folder name, puzzle name = filename.
 │   │   └── 001_initial_schema.sql
 │   └── README.md
 ├── .env.example
-├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
