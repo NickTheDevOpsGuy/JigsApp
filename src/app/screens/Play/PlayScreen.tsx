@@ -181,6 +181,9 @@ export function PlayScreen() {
     handlePointerCancel,
     handleLostPointerCapture,
     handleContextMenu,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
   } = usePointerHandlers({
     manager,
     canvasRef,
@@ -352,6 +355,10 @@ export function PlayScreen() {
           onPointerCancel={handlePointerCancel}
           onLostPointerCapture={handleLostPointerCapture}
           onContextMenu={handleContextMenu}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
         >
           <canvas className={styles.canvas} ref={canvasRef} />
           {showPreview && imgRef.current && (

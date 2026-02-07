@@ -31,60 +31,63 @@ export function computeTileSize(
   const isMobile = viewportWidth < MOBILE_BREAKPOINT;
   const pieceCount = grid.rows * grid.cols;
 
-  // Small phone: tightest sizing for iPhone SE etc.; mobile: standard; desktop: larger
+  // Piece sizes optimized for touch on mobile, comfortable on desktop
   let minTile: number;
   let maxTile: number;
 
   if (isSmallPhone) {
+    // Small phones (iPhone SE, mini): still need touchable pieces
     if (pieceCount <= 9) {
-      minTile = 12;
-      maxTile = 16;
+      minTile = 55;
+      maxTile = 95;
     } else if (pieceCount <= 16) {
-      minTile = 12;
-      maxTile = 16;
+      minTile = 45;
+      maxTile = 75;
     } else if (pieceCount <= 25) {
-      minTile = 10;
-      maxTile = 14;
-    } else if (pieceCount <= 35) {
-      minTile = 10;
-      maxTile = 12;
+      minTile = 38;
+      maxTile = 62;
+    } else if (pieceCount <= 36) {
+      minTile = 32;
+      maxTile = 52;
     } else {
-      minTile = 8;
-      maxTile = 12;
+      minTile = 26;
+      maxTile = 42;
     }
   } else if (isMobile) {
+    // Standard mobile (most iPhones, Android)
     if (pieceCount <= 9) {
-      minTile = 14;
-      maxTile = 20;
-    } else if (pieceCount <= 16) {
-      minTile = 16;
-      maxTile = 22;
-    } else if (pieceCount <= 25) {
-      minTile = 14;
-      maxTile = 18;
-    } else if (pieceCount <= 35) {
-      minTile = 12;
-      maxTile = 16;
-    } else {
-      minTile = 10;
-      maxTile = 14;
-    }
-  } else {
-    if (pieceCount <= 9) {
-      minTile = 50;
-      maxTile = 100;
+      minTile = 65;
+      maxTile = 120;
     } else if (pieceCount <= 16) {
       minTile = 55;
-      maxTile = 110;
+      maxTile = 95;
     } else if (pieceCount <= 25) {
       minTile = 45;
-      maxTile = 90;
-    } else if (pieceCount <= 35) {
-      minTile = 35;
+      maxTile = 78;
+    } else if (pieceCount <= 36) {
+      minTile = 38;
       maxTile = 65;
     } else {
-      minTile = 30;
-      maxTile = 55;
+      minTile = 32;
+      maxTile = 52;
+    }
+  } else {
+    // Desktop
+    if (pieceCount <= 9) {
+      minTile = 60;
+      maxTile = 110;
+    } else if (pieceCount <= 16) {
+      minTile = 55;
+      maxTile = 100;
+    } else if (pieceCount <= 25) {
+      minTile = 48;
+      maxTile = 85;
+    } else if (pieceCount <= 36) {
+      minTile = 40;
+      maxTile = 70;
+    } else {
+      minTile = 34;
+      maxTile = 58;
     }
   }
 
