@@ -1,3 +1,4 @@
+
 export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
@@ -44,7 +45,6 @@ export function computeTileSize(
       minTile = 45;
       maxTile = 75;
     } else if (pieceCount <= 25) {
-<<<<<<< HEAD
       minTile = 38;
       maxTile = 62;
     } else if (pieceCount <= 36) {
@@ -71,18 +71,10 @@ export function computeTileSize(
     } else {
       minTile = 32;
       maxTile = 52;
-=======
-      minTile = 18;
-      maxTile = 24;
-    } else {
-      minTile = 16;
-      maxTile = 22;
->>>>>>> parent of 9388c36 (YUP!)
     }
   } else {
     // Desktop
     if (pieceCount <= 9) {
-<<<<<<< HEAD
       minTile = 60;
       maxTile = 110;
     } else if (pieceCount <= 16) {
@@ -97,19 +89,6 @@ export function computeTileSize(
     } else {
       minTile = 34;
       maxTile = 58;
-=======
-      minTile = 100;
-      maxTile = 200;
-    } else if (pieceCount <= 16) {
-      minTile = 80;
-      maxTile = 160;
-    } else if (pieceCount <= 25) {
-      minTile = 60;
-      maxTile = 120;
-    } else {
-      minTile = 50;
-      maxTile = 100;
->>>>>>> parent of 9388c36 (YUP!)
     }
   }
 
