@@ -13,8 +13,6 @@ export function parseGrid(stored: string | null): { rows: number; cols: number }
 }
 
 const MOBILE_BREAKPOINT = 600;
-/** Small phones: iPhone SE, 12/13 mini, etc. (~320–380px width) */
-const SMALL_PHONE_BREAKPOINT = 380;
 
 export function computeTileSize(
   availW: number,
@@ -27,67 +25,40 @@ export function computeTileSize(
   const tileFromH = availH / grid.rows;
   const tile = Math.floor(Math.min(tileFromW, tileFromH));
 
-  const isSmallPhone = viewportWidth < SMALL_PHONE_BREAKPOINT;
   const isMobile = viewportWidth < MOBILE_BREAKPOINT;
   const pieceCount = grid.rows * grid.cols;
 
-  // Small phone: tightest sizing for iPhone SE etc.; mobile: standard; desktop: smaller pieces
+  // Mobile: smaller pieces so puzzle fits on screen; desktop: larger for easier play
   let minTile: number;
   let maxTile: number;
 
-  if (isSmallPhone) {
-    // Small phones: reasonable tiles for touch
+  if (isMobile) {
     if (pieceCount <= 9) {
-      minTile = 45;
-      maxTile = 95;
+      minTile = 38;
+      maxTile = 58;
     } else if (pieceCount <= 16) {
-      minTile = 36;
-      maxTile = 80;
+      minTile = 32;
+      maxTile = 50;
     } else if (pieceCount <= 25) {
-      minTile = 30;
-      maxTile = 65;
-    } else if (pieceCount <= 36) {
-      minTile = 24;
-      maxTile = 55;
-    } else {
-      minTile = 20;
-      maxTile = 45;
-    }
-  } else if (isMobile) {
-    // Mobile: moderate sizing for touch
-    if (pieceCount <= 9) {
-      minTile = 50;
-      maxTile = 110;
-    } else if (pieceCount <= 16) {
-      minTile = 42;
-      maxTile = 90;
-    } else if (pieceCount <= 25) {
-      minTile = 35;
-      maxTile = 75;
-    } else if (pieceCount <= 36) {
       minTile = 28;
-      maxTile = 65;
+      maxTile = 44;
     } else {
-      minTile = 22;
-      maxTile = 55;
+      minTile = 24;
+      maxTile = 38;
     }
   } else {
-    // Desktop: smaller pieces for better gameplay
     if (pieceCount <= 9) {
-      minTile = 55;
-      maxTile = 100;
+      minTile = 100;
+      maxTile = 200;
     } else if (pieceCount <= 16) {
-      minTile = 50;
-      maxTile = 90;
+      minTile = 80;
+      maxTile = 160;
     } else if (pieceCount <= 25) {
-      minTile = 42;
-      maxTile = 78;
-    } else if (pieceCount <= 36) {
-      minTile = 35;
-      maxTile = 65;
+      minTile = 60;
+      maxTile = 120;
     } else {
-      minTile = 30;
-      maxTile = 52;
+      minTile = 50;
+      maxTile = 100;
     }
   }
 

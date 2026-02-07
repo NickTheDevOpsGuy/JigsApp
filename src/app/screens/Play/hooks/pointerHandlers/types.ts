@@ -6,11 +6,12 @@ import type { HapticKind } from "../useHaptics";
 export type CanvasWithTouch = HTMLCanvasElement & {
   touchStartX?: number;
   touchStartY?: number;
-  touchStartTime?: number; // needed for iOS tap vs drag
   touchDragStarted?: boolean;
   pendingPieceId?: PieceId | null;
   pendingPieceRect?: DOMRect | null;
 };
+
+export const TAP_DRAG_THRESHOLD_PX = 6;
 
 export type DragPreviewState = {
   clientX: number;
@@ -18,12 +19,8 @@ export type DragPreviewState = {
   pieceId: PieceId;
 } | null;
 
-// iOS tap jitter threshold
-export const TAP_DRAG_THRESHOLD_PX = 12;
-
 export type PointerHandlersContext = {
   manager: PuzzleManager | null;
-  managerRef: React.MutableRefObject<PuzzleManager | null>;
   boardRef: React.RefObject<HTMLDivElement | null>;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   trayRef: React.RefObject<HTMLDivElement | null>;

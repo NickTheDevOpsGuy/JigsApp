@@ -11,7 +11,7 @@ import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { getBestTime } from "./timeMode";
-import { isDailyPuzzleSession, startDailyPuzzle } from "@/daily/dailyPuzzle";
+import { isDailyPuzzleSession } from "@/daily/dailyPuzzle";
 import { usePlayScreenManager } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
@@ -91,7 +91,6 @@ export function PlayScreen() {
     mainRef,
     imgRef,
     popMapRef,
-    snapFromMapRef,
   } = managerResult;
 
   const isCoarsePointer = useCoarsePointer();
@@ -181,9 +180,6 @@ export function PlayScreen() {
     handlePointerCancel,
     handleLostPointerCapture,
     handleContextMenu,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
   } = usePointerHandlers({
     manager,
     canvasRef,
@@ -209,7 +205,6 @@ export function PlayScreen() {
     canvasRef,
     imgRef,
     popMapRef,
-    snapFromMapRef,
     selectedIdRef,
     dragPreviewPieceIdRef,
     debug,
@@ -271,13 +266,7 @@ export function PlayScreen() {
               }
             }}
             onTodayPuzzle={
-              SAMPLE_PUZZLES.length > 0
-                ? () => {
-                    clearPuzzleState();
-                    startDailyPuzzle();
-                    window.location.reload();
-                  }
-                : undefined
+              SAMPLE_PUZZLES.length > 0 ? () => navigate("/?daily=1") : undefined
             }
             timeMode={timeMode}
             setTimeMode={setTimeMode}
@@ -355,10 +344,6 @@ export function PlayScreen() {
           onPointerCancel={handlePointerCancel}
           onLostPointerCapture={handleLostPointerCapture}
           onContextMenu={handleContextMenu}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onTouchCancel={handleTouchEnd}
         >
           <canvas className={styles.canvas} ref={canvasRef} />
           {showPreview && imgRef.current && (

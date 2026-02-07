@@ -2,7 +2,6 @@
 import type { Piece, PuzzleState, DragState } from "@/puzzle/types";
 import {
   snapPopScale,
-  interpolateSnapPosition,
   drawDebugBackdrop,
   drawGridOverlay,
   applyPieceShadow,
@@ -43,8 +42,6 @@ export type PieceCache = Map<string, HTMLCanvasElement>;
  * - Draw everything else in CSS pixels (PlayScreen sets ctx.setTransform(dpr,...)).
  * - Any overlay/backdrop/grid should use cssW/cssH (canvas.width / dpr).
  */
-export type SnapFromMap = Map<string, { fromX: number; fromY: number; startMs: number }>;
-
 export function renderBoard(
   ctx: CanvasRenderingContext2D,
   state: PuzzleState,
@@ -57,7 +54,6 @@ export function renderBoard(
   dragState?: DragState,
   animState?: AnimationState,
   pieceCache?: PieceCache,
-  snapFromMap?: SnapFromMap,
 ) {
   const canvas = ctx.canvas;
 
@@ -108,17 +104,9 @@ export function renderBoard(
 
   for (const p of pieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
-    let drawP = p;
-    const snapFrom = snapFromMap?.get(p.id);
-    if (snapFrom) {
-      const elapsed = nowMs - snapFrom.startMs;
-      const drawX = interpolateSnapPosition(snapFrom.fromX, p.x, elapsed);
-      const drawY = interpolateSnapPosition(snapFrom.fromY, p.y, elapsed);
-      drawP = { ...p, x: drawX, y: drawY };
-    }
     drawPiece(
       ctx,
-      drawP,
+      p,
       img,
       cols,
       rows,

@@ -100,20 +100,27 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const zoneWidth = scatterZone.maxX - scatterZone.minX;
   const zoneHeight = scatterZone.maxY - scatterZone.minY;
 
-  // Spacing between pieces: larger = more spread out (avoids piling on top of each other)
-  const tileSize = Math.min(tileW, tileH);
-  const spacing = Math.max(28, Math.floor(tileSize * 0.85));
-  const cellW = w + spacing;
-  const cellH = h + spacing;
+  // Spacing between pieces: larger = more spread out (avoids piling on mobile)
+  const spacing = Math.max(20, Math.min(tileW, tileH) * 0.5);
+  let cellW = w + spacing;
+  let cellH = h + spacing;
 
-  const gridCols = Math.max(1, Math.floor(zoneWidth / cellW));
-  const gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
+  let gridCols = Math.max(1, Math.floor(zoneWidth / cellW));
+  let gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
+
+  // Ensure we have enough cells for all pieces (avoid overlap fallback)
+  while (gridCols * gridRows < total && (cellW > w + 8 || cellH > h + 8)) {
+    cellW = Math.max(w + 8, cellW - 4);
+    cellH = Math.max(h + 8, cellH - 4);
+    gridCols = Math.max(1, Math.floor(zoneWidth / cellW));
+    gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
+  }
 
   const positions: Array<{ x: number; y: number }> = [];
-  const maxJitter = Math.min(
-    Math.floor(spacing * 0.35),
-    Math.max(0, cellW - w - 4),
-    Math.max(0, cellH - h - 4),
+  const actualSpacing = Math.min(cellW - w, cellH - h);
+  const maxJitter = Math.max(
+    0,
+    Math.min(Math.floor(actualSpacing * 0.5), cellW - w, cellH - h),
   );
   for (let row = 0; row < gridRows; row++) {
     for (let col = 0; col < gridCols; col++) {
@@ -133,43 +140,32 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     [positions[i], positions[j]] = [positions[j], positions[i]];
   }
 
-  // If there are fewer cells than pieces, add positions with strict overlap avoidance.
-  const minGap = Math.max(20, Math.floor(spacing * 0.9));
-  const requiredGap = w + minGap;
+  // If there are fewer cells than pieces, add random positions with overlap avoidance.
+  const minGap = Math.max(8, Math.floor(actualSpacing * 0.5));
   while (positions.length < total) {
+    let attempts = 0;
+    const maxAttempts = 100;
     let placed = false;
-    for (let attempt = 0; attempt < 200 && !placed; attempt++) {
+    while (!placed && attempts < maxAttempts) {
       const candidate = {
         x: randInt(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
         y: randInt(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
       };
       const tooClose = positions.some(
         (p) =>
-          Math.abs(p.x - candidate.x) < requiredGap &&
-          Math.abs(p.y - candidate.y) < requiredGap,
+          Math.abs(p.x - candidate.x) < w + minGap &&
+          Math.abs(p.y - candidate.y) < h + minGap,
       );
       if (!tooClose) {
         positions.push(candidate);
         placed = true;
       }
+      attempts++;
     }
     if (!placed) {
-      // Last resort: place in a grid pattern to guarantee separation
-      const idx = positions.length;
-      const cols = Math.max(1, Math.floor(zoneWidth / requiredGap));
-      const extraCol = idx % cols;
-      const extraRow = Math.floor(idx / cols);
-      const maxX = Math.max(scatterZone.minX, scatterZone.maxX - w);
-      const maxY = Math.max(scatterZone.minY, scatterZone.maxY - h);
       positions.push({
-        x: Math.min(
-          maxX,
-          scatterZone.minX + extraCol * requiredGap + randInt(0, Math.min(6, minGap)),
-        ),
-        y: Math.min(
-          maxY,
-          scatterZone.minY + extraRow * requiredGap + randInt(0, Math.min(6, minGap)),
-        ),
+        x: randInt(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
+        y: randInt(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
       });
     }
   }
