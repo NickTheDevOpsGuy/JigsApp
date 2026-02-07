@@ -64,7 +64,7 @@ export function usePlayScreenManager(
 
       // Compute square tile size.
       const basePieceSize = computeTileSize(availW, availH, grid, viewportW);
-      const mobileMax = isMobile ? 44 : Infinity;
+      const mobileMax = isMobile ? 56 : Infinity;
       const pieceSize = Math.min(basePieceSize, mobileMax);
 
       // Board size: always at least the assembled puzzle, plus a bit of extra room so

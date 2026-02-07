@@ -191,6 +191,7 @@
   position: absolute;
   bottom: 12px;
   right: 12px;
+  pointer-events: none;
   background: var(--color-bg-elevated);
   border-radius: 8px;
   padding: 4px;
