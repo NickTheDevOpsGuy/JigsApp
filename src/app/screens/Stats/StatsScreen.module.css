@@ -1,0 +1,204 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--color-bg-secondary);
+  padding: 24px;
+}
+
+.card {
+  width: min(520px, 100%);
+  background: var(--color-bg-card);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  color: var(--color-brand-primary);
+  flex: 1;
+}
+
+.placeholder,
+.hint {
+  margin: 0 0 16px;
+  color: var(--color-text-secondary);
+}
+
+.hint {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.debug {
+  font-size: 13px;
+  font-family: monospace;
+  padding: 8px 12px;
+  background: var(--color-bg-elevated);
+  border-radius: 8px;
+  margin: 12px 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.tabs button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tabs button:hover {
+  background: var(--color-bg-primary);
+}
+
+.tabs .tabActive {
+  background: var(--color-brand-primary);
+  color: white;
+  border-color: var(--color-brand-primary);
+}
+
+.section h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  color: var(--color-text-primary);
+}
+
+.loading,
+.empty {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.statCard {
+  padding: 16px;
+  background: var(--color-bg-elevated);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-brand-primary);
+}
+
+.statLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.leaderboard {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.leaderboardItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.leaderboardItem:last-child {
+  border-bottom: none;
+}
+
+.rank {
+  font-weight: 700;
+  color: var(--color-brand-primary);
+  min-width: 36px;
+}
+
+.player {
+  flex: 1;
+  color: var(--color-text-primary);
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.achievement {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--color-bg-elevated);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  opacity: 0.6;
+}
+
+.achievementUnlocked {
+  opacity: 1;
+  border-color: var(--color-brand-primary);
+}
+
+.achievementIcon {
+  font-size: 32px;
+}
+
+.achievementInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.achievementName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.achievementDesc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.achievementBadge {
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-size: 18px;
+}

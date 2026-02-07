@@ -1,10 +1,13 @@
 import { useCallback, useRef } from "react";
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
-import { soundManager } from "@/audio/sounds";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { Piece, PieceId, PuzzleState } from "@/puzzle/types";
 import type { HapticKind } from "./useHaptics";
+import type { DragPreviewState } from "./pointerHandlers/types";
+import { soundManager } from "@/audio/sounds";
+
+const DRAG_THRESHOLD = 12;
 
 const TAP_DRAG_THRESHOLD_PX = 12;
 const LONG_PRESS_MS = 500;
@@ -27,6 +30,7 @@ export function usePointerHandlers(args: {
   manager: PuzzleManager | null;
   boardRef: React.RefObject<HTMLDivElement | null>;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  trayRef: React.RefObject<HTMLDivElement | null>;
   selectedIdRef: React.MutableRefObject<PieceId | null>;
   setSelectedPieceId: (id: PieceId | null) => void;
   bump: () => void;
@@ -34,11 +38,17 @@ export function usePointerHandlers(args: {
   selectCycle: (dir: 1 | -1) => void;
   setState: (st: PuzzleState) => void;
   haptic?: (kind: HapticKind) => void;
+  onDragPreview?: (state: DragPreviewState | null) => void;
+  onPieceInteraction?: () => void;
 }) {
+  const argsRef = useRef(args);
+  argsRef.current = args;
+
   const {
     manager,
     boardRef,
     canvasRef,
+    trayRef,
     selectedIdRef,
     setSelectedPieceId,
     bump,
@@ -46,6 +56,8 @@ export function usePointerHandlers(args: {
     selectCycle,
     setState,
     haptic,
+    onDragPreview,
+    onPieceInteraction,
   } = args;
 
   const pendingTouchRef = useRef<PendingTouch | null>(null);
@@ -97,9 +109,20 @@ export function usePointerHandlers(args: {
     return { pieceId, piece, boardRect };
   };
 
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!manager || !canvasRef.current || !boardRef.current) return;
+  const finishDrag = useCallback(
+    (clientX: number, clientY: number) => {
+      if (!manager) return;
+      if (isOverTray(clientX, clientY)) {
+        const activeId = manager.getDragState().activeId;
+        if (activeId) {
+          manager.sendToTray(activeId);
+          selectCycle(1);
+        }
+      }
+      manager.pointerUp();
+    },
+    [manager, isOverTray, selectCycle],
+  );
 
       const canvas = canvasRef.current as CanvasWithLongPress;
       canvas.longPressFired = false;
@@ -113,6 +136,7 @@ export function usePointerHandlers(args: {
       selectedIdRef.current = pieceId;
       setSelectedPieceId(pieceId);
       bump();
+      onPieceInteraction?.();
 
       // Right click = rotate (desktop)
       if (e.pointerType !== "touch" && e.button === 2) {
@@ -129,7 +153,6 @@ export function usePointerHandlers(args: {
       if (e.pointerType !== "touch" && e.button === 1) {
         manager.sendToTray(pieceId);
         setState(manager.getState());
-        selectCycle(1);
         return;
       }
 
@@ -183,7 +206,8 @@ export function usePointerHandlers(args: {
       setState,
       selectCycle,
       haptic,
-      canRotatePiece,
+      setState,
+      isTouchDevice,
     ],
   );
 
@@ -226,9 +250,7 @@ export function usePointerHandlers(args: {
     [manager, boardRef, canvasRef, didDragRef, setState],
   );
 
-  const handlePointerUp = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!manager || !canvasRef.current) return;
+      if (!d.dragging) return;
 
       const canvas = canvasRef.current as CanvasWithLongPress;
       clearLongPress(canvas);

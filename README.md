@@ -54,19 +54,9 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ## User Stories
 
-### Players want:
+**Players** want to create puzzles from gallery, upload, or camera; enjoy smooth drag-and-drop with satisfying snaps; peek at a reference image when stuck; and relax in a clutter-free experience. They can compete on daily puzzles, track streaks, and share completed puzzles.
 
-- To upload an image and instantly generate a puzzle
-- Smooth, intuitive drag-and-drop
-- Pieces that snap when correctly aligned
-- A reference image for guidance
-- A relaxing, clutter-free experience
-
-### Developers want:
-
-- Predictable puzzle-generation logic
-- A structure that supports expansion
-- A roadmap that welcomes contribution
+**Developers** want predictable puzzle-generation logic, a structure that supports expansion, and a roadmap that welcomes contribution.
 
 ---
 
@@ -75,32 +65,41 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 ### Core Gameplay
 
 - Drag-and-drop jigsaw pieces with rotation
-- Classic interlocking jigsaw piece shapes
-- Board and neighbor snapping
-- Group merging so connected pieces move together
+- Classic interlocking piece shapes with board and neighbor snapping
+- Group merging — connected pieces move together
 - Multiple difficulty levels (3×3 to 6×6 grids)
+- Image sources: gallery, file upload, or camera capture
 
 ### UX & Polish
 
 - Reference image preview overlay
-- Progress counter and timer (with pause)
+- Progress counter and timer (elapsed, countdown, active-only, relaxed, best time)
 - Confetti celebration on completion 🎉
 - Sound effects (snap, rotate, place, complete)
-- Fullscreen mode
-- Custom fonts and icons (Inter, Fredoka, Lucide)
+- Fullscreen mode · Dark mode
+- What's New popup for updates
+- Custom fonts (Inter, Fredoka) and Lucide icons
 
 ### Mobile Support
 
-- Touch drag
-- Tap to rotate
-- Long-press to send pieces to the tray
+- Touch drag, tap to rotate, long-press to tray
 - Haptic feedback
+- Camera capture for instant puzzles
 - Mobile-safe layouts and gestures
+
+### Social & Progress
+
+- Daily puzzle — same for everyone, streak tracking
+- Player statistics dashboard (Supabase)
+- Leaderboards for daily puzzle times
+- Achievements system
+- Share completed puzzle image
 
 ### Accessibility & Controls
 
 - Keyboard shortcuts (Tab, arrows, R to rotate)
 - First-time tutorial overlay
+- Undo · Ghost hint · Lock pieces (optional)
 - Designed for relaxed, low-pressure play
 
 ### Persistence
@@ -112,38 +111,22 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ## Roadmap
 
-### Completed
+### Completed ✓
 
-- Drag-and-drop pieces with rotation
-- Interlocking piece shapes
-- Board + neighbor snapping
-- Piece merging and group movement
-- Tray system with color sorting
-- Multiple difficulty levels
-- Reference preview overlay
-- Progress counter and timer
-- Auto-save
-- Confetti celebration
-- Mobile support with haptics
-- Sound effects
-- Fullscreen mode
-- Keyboard shortcuts
-- Tutorial overlay
-- Sample puzzle gallery
-- Vercel deployment
+| Area        | Features                                                  |
+| ----------- | --------------------------------------------------------- |
+| **Core**    | Dark mode · Undo · Ghost hint · Lock pieces · Share image |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time       |
+| **Daily**   | Same puzzle for everyone · Streak tracking                |
+| **Social**  | Stats dashboard · Leaderboards · Achievements (Supabase)  |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery |
 
 ### Planned
 
-- Dark mode
-- Undo / Redo
-- Ghost / hint preview
+- Redo
 - Edge-piece filtering
 - Zoom and pan for large puzzles
-- Daily puzzle challenge
-- Share completed puzzle image
-- Player stats and achievements
 - Import puzzle from URL
-- Camera capture for custom photos
 - PWA / offline support
 
 ---

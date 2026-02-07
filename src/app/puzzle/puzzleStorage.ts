@@ -17,6 +17,7 @@ export type SavedPiece = {
   z: number;
   rotation: number;
   isPlaced: boolean;
+  locked: boolean;
   groupId: string;
   inTray: boolean;
 };
@@ -48,6 +49,7 @@ export function savePuzzleState(
     z: p.z,
     rotation: p.rotation,
     isPlaced: p.isPlaced,
+    locked: p.locked,
     groupId: p.groupId,
     inTray: p.inTray,
   }));

@@ -2,63 +2,36 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/Button/Button";
+import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import styles from "../PlayScreen.module.css";
+import {
+  buildMenuItems,
+  type HeaderMenuProps,
+  type MenuItemConfig,
+} from "./headerMenuConfig";
 
-type DebugFlags = {
-  showGrid: boolean;
-  showBounds: boolean;
-  showIds: boolean;
-};
-
-export type HeaderMenuProps = {
-  title?: string;
-
-  showPreview: boolean;
-  soundEnabled: boolean;
-  hapticsEnabled: boolean;
-  isFullscreen: boolean;
-
-  canShowHaptics: boolean;
-  canShowFullscreen: boolean;
-  canShowShortcuts: boolean;
-  canShowDebug: boolean;
-
-  debug: DebugFlags;
-
-  onNewPuzzle: () => void;
-  onTogglePreview: () => void;
-  onToggleSound: () => void;
-  onToggleHaptics: () => void;
-  onToggleFullscreen: () => void;
-  onShowShortcuts: () => void;
-  onToggleDebug: () => void;
-};
+export type { HeaderMenuProps } from "./headerMenuConfig";
 
 /**
  * Single source of truth for the "hamburger" menu.
- *
- * We keep the UI consistent by putting actions here for both desktop + mobile.
+ * Config-driven to reduce repetition and keep UI consistent.
  */
 export function HeaderMenu(props: HeaderMenuProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const items = buildMenuItems(props, setOpen, (path) => navigate(path));
 
-  // Close on outside click / Escape
   useEffect(() => {
     if (!open) return;
-
     const onPointerDown = (e: PointerEvent) => {
       const el = rootRef.current;
-      if (!el) return;
-      if (e.target && el.contains(e.target as Node)) return;
+      if (!el || (e.target && el.contains(e.target as Node))) return;
       setOpen(false);
     };
-
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
-
     window.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("keydown", onKeyDown);
     return () => {
@@ -66,6 +39,44 @@ export function HeaderMenu(props: HeaderMenuProps) {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
+
+  const visibleItems = items.filter((i) => i.visible);
+  const navItems = visibleItems.filter((i) => i.section === "nav");
+  const settingsItems = visibleItems
+    .filter((i) => i.section === "settings")
+    .sort((a, b) =>
+      (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
+        sensitivity: "base",
+      }),
+    );
+  const helpItems = visibleItems.filter((i) => i.section === "help");
+  const otherItems = visibleItems.filter((i) => i.section === "other");
+
+  const renderItem = (item: MenuItemConfig) => {
+    if (item.isTheme) {
+      return (
+        <div
+          key={item.id}
+          className={styles.headerMenuToggle}
+          role="menuitem"
+          onClick={item.onClick}
+        >
+          <ThemeToggle variant="menuItem" />
+        </div>
+      );
+    }
+    return (
+      <button
+        key={item.id}
+        className={styles.headerMenuItem}
+        role="menuitem"
+        disabled={item.disabled}
+        onClick={item.onClick}
+      >
+        {item.label}
+      </button>
+    );
+  };
 
   return (
     <div className={styles.headerMenuWrap} ref={rootRef}>
@@ -81,103 +92,14 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
       {open && (
         <div className={styles.headerMenuPanel} role="menu">
-          <button
-            className={styles.headerMenuItem}
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              navigate("/");
-            }}
-          >
-            Home
-          </button>
-
-          <button
-            className={styles.headerMenuItem}
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              props.onNewPuzzle();
-            }}
-          >
-            New puzzle
-          </button>
-
+          {navItems.map(renderItem)}
           <div className={styles.headerMenuDivider} />
-
-          <button
-            className={styles.headerMenuItem}
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              props.onTogglePreview();
-            }}
-          >
-            {props.showPreview ? "Hide preview" : "Show preview"}
-          </button>
-
-          <button
-            className={styles.headerMenuItem}
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              props.onToggleSound();
-            }}
-          >
-            {props.soundEnabled ? "Sound: on" : "Sound: off"}
-          </button>
-
-          {props.canShowHaptics && (
-            <button
-              className={styles.headerMenuItem}
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                props.onToggleHaptics();
-              }}
-            >
-              {props.hapticsEnabled ? "Haptics: on" : "Haptics: off"}
-            </button>
-          )}
-
-          {props.canShowShortcuts && (
-            <button
-              className={styles.headerMenuItem}
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                props.onShowShortcuts();
-              }}
-            >
-              Keyboard shortcuts
-            </button>
-          )}
-
-          {props.canShowFullscreen && (
-            <button
-              className={styles.headerMenuItem}
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                props.onToggleFullscreen();
-              }}
-            >
-              {props.isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-            </button>
-          )}
-
-          {props.canShowDebug && (
-            <button
-              className={styles.headerMenuItem}
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                props.onToggleDebug();
-              }}
-            >
-              Debug overlay
-            </button>
-          )}
+          <div className={styles.headerMenuSection}>Settings</div>
+          {settingsItems.map(renderItem)}
+          <div className={styles.headerMenuDivider} />
+          <div className={styles.headerMenuSection}>Help</div>
+          {helpItems.map(renderItem)}
+          {otherItems.map(renderItem)}
         </div>
       )}
     </div>

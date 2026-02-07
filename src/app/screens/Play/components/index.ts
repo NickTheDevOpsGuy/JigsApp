@@ -1,3 +1,4 @@
+export { DragPreview } from "./DragPreview";
 export { HeaderMenu } from "./HeaderMenu";
 export { PlayHUD } from "./PlayHUD";
 export { CompletionOverlay } from "./CompletionOverlay";
