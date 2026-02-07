@@ -36,6 +36,7 @@ export function handleTouchDown(
   canvas.touchStartY = e.clientY;
   canvas.touchDragStarted = false;
   canvas.pendingPieceId = pieceId;
+
   dragLog("down", { pieceId, x: e.clientX, y: e.clientY, pointerId: e.pointerId });
 
   canvas.pendingPieceRect = new DOMRect(
@@ -64,7 +65,9 @@ export function handleTouchMove(
     canvas ??
     (canvasRef?.current as CanvasWithTouch) ??
     (e.currentTarget as CanvasWithTouch);
+
   if (!canvasEl) return false;
+
   const sx = canvasEl.touchStartX;
   const sy = canvasEl.touchStartY;
   const pendingId = canvasEl.pendingPieceId;
@@ -78,6 +81,7 @@ export function handleTouchMove(
     canvasEl.touchDragStarted = true;
     didDragRef.current = true;
     ctx.onPieceInteraction?.();
+
     manager.pointerDown(pendingId, sx, sy, pendingRect);
     setState(manager.getState());
   }
@@ -86,24 +90,25 @@ export function handleTouchMove(
     ctx.onPieceInteraction?.();
     const boardRect = boardRef.current.getBoundingClientRect();
     manager.pointerMove(e.clientX, e.clientY, boardRect);
+
     dragLog("move", {
       x: e.clientX,
       y: e.clientY,
       activeId: manager.getDragState().activeId,
     });
+
     const { onDragPreview } = ctx;
     const activeId = manager.getDragState().activeId;
     if (activeId && onDragPreview) {
       const st = manager.getState();
       const piece = st.pieces.find((p) => p.id === activeId);
-      const groupSize = piece
-        ? st.pieces.filter((p) => p.groupId === piece.groupId).length
-        : 0;
+      const groupSize = piece ? st.pieces.filter((p) => p.groupId === piece.groupId).length : 0;
       if (groupSize === 1) {
         onDragPreview({ clientX: e.clientX, clientY: e.clientY, pieceId: activeId });
       }
     }
   }
+
   return true;
 }
 
@@ -113,16 +118,8 @@ export function handleTouchUp(
   canRotatePiece: (pid: string) => boolean,
   isPointerOverTray: (x: number, y: number) => boolean,
 ): void {
-  const {
-    manager,
-    boardRef,
-    canvasRef,
-    setState,
-    haptic,
-    selectCycle,
-    onDragPreview,
-    onPieceInteraction,
-  } = ctx;
+  const { manager, boardRef, canvasRef, setState, haptic, selectCycle, onDragPreview, onPieceInteraction } =
+    ctx;
   if (!manager || !canvasRef.current) return;
 
   const canvas = canvasRef.current as CanvasWithTouch;
@@ -130,6 +127,7 @@ export function handleTouchUp(
   const ctx2d = canvas.getContext("2d");
 
   onPieceInteraction?.();
+
   dragLog("up", {
     x: e.clientX,
     y: e.clientY,
@@ -138,17 +136,19 @@ export function handleTouchUp(
   });
 
   if (!dragStarted(canvas)) {
-    // Touch tap: rotate
+    // Tap: rotate (hit-test must match render DPR transform)
     if (boardRect && ctx2d) {
       const dpr = window.devicePixelRatio || 1;
       ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+
       const x = e.clientX - boardRect.left;
       const y = e.clientY - boardRect.top;
+
       const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
       const pid = pickPieceId(ctx2d, boardPieces, x, y);
+
       if (pid && canRotatePiece(pid)) {
-        onPieceInteraction?.();
         manager.rotatePiece(pid);
         soundManager.play("rotate");
         haptic?.("rotate");
@@ -156,20 +156,14 @@ export function handleTouchUp(
       }
     }
   } else {
-    // Touch drag end: check for drop on tray
+    // Drag end
     onDragPreview?.(null);
-    finishDragWithTrayCheck(
-      manager,
-      e.clientX,
-      e.clientY,
-      isPointerOverTray,
-      selectCycle,
-    );
+    finishDragWithTrayCheck(manager, e.clientX, e.clientY, isPointerOverTray, selectCycle);
     setState(manager.getState());
   }
 
   resetTouchState(canvas);
-  ctx.clearTouchPending?.();
+
   try {
     canvas.releasePointerCapture(e.pointerId);
   } catch {
