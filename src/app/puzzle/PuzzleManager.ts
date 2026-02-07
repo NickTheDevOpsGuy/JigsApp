@@ -13,12 +13,11 @@ export type PuzzleManagerOptions = {
   boardWidth: number;
   boardHeight: number;
   grid: GridSize;
-  correctEpsilonPx?: number;
 
   pieceWidth: number;
   pieceHeight: number;
-  pad?: number;
 
+  pad?: number;
   scatterPadding?: number;
   scatterStartYRatio?: number;
   snapTolerancePx?: number;
@@ -30,36 +29,33 @@ export type PuzzleManagerEvents = {
   onPieceSnapped?: () => void;
   onPuzzleComplete?: (state: PuzzleState) => void;
 };
-function _clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(n, max));
-}
 
 const UNDO_HISTORY_LIMIT = 30;
+
+const clamp = (n: number, min: number, max: number) =>
+  Math.max(min, Math.min(n, max));
 
 export class PuzzleManager {
   private state: PuzzleState;
   private drag: DragState;
-  private zCounter: number;
-  private events: PuzzleManagerEvents;
-
+  private zCounter = 10;
   private readonly undoManager = new UndoManager(UNDO_HISTORY_LIMIT);
+  private readonly events: PuzzleManagerEvents;
 
   private boardWidth: number;
   private boardHeight: number;
-
   private snapTolerancePx: number;
-  private scatterStartYRatio: number;
   private rotationStepDeg: 90 | 180;
+  private scatterStartYRatio: number;
 
-  /** When true, pieces that snap to correct position become locked (cannot be moved). */
-  private pieceLockingEnabled: boolean = false;
+  private pieceLockingEnabled = false;
 
   private pad: number;
   private tileW: number;
   private tileH: number;
 
-  private readonly targetStartX: number = 0;
-  private readonly targetStartY: number = 0;
+  private readonly targetStartX = 0;
+  private readonly targetStartY = 0;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {
@@ -69,10 +65,10 @@ export class PuzzleManager {
       grid,
       pieceWidth,
       pieceHeight,
-      scatterPadding = 24,
       pad = 18,
-      snapTolerancePx = 80,
+      scatterPadding = 24,
       scatterStartYRatio = 0.3,
+      snapTolerancePx = 80,
       rotationStepDeg = 90,
     } = options;
 
@@ -82,14 +78,13 @@ export class PuzzleManager {
     this.snapTolerancePx = snapTolerancePx;
     this.scatterStartYRatio = scatterStartYRatio;
     this.rotationStepDeg = rotationStepDeg;
-    // Tabs extend ~22% beyond tile edge; pad must exceed that or shapes get clipped
+
     const minPad = Math.ceil(Math.min(pieceWidth, pieceHeight) * 0.22);
     this.pad = Math.max(pad, minPad);
     this.tileW = pieceWidth;
     this.tileH = pieceHeight;
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
-    this.zCounter = 10;
 
     const pieces = createInitialPieces({
       grid,
@@ -103,7 +98,10 @@ export class PuzzleManager {
       rotationStepDeg,
       targetStartX: this.targetStartX,
       targetStartY: this.targetStartY,
-    });
+    }).map((p) => ({
+      ...p,
+      locked: p.locked ?? false, // ✅ normalize
+    }));
 
     this.state = {
       imageUrl,
@@ -117,455 +115,161 @@ export class PuzzleManager {
     this.recomputeDerivedState();
   }
 
-  /* ---------------- Correctness / Win condition ---------------- */
+  /* ---------- helpers ---------- */
 
-  private isPieceCorrect(p: Piece) {
-    if (p.rotation !== p.targetRotation) return false;
-    const tile = this.tilePos(p);
-    return p.targetX === Math.round(tile.x) && p.targetY === Math.round(tile.y);
-  }
-
-  private recomputeDerivedState() {
-    const allPieces = this.state.pieces;
-    if (allPieces.length === 0) {
-      this.state = { ...this.state, placedCount: 0, isComplete: false };
-      return;
-    }
-
-    const boardPieces = allPieces.filter((p) => !p.inTray);
-
-    const groupCounts = new Map<string, number>();
-    for (const p of boardPieces) {
-      groupCounts.set(p.groupId, (groupCounts.get(p.groupId) || 0) + 1);
-    }
-
-    const largestGroupSize = Math.max(...groupCounts.values(), 0);
-
-    if (boardPieces.length === 0) {
-      this.state = { ...this.state, placedCount: 0, isComplete: false };
-      return;
-    }
-
-    const firstPiece = boardPieces[0];
-    const allSameGroup = boardPieces.every((p) => p.groupId === firstPiece.groupId);
-    const allCorrectRotation = boardPieces.every((p) => p.rotation === p.targetRotation);
-    const noTrayPieces = boardPieces.length === allPieces.length;
-
-    // Win condition: all pieces snapped together in one group with correct rotation
-    // No need to check exact board position - if they're all connected correctly, puzzle is solved
-    const isComplete = allSameGroup && allCorrectRotation && noTrayPieces;
-    const prevComplete = this.state.isComplete;
-
-    this.state = {
-      ...this.state,
-      placedCount: largestGroupSize,
-      isComplete,
-    };
-
-    if (!prevComplete && isComplete) {
-      // Snap the completed puzzle to the correct board position
-      const ref = boardPieces[0];
-      const tile = this.tilePos(ref);
-      const dx = ref.targetX - tile.x;
-      const dy = ref.targetY - tile.y;
-      if (dx !== 0 || dy !== 0) {
-        this.shiftGroupUnclamped(ref.groupId, Math.round(dx), Math.round(dy));
-      }
-
-      this.updatePieces(
-        () => true,
-        () => ({ isPlaced: true }),
-      );
-      this.events.onPuzzleComplete?.(this.state);
-    }
-  }
-
-  /* ---------------- Utilities ---------------- */
-
-  private updatePieces(
-    predicate: (p: Piece) => boolean,
-    updater: (p: Piece) => Partial<Piece>,
-  ) {
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) => (predicate(p) ? { ...p, ...updater(p) } : p)),
-    };
-  }
-
-  private tilePos(p: Piece) {
-    return { x: p.x + p.pad, y: p.y + p.pad };
-  }
-
-  private getGroupPieces(groupId: string): Piece[] {
-    return this.state.pieces.filter((p) => p.groupId === groupId);
-  }
-
-  private shiftGroupUnclamped(groupId: string, dx: number, dy: number) {
-    if (dx === 0 && dy === 0) return;
-    this.updatePieces(
-      (p) => p.groupId === groupId,
-      (p) => ({ x: p.x + Math.round(dx), y: p.y + Math.round(dy) }),
-    );
-  }
-
-  private getGroupBounds(groupId: string) {
-    return getGroupBoundsUtil(this.state.pieces, groupId);
-  }
-
-  private shiftGroup(groupId: string, dx: number, dy: number) {
-    const clamped = this.clampGroupDelta(groupId, dx, dy);
-    if (clamped.dx === 0 && clamped.dy === 0) return;
-    this.updatePieces(
-      (p) => p.groupId === groupId,
-      (p) => ({ x: p.x + clamped.dx, y: p.y + clamped.dy }),
-    );
-  }
-
-  private clampGroupDelta(groupId: string, dx: number, dy: number) {
-    const b = this.getGroupBounds(groupId);
-    if (!b) return { dx: 0, dy: 0 };
-
-    return {
-      dx: _clamp(dx, -this.pad - b.minX, this.boardWidth + this.pad - b.maxX),
-      dy: _clamp(dy, -this.pad - b.minY, this.boardHeight + this.pad - b.maxY),
-    };
+  private isLocked(p: Piece) {
+    return p.locked === true;
   }
 
   private findPiece(id: string) {
     return this.state.pieces.find((p) => p.id === id) ?? null;
   }
 
-  private wouldOverlapAnyOtherGroup(groupId: string, dx: number, dy: number): boolean {
-    return wouldOverlapUtil(this.state.pieces, groupId, dx, dy);
+  private getGroupPieces(groupId: string) {
+    return this.state.pieces.filter((p) => p.groupId === groupId);
   }
 
-  private getSolvedNeighbors(piece: Piece): Piece[] {
-    return getSolvedNeighborsUtil(this.state.pieces, piece);
+  private tilePos(p: Piece) {
+    return { x: p.x + p.pad, y: p.y + p.pad };
   }
 
-  private mergeGroups(from: string, into: string) {
-    if (from === into) return;
-    this.updatePieces(
-      (p) => p.groupId === from,
-      () => ({ groupId: into }),
-    );
+  private updatePieces(
+    pred: (p: Piece) => boolean,
+    fn: (p: Piece) => Partial<Piece>,
+  ) {
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) =>
+        pred(p) ? { ...p, ...fn(p) } : p,
+      ),
+    };
   }
 
-  private computeSnapPreview() {
-    // This is a simplified version - you may want to implement full snap preview logic
-    return null;
-  }
-
-  /* ---------------- Public API ---------------- */
+  /* ---------- public API ---------- */
 
   getState(): PuzzleState {
     return this.state;
-  }
-
-  /** Save current piece state before a user action (for undo). */
-  pushUndoState(): void {
-    if (this.state.isComplete) return;
-    this.undoManager.push(this.state.pieces);
-  }
-
-  /** Restore previous piece state. Returns true if undo was performed. */
-  undo(): boolean {
-    if (!this.undoManager.canUndo() || this.state.isComplete) return false;
-    const snapshot = this.undoManager.pop();
-    if (!snapshot) return false;
-    this.restoreFromSaved(snapshot);
-    return true;
-  }
-
-  canUndo(): boolean {
-    return this.undoManager.canUndo() && !this.state.isComplete;
-  }
-
-  setPieceLockingEnabled(enabled: boolean): void {
-    this.pieceLockingEnabled = enabled;
-  }
-
-  getPieceLockingEnabled(): boolean {
-    return this.pieceLockingEnabled;
   }
 
   getDragState(): DragState {
     return this.drag;
   }
 
-  public getPiece(id: string) {
-    return this.findPiece(id);
+  setPieceLockingEnabled(enabled: boolean) {
+    this.pieceLockingEnabled = enabled;
   }
 
-  public nudgeGroup(pieceId: string, dx: number, dy: number) {
-    const p = this.findPiece(pieceId);
-    if (!p || p.isPlaced || p.locked) return;
-    this.pushUndoState();
-    this.shiftGroup(p.groupId, dx, dy);
-    this.recomputeDerivedState();
+  canUndo() {
+    return this.undoManager.canUndo() && !this.state.isComplete;
   }
 
-  public rotateGroup(pieceId: string) {
-    const p = this.findPiece(pieceId);
-    if (!p || p.isPlaced || p.locked) return;
-    this.rotatePiece(pieceId);
+  undo() {
+    if (!this.canUndo()) return false;
+    const snapshot = this.undoManager.pop();
+    if (!snapshot) return false;
+    this.restoreFromSaved(snapshot);
+    return true;
   }
 
-  public rotatePiece(pieceId: string) {
+  pushUndoState() {
+    if (!this.state.isComplete) {
+      this.undoManager.push(this.state.pieces);
+    }
+  }
+
+  /* ---------- movement ---------- */
+
+  pointerDown(pieceId: string, clientX: number, clientY: number, rect: DOMRect) {
     const piece = this.findPiece(pieceId);
-    if (!piece || piece.isPlaced || piece.locked) return;
+    if (!piece || piece.isPlaced || this.isLocked(piece)) return;
 
     this.pushUndoState();
 
+    this.zCounter++;
     this.updatePieces(
       (p) => p.groupId === piece.groupId,
-      (p) => ({ rotation: (p.rotation + this.rotationStepDeg) % 360 }),
+      () => ({ z: this.zCounter }),
     );
+
+    this.drag = {
+      activeId: pieceId,
+      offsetX: clientX - rect.left,
+      offsetY: clientY - rect.top,
+      preview: null,
+    };
   }
 
-  /** @param skipPush - when true, caller already pushed (e.g. nudgeGroup) */
-  public snapGroupNow(pieceId: string, skipPush = false) {
-    const p = this.findPiece(pieceId);
-    if (!p || p.isPlaced || p.locked) return;
+  pointerMove(clientX: number, clientY: number, boardRect: DOMRect) {
+    if (!this.drag.activeId) return;
 
-    if (!skipPush) this.pushUndoState();
-    this.drag = { ...this.drag, activeId: p.id };
+    const piece = this.findPiece(this.drag.activeId);
+    if (!piece) return;
+
+    const dx = clientX - boardRect.left - this.drag.offsetX - piece.x;
+    const dy = clientY - boardRect.top - this.drag.offsetY - piece.y;
+
+    this.shiftGroup(piece.groupId, dx, dy);
+  }
+
+  pointerUp() {
+    if (!this.drag.activeId) return;
+
     this.trySnapActiveGroupToNeighbor();
     this.trySnapActiveGroupToBoard();
+
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
     this.recomputeDerivedState();
   }
 
-  public sendToTray(pieceId: string) {
-    this.movePieceToTray(pieceId);
-    this.recomputeDerivedState();
-  }
+  /* ---------- snapping ---------- */
 
-  movePieceToTray(pieceId: string) {
-    const piece = this.findPiece(pieceId);
-    if (!piece || piece.isPlaced || piece.locked) return;
+  private trySnapActiveGroupToBoard() {
+    const id = this.drag.activeId;
+    if (!id) return false;
 
-    this.pushUndoState();
+    const p = this.findPiece(id);
+    if (!p || this.isLocked(p)) return false;
 
-    const groupPieces = this.getGroupPieces(piece.groupId);
-    if (groupPieces.length > 1) return;
-
-    this.updatePieces(
-      (p) => p.id === pieceId,
-      () => ({ inTray: true }),
-    );
-  }
-
-  movePieceFromTray(pieceId: string) {
-    const piece = this.findPiece(pieceId);
-    if (!piece || !piece.inTray) return;
-
-    this.pushUndoState();
-
-    const x = this.rand(16, Math.max(16, this.boardWidth - piece.w - 16));
-    const y = this.rand(16, Math.max(16, this.boardHeight - piece.h - 16));
-
-    this.zCounter += 1;
-    this.updatePieces(
-      (p) => p.id === pieceId,
-      () => ({
-        inTray: false,
-        x,
-        y,
-        z: this.zCounter,
-      }),
-    );
-  }
-
-  setBoardSize(boardWidth: number, boardHeight: number) {
-    this.boardWidth = boardWidth;
-    this.boardHeight = boardHeight;
-
-    const seen = new Set<string>();
-    for (const p of this.state.pieces) {
-      if (seen.has(p.groupId)) continue;
-      seen.add(p.groupId);
-
-      const bounds = this.getGroupBounds(p.groupId);
-      if (!bounds) continue;
-
-      const dxMin = -this.pad - bounds.minX;
-      const dxMax = this.boardWidth + this.pad - bounds.maxX;
-      const dyMin = -this.pad - bounds.minY;
-      const dyMax = this.boardHeight + this.pad - bounds.maxY;
-
-      const dx = _clamp(0, dxMin, dxMax);
-      const dy = _clamp(0, dyMin, dyMax);
-
-      if (dx !== 0 || dy !== 0) this.shiftGroup(p.groupId, dx, dy);
-    }
-
-    this.recomputeDerivedState();
-  }
-
-  public pointerDown(
-    pieceId: string,
-    clientX: number,
-    clientY: number,
-    pieceRect: DOMRect,
-  ) {
-    const piece = this.findPiece(pieceId);
-    if (!piece || piece.isPlaced || piece.locked) return;
-
-    this.pushUndoState();
-
-    this.zCounter += 1;
-    this.updatePieces(
-      (p) => p.groupId === piece.groupId,
-      () => ({
-        z: this.zCounter,
-      }),
-    );
-
-    // Calculate offset from pointer to piece origin
-    const offsetX = clientX - pieceRect.left;
-    const offsetY = clientY - pieceRect.top;
-
-    this.drag = {
-      activeId: pieceId,
-      offsetX,
-      offsetY,
-      preview: null,
-    };
-  }
-
-  public pointerMove(clientX: number, clientY: number, boardRect: DOMRect) {
-    const activeId = this.drag.activeId;
-    if (!activeId) return;
-
-    const piece = this.findPiece(activeId);
-    if (!piece) return;
-
-    // Calculate new position
-    const newX = clientX - boardRect.left - this.drag.offsetX;
-    const newY = clientY - boardRect.top - this.drag.offsetY;
-
-    // Calculate delta from current position
-    const dx = newX - piece.x;
-    const dy = newY - piece.y;
-
-    // Move the group
-    this.shiftGroup(piece.groupId, dx, dy);
-
-    // Compute snap preview
-    this.drag = {
-      ...this.drag,
-      preview: this.computeSnapPreview(),
-    };
-  }
-
-  public pointerUp() {
-    if (!this.drag.activeId) return;
-
-    // Try neighbor snap first (connect pieces), then board snap (align to grid).
-    // Order matters: board-then-neighbor could undo the board snap by aligning to a floating neighbor.
-    this.trySnapActiveGroupToNeighbor();
-    this.trySnapActiveGroupToBoard();
-
-    // Clear drag state
-    this.drag = {
-      activeId: null,
-      offsetX: 0,
-      offsetY: 0,
-      preview: null,
-    };
-
-    this.recomputeDerivedState();
-  }
-
-  public restoreFromSaved(savedPieces: SavedPiece[]) {
-    // Restore piece positions from saved state
-    const pieceMap = new Map(savedPieces.map((p) => [p.id, p]));
-
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) => {
-        const saved = pieceMap.get(p.id);
-        if (saved) {
-          return {
-            ...p,
-            x: saved.x,
-            y: saved.y,
-            z: saved.z,
-            rotation: saved.rotation,
-            groupId: saved.groupId,
-            isPlaced: saved.isPlaced,
-            locked: saved.locked ?? false,
-            inTray: saved.inTray,
-          };
-        }
-        return p;
-      }),
-    };
-
-    this.recomputeDerivedState();
-  }
-
-  /* ---------------- Snapping ---------------- */
-
-  private trySnapActiveGroupToBoard(): boolean {
-    const activeId = this.drag.activeId;
-    if (!activeId) return false;
-
-    const active = this.findPiece(activeId);
-    if (!active) return false;
-
-    const gid = active.groupId;
-    const groupPieces = this.getGroupPieces(gid);
-
-    if (!groupPieces.every((p) => p.rotation === 0)) return false;
-
-    const activeTile = this.tilePos(active);
-    const dx = active.targetX - activeTile.x;
-    const dy = active.targetY - activeTile.y;
+    const tile = this.tilePos(p);
+    const dx = p.targetX - tile.x;
+    const dy = p.targetY - tile.y;
 
     if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
-    // Skip overlap check: adjacent pieces have overlapping bounding boxes (pad),
-    // but correct board positions form a valid grid. Blocking would prevent snapping.
-    this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
+
+    this.shiftGroupUnclamped(p.groupId, Math.round(dx), Math.round(dy));
 
     this.updatePieces(
-      (p) => p.groupId === gid,
-      (p) => ({
+      (x) => x.groupId === p.groupId,
+      (x) => ({
+        locked: this.pieceLockingEnabled || x.locked,
         justSnapped: true,
-        locked: this.pieceLockingEnabled || p.locked,
       }),
     );
-    this.events.onPiecePlaced?.(active);
 
+    this.events.onPiecePlaced?.(p);
     return true;
   }
 
-  private trySnapActiveGroupToNeighbor(): boolean {
-    const activeId = this.drag.activeId;
-    if (!activeId) return false;
+  private trySnapActiveGroupToNeighbor() {
+    const id = this.drag.activeId;
+    if (!id) return false;
 
-    const active = this.findPiece(activeId);
+    const active = this.findPiece(id);
     if (!active || active.isPlaced) return false;
 
-    const gid = active.groupId;
-    const groupPieces = this.getGroupPieces(gid);
-    if (!groupPieces.every((p) => p.rotation === 0)) return false;
+    let best:
+      | { dx: number; dy: number; dist: number; into: string }
+      | null = null;
 
-    let best: null | { dx: number; dy: number; dist: number; into: string } = null;
+    for (const p of this.getGroupPieces(active.groupId)) {
+      for (const n of getSolvedNeighborsUtil(this.state.pieces, p)) {
+        if (n.groupId === p.groupId) continue;
 
-    for (const gp of groupPieces) {
-      for (const n of this.getSolvedNeighbors(gp)) {
-        if (n.groupId === gid || n.rotation !== 0) continue;
+        const gp = this.tilePos(p);
+        const nt = this.tilePos(n);
 
-        const gpTile = this.tilePos(gp);
-        const nTile = this.tilePos(n);
-
-        const expectedDx = (n.col - gp.col) * this.tileW;
-        const expectedDy = (n.row - gp.row) * this.tileH;
-
-        const dx = nTile.x - expectedDx - gpTile.x;
-        const dy = nTile.y - expectedDy - gpTile.y;
+        const dx = nt.x - gp.x - (n.col - p.col) * this.tileW;
+        const dy = nt.y - gp.y - (n.row - p.row) * this.tileH;
         const d = Math.hypot(dx, dy);
 
         if (d <= this.snapTolerancePx && (!best || d < best.dist)) {
@@ -576,38 +280,69 @@ export class PuzzleManager {
 
     if (!best) return false;
 
-    this.shiftGroupUnclamped(gid, Math.round(best.dx), Math.round(best.dy));
-    this.mergeGroups(gid, best.into);
-
-    if (this.pieceLockingEnabled) {
-      this.updatePieces(
-        (p) => p.groupId === best.into,
-        () => ({ locked: true }),
-      );
-    }
-
-    this.trySnapMergedGroupToBoard(best.into);
+    this.shiftGroupUnclamped(active.groupId, Math.round(best.dx), Math.round(best.dy));
+    this.mergeGroups(active.groupId, best.into);
     this.events.onPieceSnapped?.();
-
     return true;
   }
 
-  private trySnapMergedGroupToBoard(groupId: string): void {
-    const groupPieces = this.getGroupPieces(groupId);
-    if (!groupPieces.every((p) => p.rotation === 0)) return;
+  /* ---------- misc ---------- */
 
-    const ref = groupPieces[0];
-    const tile = this.tilePos(ref);
-
-    const dx = ref.targetX - tile.x;
-    const dy = ref.targetY - tile.y;
-
-    // Skip overlap check: adjacent pieces have overlapping bounding boxes (pad),
-    // but correct board positions form a valid grid. Blocking would prevent moving to board.
-    this.shiftGroupUnclamped(groupId, Math.round(dx), Math.round(dy));
+  private mergeGroups(from: string, into: string) {
+    if (from === into) return;
+    this.updatePieces((p) => p.groupId === from, () => ({ groupId: into }));
   }
 
-  private rand(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  private shiftGroup(groupId: string, dx: number, dy: number) {
+    const b = getGroupBoundsUtil(this.state.pieces, groupId);
+    if (!b) return;
+
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      (p) => ({
+        x: p.x + clamp(dx, -this.pad - b.minX, this.boardWidth + this.pad - b.maxX),
+        y: p.y + clamp(dy, -this.pad - b.minY, this.boardHeight + this.pad - b.maxY),
+      }),
+    );
+  }
+
+  private shiftGroupUnclamped(groupId: string, dx: number, dy: number) {
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      (p) => ({ x: p.x + dx, y: p.y + dy }),
+    );
+  }
+
+  restoreFromSaved(saved: SavedPiece[]) {
+    const map = new Map(saved.map((p) => [p.id, p]));
+
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) => {
+        const s = map.get(p.id);
+        return s
+          ? { ...p, ...s, locked: s.locked ?? false }
+          : p;
+      }),
+    };
+
+    this.recomputeDerivedState();
+  }
+
+  private recomputeDerivedState() {
+    const pieces = this.state.pieces.filter((p) => !p.inTray);
+    const placedCount = Math.max(
+      ...pieces.map((p) => this.getGroupPieces(p.groupId).length),
+      0,
+    );
+
+    const isComplete =
+      pieces.length > 0 &&
+      pieces.every((p) => p.groupId === pieces[0].groupId) &&
+      pieces.every((p) => p.rotation === p.targetRotation);
+
+    this.state = { ...this.state, placedCount, isComplete };
+
+    if (isComplete) this.events.onPuzzleComplete?.(this.state);
   }
 }
