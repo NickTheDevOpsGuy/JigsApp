@@ -79,7 +79,10 @@ export function usePointerHandlers(args: {
   );
 
   const pickPiece = useCallback(
-    (clientX: number, clientY: number): { pieceId: PieceId; piece: Piece; boardRect: DOMRect } | null => {
+    (
+      clientX: number,
+      clientY: number,
+    ): { pieceId: PieceId; piece: Piece; boardRect: DOMRect } | null => {
       if (!manager || !canvasRef.current || !boardRef.current) return null;
 
       const canvas = canvasRef.current;
@@ -246,7 +249,12 @@ export function usePointerHandlers(args: {
           // once we’re dragging, cancel long press
           clearLongPress(canvas);
 
-          manager.pointerDown(pending.pieceId, pending.startX, pending.startY, pending.pieceRect);
+          manager.pointerDown(
+            pending.pieceId,
+            pending.startX,
+            pending.startY,
+            pending.pieceRect,
+          );
           soundManager.play("pickup");
         }
 
