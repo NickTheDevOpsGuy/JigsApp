@@ -68,28 +68,26 @@ export function MenuScreen() {
           <Button
             variant="primary"
             onClick={() => nav("/new?source=camera")}
-            className={styles.actionCard}
+            className={styles.takePhotoCard}
           >
             <Camera size={24} />
             <span className={styles.actionLabel}>Take Photo</span>
           </Button>
 
-          <HelpMenu
-            variant="default"
-            className={styles.helpMenuCard}
-            onShowHowToPlay={() => setShowHelp(true)}
-            onShowShortcuts={() => setShowShortcuts(true)}
-          />
-
           <Button
             variant="secondary"
             onClick={() => nav("/stats")}
-            className={styles.actionCard}
+            className={styles.statsCard}
           >
             <BarChart3 size={20} />
             <span className={styles.actionLabel}>Stats</span>
           </Button>
 
+          <HelpMenu
+            variant="card"
+            onShowHowToPlay={() => setShowHelp(true)}
+            onShowShortcuts={() => setShowShortcuts(true)}
+          />
           <ThemeToggle variant="card" />
           <Button
             variant="secondary"
