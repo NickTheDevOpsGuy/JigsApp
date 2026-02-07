@@ -60,6 +60,7 @@
   margin: 0;
 }
 
+.closeBtn,
 .closeButton {
   appearance: none;
   background: none;
@@ -71,6 +72,7 @@
   transition: all 0.15s ease;
 }
 
+.closeBtn:hover,
 .closeButton:hover {
   background: var(--color-bg-card);
   color: var(--color-text-primary);

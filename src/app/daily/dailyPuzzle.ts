@@ -71,6 +71,18 @@ export function getTodayDailyPuzzle(): {
   return result;
 }
 
+export type DailyDifficulty = "easy" | "medium" | "hard" | "expert";
+
+export const DAILY_DIFFICULTY_GRIDS: Record<
+  DailyDifficulty,
+  { rows: number; cols: number }
+> = {
+  easy: { rows: 3, cols: 3 },
+  medium: { rows: 4, cols: 4 },
+  hard: { rows: 5, cols: 5 },
+  expert: { rows: 6, cols: 6 },
+};
+
 /** Start the daily puzzle: set storage and return config for navigation */
 export function startDailyPuzzle(): {
   imageUrl: string;
@@ -78,8 +90,17 @@ export function startDailyPuzzle(): {
 } | null {
   const config = getDailyPuzzleForDate(getTodayDateString());
   if (!config) return null;
+  return startDailyPuzzleWithDifficulty(config.puzzle, config.grid);
+}
 
-  const { puzzle, grid } = config;
+/** Start daily puzzle with explicit difficulty (grid size). No preview shown. */
+export function startDailyPuzzleWithDifficulty(
+  puzzle: SamplePuzzle,
+  grid: { rows: number; cols: number },
+): {
+  imageUrl: string;
+  grid: { rows: number; cols: number };
+} | null {
   const dateStr = getTodayDateString();
 
   try {

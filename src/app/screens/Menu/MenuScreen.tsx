@@ -9,16 +9,17 @@ import { Button } from "@/components/Button/Button";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { WhatsNewModal } from "@/components/WhatsNew";
+import { DailyPuzzleModal } from "@/components/DailyPuzzleModal/DailyPuzzleModal";
 import { HelpCircle, Image, Calendar, BarChart3, Sparkles } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
-import { startDailyPuzzle, isTodayDailyCompleted } from "@/daily/dailyPuzzle";
-import { clearPuzzleState } from "@/puzzle/puzzleStorage";
+import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
 
 export function MenuScreen() {
   const nav = useNavigate();
   const [showHelp, setShowHelp] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
+  const [showDailyModal, setShowDailyModal] = useState(false);
 
   const todayCompleted = isTodayDailyCompleted();
 
@@ -28,11 +29,9 @@ export function MenuScreen() {
 
   const hasDaily = SAMPLE_PUZZLES.length > 0;
 
-  const handleDailyPuzzle = () => {
-    clearPuzzleState();
-    startDailyPuzzle();
-    nav("/play");
-  };
+  const handleDailyPuzzle = () => setShowDailyModal(true);
+
+  const handleDailyStart = () => nav("/play");
 
   return (
     <div className={styles.page}>
@@ -95,6 +94,11 @@ export function MenuScreen() {
 
       <TutorialOverlay isOpen={showHelp} onComplete={() => setShowHelp(false)} />
       <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
+      <DailyPuzzleModal
+        isOpen={showDailyModal}
+        onClose={() => setShowDailyModal(false)}
+        onStart={handleDailyStart}
+      />
     </div>
   );
 }
