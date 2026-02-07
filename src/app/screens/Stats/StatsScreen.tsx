@@ -5,10 +5,7 @@ import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
 import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client";
 import { getMyStats } from "@/services/statsService";
-import {
-  getDailyLeaderboard,
-  getGridLeaderboard,
-} from "@/services/leaderboardService";
+import { getDailyLeaderboard, getGridLeaderboard } from "@/services/leaderboardService";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString } from "@/daily/dailyPuzzle";
 
@@ -214,7 +211,10 @@ export function StatsScreen() {
                       ) : (
                         <ol className={styles.leaderboard}>
                           {entries.map((entry) => (
-                            <li key={`${grid}-${entry.rank}`} className={styles.leaderboardItem}>
+                            <li
+                              key={`${grid}-${entry.rank}`}
+                              className={styles.leaderboardItem}
+                            >
                               <span className={styles.rank}>#{entry.rank}</span>
                               <span className={styles.player}>{entry.displayName}</span>
                               <span className={styles.time}>
