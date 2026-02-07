@@ -36,7 +36,12 @@ export function DailyPuzzleModal({ isOpen, onClose, onStart }: DailyPuzzleModalP
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Today's Puzzle" showCloseButton={true}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Today's Puzzle"
+      showCloseButton={true}
+    >
       <p className={styles.message}>
         Choose your difficulty. The puzzle stays the same for everyone today — only the
         grid size changes.

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
-import type {
-  PointerHandlersContext,
-  CanvasWithTouch,
-} from "./pointerHandlers/types";
-import { handleMouseDown, handleMouseMove, handleMouseUp } from "./pointerHandlers/mouseHandlers";
+import type { PointerHandlersContext, CanvasWithTouch } from "./pointerHandlers/types";
+import {
+  handleMouseDown,
+  handleMouseMove,
+  handleMouseUp,
+} from "./pointerHandlers/mouseHandlers";
 import {
   handleTouchDown as doTouchDown,
   handleTouchMove as doTouchMove,
@@ -224,12 +225,9 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
     [manager, boardRef, isCoarsePointer, didDragRef, onDragPreview, setState],
   );
 
-  const handleContextMenu = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      e.preventDefault();
-    },
-    [],
-  );
+  const handleContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  }, []);
 
   useEffect(() => {
     if (!isCoarsePointer || !boardRef.current || !canvasRef.current) return;
@@ -269,13 +267,12 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
         preventDefault: () => e.preventDefault(),
       } as React.PointerEvent<HTMLDivElement>;
 
-      doTouchDown(
-        syntheticEvent,
-        ctx,
-        pieceId,
-        boardRect,
-        { x: piece.x, y: piece.y, w: piece.w, h: piece.h },
-      );
+      doTouchDown(syntheticEvent, ctx, pieceId, boardRect, {
+        x: piece.x,
+        y: piece.y,
+        w: piece.w,
+        h: piece.h,
+      });
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -327,10 +324,22 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
       }
     };
 
-    board.addEventListener("touchstart", handleTouchStart, { passive: false, capture: true });
-    document.addEventListener("touchmove", handleTouchMove, { passive: false, capture: true });
-    document.addEventListener("touchend", handleTouchEnd, { passive: false, capture: true });
-    document.addEventListener("touchcancel", handleTouchCancel, { passive: false, capture: true });
+    board.addEventListener("touchstart", handleTouchStart, {
+      passive: false,
+      capture: true,
+    });
+    document.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+      capture: true,
+    });
+    document.addEventListener("touchend", handleTouchEnd, {
+      passive: false,
+      capture: true,
+    });
+    document.addEventListener("touchcancel", handleTouchCancel, {
+      passive: false,
+      capture: true,
+    });
 
     return () => {
       board.removeEventListener("touchstart", handleTouchStart, { capture: true });
