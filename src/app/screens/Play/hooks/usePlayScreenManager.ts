@@ -52,31 +52,20 @@ export function usePlayScreenManager(
 
       // Use real available space. Tighter padding on small phones (iPhone SE etc.)
       const padding = isSmallPhone ? 8 : isMobile ? 12 : 24;
-      const availW = Math.max(0, Math.floor(rect.width) - padding);
-      const availH = Math.max(0, Math.floor(rect.height) - padding);
+      // Guard against transient 0px measurements during initial layout.
+      // If we compute sizes off of 0px, pieces end up tiny and the puzzle becomes unplayable.
+      const minAvail = isMobile ? 280 : 420;
+      const availW = Math.max(minAvail, Math.floor(rect.width) - padding);
+      const availH = Math.max(minAvail, Math.floor(rect.height) - padding);
 
       // Base size from existing helper
       const basePieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-      // Mobile cap by difficulty so higher grids shrink naturally
-      const pieceCount = grid.rows * grid.cols;
-      const mobileMax =
-        pieceCount >= 36
-          ? 14 // 6x6+
-          : pieceCount >= 26
-            ? 16 // 5x5–5x7, 7x5 (35 pieces)
-            : pieceCount >= 17
-              ? 18 // 4x4, 5x5
-              : pieceCount >= 10
-                ? 20 // 4x4
-                : 18; // 3x3 (9 pieces)
-
-      const smallPhoneMax =
-        pieceCount >= 36 ? 12 : pieceCount >= 26 ? 12 : pieceCount >= 17 ? 14 : 16;
-      const effectiveMobileMax = isSmallPhone ? smallPhoneMax : mobileMax;
-      const pieceSize = isMobile
-        ? Math.min(basePieceSize, effectiveMobileMax)
-        : basePieceSize;
+      // IMPORTANT:
+      // Do not cap tile size on mobile. computeTileSize already clamps to sensible
+      // min/max values per device and grid. Capping here was making pieces
+      // comically small and broke snapping / dragging on iPhone.
+      const pieceSize = basePieceSize;
 
       const minBoardW = grid.cols * pieceSize;
       const minBoardH = grid.rows * pieceSize;
