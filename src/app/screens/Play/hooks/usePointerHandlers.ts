@@ -93,6 +93,9 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
     },
   };
 
+  const ctxRef = useRef(ctx);
+  ctxRef.current = ctx;
+
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (!manager || !boardRef.current || !canvasRef.current) return;
@@ -236,12 +239,16 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
     const canvas = canvasRef.current;
 
     const handleTouchStart = (e: TouchEvent) => {
-      if (e.target !== canvas && !board.contains(e.target as Node)) return;
+      if (!board.contains(e.target as Node)) return;
       if (e.touches.length !== 1) return;
+
+      e.preventDefault();
 
       const touch = e.touches[0];
       const boardRect = board.getBoundingClientRect();
       const rect = canvas.getBoundingClientRect();
+
+      const manager = ctxRef.current.manager;
       const x = touch.clientX - rect.left;
       const y = touch.clientY - rect.top;
 
@@ -267,7 +274,7 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
         preventDefault: () => e.preventDefault(),
       } as React.PointerEvent<HTMLDivElement>;
 
-      doTouchDown(syntheticEvent, ctx, pieceId, boardRect, {
+      doTouchDown(syntheticEvent, ctxRef.current, pieceId, boardRect, {
         x: piece.x,
         y: piece.y,
         w: piece.w,
@@ -287,7 +294,7 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
         pointerType: "touch" as const,
       } as React.PointerEvent<HTMLDivElement>;
 
-      doTouchMove(syntheticEvent, ctx, canvas as CanvasWithTouch);
+      doTouchMove(syntheticEvent, ctxRef.current, canvas as CanvasWithTouch);
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -302,7 +309,7 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
         pointerType: "touch" as const,
       } as React.PointerEvent<HTMLDivElement>;
 
-      doTouchUp(syntheticEvent, ctx, canRotatePiece, isPointerOverTray);
+      doTouchUp(syntheticEvent, ctxRef.current, canRotatePiece, isPointerOverTray);
       touchPendingRef.current = false;
     };
 
@@ -317,10 +324,11 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
       };
       resetTouchState(canvasEl);
       touchPendingRef.current = false;
-      if (manager) {
-        onDragPreview?.(null);
-        manager.pointerUp();
-        setState(manager.getState());
+      const mgr = ctxRef.current.manager;
+      if (mgr) {
+        ctxRef.current.onDragPreview?.(null);
+        mgr.pointerUp();
+        ctxRef.current.setState(mgr.getState());
       }
     };
 
@@ -328,6 +336,7 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
       passive: false,
       capture: true,
     });
+
     document.addEventListener("touchmove", handleTouchMove, {
       passive: false,
       capture: true,
@@ -347,17 +356,7 @@ export function usePointerHandlers(params: UsePointerHandlersParams) {
       document.removeEventListener("touchend", handleTouchEnd, { capture: true });
       document.removeEventListener("touchcancel", handleTouchCancel, { capture: true });
     };
-  }, [
-    isCoarsePointer,
-    boardRef,
-    canvasRef,
-    manager,
-    ctx,
-    canRotatePiece,
-    isPointerOverTray,
-    onDragPreview,
-    setState,
-  ]);
+  }, [isCoarsePointer, boardRef, canvasRef, canRotatePiece, isPointerOverTray]);
 
   return {
     handlePointerDown,
