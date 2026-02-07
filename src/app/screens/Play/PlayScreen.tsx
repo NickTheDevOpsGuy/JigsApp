@@ -79,6 +79,7 @@ export function PlayScreen() {
     countdownMinutes,
     lastInteractionRef,
   );
+
   const {
     manager,
     state,
@@ -170,6 +171,7 @@ export function PlayScreen() {
     clientY: number;
     pieceId: string;
   } | null>(null);
+
   const dragPreviewPieceIdRef = React.useRef<string | null>(null);
   dragPreviewPieceIdRef.current = dragPreview?.pieceId ?? null;
 
@@ -241,12 +243,15 @@ export function PlayScreen() {
     () => (state ? state.pieces.filter((p) => p.inTray) : []),
     [state],
   );
+
   const dragPreviewPiece =
     dragPreview && state ? state.pieces.find((p) => p.id === dragPreview.pieceId) : null;
+
   const placed = state?.placedCount ?? 0;
   const total = state?.totalCount ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
+
   const bestTimeSeconds =
     timeMode === "best" && state?.grid
       ? getBestTime(state.grid.rows, state.grid.cols)
@@ -296,6 +301,7 @@ export function PlayScreen() {
           />
           <div className={styles.title}>Phuzzle</div>
         </div>
+
         <div className={styles.topBarCenter}>
           <PlayHUD
             elapsedSeconds={elapsedSeconds}
@@ -308,6 +314,7 @@ export function PlayScreen() {
             onTogglePause={() => setIsPaused((p) => !p)}
           />
         </div>
+
         <TopBarButtons
           showPreview={showPreview}
           soundEnabled={soundEnabled}
@@ -335,17 +342,19 @@ export function PlayScreen() {
       />
 
       <div className={styles.main} ref={mainRef}>
-        <div
-          className={styles.board}
-          ref={boardRef}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerCancel}
-          onLostPointerCapture={handleLostPointerCapture}
-          onContextMenu={handleContextMenu}
-        >
-          <canvas className={styles.canvas} ref={canvasRef} />
+        <div className={styles.board} ref={boardRef}>
+          <canvas
+            className={styles.canvas}
+            ref={canvasRef}
+            tabIndex={0}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
+            onLostPointerCapture={handleLostPointerCapture}
+            onContextMenu={handleContextMenu}
+          />
+
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>
               <img
@@ -355,6 +364,7 @@ export function PlayScreen() {
               />
             </div>
           )}
+
           {isPaused && (
             <PauseOverlay
               onResume={() => setIsPaused(false)}
@@ -368,6 +378,7 @@ export function PlayScreen() {
               }
             />
           )}
+
           {isComplete && (
             <CompletionOverlay
               elapsedSeconds={elapsedSeconds}
