@@ -71,6 +71,12 @@ export type Piece = {
   isPlaced: boolean;
 
   /**
+   * When piece locking is enabled, pieces that snap to correct position are locked.
+   * Locked pieces cannot be dragged, rotated, or sent to tray.
+   */
+  locked: boolean;
+
+  /**
    * Group id for clusters. Pieces in same group move together.
    * Neighbor snap merges groups.
    */

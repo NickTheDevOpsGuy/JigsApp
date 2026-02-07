@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Menu, Download, Share2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
+import { setBestTime } from "../timeMode";
+import {
+  recordDailyCompletion,
+  DAILY_DATE_KEY,
+  getCurrentStreak,
+} from "@/daily/dailyPuzzle";
+import { recordCompletion } from "@/services/statsService";
+import { checkAndUnlockAchievements } from "@/services/achievementsService";
 
 interface ShareUrls {
   twitter: string;
@@ -13,6 +21,9 @@ interface ShareUrls {
 
 interface CompletionOverlayProps {
   elapsedSeconds: number;
+  grid?: { rows: number; cols: number };
+  isNewBest?: boolean;
+  isDaily?: boolean;
   shareUrls: ShareUrls;
   copied: boolean;
   canNativeShare: boolean;
@@ -26,6 +37,9 @@ interface CompletionOverlayProps {
 
 export function CompletionOverlay({
   elapsedSeconds,
+  grid,
+  isNewBest = false,
+  isDaily = false,
   shareUrls,
   copied,
   canNativeShare,
@@ -36,11 +50,64 @@ export function CompletionOverlay({
   onNewPuzzle,
   onMenu,
 }: CompletionOverlayProps) {
+  const [streak, setStreak] = useState<number>(0);
+
+  useEffect(() => {
+    if (isNewBest && grid) {
+      setBestTime(grid.rows, grid.cols, elapsedSeconds);
+    }
+  }, [isNewBest, grid, elapsedSeconds]);
+
+  useEffect(() => {
+    if (isDaily) {
+      const newStreak = recordDailyCompletion(elapsedSeconds);
+      setStreak(newStreak);
+      try {
+        localStorage.removeItem(DAILY_DATE_KEY);
+      } catch {
+        // ignore
+      }
+    }
+  }, [isDaily, elapsedSeconds]);
+
+  useEffect(() => {
+    if (!grid) return;
+    const run = async () => {
+      const dailyStreak = isDaily ? getCurrentStreak() : 0;
+      const stats = await recordCompletion({
+        elapsedSeconds,
+        grid,
+        isDaily: !!isDaily,
+        dailyStreak,
+      });
+      if (stats) {
+        await checkAndUnlockAchievements({
+          puzzlesCompleted: stats.puzzlesCompleted,
+          dailyStreak: stats.dailyStreak,
+          bestDailyStreak: stats.bestDailyStreak,
+          lastCompletion: { elapsedSeconds, grid },
+        });
+      }
+    };
+    run();
+  }, [elapsedSeconds, grid, isDaily]);
+
   return (
     <div className={styles.completeOverlay}>
       <div className={styles.completeContent}>
         <h2>🎉 Complete!</h2>
-        <p>Finished in {formatTime(elapsedSeconds)}</p>
+        <p>
+          Finished in {formatTime(elapsedSeconds)}
+          {isNewBest && <span className={styles.newBest}> — New best!</span>}
+          {isDaily && (
+            <span className={styles.dailyBadge}>
+              — Daily completed!
+              {streak > 0 && (
+                <span className={styles.streak}> {streak} day streak 🔥</span>
+              )}
+            </span>
+          )}
+        </p>
 
         <div className={styles.shareSection}>
           <p className={styles.shareLabel}>Share your result:</p>

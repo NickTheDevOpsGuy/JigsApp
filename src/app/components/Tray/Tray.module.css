@@ -4,8 +4,8 @@
   display: flex;
   gap: 16px;
   padding: 12px;
-  background: #f8f9fa;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--color-bg-card);
+  border-top: 1px solid var(--color-border);
   overflow-x: auto;
   overflow-y: hidden;
   height: 100%;
@@ -22,10 +22,10 @@
 .trayLabel {
   font-size: 12px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--color-text-secondary);
   white-space: nowrap;
   padding: 4px 8px;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-secondary);
   border-radius: 6px;
 }
 
@@ -41,15 +41,15 @@
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
-  background: white;
+  background: var(--color-bg-elevated);
   border-radius: 8px;
   padding: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .trayPiece:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .trayPiece:active {
@@ -65,7 +65,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--color-text-muted);
   font-size: 14px;
   text-align: center;
   padding: 20px;
@@ -81,15 +81,15 @@
 }
 
 .tray::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-secondary);
   border-radius: 4px;
 }
 
 .tray::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--color-border-strong);
   border-radius: 4px;
 }
 
 .tray::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--color-text-muted);
 }

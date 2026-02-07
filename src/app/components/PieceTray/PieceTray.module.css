@@ -3,18 +3,20 @@
 .tray {
   height: 150px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 5;
 
   display: flex;
   flex-direction: column;
 
-  background: #ffffff;
+  background: var(--color-bg-elevated);
   border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-border);
   margin: 0 12px 12px 12px;
 
   font-size: 13px;
   line-height: 1.35;
-  color: rgba(0, 0, 0, 0.75);
+  color: var(--color-text-secondary);
   overflow: hidden;
 }
 
@@ -22,8 +24,8 @@
   padding: 8px 14px;
   font-weight: 600;
   font-size: 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-card);
   flex-shrink: 0;
   display: flex;
   justify-content: space-between;
@@ -37,7 +39,7 @@
 .help {
   font-weight: 400;
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--color-text-muted);
 }
 
 .controls {
@@ -47,8 +49,8 @@
   justify-content: space-between;
   gap: 10px;
   padding: 6px 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  background: rgba(248, 250, 252, 0.95);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-card);
 }
 
 .segment,
@@ -60,9 +62,9 @@
 .segment button,
 .sort button {
   appearance: none;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: #ffffff;
-  color: rgba(17, 24, 39, 0.85);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
   border-radius: 6px;
   padding: 5px 10px;
   font-size: 12px;
@@ -75,14 +77,14 @@
 
 .segment button:hover,
 .sort button:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--color-bg-secondary);
 }
 
 .segment button.active,
 .sort button.active {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.5);
-  color: rgba(29, 78, 216, 1);
+  background: var(--color-brand-light);
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
 }
 
 .scroller {
@@ -107,7 +109,7 @@
 }
 
 .pieceButton:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-secondary);
   transform: scale(1.08);
 }
 
@@ -126,7 +128,7 @@
   /* was: overflow: hidden; */
   overflow: visible;
 
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--color-bg-secondary);
 
   /* helps center an <img> thumbnail cleanly */
   display: flex;
@@ -157,21 +159,22 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  color: rgba(0, 0, 0, 0.4);
+  color: var(--color-text-muted);
   font-style: italic;
   font-size: 13px;
 }
 
-/* Mobile adjustments */
+/* Mobile adjustments - smaller tray to free space for puzzle */
 @media (max-width: 600px) {
   .tray {
     margin: 0 8px 8px 8px;
-    height: 130px;
+    height: 100px;
+    border-radius: 12px;
   }
 
   .header {
     padding: 6px 10px;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .help {
@@ -190,7 +193,33 @@
   }
 
   .thumbWrap {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Small phones: iPhone SE etc. */
+@media (max-width: 380px) {
+  .tray {
+    height: 88px;
+    margin: 0 6px 6px 6px;
+    border-radius: 10px;
+  }
+  .header {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  .controls {
+    padding: 3px 6px;
+    gap: 4px;
+  }
+  .segment button,
+  .sort button {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  .thumbWrap {
+    width: 34px;
+    height: 34px;
   }
 }

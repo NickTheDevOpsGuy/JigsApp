@@ -1,6 +1,12 @@
 import type { DragState, GridSize, Piece, PuzzleState } from "./types";
 import { createInitialPieces } from "./factories/createInitialPieces";
 import type { SavedPiece } from "./puzzleStorage";
+import { UndoManager } from "./undoManager";
+import {
+  getGroupBounds as getGroupBoundsUtil,
+  wouldOverlapAnyOtherGroup as wouldOverlapUtil,
+  getSolvedNeighbors as getSolvedNeighborsUtil,
+} from "./groupUtils";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
@@ -20,13 +26,17 @@ export type PuzzleManagerOptions = {
 };
 
 export type PuzzleManagerEvents = {
-  onPiecePlaced?: (piece: Piece) => void;
-  onPieceSnapped?: () => void;
+  onPiecePlaced?: (piece: Piece, groupPieces: Piece[]) => void;
+  onPieceSnapped?: (pieceIds: string[]) => void;
   onPuzzleComplete?: (state: PuzzleState) => void;
+  /** Called before shifting pieces to snap position - allows capturing "from" positions for animation */
+  onBeforeSnap?: (pieces: Piece[]) => void;
 };
 function _clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(n, max));
 }
+
+const UNDO_HISTORY_LIMIT = 30;
 
 export class PuzzleManager {
   private state: PuzzleState;
@@ -34,12 +44,17 @@ export class PuzzleManager {
   private zCounter: number;
   private events: PuzzleManagerEvents;
 
+  private readonly undoManager = new UndoManager(UNDO_HISTORY_LIMIT);
+
   private boardWidth: number;
   private boardHeight: number;
 
   private snapTolerancePx: number;
   private scatterStartYRatio: number;
   private rotationStepDeg: 90 | 180;
+
+  /** When true, pieces that snap to correct position become locked (cannot be moved). */
+  private pieceLockingEnabled: boolean = false;
 
   private pad: number;
   private tileW: number;
@@ -58,8 +73,8 @@ export class PuzzleManager {
       pieceHeight,
       scatterPadding = 16,
       pad = 18,
-      snapTolerancePx = 40,
-      scatterStartYRatio = 0.3,
+      snapTolerancePx = 80,
+      scatterStartYRatio = 0.08,
       rotationStepDeg = 90,
     } = options;
 
@@ -69,7 +84,9 @@ export class PuzzleManager {
     this.snapTolerancePx = snapTolerancePx;
     this.scatterStartYRatio = scatterStartYRatio;
     this.rotationStepDeg = rotationStepDeg;
-    this.pad = pad;
+    // Tabs extend ~22% beyond tile edge; pad must exceed that or shapes get clipped
+    const minPad = Math.ceil(Math.min(pieceWidth, pieceHeight) * 0.22);
+    this.pad = Math.max(pad, minPad);
     this.tileW = pieceWidth;
     this.tileH = pieceHeight;
 
@@ -81,7 +98,7 @@ export class PuzzleManager {
       boardWidth,
       boardHeight,
       scatterPadding,
-      pad,
+      pad: this.pad,
       tileW: pieceWidth,
       tileH: pieceHeight,
       scatterStartYRatio,
@@ -157,15 +174,25 @@ export class PuzzleManager {
         this.shiftGroupUnclamped(ref.groupId, Math.round(dx), Math.round(dy));
       }
 
-      this.state = {
-        ...this.state,
-        pieces: this.state.pieces.map((p) => ({ ...p, isPlaced: true })),
-      };
+      this.updatePieces(
+        () => true,
+        () => ({ isPlaced: true }),
+      );
       this.events.onPuzzleComplete?.(this.state);
     }
   }
 
   /* ---------------- Utilities ---------------- */
+
+  private updatePieces(
+    predicate: (p: Piece) => boolean,
+    updater: (p: Piece) => Partial<Piece>,
+  ) {
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) => (predicate(p) ? { ...p, ...updater(p) } : p)),
+    };
+  }
 
   private tilePos(p: Piece) {
     return { x: p.x + p.pad, y: p.y + p.pad };
@@ -177,45 +204,23 @@ export class PuzzleManager {
 
   private shiftGroupUnclamped(groupId: string, dx: number, dy: number) {
     if (dx === 0 && dy === 0) return;
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.groupId === groupId
-          ? { ...p, x: p.x + Math.round(dx), y: p.y + Math.round(dy) }
-          : p,
-      ),
-    };
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      (p) => ({ x: p.x + Math.round(dx), y: p.y + Math.round(dy) }),
+    );
   }
 
   private getGroupBounds(groupId: string) {
-    const ps = this.getGroupPieces(groupId);
-    if (!ps.length) return null;
-
-    let minX = Infinity,
-      minY = Infinity,
-      maxX = -Infinity,
-      maxY = -Infinity;
-
-    for (const p of ps) {
-      minX = Math.min(minX, p.x);
-      minY = Math.min(minY, p.y);
-      maxX = Math.max(maxX, p.x + p.w);
-      maxY = Math.max(maxY, p.y + p.h);
-    }
-
-    return { minX, minY, maxX, maxY };
+    return getGroupBoundsUtil(this.state.pieces, groupId);
   }
 
   private shiftGroup(groupId: string, dx: number, dy: number) {
     const clamped = this.clampGroupDelta(groupId, dx, dy);
     if (clamped.dx === 0 && clamped.dy === 0) return;
-
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.groupId === groupId ? { ...p, x: p.x + clamped.dx, y: p.y + clamped.dy } : p,
-      ),
-    };
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      (p) => ({ x: p.x + clamped.dx, y: p.y + clamped.dy }),
+    );
   }
 
   private clampGroupDelta(groupId: string, dx: number, dy: number) {
@@ -233,52 +238,19 @@ export class PuzzleManager {
   }
 
   private wouldOverlapAnyOtherGroup(groupId: string, dx: number, dy: number): boolean {
-    const groupPieces = this.getGroupPieces(groupId);
-    const otherPieces = this.state.pieces.filter(
-      (p) => p.groupId !== groupId && !p.inTray,
-    );
-
-    for (const gp of groupPieces) {
-      const gpX = gp.x + dx;
-      const gpY = gp.y + dy;
-      const gpRight = gpX + gp.w;
-      const gpBottom = gpY + gp.h;
-
-      for (const op of otherPieces) {
-        const opRight = op.x + op.w;
-        const opBottom = op.y + op.h;
-
-        // Check for overlap
-        if (!(gpRight <= op.x || gpX >= opRight || gpBottom <= op.y || gpY >= opBottom)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return wouldOverlapUtil(this.state.pieces, groupId, dx, dy);
   }
 
   private getSolvedNeighbors(piece: Piece): Piece[] {
-    const byRC = (r: number, c: number) =>
-      this.state.pieces.find((p) => p.row === r && p.col === c) ?? null;
-
-    return [
-      byRC(piece.row - 1, piece.col),
-      byRC(piece.row + 1, piece.col),
-      byRC(piece.row, piece.col - 1),
-      byRC(piece.row, piece.col + 1),
-    ].filter(Boolean) as Piece[];
+    return getSolvedNeighborsUtil(this.state.pieces, piece);
   }
 
   private mergeGroups(from: string, into: string) {
     if (from === into) return;
-
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.groupId === from ? { ...p, groupId: into } : p,
-      ),
-    };
+    this.updatePieces(
+      (p) => p.groupId === from,
+      () => ({ groupId: into }),
+    );
   }
 
   private computeSnapPreview() {
@@ -292,8 +264,45 @@ export class PuzzleManager {
     return this.state;
   }
 
+  /** Save current piece state before a user action (for undo). */
+  pushUndoState(): void {
+    if (this.state.isComplete) return;
+    this.undoManager.push(this.state.pieces);
+  }
+
+  /** Restore previous piece state. Returns true if undo was performed. */
+  undo(): boolean {
+    if (!this.undoManager.canUndo() || this.state.isComplete) return false;
+    const snapshot = this.undoManager.pop();
+    if (!snapshot) return false;
+    this.restoreFromSaved(snapshot);
+    return true;
+  }
+
+  canUndo(): boolean {
+    return this.undoManager.canUndo() && !this.state.isComplete;
+  }
+
+  setPieceLockingEnabled(enabled: boolean): void {
+    this.pieceLockingEnabled = enabled;
+  }
+
+  getPieceLockingEnabled(): boolean {
+    return this.pieceLockingEnabled;
+  }
+
   getDragState(): DragState {
     return this.drag;
+  }
+
+  /**
+   * Cancel an in-progress drag WITHOUT running snap logic.
+   * Useful for tray drops on mobile where snap-on-pointerUp can interfere.
+   */
+  cancelDrag(): void {
+    if (!this.drag.activeId) return;
+    this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
+    this.recomputeDerivedState();
   }
 
   public getPiece(id: string) {
@@ -302,41 +311,39 @@ export class PuzzleManager {
 
   public nudgeGroup(pieceId: string, dx: number, dy: number) {
     const p = this.findPiece(pieceId);
-    if (!p || p.isPlaced) return;
+    if (!p || p.isPlaced || p.locked) return;
+    this.pushUndoState();
     this.shiftGroup(p.groupId, dx, dy);
     this.recomputeDerivedState();
   }
 
   public rotateGroup(pieceId: string) {
     const p = this.findPiece(pieceId);
-    if (!p || p.isPlaced) return;
+    if (!p || p.isPlaced || p.locked) return;
     this.rotatePiece(pieceId);
   }
 
   public rotatePiece(pieceId: string) {
     const piece = this.findPiece(pieceId);
-    if (!piece || piece.isPlaced) return;
+    if (!piece || piece.isPlaced || piece.locked) return;
 
-    // Rotate all pieces in the group
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) => {
-        if (p.groupId === piece.groupId) {
-          const newRotation = (p.rotation + this.rotationStepDeg) % 360;
-          return { ...p, rotation: newRotation };
-        }
-        return p;
-      }),
-    };
+    this.pushUndoState();
+
+    this.updatePieces(
+      (p) => p.groupId === piece.groupId,
+      (p) => ({ rotation: (p.rotation + this.rotationStepDeg) % 360 }),
+    );
   }
 
-  public snapGroupNow(pieceId: string) {
+  /** @param skipPush - when true, caller already pushed (e.g. nudgeGroup) */
+  public snapGroupNow(pieceId: string, skipPush = false) {
     const p = this.findPiece(pieceId);
-    if (!p || p.isPlaced) return;
+    if (!p || p.isPlaced || p.locked) return;
 
+    if (!skipPush) this.pushUndoState();
     this.drag = { ...this.drag, activeId: p.id };
-    this.trySnapActiveGroupToBoard();
     this.trySnapActiveGroupToNeighbor();
+    this.trySnapActiveGroupToBoard();
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
     this.recomputeDerivedState();
   }
@@ -348,34 +355,38 @@ export class PuzzleManager {
 
   movePieceToTray(pieceId: string) {
     const piece = this.findPiece(pieceId);
-    if (!piece || piece.isPlaced) return;
+    if (!piece || piece.isPlaced || piece.locked) return;
+
+    this.pushUndoState();
 
     const groupPieces = this.getGroupPieces(piece.groupId);
     if (groupPieces.length > 1) return;
 
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, inTray: true } : p,
-      ),
-    };
+    this.updatePieces(
+      (p) => p.id === pieceId,
+      () => ({ inTray: true }),
+    );
   }
 
   movePieceFromTray(pieceId: string) {
     const piece = this.findPiece(pieceId);
     if (!piece || !piece.inTray) return;
 
+    this.pushUndoState();
+
     const x = this.rand(16, Math.max(16, this.boardWidth - piece.w - 16));
     const y = this.rand(16, Math.max(16, this.boardHeight - piece.h - 16));
 
     this.zCounter += 1;
-
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.id === pieceId ? { ...p, inTray: false, x, y, z: this.zCounter } : p,
-      ),
-    };
+    this.updatePieces(
+      (p) => p.id === pieceId,
+      () => ({
+        inTray: false,
+        x,
+        y,
+        z: this.zCounter,
+      }),
+    );
   }
 
   setBoardSize(boardWidth: number, boardHeight: number) {
@@ -411,18 +422,17 @@ export class PuzzleManager {
     pieceRect: DOMRect,
   ) {
     const piece = this.findPiece(pieceId);
-    if (!piece || piece.isPlaced) return;
+    if (!piece || piece.isPlaced || piece.locked) return;
 
-    // Bring group to front
+    this.pushUndoState();
+
     this.zCounter += 1;
-    const newZ = this.zCounter;
-
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.groupId === piece.groupId ? { ...p, z: newZ } : p,
-      ),
-    };
+    this.updatePieces(
+      (p) => p.groupId === piece.groupId,
+      () => ({
+        z: this.zCounter,
+      }),
+    );
 
     // Calculate offset from pointer to piece origin
     const offsetX = clientX - pieceRect.left;
@@ -464,9 +474,10 @@ export class PuzzleManager {
   public pointerUp() {
     if (!this.drag.activeId) return;
 
-    // Try to snap
-    this.trySnapActiveGroupToBoard();
+    // Try neighbor snap first (connect pieces), then board snap (align to grid).
+    // Order matters: board-then-neighbor could undo the board snap by aligning to a floating neighbor.
     this.trySnapActiveGroupToNeighbor();
+    this.trySnapActiveGroupToBoard();
 
     // Clear drag state
     this.drag = {
@@ -496,6 +507,7 @@ export class PuzzleManager {
             rotation: saved.rotation,
             groupId: saved.groupId,
             isPlaced: saved.isPlaced,
+            locked: saved.locked ?? false,
             inTray: saved.inTray,
           };
         }
@@ -525,19 +537,20 @@ export class PuzzleManager {
     const dy = active.targetY - activeTile.y;
 
     if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
-    if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
-
+    // Capture positions before shift for snap-to-position animation
+    this.events.onBeforeSnap?.(groupPieces);
+    // Skip overlap check: adjacent pieces have overlapping bounding boxes (pad),
+    // but correct board positions form a valid grid. Blocking would prevent snapping.
     this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
 
-    // Mark as snapped for visual feedback, but don't set isPlaced
-    // (isPlaced is only set when entire puzzle is complete)
-    this.state = {
-      ...this.state,
-      pieces: this.state.pieces.map((p) =>
-        p.groupId === gid ? { ...p, justSnapped: true } : p,
-      ),
-    };
-    this.events.onPiecePlaced?.(active);
+    this.updatePieces(
+      (p) => p.groupId === gid,
+      (p) => ({
+        justSnapped: true,
+        locked: this.pieceLockingEnabled || p.locked,
+      }),
+    );
+    this.events.onPiecePlaced?.(active, groupPieces);
 
     return true;
   }
@@ -577,11 +590,20 @@ export class PuzzleManager {
 
     if (!best) return false;
 
+    // Capture positions before shift for snap-to-position animation
+    this.events.onBeforeSnap?.(groupPieces);
     this.shiftGroupUnclamped(gid, Math.round(best.dx), Math.round(best.dy));
     this.mergeGroups(gid, best.into);
 
+    if (this.pieceLockingEnabled) {
+      this.updatePieces(
+        (p) => p.groupId === best.into,
+        () => ({ locked: true }),
+      );
+    }
+
     this.trySnapMergedGroupToBoard(best.into);
-    this.events.onPieceSnapped?.();
+    this.events.onPieceSnapped?.(groupPieces.map((p) => p.id));
 
     return true;
   }
@@ -595,10 +617,21 @@ export class PuzzleManager {
 
     const dx = ref.targetX - tile.x;
     const dy = ref.targetY - tile.y;
+    if (dx === 0 && dy === 0) return;
 
-    if (this.wouldOverlapAnyOtherGroup(groupId, dx, dy)) return;
-
+    // Capture positions before shift for snap-to-position animation
+    this.events.onBeforeSnap?.(groupPieces);
+    // Skip overlap check: adjacent pieces have overlapping bounding boxes (pad),
+    // but correct board positions form a valid grid. Blocking would prevent moving to board.
     this.shiftGroupUnclamped(groupId, Math.round(dx), Math.round(dy));
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      (p) => ({
+        justSnapped: true,
+        locked: this.pieceLockingEnabled || p.locked,
+      }),
+    );
+    this.events.onPiecePlaced?.(ref, groupPieces);
   }
 
   private rand(min: number, max: number) {

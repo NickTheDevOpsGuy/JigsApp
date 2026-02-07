@@ -54,19 +54,9 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ## User Stories
 
-### Players want:
+**Players** want to create puzzles from gallery, upload, or camera; enjoy smooth drag-and-drop with satisfying snaps; peek at a reference image when stuck; and relax in a clutter-free experience. They can compete on daily puzzles, track streaks, and share completed puzzles.
 
-- To upload an image and instantly generate a puzzle
-- Smooth, intuitive drag-and-drop
-- Pieces that snap when correctly aligned
-- A reference image for guidance
-- A relaxing, clutter-free experience
-
-### Developers want:
-
-- Predictable puzzle-generation logic
-- A structure that supports expansion
-- A roadmap that welcomes contribution
+**Developers** want predictable puzzle-generation logic, a structure that supports expansion, and a roadmap that welcomes contribution.
 
 ---
 
@@ -75,32 +65,41 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 ### Core Gameplay
 
 - Drag-and-drop jigsaw pieces with rotation
-- Classic interlocking jigsaw piece shapes
-- Board and neighbor snapping
-- Group merging so connected pieces move together
+- Classic interlocking piece shapes with board and neighbor snapping
+- Group merging — connected pieces move together
 - Multiple difficulty levels (3×3 to 6×6 grids)
+- Image sources: gallery, file upload, or camera capture
 
 ### UX & Polish
 
 - Reference image preview overlay
-- Progress counter and timer (with pause)
+- Progress counter and timer (elapsed, countdown, active-only, relaxed, best time)
 - Confetti celebration on completion 🎉
 - Sound effects (snap, rotate, place, complete)
-- Fullscreen mode
-- Custom fonts and icons (Inter, Fredoka, Lucide)
+- Fullscreen mode · Dark mode
+- What's New popup for updates
+- Custom fonts (Inter, Fredoka) and Lucide icons
 
 ### Mobile Support
 
-- Touch drag
-- Tap to rotate
-- Long-press to send pieces to the tray
+- Touch drag, tap to rotate, long-press to tray
 - Haptic feedback
+- Camera capture for instant puzzles
 - Mobile-safe layouts and gestures
+
+### Social & Progress
+
+- Daily puzzle — same for everyone, streak tracking
+- Player statistics dashboard (Supabase)
+- Leaderboards for daily puzzle times
+- Achievements system
+- Share completed puzzle image
 
 ### Accessibility & Controls
 
 - Keyboard shortcuts (Tab, arrows, R to rotate)
 - First-time tutorial overlay
+- Undo · Ghost hint · Lock pieces (optional)
 - Designed for relaxed, low-pressure play
 
 ### Persistence
@@ -112,38 +111,22 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ## Roadmap
 
-### Completed
+### Completed ✓
 
-- Drag-and-drop pieces with rotation
-- Interlocking piece shapes
-- Board + neighbor snapping
-- Piece merging and group movement
-- Tray system with color sorting
-- Multiple difficulty levels
-- Reference preview overlay
-- Progress counter and timer
-- Auto-save
-- Confetti celebration
-- Mobile support with haptics
-- Sound effects
-- Fullscreen mode
-- Keyboard shortcuts
-- Tutorial overlay
-- Sample puzzle gallery
-- Vercel deployment
+| Area        | Features                                                  |
+| ----------- | --------------------------------------------------------- |
+| **Core**    | Dark mode · Undo · Ghost hint · Lock pieces · Share image |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time       |
+| **Daily**   | Same puzzle for everyone · Streak tracking                |
+| **Social**  | Stats dashboard · Leaderboards · Achievements (Supabase)  |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery |
 
 ### Planned
 
-- Dark mode
-- Undo / Redo
-- Ghost / hint preview
+- Redo
 - Edge-piece filtering
 - Zoom and pan for large puzzles
-- Daily puzzle challenge
-- Share completed puzzle image
-- Player stats and achievements
 - Import puzzle from URL
-- Camera capture for custom photos
 - PWA / offline support
 
 ---
@@ -201,7 +184,6 @@ Category = folder name, puzzle name = filename.
 <summary>📁 Click to expand file structure</summary>
 
 ```plaintext
-
 .
 ├── .github
 │   ├── ISSUE_TEMPLATE
@@ -345,12 +327,190 @@ Category = folder name, puzzle name = filename.
 ├── .prettierignore
 ├── .prettierrc.yml
 ├── CONTRIBUTORS.md
+├── .env.example
+├── .eslintcache
 ├── eslint.config.ts
+├── .github
+│   ├── ISSUE_TEMPLATE
+│   │   ├── bug.yml
+│   │   ├── config.yml
+│   │   ├── documentation.yml
+│   │   ├── enhancement_refactor.yml
+│   │   ├── feature_request.yml
+│   │   └── question_discussion.yml
+│   ├── pull_request_template.md
+│   └── workflows
+│       ├── CODEOWNERS
+│       ├── Phuzzle.yml
+│       └── vercel-production.yml
+├── .gitignore
+├── .husky
+│   ├── pre-commit
+│   └── pre-push
 ├── index.html
 ├── LICENSE.md
-├── package-lock.json
 ├── package.json
+├── .prettierignore
+├── .prettierrc.yml
+├── public
+│   └── favicon.svg
 ├── README.md
+├── scripts
+│   ├── create-mvp2-issues.sh
+│   └── precheck.sh
+├── src
+│   ├── app
+│   │   ├── App.tsx
+│   │   ├── assets
+│   │   │   ├── puzzles
+│   │   │   │   ├── animals
+│   │   │   │   │   ├── bear.png
+│   │   │   │   │   └── rabbit.png
+│   │   │   │   ├── flowers
+│   │   │   │   │   ├── daisy.png
+│   │   │   │   │   ├── flower_bed.png
+│   │   │   │   │   ├── lavender.png
+│   │   │   │   │   └── sunflower.png
+│   │   │   │   └── food
+│   │   │   │       ├── charcuterie_board.png
+│   │   │   │       ├── curries_and_rice.png
+│   │   │   │       ├── fruit_platter.png
+│   │   │   │       └── pasta_dishes.png
+│   │   │   └── ui
+│   │   │       └── phuzzle-logo-512.png
+│   │   ├── audio
+│   │   │   └── sounds.ts
+│   │   ├── components
+│   │   │   ├── Button
+│   │   │   │   ├── Button.module.css
+│   │   │   │   └── Button.tsx
+│   │   │   ├── DropDown
+│   │   │   │   ├── Dropdown.module.css
+│   │   │   │   └── Dropdown.tsx
+│   │   │   ├── HowToPlay
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── TutorialOverlay.module.css
+│   │   │   │   └── TutorialOverlay.tsx
+│   │   │   ├── Modal
+│   │   │   │   ├── Modal.module.css
+│   │   │   │   └── Modal.tsx
+│   │   │   ├── PieceTray
+│   │   │   │   ├── PieceTray.module.css
+│   │   │   │   └── PieceTray.tsx
+│   │   │   ├── ShortcutsModal
+│   │   │   │   ├── ShortcutsModal.module.css
+│   │   │   │   └── ShortcutsModal.tsx
+│   │   │   ├── ThemeToggle
+│   │   │   │   ├── ThemeToggle.module.css
+│   │   │   │   └── ThemeToggle.tsx
+│   │   │   ├── Tray
+│   │   │   │   ├── Tray.module.css
+│   │   │   │   └── Tray.tsx
+│   │   │   └── WhatsNew
+│   │   │       ├── index.ts
+│   │   │       ├── WhatsNewModal.module.css
+│   │   │       └── WhatsNewModal.tsx
+│   │   ├── daily
+│   │   │   └── dailyPuzzle.ts
+│   │   ├── data
+│   │   │   ├── achievements.ts
+│   │   │   ├── changelog.ts
+│   │   │   └── samplePuzzles.ts
+│   │   ├── hooks
+│   │   │   ├── useKeyboardShortcuts.ts
+│   │   │   └── useTheme.tsx
+│   │   ├── main.tsx
+│   │   ├── puzzle
+│   │   │   ├── canvas
+│   │   │   │   ├── pickPiece.ts
+│   │   │   │   ├── renderBoardHelpers.ts
+│   │   │   │   ├── renderBoard.ts
+│   │   │   │   ├── renderTrayPiece.ts
+│   │   │   │   └── shape.ts
+│   │   │   ├── colorUtils.ts
+│   │   │   ├── config.ts
+│   │   │   ├── factories
+│   │   │   │   └── createInitialPieces.ts
+│   │   │   ├── groupUtils.ts
+│   │   │   ├── PuzzleManager.ts
+│   │   │   ├── puzzleStorage.ts
+│   │   │   ├── shape.ts
+│   │   │   ├── SnapLogic.ts
+│   │   │   ├── types.ts
+│   │   │   └── undoManager.ts
+│   │   ├── screens
+│   │   │   ├── Menu
+│   │   │   │   ├── MenuScreen.module.css
+│   │   │   │   └── MenuScreen.tsx
+│   │   │   ├── NewGame
+│   │   │   │   ├── NewGameScreen.module.css
+│   │   │   │   └── NewGameScreen.tsx
+│   │   │   ├── Play
+│   │   │   │   ├── components
+│   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── DragPreview.tsx
+│   │   │   │   │   ├── headerMenuConfig.tsx
+│   │   │   │   │   ├── HeaderMenu.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── PauseOverlay.tsx
+│   │   │   │   │   ├── PlayHUD.tsx
+│   │   │   │   │   └── TopBarButtons.tsx
+│   │   │   │   ├── hooks
+│   │   │   │   │   ├── pointerHandlers
+│   │   │   │   │   │   ├── dragLog.ts
+│   │   │   │   │   │   ├── mouseHandlers.ts
+│   │   │   │   │   │   ├── shared.ts
+│   │   │   │   │   │   ├── touchHandlers.ts
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── useCoarsePointer.ts
+│   │   │   │   │   ├── useDownloadImage.ts
+│   │   │   │   │   ├── useHaptics.ts
+│   │   │   │   │   ├── useInputHints.ts
+│   │   │   │   │   ├── usePlayScreenAnimation.ts
+│   │   │   │   │   ├── usePlayScreenManager.ts
+│   │   │   │   │   ├── usePlayScreenShortcuts.ts
+│   │   │   │   │   ├── usePlayScreenTimer.ts
+│   │   │   │   │   ├── usePlayScreenUI.ts
+│   │   │   │   │   ├── usePointerHandlers.ts
+│   │   │   │   │   ├── usePuzzleLifecycle.ts
+│   │   │   │   │   ├── useShareResults.ts
+│   │   │   │   │   └── useTimeModeConfig.ts
+│   │   │   │   ├── PlayScreen.module.css
+│   │   │   │   ├── PlayScreen.tsx
+│   │   │   │   ├── playScreenUtils.ts
+│   │   │   │   ├── playUtils.ts
+│   │   │   │   └── timeMode.ts
+│   │   │   ├── Setup
+│   │   │   │   ├── components
+│   │   │   │   │   ├── CameraCapture.module.css
+│   │   │   │   │   └── CameraCapture.tsx
+│   │   │   │   ├── hooks
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── useGridConfig.ts
+│   │   │   │   │   └── useImagePicker.ts
+│   │   │   │   ├── SetupScreen.module.css
+│   │   │   │   └── SetupScreen.tsx
+│   │   │   └── Stats
+│   │   │       ├── StatsScreen.module.css
+│   │   │       └── StatsScreen.tsx
+│   │   ├── services
+│   │   │   ├── achievementsService.ts
+│   │   │   ├── leaderboardService.ts
+│   │   │   └── statsService.ts
+│   │   ├── styles
+│   │   │   └── global.css
+│   │   ├── supabase
+│   │   │   ├── auth.ts
+│   │   │   ├── client.ts
+│   │   │   └── types.ts
+│   │   └── vite-env.d.ts
+│   └── types
+│       ├── canvas-confetti.d.ts
+│       └── vite-env.d.ts
+├── supabase
+│   ├── migrations
+│   │   └── 001_initial_schema.sql
+│   └── README.md
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json

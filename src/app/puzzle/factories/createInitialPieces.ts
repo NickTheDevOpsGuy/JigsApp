@@ -78,8 +78,12 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const total = grid.cols * grid.rows;
   const edges = buildEdgesForGrid(grid);
 
-  const w = tileW + pad * 2;
-  const h = tileH + pad * 2;
+  // Tabs/blanks extend ~22% beyond tile edge (see shape.ts knobDepth). Pad must exceed that or shapes get clipped.
+  const minPad = Math.ceil(Math.min(tileW, tileH) * 0.22);
+  const effectivePad = Math.max(pad, minPad);
+
+  const w = tileW + effectivePad * 2;
+  const h = tileH + effectivePad * 2;
 
   const scatterStartY = Math.max(
     scatterPadding,
@@ -96,7 +100,9 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const zoneWidth = scatterZone.maxX - scatterZone.minX;
   const zoneHeight = scatterZone.maxY - scatterZone.minY;
 
-  const spacing = 8;
+  // Spacing between pieces: larger = more spread out (avoids piling on top of each other)
+  const tileSize = Math.min(tileW, tileH);
+  const spacing = Math.max(28, Math.floor(tileSize * 0.85));
   const cellW = w + spacing;
   const cellH = h + spacing;
 
@@ -104,10 +110,15 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
 
   const positions: Array<{ x: number; y: number }> = [];
+  const maxJitter = Math.min(
+    Math.floor(spacing * 0.35),
+    Math.max(0, cellW - w - 4),
+    Math.max(0, cellH - h - 4),
+  );
   for (let row = 0; row < gridRows; row++) {
     for (let col = 0; col < gridCols; col++) {
-      const jitterX = randInt(0, Math.min(spacing * 2, cellW - w));
-      const jitterY = randInt(0, Math.min(spacing * 2, cellH - h));
+      const jitterX = maxJitter > 0 ? randInt(0, maxJitter) : 0;
+      const jitterY = maxJitter > 0 ? randInt(0, maxJitter) : 0;
 
       positions.push({
         x: scatterZone.minX + col * cellW + jitterX,
@@ -122,12 +133,45 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     [positions[i], positions[j]] = [positions[j], positions[i]];
   }
 
-  // If there are fewer cells than pieces, add random positions.
+  // If there are fewer cells than pieces, add positions with strict overlap avoidance.
+  const minGap = Math.max(20, Math.floor(spacing * 0.9));
+  const requiredGap = w + minGap;
   while (positions.length < total) {
-    positions.push({
-      x: randInt(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
-      y: randInt(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
-    });
+    let placed = false;
+    for (let attempt = 0; attempt < 200 && !placed; attempt++) {
+      const candidate = {
+        x: randInt(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
+        y: randInt(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
+      };
+      const tooClose = positions.some(
+        (p) =>
+          Math.abs(p.x - candidate.x) < requiredGap &&
+          Math.abs(p.y - candidate.y) < requiredGap,
+      );
+      if (!tooClose) {
+        positions.push(candidate);
+        placed = true;
+      }
+    }
+    if (!placed) {
+      // Last resort: place in a grid pattern to guarantee separation
+      const idx = positions.length;
+      const cols = Math.max(1, Math.floor(zoneWidth / requiredGap));
+      const extraCol = idx % cols;
+      const extraRow = Math.floor(idx / cols);
+      const maxX = Math.max(scatterZone.minX, scatterZone.maxX - w);
+      const maxY = Math.max(scatterZone.minY, scatterZone.maxY - h);
+      positions.push({
+        x: Math.min(
+          maxX,
+          scatterZone.minX + extraCol * requiredGap + randInt(0, Math.min(6, minGap)),
+        ),
+        y: Math.min(
+          maxY,
+          scatterZone.minY + extraRow * requiredGap + randInt(0, Math.min(6, minGap)),
+        ),
+      });
+    }
   }
 
   const pieces: Piece[] = [];
@@ -144,7 +188,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     const shapePath = buildPiecePath({
       tileW,
       tileH,
-      pad,
+      pad: effectivePad,
       edges: edges[i],
     });
 
@@ -159,12 +203,13 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
       h,
       tileW,
       tileH,
-      pad,
+      pad: effectivePad,
       targetX,
       targetY,
       rotation: randRotation(rotationStepDeg),
       targetRotation: 0,
       isPlaced: false,
+      locked: false,
       groupId: `g${i + 1}`,
       justSnapped: false,
       shapePath,

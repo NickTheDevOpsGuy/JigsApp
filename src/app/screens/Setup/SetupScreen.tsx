@@ -2,205 +2,96 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./SetupScreen.module.css";
-import { SAMPLE_PUZZLES, CATEGORIES, type SamplePuzzle } from "@/data/samplePuzzles";
+import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/samplePuzzles";
 import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
-import { ArrowLeft, Trash2, Play } from "lucide-react";
+import { ArrowLeft, Trash2, Play, Camera } from "lucide-react";
+import { useImagePicker, useGridConfig, GRID_OPTIONS } from "./hooks";
+import { CameraCapture } from "./components/CameraCapture";
+import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
+import { COUNTDOWN_OPTIONS, type TimeMode } from "../Play/timeMode";
 
-const STORAGE_KEY = "phuzzle:imageDataUrl";
-const GRID_KEY = "phuzzle:gridSize";
-
-// Minimum image dimensions for a playable puzzle
-const MIN_IMAGE_SIZE = 200;
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-
-type GridOption = {
-  label: string;
-  rows: number;
-  cols: number;
+const TIME_MODE_LABELS: Record<TimeMode, string> = {
+  elapsed: "Elapsed",
+  countdown: "Countdown",
+  active: "Active only",
+  relaxed: "Relaxed (no timer)",
+  best: "Best time",
 };
 
-const GRID_OPTIONS: GridOption[] = [
-  { label: "Easy (3×3 - 9 pieces)", rows: 3, cols: 3 },
-  { label: "Medium (4×4 - 16 pieces)", rows: 4, cols: 4 },
-  { label: "Hard (5×5 - 25 pieces)", rows: 5, cols: 5 },
-  { label: "Expert (6×6 - 36 pieces)", rows: 6, cols: 6 },
-];
+const STORAGE_KEY = "phuzzle:imageDataUrl";
 
-type ImageSource = "upload" | "gallery";
+type ImageSource = "gallery" | "upload" | "camera";
 
 export function SetupScreen() {
   const nav = useNavigate();
-  const [imgDataUrl, setImgDataUrl] = useState<string | null>(null);
-  const [gridIndex, setGridIndex] = useState(1); // Default to Medium
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Gallery state
   const [imageSource, setImageSource] = useState<ImageSource>("gallery");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedPuzzle, setSelectedPuzzle] = useState<SamplePuzzle | null>(null);
 
+  const {
+    imgDataUrl,
+    setImgDataUrl,
+    error,
+    isLoading,
+    selectedPuzzle,
+    clearError,
+    selectGalleryPuzzle,
+    pickFile,
+    setFromBlob,
+    clearImage,
+  } = useImagePicker();
+
+  const {
+    gridIndex,
+    setGridIndex,
+    customRows,
+    setCustomRows,
+    customCols,
+    setCustomCols,
+    isCustom,
+    saveGrid,
+    minGrid,
+    maxGrid,
+  } = useGridConfig();
+
+  const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
+    useTimeModeConfig();
+
+  // Load existing image on mount
   useEffect(() => {
     const existingImg = localStorage.getItem(STORAGE_KEY);
     if (existingImg) setImgDataUrl(existingImg);
-
-    const existingGrid = localStorage.getItem(GRID_KEY);
-    if (existingGrid) {
-      const idx = GRID_OPTIONS.findIndex((g) => `${g.rows}x${g.cols}` === existingGrid);
-      if (idx >= 0) setGridIndex(idx);
-    }
-  }, []);
+  }, [setImgDataUrl]);
 
   const filteredPuzzles =
     selectedCategory === "all"
       ? SAMPLE_PUZZLES
       : SAMPLE_PUZZLES.filter((p) => p.category === selectedCategory);
 
-  function clearError() {
-    setError(null);
-  }
-
-  function validateImageDimensions(
-    dataUrl: string,
-  ): Promise<{ width: number; height: number }> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-
-      img.onload = () => {
-        resolve({ width: img.naturalWidth, height: img.naturalHeight });
-      };
-
-      img.onerror = () => {
-        reject(new Error("Failed to load image. The file may be corrupted."));
-      };
-
-      img.src = dataUrl;
-    });
-  }
-
-  async function onSelectGalleryPuzzle(puzzle: SamplePuzzle) {
-    setSelectedPuzzle(puzzle);
-    clearError();
-    setIsLoading(true);
-
-    try {
-      // Fetch the image and convert to data URL
-      const response = await fetch(puzzle.fullImage);
-      if (!response.ok) throw new Error("Failed to load image");
-
-      const blob = await response.blob();
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = () => reject(new Error("Failed to read image"));
-        reader.readAsDataURL(blob);
-      });
-
-      setImgDataUrl(dataUrl);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load image.";
-      setError(message);
-      setSelectedPuzzle(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
+  const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const success = await pickFile(file);
+    if (!success) e.currentTarget.value = "";
+  };
 
-    clearError();
-    setIsLoading(true);
-    setSelectedPuzzle(null); // Clear gallery selection
-
-    try {
-      // Check file type
-      const validTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
-      if (!validTypes.includes(file.type)) {
-        throw new Error("Please choose a PNG, JPG, or WebP image.");
-      }
-
-      // Check file size
-      if (file.size > MAX_FILE_SIZE) {
-        const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-        throw new Error(
-          `Image is too large (${sizeMB}MB). Please choose one under 10MB.`,
-        );
-      }
-
-      // Read file as data URL
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          const result = reader.result;
-          if (typeof result !== "string" || !result.startsWith("data:image/")) {
-            reject(new Error("Could not read file as an image."));
-            return;
-          }
-          resolve(result);
-        };
-
-        reader.onerror = () => {
-          reject(new Error("Failed to read file. Please try another image."));
-        };
-
-        reader.readAsDataURL(file);
-      });
-
-      // Validate image dimensions
-      const { width, height } = await validateImageDimensions(dataUrl);
-
-      if (width < MIN_IMAGE_SIZE || height < MIN_IMAGE_SIZE) {
-        throw new Error(
-          `Image is too small (${width}×${height}px). Please use an image at least ${MIN_IMAGE_SIZE}×${MIN_IMAGE_SIZE}px.`,
-        );
-      }
-
-      // Check if image is very small for higher difficulties
-      const selected = GRID_OPTIONS[gridIndex];
-      const minForGrid = selected.cols * 50; // At least 50px per piece
-      if (width < minForGrid || height < minForGrid) {
-        // Just warn, don't block
-        console.warn(`Image may be too small for ${selected.label} difficulty`);
-      }
-
-      setImgDataUrl(dataUrl);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load image.";
-      setError(message);
-      e.currentTarget.value = "";
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  function onStart() {
-    if (!imgDataUrl) {
-      setError("Please select an image first.");
-      return;
-    }
-
-    const selected = GRID_OPTIONS[gridIndex];
+  const handleStart = () => {
+    if (!imgDataUrl) return;
 
     try {
       localStorage.setItem(STORAGE_KEY, imgDataUrl);
-      localStorage.setItem(GRID_KEY, `${selected.rows}x${selected.cols}`);
+      saveGrid();
+      localStorage.removeItem("phuzzle:dailyDate");
       nav("/play");
     } catch {
-      // localStorage might be full or disabled
-      setError("Could not save image. Try a smaller image or clear browser storage.");
+      console.error("Could not save to localStorage");
     }
-  }
+  };
 
-  function onClear() {
+  const handleClear = () => {
     localStorage.removeItem(STORAGE_KEY);
-    setImgDataUrl(null);
-    setSelectedPuzzle(null);
-    clearError();
-  }
+    clearImage();
+  };
 
   return (
     <div className={styles.page}>
@@ -230,11 +121,17 @@ export function SetupScreen() {
           >
             Upload
           </button>
+          <button
+            className={`${styles.tab} ${imageSource === "camera" ? styles.tabActive : ""}`}
+            onClick={() => setImageSource("camera")}
+          >
+            <Camera size={16} />
+            Camera
+          </button>
         </div>
 
         {imageSource === "gallery" ? (
           <>
-            {/* Category filter */}
             <div className={styles.categories}>
               {CATEGORIES.map((cat) => (
                 <button
@@ -247,7 +144,6 @@ export function SetupScreen() {
               ))}
             </div>
 
-            {/* Gallery grid */}
             <div className={styles.gallery}>
               {filteredPuzzles.length === 0 ? (
                 <div className={styles.galleryEmpty}>No puzzles in this category yet</div>
@@ -256,7 +152,7 @@ export function SetupScreen() {
                   <button
                     key={puzzle.id}
                     className={`${styles.galleryItem} ${selectedPuzzle?.id === puzzle.id ? styles.galleryItemSelected : ""}`}
-                    onClick={() => onSelectGalleryPuzzle(puzzle)}
+                    onClick={() => selectGalleryPuzzle(puzzle)}
                     disabled={isLoading}
                   >
                     <img src={puzzle.thumbnail} alt={puzzle.name} />
@@ -266,17 +162,19 @@ export function SetupScreen() {
               )}
             </div>
           </>
-        ) : (
+        ) : imageSource === "upload" ? (
           <label className={styles.label}>
             Choose a Photo (PNG/JPG/WebP)
             <input
               className={styles.file}
               type="file"
               accept="image/png,image/jpeg,image/webp"
-              onChange={onPickFile}
+              onChange={handlePickFile}
               disabled={isLoading}
             />
           </label>
+        ) : (
+          <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
         )}
 
         <Dropdown
@@ -285,10 +183,74 @@ export function SetupScreen() {
           onChange={(val) => setGridIndex(Number(val))}
           options={GRID_OPTIONS.map((opt, i) => ({
             value: i,
-            label: opt.label,
+            label:
+              opt.rows > 0
+                ? opt.label
+                : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
           }))}
           fullWidth
         />
+
+        <Dropdown
+          label="Time mode"
+          value={timeMode}
+          onChange={(val) => setTimeMode(val as TimeMode)}
+          options={(
+            ["elapsed", "countdown", "active", "relaxed", "best"] as TimeMode[]
+          ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
+          fullWidth
+        />
+
+        {timeMode === "countdown" && (
+          <Dropdown
+            label="Countdown length"
+            value={countdownMinutes}
+            onChange={(val) => setCountdownMinutes(Number(val))}
+            options={COUNTDOWN_OPTIONS.map((m) => ({
+              value: m,
+              label: `${m} minutes`,
+            }))}
+            fullWidth
+          />
+        )}
+
+        {isCustom && (
+          <div className={styles.customGrid}>
+            <label className={styles.customGridLabel}>
+              Rows
+              <input
+                type="number"
+                min={minGrid}
+                max={maxGrid}
+                value={customRows}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value, 10);
+                  setCustomRows(
+                    isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
+                  );
+                }}
+                className={styles.customGridInput}
+              />
+            </label>
+            <span className={styles.customGridTimes}>×</span>
+            <label className={styles.customGridLabel}>
+              Cols
+              <input
+                type="number"
+                min={minGrid}
+                max={maxGrid}
+                value={customCols}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value, 10);
+                  setCustomCols(
+                    isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
+                  );
+                }}
+                className={styles.customGridInput}
+              />
+            </label>
+          </div>
+        )}
 
         <div className={styles.preview}>
           {isLoading ? (
@@ -306,14 +268,18 @@ export function SetupScreen() {
             Back
           </Button>
 
-          <Button onClick={onClear} disabled={isLoading}>
+          <Button onClick={handleClear} disabled={isLoading}>
             <Trash2 size={18} />
             Clear
           </Button>
 
-          <Button variant="primary" onClick={onStart} disabled={isLoading || !imgDataUrl}>
+          <Button
+            variant="primary"
+            onClick={handleStart}
+            disabled={isLoading || !imgDataUrl}
+          >
             <Play size={18} />
-            Start Puzzel
+            Start Puzzle
           </Button>
         </div>
       </div>
