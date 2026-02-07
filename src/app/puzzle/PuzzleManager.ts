@@ -26,9 +26,11 @@ export type PuzzleManagerOptions = {
 };
 
 export type PuzzleManagerEvents = {
-  onPiecePlaced?: (piece: Piece) => void;
-  onPieceSnapped?: () => void;
+  onPiecePlaced?: (piece: Piece, groupPieces: Piece[]) => void;
+  onPieceSnapped?: (pieceIds: string[]) => void;
   onPuzzleComplete?: (state: PuzzleState) => void;
+  /** Called before shifting pieces to snap position - allows capturing "from" positions for animation */
+  onBeforeSnap?: (pieces: Piece[]) => void;
 };
 function _clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(n, max));
@@ -69,10 +71,10 @@ export class PuzzleManager {
       grid,
       pieceWidth,
       pieceHeight,
-      scatterPadding = 24,
+      scatterPadding = 16,
       pad = 18,
       snapTolerancePx = 80,
-      scatterStartYRatio = 0.3,
+      scatterStartYRatio = 0.08,
       rotationStepDeg = 90,
     } = options;
 
@@ -291,6 +293,16 @@ export class PuzzleManager {
 
   getDragState(): DragState {
     return this.drag;
+  }
+
+  /**
+   * Cancel an in-progress drag WITHOUT running snap logic.
+   * Useful for tray drops on mobile where snap-on-pointerUp can interfere.
+   */
+  cancelDrag(): void {
+    if (!this.drag.activeId) return;
+    this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
+    this.recomputeDerivedState();
   }
 
   public getPiece(id: string) {
@@ -525,6 +537,8 @@ export class PuzzleManager {
     const dy = active.targetY - activeTile.y;
 
     if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
+    // Capture positions before shift for snap-to-position animation
+    this.events.onBeforeSnap?.(groupPieces);
     // Skip overlap check: adjacent pieces have overlapping bounding boxes (pad),
     // but correct board positions form a valid grid. Blocking would prevent snapping.
     this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
@@ -536,7 +550,7 @@ export class PuzzleManager {
         locked: this.pieceLockingEnabled || p.locked,
       }),
     );
-    this.events.onPiecePlaced?.(active);
+    this.events.onPiecePlaced?.(active, groupPieces);
 
     return true;
   }
@@ -576,6 +590,8 @@ export class PuzzleManager {
 
     if (!best) return false;
 
+    // Capture positions before shift for snap-to-position animation
+    this.events.onBeforeSnap?.(groupPieces);
     this.shiftGroupUnclamped(gid, Math.round(best.dx), Math.round(best.dy));
     this.mergeGroups(gid, best.into);
 
@@ -587,7 +603,7 @@ export class PuzzleManager {
     }
 
     this.trySnapMergedGroupToBoard(best.into);
-    this.events.onPieceSnapped?.();
+    this.events.onPieceSnapped?.(groupPieces.map((p) => p.id));
 
     return true;
   }
@@ -601,10 +617,21 @@ export class PuzzleManager {
 
     const dx = ref.targetX - tile.x;
     const dy = ref.targetY - tile.y;
+    if (dx === 0 && dy === 0) return;
 
+    // Capture positions before shift for snap-to-position animation
+    this.events.onBeforeSnap?.(groupPieces);
     // Skip overlap check: adjacent pieces have overlapping bounding boxes (pad),
     // but correct board positions form a valid grid. Blocking would prevent moving to board.
     this.shiftGroupUnclamped(groupId, Math.round(dx), Math.round(dy));
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      (p) => ({
+        justSnapped: true,
+        locked: this.pieceLockingEnabled || p.locked,
+      }),
+    );
+    this.events.onPiecePlaced?.(ref, groupPieces);
   }
 
   private rand(min: number, max: number) {

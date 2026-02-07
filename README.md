@@ -184,8 +184,11 @@ Category = folder name, puzzle name = filename.
 <summary>📁 Click to expand file structure</summary>
 
 ```plaintext
-
 .
+├── CONTRIBUTORS.md
+├── .env.example
+├── .eslintcache
+├── eslint.config.ts
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -194,11 +197,12 @@ Category = folder name, puzzle name = filename.
 │   │   ├── enhancement_refactor.yml
 │   │   ├── feature_request.yml
 │   │   └── question_discussion.yml
-│   ├── workflows
-│   │   ├── CODEOWNERS
-│   │   ├── Phuzzle.yml
-│   │   └── vercel-production.yml
-│   └── pull_request_template.md
+│   ├── pull_request_template.md
+│   └── workflows
+│       ├── CODEOWNERS
+│       ├── Phuzzle.yml
+│       └── vercel-production.yml
+├── .gitignore
 ├── .husky
 │   ├── _
 │   │   ├── .gitignore
@@ -220,16 +224,20 @@ Category = folder name, puzzle name = filename.
 │   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
-├── .vite
-│   └── deps
-│       ├── _metadata.json
-│       └── package.json
+├── index.html
+├── LICENSE.md
+├── package.json
+├── .prettierignore
+├── .prettierrc.yml
 ├── public
 │   └── favicon.svg
+├── README.md
 ├── scripts
+│   ├── create-mvp2-issues.sh
 │   └── precheck.sh
 ├── src
 │   ├── app
+│   │   ├── App.tsx
 │   │   ├── assets
 │   │   │   ├── puzzles
 │   │   │   │   ├── animals
@@ -253,10 +261,6 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── Button
 │   │   │   │   ├── Button.module.css
 │   │   │   │   └── Button.tsx
-│   │   │   ├── DailyDifficultyModal
-│   │   │   │   ├── DailyDifficultyModal.module.css
-│   │   │   │   ├── DailyDifficultyModal.tsx
-│   │   │   │   └── index.ts
 │   │   │   ├── DropDown
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
@@ -292,17 +296,18 @@ Category = folder name, puzzle name = filename.
 │   │   ├── hooks
 │   │   │   ├── useKeyboardShortcuts.ts
 │   │   │   └── useTheme.tsx
+│   │   ├── main.tsx
 │   │   ├── puzzle
 │   │   │   ├── canvas
 │   │   │   │   ├── pickPiece.ts
-│   │   │   │   ├── renderBoard.ts
 │   │   │   │   ├── renderBoardHelpers.ts
+│   │   │   │   ├── renderBoard.ts
 │   │   │   │   ├── renderTrayPiece.ts
 │   │   │   │   └── shape.ts
-│   │   │   ├── factories
-│   │   │   │   └── createInitialPieces.ts
 │   │   │   ├── colorUtils.ts
 │   │   │   ├── config.ts
+│   │   │   ├── factories
+│   │   │   │   └── createInitialPieces.ts
 │   │   │   ├── groupUtils.ts
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleStorage.ts
@@ -321,8 +326,8 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CompletionOverlay.tsx
 │   │   │   │   │   ├── DragPreview.tsx
-│   │   │   │   │   ├── HeaderMenu.tsx
 │   │   │   │   │   ├── headerMenuConfig.tsx
+│   │   │   │   │   ├── HeaderMenu.tsx
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── PauseOverlay.tsx
 │   │   │   │   │   ├── PlayHUD.tsx
@@ -375,8 +380,6 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── auth.ts
 │   │   │   ├── client.ts
 │   │   │   └── types.ts
-│   │   ├── App.tsx
-│   │   ├── main.tsx
 │   │   └── vite-env.d.ts
 │   └── types
 │       ├── canvas-confetti.d.ts
@@ -385,19 +388,6 @@ Category = folder name, puzzle name = filename.
 │   ├── migrations
 │   │   └── 001_initial_schema.sql
 │   └── README.md
-├── .env.development
-├── .env.example
-├── .eslintcache
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── CONTRIBUTORS.md
-├── eslint.config.ts
-├── index.html
-├── LICENSE.md
-├── package-lock.json
-├── package.json
-├── README.md
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
@@ -428,21 +418,13 @@ No gatekeeping. No ego. Just building something fun together.
 
 ---
 
-Team
+## Team
 
 Built by:
 
-Nick
-• GitHub: https://github.com/NickTheDevOpsGuy
-• LinkedIn: https://www.linkedin.com/in/nicholas-a-clark/
-
-Vinay
-• GitHub: https://github.com/v-gajjar
-• LinkedIn: https://www.linkedin.com/in/vinaygajjar/
-
-Hannah
-• GitHub: https://github.com/hannahro15
-• LinkedIn: https://www.linkedin.com/in/hannaholbrich/
+- **Nick**
+- **Vinay**
+- **Hannah**
 
 With help from the wider community ❤️  
 See all contributors here → **[CONTRIBUTORS.md](./CONTRIBUTORS.md)**

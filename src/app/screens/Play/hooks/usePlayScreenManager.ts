@@ -22,6 +22,9 @@ export function usePlayScreenManager(
   const mainRef = useRef<HTMLDivElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const popMapRef = useRef<Map<string, number>>(new Map());
+  const snapFromMapRef = useRef<
+    Map<string, { fromX: number; fromY: number; startMs: number }>
+  >(new Map());
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
@@ -45,26 +48,24 @@ export function usePlayScreenManager(
       const rect = mainEl.getBoundingClientRect();
       const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
       const isMobile = viewportW < 600;
+      const isSmallPhone = viewportW < 380;
 
-      // Use real available space. On mobile, reserve room for tray below the board.
-      const padding = isMobile ? 12 : 24;
-      const trayReserve = isMobile ? 104 : 0; // tray height (80) + gap + padding
-      const availW = Math.max(0, Math.floor(rect.width) - padding);
-      const availH = Math.max(0, Math.floor(rect.height) - padding - trayReserve);
+      // Use real available space. Tighter padding on small phones (iPhone SE etc.)
+      const padding = isSmallPhone ? 8 : isMobile ? 12 : 24;
+      // Guard against transient 0px measurements during initial layout.
+      // If we compute sizes off of 0px, pieces end up tiny and the puzzle becomes unplayable.
+      const minAvail = isMobile ? 280 : 420;
+      const availW = Math.max(minAvail, Math.floor(rect.width) - padding);
+      const availH = Math.max(minAvail, Math.floor(rect.height) - padding);
 
       // Base size from existing helper
       const basePieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-      // Mobile cap by difficulty – keep pieces small so puzzle fits on screen
-      const pieceCount = grid.rows * grid.cols;
-      const mobileMax =
-        pieceCount >= 36
-          ? 34 // 6x6+
-          : pieceCount >= 25
-            ? 38 // 5x5+
-            : 44; // 4x4 and lower
-
-      const pieceSize = isMobile ? Math.min(basePieceSize, mobileMax) : basePieceSize;
+      // IMPORTANT:
+      // Do not cap tile size on mobile. computeTileSize already clamps to sensible
+      // min/max values per device and grid. Capping here was making pieces
+      // comically small and broke snapping / dragging on iPhone.
+      const pieceSize = basePieceSize;
 
       const minBoardW = grid.cols * pieceSize;
       const minBoardH = grid.rows * pieceSize;
@@ -100,13 +101,27 @@ export function usePlayScreenManager(
           pieceHeight: pieceSize,
         },
         {
-          onPiecePlaced: (p) => {
+          onBeforeSnap: (pieces) => {
+            const now = performance.now();
+            const map = snapFromMapRef.current;
+            for (const p of pieces) {
+              map.set(p.id, { fromX: p.x, fromY: p.y, startMs: now });
+            }
+          },
+          onPiecePlaced: (p, groupPieces) => {
             lastInteractionRef.current = performance.now();
-            popMapRef.current.set(p.id, performance.now());
+            const now = performance.now();
+            for (const gp of groupPieces) {
+              popMapRef.current.set(gp.id, now);
+            }
             soundManager.play("place");
           },
-          onPieceSnapped: () => {
+          onPieceSnapped: (pieceIds) => {
             lastInteractionRef.current = performance.now();
+            const now = performance.now();
+            for (const id of pieceIds) {
+              popMapRef.current.set(id, now);
+            }
             soundManager.play("snap");
           },
           onPuzzleComplete: () => {
@@ -144,8 +159,10 @@ export function usePlayScreenManager(
 
     const ro = new ResizeObserver(() => {
       const rect = boardEl.getBoundingClientRect();
-      const w = Math.max(320, Math.floor(rect.width));
-      const h = Math.max(240, Math.floor(rect.height));
+      // IMPORTANT: keep manager board size in sync with real DOM size.
+      // Avoid hard-coded minimums that can cause hit-testing mismatches on mobile.
+      const w = Math.max(1, Math.floor(rect.width));
+      const h = Math.max(1, Math.floor(rect.height));
       manager.setBoardSize(w, h);
       setState(manager.getState());
     });
@@ -166,5 +183,6 @@ export function usePlayScreenManager(
     mainRef,
     imgRef,
     popMapRef,
+    snapFromMapRef,
   };
 }

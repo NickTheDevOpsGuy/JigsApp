@@ -3,6 +3,8 @@
 .tray {
   height: 150px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 5;
 
   display: flex;
   flex-direction: column;
@@ -95,12 +97,6 @@
   align-items: center;
 }
 
-.row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
 .pieceButton {
   appearance: none;
   border: none;
@@ -168,15 +164,16 @@
   font-size: 13px;
 }
 
-/* Mobile adjustments - compact for more board space */
+/* Mobile adjustments - smaller tray to free space for puzzle */
 @media (max-width: 600px) {
   .tray {
-    margin: 0 6px 6px 6px;
-    height: 80px;
+    margin: 0 8px 8px 8px;
+    height: 100px;
+    border-radius: 12px;
   }
 
   .header {
-    padding: 4px 8px;
+    padding: 6px 10px;
     font-size: 12px;
   }
 
@@ -185,18 +182,44 @@
   }
 
   .controls {
-    padding: 3px 6px;
-    gap: 4px;
+    padding: 4px 8px;
+    gap: 6px;
   }
 
   .segment button,
   .sort button {
-    padding: 3px 6px;
-    font-size: 10px;
+    padding: 4px 8px;
+    font-size: 11px;
   }
 
   .thumbWrap {
     width: 40px;
     height: 40px;
+  }
+}
+
+/* Small phones: iPhone SE etc. */
+@media (max-width: 380px) {
+  .tray {
+    height: 88px;
+    margin: 0 6px 6px 6px;
+    border-radius: 10px;
+  }
+  .header {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  .controls {
+    padding: 3px 6px;
+    gap: 4px;
+  }
+  .segment button,
+  .sort button {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  .thumbWrap {
+    width: 34px;
+    height: 34px;
   }
 }

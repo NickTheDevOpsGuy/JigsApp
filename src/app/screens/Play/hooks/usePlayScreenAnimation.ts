@@ -4,6 +4,8 @@ import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import type { DebugFlags } from "../playScreenUtils";
 
+import type { SnapFromMap } from "@/puzzle/canvas/renderBoard";
+
 export function usePlayScreenAnimation(args: {
   manager: PuzzleManager | null;
   setState: (st: PuzzleState) => void;
@@ -11,6 +13,7 @@ export function usePlayScreenAnimation(args: {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   imgRef: React.RefObject<HTMLImageElement | null>;
   popMapRef: React.RefObject<Map<string, number>>;
+  snapFromMapRef: React.RefObject<SnapFromMap>;
   selectedIdRef: React.RefObject<string | null>;
   dragPreviewPieceIdRef: React.RefObject<string | null>;
   debug: DebugFlags;
@@ -23,6 +26,7 @@ export function usePlayScreenAnimation(args: {
     canvasRef,
     imgRef,
     popMapRef,
+    snapFromMapRef,
     selectedIdRef,
     dragPreviewPieceIdRef,
     debug,
@@ -84,7 +88,17 @@ export function usePlayScreenAnimation(args: {
       const draggedGroupId = dragState.activeId
         ? (st.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
         : null;
+      const nowMs = performance.now();
       const popMap = popMapRef.current ?? new Map<string, number>();
+      const snapFromMap = snapFromMapRef.current;
+      // Clean up expired snap-from entries (animation duration ~220ms)
+      if (snapFromMap) {
+        const toDelete: string[] = [];
+        for (const [id, entry] of snapFromMap.entries()) {
+          if (nowMs - entry.startMs > 280) toDelete.push(id);
+        }
+        for (const id of toDelete) snapFromMap.delete(id);
+      }
       const pieceCache = pieceCacheRef.current;
       renderBoard(
         ctx,
@@ -93,7 +107,7 @@ export function usePlayScreenAnimation(args: {
         assembledW,
         assembledH,
         popMap,
-        performance.now(),
+        nowMs,
         debug,
         dragState,
         {
@@ -106,6 +120,7 @@ export function usePlayScreenAnimation(args: {
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
         },
         pieceCache,
+        snapFromMap ?? undefined,
       );
 
       // Only update React state when something meaningful changes

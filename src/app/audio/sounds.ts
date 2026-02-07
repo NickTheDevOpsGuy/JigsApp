@@ -38,7 +38,6 @@ class SoundManager {
 
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
-    // Save preference
     localStorage.setItem("phuzzle:soundEnabled", enabled ? "true" : "false");
   }
 
@@ -66,44 +65,30 @@ class SoundManager {
 
   loadPreferences() {
     const enabled = localStorage.getItem("phuzzle:soundEnabled");
-    if (enabled !== null) {
-      this.enabled = enabled === "true";
-    }
+    if (enabled !== null) this.enabled = enabled === "true";
     const volume = localStorage.getItem("phuzzle:soundVolume");
-    if (volume !== null) {
-      this.volume = parseFloat(volume);
-    }
+    if (volume !== null) this.volume = parseFloat(volume);
     const haptics = localStorage.getItem("phuzzle:hapticsEnabled");
-    if (haptics !== null) {
-      this.hapticsEnabled = haptics === "true";
-    }
+    if (haptics !== null) this.hapticsEnabled = haptics === "true";
   }
 
-  // Vibrate if supported and enabled
   private vibrate(pattern: number | number[]) {
     if (!this.hapticsEnabled) return;
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       try {
         navigator.vibrate(pattern);
       } catch {
-        // Vibration not supported or blocked
+        /* ignore */
       }
     }
   }
 
   play(sound: SoundType) {
-    // Trigger haptic feedback (works even if sound is muted)
     this.triggerHaptic(sound);
-
     if (!this.enabled) return;
-
     const ctx = this.getContext();
     if (!ctx) return;
-
-    // Resume context if suspended (browser autoplay policy)
-    if (ctx.state === "suspended") {
-      ctx.resume();
-    }
+    if (ctx.state === "suspended") ctx.resume();
 
     switch (sound) {
       case "pickup":
@@ -124,27 +109,21 @@ class SoundManager {
     }
   }
 
-  // Trigger haptic feedback based on sound type
   private triggerHaptic(sound: SoundType) {
     switch (sound) {
       case "pickup":
-        // Light tap
         this.vibrate(10);
         break;
       case "snap":
-        // Satisfying click
         this.vibrate(25);
         break;
       case "place":
-        // Heavier thunk
         this.vibrate(40);
         break;
       case "rotate":
-        // Quick buzz
         this.vibrate(15);
         break;
       case "complete":
-        // Celebration pattern: short-pause-short-pause-long
         this.vibrate([50, 50, 50, 50, 100]);
         break;
     }
@@ -184,7 +163,6 @@ class SoundManager {
     const theme = getTheme();
     const t = ctx.currentTime;
     if (theme === "space") {
-      // Sci-fi blip: soft square wave with quick decay
       this.playTone(ctx, {
         freq: 480,
         type: "square",
@@ -200,7 +178,6 @@ class SoundManager {
         start: t + 0.02,
       });
     } else if (theme === "ocean") {
-      // Bubble pop: bright sine that rises
       this.playTone(ctx, {
         freq: 600,
         type: "sine",
@@ -210,7 +187,6 @@ class SoundManager {
         freqRamp: { to: 1200, at: 0.04 },
       });
     } else if (theme === "forest") {
-      // Leaf rustle: two soft chirps
       this.playTone(ctx, {
         freq: 880,
         type: "sine",
@@ -226,7 +202,6 @@ class SoundManager {
         start: t + 0.03,
       });
     } else if (theme === "sunset") {
-      // Sunset: warm glow, soft triangle with gentle sustain
       this.playTone(ctx, {
         freq: 520,
         type: "triangle",
@@ -234,7 +209,6 @@ class SoundManager {
         duration: 0.1,
       });
     } else {
-      // Light/dark: default
       this.playTone(ctx, { freq: 800, vol: this.volume * 0.15, duration: 0.05 });
     }
   }
@@ -243,7 +217,6 @@ class SoundManager {
     const theme = getTheme();
     const t = ctx.currentTime;
     if (theme === "space") {
-      // Laser lock: crisp square-wave ping
       this.playTone(ctx, {
         freq: 660,
         type: "square",
@@ -259,7 +232,6 @@ class SoundManager {
         start: t + 0.02,
       });
     } else if (theme === "ocean") {
-      // Water droplet: clean sine pair
       this.playTone(ctx, {
         freq: 880,
         type: "sine",
@@ -275,7 +247,6 @@ class SoundManager {
         start: t + 0.015,
       });
     } else if (theme === "forest") {
-      // Twig snap: woody mid-range
       this.playTone(ctx, {
         freq: 660,
         type: "sine",
@@ -291,7 +262,6 @@ class SoundManager {
         start: t + 0.02,
       });
     } else if (theme === "sunset") {
-      // Sunset: warm click, rounded triangle
       this.playTone(ctx, {
         freq: 880,
         type: "triangle",
@@ -307,8 +277,12 @@ class SoundManager {
         start: t + 0.02,
       });
     } else {
-      // Light/dark: default
-      this.playTone(ctx, { freq: 1200, vol: this.volume * 0.4, duration: 0.1, start: t });
+      this.playTone(ctx, {
+        freq: 1200,
+        vol: this.volume * 0.4,
+        duration: 0.1,
+        start: t,
+      });
       this.playTone(ctx, {
         freq: 1800,
         vol: this.volume * 0.2,
@@ -321,7 +295,6 @@ class SoundManager {
   private playPlace(ctx: AudioContext) {
     const theme = getTheme();
     if (theme === "space") {
-      // Deep thunk: magnetic clamp
       this.playTone(ctx, {
         freq: 220,
         type: "square",
@@ -330,7 +303,6 @@ class SoundManager {
         freqRamp: { to: 80, at: 0.15 },
       });
     } else if (theme === "ocean") {
-      // Plop: water settling
       this.playTone(ctx, {
         freq: 440,
         type: "sine",
@@ -339,7 +311,6 @@ class SoundManager {
         freqRamp: { to: 180, at: 0.12 },
       });
     } else if (theme === "forest") {
-      // Soft thud: mossy landing
       this.playTone(ctx, {
         freq: 280,
         type: "sine",
@@ -348,7 +319,6 @@ class SoundManager {
         freqRamp: { to: 140, at: 0.12 },
       });
     } else if (theme === "sunset") {
-      // Sunset: warm settle, cozy drop
       this.playTone(ctx, {
         freq: 330,
         type: "triangle",
@@ -357,7 +327,6 @@ class SoundManager {
         freqRamp: { to: 165, at: 0.11 },
       });
     } else {
-      // Light/dark: default
       this.playTone(ctx, {
         freq: 400,
         type: "triangle",
@@ -371,7 +340,6 @@ class SoundManager {
   private playRotate(ctx: AudioContext) {
     const theme = getTheme();
     if (theme === "space") {
-      // Servo whir: ascending square
       this.playTone(ctx, {
         freq: 200,
         type: "square",
@@ -380,7 +348,6 @@ class SoundManager {
         freqRamp: { to: 500, at: 0.08 },
       });
     } else if (theme === "ocean") {
-      // Swirl: quick sine sweep
       this.playTone(ctx, {
         freq: 400,
         type: "sine",
@@ -389,7 +356,6 @@ class SoundManager {
         freqRamp: { to: 800, at: 0.06 },
       });
     } else if (theme === "forest") {
-      // Branch creak: low-to-mid
       this.playTone(ctx, {
         freq: 220,
         type: "sine",
@@ -398,7 +364,6 @@ class SoundManager {
         freqRamp: { to: 440, at: 0.07 },
       });
     } else if (theme === "sunset") {
-      // Sunset: gentle turn, warm triangle sweep
       this.playTone(ctx, {
         freq: 260,
         type: "triangle",
@@ -407,7 +372,6 @@ class SoundManager {
         freqRamp: { to: 520, at: 0.08 },
       });
     } else {
-      // Light/dark: default
       this.playTone(ctx, {
         freq: 300,
         vol: this.volume * 0.2,
@@ -420,8 +384,7 @@ class SoundManager {
   private playComplete(ctx: AudioContext) {
     const theme = getTheme();
     if (theme === "space") {
-      // Sci-fi victory: minor arpeggio, square wave
-      const notes = [349.23, 415.3, 523.25, 698.46]; // F4, G#4, C5, F5
+      const notes = [349.23, 415.3, 523.25, 698.46];
       const step = 0.2;
       notes.forEach((freq, i) => {
         const start = ctx.currentTime + i * step;
@@ -438,8 +401,7 @@ class SoundManager {
         osc.stop(start + step + 0.15);
       });
     } else if (theme === "ocean") {
-      // Wave crest: bright major arpeggio
-      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+      const notes = [523.25, 659.25, 783.99, 1046.5];
       const step = 0.16;
       notes.forEach((freq, i) => {
         const start = ctx.currentTime + i * step;
@@ -456,8 +418,7 @@ class SoundManager {
         osc.stop(start + step + 0.12);
       });
     } else if (theme === "forest") {
-      // Birdsong finish: natural major
-      const notes = [392, 523.25, 659.25, 1046.5]; // G4, C5, E5, C6
+      const notes = [392, 523.25, 659.25, 1046.5];
       const step = 0.18;
       notes.forEach((freq, i) => {
         const start = ctx.currentTime + i * step;
@@ -474,8 +435,7 @@ class SoundManager {
         osc.stop(start + step + 0.14);
       });
     } else if (theme === "sunset") {
-      // Sunset: golden hour, warm triangle chord
-      const notes = [392, 493.88, 587.33, 783.99]; // G4, B4, D5, G5
+      const notes = [392, 493.88, 587.33, 783.99];
       const step = 0.17;
       notes.forEach((freq, i) => {
         const start = ctx.currentTime + i * step;
@@ -492,7 +452,6 @@ class SoundManager {
         osc.stop(start + step + 0.12);
       });
     } else {
-      // Light/dark: default celebration
       const notes = [523.25, 659.25, 783.99, 1046.5];
       const step = 0.15;
       notes.forEach((freq, i) => {
@@ -522,7 +481,6 @@ class SoundManager {
   }
 }
 
-// Polyfill for exponentialDecayTo (not standard)
 declare global {
   interface AudioParam {
     exponentialDecayTo(value: number, endTime: number): void;
@@ -533,8 +491,5 @@ AudioParam.prototype.exponentialDecayTo = function (value: number, endTime: numb
   this.exponentialRampToValueAtTime(Math.max(value, 0.0001), endTime);
 };
 
-// Singleton instance
 export const soundManager = new SoundManager();
-
-// Initialize preferences on load
 soundManager.loadPreferences();

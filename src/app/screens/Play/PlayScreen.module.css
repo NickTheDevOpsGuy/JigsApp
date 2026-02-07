@@ -14,6 +14,7 @@
 .topBar {
   height: 56px;
   flex-shrink: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -145,6 +146,9 @@
   justify-content: center;
   gap: 12px;
   padding: 8px;
+  overflow: hidden;
+  position: relative;
+  z-index: 0;
 }
 
 .board {
@@ -152,6 +156,7 @@
   min-width: 0;
   min-height: 280px;
   position: relative;
+  z-index: 0;
   background: var(--color-bg-elevated);
   border-radius: 16px;
   border: 2px solid var(--color-border);
@@ -159,6 +164,7 @@
   overflow: hidden;
   touch-action: none;
   -webkit-overflow-scrolling: auto;
+  isolation: isolate;
 }
 
 .canvas {
@@ -170,10 +176,17 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  /* GPU acceleration for smoother rendering */
-  will-change: contents;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+}
+
+.touchOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .previewOverlay {
@@ -322,9 +335,6 @@
     font-size: 11px;
     gap: 4px;
   }
-  .hudPillTimer {
-    display: none;
-  }
   .main {
     padding: 4px;
     gap: 6px;
@@ -341,6 +351,35 @@
   .previewImage {
     width: 80px;
     height: 80px;
+  }
+}
+
+/* Small phones: iPhone SE, 12/13 mini (~320–380px) */
+@media (max-width: 380px) {
+  .topBar {
+    height: 44px;
+    padding: 0 6px;
+    gap: 2px;
+  }
+  .hudPill {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  .main {
+    padding: 4px;
+    gap: 4px;
+  }
+  .board {
+    min-height: 200px;
+    border-radius: 10px;
+  }
+  .previewOverlay {
+    bottom: 6px;
+    right: 6px;
+  }
+  .previewImage {
+    width: 64px;
+    height: 64px;
   }
 }
 

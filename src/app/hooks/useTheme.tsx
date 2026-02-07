@@ -21,6 +21,15 @@ export const THEME_LABELS: Record<Theme, string> = {
   sunset: "Sunset",
 };
 
+export const THEME_EMOJIS: Record<Theme, string> = {
+  light: "☀️",
+  dark: "🌙",
+  space: "🚀",
+  ocean: "🌊",
+  forest: "🌲",
+  sunset: "🌅",
+};
+
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
@@ -38,26 +47,22 @@ function getStoredTheme(): Theme {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && THEMES.includes(stored as Theme)) return stored as Theme;
   } catch {
-    // localStorage might not be available
+    /* localStorage might not be available */
   }
   return "light";
 }
 
 function applyThemeClass(theme: Theme) {
   if (typeof document === "undefined") return;
-  // Remove all theme classes first
   THEMES.forEach((t) => {
     document.documentElement.classList.remove(`theme-${t}`);
   });
-  // Add the current theme class
   document.documentElement.classList.add(`theme-${theme}`);
-  console.log("[Theme] Applied:", theme, "Classes:", document.documentElement.className);
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
 
-  // Apply theme immediately (before paint) and persist
   useLayoutEffect(() => {
     applyThemeClass(theme);
   }, [theme]);
@@ -66,14 +71,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEY, theme);
     } catch {
-      // localStorage might not be available
+      /* ignore */
     }
   }, [theme]);
 
   const setTheme = (t: Theme) => setThemeState(t);
   const cycleTheme = () => {
-    setThemeState((currentTheme) => {
-      const i = THEMES.indexOf(currentTheme);
+    setThemeState((current) => {
+      const i = THEMES.indexOf(current);
       return THEMES[(i + 1) % THEMES.length];
     });
   };

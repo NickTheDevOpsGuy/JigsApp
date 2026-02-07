@@ -1,30 +1,17 @@
 // src/app/components/ThemeToggle/ThemeToggle.tsx
 import { useState, useRef, useEffect } from "react";
-import { Palette, Check, Sun, Moon, Rocket, Waves, TreePine, Sunset } from "lucide-react";
-import { useTheme, THEMES, THEME_LABELS, type Theme } from "@/hooks/useTheme";
+import { Palette } from "lucide-react";
+import {
+  useTheme,
+  THEMES,
+  THEME_LABELS,
+  THEME_EMOJIS,
+  type Theme,
+} from "@/hooks/useTheme";
 import styles from "./ThemeToggle.module.css";
 
 type ThemeToggleProps = {
-  /** When true, renders as a full-width menu item (e.g. in hamburger menu) */
-  variant?: "default" | "menuItem";
-};
-
-const THEME_ICONS: Record<Theme, React.ReactNode> = {
-  light: <Sun size={16} />,
-  dark: <Moon size={16} />,
-  space: <Rocket size={16} />,
-  ocean: <Waves size={16} />,
-  forest: <TreePine size={16} />,
-  sunset: <Sunset size={16} />,
-};
-
-const THEME_COLORS: Record<Theme, string> = {
-  light: "#f59e0b", // sun yellow
-  dark: "#6366f1", // indigo moon
-  space: "#a78bfa", // purple
-  ocean: "#3b82f6", // blue
-  forest: "#22c55e", // green
-  sunset: "#f97316", // orange
+  variant?: "default" | "menuItem" | "card";
 };
 
 export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
@@ -32,7 +19,6 @@ export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -50,6 +36,40 @@ export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
     setIsOpen(false);
   };
 
+  if (variant === "card") {
+    return (
+      <div className={styles.cardContainer} ref={menuRef}>
+        <button
+          type="button"
+          className={styles.cardToggle}
+          onClick={() => setIsOpen(!isOpen)}
+          title={`Theme: ${THEME_LABELS[theme]}`}
+          aria-label={`Theme: ${THEME_LABELS[theme]}, click to change`}
+          aria-expanded={isOpen}
+        >
+          <Palette size={20} />
+          <span className={styles.toggleLabel}>Theme</span>
+          <span className={styles.toggleEmoji}>{THEME_EMOJIS[theme]}</span>
+        </button>
+        {isOpen && (
+          <div className={styles.cardDropdown}>
+            {THEMES.map((t) => (
+              <button
+                key={t}
+                type="button"
+                className={`${styles.dropdownItem} ${theme === t ? styles.dropdownItemActive : ""}`}
+                onClick={() => handleSelect(t)}
+              >
+                <span className={styles.themeEmoji}>{THEME_EMOJIS[t]}</span>
+                <span>{THEME_LABELS[t]}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if (variant === "menuItem") {
     return (
       <div className={styles.menuItemContainer}>
@@ -61,12 +81,13 @@ export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
           {THEMES.map((t) => (
             <button
               key={t}
+              type="button"
               className={`${styles.themeOption} ${theme === t ? styles.themeOptionActive : ""}`}
               onClick={() => setTheme(t)}
               title={THEME_LABELS[t]}
-              style={{ color: THEME_COLORS[t] }}
+              aria-label={THEME_LABELS[t]}
             >
-              {THEME_ICONS[t]}
+              {THEME_EMOJIS[t]}
             </button>
           ))}
         </div>
@@ -77,13 +98,15 @@ export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
   return (
     <div className={styles.container} ref={menuRef}>
       <button
+        type="button"
         className={styles.toggle}
         onClick={() => setIsOpen(!isOpen)}
         title={`Theme: ${THEME_LABELS[theme]}`}
         aria-label={`Theme: ${THEME_LABELS[theme]}, click to change`}
         aria-expanded={isOpen}
       >
-        <Palette size={20} />
+        <span className={styles.toggleEmoji}>{THEME_EMOJIS[theme]}</span>
+        <span className={styles.toggleLabel}>Theme</span>
       </button>
 
       {isOpen && (
@@ -91,14 +114,12 @@ export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
           {THEMES.map((t) => (
             <button
               key={t}
+              type="button"
               className={`${styles.dropdownItem} ${theme === t ? styles.dropdownItemActive : ""}`}
               onClick={() => handleSelect(t)}
             >
-              <span className={styles.themeIcon} style={{ color: THEME_COLORS[t] }}>
-                {THEME_ICONS[t]}
-              </span>
+              <span className={styles.themeEmoji}>{THEME_EMOJIS[t]}</span>
               <span>{THEME_LABELS[t]}</span>
-              {theme === t && <Check size={16} className={styles.checkIcon} />}
             </button>
           ))}
         </div>
