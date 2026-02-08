@@ -98,7 +98,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Camera capture: Menu → "Snap a Picture" or Setup → Camera tab
 - Mobile-safe layouts and gestures (44px touch targets)
 - Timer visible on mobile
-- Scrollable menu (no cut-off), Help modal (How to Play / Keyboard shortcuts)
+- Scrollable menu (no cut-off)
 
 ### Social & Progress
 
@@ -115,7 +115,8 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Accessibility & Controls
 
-- Keyboard shortcuts (Tab, arrows, R to rotate, Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y for undo/redo)
+- **Help modal** — Main menu and play screen: "Help" opens a choice of "How to Play" and "Keyboard shortcuts" (available on all devices, including touch)
+- Keyboard shortcuts (Tab, arrows, R to rotate, Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y for undo/redo, ? or F1 for help)
 - First-time tutorial overlay
 - Undo · Redo · Ghost hint · Lock pieces (optional)
 - ARIA labels, focus trapping in modals, 44px touch targets
@@ -197,15 +198,15 @@ Category = folder name, puzzle name = filename.
 
 ## Project Structure
 
-| Folder                        | Purpose                                                                   |
-| ----------------------------- | ------------------------------------------------------------------------- |
-| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage |
-| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                      |
-| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers            |
-| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HowToPlay, ThemeToggle, etc.         |
-| `src/app/audio/`              | Sound effects                                                             |
-| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                       |
-| `src/app/assets/puzzles/`     | Sample puzzle images by category                                          |
+| Folder                        | Purpose                                                                                            |
+| ----------------------------- | -------------------------------------------------------------------------------------------------- |
+| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage                          |
+| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                               |
+| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers, viewport                           |
+| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HowToPlay, HelpChoiceModal, ShortcutsModal, ThemeToggle, etc. |
+| `src/app/audio/`              | Sound effects                                                                                      |
+| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                |
+| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                   |
 
 <details>
 <summary>📁 Click to expand file structure</summary>
@@ -265,6 +266,10 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── DropDown
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
+│   │   │   ├── HelpChoiceModal
+│   │   │   │   ├── HelpChoiceModal.module.css
+│   │   │   │   ├── HelpChoiceModal.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── HowToPlay
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── TutorialOverlay.module.css
@@ -349,7 +354,8 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── useShareResults.ts
-│   │   │   │   │   └── useTimeModeConfig.ts
+│   │   │   │   │   ├── useTimeModeConfig.ts
+│   │   │   │   │   └── useViewport.ts
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
 │   │   │   │   ├── playScreenUtils.ts
