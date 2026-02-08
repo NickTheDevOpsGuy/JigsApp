@@ -1,46 +1,20 @@
-name: Deploy Phuzzle to Vercel
+name: 🧩 Phuzzle Deploy to Vercel
 
 on:
-  pull_request:
-    branches: [develop]
   push:
     branches: [develop]
-  workflow_dispatch:
 
 jobs:
-  preview:
-    name: Preview Deploy
+  deploy:
     runs-on: ubuntu-latest
-    environment: preview
+    environment:
+      name: production
+      url: https://phuzzle.vercel.app/
+
     steps:
       - uses: actions/checkout@v4
-
-      - name: Deploy Preview to Vercel
-        uses: amondnet/vercel-action@v25
+      - uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          # IMPORTANT: do NOT pass "--prod" here
-          vercel-args: ""
-          # Optional but recommended:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-  production:
-    name: Production Deploy (requires approval)
-    runs-on: ubuntu-latest
-    needs: preview
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy Production to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          # IMPORTANT: production deploy flag is "--prod"
-          vercel-args: "--prod"
-          github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -67,7 +67,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Drag-and-drop jigsaw pieces with rotation
 - Classic interlocking piece shapes with board and neighbor snapping
 - Group merging — connected pieces move together
-- Multiple difficulty levels (3×3 to 6×6 grids, plus custom rows/columns)
+- Multiple difficulty levels (3×3 to 6×6 grids)
 - Image sources: gallery, file upload, or camera capture
 
 ### UX & Polish
@@ -77,7 +77,6 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Confetti celebration on completion 🎉
 - Sound effects (snap, rotate, place, complete)
 - Fullscreen mode · Dark mode
-- Zoom and pan on the board (scroll wheel, +/−/0, Shift+drag or middle mouse)
 - What's New popup for updates
 - Custom fonts (Inter, Fredoka) and Lucide icons
 
@@ -92,18 +91,15 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 - Daily puzzle — same for everyone, streak tracking
 - Player statistics dashboard (Supabase)
-- Leaderboards with dropdown (Today's Daily, 3×3, 4×4, 5×5, 6×6)
+- Leaderboards for daily puzzle times
 - Achievements system
 - Share completed puzzle image
 
 ### Accessibility & Controls
 
-- Keyboard shortcuts (Tab, arrows, R to rotate, 1–4 for tray filtering)
-- Undo · Redo (Ctrl+Z, Ctrl+Shift+Z / Ctrl+Y)
-- Zoom and pan — scroll wheel or +/−/0, Shift+drag or middle mouse to pan
-- Edge-piece filtering — All, Edges, Corners, Center (keys 1–4)
-- First-time tutorial overlay · Help dropdown (How to Play, Keyboard shortcuts)
-- Ghost hint · Lock pieces (optional)
+- Keyboard shortcuts (Tab, arrows, R to rotate)
+- First-time tutorial overlay
+- Undo · Ghost hint · Lock pieces (optional)
 - Designed for relaxed, low-pressure play
 
 ### Persistence
@@ -117,17 +113,19 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed ✓
 
-| Area         | Features                                                                                 |
-| ------------ | ---------------------------------------------------------------------------------------- |
-| **Core**     | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image                         |
-| **Time**     | Elapsed, countdown, active-only, relaxed, best time                                      |
-| **Daily**    | Same puzzle for everyone · Streak tracking                                               |
-| **Social**   | Stats dashboard · Leaderboards · Achievements (Supabase)                                 |
-| **Content**  | What's New popup · Camera capture · Sample puzzle gallery                                |
-| **Controls** | Zoom & pan (scroll, +/−/0, Shift+drag or middle mouse) · Edge-piece tray filtering (1–4) |
+| Area        | Features                                                  |
+| ----------- | --------------------------------------------------------- |
+| **Core**    | Dark mode · Undo · Ghost hint · Lock pieces · Share image |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time       |
+| **Daily**   | Same puzzle for everyone · Streak tracking                |
+| **Social**  | Stats dashboard · Leaderboards · Achievements (Supabase)  |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery |
 
 ### Planned
 
+- Redo
+- Edge-piece filtering
+- Zoom and pan for large puzzles
 - Import puzzle from URL
 - PWA / offline support
 
@@ -186,8 +184,7 @@ Category = folder name, puzzle name = filename.
 <summary>📁 Click to expand file structure</summary>
 
 ```plaintext
-
-
+.
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── bug.yml
@@ -244,18 +241,15 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   ├── HelpMenu.module.css
 │   │   │   │   └── HelpMenu.tsx
 │   │   │   ├── HowToPlay
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── TutorialOverlay.module.css
-│   │   │   │   └── TutorialOverlay.tsx
+│   │   │   │   ├── HelpModal.module.css
+│   │   │   │   ├── HelpModal.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── Modal
 │   │   │   │   ├── Modal.module.css
 │   │   │   │   └── Modal.tsx
 │   │   │   ├── PieceTray
 │   │   │   │   ├── PieceTray.module.css
 │   │   │   │   └── PieceTray.tsx
-│   │   │   ├── ShortcutsModal
-│   │   │   │   ├── ShortcutsModal.module.css
-│   │   │   │   └── ShortcutsModal.tsx
 │   │   │   ├── ThemeToggle
 │   │   │   │   ├── ThemeToggle.module.css
 │   │   │   │   └── ThemeToggle.tsx
@@ -317,6 +311,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   │   ├── shared.ts
 │   │   │   │   │   │   ├── touchHandlers.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── useBoardZoom.ts
 │   │   │   │   │   ├── useCoarsePointer.ts
 │   │   │   │   │   ├── useDownloadImage.ts
 │   │   │   │   │   ├── useHaptics.ts
@@ -358,6 +353,8 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── auth.ts
 │   │   │   ├── client.ts
 │   │   │   └── types.ts
+│   │   ├── utils
+│   │   │   └── timeUtils.ts
 │   │   ├── App.tsx
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
@@ -369,6 +366,7 @@ Category = folder name, puzzle name = filename.
 │   │   └── 001_initial_schema.sql
 │   └── README.md
 ├── .env.example
+├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
@@ -379,6 +377,7 @@ Category = folder name, puzzle name = filename.
 ├── package-lock.json
 ├── package.json
 ├── README.md
+├── src.zip
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
