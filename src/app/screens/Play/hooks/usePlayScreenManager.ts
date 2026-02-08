@@ -29,6 +29,7 @@ export function usePlayScreenManager(
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [awaitingResumeChoice, setAwaitingResumeChoice] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [puzzleKey, setPuzzleKey] = useState(0);
 
   // Initial setup: create manager with square tiles
   useEffect(() => {
@@ -43,6 +44,11 @@ export function usePlayScreenManager(
     if (!imageUrl) {
       setIsLoading(false);
       return;
+    }
+
+    // Show loading when user chose resume/fresh (async manager creation)
+    if (resumeChoice === "fresh" || resumeChoice === "resume") {
+      setIsLoading(true);
     }
 
     // Load image
@@ -82,7 +88,7 @@ export function usePlayScreenManager(
         savedState.grid.rows === grid.rows &&
         savedState.grid.cols === grid.cols;
 
-      if (hasSavedGame && savedState) {
+      if (hasSavedGame && savedState && resumeChoice === "resume") {
         setElapsedSeconds(savedState.elapsedSeconds);
       } else {
         const isCountdown = timeMode === "countdown";
@@ -99,6 +105,7 @@ export function usePlayScreenManager(
 
       if (hasSavedGame && resumeChoice === "fresh") {
         clearPuzzleState();
+        setPuzzleKey((k) => k + 1);
       }
 
       const next = new PuzzleManager(
@@ -176,6 +183,7 @@ export function usePlayScreenManager(
   return {
     manager,
     state,
+    puzzleKey,
     setState,
     elapsedSeconds,
     setElapsedSeconds,

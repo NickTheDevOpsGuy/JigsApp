@@ -108,8 +108,9 @@ export function HeaderMenu(props: HeaderMenuProps) {
             className={styles.headerMenuHelpTrigger}
             onClick={() => setHelpExpanded((e) => !e)}
             aria-expanded={helpExpanded}
+            aria-haspopup="true"
           >
-            Choose help
+            Help
             <ChevronRight
               size={16}
               className={styles.headerMenuChevron}

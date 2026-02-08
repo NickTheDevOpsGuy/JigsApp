@@ -85,6 +85,7 @@ export function PlayScreen() {
   const {
     manager,
     state,
+    puzzleKey,
     setState,
     elapsedSeconds,
     setElapsedSeconds,
@@ -336,7 +337,7 @@ export function PlayScreen() {
       </div>
 
       <ConfirmModal
-        isOpen={awaitingResumeChoice}
+        isOpen={awaitingResumeChoice && resumeChoice === null}
         onClose={() => setResumeChoice("fresh")}
         onConfirm={() => setResumeChoice("resume")}
         title="Resume Your Puzzle?"
@@ -346,6 +347,7 @@ export function PlayScreen() {
         tertiaryText="Back to Home"
         onTertiary={() => navigate("/")}
         variant="default"
+        primaryOnlyConfirm
       />
 
       <ConfirmModal
@@ -368,6 +370,7 @@ export function PlayScreen() {
             </div>
           )}
           <canvas
+            key={puzzleKey}
             className={styles.canvas}
             ref={canvasRef}
             onPointerDown={handlePointerDown}

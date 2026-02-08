@@ -121,6 +121,8 @@ type ConfirmModalProps = {
   tertiaryText?: string;
   onTertiary?: () => void;
   variant?: "danger" | "default";
+  /** When true, primary button only calls onConfirm (for async close flows) */
+  primaryOnlyConfirm?: boolean;
 };
 
 export function ConfirmModal({
@@ -134,6 +136,7 @@ export function ConfirmModal({
   tertiaryText,
   onTertiary,
   variant = "default",
+  primaryOnlyConfirm = false,
 }: ConfirmModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} showCloseButton={false}>
@@ -152,7 +155,7 @@ export function ConfirmModal({
             variant="primary"
             onClick={() => {
               onConfirm();
-              onClose();
+              if (!primaryOnlyConfirm) onClose();
             }}
             className={variant === "danger" ? styles.dangerBtn : ""}
           >

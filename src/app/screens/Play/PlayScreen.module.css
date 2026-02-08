@@ -351,6 +351,10 @@
     gap: 4px;
   }
   .hudPillTimer {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+  .hudPillTimer .timerSuffix {
     display: none;
   }
   .main {
