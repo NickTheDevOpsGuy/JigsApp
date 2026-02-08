@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
 
 import { PieceTray } from "@/components/PieceTray/PieceTray";
-import { ConfirmModal, Modal } from "@/components/Modal/Modal";
+import { ConfirmModal } from "@/components/Modal/Modal";
+import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
@@ -364,35 +365,12 @@ export function PlayScreen() {
         primaryOnlyConfirm
       />
 
-      <Modal
+      <HelpChoiceModal
         isOpen={showHelpChoice}
         onClose={() => setShowHelpChoice(false)}
-        title="Help"
-        showCloseButton={true}
-      >
-        <div className={styles.helpChoice}>
-          <button
-            type="button"
-            className={styles.helpChoiceBtn}
-            onClick={() => {
-              setShowHelpChoice(false);
-              setShowHowToPlay(true);
-            }}
-          >
-            How to Play
-          </button>
-          <button
-            type="button"
-            className={styles.helpChoiceBtn}
-            onClick={() => {
-              setShowHelpChoice(false);
-              setShowShortcuts(true);
-            }}
-          >
-            Keyboard shortcuts
-          </button>
-        </div>
-      </Modal>
+        onHowToPlay={() => setShowHowToPlay(true)}
+        onKeyboardShortcuts={() => setShowShortcuts(true)}
+      />
 
       <ConfirmModal
         isOpen={showNewGameModal}

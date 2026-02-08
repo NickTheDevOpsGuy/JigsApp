@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import styles from "../PlayScreen.module.css";
@@ -19,7 +19,6 @@ export type { HeaderMenuProps } from "./headerMenuConfig";
 export function HeaderMenu(props: HeaderMenuProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [helpExpanded, setHelpExpanded] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const items = buildMenuItems(props, setOpen, (path) => navigate(path));
 
@@ -106,39 +105,12 @@ export function HeaderMenu(props: HeaderMenuProps) {
           <div className={styles.headerMenuSection}>Help</div>
           <button
             type="button"
-            className={styles.headerMenuHelpTrigger}
-            onClick={() => setHelpExpanded((e) => !e)}
-            aria-expanded={helpExpanded}
+            className={styles.headerMenuItem}
+            role="menuitem"
+            onClick={closeAnd(props.onShowHelpChoice)}
           >
             Help
-            <ChevronDown
-              size={16}
-              className={styles.headerMenuChevron}
-              style={{ transform: helpExpanded ? "rotate(180deg)" : undefined }}
-            />
           </button>
-          {helpExpanded && (
-            <div className={styles.headerMenuHelpSubmenu} role="group">
-              <button
-                type="button"
-                className={styles.headerMenuItem}
-                role="menuitem"
-                onClick={closeAnd(props.onShowHowToPlay)}
-              >
-                How to Play
-              </button>
-              {props.canShowShortcuts && (
-                <button
-                  type="button"
-                  className={styles.headerMenuItem}
-                  role="menuitem"
-                  onClick={closeAnd(props.onShowShortcuts)}
-                >
-                  Keyboard shortcuts
-                </button>
-              )}
-            </div>
-          )}
           {otherItems.map(renderItem)}
         </div>
       )}

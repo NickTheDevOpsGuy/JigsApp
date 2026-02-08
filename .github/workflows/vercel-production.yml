@@ -1,4 +1,4 @@
-name: 🧩 Phuzzle Deploy to Vercel
+name: 🧩 Phuzzle Deploy to Vercel (Production)
 
 on:
   push:
@@ -9,12 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://phuzzle.vercel.app//
+      url: https://phuzzle.vercel.app/
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: amondnet/vercel-action@v25
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel (Production)
+        uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: "--prod"

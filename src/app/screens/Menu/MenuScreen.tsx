@@ -6,7 +6,9 @@ import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
+import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
+import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
 import { HelpCircle, Image, Calendar, BarChart3, Sparkles, Camera } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
@@ -15,7 +17,9 @@ import { shouldShowChangelog } from "@/data/changelog";
 
 export function MenuScreen() {
   const nav = useNavigate();
-  const [showHelp, setShowHelp] = useState(false);
+  const [showHelpChoice, setShowHelpChoice] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
 
@@ -66,11 +70,11 @@ export function MenuScreen() {
 
           <Button
             variant="secondary"
-            onClick={() => setShowHelp(true)}
+            onClick={() => setShowHelpChoice(true)}
             className={styles.actionCard}
           >
             <HelpCircle size={20} />
-            <span className={styles.actionLabel}>How to Play</span>
+            <span className={styles.actionLabel}>Help</span>
           </Button>
 
           <Button
@@ -93,7 +97,17 @@ export function MenuScreen() {
         </div>
       </div>
 
-      <TutorialOverlay isOpen={showHelp} onComplete={() => setShowHelp(false)} />
+      <HelpChoiceModal
+        isOpen={showHelpChoice}
+        onClose={() => setShowHelpChoice(false)}
+        onHowToPlay={() => setShowHowToPlay(true)}
+        onKeyboardShortcuts={() => setShowShortcuts(true)}
+      />
+      <TutorialOverlay
+        isOpen={showHowToPlay}
+        onComplete={() => setShowHowToPlay(false)}
+      />
+      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
       <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <DailyDifficultyModal
         isOpen={showDailyModal}
