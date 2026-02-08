@@ -186,15 +186,15 @@ Category = folder name, puzzle name = filename.
 
 ## Project Structure
 
-| Folder | Purpose |
-|--------|---------|
-| `src/app/puzzle/` | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage |
-| `src/app/screens/` | Screen components: Menu, NewGame, Setup, Play, Stats |
-| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers |
-| `src/app/components/` | Shared UI: Modal, Button, PieceTray, HowToPlay, ThemeToggle, etc. |
-| `src/app/audio/` | Sound effects |
-| `src/app/services/` | Supabase: stats, leaderboard, achievements |
-| `src/app/assets/puzzles/` | Sample puzzle images by category |
+| Folder                        | Purpose                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------- |
+| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage |
+| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                      |
+| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers            |
+| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HowToPlay, ThemeToggle, etc.         |
+| `src/app/audio/`              | Sound effects                                                             |
+| `src/app/services/`           | Supabase: stats, leaderboard, achievements                                |
+| `src/app/assets/puzzles/`     | Sample puzzle images by category                                          |
 
 <details>
 <summary>📁 Click to expand file structure</summary>
