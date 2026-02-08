@@ -23,6 +23,7 @@ export function usePlayScreenManager(
   const mainRef = useRef<HTMLDivElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const popMapRef = useRef<Map<string, number>>(new Map());
+  const lockMapRef = useRef<Map<string, number>>(new Map());
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
@@ -103,9 +104,25 @@ export function usePlayScreenManager(
       }
       setAwaitingResumeChoice(false);
 
+      // Reset and clear before creating manager (fixes double puzzle on mobile)
+      setManager(null);
+      setState(null);
+      popMapRef.current.clear();
+      lockMapRef.current.clear();
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.save();
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.restore();
+        }
+      }
+      setPuzzleKey((k) => k + 1);
+
       if (hasSavedGame && resumeChoice === "fresh") {
         clearPuzzleState();
-        setPuzzleKey((k) => k + 1);
       }
 
       const next = new PuzzleManager(
@@ -126,6 +143,10 @@ export function usePlayScreenManager(
           onPieceSnapped: () => {
             lastInteractionRef.current = performance.now();
             soundManager.play("snap");
+          },
+          onPieceLocked: (ids) => {
+            const now = performance.now();
+            for (const id of ids) lockMapRef.current.set(id, now);
           },
           onPuzzleComplete: () => {
             clearPuzzleState();
@@ -195,5 +216,6 @@ export function usePlayScreenManager(
     mainRef,
     imgRef,
     popMapRef,
+    lockMapRef,
   };
 }

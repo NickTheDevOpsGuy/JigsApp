@@ -1,11 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BarChart3, Trophy, Award } from "lucide-react";
+import { ArrowLeft, BarChart3, Trophy, Award, User, Share2 } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
 import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client";
 import { getMyStats } from "@/services/statsService";
-import { getDailyLeaderboard } from "@/services/leaderboardService";
+import {
+  getDailyLeaderboard,
+  getStreakLeaderboard,
+  getCompletionCountLeaderboard,
+  getPeriodLeaderboard,
+  getAllTimeBestLeaderboard,
+  getMyPersonalBests,
+  type LeaderboardEntry,
+  type StreakEntry,
+  type CompletionCountEntry,
+  type PersonalBestEntry,
+} from "@/services/leaderboardService";
+import { getMyProfile, updateMyProfile } from "@/services/profileService";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString } from "@/daily/dailyPuzzle";
 
@@ -26,11 +38,17 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+const PODIUM = ["🥇", "🥈", "🥉"];
+
+type LeaderboardType = "today" | "week" | "month" | "streaks" | "completions" | "alltime";
+
 export function StatsScreen() {
   const nav = useNavigate();
   const [activeTab, setActiveTab] = useState<
-    "dashboard" | "leaderboard" | "achievements"
+    "dashboard" | "profile" | "leaderboard" | "achievements"
   >("dashboard");
+  const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("today");
+  const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
   const [stats, setStats] = useState<{
     puzzlesCompleted: number;
     totalPlayTimeSeconds: number;
@@ -38,9 +56,17 @@ export function StatsScreen() {
     bestDailyStreak: number;
     lastPlayedAt: string | null;
   } | null>(null);
-  const [leaderboard, setLeaderboard] = useState<
-    { rank: number; elapsedSeconds: number; displayName: string }[]
+  const [profile, setProfile] = useState<{
+    displayName: string;
+    showOnLeaderboard: boolean;
+  } | null>(null);
+  const [displayNameInput, setDisplayNameInput] = useState("");
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [streakLeaderboard, setStreakLeaderboard] = useState<StreakEntry[]>([]);
+  const [completionLeaderboard, setCompletionLeaderboard] = useState<
+    CompletionCountEntry[]
   >([]);
+  const [personalBests, setPersonalBests] = useState<PersonalBestEntry[]>([]);
   const [achievements, setAchievements] = useState<
     {
       id: string;
@@ -52,24 +78,106 @@ export function StatsScreen() {
     }[]
   >([]);
   const [loading, setLoading] = useState(true);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const configured = isSupabaseConfigured();
+
+  const loadData = useCallback(async () => {
+    if (!configured) return;
+    const [s, p, a] = await Promise.all([
+      getMyStats(),
+      getMyProfile(),
+      getMyAchievements(),
+    ]);
+    setStats(s ?? null);
+    setProfile(p ?? null);
+    setDisplayNameInput(p?.displayName ?? "");
+    setAchievements(a ?? []);
+    const today = getTodayDateString();
+    const [lb, slb, clb, pb] = await Promise.all([
+      getDailyLeaderboard(today),
+      getStreakLeaderboard(),
+      getCompletionCountLeaderboard(),
+      getMyPersonalBests(),
+    ]);
+    setLeaderboard(lb);
+    setStreakLeaderboard(slb);
+    setCompletionLeaderboard(clb);
+    setPersonalBests(pb);
+    setLoading(false);
+  }, [configured]);
 
   useEffect(() => {
     if (!configured) {
       setLoading(false);
       return;
     }
-    const load = async () => {
-      const [s, a] = await Promise.all([getMyStats(), getMyAchievements()]);
-      setStats(s ?? null);
-      setAchievements(a);
-      const lb = await getDailyLeaderboard(getTodayDateString());
-      setLeaderboard(lb);
-      setLoading(false);
+    loadData();
+  }, [configured, loadData]);
+
+  useEffect(() => {
+    if (!configured || activeTab !== "leaderboard") return;
+    const loadLb = async () => {
+      if (leaderboardType === "today") {
+        const lb = await getDailyLeaderboard(getTodayDateString());
+        setLeaderboard(lb);
+      } else if (leaderboardType === "week" || leaderboardType === "month") {
+        const lb = await getPeriodLeaderboard(
+          leaderboardType === "week" ? "week" : "month",
+        );
+        setLeaderboard(lb);
+      } else if (leaderboardType === "streaks") {
+        const slb = await getStreakLeaderboard();
+        setStreakLeaderboard(slb);
+      } else if (leaderboardType === "completions") {
+        const clb = await getCompletionCountLeaderboard();
+        setCompletionLeaderboard(clb);
+      } else if (leaderboardType === "alltime") {
+        const [r, c] = allTimeGrid.split("x").map(Number);
+        const lb = await getAllTimeBestLeaderboard(r, c);
+        setLeaderboard(lb);
+      }
     };
-    load();
-  }, [configured]);
+    loadLb();
+  }, [configured, activeTab, leaderboardType, allTimeGrid]);
+
+  const handleSaveProfile = async () => {
+    if (!configured) return;
+    setProfileSaving(true);
+    const updated = await updateMyProfile({
+      displayName: displayNameInput.trim() || "Puzzler",
+      showOnLeaderboard: profile?.showOnLeaderboard ?? true,
+    });
+    if (updated) setProfile(updated);
+    setProfileSaving(false);
+    loadData();
+  };
+
+  const handleShareLeaderboard = () => {
+    const text =
+      leaderboardType === "today"
+        ? `Today's Daily Puzzle leaderboard - Phuzzle`
+        : leaderboardType === "streaks"
+          ? "Streak leaderboard - Phuzzle"
+          : leaderboardType === "completions"
+            ? "Puzzle completions leaderboard - Phuzzle"
+            : "Leaderboard - Phuzzle";
+    const url = window.location.origin;
+    const shareText = `${text}\n${url}`;
+    if (navigator.share) {
+      navigator.share({
+        title: "Phuzzle Leaderboard",
+        text: shareText,
+        url,
+      });
+    } else {
+      navigator.clipboard?.writeText(shareText).then(() => {
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2000);
+      });
+    }
+  };
 
   if (!configured) {
     const status = getSupabaseConfigStatus();
@@ -101,6 +209,81 @@ export function StatsScreen() {
     );
   }
 
+  const renderTimeLeaderboard = (entries: LeaderboardEntry[], emptyMsg: string) => (
+    <>
+      {entries.length === 0 ? (
+        <p className={styles.empty}>{emptyMsg}</p>
+      ) : (
+        <ol className={styles.leaderboard}>
+          {entries.map((entry) => (
+            <li
+              key={`${entry.rank}-${entry.displayName}`}
+              className={`${styles.leaderboardItem} ${
+                entry.rank <= 3 ? styles.leaderboardPodium : ""
+              }`}
+            >
+              <span className={styles.rank}>
+                {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+              </span>
+              <span className={styles.player}>{entry.displayName}</span>
+              <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </>
+  );
+
+  const renderStreakLeaderboard = (entries: StreakEntry[]) => (
+    <>
+      {entries.length === 0 ? (
+        <p className={styles.empty}>No streaks yet. Complete daily puzzles!</p>
+      ) : (
+        <ol className={styles.leaderboard}>
+          {entries.map((entry) => (
+            <li
+              key={`${entry.rank}-${entry.displayName}`}
+              className={`${styles.leaderboardItem} ${
+                entry.rank <= 3 ? styles.leaderboardPodium : ""
+              }`}
+            >
+              <span className={styles.rank}>
+                {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+              </span>
+              <span className={styles.player}>{entry.displayName}</span>
+              <span className={styles.time}>{entry.streak} days</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </>
+  );
+
+  const renderCompletionLeaderboard = (entries: CompletionCountEntry[]) => (
+    <>
+      {entries.length === 0 ? (
+        <p className={styles.empty}>No completions yet. Play puzzles!</p>
+      ) : (
+        <ol className={styles.leaderboard}>
+          {entries.map((entry) => (
+            <li
+              key={`${entry.rank}-${entry.displayName}`}
+              className={`${styles.leaderboardItem} ${
+                entry.rank <= 3 ? styles.leaderboardPodium : ""
+              }`}
+            >
+              <span className={styles.rank}>
+                {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+              </span>
+              <span className={styles.player}>{entry.displayName}</span>
+              <span className={styles.time}>{entry.count} puzzles</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </>
+  );
+
   return (
     <div className={styles.page}>
       <div className={styles.card}>
@@ -119,6 +302,13 @@ export function StatsScreen() {
           >
             <BarChart3 size={18} />
             Dashboard
+          </button>
+          <button
+            className={activeTab === "profile" ? styles.tabActive : ""}
+            onClick={() => setActiveTab("profile")}
+          >
+            <User size={18} />
+            Profile
           </button>
           <button
             className={activeTab === "leaderboard" ? styles.tabActive : ""}
@@ -167,27 +357,137 @@ export function StatsScreen() {
                     <span className={styles.statLabel}>Best streak</span>
                   </div>
                 </div>
+                {personalBests.length > 0 && (
+                  <>
+                    <h2>Personal Bests</h2>
+                    <ol className={styles.personalBests}>
+                      {personalBests.slice(0, 10).map((pb, i) => (
+                        <li key={i} className={styles.personalBestItem}>
+                          <span className={styles.pbGrid}>{pb.gridSize}</span>
+                          <span className={styles.pbTime}>
+                            {formatTime(pb.elapsedSeconds)}
+                          </span>
+                          {pb.isDaily && <span className={styles.pbDaily}>Daily</span>}
+                        </li>
+                      ))}
+                    </ol>
+                  </>
+                )}
+              </div>
+            )}
+
+            {activeTab === "profile" && (
+              <div className={styles.section}>
+                <h2>Display Name</h2>
+                <p className={styles.hint}>Set your name to appear on leaderboards.</p>
+                <input
+                  type="text"
+                  className={styles.displayNameInput}
+                  value={displayNameInput}
+                  onChange={(e) => setDisplayNameInput(e.target.value)}
+                  placeholder="Puzzler"
+                  maxLength={32}
+                  aria-label="Display name"
+                />
+                <div className={styles.profileRow}>
+                  <label className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={profile?.showOnLeaderboard ?? true}
+                      onChange={(e) =>
+                        setProfile((p) => ({
+                          ...p!,
+                          showOnLeaderboard: e.target.checked,
+                        }))
+                      }
+                    />
+                    <span>Show my name on leaderboards</span>
+                  </label>
+                </div>
+                <p className={styles.hint}>Uncheck to appear as &quot;Anonymous&quot;.</p>
+                <Button
+                  onClick={handleSaveProfile}
+                  disabled={profileSaving}
+                  className={styles.saveBtn}
+                >
+                  {profileSaving ? "Saving…" : "Save"}
+                </Button>
               </div>
             )}
 
             {activeTab === "leaderboard" && (
               <div className={styles.section}>
-                <h2>Today&apos;s Daily Puzzle</h2>
-                {leaderboard.length === 0 ? (
-                  <p className={styles.empty}>No completions yet. Be the first!</p>
-                ) : (
-                  <ol className={styles.leaderboard}>
-                    {leaderboard.map((entry) => (
-                      <li key={entry.rank} className={styles.leaderboardItem}>
-                        <span className={styles.rank}>#{entry.rank}</span>
-                        <span className={styles.player}>{entry.displayName}</span>
-                        <span className={styles.time}>
-                          {formatTime(entry.elapsedSeconds)}
-                        </span>
-                      </li>
+                <div className={styles.leaderboardHeader}>
+                  <div className={styles.leaderboardTabs}>
+                    {(
+                      [
+                        ["today", "Today"],
+                        ["week", "Weekly"],
+                        ["month", "Monthly"],
+                        ["streaks", "Streaks"],
+                        ["completions", "Completions"],
+                        ["alltime", "All-Time"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        className={leaderboardType === key ? styles.lbTabActive : ""}
+                        onClick={() => setLeaderboardType(key)}
+                      >
+                        {label}
+                      </button>
                     ))}
-                  </ol>
-                )}
+                  </div>
+                  {leaderboardType === "alltime" && (
+                    <div className={styles.allTimeGrid}>
+                      <label>Grid:</label>
+                      <select
+                        value={allTimeGrid}
+                        onChange={(e) =>
+                          setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")
+                        }
+                      >
+                        <option value="3x3">3×3</option>
+                        <option value="4x4">4×4</option>
+                        <option value="5x5">5×5</option>
+                        <option value="6x6">6×6</option>
+                      </select>
+                    </div>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={handleShareLeaderboard}
+                    className={styles.shareBtn}
+                  >
+                    <Share2 size={16} />
+                    {shareCopied ? "Copied!" : "Share"}
+                  </Button>
+                </div>
+                <h2>
+                  {leaderboardType === "today" && "Today's Daily"}
+                  {leaderboardType === "week" && "Weekly Best"}
+                  {leaderboardType === "month" && "Monthly Best"}
+                  {leaderboardType === "streaks" && "Longest Streaks"}
+                  {leaderboardType === "completions" && "Most Completions"}
+                  {leaderboardType === "alltime" && `All-Time Best (${allTimeGrid})`}
+                </h2>
+                {leaderboardType === "today" &&
+                  renderTimeLeaderboard(leaderboard, "No completions yet. Be the first!")}
+                {(leaderboardType === "week" || leaderboardType === "month") &&
+                  renderTimeLeaderboard(
+                    leaderboard,
+                    `No completions in this period yet.`,
+                  )}
+                {leaderboardType === "streaks" &&
+                  renderStreakLeaderboard(streakLeaderboard)}
+                {leaderboardType === "completions" &&
+                  renderCompletionLeaderboard(completionLeaderboard)}
+                {leaderboardType === "alltime" &&
+                  renderTimeLeaderboard(
+                    leaderboard,
+                    "No completions for this grid size yet.",
+                  )}
               </div>
             )}
 
@@ -198,7 +498,9 @@ export function StatsScreen() {
                   {achievements.map((a) => (
                     <div
                       key={a.id}
-                      className={`${styles.achievement} ${a.unlocked ? styles.achievementUnlocked : ""}`}
+                      className={`${styles.achievement} ${
+                        a.unlocked ? styles.achievementUnlocked : ""
+                      }`}
                     >
                       <span className={styles.achievementIcon}>{a.icon}</span>
                       <div className={styles.achievementInfo}>

@@ -37,6 +37,7 @@ export type HeaderMenuProps = {
   onToggleFullscreen: () => void;
   onShowShortcuts: () => void;
   onShowHowToPlay: () => void;
+  onShowHelpChoice: () => void;
   onToggleDebug: () => void;
 };
 
@@ -158,18 +159,11 @@ export function buildMenuItems(
       onClick: c(props.onToggleHaptics),
     },
     {
-      id: "howto",
+      id: "help",
       section: "help",
       visible: true,
-      label: "How to Play",
-      onClick: c(props.onShowHowToPlay),
-    },
-    {
-      id: "shortcuts",
-      section: "help",
-      visible: props.canShowShortcuts,
-      label: "Keyboard shortcuts",
-      onClick: c(props.onShowShortcuts),
+      label: "Help",
+      onClick: c(props.onShowHelpChoice),
     },
     {
       id: "theme",

@@ -4,7 +4,11 @@ import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PieceId, PuzzleState } from "@/puzzle/types";
 import type { HapticKind } from "./useHaptics";
-import type { CanvasWithTouch, DragPreviewState } from "./pointerHandlers/types";
+import type {
+  CanvasWithTouch,
+  DragPreviewState,
+  ScreenToBoard,
+} from "./pointerHandlers/types";
 import {
   handleTouchDown,
   handleTouchMove,
@@ -30,6 +34,13 @@ export function usePointerHandlers(args: {
   haptic?: (kind: HapticKind) => void;
   onDragPreview?: (state: DragPreviewState) => void;
   onPieceInteraction?: () => void;
+  screenToBoard?: ScreenToBoard;
+  viewport?: {
+    startPan: (x: number, y: number) => void;
+    handlePanMove: (x: number, y: number) => void;
+    endPan: () => void;
+    isPanning: () => boolean;
+  };
 }) {
   const {
     manager,
@@ -45,6 +56,8 @@ export function usePointerHandlers(args: {
     haptic,
     onDragPreview,
     onPieceInteraction,
+    screenToBoard,
+    viewport,
   } = args;
 
   const canRotatePiece = useCallback(
@@ -89,24 +102,39 @@ export function usePointerHandlers(args: {
     haptic,
     onDragPreview,
     onPieceInteraction,
+    screenToBoard,
+    viewport,
   };
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current || !boardRef.current) return;
 
+      // Middle mouse: start pan
+      if (e.button === 1 && viewport) {
+        e.preventDefault();
+        viewport.startPan(e.clientX, e.clientY);
+        try {
+          (canvasRef.current as CanvasWithTouch).setPointerCapture(e.pointerId);
+        } catch {
+          /* ignore */
+        }
+        return;
+      }
+
       const canvas = canvasRef.current as CanvasWithTouch;
       const boardRect = boardRef.current.getBoundingClientRect();
       const ctx2d = canvas.getContext("2d");
       if (!ctx2d) return;
 
-      ctx2d.setTransform(1, 0, 0, 1, 0, 0);
-      const cssX = e.clientX - boardRect.left;
-      const cssY = e.clientY - boardRect.top;
+      const { x: pickX, y: pickY } = screenToBoard
+        ? screenToBoard(e.clientX, e.clientY, boardRect)
+        : { x: e.clientX - boardRect.left, y: e.clientY - boardRect.top };
 
+      ctx2d.setTransform(1, 0, 0, 1, 0, 0);
       const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
-      const pieceId = pickPieceId(ctx2d, boardPieces, cssX, cssY);
+      const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY);
       if (!pieceId) return;
 
       const piece = st.pieces.find((p) => p.id === pieceId);
@@ -120,7 +148,7 @@ export function usePointerHandlers(args: {
       const isLeftClick = e.button === 0;
 
       if (isTouch && piece) {
-        handleTouchDown(e, ctx, pieceId, boardRect, piece);
+        handleTouchDown(e, ctx, pieceId, boardRect, piece, screenToBoard);
         return;
       }
 
@@ -133,6 +161,7 @@ export function usePointerHandlers(args: {
             boardRect,
             piece,
             canRotatePiece,
+            screenToBoard,
           );
           if (handled) return;
         }
@@ -146,39 +175,53 @@ export function usePointerHandlers(args: {
       setSelectedPieceId,
       bump,
       canRotatePiece,
+      screenToBoard,
     ],
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (viewport?.isPanning?.()) {
+        viewport.handlePanMove(e.clientX, e.clientY);
+        return;
+      }
       if (!manager || !boardRef.current) return;
 
       const isTouch = e.pointerType === "touch";
       if (isTouch) {
-        const handled = handleTouchMove(e, ctx);
+        const handled = handleTouchMove(e, ctx, screenToBoard);
         if (handled) return;
         return;
       }
 
-      handleMouseMove(e, ctx);
+      handleMouseMove(e, ctx, screenToBoard);
     },
-    [manager, boardRef],
+    [manager, boardRef, screenToBoard, viewport],
   );
 
   const handlePointerUp = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (viewport?.isPanning?.()) {
+        viewport.endPan();
+        try {
+          (canvasRef.current as CanvasWithTouch)?.releasePointerCapture(e.pointerId);
+        } catch {
+          /* ignore */
+        }
+        return;
+      }
       if (!manager || !canvasRef.current) return;
 
       const isTouch = e.pointerType === "touch";
 
       if (isTouch) {
-        handleTouchUp(e, ctx, canRotatePiece, isPointerOverTray);
+        handleTouchUp(e, ctx, canRotatePiece, isPointerOverTray, screenToBoard);
         return;
       }
 
-      handleMouseUp(e, ctx, isPointerOverTray);
+      handleMouseUp(e, ctx, isPointerOverTray, screenToBoard);
     },
-    [manager, canvasRef, canRotatePiece, isPointerOverTray],
+    [manager, canvasRef, canRotatePiece, isPointerOverTray, screenToBoard],
   );
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
@@ -187,11 +230,13 @@ export function usePointerHandlers(args: {
 
   const handlePointerCancel = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (viewport?.isPanning?.()) {
+        viewport.endPan();
+        return;
+      }
       if (!manager || !canvasRef.current) return;
       const canvas = canvasRef.current as CanvasWithTouch;
-      // ensure drag state clears even if the browser cancels the pointer sequence
       try {
-        // release capture if we had it
         canvas.releasePointerCapture(e.pointerId);
       } catch {
         // ignore
@@ -199,7 +244,6 @@ export function usePointerHandlers(args: {
       onDragPreview?.(null);
       manager.pointerUp();
       setState(manager.getState());
-      // reset touch bookkeeping to avoid "stuck" drags
       if (e.pointerType === "touch") {
         canvas.touchStartX = undefined;
         canvas.touchStartY = undefined;
@@ -208,7 +252,7 @@ export function usePointerHandlers(args: {
         canvas.pendingPieceRect = null;
       }
     },
-    [manager, canvasRef, onDragPreview, setState],
+    [manager, canvasRef, onDragPreview, setState, viewport],
   );
 
   const handleLostPointerCapture = useCallback(

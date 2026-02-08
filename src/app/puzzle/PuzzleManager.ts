@@ -28,6 +28,7 @@ export type PuzzleManagerOptions = {
 export type PuzzleManagerEvents = {
   onPiecePlaced?: (piece: Piece) => void;
   onPieceSnapped?: () => void;
+  onPieceLocked?: (pieceIds: string[]) => void;
   onPuzzleComplete?: (state: PuzzleState) => void;
 };
 function _clamp(n: number, min: number, max: number) {
@@ -474,6 +475,47 @@ export class PuzzleManager {
     };
   }
 
+  /** Board-space coords for zoom/pan viewports. */
+  public pointerDownBoardSpace(pieceId: string, boardX: number, boardY: number) {
+    const piece = this.findPiece(pieceId);
+    if (!piece || piece.isPlaced || piece.locked) return;
+
+    this.pushUndoState();
+
+    this.zCounter += 1;
+    this.updatePieces(
+      (p) => p.groupId === piece.groupId,
+      () => ({ z: this.zCounter }),
+    );
+
+    this.drag = {
+      activeId: pieceId,
+      offsetX: boardX - piece.x,
+      offsetY: boardY - piece.y,
+      preview: null,
+    };
+  }
+
+  /** Board-space coords for zoom/pan viewports. */
+  public pointerMoveBoardSpace(boardX: number, boardY: number) {
+    const activeId = this.drag.activeId;
+    if (!activeId) return;
+
+    const piece = this.findPiece(activeId);
+    if (!piece) return;
+
+    const newX = boardX - this.drag.offsetX;
+    const newY = boardY - this.drag.offsetY;
+    const dx = newX - piece.x;
+    const dy = newY - piece.y;
+
+    this.shiftGroup(piece.groupId, dx, dy);
+    this.drag = {
+      ...this.drag,
+      preview: this.computeSnapPreview(),
+    };
+  }
+
   public pointerUp() {
     if (!this.drag.activeId) return;
 
@@ -544,6 +586,7 @@ export class PuzzleManager {
 
     this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
 
+    const wasLocked = new Set(groupPieces.filter((p) => p.locked).map((p) => p.id));
     this.updatePieces(
       (p) => p.groupId === gid,
       (p) => ({
@@ -552,7 +595,12 @@ export class PuzzleManager {
       }),
     );
     this.events.onPiecePlaced?.(active);
-
+    if (this.pieceLockingEnabled) {
+      const newlyLocked = groupPieces
+        .filter((p) => !wasLocked.has(p.id))
+        .map((p) => p.id);
+      if (newlyLocked.length > 0) this.events.onPieceLocked?.(newlyLocked);
+    }
     return true;
   }
 
@@ -595,10 +643,13 @@ export class PuzzleManager {
     this.mergeGroups(gid, best.into);
 
     if (this.pieceLockingEnabled) {
+      const intoGroup = this.getGroupPieces(best.into);
+      const newlyLocked = intoGroup.filter((p) => !p.locked).map((p) => p.id);
       this.updatePieces(
         (p) => p.groupId === best.into,
         () => ({ locked: true }),
       );
+      if (newlyLocked.length > 0) this.events.onPieceLocked?.(newlyLocked);
     }
 
     this.trySnapMergedGroupToBoard(best.into);

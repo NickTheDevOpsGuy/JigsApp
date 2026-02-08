@@ -1,6 +1,6 @@
 import type React from "react";
 import { soundManager } from "@/audio/sounds";
-import type { CanvasWithTouch } from "./types";
+import type { CanvasWithTouch, ScreenToBoard } from "./types";
 import type { PointerHandlersContext } from "./types";
 import { finishDragWithTrayCheck } from "./shared";
 import { dragLog } from "./dragLog";
@@ -12,6 +12,7 @@ export function handleMouseDown(
   boardRect: DOMRect,
   piece: { x: number; y: number; w: number; h: number },
   canRotatePiece: (pid: string) => boolean,
+  screenToBoard?: ScreenToBoard,
 ): boolean {
   const { manager, canvasRef, didDragRef, setState, haptic, onPieceInteraction } = ctx;
   if (!manager) return false;
@@ -37,15 +38,19 @@ export function handleMouseDown(
     didDragRef.current = false;
     e.preventDefault();
 
-    const pieceRect = new DOMRect(
-      boardRect.left + piece.x,
-      boardRect.top + piece.y,
-      piece.w,
-      piece.h,
-    );
-
     onPieceInteraction?.();
-    manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
+    if (screenToBoard) {
+      const { x: boardX, y: boardY } = screenToBoard(e.clientX, e.clientY, boardRect);
+      manager.pointerDownBoardSpace(pieceId, boardX, boardY);
+    } else {
+      const pieceRect = new DOMRect(
+        boardRect.left + piece.x,
+        boardRect.top + piece.y,
+        piece.w,
+        piece.h,
+      );
+      manager.pointerDown(pieceId, e.clientX, e.clientY, pieceRect);
+    }
     dragLog("down", { pieceId, x: e.clientX, y: e.clientY, pointerId: e.pointerId });
     setState(manager.getState());
 
@@ -63,6 +68,7 @@ export function handleMouseDown(
 export function handleMouseMove(
   e: React.PointerEvent<HTMLCanvasElement>,
   ctx: PointerHandlersContext,
+  screenToBoard?: ScreenToBoard,
 ): void {
   const { manager, boardRef, didDragRef, onDragPreview, onPieceInteraction } = ctx;
   if (!manager || !boardRef.current) return;
@@ -70,7 +76,12 @@ export function handleMouseMove(
   didDragRef.current = true;
   onPieceInteraction?.();
   const boardRect = boardRef.current.getBoundingClientRect();
-  manager.pointerMove(e.clientX, e.clientY, boardRect);
+  if (screenToBoard) {
+    const { x: boardX, y: boardY } = screenToBoard(e.clientX, e.clientY, boardRect);
+    manager.pointerMoveBoardSpace(boardX, boardY);
+  } else {
+    manager.pointerMove(e.clientX, e.clientY, boardRect);
+  }
   dragLog("move", {
     x: e.clientX,
     y: e.clientY,
@@ -94,6 +105,7 @@ export function handleMouseUp(
   e: React.PointerEvent<HTMLCanvasElement>,
   ctx: PointerHandlersContext,
   isPointerOverTray: (x: number, y: number) => boolean,
+  _screenToBoard?: ScreenToBoard,
 ): void {
   const {
     manager,

@@ -108,6 +108,20 @@
   white-space: nowrap;
 }
 
+.hudPillBounce {
+  animation: hudPillBounce 0.3s ease-out;
+}
+
+@keyframes hudPillBounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
 .hudPillTimer {
   composes: hudPill;
 }
@@ -582,6 +596,34 @@
   display: flex;
   gap: 12px;
   justify-content: center;
+}
+
+/* Help choice modal */
+.helpChoice {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.helpChoiceBtn {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 14px 20px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.helpChoiceBtn:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-brand-primary);
 }
 
 /* Hamburger menu */

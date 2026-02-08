@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Clock, Puzzle, Pause, Play } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
@@ -32,6 +32,13 @@ export function PlayHUD({
   const isCountdown = timeMode === "countdown";
   const countdownTotal = countdownMinutes * 60;
   const isLowTime = isCountdown && elapsedSeconds > 0 && elapsedSeconds <= 60;
+  const [bounce, setBounce] = useState(false);
+
+  useEffect(() => {
+    setBounce(true);
+    const t = setTimeout(() => setBounce(false), 300);
+    return () => clearTimeout(t);
+  }, [piecesLeft]);
 
   return (
     <div className={styles.hud}>
@@ -57,7 +64,7 @@ export function PlayHUD({
         {isPaused ? <Play size={16} /> : <Pause size={16} />}
       </Button>
       <div
-        className={styles.hudPill}
+        className={`${styles.hudPill} ${bounce ? styles.hudPillBounce : ""}`}
         aria-label={`${piecesLeft} of ${totalPieces} pieces remaining`}
         role="status"
       >

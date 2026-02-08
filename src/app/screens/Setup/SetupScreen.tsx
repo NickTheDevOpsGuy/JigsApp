@@ -1,6 +1,6 @@
 // src/app/screens/Setup/SetupScreen.tsx
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/samplePuzzles";
 import { Button } from "@/components/Button/Button";
@@ -25,7 +25,11 @@ type ImageSource = "gallery" | "upload" | "camera";
 
 export function SetupScreen() {
   const nav = useNavigate();
-  const [imageSource, setImageSource] = useState<ImageSource>("gallery");
+  const [searchParams] = useSearchParams();
+  const sourceParam = searchParams.get("source");
+  const [imageSource, setImageSource] = useState<ImageSource>(
+    sourceParam === "camera" ? "camera" : "gallery",
+  );
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const {

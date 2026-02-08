@@ -19,6 +19,12 @@ export type DragPreviewState = {
   pieceId: PieceId;
 } | null;
 
+export type ScreenToBoard = (
+  clientX: number,
+  clientY: number,
+  boardRect: DOMRect,
+) => { x: number; y: number };
+
 export type PointerHandlersContext = {
   manager: PuzzleManager | null;
   boardRef: React.RefObject<HTMLDivElement | null>;
@@ -33,4 +39,6 @@ export type PointerHandlersContext = {
   haptic?: (kind: HapticKind) => void;
   onDragPreview?: (state: DragPreviewState) => void;
   onPieceInteraction?: () => void;
+  /** When set, use board-space API for zoom/pan viewport */
+  screenToBoard?: ScreenToBoard;
 };

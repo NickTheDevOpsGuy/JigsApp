@@ -23,7 +23,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 - [Adding Sample Puzzles](#-adding-sample-puzzles)
 - [Project Structure](#-project-structure)
 - [Contributing](#-contributing)
-- [Team](#-team)
+- [Team](#team)
 - [License](#-license)
 
 ---
@@ -32,7 +32,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 ### Gameplay Demo
 
-[![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
+[**Play Phuzzle →**](https://phuzzle.vercel.app/)
 
 ---
 
@@ -69,6 +69,9 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Group merging — connected pieces move together
 - Multiple difficulty levels (3×3 to 6×6 grids)
 - Image sources: gallery, file upload, or camera capture
+- Improved piece spreading — less overlap at start, especially on harder puzzles
+- Edge-piece filtering — tray filters: All, Edges, Corners, Center (Grid/Color sort)
+- Zoom and pan — scroll to zoom (toward cursor), middle-click drag to pan
 
 ### UX & Polish
 
@@ -79,24 +82,34 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Fullscreen mode · Dark mode · Multiple themes (Space, Ocean, Forest, Sunset)
 - What's New popup for updates
 - Custom fonts (Inter, Fredoka) and Lucide icons
-- Resume prompt – "Resume Your Puzzle?" when returning with saved progress (Resume / Start Fresh / Back to Home)
+- Resume prompt — "Resume Your Puzzle?" when returning with saved progress (Resume / Start Fresh / Back to Home)
 - Loading spinner while puzzle initializes
 - Piece count display (e.g. 12 / 24) in HUD
-- Empty tray message ("All pieces on board!") when drawer is empty
+- Empty tray message ("All pieces on board! Long-press pieces to store them here.") when drawer is empty
+- Timer visible on mobile (compact form)
+- Time mode cycling: tap Menu → Time to cycle elapsed, countdown, active-only, relaxed, best
+- Lock animation: green glow when pieces lock (piece locking on)
+- HUD bounce animation when piece count changes
 
 ### Mobile Support
 
 - Touch drag, tap to rotate, long-press to tray
 - Haptic feedback
-- Camera capture for instant puzzles
-- Mobile-safe layouts and gestures
-- Scrollable menu (no cut-off), Help submenu (How to Play / Keyboard shortcuts)
+- Camera capture: Menu → "Snap a Picture" or Setup → Camera tab
+- Mobile-safe layouts and gestures (44px touch targets)
+- Timer visible on mobile
+- Scrollable menu (no cut-off), Help modal (How to Play / Keyboard shortcuts)
 
 ### Social & Progress
 
 - Daily puzzle — same for everyone, streak tracking
 - Player statistics dashboard (Supabase)
-- Leaderboards for daily puzzle times
+- **Display names** — set your name for leaderboards (Stats → Profile)
+- **Anonymous toggle** — hide name on leaderboards (Stats → Profile)
+- **Leaderboards**: Today, Weekly, Monthly, Streaks, Completions, All-time best per grid
+- **Podium styling** 🥇🥈🥉 for top 3
+- **Personal best history** — best times per grid size
+- **Share leaderboard** — copy or native share
 - Achievements system
 - Share completed puzzle image
 
@@ -120,18 +133,16 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed ✓
 
-| Area        | Features                                                         |
-| ----------- | ---------------------------------------------------------------- |
-| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image |
-| **Time**    | Elapsed, countdown, active-only, relaxed, best time              |
-| **Daily**   | Same puzzle for everyone · Streak tracking                       |
-| **Social**  | Stats dashboard · Leaderboards · Achievements (Supabase)         |
-| **Content** | What's New popup · Camera capture · Sample puzzle gallery        |
+| Area        | Features                                                                                                                           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                             |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                |
+| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                         |
+| **Social**  | Stats · Leaderboards (today/weekly/monthly/streaks/completions/all-time) · Profile (display name, anonymous toggle) · Achievements |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                          |
 
 ### Planned
 
-- Edge-piece filtering
-- Zoom and pan for large puzzles
 - Import puzzle from URL
 - PWA / offline support
 
@@ -193,7 +204,7 @@ Category = folder name, puzzle name = filename.
 | `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers            |
 | `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HowToPlay, ThemeToggle, etc.         |
 | `src/app/audio/`              | Sound effects                                                             |
-| `src/app/services/`           | Supabase: stats, leaderboard, achievements                                |
+| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                       |
 | `src/app/assets/puzzles/`     | Sample puzzle images by category                                          |
 
 <details>
@@ -360,6 +371,7 @@ Category = folder name, puzzle name = filename.
 │   │   ├── services
 │   │   │   ├── achievementsService.ts
 │   │   │   ├── leaderboardService.ts
+│   │   │   ├── profileService.ts
 │   │   │   └── statsService.ts
 │   │   ├── styles
 │   │   │   └── global.css
@@ -375,7 +387,8 @@ Category = folder name, puzzle name = filename.
 │       └── vite-env.d.ts
 ├── supabase
 │   ├── migrations
-│   │   └── 001_initial_schema.sql
+│   │   ├── 001_initial_schema.sql
+│   │   └── 002_player_profiles.sql
 │   └── README.md
 ├── .env.example
 ├── .gitignore
@@ -417,7 +430,7 @@ No gatekeeping. No ego. Just building something fun together.
 
 ---
 
-Team
+## Team
 
 Built by:
 

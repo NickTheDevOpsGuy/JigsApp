@@ -85,22 +85,23 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const w = tileW + effectivePad * 2;
   const h = tileH + effectivePad * 2;
 
+  // Use full board area for scattering so pieces spread out well
   const scatterStartY = Math.max(
     scatterPadding,
     Math.floor(boardHeight * scatterStartYRatio),
   );
-
   const scatterZone = {
     minX: scatterPadding,
     maxX: Math.max(scatterPadding + w, boardWidth - scatterPadding),
     minY: scatterStartY,
     maxY: Math.max(scatterStartY + h, boardHeight - scatterPadding),
   };
-
   const zoneWidth = scatterZone.maxX - scatterZone.minX;
   const zoneHeight = scatterZone.maxY - scatterZone.minY;
 
-  const spacing = 8;
+  // Larger spacing for bigger puzzles to avoid overlap
+  const minSpacing = total <= 9 ? 12 : total <= 16 ? 16 : total <= 25 ? 20 : 24;
+  const spacing = minSpacing;
   const cellW = w + spacing;
   const cellH = h + spacing;
 
@@ -108,11 +109,16 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
 
   const positions: Array<{ x: number; y: number }> = [];
+  const jitterMax = Math.min(
+    spacing,
+    Math.floor(cellW - w) - 1,
+    Math.floor(cellH - h) - 1,
+  );
+
   for (let row = 0; row < gridRows; row++) {
     for (let col = 0; col < gridCols; col++) {
-      const jitterX = randInt(0, Math.min(spacing * 2, cellW - w));
-      const jitterY = randInt(0, Math.min(spacing * 2, cellH - h));
-
+      const jitterX = jitterMax > 0 ? randInt(0, jitterMax) : 0;
+      const jitterY = jitterMax > 0 ? randInt(0, jitterMax) : 0;
       positions.push({
         x: scatterZone.minX + col * cellW + jitterX,
         y: scatterZone.minY + row * cellH + jitterY,
@@ -126,12 +132,19 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     [positions[i], positions[j]] = [positions[j], positions[i]];
   }
 
-  // If there are fewer cells than pieces, add random positions.
+  // Add more positions in rows below if we have more pieces than grid cells
+  let rowOffset = 0;
   while (positions.length < total) {
-    positions.push({
-      x: randInt(scatterZone.minX, Math.max(scatterZone.minX, scatterZone.maxX - w)),
-      y: randInt(scatterZone.minY, Math.max(scatterZone.minY, scatterZone.maxY - h)),
-    });
+    rowOffset++;
+    const baseY = scatterZone.minY + gridRows * cellH + (rowOffset - 1) * cellH;
+    for (let col = 0; col < gridCols && positions.length < total; col++) {
+      const jitterX = jitterMax > 0 ? randInt(0, jitterMax) : 0;
+      const jitterY = jitterMax > 0 ? randInt(0, jitterMax) : 0;
+      positions.push({
+        x: scatterZone.minX + col * cellW + jitterX,
+        y: baseY + jitterY,
+      });
+    }
   }
 
   const pieces: Piece[] = [];

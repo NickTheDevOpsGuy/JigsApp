@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { WhatsNewModal } from "@/components/WhatsNew";
-import { HelpCircle, Image, Calendar, BarChart3, Sparkles } from "lucide-react";
+import { HelpCircle, Image, Calendar, BarChart3, Sparkles, Camera } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
@@ -54,6 +54,14 @@ export function MenuScreen() {
           >
             <Image size={24} />
             <span className={styles.actionLabel}>Choose Photo</span>
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => nav("/new?source=camera")}
+            className={styles.actionCard}
+          >
+            <Camera size={24} />
+            <span className={styles.actionLabel}>Snap a Picture</span>
           </Button>
 
           <Button

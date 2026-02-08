@@ -3,6 +3,7 @@ import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import type { DebugFlags } from "../playScreenUtils";
+import type { ViewportState } from "./useViewport";
 
 export function usePlayScreenAnimation(args: {
   manager: PuzzleManager | null;
@@ -11,10 +12,12 @@ export function usePlayScreenAnimation(args: {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   imgRef: React.RefObject<HTMLImageElement | null>;
   popMapRef: React.RefObject<Map<string, number>>;
+  lockMapRef: React.RefObject<Map<string, number>>;
   selectedIdRef: React.RefObject<string | null>;
   dragPreviewPieceIdRef: React.RefObject<string | null>;
   debug: DebugFlags;
   showGhostHint: boolean;
+  viewport: ViewportState;
 }) {
   const {
     manager,
@@ -23,10 +26,12 @@ export function usePlayScreenAnimation(args: {
     canvasRef,
     imgRef,
     popMapRef,
+    lockMapRef,
     selectedIdRef,
     dragPreviewPieceIdRef,
     debug,
     showGhostHint,
+    viewport,
   } = args;
 
   const rafRef = useRef<number | null>(null);
@@ -85,6 +90,7 @@ export function usePlayScreenAnimation(args: {
         ? (st.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
         : null;
       const popMap = popMapRef.current ?? new Map<string, number>();
+      const lockMap = lockMapRef.current ?? new Map<string, number>();
       const pieceCache = pieceCacheRef.current;
       renderBoard(
         ctx,
@@ -93,6 +99,7 @@ export function usePlayScreenAnimation(args: {
         assembledW,
         assembledH,
         popMap,
+        lockMap,
         performance.now(),
         debug,
         dragState,
@@ -106,6 +113,7 @@ export function usePlayScreenAnimation(args: {
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
         },
         pieceCache,
+        viewport,
       );
 
       // Only update React state when something meaningful changes
@@ -127,5 +135,5 @@ export function usePlayScreenAnimation(args: {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [manager, debug, showGhostHint, setState]);
+  }, [manager, debug, showGhostHint, setState, viewport]);
 }

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
 
 import { PieceTray } from "@/components/PieceTray/PieceTray";
-import { ConfirmModal } from "@/components/Modal/Modal";
+import { ConfirmModal, Modal } from "@/components/Modal/Modal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
@@ -22,6 +22,7 @@ import { useTimeModeConfig } from "./hooks/useTimeModeConfig";
 import { useShareResults } from "./hooks/useShareResults";
 import { useDownloadImage } from "./hooks/useDownloadImage";
 import { usePointerHandlers } from "./hooks/usePointerHandlers";
+import { useViewport } from "./hooks/useViewport";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import {
@@ -56,6 +57,8 @@ export function PlayScreen() {
     setShowShortcuts,
     showHowToPlay,
     setShowHowToPlay,
+    showHelpChoice,
+    setShowHelpChoice,
     showNewGameModal,
     setShowNewGameModal,
     selectedPieceId,
@@ -97,10 +100,16 @@ export function PlayScreen() {
     mainRef,
     imgRef,
     popMapRef,
+    lockMapRef,
   } = managerResult;
 
   const isCoarsePointer = useCoarsePointer();
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
+  const viewport = useViewport();
+
+  useEffect(() => {
+    viewport.reset();
+  }, [puzzleKey, viewport.reset]);
 
   const getSelectable = useCallback(() => {
     if (!manager) return [];
@@ -202,6 +211,8 @@ export function PlayScreen() {
     onPieceInteraction: () => {
       lastInteractionRef.current = performance.now();
     },
+    screenToBoard: viewport.screenToBoard,
+    viewport,
   });
 
   usePlayScreenAnimation({
@@ -211,10 +222,12 @@ export function PlayScreen() {
     canvasRef,
     imgRef,
     popMapRef,
+    lockMapRef,
     selectedIdRef,
     dragPreviewPieceIdRef,
     debug,
     showGhostHint,
+    viewport: viewport.viewport,
   });
 
   const handleTrayPieceClick = useCallback(
@@ -304,6 +317,7 @@ export function PlayScreen() {
             onToggleFullscreen={toggleFullscreen}
             onShowShortcuts={() => setShowShortcuts(true)}
             onShowHowToPlay={() => setShowHowToPlay(true)}
+            onShowHelpChoice={() => setShowHelpChoice(true)}
             onToggleDebug={toggleDebug}
           />
           <div className={styles.title}>Phuzzle</div>
@@ -350,6 +364,36 @@ export function PlayScreen() {
         primaryOnlyConfirm
       />
 
+      <Modal
+        isOpen={showHelpChoice}
+        onClose={() => setShowHelpChoice(false)}
+        title="Help"
+        showCloseButton={true}
+      >
+        <div className={styles.helpChoice}>
+          <button
+            type="button"
+            className={styles.helpChoiceBtn}
+            onClick={() => {
+              setShowHelpChoice(false);
+              setShowHowToPlay(true);
+            }}
+          >
+            How to Play
+          </button>
+          <button
+            type="button"
+            className={styles.helpChoiceBtn}
+            onClick={() => {
+              setShowHelpChoice(false);
+              setShowShortcuts(true);
+            }}
+          >
+            Keyboard shortcuts
+          </button>
+        </div>
+      </Modal>
+
       <ConfirmModal
         isOpen={showNewGameModal}
         onClose={() => setShowNewGameModal(false)}
@@ -379,6 +423,7 @@ export function PlayScreen() {
             onPointerCancel={handlePointerCancel}
             onLostPointerCapture={handleLostPointerCapture}
             onContextMenu={handleContextMenu}
+            onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
           />
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>

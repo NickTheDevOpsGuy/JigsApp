@@ -10,6 +10,9 @@ import {
 } from "./renderBoardHelpers";
 
 export type PopMap = Map<string, number>;
+export type LockMap = Map<string, number>;
+
+export type ViewportTransform = { scale: number; panX: number; panY: number };
 
 export type DebugFlags = {
   showGrid: boolean;
@@ -49,11 +52,13 @@ export function renderBoard(
   assembledW: number,
   assembledH: number,
   popMap: PopMap,
+  lockMap: LockMap,
   nowMs: number,
   debug: DebugFlags,
   dragState?: DragState,
   animState?: AnimationState,
   pieceCache?: PieceCache,
+  viewport?: ViewportTransform,
 ) {
   const canvas = ctx.canvas;
 
@@ -83,6 +88,13 @@ export function renderBoard(
 
   if (debug.showGrid) drawGridOverlay(ctx, cssW, cssH);
 
+  // Apply viewport transform for zoom/pan (pieces, ghosts, completion glow only)
+  if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
+    ctx.save();
+    ctx.translate(viewport.panX, viewport.panY);
+    ctx.scale(viewport.scale, viewport.scale);
+  }
+
   // Get grid from state
   const { cols, rows } = state.grid;
 
@@ -102,8 +114,12 @@ export function renderBoard(
     .filter((p) => p.id !== animState?.dragPreviewPieceId)
     .sort((a, b) => a.z - b.z);
 
+  const LOCK_GLOW_MS = 500;
   for (const p of pieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
+    const lockAt = lockMap.get(p.id);
+    const lockElapsedMs = lockAt != null ? nowMs - lockAt : 0;
+    const showLockGlow = lockAt != null && lockElapsedMs < LOCK_GLOW_MS;
     drawPiece(
       ctx,
       p,
@@ -111,16 +127,23 @@ export function renderBoard(
       cols,
       rows,
       popMap,
+      lockMap,
       nowMs,
       debug,
       isDragging,
+      showLockGlow,
+      lockElapsedMs,
       animState,
       pieceCache,
       dpr,
     );
   }
 
-  // Completion glow effect
+  if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
+    ctx.restore();
+  }
+
+  // Completion glow effect (screen-space, outside viewport)
   if (animState?.isComplete && animState.completedAtMs) {
     drawCompletionGlow(ctx, cssW, cssH, nowMs - animState.completedAtMs);
   }
@@ -172,9 +195,12 @@ function drawGhostHints(
       cols,
       rows,
       popMap,
+      new Map(),
       nowMs,
       debug,
       false,
+      false,
+      0,
       undefined,
       undefined,
       ghostDpr,
@@ -190,9 +216,12 @@ function drawPiece(
   cols: number,
   rows: number,
   popMap: PopMap,
+  lockMap: LockMap,
   nowMs: number,
   debug: DebugFlags,
   isDragging: boolean,
+  showLockGlow: boolean,
+  lockElapsedMs: number,
   animState?: AnimationState,
   pieceCache?: PieceCache,
   dpr: number = 1,
@@ -243,6 +272,8 @@ function drawPiece(
       scale,
       isDragging,
       isSelected,
+      showLockGlow,
+      lockElapsedMs,
       path,
       dpr,
     );
@@ -295,6 +326,8 @@ function drawPiece(
       scale,
       isDragging,
       isSelected,
+      showLockGlow,
+      lockElapsedMs,
       path,
       dpr,
     );
@@ -327,6 +360,9 @@ function drawPiece(
   ctx.restore();
   clearPieceShadow(ctx);
   strokePieceOutline(ctx, path, isDragging, isSelected, p.isPlaced, p.locked);
+  if (showLockGlow) {
+    drawLockGlow(ctx, path, lockElapsedMs);
+  }
   if (debug.showBounds) {
     ctx.strokeStyle = "rgba(255,0,0,0.35)";
     ctx.lineWidth = 1;
@@ -348,6 +384,17 @@ function drawPiece(
   ctx.restore();
 }
 
+function drawLockGlow(ctx: CanvasRenderingContext2D, path: Path2D, elapsedMs: number) {
+  const LOCK_GLOW_MS = 500;
+  const alpha = Math.max(0, 0.5 * (1 - elapsedMs / LOCK_GLOW_MS));
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.strokeStyle = `rgba(0, 200, 100, ${alpha})`;
+  ctx.lineWidth = 4;
+  ctx.stroke(path);
+  ctx.restore();
+}
+
 function drawCachedPiece(
   ctx: CanvasRenderingContext2D,
   p: Piece,
@@ -359,6 +406,8 @@ function drawCachedPiece(
   scale: number,
   isDragging: boolean,
   isSelected: boolean,
+  showLockGlow: boolean,
+  lockElapsedMs: number,
   path: Path2D,
   dpr: number,
 ) {
@@ -382,6 +431,12 @@ function drawCachedPiece(
     ctx.strokeStyle = isDragging ? "rgba(102, 126, 234, 0.6)" : "#667eea";
     ctx.lineWidth = isDragging ? 2 : 3;
     ctx.stroke(path);
+  }
+  if (showLockGlow) {
+    ctx.translate(cacheW / 2, cacheH / 2);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.translate(-p.w / 2, -p.h / 2);
+    drawLockGlow(ctx, path, lockElapsedMs);
   }
   ctx.restore();
 }
