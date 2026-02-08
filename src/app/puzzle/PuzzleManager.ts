@@ -147,14 +147,16 @@ export class PuzzleManager {
       return;
     }
 
-    const firstPiece = boardPieces[0];
-    const allSameGroup = boardPieces.every((p) => p.groupId === firstPiece.groupId);
-    const allCorrectRotation = boardPieces.every((p) => p.rotation === p.targetRotation);
     const noTrayPieces = boardPieces.length === allPieces.length;
+    const allCorrectRotation = boardPieces.every((p) => p.rotation === p.targetRotation);
 
-    // Win condition: all pieces snapped together in one group with correct rotation
-    // No need to check exact board position - if they're all connected correctly, puzzle is solved
-    const isComplete = allSameGroup && allCorrectRotation && noTrayPieces;
+    // Win condition: all pieces must be at their correct board positions with correct rotation.
+    // (Previously only checked "all in one group" - allowed false wins when a piece locked
+    // over another but wasn't snapped to the right spot.)
+    const isComplete =
+      noTrayPieces &&
+      allCorrectRotation &&
+      boardPieces.every((p) => this.isPieceCorrect(p));
     const prevComplete = this.state.isComplete;
 
     this.state = {
@@ -642,15 +644,8 @@ export class PuzzleManager {
     this.shiftGroupUnclamped(gid, Math.round(best.dx), Math.round(best.dy));
     this.mergeGroups(gid, best.into);
 
-    if (this.pieceLockingEnabled) {
-      const intoGroup = this.getGroupPieces(best.into);
-      const newlyLocked = intoGroup.filter((p) => !p.locked).map((p) => p.id);
-      this.updatePieces(
-        (p) => p.groupId === best.into,
-        () => ({ locked: true }),
-      );
-      if (newlyLocked.length > 0) this.events.onPieceLocked?.(newlyLocked);
-    }
+    // Don't lock on neighbor snap - the neighbor group may not be at correct positions.
+    // Locking only happens in trySnapActiveGroupToBoard when snapping to the correct board spot.
 
     this.trySnapMergedGroupToBoard(best.into);
     this.events.onPieceSnapped?.();

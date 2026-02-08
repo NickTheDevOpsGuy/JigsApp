@@ -1,6 +1,10 @@
 /* src/app/components/ThemeToggle/ThemeToggle.module.css */
 
 .container {
+  position: relative;
+}
+
+.container.floating {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -146,11 +150,6 @@
 
 /* Mobile adjustments */
 @media (max-width: 600px) {
-  .container {
-    top: 12px;
-    right: 12px;
-  }
-
   .toggle {
     width: 44px;
     height: 44px;
