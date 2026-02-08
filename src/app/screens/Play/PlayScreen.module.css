@@ -147,6 +147,35 @@
   padding: 8px;
 }
 
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  z-index: 10;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-brand-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .board {
   flex-shrink: 0;
   min-width: 0;
@@ -562,6 +591,9 @@
   left: 0;
   margin-top: 4px;
   min-width: 200px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: var(--color-bg-elevated);
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
@@ -585,6 +617,7 @@
 .headerMenuItem {
   display: block;
   width: 100%;
+  min-height: 44px;
   padding: 12px 16px;
   border: none;
   background: none;
@@ -623,6 +656,36 @@
   border: none;
   background: none;
   cursor: default;
+}
+
+.headerMenuHelpTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.headerMenuHelpTrigger:hover {
+  background: var(--color-bg-card);
+}
+
+.headerMenuChevron {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.headerMenuHelpSubmenu {
+  padding-left: 16px;
+  padding-bottom: 4px;
 }
 
 /* Drag preview overlay - piece floats on top when dragging to tray */

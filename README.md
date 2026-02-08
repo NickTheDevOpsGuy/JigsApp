@@ -75,10 +75,14 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Reference image preview overlay
 - Progress counter and timer (elapsed, countdown, active-only, relaxed, best time)
 - Confetti celebration on completion 🎉
-- Sound effects (snap, rotate, place, complete)
-- Fullscreen mode · Dark mode
+- Sound effects (snap, rotate, place, complete, undo/redo)
+- Fullscreen mode · Dark mode · Multiple themes (Space, Ocean, Forest, Sunset)
 - What's New popup for updates
 - Custom fonts (Inter, Fredoka) and Lucide icons
+- Resume prompt – "Resume Your Puzzle?" when returning with saved progress (Resume / Start Fresh / Back to Home)
+- Loading spinner while puzzle initializes
+- Piece count display (e.g. 12 / 24) in HUD
+- Empty tray message ("All pieces on board!") when drawer is empty
 
 ### Mobile Support
 
@@ -86,6 +90,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Haptic feedback
 - Camera capture for instant puzzles
 - Mobile-safe layouts and gestures
+- Scrollable menu (no cut-off), Help submenu (How to Play / Keyboard shortcuts)
 
 ### Social & Progress
 
@@ -97,15 +102,17 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Accessibility & Controls
 
-- Keyboard shortcuts (Tab, arrows, R to rotate)
+- Keyboard shortcuts (Tab, arrows, R to rotate, Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y for undo/redo)
 - First-time tutorial overlay
-- Undo · Ghost hint · Lock pieces (optional)
+- Undo · Redo · Ghost hint · Lock pieces (optional)
+- ARIA labels, focus trapping in modals, 44px touch targets
 - Designed for relaxed, low-pressure play
 
 ### Persistence
 
 - Auto-save puzzle progress
 - Resume across browser sessions
+- Resume prompt on return (Resume / Start Fresh / Back to Home)
 
 ---
 
@@ -113,17 +120,16 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed ✓
 
-| Area        | Features                                                  |
-| ----------- | --------------------------------------------------------- |
-| **Core**    | Dark mode · Undo · Ghost hint · Lock pieces · Share image |
-| **Time**    | Elapsed, countdown, active-only, relaxed, best time       |
-| **Daily**   | Same puzzle for everyone · Streak tracking                |
-| **Social**  | Stats dashboard · Leaderboards · Achievements (Supabase)  |
-| **Content** | What's New popup · Camera capture · Sample puzzle gallery |
+| Area        | Features                                                         |
+| ----------- | ---------------------------------------------------------------- |
+| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time              |
+| **Daily**   | Same puzzle for everyone · Streak tracking                       |
+| **Social**  | Stats dashboard · Leaderboards · Achievements (Supabase)         |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery        |
 
 ### Planned
 
-- Redo
 - Edge-piece filtering
 - Zoom and pan for large puzzles
 - Import puzzle from URL
@@ -294,7 +300,6 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleStorage.ts
 │   │   │   ├── shape.ts
-│   │   │   ├── snapLogic.ts
 │   │   │   ├── types.ts
 │   │   │   └── undoManager.ts
 │   │   ├── screens
@@ -331,7 +336,6 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   ├── usePlayScreenTimer.ts
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
-│   │   │   │   │   ├── usePuzzleLifecycle.ts
 │   │   │   │   │   ├── useShareResults.ts
 │   │   │   │   │   └── useTimeModeConfig.ts
 │   │   │   │   ├── PlayScreen.module.css

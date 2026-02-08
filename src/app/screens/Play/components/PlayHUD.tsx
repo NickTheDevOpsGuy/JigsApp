@@ -8,6 +8,7 @@ import type { TimeMode } from "../timeMode";
 interface PlayHUDProps {
   elapsedSeconds: number;
   piecesLeft: number;
+  totalPieces: number;
   isPaused: boolean;
   isComplete: boolean;
   timeMode: TimeMode;
@@ -19,6 +20,7 @@ interface PlayHUDProps {
 export function PlayHUD({
   elapsedSeconds,
   piecesLeft,
+  totalPieces,
   isPaused,
   isComplete,
   timeMode,
@@ -45,12 +47,24 @@ export function PlayHUD({
           )}
         </div>
       )}
-      <Button size="sm" onClick={onTogglePause} disabled={isComplete}>
+      <Button
+        size="sm"
+        onClick={onTogglePause}
+        disabled={isComplete}
+        aria-label={isPaused ? "Resume puzzle" : "Pause puzzle"}
+        aria-pressed={isPaused}
+      >
         {isPaused ? <Play size={16} /> : <Pause size={16} />}
       </Button>
-      <div className={styles.hudPill}>
+      <div
+        className={styles.hudPill}
+        aria-label={`${piecesLeft} of ${totalPieces} pieces remaining`}
+        role="status"
+      >
         <Puzzle size={14} />
-        <span>{piecesLeft} left</span>
+        <span>
+          {piecesLeft} / {totalPieces}
+        </span>
       </div>
     </div>
   );

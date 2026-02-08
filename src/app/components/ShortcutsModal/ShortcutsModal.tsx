@@ -124,6 +124,10 @@ function formatKey(key: string): string {
     F1: "F1",
     "Ctrl+Z": "Ctrl+Z",
     "⌘Z": "⌘ Z",
+    "Ctrl+Shift+Z": "Ctrl+Shift+Z",
+    "⌘⇧Z": "⌘⇧Z",
+    "Ctrl+Y": "Ctrl+Y",
+    "⌘Y": "⌘ Y",
   };
   return keyMap[key] || key.toUpperCase();
 }

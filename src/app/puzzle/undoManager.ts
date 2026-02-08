@@ -3,6 +3,26 @@ import type { Piece } from "./types";
 
 const DEFAULT_LIMIT = 30;
 
+/** Generic limited stack - pushes with cap, pops from top. */
+function createLimitedStack<T>(limit: number) {
+  const stack: T[] = [];
+  return {
+    push(item: T) {
+      stack.push(item);
+      if (stack.length > limit) stack.shift();
+    },
+    pop(): T | null {
+      return stack.length === 0 ? null : (stack.pop() ?? null);
+    },
+    canPop(): boolean {
+      return stack.length > 0;
+    },
+    clear() {
+      stack.length = 0;
+    },
+  };
+}
+
 export function piecesToSaved(pieces: Piece[]): SavedPiece[] {
   return pieces.map((p) => ({
     id: p.id,
@@ -20,30 +40,41 @@ export function piecesToSaved(pieces: Piece[]): SavedPiece[] {
 }
 
 export class UndoManager {
-  private history: SavedPiece[][] = [];
-  private readonly limit: number;
+  private readonly undoStack: ReturnType<typeof createLimitedStack<SavedPiece[]>>;
+  private readonly redoStack: ReturnType<typeof createLimitedStack<SavedPiece[]>>;
 
   constructor(limit = DEFAULT_LIMIT) {
-    this.limit = limit;
+    this.undoStack = createLimitedStack<SavedPiece[]>(limit);
+    this.redoStack = createLimitedStack<SavedPiece[]>(limit);
   }
 
   push(pieces: Piece[]): void {
-    this.history.push(piecesToSaved(pieces));
-    if (this.history.length > this.limit) {
-      this.history.shift();
-    }
+    this.undoStack.push(piecesToSaved(pieces));
+    this.redoStack.clear();
   }
 
   pop(): SavedPiece[] | null {
-    if (this.history.length === 0) return null;
-    return this.history.pop() ?? null;
+    return this.undoStack.pop();
   }
 
   canUndo(): boolean {
-    return this.history.length > 0;
+    return this.undoStack.canPop();
+  }
+
+  pushRedo(pieces: Piece[]): void {
+    this.redoStack.push(piecesToSaved(pieces));
+  }
+
+  popRedo(): SavedPiece[] | null {
+    return this.redoStack.pop();
+  }
+
+  canRedo(): boolean {
+    return this.redoStack.canPop();
   }
 
   clear(): void {
-    this.history = [];
+    this.undoStack.clear();
+    this.redoStack.clear();
   }
 }

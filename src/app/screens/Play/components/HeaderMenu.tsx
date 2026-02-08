@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, ChevronRight } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import styles from "../PlayScreen.module.css";
@@ -19,11 +19,15 @@ export type { HeaderMenuProps } from "./headerMenuConfig";
 export function HeaderMenu(props: HeaderMenuProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [helpExpanded, setHelpExpanded] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const items = buildMenuItems(props, setOpen, (path) => navigate(path));
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setHelpExpanded(false);
+      return;
+    }
     const onPointerDown = (e: PointerEvent) => {
       const el = rootRef.current;
       if (!el || (e.target && el.contains(e.target as Node))) return;
@@ -84,6 +88,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         size="sm"
         aria-haspopup="menu"
         aria-expanded={open}
+        aria-label={open ? "Close menu" : "Open menu"}
         onClick={() => setOpen((s) => !s)}
       >
         <Menu size={16} />
@@ -98,7 +103,24 @@ export function HeaderMenu(props: HeaderMenuProps) {
           {settingsItems.map(renderItem)}
           <div className={styles.headerMenuDivider} />
           <div className={styles.headerMenuSection}>Help</div>
-          {helpItems.map(renderItem)}
+          <button
+            type="button"
+            className={styles.headerMenuHelpTrigger}
+            onClick={() => setHelpExpanded((e) => !e)}
+            aria-expanded={helpExpanded}
+          >
+            Choose help
+            <ChevronRight
+              size={16}
+              className={styles.headerMenuChevron}
+              style={{ transform: helpExpanded ? "rotate(90deg)" : undefined }}
+            />
+          </button>
+          {helpExpanded && (
+            <div className={styles.headerMenuHelpSubmenu}>
+              {helpItems.map(renderItem)}
+            </div>
+          )}
           {otherItems.map(renderItem)}
         </div>
       )}

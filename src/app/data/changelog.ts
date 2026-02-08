@@ -13,6 +13,7 @@ export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
       "⏱ Time modes – Elapsed, countdown, active-only, relaxed, best time",
       "🌙 Dark mode – Easy on the eyes",
       "↩️ Undo – Reverse accidental moves",
+      "↪️ Redo – Re-apply undone moves (Ctrl+Shift+Z / ⌘⇧Z)",
       "👻 Ghost hint – See where pieces belong when stuck",
     ],
   },

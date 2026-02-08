@@ -51,7 +51,6 @@ function applyThemeClass(theme: Theme) {
   });
   // Add the current theme class
   document.documentElement.classList.add(`theme-${theme}`);
-  console.log("[Theme] Applied:", theme, "Classes:", document.documentElement.className);
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {

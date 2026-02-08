@@ -180,7 +180,7 @@ export function SetupScreen() {
         <Dropdown
           label="Difficulty"
           value={gridIndex}
-          onChange={(val) => setGridIndex(Number(val))}
+          onChange={(val: string) => setGridIndex(Number(val))}
           options={GRID_OPTIONS.map((opt, i) => ({
             value: i,
             label:
@@ -194,7 +194,7 @@ export function SetupScreen() {
         <Dropdown
           label="Time mode"
           value={timeMode}
-          onChange={(val) => setTimeMode(val as TimeMode)}
+          onChange={(val: string) => setTimeMode(val as TimeMode)}
           options={(
             ["elapsed", "countdown", "active", "relaxed", "best"] as TimeMode[]
           ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
@@ -205,7 +205,7 @@ export function SetupScreen() {
           <Dropdown
             label="Countdown length"
             value={countdownMinutes}
-            onChange={(val) => setCountdownMinutes(Number(val))}
+            onChange={(val: string) => setCountdownMinutes(Number(val))}
             options={COUNTDOWN_OPTIONS.map((m) => ({
               value: m,
               label: `${m} minutes`,

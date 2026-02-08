@@ -3,7 +3,7 @@
 // Haptic feedback using Vibration API
 // Theme-specific sound variants
 
-type SoundType = "snap" | "place" | "rotate" | "complete" | "pickup";
+type SoundType = "snap" | "place" | "rotate" | "complete" | "pickup" | "undo";
 
 type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
 
@@ -121,6 +121,9 @@ class SoundManager {
       case "complete":
         this.playComplete(ctx);
         break;
+      case "undo":
+        this.playUndo(ctx);
+        break;
     }
   }
 
@@ -146,6 +149,10 @@ class SoundManager {
       case "complete":
         // Celebration pattern: short-pause-short-pause-long
         this.vibrate([50, 50, 50, 50, 100]);
+        break;
+      case "undo":
+        // Quick reverse buzz
+        this.vibrate(20);
         break;
     }
   }
@@ -364,6 +371,36 @@ class SoundManager {
         vol: this.volume * 0.5,
         duration: 0.15,
         freqRamp: { to: 200, at: 0.1 },
+      });
+    }
+  }
+
+  private playUndo(ctx: AudioContext) {
+    const theme = getTheme();
+    const t = ctx.currentTime;
+    // Subtle "rewind" tone - soft, descending
+    if (
+      theme === "space" ||
+      theme === "ocean" ||
+      theme === "forest" ||
+      theme === "sunset"
+    ) {
+      this.playTone(ctx, {
+        freq: 400,
+        type: "sine",
+        vol: this.volume * 0.12,
+        duration: 0.06,
+        start: t,
+        freqRamp: { to: 200, at: 0.04 },
+      });
+    } else {
+      this.playTone(ctx, {
+        freq: 350,
+        type: "triangle",
+        vol: this.volume * 0.12,
+        duration: 0.06,
+        start: t,
+        freqRamp: { to: 180, at: 0.04 },
       });
     }
   }

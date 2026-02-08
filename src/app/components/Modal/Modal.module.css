@@ -9,8 +9,9 @@
   justify-content: center;
   padding: 16px;
   z-index: 1000;
-  animation: fadeIn 0.15s ease;
+  animation: fadeIn 0.2s ease;
   backdrop-filter: blur(4px);
+  transition: backdrop-filter 0.2s ease;
 }
 
 @keyframes fadeIn {
@@ -30,7 +31,7 @@
   width: 100%;
   max-height: 90vh;
   overflow: auto;
-  animation: slideUp 0.2s ease;
+  animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   border: 1px solid var(--color-border);
 }
 
@@ -83,9 +84,21 @@
 
 .actions {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
   justify-content: flex-end;
+  align-items: center;
   margin-top: 24px;
+}
+
+.tertiaryBtn {
+  margin-right: auto;
+  order: -1;
+}
+
+.primaryActions {
+  display: flex;
+  gap: 12px;
 }
 
 .message {

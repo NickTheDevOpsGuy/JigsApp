@@ -51,32 +51,65 @@ export function TopBarButtons({
 
   return (
     <div className={styles.topBarRight}>
-      <Button size="sm" onClick={onTogglePreview} title="Toggle preview (P)">
+      <Button
+        size="sm"
+        onClick={onTogglePreview}
+        title="Toggle preview (P)"
+        aria-label={showPreview ? "Hide preview" : "Show preview"}
+        aria-pressed={showPreview}
+      >
         {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
         <span className={styles.btnText}>{showPreview ? "Hide" : "Preview"}</span>
       </Button>
 
-      <Button size="sm" onClick={onToggleSound} title="Toggle sound (M)">
+      <Button
+        size="sm"
+        onClick={onToggleSound}
+        title="Toggle sound (M)"
+        aria-label={soundEnabled ? "Mute sound" : "Unmute sound"}
+        aria-pressed={soundEnabled}
+      >
         {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
       </Button>
 
-      <Button size="sm" onClick={onShowShortcuts} title="Keyboard shortcuts (?)">
+      <Button
+        size="sm"
+        onClick={onShowShortcuts}
+        title="Keyboard shortcuts (?)"
+        aria-label="Show keyboard shortcuts"
+      >
         <Keyboard size={16} />
       </Button>
 
       {document.fullscreenEnabled && (
-        <Button size="sm" onClick={onToggleFullscreen} title="Toggle fullscreen (F)">
+        <Button
+          size="sm"
+          onClick={onToggleFullscreen}
+          title="Toggle fullscreen (F)"
+          aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          aria-pressed={isFullscreen}
+        >
           {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
         </Button>
       )}
 
       {showDebug && (
-        <Button size="sm" onClick={onToggleDebug} title="Toggle debug overlay">
+        <Button
+          size="sm"
+          onClick={onToggleDebug}
+          title="Toggle debug overlay"
+          aria-label="Toggle debug overlay"
+        >
           <Bug size={16} />
         </Button>
       )}
 
-      <Button size="sm" variant="primary" onClick={onNewPuzzle}>
+      <Button
+        size="sm"
+        variant="primary"
+        onClick={onNewPuzzle}
+        aria-label="Start new puzzle"
+      >
         <Plus size={16} />
         <span className={styles.btnText}>New Puzzle</span>
       </Button>

@@ -1,27 +1,39 @@
 .content {
   max-height: 60vh;
   overflow-y: auto;
+  font-size: 1rem;
 }
 
 .section {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.section:last-of-type {
+  margin-bottom: 0;
 }
 
 .sectionTitle {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
   color: var(--color-brand-primary);
 }
 
 .list {
   margin: 0;
-  padding-left: 1.25rem;
+  padding-left: 1.5rem;
 }
 
 .item {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.75rem;
   color: var(--color-text-primary);
-  line-height: 1.4;
+  font-size: 1rem;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+.item:last-child {
+  margin-bottom: 0;
 }
 
 .actions {

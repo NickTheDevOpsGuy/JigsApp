@@ -105,7 +105,9 @@
   appearance: none;
   border: none;
   background: transparent;
-  padding: 2px;
+  padding: 4px;
+  min-width: 44px;
+  min-height: 44px;
   cursor: pointer;
   border-radius: 6px;
   transition: all 0.15s ease;
@@ -196,7 +198,12 @@
   }
 
   .thumbWrap {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .pieceButton {
+    min-width: 48px;
+    min-height: 48px;
   }
 }

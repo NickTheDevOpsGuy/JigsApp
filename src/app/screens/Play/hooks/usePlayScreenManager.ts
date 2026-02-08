@@ -7,12 +7,15 @@ import { soundManager } from "@/audio/sounds";
 import { STORAGE_KEY, computeTileSize } from "../playScreenUtils";
 import type { TimeMode } from "../timeMode";
 
+export type ResumeChoice = "resume" | "fresh" | null;
+
 export function usePlayScreenManager(
   grid: { rows: number; cols: number },
   pieceLockingEnabled: boolean,
   timeMode: TimeMode,
   countdownMinutes: number,
   lastInteractionRef: MutableRefObject<number>,
+  resumeChoice: ResumeChoice,
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -24,15 +27,23 @@ export function usePlayScreenManager(
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [awaitingResumeChoice, setAwaitingResumeChoice] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Initial setup: create manager with square tiles
   useEffect(() => {
     const mainEl = mainRef.current;
     const boardEl = boardRef.current;
-    if (!mainEl || !boardEl) return;
+    if (!mainEl || !boardEl) {
+      setIsLoading(false);
+      return;
+    }
 
     const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
-    if (!imageUrl) return;
+    if (!imageUrl) {
+      setIsLoading(false);
+      return;
+    }
 
     // Load image
     const img = new Image();
@@ -78,6 +89,18 @@ export function usePlayScreenManager(
         setElapsedSeconds(isCountdown ? countdownMinutes * 60 : 0);
       }
 
+      // If saved game exists and user hasn't chosen, wait for choice
+      if (hasSavedGame && resumeChoice === null) {
+        setAwaitingResumeChoice(true);
+        setIsLoading(false);
+        return;
+      }
+      setAwaitingResumeChoice(false);
+
+      if (hasSavedGame && resumeChoice === "fresh") {
+        clearPuzzleState();
+      }
+
       const next = new PuzzleManager(
         {
           imageUrl,
@@ -111,15 +134,23 @@ export function usePlayScreenManager(
         },
       );
 
-      if (hasSavedGame && savedState) {
+      if (hasSavedGame && savedState && resumeChoice === "resume") {
         next.restoreFromSaved(savedState.pieces);
       }
 
       next.setPieceLockingEnabled(pieceLockingEnabled);
       setManager(next);
       setState(next.getState());
+      setIsLoading(false);
     };
-  }, [grid, pieceLockingEnabled, timeMode, countdownMinutes, lastInteractionRef]);
+  }, [
+    grid,
+    pieceLockingEnabled,
+    timeMode,
+    countdownMinutes,
+    lastInteractionRef,
+    resumeChoice,
+  ]);
 
   useEffect(() => {
     manager?.setPieceLockingEnabled(pieceLockingEnabled);
@@ -148,6 +179,8 @@ export function usePlayScreenManager(
     setState,
     elapsedSeconds,
     setElapsedSeconds,
+    awaitingResumeChoice,
+    isLoading,
     boardRef,
     canvasRef,
     trayRef,

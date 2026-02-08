@@ -87,7 +87,10 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const displayed = sections[section];
 
   const helpText = "Drag pieces here to store • Tap to place";
-  const emptyText = "Drag pieces here to store them";
+  const emptyText =
+    pieces.length === 0
+      ? "All pieces on board! Long-press pieces to store them here."
+      : "Drag pieces here to store them";
 
   // Generate jigsaw-shaped thumbnails using the same clip path as the board renderer.
   // Memoized so the tray stays snappy.

@@ -22,6 +22,7 @@ export type ShortcutAction =
   | "sendToTray"
   | "snap"
   | "undo"
+  | "redo"
   | "showHelp"
   | "escape";
 
@@ -152,6 +153,16 @@ export function useKeyboardShortcuts({
         e.preventDefault();
         action = "undo";
       }
+      // Ctrl/Cmd+Shift+Z - Redo
+      else if (key === "z" && mod && shift) {
+        e.preventDefault();
+        action = "redo";
+      }
+      // Ctrl/Cmd+Y - Redo (alternative, common on Windows)
+      else if (key === "y" && mod && !shift) {
+        e.preventDefault();
+        action = "redo";
+      }
 
       if (action) onAction(action);
     },
@@ -167,6 +178,7 @@ export function useKeyboardShortcuts({
 // Shortcut definitions for the help modal
 export const SHORTCUTS = [
   { keys: ["Ctrl+Z", "⌘Z"], action: "Undo last move" },
+  { keys: ["Ctrl+Shift+Z", "⌘⇧Z", "Ctrl+Y", "⌘Y"], action: "Redo last undone move" },
   { keys: ["Space"], action: "Pause / Resume" },
   { keys: ["Tab"], action: "Select next piece" },
   { keys: ["Shift+Tab"], action: "Select previous piece" },

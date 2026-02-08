@@ -11,6 +11,8 @@ export type HeaderMenuProps = {
   title?: string;
   canUndo: boolean;
   onUndo: () => void;
+  canRedo: boolean;
+  onRedo: () => void;
   timeMode: TimeMode;
   setTimeMode: (m: TimeMode | ((prev: TimeMode) => TimeMode)) => void;
   countdownMinutes: number;
@@ -62,7 +64,7 @@ export function buildMenuItems(
   setOpen: (open: boolean) => void,
   navigate: (path: string) => void,
 ): MenuItemConfig[] {
-  const closeAnd = (fn: () => void) => () => {
+  const c = (fn: () => void) => () => {
     setOpen(false);
     fn();
   };
@@ -73,14 +75,14 @@ export function buildMenuItems(
       section: "nav",
       visible: true,
       label: "Home",
-      onClick: closeAnd(() => navigate("/")),
+      onClick: c(() => navigate("/")),
     },
     {
       id: "new",
       section: "nav",
       visible: true,
       label: "New puzzle",
-      onClick: closeAnd(props.onNewPuzzle),
+      onClick: c(props.onNewPuzzle),
     },
     {
       id: "undo",
@@ -88,7 +90,15 @@ export function buildMenuItems(
       visible: true,
       label: "Undo",
       disabled: !props.canUndo,
-      onClick: closeAnd(props.onUndo),
+      onClick: c(props.onUndo),
+    },
+    {
+      id: "redo",
+      section: "nav",
+      visible: true,
+      label: "Redo",
+      disabled: !props.canRedo,
+      onClick: c(props.onRedo),
     },
     {
       id: "debug",
@@ -96,7 +106,7 @@ export function buildMenuItems(
       visible: props.canShowDebug,
       label: "Debug overlay",
       sortKey: "Debug overlay",
-      onClick: closeAnd(props.onToggleDebug),
+      onClick: c(props.onToggleDebug),
     },
     {
       id: "fullscreen",
@@ -104,7 +114,7 @@ export function buildMenuItems(
       visible: props.canShowFullscreen,
       label: props.isFullscreen ? "Exit fullscreen" : "Fullscreen",
       sortKey: "Fullscreen",
-      onClick: closeAnd(props.onToggleFullscreen),
+      onClick: c(props.onToggleFullscreen),
     },
     {
       id: "timeMode",
@@ -112,7 +122,7 @@ export function buildMenuItems(
       visible: true,
       label: `Time: ${TIME_MODE_LABELS[props.timeMode]} (tap to change)`,
       sortKey: "Time",
-      onClick: closeAnd(() => {
+      onClick: c(() => {
         const order: TimeMode[] = ["elapsed", "countdown", "active", "relaxed", "best"];
         props.setTimeMode(order[(order.indexOf(props.timeMode) + 1) % order.length]);
       }),
@@ -123,7 +133,7 @@ export function buildMenuItems(
       visible: props.timeMode === "countdown",
       label: `Countdown: ${props.countdownMinutes} min`,
       sortKey: "Countdown",
-      onClick: closeAnd(() => {
+      onClick: c(() => {
         const idx = COUNTDOWN_OPTIONS.indexOf(
           props.countdownMinutes as (typeof COUNTDOWN_OPTIONS)[number],
         );
@@ -137,7 +147,7 @@ export function buildMenuItems(
       visible: true,
       label: props.showGhostHint ? "Ghost hint: on" : "Ghost hint: off",
       sortKey: "Ghost hint",
-      onClick: closeAnd(props.onToggleGhostHint),
+      onClick: c(props.onToggleGhostHint),
     },
     {
       id: "haptics",
@@ -145,21 +155,21 @@ export function buildMenuItems(
       visible: props.canShowHaptics,
       label: props.hapticsEnabled ? "Haptics: on" : "Haptics: off",
       sortKey: "Haptics",
-      onClick: closeAnd(props.onToggleHaptics),
+      onClick: c(props.onToggleHaptics),
     },
     {
       id: "howto",
       section: "help",
       visible: true,
       label: "How to Play",
-      onClick: closeAnd(props.onShowHowToPlay),
+      onClick: c(props.onShowHowToPlay),
     },
     {
       id: "shortcuts",
       section: "help",
       visible: props.canShowShortcuts,
       label: "Keyboard shortcuts",
-      onClick: closeAnd(props.onShowShortcuts),
+      onClick: c(props.onShowShortcuts),
     },
     {
       id: "theme",
@@ -176,7 +186,7 @@ export function buildMenuItems(
       visible: true,
       label: props.pieceLockingEnabled ? "Lock pieces: on" : "Lock pieces: off",
       sortKey: "Lock pieces",
-      onClick: closeAnd(props.onTogglePieceLocking),
+      onClick: c(props.onTogglePieceLocking),
     },
     {
       id: "preview",
@@ -184,7 +194,7 @@ export function buildMenuItems(
       visible: true,
       label: props.showPreview ? "Hide preview" : "Show preview",
       sortKey: "Show preview",
-      onClick: closeAnd(props.onTogglePreview),
+      onClick: c(props.onTogglePreview),
     },
     {
       id: "sound",
@@ -192,7 +202,7 @@ export function buildMenuItems(
       visible: true,
       label: props.soundEnabled ? "Sound: on" : "Sound: off",
       sortKey: "Sound",
-      onClick: closeAnd(props.onToggleSound),
+      onClick: c(props.onToggleSound),
     },
   ];
 }

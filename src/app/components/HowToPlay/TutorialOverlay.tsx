@@ -123,8 +123,8 @@ export function TutorialOverlay({
           </p>
           <ul className={styles.tips}>
             <li>
-              <strong>Undo:</strong> Reverse accidental moves from the menu or{" "}
-              {isTouch ? "use the menu" : "press Ctrl+Z (⌘Z)"}.
+              <strong>Undo / Redo:</strong> Reverse or re-apply moves from the menu or{" "}
+              {isTouch ? "use the menu" : "press Ctrl+Z / Ctrl+Shift+Z (⌘Z / ⌘⇧Z)"}.
             </li>
             <li>
               <strong>Lock pieces:</strong> When on, pieces that snap into place become
@@ -144,7 +144,7 @@ export function TutorialOverlay({
             <li>Group pieces by color or pattern</li>
             <li>Use the Preview button to see the full image</li>
             <li>Pieces snap together when correctly aligned</li>
-            <li>Undo accidental moves (Menu or Ctrl+Z / ⌘Z)</li>
+            <li>Undo / Redo moves (Menu or Ctrl+Z / Ctrl+Shift+Z)</li>
             <li>Turn on Ghost hint (Menu or press G) when stuck</li>
             <li>
               Turn on Lock pieces (Menu) to prevent accidentally moving placed pieces

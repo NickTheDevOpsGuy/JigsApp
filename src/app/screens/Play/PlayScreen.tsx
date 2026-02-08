@@ -6,12 +6,14 @@ import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
+import { soundManager } from "@/audio/sounds";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
+import { createUndoRedoHandler } from "./playUtils";
 import { getBestTime } from "./timeMode";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzle";
-import { usePlayScreenManager } from "./hooks/usePlayScreenManager";
+import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
 import { usePlayScreenAnimation } from "./hooks/usePlayScreenAnimation";
@@ -70,6 +72,7 @@ export function PlayScreen() {
   const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
     useTimeModeConfig();
   const lastInteractionRef = React.useRef(performance.now());
+  const [resumeChoice, setResumeChoice] = React.useState<ResumeChoice>(null);
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -77,6 +80,7 @@ export function PlayScreen() {
     timeMode,
     countdownMinutes,
     lastInteractionRef,
+    resumeChoice,
   );
   const {
     manager,
@@ -84,6 +88,8 @@ export function PlayScreen() {
     setState,
     elapsedSeconds,
     setElapsedSeconds,
+    awaitingResumeChoice,
+    isLoading,
     boardRef,
     canvasRef,
     trayRef,
@@ -258,12 +264,21 @@ export function PlayScreen() {
           <HeaderMenu
             title="Phuzzle"
             canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
-            onUndo={() => {
-              if (manager?.canUndo()) {
-                manager.undo();
-                setState(manager.getState());
-              }
-            }}
+            onUndo={createUndoRedoHandler(
+              manager ?? null,
+              "undo",
+              setState,
+              () => Boolean(manager?.canUndo()),
+              soundManager.play.bind(soundManager),
+            )}
+            canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
+            onRedo={createUndoRedoHandler(
+              manager ?? null,
+              "redo",
+              setState,
+              () => Boolean(manager?.canRedo()),
+              soundManager.play.bind(soundManager),
+            )}
             timeMode={timeMode}
             setTimeMode={setTimeMode}
             countdownMinutes={countdownMinutes}
@@ -296,6 +311,7 @@ export function PlayScreen() {
           <PlayHUD
             elapsedSeconds={elapsedSeconds}
             piecesLeft={left}
+            totalPieces={total}
             isPaused={isPaused}
             isComplete={isComplete}
             timeMode={timeMode}
@@ -320,6 +336,19 @@ export function PlayScreen() {
       </div>
 
       <ConfirmModal
+        isOpen={awaitingResumeChoice}
+        onClose={() => setResumeChoice("fresh")}
+        onConfirm={() => setResumeChoice("resume")}
+        title="Resume Your Puzzle?"
+        message="You have a puzzle in progress. Would you like to continue where you left off?"
+        confirmText="Resume"
+        cancelText="Start Fresh"
+        tertiaryText="Back to Home"
+        onTertiary={() => navigate("/")}
+        variant="default"
+      />
+
+      <ConfirmModal
         isOpen={showNewGameModal}
         onClose={() => setShowNewGameModal(false)}
         onConfirm={handleNewGame}
@@ -332,6 +361,12 @@ export function PlayScreen() {
 
       <div className={styles.main} ref={mainRef}>
         <div className={styles.board} ref={boardRef}>
+          {isLoading && (
+            <div className={styles.loadingOverlay} aria-label="Loading puzzle">
+              <div className={styles.spinner} />
+              <span>Loading puzzle…</span>
+            </div>
+          )}
           <canvas
             className={styles.canvas}
             ref={canvasRef}

@@ -1,9 +1,15 @@
 //
 // src/app/components/Modal/Modal.tsx
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Modal.module.css";
 import { Button } from "@/components/Button/Button";
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  const selector =
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  return Array.from(container.querySelectorAll<HTMLElement>(selector));
+}
 
 type ModalProps = {
   isOpen: boolean;
@@ -20,22 +26,53 @@ export function Modal({
   children,
   showCloseButton = true,
 }: ModalProps) {
-  // Close on escape key
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveRef = useRef<HTMLElement | null>(null);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      if (e.key !== "Tab") return;
+      const el = modalRef.current;
+      if (!el) return;
+      const focusable = getFocusableElements(el);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const { activeElement } = document;
+      if (e.shiftKey) {
+        if (activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     },
     [onClose],
   );
 
   useEffect(() => {
     if (isOpen) {
+      previousActiveRef.current = document.activeElement as HTMLElement | null;
       document.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
+      requestAnimationFrame(() => {
+        const el = modalRef.current;
+        if (!el) return;
+        const focusable = getFocusableElements(el);
+        if (focusable.length > 0) focusable[0].focus();
+      });
     }
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      if (previousActiveRef.current?.focus) {
+        previousActiveRef.current.focus();
+      }
     };
   }, [isOpen, handleKeyDown]);
 
@@ -43,12 +80,23 @@ export function Modal({
 
   return createPortal(
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={modalRef}
+        className={styles.modal}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
         {(title || showCloseButton) && (
           <div className={styles.header}>
             {title && <h2 className={styles.title}>{title}</h2>}
             {showCloseButton && (
-              <button className={styles.closeBtn} onClick={onClose}>
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={onClose}
+                aria-label="Close"
+              >
                 ×
               </button>
             )}
@@ -70,6 +118,8 @@ type ConfirmModalProps = {
   message: string;
   confirmText?: string;
   cancelText?: string;
+  tertiaryText?: string;
+  onTertiary?: () => void;
   variant?: "danger" | "default";
 };
 
@@ -81,25 +131,34 @@ export function ConfirmModal({
   message,
   confirmText = "Confirm",
   cancelText = "Cancel",
+  tertiaryText,
+  onTertiary,
   variant = "default",
 }: ConfirmModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} showCloseButton={false}>
       <p className={styles.message}>{message}</p>
       <div className={styles.actions}>
-        <Button variant="secondary" onClick={onClose}>
-          {cancelText}
-        </Button>
-        <Button
-          variant={variant === "danger" ? "primary" : "primary"}
-          onClick={() => {
-            onConfirm();
-            onClose();
-          }}
-          className={variant === "danger" ? styles.dangerBtn : ""}
-        >
-          {confirmText}
-        </Button>
+        {tertiaryText && onTertiary && (
+          <Button variant="ghost" onClick={onTertiary} className={styles.tertiaryBtn}>
+            {tertiaryText}
+          </Button>
+        )}
+        <div className={styles.primaryActions}>
+          <Button variant="secondary" onClick={onClose}>
+            {cancelText}
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            className={variant === "danger" ? styles.dangerBtn : ""}
+          >
+            {confirmText}
+          </Button>
+        </div>
       </div>
     </Modal>
   );

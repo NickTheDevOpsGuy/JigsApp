@@ -6,16 +6,15 @@ import styles from "./Button.module.css";
 export type ButtonVariant = "primary" | "secondary" | "ghost";
 export type ButtonSize = "sm" | "md" | "lg";
 
-type ButtonProps = {
+type ButtonProps = React.ComponentPropsWithoutRef<"button"> & {
   children: React.ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   disabled?: boolean;
   fullWidth?: boolean;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   type?: "button" | "submit" | "reset";
   className?: string;
-  title?: string;
+  "aria-pressed"?: boolean | "mixed";
 };
 
 export function Button({
@@ -24,10 +23,9 @@ export function Button({
   size = "md",
   disabled = false,
   fullWidth = false,
-  onClick,
   type = "button",
   className = "",
-  title,
+  ...rest
 }: ButtonProps) {
   const classNames = [
     styles.button,
@@ -40,13 +38,7 @@ export function Button({
     .join(" ");
 
   return (
-    <button
-      type={type}
-      className={classNames}
-      disabled={disabled}
-      onClick={onClick}
-      title={title}
-    >
+    <button type={type} className={classNames} disabled={disabled} {...rest}>
       {children}
     </button>
   );

@@ -273,12 +273,27 @@ export class PuzzleManager {
     if (!this.undoManager.canUndo() || this.state.isComplete) return false;
     const snapshot = this.undoManager.pop();
     if (!snapshot) return false;
+    this.undoManager.pushRedo(this.state.pieces);
     this.restoreFromSaved(snapshot);
     return true;
   }
 
   canUndo(): boolean {
     return this.undoManager.canUndo() && !this.state.isComplete;
+  }
+
+  /** Re-apply a previously undone state. Returns true if redo was performed. */
+  redo(): boolean {
+    if (!this.undoManager.canRedo() || this.state.isComplete) return false;
+    const snapshot = this.undoManager.popRedo();
+    if (!snapshot) return false;
+    this.undoManager.push(this.state.pieces);
+    this.restoreFromSaved(snapshot);
+    return true;
+  }
+
+  canRedo(): boolean {
+    return this.undoManager.canRedo() && !this.state.isComplete;
   }
 
   setPieceLockingEnabled(enabled: boolean): void {

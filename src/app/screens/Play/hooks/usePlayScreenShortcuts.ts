@@ -3,6 +3,7 @@ import { soundManager } from "@/audio/sounds";
 import { useKeyboardShortcuts, ShortcutAction } from "@/hooks/useKeyboardShortcuts";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
+import { createUndoRedoHandler } from "../playUtils";
 
 type UsePlayScreenShortcutsArgs = {
   manager: PuzzleManager | null;
@@ -145,10 +146,22 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
           break;
         }
         case "undo":
-          if (manager?.canUndo() && !isPaused && !state?.isComplete) {
-            manager.undo();
-            setState(manager.getState());
-          }
+          createUndoRedoHandler(
+            manager ?? null,
+            "undo",
+            setState,
+            () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
+            soundManager.play.bind(soundManager),
+          )();
+          break;
+        case "redo":
+          createUndoRedoHandler(
+            manager ?? null,
+            "redo",
+            setState,
+            () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
+            soundManager.play.bind(soundManager),
+          )();
           break;
         case "sendToTray":
           if (manager && state && !isPaused && selectedPieceId) {
