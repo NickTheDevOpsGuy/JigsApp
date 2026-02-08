@@ -158,13 +158,7 @@ export function buildMenuItems(
       sortKey: "Haptics",
       onClick: c(props.onToggleHaptics),
     },
-    {
-      id: "help",
-      section: "help",
-      visible: true,
-      label: "Help",
-      onClick: c(props.onShowHelpChoice),
-    },
+    /* Help is rendered as expandable submenu in HeaderMenu (How to Play / Keyboard shortcuts) */
     {
       id: "theme",
       section: "settings",

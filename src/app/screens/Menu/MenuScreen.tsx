@@ -76,7 +76,7 @@ export function MenuScreen() {
           <Button
             variant="secondary"
             onClick={() => nav("/stats")}
-            className={styles.actionCard}
+            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
           >
             <BarChart3 size={20} />
             <span className={styles.actionLabel}>Stats</span>
