@@ -8,10 +8,10 @@ import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import type { SamplePuzzle } from "@/data/samplePuzzles";
 
 export const GRID_OPTIONS = [
-  { rows: 3, cols: 3, label: "Easy", pieces: 9 },
-  { rows: 4, cols: 4, label: "Medium", pieces: 16 },
-  { rows: 5, cols: 5, label: "Hard", pieces: 25 },
-  { rows: 6, cols: 6, label: "Expert", pieces: 36 },
+  { rows: 3, cols: 3, label: "Easy 🌱", pieces: 9 },
+  { rows: 4, cols: 4, label: "Medium ⚡", pieces: 16 },
+  { rows: 5, cols: 5, label: "Hard 🔥", pieces: 25 },
+  { rows: 6, cols: 6, label: "Expert 👑", pieces: 36 },
 ] as const;
 
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";

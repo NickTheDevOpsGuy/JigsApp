@@ -11,10 +11,10 @@ export type GridOption = {
 };
 
 export const GRID_OPTIONS: GridOption[] = [
-  { label: "Easy (3×3 - 9 pieces)", rows: 3, cols: 3 },
-  { label: "Medium (4×4 - 16 pieces)", rows: 4, cols: 4 },
-  { label: "Hard (5×5 - 25 pieces)", rows: 5, cols: 5 },
-  { label: "Expert (6×6 - 36 pieces)", rows: 6, cols: 6 },
+  { label: "Easy 🌱 (3×3 - 9 pieces)", rows: 3, cols: 3 },
+  { label: "Medium ⚡ (4×4 - 16 pieces)", rows: 4, cols: 4 },
+  { label: "Hard 🔥 (5×5 - 25 pieces)", rows: 5, cols: 5 },
+  { label: "Expert 👑 (6×6 - 36 pieces)", rows: 6, cols: 6 },
   { label: "Custom", rows: 0, cols: 0 },
 ];
 

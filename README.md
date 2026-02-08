@@ -85,7 +85,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Resume prompt — "Resume Your Puzzle?" when returning with saved progress (Resume / Start Fresh / Back to Home)
 - Loading spinner while puzzle initializes
 - Piece count display (e.g. 12 / 24) in HUD
-- Empty tray message ("All pieces on board! Long-press pieces to store them here.") when drawer is empty
+- Empty tray message ("All pieces on board! Drag pieces here to store them.") when drawer is empty
 - Timer visible on mobile (compact form)
 - Time mode cycling: tap Menu → Time to cycle elapsed, countdown, active-only, relaxed, best
 - Lock animation: green glow when pieces lock (piece locking on)
@@ -93,7 +93,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Mobile Support
 
-- Touch drag, tap to rotate, long-press to tray
+- Touch drag, tap to rotate, drag pieces to tray
 - Haptic feedback
 - Camera capture: Menu → "Snap a Picture" or Setup → Camera tab
 - Mobile-safe layouts and gestures (44px touch targets)

@@ -17,18 +17,18 @@ export function useInputHints(isCoarsePointer: boolean): InputHints {
     if (isCoarsePointer) {
       return {
         rotate: "Tap to rotate",
-        sendToTray: "Long-press to store",
+        sendToTray: "Drag to tray",
         placeFromTray: "Tap to place on board",
-        trayHelpText: "Long-press to store • Tap to rotate",
-        emptyTrayText: "Long-press pieces to store them here",
+        trayHelpText: "Drag pieces here to store • Tap to place",
+        emptyTrayText: "Drag pieces here to store them",
       };
     }
     return {
       rotate: "Right-click to rotate",
-      sendToTray: "Middle-click to store",
+      sendToTray: "Drag to tray",
       placeFromTray: "Click to place on board",
-      trayHelpText: "Middle-click to store • Right-click to rotate",
-      emptyTrayText: "Middle-click pieces to store them here",
+      trayHelpText: "Drag pieces here to store • Right-click to rotate",
+      emptyTrayText: "Drag pieces here to store them",
     };
   }, [isCoarsePointer]);
 }
