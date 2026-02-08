@@ -120,10 +120,17 @@ export class PuzzleManager {
 
   /* ---------------- Correctness / Win condition ---------------- */
 
+  /** Allow 2px tolerance for rounding from snap shifts */
+  private static readonly CORRECT_EPSILON_PX = 2;
+
   private isPieceCorrect(p: Piece) {
     if (p.rotation !== p.targetRotation) return false;
     const tile = this.tilePos(p);
-    return p.targetX === Math.round(tile.x) && p.targetY === Math.round(tile.y);
+    const dx = Math.abs(tile.x - p.targetX);
+    const dy = Math.abs(tile.y - p.targetY);
+    return (
+      dx <= PuzzleManager.CORRECT_EPSILON_PX && dy <= PuzzleManager.CORRECT_EPSILON_PX
+    );
   }
 
   private recomputeDerivedState() {
