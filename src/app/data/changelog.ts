@@ -1,8 +1,16 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "3";
+export const CHANGELOG_VERSION = "4";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
+  {
+    title: "Latest",
+    items: [
+      "🔍 Zoom & pan – Scroll wheel over the board to zoom; +/−/0 keys; Shift+drag or middle mouse to pan",
+      "↩️ Redo – Ctrl+Shift+Z or Ctrl+Y to redo after undo",
+      "🧩 Edge-piece filtering – Press 1–4 to filter tray: All, Edges, Corners, Center",
+    ],
+  },
   {
     title: "What's New",
     items: [

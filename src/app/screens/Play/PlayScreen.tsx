@@ -4,9 +4,8 @@ import styles from "./PlayScreen.module.css";
 
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { ConfirmModal } from "@/components/Modal/Modal";
-import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
+import { HelpModal, useShouldShowTutorial } from "@/components/HowToPlay";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
-import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
@@ -14,6 +13,7 @@ import { getBestTime } from "./timeMode";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzle";
 import { usePlayScreenManager } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
+import { useBoardZoom } from "./hooks/useBoardZoom";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
 import { usePlayScreenAnimation } from "./hooks/usePlayScreenAnimation";
 import { usePlayScreenTimer } from "./hooks/usePlayScreenTimer";
@@ -35,6 +35,11 @@ import {
 export function PlayScreen() {
   const navigate = useNavigate();
   const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
+
+  useEffect(() => {
+    const url = localStorage.getItem(STORAGE_KEY) || "";
+    if (!url) navigate("/new", { replace: true });
+  }, [navigate]);
 
   const ui = usePlayScreenUI();
   const {
@@ -94,6 +99,16 @@ export function PlayScreen() {
     popMapRef,
   } = managerResult;
 
+  const zoomContainerRef = React.useRef<HTMLDivElement>(null);
+  const { zoomIn, zoomOut, zoomReset, transform } = useBoardZoom(
+    zoomContainerRef,
+    boardRef,
+  );
+
+  const [traySection, setTraySection] = React.useState<
+    "all" | "corners" | "edges" | "center"
+  >("all");
+
   const isCoarsePointer = useCoarsePointer();
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
 
@@ -141,6 +156,10 @@ export function PlayScreen() {
     toggleFullscreen,
     selectCycle,
     selectedIdRef,
+    zoomIn,
+    zoomOut,
+    zoomReset,
+    setTraySection,
   });
 
   usePlayScreenTimer({
@@ -270,6 +289,13 @@ export function PlayScreen() {
                 setState(manager.getState());
               }
             }}
+            canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
+            onRedo={() => {
+              if (manager?.canRedo()) {
+                manager.redo();
+                setState(manager.getState());
+              }
+            }}
             onTodayPuzzle={
               SAMPLE_PUZZLES.length > 0 ? () => navigate("/?daily=1") : undefined
             }
@@ -342,65 +368,82 @@ export function PlayScreen() {
       />
 
       <div className={styles.main} ref={mainRef}>
-        <div className={styles.board} ref={boardRef}>
-          <canvas
-            className={styles.canvas}
-            ref={canvasRef}
-            tabIndex={0}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerCancel}
-            onLostPointerCapture={handleLostPointerCapture}
-            onContextMenu={handleContextMenu}
-          />
+        <div className={styles.boardZoomWrap} ref={zoomContainerRef}>
+          <div
+            className={styles.board}
+            ref={boardRef}
+            style={{
+              transform,
+              transformOrigin: "center center",
+            }}
+          >
+            <canvas
+              className={styles.canvas}
+              ref={canvasRef}
+              tabIndex={0}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
+              onLostPointerCapture={handleLostPointerCapture}
+              onContextMenu={handleContextMenu}
+            />
 
-          {showPreview && imgRef.current && (
-            <div className={styles.previewOverlay}>
-              <img
-                src={imgRef.current.src}
-                alt="Puzzle preview"
-                className={styles.previewImage}
+            {showPreview && imgRef.current && (
+              <div className={styles.previewOverlay}>
+                <img
+                  src={imgRef.current.src}
+                  alt="Puzzle preview"
+                  className={styles.previewImage}
+                />
+              </div>
+            )}
+
+            {isPaused && (
+              <PauseOverlay
+                onResume={() => setIsPaused(false)}
+                isCountdownExpired={
+                  timeMode === "countdown" &&
+                  elapsedSeconds <= 0 &&
+                  !isComplete &&
+                  isPaused
+                }
+                onNewPuzzle={
+                  timeMode === "countdown" &&
+                  elapsedSeconds <= 0 &&
+                  !isComplete &&
+                  isPaused
+                    ? handleNewGame
+                    : undefined
+                }
               />
-            </div>
-          )}
+            )}
 
-          {isPaused && (
-            <PauseOverlay
-              onResume={() => setIsPaused(false)}
-              isCountdownExpired={
-                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
-              }
-              onNewPuzzle={
-                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
-                  ? handleNewGame
-                  : undefined
-              }
-            />
-          )}
-
-          {isComplete && (
-            <CompletionOverlay
-              elapsedSeconds={elapsedSeconds}
-              grid={state?.grid}
-              isNewBest={
-                timeMode === "best" &&
-                state?.grid != null &&
-                (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
-              }
-              isDaily={isDailyPuzzleSession()}
-              shareUrls={share.shareUrls}
-              copied={share.copied}
-              canNativeShare={share.canNativeShare}
-              onOpenShareWindow={share.openShareWindow}
-              onCopyResults={share.handleCopyResults}
-              onNativeShare={share.handleNativeShare}
-              onDownloadImage={handleDownloadImage}
-              onNewPuzzle={handleNewGame}
-              onMenu={() => navigate("/")}
-              onViewLeaderboard={() => navigate("/stats")}
-            />
-          )}
+            {isComplete && (
+              <CompletionOverlay
+                elapsedSeconds={elapsedSeconds}
+                grid={state?.grid}
+                isNewBest={
+                  timeMode === "best" &&
+                  state?.grid != null &&
+                  (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
+                }
+                isDaily={isDailyPuzzleSession()}
+                shareUrls={share.shareUrls}
+                copied={share.copied}
+                canNativeShare={share.canNativeShare}
+                onOpenShareWindow={share.openShareWindow}
+                onCopyResults={share.handleCopyResults}
+                onNativeShare={share.handleNativeShare}
+                onDownloadImage={handleDownloadImage}
+                onNewPuzzle={handleNewGame}
+                onMenu={() => navigate("/")}
+                onViewLeaderboard={() =>
+                  navigate("/stats", { state: { tab: "leaderboard" } })
+                }
+              />
+            )}
+          </div>
         </div>
       </div>
 
@@ -411,18 +454,20 @@ export function PlayScreen() {
         grid={state?.grid ?? grid}
         onPieceClick={handleTrayPieceClick}
         isCoarsePointer={isCoarsePointer}
+        section={traySection}
+        onSectionChange={setTraySection}
       />
 
-      <TutorialOverlay
-        isOpen={showTutorial || showHowToPlay}
-        onComplete={() => {
+      <HelpModal
+        isOpen={showTutorial || showHowToPlay || showShortcuts}
+        onClose={() => {
           if (showTutorial) dismissTutorial();
           setShowHowToPlay(false);
+          setShowShortcuts(false);
         }}
+        initialTab={showShortcuts ? "shortcuts" : "tutorial"}
         showSkipLink={showTutorial}
       />
-
-      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
 
       {dragPreviewPiece && dragPreview && imgRef.current && (
         <DragPreview

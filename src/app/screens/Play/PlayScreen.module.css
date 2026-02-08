@@ -151,8 +151,18 @@
   overflow: hidden;
 }
 
+.boardZoomWrap {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .board {
-  flex-shrink: 0;
+  flex-shrink: 1;
   min-width: 0;
   min-height: 280px;
   max-width: 100%;
@@ -164,10 +174,9 @@
   border-radius: 16px;
   border: 2px solid var(--color-border);
   box-shadow: var(--shadow-md);
-  overflow: hidden;
+  overflow: clip;
   contain: layout paint;
   touch-action: none;
-  -webkit-overflow-scrolling: auto;
 }
 
 .canvas {

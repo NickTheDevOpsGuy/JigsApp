@@ -45,6 +45,20 @@
   padding: 12px 16px;
 }
 
+.sideBySideCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 16px;
+}
+
+.sideBySideCard > * {
+  width: 100%;
+}
+
 .actionCard {
   display: flex;
   flex-direction: column;
@@ -77,6 +91,18 @@
   padding: 12px 16px;
 }
 
+.tutorialCard {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 16px 24px;
+  font-size: 16px;
+}
+
 .helpMenuCard {
   display: flex;
   flex-direction: column;
@@ -89,6 +115,12 @@
 .actionLabel {
   font-weight: 600;
   font-size: 14px;
+}
+
+.streakBadge {
+  font-weight: 500;
+  font-size: 13px;
+  opacity: 0.9;
 }
 
 @media (max-width: 380px) {

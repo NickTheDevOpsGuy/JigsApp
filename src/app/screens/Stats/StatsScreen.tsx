@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, BarChart3, Trophy, Award } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
@@ -9,6 +9,8 @@ import { getMyStats } from "@/services/statsService";
 import { getDailyLeaderboard, getGridLeaderboard } from "@/services/leaderboardService";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString } from "@/daily/dailyPuzzle";
+import { getLocalPuzzleCount } from "@/puzzle/puzzleStorage";
+import { formatTime, formatDuration } from "@/utils/timeUtils";
 
 type LeaderboardView = "daily" | "3x3" | "4x4" | "5x5" | "6x6";
 
@@ -20,28 +22,15 @@ const LEADERBOARD_OPTIONS: { value: LeaderboardView; label: string }[] = [
   { value: "6x6", label: "6×6 grid" },
 ];
 
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  if (m >= 60) {
-    const h = Math.floor(m / 60);
-    const rm = m % 60;
-    return `${h}h ${rm}m`;
-  }
-  return `${m}m ${s}s`;
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
 export function StatsScreen() {
   const nav = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "leaderboard" | "achievements"
-  >("dashboard");
+  >(() => {
+    const tab = (location.state as { tab?: string })?.tab;
+    return tab === "leaderboard" || tab === "achievements" ? tab : "dashboard";
+  });
   const [leaderboardView, setLeaderboardView] = useState<LeaderboardView>("daily");
   const [stats, setStats] = useState<{
     puzzlesCompleted: number;
@@ -104,44 +93,59 @@ export function StatsScreen() {
     load();
   }, [configured]);
 
+  const backBtn = (
+    <Button size="sm" onClick={() => nav("/")}>
+      <ArrowLeft size={18} />
+      Back
+    </Button>
+  );
+
   if (!configured) {
     const status = getSupabaseConfigStatus();
     return (
       <div className={styles.page}>
         <div className={styles.card}>
-          <h1 className={styles.title}>Stats & Leaderboards</h1>
-          <p className={styles.placeholder}>
-            Connect Supabase to track your stats, compete on leaderboards, and unlock
-            achievements.
-          </p>
-          <p className={styles.hint}>
-            Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment.
-          </p>
-          <p className={styles.debug}>
-            VITE_SUPABASE_URL: {status.url ? "✓ set" : "✗ missing"} ·
-            VITE_SUPABASE_ANON_KEY: {status.key ? "✓ set" : "✗ missing"}
-          </p>
-          <p className={styles.hint}>
-            Local: add to .env.development and restart dev server. Vercel: add in project
-            Settings → Environment Variables, then redeploy.
-          </p>
-          <Button onClick={() => nav("/")}>
-            <ArrowLeft size={18} />
-            Back
-          </Button>
+          <div className={styles.header}>
+            {backBtn}
+            <h1 className={styles.title}>Stats</h1>
+          </div>
+          <div className={styles.section}>
+            <h2>Local Progress</h2>
+            <div className={styles.statsGrid}>
+              <div className={styles.statCard}>
+                <span className={styles.statValue}>{getLocalPuzzleCount()}</span>
+                <span className={styles.statLabel}>Puzzles completed (local)</span>
+              </div>
+            </div>
+          </div>
+          <div className={styles.section}>
+            <h2>Connect for More</h2>
+            <p className={styles.placeholder}>
+              Add Supabase to track stats, leaderboards, and achievements.
+            </p>
+            <p className={styles.debug}>
+              VITE_SUPABASE_URL: {status.url ? "✓" : "✗"} · VITE_SUPABASE_ANON_KEY:{" "}
+              {status.key ? "✓" : "✗"}
+            </p>
+            <Button onClick={() => nav("/")}>Back</Button>
+          </div>
         </div>
       </div>
     );
   }
 
+  const DASHBOARD_STATS = [
+    { value: stats?.puzzlesCompleted ?? 0, label: "Puzzles completed" },
+    { value: formatDuration(stats?.totalPlayTimeSeconds ?? 0), label: "Total play time" },
+    { value: stats?.dailyStreak ?? 0, label: "Current streak" },
+    { value: stats?.bestDailyStreak ?? 0, label: "Best streak" },
+  ] as const;
+
   return (
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <Button size="sm" onClick={() => nav("/")}>
-            <ArrowLeft size={18} />
-            Back
-          </Button>
+          {backBtn}
           <h1 className={styles.title}>Stats</h1>
         </div>
 
@@ -177,28 +181,12 @@ export function StatsScreen() {
               <div className={styles.section}>
                 <h2>Your Statistics</h2>
                 <div className={styles.statsGrid}>
-                  <div className={styles.statCard}>
-                    <span className={styles.statValue}>
-                      {stats?.puzzlesCompleted ?? 0}
-                    </span>
-                    <span className={styles.statLabel}>Puzzles completed</span>
-                  </div>
-                  <div className={styles.statCard}>
-                    <span className={styles.statValue}>
-                      {formatDuration(stats?.totalPlayTimeSeconds ?? 0)}
-                    </span>
-                    <span className={styles.statLabel}>Total play time</span>
-                  </div>
-                  <div className={styles.statCard}>
-                    <span className={styles.statValue}>{stats?.dailyStreak ?? 0}</span>
-                    <span className={styles.statLabel}>Current streak</span>
-                  </div>
-                  <div className={styles.statCard}>
-                    <span className={styles.statValue}>
-                      {stats?.bestDailyStreak ?? 0}
-                    </span>
-                    <span className={styles.statLabel}>Best streak</span>
-                  </div>
+                  {DASHBOARD_STATS.map((s) => (
+                    <div key={s.label} className={styles.statCard}>
+                      <span className={styles.statValue}>{s.value}</span>
+                      <span className={styles.statLabel}>{s.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -215,21 +203,23 @@ export function StatsScreen() {
                 />
                 {(() => {
                   const entries = gridLeaderboards[leaderboardView] ?? [];
-                  return entries.length === 0 ? (
-                    <p className={styles.empty}>
-                      No completions yet.
-                      {leaderboardView === "daily"
-                        ? " Be the first!"
-                        : " Complete a puzzle to appear here."}
-                    </p>
-                  ) : (
+                  if (entries.length === 0)
+                    return (
+                      <p className={styles.empty}>
+                        No completions yet.
+                        {leaderboardView === "daily"
+                          ? " Be the first!"
+                          : " Complete a puzzle to appear here."}
+                      </p>
+                    );
+                  return (
                     <ol className={styles.leaderboard}>
-                      {entries.map((entry) => (
-                        <li key={entry.rank} className={styles.leaderboardItem}>
-                          <span className={styles.rank}>#{entry.rank}</span>
-                          <span className={styles.player}>{entry.displayName}</span>
+                      {entries.map((e) => (
+                        <li key={e.rank} className={styles.leaderboardItem}>
+                          <span className={styles.rank}>#{e.rank}</span>
+                          <span className={styles.player}>{e.displayName}</span>
                           <span className={styles.time}>
-                            {formatTime(entry.elapsedSeconds)}
+                            {formatTime(e.elapsedSeconds)}
                           </span>
                         </li>
                       ))}

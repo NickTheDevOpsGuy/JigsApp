@@ -9,6 +9,11 @@ type HelpMenuProps = {
   className?: string;
 };
 
+const HELP_ITEMS = [
+  { id: "howto", icon: BookOpen, label: "How to Play" },
+  { id: "shortcuts", icon: Keyboard, label: "Keyboard shortcuts" },
+] as const;
+
 export function HelpMenu({
   onShowHowToPlay,
   onShowShortcuts,
@@ -20,9 +25,8 @@ export function HelpMenu({
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node))
         setIsOpen(false);
-      }
     };
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -30,77 +34,42 @@ export function HelpMenu({
     }
   }, [isOpen]);
 
-  const handleHowToPlay = () => {
-    onShowHowToPlay();
-    setIsOpen(false);
-  };
-
-  const handleShortcuts = () => {
-    onShowShortcuts();
-    setIsOpen(false);
-  };
-
-  if (variant === "card") {
-    return (
-      <div className={`${styles.cardContainer} ${className}`} ref={menuRef}>
-        <button
-          type="button"
-          className={styles.cardToggle}
-          onClick={() => setIsOpen(!isOpen)}
-          title="Help"
-          aria-label="Help – How to Play & Keyboard shortcuts"
-          aria-expanded={isOpen}
-        >
-          <HelpCircle size={20} />
-          <span className={styles.toggleLabel}>Help</span>
-        </button>
-        {isOpen && (
-          <div className={styles.cardDropdown}>
-            <button
-              type="button"
-              className={styles.dropdownItem}
-              onClick={handleHowToPlay}
-            >
-              <BookOpen size={18} />
-              <span>How to Play</span>
-            </button>
-            <button
-              type="button"
-              className={styles.dropdownItem}
-              onClick={handleShortcuts}
-            >
-              <Keyboard size={18} />
-              <span>Keyboard shortcuts</span>
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
+  const handlers = [onShowHowToPlay, onShowShortcuts] as const;
+  const isCard = variant === "card";
+  const containerClass = isCard ? styles.cardContainer : styles.container;
+  const toggleClass = isCard ? styles.cardToggle : styles.toggle;
+  const dropdownClass = isCard ? styles.cardDropdown : styles.dropdown;
+  const iconSize = isCard ? 20 : 18;
 
   return (
-    <div className={`${styles.container} ${className}`} ref={menuRef}>
+    <div className={`${containerClass} ${className}`.trim()} ref={menuRef}>
       <button
         type="button"
-        className={styles.toggle}
+        className={toggleClass}
         onClick={() => setIsOpen(!isOpen)}
         title="Help"
-        aria-label="Help"
+        aria-label={isCard ? "Help – How to Play & Keyboard shortcuts" : "Help"}
         aria-expanded={isOpen}
       >
-        <HelpCircle size={18} />
+        <HelpCircle size={iconSize} />
         <span className={styles.toggleLabel}>Help</span>
       </button>
       {isOpen && (
-        <div className={styles.dropdown}>
-          <button type="button" className={styles.dropdownItem} onClick={handleHowToPlay}>
-            <BookOpen size={18} />
-            <span>How to Play</span>
-          </button>
-          <button type="button" className={styles.dropdownItem} onClick={handleShortcuts}>
-            <Keyboard size={18} />
-            <span>Keyboard shortcuts</span>
-          </button>
+        <div className={dropdownClass}>
+          {HELP_ITEMS.map((item, i) => (
+            <button
+              key={item.id}
+              type="button"
+              className={styles.dropdownItem}
+              onClick={() => {
+                handlers[i]();
+                setIsOpen(false);
+              }}
+            >
+              <item.icon size={18} />
+              <span>{item.label}</span>
+            </button>
+          ))}
         </div>
       )}
     </div>

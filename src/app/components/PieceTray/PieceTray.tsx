@@ -5,7 +5,7 @@ import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
 import styles from "./PieceTray.module.css";
 
-type TraySection = "all" | "corners" | "edges" | "center";
+export type TraySection = "all" | "corners" | "edges" | "center";
 type SortMode = "grid" | "color";
 
 type Props = {
@@ -14,6 +14,8 @@ type Props = {
   grid: { rows: number; cols: number };
   onPieceClick: (pieceId: string) => void;
   isCoarsePointer: boolean;
+  section?: TraySection;
+  onSectionChange?: (section: TraySection) => void;
 };
 
 function isCorner(p: Piece, grid: { rows: number; cols: number }) {
@@ -35,10 +37,15 @@ function isEdge(p: Piece, grid: { rows: number; cols: number }) {
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
-  { pieces, image, grid, onPieceClick },
+  { pieces, image, grid, onPieceClick, section: controlledSection, onSectionChange },
   ref,
 ) {
-  const [section, setSection] = useState<TraySection>("all");
+  const [internalSection, setInternalSection] = useState<TraySection>("all");
+  const section = controlledSection !== undefined ? controlledSection : internalSection;
+  const setSection = (s: TraySection) => {
+    if (onSectionChange) onSectionChange(s);
+    else setInternalSection(s);
+  };
   const [sortMode, setSortMode] = useState<SortMode>("grid");
 
   // Precompute hue for stable-ish sorting.

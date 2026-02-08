@@ -1,2 +1,3 @@
 // src/app/components/HowToPlay/index.ts
-export { TutorialOverlay, useShouldShowTutorial, resetTutorial } from "./TutorialOverlay";
+export { HelpModal, useShouldShowTutorial, resetTutorial } from "./HelpModal";
+export type { HelpTab } from "./HelpModal";

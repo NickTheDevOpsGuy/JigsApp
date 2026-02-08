@@ -271,7 +271,18 @@ export class PuzzleManager {
   /** Restore previous piece state. Returns true if undo was performed. */
   undo(): boolean {
     if (!this.undoManager.canUndo() || this.state.isComplete) return false;
+    this.undoManager.redoPush(this.state.pieces);
     const snapshot = this.undoManager.pop();
+    if (!snapshot) return false;
+    this.restoreFromSaved(snapshot);
+    return true;
+  }
+
+  /** Re-apply last undone state. Returns true if redo was performed. */
+  redo(): boolean {
+    if (!this.undoManager.canRedo() || this.state.isComplete) return false;
+    this.undoManager.push(this.state.pieces);
+    const snapshot = this.undoManager.redoPop();
     if (!snapshot) return false;
     this.restoreFromSaved(snapshot);
     return true;
@@ -279,6 +290,10 @@ export class PuzzleManager {
 
   canUndo(): boolean {
     return this.undoManager.canUndo() && !this.state.isComplete;
+  }
+
+  canRedo(): boolean {
+    return this.undoManager.canRedo() && !this.state.isComplete;
   }
 
   setPieceLockingEnabled(enabled: boolean): void {

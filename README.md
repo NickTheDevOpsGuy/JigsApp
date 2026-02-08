@@ -77,6 +77,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Confetti celebration on completion 🎉
 - Sound effects (snap, rotate, place, complete)
 - Fullscreen mode · Dark mode
+- Zoom and pan on the board (scroll wheel, +/−/0, Shift+drag or middle mouse)
 - What's New popup for updates
 - Custom fonts (Inter, Fredoka) and Lucide icons
 
@@ -97,9 +98,12 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Accessibility & Controls
 
-- Keyboard shortcuts (Tab, arrows, R to rotate)
+- Keyboard shortcuts (Tab, arrows, R to rotate, 1–4 for tray filtering)
+- Undo · Redo (Ctrl+Z, Ctrl+Shift+Z / Ctrl+Y)
+- Zoom and pan — scroll wheel or +/−/0, Shift+drag or middle mouse to pan
+- Edge-piece filtering — All, Edges, Corners, Center (keys 1–4)
 - First-time tutorial overlay · Help dropdown (How to Play, Keyboard shortcuts)
-- Undo · Ghost hint · Lock pieces (optional)
+- Ghost hint · Lock pieces (optional)
 - Designed for relaxed, low-pressure play
 
 ### Persistence
@@ -113,19 +117,17 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed ✓
 
-| Area        | Features                                                  |
-| ----------- | --------------------------------------------------------- |
-| **Core**    | Dark mode · Undo · Ghost hint · Lock pieces · Share image |
-| **Time**    | Elapsed, countdown, active-only, relaxed, best time       |
-| **Daily**   | Same puzzle for everyone · Streak tracking                |
-| **Social**  | Stats dashboard · Leaderboards · Achievements (Supabase)  |
-| **Content** | What's New popup · Camera capture · Sample puzzle gallery |
+| Area         | Features                                                                                 |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| **Core**     | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image                         |
+| **Time**     | Elapsed, countdown, active-only, relaxed, best time                                      |
+| **Daily**    | Same puzzle for everyone · Streak tracking                                               |
+| **Social**   | Stats dashboard · Leaderboards · Achievements (Supabase)                                 |
+| **Content**  | What's New popup · Camera capture · Sample puzzle gallery                                |
+| **Controls** | Zoom & pan (scroll, +/−/0, Shift+drag or middle mouse) · Edge-piece tray filtering (1–4) |
 
 ### Planned
 
-- Redo
-- Edge-piece filtering
-- Zoom and pan for large puzzles
 - Import puzzle from URL
 - PWA / offline support
 

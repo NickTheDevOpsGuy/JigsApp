@@ -11,19 +11,27 @@ export type ShortcutAction =
   | "toggleSound"
   | "toggleHaptics"
   | "toggleGhostHint"
-  | "rotateCW" // Rotate clockwise
-  | "rotateCCW" // Rotate counter-clockwise
-  | "nextPiece" // Select next piece
-  | "prevPiece" // Select previous piece
-  | "moveUp" // Move piece up
-  | "moveDown" // Move piece down
-  | "moveLeft" // Move piece left
-  | "moveRight" // Move piece right
+  | "rotateCW"
+  | "rotateCCW"
+  | "nextPiece"
+  | "prevPiece"
+  | "moveUp"
+  | "moveDown"
+  | "moveLeft"
+  | "moveRight"
   | "sendToTray"
   | "snap"
   | "undo"
+  | "redo"
   | "showHelp"
-  | "escape";
+  | "escape"
+  | "zoomIn"
+  | "zoomOut"
+  | "zoomReset"
+  | "trayAll"
+  | "trayEdges"
+  | "trayCorners"
+  | "trayCenter";
 
 type ShortcutHandler = (action: ShortcutAction) => void;
 
@@ -152,6 +160,40 @@ export function useKeyboardShortcuts({
         e.preventDefault();
         action = "undo";
       }
+      // Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y - Redo
+      else if ((key === "z" && mod && shift) || (key === "y" && mod && !shift)) {
+        e.preventDefault();
+        action = "redo";
+      }
+      // + = Zoom in
+      else if ((key === "=" || key === "+") && !mod) {
+        e.preventDefault();
+        action = "zoomIn";
+      }
+      // - = Zoom out
+      else if (key === "-" && !mod) {
+        e.preventDefault();
+        action = "zoomOut";
+      }
+      // 0 = Zoom reset
+      else if (key === "0" && !mod) {
+        e.preventDefault();
+        action = "zoomReset";
+      }
+      // 1-4 = Tray sections (1=all, 2=edges, 3=corners, 4=center)
+      else if (key === "1" && !mod) {
+        e.preventDefault();
+        action = "trayAll";
+      } else if (key === "2" && !mod) {
+        e.preventDefault();
+        action = "trayEdges";
+      } else if (key === "3" && !mod) {
+        e.preventDefault();
+        action = "trayCorners";
+      } else if (key === "4" && !mod) {
+        e.preventDefault();
+        action = "trayCenter";
+      }
 
       if (action) onAction(action);
     },
@@ -167,6 +209,10 @@ export function useKeyboardShortcuts({
 // Shortcut definitions for the help modal
 export const SHORTCUTS = [
   { keys: ["Ctrl+Z", "⌘Z"], action: "Undo last move" },
+  { keys: ["Ctrl+Shift+Z", "⌘⇧Z", "Ctrl+Y", "⌘Y"], action: "Redo" },
+  { keys: ["+", "−"], action: "Zoom in / out (scroll wheel on board)" },
+  { keys: ["0"], action: "Zoom reset" },
+  { keys: ["1", "2", "3", "4"], action: "Tray: All / Edges / Corners / Center" },
   { keys: ["Space"], action: "Pause / Resume" },
   { keys: ["Tab"], action: "Select next piece" },
   { keys: ["Shift+Tab"], action: "Select previous piece" },

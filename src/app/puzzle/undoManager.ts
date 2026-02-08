@@ -20,7 +20,8 @@ export function piecesToSaved(pieces: Piece[]): SavedPiece[] {
 }
 
 export class UndoManager {
-  private history: SavedPiece[][] = [];
+  private undoStack: SavedPiece[][] = [];
+  private redoStack: SavedPiece[][] = [];
   private readonly limit: number;
 
   constructor(limit = DEFAULT_LIMIT) {
@@ -28,22 +29,36 @@ export class UndoManager {
   }
 
   push(pieces: Piece[]): void {
-    this.history.push(piecesToSaved(pieces));
-    if (this.history.length > this.limit) {
-      this.history.shift();
-    }
+    this.undoStack.push(piecesToSaved(pieces));
+    if (this.undoStack.length > this.limit) this.undoStack.shift();
+    this.redoStack = [];
   }
 
   pop(): SavedPiece[] | null {
-    if (this.history.length === 0) return null;
-    return this.history.pop() ?? null;
+    if (this.undoStack.length === 0) return null;
+    return this.undoStack.pop() ?? null;
   }
 
   canUndo(): boolean {
-    return this.history.length > 0;
+    return this.undoStack.length > 0;
+  }
+
+  redoPop(): SavedPiece[] | null {
+    if (this.redoStack.length === 0) return null;
+    return this.redoStack.pop() ?? null;
+  }
+
+  redoPush(pieces: Piece[]): void {
+    this.redoStack.push(piecesToSaved(pieces));
+    if (this.redoStack.length > this.limit) this.redoStack.shift();
+  }
+
+  canRedo(): boolean {
+    return this.redoStack.length > 0;
   }
 
   clear(): void {
-    this.history = [];
+    this.undoStack = [];
+    this.redoStack = [];
   }
 }

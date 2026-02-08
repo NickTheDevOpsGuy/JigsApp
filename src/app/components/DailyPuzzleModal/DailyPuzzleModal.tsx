@@ -18,26 +18,26 @@ const DIFFICULTY_OPTIONS: { id: DailyDifficulty; label: string; emoji: string }[
 
 type DailyPuzzleModalProps = {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (started?: boolean) => void;
   onStart: () => void;
 };
 
 export function DailyPuzzleModal({ isOpen, onClose, onStart }: DailyPuzzleModalProps) {
   const handleStart = (difficulty: DailyDifficulty) => {
     const config = getDailyPuzzleForDate(getTodayDateString());
-    if (!config) return;
+    if (!config?.puzzle?.fullImage) return;
 
     const grid = DAILY_DIFFICULTY_GRIDS[difficulty];
     clearPuzzleState();
     startDailyPuzzleWithDifficulty(config.puzzle, grid);
-    onClose();
+    onClose(true);
     onStart();
   };
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={() => onClose(false)}
       title="Today's Puzzle"
       showCloseButton={true}
     >

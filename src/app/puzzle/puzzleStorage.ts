@@ -98,6 +98,8 @@ export function loadPuzzleState(): SavedPuzzleState | null {
   }
 }
 
+const LOCAL_COMPLETIONS_KEY = "phuzzle:localCompletions";
+
 /**
  * Clear saved puzzle state
  */
@@ -106,6 +108,23 @@ export function clearPuzzleState(): void {
     localStorage.removeItem(PUZZLE_STATE_KEY);
   } catch (e) {
     console.warn("Failed to clear puzzle state:", e);
+  }
+}
+
+export function incrementLocalCompletions(): void {
+  try {
+    const n = parseInt(localStorage.getItem(LOCAL_COMPLETIONS_KEY) || "0", 10);
+    localStorage.setItem(LOCAL_COMPLETIONS_KEY, String(n + 1));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function getLocalPuzzleCount(): number {
+  try {
+    return parseInt(localStorage.getItem(LOCAL_COMPLETIONS_KEY) || "0", 10);
+  } catch {
+    return 0;
   }
 }
 

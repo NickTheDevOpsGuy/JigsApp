@@ -1,0 +1,187 @@
+/* src/app/components/HowToPlay/HelpModal.module.css */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 0 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tab,
+.tabActive {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-card);
+}
+
+.tabActive {
+  color: var(--color-brand-primary);
+  background: var(--color-bg-card);
+}
+
+.panel {
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.intro {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.section {
+  background: var(--color-bg-card);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.sectionTitle {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.section p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.section p + p {
+  margin-top: 6px;
+}
+
+.tips {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.tips li {
+  margin-bottom: 4px;
+}
+
+.tips li:last-child {
+  margin-bottom: 0;
+}
+
+/* Shortcuts tab */
+.shortcutsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table tr {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table tr:last-child {
+  border-bottom: none;
+}
+
+.table td {
+  padding: 10px 0;
+  vertical-align: middle;
+}
+
+.keys {
+  white-space: nowrap;
+  width: 45%;
+}
+
+.action {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.key {
+  display: inline-block;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-strong);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-family: "SF Mono", "Roboto Mono", Consolas, monospace;
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+  margin-right: 4px;
+}
+
+.separator {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  margin: 0 6px;
+}
+
+.mouseSection h3 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.navNote {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--color-brand-light);
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.navNote strong {
+  color: var(--color-brand-primary);
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skipLink {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.skipLink:hover {
+  color: var(--color-text-secondary);
+}

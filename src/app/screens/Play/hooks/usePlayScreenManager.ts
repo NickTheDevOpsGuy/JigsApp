@@ -2,7 +2,11 @@ import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
-import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
+import {
+  loadPuzzleState,
+  clearPuzzleState,
+  incrementLocalCompletions,
+} from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { STORAGE_KEY, computeTileSize } from "../playScreenUtils";
 import type { TimeMode } from "../timeMode";
@@ -114,6 +118,7 @@ export function usePlayScreenManager(
           },
           onPuzzleComplete: () => {
             clearPuzzleState();
+            incrementLocalCompletions();
             soundManager.play("complete");
             import("canvas-confetti").then((confetti) => {
               confetti.default({

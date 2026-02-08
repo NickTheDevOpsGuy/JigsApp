@@ -24,6 +24,10 @@ type UsePlayScreenShortcutsArgs = {
   toggleFullscreen: () => void;
   selectCycle: (dir: 1 | -1) => void;
   selectedIdRef: React.MutableRefObject<string | null>;
+  zoomIn?: () => void;
+  zoomOut?: () => void;
+  zoomReset?: () => void;
+  setTraySection?: (section: "all" | "corners" | "edges" | "center") => void;
 };
 
 export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
@@ -47,6 +51,10 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
     toggleFullscreen,
     selectCycle,
     selectedIdRef: _selectedIdRef,
+    zoomIn,
+    zoomOut,
+    zoomReset,
+    setTraySection,
   } = args;
 
   const handleShortcut = useCallback(
@@ -150,6 +158,33 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
             setState(manager.getState());
           }
           break;
+        case "redo":
+          if (manager?.canRedo() && !isPaused && !state?.isComplete) {
+            manager.redo();
+            setState(manager.getState());
+          }
+          break;
+        case "zoomIn":
+          zoomIn?.();
+          break;
+        case "zoomOut":
+          zoomOut?.();
+          break;
+        case "zoomReset":
+          zoomReset?.();
+          break;
+        case "trayAll":
+          setTraySection?.("all");
+          break;
+        case "trayEdges":
+          setTraySection?.("edges");
+          break;
+        case "trayCorners":
+          setTraySection?.("corners");
+          break;
+        case "trayCenter":
+          setTraySection?.("center");
+          break;
         case "sendToTray":
           if (manager && state && !isPaused && selectedPieceId) {
             const piece = state.pieces.find((p) => p.id === selectedPieceId);
@@ -192,6 +227,10 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
       setHapticsEnabled,
       selectCycle,
       setState,
+      zoomIn,
+      zoomOut,
+      zoomReset,
+      setTraySection,
     ],
   );
 

@@ -11,6 +11,8 @@ export type HeaderMenuProps = {
   title?: string;
   canUndo: boolean;
   onUndo: () => void;
+  canRedo?: boolean;
+  onRedo?: () => void;
   onTodayPuzzle?: () => void;
   timeMode: TimeMode;
   setTimeMode: (m: TimeMode | ((prev: TimeMode) => TimeMode)) => void;
@@ -97,6 +99,14 @@ export function buildMenuItems(
       label: "Undo",
       disabled: !props.canUndo,
       onClick: closeAnd(props.onUndo),
+    },
+    {
+      id: "redo",
+      section: "nav",
+      visible: !!props.onRedo,
+      label: "Redo",
+      disabled: !(props.canRedo ?? false),
+      onClick: closeAnd(props.onRedo!),
     },
     {
       id: "debug",
