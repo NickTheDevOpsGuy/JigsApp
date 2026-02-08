@@ -99,9 +99,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
         <div className={styles.headerMenuPanel} role="menu">
           {navItems.map(renderItem)}
           <div className={styles.headerMenuDivider} />
-          <div className={styles.headerMenuSection}>Settings</div>
-          {settingsItems.map(renderItem)}
-          <div className={styles.headerMenuDivider} />
           <div className={styles.headerMenuSection}>Help</div>
           <button
             type="button"
@@ -111,6 +108,9 @@ export function HeaderMenu(props: HeaderMenuProps) {
           >
             Help
           </button>
+          <div className={styles.headerMenuDivider} />
+          <div className={styles.headerMenuSection}>Settings</div>
+          {settingsItems.map(renderItem)}
           {otherItems.map(renderItem)}
         </div>
       )}
