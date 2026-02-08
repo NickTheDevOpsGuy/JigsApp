@@ -35,7 +35,9 @@ export function MenuScreen() {
       <div className={styles.card}>
         <div className={styles.header}>
           <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
-          <ThemeToggle variant="default" />
+          <div className={styles.themeToggleWrap}>
+            <ThemeToggle variant="default" />
+          </div>
         </div>
 
         <div className={styles.actionsGrid}>
