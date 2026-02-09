@@ -501,6 +501,34 @@
   }
 }
 
+/* Engagement toasts: streak, milestones */
+.engagementToast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: var(--color-overlay-content);
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  z-index: 90;
+  animation: engagementToastIn 0.3s ease-out;
+}
+
+@keyframes engagementToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 .completeContent h2 {
   font-family: "Fredoka", sans-serif;
   font-size: 3rem;

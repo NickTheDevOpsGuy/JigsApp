@@ -45,6 +45,35 @@ export function drawSnapGlow(
   ctx.restore();
 }
 
+export type SnapParticle = { x: number; y: number; t0: number };
+
+const SNAP_PARTICLE_MS = 450;
+
+/** Draw small particles for neighbor-snap celebration. */
+export function drawSnapParticles(
+  ctx: CanvasRenderingContext2D,
+  particles: SnapParticle[],
+  nowMs: number,
+): void {
+  ctx.save();
+  for (const p of particles) {
+    const elapsed = nowMs - p.t0;
+    if (elapsed >= SNAP_PARTICLE_MS) continue;
+    const life = 1 - elapsed / SNAP_PARTICLE_MS;
+    const alpha = 0.6 * life * life;
+    const r = 3 + 4 * (1 - life);
+    const drift = 8 * (1 - life);
+    const angle = (p.t0 % 8) * 0.78;
+    const dx = Math.cos(angle) * drift;
+    const dy = Math.sin(angle) * drift;
+    ctx.fillStyle = `rgba(255, 200, 100, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(p.x + dx, p.y + dy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 export function easeOutBack(t: number): number {
   const c1 = 1.70158;
   const c3 = c1 + 1;

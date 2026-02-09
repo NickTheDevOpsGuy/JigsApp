@@ -6,8 +6,15 @@ import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { STORAGE_KEY, computeTileSize } from "../playScreenUtils";
 import type { TimeMode } from "../timeMode";
+import type { Theme } from "@/hooks/useTheme";
+import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
+import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 
 export type ResumeChoice = "resume" | "fresh" | null;
+
+const PLACEMENT_STREAK_MS = 3000;
+const STREAK_COOLDOWN_MS = 5000;
+const SNAP_PARTICLE_COUNT = 8;
 
 export function usePlayScreenManager(
   grid: { rows: number; cols: number },
@@ -16,6 +23,11 @@ export function usePlayScreenManager(
   countdownMinutes: number,
   lastInteractionRef: MutableRefObject<number>,
   resumeChoice: ResumeChoice,
+  options?: {
+    haptic?: (kind: "place" | "snap" | "rotate") => void;
+    themeRef?: MutableRefObject<Theme | undefined>;
+    onPlacementStreak?: () => void;
+  },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -24,7 +36,12 @@ export function usePlayScreenManager(
   const imgRef = useRef<HTMLImageElement | null>(null);
   const popMapRef = useRef<Map<string, number>>(new Map());
   const lockMapRef = useRef<Map<string, number>>(new Map());
+  const snapParticlesRef = useRef<SnapParticle[]>([]);
+  const placementTimesRef = useRef<number[]>([]);
+  const lastStreakAtRef = useRef<number | null>(null);
   const sizingCleanupRef = useRef<(() => void) | null>(null);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
@@ -113,6 +130,7 @@ export function usePlayScreenManager(
         setState(null);
         popMapRef.current.clear();
         lockMapRef.current.clear();
+        snapParticlesRef.current = [];
         const canvas = canvasRef.current;
         if (canvas) {
           const ctx = canvas.getContext("2d");
@@ -140,15 +158,48 @@ export function usePlayScreenManager(
           },
           {
             onPiecePlaced: (p) => {
-              lastInteractionRef.current = performance.now();
-              popMapRef.current.set(p.id, performance.now());
-              soundManager.play("place");
-            },
-            onPieceSnapped: (pieceIds) => {
-              lastInteractionRef.current = performance.now();
-              soundManager.play("snap");
               const now = performance.now();
+              const opts = optionsRef.current;
+              lastInteractionRef.current = now;
+              popMapRef.current.set(p.id, now);
+              soundManager.play("place");
+              opts?.haptic?.("place");
+              // Placement streak: 3+ placements in 3s triggers "On fire!"
+              placementTimesRef.current.push(now);
+              const cutoff = now - PLACEMENT_STREAK_MS;
+              placementTimesRef.current = placementTimesRef.current.filter(
+                (t) => t > cutoff,
+              );
+              if (
+                placementTimesRef.current.length >= 3 &&
+                (lastStreakAtRef.current == null ||
+                  now - lastStreakAtRef.current > STREAK_COOLDOWN_MS)
+              ) {
+                lastStreakAtRef.current = now;
+                opts?.onPlacementStreak?.();
+              }
+            },
+            onPieceSnapped: (pieceIds, center) => {
+              const now = performance.now();
+              const opts = optionsRef.current;
+              lastInteractionRef.current = now;
+              soundManager.play("snap");
+              opts?.haptic?.("snap");
               for (const id of pieceIds) popMapRef.current.set(id, now);
+              if (center) {
+                const particles = snapParticlesRef.current;
+                for (let i = 0; i < SNAP_PARTICLE_COUNT; i++) {
+                  const angle = (i / SNAP_PARTICLE_COUNT) * Math.PI * 2 + (now % 1);
+                  const r = 4 + (now % 3);
+                  particles.push({
+                    x: center.x + Math.cos(angle) * r,
+                    y: center.y + Math.sin(angle) * r,
+                    t0: now,
+                  });
+                }
+                const maxAge = 500;
+                snapParticlesRef.current = particles.filter((p) => now - p.t0 < maxAge);
+              }
             },
             onPieceLocked: (ids) => {
               const now = performance.now();
@@ -157,11 +208,14 @@ export function usePlayScreenManager(
             onPuzzleComplete: () => {
               clearPuzzleState();
               soundManager.play("complete");
+              const theme = optionsRef.current?.themeRef?.current ?? "light";
+              const colors = CONFETTI_COLORS_BY_THEME[theme];
               import("canvas-confetti").then((confetti) => {
                 confetti.default({
                   particleCount: 150,
                   spread: 70,
                   origin: { y: 0.6 },
+                  colors,
                 });
               });
             },
@@ -256,5 +310,6 @@ export function usePlayScreenManager(
     imgRef,
     popMapRef,
     lockMapRef,
+    snapParticlesRef,
   };
 }

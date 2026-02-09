@@ -11,6 +11,7 @@ import {
 } from "@/daily/dailyPuzzle";
 import { recordCompletion } from "@/services/statsService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
+import { getCompletionMessage } from "@/data/completionMessages";
 
 interface ShareUrls {
   twitter: string;
@@ -51,6 +52,7 @@ export function CompletionOverlay({
   onMenu,
 }: CompletionOverlayProps) {
   const [streak, setStreak] = useState<number>(0);
+  const completionMessage = getCompletionMessage(elapsedSeconds);
 
   useEffect(() => {
     if (isNewBest && grid) {
@@ -95,7 +97,7 @@ export function CompletionOverlay({
   return (
     <div className={styles.completeOverlay}>
       <div className={styles.completeContent}>
-        <h2>🎉 Complete!</h2>
+        <h2>🎉 {completionMessage}</h2>
         <p>
           Finished in {formatTime(elapsedSeconds)}
           {isNewBest && <span className={styles.newBest}> — New best!</span>}
