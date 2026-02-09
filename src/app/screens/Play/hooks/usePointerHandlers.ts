@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
@@ -13,6 +13,7 @@ import {
   handleTouchDown,
   handleTouchMove,
   handleTouchUp,
+  resetTouchState,
 } from "./pointerHandlers/touchHandlers";
 import {
   handleMouseDown,
@@ -40,6 +41,18 @@ export function usePointerHandlers(args: {
     handlePanMove: (x: number, y: number) => void;
     endPan: () => void;
     isPanning: () => boolean;
+    isZoomedOrPanned?: () => boolean;
+    startPinch: (
+      p1: { clientX: number; clientY: number },
+      p2: { clientX: number; clientY: number },
+    ) => void;
+    handlePinchMove: (
+      p1: { clientX: number; clientY: number },
+      p2: { clientX: number; clientY: number },
+      boardRect: DOMRect,
+    ) => void;
+    endPinch: () => void;
+    isPinching: () => boolean;
   };
 }) {
   const {
@@ -106,9 +119,45 @@ export function usePointerHandlers(args: {
     viewport,
   };
 
+  const activePointersRef = useRef<
+    Map<number, { clientX: number; clientY: number; pointerType: string }>
+  >(new Map());
+
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!manager || !canvasRef.current || !boardRef.current) return;
+
+      activePointersRef.current.set(e.pointerId, {
+        clientX: e.clientX,
+        clientY: e.clientY,
+        pointerType: e.pointerType,
+      });
+
+      const touchPointers = [...activePointersRef.current.entries()]
+        .filter(([, p]) => p.pointerType === "touch")
+        .map(([id, p]) => ({ id, ...p }));
+      if (viewport && touchPointers.length >= 2 && e.pointerType === "touch") {
+        const [p1, p2] = touchPointers;
+        const canvas = canvasRef.current as CanvasWithTouch;
+        resetTouchState(canvas);
+        onDragPreview?.(null);
+        selectedIdRef.current = null;
+        setSelectedPieceId(null);
+        manager.pointerUp();
+        setState(manager.getState());
+        try {
+          canvas.releasePointerCapture(p1.id);
+          canvas.releasePointerCapture(p2.id);
+        } catch {
+          /* ignore */
+        }
+        viewport.startPinch(
+          { clientX: p1.clientX, clientY: p1.clientY },
+          { clientX: p2.clientX, clientY: p2.clientY },
+        );
+        e.preventDefault();
+        return;
+      }
 
       // Middle mouse: start pan
       if (e.button === 1 && viewport) {
@@ -135,7 +184,19 @@ export function usePointerHandlers(args: {
       const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
       const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY);
-      if (!pieceId) return;
+      if (!pieceId) {
+        // Empty space — single-finger pan when zoomed (touch only)
+        if (viewport && e.pointerType === "touch" && viewport.isZoomedOrPanned?.()) {
+          e.preventDefault();
+          viewport.startPan(e.clientX, e.clientY);
+          try {
+            (canvasRef.current as CanvasWithTouch).setPointerCapture(e.pointerId);
+          } catch {
+            /* ignore */
+          }
+        }
+        return;
+      }
 
       const piece = st.pieces.find((p) => p.id === pieceId);
       if (piece?.locked) return;
@@ -176,11 +237,31 @@ export function usePointerHandlers(args: {
       bump,
       canRotatePiece,
       screenToBoard,
+      viewport,
+      onDragPreview,
+      setState,
     ],
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
+      activePointersRef.current.set(e.pointerId, {
+        clientX: e.clientX,
+        clientY: e.clientY,
+        pointerType: e.pointerType,
+      });
+
+      if (viewport?.isPinching?.()) {
+        const touchPointers = [...activePointersRef.current.entries()]
+          .filter(([, p]) => p.pointerType === "touch")
+          .map(([, p]) => p);
+        if (touchPointers.length >= 2 && boardRef.current) {
+          const boardRect = boardRef.current.getBoundingClientRect();
+          viewport.handlePinchMove(touchPointers[0], touchPointers[1], boardRect);
+        }
+        e.preventDefault();
+        return;
+      }
       if (viewport?.isPanning?.()) {
         viewport.handlePanMove(e.clientX, e.clientY);
         return;
@@ -201,6 +282,13 @@ export function usePointerHandlers(args: {
 
   const handlePointerUp = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
+      activePointersRef.current.delete(e.pointerId);
+      if (viewport?.isPinching?.()) {
+        if (activePointersRef.current.size < 2) {
+          viewport.endPinch();
+        }
+        return;
+      }
       if (viewport?.isPanning?.()) {
         viewport.endPan();
         try {
@@ -221,7 +309,7 @@ export function usePointerHandlers(args: {
 
       handleMouseUp(e, ctx, isPointerOverTray, screenToBoard);
     },
-    [manager, canvasRef, canRotatePiece, isPointerOverTray, screenToBoard],
+    [manager, canvasRef, canRotatePiece, isPointerOverTray, screenToBoard, viewport],
   );
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
@@ -230,6 +318,13 @@ export function usePointerHandlers(args: {
 
   const handlePointerCancel = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
+      activePointersRef.current.delete(e.pointerId);
+      if (viewport?.isPinching?.()) {
+        if (activePointersRef.current.size < 2) {
+          viewport.endPinch();
+        }
+        return;
+      }
       if (viewport?.isPanning?.()) {
         viewport.endPan();
         return;
@@ -281,6 +376,81 @@ export function usePointerHandlers(args: {
       window.removeEventListener("pointercancel", onWinUp);
     };
   }, [manager, onDragPreview, setState]);
+
+  // Touch-event-based pinch zoom for iOS Safari.
+  // Pointer events are unreliable for multi-touch on iOS (second finger often doesn't fire).
+  // Native touch events work reliably.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const board = boardRef.current;
+    if (!canvas || !board || !viewport) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length >= 2) {
+        const p1 = e.touches[0];
+        const p2 = e.touches[1];
+        const canvasWithTouch = canvas as CanvasWithTouch;
+        resetTouchState(canvasWithTouch);
+        onDragPreview?.(null);
+        selectedIdRef.current = null;
+        setSelectedPieceId(null);
+        manager?.pointerUp();
+        if (manager) setState(manager.getState());
+        viewport.startPinch(
+          { clientX: p1.clientX, clientY: p1.clientY },
+          { clientX: p2.clientX, clientY: p2.clientY },
+        );
+        e.preventDefault();
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (viewport.isPinching() && e.touches.length >= 2 && board) {
+        const p1 = e.touches[0];
+        const p2 = e.touches[1];
+        const boardRect = board.getBoundingClientRect();
+        viewport.handlePinchMove(
+          { clientX: p1.clientX, clientY: p1.clientY },
+          { clientX: p2.clientX, clientY: p2.clientY },
+          boardRect,
+        );
+        e.preventDefault();
+      }
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (viewport.isPinching() && e.touches.length < 2) {
+        viewport.endPinch();
+      }
+    };
+
+    const onTouchCancel = (e: TouchEvent) => {
+      if (viewport.isPinching() && e.touches.length < 2) {
+        viewport.endPinch();
+      }
+    };
+
+    canvas.addEventListener("touchstart", onTouchStart, { passive: false });
+    canvas.addEventListener("touchmove", onTouchMove, { passive: false });
+    canvas.addEventListener("touchend", onTouchEnd, { passive: true });
+    canvas.addEventListener("touchcancel", onTouchCancel, { passive: true });
+
+    return () => {
+      canvas.removeEventListener("touchstart", onTouchStart);
+      canvas.removeEventListener("touchmove", onTouchMove);
+      canvas.removeEventListener("touchend", onTouchEnd);
+      canvas.removeEventListener("touchcancel", onTouchCancel);
+    };
+  }, [
+    canvasRef,
+    boardRef,
+    viewport,
+    manager,
+    onDragPreview,
+    setState,
+    setSelectedPieceId,
+    selectedIdRef,
+  ]);
 
   return {
     handlePointerDown,
