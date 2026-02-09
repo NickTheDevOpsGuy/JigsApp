@@ -5,17 +5,73 @@
 
 import type { Piece } from "@/puzzle/types";
 
+const SNAP_GLOW_MS = 280;
+
 export function snapPopScale(tMs: number): number {
   if (tMs <= 0) return 1;
   if (tMs >= 200) return 1;
 
   if (tMs < 80) {
     const k = tMs / 80;
-    return 1 + 0.1 * easeOutBack(k);
+    return 1 + 0.08 * easeOutBack(k);
   }
 
   const k = (tMs - 80) / 120;
-  return 1.1 - 0.1 * easeOutBounce(k);
+  return 1.08 - 0.08 * easeOutBounce(k);
+}
+
+/** Alpha for snap glow (0 = no glow, fades out over SNAP_GLOW_MS). */
+export function snapGlowAlpha(elapsedMs: number): number {
+  if (elapsedMs <= 0 || elapsedMs >= SNAP_GLOW_MS) return 0;
+  return 0.14 * (1 - elapsedMs / SNAP_GLOW_MS);
+}
+
+/** Draw a subtle radial glow at (cx, cy). Used for snap/placement feedback. */
+export function drawSnapGlow(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  radius: number,
+  alpha: number,
+): void {
+  if (alpha <= 0) return;
+  ctx.save();
+  const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+  gradient.addColorStop(0, `rgba(255, 220, 130, ${alpha})`);
+  gradient.addColorStop(0.5, `rgba(255, 200, 100, ${alpha * 0.4})`);
+  gradient.addColorStop(1, "rgba(255, 200, 100, 0)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+  ctx.restore();
+}
+
+export type SnapParticle = { x: number; y: number; t0: number };
+
+const SNAP_PARTICLE_MS = 450;
+
+/** Draw small particles for neighbor-snap celebration. */
+export function drawSnapParticles(
+  ctx: CanvasRenderingContext2D,
+  particles: SnapParticle[],
+  nowMs: number,
+): void {
+  ctx.save();
+  for (const p of particles) {
+    const elapsed = nowMs - p.t0;
+    if (elapsed >= SNAP_PARTICLE_MS) continue;
+    const life = 1 - elapsed / SNAP_PARTICLE_MS;
+    const alpha = 0.6 * life * life;
+    const r = 3 + 4 * (1 - life);
+    const drift = 8 * (1 - life);
+    const angle = (p.t0 % 8) * 0.78;
+    const dx = Math.cos(angle) * drift;
+    const dy = Math.sin(angle) * drift;
+    ctx.fillStyle = `rgba(255, 200, 100, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(p.x + dx, p.y + dy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 export function easeOutBack(t: number): number {

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
+import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
 import type { DebugFlags } from "../playScreenUtils";
 import type { ViewportState } from "./useViewport";
 
@@ -15,6 +16,7 @@ export function usePlayScreenAnimation(args: {
   lockMapRef: React.RefObject<Map<string, number>>;
   selectedIdRef: React.RefObject<string | null>;
   dragPreviewPieceIdRef: React.RefObject<string | null>;
+  snapParticlesRef?: React.RefObject<SnapParticle[]>;
   debug: DebugFlags;
   showGhostHint: boolean;
   viewport: ViewportState;
@@ -29,6 +31,7 @@ export function usePlayScreenAnimation(args: {
     lockMapRef,
     selectedIdRef,
     dragPreviewPieceIdRef,
+    snapParticlesRef,
     debug,
     showGhostHint,
     viewport,
@@ -92,6 +95,7 @@ export function usePlayScreenAnimation(args: {
       const popMap = popMapRef.current ?? new Map<string, number>();
       const lockMap = lockMapRef.current ?? new Map<string, number>();
       const pieceCache = pieceCacheRef.current;
+      const snapParticles = snapParticlesRef?.current ?? [];
       renderBoard(
         ctx,
         st,
@@ -114,6 +118,7 @@ export function usePlayScreenAnimation(args: {
         },
         pieceCache,
         viewport,
+        snapParticles,
       );
 
       // Only update React state when something meaningful changes
@@ -135,5 +140,5 @@ export function usePlayScreenAnimation(args: {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [manager, debug, showGhostHint, setState, viewport]);
+  }, [manager, debug, showGhostHint, setState, viewport, snapParticlesRef]);
 }

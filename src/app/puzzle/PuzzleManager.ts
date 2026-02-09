@@ -27,7 +27,8 @@ export type PuzzleManagerOptions = {
 
 export type PuzzleManagerEvents = {
   onPiecePlaced?: (piece: Piece) => void;
-  onPieceSnapped?: () => void;
+  /** Called when a group snaps to a neighbor (merge). Pass merged group piece IDs and optional center (board space) for particles. */
+  onPieceSnapped?: (pieceIds: string[], center?: { x: number; y: number }) => void;
   onPieceLocked?: (pieceIds: string[]) => void;
   onPuzzleComplete?: (state: PuzzleState) => void;
 };
@@ -655,7 +656,16 @@ export class PuzzleManager {
     // Locking only happens in trySnapActiveGroupToBoard when snapping to the correct board spot.
 
     this.trySnapMergedGroupToBoard(best.into);
-    this.events.onPieceSnapped?.();
+    const mergedPieces = this.getGroupPieces(best.into);
+    const mergedIds = mergedPieces.map((p) => p.id);
+    const center =
+      mergedPieces.length > 0
+        ? {
+            x: mergedPieces.reduce((s, p) => s + p.x + p.w / 2, 0) / mergedPieces.length,
+            y: mergedPieces.reduce((s, p) => s + p.y + p.h / 2, 0) / mergedPieces.length,
+          }
+        : undefined;
+    this.events.onPieceSnapped?.(mergedIds, center);
 
     return true;
   }

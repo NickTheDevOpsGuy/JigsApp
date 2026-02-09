@@ -2,6 +2,10 @@
 import type { Piece, PuzzleState, DragState } from "@/puzzle/types";
 import {
   snapPopScale,
+  snapGlowAlpha,
+  drawSnapGlow,
+  drawSnapParticles,
+  type SnapParticle,
   drawDebugBackdrop,
   drawGridOverlay,
   applyPieceShadow,
@@ -59,6 +63,7 @@ export function renderBoard(
   animState?: AnimationState,
   pieceCache?: PieceCache,
   viewport?: ViewportTransform,
+  snapParticles?: SnapParticle[],
 ) {
   const canvas = ctx.canvas;
 
@@ -137,6 +142,11 @@ export function renderBoard(
       pieceCache,
       dpr,
     );
+  }
+
+  // Snap particles (board space, on top of pieces)
+  if (snapParticles && snapParticles.length > 0) {
+    drawSnapParticles(ctx, snapParticles, nowMs);
   }
 
   if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
@@ -229,8 +239,17 @@ function drawPiece(
   const isSelected = animState?.selectedPieceId === p.id && !p.isPlaced;
 
   const start = popMap.get(p.id);
-  const popScale = start ? snapPopScale(nowMs - start) : 1;
+  const popElapsedMs = start != null ? nowMs - start : 0;
+  const popScale = start != null ? snapPopScale(popElapsedMs) : 1;
   const scale = popScale;
+
+  // Subtle snap glow behind piece (placement or neighbor merge)
+  if (start != null && popElapsedMs < 280) {
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const radius = Math.max(p.w, p.h) * 0.55;
+    drawSnapGlow(ctx, cx, cy, radius, snapGlowAlpha(popElapsedMs));
+  }
 
   let path: Path2D | null = null;
   try {
@@ -471,12 +490,13 @@ function drawCompletionGlow(
   cssH: number,
   elapsedMs: number,
 ) {
-  // Subtle pulsing glow that fades out after a few seconds
+  // Last-piece flourish: strong pulse in first 300ms, then subtle pulse that fades
   if (elapsedMs > 3000) return;
 
   const fadeOut = Math.max(0, 1 - elapsedMs / 3000);
   const pulse = 0.5 + 0.5 * Math.sin(elapsedMs / 200);
-  const alpha = 0.08 * fadeOut * pulse;
+  const flourish = elapsedMs < 300 ? 0.2 * (1 - elapsedMs / 300) : 0;
+  const alpha = Math.min(0.35, flourish + 0.08 * fadeOut * pulse);
 
   ctx.save();
 

@@ -22,6 +22,7 @@ import {
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
+import { getMenuTip } from "@/data/menuTips";
 
 export function MenuScreen() {
   const nav = useNavigate();
@@ -112,6 +113,8 @@ export function MenuScreen() {
             <span className={styles.actionLabel}>What&apos;s New</span>
           </Button>
         </div>
+
+        <p className={styles.menuTip}>{getMenuTip()}</p>
       </div>
 
       <HelpChoiceModal

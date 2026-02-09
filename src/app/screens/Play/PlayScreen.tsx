@@ -26,6 +26,7 @@ import { usePointerHandlers } from "./hooks/usePointerHandlers";
 import { useViewport } from "./hooks/useViewport";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
+import { useTheme } from "@/hooks/useTheme";
 import {
   DragPreview,
   PlayHUD,
@@ -77,6 +78,13 @@ export function PlayScreen() {
     useTimeModeConfig();
   const lastInteractionRef = React.useRef(performance.now());
   const [resumeChoice, setResumeChoice] = React.useState<ResumeChoice>(null);
+  const { theme } = useTheme();
+  const themeRef = React.useRef(theme);
+  themeRef.current = theme;
+  const haptics = useHaptics();
+  const [showStreakToast, setShowStreakToast] = React.useState(false);
+  const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
+  const lastMilestoneRef = React.useRef<number>(0);
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -85,6 +93,11 @@ export function PlayScreen() {
     countdownMinutes,
     lastInteractionRef,
     resumeChoice,
+    {
+      haptic: hapticsEnabled ? haptics.vibrate : undefined,
+      themeRef,
+      onPlacementStreak: () => setShowStreakToast(true),
+    },
   );
   const {
     manager,
@@ -102,7 +115,46 @@ export function PlayScreen() {
     imgRef,
     popMapRef,
     lockMapRef,
+    snapParticlesRef,
   } = managerResult;
+
+  // Milestone callouts at 25%, 50%, 75%
+  useEffect(() => {
+    if (!state || state.isComplete) return;
+    const placed = state.placedCount ?? 0;
+    const total = state.totalCount ?? 0;
+    if (total === 0) return;
+    const pct = placed / total;
+    const milestones: { threshold: number; message: string }[] = [
+      { threshold: 0.25, message: "Quarter done!" },
+      { threshold: 0.5, message: "Halfway there!" },
+      { threshold: 0.75, message: "Almost there!" },
+    ];
+    const hit = milestones.find(
+      (m) => pct >= m.threshold && lastMilestoneRef.current < m.threshold,
+    );
+    if (hit) {
+      lastMilestoneRef.current = hit.threshold;
+      setMilestoneMessage(hit.message);
+    }
+  }, [state?.placedCount, state?.totalCount, state?.isComplete]);
+
+  useEffect(() => {
+    if (!milestoneMessage) return;
+    const t = setTimeout(() => setMilestoneMessage(null), 2000);
+    return () => clearTimeout(t);
+  }, [milestoneMessage]);
+
+  useEffect(() => {
+    if (!state) return;
+    if (state.placedCount === 0) lastMilestoneRef.current = 0;
+  }, [state?.placedCount, puzzleKey]);
+
+  useEffect(() => {
+    if (!showStreakToast) return;
+    const t = setTimeout(() => setShowStreakToast(false), 2000);
+    return () => clearTimeout(t);
+  }, [showStreakToast]);
 
   const isCoarsePointer = useCoarsePointer();
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
@@ -179,7 +231,6 @@ export function PlayScreen() {
     return () => clearTimeout(id);
   }, [state, elapsedSeconds]);
 
-  const haptics = useHaptics();
   const didDragRef = React.useRef(false);
   const [dragPreview, setDragPreview] = React.useState<{
     clientX: number;
@@ -226,6 +277,7 @@ export function PlayScreen() {
     lockMapRef,
     selectedIdRef,
     dragPreviewPieceIdRef,
+    snapParticlesRef,
     debug,
     showGhostHint,
     viewport: viewport.viewport,
@@ -477,6 +529,17 @@ export function PlayScreen() {
           image={imgRef.current}
           grid={state!.grid}
         />
+      )}
+
+      {showStreakToast && (
+        <div className={styles.engagementToast} role="status">
+          🔥 On fire!
+        </div>
+      )}
+      {milestoneMessage && (
+        <div className={styles.engagementToast} role="status">
+          {milestoneMessage}
+        </div>
       )}
     </div>
   );

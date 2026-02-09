@@ -76,20 +76,21 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 - Reference image preview overlay
 - Progress counter and timer (elapsed, countdown, active-only, relaxed, best time)
-- Confetti celebration on completion 🎉
+- Confetti on completion (theme-colored); random completion headline (e.g. "You did it!", "Puzzle master!")
 - Sound effects (snap, rotate, place, complete, undo/redo)
 - Fullscreen mode · Multiple themes (Light, Dark, Space, Ocean, Forest, Sunset)
 - Theme as full action card on main menu (no floating toggle)
 - What's New popup for updates
 - Custom fonts (Inter, Fredoka) and Lucide icons
 - Difficulty emojis (Easy 🌱, Medium ⚡, Hard 🔥, Expert 👑) for daily and regular play
+- **Engagement polish:** Snap glow and placement bounce when pieces lock; neighbor-snap particle burst when groups merge; milestone callouts at 25%, 50%, 75%; "On fire!" toast when placing 3+ pieces quickly; rotating tip/quote on main menu; last-piece flourish (brief board pulse on completion)
 
 ### Mobile Support
 
 - Touch drag, tap to rotate, drag pieces to tray
 - Two-finger pinch to zoom, two-finger drag to pan (iOS & Android, touch-event-based for reliability)
 - Single-finger pan when zoomed — drag on empty space to pan
-- Haptic feedback
+- Haptic feedback (place, snap, rotate)
 - Camera capture for instant puzzles
 - Mobile-safe layouts and gestures (44px touch targets)
 - Mobile piece scaling — smaller pieces for higher piece counts
@@ -127,14 +128,14 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed ✓
 
-| Area        | Features                                                                                                                                                                                                                                            |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                                                                                              |
-| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                                                                                                 |
-| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                          |
-| **Social**  | Stats · Leaderboards · Profile (display name, anonymous) · Achievements                                                                                                                                                                             |
-| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                           |
-| **UX**      | Help modal (How to Play + Keyboard shortcuts) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) |
+| Area        | Features                                                                                                                                                                                                                                                                                              |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                                                                                                                                                |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                                                                                                                                                   |
+| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                            |
+| **Social**  | Stats · Leaderboards · Profile (display name, anonymous) · Achievements                                                                                                                                                                                                                               |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                             |
+| **UX**      | Help modal · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) |
 
 ### Planned
 
@@ -199,6 +200,7 @@ Category = folder name, puzzle name = filename.
 | `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers (touch + mouse), viewport (zoom/pan) |
 | `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc.              |
 | `src/app/audio/`              | Sound effects                                                                                       |
+| `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, sample puzzles            |
 | `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                 |
 | `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                    |
 
@@ -295,6 +297,9 @@ Category = folder name, puzzle name = filename.
 │   │   ├── data
 │   │   │   ├── achievements.ts
 │   │   │   ├── changelog.ts
+│   │   │   ├── completionMessages.ts
+│   │   │   ├── confettiColors.ts
+│   │   │   ├── menuTips.ts
 │   │   │   └── samplePuzzles.ts
 │   │   ├── hooks
 │   │   │   ├── useKeyboardShortcuts.ts

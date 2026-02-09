@@ -7,6 +7,29 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   return {
     plugins: [react()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // Split vendor chunks to avoid a single >500kB bundle
+            if (id.includes("node_modules")) {
+              if (id.includes("react-dom") || id.includes("react/")) {
+                return "react";
+              }
+              if (id.includes("react-router")) {
+                return "router";
+              }
+              if (id.includes("@supabase")) {
+                return "supabase";
+              }
+              // Other node_modules (lucide-react, canvas-confetti, etc.)
+              return "vendor";
+            }
+          },
+        },
+      },
+      chunkSizeWarningLimit: 600,
+    },
     define: {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
         env.VITE_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "",
