@@ -70,7 +70,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Multiple difficulty levels (3×3 to 6×6 grids, custom sizes)
 - Image sources: gallery, file upload, or camera capture
 - Edge-piece tray filter — All, Edges, Corners, Center (Grid/Color sort)
-- Zoom and pan — scroll to zoom (toward cursor), middle-click drag to pan
+- Zoom and pan — scroll to zoom (toward cursor), middle-click drag to pan; on mobile: two-finger pinch and drag
 
 ### UX & Polish
 
@@ -87,6 +87,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 ### Mobile Support
 
 - Touch drag, tap to rotate, drag pieces to tray
+- Two-finger pinch to zoom, two-finger drag to pan (iOS & Android)
 - Haptic feedback
 - Camera capture for instant puzzles
 - Mobile-safe layouts and gestures (44px touch targets)
@@ -124,14 +125,14 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed ✓
 
-| Area        | Features                                                                                                                           |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                             |
-| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                |
-| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                         |
-| **Social**  | Stats · Leaderboards · Profile (display name, anonymous) · Achievements                                                            |
-| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                          |
-| **UX**      | Help modal (How to Play + Keyboard shortcuts) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) |
+| Area        | Features                                                                                                                                                                   |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                     |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                        |
+| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                 |
+| **Social**  | Stats · Leaderboards · Profile (display name, anonymous) · Achievements                                                                                                    |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                  |
+| **UX**      | Help modal (How to Play + Keyboard shortcuts) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) |
 
 ### Planned
 

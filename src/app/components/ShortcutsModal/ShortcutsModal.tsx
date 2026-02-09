@@ -77,20 +77,32 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
           </div>
 
           <div className={styles.mouseSection}>
-            <h3>Navigation Tips</h3>
+            <h3>Zoom & Pan</h3>
             <table className={styles.table}>
               <tbody>
                 <tr>
                   <td className={styles.keys}>
-                    <kbd className={styles.key}>Scroll Wheel</kbd>
+                    <kbd className={styles.key}>Scroll Wheel</kbd> on board
                   </td>
-                  <td className={styles.action}>Scroll page (no zoom)</td>
+                  <td className={styles.action}>Zoom in/out (desktop)</td>
                 </tr>
                 <tr>
                   <td className={styles.keys}>
-                    <kbd className={styles.key}>Pinch</kbd>
+                    <kbd className={styles.key}>Middle mouse</kbd> + Drag
                   </td>
-                  <td className={styles.action}>Browser zoom (touch)</td>
+                  <td className={styles.action}>Pan (desktop)</td>
+                </tr>
+                <tr>
+                  <td className={styles.keys}>
+                    <kbd className={styles.key}>Two-finger pinch</kbd>
+                  </td>
+                  <td className={styles.action}>Zoom in/out (iOS & Android)</td>
+                </tr>
+                <tr>
+                  <td className={styles.keys}>
+                    <kbd className={styles.key}>Two-finger drag</kbd>
+                  </td>
+                  <td className={styles.action}>Pan (iOS & Android)</td>
                 </tr>
               </tbody>
             </table>
