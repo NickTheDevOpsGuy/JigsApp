@@ -104,6 +104,12 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
                   </td>
                   <td className={styles.action}>Pan (iOS & Android)</td>
                 </tr>
+                <tr>
+                  <td className={styles.keys}>
+                    <kbd className={styles.key}>Single-finger drag</kbd> on empty space
+                  </td>
+                  <td className={styles.action}>Pan when zoomed (iOS & Android)</td>
+                </tr>
               </tbody>
             </table>
             <p className={styles.navNote}>

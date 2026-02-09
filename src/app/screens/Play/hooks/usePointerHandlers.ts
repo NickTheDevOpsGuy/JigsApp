@@ -41,6 +41,7 @@ export function usePointerHandlers(args: {
     handlePanMove: (x: number, y: number) => void;
     endPan: () => void;
     isPanning: () => boolean;
+    isZoomedOrPanned?: () => boolean;
     startPinch: (
       p1: { clientX: number; clientY: number },
       p2: { clientX: number; clientY: number },
@@ -183,7 +184,19 @@ export function usePointerHandlers(args: {
       const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
       const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY);
-      if (!pieceId) return;
+      if (!pieceId) {
+        // Empty space — single-finger pan when zoomed (touch only)
+        if (viewport && e.pointerType === "touch" && viewport.isZoomedOrPanned?.()) {
+          e.preventDefault();
+          viewport.startPan(e.clientX, e.clientY);
+          try {
+            (canvasRef.current as CanvasWithTouch).setPointerCapture(e.pointerId);
+          } catch {
+            /* ignore */
+          }
+        }
+        return;
+      }
 
       const piece = st.pieces.find((p) => p.id === pieceId);
       if (piece?.locked) return;

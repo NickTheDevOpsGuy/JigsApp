@@ -70,7 +70,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Multiple difficulty levels (3×3 to 6×6 grids, custom sizes)
 - Image sources: gallery, file upload, or camera capture
 - Edge-piece tray filter — All, Edges, Corners, Center (Grid/Color sort)
-- Zoom and pan — scroll to zoom (toward cursor), middle-click drag to pan; on mobile: two-finger pinch and drag
+- Zoom and pan — scroll to zoom (toward cursor), middle-click drag to pan; on mobile: two-finger pinch/drag, single-finger drag on empty space when zoomed
 
 ### UX & Polish
 
@@ -87,7 +87,8 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 ### Mobile Support
 
 - Touch drag, tap to rotate, drag pieces to tray
-- Two-finger pinch to zoom, two-finger drag to pan (iOS & Android)
+- Two-finger pinch to zoom, two-finger drag to pan (iOS & Android, touch-event-based for reliability)
+- Single-finger pan when zoomed — drag on empty space to pan
 - Haptic feedback
 - Camera capture for instant puzzles
 - Mobile-safe layouts and gestures (44px touch targets)
@@ -110,6 +111,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - **Help modal** — Main menu and play screen: "Help" opens How to Play + Keyboard shortcuts (all devices)
 - Keyboard shortcuts (Tab, arrows, R to rotate, ? or F1 for help, Ctrl+Z/Y undo/redo)
 - First-time tutorial overlay
+- Settings sub-menus — Game (time, ghost, lock), View (theme, preview, fullscreen), Audio (sound, haptics)
 - Undo · Redo · Ghost hint · Lock pieces (optional)
 - Designed for relaxed, low-pressure play
 
@@ -125,14 +127,14 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed ✓
 
-| Area        | Features                                                                                                                                                                   |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                     |
-| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                        |
-| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                 |
-| **Social**  | Stats · Leaderboards · Profile (display name, anonymous) · Achievements                                                                                                    |
-| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                  |
-| **UX**      | Help modal (How to Play + Keyboard shortcuts) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) |
+| Area        | Features                                                                                                                                                                                                                                            |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                                                                                              |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                                                                                                 |
+| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                          |
+| **Social**  | Stats · Leaderboards · Profile (display name, anonymous) · Achievements                                                                                                                                                                             |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                           |
+| **UX**      | Help modal (How to Play + Keyboard shortcuts) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) |
 
 ### Planned
 
@@ -190,15 +192,15 @@ Category = folder name, puzzle name = filename.
 
 ## Project Structure
 
-| Folder                        | Purpose                                                                                |
-| ----------------------------- | -------------------------------------------------------------------------------------- |
-| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage              |
-| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                   |
-| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers, viewport               |
-| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc. |
-| `src/app/audio/`              | Sound effects                                                                          |
-| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                    |
-| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                       |
+| Folder                        | Purpose                                                                                             |
+| ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage                           |
+| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                                |
+| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers (touch + mouse), viewport (zoom/pan) |
+| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc.              |
+| `src/app/audio/`              | Sound effects                                                                                       |
+| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                 |
+| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                    |
 
 <details>
 <summary>📁 Click to expand file structure</summary>

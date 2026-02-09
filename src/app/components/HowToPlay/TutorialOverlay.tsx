@@ -95,7 +95,8 @@ export function TutorialOverlay({
             <h3 className={styles.sectionTitle}>📱 Zoom & Pan</h3>
             <p>
               Pinch with two fingers to zoom in or out on the board. Drag with two fingers
-              to pan around. Great for larger puzzles!
+              to pan, or drag with one finger on empty space when zoomed. Great for larger
+              puzzles!
             </p>
           </div>
         )}

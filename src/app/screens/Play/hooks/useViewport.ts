@@ -152,6 +152,11 @@ export function useViewport() {
 
   const isPanning = useCallback(() => isPanningRef.current, []);
 
+  const isZoomedOrPanned = useCallback(() => {
+    const v = viewportRef.current;
+    return v.scale !== 1 || v.panX !== 0 || v.panY !== 0;
+  }, []);
+
   const reset = useCallback(() => {
     setViewport({ scale: 1, panX: 0, panY: 0 });
   }, []);
@@ -191,6 +196,7 @@ export function useViewport() {
     handlePanMove,
     endPan,
     isPanning,
+    isZoomedOrPanned,
     startPinch,
     handlePinchMove,
     endPinch,
