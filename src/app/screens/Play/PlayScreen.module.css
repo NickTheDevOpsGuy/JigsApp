@@ -726,7 +726,48 @@
 
 .headerMenuChevron {
   flex-shrink: 0;
+  opacity: 0.6;
   transition: transform 0.15s ease;
+}
+
+.headerMenuSubmenuTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.headerMenuSubmenuTrigger:hover {
+  background: var(--color-bg-card);
+}
+
+.headerMenuBack {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.headerMenuBack:hover {
+  background: var(--color-bg-card);
 }
 
 .headerMenuHelpSubmenu {

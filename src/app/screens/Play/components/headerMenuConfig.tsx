@@ -41,6 +41,8 @@ export type HeaderMenuProps = {
   onToggleDebug: () => void;
 };
 
+export type SubMenuId = "game" | "view" | "audio";
+
 export type MenuItemConfig = {
   id: string;
   label: string;
@@ -50,6 +52,8 @@ export type MenuItemConfig = {
   onClick: () => void;
   isTheme?: boolean;
   sortKey?: string;
+  /** When set, item appears in this sub-menu instead of top-level settings */
+  subMenu?: SubMenuId;
 };
 
 const TIME_MODE_LABELS: Record<TimeMode, string> = {
@@ -108,6 +112,7 @@ export function buildMenuItems(
       label: "Debug overlay",
       sortKey: "Debug overlay",
       onClick: c(props.onToggleDebug),
+      /* No subMenu - stays at top level */
     },
     {
       id: "fullscreen",
@@ -116,6 +121,7 @@ export function buildMenuItems(
       label: props.isFullscreen ? "Exit fullscreen" : "Fullscreen",
       sortKey: "Fullscreen",
       onClick: c(props.onToggleFullscreen),
+      subMenu: "view",
     },
     {
       id: "timeMode",
@@ -127,6 +133,7 @@ export function buildMenuItems(
         const order: TimeMode[] = ["elapsed", "countdown", "active", "relaxed", "best"];
         props.setTimeMode(order[(order.indexOf(props.timeMode) + 1) % order.length]);
       }),
+      subMenu: "game",
     },
     {
       id: "countdownMinutes",
@@ -141,6 +148,7 @@ export function buildMenuItems(
         const i = idx >= 0 ? idx : 0;
         props.setCountdownMinutes(COUNTDOWN_OPTIONS[(i + 1) % COUNTDOWN_OPTIONS.length]);
       }),
+      subMenu: "game",
     },
     {
       id: "ghost",
@@ -149,6 +157,7 @@ export function buildMenuItems(
       label: props.showGhostHint ? "Ghost hint: on" : "Ghost hint: off",
       sortKey: "Ghost hint",
       onClick: c(props.onToggleGhostHint),
+      subMenu: "game",
     },
     {
       id: "haptics",
@@ -157,8 +166,8 @@ export function buildMenuItems(
       label: props.hapticsEnabled ? "Haptics: on" : "Haptics: off",
       sortKey: "Haptics",
       onClick: c(props.onToggleHaptics),
+      subMenu: "audio",
     },
-    /* Help is rendered as expandable submenu in HeaderMenu (How to Play / Keyboard shortcuts) */
     {
       id: "theme",
       section: "settings",
@@ -167,6 +176,7 @@ export function buildMenuItems(
       sortKey: "Theme",
       onClick: () => setOpen(false),
       isTheme: true,
+      subMenu: "view",
     },
     {
       id: "lock",
@@ -175,6 +185,7 @@ export function buildMenuItems(
       label: props.pieceLockingEnabled ? "Lock pieces: on" : "Lock pieces: off",
       sortKey: "Lock pieces",
       onClick: c(props.onTogglePieceLocking),
+      subMenu: "game",
     },
     {
       id: "preview",
@@ -183,6 +194,7 @@ export function buildMenuItems(
       label: props.showPreview ? "Hide preview" : "Show preview",
       sortKey: "Show preview",
       onClick: c(props.onTogglePreview),
+      subMenu: "view",
     },
     {
       id: "sound",
@@ -191,6 +203,7 @@ export function buildMenuItems(
       label: props.soundEnabled ? "Sound: on" : "Sound: off",
       sortKey: "Sound",
       onClick: c(props.onToggleSound),
+      subMenu: "audio",
     },
   ];
 }

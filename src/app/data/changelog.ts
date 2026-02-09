@@ -1,11 +1,12 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "2";
+export const CHANGELOG_VERSION = "3";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📱 Two-finger pinch zoom – Zoom and pan on mobile (iOS & Android) now works reliably",
       "📸 Camera capture – Take a photo directly for your puzzle",
       "📰 What's New popup – Stay updated on the latest features",
       "📊 Stats & Achievements – Track progress, compete on leaderboards",
