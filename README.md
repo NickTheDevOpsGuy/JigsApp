@@ -23,7 +23,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 - [Adding Sample Puzzles](#-adding-sample-puzzles)
 - [Project Structure](#-project-structure)
 - [Contributing](#-contributing)
-- [Team](#team)
+- [Team](#-team)
 - [License](#-license)
 
 ---
@@ -32,7 +32,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 ### Gameplay Demo
 
-[**Play Phuzzle →**](https://phuzzle.vercel.app/)
+[![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
 
 ---
 
@@ -67,10 +67,9 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Drag-and-drop jigsaw pieces with rotation
 - Classic interlocking piece shapes with board and neighbor snapping
 - Group merging — connected pieces move together
-- Multiple difficulty levels (3×3 to 6×6 grids)
+- Multiple difficulty levels (3×3 to 6×6 grids, custom sizes)
 - Image sources: gallery, file upload, or camera capture
-- Improved piece spreading — less overlap at start, especially on harder puzzles
-- Edge-piece filtering — tray filters: All, Edges, Corners, Center (Grid/Color sort)
+- Edge-piece tray filter — All, Edges, Corners, Center (Grid/Color sort)
 - Zoom and pan — scroll to zoom (toward cursor), middle-click drag to pan
 
 ### UX & Polish
@@ -79,47 +78,38 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Progress counter and timer (elapsed, countdown, active-only, relaxed, best time)
 - Confetti celebration on completion 🎉
 - Sound effects (snap, rotate, place, complete, undo/redo)
-- Fullscreen mode · Dark mode · Multiple themes (Space, Ocean, Forest, Sunset)
+- Fullscreen mode · Multiple themes (Light, Dark, Space, Ocean, Forest, Sunset)
+- Theme as full action card on main menu (no floating toggle)
 - What's New popup for updates
 - Custom fonts (Inter, Fredoka) and Lucide icons
-- Resume prompt — "Resume Your Puzzle?" when returning with saved progress (Resume / Start Fresh / Back to Home)
-- Loading spinner while puzzle initializes
-- Piece count display (e.g. 12 / 24) in HUD
-- Empty tray message ("All pieces on board! Drag pieces here to store them.") when drawer is empty
-- Timer visible on mobile (compact form)
-- Time mode cycling: tap Menu → Time to cycle elapsed, countdown, active-only, relaxed, best
-- Lock animation: green glow when pieces lock (piece locking on)
-- HUD bounce animation when piece count changes
+- Difficulty emojis (Easy 🌱, Medium ⚡, Hard 🔥, Expert 👑) for daily and regular play
 
 ### Mobile Support
 
 - Touch drag, tap to rotate, drag pieces to tray
 - Haptic feedback
-- Camera capture: Menu → "Snap a Picture" or Setup → Camera tab
+- Camera capture for instant puzzles
 - Mobile-safe layouts and gestures (44px touch targets)
-- Timer visible on mobile
-- Scrollable menu (no cut-off)
+- Mobile piece scaling — smaller pieces for higher piece counts
+- Larger puzzles (16+ pieces) start with ~30% of pieces in tray
+- Improved scatter spacing — less overlap on start
+- Longer play menu (80vh) — no cut-off on small screens
 
 ### Social & Progress
 
-- Daily puzzle — same for everyone, streak tracking
+- Daily puzzle — same for everyone (date-based), streak tracking
 - Player statistics dashboard (Supabase)
-- **Display names** — set your name for leaderboards (Stats → Profile)
-- **Anonymous toggle** — hide name on leaderboards (Stats → Profile)
-- **Leaderboards**: Today, Weekly, Monthly, Streaks, Completions, All-time best per grid
-- **Podium styling** 🥇🥈🥉 for top 3
-- **Personal best history** — best times per grid size
-- **Share leaderboard** — copy or native share
+- Leaderboards (Today, Weekly, Monthly, Streaks, All-time)
+- Display names and anonymous toggle for leaderboards
 - Achievements system
 - Share completed puzzle image
 
 ### Accessibility & Controls
 
-- **Help modal** — Main menu and play screen: "Help" opens a choice of "How to Play" and "Keyboard shortcuts" (available on all devices, including touch)
-- Keyboard shortcuts (Tab, arrows, R to rotate, Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y for undo/redo, ? or F1 for help)
+- **Help modal** — Main menu and play screen: "Help" opens How to Play + Keyboard shortcuts (all devices)
+- Keyboard shortcuts (Tab, arrows, R to rotate, ? or F1 for help, Ctrl+Z/Y undo/redo)
 - First-time tutorial overlay
 - Undo · Redo · Ghost hint · Lock pieces (optional)
-- ARIA labels, focus trapping in modals, 44px touch targets
 - Designed for relaxed, low-pressure play
 
 ### Persistence
@@ -139,8 +129,9 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 | **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                             |
 | **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                |
 | **Daily**   | Same puzzle for everyone · Streak tracking                                                                                         |
-| **Social**  | Stats · Leaderboards (today/weekly/monthly/streaks/completions/all-time) · Profile (display name, anonymous toggle) · Achievements |
+| **Social**  | Stats · Leaderboards · Profile (display name, anonymous) · Achievements                                                            |
 | **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                          |
+| **UX**      | Help modal (How to Play + Keyboard shortcuts) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) |
 
 ### Planned
 
@@ -198,21 +189,20 @@ Category = folder name, puzzle name = filename.
 
 ## Project Structure
 
-| Folder                        | Purpose                                                                                            |
-| ----------------------------- | -------------------------------------------------------------------------------------------------- |
-| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage                          |
-| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                               |
-| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers, viewport                           |
-| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HowToPlay, HelpChoiceModal, ShortcutsModal, ThemeToggle, etc. |
-| `src/app/audio/`              | Sound effects                                                                                      |
-| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                |
-| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                   |
+| Folder                        | Purpose                                                                                |
+| ----------------------------- | -------------------------------------------------------------------------------------- |
+| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage              |
+| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                   |
+| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers, viewport               |
+| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc. |
+| `src/app/audio/`              | Sound effects                                                                          |
+| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                    |
+| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                       |
 
 <details>
 <summary>📁 Click to expand file structure</summary>
 
 ```plaintext
-
 .
 ├── .github
 │   ├── ISSUE_TEMPLATE
@@ -283,6 +273,10 @@ Category = folder name, puzzle name = filename.
 │   │   │   ├── ShortcutsModal
 │   │   │   │   ├── ShortcutsModal.module.css
 │   │   │   │   └── ShortcutsModal.tsx
+│   │   │   ├── ThemeModal
+│   │   │   │   ├── ThemeModal.module.css
+│   │   │   │   ├── ThemeModal.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── ThemeToggle
 │   │   │   │   ├── ThemeToggle.module.css
 │   │   │   │   └── ThemeToggle.tsx
@@ -408,6 +402,7 @@ Category = folder name, puzzle name = filename.
 ├── package.json
 ├── README.md
 ├── tsconfig.app.json
+├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
 ├── tsconfig.node.json
 ├── vercel.json
@@ -436,7 +431,7 @@ No gatekeeping. No ego. Just building something fun together.
 
 ---
 
-## Team
+Team
 
 Built by:
 

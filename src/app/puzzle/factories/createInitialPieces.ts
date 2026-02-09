@@ -99,8 +99,9 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const zoneWidth = scatterZone.maxX - scatterZone.minX;
   const zoneHeight = scatterZone.maxY - scatterZone.minY;
 
-  // Larger spacing for bigger puzzles to avoid overlap
-  const minSpacing = total <= 9 ? 12 : total <= 16 ? 16 : total <= 25 ? 20 : 24;
+  // Larger spacing for bigger puzzles to avoid overlap and spread things out
+  const minSpacing =
+    total <= 9 ? 14 : total <= 16 ? 18 : total <= 25 ? 22 : total <= 36 ? 26 : 30;
   const spacing = minSpacing;
   const cellW = w + spacing;
   const cellH = h + spacing;
@@ -147,6 +148,19 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     }
   }
 
+  // For larger puzzles (16+ pieces), start ~30% in tray to reduce board clutter
+  const trayStartCount = total >= 16 ? Math.max(1, Math.floor(total * 0.3)) : 0;
+  const trayIndices = new Set<number>();
+  if (trayStartCount > 0) {
+    const indices = Array.from({ length: total }, (_, i) => i);
+    for (let i = indices.length - 1; i > 0 && trayIndices.size < trayStartCount; i--) {
+      const j = randInt(0, i);
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+      trayIndices.add(indices[i]);
+    }
+    if (trayIndices.size < trayStartCount) trayIndices.add(indices[0]);
+  }
+
   const pieces: Piece[] = [];
 
   for (let i = 0; i < total; i++) {
@@ -156,6 +170,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     const targetX = targetStartX + col * tileW;
     const targetY = targetStartY + row * tileH;
 
+    const startInTray = trayIndices.has(i);
     const pos = positions[i];
 
     const shapePath = buildPiecePath({
@@ -187,7 +202,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
       justSnapped: false,
       shapePath,
       edges: edges[i],
-      inTray: false,
+      inTray: startInTray,
     });
   }
 

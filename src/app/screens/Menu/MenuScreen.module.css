@@ -16,29 +16,13 @@
 
 .header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: center;
   margin-bottom: 24px;
-  position: relative;
 }
 
 .logo {
-  flex: 1;
-  min-width: 0;
-}
-
-.themeToggleWrap {
-  flex-shrink: 0;
-  position: relative;
-}
-
-/* Force theme toggle to stay in header flow, not float */
-.themeToggleWrap > * {
-  position: relative !important;
-  top: auto !important;
-  right: auto !important;
-  inset: auto !important;
+  max-width: 100%;
+  height: auto;
 }
 
 .actionsGrid {

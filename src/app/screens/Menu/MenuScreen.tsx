@@ -4,13 +4,21 @@ import styles from "./MenuScreen.module.css";
 
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
-import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
+import { ThemeModal } from "@/components/ThemeModal";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
-import { HelpCircle, Image, Calendar, BarChart3, Sparkles, Camera } from "lucide-react";
+import {
+  HelpCircle,
+  Image,
+  Calendar,
+  BarChart3,
+  Sparkles,
+  Camera,
+  Palette,
+} from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
@@ -22,6 +30,7 @@ export function MenuScreen() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
+  const [showThemeModal, setShowThemeModal] = useState(false);
 
   const todayCompleted = isTodayDailyCompleted();
   const hasDaily = SAMPLE_PUZZLES.length > 0;
@@ -35,9 +44,6 @@ export function MenuScreen() {
       <div className={styles.card}>
         <div className={styles.header}>
           <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
-          <div className={styles.themeToggleWrap}>
-            <ThemeToggle variant="default" />
-          </div>
         </div>
 
         <div className={styles.actionsGrid}>
@@ -90,6 +96,15 @@ export function MenuScreen() {
 
           <Button
             variant="secondary"
+            onClick={() => setShowThemeModal(true)}
+            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
+          >
+            <Palette size={20} />
+            <span className={styles.actionLabel}>Theme</span>
+          </Button>
+
+          <Button
+            variant="secondary"
             onClick={() => setShowWhatsNew(true)}
             className={styles.whatsNewCard}
           >
@@ -110,6 +125,7 @@ export function MenuScreen() {
         onComplete={() => setShowHowToPlay(false)}
       />
       <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
+      <ThemeModal isOpen={showThemeModal} onClose={() => setShowThemeModal(false)} />
       <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <DailyDifficultyModal
         isOpen={showDailyModal}

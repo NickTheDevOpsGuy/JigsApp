@@ -23,28 +23,35 @@ export function computeTileSize(
   // Calculate max tile size that fits the available space
   const tileFromW = availW / grid.cols;
   const tileFromH = availH / grid.rows;
-  const tile = Math.floor(Math.min(tileFromW, tileFromH));
+  let tile = Math.floor(Math.min(tileFromW, tileFromH));
 
   const isMobile = viewportWidth < MOBILE_BREAKPOINT;
   const pieceCount = grid.rows * grid.cols;
 
-  // Mobile: smaller pieces so puzzle fits on screen; desktop: larger for easier play
+  // Mobile: scale down pieces as count increases so puzzle fits and feels playable
+  // (avoids "technically working, experientially wrong" - cramped boards)
+  if (isMobile && pieceCount > 6) {
+    const scale = Math.max(0.55, Math.min(1, 14 / pieceCount));
+    tile = Math.floor(tile * scale);
+  }
+
+  // Desktop: larger pieces for easier play
   let minTile: number;
   let maxTile: number;
 
   if (isMobile) {
     if (pieceCount <= 9) {
-      minTile = 50;
-      maxTile = 90;
+      minTile = 42;
+      maxTile = 72;
     } else if (pieceCount <= 16) {
-      minTile = 45;
-      maxTile = 80;
-    } else if (pieceCount <= 25) {
-      minTile = 40;
-      maxTile = 70;
-    } else {
-      minTile = 35;
+      minTile = 36;
       maxTile = 60;
+    } else if (pieceCount <= 25) {
+      minTile = 30;
+      maxTile = 48;
+    } else {
+      minTile = 24;
+      maxTile = 40;
     }
   } else {
     if (pieceCount <= 9) {
