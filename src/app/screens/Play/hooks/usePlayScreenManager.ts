@@ -24,6 +24,7 @@ export function usePlayScreenManager(
   const imgRef = useRef<HTMLImageElement | null>(null);
   const popMapRef = useRef<Map<string, number>>(new Map());
   const lockMapRef = useRef<Map<string, number>>(new Map());
+  const sizingCleanupRef = useRef<(() => void) | null>(null);
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
@@ -34,6 +35,7 @@ export function usePlayScreenManager(
 
   // Initial setup: create manager with square tiles
   useEffect(() => {
+    sizingCleanupRef.current = null;
     const mainEl = mainRef.current;
     const boardEl = boardRef.current;
     if (!mainEl || !boardEl) {
@@ -58,125 +60,153 @@ export function usePlayScreenManager(
     img.onload = () => {
       imgRef.current = img;
 
-      // Double rAF: wait for layout to settle before measuring (fixes intermittent
-      // canvas overflow on mobile when measuring before layout is complete)
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (!mainEl || !boardEl) return;
-          const rect = mainEl.getBoundingClientRect();
-          const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
-          const isMobile = viewportW < 600;
-          const minAvail = isMobile ? 260 : 400;
-          const availW = Math.max(minAvail, Math.floor(rect.width) - 24);
-          const availH = Math.max(minAvail, Math.floor(rect.height) - 24);
+      const runSizing = () => {
+        if (!mainEl || !boardEl) return;
+        const rect = mainEl.getBoundingClientRect();
+        const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
+        const isMobile = viewportW < 600;
+        const minAvail = isMobile ? 260 : 400;
+        const availW = Math.max(minAvail, Math.floor(rect.width) - 24);
+        const availH = Math.max(minAvail, Math.floor(rect.height) - 24);
 
-          // Compute square tile size (smaller on mobile for better fit)
-          const pieceSize = computeTileSize(availW, availH, grid, viewportW);
+        // Compute square tile size (smaller on mobile for better fit)
+        const pieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-          // Board: fit puzzle; on mobile cap to available space so it doesn't overflow
-          const minBoardW = grid.cols * pieceSize;
-          const minBoardH = grid.rows * pieceSize;
-          const fillRatio = isMobile ? 0.95 : 0.88;
-          let boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
-          let boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
-          if (isMobile) {
-            boardW = Math.min(boardW, Math.max(minBoardW, Math.floor(rect.width) - 16));
-            boardH = Math.min(boardH, Math.max(minBoardH, Math.floor(rect.height) - 16));
-          }
+        // Board: fit puzzle; on mobile cap to available space so it doesn't overflow
+        const minBoardW = grid.cols * pieceSize;
+        const minBoardH = grid.rows * pieceSize;
+        const fillRatio = isMobile ? 0.95 : 0.88;
+        let boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
+        let boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
+        if (isMobile) {
+          boardW = Math.min(boardW, Math.max(minBoardW, Math.floor(rect.width) - 16));
+          boardH = Math.min(boardH, Math.max(minBoardH, Math.floor(rect.height) - 16));
+        }
 
-          boardEl.style.width = `${boardW}px`;
-          boardEl.style.height = `${boardH}px`;
+        boardEl.style.width = `${boardW}px`;
+        boardEl.style.height = `${boardH}px`;
 
-          const savedState = loadPuzzleState();
-          const hasSavedGame =
-            savedState &&
-            savedState.imageUrl === imageUrl &&
-            savedState.grid.rows === grid.rows &&
-            savedState.grid.cols === grid.cols;
+        const savedState = loadPuzzleState();
+        const hasSavedGame =
+          savedState &&
+          savedState.imageUrl === imageUrl &&
+          savedState.grid.rows === grid.rows &&
+          savedState.grid.cols === grid.cols;
 
-          if (hasSavedGame && savedState && resumeChoice === "resume") {
-            setElapsedSeconds(savedState.elapsedSeconds);
-          } else {
-            const isCountdown = timeMode === "countdown";
-            setElapsedSeconds(isCountdown ? countdownMinutes * 60 : 0);
-          }
+        if (hasSavedGame && savedState && resumeChoice === "resume") {
+          setElapsedSeconds(savedState.elapsedSeconds);
+        } else {
+          const isCountdown = timeMode === "countdown";
+          setElapsedSeconds(isCountdown ? countdownMinutes * 60 : 0);
+        }
 
-          // If saved game exists and user hasn't chosen, wait for choice
-          if (hasSavedGame && resumeChoice === null) {
-            setAwaitingResumeChoice(true);
-            setIsLoading(false);
-            return;
-          }
-          setAwaitingResumeChoice(false);
-
-          // Reset and clear before creating manager (fixes double puzzle on mobile)
-          setManager(null);
-          setState(null);
-          popMapRef.current.clear();
-          lockMapRef.current.clear();
-          const canvas = canvasRef.current;
-          if (canvas) {
-            const ctx = canvas.getContext("2d");
-            if (ctx) {
-              ctx.save();
-              ctx.setTransform(1, 0, 0, 1, 0, 0);
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              ctx.restore();
-            }
-          }
-          setPuzzleKey((k) => k + 1);
-
-          if (hasSavedGame && resumeChoice === "fresh") {
-            clearPuzzleState();
-          }
-
-          const next = new PuzzleManager(
-            {
-              imageUrl,
-              boardWidth: boardW,
-              boardHeight: boardH,
-              grid,
-              pieceWidth: pieceSize,
-              pieceHeight: pieceSize,
-            },
-            {
-              onPiecePlaced: (p) => {
-                lastInteractionRef.current = performance.now();
-                popMapRef.current.set(p.id, performance.now());
-                soundManager.play("place");
-              },
-              onPieceSnapped: () => {
-                lastInteractionRef.current = performance.now();
-                soundManager.play("snap");
-              },
-              onPieceLocked: (ids) => {
-                const now = performance.now();
-                for (const id of ids) lockMapRef.current.set(id, now);
-              },
-              onPuzzleComplete: () => {
-                clearPuzzleState();
-                soundManager.play("complete");
-                import("canvas-confetti").then((confetti) => {
-                  confetti.default({
-                    particleCount: 150,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                  });
-                });
-              },
-            },
-          );
-
-          if (hasSavedGame && savedState && resumeChoice === "resume") {
-            next.restoreFromSaved(savedState.pieces);
-          }
-
-          next.setPieceLockingEnabled(pieceLockingEnabled);
-          setManager(next);
-          setState(next.getState());
+        // If saved game exists and user hasn't chosen, wait for choice
+        if (hasSavedGame && resumeChoice === null) {
+          setAwaitingResumeChoice(true);
           setIsLoading(false);
+          return;
+        }
+        setAwaitingResumeChoice(false);
+
+        // Reset and clear before creating manager (fixes double puzzle on mobile)
+        setManager(null);
+        setState(null);
+        popMapRef.current.clear();
+        lockMapRef.current.clear();
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+          }
+        }
+        setPuzzleKey((k) => k + 1);
+
+        if (hasSavedGame && resumeChoice === "fresh") {
+          clearPuzzleState();
+        }
+
+        const next = new PuzzleManager(
+          {
+            imageUrl,
+            boardWidth: boardW,
+            boardHeight: boardH,
+            grid,
+            pieceWidth: pieceSize,
+            pieceHeight: pieceSize,
+          },
+          {
+            onPiecePlaced: (p) => {
+              lastInteractionRef.current = performance.now();
+              popMapRef.current.set(p.id, performance.now());
+              soundManager.play("place");
+            },
+            onPieceSnapped: () => {
+              lastInteractionRef.current = performance.now();
+              soundManager.play("snap");
+            },
+            onPieceLocked: (ids) => {
+              const now = performance.now();
+              for (const id of ids) lockMapRef.current.set(id, now);
+            },
+            onPuzzleComplete: () => {
+              clearPuzzleState();
+              soundManager.play("complete");
+              import("canvas-confetti").then((confetti) => {
+                confetti.default({
+                  particleCount: 150,
+                  spread: 70,
+                  origin: { y: 0.6 },
+                });
+              });
+            },
+          },
+        );
+
+        if (hasSavedGame && savedState && resumeChoice === "resume") {
+          next.restoreFromSaved(savedState.pieces);
+        }
+
+        next.setPieceLockingEnabled(pieceLockingEnabled);
+        setManager(next);
+        setState(next.getState());
+        setIsLoading(false);
+      };
+
+      // ResizeObserver: measure when layout is stable (more reliable than rAF on mobile).
+      // Observer fires after layout; double rAF inside callback if it fires too early.
+      let didRun = false;
+      const ro = new ResizeObserver(() => {
+        if (didRun) return;
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (didRun || !mainEl || !boardEl) return;
+            didRun = true;
+            ro.disconnect();
+            clearTimeout(fallbackId);
+            runSizing();
+          });
         });
       });
+      ro.observe(mainEl);
+      const fallbackId = setTimeout(() => {
+        if (!didRun) {
+          didRun = true;
+          ro.disconnect();
+          runSizing();
+        }
+      }, 200);
+      sizingCleanupRef.current = () => {
+        ro.disconnect();
+        clearTimeout(fallbackId);
+      };
+    };
+    return () => {
+      sizingCleanupRef.current?.();
+      sizingCleanupRef.current = null;
     };
   }, [
     grid,
