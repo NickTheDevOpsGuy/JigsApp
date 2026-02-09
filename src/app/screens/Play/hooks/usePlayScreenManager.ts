@@ -144,9 +144,11 @@ export function usePlayScreenManager(
               popMapRef.current.set(p.id, performance.now());
               soundManager.play("place");
             },
-            onPieceSnapped: () => {
+            onPieceSnapped: (pieceIds) => {
               lastInteractionRef.current = performance.now();
               soundManager.play("snap");
+              const now = performance.now();
+              for (const id of pieceIds) popMapRef.current.set(id, now);
             },
             onPieceLocked: (ids) => {
               const now = performance.now();

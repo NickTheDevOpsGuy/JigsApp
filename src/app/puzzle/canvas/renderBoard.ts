@@ -2,6 +2,8 @@
 import type { Piece, PuzzleState, DragState } from "@/puzzle/types";
 import {
   snapPopScale,
+  snapGlowAlpha,
+  drawSnapGlow,
   drawDebugBackdrop,
   drawGridOverlay,
   applyPieceShadow,
@@ -229,8 +231,17 @@ function drawPiece(
   const isSelected = animState?.selectedPieceId === p.id && !p.isPlaced;
 
   const start = popMap.get(p.id);
-  const popScale = start ? snapPopScale(nowMs - start) : 1;
+  const popElapsedMs = start != null ? nowMs - start : 0;
+  const popScale = start != null ? snapPopScale(popElapsedMs) : 1;
   const scale = popScale;
+
+  // Subtle snap glow behind piece (placement or neighbor merge)
+  if (start != null && popElapsedMs < 280) {
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const radius = Math.max(p.w, p.h) * 0.55;
+    drawSnapGlow(ctx, cx, cy, radius, snapGlowAlpha(popElapsedMs));
+  }
 
   let path: Path2D | null = null;
   try {

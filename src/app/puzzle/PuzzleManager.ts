@@ -27,7 +27,8 @@ export type PuzzleManagerOptions = {
 
 export type PuzzleManagerEvents = {
   onPiecePlaced?: (piece: Piece) => void;
-  onPieceSnapped?: () => void;
+  /** Called when a group snaps to a neighbor (merge). Pass merged group piece IDs for glow/bounce. */
+  onPieceSnapped?: (pieceIds: string[]) => void;
   onPieceLocked?: (pieceIds: string[]) => void;
   onPuzzleComplete?: (state: PuzzleState) => void;
 };
@@ -655,7 +656,8 @@ export class PuzzleManager {
     // Locking only happens in trySnapActiveGroupToBoard when snapping to the correct board spot.
 
     this.trySnapMergedGroupToBoard(best.into);
-    this.events.onPieceSnapped?.();
+    const mergedIds = this.getGroupPieces(best.into).map((piece) => piece.id);
+    this.events.onPieceSnapped?.(mergedIds);
 
     return true;
   }
