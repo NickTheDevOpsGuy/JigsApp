@@ -57,7 +57,9 @@ async function resolveDisplayNames(
     if (!map.has(uid)) {
       map.set(
         uid,
-        useAnonymous.has(uid) ? getAnonymousDisplayName(uid) : `Player ${uid.slice(0, 8)}`,
+        useAnonymous.has(uid)
+          ? getAnonymousDisplayName(uid)
+          : `Player ${uid.slice(0, 8)}`,
       );
     }
   }
@@ -257,9 +259,7 @@ export async function getWeeklyTotalsLeaderboard(
     countByUser.set(row.user_id, (countByUser.get(row.user_id) ?? 0) + 1);
   }
 
-  const sorted = [...countByUser.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit);
+  const sorted = [...countByUser.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
 
   const names = await resolveDisplayNames(
     sorted.map(([uid]) => uid),
@@ -294,9 +294,7 @@ export async function getMonthlyTotalsLeaderboard(
     countByUser.set(row.user_id, (countByUser.get(row.user_id) ?? 0) + 1);
   }
 
-  const sorted = [...countByUser.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit);
+  const sorted = [...countByUser.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
 
   const names = await resolveDisplayNames(
     sorted.map(([uid]) => uid),

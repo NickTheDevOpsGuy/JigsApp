@@ -130,13 +130,13 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed ✓
 
-| Area        | Features                                                                                                                                                                                                                                                                                              |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                                                                                                                                                |
-| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                                                                                                                                                   |
-| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                            |
-| **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                        |
-| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                             |
+| Area        | Features                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                                                                                                                                                                                                                               |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                                                                                                                                                                                                                                  |
+| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                                                                                                           |
+| **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                                                                                                       |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                                                                                                            |
 | **UX**      | Help modal · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count |
 
 ### Planned
@@ -195,16 +195,16 @@ Category = folder name, puzzle name = filename.
 
 ## Project Structure
 
-| Folder                        | Purpose                                                                                             |
-| ----------------------------- | --------------------------------------------------------------------------------------------------- |
-| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage                           |
-| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                                |
-| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers (touch + mouse), viewport (zoom/pan) |
-| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc.              |
-| `src/app/audio/`              | Sound effects                                                                                       |
+| Folder                        | Purpose                                                                                                           |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage                                         |
+| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                                              |
+| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers (touch + mouse), viewport (zoom/pan)               |
+| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc.                            |
+| `src/app/audio/`              | Sound effects                                                                                                     |
 | `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, anonymous raccoon names, sample puzzles |
-| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                 |
-| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                    |
+| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                               |
+| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                                  |
 
 <details>
 <summary>📁 Click to expand file structure</summary>
