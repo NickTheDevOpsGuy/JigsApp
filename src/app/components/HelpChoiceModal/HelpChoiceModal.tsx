@@ -35,7 +35,7 @@ export function HelpChoiceModal({
             onKeyboardShortcuts();
           }}
         >
-          Keyboard shortcuts
+          Keyboard & Controls
         </button>
       </div>
     </Modal>

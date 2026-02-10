@@ -13,7 +13,7 @@ export const MENU_TIPS = [
   "Corners first, then edges.",
   "Group by color or pattern.",
   "Undo is your friend.",
-  "The tray is for organizing—not giving up.",
+  "Use the tray to hold pieces and free up space on the board.",
 ] as const;
 
 export function getMenuTip(): string {

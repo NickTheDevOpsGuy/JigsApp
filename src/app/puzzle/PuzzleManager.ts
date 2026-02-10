@@ -6,6 +6,8 @@ import {
   getGroupBounds as getGroupBoundsUtil,
   wouldOverlapAnyOtherGroup as wouldOverlapUtil,
   getSolvedNeighbors as getSolvedNeighborsUtil,
+  buildRowColMap,
+  getSolvedNeighborsFromMap,
 } from "./groupUtils";
 
 export type PuzzleManagerOptions = {
@@ -625,10 +627,19 @@ export class PuzzleManager {
     const groupPieces = this.getGroupPieces(gid);
     if (!groupPieces.every((p) => p.rotation === 0)) return false;
 
+    const groupIdSet = new Set(groupPieces.map((p) => p.id));
+    const rowColMap = buildRowColMap(this.state.pieces);
+
+    // Only check boundary pieces: those with a neighbor outside this group (possible snap target).
+    const boundaryPieces = groupPieces.filter((gp) => {
+      const neighbors = getSolvedNeighborsFromMap(gp, rowColMap);
+      return neighbors.some((n) => !groupIdSet.has(n.id) && n.rotation === 0);
+    });
+
     let best: null | { dx: number; dy: number; dist: number; into: string } = null;
 
-    for (const gp of groupPieces) {
-      for (const n of this.getSolvedNeighbors(gp)) {
+    for (const gp of boundaryPieces) {
+      for (const n of getSolvedNeighborsFromMap(gp, rowColMap)) {
         if (n.groupId === gid || n.rotation !== 0) continue;
 
         const gpTile = this.tilePos(gp);

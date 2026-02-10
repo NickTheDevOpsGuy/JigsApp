@@ -84,6 +84,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Custom fonts (Inter, Fredoka) and Lucide icons
 - Difficulty emojis (Easy 🌱, Medium ⚡, Hard 🔥, Expert 👑) for daily and regular play
 - **Engagement polish:** Snap glow and placement bounce when pieces lock; neighbor-snap particle burst when groups merge; milestone callouts at 25%, 50%, 75%; "On fire!" toast when placing 3+ pieces quickly; rotating tip/quote on main menu; last-piece flourish (brief board pulse on completion)
+- **Play screen polish:** Completion overlay fits on mobile (scroll, responsive text); piece selection border is thin and auto-clears after 1s (tap empty space to clear); board size scales with piece count on mobile for easier planning
 
 ### Mobile Support
 
@@ -102,14 +103,15 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 - Daily puzzle — same for everyone (date-based), streak tracking
 - Player statistics dashboard (Supabase)
-- Leaderboards (Today, Weekly, Monthly, Streaks, All-time)
-- Display names and anonymous toggle for leaderboards
+- Leaderboards: daily puzzle, weekly totals, monthly totals, all-time completions, streaks, all-time best by grid
+- Anonymous mode: toggle in profile; anonymous players appear as fun raccoon names (e.g. Trash Eater 42, Feral Raccoon 7), are still tracked, and can opt in to show their display name anytime
+- Display names and profile (Stats → Profile)
 - Achievements system
 - Share completed puzzle image
 
 ### Accessibility & Controls
 
-- **Help modal** — Main menu and play screen: "Help" opens How to Play + Keyboard shortcuts (all devices)
+- **Help menu** — Main menu and play screen: "Help" presents two clear options: **How to Play** (gameplay basics) and **Keyboard & Controls** (shortcuts, mouse/touch, zoom/pan). No duplicate content; each flow has a single focus.
 - Keyboard shortcuts (Tab, arrows, R to rotate, ? or F1 for help, Ctrl+Z/Y undo/redo)
 - First-time tutorial overlay
 - Settings sub-menus — Game (time, ghost, lock), View (theme, preview, fullscreen), Audio (sound, haptics)
@@ -128,19 +130,29 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Completed ✓
 
-| Area        | Features                                                                                                                                                                                                                                                                                              |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                                                                                                                                                |
-| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                                                                                                                                                   |
-| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                            |
-| **Social**  | Stats · Leaderboards · Profile (display name, anonymous) · Achievements                                                                                                                                                                                                                               |
-| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                             |
-| **UX**      | Help modal · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) |
+| Area        | Features                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                                                                                                                                                                                                                                                                                          |
+| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                                                                                                                                                                  |
+| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                                                                                                                                                                       |
+| **UX**      | Help menu (How to Play + Keyboard & Controls, reduced cognitive load) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count |
 
 ### Planned
 
 - Import puzzle from URL
 - PWA / offline support
+
+---
+
+## Performance (100+ piece puzzles)
+
+Rendering and interaction are tuned for large puzzles:
+
+- **Canvas redraw** – When idle (no drag, no completion animation), the board redraw is throttled to 30fps for puzzles with 50+ pieces to reduce CPU/GPU load. During drag or completion flourish, it runs at full frame rate.
+- **Snap calculations** – A single (row, col) → piece map is built per snap check so neighbor lookups are O(1). Only _boundary_ pieces of the dragged group (those with a neighbor outside the group) are considered for neighbor snap, cutting work for large groups.
+- **Overlap checks** – Before testing piece-vs-piece overlap, group bounds are compared; only groups whose bounding boxes intersect the moved group are checked in detail.
 
 ---
 
@@ -193,16 +205,19 @@ Category = folder name, puzzle name = filename.
 
 ## Project Structure
 
-| Folder                        | Purpose                                                                                             |
-| ----------------------------- | --------------------------------------------------------------------------------------------------- |
-| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage                           |
-| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                                |
-| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers (touch + mouse), viewport (zoom/pan) |
-| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc.              |
-| `src/app/audio/`              | Sound effects                                                                                       |
-| `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, sample puzzles            |
-| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                 |
-| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                    |
+| Folder                        | Purpose                                                                                                           |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage                                         |
+| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                                              |
+| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers (touch + mouse), viewport (zoom/pan)               |
+| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc.                            |
+| `src/app/audio/`              | Sound effects                                                                                                     |
+| `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, anonymous raccoon names, sample puzzles |
+| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                               |
+| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                                  |
+| `e2e/`                        | Playwright E2E tests (e.g. home.spec.ts)                                                                          |
+
+Root configs: `vite.config.ts` (Vite + Vitest), `playwright.config.ts` (Playwright). Unit tests live alongside source (e.g. `*.test.ts`).
 
 <details>
 <summary>📁 Click to expand file structure</summary>
@@ -227,6 +242,8 @@ Category = folder name, puzzle name = filename.
 │   └── pre-push
 ├── public
 │   └── favicon.svg
+├── e2e
+│   └── home.spec.ts
 ├── scripts
 │   └── precheck.sh
 ├── src
@@ -296,6 +313,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   └── dailyPuzzle.ts
 │   │   ├── data
 │   │   │   ├── achievements.ts
+│   │   │   ├── anonymousNames.ts
 │   │   │   ├── changelog.ts
 │   │   │   ├── completionMessages.ts
 │   │   │   ├── confettiColors.ts
@@ -360,6 +378,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   └── useViewport.ts
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
+│   │   │   │   ├── playScreenUtils.test.ts
 │   │   │   │   ├── playScreenUtils.ts
 │   │   │   │   ├── playUtils.ts
 │   │   │   │   └── timeMode.ts
@@ -408,6 +427,7 @@ Category = folder name, puzzle name = filename.
 ├── LICENSE.md
 ├── package-lock.json
 ├── package.json
+├── playwright.config.ts
 ├── README.md
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo

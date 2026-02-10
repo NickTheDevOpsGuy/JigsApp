@@ -42,11 +42,17 @@ export function usePlayScreenAnimation(args: {
   const pieceCacheRef = useRef<Map<string, HTMLCanvasElement>>(new Map());
   const lastCompleteRef = useRef<boolean>(false);
   const lastPieceCountRef = useRef<number>(0);
+  const lastFrameTimeRef = useRef<number>(0);
+
+  /** For 100+ piece puzzles: throttle redraw to 30fps when idle to reduce CPU/GPU load. */
+  const IDLE_TARGET_FPS = 30;
+  const IDLE_MIN_INTERVAL_MS = 1000 / IDLE_TARGET_FPS;
+  const HIGH_PIECE_COUNT_THRESHOLD = 50;
 
   useEffect(() => {
     if (!manager) return;
     pieceCacheRef.current.clear();
-    const tick = () => {
+    const tick = (now: number) => {
       const canvas = canvasRef.current;
       const boardEl = boardRef.current;
       const img = imgRef.current;
@@ -54,15 +60,38 @@ export function usePlayScreenAnimation(args: {
         rafRef.current = requestAnimationFrame(tick);
         return;
       }
+      const st = manager.getState();
+      const firstPiece = st.pieces[0];
+      if (!firstPiece) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+      const dragState = manager.getDragState();
+      const isDragging = dragState.activeId != null;
+      const completionElapsed =
+        st.isComplete && completedAtRef.current ? now - completedAtRef.current : Infinity;
+      const inCompletionFlourish = completionElapsed < 800;
+      const pieceCount = st.pieces.length;
+      const throttleIdle =
+        pieceCount >= HIGH_PIECE_COUNT_THRESHOLD && !isDragging && !inCompletionFlourish;
+
+      if (throttleIdle && now - lastFrameTimeRef.current < IDLE_MIN_INTERVAL_MS) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+      lastFrameTimeRef.current = now;
+
       const rect = boardEl.getBoundingClientRect();
       const cssW = Math.max(1, Math.floor(rect.width));
       const cssH = Math.max(1, Math.floor(rect.height));
       const dpr = window.devicePixelRatio || 1;
 
-      // Only resize canvas if dimensions changed
-      const targetW = Math.floor(cssW * dpr);
-      const targetH = Math.floor(cssH * dpr);
-      if (canvas.width !== targetW || canvas.height !== targetH) {
+      if (
+        canvas.width !== Math.floor(cssW * dpr) ||
+        canvas.height !== Math.floor(cssH * dpr)
+      ) {
+        const targetW = Math.floor(cssW * dpr);
+        const targetH = Math.floor(cssH * dpr);
         canvas.width = targetW;
         canvas.height = targetH;
         canvas.style.width = `${cssW}px`;
@@ -77,18 +106,10 @@ export function usePlayScreenAnimation(args: {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const st = manager.getState();
-      const firstPiece = st.pieces[0];
-      if (!firstPiece) {
-        rafRef.current = requestAnimationFrame(tick);
-        return;
-      }
       const assembledW = st.grid.cols * firstPiece.tileW;
       const assembledH = st.grid.rows * firstPiece.tileH;
-      if (st.isComplete && !completedAtRef.current)
-        completedAtRef.current = performance.now();
+      if (st.isComplete && !completedAtRef.current) completedAtRef.current = now;
       else if (!st.isComplete) completedAtRef.current = null;
-      const dragState = manager.getDragState();
       const draggedGroupId = dragState.activeId
         ? (st.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
         : null;
@@ -104,7 +125,7 @@ export function usePlayScreenAnimation(args: {
         assembledH,
         popMap,
         lockMap,
-        performance.now(),
+        now,
         debug,
         dragState,
         {
@@ -121,8 +142,6 @@ export function usePlayScreenAnimation(args: {
         snapParticles,
       );
 
-      // Only update React state when something meaningful changes
-      // (completion status or placed piece count)
       const placedCount = st.pieces.filter((p) => p.isPlaced).length;
       if (
         st.isComplete !== lastCompleteRef.current ||
