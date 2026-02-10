@@ -94,7 +94,11 @@ export function usePlayScreenManager(
         const minBoardH = grid.rows * pieceSize;
         const pieceCount = grid.rows * grid.cols;
         const fillRatio = isMobile
-          ? (pieceCount >= 25 ? 0.98 : pieceCount >= 16 ? 0.96 : 0.95)
+          ? pieceCount >= 25
+            ? 0.98
+            : pieceCount >= 16
+              ? 0.96
+              : 0.95
           : 0.88;
         let boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
         let boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
