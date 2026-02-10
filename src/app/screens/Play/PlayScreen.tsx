@@ -156,6 +156,17 @@ export function PlayScreen() {
     return () => clearTimeout(t);
   }, [showStreakToast]);
 
+  // Auto-clear piece selection after 1s so the blue border doesn’t stay until another click
+  useEffect(() => {
+    if (selectedPieceId == null) return;
+    const t = setTimeout(() => {
+      setSelectedPieceId(null);
+      selectedIdRef.current = null;
+      bump();
+    }, 1000);
+    return () => clearTimeout(t);
+  }, [selectedPieceId, setSelectedPieceId, selectedIdRef, bump]);
+
   const isCoarsePointer = useCoarsePointer();
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
   const viewport = useViewport();

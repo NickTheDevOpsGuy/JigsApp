@@ -185,6 +185,8 @@ export function usePointerHandlers(args: {
       const boardPieces = st.pieces.filter((p) => !p.inTray);
       const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY);
       if (!pieceId) {
+        selectedIdRef.current = null;
+        setSelectedPieceId(null);
         // Empty space — single-finger pan when zoomed (touch only)
         if (viewport && e.pointerType === "touch" && viewport.isZoomedOrPanned?.()) {
           e.preventDefault();

@@ -481,6 +481,10 @@
   justify-content: center;
   z-index: 100;
   animation: fadeIn 0.5s ease-out;
+  padding: 12px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
 }
 
 .completeContent {
@@ -488,6 +492,10 @@
   color: white;
   user-select: none;
   animation: completeFlourish 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) 0.1s both;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0 4px;
+  box-sizing: border-box;
 }
 
 @keyframes completeFlourish {
@@ -543,12 +551,33 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-shadow: 0 2px 20px var(--color-complete-text-shadow);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .completeContent p {
   font-size: 1.25rem;
   opacity: 0.9;
   margin: 0 0 1.5rem 0;
+}
+
+@media (max-width: 600px) {
+  .completeContent h2 {
+    font-size: 1.75rem;
+    line-height: 1.25;
+  }
+  .completeContent p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  .shareSection {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .completeActions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
 
 .newBest {
