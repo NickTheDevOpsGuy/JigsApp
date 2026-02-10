@@ -147,7 +147,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 | **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                                                                                                                                                                  |
 | **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                                                                                                                                                                       |
 | **UX**      | Help menu (How to Play + Keyboard & Controls, reduced cognitive load) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count |
-| **PWA**     | Installable app (manifest, service worker, offline precache) via vite-plugin-pwa                              |
+| **PWA**     | Installable app (manifest, service worker, offline precache) via vite-plugin-pwa                                                                                                                                                                                                                                                                                                                                                                |
 
 ### Planned
 
@@ -168,16 +168,16 @@ Rendering and interaction are tuned for large puzzles:
 
 ## Tech Stack
 
-| Category  | Tools                    |
-| --------- | ------------------------ |
-| Framework | React                    |
-| Language  | TypeScript               |
-| Build     | Vite                     |
-| Rendering | HTML Canvas              |
-| PWA       | vite-plugin-pwa (Workbox)|
+| Category  | Tools                           |
+| --------- | ------------------------------- |
+| Framework | React                           |
+| Language  | TypeScript                      |
+| Build     | Vite                            |
+| Rendering | HTML Canvas                     |
+| PWA       | vite-plugin-pwa (Workbox)       |
 | Testing   | Vitest (unit), Playwright (E2E) |
-| CI/CD     | GitHub Actions           |
-| Hosting   | Vercel                   |
+| CI/CD     | GitHub Actions                  |
+| Hosting   | Vercel                          |
 
 ---
 
@@ -245,14 +245,14 @@ Images are auto-discovered at any depth.
 | `src/app/audio/`              | Sound effects                                                                                                     |
 | `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, anonymous raccoon names, sample puzzles |
 | `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                               |
-| `src/app/assets/puzzles/`     | Sample puzzle images by category (animals, flowers, food, space, tech; subfolders supported)                        |
+| `src/app/assets/puzzles/`     | Sample puzzle images by category (animals, flowers, food, space, tech; subfolders supported)                      |
 | `public/`                     | Favicon, PWA icons (icon-192.png, icon-512.png)                                                                   |
-| `e2e/`                        | Playwright E2E tests (e.g. home.spec.ts)                                                                         |
-| `scripts/`                    | Pre-push precheck (empty files, Prettier, ESLint, TypeScript, unit tests)                                        |
-| `.husky/`                     | Git hooks: pre-commit (empty files, node_modules check), pre-push (runs precheck)                                |
-| `src/types/`                  | TypeScript declarations (e.g. canvas-confetti, vite-env)                                                         |
-| `.github/`                    | Issue templates, workflows (Phuzzle.yml, vercel-production.yml), pull_request_template.md                       |
-| `supabase/`                   | Migrations (001_initial_schema.sql, 002_player_profiles.sql), Supabase setup README                              |
+| `e2e/`                        | Playwright E2E tests (e.g. home.spec.ts)                                                                          |
+| `scripts/`                    | Pre-push precheck (empty files, Prettier, ESLint, TypeScript, unit tests)                                         |
+| `.husky/`                     | Git hooks: pre-commit (empty files, node_modules check), pre-push (runs precheck)                                 |
+| `src/types/`                  | TypeScript declarations (e.g. canvas-confetti, vite-env)                                                          |
+| `.github/`                    | Issue templates, workflows (Phuzzle.yml, vercel-production.yml), pull_request_template.md                         |
+| `supabase/`                   | Migrations (001_initial_schema.sql, 002_player_profiles.sql), Supabase setup README                               |
 
 Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwright.config.ts` (Playwright). Unit tests live alongside source (e.g. `*.test.ts`). Release notes / changelog: `CHANGELOG_UPDATE.md`.
 
