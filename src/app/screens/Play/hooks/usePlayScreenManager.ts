@@ -89,10 +89,13 @@ export function usePlayScreenManager(
         // Compute square tile size (smaller on mobile for better fit)
         const pieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-        // Board: fit puzzle; on mobile cap to available space so it doesn't overflow
+        // Board: fit puzzle; scale by piece count so more pieces = bigger board for planning
         const minBoardW = grid.cols * pieceSize;
         const minBoardH = grid.rows * pieceSize;
-        const fillRatio = isMobile ? 0.95 : 0.88;
+        const pieceCount = grid.rows * grid.cols;
+        const fillRatio = isMobile
+          ? (pieceCount >= 25 ? 0.98 : pieceCount >= 16 ? 0.96 : 0.95)
+          : 0.88;
         let boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
         let boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
         if (isMobile) {

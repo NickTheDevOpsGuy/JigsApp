@@ -394,10 +394,10 @@ function drawPiece(
   }
   if (isSelected) {
     ctx.strokeStyle = "#667eea";
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 1.5;
     ctx.stroke(path);
-    ctx.strokeStyle = "rgba(102, 126, 234, 0.4)";
-    ctx.lineWidth = 6;
+    ctx.strokeStyle = "rgba(102, 126, 234, 0.35)";
+    ctx.lineWidth = 3;
     ctx.stroke(path);
   }
   ctx.restore();
@@ -448,7 +448,7 @@ function drawCachedPiece(
     ctx.rotate((p.rotation * Math.PI) / 180);
     ctx.translate(-p.w / 2, -p.h / 2);
     ctx.strokeStyle = isDragging ? "rgba(102, 126, 234, 0.6)" : "#667eea";
-    ctx.lineWidth = isDragging ? 2 : 3;
+    ctx.lineWidth = isDragging ? 1.5 : 1.5;
     ctx.stroke(path);
   }
   if (showLockGlow) {
