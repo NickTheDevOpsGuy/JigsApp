@@ -84,6 +84,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Custom fonts (Inter, Fredoka) and Lucide icons
 - Difficulty emojis (Easy 🌱, Medium ⚡, Hard 🔥, Expert 👑) for daily and regular play
 - **Engagement polish:** Snap glow and placement bounce when pieces lock; neighbor-snap particle burst when groups merge; milestone callouts at 25%, 50%, 75%; "On fire!" toast when placing 3+ pieces quickly; rotating tip/quote on main menu; last-piece flourish (brief board pulse on completion)
+- **Play screen polish:** Completion overlay fits on mobile (scroll, responsive text); piece selection border is thin and auto-clears after 1s (tap empty space to clear); board size scales with piece count on mobile for easier planning
 
 ### Mobile Support
 
@@ -102,8 +103,9 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 - Daily puzzle — same for everyone (date-based), streak tracking
 - Player statistics dashboard (Supabase)
-- Leaderboards (Today, Weekly, Monthly, Streaks, All-time)
-- Display names and anonymous toggle for leaderboards
+- Leaderboards: daily puzzle, weekly totals, monthly totals, all-time completions, streaks, all-time best by grid
+- Anonymous mode: toggle in profile; anonymous players appear as fun raccoon names (e.g. Trash Eater 42, Feral Raccoon 7), are still tracked, and can opt in to show their display name anytime
+- Display names and profile (Stats → Profile)
 - Achievements system
 - Share completed puzzle image
 
@@ -133,9 +135,9 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 | **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                                                                                                                                                |
 | **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                                                                                                                                                   |
 | **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                            |
-| **Social**  | Stats · Leaderboards · Profile (display name, anonymous) · Achievements                                                                                                                                                                                                                               |
+| **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                        |
 | **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                             |
-| **UX**      | Help modal · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) |
+| **UX**      | Help modal · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count |
 
 ### Planned
 
@@ -200,7 +202,7 @@ Category = folder name, puzzle name = filename.
 | `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers (touch + mouse), viewport (zoom/pan) |
 | `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc.              |
 | `src/app/audio/`              | Sound effects                                                                                       |
-| `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, sample puzzles            |
+| `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, anonymous raccoon names, sample puzzles |
 | `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                 |
 | `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                    |
 
@@ -296,6 +298,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   └── dailyPuzzle.ts
 │   │   ├── data
 │   │   │   ├── achievements.ts
+│   │   │   ├── anonymousNames.ts
 │   │   │   ├── changelog.ts
 │   │   │   ├── completionMessages.ts
 │   │   │   ├── confettiColors.ts

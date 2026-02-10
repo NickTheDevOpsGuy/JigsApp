@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import { getUserId } from "@/supabase/auth";
+import { getAnonymousDisplayName } from "@/data/anonymousNames";
 
 export type LeaderboardEntry = {
   rank: number;
@@ -27,7 +28,7 @@ export type PersonalBestEntry = {
   isDaily: boolean;
 };
 
-/** Resolve display names from user IDs (profiles or fallback). */
+/** Resolve display names from user IDs. Anonymous mode (show_on_leaderboard = false) → fun raccoon name. */
 async function resolveDisplayNames(
   userIds: string[],
   useAnonymous: Set<string>,
@@ -44,7 +45,7 @@ async function resolveDisplayNames(
     for (const p of profiles ?? []) {
       const name =
         p.show_on_leaderboard === false || useAnonymous.has(p.user_id)
-          ? "Anonymous"
+          ? getAnonymousDisplayName(p.user_id)
           : (p.display_name ?? "Puzzler").trim() || "Puzzler";
       map.set(p.user_id, name);
     }
@@ -54,7 +55,10 @@ async function resolveDisplayNames(
 
   for (const uid of unique) {
     if (!map.has(uid)) {
-      map.set(uid, useAnonymous.has(uid) ? "Anonymous" : `Player ${uid.slice(0, 8)}`);
+      map.set(
+        uid,
+        useAnonymous.has(uid) ? getAnonymousDisplayName(uid) : `Player ${uid.slice(0, 8)}`,
+      );
     }
   }
   return map;
@@ -228,6 +232,80 @@ export async function getPeriodLeaderboard(
   return sorted.map(([userId, elapsedSeconds], i) => ({
     rank: i + 1,
     elapsedSeconds,
+    displayName: names.get(userId) ?? `Player ${userId.slice(0, 8)}`,
+  }));
+}
+
+/** Fetch weekly totals leaderboard (completion count in last 7 days). Respects anonymous (show_on_leaderboard). */
+export async function getWeeklyTotalsLeaderboard(
+  limit = 10,
+): Promise<CompletionCountEntry[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  const { start, end } = getDateRange("week");
+
+  const { data, error } = await supabase!
+    .from("completions")
+    .select("user_id")
+    .gte("puzzle_date", start)
+    .lte("puzzle_date", end);
+
+  if (error) return [];
+
+  const countByUser = new Map<string, number>();
+  for (const row of data ?? []) {
+    countByUser.set(row.user_id, (countByUser.get(row.user_id) ?? 0) + 1);
+  }
+
+  const sorted = [...countByUser.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
+
+  const names = await resolveDisplayNames(
+    sorted.map(([uid]) => uid),
+    new Set(),
+  );
+
+  return sorted.map(([userId, count], i) => ({
+    rank: i + 1,
+    count,
+    displayName: names.get(userId) ?? `Player ${userId.slice(0, 8)}`,
+  }));
+}
+
+/** Fetch monthly totals leaderboard (completion count in last 30 days). Respects anonymous (show_on_leaderboard). */
+export async function getMonthlyTotalsLeaderboard(
+  limit = 10,
+): Promise<CompletionCountEntry[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  const { start, end } = getDateRange("month");
+
+  const { data, error } = await supabase!
+    .from("completions")
+    .select("user_id")
+    .gte("puzzle_date", start)
+    .lte("puzzle_date", end);
+
+  if (error) return [];
+
+  const countByUser = new Map<string, number>();
+  for (const row of data ?? []) {
+    countByUser.set(row.user_id, (countByUser.get(row.user_id) ?? 0) + 1);
+  }
+
+  const sorted = [...countByUser.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
+
+  const names = await resolveDisplayNames(
+    sorted.map(([uid]) => uid),
+    new Set(),
+  );
+
+  return sorted.map(([userId, count], i) => ({
+    rank: i + 1,
+    count,
     displayName: names.get(userId) ?? `Player ${userId.slice(0, 8)}`,
   }));
 }

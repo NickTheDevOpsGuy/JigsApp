@@ -9,7 +9,8 @@ import {
   getDailyLeaderboard,
   getStreakLeaderboard,
   getCompletionCountLeaderboard,
-  getPeriodLeaderboard,
+  getWeeklyTotalsLeaderboard,
+  getMonthlyTotalsLeaderboard,
   getAllTimeBestLeaderboard,
   getMyPersonalBests,
   type LeaderboardEntry,
@@ -66,6 +67,12 @@ export function StatsScreen() {
   const [completionLeaderboard, setCompletionLeaderboard] = useState<
     CompletionCountEntry[]
   >([]);
+  const [weeklyTotalsLeaderboard, setWeeklyTotalsLeaderboard] = useState<
+    CompletionCountEntry[]
+  >([]);
+  const [monthlyTotalsLeaderboard, setMonthlyTotalsLeaderboard] = useState<
+    CompletionCountEntry[]
+  >([]);
   const [personalBests, setPersonalBests] = useState<PersonalBestEntry[]>([]);
   const [achievements, setAchievements] = useState<
     {
@@ -95,15 +102,19 @@ export function StatsScreen() {
     setDisplayNameInput(p?.displayName ?? "");
     setAchievements(a ?? []);
     const today = getTodayDateString();
-    const [lb, slb, clb, pb] = await Promise.all([
+    const [lb, slb, clb, wklb, molb, pb] = await Promise.all([
       getDailyLeaderboard(today),
       getStreakLeaderboard(),
       getCompletionCountLeaderboard(),
+      getWeeklyTotalsLeaderboard(),
+      getMonthlyTotalsLeaderboard(),
       getMyPersonalBests(),
     ]);
     setLeaderboard(lb);
     setStreakLeaderboard(slb);
     setCompletionLeaderboard(clb);
+    setWeeklyTotalsLeaderboard(wklb);
+    setMonthlyTotalsLeaderboard(molb);
     setPersonalBests(pb);
     setLoading(false);
   }, [configured]);
@@ -122,11 +133,12 @@ export function StatsScreen() {
       if (leaderboardType === "today") {
         const lb = await getDailyLeaderboard(getTodayDateString());
         setLeaderboard(lb);
-      } else if (leaderboardType === "week" || leaderboardType === "month") {
-        const lb = await getPeriodLeaderboard(
-          leaderboardType === "week" ? "week" : "month",
-        );
-        setLeaderboard(lb);
+      } else if (leaderboardType === "week") {
+        const wklb = await getWeeklyTotalsLeaderboard();
+        setWeeklyTotalsLeaderboard(wklb);
+      } else if (leaderboardType === "month") {
+        const molb = await getMonthlyTotalsLeaderboard();
+        setMonthlyTotalsLeaderboard(molb);
       } else if (leaderboardType === "streaks") {
         const slb = await getStreakLeaderboard();
         setStreakLeaderboard(slb);
@@ -259,10 +271,13 @@ export function StatsScreen() {
     </>
   );
 
-  const renderCompletionLeaderboard = (entries: CompletionCountEntry[]) => (
+  const renderCompletionLeaderboard = (
+    entries: CompletionCountEntry[],
+    emptyMsg = "No completions yet. Play puzzles!",
+  ) => (
     <>
       {entries.length === 0 ? (
-        <p className={styles.empty}>No completions yet. Play puzzles!</p>
+        <p className={styles.empty}>{emptyMsg}</p>
       ) : (
         <ol className={styles.leaderboard}>
           {entries.map((entry) => (
@@ -404,7 +419,10 @@ export function StatsScreen() {
                     <span>Show my name on leaderboards</span>
                   </label>
                 </div>
-                <p className={styles.hint}>Uncheck to appear as &quot;Anonymous&quot;.</p>
+                <p className={styles.hint}>
+                  Uncheck to appear as a fun anonymous name (e.g. Trash Eater 42). You’re
+                  still tracked—turn this back on anytime to show your display name.
+                </p>
                 <Button
                   onClick={handleSaveProfile}
                   disabled={profileSaving}
@@ -421,12 +439,12 @@ export function StatsScreen() {
                   <div className={styles.leaderboardTabs}>
                     {(
                       [
-                        ["today", "Today"],
-                        ["week", "Weekly"],
-                        ["month", "Monthly"],
+                        ["today", "Daily puzzle"],
+                        ["week", "Weekly totals"],
+                        ["month", "Monthly totals"],
                         ["streaks", "Streaks"],
-                        ["completions", "Completions"],
-                        ["alltime", "All-Time"],
+                        ["completions", "All-time completions"],
+                        ["alltime", "All-time best"],
                       ] as const
                     ).map(([key, label]) => (
                       <button
@@ -465,24 +483,32 @@ export function StatsScreen() {
                   </Button>
                 </div>
                 <h2>
-                  {leaderboardType === "today" && "Today's Daily"}
-                  {leaderboardType === "week" && "Weekly Best"}
-                  {leaderboardType === "month" && "Monthly Best"}
-                  {leaderboardType === "streaks" && "Longest Streaks"}
-                  {leaderboardType === "completions" && "Most Completions"}
-                  {leaderboardType === "alltime" && `All-Time Best (${allTimeGrid})`}
+                  {leaderboardType === "today" && "Daily puzzle"}
+                  {leaderboardType === "week" && "Weekly totals"}
+                  {leaderboardType === "month" && "Monthly totals"}
+                  {leaderboardType === "streaks" && "Longest streaks"}
+                  {leaderboardType === "completions" && "All-time completions"}
+                  {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
                 </h2>
                 {leaderboardType === "today" &&
                   renderTimeLeaderboard(leaderboard, "No completions yet. Be the first!")}
-                {(leaderboardType === "week" || leaderboardType === "month") &&
-                  renderTimeLeaderboard(
-                    leaderboard,
-                    `No completions in this period yet.`,
+                {leaderboardType === "week" &&
+                  renderCompletionLeaderboard(
+                    weeklyTotalsLeaderboard,
+                    "No completions in the last 7 days.",
+                  )}
+                {leaderboardType === "month" &&
+                  renderCompletionLeaderboard(
+                    monthlyTotalsLeaderboard,
+                    "No completions in the last 30 days.",
                   )}
                 {leaderboardType === "streaks" &&
                   renderStreakLeaderboard(streakLeaderboard)}
                 {leaderboardType === "completions" &&
-                  renderCompletionLeaderboard(completionLeaderboard)}
+                  renderCompletionLeaderboard(
+                    completionLeaderboard,
+                    "No completions yet. Play puzzles!",
+                  )}
                 {leaderboardType === "alltime" &&
                   renderTimeLeaderboard(
                     leaderboard,
