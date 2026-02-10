@@ -11,19 +11,23 @@ export type SamplePuzzle = {
 /**
  * Auto-discover puzzle images from /src/assets/puzzles/ folder
  *
- * Folder structure:
+ * Folder structure (one level or subfolders):
  *   /src/assets/puzzles/
  *     nature/
  *       mountain-lake.jpg
- *       autumn-forest.jpg
  *     animals/
- *       colorful-parrot.jpg
+ *       bear.png
+ *     animals/
+ *       cute/
+ *         kitten.png
+ *       realistic/
+ *         wolf.png
  *
- * Category = folder name
+ * Category = path under puzzles (e.g. "animals", "animals/cute", "animals/realistic")
  * Puzzle name = filename (kebab-case converted to Title Case)
  */
 
-// Use Vite's glob import to find all images in src/assets/puzzles
+// Use Vite's glob import to find all images in src/assets/puzzles (any depth)
 const puzzleImages = import.meta.glob<{ default: string }>(
   "@/assets/puzzles/**/*.{jpg,jpeg,png,webp}",
   { eager: true },
@@ -34,19 +38,19 @@ function kebabToTitle(str: string): string {
 }
 
 function parsePuzzlePath(path: string, imageUrl: string): SamplePuzzle | null {
-  // Path format: various patterns depending on how Vite resolves
-  // Try to extract category/filename from the path
-  const match = path.match(/puzzles\/([^/]+)\/([^/]+)\.(jpg|jpeg|png|webp)$/i);
+  // Match puzzles/.../filename.ext (any depth under puzzles)
+  const match = path.match(/puzzles\/(.+)\/([^/]+)\.(jpg|jpeg|png|webp)$/i);
   if (!match) return null;
 
-  const [, category, filename] = match;
-  const id = `${category}-${filename}`;
+  const [, categoryPath, filename] = match;
+  const category = categoryPath.toLowerCase();
+  const id = `${categoryPath.replace(/\//g, "-")}-${filename}`.toLowerCase();
   const name = kebabToTitle(filename);
 
   return {
     id,
     name,
-    category: category.toLowerCase(),
+    category,
     thumbnail: imageUrl,
     fullImage: imageUrl,
   };
