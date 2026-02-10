@@ -69,9 +69,7 @@ export function usePlayScreenAnimation(args: {
       const dragState = manager.getDragState();
       const isDragging = dragState.activeId != null;
       const completionElapsed =
-        st.isComplete && completedAtRef.current
-          ? now - completedAtRef.current
-          : Infinity;
+        st.isComplete && completedAtRef.current ? now - completedAtRef.current : Infinity;
       const inCompletionFlourish = completionElapsed < 800;
       const pieceCount = st.pieces.length;
       const throttleIdle =
@@ -88,7 +86,10 @@ export function usePlayScreenAnimation(args: {
       const cssH = Math.max(1, Math.floor(rect.height));
       const dpr = window.devicePixelRatio || 1;
 
-      if (canvas.width !== Math.floor(cssW * dpr) || canvas.height !== Math.floor(cssH * dpr)) {
+      if (
+        canvas.width !== Math.floor(cssW * dpr) ||
+        canvas.height !== Math.floor(cssH * dpr)
+      ) {
         const targetW = Math.floor(cssW * dpr);
         const targetH = Math.floor(cssH * dpr);
         canvas.width = targetW;
@@ -107,8 +108,7 @@ export function usePlayScreenAnimation(args: {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const assembledW = st.grid.cols * firstPiece.tileW;
       const assembledH = st.grid.rows * firstPiece.tileH;
-      if (st.isComplete && !completedAtRef.current)
-        completedAtRef.current = now;
+      if (st.isComplete && !completedAtRef.current) completedAtRef.current = now;
       else if (!st.isComplete) completedAtRef.current = null;
       const draggedGroupId = dragState.activeId
         ? (st.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)

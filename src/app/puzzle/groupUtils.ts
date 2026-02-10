@@ -52,10 +52,7 @@ export function getGroupBounds(pieces: Piece[], groupId: string): GroupBounds | 
 }
 
 /** Check if two axis-aligned bounds intersect. */
-function boundsIntersect(
-  a: GroupBounds,
-  b: GroupBounds,
-): boolean {
+function boundsIntersect(a: GroupBounds, b: GroupBounds): boolean {
   return !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
 }
 
