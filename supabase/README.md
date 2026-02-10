@@ -1,6 +1,6 @@
 # Supabase Setup for Phuzzle
 
-Phuzzle uses Supabase for player statistics, leaderboards, and achievements.
+Phuzzle uses Supabase for player statistics, leaderboards, and achievements. The app is a PWA (installable from the browser); Supabase is used when the user is online.
 
 ## 1. Create a Supabase project
 

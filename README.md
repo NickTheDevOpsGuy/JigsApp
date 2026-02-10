@@ -20,6 +20,8 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 - [Roadmap](#-roadmap)
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
+- [Testing](#testing)
+- [PWA](#pwa)
 - [Adding Sample Puzzles](#-adding-sample-puzzles)
 - [Project Structure](#-project-structure)
 - [Contributing](#-contributing)
@@ -124,6 +126,13 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Resume across browser sessions
 - Resume prompt on return (Resume / Start Fresh / Back to Home)
 
+### PWA (Progressive Web App)
+
+- **Installable** — Add to Home Screen (iOS/Android) or Install app (Chrome/Edge) from the live site.
+- **Manifest** — Name, icons (192×192, 512×512), theme color, standalone display, start URL.
+- **Service worker** — Auto-updating; precaches JS, CSS, HTML, and assets for faster repeat loads and basic offline support.
+- **Apple** — `apple-mobile-web-app-capable`, `apple-touch-icon`, status bar style.
+
 ---
 
 ## Roadmap
@@ -138,11 +147,12 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 | **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                                                                                                                                                                  |
 | **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                                                                                                                                                                       |
 | **UX**      | Help menu (How to Play + Keyboard & Controls, reduced cognitive load) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count |
+| **PWA**     | Installable app (manifest, service worker, offline precache) via vite-plugin-pwa                                                                                                                                                                                                                                                                                                                                                                |
 
 ### Planned
 
 - Import puzzle from URL
-- PWA / offline support
+- Offline-first gameplay (e.g. play without network after first load)
 
 ---
 
@@ -158,14 +168,16 @@ Rendering and interaction are tuned for large puzzles:
 
 ## Tech Stack
 
-| Category  | Tools          |
-| --------- | -------------- |
-| Framework | React          |
-| Language  | TypeScript     |
-| Build     | Vite           |
-| Rendering | HTML Canvas    |
-| CI/CD     | GitHub Actions |
-| Hosting   | Vercel         |
+| Category  | Tools                           |
+| --------- | ------------------------------- |
+| Framework | React                           |
+| Language  | TypeScript                      |
+| Build     | Vite                            |
+| Rendering | HTML Canvas                     |
+| PWA       | vite-plugin-pwa (Workbox)       |
+| Testing   | Vitest (unit), Playwright (E2E) |
+| CI/CD     | GitHub Actions                  |
+| Hosting   | Vercel                          |
 
 ---
 
@@ -178,28 +190,47 @@ npm install
 npm run dev
 ```
 
+**Useful scripts:** `npm run build` (production build), `npm run test` (unit tests), `npm run test:e2e` (E2E; run `npx playwright install` once for browsers), `npm run preview` (preview production build locally).
+
+---
+
+## Testing
+
+- **Unit tests (Vitest)** — `npm run test` (single run), `npm run test:watch` (watch), `npm run test:ui` (UI). Tests live next to source (`*.test.ts` / `*.test.tsx`). Config: `vite.config.ts` `test` block.
+- **E2E tests (Playwright)** — `npm run test:e2e` (starts dev server, runs `e2e/*.spec.ts`). First time: `npx playwright install`. Config: `playwright.config.ts`. CI runs Chromium only.
+
+Pre-push (Husky) runs: empty-file check, Prettier, ESLint, TypeScript, and unit tests.
+
+---
+
+## PWA
+
+Phuzzle is a **Progressive Web App**: users can install it from the browser for a standalone app experience.
+
+- **Manifest** — Generated at build; defines name, short name, icons, theme color, `display: standalone`, start URL. Icons: `public/icon-192.png`, `public/icon-512.png`.
+- **Service worker** — Generated by `vite-plugin-pwa` (Workbox); precaches built assets; `registerType: "autoUpdate"` so updates apply on next load.
+- **Install** — On supported browsers (Chrome, Edge, Safari, etc.), use “Install” / “Add to Home Screen” when visiting the deployed site (e.g. phuzzle.vercel.app). No app-store submission required.
+
 ---
 
 ## Adding Sample Puzzles
 
-Drop images into:
-
-```
-src/app/assets/puzzles/<category>/
-```
-
-Example:
+Drop images into `src/app/assets/puzzles/`. You can use **one level** (e.g. `animals/`) or **subfolders** (e.g. `animals/cute/`, `animals/realistic/`).
 
 ```
 src/app/assets/puzzles/
   animals/
-    kitten.png
+    bear.png
+    cute/
+      kitten.png
+    realistic/
+      wolf.png
   nature/
     mountain.jpg
 ```
 
-Images are auto-discovered.  
-Category = folder name, puzzle name = filename.
+Images are auto-discovered at any depth.  
+**Category** = path under `puzzles/` (e.g. `animals`, `animals/cute`, `animals/realistic`). **Puzzle name** = filename (kebab-case → Title Case).
 
 ---
 
@@ -214,10 +245,16 @@ Category = folder name, puzzle name = filename.
 | `src/app/audio/`              | Sound effects                                                                                                     |
 | `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, anonymous raccoon names, sample puzzles |
 | `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                               |
-| `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                                  |
+| `src/app/assets/puzzles/`     | Sample puzzle images by category (animals, flowers, food, space, tech; subfolders supported)                      |
+| `public/`                     | Favicon, PWA icons (icon-192.png, icon-512.png)                                                                   |
 | `e2e/`                        | Playwright E2E tests (e.g. home.spec.ts)                                                                          |
+| `scripts/`                    | Pre-push precheck (empty files, Prettier, ESLint, TypeScript, unit tests)                                         |
+| `.husky/`                     | Git hooks: pre-commit (empty files, node_modules check), pre-push (runs precheck)                                 |
+| `src/types/`                  | TypeScript declarations (e.g. canvas-confetti, vite-env)                                                          |
+| `.github/`                    | Issue templates, workflows (Phuzzle.yml, vercel-production.yml), pull_request_template.md                         |
+| `supabase/`                   | Migrations (001_initial_schema.sql, 002_player_profiles.sql), Supabase setup README                               |
 
-Root configs: `vite.config.ts` (Vite + Vitest), `playwright.config.ts` (Playwright). Unit tests live alongside source (e.g. `*.test.ts`).
+Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwright.config.ts` (Playwright). Unit tests live alongside source (e.g. `*.test.ts`). Release notes / changelog: `CHANGELOG_UPDATE.md`.
 
 <details>
 <summary>📁 Click to expand file structure</summary>
@@ -241,7 +278,9 @@ Root configs: `vite.config.ts` (Vite + Vitest), `playwright.config.ts` (Playwrig
 │   ├── pre-commit
 │   └── pre-push
 ├── public
-│   └── favicon.svg
+│   ├── favicon.svg
+│   ├── icon-192.png
+│   └── icon-512.png
 ├── e2e
 │   └── home.spec.ts
 ├── scripts
@@ -252,17 +291,33 @@ Root configs: `vite.config.ts` (Vite + Vitest), `playwright.config.ts` (Playwrig
 │   │   │   ├── puzzles
 │   │   │   │   ├── animals
 │   │   │   │   │   ├── bear.png
-│   │   │   │   │   └── rabbit.png
+│   │   │   │   │   ├── cat.png
+│   │   │   │   │   ├── fox.png
+│   │   │   │   │   ├── rabbit.png
+│   │   │   │   │   └── racoon-8bit.png
 │   │   │   │   ├── flowers
 │   │   │   │   │   ├── daisy.png
 │   │   │   │   │   ├── flower_bed.png
 │   │   │   │   │   ├── lavender.png
 │   │   │   │   │   └── sunflower.png
-│   │   │   │   └── food
-│   │   │   │       ├── charcuterie_board.png
-│   │   │   │       ├── curries_and_rice.png
-│   │   │   │       ├── fruit_platter.png
-│   │   │   │       └── pasta_dishes.png
+│   │   │   │   ├── food
+│   │   │   │   │   ├── charcuterie_board.png
+│   │   │   │   │   ├── curries_and_rice.png
+│   │   │   │   │   ├── fruit_platter.png
+│   │   │   │   │   ├── pasta_dishes.png
+│   │   │   │   │   ├── strawbery_shortcake.png
+│   │   │   │   │   ├── tacos.png
+│   │   │   │   │   └── warmcoco.png
+│   │   │   │   ├── space
+│   │   │   │   │   ├── nebual.png
+│   │   │   │   │   ├── outterspace.png
+│   │   │   │   │   ├── outterspace2.png
+│   │   │   │   │   └── saturn.png
+│   │   │   │   └── tech
+│   │   │   │       ├── 404.png
+│   │   │   │       ├── computer-404.png
+│   │   │   │       ├── racoon-computer.png
+│   │   │   │       └── racoon-matrix.png
 │   │   │   └── ui
 │   │   │       └── phuzzle-logo-512.png
 │   │   ├── audio
@@ -417,6 +472,7 @@ Root configs: `vite.config.ts` (Vite + Vitest), `playwright.config.ts` (Playwrig
 │   │   ├── 001_initial_schema.sql
 │   │   └── 002_player_profiles.sql
 │   └── README.md
+├── CHANGELOG_UPDATE.md
 ├── .env.example
 ├── .gitignore
 ├── .prettierignore
@@ -452,6 +508,8 @@ If you want to:
 - improve performance
 - add features
 - learn how puzzle engines work
+
+Before submitting a PR: run `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`. E2E: `npm run test:e2e` (optional; requires `npx playwright install` once).
 
 **DM us** to join the Discord and get involved.
 

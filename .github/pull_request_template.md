@@ -15,6 +15,9 @@ Brief description of what this PR does and why.
 
 - [ ] I have tested these changes locally
 - [ ] I have tested these changes in multiple browsers/environments if applicable
+- [ ] `npm run test` (unit tests) passes
+- [ ] `npm run build` succeeds
+- [ ] If UI/routing changed: tested PWA install/update (or noted N/A)
 
 ## Checklist
 
@@ -22,15 +25,18 @@ Brief description of what this PR does and why.
 - [ ] I have performed a self-review of my code
 - [ ] I have commented my code where necessary
 - [ ] My changes generate no new warnings or errors
-- [ ] I have updated documentation if needed
+- [ ] I have updated documentation (e.g. README) if needed
 
 ## How to Test
 
-1. Check out my changes
-2. Run `npm i`
-3. Run `npm run build`
-4. Run `npm dev:host`
-5. Test on both mobile and desktop
+1. Check out this branch
+2. Run `npm install`
+3. Run `npm run test` (unit tests)
+4. Run `npm run build`
+5. Run `npm run dev` or `npm run dev:host`
+6. Test on both mobile and desktop
+7. (Optional) Run `npm run test:e2e` after `npx playwright install`
+8. (Optional) For PWA: run `npm run preview` and use Install / Add to Home Screen
 
 ## Screenshots (if applicable)
 

@@ -1,6 +1,6 @@
 # 👥 Contributors
 
-Thanks to everyone who has helped make **ClocksAbound** possible!
+Thanks to everyone who has helped make **Phuzzle** possible!
 
 ---
 
