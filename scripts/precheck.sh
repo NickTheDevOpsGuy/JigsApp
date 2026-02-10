@@ -89,5 +89,13 @@ if ! npx --no-install tsc --noEmit --pretty false; then
 fi
 echo "✅ [SUCCESS]: Types are verified."
 
+# 5. UNIT TESTS (Vitest)
+echo "🧪 [STEP 5]: Running unit tests (Vitest)..."
+if ! npm run test; then
+  echo "🛑 [SYSTEM FAULT]: Unit tests failed. Fix the red dots!"
+  exit 1
+fi
+echo "✅ [SUCCESS]: All unit tests passed."
+
 echo "----------------------------------------------------------------"
 echo "🚀 [SYSTEM AUDIT COMPLETE]: All systems nominal."

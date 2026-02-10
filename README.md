@@ -111,7 +111,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Accessibility & Controls
 
-- **Help modal** — Main menu and play screen: "Help" opens How to Play + Keyboard shortcuts (all devices)
+- **Help menu** — Main menu and play screen: "Help" presents two clear options: **How to Play** (gameplay basics) and **Keyboard & Controls** (shortcuts, mouse/touch, zoom/pan). No duplicate content; each flow has a single focus.
 - Keyboard shortcuts (Tab, arrows, R to rotate, ? or F1 for help, Ctrl+Z/Y undo/redo)
 - First-time tutorial overlay
 - Settings sub-menus — Game (time, ghost, lock), View (theme, preview, fullscreen), Audio (sound, haptics)
@@ -137,12 +137,22 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 | **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                                                                                                           |
 | **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                                                                                                       |
 | **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                                                                                                            |
-| **UX**      | Help modal · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count |
+| **UX**      | Help menu (How to Play + Keyboard & Controls, reduced cognitive load) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count |
 
 ### Planned
 
 - Import puzzle from URL
 - PWA / offline support
+
+---
+
+## Performance (100+ piece puzzles)
+
+Rendering and interaction are tuned for large puzzles:
+
+- **Canvas redraw** – When idle (no drag, no completion animation), the board redraw is throttled to 30fps for puzzles with 50+ pieces to reduce CPU/GPU load. During drag or completion flourish, it runs at full frame rate.
+- **Snap calculations** – A single (row, col) → piece map is built per snap check so neighbor lookups are O(1). Only *boundary* pieces of the dragged group (those with a neighbor outside the group) are considered for neighbor snap, cutting work for large groups.
+- **Overlap checks** – Before testing piece-vs-piece overlap, group bounds are compared; only groups whose bounding boxes intersect the moved group are checked in detail.
 
 ---
 
@@ -205,6 +215,9 @@ Category = folder name, puzzle name = filename.
 | `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, anonymous raccoon names, sample puzzles |
 | `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                               |
 | `src/app/assets/puzzles/`     | Sample puzzle images by category                                                                                  |
+| `e2e/`                        | Playwright E2E tests (e.g. home.spec.ts)                                                                         |
+
+Root configs: `vite.config.ts` (Vite + Vitest), `playwright.config.ts` (Playwright). Unit tests live alongside source (e.g. `*.test.ts`).
 
 <details>
 <summary>📁 Click to expand file structure</summary>
@@ -229,6 +242,8 @@ Category = folder name, puzzle name = filename.
 │   └── pre-push
 ├── public
 │   └── favicon.svg
+├── e2e
+│   └── home.spec.ts
 ├── scripts
 │   └── precheck.sh
 ├── src
@@ -363,6 +378,7 @@ Category = folder name, puzzle name = filename.
 │   │   │   │   │   └── useViewport.ts
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
+│   │   │   │   ├── playScreenUtils.test.ts
 │   │   │   │   ├── playScreenUtils.ts
 │   │   │   │   ├── playUtils.ts
 │   │   │   │   └── timeMode.ts
@@ -411,6 +427,7 @@ Category = folder name, puzzle name = filename.
 ├── LICENSE.md
 ├── package-lock.json
 ├── package.json
+├── playwright.config.ts
 ├── README.md
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo

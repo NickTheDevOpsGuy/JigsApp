@@ -103,3 +103,11 @@ $RECYCLE.BIN/
 
 # Vite / tooling temp
 .vite/
+
+# =========================
+# Tests
+# =========================
+test-results/
+playwright-report/
+playwright/.cache/
+.vitest/

@@ -44,3 +44,12 @@ jobs:
 
       - name: 🏗️ Build
         run: npm run build
+
+      - name: 🧪 Unit tests (Vitest)
+        run: npm run test
+
+      - name: 📦 Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: 🎭 E2E tests (Playwright)
+        run: npx playwright test --project=chromium
