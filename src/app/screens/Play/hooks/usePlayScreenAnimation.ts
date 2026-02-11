@@ -19,6 +19,7 @@ export function usePlayScreenAnimation(args: {
   snapParticlesRef?: React.RefObject<SnapParticle[]>;
   debug: DebugFlags;
   showGhostHint: boolean;
+  showPieceBorders: boolean;
   viewport: ViewportState;
 }) {
   const {
@@ -34,6 +35,7 @@ export function usePlayScreenAnimation(args: {
     snapParticlesRef,
     debug,
     showGhostHint,
+    showPieceBorders,
     viewport,
   } = args;
 
@@ -135,6 +137,7 @@ export function usePlayScreenAnimation(args: {
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
           showGhostHint,
+          showPieceBorders,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
         },
         pieceCache,
@@ -159,5 +162,5 @@ export function usePlayScreenAnimation(args: {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [manager, debug, showGhostHint, setState, viewport, snapParticlesRef]);
+  }, [manager, debug, showGhostHint, showPieceBorders, setState, viewport, snapParticlesRef]);
 }

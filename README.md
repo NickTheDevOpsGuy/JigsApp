@@ -110,13 +110,15 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Display names and profile (Stats → Profile)
 - Achievements system
 - Share completed puzzle image
+- **Share app / Invite testers** — Main menu button: native share (mobile) or copy link to invite others to try the app
 
 ### Accessibility & Controls
 
 - **Help menu** — Main menu and play screen: "Help" presents two clear options: **How to Play** (gameplay basics) and **Keyboard & Controls** (shortcuts, mouse/touch, zoom/pan). No duplicate content; each flow has a single focus.
 - Keyboard shortcuts (Tab, arrows, R to rotate, ? or F1 for help, Ctrl+Z/Y undo/redo)
 - First-time tutorial overlay
-- Settings sub-menus — Game (time, ghost, lock), View (theme, preview, fullscreen), Audio (sound, haptics)
+- Settings sub-menus — Game (time, ghost, lock), View (theme, preview, **piece borders**, fullscreen), Audio (sound, haptics)
+- **Piece borders** — Optional overlay (Settings → View) to show jigsaw cut lines on the board
 - Undo · Redo · Ghost hint · Lock pieces (optional)
 - Designed for relaxed, low-pressure play
 
@@ -146,7 +148,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 | **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                                                                                                                                                                      |
 | **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                                                                                                                                                                  |
 | **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                                                                                                                                                                       |
-| **UX**      | Help menu (How to Play + Keyboard & Controls, reduced cognitive load) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count |
+| **UX**      | Help menu (How to Play + Keyboard & Controls, reduced cognitive load) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Piece borders option (View) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count · Share app / Invite testers (main menu) |
 | **PWA**     | Installable app (manifest, service worker, offline precache) via vite-plugin-pwa                                                                                                                                                                                                                                                                                                                                                                |
 
 ### Planned

@@ -2,6 +2,7 @@ export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
 export const GHOST_HINT_KEY = "phuzzle:ghostHint";
+export const PIECE_BORDERS_KEY = "phuzzle:pieceBorders";
 
 export const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
 
@@ -29,9 +30,9 @@ export function computeTileSize(
   const pieceCount = grid.rows * grid.cols;
 
   // Mobile: scale down pieces as count increases so puzzle fits and feels playable
-  // (avoids "technically working, experientially wrong" - cramped boards)
+  // Use 16/pieceCount so 16-piece stays full size; avoid over-shrinking small puzzles
   if (isMobile && pieceCount > 6) {
-    const scale = Math.max(0.55, Math.min(1, 14 / pieceCount));
+    const scale = Math.max(0.55, Math.min(1, 16 / pieceCount));
     tile = Math.floor(tile * scale);
   }
 
@@ -40,18 +41,19 @@ export function computeTileSize(
   let maxTile: number;
 
   if (isMobile) {
+    // Slightly larger minimums so pieces stay tappable and readable
     if (pieceCount <= 9) {
-      minTile = 42;
-      maxTile = 72;
+      minTile = 44;
+      maxTile = 76;
     } else if (pieceCount <= 16) {
-      minTile = 36;
-      maxTile = 60;
+      minTile = 38;
+      maxTile = 64;
     } else if (pieceCount <= 25) {
-      minTile = 30;
-      maxTile = 48;
+      minTile = 32;
+      maxTile = 52;
     } else {
-      minTile = 24;
-      maxTile = 40;
+      minTile = 26;
+      maxTile = 44;
     }
   } else {
     if (pieceCount <= 9) {

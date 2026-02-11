@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MenuScreen.module.css";
 
@@ -18,11 +18,14 @@ import {
   Sparkles,
   Camera,
   Palette,
+  Share2,
 } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
 import { getMenuTip } from "@/data/menuTips";
+
+const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
 
 export function MenuScreen() {
   const nav = useNavigate();
@@ -32,6 +35,30 @@ export function MenuScreen() {
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState("");
+
+  const handleInviteTesters = useCallback(async () => {
+    const title = "Phuzzle";
+    const text = "Try Phuzzle – a cozy jigsaw puzzle game. I'd love your feedback!";
+    const url = APP_URL || "https://phuzzle.vercel.app";
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+        setShareFeedback("Thanks for sharing!");
+      } catch (err) {
+        if ((err as Error)?.name !== "AbortError") setShareFeedback("Share cancelled");
+      }
+      setTimeout(() => setShareFeedback(""), 3000);
+    } else {
+      try {
+        await navigator.clipboard?.writeText(url);
+        setShareFeedback("Link copied! Share it to invite testers.");
+      } catch {
+        setShareFeedback("Copy failed – share " + url);
+      }
+      setTimeout(() => setShareFeedback(""), 3000);
+    }
+  }, []);
 
   const todayCompleted = isTodayDailyCompleted();
   const hasDaily = SAMPLE_PUZZLES.length > 0;
@@ -112,8 +139,22 @@ export function MenuScreen() {
             <Sparkles size={20} />
             <span className={styles.actionLabel}>What&apos;s New</span>
           </Button>
+
+          <Button
+            variant="secondary"
+            onClick={handleInviteTesters}
+            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
+          >
+            <Share2 size={20} />
+            <span className={styles.actionLabel}>Share app / Invite testers</span>
+          </Button>
         </div>
 
+        {shareFeedback ? (
+          <p className={styles.shareFeedback} role="status">
+            {shareFeedback}
+          </p>
+        ) : null}
         <p className={styles.menuTip}>{getMenuTip()}</p>
       </div>
 

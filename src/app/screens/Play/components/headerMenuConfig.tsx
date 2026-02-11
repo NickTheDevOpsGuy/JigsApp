@@ -22,6 +22,7 @@ export type HeaderMenuProps = {
   hapticsEnabled: boolean;
   pieceLockingEnabled: boolean;
   showGhostHint: boolean;
+  showPieceBorders: boolean;
   isFullscreen: boolean;
   canShowHaptics: boolean;
   canShowFullscreen: boolean;
@@ -34,6 +35,7 @@ export type HeaderMenuProps = {
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
   onToggleGhostHint: () => void;
+  onTogglePieceBorders: () => void;
   onToggleFullscreen: () => void;
   onShowShortcuts: () => void;
   onShowHowToPlay: () => void;
@@ -194,6 +196,15 @@ export function buildMenuItems(
       label: props.showPreview ? "Hide preview" : "Show preview",
       sortKey: "Show preview",
       onClick: c(props.onTogglePreview),
+      subMenu: "view",
+    },
+    {
+      id: "pieceBorders",
+      section: "settings",
+      visible: true,
+      label: props.showPieceBorders ? "Piece borders: on" : "Piece borders: off",
+      sortKey: "Piece borders",
+      onClick: c(props.onTogglePieceBorders),
       subMenu: "view",
     },
     {

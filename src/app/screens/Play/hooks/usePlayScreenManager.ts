@@ -154,6 +154,11 @@ export function usePlayScreenManager(
           clearPuzzleState();
         }
 
+        // More forgiving snap on mobile so pieces lock reliably despite touch jitter
+        const snapTolerancePx = isMobile
+          ? Math.min(56, Math.max(44, Math.round(pieceSize * 1.2)))
+          : 40;
+
         const next = new PuzzleManager(
           {
             imageUrl,
@@ -162,6 +167,7 @@ export function usePlayScreenManager(
             grid,
             pieceWidth: pieceSize,
             pieceHeight: pieceSize,
+            snapTolerancePx,
           },
           {
             onPiecePlaced: (p) => {

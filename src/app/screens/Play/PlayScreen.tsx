@@ -46,6 +46,8 @@ export function PlayScreen() {
     setPieceLockingEnabled,
     showGhostHint,
     setShowGhostHint,
+    showPieceBorders,
+    setShowPieceBorders,
     debug,
     showPreview,
     setShowPreview,
@@ -291,6 +293,7 @@ export function PlayScreen() {
     snapParticlesRef,
     debug,
     showGhostHint,
+    showPieceBorders,
     viewport: viewport.viewport,
   });
 
@@ -366,6 +369,7 @@ export function PlayScreen() {
             hapticsEnabled={hapticsEnabled}
             pieceLockingEnabled={pieceLockingEnabled}
             showGhostHint={showGhostHint}
+            showPieceBorders={showPieceBorders}
             isFullscreen={ui.isFullscreen}
             canShowHaptics={isCoarsePointer && typeof navigator?.vibrate === "function"}
             canShowFullscreen={!!document.fullscreenEnabled}
@@ -378,6 +382,7 @@ export function PlayScreen() {
             onToggleHaptics={toggleHaptics}
             onTogglePieceLocking={() => setPieceLockingEnabled((p) => !p)}
             onToggleGhostHint={() => setShowGhostHint((g) => !g)}
+            onTogglePieceBorders={() => setShowPieceBorders((b) => !b)}
             onToggleFullscreen={toggleFullscreen}
             onShowShortcuts={() => setShowShortcuts(true)}
             onShowHowToPlay={() => setShowHowToPlay(true)}
