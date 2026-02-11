@@ -162,5 +162,13 @@ export function usePlayScreenAnimation(args: {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [manager, debug, showGhostHint, showPieceBorders, setState, viewport, snapParticlesRef]);
+  }, [
+    manager,
+    debug,
+    showGhostHint,
+    showPieceBorders,
+    setState,
+    viewport,
+    snapParticlesRef,
+  ]);
 }

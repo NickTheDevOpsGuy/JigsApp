@@ -169,10 +169,7 @@ export function renderBoard(
 /**
  * Draw piece borders (jigsaw cut lines) on the board when the option is enabled.
  */
-function drawPieceBorders(
-  ctx: CanvasRenderingContext2D,
-  pieces: Piece[],
-): void {
+function drawPieceBorders(ctx: CanvasRenderingContext2D, pieces: Piece[]): void {
   ctx.save();
   ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
   ctx.lineWidth = 1;
