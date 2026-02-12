@@ -54,7 +54,8 @@ Phuzzle is a fully interactive jigsaw puzzle experience focused on:
 - Mobile-first usability
 - Clean, maintainable game logic
 
-Purpose:  
+Purpose:
+
 A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ---

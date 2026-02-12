@@ -547,6 +547,19 @@ export class PuzzleManager {
     this.trySnapActiveGroupToNeighbor();
     this.trySnapActiveGroupToBoard();
 
+    // If the dropped group is off the board, clamp it back so pieces don't stay off canvas
+    const activeId = this.drag.activeId;
+    const active = this.findPiece(activeId);
+    if (active && !active.isPlaced && !active.inTray) {
+      const gid = active.groupId;
+      const b = this.getGroupBounds(gid);
+      if (b) {
+        const dx = _clamp(0, -this.pad - b.minX, this.boardWidth + this.pad - b.maxX);
+        const dy = _clamp(0, -this.pad - b.minY, this.boardHeight + this.pad - b.maxY);
+        if (dx !== 0 || dy !== 0) this.shiftGroup(gid, dx, dy);
+      }
+    }
+
     // Clear drag state
     this.drag = {
       activeId: null,
