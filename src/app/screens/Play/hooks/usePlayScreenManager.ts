@@ -96,7 +96,11 @@ export function usePlayScreenManager(
         const availH = Math.max(minAvail, Math.floor(effectiveH) - 24);
 
         // Compute square tile size (smaller on mobile for better fit)
-        const pieceSize = computeTileSize(availW, availH, grid, viewportW);
+        let pieceSize = computeTileSize(availW, availH, grid, viewportW);
+        // Cap so the full board always fits in available space (fixes large puzzles)
+        const maxPieceByW = Math.max(1, Math.floor(availW / grid.cols));
+        const maxPieceByH = Math.max(1, Math.floor(availH / grid.rows));
+        pieceSize = Math.min(pieceSize, maxPieceByW, maxPieceByH);
 
         // Board: match piece grid so canvas size = puzzle size (no extra empty space)
         const minBoardW = grid.cols * pieceSize;

@@ -620,7 +620,21 @@ export class PuzzleManager {
     if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
     if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
 
-    this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
+    const shiftX = Math.round(dx);
+    const shiftY = Math.round(dy);
+    this.shiftGroupUnclamped(gid, shiftX, shiftY);
+
+    // Only mark as placed if every piece in the group is at its correct position (prevents locking to edges or wrong spots)
+    const afterShift = this.getGroupPieces(gid);
+    const allAtTarget = afterShift.every((p) => {
+      const tile = this.tilePos(p);
+      const dist = Math.hypot(p.targetX - tile.x, p.targetY - tile.y);
+      return dist <= this.snapTolerancePx;
+    });
+    if (!allAtTarget) {
+      this.shiftGroupUnclamped(gid, -shiftX, -shiftY);
+      return false;
+    }
 
     const wasLocked = new Set(groupPieces.filter((p) => p.locked).map((p) => p.id));
     this.updatePieces(
