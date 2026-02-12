@@ -68,6 +68,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 - Drag-and-drop jigsaw pieces with rotation
 - Classic interlocking piece shapes with board and neighbor snapping
+- **Forgiving snap** — generous tolerance so “close” locks without forcing; piece-to-piece (neighbor) snap uses a slightly larger zone so left-to-right or right-to-left both lock
 - Group merging — connected pieces move together
 - Multiple difficulty levels (3×3 to 6×6 grids, custom sizes)
 - Image sources: gallery, file upload, or camera capture
@@ -79,7 +80,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - Reference image preview overlay
 - Progress counter and timer (elapsed, countdown, active-only, relaxed, best time)
 - Confetti on completion (theme-colored); random completion headline (e.g. "You did it!", "Puzzle master!")
-- Sound effects (snap, rotate, place, complete, undo/redo)
+- Sound effects (snap, rotate, place, complete, undo/redo) · **Background music** (MP3, loop; toggle in Menu → Settings → Audio → Music)
 - Fullscreen mode · Multiple themes (Light, Dark, Space, Ocean, Forest, Sunset)
 - Theme as full action card on main menu (no floating toggle)
 - What's New popup for updates
@@ -117,10 +118,14 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 - **Help menu** — Main menu and play screen: "Help" presents two clear options: **How to Play** (gameplay basics) and **Keyboard & Controls** (shortcuts, mouse/touch, zoom/pan). No duplicate content; each flow has a single focus.
 - Keyboard shortcuts (Tab, arrows, R to rotate, ? or F1 for help, Ctrl+Z/Y undo/redo)
 - First-time tutorial overlay
-- Settings sub-menus — Game (time, ghost, lock), View (theme, preview, **piece borders**, fullscreen), Audio (sound, haptics)
+- Settings sub-menus — Game (time, ghost, lock), View (theme, preview, piece borders, fullscreen), Audio (sound, **music**, haptics)
 - **Piece borders** — Optional overlay (Settings → View) to show jigsaw cut lines on the board
 - Undo · Redo · Ghost hint · Lock pieces (optional)
 - Designed for relaxed, low-pressure play
+
+### Analytics (optional)
+
+- **PostHog** — Optional integration for who is playing, events (e.g. puzzle_started, puzzle_completed), and stats. Set `VITE_POSTHOG_KEY` and `VITE_POSTHOG_HOST`; view data at [app.posthog.com](https://app.posthog.com). No route in the app.
 
 ### Persistence
 
@@ -148,7 +153,8 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 | **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                                                                                                                                                                                                                                         |
 | **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| **UX**      | Help menu (How to Play + Keyboard & Controls, reduced cognitive load) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Piece borders option (View) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count · Share app / Invite testers (main menu) |
+| **UX**      | Help menu (How to Play + Keyboard & Controls, reduced cognitive load) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Piece borders (View) · Music on/off (Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count · Share app / Invite testers (main menu) · Forgiving snap (board + neighbor, left/right both lock) |
+| **Analytics** | PostHog (optional): puzzle_started, puzzle_completed, identify; env vars for key/host |
 | **PWA**     | Installable app (manifest, service worker, offline precache) via vite-plugin-pwa                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 ### Planned
@@ -163,7 +169,7 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 Rendering and interaction are tuned for large puzzles:
 
 - **Canvas redraw** – When idle (no drag, no completion animation), the board redraw is throttled to 30fps for puzzles with 50+ pieces to reduce CPU/GPU load. During drag or completion flourish, it runs at full frame rate.
-- **Snap calculations** – A single (row, col) → piece map is built per snap check so neighbor lookups are O(1). Only _boundary_ pieces of the dragged group (those with a neighbor outside the group) are considered for neighbor snap, cutting work for large groups.
+- **Snap calculations** – A single (row, col) → piece map is built per snap check so neighbor lookups are O(1). Only _boundary_ pieces of the dragged group are considered for neighbor snap. Board snap and neighbor snap use tuned tolerances (neighbor slightly more forgiving so left-to-right or right-to-left both lock).
 - **Overlap checks** – Before testing piece-vs-piece overlap, group bounds are compared; only groups whose bounding boxes intersect the moved group are checked in detail.
 
 ---
@@ -263,7 +269,7 @@ Images are auto-discovered at any depth.
 | `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, anonymous raccoon names, sample puzzles |
 | `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                               |
 | `src/app/assets/puzzles/`     | Sample puzzle images by category (animals, flowers, food, space, tech; subfolders supported)                      |
-| `public/`                     | Favicon, PWA icons (icon-192.png, icon-512.png)                                                                   |
+| `public/`                     | Favicon, PWA icons (icon-192.png, icon-512.png), `music/` (add background.mp3 for in-game music)                 |
 | `e2e/`                        | Playwright E2E tests (e.g. home.spec.ts)                                                                          |
 | `scripts/`                    | Pre-push precheck (empty files, Prettier, ESLint, TypeScript, unit tests)                                         |
 | `.husky/`                     | Git hooks: pre-commit (empty files, node_modules check), pre-push (runs precheck)                                 |
@@ -297,7 +303,9 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 ├── public
 │   ├── favicon.svg
 │   ├── icon-192.png
-│   └── icon-512.png
+│   ├── icon-512.png
+│   └── music
+│       └── README.md
 ├── e2e
 │   └── home.spec.ts
 ├── scripts
