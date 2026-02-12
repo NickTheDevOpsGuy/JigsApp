@@ -549,7 +549,11 @@ export function PlayScreen() {
       />
 
       <div className={styles.main} ref={mainRef}>
-        <div className={styles.board} ref={boardRef}>
+        <div
+          className={styles.board}
+          ref={boardRef}
+          onContextMenu={(e) => e.preventDefault()}
+        >
           {isLoading && (
             <div className={styles.loadingOverlay} aria-label="Loading puzzle">
               <div className={styles.spinner} />

@@ -396,8 +396,21 @@ export class PuzzleManager {
 
     this.pushUndoState();
 
-    const x = this.rand(16, Math.max(16, this.boardWidth - piece.w - 16));
-    const y = this.rand(16, Math.max(16, this.boardHeight - piece.h - 16));
+    const padding = 12;
+    const xMax = Math.max(0, this.boardWidth - piece.w - padding);
+    const yMax = Math.max(0, this.boardHeight - piece.h - padding);
+    const xMin = Math.min(padding, xMax);
+    const yMin = Math.min(padding, yMax);
+    const x = _clamp(
+      this.rand(xMin, xMax),
+      0,
+      Math.max(0, this.boardWidth - piece.w),
+    );
+    const y = _clamp(
+      this.rand(yMin, yMax),
+      0,
+      Math.max(0, this.boardHeight - piece.h),
+    );
 
     this.zCounter += 1;
     this.updatePieces(

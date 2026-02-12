@@ -202,6 +202,10 @@
   overflow: hidden;
   touch-action: none;
   -webkit-overflow-scrolling: auto;
+  /* Prevent iOS long-press context menu / callout */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .canvas {

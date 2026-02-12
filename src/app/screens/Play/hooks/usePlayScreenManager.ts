@@ -170,8 +170,8 @@ export function usePlayScreenManager(
 
         // Snap tolerance: generous so "close" locks without feeling stiff.
         const snapTolerancePx = isMobile
-          ? Math.min(60, Math.max(48, Math.round(pieceSize * 1.2)))
-          : 48;
+          ? Math.min(72, Math.max(56, Math.round(pieceSize * 1.35)))
+          : 56;
 
         const next = new PuzzleManager(
           {

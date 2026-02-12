@@ -170,12 +170,12 @@
   font-size: 13px;
 }
 
-/* Mobile: smaller thumbs + 2 rows so more pieces visible in tray */
+/* Mobile: larger thumbs for visibility, 2 rows */
 @media (max-width: 600px) {
   .tray {
     margin: 0 6px 6px 6px;
-    height: 132px;
-    min-height: 132px;
+    height: 160px;
+    min-height: 160px;
   }
 
   .header {
@@ -213,13 +213,13 @@
   }
 
   .thumbWrap {
-    width: 32px;
-    height: 32px;
+    width: 48px;
+    height: 48px;
   }
 
   .pieceButton {
-    min-width: 36px;
-    min-height: 36px;
+    min-width: 52px;
+    min-height: 52px;
     padding: 2px;
   }
 }
