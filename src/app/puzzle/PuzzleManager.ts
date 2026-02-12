@@ -396,13 +396,19 @@ export class PuzzleManager {
 
     this.pushUndoState();
 
+    // Keep piece fully on canvas: clamp to [0, board - piece size]
+    const maxX = Math.max(0, this.boardWidth - piece.w);
+    const maxY = Math.max(0, this.boardHeight - piece.h);
     const padding = 12;
     const xMax = Math.max(0, this.boardWidth - piece.w - padding);
     const yMax = Math.max(0, this.boardHeight - piece.h - padding);
     const xMin = Math.min(padding, xMax);
     const yMin = Math.min(padding, yMax);
-    const x = _clamp(this.rand(xMin, xMax), 0, Math.max(0, this.boardWidth - piece.w));
-    const y = _clamp(this.rand(yMin, yMax), 0, Math.max(0, this.boardHeight - piece.h));
+    let x = _clamp(this.rand(xMin, xMax), 0, maxX);
+    let y = _clamp(this.rand(yMin, yMax), 0, maxY);
+    // Final clamp so piece never lands off canvas (handles stale or zero board size)
+    x = Math.max(0, Math.min(x, maxX));
+    y = Math.max(0, Math.min(y, maxY));
 
     this.zCounter += 1;
     this.updatePieces(

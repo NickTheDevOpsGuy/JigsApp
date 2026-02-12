@@ -500,6 +500,7 @@
   min-width: 0;
   padding: 0 4px;
   box-sizing: border-box;
+  width: 100%;
 }
 
 @keyframes completeFlourish {
@@ -566,6 +567,17 @@
 }
 
 @media (max-width: 600px) {
+  .completeOverlay {
+    padding: 16px 20px;
+    align-items: flex-start;
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+  .completeContent {
+    min-width: 280px;
+    max-width: min(100%, 420px);
+    margin: 0 auto;
+    padding: 0 8px;
+  }
   .completeContent h2 {
     font-size: 1.75rem;
     line-height: 1.25;
@@ -575,12 +587,17 @@
     margin-bottom: 1rem;
   }
   .shareSection {
-    padding: 0.75rem;
+    padding: 1rem;
     margin-bottom: 1rem;
+  }
+  .shareButtons {
+    gap: 10px;
+    justify-content: center;
   }
   .completeActions {
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
+    justify-content: center;
   }
 }
 
