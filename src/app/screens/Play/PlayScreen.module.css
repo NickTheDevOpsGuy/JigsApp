@@ -568,35 +568,51 @@
 
 @media (max-width: 600px) {
   .completeOverlay {
-    padding: 16px 20px;
+    padding: 20px 24px;
     align-items: flex-start;
-    padding-top: max(16px, env(safe-area-inset-top));
+    padding-top: max(20px, env(safe-area-inset-top));
   }
   .completeContent {
-    min-width: 280px;
-    max-width: min(100%, 420px);
+    min-width: 300px;
+    max-width: min(100%, 480px);
     margin: 0 auto;
-    padding: 0 8px;
+    padding: 0 12px;
   }
   .completeContent h2 {
     font-size: 1.75rem;
     line-height: 1.25;
   }
   .completeContent p {
-    font-size: 1rem;
+    font-size: 1.05rem;
     margin-bottom: 1rem;
   }
   .shareSection {
-    padding: 1rem;
-    margin-bottom: 1rem;
+    padding: 1.25rem 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .shareLabel {
+    font-size: 1.15rem !important;
+    margin-bottom: 1rem !important;
+  }
+  .socialBtn {
+    width: 56px;
+    height: 56px;
+    font-size: 1.6rem;
+  }
+  .socialButtons {
+    gap: 16px;
+    margin-bottom: 1.25rem;
   }
   .shareButtons {
-    gap: 10px;
+    gap: 12px;
     justify-content: center;
+  }
+  .shareHint {
+    font-size: 0.95rem !important;
   }
   .completeActions {
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
     justify-content: center;
   }
 }
@@ -621,32 +637,33 @@
 
 .shareSection {
   margin-bottom: 1.5rem;
-  padding: 1rem;
+  padding: 1.25rem;
   background: var(--color-overlay-content);
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
 .shareLabel {
-  font-size: 0.9rem !important;
-  opacity: 0.7 !important;
-  margin-bottom: 0.75rem !important;
+  font-size: 1.1rem !important;
+  opacity: 0.9 !important;
+  margin-bottom: 1rem !important;
+  font-weight: 600;
 }
 
 .socialButtons {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .socialBtn {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: none;
   background: var(--color-overlay-content-hover);
   color: white;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -662,16 +679,17 @@
 
 .shareButtons {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .shareHint {
-  font-size: 0.75rem !important;
-  opacity: 0.5 !important;
-  margin: 0 !important;
+  font-size: 0.9rem !important;
+  opacity: 0.7 !important;
+  margin: 0.5rem 0 0 !important;
+  line-height: 1.4;
 }
 
 .completeActions {
