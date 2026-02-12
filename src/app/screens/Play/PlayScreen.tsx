@@ -569,7 +569,15 @@ export function PlayScreen() {
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerCancel}
             onLostPointerCapture={handleLostPointerCapture}
-            onContextMenu={handleContextMenu}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleContextMenu(e);
+            }}
+            onContextMenuCapture={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
             onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
           />
           {showPreview && imgRef.current && (

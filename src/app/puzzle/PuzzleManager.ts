@@ -250,6 +250,29 @@ export class PuzzleManager {
     };
   }
 
+  /** Move only the active piece during drag (so connected groups don't move together). */
+  private shiftActivePieceOnly(dx: number, dy: number) {
+    const activeId = this.drag.activeId;
+    if (!activeId) return;
+    const piece = this.findPiece(activeId);
+    if (!piece) return;
+    const dxClamp = _clamp(
+      dx,
+      -this.pad - piece.x,
+      this.boardWidth + this.pad - (piece.x + piece.w),
+    );
+    const dyClamp = _clamp(
+      dy,
+      -this.pad - piece.y,
+      this.boardHeight + this.pad - (piece.y + piece.h),
+    );
+    if (dxClamp === 0 && dyClamp === 0) return;
+    this.updatePieces(
+      (p) => p.id === activeId,
+      (p) => ({ x: p.x + dxClamp, y: p.y + dyClamp }),
+    );
+  }
+
   private findPiece(id: string) {
     return this.state.pieces.find((p) => p.id === id) ?? null;
   }
@@ -494,8 +517,8 @@ export class PuzzleManager {
     const dx = newX - piece.x;
     const dy = newY - piece.y;
 
-    // Move the group
-    this.shiftGroup(piece.groupId, dx, dy);
+    // Move only the active piece (so two unconnected pieces don't move together)
+    this.shiftActivePieceOnly(dx, dy);
 
     // Compute snap preview
     this.drag = {
@@ -538,7 +561,7 @@ export class PuzzleManager {
     const dx = newX - piece.x;
     const dy = newY - piece.y;
 
-    this.shiftGroup(piece.groupId, dx, dy);
+    this.shiftActivePieceOnly(dx, dy);
     this.drag = {
       ...this.drag,
       preview: this.computeSnapPreview(),
