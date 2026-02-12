@@ -77,12 +77,16 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 - Reference image preview overlay
 - Progress and timer modes
-- Completion confetti and fun completion messages
+- Completion confetti and fun completion messages (respects reduced motion)
+- Completion summary: time, grid size, piece count
 - Settings organized into sub-menus (Game, View, Audio)
 - Optional piece borders (View)
 - Undo and redo
 - Ghost hint
 - Optional piece locking
+- Error boundary with reload (no blank screens)
+- Visible focus indicators for keyboard users
+- Difficulty indicator on setup (piece count + Easy/Medium/Hard/Expert)
 
 ### Social and progress
 
@@ -90,12 +94,13 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Stats dashboard and leaderboards (Supabase)
 - Profile with display name and anonymous mode
 - Share completed puzzle image
-- Share app / invite testers button (native share on mobile, copy link on desktop)
+- Share app / invite testers (in-game Menu → More; native share on mobile, copy link on desktop)
+- What's New (in-game Menu → More)
 
 ### Analytics (optional)
 
 - PostHog integration behind env vars
-  - Events like `puzzle_started` and `puzzle_completed`
+  - Events: `puzzle_started`, `puzzle_completed`, `puzzle_exit_before_completion`, `time_to_first_snap_ms`
   - No route inside the app
 
 ---

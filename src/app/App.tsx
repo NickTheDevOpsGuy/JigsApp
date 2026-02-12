@@ -2,6 +2,7 @@
 import { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { identify } from "@/analytics/posthog";
 import { ensureSignedIn } from "@/supabase/auth";
 
@@ -47,16 +48,18 @@ export function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={<PageFallback />}>
-        <Routes>
-          <Route path="/" element={<MenuScreen />} />
-          <Route path="/new" element={<NewGameScreen />} />
-          <Route path="/play" element={<PlayScreen />} />
-          <Route path="/stats" element={<StatsScreen />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Suspense fallback={<PageFallback />}>
+          <Routes>
+            <Route path="/" element={<MenuScreen />} />
+            <Route path="/new" element={<NewGameScreen />} />
+            <Route path="/play" element={<PlayScreen />} />
+            <Route path="/stats" element={<StatsScreen />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }

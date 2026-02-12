@@ -27,6 +27,7 @@ export function usePlayScreenManager(
     haptic?: (kind: "place" | "snap" | "rotate") => void;
     themeRef?: MutableRefObject<Theme | undefined>;
     onPlacementStreak?: () => void;
+    reducedMotion?: boolean;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -40,6 +41,8 @@ export function usePlayScreenManager(
   const placementTimesRef = useRef<number[]>([]);
   const lastStreakAtRef = useRef<number | null>(null);
   const sizingCleanupRef = useRef<(() => void) | null>(null);
+  const puzzleStartTimeRef = useRef<number>(0);
+  const firstPlacementTimeRef = useRef<number | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
@@ -83,13 +86,19 @@ export function usePlayScreenManager(
         const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
         const isMobile = viewportW < 600;
         const minAvail = isMobile ? 260 : 400;
-        const availW = Math.max(minAvail, Math.floor(rect.width) - 24);
-        const availH = Math.max(minAvail, Math.floor(rect.height) - 24);
+        // Fallback to window size when main isn't laid out yet (avoids tiny canvas on first paint)
+        const topBarH = 56;
+        const winH = typeof window !== "undefined" ? window.innerHeight - topBarH : 600;
+        const winW = typeof window !== "undefined" ? window.innerWidth : 1024;
+        const effectiveW = rect.width >= 200 ? rect.width : winW - 24;
+        const effectiveH = rect.height >= 200 ? rect.height : winH - 24;
+        const availW = Math.max(minAvail, Math.floor(effectiveW) - 24);
+        const availH = Math.max(minAvail, Math.floor(effectiveH) - 24);
 
         // Compute square tile size (smaller on mobile for better fit)
         const pieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-        // Board: fit puzzle; scale by piece count so more pieces = bigger board for planning
+        // Board: match piece grid so canvas size = puzzle size (no extra empty space)
         const minBoardW = grid.cols * pieceSize;
         const minBoardH = grid.rows * pieceSize;
         const pieceCount = grid.rows * grid.cols;
@@ -98,13 +107,18 @@ export function usePlayScreenManager(
             ? 0.98
             : pieceCount >= 16
               ? 0.96
-              : 0.95
+              : 0.94
           : 0.88;
         let boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
         let boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
         if (isMobile) {
-          boardW = Math.min(boardW, Math.max(minBoardW, Math.floor(rect.width) - 16));
-          boardH = Math.min(boardH, Math.max(minBoardH, Math.floor(rect.height) - 16));
+          boardW = Math.min(boardW, Math.max(minBoardW, Math.floor(effectiveW) - 16));
+          boardH = Math.min(boardH, Math.max(minBoardH, Math.floor(effectiveH) - 16));
+        }
+        // For small/medium grids, match board to piece grid so canvas size = puzzle size
+        if (pieceCount <= 25) {
+          boardW = minBoardW;
+          boardH = minBoardH;
         }
 
         boardEl.style.width = `${boardW}px`;
@@ -174,6 +188,8 @@ export function usePlayScreenManager(
               const now = performance.now();
               const opts = optionsRef.current;
               lastInteractionRef.current = now;
+              if (firstPlacementTimeRef.current == null)
+                firstPlacementTimeRef.current = Date.now();
               popMapRef.current.set(p.id, now);
               soundManager.play("place");
               opts?.haptic?.("place");
@@ -221,16 +237,18 @@ export function usePlayScreenManager(
             onPuzzleComplete: () => {
               clearPuzzleState();
               soundManager.play("complete");
-              const theme = optionsRef.current?.themeRef?.current ?? "light";
-              const colors = CONFETTI_COLORS_BY_THEME[theme];
-              import("canvas-confetti").then((confetti) => {
-                confetti.default({
-                  particleCount: 150,
-                  spread: 70,
-                  origin: { y: 0.6 },
-                  colors,
+              if (!optionsRef.current?.reducedMotion) {
+                const theme = optionsRef.current?.themeRef?.current ?? "light";
+                const colors = CONFETTI_COLORS_BY_THEME[theme];
+                import("canvas-confetti").then((confetti) => {
+                  confetti.default({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors,
+                  });
                 });
-              });
+              }
             },
           },
         );
@@ -239,6 +257,8 @@ export function usePlayScreenManager(
           next.restoreFromSaved(savedState.pieces);
         }
 
+        puzzleStartTimeRef.current = Date.now();
+        firstPlacementTimeRef.current = null;
         next.setPieceLockingEnabled(pieceLockingEnabled);
         setManager(next);
         setState(next.getState());
@@ -324,5 +344,7 @@ export function usePlayScreenManager(
     popMapRef,
     lockMapRef,
     snapParticlesRef,
+    puzzleStartTimeRef,
+    firstPlacementTimeRef,
   };
 }

@@ -134,7 +134,7 @@
   /* was: overflow: hidden; */
   overflow: visible;
 
-  background: var(--color-bg-secondary);
+  background: transparent;
 
   /* helps center an <img> thumbnail cleanly */
   display: flex;
@@ -170,11 +170,12 @@
   font-size: 13px;
 }
 
-/* Mobile adjustments - compact for more board space */
+/* Mobile: smaller thumbs + 2 rows so more pieces visible in tray */
 @media (max-width: 600px) {
   .tray {
     margin: 0 6px 6px 6px;
-    height: 96px;
+    height: 132px;
+    min-height: 132px;
   }
 
   .header {
@@ -197,13 +198,28 @@
     font-size: 10px;
   }
 
+  .scroller {
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+    padding: 4px 8px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: flex-start;
+  }
+
   .thumbWrap {
-    width: 44px;
-    height: 44px;
+    width: 32px;
+    height: 32px;
   }
 
   .pieceButton {
-    min-width: 48px;
-    min-height: 48px;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 2px;
   }
 }

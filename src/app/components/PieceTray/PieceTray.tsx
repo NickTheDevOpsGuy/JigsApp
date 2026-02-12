@@ -35,7 +35,7 @@ function isEdge(p: Piece, grid: { rows: number; cols: number }) {
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
-  { pieces, image, grid, onPieceClick },
+  { pieces, image, grid, onPieceClick, isCoarsePointer },
   ref,
 ) {
   const [section, setSection] = useState<TraySection>("all");
@@ -93,15 +93,15 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       : "Drag pieces here to store them";
 
   // Generate jigsaw-shaped thumbnails using the same clip path as the board renderer.
-  // Memoized so the tray stays snappy.
+  // On mobile use smaller box so more pieces fit and thumbs stay sharp.
   const thumbsById = useMemo(() => {
     const m = new Map<string, string>();
     if (!image) return m;
 
+    const box = isCoarsePointer ? 32 : 56;
+    const padding = isCoarsePointer ? 2 : 6;
+
     for (const p of displayed) {
-      // Fit piece bounding box into the 56px thumb box (with a little breathing room)
-      const box = 56;
-      const padding = 6;
       const maxW = box - padding;
       const maxH = box - padding;
 
@@ -115,7 +115,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     }
 
     return m;
-  }, [displayed, image, grid]);
+  }, [displayed, image, grid, isCoarsePointer]);
 
   return (
     <div className={styles.tray} ref={ref}>

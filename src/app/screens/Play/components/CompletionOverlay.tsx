@@ -100,6 +100,12 @@ export function CompletionOverlay({
         <h2>🎉 {completionMessage}</h2>
         <p>
           Finished in {formatTime(elapsedSeconds)}
+          {grid && (
+            <span className={styles.puzzleSize}>
+              {" "}
+              · {grid.rows}×{grid.cols} puzzle ({grid.rows * grid.cols} pieces)
+            </span>
+          )}
           {isNewBest && <span className={styles.newBest}> — New best!</span>}
           {isDaily && (
             <span className={styles.dailyBadge}>

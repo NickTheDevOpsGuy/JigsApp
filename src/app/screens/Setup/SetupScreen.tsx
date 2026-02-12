@@ -11,6 +11,14 @@ import { CameraCapture } from "./components/CameraCapture";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
 import { COUNTDOWN_OPTIONS, type TimeMode } from "../Play/timeMode";
 
+/** Difficulty label from piece count (for display before starting). */
+function getDifficultyLabel(pieceCount: number): string {
+  if (pieceCount <= 9) return "Easy";
+  if (pieceCount <= 16) return "Medium";
+  if (pieceCount <= 25) return "Hard";
+  return "Expert";
+}
+
 const TIME_MODE_LABELS: Record<TimeMode, string> = {
   elapsed: "Elapsed",
   countdown: "Countdown",
@@ -53,6 +61,8 @@ export function SetupScreen() {
     customCols,
     setCustomCols,
     isCustom,
+    effectiveRows,
+    effectiveCols,
     saveGrid,
     minGrid,
     maxGrid,
@@ -194,6 +204,10 @@ export function SetupScreen() {
           }))}
           fullWidth
         />
+        <p className={styles.difficultyHint} aria-live="polite">
+          {effectiveRows * effectiveCols} pieces ·{" "}
+          {getDifficultyLabel(effectiveRows * effectiveCols)}
+        </p>
 
         <Dropdown
           label="Time mode"

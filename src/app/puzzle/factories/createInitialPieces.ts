@@ -148,19 +148,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     }
   }
 
-  // For larger puzzles (16+ pieces), start ~30% in tray to reduce board clutter
-  const trayStartCount = total >= 16 ? Math.max(1, Math.floor(total * 0.3)) : 0;
-  const trayIndices = new Set<number>();
-  if (trayStartCount > 0) {
-    const indices = Array.from({ length: total }, (_, i) => i);
-    for (let i = indices.length - 1; i > 0 && trayIndices.size < trayStartCount; i--) {
-      const j = randInt(0, i);
-      [indices[i], indices[j]] = [indices[j], indices[i]];
-      trayIndices.add(indices[i]);
-    }
-    if (trayIndices.size < trayStartCount) trayIndices.add(indices[0]);
-  }
-
+  // All pieces start in the tray; player moves them to the board
   const pieces: Piece[] = [];
 
   for (let i = 0; i < total; i++) {
@@ -170,7 +158,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     const targetX = targetStartX + col * tileW;
     const targetY = targetStartY + row * tileH;
 
-    const startInTray = trayIndices.has(i);
+    const startInTray = true;
     const pos = positions[i];
 
     const shapePath = buildPiecePath({

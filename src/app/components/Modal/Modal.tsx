@@ -142,26 +142,24 @@ export function ConfirmModal({
     <Modal isOpen={isOpen} onClose={onClose} title={title} showCloseButton={false}>
       <p className={styles.message}>{message}</p>
       <div className={styles.actions}>
+        <Button
+          variant="primary"
+          onClick={() => {
+            onConfirm();
+            if (!primaryOnlyConfirm) onClose();
+          }}
+          className={`${styles.confirmModalBtn} ${variant === "danger" ? styles.dangerBtn : ""}`.trim()}
+        >
+          {confirmText}
+        </Button>
+        <Button variant="secondary" onClick={onClose} className={styles.confirmModalBtn}>
+          {cancelText}
+        </Button>
         {tertiaryText && onTertiary && (
-          <Button variant="ghost" onClick={onTertiary} className={styles.tertiaryBtn}>
+          <Button variant="secondary" onClick={onTertiary} className={styles.confirmModalBtn}>
             {tertiaryText}
           </Button>
         )}
-        <div className={styles.primaryActions}>
-          <Button variant="secondary" onClick={onClose}>
-            {cancelText}
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              onConfirm();
-              if (!primaryOnlyConfirm) onClose();
-            }}
-            className={variant === "danger" ? styles.dangerBtn : ""}
-          >
-            {confirmText}
-          </Button>
-        </div>
       </div>
     </Modal>
   );

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MenuScreen.module.css";
 
@@ -9,63 +9,21 @@ import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
-import { WhatsNewModal } from "@/components/WhatsNew";
-import {
-  HelpCircle,
-  Image,
-  Calendar,
-  BarChart3,
-  Sparkles,
-  Camera,
-  Palette,
-  Share2,
-} from "lucide-react";
+import { HelpCircle, Image, Calendar, BarChart3, Camera, Palette } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
-import { shouldShowChangelog } from "@/data/changelog";
 import { getMenuTip } from "@/data/menuTips";
-
-const APP_URL = typeof window !== "undefined" ? window.location.origin : "";
 
 export function MenuScreen() {
   const nav = useNavigate();
   const [showHelpChoice, setShowHelpChoice] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
-  const [shareFeedback, setShareFeedback] = useState("");
-
-  const handleInviteTesters = useCallback(async () => {
-    const title = "Phuzzle";
-    const text = "Try Phuzzle – a cozy jigsaw puzzle game. I'd love your feedback!";
-    const url = APP_URL || "https://phuzzle.vercel.app";
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({ title, text, url });
-        setShareFeedback("Thanks for sharing!");
-      } catch (err) {
-        if ((err as Error)?.name !== "AbortError") setShareFeedback("Share cancelled");
-      }
-      setTimeout(() => setShareFeedback(""), 3000);
-    } else {
-      try {
-        await navigator.clipboard?.writeText(url);
-        setShareFeedback("Link copied! Share it to invite testers.");
-      } catch {
-        setShareFeedback("Copy failed – share " + url);
-      }
-      setTimeout(() => setShareFeedback(""), 3000);
-    }
-  }, []);
 
   const todayCompleted = isTodayDailyCompleted();
   const hasDaily = SAMPLE_PUZZLES.length > 0;
-
-  useEffect(() => {
-    if (shouldShowChangelog()) setShowWhatsNew(true);
-  }, []);
 
   return (
     <div className={styles.page}>
@@ -130,31 +88,8 @@ export function MenuScreen() {
             <Palette size={20} />
             <span className={styles.actionLabel}>Theme</span>
           </Button>
-
-          <Button
-            variant="secondary"
-            onClick={() => setShowWhatsNew(true)}
-            className={styles.whatsNewCard}
-          >
-            <Sparkles size={20} />
-            <span className={styles.actionLabel}>What&apos;s New</span>
-          </Button>
-
-          <Button
-            variant="secondary"
-            onClick={handleInviteTesters}
-            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
-          >
-            <Share2 size={20} />
-            <span className={styles.actionLabel}>Share app / Invite testers</span>
-          </Button>
         </div>
 
-        {shareFeedback ? (
-          <p className={styles.shareFeedback} role="status">
-            {shareFeedback}
-          </p>
-        ) : null}
         <p className={styles.menuTip}>{getMenuTip()}</p>
       </div>
 
@@ -170,7 +105,6 @@ export function MenuScreen() {
       />
       <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
       <ThemeModal isOpen={showThemeModal} onClose={() => setShowThemeModal(false)} />
-      <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <DailyDifficultyModal
         isOpen={showDailyModal}
         onClose={() => setShowDailyModal(false)}

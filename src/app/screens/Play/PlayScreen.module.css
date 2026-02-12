@@ -580,6 +580,10 @@
   }
 }
 
+.puzzleSize {
+  opacity: 0.85;
+}
+
 .newBest {
   color: #fbbf24;
   font-weight: 600;
@@ -704,6 +708,35 @@
   padding: 8px 0;
   z-index: 1000;
   animation: menuFadeIn 0.15s ease;
+}
+
+@media (max-width: 600px) {
+  .headerMenuPanel {
+    max-height: min(85dvh, 85vh);
+    padding: 4px 0;
+  }
+  .headerMenuItem {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .headerMenuDivider {
+    margin: 4px 0;
+  }
+  .headerMenuSection {
+    padding: 6px 12px 2px;
+    font-size: 10px;
+  }
+  .headerMenuSubmenuTrigger {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .headerMenuBack {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
 }
 
 @keyframes menuFadeIn {
