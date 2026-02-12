@@ -156,7 +156,11 @@ export function ConfirmModal({
           {cancelText}
         </Button>
         {tertiaryText && onTertiary && (
-          <Button variant="secondary" onClick={onTertiary} className={styles.confirmModalBtn}>
+          <Button
+            variant="secondary"
+            onClick={onTertiary}
+            className={styles.confirmModalBtn}
+          >
             {tertiaryText}
           </Button>
         )}

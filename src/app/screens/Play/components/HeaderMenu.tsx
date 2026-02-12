@@ -86,8 +86,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
       }),
     );
 
-  const hasSubMenuItems = (id: SubMenuId) =>
-    settingsItems.some((i) => i.subMenu === id);
+  const hasSubMenuItems = (id: SubMenuId) => settingsItems.some((i) => i.subMenu === id);
 
   const closeAnd = (fn: () => void) => () => {
     setOpen(false);

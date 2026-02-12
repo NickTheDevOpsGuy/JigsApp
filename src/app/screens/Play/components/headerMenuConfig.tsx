@@ -45,7 +45,14 @@ export type HeaderMenuProps = {
   onShareApp: () => void;
 };
 
-export type SubMenuId = "control" | "game" | "view" | "audio" | "help" | "community" | "navigate";
+export type SubMenuId =
+  | "control"
+  | "game"
+  | "view"
+  | "audio"
+  | "help"
+  | "community"
+  | "navigate";
 
 export type MenuItemConfig = {
   id: string;
