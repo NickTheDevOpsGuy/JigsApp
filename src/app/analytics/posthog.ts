@@ -48,10 +48,7 @@ export function identify(userId: string | null, traits?: Record<string, unknown>
 }
 
 /** Capture a custom event (who is playing, puzzle stats, etc.). */
-export function capture(
-  event: string,
-  properties?: Record<string, unknown>,
-): void {
+export function capture(event: string, properties?: Record<string, unknown>): void {
   if (!isPostHogReady()) return;
   try {
     posthog.capture(event, properties);

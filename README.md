@@ -198,13 +198,13 @@ npm run dev
 
 Copy `.env.example` to `.env.local` or `.env.development` and set any optional vars you need. For **Vercel**, add the same keys in **Project → Settings → Environment Variables** (no `VITE_` prefix change; Vite exposes `VITE_*` at build time).
 
-| Variable | Required | Purpose |
-| -------- | -------- | ------- |
-| `VITE_SHOW_DEBUG` | No | `true` to show debug overlay in play screen |
-| `VITE_SUPABASE_URL` | No | Supabase project URL (stats, leaderboards, achievements) |
-| `VITE_SUPABASE_ANON_KEY` | No | Supabase anon key |
-| `VITE_POSTHOG_KEY` | No | PostHog project API key (analytics) |
-| `VITE_POSTHOG_HOST` | No | PostHog host, e.g. `https://us.i.posthog.com` |
+| Variable                 | Required | Purpose                                                  |
+| ------------------------ | -------- | -------------------------------------------------------- |
+| `VITE_SHOW_DEBUG`        | No       | `true` to show debug overlay in play screen              |
+| `VITE_SUPABASE_URL`      | No       | Supabase project URL (stats, leaderboards, achievements) |
+| `VITE_SUPABASE_ANON_KEY` | No       | Supabase anon key                                        |
+| `VITE_POSTHOG_KEY`       | No       | PostHog project API key (analytics)                      |
+| `VITE_POSTHOG_HOST`      | No       | PostHog host, e.g. `https://us.i.posthog.com`            |
 
 View PostHog data at [app.posthog.com](https://app.posthog.com); no route or credentials in the app.
 
@@ -259,7 +259,7 @@ Images are auto-discovered at any depth.
 | `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers (touch + mouse), viewport (zoom/pan)               |
 | `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc.                            |
 | `src/app/audio/`              | Sound effects, background music (MP3)                                                                             |
-| `src/app/analytics/`          | PostHog: init, capture, identify (optional; env vars for key/host)                                               |
+| `src/app/analytics/`          | PostHog: init, capture, identify (optional; env vars for key/host)                                                |
 | `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, anonymous raccoon names, sample puzzles |
 | `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                               |
 | `src/app/assets/puzzles/`     | Sample puzzle images by category (animals, flowers, food, space, tech; subfolders supported)                      |
