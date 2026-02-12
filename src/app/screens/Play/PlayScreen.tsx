@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
 
+import { capture } from "@/analytics/posthog";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
@@ -87,6 +88,8 @@ export function PlayScreen() {
   const [showStreakToast, setShowStreakToast] = React.useState(false);
   const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
   const lastMilestoneRef = React.useRef<number>(0);
+  const puzzleStartedSentRef = React.useRef<string | null>(null);
+  const puzzleCompletedSentRef = React.useRef<string | null>(null);
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -119,6 +122,32 @@ export function PlayScreen() {
     lockMapRef,
     snapParticlesRef,
   } = managerResult;
+
+  // Analytics: puzzle_started (once per puzzle load)
+  useEffect(() => {
+    if (!state || state.pieces.length === 0) return;
+    const key = `${puzzleKey}-${state.grid.rows}x${state.grid.cols}`;
+    if (puzzleStartedSentRef.current === key) return;
+    puzzleStartedSentRef.current = key;
+    capture("puzzle_started", {
+      rows: state.grid.rows,
+      cols: state.grid.cols,
+      totalPieces: state.totalCount,
+    });
+  }, [state, puzzleKey]);
+
+  // Analytics: puzzle_completed (once per completion)
+  useEffect(() => {
+    if (!state?.isComplete) return;
+    const key = `${puzzleKey}-${state.grid.rows}x${state.grid.cols}`;
+    if (puzzleCompletedSentRef.current === key) return;
+    puzzleCompletedSentRef.current = key;
+    capture("puzzle_completed", {
+      rows: state.grid.rows,
+      cols: state.grid.cols,
+      totalPieces: state.totalCount,
+    });
+  }, [state?.isComplete, state?.grid, state?.totalCount, puzzleKey]);
 
   // Milestone callouts at 25%, 50%, 75%
   useEffect(() => {
