@@ -24,6 +24,8 @@ export type PuzzleManagerOptions = {
   scatterPadding?: number;
   scatterStartYRatio?: number;
   snapTolerancePx?: number;
+  /** If set, used for piece-to-piece (neighbor) snap; otherwise 1.2× snapTolerancePx so left/right both lock. */
+  neighborSnapTolerancePx?: number;
   rotationStepDeg?: 90 | 180;
 };
 
@@ -52,6 +54,7 @@ export class PuzzleManager {
   private boardHeight: number;
 
   private snapTolerancePx: number;
+  private neighborSnapTolerancePx: number;
   private scatterStartYRatio: number;
   private rotationStepDeg: 90 | 180;
 
@@ -76,6 +79,7 @@ export class PuzzleManager {
       scatterPadding = 16,
       pad = 18,
       snapTolerancePx = 40,
+      neighborSnapTolerancePx,
       scatterStartYRatio = 0.3,
       rotationStepDeg = 90,
     } = options;
@@ -84,6 +88,8 @@ export class PuzzleManager {
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
     this.snapTolerancePx = snapTolerancePx;
+    this.neighborSnapTolerancePx =
+      neighborSnapTolerancePx ?? Math.ceil(snapTolerancePx * 1.2);
     this.scatterStartYRatio = scatterStartYRatio;
     this.rotationStepDeg = rotationStepDeg;
     // Tabs extend ~22% beyond tile edge; pad must exceed that or shapes get clipped
@@ -652,7 +658,8 @@ export class PuzzleManager {
         const dy = nTile.y - expectedDy - gpTile.y;
         const d = Math.hypot(dx, dy);
 
-        if (d <= this.snapTolerancePx && (!best || d < best.dist)) {
+        const tolerance = this.neighborSnapTolerancePx;
+        if (d <= tolerance && (!best || d < best.dist)) {
           best = { dx, dy, dist: d, into: n.groupId };
         }
       }

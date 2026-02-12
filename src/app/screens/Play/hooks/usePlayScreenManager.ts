@@ -154,10 +154,10 @@ export function usePlayScreenManager(
           clearPuzzleState();
         }
 
-        // More forgiving snap on mobile so pieces lock reliably despite touch jitter
+        // Snap tolerance: generous so "close" locks without feeling stiff.
         const snapTolerancePx = isMobile
-          ? Math.min(56, Math.max(44, Math.round(pieceSize * 1.2)))
-          : 40;
+          ? Math.min(60, Math.max(48, Math.round(pieceSize * 1.2)))
+          : 48;
 
         const next = new PuzzleManager(
           {
