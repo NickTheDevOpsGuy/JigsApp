@@ -401,16 +401,8 @@ export class PuzzleManager {
     const yMax = Math.max(0, this.boardHeight - piece.h - padding);
     const xMin = Math.min(padding, xMax);
     const yMin = Math.min(padding, yMax);
-    const x = _clamp(
-      this.rand(xMin, xMax),
-      0,
-      Math.max(0, this.boardWidth - piece.w),
-    );
-    const y = _clamp(
-      this.rand(yMin, yMax),
-      0,
-      Math.max(0, this.boardHeight - piece.h),
-    );
+    const x = _clamp(this.rand(xMin, xMax), 0, Math.max(0, this.boardWidth - piece.w));
+    const y = _clamp(this.rand(yMin, yMax), 0, Math.max(0, this.boardHeight - piece.h));
 
     this.zCounter += 1;
     this.updatePieces(
