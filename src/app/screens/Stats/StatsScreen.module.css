@@ -251,6 +251,20 @@
   border-color: var(--color-brand-primary);
 }
 
+.raccoonPreview {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  background: var(--color-bg-elevated);
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.raccoonPreview strong {
+  color: var(--color-brand-primary);
+}
+
 .profileRow {
   margin-bottom: 12px;
 }
