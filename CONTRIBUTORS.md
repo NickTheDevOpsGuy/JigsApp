@@ -1,6 +1,6 @@
-# 👥 Contributors
+👥 Meet the Team
 
-Thanks to everyone who has helped make **Phuzzle** possible!
+Phuzzle isn’t built alone. It’s built with sharp eyes, strong opinions, and lots of bug squashing.
 
 ---
 
@@ -12,13 +12,29 @@ Thanks to everyone who has helped make **Phuzzle** possible!
 
 ---
 
-## Contributors
+## 🚀 Core Team
 
-| Name               | GitHub                                       | LinkedIn                                              | Role             |
-| ------------------ | -------------------------------------------- | ----------------------------------------------------- | ---------------- |
-| **Vinay Gajjar**   | [@v-gajjar](https://github.com/v-gajjar)     | [LinkedIn](https://www.linkedin.com/in/vinaygajjar)   | Core Contributor |
-| **Hannah Olbrich** | [@hannahro15](https://github.com/hannahro15) | [LinkedIn](https://www.linkedin.com/in/hannaholbrich) | Core Contributor |
+| Name               | GitHub                                       | LinkedIn                                              | Role                                                    |
+| ------------------ | -------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| **Vinay Gajjar**   | [@v-gajjar](https://github.com/v-gajjar)     | [LinkedIn](https://www.linkedin.com/in/vinaygajjar)   | Bug Hunter • Mobile Breaker-Tester • Feature Instigator |
+| **Hannah Olbrich** | [@hannahro15](https://github.com/hannahro15) | [LinkedIn](https://www.linkedin.com/in/hannaholbrich) | UX Sharp Shooter • Edge Case Finder • Chaos Preventer   |
 
 ---
 
-> 💡 Want to contribute? Fork the repo, open a PR, or share feedback in the Discussions tab.
+## 🧩 Want In?
+
+Phuzzle is open source and evolving fast.
+
+If you:
+
+- Enjoy clean UI polish
+- Like solving weird input edge cases
+- want to experiment with React, Canvas, or game logic
+- Or just enjoy breaking things in creative ways
+
+Jump in.
+
+Fork it. Open a PR. Suggest something bold.
+Or DM to join the Discord and build with us.
+
+Let’s make the coziest puzzle engine on the internet.
