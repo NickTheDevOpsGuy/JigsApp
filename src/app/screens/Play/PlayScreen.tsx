@@ -127,9 +127,9 @@ export function PlayScreen() {
     if (total === 0) return;
     const pct = placed / total;
     const milestones: { threshold: number; message: string }[] = [
-      { threshold: 0.25, message: "🥉 25% — Early win." },
-      { threshold: 0.5, message: "🥈 50% — Big motivation spike." },
-      { threshold: 0.75, message: "🥇 75% — Momentum moment." },
+      { threshold: 0.25, message: "🥉 25% Early win." },
+      { threshold: 0.5, message: "🥈 50% Big motivation spike." },
+      { threshold: 0.75, message: "🥇 75% Momentum moment." },
       { threshold: 1, message: "🏁 100%" },
     ];
     const hit = milestones.find(
