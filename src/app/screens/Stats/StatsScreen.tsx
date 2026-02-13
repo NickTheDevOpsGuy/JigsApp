@@ -450,8 +450,9 @@ export function StatsScreen() {
                   </p>
                 )}
                 <p className={styles.hint}>
-                  Uncheck "Show my name" to appear as your raccoon name on leaderboards. You’re
-                  still tracked—turn this back on anytime to show your display name.
+                  Uncheck "Show my name" to appear as your raccoon name on leaderboards.
+                  You’re still tracked—turn this back on anytime to show your display
+                  name.
                 </p>
                 <Button
                   onClick={handleSaveProfile}
