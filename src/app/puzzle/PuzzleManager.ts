@@ -554,12 +554,23 @@ export class PuzzleManager {
   }
 
   public restoreFromSaved(savedPieces: SavedPiece[]) {
-    // Restore piece positions from saved state
+    const currentPieces = this.state.pieces;
+    if (savedPieces.length !== currentPieces.length) {
+      throw new Error(
+        `Saved piece count (${savedPieces.length}) does not match grid (${currentPieces.length})`,
+      );
+    }
     const pieceMap = new Map(savedPieces.map((p) => [p.id, p]));
+    const currentIds = new Set(currentPieces.map((p) => p.id));
+    for (const sp of savedPieces) {
+      if (!currentIds.has(sp.id)) {
+        throw new Error(`Saved piece id ${sp.id} not found in current puzzle`);
+      }
+    }
 
     this.state = {
       ...this.state,
-      pieces: this.state.pieces.map((p) => {
+      pieces: currentPieces.map((p) => {
         const saved = pieceMap.get(p.id);
         if (saved) {
           return {
@@ -576,7 +587,7 @@ export class PuzzleManager {
         }
         return p;
       }),
-    };
+    });
 
     this.recomputeDerivedState();
   }

@@ -119,6 +119,11 @@ export function PlayScreen() {
     snapParticlesRef,
   } = managerResult;
 
+  const stateRef = React.useRef(state);
+  stateRef.current = state;
+  const elapsedSecondsRef = React.useRef(elapsedSeconds);
+  elapsedSecondsRef.current = elapsedSeconds;
+
   // Milestone callouts at 25%, 50%, 75%
   useEffect(() => {
     if (!state || state.isComplete) return;
@@ -233,16 +238,53 @@ export function PlayScreen() {
     lastInteractionRef,
   });
 
+  // Auto-save: every 3 placements, on debounced state change, and before tab hide
+  const SAVE_DEBOUNCE_MS = 500;
+  const SAVE_EVERY_N_MOVES = 3;
+  const lastSavedPlacedCountRef = React.useRef(0);
+
   useEffect(() => {
     if (!state || state.isComplete) return;
     const url = localStorage.getItem(STORAGE_KEY) || "";
     if (!url) return;
+    const placed = state.placedCount ?? 0;
+
+    // Save immediately every N placements
+    const movesSinceSave = placed - lastSavedPlacedCountRef.current;
+    if (movesSinceSave >= SAVE_EVERY_N_MOVES) {
+      savePuzzleState(url, state.grid, state.pieces, elapsedSeconds);
+      lastSavedPlacedCountRef.current = placed;
+      return;
+    }
+
+    // Otherwise debounce
     const id = setTimeout(
       () => savePuzzleState(url, state.grid, state.pieces, elapsedSeconds),
-      500,
+      SAVE_DEBOUNCE_MS,
     );
     return () => clearTimeout(id);
   }, [state, elapsedSeconds]);
+
+  // Save before tab hide / refresh (visibilitychange, pagehide)
+  useEffect(() => {
+    const flush = () => {
+      const s = stateRef.current;
+      if (!s || s.isComplete) return;
+      const url = localStorage.getItem(STORAGE_KEY) || "";
+      if (!url) return;
+      savePuzzleState(url, s.grid, s.pieces, elapsedSecondsRef.current);
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    const onPageHide = () => flush();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pagehide", onPageHide);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pagehide", onPageHide);
+    };
+  }, []);
 
   // Analytics: time to first snap (first piece placed)
   const firstSnapCapturedRef = useRef(false);
@@ -258,8 +300,6 @@ export function PlayScreen() {
   }, [state?.placedCount, elapsedSeconds]);
 
   // Analytics: exit before completion (on unmount)
-  const stateRef = useRef(state);
-  stateRef.current = state;
   useEffect(() => {
     return () => {
       if (stateRef.current && !stateRef.current.isComplete) {
