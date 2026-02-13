@@ -43,6 +43,9 @@ export function usePlayScreenAnimation(args: {
   const lastCompleteRef = useRef<boolean>(false);
   const lastPieceCountRef = useRef<number>(0);
   const lastFrameTimeRef = useRef<number>(0);
+  /** Interpolated positions for dragged group (smooth drag, no touch/pointer changes) */
+  const dragDisplayRef = useRef<Map<string, { x: number; y: number }>>(new Map());
+  const DRAG_LERP = 0.32;
 
   /** For 100+ piece puzzles: throttle redraw to 30fps when idle to reduce CPU/GPU load. */
   const IDLE_TARGET_FPS = 30;
@@ -113,6 +116,25 @@ export function usePlayScreenAnimation(args: {
       const draggedGroupId = dragState.activeId
         ? (st.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
         : null;
+
+      const dragDisplayOverrides = dragDisplayRef.current;
+      if (isDragging && draggedGroupId) {
+        const groupPieces = st.pieces.filter(
+          (p) => !p.inTray && p.groupId === draggedGroupId,
+        );
+        for (const p of groupPieces) {
+          let pos = dragDisplayOverrides.get(p.id);
+          if (!pos) {
+            pos = { x: p.x, y: p.y };
+            dragDisplayOverrides.set(p.id, pos);
+          }
+          pos.x += (p.x - pos.x) * DRAG_LERP;
+          pos.y += (p.y - pos.y) * DRAG_LERP;
+        }
+      } else {
+        dragDisplayOverrides.clear();
+      }
+
       const popMap = popMapRef.current ?? new Map<string, number>();
       const lockMap = lockMapRef.current ?? new Map<string, number>();
       const pieceCache = pieceCacheRef.current;
@@ -136,6 +158,7 @@ export function usePlayScreenAnimation(args: {
           completedAtMs: completedAtRef.current,
           showGhostHint,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
+          dragDisplayOverrides: isDragging ? dragDisplayOverrides : undefined,
         },
         pieceCache,
         viewport,
