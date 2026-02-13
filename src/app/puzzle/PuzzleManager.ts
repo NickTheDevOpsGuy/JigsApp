@@ -176,14 +176,9 @@ export class PuzzleManager {
     };
 
     if (!prevComplete && isComplete) {
-      // Snap the completed puzzle to the correct board position
+      // Snap the completed puzzle to the correct board position (exact target positions)
       const ref = boardPieces[0];
-      const tile = this.tilePos(ref);
-      const dx = ref.targetX - tile.x;
-      const dy = ref.targetY - tile.y;
-      if (dx !== 0 || dy !== 0) {
-        this.shiftGroupUnclamped(ref.groupId, Math.round(dx), Math.round(dy));
-      }
+      this.setGroupToExactTargetPositions(ref.groupId);
 
       this.updatePieces(
         () => true,
@@ -218,6 +213,17 @@ export class PuzzleManager {
     this.updatePieces(
       (p) => p.groupId === groupId,
       (p) => ({ x: p.x + Math.round(dx), y: p.y + Math.round(dy) }),
+    );
+  }
+
+  /** Set every piece in the group to its exact target position on the canvas (no rounding drift). */
+  private setGroupToExactTargetPositions(groupId: string): void {
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      (p) => ({
+        x: p.targetX - p.pad,
+        y: p.targetY - p.pad,
+      }),
     );
   }
 
@@ -597,6 +603,7 @@ export class PuzzleManager {
     if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
 
     this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
+    this.setGroupToExactTargetPositions(gid);
 
     const wasLocked = new Set(groupPieces.filter((p) => p.locked).map((p) => p.id));
     this.updatePieces(
@@ -694,6 +701,7 @@ export class PuzzleManager {
     if (this.wouldOverlapAnyOtherGroup(groupId, dx, dy)) return;
 
     this.shiftGroupUnclamped(groupId, Math.round(dx), Math.round(dy));
+    this.setGroupToExactTargetPositions(groupId);
   }
 
   private rand(min: number, max: number) {
