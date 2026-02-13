@@ -32,8 +32,6 @@ export type AnimationState = {
   completedAtMs: number | null;
   /** When true, show semi-transparent ghosts at correct positions for misplaced pieces */
   showGhostHint?: boolean;
-  /** When true, stroke piece edges so cut lines are visible on the board */
-  showPieceBorders?: boolean;
   /** When set, this piece is drawn in a DOM overlay instead of on canvas (for drag-to-tray) */
   dragPreviewPieceId?: string | null;
 };
@@ -151,11 +149,6 @@ export function renderBoard(
     drawSnapParticles(ctx, snapParticles, nowMs);
   }
 
-  // Optional: draw piece borders (jigsaw cut lines) on top of pieces
-  if (animState?.showPieceBorders) {
-    drawPieceBorders(ctx, pieces);
-  }
-
   if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
     ctx.restore();
   }
@@ -164,28 +157,6 @@ export function renderBoard(
   if (animState?.isComplete && animState.completedAtMs) {
     drawCompletionGlow(ctx, cssW, cssH, nowMs - animState.completedAtMs);
   }
-}
-
-/**
- * Draw piece borders (jigsaw cut lines) on the board when the option is enabled.
- */
-function drawPieceBorders(ctx: CanvasRenderingContext2D, pieces: Piece[]): void {
-  ctx.save();
-  ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
-  ctx.lineWidth = 1;
-  for (const p of pieces) {
-    if (!p.shapePath || p.shapePath.length === 0) continue;
-    try {
-      const path = new Path2D(p.shapePath);
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.stroke(path);
-      ctx.restore();
-    } catch {
-      // ignore invalid path
-    }
-  }
-  ctx.restore();
 }
 
 /**

@@ -22,7 +22,6 @@ export type HeaderMenuProps = {
   hapticsEnabled: boolean;
   pieceLockingEnabled: boolean;
   showGhostHint: boolean;
-  showPieceBorders: boolean;
   isFullscreen: boolean;
   canShowHaptics: boolean;
   canShowFullscreen: boolean;
@@ -35,29 +34,19 @@ export type HeaderMenuProps = {
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
   onToggleGhostHint: () => void;
-  onTogglePieceBorders: () => void;
   onToggleFullscreen: () => void;
   onShowShortcuts: () => void;
   onShowHowToPlay: () => void;
   onShowHelpChoice: () => void;
   onToggleDebug: () => void;
-  onShowWhatsNew: () => void;
-  onShareApp: () => void;
 };
 
-export type SubMenuId =
-  | "control"
-  | "game"
-  | "view"
-  | "audio"
-  | "help"
-  | "community"
-  | "navigate";
+export type SubMenuId = "game" | "view" | "audio";
 
 export type MenuItemConfig = {
   id: string;
   label: string;
-  section: "nav" | "settings" | "help" | "about" | "community";
+  section: "nav" | "settings" | "help" | "other";
   visible: boolean;
   disabled?: boolean;
   onClick: () => void;
@@ -66,10 +55,6 @@ export type MenuItemConfig = {
   /** When set, item appears in this sub-menu instead of top-level settings */
   subMenu?: SubMenuId;
 };
-
-const GITHUB_URL = "https://github.com/NickTheDevOpsGuy/phuzzle";
-const CONTRIBUTORS_URL =
-  "https://github.com/NickTheDevOpsGuy/phuzzle/blob/develop/CONTRIBUTORS.md";
 
 const TIME_MODE_LABELS: Record<TimeMode, string> = {
   elapsed: "Elapsed",
@@ -92,50 +77,33 @@ export function buildMenuItems(
   return [
     {
       id: "home",
-      section: "settings",
+      section: "nav",
       visible: true,
       label: "Home",
-      sortKey: "Home",
       onClick: c(() => navigate("/")),
-      subMenu: "navigate",
     },
     {
       id: "new",
-      section: "settings",
+      section: "nav",
       visible: true,
       label: "New puzzle",
-      sortKey: "New puzzle",
       onClick: c(props.onNewPuzzle),
-      subMenu: "navigate",
     },
     {
       id: "undo",
-      section: "settings",
+      section: "nav",
       visible: true,
       label: "Undo",
       disabled: !props.canUndo,
-      sortKey: "Undo",
       onClick: c(props.onUndo),
-      subMenu: "control",
     },
     {
       id: "redo",
-      section: "settings",
+      section: "nav",
       visible: true,
       label: "Redo",
       disabled: !props.canRedo,
-      sortKey: "Redo",
       onClick: c(props.onRedo),
-      subMenu: "control",
-    },
-    {
-      id: "help",
-      section: "settings",
-      visible: true,
-      label: "Help",
-      sortKey: "Help",
-      onClick: c(props.onShowHelpChoice),
-      subMenu: "help",
     },
     {
       id: "debug",
@@ -229,15 +197,6 @@ export function buildMenuItems(
       subMenu: "view",
     },
     {
-      id: "pieceBorders",
-      section: "settings",
-      visible: true,
-      label: props.showPieceBorders ? "Piece borders: on" : "Piece borders: off",
-      sortKey: "Piece borders",
-      onClick: c(props.onTogglePieceBorders),
-      subMenu: "view",
-    },
-    {
       id: "sound",
       section: "settings",
       visible: true,
@@ -245,47 +204,6 @@ export function buildMenuItems(
       sortKey: "Sound",
       onClick: c(props.onToggleSound),
       subMenu: "audio",
-    },
-    {
-      id: "whatsNew",
-      section: "settings",
-      visible: true,
-      label: "What's New",
-      sortKey: "What's New",
-      onClick: c(props.onShowWhatsNew),
-      subMenu: "community",
-    },
-    {
-      id: "shareApp",
-      section: "settings",
-      visible: true,
-      label: "Share",
-      sortKey: "Share",
-      onClick: c(props.onShareApp),
-      subMenu: "community",
-    },
-    {
-      id: "github",
-      section: "settings",
-      visible: true,
-      label: "GitHub",
-      sortKey: "GitHub",
-      onClick: c(() => {
-        if (typeof window !== "undefined") window.open(GITHUB_URL, "_blank", "noopener");
-      }),
-      subMenu: "community",
-    },
-    {
-      id: "contributors",
-      section: "settings",
-      visible: true,
-      label: "Contributors",
-      sortKey: "Contributors",
-      onClick: c(() => {
-        if (typeof window !== "undefined")
-          window.open(CONTRIBUTORS_URL, "_blank", "noopener");
-      }),
-      subMenu: "community",
     },
   ];
 }

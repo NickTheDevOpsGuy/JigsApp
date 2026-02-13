@@ -14,24 +14,10 @@ import {
 export type { HeaderMenuProps } from "./headerMenuConfig";
 
 const SUB_MENU_LABELS: Record<SubMenuId, string> = {
-  control: "Control",
   game: "Game",
   view: "View",
   audio: "Audio",
-  help: "Help",
-  community: "Community",
-  navigate: "Navigate",
 };
-
-/** Settings submenus in alphabetical order by label */
-const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
-  "audio",
-  "control",
-  "game",
-  "help",
-  "navigate",
-  "view",
-];
 
 /**
  * Single source of truth for the "hamburger" menu.
@@ -70,6 +56,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
   }, [open, activeSubMenu]);
 
   const visibleItems = items.filter((i) => i.visible);
+  const navItems = visibleItems.filter((i) => i.section === "nav");
   const settingsItems = visibleItems
     .filter((i) => i.section === "settings")
     .sort((a, b) =>
@@ -77,6 +64,8 @@ export function HeaderMenu(props: HeaderMenuProps) {
         sensitivity: "base",
       }),
     );
+  const otherItems = visibleItems.filter((i) => i.section === "other");
+
   const topLevelSettings = settingsItems.filter((i) => !i.subMenu);
   const subMenuItems = settingsItems
     .filter((i) => i.subMenu === activeSubMenu)
@@ -87,6 +76,11 @@ export function HeaderMenu(props: HeaderMenuProps) {
     );
 
   const hasSubMenuItems = (id: SubMenuId) => settingsItems.some((i) => i.subMenu === id);
+
+  const closeAnd = (fn: () => void) => () => {
+    setOpen(false);
+    fn();
+  };
 
   const renderItem = (item: MenuItemConfig) => {
     if (item.isTheme) {
@@ -116,36 +110,54 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const renderMainMenu = () => (
     <>
-      {hasSubMenuItems("community") && (
-        <>
-          <div className={styles.headerMenuDivider} />
-          <div className={styles.headerMenuSection}>About</div>
-          <button
-            type="button"
-            className={styles.headerMenuSubmenuTrigger}
-            role="menuitem"
-            onClick={() => setActiveSubMenu("community")}
-          >
-            {SUB_MENU_LABELS.community}
-            <ChevronRight size={16} className={styles.headerMenuChevron} />
-          </button>
-        </>
-      )}
+      {navItems.map(renderItem)}
+      <div className={styles.headerMenuDivider} />
+      <div className={styles.headerMenuSection}>Help</div>
+      <button
+        type="button"
+        className={styles.headerMenuItem}
+        role="menuitem"
+        onClick={closeAnd(props.onShowHelpChoice)}
+      >
+        Help
+      </button>
       <div className={styles.headerMenuDivider} />
       <div className={styles.headerMenuSection}>Settings</div>
-      {SETTINGS_SUBMENU_ORDER.filter((id) => hasSubMenuItems(id)).map((id) => (
+      {hasSubMenuItems("game") && (
         <button
-          key={id}
           type="button"
           className={styles.headerMenuSubmenuTrigger}
           role="menuitem"
-          onClick={() => setActiveSubMenu(id)}
+          onClick={() => setActiveSubMenu("game")}
         >
-          {SUB_MENU_LABELS[id]}
+          {SUB_MENU_LABELS.game}
           <ChevronRight size={16} className={styles.headerMenuChevron} />
         </button>
-      ))}
+      )}
+      {hasSubMenuItems("view") && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => setActiveSubMenu("view")}
+        >
+          {SUB_MENU_LABELS.view}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
+      )}
+      {hasSubMenuItems("audio") && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => setActiveSubMenu("audio")}
+        >
+          {SUB_MENU_LABELS.audio}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
+      )}
       {topLevelSettings.map(renderItem)}
+      {otherItems.map(renderItem)}
     </>
   );
 

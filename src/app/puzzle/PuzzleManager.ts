@@ -24,8 +24,6 @@ export type PuzzleManagerOptions = {
   scatterPadding?: number;
   scatterStartYRatio?: number;
   snapTolerancePx?: number;
-  /** If set, used for piece-to-piece (neighbor) snap; otherwise 1.2× snapTolerancePx so left/right both lock. */
-  neighborSnapTolerancePx?: number;
   rotationStepDeg?: 90 | 180;
 };
 
@@ -54,7 +52,6 @@ export class PuzzleManager {
   private boardHeight: number;
 
   private snapTolerancePx: number;
-  private neighborSnapTolerancePx: number;
   private scatterStartYRatio: number;
   private rotationStepDeg: 90 | 180;
 
@@ -79,7 +76,6 @@ export class PuzzleManager {
       scatterPadding = 16,
       pad = 18,
       snapTolerancePx = 40,
-      neighborSnapTolerancePx,
       scatterStartYRatio = 0.3,
       rotationStepDeg = 90,
     } = options;
@@ -88,8 +84,6 @@ export class PuzzleManager {
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
     this.snapTolerancePx = snapTolerancePx;
-    this.neighborSnapTolerancePx =
-      neighborSnapTolerancePx ?? Math.ceil(snapTolerancePx * 1.2);
     this.scatterStartYRatio = scatterStartYRatio;
     this.rotationStepDeg = rotationStepDeg;
     // Tabs extend ~22% beyond tile edge; pad must exceed that or shapes get clipped
@@ -250,29 +244,6 @@ export class PuzzleManager {
     };
   }
 
-  /** Move only the active piece during drag (so connected groups don't move together). */
-  private shiftActivePieceOnly(dx: number, dy: number) {
-    const activeId = this.drag.activeId;
-    if (!activeId) return;
-    const piece = this.findPiece(activeId);
-    if (!piece) return;
-    const dxClamp = _clamp(
-      dx,
-      -this.pad - piece.x,
-      this.boardWidth + this.pad - (piece.x + piece.w),
-    );
-    const dyClamp = _clamp(
-      dy,
-      -this.pad - piece.y,
-      this.boardHeight + this.pad - (piece.y + piece.h),
-    );
-    if (dxClamp === 0 && dyClamp === 0) return;
-    this.updatePieces(
-      (p) => p.id === activeId,
-      (p) => ({ x: p.x + dxClamp, y: p.y + dyClamp }),
-    );
-  }
-
   private findPiece(id: string) {
     return this.state.pieces.find((p) => p.id === id) ?? null;
   }
@@ -419,19 +390,8 @@ export class PuzzleManager {
 
     this.pushUndoState();
 
-    // Keep piece fully on canvas: clamp to [0, board - piece size]
-    const maxX = Math.max(0, this.boardWidth - piece.w);
-    const maxY = Math.max(0, this.boardHeight - piece.h);
-    const padding = 12;
-    const xMax = Math.max(0, this.boardWidth - piece.w - padding);
-    const yMax = Math.max(0, this.boardHeight - piece.h - padding);
-    const xMin = Math.min(padding, xMax);
-    const yMin = Math.min(padding, yMax);
-    let x = _clamp(this.rand(xMin, xMax), 0, maxX);
-    let y = _clamp(this.rand(yMin, yMax), 0, maxY);
-    // Final clamp so piece never lands off canvas (handles stale or zero board size)
-    x = Math.max(0, Math.min(x, maxX));
-    y = Math.max(0, Math.min(y, maxY));
+    const x = this.rand(16, Math.max(16, this.boardWidth - piece.w - 16));
+    const y = this.rand(16, Math.max(16, this.boardHeight - piece.h - 16));
 
     this.zCounter += 1;
     this.updatePieces(
@@ -517,8 +477,8 @@ export class PuzzleManager {
     const dx = newX - piece.x;
     const dy = newY - piece.y;
 
-    // Move only the active piece (so two unconnected pieces don't move together)
-    this.shiftActivePieceOnly(dx, dy);
+    // Move the group
+    this.shiftGroup(piece.groupId, dx, dy);
 
     // Compute snap preview
     this.drag = {
@@ -561,7 +521,7 @@ export class PuzzleManager {
     const dx = newX - piece.x;
     const dy = newY - piece.y;
 
-    this.shiftActivePieceOnly(dx, dy);
+    this.shiftGroup(piece.groupId, dx, dy);
     this.drag = {
       ...this.drag,
       preview: this.computeSnapPreview(),
@@ -575,19 +535,6 @@ export class PuzzleManager {
     // Order matters: board-then-neighbor could undo the board snap by aligning to a floating neighbor.
     this.trySnapActiveGroupToNeighbor();
     this.trySnapActiveGroupToBoard();
-
-    // If the dropped group is off the board, clamp it back so pieces don't stay off canvas
-    const activeId = this.drag.activeId;
-    const active = this.findPiece(activeId);
-    if (active && !active.isPlaced && !active.inTray) {
-      const gid = active.groupId;
-      const b = this.getGroupBounds(gid);
-      if (b) {
-        const dx = _clamp(0, -this.pad - b.minX, this.boardWidth + this.pad - b.maxX);
-        const dy = _clamp(0, -this.pad - b.minY, this.boardHeight + this.pad - b.maxY);
-        if (dx !== 0 || dy !== 0) this.shiftGroup(gid, dx, dy);
-      }
-    }
 
     // Clear drag state
     this.drag = {
@@ -649,21 +596,7 @@ export class PuzzleManager {
     if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
     if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
 
-    const shiftX = Math.round(dx);
-    const shiftY = Math.round(dy);
-    this.shiftGroupUnclamped(gid, shiftX, shiftY);
-
-    // Only mark as placed if every piece in the group is at its correct position (prevents locking to edges or wrong spots)
-    const afterShift = this.getGroupPieces(gid);
-    const allAtTarget = afterShift.every((p) => {
-      const tile = this.tilePos(p);
-      const dist = Math.hypot(p.targetX - tile.x, p.targetY - tile.y);
-      return dist <= this.snapTolerancePx;
-    });
-    if (!allAtTarget) {
-      this.shiftGroupUnclamped(gid, -shiftX, -shiftY);
-      return false;
-    }
+    this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
 
     const wasLocked = new Set(groupPieces.filter((p) => p.locked).map((p) => p.id));
     this.updatePieces(
@@ -719,8 +652,7 @@ export class PuzzleManager {
         const dy = nTile.y - expectedDy - gpTile.y;
         const d = Math.hypot(dx, dy);
 
-        const tolerance = this.neighborSnapTolerancePx;
-        if (d <= tolerance && (!best || d < best.dist)) {
+        if (d <= this.snapTolerancePx && (!best || d < best.dist)) {
           best = { dx, dy, dist: d, into: n.groupId };
         }
       }

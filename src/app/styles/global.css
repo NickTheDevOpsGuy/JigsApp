@@ -312,17 +312,6 @@ button {
   font-family: inherit;
 }
 
-/* Visible focus for keyboard users; no outline on mouse click */
-button:focus-visible,
-a:focus-visible,
-[role="button"]:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
-}
-
 img {
   max-width: 100%;
   display: block;

@@ -75,20 +75,6 @@ export default defineConfig(({ mode }) => {
       "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(
         env.VITE_SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY ?? "",
       ),
-      "import.meta.env.VITE_POSTHOG_KEY": JSON.stringify(
-        env.VITE_POSTHOG_KEY ??
-          env.VITE_PUBLIC_POSTHOG_KEY ??
-          process.env.VITE_POSTHOG_KEY ??
-          process.env.VITE_PUBLIC_POSTHOG_KEY ??
-          "",
-      ),
-      "import.meta.env.VITE_POSTHOG_HOST": JSON.stringify(
-        env.VITE_POSTHOG_HOST ??
-          env.VITE_PUBLIC_POSTHOG_HOST ??
-          process.env.VITE_POSTHOG_HOST ??
-          process.env.VITE_PUBLIC_POSTHOG_HOST ??
-          "",
-      ),
     },
     resolve: {
       alias: {

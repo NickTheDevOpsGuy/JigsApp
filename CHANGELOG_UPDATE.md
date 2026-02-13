@@ -4,13 +4,6 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 🧩 Latest (piece borders & invite testers)
-
-- **Piece borders** — New View option (Settings → View → Piece borders: on/off). When on, jigsaw cut lines are drawn on the board so piece boundaries are visible. Preference is saved in localStorage.
-- **Share app / Invite testers** — Main menu button “Share app / Invite testers”: on supported devices uses the native share sheet (title, text, app URL); otherwise copies the app link to the clipboard. Brief feedback message (“Link copied!” or “Thanks for sharing!”) for 3 seconds. Helps get more people testing the app.
-
----
-
 ## 🧩 Play screen & mobile polish
 
 - **Completion overlay (mobile)** — Text stays inside the container: padding, scroll, responsive font sizes (smaller heading/body on narrow screens), and word-wrap so long messages don’t overflow.

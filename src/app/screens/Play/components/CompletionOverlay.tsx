@@ -100,12 +100,6 @@ export function CompletionOverlay({
         <h2>🎉 {completionMessage}</h2>
         <p>
           Finished in {formatTime(elapsedSeconds)}
-          {grid && (
-            <span className={styles.puzzleSize}>
-              {" "}
-              · {grid.rows}×{grid.cols} puzzle ({grid.rows * grid.cols} pieces)
-            </span>
-          )}
           {isNewBest && <span className={styles.newBest}> — New best!</span>}
           {isDaily && (
             <span className={styles.dailyBadge}>
@@ -154,17 +148,17 @@ export function CompletionOverlay({
 
           {/* Utility buttons */}
           <div className={styles.shareButtons}>
-            <Button size="md" onClick={onDownloadImage}>
-              <Download size={20} />
+            <Button size="sm" onClick={onDownloadImage}>
+              <Download size={16} />
               Download
             </Button>
-            <Button size="md" onClick={onCopyResults}>
-              {copied ? <Check size={20} /> : <Copy size={20} />}
+            <Button size="sm" onClick={onCopyResults}>
+              {copied ? <Check size={16} /> : <Copy size={16} />}
               {copied ? "Copied!" : "Copy"}
             </Button>
             {canNativeShare && (
-              <Button size="md" onClick={onNativeShare}>
-                <Share2 size={20} />
+              <Button size="sm" onClick={onNativeShare}>
+                <Share2 size={16} />
                 More
               </Button>
             )}

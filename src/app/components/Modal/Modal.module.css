@@ -84,14 +84,21 @@
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
-  align-items: stretch;
+  justify-content: flex-end;
+  align-items: center;
   margin-top: 24px;
 }
 
-.confirmModalBtn {
-  flex: 1;
-  min-width: 0;
+.tertiaryBtn {
+  margin-right: auto;
+  order: -1;
+}
+
+.primaryActions {
+  display: flex;
+  gap: 12px;
 }
 
 .message {

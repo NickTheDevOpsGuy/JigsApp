@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PlayScreen.module.css";
 
-import { capture } from "@/analytics/posthog";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
@@ -10,8 +9,6 @@ import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
-import { WhatsNewModal } from "@/components/WhatsNew";
-import { shouldShowChangelog } from "@/data/changelog";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
@@ -30,7 +27,6 @@ import { useViewport } from "./hooks/useViewport";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
 import {
   DragPreview,
   PlayHUD,
@@ -50,8 +46,6 @@ export function PlayScreen() {
     setPieceLockingEnabled,
     showGhostHint,
     setShowGhostHint,
-    showPieceBorders,
-    setShowPieceBorders,
     debug,
     showPreview,
     setShowPreview,
@@ -90,13 +84,7 @@ export function PlayScreen() {
   const haptics = useHaptics();
   const [showStreakToast, setShowStreakToast] = React.useState(false);
   const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
-  const [showWhatsNew, setShowWhatsNew] = React.useState(false);
-  const [shareFeedback, setShareFeedback] = React.useState("");
   const lastMilestoneRef = React.useRef<number>(0);
-  const puzzleStartedSentRef = React.useRef<string | null>(null);
-  const puzzleCompletedSentRef = React.useRef<string | null>(null);
-  const completedThisSessionRef = React.useRef(false);
-  const reducedMotion = useReducedMotion();
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -109,7 +97,6 @@ export function PlayScreen() {
       haptic: hapticsEnabled ? haptics.vibrate : undefined,
       themeRef,
       onPlacementStreak: () => setShowStreakToast(true),
-      reducedMotion,
     },
   );
   const {
@@ -129,59 +116,7 @@ export function PlayScreen() {
     popMapRef,
     lockMapRef,
     snapParticlesRef,
-    puzzleStartTimeRef,
-    firstPlacementTimeRef,
   } = managerResult;
-
-  // Analytics: puzzle_started (once per puzzle load)
-  useEffect(() => {
-    if (!state || state.pieces.length === 0) return;
-    const key = `${puzzleKey}-${state.grid.rows}x${state.grid.cols}`;
-    if (puzzleStartedSentRef.current === key) return;
-    puzzleStartedSentRef.current = key;
-    capture("puzzle_started", {
-      rows: state.grid.rows,
-      cols: state.grid.cols,
-      totalPieces: state.totalCount,
-    });
-  }, [state, puzzleKey]);
-
-  // Analytics: puzzle_completed (once per completion)
-  useEffect(() => {
-    if (!state?.isComplete) return;
-    const key = `${puzzleKey}-${state.grid.rows}x${state.grid.cols}`;
-    if (puzzleCompletedSentRef.current === key) return;
-    puzzleCompletedSentRef.current = key;
-    completedThisSessionRef.current = true;
-    const timeToFirstSnapMs =
-      firstPlacementTimeRef?.current != null && puzzleStartTimeRef?.current != null
-        ? firstPlacementTimeRef.current - puzzleStartTimeRef.current
-        : undefined;
-    capture("puzzle_completed", {
-      rows: state.grid.rows,
-      cols: state.grid.cols,
-      totalPieces: state.totalCount,
-      ...(timeToFirstSnapMs != null && { time_to_first_snap_ms: timeToFirstSnapMs }),
-    });
-  }, [state?.isComplete, state?.grid, state?.totalCount, puzzleKey]);
-
-  // Reset completion flag when starting a new puzzle (so exit-before-completion applies to next)
-  useEffect(() => {
-    completedThisSessionRef.current = false;
-  }, [puzzleKey]);
-
-  // Analytics: exit before completion (on unmount when puzzle not completed)
-  useEffect(() => {
-    return () => {
-      if (completedThisSessionRef.current) return;
-      if (!grid) return;
-      capture("puzzle_exit_before_completion", {
-        rows: grid.rows,
-        cols: grid.cols,
-        totalPieces: grid.rows * grid.cols,
-      });
-    };
-  }, [grid]);
 
   // Milestone callouts at 25%, 50%, 75%
   useEffect(() => {
@@ -239,40 +174,6 @@ export function PlayScreen() {
   useEffect(() => {
     viewport.reset();
   }, [puzzleKey, viewport.reset]);
-
-  useEffect(() => {
-    if (shouldShowChangelog()) setShowWhatsNew(true);
-  }, []);
-
-  const handleShareApp = useCallback(async () => {
-    const url =
-      typeof window !== "undefined"
-        ? window.location.origin
-        : "https://phuzzle.vercel.app";
-    const title = "Phuzzle";
-    const text = "Try Phuzzle – a cozy jigsaw puzzle game. I'd love your feedback!";
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({ title, text, url });
-        setShareFeedback("Thanks for sharing!");
-      } catch (err) {
-        if ((err as Error)?.name !== "AbortError") setShareFeedback("Share cancelled");
-      }
-    } else {
-      try {
-        await navigator.clipboard?.writeText(url);
-        setShareFeedback("Link copied! Share it to invite testers.");
-      } catch {
-        setShareFeedback("Copy failed – share " + url);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!shareFeedback) return;
-    const t = setTimeout(() => setShareFeedback(""), 3000);
-    return () => clearTimeout(t);
-  }, [shareFeedback]);
 
   const getSelectable = useCallback(() => {
     if (!manager) return [];
@@ -390,7 +291,6 @@ export function PlayScreen() {
     snapParticlesRef,
     debug,
     showGhostHint,
-    showPieceBorders,
     viewport: viewport.viewport,
   });
 
@@ -466,7 +366,6 @@ export function PlayScreen() {
             hapticsEnabled={hapticsEnabled}
             pieceLockingEnabled={pieceLockingEnabled}
             showGhostHint={showGhostHint}
-            showPieceBorders={showPieceBorders}
             isFullscreen={ui.isFullscreen}
             canShowHaptics={isCoarsePointer && typeof navigator?.vibrate === "function"}
             canShowFullscreen={!!document.fullscreenEnabled}
@@ -479,14 +378,11 @@ export function PlayScreen() {
             onToggleHaptics={toggleHaptics}
             onTogglePieceLocking={() => setPieceLockingEnabled((p) => !p)}
             onToggleGhostHint={() => setShowGhostHint((g) => !g)}
-            onTogglePieceBorders={() => setShowPieceBorders((b) => !b)}
             onToggleFullscreen={toggleFullscreen}
             onShowShortcuts={() => setShowShortcuts(true)}
             onShowHowToPlay={() => setShowHowToPlay(true)}
             onShowHelpChoice={() => setShowHelpChoice(true)}
             onToggleDebug={toggleDebug}
-            onShowWhatsNew={() => setShowWhatsNew(true)}
-            onShareApp={handleShareApp}
           />
           <div className={styles.title}>Phuzzle</div>
         </div>
@@ -526,6 +422,8 @@ export function PlayScreen() {
         message="You have a puzzle in progress. Would you like to continue where you left off?"
         confirmText="Resume"
         cancelText="Start Fresh"
+        tertiaryText="Back to Home"
+        onTertiary={() => navigate("/")}
         variant="default"
         primaryOnlyConfirm
       />
@@ -549,11 +447,7 @@ export function PlayScreen() {
       />
 
       <div className={styles.main} ref={mainRef}>
-        <div
-          className={styles.board}
-          ref={boardRef}
-          onContextMenu={(e) => e.preventDefault()}
-        >
+        <div className={styles.board} ref={boardRef}>
           {isLoading && (
             <div className={styles.loadingOverlay} aria-label="Loading puzzle">
               <div className={styles.spinner} />
@@ -569,15 +463,7 @@ export function PlayScreen() {
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerCancel}
             onLostPointerCapture={handleLostPointerCapture}
-            onContextMenu={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleContextMenu(e);
-            }}
-            onContextMenuCapture={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
+            onContextMenu={handleContextMenu}
             onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
           />
           {showPreview && imgRef.current && (
@@ -666,12 +552,6 @@ export function PlayScreen() {
           {milestoneMessage}
         </div>
       )}
-      {shareFeedback && (
-        <div className={styles.engagementToast} role="status">
-          {shareFeedback}
-        </div>
-      )}
-      <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
     </div>
   );
 }

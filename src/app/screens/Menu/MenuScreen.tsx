@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MenuScreen.module.css";
 
@@ -9,9 +9,19 @@ import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
-import { HelpCircle, Image, Calendar, BarChart3, Camera, Palette } from "lucide-react";
+import { WhatsNewModal } from "@/components/WhatsNew";
+import {
+  HelpCircle,
+  Image,
+  Calendar,
+  BarChart3,
+  Sparkles,
+  Camera,
+  Palette,
+} from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
+import { shouldShowChangelog } from "@/data/changelog";
 import { getMenuTip } from "@/data/menuTips";
 
 export function MenuScreen() {
@@ -19,11 +29,16 @@ export function MenuScreen() {
   const [showHelpChoice, setShowHelpChoice] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
 
   const todayCompleted = isTodayDailyCompleted();
   const hasDaily = SAMPLE_PUZZLES.length > 0;
+
+  useEffect(() => {
+    if (shouldShowChangelog()) setShowWhatsNew(true);
+  }, []);
 
   return (
     <div className={styles.page}>
@@ -88,6 +103,15 @@ export function MenuScreen() {
             <Palette size={20} />
             <span className={styles.actionLabel}>Theme</span>
           </Button>
+
+          <Button
+            variant="secondary"
+            onClick={() => setShowWhatsNew(true)}
+            className={styles.whatsNewCard}
+          >
+            <Sparkles size={20} />
+            <span className={styles.actionLabel}>What&apos;s New</span>
+          </Button>
         </div>
 
         <p className={styles.menuTip}>{getMenuTip()}</p>
@@ -105,6 +129,7 @@ export function MenuScreen() {
       />
       <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
       <ThemeModal isOpen={showThemeModal} onClose={() => setShowThemeModal(false)} />
+      <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <DailyDifficultyModal
         isOpen={showDailyModal}
         onClose={() => setShowDailyModal(false)}

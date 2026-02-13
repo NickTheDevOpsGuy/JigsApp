@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { soundManager } from "@/audio/sounds";
-import {
-  PIECE_LOCKING_KEY,
-  GHOST_HINT_KEY,
-  PIECE_BORDERS_KEY,
-  type DebugFlags,
-} from "../playScreenUtils";
+import { PIECE_LOCKING_KEY, GHOST_HINT_KEY, type DebugFlags } from "../playScreenUtils";
 
 export function usePlayScreenUI() {
   const [pieceLockingEnabled, setPieceLockingEnabled] = useState(() => {
@@ -19,14 +14,6 @@ export function usePlayScreenUI() {
   const [showGhostHint, setShowGhostHint] = useState(() => {
     try {
       return localStorage.getItem(GHOST_HINT_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const [showPieceBorders, setShowPieceBorders] = useState(() => {
-    try {
-      return localStorage.getItem(PIECE_BORDERS_KEY) === "true";
     } catch {
       return false;
     }
@@ -92,14 +79,6 @@ export function usePlayScreenUI() {
   }, [showGhostHint]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(PIECE_BORDERS_KEY, showPieceBorders ? "true" : "false");
-    } catch {
-      // ignore
-    }
-  }, [showPieceBorders]);
-
-  useEffect(() => {
     setSoundEnabled(soundManager.isEnabled());
     setHapticsEnabled(soundManager.isHapticsEnabled());
   }, []);
@@ -131,8 +110,6 @@ export function usePlayScreenUI() {
     setPieceLockingEnabled,
     showGhostHint,
     setShowGhostHint,
-    showPieceBorders,
-    setShowPieceBorders,
     debug,
     setDebug,
     showPreview,

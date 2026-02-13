@@ -314,21 +314,9 @@ export function usePointerHandlers(args: {
     [manager, canvasRef, canRotatePiece, isPointerOverTray, screenToBoard, viewport],
   );
 
-  const handleContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      if (!manager || !canvasRef.current) return;
-      if (manager.getDragState().activeId) {
-        const canvas = canvasRef.current as CanvasWithTouch;
-        resetTouchState(canvas);
-        onDragPreview?.(null);
-        didDragRef.current = false;
-        manager.pointerUp();
-        setState(manager.getState());
-      }
-    },
-    [manager, canvasRef, onDragPreview, setState, didDragRef],
-  );
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+  }, []);
 
   const handlePointerCancel = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -348,15 +336,20 @@ export function usePointerHandlers(args: {
       try {
         canvas.releasePointerCapture(e.pointerId);
       } catch {
-        /* ignore */
+        // ignore
       }
-      resetTouchState(canvas);
       onDragPreview?.(null);
-      didDragRef.current = false;
       manager.pointerUp();
       setState(manager.getState());
+      if (e.pointerType === "touch") {
+        canvas.touchStartX = undefined;
+        canvas.touchStartY = undefined;
+        canvas.touchDragStarted = false;
+        canvas.pendingPieceId = null;
+        canvas.pendingPieceRect = null;
+      }
     },
-    [manager, canvasRef, onDragPreview, setState, viewport, didDragRef],
+    [manager, canvasRef, onDragPreview, setState, viewport],
   );
 
   const handleLostPointerCapture = useCallback(
