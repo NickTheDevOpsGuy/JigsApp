@@ -127,9 +127,9 @@ export function PlayScreen() {
     if (total === 0) return;
     const pct = placed / total;
     const milestones: { threshold: number; message: string }[] = [
-      { threshold: 0.25, message: "Quarter done!" },
-      { threshold: 0.5, message: "Halfway there!" },
-      { threshold: 0.75, message: "Almost there!" },
+      { threshold: 1 / 3, message: "1/3 done 🧩" },
+      { threshold: 0.5, message: "Enjoy 1/2 done! 🧩" },
+      { threshold: 2 / 3, message: "2/3 done 🧩" },
     ];
     const hit = milestones.find(
       (m) => pct >= m.threshold && lastMilestoneRef.current < m.threshold,
