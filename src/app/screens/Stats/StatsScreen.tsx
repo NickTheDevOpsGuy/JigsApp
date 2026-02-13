@@ -11,6 +11,7 @@ import {
   getCompletionCountLeaderboard,
   getWeeklyTotalsLeaderboard,
   getMonthlyTotalsLeaderboard,
+  getPeriodLeaderboard,
   getAllTimeBestLeaderboard,
   getMyPersonalBests,
   type LeaderboardEntry,
@@ -19,6 +20,8 @@ import {
   type PersonalBestEntry,
 } from "@/services/leaderboardService";
 import { getMyProfile, updateMyProfile } from "@/services/profileService";
+import { getUserId } from "@/supabase/auth";
+import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString } from "@/daily/dailyPuzzle";
 
@@ -41,7 +44,15 @@ function formatTime(seconds: number): string {
 
 const PODIUM = ["🥇", "🥈", "🥉"];
 
-type LeaderboardType = "today" | "week" | "month" | "streaks" | "completions" | "alltime";
+type LeaderboardType =
+  | "today"
+  | "bestWeek"
+  | "bestMonth"
+  | "week"
+  | "month"
+  | "streaks"
+  | "completions"
+  | "alltime";
 
 export function StatsScreen() {
   const nav = useNavigate();
@@ -87,6 +98,7 @@ export function StatsScreen() {
   const [loading, setLoading] = useState(true);
   const [profileSaving, setProfileSaving] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [raccoonName, setRaccoonName] = useState<string | null>(null);
 
   const configured = isSupabaseConfigured();
 
@@ -128,10 +140,23 @@ export function StatsScreen() {
   }, [configured, loadData]);
 
   useEffect(() => {
+    if (!configured) return;
+    getUserId().then((uid) => {
+      if (uid) setRaccoonName(getAnonymousDisplayName(uid));
+    });
+  }, [configured]);
+
+  useEffect(() => {
     if (!configured || activeTab !== "leaderboard") return;
     const loadLb = async () => {
       if (leaderboardType === "today") {
         const lb = await getDailyLeaderboard(getTodayDateString());
+        setLeaderboard(lb);
+      } else if (leaderboardType === "bestWeek") {
+        const lb = await getPeriodLeaderboard("week");
+        setLeaderboard(lb);
+      } else if (leaderboardType === "bestMonth") {
+        const lb = await getPeriodLeaderboard("month");
         setLeaderboard(lb);
       } else if (leaderboardType === "week") {
         const wklb = await getWeeklyTotalsLeaderboard();
@@ -307,7 +332,7 @@ export function StatsScreen() {
             <ArrowLeft size={18} />
             Back
           </Button>
-          <h1 className={styles.title}>Stats</h1>
+          <h1 className={styles.title}>Stats & Leaderboards</h1>
         </div>
 
         <div className={styles.tabs}>
@@ -419,9 +444,15 @@ export function StatsScreen() {
                     <span>Show my name on leaderboards</span>
                   </label>
                 </div>
+                {raccoonName && (
+                  <p className={styles.raccoonPreview}>
+                    🦝 Your raccoon name: <strong>{raccoonName}</strong>
+                  </p>
+                )}
                 <p className={styles.hint}>
-                  Uncheck to appear as a fun anonymous name (e.g. Trash Eater 42). You’re
-                  still tracked—turn this back on anytime to show your display name.
+                  Uncheck "Show my name" to appear as your raccoon name on leaderboards.
+                  You’re still tracked—turn this back on anytime to show your display
+                  name.
                 </p>
                 <Button
                   onClick={handleSaveProfile}
@@ -439,7 +470,9 @@ export function StatsScreen() {
                   <div className={styles.leaderboardTabs}>
                     {(
                       [
-                        ["today", "Daily puzzle"],
+                        ["today", "Today"],
+                        ["bestWeek", "Best time (week)"],
+                        ["bestMonth", "Best time (month)"],
                         ["week", "Weekly totals"],
                         ["month", "Monthly totals"],
                         ["streaks", "Streaks"],
@@ -483,7 +516,9 @@ export function StatsScreen() {
                   </Button>
                 </div>
                 <h2>
-                  {leaderboardType === "today" && "Daily puzzle"}
+                  {leaderboardType === "today" && "Today's daily puzzle"}
+                  {leaderboardType === "bestWeek" && "Best time this week (daily)"}
+                  {leaderboardType === "bestMonth" && "Best time this month (daily)"}
                   {leaderboardType === "week" && "Weekly totals"}
                   {leaderboardType === "month" && "Monthly totals"}
                   {leaderboardType === "streaks" && "Longest streaks"}
@@ -492,6 +527,16 @@ export function StatsScreen() {
                 </h2>
                 {leaderboardType === "today" &&
                   renderTimeLeaderboard(leaderboard, "No completions yet. Be the first!")}
+                {leaderboardType === "bestWeek" &&
+                  renderTimeLeaderboard(
+                    leaderboard,
+                    "No daily completions this week yet.",
+                  )}
+                {leaderboardType === "bestMonth" &&
+                  renderTimeLeaderboard(
+                    leaderboard,
+                    "No daily completions this month yet.",
+                  )}
                 {leaderboardType === "week" &&
                   renderCompletionLeaderboard(
                     weeklyTotalsLeaderboard,
