@@ -3,6 +3,11 @@
 import type { Piece, GridSize } from "./types";
 
 const PUZZLE_STATE_KEY = "phuzzle:puzzleState";
+const PUZZLE_BACKUP_KEY = "phuzzle:puzzleStateBackup";
+const BACKUP_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+/** Current schema version. Bump when SavedPiece or SavedPuzzleState shape changes. */
+export const PUZZLE_STATE_VERSION = 1;
 
 /**
  * Minimal piece data needed to restore state.
@@ -23,16 +28,133 @@ export type SavedPiece = {
 };
 
 export type SavedPuzzleState = {
-  version: 1;
+  version: number;
   imageUrl: string;
   grid: GridSize;
   pieces: SavedPiece[];
   elapsedSeconds: number;
-  savedAt: number; // timestamp
+  savedAt: number;
 };
 
+export type LoadResult =
+  | { ok: true; state: SavedPuzzleState }
+  | { ok: false; reason: "corrupted" | "version_mismatch" | "invalid"; cleared: boolean };
+
+function isValidPiece(p: unknown, grid: GridSize): p is SavedPiece {
+  if (!p || typeof p !== "object") return false;
+  const o = p as Record<string, unknown>;
+  return (
+    typeof o.id === "string" &&
+    typeof o.row === "number" &&
+    o.row >= 0 &&
+    o.row < grid.rows &&
+    typeof o.col === "number" &&
+    o.col >= 0 &&
+    o.col < grid.cols &&
+    typeof o.x === "number" &&
+    typeof o.y === "number" &&
+    typeof o.z === "number" &&
+    typeof o.rotation === "number" &&
+    typeof o.isPlaced === "boolean" &&
+    typeof o.locked === "boolean" &&
+    typeof o.groupId === "string" &&
+    typeof o.inTray === "boolean"
+  );
+}
+
+function validateState(raw: unknown): LoadResult {
+  try {
+    if (!raw || typeof raw !== "object")
+      return { ok: false, reason: "corrupted", cleared: false };
+    const state = raw as Record<string, unknown>;
+
+    const version = state.version;
+    if (typeof version !== "number")
+      return { ok: false, reason: "corrupted", cleared: false };
+    if (version !== PUZZLE_STATE_VERSION) {
+      return { ok: false, reason: "version_mismatch", cleared: false };
+    }
+
+    const imageUrl = state.imageUrl;
+    if (typeof imageUrl !== "string" || !imageUrl) {
+      return { ok: false, reason: "invalid", cleared: false };
+    }
+
+    const grid = state.grid as GridSize | undefined;
+    if (
+      !grid ||
+      typeof grid.rows !== "number" ||
+      typeof grid.cols !== "number" ||
+      grid.rows < 1 ||
+      grid.cols < 1
+    ) {
+      return { ok: false, reason: "invalid", cleared: false };
+    }
+
+    const pieces = state.pieces;
+    if (!Array.isArray(pieces) || pieces.length !== grid.rows * grid.cols) {
+      return { ok: false, reason: "invalid", cleared: false };
+    }
+
+    const pieceIds = new Set<string>();
+    for (let i = 0; i < pieces.length; i++) {
+      if (!isValidPiece(pieces[i], grid)) {
+        return { ok: false, reason: "invalid", cleared: false };
+      }
+      const id = (pieces[i] as SavedPiece).id;
+      if (pieceIds.has(id)) return { ok: false, reason: "invalid", cleared: false };
+      pieceIds.add(id);
+    }
+
+    const elapsedSeconds = state.elapsedSeconds;
+    if (typeof elapsedSeconds !== "number" || elapsedSeconds < 0) {
+      return { ok: false, reason: "invalid", cleared: false };
+    }
+
+    const savedAt = state.savedAt;
+    if (typeof savedAt !== "number" || savedAt <= 0) {
+      return { ok: false, reason: "invalid", cleared: false };
+    }
+
+    return {
+      ok: true,
+      state: {
+        version,
+        imageUrl,
+        grid,
+        pieces: pieces as SavedPiece[],
+        elapsedSeconds,
+        savedAt,
+      },
+    };
+  } catch {
+    return { ok: false, reason: "corrupted", cleared: false };
+  }
+}
+
+function tryLoadFromStorage(key: string): LoadResult {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return { ok: false, reason: "corrupted", cleared: false };
+    const parsed = JSON.parse(raw) as unknown;
+    return validateState(parsed);
+  } catch {
+    return { ok: false, reason: "corrupted", cleared: false };
+  }
+}
+
+function clearBoth(): void {
+  try {
+    localStorage.removeItem(PUZZLE_STATE_KEY);
+    localStorage.removeItem(PUZZLE_BACKUP_KEY);
+  } catch (e) {
+    console.warn("Failed to clear puzzle state:", e);
+  }
+}
+
 /**
- * Save current puzzle state to localStorage
+ * Save current puzzle state to localStorage.
+ * On success, also updates the backup (previous good save).
  */
 export function savePuzzleState(
   imageUrl: string,
@@ -55,7 +177,7 @@ export function savePuzzleState(
   }));
 
   const state: SavedPuzzleState = {
-    version: 1,
+    version: PUZZLE_STATE_VERSION,
     imageUrl,
     grid,
     pieces: savedPieces,
@@ -64,6 +186,11 @@ export function savePuzzleState(
   };
 
   try {
+    // Rotate: copy current main to backup before overwriting (fallback if new save gets corrupted)
+    const existing = localStorage.getItem(PUZZLE_STATE_KEY);
+    if (existing) {
+      localStorage.setItem(PUZZLE_BACKUP_KEY, existing);
+    }
     localStorage.setItem(PUZZLE_STATE_KEY, JSON.stringify(state));
   } catch (e) {
     console.warn("Failed to save puzzle state:", e);
@@ -71,51 +198,48 @@ export function savePuzzleState(
 }
 
 /**
- * Load saved puzzle state from localStorage
+ * Load and validate saved puzzle state.
+ * Tries main storage first; if corrupted or invalid, tries backup.
+ * Returns null on failure and optionally clears bad data.
  */
 export function loadPuzzleState(): SavedPuzzleState | null {
-  try {
-    const raw = localStorage.getItem(PUZZLE_STATE_KEY);
-    if (!raw) return null;
+  const main = tryLoadFromStorage(PUZZLE_STATE_KEY);
+  if (main.ok) return main.state;
 
-    const state = JSON.parse(raw) as SavedPuzzleState;
-
-    // Validate version
-    if (state.version !== 1) {
-      console.warn("Unknown puzzle state version:", state.version);
-      return null;
+  // Try backup
+  const backup = tryLoadFromStorage(PUZZLE_BACKUP_KEY);
+  if (backup.ok) {
+    const state = backup.state;
+    // Only use backup if not too old
+    if (Date.now() - state.savedAt < BACKUP_MAX_AGE_MS) {
+      try {
+        // Restore backup to main so next load is fast
+        localStorage.setItem(PUZZLE_STATE_KEY, JSON.stringify(state));
+      } catch {
+        // Ignore
+      }
+      return state;
     }
-
-    // Basic validation
-    if (!state.imageUrl || !state.grid || !state.pieces) {
-      return null;
-    }
-
-    return state;
-  } catch (e) {
-    console.warn("Failed to load puzzle state:", e);
-    return null;
   }
+
+  // Both failed or backup too old – clear corrupted data
+  clearBoth();
+  return null;
 }
 
 /**
- * Clear saved puzzle state
+ * Clear saved puzzle state (and backup)
  */
 export function clearPuzzleState(): void {
-  try {
-    localStorage.removeItem(PUZZLE_STATE_KEY);
-  } catch (e) {
-    console.warn("Failed to clear puzzle state:", e);
-  }
+  clearBoth();
 }
 
 /**
- * Check if there's a saved game that matches current settings
+ * Check if there's a valid saved game that matches current settings
  */
 export function hasSavedGame(imageUrl: string, grid: GridSize): boolean {
   const saved = loadPuzzleState();
   if (!saved) return false;
-
   return (
     saved.imageUrl === imageUrl &&
     saved.grid.rows === grid.rows &&

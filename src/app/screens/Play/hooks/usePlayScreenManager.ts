@@ -259,7 +259,13 @@ export function usePlayScreenManager(
         );
 
         if (hasSavedGame && savedState && resumeChoice === "resume") {
-          next.restoreFromSaved(savedState.pieces);
+          try {
+            next.restoreFromSaved(savedState.pieces);
+          } catch (e) {
+            console.warn("Failed to restore puzzle state, starting fresh:", e);
+            clearPuzzleState();
+            // next already has fresh pieces; no need to recreate
+          }
         }
 
         next.setPieceLockingEnabled(pieceLockingEnabled);
