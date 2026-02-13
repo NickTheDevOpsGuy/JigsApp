@@ -30,6 +30,12 @@
   font-weight: 700;
 }
 
+.difficultySummary {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
 .file {
   height: 48px;
   border-radius: 12px;

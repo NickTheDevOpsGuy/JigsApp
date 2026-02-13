@@ -81,10 +81,16 @@ export function usePlayScreenManager(
         if (!mainEl || !boardEl) return;
         const rect = mainEl.getBoundingClientRect();
         const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
+        const viewportH = typeof window !== "undefined" ? window.innerHeight : 768;
         const isMobile = viewportW < 600;
         const minAvail = isMobile ? 260 : 400;
-        const availW = Math.max(minAvail, Math.floor(rect.width) - 24);
-        const availH = Math.max(minAvail, Math.floor(rect.height) - 24);
+        // If container measures too early (tiny board on first paint), fall back to window dimensions
+        const rectW = Math.floor(rect.width);
+        const rectH = Math.floor(rect.height);
+        const fallbackW = isMobile && (rectW < minAvail || rectW === 0) ? viewportW - 24 : rectW;
+        const fallbackH = isMobile && (rectH < minAvail || rectH === 0) ? viewportH - 24 : rectH;
+        const availW = Math.max(minAvail, fallbackW - 24);
+        const availH = Math.max(minAvail, fallbackH - 24);
 
         // Compute square tile size (smaller on mobile for better fit)
         const pieceSize = computeTileSize(availW, availH, grid, viewportW);
@@ -103,8 +109,10 @@ export function usePlayScreenManager(
         let boardW = Math.max(minBoardW, Math.floor(availW * fillRatio));
         let boardH = Math.max(minBoardH, Math.floor(availH * fillRatio));
         if (isMobile) {
-          boardW = Math.min(boardW, Math.max(minBoardW, Math.floor(rect.width) - 16));
-          boardH = Math.min(boardH, Math.max(minBoardH, Math.floor(rect.height) - 16));
+          const maxW = Math.max(minBoardW, (rectW > 0 ? rectW : viewportW) - 16);
+          const maxH = Math.max(minBoardH, (rectH > 0 ? rectH : viewportH) - 16);
+          boardW = Math.min(boardW, maxW);
+          boardH = Math.min(boardH, maxH);
         }
 
         boardEl.style.width = `${boardW}px`;
@@ -215,16 +223,21 @@ export function usePlayScreenManager(
             onPuzzleComplete: () => {
               clearPuzzleState();
               soundManager.play("complete");
-              const theme = optionsRef.current?.themeRef?.current ?? "light";
-              const colors = CONFETTI_COLORS_BY_THEME[theme];
-              import("canvas-confetti").then((confetti) => {
-                confetti.default({
-                  particleCount: 150,
-                  spread: 70,
-                  origin: { y: 0.6 },
-                  colors,
+              const prefersReducedMotion =
+                typeof window !== "undefined" &&
+                window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+              if (!prefersReducedMotion) {
+                const theme = optionsRef.current?.themeRef?.current ?? "light";
+                const colors = CONFETTI_COLORS_BY_THEME[theme];
+                import("canvas-confetti").then((confetti) => {
+                  confetti.default({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors,
+                  });
                 });
-              });
+              }
             },
           },
         );

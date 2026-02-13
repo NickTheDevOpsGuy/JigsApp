@@ -53,6 +53,8 @@ export function SetupScreen() {
     customCols,
     setCustomCols,
     isCustom,
+    effectiveRows,
+    effectiveCols,
     saveGrid,
     minGrid,
     maxGrid,
@@ -181,6 +183,10 @@ export function SetupScreen() {
           <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
         )}
 
+        <p className={styles.difficultySummary}>
+          {effectiveRows * effectiveCols} pieces
+          {isCustom ? " · Custom" : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
+        </p>
         <Dropdown
           label="Difficulty"
           value={gridIndex}

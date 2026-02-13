@@ -561,6 +561,12 @@
   margin: 0 0 1.5rem 0;
 }
 
+.completeContent .puzzleSize {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin: 0 0 0.5rem 0;
+}
+
 @media (max-width: 600px) {
   .completeContent h2 {
     font-size: 1.75rem;

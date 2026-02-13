@@ -6,6 +6,7 @@ type HelpChoiceModalProps = {
   onClose: () => void;
   onHowToPlay: () => void;
   onKeyboardShortcuts: () => void;
+  onShowAbout?: () => void;
 };
 
 export function HelpChoiceModal({
@@ -13,6 +14,7 @@ export function HelpChoiceModal({
   onClose,
   onHowToPlay,
   onKeyboardShortcuts,
+  onShowAbout,
 }: HelpChoiceModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Help" showCloseButton={true}>
@@ -37,6 +39,18 @@ export function HelpChoiceModal({
         >
           Keyboard & Controls
         </button>
+        {onShowAbout && (
+          <button
+            type="button"
+            className={styles.helpChoiceBtn}
+            onClick={() => {
+              onClose();
+              onShowAbout();
+            }}
+          >
+            About
+          </button>
+        )}
       </div>
     </Modal>
   );

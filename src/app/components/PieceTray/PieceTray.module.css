@@ -130,11 +130,10 @@
   /* IMPORTANT:
      Do NOT clip the thumbnail, otherwise jigsaw tabs/slots get cut off. */
   border-radius: 4px;
-
-  /* was: overflow: hidden; */
   overflow: visible;
 
-  background: var(--color-bg-secondary);
+  /* Minimal background so pieces don't sit in a visible box */
+  background: transparent;
 
   /* helps center an <img> thumbnail cleanly */
   display: flex;
