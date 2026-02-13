@@ -149,7 +149,6 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   }
 
   // All pieces start in tray; board starts empty (build intentionally)
-  const trayStartCount = total;
   const trayIndices = new Set<number>(Array.from({ length: total }, (_, i) => i));
 
   const pieces: Piece[] = [];

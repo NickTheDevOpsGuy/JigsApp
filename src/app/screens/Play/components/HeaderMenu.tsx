@@ -116,11 +116,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
         ? aboutItems.length > 0
         : settingsItems.some((i) => i.subMenu === id);
 
-  const closeAnd = (fn: () => void) => () => {
-    setOpen(false);
-    fn();
-  };
-
   const renderItem = (item: MenuItemConfig) => {
     if (item.isTheme) {
       return (
