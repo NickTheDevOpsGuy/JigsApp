@@ -14,10 +14,10 @@ Thanks to everyone who has helped make **Phuzzle** possible!
 
 ## Contributors
 
-| Name             | GitHub                                               | LinkedIn                                             | Role     |
-| ---------------- | ---------------------------------------------------- | ---------------------------------------------------- | -------- |
-| **Vinay Gajjar**   | [@v-gajjar](https://github.com/v-gajjar)              | [LinkedIn](https://www.linkedin.com/in/vinaygajjar)   | Core Contributor |
-| **Hannah Olbrich** | [@hannahro15](https://github.com/hannahro15)          | [LinkedIn](https://www.linkedin.com/in/hannaholbrich) | Core Contributor |
+| Name               | GitHub                                       | LinkedIn                                              | Role             |
+| ------------------ | -------------------------------------------- | ----------------------------------------------------- | ---------------- |
+| **Vinay Gajjar**   | [@v-gajjar](https://github.com/v-gajjar)     | [LinkedIn](https://www.linkedin.com/in/vinaygajjar)   | Core Contributor |
+| **Hannah Olbrich** | [@hannahro15](https://github.com/hannahro15) | [LinkedIn](https://www.linkedin.com/in/hannaholbrich) | Core Contributor |
 
 ---
 
