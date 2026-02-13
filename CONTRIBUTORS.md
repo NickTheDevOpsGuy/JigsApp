@@ -16,8 +16,8 @@ Phuzzle isn’t built alone. It’s built with sharp eyes, strong opinions, and 
 
 | Name               | GitHub                                       | LinkedIn                                              | Role                                                    |
 | ------------------ | -------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
-| **Vinay Gajjar**   | [@v-gajjar](https://github.com/v-gajjar)     | [LinkedIn](https://www.linkedin.com/in/vinaygajjar)   | UX Sharp Shooter • Edge Case Finder • Chaos Preventer|
-| **Hannah Olbrich** | [@hannahro15](https://github.com/hannahro15) | [LinkedIn](https://www.linkedin.com/in/hannaholbrich) | Bug Hunter • Mobile Breaker-Tester • Feature Instigator     |
+| **Vinay Gajjar**   | [@v-gajjar](https://github.com/v-gajjar)     | [LinkedIn](https://www.linkedin.com/in/vinaygajjar)   | UX Sharp Shooter • Edge Case Finder • Chaos Preventer   |
+| **Hannah Olbrich** | [@hannahro15](https://github.com/hannahro15) | [LinkedIn](https://www.linkedin.com/in/hannaholbrich) | Bug Hunter • Mobile Breaker-Tester • Feature Instigator |
 
 ---
 
