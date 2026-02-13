@@ -110,7 +110,17 @@ export function usePlayScreenManager(
           : 0.88;
         // Scale down canvas for larger puzzles so the board doesn't get huge (e.g. 9×9)
         const pieceCountScale =
-          pieceCount <= 9 ? 1 : pieceCount <= 16 ? 0.92 : pieceCount <= 25 ? 0.82 : pieceCount <= 36 ? 0.72 : pieceCount <= 49 ? 0.65 : 0.58;
+          pieceCount <= 9
+            ? 1
+            : pieceCount <= 16
+              ? 0.92
+              : pieceCount <= 25
+                ? 0.82
+                : pieceCount <= 36
+                  ? 0.72
+                  : pieceCount <= 49
+                    ? 0.65
+                    : 0.58;
         const effectiveFill = fillRatio * pieceCountScale;
         let boardW = Math.max(minBoardW, Math.floor(availW * effectiveFill));
         let boardH = Math.max(minBoardH, Math.floor(availH * effectiveFill));
