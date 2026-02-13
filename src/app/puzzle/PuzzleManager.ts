@@ -587,7 +587,7 @@ export class PuzzleManager {
         }
         return p;
       }),
-    });
+    };
 
     this.recomputeDerivedState();
   }

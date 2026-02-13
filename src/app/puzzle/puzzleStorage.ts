@@ -64,11 +64,13 @@ function isValidPiece(p: unknown, grid: GridSize): p is SavedPiece {
 
 function validateState(raw: unknown): LoadResult {
   try {
-    if (!raw || typeof raw !== "object") return { ok: false, reason: "corrupted", cleared: false };
+    if (!raw || typeof raw !== "object")
+      return { ok: false, reason: "corrupted", cleared: false };
     const state = raw as Record<string, unknown>;
 
     const version = state.version;
-    if (typeof version !== "number") return { ok: false, reason: "corrupted", cleared: false };
+    if (typeof version !== "number")
+      return { ok: false, reason: "corrupted", cleared: false };
     if (version !== PUZZLE_STATE_VERSION) {
       return { ok: false, reason: "version_mismatch", cleared: false };
     }
