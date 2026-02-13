@@ -103,9 +103,7 @@ export function CompletionOverlay({
     <div className={styles.completeOverlay}>
       <div className={styles.completeContent}>
         <h2>🎉 {completionMessage}</h2>
-        {puzzleSizeText != null && (
-          <p className={styles.puzzleSize}>{puzzleSizeText}</p>
-        )}
+        {puzzleSizeText != null && <p className={styles.puzzleSize}>{puzzleSizeText}</p>}
         <p>
           Finished in {formatTime(elapsedSeconds)}
           {isNewBest && <span className={styles.newBest}> — New best!</span>}

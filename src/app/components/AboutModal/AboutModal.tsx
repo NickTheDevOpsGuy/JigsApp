@@ -24,11 +24,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="About" showCloseButton>
       <div className={styles.aboutChoice}>
-        <button
-          type="button"
-          className={styles.aboutChoiceBtn}
-          onClick={openRepo}
-        >
+        <button type="button" className={styles.aboutChoiceBtn} onClick={openRepo}>
           Repo
         </button>
         <button

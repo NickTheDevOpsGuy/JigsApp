@@ -87,8 +87,10 @@ export function usePlayScreenManager(
         // If container measures too early (tiny board on first paint), fall back to window dimensions
         const rectW = Math.floor(rect.width);
         const rectH = Math.floor(rect.height);
-        const fallbackW = isMobile && (rectW < minAvail || rectW === 0) ? viewportW - 24 : rectW;
-        const fallbackH = isMobile && (rectH < minAvail || rectH === 0) ? viewportH - 24 : rectH;
+        const fallbackW =
+          isMobile && (rectW < minAvail || rectW === 0) ? viewportW - 24 : rectW;
+        const fallbackH =
+          isMobile && (rectH < minAvail || rectH === 0) ? viewportH - 24 : rectH;
         const availW = Math.max(minAvail, fallbackW - 24);
         const availH = Math.max(minAvail, fallbackH - 24);
 

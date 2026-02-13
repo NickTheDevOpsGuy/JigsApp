@@ -14,7 +14,10 @@ type ErrorBoundaryState = {
  * Catches React errors in the tree and shows a friendly fallback + reload.
  * Does not affect touch, pointer, or any event handling.
  */
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -47,7 +50,13 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
           }}
         >
           <h1 style={{ fontSize: 20, marginBottom: 8 }}>Something went wrong</h1>
-          <p style={{ fontSize: 14, marginBottom: 16, color: "var(--color-text-secondary)" }}>
+          <p
+            style={{
+              fontSize: 14,
+              marginBottom: 16,
+              color: "var(--color-text-secondary)",
+            }}
+          >
             The app hit an error. You can reload to try again.
           </p>
           <button

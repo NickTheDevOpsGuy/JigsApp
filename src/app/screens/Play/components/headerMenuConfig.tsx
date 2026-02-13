@@ -42,7 +42,14 @@ export type HeaderMenuProps = {
   onToggleDebug: () => void;
 };
 
-export type SubMenuId = "about" | "audio" | "controls" | "game" | "help" | "navigation" | "view";
+export type SubMenuId =
+  | "about"
+  | "audio"
+  | "controls"
+  | "game"
+  | "help"
+  | "navigation"
+  | "view";
 
 export type MenuItemConfig = {
   id: string;

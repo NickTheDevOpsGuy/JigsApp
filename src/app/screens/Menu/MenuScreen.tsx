@@ -126,10 +126,7 @@ export function MenuScreen() {
         onKeyboardShortcuts={() => setShowShortcuts(true)}
         onShowAbout={() => setShowAbout(true)}
       />
-      <AboutModal
-        isOpen={showAbout}
-        onClose={() => setShowAbout(false)}
-      />
+      <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
       <TutorialOverlay
         isOpen={showHowToPlay}
         onComplete={() => setShowHowToPlay(false)}
