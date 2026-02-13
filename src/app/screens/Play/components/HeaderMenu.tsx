@@ -14,10 +14,26 @@ import {
 export type { HeaderMenuProps } from "./headerMenuConfig";
 
 const SUB_MENU_LABELS: Record<SubMenuId, string> = {
-  game: "Game",
-  view: "View",
+  about: "About",
   audio: "Audio",
+  controls: "Control",
+  game: "Game",
+  help: "Help",
+  navigation: "Navigate",
+  view: "View",
 };
+
+/** When in About submenu, Back goes to Help */
+const ABOUT_PARENT: SubMenuId = "help";
+
+/** Settings submenus in alphabetical order */
+const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
+  "audio",
+  "controls",
+  "game",
+  "navigation",
+  "view",
+];
 
 /**
  * Single source of truth for the "hamburger" menu.
@@ -56,9 +72,22 @@ export function HeaderMenu(props: HeaderMenuProps) {
   }, [open, activeSubMenu]);
 
   const visibleItems = items.filter((i) => i.visible);
-  const navItems = visibleItems.filter((i) => i.section === "nav");
   const settingsItems = visibleItems
     .filter((i) => i.section === "settings")
+    .sort((a, b) =>
+      (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
+        sensitivity: "base",
+      }),
+    );
+  const helpItems = visibleItems
+    .filter((i) => i.section === "help")
+    .sort((a, b) =>
+      (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
+        sensitivity: "base",
+      }),
+    );
+  const aboutItems = visibleItems
+    .filter((i) => i.section === "about")
     .sort((a, b) =>
       (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
         sensitivity: "base",
@@ -67,20 +96,25 @@ export function HeaderMenu(props: HeaderMenuProps) {
   const otherItems = visibleItems.filter((i) => i.section === "other");
 
   const topLevelSettings = settingsItems.filter((i) => !i.subMenu);
-  const subMenuItems = settingsItems
-    .filter((i) => i.subMenu === activeSubMenu)
-    .sort((a, b) =>
-      (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
-        sensitivity: "base",
-      }),
-    );
+  const subMenuItems =
+    activeSubMenu === "help"
+      ? helpItems
+      : activeSubMenu === "about"
+        ? aboutItems
+        : settingsItems
+            .filter((i) => i.subMenu === activeSubMenu)
+            .sort((a, b) =>
+              (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
+                sensitivity: "base",
+              }),
+            );
 
-  const hasSubMenuItems = (id: SubMenuId) => settingsItems.some((i) => i.subMenu === id);
-
-  const closeAnd = (fn: () => void) => () => {
-    setOpen(false);
-    fn();
-  };
+  const hasSubMenuItems = (id: SubMenuId) =>
+    id === "help"
+      ? helpItems.length > 0
+      : id === "about"
+        ? aboutItems.length > 0
+        : settingsItems.some((i) => i.subMenu === id);
 
   const renderItem = (item: MenuItemConfig) => {
     if (item.isTheme) {
@@ -110,56 +144,40 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const renderMainMenu = () => (
     <>
-      {navItems.map(renderItem)}
-      <div className={styles.headerMenuDivider} />
       <div className={styles.headerMenuSection}>Help</div>
-      <button
-        type="button"
-        className={styles.headerMenuItem}
-        role="menuitem"
-        onClick={closeAnd(props.onShowHelpChoice)}
-      >
-        Help
-      </button>
+      {hasSubMenuItems("help") && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => setActiveSubMenu("help")}
+        >
+          {SUB_MENU_LABELS.help}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
+      )}
       <div className={styles.headerMenuDivider} />
       <div className={styles.headerMenuSection}>Settings</div>
-      {hasSubMenuItems("game") && (
+      {SETTINGS_SUBMENU_ORDER.filter((id) => hasSubMenuItems(id)).map((id) => (
         <button
+          key={id}
           type="button"
           className={styles.headerMenuSubmenuTrigger}
           role="menuitem"
-          onClick={() => setActiveSubMenu("game")}
+          onClick={() => setActiveSubMenu(id)}
         >
-          {SUB_MENU_LABELS.game}
+          {SUB_MENU_LABELS[id]}
           <ChevronRight size={16} className={styles.headerMenuChevron} />
         </button>
-      )}
-      {hasSubMenuItems("view") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("view")}
-        >
-          {SUB_MENU_LABELS.view}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
-      {hasSubMenuItems("audio") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("audio")}
-        >
-          {SUB_MENU_LABELS.audio}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
+      ))}
       {topLevelSettings.map(renderItem)}
       {otherItems.map(renderItem)}
     </>
   );
+
+  const handleBack = () => {
+    setActiveSubMenu(activeSubMenu === "about" ? ABOUT_PARENT : null);
+  };
 
   const renderSubMenu = () => (
     <>
@@ -167,13 +185,24 @@ export function HeaderMenu(props: HeaderMenuProps) {
         type="button"
         className={styles.headerMenuBack}
         role="menuitem"
-        onClick={() => setActiveSubMenu(null)}
+        onClick={handleBack}
       >
         <ChevronLeft size={16} />
         Back
       </button>
       <div className={styles.headerMenuDivider} />
       <div className={styles.headerMenuSection}>{SUB_MENU_LABELS[activeSubMenu!]}</div>
+      {activeSubMenu === "help" && hasSubMenuItems("about") && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => setActiveSubMenu("about")}
+        >
+          {SUB_MENU_LABELS.about}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
+      )}
       {subMenuItems.map(renderItem)}
     </>
   );

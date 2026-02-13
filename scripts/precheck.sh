@@ -52,10 +52,9 @@ if ! npx --no-install prettier --check .; then
   
   echo ""
   echo "----------------------------------------------------------------"
-  echo "⚠️  [TIMELINE DESYNC]: Prettier fixed your files and committed them."
-  echo "Your local 'Human OS' is now ahead of the remote server."
-  echo "ACTION REQUIRED: Run this to realign the timelines:"
-  echo "   git pull --rebase origin $(git rev-parse --abbrev-ref HEAD) && git push"
+  echo "Prettier fixed your files and committed them."
+  echo "You're ahead of origin. Run this to sync and push:"
+  echo "  git pull --rebase origin $(git rev-parse --abbrev-ref HEAD) && git push"
   echo "----------------------------------------------------------------"
   echo ""
   exit 1
@@ -72,9 +71,9 @@ if ! npx --no-install eslint . --cache --max-warnings=0; then
   
   echo ""
   echo "----------------------------------------------------------------"
-  echo "⚠️  [TIMELINE DESYNC]: ESLint auto-fixed what it could and committed."
-  echo "ACTION REQUIRED: Align and push again:"
-  echo "   git pull --rebase origin $(git rev-parse --abbrev-ref HEAD) && git push"
+  echo "ESLint auto-fixed what it could and committed."
+  echo "You're ahead of origin. Run this to sync and push:"
+  echo "  git pull --rebase origin $(git rev-parse --abbrev-ref HEAD) && git push"
   echo "----------------------------------------------------------------"
   echo ""
   exit 1

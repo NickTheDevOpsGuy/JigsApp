@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import posthog from "posthog-js";
 import styles from "./PlayScreen.module.css";
 
 import { PieceTray } from "@/components/PieceTray/PieceTray";
@@ -242,6 +243,30 @@ export function PlayScreen() {
     return () => clearTimeout(id);
   }, [state, elapsedSeconds]);
 
+  // Analytics: time to first snap (first piece placed)
+  const firstSnapCapturedRef = useRef(false);
+  useEffect(() => {
+    if (!state || firstSnapCapturedRef.current) return;
+    const placed = state.placedCount ?? 0;
+    if (placed >= 1) {
+      firstSnapCapturedRef.current = true;
+      posthog.capture("time_to_first_snap", {
+        time_to_first_snap_seconds: elapsedSeconds,
+      });
+    }
+  }, [state?.placedCount, elapsedSeconds]);
+
+  // Analytics: exit before completion (on unmount)
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  useEffect(() => {
+    return () => {
+      if (stateRef.current && !stateRef.current.isComplete) {
+        posthog.capture("exit_before_completion");
+      }
+    };
+  }, []);
+
   const didDragRef = React.useRef(false);
   const [dragPreview, setDragPreview] = React.useState<{
     clientX: number;
@@ -422,8 +447,6 @@ export function PlayScreen() {
         message="You have a puzzle in progress. Would you like to continue where you left off?"
         confirmText="Resume"
         cancelText="Start Fresh"
-        tertiaryText="Back to Home"
-        onTertiary={() => navigate("/")}
         variant="default"
         primaryOnlyConfirm
       />

@@ -34,6 +34,8 @@ export type AnimationState = {
   showGhostHint?: boolean;
   /** When set, this piece is drawn in a DOM overlay instead of on canvas (for drag-to-tray) */
   dragPreviewPieceId?: string | null;
+  /** Interpolated display positions for dragged group (smoother drag, no touch/pointer changes) */
+  dragDisplayOverrides?: Map<string, { x: number; y: number }>;
 };
 
 /** Cache for pre-rendered pieces - clip at (0,0) gives crisp edges, avoids blocky look when moving */
@@ -120,14 +122,19 @@ export function renderBoard(
     .sort((a, b) => a.z - b.z);
 
   const LOCK_GLOW_MS = 500;
+  const overrides = animState?.dragDisplayOverrides;
   for (const p of pieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
     const lockAt = lockMap.get(p.id);
     const lockElapsedMs = lockAt != null ? nowMs - lockAt : 0;
     const showLockGlow = lockAt != null && lockElapsedMs < LOCK_GLOW_MS;
+    const drawPieceData =
+      isDragging && overrides?.has(p.id)
+        ? { ...p, x: overrides.get(p.id)!.x, y: overrides.get(p.id)!.y }
+        : p;
     drawPiece(
       ctx,
-      p,
+      drawPieceData,
       img,
       cols,
       rows,

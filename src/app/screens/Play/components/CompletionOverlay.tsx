@@ -94,10 +94,16 @@ export function CompletionOverlay({
     run();
   }, [elapsedSeconds, grid, isDaily]);
 
+  const puzzleSizeText =
+    grid != null
+      ? `${grid.rows}×${grid.cols} puzzle · ${grid.rows * grid.cols} pieces`
+      : null;
+
   return (
     <div className={styles.completeOverlay}>
       <div className={styles.completeContent}>
         <h2>🎉 {completionMessage}</h2>
+        {puzzleSizeText != null && <p className={styles.puzzleSize}>{puzzleSizeText}</p>}
         <p>
           Finished in {formatTime(elapsedSeconds)}
           {isNewBest && <span className={styles.newBest}> — New best!</span>}

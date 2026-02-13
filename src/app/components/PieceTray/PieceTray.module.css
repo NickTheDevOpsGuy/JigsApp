@@ -115,7 +115,7 @@
 }
 
 .pieceButton:hover {
-  background: var(--color-bg-secondary);
+  background: transparent;
   transform: scale(1.08);
 }
 
@@ -130,11 +130,8 @@
   /* IMPORTANT:
      Do NOT clip the thumbnail, otherwise jigsaw tabs/slots get cut off. */
   border-radius: 4px;
-
-  /* was: overflow: hidden; */
   overflow: visible;
-
-  background: var(--color-bg-secondary);
+  background: transparent;
 
   /* helps center an <img> thumbnail cleanly */
   display: flex;

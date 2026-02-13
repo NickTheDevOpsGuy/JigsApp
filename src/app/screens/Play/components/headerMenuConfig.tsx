@@ -38,15 +38,23 @@ export type HeaderMenuProps = {
   onShowShortcuts: () => void;
   onShowHowToPlay: () => void;
   onShowHelpChoice: () => void;
+  onShowAbout?: () => void;
   onToggleDebug: () => void;
 };
 
-export type SubMenuId = "game" | "view" | "audio";
+export type SubMenuId =
+  | "about"
+  | "audio"
+  | "controls"
+  | "game"
+  | "help"
+  | "navigation"
+  | "view";
 
 export type MenuItemConfig = {
   id: string;
   label: string;
-  section: "nav" | "settings" | "help" | "other";
+  section: "nav" | "settings" | "help" | "about" | "other";
   visible: boolean;
   disabled?: boolean;
   onClick: () => void;
@@ -64,6 +72,10 @@ const TIME_MODE_LABELS: Record<TimeMode, string> = {
   best: "Best time",
 };
 
+const GITHUB_REPO_URL = "https://github.com/NickTheDevOpsGuy/phuzzle";
+const GITHUB_CONTRIBUTORS_URL =
+  "https://github.com/NickTheDevOpsGuy/phuzzle/blob/develop/CONTRIBUTORS.md";
+
 export function buildMenuItems(
   props: HeaderMenuProps,
   setOpen: (open: boolean) => void,
@@ -77,33 +89,41 @@ export function buildMenuItems(
   return [
     {
       id: "home",
-      section: "nav",
+      section: "settings",
       visible: true,
       label: "Home",
+      sortKey: "Home",
       onClick: c(() => navigate("/")),
+      subMenu: "navigation",
     },
     {
       id: "new",
-      section: "nav",
+      section: "settings",
       visible: true,
       label: "New puzzle",
+      sortKey: "New puzzle",
       onClick: c(props.onNewPuzzle),
+      subMenu: "navigation",
     },
     {
       id: "undo",
-      section: "nav",
+      section: "settings",
       visible: true,
       label: "Undo",
+      sortKey: "Undo",
       disabled: !props.canUndo,
       onClick: c(props.onUndo),
+      subMenu: "controls",
     },
     {
       id: "redo",
-      section: "nav",
+      section: "settings",
       visible: true,
       label: "Redo",
+      sortKey: "Redo",
       disabled: !props.canRedo,
       onClick: c(props.onRedo),
+      subMenu: "controls",
     },
     {
       id: "debug",
@@ -204,6 +224,44 @@ export function buildMenuItems(
       sortKey: "Sound",
       onClick: c(props.onToggleSound),
       subMenu: "audio",
+    },
+    {
+      id: "repo",
+      section: "about",
+      visible: true,
+      label: "Get Involved",
+      sortKey: "Get Involved",
+      onClick: c(() => window.open(GITHUB_REPO_URL, "_blank", "noopener,noreferrer")),
+      subMenu: "about",
+    },
+    {
+      id: "contributors",
+      section: "about",
+      visible: true,
+      label: "Meet the Team",
+      sortKey: "Meet the Team",
+      onClick: c(() =>
+        window.open(GITHUB_CONTRIBUTORS_URL, "_blank", "noopener,noreferrer"),
+      ),
+      subMenu: "about",
+    },
+    {
+      id: "howToPlay",
+      section: "help",
+      visible: true,
+      label: "How to Play",
+      sortKey: "How to Play",
+      onClick: c(props.onShowHowToPlay),
+      subMenu: "help",
+    },
+    {
+      id: "shortcuts",
+      section: "help",
+      visible: true,
+      label: "Keyboard & Controls",
+      sortKey: "Keyboard & Controls",
+      onClick: c(props.onShowShortcuts),
+      subMenu: "help",
     },
   ];
 }

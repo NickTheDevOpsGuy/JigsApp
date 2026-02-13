@@ -7,6 +7,7 @@ import { Button } from "@/components/Button/Button";
 import { ThemeModal } from "@/components/ThemeModal";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
+import { AboutModal } from "@/components/AboutModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
@@ -29,6 +30,7 @@ export function MenuScreen() {
   const [showHelpChoice, setShowHelpChoice] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
@@ -122,7 +124,9 @@ export function MenuScreen() {
         onClose={() => setShowHelpChoice(false)}
         onHowToPlay={() => setShowHowToPlay(true)}
         onKeyboardShortcuts={() => setShowShortcuts(true)}
+        onShowAbout={() => setShowAbout(true)}
       />
+      <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
       <TutorialOverlay
         isOpen={showHowToPlay}
         onComplete={() => setShowHowToPlay(false)}
