@@ -45,4 +45,3 @@ export function getMenuTip(): string {
   const i = dayOfYear % MENU_TIPS.length;
   return MENU_TIPS[i];
 }
-
