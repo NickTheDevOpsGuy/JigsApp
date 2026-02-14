@@ -109,6 +109,7 @@ export function MenuScreen() {
           setShowWhatsNew(true);
         }}
       />
+      <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
       <TutorialOverlay
         isOpen={showHowToPlay}
         onComplete={() => setShowHowToPlay(false)}

@@ -186,6 +186,21 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     [positions[i], positions[j]] = [positions[j], positions[i]];
   }
 
+  // Add more positions in rows below if we have more pieces than grid cells
+  let rowOffset = 0;
+  while (positions.length < total) {
+    rowOffset++;
+    const baseY = scatterZone.minY + gridRows * cellH + (rowOffset - 1) * cellH;
+    for (let col = 0; col < gridCols && positions.length < total; col++) {
+      const jitterX = jitterMax > 0 ? randInt(0, jitterMax) : 0;
+      const jitterY = jitterMax > 0 ? randInt(0, jitterMax) : 0;
+      positions.push({
+        x: scatterZone.minX + col * cellW + jitterX,
+        y: baseY + jitterY,
+      });
+    }
+  }
+
   // All pieces start in tray; board starts empty (build intentionally)
   const trayIndices = new Set<number>(Array.from({ length: total }, (_, i) => i));
 
