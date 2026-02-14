@@ -52,10 +52,7 @@ export type PuzzleSessionResult = {
   clearRemoteState: () => void;
 };
 
-export function usePuzzleSession(
-  imageUrl: string,
-  grid: GridSize,
-): PuzzleSessionResult {
+export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessionResult {
   const [searchParams, setSearchParams] = useSearchParams();
   const sessionIdFromUrl = searchParams.get(SESSION_ID_PARAM);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -105,17 +102,19 @@ export function usePuzzleSession(
         elapsedSeconds: initialElapsed ?? 0,
         isComplete: false,
       };
-    const result = await createPuzzleSession(url, gr, state);
-    if (!result) return null;
-    isHostRef.current = true;
-    setSessionId(result.sessionId);
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.set(SESSION_ID_PARAM, result.sessionId);
-      return next;
-    });
-    return result.sessionId;
-  }, [imageUrl, grid, setSearchParams]);
+      const result = await createPuzzleSession(url, gr, state);
+      if (!result) return null;
+      isHostRef.current = true;
+      setSessionId(result.sessionId);
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set(SESSION_ID_PARAM, result.sessionId);
+        return next;
+      });
+      return result.sessionId;
+    },
+    [imageUrl, grid, setSearchParams],
+  );
 
   const getShareUrl = useCallback(() => {
     if (!sessionId) return "";
@@ -200,4 +199,3 @@ export function usePuzzleSession(
     clearRemoteState: () => setRemoteState(null),
   };
 }
-

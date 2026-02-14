@@ -21,10 +21,7 @@ interface TopBarButtonsProps {
  * Compact top bar: New Puzzle only.
  * Other options available via hamburger menu.
  */
-export function TopBarButtons({
-  isCoarsePointer,
-  onNewPuzzle,
-}: TopBarButtonsProps) {
+export function TopBarButtons({ isCoarsePointer, onNewPuzzle }: TopBarButtonsProps) {
   if (isCoarsePointer) {
     return null;
   }

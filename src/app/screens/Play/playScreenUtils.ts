@@ -15,9 +15,7 @@ export function parseGrid(stored: string | null): { rows: number; cols: number }
 const MOBILE_BREAKPOINT = 600;
 
 /** Difficulty tiers for piece scaling: easy 9–16, medium 25–36, hard 49–64, extreme 81+ */
-function getDifficultyTier(
-  pieceCount: number,
-): "easy" | "medium" | "hard" | "extreme" {
+function getDifficultyTier(pieceCount: number): "easy" | "medium" | "hard" | "extreme" {
   if (pieceCount <= 16) return "easy";
   if (pieceCount <= 36) return "medium";
   if (pieceCount <= 64) return "hard";

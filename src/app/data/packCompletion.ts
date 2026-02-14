@@ -25,7 +25,10 @@ export function recordPuzzleCompletion(puzzleId: string): void {
 }
 
 /** Get progress for a pack: { completed, total } */
-export function getPackProgress(puzzleIds: string[]): { completed: number; total: number } {
+export function getPackProgress(puzzleIds: string[]): {
+  completed: number;
+  total: number;
+} {
   const completed = getCompletedPuzzleIds();
   const count = puzzleIds.filter((id) => completed.has(id)).length;
   return { completed: count, total: puzzleIds.length };

@@ -41,11 +41,7 @@ export function AboutModal({ isOpen, onClose, onShowWhatsNew }: AboutModalProps)
           Contributors
         </button>
         {onShowWhatsNew && (
-          <button
-            type="button"
-            className={styles.aboutChoiceBtn}
-            onClick={showWhatsNew}
-          >
+          <button type="button" className={styles.aboutChoiceBtn} onClick={showWhatsNew}>
             What&apos;s New
           </button>
         )}

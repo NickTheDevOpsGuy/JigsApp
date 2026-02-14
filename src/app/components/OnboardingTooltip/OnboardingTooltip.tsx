@@ -12,24 +12,12 @@ type Props = {
  * Lightweight contextual tooltip for onboarding steps.
  * Single line, non-blocking, dismissible.
  */
-export function OnboardingTooltip({
-  message,
-  onDismiss,
-  showButton = false,
-}: Props) {
+export function OnboardingTooltip({ message, onDismiss, showButton = false }: Props) {
   return (
-    <div
-      className={styles.tooltip}
-      role="status"
-      aria-live="polite"
-    >
+    <div className={styles.tooltip} role="status" aria-live="polite">
       <span className={styles.message}>{message}</span>
       {showButton ? (
-        <button
-          type="button"
-          className={styles.dismissBtn}
-          onClick={onDismiss}
-        >
+        <button type="button" className={styles.dismissBtn} onClick={onDismiss}>
           Got it
         </button>
       ) : (

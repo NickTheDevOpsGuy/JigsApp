@@ -57,14 +57,14 @@ export async function createPuzzleSession(
 /**
  * Fetch session by ID (for joining via share link).
  */
-export async function getPuzzleSession(
-  sessionId: string,
-): Promise<PuzzleSession | null> {
+export async function getPuzzleSession(sessionId: string): Promise<PuzzleSession | null> {
   if (!isSupabaseConfigured() || !supabase) return null;
 
   const { data, error } = await supabase
     .from("puzzle_sessions")
-    .select("id, image_url, grid_rows, grid_cols, state_json, elapsed_seconds, is_complete, created_at, updated_at")
+    .select(
+      "id, image_url, grid_rows, grid_cols, state_json, elapsed_seconds, is_complete, created_at, updated_at",
+    )
     .eq("id", sessionId)
     .single();
 

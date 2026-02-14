@@ -1,4 +1,11 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import posthog from "posthog-js";
 import styles from "./PlayScreen.module.css";
@@ -8,10 +15,7 @@ import { ConfirmModal } from "@/components/Modal/Modal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
-import {
-  consumeCurrentPuzzleId,
-  recordPuzzleCompletion,
-} from "@/data/packCompletion";
+import { consumeCurrentPuzzleId, recordPuzzleCompletion } from "@/data/packCompletion";
 import { soundManager } from "@/audio/sounds";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
@@ -43,10 +47,7 @@ import {
 } from "./components";
 import { OnboardingTooltip } from "@/components/OnboardingTooltip";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
-import {
-  usePuzzleSession,
-  SESSION_ID_PARAM,
-} from "./hooks/usePuzzleSession";
+import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
 import { Share2, Users } from "lucide-react";
 import { isSupabaseConfigured } from "@/supabase/client";
 
@@ -55,10 +56,7 @@ export function PlayScreen() {
   const [searchParams] = useSearchParams();
   const sessionIdFromUrl = searchParams.get(SESSION_ID_PARAM);
 
-  const localGrid = useMemo(
-    () => parseGrid(localStorage.getItem(GRID_KEY)),
-    [],
-  );
+  const localGrid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
   const localImageUrl = localStorage.getItem(STORAGE_KEY) ?? "";
 
   const sessionResult = usePuzzleSession(localImageUrl, localGrid);
@@ -173,8 +171,9 @@ export function PlayScreen() {
       haptic: hapticsEnabled ? haptics.vibrate : undefined,
       themeRef,
       onPlacementStreak: () => setShowStreakToast(true),
-      initialSessionPieces:
-        session?.state?.pieces?.length ? session.state.pieces : undefined,
+      initialSessionPieces: session?.state?.pieces?.length
+        ? session.state.pieces
+        : undefined,
       snapScaleRef,
     },
   );

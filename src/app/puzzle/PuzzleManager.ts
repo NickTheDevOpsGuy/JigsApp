@@ -710,7 +710,9 @@ export class PuzzleManager {
         const dy = nTile.y - expectedDy - gpTile.y;
         const d = Math.hypot(dx, dy);
 
-        const neighborTolerance = this.getEffectiveTolerance(this.snapToleranceNeighborPx);
+        const neighborTolerance = this.getEffectiveTolerance(
+          this.snapToleranceNeighborPx,
+        );
         if (d <= neighborTolerance && (!best || d < best.dist)) {
           best = { dx, dy, dist: d, into: n.groupId };
         }

@@ -137,7 +137,11 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   // If we can't fit all pieces, reduce spacing until we do (with floor)
   let effectiveCellW = cellW;
   let effectiveCellH = cellH;
-  while (gridCols * gridRows < total && effectiveCellW > w + 8 && effectiveCellH > h + 8) {
+  while (
+    gridCols * gridRows < total &&
+    effectiveCellW > w + 8 &&
+    effectiveCellH > h + 8
+  ) {
     effectiveCellW = Math.max(w + 8, effectiveCellW - 4);
     effectiveCellH = Math.max(h + 8, effectiveCellH - 4);
     gridCols = Math.min(maxCols, Math.floor(zoneWidth / effectiveCellW));
@@ -171,14 +175,8 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     const jitterX = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
     const jitterY = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
     positions.push({
-      x: Math.max(
-        scatterZone.minX,
-        Math.min(scatterZone.maxX - w, baseX + jitterX),
-      ),
-      y: Math.max(
-        scatterZone.minY,
-        Math.min(scatterZone.maxY - h, baseY + jitterY),
-      ),
+      x: Math.max(scatterZone.minX, Math.min(scatterZone.maxX - w, baseX + jitterX)),
+      y: Math.max(scatterZone.minY, Math.min(scatterZone.maxY - h, baseY + jitterY)),
     });
   }
 
