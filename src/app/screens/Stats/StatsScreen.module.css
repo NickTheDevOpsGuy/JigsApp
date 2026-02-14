@@ -406,12 +406,16 @@
   .leaderboardTabs {
     order: 1;
     margin: 0 -4px;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-start;
   }
 
   .leaderboardTabs button {
     padding: 10px 12px;
     font-size: 12px;
     min-height: 44px;
+    flex: 0 0 auto;
   }
 
   .allTimeGrid {

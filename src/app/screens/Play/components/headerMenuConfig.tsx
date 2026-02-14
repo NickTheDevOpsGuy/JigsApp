@@ -49,6 +49,7 @@ export type SubMenuId =
   | "game"
   | "help"
   | "navigation"
+  | "stats"
   | "view";
 
 export type MenuItemConfig = {
@@ -224,6 +225,15 @@ export function buildMenuItems(
       sortKey: "Sound",
       onClick: c(props.onToggleSound),
       subMenu: "audio",
+    },
+    {
+      id: "stats",
+      section: "settings",
+      visible: true,
+      label: "Stats & Leaderboards",
+      sortKey: "Stats",
+      onClick: c(() => navigate("/stats")),
+      subMenu: "stats",
     },
     {
       id: "repo",

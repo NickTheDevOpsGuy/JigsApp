@@ -15,6 +15,8 @@ export const GRID_OPTIONS: GridOption[] = [
   { label: "Medium ⚡ (4×4 - 16 pieces)", rows: 4, cols: 4 },
   { label: "Hard 🔥 (5×5 - 25 pieces)", rows: 5, cols: 5 },
   { label: "Expert 👑 (6×6 - 36 pieces)", rows: 6, cols: 6 },
+  { label: "Master 🧠 (7×7 - 49 pieces)", rows: 7, cols: 7 },
+  { label: "Legend 🔮 (8×8 - 64 pieces)", rows: 8, cols: 8 },
   { label: "Custom", rows: 0, cols: 0 },
 ];
 

@@ -111,3 +111,7 @@ test-results/
 playwright-report/
 playwright/.cache/
 .vitest/
+
+# Lighthouse CI reports
+lhci-reports/
+.lighthouseci/

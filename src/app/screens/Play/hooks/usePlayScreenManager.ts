@@ -24,9 +24,12 @@ export function usePlayScreenManager(
   lastInteractionRef: MutableRefObject<number>,
   resumeChoice: ResumeChoice,
   options?: {
+    initialSessionPieces?: import("@/puzzle/puzzleStorage").SavedPiece[];
     haptic?: (kind: "place" | "snap" | "rotate") => void;
     themeRef?: MutableRefObject<Theme | undefined>;
     onPlacementStreak?: () => void;
+    /** Ref to viewport scale for zoom-adaptive snap tolerance. */
+    snapScaleRef?: MutableRefObject<number>;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -120,7 +123,9 @@ export function usePlayScreenManager(
                   ? 0.72
                   : pieceCount <= 49
                     ? 0.65
-                    : 0.58;
+                    : pieceCount <= 64
+                      ? 0.58
+                      : 0.52;
         const effectiveFill = fillRatio * pieceCountScale;
         let boardW = Math.max(minBoardW, Math.floor(availW * effectiveFill));
         let boardH = Math.max(minBoardH, Math.floor(availH * effectiveFill));
@@ -178,6 +183,7 @@ export function usePlayScreenManager(
           clearPuzzleState();
         }
 
+        const opts = optionsRef.current;
         const next = new PuzzleManager(
           {
             imageUrl,
@@ -186,6 +192,8 @@ export function usePlayScreenManager(
             grid,
             pieceWidth: pieceSize,
             pieceHeight: pieceSize,
+            isMobile,
+            snapScaleRef: opts?.snapScaleRef,
           },
           {
             onPiecePlaced: (p) => {
@@ -266,6 +274,12 @@ export function usePlayScreenManager(
             clearPuzzleState();
             // next already has fresh pieces; no need to recreate
           }
+        } else if (options?.initialSessionPieces?.length) {
+          try {
+            next.restoreFromSaved(options.initialSessionPieces);
+          } catch (e) {
+            console.warn("Failed to restore session state:", e);
+          }
         }
 
         next.setPieceLockingEnabled(pieceLockingEnabled);
@@ -313,6 +327,7 @@ export function usePlayScreenManager(
     countdownMinutes,
     lastInteractionRef,
     resumeChoice,
+    options?.initialSessionPieces,
   ]);
 
   useEffect(() => {

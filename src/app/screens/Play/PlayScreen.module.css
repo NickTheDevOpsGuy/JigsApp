@@ -39,6 +39,39 @@
   justify-content: center;
 }
 
+.coopIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.connectedCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.coopShareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.coopShareBtn:hover {
+  background: var(--color-bg-card);
+  border-color: var(--color-brand-primary);
+}
+
 .topBarRight {
   display: flex;
   align-items: center;
@@ -202,6 +235,29 @@
   overflow: hidden;
   touch-action: none;
   -webkit-overflow-scrolling: auto;
+}
+
+.emptyBoardHint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.emptyBoardEmoji {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.emptyBoardText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
 }
 
 .canvas {
@@ -507,6 +563,25 @@
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* Onboarding tooltips */
+.onboardingOverlay {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 85;
+  animation: engagementToastIn 0.3s ease-out;
+}
+
+.onboardingOverlayTray {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 85;
+  animation: engagementToastIn 0.3s ease-out;
 }
 
 /* Engagement toasts: streak, milestones */

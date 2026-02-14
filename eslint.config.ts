@@ -9,6 +9,16 @@ export default [
     ignores: ["dist", "node_modules", "coverage"],
   },
 
+  // CommonJS config files (Node globals)
+  {
+    files: ["**/*.cjs", "**/*.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+
   // Base JS rules
   js.configs.recommended,
 

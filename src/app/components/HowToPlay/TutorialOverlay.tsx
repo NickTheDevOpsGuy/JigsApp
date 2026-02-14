@@ -1,5 +1,5 @@
 // src/app/components/HowToPlay/TutorialOverlay.tsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/Button/Button";
 import { Modal } from "@/components/Modal/Modal";
 import styles from "./TutorialOverlay.module.css";
@@ -178,16 +178,13 @@ export function TutorialOverlay({
   );
 }
 
-// Hook to check if tutorial should be shown
+/**
+ * Hook for tutorial visibility.
+ * No longer auto-shows the full modal on first visit—contextual onboarding handles that.
+ * Used when user taps "How to Play"; showSkipLink persists "Don't show again".
+ */
 export function useShouldShowTutorial(): [boolean, () => void] {
   const [shouldShow, setShouldShow] = useState(false);
-
-  useEffect(() => {
-    const seen = localStorage.getItem(TUTORIAL_SEEN_KEY);
-    if (!seen) {
-      setShouldShow(true);
-    }
-  }, []);
 
   const dismiss = () => {
     localStorage.setItem(TUTORIAL_SEEN_KEY, "true");

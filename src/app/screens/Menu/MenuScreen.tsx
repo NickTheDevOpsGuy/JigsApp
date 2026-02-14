@@ -11,22 +11,15 @@ import { AboutModal } from "@/components/AboutModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
-import {
-  HelpCircle,
-  Image,
-  Calendar,
-  BarChart3,
-  Sparkles,
-  Camera,
-  Palette,
-} from "lucide-react";
+import { HelpCircle, Image, Calendar, Camera, Package } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
-import { getMenuTip } from "@/data/menuTips";
+import { getMenuTagline } from "@/data/menuTips";
 
 export function MenuScreen() {
   const nav = useNavigate();
+  const [tagline] = useState(() => getMenuTagline());
   const [showHelpChoice, setShowHelpChoice] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -64,6 +57,14 @@ export function MenuScreen() {
 
           <Button
             variant="primary"
+            onClick={() => nav("/packs")}
+            className={styles.actionCard}
+          >
+            <Package size={24} />
+            <span className={styles.actionLabel}>Puzzle Packs</span>
+          </Button>
+          <Button
+            variant="primary"
             onClick={() => nav("/new")}
             className={styles.actionCard}
           >
@@ -82,41 +83,14 @@ export function MenuScreen() {
           <Button
             variant="secondary"
             onClick={() => setShowHelpChoice(true)}
-            className={styles.actionCard}
+            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
           >
             <HelpCircle size={20} />
             <span className={styles.actionLabel}>Help</span>
           </Button>
-
-          <Button
-            variant="secondary"
-            onClick={() => nav("/stats")}
-            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
-          >
-            <BarChart3 size={20} />
-            <span className={styles.actionLabel}>Stats</span>
-          </Button>
-
-          <Button
-            variant="secondary"
-            onClick={() => setShowThemeModal(true)}
-            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
-          >
-            <Palette size={20} />
-            <span className={styles.actionLabel}>Theme</span>
-          </Button>
-
-          <Button
-            variant="secondary"
-            onClick={() => setShowWhatsNew(true)}
-            className={styles.whatsNewCard}
-          >
-            <Sparkles size={20} />
-            <span className={styles.actionLabel}>What&apos;s New</span>
-          </Button>
         </div>
 
-        <p className={styles.menuTip}>{getMenuTip()}</p>
+        <p className={styles.menuTip}>{tagline}</p>
       </div>
 
       <HelpChoiceModal
@@ -125,6 +99,16 @@ export function MenuScreen() {
         onHowToPlay={() => setShowHowToPlay(true)}
         onKeyboardShortcuts={() => setShowShortcuts(true)}
         onShowAbout={() => setShowAbout(true)}
+        onOpenSettings={() => nav("/stats")}
+        onOpenTheme={() => setShowThemeModal(true)}
+      />
+      <AboutModal
+        isOpen={showAbout}
+        onClose={() => setShowAbout(false)}
+        onShowWhatsNew={() => {
+          setShowAbout(false);
+          setShowWhatsNew(true);
+        }}
       />
       <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
       <TutorialOverlay

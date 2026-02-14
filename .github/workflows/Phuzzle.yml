@@ -53,3 +53,6 @@ jobs:
 
       - name: 🎭 E2E tests (Playwright)
         run: npx playwright test --project=chromium
+
+      - name: 🔦 Lighthouse CI (perf, a11y)
+        run: npx lhci autorun

@@ -21,6 +21,16 @@ const StatsScreen = lazy(() =>
     default: m.StatsScreen,
   })),
 );
+const PackListScreen = lazy(() =>
+  import("@/screens/Packs/PackListScreen").then((m) => ({
+    default: m.PackListScreen,
+  })),
+);
+const PackDetailScreen = lazy(() =>
+  import("@/screens/Packs/PackDetailScreen").then((m) => ({
+    default: m.PackDetailScreen,
+  })),
+);
 
 function PageFallback() {
   return (
@@ -51,6 +61,8 @@ export function App() {
           <Route path="/new" element={<NewGameScreen />} />
           <Route path="/play" element={<PlayScreen />} />
           <Route path="/stats" element={<StatsScreen />} />
+          <Route path="/packs" element={<PackListScreen />} />
+          <Route path="/packs/:packId" element={<PackDetailScreen />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

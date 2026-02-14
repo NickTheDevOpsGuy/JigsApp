@@ -86,7 +86,6 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
   const displayed = sections[section];
 
-  const helpText = "Drag pieces here to store • Tap to place";
   const emptyText =
     pieces.length === 0
       ? "All pieces on board! Drag pieces here to store them."
@@ -121,58 +120,56 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     <div className={styles.tray} ref={ref}>
       <div className={styles.header}>
         <div className={styles.title}>Piece Drawer ({pieces.length})</div>
-        <div className={styles.help}>{helpText}</div>
-      </div>
+        <div className={styles.controls}>
+          <div className={styles.segment} aria-label="Tray section">
+            <button
+              type="button"
+              className={section === "all" ? styles.active : undefined}
+              onClick={() => setSection("all")}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              className={section === "edges" ? styles.active : undefined}
+              onClick={() => setSection("edges")}
+            >
+              Edges
+            </button>
+            <button
+              type="button"
+              className={section === "center" ? styles.active : undefined}
+              onClick={() => setSection("center")}
+            >
+              Center
+            </button>
+            <button
+              type="button"
+              className={section === "corners" ? styles.active : undefined}
+              onClick={() => setSection("corners")}
+            >
+              Corners
+            </button>
+          </div>
 
-      <div className={styles.controls}>
-        <div className={styles.segment} aria-label="Tray section">
-          <button
-            type="button"
-            className={section === "all" ? styles.active : undefined}
-            onClick={() => setSection("all")}
-          >
-            All
-          </button>
-          <button
-            type="button"
-            className={section === "edges" ? styles.active : undefined}
-            onClick={() => setSection("edges")}
-          >
-            Edges
-          </button>
-          <button
-            type="button"
-            className={section === "center" ? styles.active : undefined}
-            onClick={() => setSection("center")}
-          >
-            Center
-          </button>
-          <button
-            type="button"
-            className={section === "corners" ? styles.active : undefined}
-            onClick={() => setSection("corners")}
-          >
-            Corners
-          </button>
-        </div>
-
-        <div className={styles.segment} aria-label="Sort mode">
-          <button
-            type="button"
-            className={sortMode === "grid" ? styles.active : undefined}
-            onClick={() => setSortMode("grid")}
-          >
-            Grid
-          </button>
-          <button
-            type="button"
-            className={sortMode === "color" ? styles.active : undefined}
-            onClick={() => setSortMode("color")}
-            disabled={!image}
-            title={!image ? "Load an image to enable color sorting" : undefined}
-          >
-            Color
-          </button>
+          <div className={styles.segment} aria-label="Sort mode">
+            <button
+              type="button"
+              className={sortMode === "grid" ? styles.active : undefined}
+              onClick={() => setSortMode("grid")}
+            >
+              Grid
+            </button>
+            <button
+              type="button"
+              className={sortMode === "color" ? styles.active : undefined}
+              onClick={() => setSortMode("color")}
+              disabled={!image}
+              title={!image ? "Load an image to enable color sorting" : undefined}
+            >
+              Color
+            </button>
+          </div>
         </div>
       </div>
 

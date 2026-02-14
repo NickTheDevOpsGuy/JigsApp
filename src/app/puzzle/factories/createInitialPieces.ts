@@ -13,6 +13,8 @@ type CreateInitialPiecesArgs = {
   rotationStepDeg: 90 | 180;
   targetStartX: number;
   targetStartY: number;
+  /** When true, use tighter scatter for mobile (fewer columns, more rows). */
+  isMobile?: boolean;
 };
 
 function randInt(min: number, max: number) {
@@ -73,6 +75,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     rotationStepDeg,
     targetStartX,
     targetStartY,
+    isMobile = false,
   } = args;
 
   const total = grid.cols * grid.rows;
@@ -85,49 +88,99 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const w = tileW + effectivePad * 2;
   const h = tileH + effectivePad * 2;
 
-  // Use full board area for scattering so pieces spread out well
   const scatterStartY = Math.max(
     scatterPadding,
     Math.floor(boardHeight * scatterStartYRatio),
   );
   const scatterZone = {
     minX: scatterPadding,
-    maxX: Math.max(scatterPadding + w, boardWidth - scatterPadding),
+    maxX: Math.max(scatterPadding, boardWidth - scatterPadding - w),
     minY: scatterStartY,
-    maxY: Math.max(scatterStartY + h, boardHeight - scatterPadding),
+    maxY: Math.max(scatterStartY, boardHeight - scatterPadding - h),
   };
-  const zoneWidth = scatterZone.maxX - scatterZone.minX;
-  const zoneHeight = scatterZone.maxY - scatterZone.minY;
+  const zoneWidth = Math.max(w, scatterZone.maxX - scatterZone.minX);
+  const zoneHeight = Math.max(h, scatterZone.maxY - scatterZone.minY);
 
-  // Larger spacing for bigger puzzles to avoid overlap and spread things out
+  // Min spacing by piece count: larger puzzles need more clearance for visual clarity
   const minSpacing =
-    total <= 9 ? 14 : total <= 16 ? 18 : total <= 25 ? 22 : total <= 36 ? 26 : 30;
-  const spacing = minSpacing;
-  const cellW = w + spacing;
-  const cellH = h + spacing;
+    total <= 9
+      ? 18
+      : total <= 16
+        ? 22
+        : total <= 25
+          ? 26
+          : total <= 36
+            ? 30
+            : total <= 49
+              ? 34
+              : 40;
 
-  const gridCols = Math.max(1, Math.floor(zoneWidth / cellW));
-  const gridRows = Math.max(1, Math.floor(zoneHeight / cellH));
+  // Grid-based distribution: allocate exactly total cells within zone bounds
+  const cellW = w + minSpacing;
+  const cellH = h + minSpacing;
+  const maxCols = Math.max(1, Math.floor(zoneWidth / cellW));
+  const maxRows = Math.max(1, Math.floor(zoneHeight / cellH));
 
-  const positions: Array<{ x: number; y: number }> = [];
-  const jitterMax = Math.min(
-    spacing,
-    Math.floor(cellW - w) - 1,
-    Math.floor(cellH - h) - 1,
-  );
+  // Choose grid shape: mobile prefers fewer cols (narrower layout), desktop more square
+  let gridCols: number;
+  let gridRows: number;
+  if (isMobile) {
+    gridCols = Math.min(maxCols, Math.max(2, Math.ceil(Math.sqrt(total) * 0.8)));
+    gridRows = Math.ceil(total / gridCols);
+  } else {
+    gridCols = Math.min(maxCols, Math.ceil(Math.sqrt(total)));
+    gridRows = Math.ceil(total / gridCols);
+  }
+  gridCols = Math.min(gridCols, maxCols);
+  gridRows = Math.min(gridRows, maxRows);
 
-  for (let row = 0; row < gridRows; row++) {
-    for (let col = 0; col < gridCols; col++) {
-      const jitterX = jitterMax > 0 ? randInt(0, jitterMax) : 0;
-      const jitterY = jitterMax > 0 ? randInt(0, jitterMax) : 0;
-      positions.push({
-        x: scatterZone.minX + col * cellW + jitterX,
-        y: scatterZone.minY + row * cellH + jitterY,
-      });
-    }
+  // If we can't fit all pieces, reduce spacing until we do (with floor)
+  let effectiveCellW = cellW;
+  let effectiveCellH = cellH;
+  while (
+    gridCols * gridRows < total &&
+    effectiveCellW > w + 8 &&
+    effectiveCellH > h + 8
+  ) {
+    effectiveCellW = Math.max(w + 8, effectiveCellW - 4);
+    effectiveCellH = Math.max(h + 8, effectiveCellH - 4);
+    gridCols = Math.min(maxCols, Math.floor(zoneWidth / effectiveCellW));
+    gridRows = Math.min(maxRows, Math.ceil(total / gridCols));
   }
 
-  // Shuffle positions
+  const positions: Array<{ x: number; y: number }> = [];
+  const jitterSpace = Math.max(
+    0,
+    Math.min(
+      effectiveCellW - w - 4,
+      effectiveCellH - h - 4,
+      Math.floor(minSpacing * 0.5),
+    ),
+  );
+
+  const capacity = gridCols * gridRows;
+  for (let i = 0; i < total; i++) {
+    let row: number;
+    let col: number;
+    if (i < capacity) {
+      row = Math.floor(i / gridCols);
+      col = i % gridCols;
+    } else {
+      const overflow = i - capacity;
+      row = gridRows + Math.floor(overflow / gridCols);
+      col = overflow % gridCols;
+    }
+    const baseX = scatterZone.minX + col * effectiveCellW;
+    const baseY = scatterZone.minY + row * effectiveCellH;
+    const jitterX = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
+    const jitterY = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
+    positions.push({
+      x: Math.max(scatterZone.minX, Math.min(scatterZone.maxX - w, baseX + jitterX)),
+      y: Math.max(scatterZone.minY, Math.min(scatterZone.maxY - h, baseY + jitterY)),
+    });
+  }
+
+  // Shuffle so piece assignment is random
   for (let i = positions.length - 1; i > 0; i--) {
     const j = randInt(0, i);
     [positions[i], positions[j]] = [positions[j], positions[i]];
@@ -139,8 +192,8 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     rowOffset++;
     const baseY = scatterZone.minY + gridRows * cellH + (rowOffset - 1) * cellH;
     for (let col = 0; col < gridCols && positions.length < total; col++) {
-      const jitterX = jitterMax > 0 ? randInt(0, jitterMax) : 0;
-      const jitterY = jitterMax > 0 ? randInt(0, jitterMax) : 0;
+      const jitterX = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
+      const jitterY = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
       positions.push({
         x: scatterZone.minX + col * cellW + jitterX,
         y: baseY + jitterY,
@@ -161,7 +214,12 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     const targetY = targetStartY + row * tileH;
 
     const startInTray = trayIndices.has(i);
-    const pos = positions[i];
+    const rawPos = positions[i];
+    // Clamp to ensure piece stays fully on-board (piece has size w×h)
+    const pos = {
+      x: Math.max(scatterZone.minX, Math.min(scatterZone.maxX - w, rawPos.x)),
+      y: Math.max(scatterZone.minY, Math.min(scatterZone.maxY - h, rawPos.y)),
+    };
 
     const shapePath = buildPiecePath({
       tileW,

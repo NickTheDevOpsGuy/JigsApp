@@ -1,5 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import posthog from "posthog-js";
 import styles from "./PlayScreen.module.css";
 
@@ -8,6 +15,7 @@ import { ConfirmModal } from "@/components/Modal/Modal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
+import { consumeCurrentPuzzleId, recordPuzzleCompletion } from "@/data/packCompletion";
 import { soundManager } from "@/audio/sounds";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
@@ -23,6 +31,7 @@ import { usePlayScreenTimer } from "./hooks/usePlayScreenTimer";
 import { useTimeModeConfig } from "./hooks/useTimeModeConfig";
 import { useShareResults } from "./hooks/useShareResults";
 import { useDownloadImage } from "./hooks/useDownloadImage";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { usePointerHandlers } from "./hooks/usePointerHandlers";
 import { useViewport } from "./hooks/useViewport";
 import { useHaptics } from "./hooks/useHaptics";
@@ -36,10 +45,70 @@ import {
   TopBarButtons,
   HeaderMenu,
 } from "./components";
+import { OnboardingTooltip } from "@/components/OnboardingTooltip";
+import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
+import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
+import { Share2, Users } from "lucide-react";
+import { isSupabaseConfigured } from "@/supabase/client";
 
 export function PlayScreen() {
   const navigate = useNavigate();
-  const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
+  const [searchParams] = useSearchParams();
+  const sessionIdFromUrl = searchParams.get(SESSION_ID_PARAM);
+
+  const localGrid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
+  const localImageUrl = localStorage.getItem(STORAGE_KEY) ?? "";
+
+  const sessionResult = usePuzzleSession(localImageUrl, localGrid);
+  const {
+    sessionId,
+    session,
+    sessionLoading,
+    connectedCount,
+    createSession,
+    copyShareLink,
+    nativeShare,
+    pushState,
+    remoteState,
+    clearRemoteState,
+  } = sessionResult;
+
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const grid = session ? session.grid : localGrid;
+
+  useLayoutEffect(() => {
+    if (session) {
+      localStorage.setItem(STORAGE_KEY, session.imageUrl);
+      localStorage.setItem(GRID_KEY, `${session.grid.rows}x${session.grid.cols}`);
+      clearPuzzleState();
+    }
+  }, [session]);
+
+  if (sessionIdFromUrl && sessionLoading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.loadingOverlay} aria-label="Loading session">
+          <div className={styles.spinner} />
+          <span>Joining puzzle session…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (sessionIdFromUrl && !session && !sessionLoading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.card} style={{ padding: 24 }}>
+          <h2>Session not found</h2>
+          <p>The puzzle session may have expired or the link is invalid.</p>
+          <button type="button" onClick={() => navigate("/")}>
+            Back to menu
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const ui = usePlayScreenUI();
   const {
@@ -87,6 +156,10 @@ export function PlayScreen() {
   const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
   const lastMilestoneRef = React.useRef<number>(0);
 
+  const viewport = useViewport();
+  const snapScaleRef = React.useRef(1);
+  snapScaleRef.current = viewport.viewport.scale;
+
   const managerResult = usePlayScreenManager(
     grid,
     pieceLockingEnabled,
@@ -98,6 +171,10 @@ export function PlayScreen() {
       haptic: hapticsEnabled ? haptics.vibrate : undefined,
       themeRef,
       onPlacementStreak: () => setShowStreakToast(true),
+      initialSessionPieces: session?.state?.pieces?.length
+        ? session.state.pieces
+        : undefined,
+      snapScaleRef,
     },
   );
   const {
@@ -118,6 +195,10 @@ export function PlayScreen() {
     lockMapRef,
     snapParticlesRef,
   } = managerResult;
+
+  const placedForOnboarding = state?.placedCount ?? 0;
+  const totalForOnboarding = state?.totalCount ?? 0;
+  const onboarding = useOnboarding(placedForOnboarding, totalForOnboarding);
 
   const stateRef = React.useRef(state);
   stateRef.current = state;
@@ -157,6 +238,13 @@ export function PlayScreen() {
     if (state.placedCount === 0) lastMilestoneRef.current = 0;
   }, [state?.placedCount, puzzleKey]);
 
+  // Record pack puzzle completion when puzzle is finished
+  useEffect(() => {
+    if (!state?.isComplete) return;
+    const puzzleId = consumeCurrentPuzzleId();
+    if (puzzleId) recordPuzzleCompletion(puzzleId);
+  }, [state?.isComplete]);
+
   useEffect(() => {
     if (!showStreakToast) return;
     const t = setTimeout(() => setShowStreakToast(false), 2000);
@@ -176,7 +264,6 @@ export function PlayScreen() {
 
   const isCoarsePointer = useCoarsePointer();
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
-  const viewport = useViewport();
 
   useEffect(() => {
     viewport.reset();
@@ -265,6 +352,26 @@ export function PlayScreen() {
     return () => clearTimeout(id);
   }, [state, elapsedSeconds]);
 
+  // Co-op: push state to server when in session
+  useEffect(() => {
+    if (!sessionId || !state || state.isComplete) return;
+    pushState(state.pieces, elapsedSeconds, state.isComplete);
+  }, [sessionId, state, elapsedSeconds, pushState]);
+
+  // Co-op: apply remote state when we receive an update from another participant
+  useEffect(() => {
+    if (!remoteState || !manager) return;
+    try {
+      manager.restoreFromSaved(remoteState.pieces);
+      setState(manager.getState());
+      setElapsedSeconds(remoteState.elapsedSeconds);
+      clearRemoteState();
+    } catch (e) {
+      console.warn("Failed to apply remote state:", e);
+      clearRemoteState();
+    }
+  }, [remoteState, manager, setState, setElapsedSeconds, clearRemoteState]);
+
   // Save before tab hide / refresh (visibilitychange, pagehide)
   useEffect(() => {
     const flush = () => {
@@ -285,6 +392,25 @@ export function PlayScreen() {
       window.removeEventListener("pagehide", onPageHide);
     };
   }, []);
+
+  // First-snap celebration (lightweight confetti for onboarding)
+  useEffect(() => {
+    if (!onboarding.showFirstSnapToast) return;
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!prefersReducedMotion) {
+      import("canvas-confetti").then((confetti) => {
+        const colors = CONFETTI_COLORS_BY_THEME[themeRef.current ?? "light"];
+        confetti.default({
+          particleCount: 60,
+          spread: 50,
+          origin: { y: 0.6 },
+          colors,
+        });
+      });
+    }
+  }, [onboarding.showFirstSnapToast]);
 
   // Analytics: time to first snap (first piece placed)
   const firstSnapCapturedRef = useRef(false);
@@ -450,7 +576,6 @@ export function PlayScreen() {
             onShowHelpChoice={() => setShowHelpChoice(true)}
             onToggleDebug={toggleDebug}
           />
-          <div className={styles.title}>Phuzzle</div>
         </div>
         <div className={styles.topBarCenter}>
           <PlayHUD
@@ -464,6 +589,75 @@ export function PlayScreen() {
             bestTimeSeconds={bestTimeSeconds}
             onTogglePause={() => setIsPaused((p) => !p)}
           />
+          {isSupabaseConfigured() && (
+            <div className={styles.coopIndicator}>
+              {sessionId ? (
+                <>
+                  <span className={styles.connectedCount}>
+                    <Users size={14} />
+                    {connectedCount}
+                  </span>
+                  <button
+                    type="button"
+                    className={styles.coopShareBtn}
+                    onClick={async () => {
+                      const ok =
+                        typeof navigator.share === "function"
+                          ? await nativeShare()
+                          : await copyShareLink();
+                      if (ok) setShareCopied(true);
+                      setTimeout(() => setShareCopied(false), 2000);
+                    }}
+                    title="Copy or share link"
+                  >
+                    <Share2 size={14} />
+                    {shareCopied ? "Copied!" : "Share"}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.coopShareBtn}
+                  onClick={async () => {
+                    const s = stateRef.current;
+                    const pieces = s?.pieces
+                      ? s.pieces.map((p) => ({
+                          id: p.id,
+                          row: p.row,
+                          col: p.col,
+                          x: p.x,
+                          y: p.y,
+                          z: p.z,
+                          rotation: p.rotation,
+                          isPlaced: p.isPlaced,
+                          locked: p.locked,
+                          groupId: p.groupId,
+                          inTray: p.inTray,
+                        }))
+                      : [];
+                    const id = await createSession(
+                      s?.imageUrl ?? localStorage.getItem(STORAGE_KEY) ?? "",
+                      s?.grid ?? grid,
+                      pieces,
+                      elapsedSecondsRef.current,
+                    );
+                    if (id) {
+                      const ok =
+                        typeof navigator.share === "function"
+                          ? await nativeShare()
+                          : await copyShareLink();
+                      if (ok) setShareCopied(true);
+                      setTimeout(() => setShareCopied(false), 2000);
+                    }
+                  }}
+                  title="Create session and share"
+                >
+                  <Share2 size={14} />
+                  Share puzzle
+                </button>
+              )}
+            </div>
+          )}
         </div>
         <TopBarButtons
           showPreview={showPreview}
@@ -512,6 +706,12 @@ export function PlayScreen() {
 
       <div className={styles.main} ref={mainRef}>
         <div className={styles.board} ref={boardRef}>
+          {!isLoading && total > 0 && placed === 0 && (
+            <div className={styles.emptyBoardHint} aria-hidden="true">
+              <span className={styles.emptyBoardEmoji}>🧩</span>
+              <p className={styles.emptyBoardText}>Drag a piece to start the puzzle</p>
+            </div>
+          )}
           {isLoading && (
             <div className={styles.loadingOverlay} aria-label="Loading puzzle">
               <div className={styles.spinner} />
@@ -606,6 +806,11 @@ export function PlayScreen() {
         />
       )}
 
+      {onboarding.showFirstSnapToast && (
+        <div className={styles.engagementToast} role="status">
+          First piece! ✨
+        </div>
+      )}
       {showStreakToast && (
         <div className={styles.engagementToast} role="status">
           🔥 On fire!
@@ -614,6 +819,24 @@ export function PlayScreen() {
       {milestoneMessage && (
         <div className={styles.engagementToast} role="status">
           {milestoneMessage}
+        </div>
+      )}
+      {onboarding.needsTrayTip && (
+        <div className={styles.onboardingOverlayTray}>
+          <OnboardingTooltip
+            message="Use the tray below to store or recall pieces"
+            onDismiss={onboarding.dismissTrayTip}
+            showButton
+          />
+        </div>
+      )}
+      {onboarding.needsZoomTip && (
+        <div className={styles.onboardingOverlay}>
+          <OnboardingTooltip
+            message="Pinch or scroll to zoom on larger puzzles"
+            onDismiss={onboarding.dismissZoomTip}
+            showButton
+          />
         </div>
       )}
     </div>

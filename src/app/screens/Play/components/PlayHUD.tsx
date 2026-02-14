@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Clock, Puzzle, Pause, Play } from "lucide-react";
-import { Button } from "@/components/Button/Button";
+import { Clock, Puzzle } from "lucide-react";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
 import type { TimeMode } from "../timeMode";
@@ -21,12 +20,12 @@ export function PlayHUD({
   elapsedSeconds,
   piecesLeft,
   totalPieces,
-  isPaused,
-  isComplete,
+  isPaused: _isPaused,
+  isComplete: _isComplete,
   timeMode,
   countdownMinutes = 10,
   bestTimeSeconds,
-  onTogglePause,
+  onTogglePause: _onTogglePause,
 }: PlayHUDProps) {
   const showTimer = timeMode !== "relaxed";
   const isCountdown = timeMode === "countdown";
@@ -54,15 +53,6 @@ export function PlayHUD({
           )}
         </div>
       )}
-      <Button
-        size="sm"
-        onClick={onTogglePause}
-        disabled={isComplete}
-        aria-label={isPaused ? "Resume puzzle" : "Pause puzzle"}
-        aria-pressed={isPaused}
-      >
-        {isPaused ? <Play size={16} /> : <Pause size={16} />}
-      </Button>
       <div
         className={`${styles.hudPill} ${bounce ? styles.hudPillBounce : ""}`}
         aria-label={`${piecesLeft} of ${totalPieces} pieces remaining`}

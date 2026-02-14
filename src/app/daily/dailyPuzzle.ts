@@ -12,6 +12,8 @@ export const GRID_OPTIONS = [
   { rows: 4, cols: 4, label: "Medium ⚡", pieces: 16 },
   { rows: 5, cols: 5, label: "Hard 🔥", pieces: 25 },
   { rows: 6, cols: 6, label: "Expert 👑", pieces: 36 },
+  { rows: 7, cols: 7, label: "Master 🧠", pieces: 49 },
+  { rows: 8, cols: 8, label: "Legend 🔮", pieces: 64 },
 ] as const;
 
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";

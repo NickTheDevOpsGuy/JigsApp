@@ -312,6 +312,18 @@
   object-fit: cover;
 }
 
+.galleryItemPlaceholder {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  font-size: 24px;
+  font-weight: 600;
+}
+
 .galleryItemName {
   position: absolute;
   bottom: 0;

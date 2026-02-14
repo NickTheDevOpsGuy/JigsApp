@@ -51,25 +51,11 @@ export function useImagePicker() {
 
   const clearError = () => setError(null);
 
-  const selectGalleryPuzzle = async (puzzle: SamplePuzzle) => {
+  const selectGalleryPuzzle = (puzzle: SamplePuzzle) => {
     setSelectedPuzzle(puzzle);
     clearError();
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(puzzle.fullImage);
-      if (!response.ok) throw new Error("Failed to load image");
-
-      const blob = await response.blob();
-      const dataUrl = await readBlobAsDataUrl(blob);
-      setImgDataUrl(dataUrl);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load image.";
-      setError(message);
-      setSelectedPuzzle(null);
-    } finally {
-      setIsLoading(false);
-    }
+    setImgDataUrl(puzzle.fullImage);
+    // Use asset URL directly; PlayScreen accepts URLs (daily puzzle already does this)
   };
 
   const setFromBlob = async (blob: Blob): Promise<boolean> => {
