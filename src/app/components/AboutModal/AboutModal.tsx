@@ -8,9 +8,10 @@ const GITHUB_CONTRIBUTORS_URL =
 type AboutModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onShowWhatsNew?: () => void;
 };
 
-export function AboutModal({ isOpen, onClose }: AboutModalProps) {
+export function AboutModal({ isOpen, onClose, onShowWhatsNew }: AboutModalProps) {
   const openRepo = () => {
     window.open(GITHUB_REPO_URL, "_blank", "noopener,noreferrer");
     onClose();
@@ -19,6 +20,11 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
   const openContributors = () => {
     window.open(GITHUB_CONTRIBUTORS_URL, "_blank", "noopener,noreferrer");
     onClose();
+  };
+
+  const showWhatsNew = () => {
+    onClose();
+    onShowWhatsNew?.();
   };
 
   return (
@@ -34,6 +40,15 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
         >
           Contributors
         </button>
+        {onShowWhatsNew && (
+          <button
+            type="button"
+            className={styles.aboutChoiceBtn}
+            onClick={showWhatsNew}
+          >
+            What&apos;s New
+          </button>
+        )}
       </div>
     </Modal>
   );

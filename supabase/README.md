@@ -22,6 +22,7 @@ In the Supabase dashboard **SQL Editor**, run each migration in order:
 
 1. `migrations/001_initial_schema.sql` – player_stats, completions, user_achievements, RLS
 2. `migrations/002_player_profiles.sql` – player_profiles (display name, show_on_leaderboard for anonymous mode)
+3. `migrations/003_puzzle_sessions.sql` – puzzle_sessions (co-op real-time sharing)
 
 Or use the Supabase CLI:
 
@@ -33,9 +34,17 @@ supabase db push
 
 In **Authentication > Providers**, enable **Anonymous sign-ins**. This lets users track stats without creating an account.
 
+## Enable Realtime for co-op puzzles
+
+For shared puzzle sessions (real-time co-op), add `puzzle_sessions` to the Realtime publication:
+
+1. In Supabase dashboard: **Database > Replication**
+2. Enable replication for the **puzzle_sessions** table
+
 ## Tables
 
 - **player_stats** – One row per user: puzzles completed, play time, streaks
 - **completions** – Each puzzle completion (used for daily, weekly, monthly, and all-time leaderboards)
 - **player_profiles** – Display name and `show_on_leaderboard` (anonymous mode)
 - **user_achievements** – Unlocked achievements per user
+- **puzzle_sessions** – UUID session state for co-op puzzles (pieces, elapsed time, completion)

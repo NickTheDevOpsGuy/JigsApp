@@ -14,58 +14,83 @@ export function parseGrid(stored: string | null): { rows: number; cols: number }
 
 const MOBILE_BREAKPOINT = 600;
 
+/** Difficulty tiers for piece scaling: easy 9–16, medium 25–36, hard 49–64, extreme 81+ */
+function getDifficultyTier(
+  pieceCount: number,
+): "easy" | "medium" | "hard" | "extreme" {
+  if (pieceCount <= 16) return "easy";
+  if (pieceCount <= 36) return "medium";
+  if (pieceCount <= 64) return "hard";
+  return "extreme";
+}
+
 export function computeTileSize(
   availW: number,
   availH: number,
   grid: { rows: number; cols: number },
   viewportWidth: number = 1024,
+  _viewportHeight: number = 768,
 ): number {
-  // Calculate max tile size that fits the available space
   const tileFromW = availW / grid.cols;
   const tileFromH = availH / grid.rows;
   let tile = Math.floor(Math.min(tileFromW, tileFromH));
 
   const isMobile = viewportWidth < MOBILE_BREAKPOINT;
   const pieceCount = grid.rows * grid.cols;
+  const tier = getDifficultyTier(pieceCount);
 
-  // Mobile: scale down pieces as count increases so puzzle fits and feels playable
-  // (avoids "technically working, experientially wrong" - cramped boards)
-  if (isMobile && pieceCount > 6) {
-    const scale = Math.max(0.55, Math.min(1, 14 / pieceCount));
-    tile = Math.floor(tile * scale);
+  // Mobile: dynamic scaling by difficulty for better touch interaction
+  if (isMobile) {
+    const mobileScale =
+      tier === "easy"
+        ? Math.min(1, 1.1 - pieceCount * 0.01)
+        : tier === "medium"
+          ? Math.max(0.65, 0.95 - pieceCount * 0.01)
+          : tier === "hard"
+            ? Math.max(0.5, 0.75 - pieceCount * 0.005)
+            : Math.max(0.4, 0.65 - pieceCount * 0.004);
+    tile = Math.floor(tile * mobileScale);
   }
 
-  // Desktop: larger pieces for easier play
+  // Per-tier bounds: easy = larger, medium = mid, hard = smaller, extreme = smallest
   let minTile: number;
   let maxTile: number;
 
   if (isMobile) {
-    if (pieceCount <= 9) {
-      minTile = 42;
-      maxTile = 72;
-    } else if (pieceCount <= 16) {
-      minTile = 36;
-      maxTile = 60;
-    } else if (pieceCount <= 25) {
-      minTile = 30;
-      maxTile = 48;
-    } else {
-      minTile = 24;
-      maxTile = 40;
+    switch (tier) {
+      case "easy":
+        minTile = 48;
+        maxTile = 80;
+        break;
+      case "medium":
+        minTile = 36;
+        maxTile = 60;
+        break;
+      case "hard":
+        minTile = 28;
+        maxTile = 44;
+        break;
+      default:
+        minTile = 24;
+        maxTile = 36;
     }
   } else {
-    if (pieceCount <= 9) {
-      minTile = 100;
-      maxTile = 200;
-    } else if (pieceCount <= 16) {
-      minTile = 80;
-      maxTile = 160;
-    } else if (pieceCount <= 25) {
-      minTile = 60;
-      maxTile = 120;
-    } else {
-      minTile = 50;
-      maxTile = 100;
+    switch (tier) {
+      case "easy":
+        minTile = 110;
+        maxTile = 200;
+        break;
+      case "medium":
+        minTile = 70;
+        maxTile = 140;
+        break;
+      case "hard":
+        minTile = 48;
+        maxTile = 100;
+        break;
+      default:
+        minTile = 38;
+        maxTile = 72;
     }
   }
 

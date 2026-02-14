@@ -1,0 +1,108 @@
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) 16px 24px;
+  background: var(--color-bg-primary);
+}
+
+.card {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--color-bg-card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.backBtn:hover {
+  background: var(--color-bg-primary);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.packGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.packCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.packCard:hover {
+  background: var(--color-bg-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.packEmoji {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.packInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.packName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.packDesc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.packProgress {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}

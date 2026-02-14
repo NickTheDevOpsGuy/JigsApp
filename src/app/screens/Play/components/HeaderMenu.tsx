@@ -20,6 +20,7 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   game: "Game",
   help: "Help",
   navigation: "Navigate",
+  stats: "Stats",
   view: "View",
 };
 
@@ -32,6 +33,7 @@ const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
   "controls",
   "game",
   "navigation",
+  "stats",
   "view",
 ];
 

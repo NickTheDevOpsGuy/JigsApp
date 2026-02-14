@@ -86,7 +86,6 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
   const displayed = sections[section];
 
-  const helpText = "Drag pieces here to store • Tap to place";
   const emptyText =
     pieces.length === 0
       ? "All pieces on board! Drag pieces here to store them."
@@ -121,10 +120,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     <div className={styles.tray} ref={ref}>
       <div className={styles.header}>
         <div className={styles.title}>Piece Drawer ({pieces.length})</div>
-        <div className={styles.help}>{helpText}</div>
-      </div>
-
-      <div className={styles.controls}>
+        <div className={styles.controls}>
         <div className={styles.segment} aria-label="Tray section">
           <button
             type="button"
@@ -173,6 +169,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
           >
             Color
           </button>
+        </div>
         </div>
       </div>
 

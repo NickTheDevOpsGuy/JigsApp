@@ -1,3 +1,4 @@
+import type { MutableRefObject } from "react";
 import type { DragState, GridSize, Piece, PuzzleState } from "./types";
 import { createInitialPieces } from "./factories/createInitialPieces";
 import type { SavedPiece } from "./puzzleStorage";
@@ -23,8 +24,15 @@ export type PuzzleManagerOptions = {
 
   scatterPadding?: number;
   scatterStartYRatio?: number;
-  snapTolerancePx?: number;
+  /** Board snap tolerance (precise placement). Default 34. */
+  snapToleranceBoardPx?: number;
+  /** Neighbor snap tolerance (connecting pieces, more forgiving). Default 48. */
+  snapToleranceNeighborPx?: number;
+  /** Ref to viewport scale for zoom-adaptive tolerance. When set, effective = base / scale (capped). */
+  snapScaleRef?: MutableRefObject<number>;
   rotationStepDeg?: 90 | 180;
+  /** Use tighter scatter pattern for mobile viewports. */
+  isMobile?: boolean;
 };
 
 export type PuzzleManagerEvents = {
@@ -51,7 +59,10 @@ export class PuzzleManager {
   private boardWidth: number;
   private boardHeight: number;
 
-  private snapTolerancePx: number;
+  private snapToleranceBoardPx: number;
+  private snapToleranceNeighborPx: number;
+  private snapScaleRef: MutableRefObject<number> | undefined;
+  private isMobile: boolean;
   private scatterStartYRatio: number;
   private rotationStepDeg: 90 | 180;
 
@@ -75,15 +86,21 @@ export class PuzzleManager {
       pieceHeight,
       scatterPadding = 16,
       pad = 18,
-      snapTolerancePx = 40,
+      snapToleranceBoardPx = 34,
+      snapToleranceNeighborPx = 48,
+      snapScaleRef,
       scatterStartYRatio = 0.3,
       rotationStepDeg = 90,
+      isMobile = false,
     } = options;
 
     this.events = events;
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
-    this.snapTolerancePx = snapTolerancePx;
+    this.snapToleranceBoardPx = snapToleranceBoardPx;
+    this.snapToleranceNeighborPx = snapToleranceNeighborPx;
+    this.snapScaleRef = snapScaleRef;
+    this.isMobile = isMobile;
     this.scatterStartYRatio = scatterStartYRatio;
     this.rotationStepDeg = rotationStepDeg;
     // Tabs extend ~22% beyond tile edge; pad must exceed that or shapes get clipped
@@ -107,6 +124,7 @@ export class PuzzleManager {
       rotationStepDeg,
       targetStartX: this.targetStartX,
       targetStartY: this.targetStartY,
+      isMobile,
     });
 
     this.state = {
@@ -539,8 +557,15 @@ export class PuzzleManager {
 
     // Try neighbor snap first (connect pieces), then board snap (align to grid).
     // Order matters: board-then-neighbor could undo the board snap by aligning to a floating neighbor.
+    performance.mark("snap-neighbor-start");
     this.trySnapActiveGroupToNeighbor();
+    performance.mark("snap-neighbor-end");
+    performance.measure("snap-neighbor", "snap-neighbor-start", "snap-neighbor-end");
+
+    performance.mark("snap-board-start");
     this.trySnapActiveGroupToBoard();
+    performance.mark("snap-board-end");
+    performance.measure("snap-board", "snap-board-start", "snap-board-end");
 
     // Clear drag state
     this.drag = {
@@ -594,6 +619,20 @@ export class PuzzleManager {
 
   /* ---------------- Snapping ---------------- */
 
+  /**
+   * Zoom-adaptive tolerance: keeps snap zone roughly constant in screen pixels.
+   * effective = base / scale, clamped to avoid accidental long-distance snaps.
+   * Mobile gets a small bump (~8%) for touch imprecision.
+   */
+  private getEffectiveTolerance(basePx: number): number {
+    const mobileBump = this.isMobile ? 1.08 : 1;
+    const adjusted = basePx * mobileBump;
+    const scale = this.snapScaleRef?.current ?? 1;
+    const clampedScale = Math.max(0.25, Math.min(4, scale));
+    const effective = adjusted / clampedScale;
+    return Math.min(effective, adjusted * 2);
+  }
+
   private trySnapActiveGroupToBoard(): boolean {
     const activeId = this.drag.activeId;
     if (!activeId) return false;
@@ -610,7 +649,8 @@ export class PuzzleManager {
     const dx = active.targetX - activeTile.x;
     const dy = active.targetY - activeTile.y;
 
-    if (Math.hypot(dx, dy) > this.snapTolerancePx) return false;
+    const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
+    if (Math.hypot(dx, dy) > tolerance) return false;
     if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
 
     this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
@@ -670,7 +710,8 @@ export class PuzzleManager {
         const dy = nTile.y - expectedDy - gpTile.y;
         const d = Math.hypot(dx, dy);
 
-        if (d <= this.snapTolerancePx && (!best || d < best.dist)) {
+        const neighborTolerance = this.getEffectiveTolerance(this.snapToleranceNeighborPx);
+        if (d <= neighborTolerance && (!best || d < best.dist)) {
           best = { dx, dy, dist: d, into: n.groupId };
         }
       }

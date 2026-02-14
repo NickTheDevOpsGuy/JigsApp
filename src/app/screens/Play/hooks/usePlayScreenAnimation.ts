@@ -3,7 +3,7 @@ import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
-import type { DebugFlags } from "../playScreenUtils";
+import { SHOW_DEBUG, type DebugFlags } from "../playScreenUtils";
 import type { ViewportState } from "./useViewport";
 
 export function usePlayScreenAnimation(args: {
@@ -43,6 +43,8 @@ export function usePlayScreenAnimation(args: {
   const lastCompleteRef = useRef<boolean>(false);
   const lastPieceCountRef = useRef<number>(0);
   const lastFrameTimeRef = useRef<number>(0);
+  const fpsFrameTimesRef = useRef<number[]>([]);
+  const fpsLogIntervalRef = useRef<number>(0);
   /** Interpolated positions for dragged group (smooth drag, no touch/pointer changes) */
   const dragDisplayRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const DRAG_LERP = 0.32;
@@ -82,7 +84,26 @@ export function usePlayScreenAnimation(args: {
         rafRef.current = requestAnimationFrame(tick);
         return;
       }
+      const dt = lastFrameTimeRef.current > 0 ? now - lastFrameTimeRef.current : 0;
       lastFrameTimeRef.current = now;
+
+      if (SHOW_DEBUG) {
+        performance.mark("render-frame-start");
+        const times = fpsFrameTimesRef.current;
+        if (dt > 0) {
+          times.push(dt);
+          if (times.length > 60) times.shift();
+        }
+        fpsLogIntervalRef.current += dt;
+        if (fpsLogIntervalRef.current >= 2000) {
+          fpsLogIntervalRef.current = 0;
+          const avg = times.length ? times.reduce((a, t) => a + t, 0) / times.length : 0;
+          const fps = avg > 0 ? Math.round(1000 / avg) : 0;
+          console.debug(
+            `[Phuzzle] FPS: ~${fps} (drag: ${isDragging ? "yes" : "no"}, pieces: ${pieceCount})`,
+          );
+        }
+      }
 
       const rect = boardEl.getBoundingClientRect();
       const cssW = Math.max(1, Math.floor(rect.width));
@@ -164,6 +185,11 @@ export function usePlayScreenAnimation(args: {
         viewport,
         snapParticles,
       );
+
+      if (SHOW_DEBUG) {
+        performance.mark("render-frame-end");
+        performance.measure("render-frame", "render-frame-start", "render-frame-end");
+      }
 
       const placedCount = st.pieces.filter((p) => p.isPlaced).length;
       if (

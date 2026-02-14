@@ -7,6 +7,8 @@ type HelpChoiceModalProps = {
   onHowToPlay: () => void;
   onKeyboardShortcuts: () => void;
   onShowAbout?: () => void;
+  onOpenSettings?: () => void;
+  onOpenTheme?: () => void;
 };
 
 export function HelpChoiceModal({
@@ -15,6 +17,8 @@ export function HelpChoiceModal({
   onHowToPlay,
   onKeyboardShortcuts,
   onShowAbout,
+  onOpenSettings,
+  onOpenTheme,
 }: HelpChoiceModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Help" showCloseButton={true}>
@@ -49,6 +53,30 @@ export function HelpChoiceModal({
             }}
           >
             About
+          </button>
+        )}
+        {onOpenSettings && (
+          <button
+            type="button"
+            className={styles.helpChoiceBtn}
+            onClick={() => {
+              onClose();
+              onOpenSettings();
+            }}
+          >
+            Settings
+          </button>
+        )}
+        {onOpenTheme && (
+          <button
+            type="button"
+            className={styles.helpChoiceBtn}
+            onClick={() => {
+              onClose();
+              onOpenTheme();
+            }}
+          >
+            Theme
           </button>
         )}
       </div>

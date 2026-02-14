@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/samplePuzzles";
+import { setCurrentPuzzleId } from "@/data/packCompletion";
 import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
 import { ArrowLeft, Trash2, Play, Camera } from "lucide-react";
@@ -23,10 +24,45 @@ const STORAGE_KEY = "phuzzle:imageDataUrl";
 
 type ImageSource = "gallery" | "upload" | "camera";
 
+function GalleryThumbnail({
+  puzzle,
+  isSelected,
+  isLoading,
+  onSelect,
+}: {
+  puzzle: (typeof SAMPLE_PUZZLES)[0];
+  isSelected: boolean;
+  isLoading: boolean;
+  onSelect: () => void;
+}) {
+  const [imgError, setImgError] = useState(false);
+  return (
+    <button
+      className={`${styles.galleryItem} ${isSelected ? styles.galleryItemSelected : ""}`}
+      onClick={onSelect}
+      disabled={isLoading}
+    >
+      {imgError ? (
+        <div className={styles.galleryItemPlaceholder} title="Image unavailable">
+          ?
+        </div>
+      ) : (
+        <img
+          src={puzzle.thumbnail}
+          alt={puzzle.name}
+          onError={() => setImgError(true)}
+        />
+      )}
+      <span className={styles.galleryItemName}>{puzzle.name}</span>
+    </button>
+  );
+}
+
 export function SetupScreen() {
   const nav = useNavigate();
   const [searchParams] = useSearchParams();
   const sourceParam = searchParams.get("source");
+  const puzzleIdParam = searchParams.get("puzzle");
   const [imageSource, setImageSource] = useState<ImageSource>(
     sourceParam === "camera" ? "camera" : "gallery",
   );
@@ -69,6 +105,18 @@ export function SetupScreen() {
     if (existingImg) setImgDataUrl(existingImg);
   }, [setImgDataUrl]);
 
+  // Pre-select puzzle when navigating from pack (?puzzle=id)
+  useEffect(() => {
+    if (!puzzleIdParam) return;
+    const puzzle = SAMPLE_PUZZLES.find((p) => p.id === puzzleIdParam);
+    if (puzzle) {
+      setImageSource("gallery");
+      setSelectedCategory(puzzle.category);
+      selectGalleryPuzzle(puzzle);
+      setCurrentPuzzleId(puzzleIdParam);
+    }
+  }, [puzzleIdParam, selectGalleryPuzzle]);
+
   const filteredPuzzles =
     selectedCategory === "all"
       ? SAMPLE_PUZZLES
@@ -88,6 +136,8 @@ export function SetupScreen() {
       localStorage.setItem(STORAGE_KEY, imgDataUrl);
       saveGrid();
       localStorage.removeItem("phuzzle:dailyDate");
+      if (selectedPuzzle) setCurrentPuzzleId(selectedPuzzle.id);
+      else setCurrentPuzzleId(null);
       nav("/play");
     } catch {
       console.error("Could not save to localStorage");
@@ -96,13 +146,18 @@ export function SetupScreen() {
 
   const handleClear = () => {
     localStorage.removeItem(STORAGE_KEY);
+    setCurrentPuzzleId(null);
     clearImage();
   };
+
+  const isPackFlow = !!puzzleIdParam;
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>New Puzzle</h1>
+        <h1 className={styles.title}>
+          {isPackFlow && selectedPuzzle ? selectedPuzzle.name : "New Puzzle"}
+        </h1>
 
         {error && (
           <div className={styles.error}>
@@ -113,28 +168,30 @@ export function SetupScreen() {
           </div>
         )}
 
-        {/* Image source tabs */}
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${imageSource === "gallery" ? styles.tabActive : ""}`}
-            onClick={() => setImageSource("gallery")}
-          >
-            Gallery
-          </button>
-          <button
-            className={`${styles.tab} ${imageSource === "upload" ? styles.tabActive : ""}`}
-            onClick={() => setImageSource("upload")}
-          >
-            Upload
-          </button>
-          <button
-            className={`${styles.tab} ${imageSource === "camera" ? styles.tabActive : ""}`}
-            onClick={() => setImageSource("camera")}
-          >
-            <Camera size={16} />
-            Camera
-          </button>
-        </div>
+        {/* Standard workflow: source tabs + gallery/upload/camera */}
+        {!isPackFlow && (
+          <>
+            <div className={styles.tabs}>
+              <button
+                className={`${styles.tab} ${imageSource === "gallery" ? styles.tabActive : ""}`}
+                onClick={() => setImageSource("gallery")}
+              >
+                Gallery
+              </button>
+              <button
+                className={`${styles.tab} ${imageSource === "upload" ? styles.tabActive : ""}`}
+                onClick={() => setImageSource("upload")}
+              >
+                Upload
+              </button>
+              <button
+                className={`${styles.tab} ${imageSource === "camera" ? styles.tabActive : ""}`}
+                onClick={() => setImageSource("camera")}
+              >
+                <Camera size={16} />
+                Camera
+              </button>
+            </div>
 
         {imageSource === "gallery" ? (
           <>
@@ -155,15 +212,13 @@ export function SetupScreen() {
                 <div className={styles.galleryEmpty}>No puzzles in this category yet</div>
               ) : (
                 filteredPuzzles.map((puzzle) => (
-                  <button
+                  <GalleryThumbnail
                     key={puzzle.id}
-                    className={`${styles.galleryItem} ${selectedPuzzle?.id === puzzle.id ? styles.galleryItemSelected : ""}`}
-                    onClick={() => selectGalleryPuzzle(puzzle)}
-                    disabled={isLoading}
-                  >
-                    <img src={puzzle.thumbnail} alt={puzzle.name} />
-                    <span className={styles.galleryItemName}>{puzzle.name}</span>
-                  </button>
+                    puzzle={puzzle}
+                    isSelected={selectedPuzzle?.id === puzzle.id}
+                    isLoading={isLoading}
+                    onSelect={() => selectGalleryPuzzle(puzzle)}
+                  />
                 ))
               )}
             </div>
@@ -181,6 +236,8 @@ export function SetupScreen() {
           </label>
         ) : (
           <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
+        )}
+          </>
         )}
 
         <p className={styles.difficultySummary}>
