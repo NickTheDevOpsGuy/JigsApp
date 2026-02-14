@@ -157,6 +157,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
       Math.floor(minSpacing * 0.5),
     ),
   );
+  const jitterMax = jitterSpace;
 
   const capacity = gridCols * gridRows;
   for (let i = 0; i < total; i++) {
@@ -172,8 +173,8 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     }
     const baseX = scatterZone.minX + col * effectiveCellW;
     const baseY = scatterZone.minY + row * effectiveCellH;
-    const jitterX = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
-    const jitterY = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
+    const jitterX = jitterMax > 0 ? randInt(0, jitterMax) : 0;
+    const jitterY = jitterMax > 0 ? randInt(0, jitterMax) : 0;
     positions.push({
       x: Math.max(scatterZone.minX, Math.min(scatterZone.maxX - w, baseX + jitterX)),
       y: Math.max(scatterZone.minY, Math.min(scatterZone.maxY - h, baseY + jitterY)),
