@@ -16,6 +16,25 @@ export const MENU_TIPS = [
   "Use the tray to hold pieces and free up space on the board.",
 ] as const;
 
+/** Taglines for the menu header. One random tagline shown per visit. */
+export const MENU_TAGLINES = [
+  "A Phuzzle a Day Keeps Your Brain at Play.",
+  "A Phuzzle a Day Keeps the Brain in Play.",
+  "A Phuzzle a Day Keeps Your Mind in Motion.",
+  "A Phuzzle a Day Keeps the Mind Ticking.",
+  "A Phuzzle a Day. Brainpower at Play.",
+  "A Phuzzle a Day – Stay Sharp, Stay Smart.",
+  "A Phuzzle a Day Keeps the Brain Buzzing.",
+  "Zoom in for the tricky bits.",
+  "Start with the edges.",
+  "Every piece has a place.",
+] as const;
+
+export function getMenuTagline(): string {
+  const i = Math.floor(Math.random() * MENU_TAGLINES.length);
+  return MENU_TAGLINES[i];
+}
+
 export function getMenuTip(): string {
   const dayOfYear = (() => {
     const now = new Date();
@@ -26,3 +45,4 @@ export function getMenuTip(): string {
   const i = dayOfYear % MENU_TIPS.length;
   return MENU_TIPS[i];
 }
+

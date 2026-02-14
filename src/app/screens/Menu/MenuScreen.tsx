@@ -15,10 +15,11 @@ import { HelpCircle, Image, Calendar, Camera, Package } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
-import { getMenuTip } from "@/data/menuTips";
+import { getMenuTagline } from "@/data/menuTips";
 
 export function MenuScreen() {
   const nav = useNavigate();
+  const [tagline] = useState(() => getMenuTagline());
   const [showHelpChoice, setShowHelpChoice] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -89,7 +90,7 @@ export function MenuScreen() {
           </Button>
         </div>
 
-        <p className={styles.menuTip}>{getMenuTip()}</p>
+        <p className={styles.menuTip}>{tagline}</p>
       </div>
 
       <HelpChoiceModal
