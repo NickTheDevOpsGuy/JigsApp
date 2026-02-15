@@ -134,7 +134,8 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
     const maxScroll = scrollWidth - clientWidth;
-    setCanScroll(maxScroll > 0);
+    // Only show indicator when there's meaningful overflow (avoids rounding/subpixel false positives)
+    setCanScroll(maxScroll > 8);
     const pct = maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, scrollLeft / maxScroll));
     setScrollProgress(pct);
   }, []);
