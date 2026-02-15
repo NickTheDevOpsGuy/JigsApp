@@ -416,8 +416,8 @@ export class PuzzleManager {
 
     // Use effective dimensions for rotated pieces (90°/270° swap w and h in screen space)
     const rot = piece.rotation % 360;
-    const effW = (rot === 90 || rot === 270) ? piece.h : piece.w;
-    const effH = (rot === 90 || rot === 270) ? piece.w : piece.h;
+    const effW = rot === 90 || rot === 270 ? piece.h : piece.w;
+    const effH = rot === 90 || rot === 270 ? piece.w : piece.h;
 
     const pad = 16;
     const xMin = pad;
