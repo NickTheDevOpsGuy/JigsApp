@@ -53,6 +53,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const [sortMode, setSortMode] = useState<SortMode>("grid");
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [canScroll, setCanScroll] = useState(false);
 
   // Compact mode: default on for mobile when 25+ pieces; user can toggle
   const compactDefault = isCoarsePointer && pieces.length >= 25;
@@ -133,6 +134,8 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
     const maxScroll = scrollWidth - clientWidth;
+    // Only show indicator when there's meaningful overflow (avoids rounding/subpixel false positives)
+    setCanScroll(maxScroll > 8);
     const pct = maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, scrollLeft / maxScroll));
     setScrollProgress(pct);
   }, []);
@@ -222,7 +225,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         </div>
       </div>
 
-      {displayed.length > 0 && (
+      {displayed.length > 0 && canScroll && (
         <div
           className={styles.scrollIndicator}
           role="progressbar"

@@ -1,7 +1,7 @@
 /* src/app/components/PieceTray/PieceTray.module.css */
 
 .tray {
-  height: 150px;
+  height: 120px;
   flex-shrink: 0;
   min-width: 0;
   max-width: 100%;
@@ -135,15 +135,23 @@
   overflow-x: auto;
   overflow-y: hidden;
   padding: 8px 12px;
+  padding-inline-end: max(16px, env(safe-area-inset-right, 0));
   display: flex;
   gap: 8px;
   align-items: center;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.scroller::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
 }
 
 .scrollerSnap {
   scroll-snap-type: x mandatory;
-  scroll-padding: 0 12px;
+  scroll-padding-inline-start: 12px;
+  scroll-padding-inline-end: max(16px, env(safe-area-inset-right, 0));
 }
 
 .row {
@@ -241,13 +249,15 @@
 
 .trayCompact .scroller {
   padding: 6px 12px;
+  padding-inline-end: max(16px, env(safe-area-inset-right, 0));
 }
 
-/* Mobile adjustments - compact for more board space */
+/* Mobile adjustments */
 @media (max-width: 600px) {
   .tray {
-    margin: 0 6px 6px 6px;
-    height: 96px;
+    margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px
+      max(6px, env(safe-area-inset-right, 0));
+    height: 92px;
   }
 
   .header {
