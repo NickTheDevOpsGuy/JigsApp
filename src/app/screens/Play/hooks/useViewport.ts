@@ -6,6 +6,7 @@ const isPinchingRef = { current: false };
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 4;
 const ZOOM_SENSITIVITY = 0.001;
+const ZOOM_STEP = 0.25;
 
 export type ViewportState = {
   scale: number;
@@ -161,6 +162,30 @@ export function useViewport() {
     setViewport({ scale: 1, panX: 0, panY: 0 });
   }, []);
 
+  const zoomIn = useCallback(() => {
+    setViewport((prev) => {
+      const newScale = Math.min(MAX_SCALE, prev.scale + ZOOM_STEP);
+      const factor = newScale / prev.scale;
+      return {
+        scale: newScale,
+        panX: prev.panX * factor,
+        panY: prev.panY * factor,
+      };
+    });
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setViewport((prev) => {
+      const newScale = Math.max(MIN_SCALE, prev.scale - ZOOM_STEP);
+      const factor = newScale / prev.scale;
+      return {
+        scale: newScale,
+        panX: prev.panX * factor,
+        panY: prev.panY * factor,
+      };
+    });
+  }, []);
+
   const handleWheel = useCallback(
     (e: React.WheelEvent<HTMLCanvasElement>, boardEl: HTMLDivElement | null) => {
       if (!boardEl) return;
@@ -191,6 +216,8 @@ export function useViewport() {
     screenToBoard,
     boardToScreen,
     reset,
+    zoomIn,
+    zoomOut,
     handleWheel,
     startPan,
     handlePanMove,

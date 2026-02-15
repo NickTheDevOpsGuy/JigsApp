@@ -198,7 +198,8 @@
   margin: 12px 0 0;
   padding: 10px 14px;
   font-size: 13px;
-  color: var(--color-text-muted);
+  font-weight: 500;
+  color: var(--color-text-secondary);
   text-align: center;
   border-radius: 10px;
   background: var(--color-bg-secondary);

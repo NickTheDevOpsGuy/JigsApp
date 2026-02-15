@@ -19,14 +19,22 @@ export const GRID_OPTIONS = [
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";
 const DAILY_PREFIX = "phuzzle:daily:";
 
-/** Simple deterministic hash from string */
-function hash(str: string): number {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = (h << 5) - h + str.charCodeAt(i);
-    h = h & h;
-  }
-  return Math.abs(h);
+/**
+ * Mulberry32 - fast 32-bit PRNG with good distribution.
+ * Seeded with date so same date = same puzzle for everyone.
+ */
+function mulberry32(seed: number): () => number {
+  return function () {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Seed from date string (YYYY-MM-DD) for deterministic but well-distributed selection */
+function seedFromDate(dateStr: string): number {
+  return new Date(dateStr + "T12:00:00Z").getTime();
 }
 
 /** Get today's date string in user's local timezone (YYYY-MM-DD) */
@@ -40,7 +48,9 @@ export function getDailyPuzzleForDate(dateStr: string): SamplePuzzle | null {
   const puzzles = SAMPLE_PUZZLES;
   if (puzzles.length === 0) return null;
 
-  const puzzleIndex = hash(dateStr) % puzzles.length;
+  const seed = seedFromDate(dateStr);
+  const rng = mulberry32(seed);
+  const puzzleIndex = Math.floor(rng() * puzzles.length);
   return puzzles[puzzleIndex];
 }
 

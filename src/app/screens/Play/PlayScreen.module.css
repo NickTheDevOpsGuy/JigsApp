@@ -10,6 +10,11 @@
   overscroll-behavior: none;
   overflow: hidden;
   padding-bottom: env(safe-area-inset-bottom, 0);
+  /* PZ-045: Prevent text selection and Safari callouts on touch */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .topBar {
@@ -237,6 +242,10 @@
   overflow: hidden;
   touch-action: none;
   -webkit-overflow-scrolling: auto;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .emptyBoardHint {
@@ -493,6 +502,11 @@
   z-index: 100;
   cursor: pointer;
   animation: fadeIn 0.2s ease-out;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @keyframes fadeIn {
@@ -543,6 +557,11 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .completeContent {
