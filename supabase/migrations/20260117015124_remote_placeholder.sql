@@ -1,0 +1,2 @@
+-- Placeholder to match remote migration history.
+-- No schema changes; required for db push to succeed.

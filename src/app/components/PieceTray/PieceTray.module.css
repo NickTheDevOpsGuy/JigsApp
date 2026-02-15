@@ -30,10 +30,43 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .title {
   font-weight: 600;
+}
+
+.compactToggle {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.compactToggle:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.compactToggle:active {
+  transform: scale(0.95);
 }
 
 .controls {
@@ -77,6 +110,22 @@
   color: var(--color-brand-primary);
 }
 
+.scrollIndicator {
+  flex-shrink: 0;
+  height: 4px;
+  background: var(--color-bg-secondary);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 0 12px 4px;
+}
+
+.scrollIndicatorFill {
+  height: 100%;
+  background: var(--color-brand-primary);
+  border-radius: 2px;
+  transition: width 0.1s ease-out;
+}
+
 .scroller {
   flex: 1;
   overflow-x: auto;
@@ -85,12 +134,23 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollerSnap {
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 12px;
 }
 
 .row {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.scrollerSnap .pieceButton {
+  scroll-snap-align: center;
+  scroll-snap-stop: normal;
 }
 
 .pieceButton {
@@ -116,8 +176,8 @@
 }
 
 .thumbWrap {
-  width: 56px;
-  height: 56px;
+  width: var(--thumb-size, 56px);
+  height: var(--thumb-size, 56px);
 
   /* IMPORTANT:
      Do NOT clip the thumbnail, otherwise jigsaw tabs/slots get cut off. */
@@ -159,6 +219,26 @@
   font-size: 13px;
 }
 
+/* Compact mode: smaller thumbs for 25+ piece puzzles on mobile */
+.trayCompact .thumbWrap {
+  width: 36px;
+  height: 36px;
+}
+
+.trayCompact .pieceButton {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 2px;
+}
+
+.trayCompact .row {
+  gap: 6px;
+}
+
+.trayCompact .scroller {
+  padding: 6px 12px;
+}
+
 /* Mobile adjustments - compact for more board space */
 @media (max-width: 600px) {
   .tray {
@@ -194,5 +274,20 @@
   .pieceButton {
     min-width: 48px;
     min-height: 48px;
+  }
+
+  /* Mobile compact overrides */
+  .trayCompact .thumbWrap {
+    width: 36px;
+    height: 36px;
+  }
+
+  .trayCompact .pieceButton {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .trayCompact .scrollIndicator {
+    margin: 0 6px 2px;
   }
 }
