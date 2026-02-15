@@ -125,7 +125,7 @@ export function handleTouchUp(
   ctx: PointerHandlersContext,
   canRotatePiece: (pid: string) => boolean,
   isPointerOverTray: (x: number, y: number) => boolean,
-  screenToBoard?: ScreenToBoard,
+  _screenToBoard?: ScreenToBoard,
 ): void {
   const {
     manager,
@@ -152,9 +152,9 @@ export function handleTouchUp(
     // Touch tap: rotate (only if within time + distance threshold)
     const now = Date.now();
     const doubleFireWindow = 300;
-    if ((ctx.lastTapRotateTimeRef?.current ?? 0) > now - doubleFireWindow) {
-      // Skip: likely duplicate from click+touch/pointer
-    } else {
+    const recentlyRotated =
+      (ctx.lastTapRotateTimeRef?.current ?? 0) > now - doubleFireWindow;
+    if (!recentlyRotated) {
       const sx = canvas.touchStartX ?? 0;
       const sy = canvas.touchStartY ?? 0;
       const dist = Math.hypot(e.clientX - sx, e.clientY - sy);
@@ -167,7 +167,7 @@ export function handleTouchUp(
         pid &&
         canRotatePiece(pid)
       ) {
-        ctx.lastTapRotateTimeRef && (ctx.lastTapRotateTimeRef.current = now);
+        if (ctx.lastTapRotateTimeRef) ctx.lastTapRotateTimeRef.current = now;
         onPieceInteraction?.();
         manager.rotatePiece(pid);
         soundManager.play("rotate");
