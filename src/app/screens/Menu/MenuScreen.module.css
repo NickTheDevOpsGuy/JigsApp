@@ -6,6 +6,14 @@
   background: var(--color-bg-secondary);
   padding: 24px;
   padding-bottom: max(24px, env(safe-area-inset-bottom, 0));
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
 }
 
 .card {
@@ -18,8 +26,9 @@
 
 .header {
   display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .logo {
@@ -54,19 +63,77 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 100px;
-  padding: 16px;
+  gap: 6px;
+  min-height: 72px;
+  padding: 12px;
+}
+
+/* Today's Puzzle – featured daily CTA */
+.actionCardFeatured {
+  position: relative;
+  box-shadow: 0 4px 16px rgba(11, 99, 184, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.actionCardFeatured:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(11, 99, 184, 0.35);
+}
+
+.dailyEmoji {
+  font-size: 26px;
+  line-height: 1;
 }
 
 .actionLabel {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+.actionCard svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 20px;
+  }
+
+  .page {
+    padding: 16px;
+  }
+
+  .actionCard {
+    min-height: 64px;
+    padding: 10px;
+  }
+
+  .actionLabel {
+    font-size: 12px;
+  }
+
+  .dailyEmoji {
+    font-size: 24px;
+  }
+
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .menuTip {
+    margin: 10px 0 0;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
 }
 
 @media (max-width: 380px) {
   .actionsGrid {
     grid-template-columns: 1fr;
+  }
+
+  .actionCard {
+    min-height: 56px;
+    padding: 8px;
   }
 }
 
@@ -128,12 +195,13 @@
 }
 
 .menuTip {
-  margin: 20px 0 0;
-  padding: 12px 16px;
+  margin: 12px 0 0;
+  padding: 10px 14px;
   font-size: 13px;
   color: var(--color-text-muted);
   text-align: center;
   border-radius: 10px;
   background: var(--color-bg-secondary);
   line-height: 1.4;
+  max-width: 100%;
 }

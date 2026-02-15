@@ -3,7 +3,7 @@
 import React from "react";
 import styles from "./Button.module.css";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "outline";
 export type ButtonSize = "sm" | "md" | "lg";
 
 type ButtonProps = React.ComponentPropsWithoutRef<"button"> & {

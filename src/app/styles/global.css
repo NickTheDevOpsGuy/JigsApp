@@ -286,9 +286,14 @@ body,
   width: 100%;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   background: var(--color-bg-primary);
+  overflow-x: hidden;
   font-family:
     "Inter",
     system-ui,
