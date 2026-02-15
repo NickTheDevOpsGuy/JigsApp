@@ -22,7 +22,6 @@
   overflow: hidden;
 }
 
-
 .header {
   padding: 6px 12px;
   font-weight: 600;
@@ -250,7 +249,8 @@
 /* Mobile adjustments - compact for more board space */
 @media (max-width: 600px) {
   .tray {
-    margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px max(6px, env(safe-area-inset-right, 0));
+    margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px
+      max(6px, env(safe-area-inset-right, 0));
     height: 96px;
   }
 
