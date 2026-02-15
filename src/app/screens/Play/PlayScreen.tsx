@@ -598,13 +598,7 @@ export function PlayScreen() {
         /* user cancelled or failed */
       }
     }
-  }, [
-    sessionId,
-    nativeShare,
-    copyShareLink,
-    createSession,
-    grid,
-  ]);
+  }, [sessionId, nativeShare, copyShareLink, createSession, grid]);
   const handleDownloadImage = useDownloadImage({
     canvasRef,
     imgRef,
