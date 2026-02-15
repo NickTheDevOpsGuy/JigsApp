@@ -153,10 +153,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const showCompactToggle = isCoarsePointer && pieces.length >= 25;
 
   return (
-    <div
-      className={`${styles.tray} ${compact ? styles.trayCompact : ""}`}
-      ref={ref}
-    >
+    <div className={`${styles.tray} ${compact ? styles.trayCompact : ""}`} ref={ref}>
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <span className={styles.title}>Piece Drawer ({pieces.length})</span>
@@ -168,11 +165,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
               aria-label={compact ? "Expand thumbnails" : "Compact thumbnails"}
               title={compact ? "Expand thumbnails" : "Compact thumbnails"}
             >
-              {compact ? (
-                <Maximize2 size={14} />
-              ) : (
-                <Minimize2 size={14} />
-              )}
+              {compact ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
             </button>
           )}
         </div>
@@ -264,9 +257,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
               >
                 <div
                   className={styles.thumbWrap}
-                  style={
-                    { "--thumb-size": `${thumbSize}px` } as React.CSSProperties
-                  }
+                  style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
                 >
                   {image ? (
                     <img

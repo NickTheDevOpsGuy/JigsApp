@@ -466,13 +466,7 @@ export function PlayScreen() {
         time_mode: timeMode,
       });
     }
-  }, [
-    state?.placedCount,
-    state?.grid,
-    elapsedSeconds,
-    isCoarsePointer,
-    timeMode,
-  ]);
+  }, [state?.placedCount, state?.grid, elapsedSeconds, isCoarsePointer, timeMode]);
 
   // Analytics: exit before completion (on unmount)
   useEffect(() => {
