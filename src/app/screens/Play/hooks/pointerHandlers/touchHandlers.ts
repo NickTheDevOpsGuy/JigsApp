@@ -60,10 +60,7 @@ export function handleTouchMove(
 ): boolean {
   const { manager, boardRef, didDragRef, setState, activePointerIdRef } = ctx;
   if (!manager || !boardRef.current) return false;
-  if (
-    activePointerIdRef.current != null &&
-    e.pointerId !== activePointerIdRef.current
-  ) {
+  if (activePointerIdRef.current != null && e.pointerId !== activePointerIdRef.current) {
     return true;
   }
 
@@ -161,7 +158,8 @@ export function handleTouchUp(
       const sx = canvas.touchStartX ?? 0;
       const sy = canvas.touchStartY ?? 0;
       const dist = Math.hypot(e.clientX - sx, e.clientY - sy);
-      const elapsed = (canvas.touchStartTime ?? 0) > 0 ? now - canvas.touchStartTime! : Infinity;
+      const elapsed =
+        (canvas.touchStartTime ?? 0) > 0 ? now - canvas.touchStartTime! : Infinity;
       const pid = canvas.pendingPieceId;
       if (
         dist < TAP_DRAG_THRESHOLD_PX &&
