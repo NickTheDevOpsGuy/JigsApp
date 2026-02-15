@@ -548,6 +548,63 @@ export function PlayScreen() {
   }, [navigate]);
 
   const share = useShareResults({ elapsedSeconds, state });
+  const handleSharePuzzle = useCallback(async () => {
+    if (!isSupabaseConfigured()) return;
+    if (sessionId) {
+      const ok =
+        typeof navigator.share === "function"
+          ? await nativeShare()
+          : await copyShareLink();
+      if (ok) setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+      return;
+    }
+    const s = stateRef.current;
+    const pieces = s?.pieces
+      ? s.pieces.map((p) => ({
+          id: p.id,
+          row: p.row,
+          col: p.col,
+          x: p.x,
+          y: p.y,
+          z: p.z,
+          rotation: p.rotation,
+          isPlaced: p.isPlaced,
+          locked: p.locked,
+          groupId: p.groupId,
+          inTray: p.inTray,
+        }))
+      : [];
+    const id = await createSession(
+      s?.imageUrl ?? localStorage.getItem(STORAGE_KEY) ?? "",
+      s?.grid ?? grid,
+      pieces,
+      elapsedSecondsRef.current,
+    );
+    if (id) {
+      const shareUrl = `${window.location.origin}/play?${SESSION_ID_PARAM}=${id}`;
+      try {
+        const ok =
+          typeof navigator.share === "function"
+            ? await navigator.share({
+                title: "Join my Phuzzle",
+                text: "Solve this puzzle with me!",
+                url: shareUrl,
+              })
+            : await navigator.clipboard.writeText(shareUrl).then(() => true);
+        if (ok) setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2000);
+      } catch {
+        /* user cancelled or failed */
+      }
+    }
+  }, [
+    sessionId,
+    nativeShare,
+    copyShareLink,
+    createSession,
+    grid,
+  ]);
   const handleDownloadImage = useDownloadImage({
     canvasRef,
     imgRef,
@@ -618,6 +675,7 @@ export function PlayScreen() {
             onShowHowToPlay={() => setShowHowToPlay(true)}
             onShowHelpChoice={() => setShowHelpChoice(true)}
             onToggleDebug={toggleDebug}
+            onSharePuzzle={isSupabaseConfigured() ? handleSharePuzzle : undefined}
           />
         </div>
         <div className={styles.topBarCenter}>

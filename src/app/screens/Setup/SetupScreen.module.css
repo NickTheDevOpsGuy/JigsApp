@@ -1,7 +1,9 @@
 .page {
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--color-bg-secondary);
   padding: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom, 0));
   display: flex;
   align-items: flex-start;
   justify-content: center;

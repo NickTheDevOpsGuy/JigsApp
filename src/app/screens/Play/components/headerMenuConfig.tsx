@@ -40,6 +40,7 @@ export type HeaderMenuProps = {
   onShowHelpChoice: () => void;
   onShowAbout?: () => void;
   onToggleDebug: () => void;
+  onSharePuzzle?: () => void | Promise<void>;
 };
 
 export type SubMenuId =
@@ -49,6 +50,7 @@ export type SubMenuId =
   | "game"
   | "help"
   | "navigation"
+  | "share"
   | "stats"
   | "view";
 
@@ -225,6 +227,15 @@ export function buildMenuItems(
       sortKey: "Sound",
       onClick: c(props.onToggleSound),
       subMenu: "audio",
+    },
+    {
+      id: "share",
+      section: "settings",
+      visible: !!props.onSharePuzzle,
+      label: "Play with friend?",
+      sortKey: "Share",
+      onClick: c(props.onSharePuzzle ?? (() => {})),
+      subMenu: "share",
     },
     {
       id: "stats",
