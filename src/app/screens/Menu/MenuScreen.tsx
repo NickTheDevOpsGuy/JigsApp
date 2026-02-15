@@ -6,7 +6,7 @@ import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
-import { Image, Calendar, Camera, Package } from "lucide-react";
+import { Image, Camera, Package } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
@@ -30,6 +30,7 @@ export function MenuScreen() {
       <div className={styles.card}>
         <div className={styles.header}>
           <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
+          <p className={styles.menuTip}>{tagline}</p>
         </div>
 
         <div className={styles.actionsGrid}>
@@ -37,41 +38,39 @@ export function MenuScreen() {
             variant="primary"
             onClick={() => setShowDailyModal(true)}
             disabled={!hasDaily}
-            className={styles.actionCard}
+            className={`${styles.actionCard} ${styles.actionCardFeatured}`}
           >
-            <Calendar size={24} />
+            <span className={styles.dailyEmoji}>🧩</span>
             <span className={styles.actionLabel}>
               {todayCompleted ? "Today's Puzzle ✓" : "Today's Puzzle"}
             </span>
           </Button>
 
           <Button
-            variant="primary"
+            variant="outline"
             onClick={() => nav("/packs")}
             className={styles.actionCard}
           >
-            <Package size={24} />
+            <Package size={22} />
             <span className={styles.actionLabel}>Puzzle Packs</span>
           </Button>
           <Button
-            variant="primary"
+            variant="outline"
             onClick={() => nav("/new")}
             className={styles.actionCard}
           >
-            <Image size={24} />
+            <Image size={22} />
             <span className={styles.actionLabel}>Choose Photo</span>
           </Button>
           <Button
-            variant="primary"
+            variant="outline"
             onClick={() => nav("/new?source=camera")}
             className={styles.actionCard}
           >
-            <Camera size={24} />
+            <Camera size={22} />
             <span className={styles.actionLabel}>Snap a Picture</span>
           </Button>
         </div>
-
-        <p className={styles.menuTip}>{tagline}</p>
       </div>
 
       <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />

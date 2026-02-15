@@ -65,6 +65,22 @@
   transform: translateY(1px);
 }
 
+/* Outline: blue border/text, light background - for secondary CTAs */
+.outline {
+  background: var(--color-bg-elevated);
+  color: var(--color-brand-primary);
+  border: 1px solid var(--color-brand-primary);
+}
+
+.outline:hover:not(:disabled) {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand-primary);
+}
+
+.outline:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
 /* Sizes */
 .sm {
   padding: 6px 10px;
