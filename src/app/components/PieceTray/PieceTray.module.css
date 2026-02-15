@@ -22,6 +22,7 @@
   overflow: hidden;
 }
 
+
 .header {
   padding: 6px 12px;
   font-weight: 600;
@@ -135,6 +136,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   padding: 8px 12px;
+  padding-inline-end: max(16px, env(safe-area-inset-right, 0));
   display: flex;
   gap: 8px;
   align-items: center;
@@ -143,7 +145,8 @@
 
 .scrollerSnap {
   scroll-snap-type: x mandatory;
-  scroll-padding: 0 12px;
+  scroll-padding-inline-start: 12px;
+  scroll-padding-inline-end: max(16px, env(safe-area-inset-right, 0));
 }
 
 .row {
@@ -241,12 +244,13 @@
 
 .trayCompact .scroller {
   padding: 6px 12px;
+  padding-inline-end: max(16px, env(safe-area-inset-right, 0));
 }
 
 /* Mobile adjustments - compact for more board space */
 @media (max-width: 600px) {
   .tray {
-    margin: 0 6px 6px 6px;
+    margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px max(6px, env(safe-area-inset-right, 0));
     height: 96px;
   }
 

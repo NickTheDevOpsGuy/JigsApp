@@ -257,11 +257,23 @@ export function PlayScreen() {
   }, [state?.placedCount, puzzleKey]);
 
   // Record pack puzzle completion when puzzle is finished
+  const completionCapturedRef = useRef(false);
   useEffect(() => {
     if (!state?.isComplete) return;
     const puzzleId = consumeCurrentPuzzleId();
     if (puzzleId) recordPuzzleCompletion(puzzleId);
-  }, [state?.isComplete]);
+    if (!completionCapturedRef.current) {
+      completionCapturedRef.current = true;
+      const g = state?.grid;
+      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
+      posthog.capture("puzzle_complete", {
+        grid_size: gridSize,
+        device_type: isCoarsePointer ? "mobile" : "desktop",
+        time_mode: timeMode,
+        elapsed_seconds: elapsedSeconds,
+      });
+    }
+  }, [state?.isComplete, state?.grid, elapsedSeconds, isCoarsePointer, timeMode]);
 
   // Analytics: on_fire_toast_shown when placement streak toast appears
   const onFireCapturedRef = useRef(false);
@@ -288,6 +300,7 @@ export function PlayScreen() {
   useEffect(() => {
     firstSnapCapturedRef.current = false;
     onFireCapturedRef.current = false;
+    completionCapturedRef.current = false;
   }, [puzzleKey]);
 
   // Auto-clear piece selection after 1s so the blue border doesn’t stay until another click
