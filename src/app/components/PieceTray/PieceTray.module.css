@@ -246,12 +246,12 @@
   padding-inline-end: max(16px, env(safe-area-inset-right, 0));
 }
 
-/* Mobile adjustments - compact for more board space */
+/* Mobile adjustments - taller tray so pieces are easier to see */
 @media (max-width: 600px) {
   .tray {
     margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px
       max(6px, env(safe-area-inset-right, 0));
-    height: 96px;
+    height: 140px;
   }
 
   .header {
