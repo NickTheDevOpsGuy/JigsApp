@@ -18,13 +18,13 @@ export const MENU_TIPS = [
 
 /** Taglines for the menu header. One random tagline shown per visit. */
 export const MENU_TAGLINES = [
-  "A Phuzzle a Day Keeps Your Brain at Play.",
-  "A Phuzzle a Day Keeps the Brain in Play.",
-  "A Phuzzle a Day Keeps Your Mind in Motion.",
-  "A Phuzzle a Day Keeps the Mind Ticking.",
-  "A Phuzzle a Day. Brainpower at Play.",
-  "A Phuzzle a Day – Stay Sharp, Stay Smart.",
-  "A Phuzzle a Day Keeps the Brain Buzzing.",
+  "A PHUZZLE a Day Keeps Your Brain at Play.",
+  "A PHUZZLE a Day Keeps the Brain in Play.",
+  "A PHUZZLE a Day Keeps Your Mind in Motion.",
+  "A PHUZZLE a Day Keeps the Mind Ticking.",
+  "A PHUZZLE a Day. Brainpower at Play.",
+  "A PHUZZLE a Day – Stay Sharp, Stay Smart.",
+  "A PHUZZLE a Day Keeps the Brain Buzzing.",
   "Zoom in for the tricky bits.",
   "Start with the edges.",
   "Every piece has a place.",

@@ -16,17 +16,23 @@ export type { HeaderMenuProps } from "./headerMenuConfig";
 const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   about: "About",
   audio: "Audio",
+  board: "Board",
   controls: "Control",
+  display: "Display",
   game: "Game",
   help: "Help",
   navigation: "Navigate",
   share: "Share",
-  stats: "Stats",
+  stats: "Leaderboards",
   view: "View",
 };
 
 /** When in About submenu, Back goes to Help */
 const ABOUT_PARENT: SubMenuId = "help";
+
+/** When in Display or Board, Back goes to View */
+const VIEW_CHILDREN: SubMenuId[] = ["display", "board"];
+const VIEW_PARENT: SubMenuId = "view";
 
 /** Settings submenus in alphabetical order */
 const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
@@ -118,7 +124,9 @@ export function HeaderMenu(props: HeaderMenuProps) {
       ? helpItems.length > 0
       : id === "about"
         ? aboutItems.length > 0
-        : settingsItems.some((i) => i.subMenu === id);
+        : id === "view"
+          ? settingsItems.some((i) => i.subMenu === "display" || i.subMenu === "board")
+          : settingsItems.some((i) => i.subMenu === id);
 
   const renderItem = (item: MenuItemConfig) => {
     if (item.isTheme) {
@@ -180,7 +188,9 @@ export function HeaderMenu(props: HeaderMenuProps) {
   );
 
   const handleBack = () => {
-    setActiveSubMenu(activeSubMenu === "about" ? ABOUT_PARENT : null);
+    if (activeSubMenu === "about") setActiveSubMenu(ABOUT_PARENT);
+    else if (VIEW_CHILDREN.includes(activeSubMenu!)) setActiveSubMenu(VIEW_PARENT);
+    else setActiveSubMenu(null);
   };
 
   const renderSubMenu = () => (
@@ -206,6 +216,28 @@ export function HeaderMenu(props: HeaderMenuProps) {
           {SUB_MENU_LABELS.about}
           <ChevronRight size={16} className={styles.headerMenuChevron} />
         </button>
+      )}
+      {activeSubMenu === "view" && (
+        <>
+          <button
+            type="button"
+            className={styles.headerMenuSubmenuTrigger}
+            role="menuitem"
+            onClick={() => setActiveSubMenu("display")}
+          >
+            {SUB_MENU_LABELS.display}
+            <ChevronRight size={16} className={styles.headerMenuChevron} />
+          </button>
+          <button
+            type="button"
+            className={styles.headerMenuSubmenuTrigger}
+            role="menuitem"
+            onClick={() => setActiveSubMenu("board")}
+          >
+            {SUB_MENU_LABELS.board}
+            <ChevronRight size={16} className={styles.headerMenuChevron} />
+          </button>
+        </>
       )}
       {subMenuItems.map(renderItem)}
     </>

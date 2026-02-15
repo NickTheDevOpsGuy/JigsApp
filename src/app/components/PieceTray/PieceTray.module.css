@@ -20,6 +20,11 @@
   line-height: 1.35;
   color: var(--color-text-secondary);
   overflow: hidden;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .header {

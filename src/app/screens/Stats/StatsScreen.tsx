@@ -221,7 +221,7 @@ export function StatsScreen() {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
-          <h1 className={styles.title}>Stats & Leaderboards</h1>
+          <h1 className={styles.title}>Leaderboard</h1>
           <p className={styles.placeholder}>
             Connect Supabase to track your stats, compete on leaderboards, and unlock
             achievements.
@@ -332,7 +332,7 @@ export function StatsScreen() {
             <ArrowLeft size={18} />
             Back
           </Button>
-          <h1 className={styles.title}>Stats & Leaderboards</h1>
+          <h1 className={styles.title}>Leaderboard</h1>
         </div>
 
         <div className={styles.tabs}>

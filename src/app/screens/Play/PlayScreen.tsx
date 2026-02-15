@@ -678,6 +678,9 @@ export function PlayScreen() {
             onTogglePieceLocking={() => setPieceLockingEnabled((p) => !p)}
             onToggleGhostHint={() => setShowGhostHint((g) => !g)}
             onToggleFullscreen={toggleFullscreen}
+            onCenterBoard={() => viewport.reset()}
+            onZoomIn={() => viewport.zoomIn()}
+            onZoomOut={() => viewport.zoomOut()}
             onShowShortcuts={() => setShowShortcuts(true)}
             onShowHowToPlay={() => setShowHowToPlay(true)}
             onShowHelpChoice={() => setShowHelpChoice(true)}

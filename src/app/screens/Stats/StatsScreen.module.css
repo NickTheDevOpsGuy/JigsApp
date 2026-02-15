@@ -30,6 +30,7 @@
   font-size: 24px;
   color: var(--color-brand-primary);
   flex: 1;
+  min-width: 0;
 }
 
 .placeholder,
@@ -461,6 +462,159 @@
   .empty {
     font-size: 14px;
     padding: 8px 0;
+  }
+}
+
+/* PZ-041: Very narrow screens (e.g. 320px) – compact leaderboard layout */
+@media (max-width: 400px) {
+  .page {
+    padding: 8px;
+    padding-top: 12px;
+  }
+
+  .card {
+    padding: 14px 12px;
+  }
+
+  .header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .title {
+    font-size: 17px;
+  }
+
+  .tabs button {
+    padding: 10px 6px;
+    font-size: 12px;
+    min-width: 64px;
+  }
+
+  .leaderboardHeader {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  /* Keep tabs in single scrollable row – no wrap, avoids 3+ rows on 320px */
+  .leaderboardTabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -4px;
+  }
+
+  .leaderboardTabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .leaderboardTabs button {
+    padding: 8px 10px;
+    font-size: 11px;
+    min-height: 40px;
+    flex-shrink: 0;
+  }
+
+  .leaderboardItem {
+    padding: 10px 8px;
+    min-height: 44px;
+    gap: 8px;
+  }
+
+  .leaderboardItem .rank {
+    min-width: 28px;
+    font-size: 14px;
+  }
+
+  .leaderboardItem .player {
+    font-size: 13px;
+  }
+
+  .leaderboardItem .time {
+    font-size: 12px;
+  }
+
+  .allTimeGrid {
+    font-size: 12px;
+  }
+
+  .allTimeGrid select {
+    padding: 6px 10px;
+    font-size: 13px;
+    min-height: 36px;
+  }
+
+  .statCard {
+    padding: 12px;
+  }
+
+  .statValue {
+    font-size: 18px;
+  }
+
+  /* Single column for stats grid on very narrow */
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Compact personal bests */
+  .personalBestItem {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .pbGrid {
+    min-width: 36px;
+    font-size: 13px;
+  }
+
+  .pbTime {
+    font-size: 13px;
+  }
+
+  .pbDaily {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  /* Share + All-time grid on one row when both visible; tabs full width above */
+  .leaderboardHeader {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .leaderboardTabs {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .allTimeGrid {
+    order: 2;
+  }
+
+  .shareBtn {
+    order: 2;
+    margin-left: auto;
+  }
+
+  /* Tighter achievements */
+  .achievement {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .achievementIcon {
+    font-size: 28px;
+  }
+
+  .achievementName {
+    font-size: 14px;
+  }
+
+  .achievementDesc {
+    font-size: 12px;
   }
 }
 

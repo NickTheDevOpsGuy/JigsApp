@@ -35,6 +35,9 @@ export type HeaderMenuProps = {
   onTogglePieceLocking: () => void;
   onToggleGhostHint: () => void;
   onToggleFullscreen: () => void;
+  onCenterBoard: () => void;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
   onShowShortcuts: () => void;
   onShowHowToPlay: () => void;
   onShowHelpChoice: () => void;
@@ -46,7 +49,9 @@ export type HeaderMenuProps = {
 export type SubMenuId =
   | "about"
   | "audio"
+  | "board"
   | "controls"
+  | "display"
   | "game"
   | "help"
   | "navigation"
@@ -142,9 +147,55 @@ export function buildMenuItems(
       section: "settings",
       visible: props.canShowFullscreen,
       label: props.isFullscreen ? "Exit fullscreen" : "Fullscreen",
-      sortKey: "Fullscreen",
+      sortKey: "1 Fullscreen",
       onClick: c(props.onToggleFullscreen),
-      subMenu: "view",
+      subMenu: "display",
+    },
+    {
+      id: "preview",
+      section: "settings",
+      visible: true,
+      label: props.showPreview ? "Hide preview" : "Show preview",
+      sortKey: "2 Show preview",
+      onClick: c(props.onTogglePreview),
+      subMenu: "display",
+    },
+    {
+      id: "theme",
+      section: "settings",
+      visible: true,
+      label: "",
+      sortKey: "3 Theme",
+      onClick: () => setOpen(false),
+      isTheme: true,
+      subMenu: "display",
+    },
+    {
+      id: "centerBoard",
+      section: "settings",
+      visible: true,
+      label: "Center board",
+      sortKey: "1 Center board",
+      onClick: c(props.onCenterBoard),
+      subMenu: "board",
+    },
+    {
+      id: "zoomIn",
+      section: "settings",
+      visible: true,
+      label: "Zoom in",
+      sortKey: "2 Zoom in",
+      onClick: c(props.onZoomIn),
+      subMenu: "board",
+    },
+    {
+      id: "zoomOut",
+      section: "settings",
+      visible: true,
+      label: "Zoom out",
+      sortKey: "3 Zoom out",
+      onClick: c(props.onZoomOut),
+      subMenu: "board",
     },
     {
       id: "timeMode",
@@ -192,16 +243,6 @@ export function buildMenuItems(
       subMenu: "audio",
     },
     {
-      id: "theme",
-      section: "settings",
-      visible: true,
-      label: "",
-      sortKey: "Theme",
-      onClick: () => setOpen(false),
-      isTheme: true,
-      subMenu: "view",
-    },
-    {
       id: "lock",
       section: "settings",
       visible: true,
@@ -209,15 +250,6 @@ export function buildMenuItems(
       sortKey: "Lock pieces",
       onClick: c(props.onTogglePieceLocking),
       subMenu: "game",
-    },
-    {
-      id: "preview",
-      section: "settings",
-      visible: true,
-      label: props.showPreview ? "Hide preview" : "Show preview",
-      sortKey: "Show preview",
-      onClick: c(props.onTogglePreview),
-      subMenu: "view",
     },
     {
       id: "sound",
@@ -241,7 +273,7 @@ export function buildMenuItems(
       id: "stats",
       section: "settings",
       visible: true,
-      label: "Stats & Leaderboards",
+      label: "Leaderboards",
       sortKey: "Stats",
       onClick: c(() => navigate("/stats")),
       subMenu: "stats",
