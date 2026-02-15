@@ -3,6 +3,10 @@
 .tray {
   height: 150px;
   flex-shrink: 0;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
@@ -26,13 +30,12 @@
   background: var(--color-bg-card);
   flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 6px;
   position: sticky;
   top: 0;
   z-index: 2;
+  min-width: 0;
 }
 
 .titleRow {
@@ -72,8 +75,9 @@
 .controls {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .segment,

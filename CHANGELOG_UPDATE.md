@@ -1,6 +1,16 @@
 # Phuzzle — Recent Changes Summary
 
-A single post summarizing all recent updates: UX polish, leaderboards, performance, testing, PWA, and docs.
+A single post summarizing all recent updates: UX polish, leaderboards, performance, testing, PWA, tap-to-rotate, and docs.
+
+---
+
+## 📱 Tap-to-rotate (mobile)
+
+- **Single tap on piece** — Rotates 90° on touch release. Uses distance (6px) and time (400ms) thresholds so drags never trigger accidental rotation.
+- **No accidental rotate during drag** — Movement beyond 6px or hold longer than 400ms is treated as drag, not tap.
+- **Double-trigger guard** — Avoids duplicate rotate when both click and touch/pointer events fire on some devices.
+- **Pinch zoom unchanged** — Two-finger pinch on empty space zooms only; never rotates pieces.
+- **Multi-touch fix** — Only the finger that started a piece drag can move it; second finger does not hijack the drag.
 
 ---
 
@@ -9,6 +19,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 - **Completion overlay (mobile)** — Text stays inside the container: padding, scroll, responsive font sizes (smaller heading/body on narrow screens), and word-wrap so long messages don’t overflow.
 - **Piece selection** — Blue border is thinner (1.5px). Selection auto-clears after 1 second so it doesn’t stick until you click another piece. Tapping empty board space clears selection immediately.
 - **Board size by piece count** — On mobile, the board uses a higher fill ratio when there are more pieces (16+ → 96%, 25+ → 98%), so bigger puzzles get more screen space and are easier to plan.
+- **Piece tray** — Compact mode on mobile for 25+ pieces (toggle to expand); scroll snapping; "you are here" scroll indicator; filters wrap on small screens.
 - **Smooth scrolling** — Completion overlay uses `-webkit-overflow-scrolling: touch` for better scroll on iOS.
 
 ---
@@ -63,7 +74,8 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ## 📄 Documentation
 
-- **README** — Table of contents (Testing, PWA). Features: PWA subsection, Help menu, anonymous raccoon names, leaderboard views, performance section. Tech stack: PWA (vite-plugin-pwa), Testing (Vitest, Playwright). New sections: **Testing** (unit + E2E, commands, pre-push), **PWA** (install, manifest, service worker). Project structure: `e2e/`, `playwright.config.ts`, `public/icon-*.png`, `playScreenUtils.test.ts`. Getting Started and Contributing: test/build/preview commands.
+- **README** — Tap-to-rotate reliability (distance/time thresholds, multi-touch fix). Piece tray (compact mode, scroll snapping, scroll indicator). Adding Sample Puzzles: nested subfolders, `import.meta.glob`, supported formats, rebuild note.
+- **samplePuzzles.ts** — Doc comment: correct path (`src/app/assets/puzzles/`), clearer folder example, add/remove note.
 - **Pull request template** — Testing checklist (unit tests, build, optional PWA). How to Test steps: `npm run test`, `npm run build`, optional E2E and PWA preview.
 - **CONTRIBUTORS** — Project name fixed: “ClocksAbound” → “Phuzzle.”
 - **supabase/README** — Note that Phuzzle is a PWA and Supabase is used when online.

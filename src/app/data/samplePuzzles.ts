@@ -9,22 +9,22 @@ export type SamplePuzzle = {
 };
 
 /**
- * Auto-discover puzzle images from /src/assets/puzzles/ folder
+ * Auto-discover puzzle images from src/app/assets/puzzles/
  *
- * Folder structure (one level or subfolders):
- *   /src/assets/puzzles/
+ * Folder structure (one level or nested subfolders):
+ *   src/app/assets/puzzles/
  *     nature/
  *       mountain-lake.jpg
  *     animals/
  *       bear.png
- *     animals/
  *       cute/
  *         kitten.png
  *       realistic/
  *         wolf.png
  *
- * Category = path under puzzles (e.g. "animals", "animals/cute", "animals/realistic")
+ * Category = path under puzzles/ (e.g. "animals", "animals/cute", "animals/realistic")
  * Puzzle name = filename (kebab-case converted to Title Case)
+ * Add/remove images and folders; rebuild to see changes.
  */
 
 // Use Vite's glob import to find all images in src/assets/puzzles (any depth)

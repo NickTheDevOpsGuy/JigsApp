@@ -275,14 +275,44 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── pre-push
+│   │   ├── pre-rebase
+│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
+├── .lighthouseci
+│   ├── assertion-results.json
+│   ├── lhr-1771101136136.html
+│   ├── lhr-1771101136136.json
+│   ├── lhr-1771101150354.html
+│   └── lhr-1771101150354.json
+├── e2e
+│   └── home.spec.ts
+├── lhci-reports
+│   ├── localhost-index_html-2026_02_14_20_32_05.report.html
+│   ├── localhost-index_html-2026_02_14_20_32_05.report.json
+│   ├── localhost-index_html-2026_02_14_20_32_19.report.html
+│   ├── localhost-index_html-2026_02_14_20_32_19.report.json
+│   └── manifest.json
 ├── public
 │   ├── favicon.svg
 │   ├── icon-192.png
 │   └── icon-512.png
-├── e2e
-│   └── home.spec.ts
 ├── scripts
 │   └── precheck.sh
 ├── src
@@ -323,6 +353,10 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   ├── audio
 │   │   │   └── sounds.ts
 │   │   ├── components
+│   │   │   ├── AboutModal
+│   │   │   │   ├── AboutModal.module.css
+│   │   │   │   ├── AboutModal.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── Button
 │   │   │   │   ├── Button.module.css
 │   │   │   │   └── Button.tsx
@@ -333,6 +367,9 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── DropDown
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
+│   │   │   ├── ErrorBoundary
+│   │   │   │   ├── ErrorBoundary.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── HelpChoiceModal
 │   │   │   │   ├── HelpChoiceModal.module.css
 │   │   │   │   ├── HelpChoiceModal.tsx
@@ -344,6 +381,10 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── Modal
 │   │   │   │   ├── Modal.module.css
 │   │   │   │   └── Modal.tsx
+│   │   │   ├── OnboardingTooltip
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── OnboardingTooltip.module.css
+│   │   │   │   └── OnboardingTooltip.tsx
 │   │   │   ├── PieceTray
 │   │   │   │   ├── PieceTray.module.css
 │   │   │   │   └── PieceTray.tsx
@@ -351,9 +392,9 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   │   ├── ShortcutsModal.module.css
 │   │   │   │   └── ShortcutsModal.tsx
 │   │   │   ├── ThemeModal
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── ThemeModal.module.css
-│   │   │   │   ├── ThemeModal.tsx
-│   │   │   │   └── index.ts
+│   │   │   │   └── ThemeModal.tsx
 │   │   │   ├── ThemeToggle
 │   │   │   │   ├── ThemeToggle.module.css
 │   │   │   │   └── ThemeToggle.tsx
@@ -373,9 +414,12 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── completionMessages.ts
 │   │   │   ├── confettiColors.ts
 │   │   │   ├── menuTips.ts
+│   │   │   ├── packCompletion.ts
+│   │   │   ├── puzzlePacks.ts
 │   │   │   └── samplePuzzles.ts
 │   │   ├── hooks
 │   │   │   ├── useKeyboardShortcuts.ts
+│   │   │   ├── useOnboarding.ts
 │   │   │   └── useTheme.tsx
 │   │   ├── puzzle
 │   │   │   ├── canvas
@@ -401,6 +445,11 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── NewGame
 │   │   │   │   ├── NewGameScreen.module.css
 │   │   │   │   └── NewGameScreen.tsx
+│   │   │   ├── Packs
+│   │   │   │   ├── PackDetailScreen.module.css
+│   │   │   │   ├── PackDetailScreen.tsx
+│   │   │   │   ├── PackListScreen.module.css
+│   │   │   │   └── PackListScreen.tsx
 │   │   │   ├── Play
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CompletionOverlay.tsx
@@ -428,6 +477,7 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   │   │   ├── usePlayScreenTimer.ts
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
+│   │   │   │   │   ├── usePuzzleSession.ts
 │   │   │   │   │   ├── useShareResults.ts
 │   │   │   │   │   ├── useTimeModeConfig.ts
 │   │   │   │   │   └── useViewport.ts
@@ -454,6 +504,7 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── achievementsService.ts
 │   │   │   ├── leaderboardService.ts
 │   │   │   ├── profileService.ts
+│   │   │   ├── puzzleSessionService.ts
 │   │   │   └── statsService.ts
 │   │   ├── styles
 │   │   │   └── global.css
@@ -470,21 +521,27 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 ├── supabase
 │   ├── migrations
 │   │   ├── 001_initial_schema.sql
-│   │   └── 002_player_profiles.sql
+│   │   ├── 002_player_profiles.sql
+│   │   └── 003_puzzle_sessions.sql
 │   └── README.md
-├── CHANGELOG_UPDATE.md
+├── test-results
+│   └── .last-run.json
 ├── .env.example
+├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
+├── CHANGELOG_UPDATE.md
 ├── CONTRIBUTORS.md
 ├── eslint.config.ts
 ├── index.html
 ├── LICENSE.md
+├── lighthouserc.cjs
 ├── package-lock.json
 ├── package.json
 ├── playwright.config.ts
 ├── README.md
+├── src.zip
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json
