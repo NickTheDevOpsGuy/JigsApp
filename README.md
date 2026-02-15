@@ -137,18 +137,6 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ## Roadmap
 
-### Completed ✓
-
-| Area        | Features                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Core**    | Dark mode · Undo · Redo · Ghost hint · Lock pieces · Share image · Edge-piece tray filter · Zoom & pan                                                                                                                                                                                                                                                                                                                                          |
-| **Time**    | Elapsed, countdown, active-only, relaxed, best time                                                                                                                                                                                                                                                                                                                                                                                             |
-| **Daily**   | Same puzzle for everyone · Streak tracking                                                                                                                                                                                                                                                                                                                                                                                                      |
-| **Social**  | Stats · Leaderboards · Profile (display name) · Anonymous mode (fun raccoon names, still tracked, opt-in later) · Achievements                                                                                                                                                                                                                                                                                                                  |
-| **Content** | What's New popup · Camera capture · Sample puzzle gallery                                                                                                                                                                                                                                                                                                                                                                                       |
-| **UX**      | Help menu (How to Play + Keyboard & Controls, reduced cognitive load) · Theme as action card · Difficulty emojis · Mobile piece scaling · Tray start (16+) · Two-finger pinch zoom (iOS & Android) · Single-finger pan when zoomed · Settings sub-menus (Game, View, Audio) · Engagement polish (snap glow, milestones, streak toast, theme confetti, menu tips) · Completion overlay mobile · Selection auto-clear · Board size by piece count |
-| **PWA**     | Installable app (manifest, service worker, offline precache) via vite-plugin-pwa                                                                                                                                                                                                                                                                                                                                                                |
-
 ### Planned
 
 - Import puzzle from URL
@@ -234,28 +222,6 @@ Images are auto-discovered at any depth.
 
 ---
 
-## Project Structure
-
-| Folder                        | Purpose                                                                                                           |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `src/app/puzzle/`             | Core puzzle logic: PuzzleManager, pieces, canvas rendering, undo, storage                                         |
-| `src/app/screens/`            | Screen components: Menu, NewGame, Setup, Play, Stats                                                              |
-| `src/app/screens/Play/hooks/` | Play screen hooks: manager, animation, timer, pointer handlers (touch + mouse), viewport (zoom/pan)               |
-| `src/app/components/`         | Shared UI: Modal, Button, PieceTray, HelpChoiceModal, ThemeModal, ShortcutsModal, etc.                            |
-| `src/app/audio/`              | Sound effects                                                                                                     |
-| `src/app/data/`               | Changelog, completion messages, menu tips, confetti colors, achievements, anonymous raccoon names, sample puzzles |
-| `src/app/services/`           | Supabase: stats, leaderboard, profile, achievements                                                               |
-| `src/app/assets/puzzles/`     | Sample puzzle images by category (animals, flowers, food, space, tech; subfolders supported)                      |
-| `public/`                     | Favicon, PWA icons (icon-192.png, icon-512.png)                                                                   |
-| `e2e/`                        | Playwright E2E tests (e.g. home.spec.ts)                                                                          |
-| `scripts/`                    | Pre-push precheck (empty files, Prettier, ESLint, TypeScript, unit tests)                                         |
-| `.husky/`                     | Git hooks: pre-commit (empty files, node_modules check), pre-push (runs precheck)                                 |
-| `src/types/`                  | TypeScript declarations (e.g. canvas-confetti, vite-env)                                                          |
-| `.github/`                    | Issue templates, workflows (Phuzzle.yml, vercel-production.yml), pull_request_template.md                         |
-| `supabase/`                   | Migrations (001_initial_schema.sql, 002_player_profiles.sql), Supabase setup README                               |
-
-Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwright.config.ts` (Playwright). Unit tests live alongside source (e.g. `*.test.ts`). Release notes / changelog: `CHANGELOG_UPDATE.md`.
-
 <details>
 <summary>📁 Click to expand file structure</summary>
 
@@ -277,12 +243,11 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push
-├── public
+├── e2e
+│   └── home.spec.ts
 │   ├── favicon.svg
 │   ├── icon-192.png
 │   └── icon-512.png
-├── e2e
-│   └── home.spec.ts
 ├── scripts
 │   └── precheck.sh
 ├── src
@@ -323,6 +288,10 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   ├── audio
 │   │   │   └── sounds.ts
 │   │   ├── components
+│   │   │   ├── AboutModal
+│   │   │   │   ├── AboutModal.module.css
+│   │   │   │   ├── AboutModal.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── Button
 │   │   │   │   ├── Button.module.css
 │   │   │   │   └── Button.tsx
@@ -333,6 +302,9 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── DropDown
 │   │   │   │   ├── Dropdown.module.css
 │   │   │   │   └── Dropdown.tsx
+│   │   │   ├── ErrorBoundary
+│   │   │   │   ├── ErrorBoundary.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── HelpChoiceModal
 │   │   │   │   ├── HelpChoiceModal.module.css
 │   │   │   │   ├── HelpChoiceModal.tsx
@@ -344,6 +316,10 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── Modal
 │   │   │   │   ├── Modal.module.css
 │   │   │   │   └── Modal.tsx
+│   │   │   ├── OnboardingTooltip
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── OnboardingTooltip.module.css
+│   │   │   │   └── OnboardingTooltip.tsx
 │   │   │   ├── PieceTray
 │   │   │   │   ├── PieceTray.module.css
 │   │   │   │   └── PieceTray.tsx
@@ -351,9 +327,9 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   │   ├── ShortcutsModal.module.css
 │   │   │   │   └── ShortcutsModal.tsx
 │   │   │   ├── ThemeModal
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── ThemeModal.module.css
-│   │   │   │   ├── ThemeModal.tsx
-│   │   │   │   └── index.ts
+│   │   │   │   └── ThemeModal.tsx
 │   │   │   ├── ThemeToggle
 │   │   │   │   ├── ThemeToggle.module.css
 │   │   │   │   └── ThemeToggle.tsx
@@ -373,9 +349,12 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── completionMessages.ts
 │   │   │   ├── confettiColors.ts
 │   │   │   ├── menuTips.ts
+│   │   │   ├── packCompletion.ts
+│   │   │   ├── puzzlePacks.ts
 │   │   │   └── samplePuzzles.ts
 │   │   ├── hooks
 │   │   │   ├── useKeyboardShortcuts.ts
+│   │   │   ├── useOnboarding.ts
 │   │   │   └── useTheme.tsx
 │   │   ├── puzzle
 │   │   │   ├── canvas
@@ -401,6 +380,11 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── NewGame
 │   │   │   │   ├── NewGameScreen.module.css
 │   │   │   │   └── NewGameScreen.tsx
+│   │   │   ├── Packs
+│   │   │   │   ├── PackDetailScreen.module.css
+│   │   │   │   ├── PackDetailScreen.tsx
+│   │   │   │   ├── PackListScreen.module.css
+│   │   │   │   └── PackListScreen.tsx
 │   │   │   ├── Play
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CompletionOverlay.tsx
@@ -428,6 +412,7 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   │   │   ├── usePlayScreenTimer.ts
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
+│   │   │   │   │   ├── usePuzzleSession.ts
 │   │   │   │   │   ├── useShareResults.ts
 │   │   │   │   │   ├── useTimeModeConfig.ts
 │   │   │   │   │   └── useViewport.ts
@@ -454,6 +439,7 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 │   │   │   ├── achievementsService.ts
 │   │   │   ├── leaderboardService.ts
 │   │   │   ├── profileService.ts
+│   │   │   ├── puzzleSessionService.ts
 │   │   │   └── statsService.ts
 │   │   ├── styles
 │   │   │   └── global.css
@@ -470,21 +456,27 @@ Root configs: `vite.config.ts` (Vite + Vitest, PWA via vite-plugin-pwa), `playwr
 ├── supabase
 │   ├── migrations
 │   │   ├── 001_initial_schema.sql
-│   │   └── 002_player_profiles.sql
+│   │   ├── 002_player_profiles.sql
+│   │   └── 003_puzzle_sessions.sql
 │   └── README.md
-├── CHANGELOG_UPDATE.md
+├── test-results
+│   └── .last-run.json
 ├── .env.example
+├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
+├── CHANGELOG_UPDATE.md
 ├── CONTRIBUTORS.md
 ├── eslint.config.ts
 ├── index.html
 ├── LICENSE.md
+├── lighthouserc.cjs
 ├── package-lock.json
 ├── package.json
 ├── playwright.config.ts
 ├── README.md
+├── src.zip
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json

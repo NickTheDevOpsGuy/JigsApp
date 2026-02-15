@@ -9,6 +9,7 @@
   background: var(--color-bg-primary);
   overscroll-behavior: none;
   overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .topBar {
@@ -157,6 +158,7 @@
 
 .hudPillTimer {
   composes: hudPill;
+  flex-shrink: 0; /* Prevent timer from being squeezed off on mobile */
 }
 
 .hudPillTimer.timerLow {

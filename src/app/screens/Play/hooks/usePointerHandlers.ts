@@ -101,6 +101,9 @@ export function usePointerHandlers(args: {
     [trayRef],
   );
 
+  const activePointerIdRef = useRef<number | null>(null);
+  const lastTapRotateTimeRef = useRef<number>(0);
+
   const ctx = {
     manager,
     boardRef,
@@ -117,6 +120,8 @@ export function usePointerHandlers(args: {
     onPieceInteraction,
     screenToBoard,
     viewport,
+    activePointerIdRef,
+    lastTapRotateTimeRef,
   };
 
   const activePointersRef = useRef<
@@ -139,6 +144,7 @@ export function usePointerHandlers(args: {
       if (viewport && touchPointers.length >= 2 && e.pointerType === "touch") {
         const [p1, p2] = touchPointers;
         const canvas = canvasRef.current as CanvasWithTouch;
+        activePointerIdRef.current = null;
         resetTouchState(canvas);
         onDragPreview?.(null);
         selectedIdRef.current = null;
@@ -272,6 +278,12 @@ export function usePointerHandlers(args: {
 
       const isTouch = e.pointerType === "touch";
       if (isTouch) {
+        if (
+          activePointerIdRef.current != null &&
+          e.pointerId !== activePointerIdRef.current
+        ) {
+          return;
+        }
         const handled = handleTouchMove(e, ctx, screenToBoard);
         if (handled) return;
         return;
@@ -305,6 +317,12 @@ export function usePointerHandlers(args: {
       const isTouch = e.pointerType === "touch";
 
       if (isTouch) {
+        if (
+          activePointerIdRef.current != null &&
+          e.pointerId !== activePointerIdRef.current
+        ) {
+          return;
+        }
         handleTouchUp(e, ctx, canRotatePiece, isPointerOverTray, screenToBoard);
         return;
       }
@@ -332,6 +350,7 @@ export function usePointerHandlers(args: {
         return;
       }
       if (!manager || !canvasRef.current) return;
+      activePointerIdRef.current = null;
       const canvas = canvasRef.current as CanvasWithTouch;
       try {
         canvas.releasePointerCapture(e.pointerId);
@@ -392,6 +411,7 @@ export function usePointerHandlers(args: {
         const p1 = e.touches[0];
         const p2 = e.touches[1];
         const canvasWithTouch = canvas as CanvasWithTouch;
+        activePointerIdRef.current = null;
         resetTouchState(canvasWithTouch);
         onDragPreview?.(null);
         selectedIdRef.current = null;

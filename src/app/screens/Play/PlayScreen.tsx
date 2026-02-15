@@ -152,6 +152,7 @@ export function PlayScreen() {
   const themeRef = React.useRef(theme);
   themeRef.current = theme;
   const haptics = useHaptics();
+  const isCoarsePointer = useCoarsePointer();
   const [showStreakToast, setShowStreakToast] = React.useState(false);
   const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
   const lastMilestoneRef = React.useRef<number>(0);
@@ -205,27 +206,44 @@ export function PlayScreen() {
   const elapsedSecondsRef = React.useRef(elapsedSeconds);
   elapsedSecondsRef.current = elapsedSeconds;
 
-  // Milestone callouts at 25%, 50%, 75%
+  // Milestone callouts at 25%, 33%, 50%, 66%, 75%
+  const MILESTONE_THRESHOLDS = [25, 33, 50, 66, 75] as const;
+  const milestoneMessages: Record<number, string> = {
+    25: "🥉 25% Early win.",
+    33: "📈 33% Making progress.",
+    50: "🥈 50% Big motivation spike.",
+    66: "💪 66% Momentum building.",
+    75: "🥇 75% Almost there!",
+  };
   useEffect(() => {
     if (!state || state.isComplete) return;
     const placed = state.placedCount ?? 0;
     const total = state.totalCount ?? 0;
     if (total === 0) return;
-    const pct = placed / total;
-    const milestones: { threshold: number; message: string }[] = [
-      { threshold: 0.25, message: "🥉 25% Early win." },
-      { threshold: 0.5, message: "🥈 50% Big motivation spike." },
-      { threshold: 0.75, message: "🥇 75% Momentum moment." },
-      { threshold: 1, message: "🏁 100%" },
-    ];
-    const hit = milestones.find(
-      (m) => pct >= m.threshold && lastMilestoneRef.current < m.threshold,
+    const pct = (placed / total) * 100;
+    const hit = MILESTONE_THRESHOLDS.find(
+      (t) => pct >= t && lastMilestoneRef.current < t,
     );
     if (hit) {
-      lastMilestoneRef.current = hit.threshold;
-      setMilestoneMessage(hit.message);
+      lastMilestoneRef.current = hit;
+      setMilestoneMessage(milestoneMessages[hit]);
+      const g = state.grid;
+      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
+      posthog.capture("milestone_popup_shown", {
+        milestone_percent: hit,
+        grid_size: gridSize,
+        device_type: isCoarsePointer ? "mobile" : "desktop",
+        time_mode: timeMode,
+      });
     }
-  }, [state?.placedCount, state?.totalCount, state?.isComplete]);
+  }, [
+    state?.placedCount,
+    state?.totalCount,
+    state?.isComplete,
+    state?.grid,
+    isCoarsePointer,
+    timeMode,
+  ]);
 
   useEffect(() => {
     if (!milestoneMessage) return;
@@ -245,11 +263,32 @@ export function PlayScreen() {
     if (puzzleId) recordPuzzleCompletion(puzzleId);
   }, [state?.isComplete]);
 
+  // Analytics: on_fire_toast_shown when placement streak toast appears
+  const onFireCapturedRef = useRef(false);
+  useEffect(() => {
+    if (showStreakToast && !onFireCapturedRef.current) {
+      onFireCapturedRef.current = true;
+      const g = state?.grid;
+      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
+      posthog.capture("on_fire_toast_shown", {
+        grid_size: gridSize,
+        device_type: isCoarsePointer ? "mobile" : "desktop",
+        time_mode: timeMode,
+      });
+    }
+  }, [showStreakToast, state?.grid, isCoarsePointer, timeMode]);
+
   useEffect(() => {
     if (!showStreakToast) return;
     const t = setTimeout(() => setShowStreakToast(false), 2000);
     return () => clearTimeout(t);
   }, [showStreakToast]);
+
+  // Reset analytics refs when starting a new puzzle
+  useEffect(() => {
+    firstSnapCapturedRef.current = false;
+    onFireCapturedRef.current = false;
+  }, [puzzleKey]);
 
   // Auto-clear piece selection after 1s so the blue border doesn’t stay until another click
   useEffect(() => {
@@ -262,7 +301,6 @@ export function PlayScreen() {
     return () => clearTimeout(t);
   }, [selectedPieceId, setSelectedPieceId, selectedIdRef, bump]);
 
-  const isCoarsePointer = useCoarsePointer();
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
 
   useEffect(() => {
@@ -412,18 +450,23 @@ export function PlayScreen() {
     }
   }, [onboarding.showFirstSnapToast]);
 
-  // Analytics: time to first snap (first piece placed)
+  // Analytics: first piece placed
   const firstSnapCapturedRef = useRef(false);
   useEffect(() => {
     if (!state || firstSnapCapturedRef.current) return;
     const placed = state.placedCount ?? 0;
     if (placed >= 1) {
       firstSnapCapturedRef.current = true;
-      posthog.capture("time_to_first_snap", {
+      const g = state.grid;
+      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
+      posthog.capture("first_piece_placed", {
         time_to_first_snap_seconds: elapsedSeconds,
+        grid_size: gridSize,
+        device_type: isCoarsePointer ? "mobile" : "desktop",
+        time_mode: timeMode,
       });
     }
-  }, [state?.placedCount, elapsedSeconds]);
+  }, [state?.placedCount, state?.grid, elapsedSeconds, isCoarsePointer, timeMode]);
 
   // Analytics: exit before completion (on unmount)
   useEffect(() => {
@@ -505,6 +548,57 @@ export function PlayScreen() {
   }, [navigate]);
 
   const share = useShareResults({ elapsedSeconds, state });
+  const handleSharePuzzle = useCallback(async () => {
+    if (!isSupabaseConfigured()) return;
+    if (sessionId) {
+      const ok =
+        typeof navigator.share === "function"
+          ? await nativeShare()
+          : await copyShareLink();
+      if (ok) setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+      return;
+    }
+    const s = stateRef.current;
+    const pieces = s?.pieces
+      ? s.pieces.map((p) => ({
+          id: p.id,
+          row: p.row,
+          col: p.col,
+          x: p.x,
+          y: p.y,
+          z: p.z,
+          rotation: p.rotation,
+          isPlaced: p.isPlaced,
+          locked: p.locked,
+          groupId: p.groupId,
+          inTray: p.inTray,
+        }))
+      : [];
+    const id = await createSession(
+      s?.imageUrl ?? localStorage.getItem(STORAGE_KEY) ?? "",
+      s?.grid ?? grid,
+      pieces,
+      elapsedSecondsRef.current,
+    );
+    if (id) {
+      const shareUrl = `${window.location.origin}/play?${SESSION_ID_PARAM}=${id}`;
+      try {
+        const ok =
+          typeof navigator.share === "function"
+            ? await navigator.share({
+                title: "Join my Phuzzle",
+                text: "Solve this puzzle with me!",
+                url: shareUrl,
+              })
+            : await navigator.clipboard.writeText(shareUrl).then(() => true);
+        if (ok) setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2000);
+      } catch {
+        /* user cancelled or failed */
+      }
+    }
+  }, [sessionId, nativeShare, copyShareLink, createSession, grid]);
   const handleDownloadImage = useDownloadImage({
     canvasRef,
     imgRef,
@@ -575,6 +669,7 @@ export function PlayScreen() {
             onShowHowToPlay={() => setShowHowToPlay(true)}
             onShowHelpChoice={() => setShowHelpChoice(true)}
             onToggleDebug={toggleDebug}
+            onSharePuzzle={isSupabaseConfigured() ? handleSharePuzzle : undefined}
           />
         </div>
         <div className={styles.topBarCenter}>

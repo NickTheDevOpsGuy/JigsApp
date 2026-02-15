@@ -414,8 +414,23 @@ export class PuzzleManager {
 
     this.pushUndoState();
 
-    const x = this.rand(16, Math.max(16, this.boardWidth - piece.w - 16));
-    const y = this.rand(16, Math.max(16, this.boardHeight - piece.h - 16));
+    // Use effective dimensions for rotated pieces (90°/270° swap w and h in screen space)
+    const rot = piece.rotation % 360;
+    const effW = rot === 90 || rot === 270 ? piece.h : piece.w;
+    const effH = rot === 90 || rot === 270 ? piece.w : piece.h;
+
+    const pad = 16;
+    const xMin = pad;
+    const xMax = Math.max(pad, this.boardWidth - effW - pad);
+    const yMin = pad;
+    const yMax = Math.max(pad, this.boardHeight - effH - pad);
+
+    let x = this.rand(xMin, xMax);
+    let y = this.rand(yMin, yMax);
+
+    // Clamp to ensure piece stays fully on canvas (handles edge cases)
+    x = _clamp(x, 0, Math.max(0, this.boardWidth - effW));
+    y = _clamp(y, 0, Math.max(0, this.boardHeight - effH));
 
     this.zCounter += 1;
     this.updatePieces(
