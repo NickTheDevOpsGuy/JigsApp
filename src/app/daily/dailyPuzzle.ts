@@ -13,11 +13,19 @@ export {
   GRID_OPTIONS,
   DAILY_DATE_KEY,
   getTodayDateString,
+  getYesterdayDateString,
   isDailyPuzzleSession,
   isTodayDailyCompleted,
   recordDailyCompletion,
   getTodayDailyTime,
   getCurrentStreak,
+  getStreakFreezeCount,
+  useStreakFreeze,
+  wasYesterdayMissed,
+  wasFreezeOfferDismissedToday,
+  dismissFreezeOfferToday,
+  initStreakFreeze,
+  refreshStreakFreeze,
 } from "./dailyPuzzleCore";
 
 function mulberry32(seed: number): () => number {

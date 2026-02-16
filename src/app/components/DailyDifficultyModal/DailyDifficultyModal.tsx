@@ -1,7 +1,7 @@
 /**
  * DailyDifficultyModal – shows today's daily puzzle, grid picker, and launch action.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "@/components/Modal/Modal";
 import {
@@ -27,6 +27,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     typeof import("@/daily/dailyPuzzle") | null
   >(null);
   const [freezeUsed, setFreezeUsed] = useState(false);
+  const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
   const showFreezeOffer =
     wasYesterdayMissed() &&
     getStreakFreezeCount() > 0 &&
@@ -40,6 +41,13 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       setDailyModule(null);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (showFreezeOffer && useFreezeBtnRef.current) {
+      const id = setTimeout(() => useFreezeBtnRef.current?.focus(), 50);
+      return () => clearTimeout(id);
+    }
+  }, [showFreezeOffer]);
 
   const puzzle = dailyModule ? dailyModule.getTodayDailyPuzzle() : null;
 
@@ -74,7 +82,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Today's Puzzle"
+      title="🧩 Today's Puzzle"
       showCloseButton={true}
     >
       {showFreezeOffer && (
@@ -91,8 +99,13 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
             One per week — your streak won&apos;t break.
           </span>
           <div className={styles.freezeActions}>
-            <button type="button" className={styles.freezeBtn} onClick={handleUseFreeze}>
-              Use Freeze
+            <button
+              ref={useFreezeBtnRef}
+              type="button"
+              className={styles.freezeBtn}
+              onClick={handleUseFreeze}
+            >
+              🧊 Use Freeze
             </button>
             <button
               type="button"

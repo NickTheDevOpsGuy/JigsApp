@@ -33,19 +33,30 @@ export function AboutModal({ isOpen, onClose, onShowWhatsNew }: AboutModalProps)
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="About" showCloseButton>
       <div className={styles.aboutChoice}>
-        <button type="button" className={styles.aboutChoiceBtn} onClick={openRepo}>
-          Repo
+        <button
+          type="button"
+          className={styles.aboutChoiceBtn}
+          onClick={openRepo}
+          aria-label="Get Involved"
+        >
+          🌟 Get Involved
         </button>
         <button
           type="button"
           className={styles.aboutChoiceBtn}
           onClick={openContributors}
+          aria-label="Meet the Team"
         >
-          Contributors
+          👋 Meet the Team
         </button>
         {onShowWhatsNew && (
-          <button type="button" className={styles.aboutChoiceBtn} onClick={showWhatsNew}>
-            What&apos;s New
+          <button
+            type="button"
+            className={styles.aboutChoiceBtn}
+            onClick={showWhatsNew}
+            aria-label="What's New"
+          >
+            ✨ What&apos;s New
           </button>
         )}
       </div>

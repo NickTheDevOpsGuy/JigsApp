@@ -2,7 +2,7 @@
  * StatsScreen – leaderboards, achievements, profile, streaks (Supabase).
  */
 import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, BarChart3, Trophy, Award, User, Share2 } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
@@ -26,7 +26,7 @@ import { getMyProfile, updateMyProfile } from "@/services/profileService";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
-import { getTodayDateString } from "@/daily/dailyPuzzleCore";
+import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -57,11 +57,31 @@ type LeaderboardType =
   | "completions"
   | "alltime";
 
+type StatsTab = "dashboard" | "profile" | "leaderboard" | "achievements";
+
 export function StatsScreen() {
   const nav = useNavigate();
-  const [activeTab, setActiveTab] = useState<
-    "dashboard" | "profile" | "leaderboard" | "achievements"
-  >("dashboard");
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<StatsTab>(() => {
+    if (
+      tabParam &&
+      ["dashboard", "profile", "leaderboard", "achievements"].includes(tabParam)
+    ) {
+      return tabParam as StatsTab;
+    }
+    return "dashboard";
+  });
+
+  const tabFromUrl = searchParams.get("tab");
+  useEffect(() => {
+    if (
+      tabFromUrl &&
+      ["dashboard", "profile", "leaderboard", "achievements"].includes(tabFromUrl)
+    ) {
+      setActiveTab(tabFromUrl as StatsTab);
+    }
+  }, [tabFromUrl]);
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("today");
   const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
   const [stats, setStats] = useState<{
@@ -474,6 +494,10 @@ export function StatsScreen() {
                       {stats?.bestDailyStreak ?? 0}
                     </span>
                     <span className={styles.statLabel}>Best streak</span>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statValue}>{getStreakFreezeCount()}</span>
+                    <span className={styles.statLabel}>Streak freeze</span>
                   </div>
                 </div>
                 {personalBests.length > 0 && (

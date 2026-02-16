@@ -27,7 +27,9 @@
 }
 
 .modal {
-  background: var(--color-bg-elevated);
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);

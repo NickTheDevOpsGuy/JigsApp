@@ -39,11 +39,21 @@ function getStoredTheme(): Theme {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && THEMES.includes(stored as Theme)) return stored as Theme;
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
   } catch {
     // localStorage might not be available
   }
   return "light";
 }
+
+const THEME_COLORS: Record<Theme, string> = {
+  light: "#f3f7ff",
+  dark: "#1a2128",
+  space: "#1a1735",
+  ocean: "#132a4a",
+  forest: "#182d22",
+  sunset: "#3d2412",
+};
 
 function applyThemeClass(theme: Theme) {
   if (typeof document === "undefined") return;
@@ -53,6 +63,9 @@ function applyThemeClass(theme: Theme) {
   });
   // Add the current theme class
   document.documentElement.classList.add(`theme-${theme}`);
+  // Update meta theme-color for PWA/browser chrome
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", THEME_COLORS[theme]);
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {

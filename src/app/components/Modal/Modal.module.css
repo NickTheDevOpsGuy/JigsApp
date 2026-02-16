@@ -29,7 +29,9 @@
 }
 
 .modal {
-  background: var(--color-bg-elevated);
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   box-shadow: var(--shadow-lg);
   max-width: 420px;
@@ -148,7 +150,9 @@
 .footer {
   padding: 16px 24px;
   border-top: 1px solid var(--color-border);
-  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--color-bg-card) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   gap: 12px;
   justify-content: flex-end;

@@ -20,7 +20,7 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
         <div className={styles.header}>
           <div className={styles.titleRow}>
             <Keyboard size={24} />
-            <h2>Keyboard Shortcuts</h2>
+            <h2>⌨️ Keyboard Shortcuts</h2>
           </div>
           <button className={styles.closeBtn} onClick={onClose}>
             <X size={20} />
@@ -31,7 +31,10 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
           <table className={styles.table}>
             <tbody>
               {SHORTCUTS.map((shortcut, i) => (
-                <tr key={i}>
+                <tr
+                  key={i}
+                  aria-label={`${shortcut.ariaAction}: ${shortcut.keys.join(" or ")}`}
+                >
                   <td className={styles.keys}>
                     {shortcut.keys.map((key, j) => (
                       <React.Fragment key={j}>
@@ -47,39 +50,39 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
           </table>
 
           <div className={styles.mouseSection}>
-            <h3>Mouse / Touch Controls</h3>
+            <h3>🖱️ Mouse / Touch Controls</h3>
             <table className={styles.table}>
               <tbody>
                 <tr>
                   <td className={styles.keys}>
                     <kbd className={styles.key}>Left Click</kbd> + Drag
                   </td>
-                  <td className={styles.action}>Move piece</td>
+                  <td className={styles.action}>↔️ Move piece</td>
                 </tr>
                 <tr>
                   <td className={styles.keys}>
                     <kbd className={styles.key}>Right Click</kbd>
                   </td>
-                  <td className={styles.action}>Rotate piece</td>
+                  <td className={styles.action}>🔄 Rotate piece</td>
                 </tr>
                 <tr>
                   <td className={styles.keys}>
                     <kbd className={styles.key}>Drag</kbd> to drawer
                   </td>
-                  <td className={styles.action}>Store piece (desktop & touch)</td>
+                  <td className={styles.action}>📥 Store piece (desktop & touch)</td>
                 </tr>
                 <tr>
                   <td className={styles.keys}>
                     <kbd className={styles.key}>Tap</kbd>
                   </td>
-                  <td className={styles.action}>Rotate piece (touch)</td>
+                  <td className={styles.action}>🔄 Rotate piece (touch)</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           <div className={styles.mouseSection}>
-            <h3>Zoom & Pan</h3>
+            <h3>🔍 Zoom & Pan</h3>
             <table className={styles.table}>
               <tbody>
                 <tr>

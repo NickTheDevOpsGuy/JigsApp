@@ -20,6 +20,7 @@
   display: flex;
   gap: 10px;
   margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .freezeBtn {
@@ -27,11 +28,15 @@
   border: none;
   background: var(--color-brand-primary);
   color: var(--color-text-on-brand);
-  padding: 8px 14px;
+  padding: 10px 16px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .freezeBtn:hover {
@@ -43,10 +48,14 @@
   border: 1px solid var(--color-border-strong);
   background: transparent;
   color: var(--color-text-muted);
-  padding: 8px 14px;
+  padding: 10px 16px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .freezeSkip:hover {
@@ -105,5 +114,15 @@
 @media (max-width: 400px) {
   .difficulties {
     grid-template-columns: 1fr;
+  }
+
+  /* Stack freeze buttons for full-width touch targets on narrow screens */
+  .freezeActions {
+    flex-direction: column;
+  }
+
+  .freezeBtn,
+  .freezeSkip {
+    width: 100%;
   }
 }

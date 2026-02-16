@@ -1,11 +1,10 @@
 /**
- * HeaderMenu – hamburger menu with submenus (View, Game, Board, etc.).
+ * HeaderMenu – hamburger menu with Theme, Gameplay, Display, Audio, Advanced.
  */
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/Button/Button";
-import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import styles from "../PlayScreen.module.css";
 import {
   buildMenuItems,
@@ -17,50 +16,46 @@ import {
 export type { HeaderMenuProps } from "./headerMenuConfig";
 
 const SUB_MENU_LABELS: Record<SubMenuId, string> = {
-  about: "About",
-  audio: "Audio",
-  board: "Board",
-  controls: "Control",
-  display: "Display",
-  game: "Game",
-  help: "Help",
-  navigation: "Navigate",
-  share: "Share",
-  stats: "Leaderboards",
-  view: "View",
+  about: "ℹ️ About",
+  advanced: "⚙️ Advanced",
+  audio: "🔊 Audio",
+  controls: "🎮 Controls",
+  display: "👁️ Display",
+  gameplay: "🎯 Gameplay",
+  help: "❓ Help",
+  navigation: "🧭 Navigate",
+  share: "👥 Share",
+  stats: "🏆 Leaderboards",
+  theme: "🎨 Theme",
 };
 
-/** When in About submenu, Back goes to main menu (no longer nested under Help) */
-const ABOUT_PARENT = null as SubMenuId | null;
+const SUBMENU_PARENT: Partial<Record<SubMenuId, SubMenuId>> = {
+  controls: "gameplay",
+  help: "about",
+};
 
-/** When in Display or Board, Back goes to View */
-const VIEW_SUBMENU_IDS: SubMenuId[] = ["display", "board"];
-const VIEW_PARENT_ID: SubMenuId = "view";
-
-/** Settings submenus in alphabetical order */
 const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
+  "advanced",
   "audio",
-  "controls",
-  "game",
+  "display",
+  "gameplay",
   "navigation",
   "share",
   "stats",
-  "view",
 ];
 
-/**
- * Single source of truth for the "hamburger" menu.
- * Config-driven to reduce repetition and keep UI consistent.
- */
 export function HeaderMenu(props: HeaderMenuProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [activeSubMenu, setActiveSubMenu] = useState<SubMenuId | null>(null);
+  const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const items = buildMenuItems(props, setOpen, (path) => navigate(path));
 
   useEffect(() => {
-    if (!open) setActiveSubMenu(null);
+    if (!open) {
+      setActiveSubMenu(null);
+    }
   }, [open]);
 
   useEffect(() => {
@@ -72,8 +67,31 @@ export function HeaderMenu(props: HeaderMenuProps) {
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (activeSubMenu) setActiveSubMenu(null);
-        else setOpen(false);
+        if (activeSubMenu) {
+          const parent = SUBMENU_PARENT[activeSubMenu];
+          setActiveSubMenu(parent ?? null);
+        } else {
+          setOpen(false);
+        }
+        return;
+      }
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        const panel = rootRef.current?.querySelector("[role='menu']");
+        if (!panel) return;
+        const focusable = Array.from(
+          panel.querySelectorAll<HTMLElement>(
+            "button[role='menuitem'], [role='menuitem']",
+          ),
+        ).filter((el) => !(el as HTMLButtonElement).disabled);
+        const idx = focusable.indexOf(document.activeElement as HTMLElement);
+        if (idx === -1) {
+          focusable[0]?.focus();
+        } else if (e.key === "ArrowDown" && idx < focusable.length - 1) {
+          focusable[idx + 1]?.focus();
+        } else if (e.key === "ArrowUp" && idx > 0) {
+          focusable[idx - 1]?.focus();
+        }
+        e.preventDefault();
       }
     };
     window.addEventListener("pointerdown", onPointerDown);
@@ -106,9 +124,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         sensitivity: "base",
       }),
     );
-  const otherItems = visibleItems.filter((i) => i.section === "other");
 
-  const topLevelSettings = settingsItems.filter((i) => !i.subMenu);
   const subMenuItems =
     activeSubMenu === "help"
       ? helpItems
@@ -127,23 +143,21 @@ export function HeaderMenu(props: HeaderMenuProps) {
       ? helpItems.length > 0
       : id === "about"
         ? aboutItems.length > 0
-        : id === "view"
-          ? settingsItems.some(
-              (i) =>
-                i.subMenu === "display" || i.subMenu === "board" || i.subMenu === "view",
-            )
-          : settingsItems.some((i) => i.subMenu === id);
+        : settingsItems.some((i) => i.subMenu === id);
+
+  const getAriaLabel = (item: MenuItemConfig): string => {
+    if (item.ariaLabel) return item.ariaLabel;
+    const base = item.sortKey ?? item.label;
+    if (item.label.includes("✨")) return `${base}, on`;
+    if (item.label.includes("🌙")) return `${base}, off`;
+    return base;
+  };
 
   const renderItem = (item: MenuItemConfig) => {
-    if (item.isTheme) {
+    if (item.isSectionLabel) {
       return (
-        <div
-          key={item.id}
-          className={styles.headerMenuToggle}
-          role="menuitem"
-          onClick={item.onClick}
-        >
-          <ThemeToggle variant="menuItem" />
+        <div key={item.id} className={styles.headerMenuSection} style={{ marginTop: 8 }}>
+          {item.label}
         </div>
       );
     }
@@ -154,62 +168,17 @@ export function HeaderMenu(props: HeaderMenuProps) {
         role="menuitem"
         disabled={item.disabled}
         onClick={item.onClick}
+        aria-label={getAriaLabel(item)}
+        title={item.disabled && item.disabledTitle ? item.disabledTitle : undefined}
       >
         {item.label}
       </button>
     );
   };
 
-  const renderMainMenu = () => (
-    <>
-      <div className={styles.headerMenuSection}>Help</div>
-      {hasSubMenuItems("help") && props.onShowHelpChoice && (
-        <button
-          type="button"
-          className={styles.headerMenuItem}
-          role="menuitem"
-          onClick={() => {
-            setOpen(false);
-            props.onShowHelpChoice();
-          }}
-        >
-          {SUB_MENU_LABELS.help}
-        </button>
-      )}
-      {hasSubMenuItems("about") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("about")}
-        >
-          {SUB_MENU_LABELS.about}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
-      <div className={styles.headerMenuDivider} />
-      <div className={styles.headerMenuSection}>Settings</div>
-      {SETTINGS_SUBMENU_ORDER.filter((id) => hasSubMenuItems(id)).map((id) => (
-        <button
-          key={id}
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu(id)}
-        >
-          {SUB_MENU_LABELS[id]}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      ))}
-      {topLevelSettings.map(renderItem)}
-      {otherItems.map(renderItem)}
-    </>
-  );
-
   const handleBack = () => {
-    if (activeSubMenu === "about") setActiveSubMenu(ABOUT_PARENT);
-    else if (VIEW_SUBMENU_IDS.includes(activeSubMenu!)) setActiveSubMenu(VIEW_PARENT_ID);
-    else setActiveSubMenu(null);
+    const parent = activeSubMenu ? SUBMENU_PARENT[activeSubMenu] : null;
+    setActiveSubMenu(parent ?? null);
   };
 
   const renderSubMenu = () => (
@@ -219,59 +188,61 @@ export function HeaderMenu(props: HeaderMenuProps) {
         className={styles.headerMenuBack}
         role="menuitem"
         onClick={handleBack}
+        aria-label="Back"
       >
         <ChevronLeft size={16} />
         Back
       </button>
       <div className={styles.headerMenuDivider} />
       <div className={styles.headerMenuSection}>{SUB_MENU_LABELS[activeSubMenu!]}</div>
-      {activeSubMenu === "view" && (
-        <>
-          <button
-            type="button"
-            className={styles.headerMenuSubmenuTrigger}
-            role="menuitem"
-            onClick={() => setActiveSubMenu("display")}
-          >
-            {SUB_MENU_LABELS.display}
-            <ChevronRight size={16} className={styles.headerMenuChevron} />
-          </button>
-          <button
-            type="button"
-            className={styles.headerMenuSubmenuTrigger}
-            role="menuitem"
-            onClick={() => setActiveSubMenu("board")}
-          >
-            {SUB_MENU_LABELS.board}
-            <ChevronRight size={16} className={styles.headerMenuChevron} />
-          </button>
-        </>
+      {activeSubMenu === "gameplay" && hasSubMenuItems("controls") && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => setActiveSubMenu("controls")}
+          aria-label="Controls"
+        >
+          {SUB_MENU_LABELS.controls}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
       )}
-      {activeSubMenu === "view" && (
-        <>
-          <button
-            type="button"
-            className={styles.headerMenuSubmenuTrigger}
-            role="menuitem"
-            onClick={() => setActiveSubMenu("display")}
-          >
-            {SUB_MENU_LABELS.display}
-            <ChevronRight size={16} className={styles.headerMenuChevron} />
-          </button>
-          <button
-            type="button"
-            className={styles.headerMenuSubmenuTrigger}
-            role="menuitem"
-            onClick={() => setActiveSubMenu("board")}
-          >
-            {SUB_MENU_LABELS.board}
-            <ChevronRight size={16} className={styles.headerMenuChevron} />
-          </button>
-        </>
+      {subMenuItems.map((item, i) => (
+        <React.Fragment key={item.id}>
+          {renderItem(item)}
+          {activeSubMenu === "about" && i === 0 && hasSubMenuItems("help") && (
+            <button
+              type="button"
+              className={styles.headerMenuSubmenuTrigger}
+              role="menuitem"
+              onClick={() => setActiveSubMenu("help")}
+              aria-label="Help"
+            >
+              {SUB_MENU_LABELS.help}
+              <ChevronRight size={16} className={styles.headerMenuChevron} />
+            </button>
+          )}
+        </React.Fragment>
+      ))}
+      {activeSubMenu === "display" && props.onOpenThemeModal && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => {
+            setOpen(false);
+            props.onOpenThemeModal!();
+          }}
+          aria-label="Theme"
+        >
+          {SUB_MENU_LABELS.theme}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
       )}
-      {subMenuItems.map(renderItem)}
     </>
   );
+
+  const mainMenuSubmenus = SETTINGS_SUBMENU_ORDER.filter((id) => hasSubMenuItems(id));
 
   return (
     <div className={styles.headerMenuWrap} ref={rootRef}>
@@ -289,7 +260,61 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
       {open && (
         <div className={styles.headerMenuPanel} role="menu">
-          {activeSubMenu ? renderSubMenu() : renderMainMenu()}
+          {activeSubMenu ? (
+            renderSubMenu()
+          ) : (
+            <>
+              <div className={styles.headerMenuSection}>ℹ️ About</div>
+              {hasSubMenuItems("about") && (
+                <button
+                  type="button"
+                  className={styles.headerMenuSubmenuTrigger}
+                  role="menuitem"
+                  onClick={() => setActiveSubMenu("about")}
+                  aria-label="About"
+                >
+                  {SUB_MENU_LABELS.about}
+                  <ChevronRight size={16} className={styles.headerMenuChevron} />
+                </button>
+              )}
+              <div className={styles.headerMenuDivider} />
+              <div className={styles.headerMenuSection}>⚙️ Settings</div>
+              {mainMenuSubmenus.map((id) => (
+                <React.Fragment key={id}>
+                  <button
+                    type="button"
+                    className={styles.headerMenuSubmenuTrigger}
+                    role="menuitem"
+                    onClick={() => {
+                      if (id === "advanced") setAdvancedExpanded((e) => !e);
+                      else setActiveSubMenu(id);
+                    }}
+                    aria-label={
+                      SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
+                    }
+                  >
+                    {SUB_MENU_LABELS[id]}
+                    <ChevronRight
+                      size={16}
+                      className={`${styles.headerMenuChevron} ${id === "advanced" && advancedExpanded ? styles.headerMenuChevronExpanded : ""}`}
+                    />
+                  </button>
+                  {id === "advanced" && advancedExpanded && (
+                    <div className={styles.headerMenuNested}>
+                      {settingsItems
+                        .filter((i) => i.subMenu === "advanced")
+                        .sort((a, b) =>
+                          (a.sortKey ?? "").localeCompare(b.sortKey ?? "", undefined, {
+                            sensitivity: "base",
+                          }),
+                        )
+                        .map(renderItem)}
+                    </div>
+                  )}
+                </React.Fragment>
+              ))}
+            </>
+          )}
         </div>
       )}
     </div>

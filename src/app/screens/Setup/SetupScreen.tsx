@@ -63,7 +63,7 @@ export function SetupScreen() {
   const sourceParam = searchParams.get("source");
   const puzzleIdParam = searchParams.get("puzzle");
   const [imageSource, setImageSource] = useState<ImageSource>(
-    sourceParam === "camera" ? "camera" : "gallery",
+    sourceParam === "camera" ? "camera" : sourceParam === "upload" ? "upload" : "gallery",
   );
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
@@ -167,7 +167,7 @@ export function SetupScreen() {
     <div className={styles.page}>
       <div className={styles.card}>
         <h1 className={styles.title}>
-          {isPackFlow && selectedPuzzle ? selectedPuzzle.name : "New Puzzle"}
+          {isPackFlow && selectedPuzzle ? selectedPuzzle.name : "🧩 New Puzzle"}
         </h1>
 
         {error && (
@@ -187,20 +187,20 @@ export function SetupScreen() {
                 className={`${styles.tab} ${imageSource === "gallery" ? styles.tabActive : ""}`}
                 onClick={() => setImageSource("gallery")}
               >
-                Gallery
+                🖼️ Gallery
               </button>
               <button
                 className={`${styles.tab} ${imageSource === "upload" ? styles.tabActive : ""}`}
                 onClick={() => setImageSource("upload")}
               >
-                Upload
+                📤 Upload
               </button>
               <button
                 className={`${styles.tab} ${imageSource === "camera" ? styles.tabActive : ""}`}
                 onClick={() => setImageSource("camera")}
               >
                 <Camera size={16} />
-                Camera
+                📷 Camera
               </button>
             </div>
 
@@ -359,7 +359,7 @@ export function SetupScreen() {
 
           <Button onClick={handleClear} disabled={isLoading}>
             <Trash2 size={18} />
-            Clear
+            🗑️ Clear
           </Button>
 
           <Button
@@ -368,7 +368,7 @@ export function SetupScreen() {
             disabled={isLoading || !imgDataUrl}
           >
             <Play size={18} />
-            Start Puzzle
+            🧩 Start Puzzle
           </Button>
         </div>
       </div>

@@ -132,11 +132,12 @@ class SoundManager {
         // Light tap
         this.vibrate(10);
         break;
-      case "snap":
+      case "snap": {
         // Scale by group size: small = subtle, large = stronger
         const snapStrength = groupSize != null ? Math.min(50, 15 + groupSize * 6) : 25;
         this.vibrate(snapStrength);
         break;
+      }
       case "place":
         // Heavier thunk
         this.vibrate(40);

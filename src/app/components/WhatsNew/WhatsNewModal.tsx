@@ -24,7 +24,12 @@ export function WhatsNewModal({ isOpen, onClose }: WhatsNewModalProps) {
       title="What's New"
       showCloseButton={true}
     >
-      <div className={styles.content}>
+      <div
+        className={styles.content}
+        tabIndex={0}
+        role="region"
+        aria-label="What's new in this release"
+      >
         {CHANGELOG_ENTRIES.map((section, i) => (
           <div key={i} className={styles.section}>
             <h3 className={styles.sectionTitle}>{section.title}</h3>
