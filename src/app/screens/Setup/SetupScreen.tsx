@@ -143,9 +143,10 @@ export function SetupScreen() {
       if (selectedPuzzle) setCurrentPuzzleId(selectedPuzzle.id);
       else setCurrentPuzzleId(null);
       nav("/play");
-    } catch {
-      console.error("Could not save to localStorage");
-      setError("Could not save. Please try again.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("Could not save to localStorage", e);
+      setError(msg || "Could not save. Please try again.");
     }
   };
 

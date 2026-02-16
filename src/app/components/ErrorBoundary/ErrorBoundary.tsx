@@ -50,6 +50,26 @@ export class ErrorBoundary extends React.Component<
           }}
         >
           <h1 style={{ fontSize: 20, marginBottom: 8 }}>Something went wrong</h1>
+          {this.state.error && (
+            <p
+              style={{
+                fontSize: 13,
+                marginBottom: 12,
+                padding: "12px 16px",
+                maxWidth: 480,
+                width: "100%",
+                textAlign: "left",
+                background: "var(--color-error-bg, #fef2f2)",
+                color: "var(--color-error, #dc2626)",
+                border: "1px solid var(--color-error-border, #fecaca)",
+                borderRadius: 8,
+                wordBreak: "break-word",
+                fontFamily: "monospace",
+              }}
+            >
+              {this.state.error.message || String(this.state.error)}
+            </p>
+          )}
           <p
             style={{
               fontSize: 14,
@@ -57,7 +77,7 @@ export class ErrorBoundary extends React.Component<
               color: "var(--color-text-secondary)",
             }}
           >
-            The app hit an error. You can reload to try again.
+            You can reload to try again.
           </p>
           <button
             type="button"
