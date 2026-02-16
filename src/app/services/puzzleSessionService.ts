@@ -26,8 +26,9 @@ export async function createPuzzleSession(
   imageUrl: string,
   grid: GridSize,
   state: PuzzleSessionState,
-): Promise<{ sessionId: string } | null> {
-  if (!isSupabaseConfigured() || !supabase) return null;
+): Promise<{ sessionId: string } | { error: string }> {
+  if (!isSupabaseConfigured() || !supabase)
+    return { error: "Supabase is not configured" };
 
   const fullImageUrl =
     imageUrl.startsWith("data:") || imageUrl.startsWith("http")
@@ -49,8 +50,9 @@ export async function createPuzzleSession(
 
   if (error) {
     console.warn("Failed to create puzzle session:", error);
-    return null;
+    return { error: error.message };
   }
+  if (!data?.id) return { error: "No session ID returned" };
   return { sessionId: data.id };
 }
 

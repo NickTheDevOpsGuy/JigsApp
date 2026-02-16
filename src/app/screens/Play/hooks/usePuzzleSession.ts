@@ -103,7 +103,7 @@ export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessio
         isComplete: false,
       };
       const result = await createPuzzleSession(url, gr, state);
-      if (!result) return null;
+      if ("error" in result) throw new Error(result.error);
       isHostRef.current = true;
       setSessionId(result.sessionId);
       setSearchParams((prev) => {

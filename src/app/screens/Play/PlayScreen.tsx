@@ -144,6 +144,7 @@ export function PlayScreen() {
   const isCoarsePointer = useCoarsePointer();
   const [showStreakToast, setShowStreakToast] = React.useState(false);
   const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
+  const [shareToast, setShareToast] = React.useState<string | null>(null);
   const lastMilestoneRef = React.useRef<number>(0);
 
   const viewport = useViewport();
@@ -284,6 +285,12 @@ export function PlayScreen() {
     const t = setTimeout(() => setShowStreakToast(false), 2000);
     return () => clearTimeout(t);
   }, [showStreakToast]);
+
+  useEffect(() => {
+    if (!shareToast) return;
+    const t = setTimeout(() => setShareToast(null), 3000);
+    return () => clearTimeout(t);
+  }, [shareToast]);
 
   // Reset analytics refs when starting a new puzzle
   useEffect(() => {
@@ -554,33 +561,43 @@ export function PlayScreen() {
   const share = useShareResults({ elapsedSeconds, state });
   const handleSharePuzzle = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
-    if (sessionId) {
-      await (typeof navigator.share === "function" ? nativeShare() : copyShareLink());
-      return;
-    }
-    const s = stateRef.current;
-    const pieces = s?.pieces
-      ? s.pieces.map((p) => ({
-          id: p.id,
-          row: p.row,
-          col: p.col,
-          x: p.x,
-          y: p.y,
-          z: p.z,
-          rotation: p.rotation,
-          isPlaced: p.isPlaced,
-          locked: p.locked,
-          groupId: p.groupId,
-          inTray: p.inTray,
-        }))
-      : [];
-    const id = await createSession(
-      s?.imageUrl ?? localStorage.getItem(STORAGE_KEY) ?? "",
-      s?.grid ?? grid,
-      pieces,
-      elapsedSecondsRef.current,
-    );
-    if (id) {
+    setShareToast(null);
+    try {
+      if (sessionId) {
+        const ok = await (typeof navigator.share === "function"
+          ? nativeShare()
+          : copyShareLink());
+        if (ok && typeof navigator.share !== "function") {
+          setShareToast("Link copied!");
+        }
+        return;
+      }
+      const s = stateRef.current;
+      const pieces = s?.pieces
+        ? s.pieces.map((p) => ({
+            id: p.id,
+            row: p.row,
+            col: p.col,
+            x: p.x,
+            y: p.y,
+            z: p.z,
+            rotation: p.rotation,
+            isPlaced: p.isPlaced,
+            locked: p.locked,
+            groupId: p.groupId,
+            inTray: p.inTray,
+          }))
+        : [];
+      const id = await createSession(
+        s?.imageUrl ?? localStorage.getItem(STORAGE_KEY) ?? "",
+        s?.grid ?? grid,
+        pieces,
+        elapsedSecondsRef.current,
+      );
+      if (!id) {
+        setShareToast("Couldn't create share link. Check your connection.");
+        return;
+      }
       const shareUrl = `${window.location.origin}/play?${SESSION_ID_PARAM}=${id}`;
       try {
         await (typeof navigator.share === "function"
@@ -590,9 +607,16 @@ export function PlayScreen() {
               url: shareUrl,
             })
           : navigator.clipboard.writeText(shareUrl));
+        if (typeof navigator.share !== "function") {
+          setShareToast("Link copied!");
+        }
       } catch {
         /* user cancelled or failed */
       }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn("Share failed:", err);
+      setShareToast(msg || "Share failed. Try again.");
     }
   }, [sessionId, nativeShare, copyShareLink, createSession, grid]);
   const handleDownloadImage = useDownloadImage({
@@ -843,6 +867,11 @@ export function PlayScreen() {
       {milestoneMessage && (
         <div className={styles.engagementToast} role="status">
           {milestoneMessage}
+        </div>
+      )}
+      {shareToast && (
+        <div className={styles.engagementToast} role="status">
+          {shareToast}
         </div>
       )}
       {onboarding.needsTrayTip && (
