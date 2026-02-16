@@ -474,9 +474,7 @@ export class PuzzleManager {
         const pr = p.rotation % 360;
         const pw = pr === 90 || pr === 270 ? p.h : p.w;
         const ph = pr === 90 || pr === 270 ? p.w : p.h;
-        if (
-          !(x + effW <= p.x || p.x + pw <= x || y + effH <= p.y || p.y + ph <= y)
-        ) {
+        if (!(x + effW <= p.x || p.x + pw <= x || y + effH <= p.y || p.y + ph <= y)) {
           overlaps = true;
           break;
         }

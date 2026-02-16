@@ -197,14 +197,8 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     do {
       const jitterX = jitterSpace > 0 ? randInt(-jitterSpace, jitterSpace) : 0;
       const jitterY = jitterSpace > 0 ? randInt(-jitterSpace, jitterSpace) : 0;
-      x = Math.max(
-        scatterZone.minX,
-        Math.min(scatterZone.maxX - w, baseX + jitterX),
-      );
-      y = Math.max(
-        scatterZone.minY,
-        Math.min(scatterZone.maxY - h, baseY + jitterY),
-      );
+      x = Math.max(scatterZone.minX, Math.min(scatterZone.maxX - w, baseX + jitterX));
+      y = Math.max(scatterZone.minY, Math.min(scatterZone.maxY - h, baseY + jitterY));
       retries++;
       if (retries > SPAWN_RETRY_MAX) break;
     } while (wouldOverlap(positions, x, y));
