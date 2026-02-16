@@ -199,6 +199,15 @@ Project Settings → Environment Variables
 
 PostHog UI: https://app.posthog.com/
 
+**Vercel:** After adding or changing env vars, trigger a new deployment (Deployments → Redeploy). Supabase co-op needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+
+---
+
+## Deployment Troubleshooting
+
+- **"Failed to fetch" or blank play screen** – Stale cache; the app auto-reloads. Hard refresh (Cmd+Shift+R) or clear site data if it persists.
+- **Co-op WebSocket fails** – See [doc/SHARING.md](doc/SHARING.md#troubleshooting) and [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md#troubleshooting).
+
 ---
 
 ## Testing

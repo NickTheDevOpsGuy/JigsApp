@@ -77,12 +77,15 @@ npx supabase db push
 
 Required for "Play with friend" real-time sessions.
 
-### Option A: Supabase Dashboard (UI)
+### Option A: Supabase Dashboard (Publications)
 
 1. Open your [Supabase Dashboard](https://app.supabase.com) and select your project
-2. In the left sidebar, go to **Database** → **Replication** (or **Database** → **Publications**)
-3. Find the **supabase_realtime** publication
-4. Under **Tables** or **Source**, locate `puzzle_sessions` and **toggle it ON** to include it in the publication
+2. In the left sidebar, go to **Database** → **Publications**
+   - Direct URL: `https://app.supabase.com/project/<your-project-ref>/database/publications`
+3. Click the **supabase_realtime** publication
+4. Under **Tables**, find `puzzle_sessions` and **toggle it ON**
+
+If `puzzle_sessions` is missing, run the migrations first (step 4 above).
 
 ### Option B: SQL Editor
 
@@ -145,10 +148,12 @@ Row Level Security (RLS) is enabled on all tables:
 - Complete at least one puzzle (especially a daily puzzle)
 - Ensure RLS policies were created and migrations ran successfully
 
-**Co-op sessions not syncing**
+**Co-op sessions not syncing / WebSocket "closed before connection established"**
 
-- Realtime must be enabled for `puzzle_sessions`
-- Check browser console for Realtime / WebSocket errors
+- **Realtime publication:** Ensure `puzzle_sessions` is in the `supabase_realtime` publication (see [Enable Realtime](#5-enable-realtime-co-op-puzzles))
+- **API keys:** Use the **anon** or **publishable** key from Supabase → Settings → API. Both `eyJ...` (JWT) and `sb_publishable_...` formats work
+- **Vercel env vars:** Ensure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set in Vercel → Project → Settings → Environment Variables, then **redeploy**
+- **Browser extensions:** Ad blockers or privacy tools can block WebSockets; try incognito or disable them
 
 **Environment variables not loading**
 
