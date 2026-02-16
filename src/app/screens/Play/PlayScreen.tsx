@@ -982,6 +982,7 @@ export function PlayScreen() {
         shareToast={shareToast}
         classNames={{
           engagementToast: styles.engagementToast,
+          toastDismiss: styles.toastDismiss,
           onboardingOverlay: styles.onboardingOverlay,
           onboardingOverlayTray: styles.onboardingOverlayTray,
         }}

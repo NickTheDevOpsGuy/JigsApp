@@ -14,6 +14,7 @@ type Props = {
   shareToast: string | null;
   classNames: {
     engagementToast: string;
+    toastDismiss: string;
     onboardingOverlay: string;
     onboardingOverlayTray: string;
   };
@@ -51,12 +52,16 @@ export function PlayToasts({
         </div>
       )}
       {onboarding.needsStartTip && placed === 0 && (
-        <div className={s.onboardingOverlay}>
-          <OnboardingTooltip
-            message="Drag a piece to start"
-            onDismiss={onboarding.dismissStartTip}
-            showButton
-          />
+        <div className={s.engagementToast} role="status">
+          <span>Drag a piece to start</span>
+          <button
+            type="button"
+            className={s.toastDismiss}
+            onClick={onboarding.dismissStartTip}
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
         </div>
       )}
       {onboarding.needsTrayTip && (
