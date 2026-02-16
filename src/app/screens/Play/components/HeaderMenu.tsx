@@ -234,6 +234,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
             props.onOpenThemeModal!();
           }}
           aria-label="Theme"
+          data-testid="open-theme-modal"
         >
           {SUB_MENU_LABELS.theme}
           <ChevronRight size={16} className={styles.headerMenuChevron} />
