@@ -24,7 +24,6 @@ type Props = {
   image: HTMLImageElement | null;
   grid: { rows: number; cols: number };
   onPieceClick: (pieceId: string) => void;
-  isCoarsePointer: boolean;
 };
 
 function isCorner(p: Piece, grid: { rows: number; cols: number }) {
@@ -46,7 +45,7 @@ function isEdge(p: Piece, grid: { rows: number; cols: number }) {
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
-  { pieces, image, grid, onPieceClick, isCoarsePointer },
+  { pieces, image, grid, onPieceClick },
   ref,
 ) {
   const [section, setSection] = useState<TraySection>("all");

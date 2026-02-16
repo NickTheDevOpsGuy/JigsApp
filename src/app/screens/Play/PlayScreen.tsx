@@ -4,7 +4,6 @@ import React, {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import posthog from "posthog-js";
@@ -63,7 +62,6 @@ export function PlayScreen() {
     sessionId,
     session,
     sessionLoading,
-    connectedCount,
     createSession,
     copyShareLink,
     nativeShare,
@@ -72,7 +70,6 @@ export function PlayScreen() {
     clearRemoteState,
   } = sessionResult;
 
-  const [shareCopied, setShareCopied] = useState(false);
   const grid = session ? session.grid : localGrid;
 
   useLayoutEffect(() => {
@@ -562,12 +559,9 @@ export function PlayScreen() {
   const handleSharePuzzle = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
     if (sessionId) {
-      const ok =
-        typeof navigator.share === "function"
-          ? await nativeShare()
-          : await copyShareLink();
-      if (ok) setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 2000);
+      await (typeof navigator.share === "function"
+        ? nativeShare()
+        : copyShareLink());
       return;
     }
     const s = stateRef.current;
@@ -595,16 +589,13 @@ export function PlayScreen() {
     if (id) {
       const shareUrl = `${window.location.origin}/play?${SESSION_ID_PARAM}=${id}`;
       try {
-        const ok =
-          typeof navigator.share === "function"
-            ? await navigator.share({
-                title: "Join my Phuzzle",
-                text: "Solve this puzzle with me!",
-                url: shareUrl,
-              })
-            : await navigator.clipboard.writeText(shareUrl).then(() => true);
-        if (ok) setShareCopied(true);
-        setTimeout(() => setShareCopied(false), 2000);
+        await (typeof navigator.share === "function"
+          ? navigator.share({
+              title: "Join my Phuzzle",
+              text: "Solve this puzzle with me!",
+              url: shareUrl,
+            })
+          : navigator.clipboard.writeText(shareUrl));
       } catch {
         /* user cancelled or failed */
       }
@@ -822,7 +813,6 @@ export function PlayScreen() {
         image={imgRef.current}
         grid={state?.grid ?? grid}
         onPieceClick={handleTrayPieceClick}
-        isCoarsePointer={isCoarsePointer}
       />
 
       <TutorialOverlay
