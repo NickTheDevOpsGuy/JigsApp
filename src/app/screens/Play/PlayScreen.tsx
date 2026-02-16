@@ -1,11 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import posthog from "posthog-js";
 import styles from "./PlayScreen.module.css";
@@ -48,7 +41,6 @@ import {
 import { OnboardingTooltip } from "@/components/OnboardingTooltip";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
-import { Share2, Users } from "lucide-react";
 import { isSupabaseConfigured } from "@/supabase/client";
 
 export function PlayScreen() {
@@ -64,7 +56,6 @@ export function PlayScreen() {
     sessionId,
     session,
     sessionLoading,
-    connectedCount,
     createSession,
     copyShareLink,
     nativeShare,
@@ -72,8 +63,6 @@ export function PlayScreen() {
     remoteState,
     clearRemoteState,
   } = sessionResult;
-
-  const [shareCopied, setShareCopied] = useState(false);
 
   const grid = session ? session.grid : localGrid;
 
@@ -350,11 +339,13 @@ export function PlayScreen() {
     setState,
     isPaused,
     showShortcuts,
+    showHelpChoice,
     showNewGameModal,
     showTutorial,
     selectedPieceId,
     setSelectedPieceId,
     setShowShortcuts,
+    setShowHelpChoice,
     setShowNewGameModal,
     setShowPreview,
     setShowGhostHint,
@@ -564,12 +555,7 @@ export function PlayScreen() {
   const handleSharePuzzle = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
     if (sessionId) {
-      const ok =
-        typeof navigator.share === "function"
-          ? await nativeShare()
-          : await copyShareLink();
-      if (ok) setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 2000);
+      await (typeof navigator.share === "function" ? nativeShare() : copyShareLink());
       return;
     }
     const s = stateRef.current;
@@ -597,16 +583,13 @@ export function PlayScreen() {
     if (id) {
       const shareUrl = `${window.location.origin}/play?${SESSION_ID_PARAM}=${id}`;
       try {
-        const ok =
-          typeof navigator.share === "function"
-            ? await navigator.share({
-                title: "Join my Phuzzle",
-                text: "Solve this puzzle with me!",
-                url: shareUrl,
-              })
-            : await navigator.clipboard.writeText(shareUrl).then(() => true);
-        if (ok) setShareCopied(true);
-        setTimeout(() => setShareCopied(false), 2000);
+        await (typeof navigator.share === "function"
+          ? navigator.share({
+              title: "Join my Phuzzle",
+              text: "Solve this puzzle with me!",
+              url: shareUrl,
+            })
+          : navigator.clipboard.writeText(shareUrl));
       } catch {
         /* user cancelled or failed */
       }
@@ -700,75 +683,6 @@ export function PlayScreen() {
             bestTimeSeconds={bestTimeSeconds}
             onTogglePause={() => setIsPaused((p) => !p)}
           />
-          {isSupabaseConfigured() && (
-            <div className={styles.coopIndicator}>
-              {sessionId ? (
-                <>
-                  <span className={styles.connectedCount}>
-                    <Users size={14} />
-                    {connectedCount}
-                  </span>
-                  <button
-                    type="button"
-                    className={styles.coopShareBtn}
-                    onClick={async () => {
-                      const ok =
-                        typeof navigator.share === "function"
-                          ? await nativeShare()
-                          : await copyShareLink();
-                      if (ok) setShareCopied(true);
-                      setTimeout(() => setShareCopied(false), 2000);
-                    }}
-                    title="Copy or share link"
-                  >
-                    <Share2 size={14} />
-                    {shareCopied ? "Copied!" : "Share"}
-                  </button>
-                </>
-              ) : (
-                <button
-                  type="button"
-                  className={styles.coopShareBtn}
-                  onClick={async () => {
-                    const s = stateRef.current;
-                    const pieces = s?.pieces
-                      ? s.pieces.map((p) => ({
-                          id: p.id,
-                          row: p.row,
-                          col: p.col,
-                          x: p.x,
-                          y: p.y,
-                          z: p.z,
-                          rotation: p.rotation,
-                          isPlaced: p.isPlaced,
-                          locked: p.locked,
-                          groupId: p.groupId,
-                          inTray: p.inTray,
-                        }))
-                      : [];
-                    const id = await createSession(
-                      s?.imageUrl ?? localStorage.getItem(STORAGE_KEY) ?? "",
-                      s?.grid ?? grid,
-                      pieces,
-                      elapsedSecondsRef.current,
-                    );
-                    if (id) {
-                      const ok =
-                        typeof navigator.share === "function"
-                          ? await nativeShare()
-                          : await copyShareLink();
-                      if (ok) setShareCopied(true);
-                      setTimeout(() => setShareCopied(false), 2000);
-                    }
-                  }}
-                  title="Create session and share"
-                >
-                  <Share2 size={14} />
-                  Share puzzle
-                </button>
-              )}
-            </div>
-          )}
         </div>
         <TopBarButtons
           showPreview={showPreview}
@@ -893,7 +807,6 @@ export function PlayScreen() {
         image={imgRef.current}
         grid={state?.grid ?? grid}
         onPieceClick={handleTrayPieceClick}
-        isCoarsePointer={isCoarsePointer}
       />
 
       <TutorialOverlay

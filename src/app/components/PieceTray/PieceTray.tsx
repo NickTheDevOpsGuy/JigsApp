@@ -24,7 +24,6 @@ type Props = {
   image: HTMLImageElement | null;
   grid: { rows: number; cols: number };
   onPieceClick: (pieceId: string) => void;
-  isCoarsePointer: boolean;
 };
 
 function isCorner(p: Piece, grid: { rows: number; cols: number }) {
@@ -46,7 +45,7 @@ function isEdge(p: Piece, grid: { rows: number; cols: number }) {
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
-  { pieces, image, grid, onPieceClick, isCoarsePointer },
+  { pieces, image, grid, onPieceClick },
   ref,
 ) {
   const [section, setSection] = useState<TraySection>("all");
@@ -55,8 +54,8 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScroll, setCanScroll] = useState(false);
 
-  // Compact mode: default on for mobile when 25+ pieces; user can toggle
-  const compactDefault = isCoarsePointer && pieces.length >= 25;
+  // Compact mode: default on for 25+ pieces (mobile or desktop); user can toggle
+  const compactDefault = pieces.length >= 25;
   const [compact, setCompact] = useState(compactDefault);
   const thumbSize = compact ? THUMB_COMPACT : THUMB_NORMAL;
 
@@ -153,7 +152,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     };
   }, [updateScrollProgress, displayed.length]);
 
-  const showCompactToggle = isCoarsePointer && pieces.length >= 25;
+  const showCompactToggle = pieces.length >= 25;
 
   return (
     <div className={`${styles.tray} ${compact ? styles.trayCompact : ""}`} ref={ref}>

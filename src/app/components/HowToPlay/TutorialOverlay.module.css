@@ -1,5 +1,30 @@
 /* src/app/components/HowToPlay/HowToPlay.module.css */
 
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.scrollArea {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actionsSticky {
+  flex-shrink: 0;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
 .content {
   display: flex;
   flex-direction: column;
@@ -71,4 +96,60 @@
 
 .skipLink:hover {
   color: var(--color-text-secondary);
+}
+
+/* Mobile: compact, sticky dismiss button always visible */
+@media (max-width: 600px) {
+  .scrollArea {
+    gap: 10px;
+  }
+
+  .actionsSticky {
+    margin-top: 8px;
+    padding-top: 10px;
+  }
+
+  .intro {
+    font-size: 13px;
+    line-height: 1.45;
+    margin-bottom: 2px;
+  }
+
+  .section {
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .sectionTitle {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .section p {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .section p + p {
+    margin-top: 4px;
+  }
+
+  /* Hide detailed sections on mobile - keep it short */
+  .mobileCollapse {
+    display: none !important;
+  }
+
+  .tips {
+    font-size: 12px;
+    padding-left: 18px;
+    line-height: 1.5;
+  }
+
+  .tips li {
+    margin-bottom: 2px;
+  }
+
+  .skipLink {
+    font-size: 12px;
+  }
 }

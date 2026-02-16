@@ -1,20 +1,73 @@
 import { useState } from "react";
 import type { SamplePuzzle } from "@/data/samplePuzzles";
 
-const MIN_IMAGE_SIZE = 200;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const VALID_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+
+/** Min pixels per piece edge for readable puzzle pieces. */
+const MIN_PX_PER_PIECE = 45;
+
+/** Resolution rules per grid size: 3x3-4x4 allow smaller, 5x5-6x6 medium, 7x7+ require higher. */
+function getMinDimensionForGrid(rows: number, cols: number): number {
+  const maxDim = Math.max(rows, cols);
+  if (maxDim <= 4) return 160;
+  if (maxDim <= 6) return Math.max(280, maxDim * MIN_PX_PER_PIECE);
+  return Math.max(400, maxDim * MIN_PX_PER_PIECE);
+}
+
+export type ImageValidationResult =
+  | { ok: true; width: number; height: number }
+  | { ok: false; error: string; suggestion?: string };
 
 function validateImageDimensions(
   dataUrl: string,
 ): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onload = () => {
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      } else {
+        reject(new Error("Image could not be loaded. The file may be corrupted."));
+      }
+    };
     img.onerror = () =>
-      reject(new Error("Failed to load image. The file may be corrupted."));
+      reject(
+        new Error(
+          "Failed to load image. The file may be corrupted. Please try another image.",
+        ),
+      );
     img.src = dataUrl;
   });
+}
+
+export function validateImageForGrid(
+  dataUrl: string,
+  rows: number,
+  cols: number,
+): Promise<ImageValidationResult> {
+  return validateImageDimensions(dataUrl).then(
+    ({ width, height }) => {
+      const minDim = getMinDimensionForGrid(rows, cols);
+      const minSide = Math.min(width, height);
+      if (minSide < minDim) {
+        const suggestion =
+          rows * cols >= 49
+            ? "Try a smaller grid (e.g. 5×5 or 6×6) for better results."
+            : undefined;
+        return {
+          ok: false,
+          error: `Image is too small (${width}×${height}px) for a ${rows}×${cols} puzzle. Use at least ${minDim}×${minDim}px for clear pieces.`,
+          suggestion,
+        };
+      }
+      return { ok: true, width, height };
+    },
+    (err) => ({
+      ok: false,
+      error: err instanceof Error ? err.message : "Failed to load image.",
+    }),
+  );
 }
 
 function readFileAsDataUrl(file: File): Promise<string> {
@@ -43,7 +96,13 @@ function readBlobAsDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-export function useImagePicker() {
+export type UseImagePickerOptions = {
+  gridRows?: number;
+  gridCols?: number;
+};
+
+export function useImagePicker(options: UseImagePickerOptions = {}) {
+  const { gridRows = 4, gridCols = 4 } = options;
   const [imgDataUrl, setImgDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +114,6 @@ export function useImagePicker() {
     setSelectedPuzzle(puzzle);
     clearError();
     setImgDataUrl(puzzle.fullImage);
-    // Use asset URL directly; PlayScreen accepts URLs (daily puzzle already does this)
   };
 
   const setFromBlob = async (blob: Blob): Promise<boolean> => {
@@ -65,18 +123,20 @@ export function useImagePicker() {
 
     try {
       const dataUrl = await readBlobAsDataUrl(blob);
-      const { width, height } = await validateImageDimensions(dataUrl);
+      const result = await validateImageForGrid(dataUrl, gridRows, gridCols);
 
-      if (width < MIN_IMAGE_SIZE || height < MIN_IMAGE_SIZE) {
-        throw new Error(
-          `Image is too small (${width}×${height}px). Please use at least ${MIN_IMAGE_SIZE}×${MIN_IMAGE_SIZE}px.`,
-        );
+      if (!result.ok) {
+        const msg = result.suggestion
+          ? `${result.error} ${result.suggestion}`
+          : result.error;
+        throw new Error(msg);
       }
 
       setImgDataUrl(dataUrl);
       return true;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load image.";
+      const message =
+        err instanceof Error ? err.message : "Failed to load image. Please try another.";
       setError(message);
       return false;
     } finally {
@@ -102,18 +162,20 @@ export function useImagePicker() {
       }
 
       const dataUrl = await readFileAsDataUrl(file);
-      const { width, height } = await validateImageDimensions(dataUrl);
+      const result = await validateImageForGrid(dataUrl, gridRows, gridCols);
 
-      if (width < MIN_IMAGE_SIZE || height < MIN_IMAGE_SIZE) {
-        throw new Error(
-          `Image is too small (${width}×${height}px). Please use an image at least ${MIN_IMAGE_SIZE}×${MIN_IMAGE_SIZE}px.`,
-        );
+      if (!result.ok) {
+        const msg = result.suggestion
+          ? `${result.error} ${result.suggestion}`
+          : result.error;
+        throw new Error(msg);
       }
 
       setImgDataUrl(dataUrl);
       return true;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load image.";
+      const message =
+        err instanceof Error ? err.message : "Failed to load image. Please try another.";
       setError(message);
       return false;
     } finally {
@@ -127,10 +189,25 @@ export function useImagePicker() {
     clearError();
   };
 
+  /** Validate current image for the given grid before starting. Sets error and returns false if invalid. */
+  const validateBeforeStart = async (rows: number, cols: number): Promise<boolean> => {
+    if (!imgDataUrl) {
+      setError("No image selected.");
+      return false;
+    }
+    const result = await validateImageForGrid(imgDataUrl, rows, cols);
+    if (!result.ok) {
+      setError(result.suggestion ? `${result.error} ${result.suggestion}` : result.error);
+      return false;
+    }
+    return true;
+  };
+
   return {
     imgDataUrl,
     setImgDataUrl,
     error,
+    setError,
     isLoading,
     selectedPuzzle,
     clearError,
@@ -138,5 +215,6 @@ export function useImagePicker() {
     pickFile,
     setFromBlob,
     clearImage,
+    validateBeforeStart,
   };
 }

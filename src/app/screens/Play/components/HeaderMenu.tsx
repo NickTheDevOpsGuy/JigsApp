@@ -27,12 +27,12 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   view: "View",
 };
 
-/** When in About submenu, Back goes to Help */
-const ABOUT_PARENT: SubMenuId = "help";
+/** When in About submenu, Back goes to main menu (no longer nested under Help) */
+const ABOUT_PARENT = null as SubMenuId | null;
 
 /** When in Display or Board, Back goes to View */
-const VIEW_CHILDREN: SubMenuId[] = ["display", "board"];
-const VIEW_PARENT: SubMenuId = "view";
+const VIEW_SUBMENU_IDS: SubMenuId[] = ["display", "board"];
+const VIEW_PARENT_ID: SubMenuId = "view";
 
 /** Settings submenus in alphabetical order */
 const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
@@ -157,14 +157,27 @@ export function HeaderMenu(props: HeaderMenuProps) {
   const renderMainMenu = () => (
     <>
       <div className={styles.headerMenuSection}>Help</div>
-      {hasSubMenuItems("help") && (
+      {hasSubMenuItems("help") && props.onShowHelpChoice && (
+        <button
+          type="button"
+          className={styles.headerMenuItem}
+          role="menuitem"
+          onClick={() => {
+            setOpen(false);
+            props.onShowHelpChoice();
+          }}
+        >
+          {SUB_MENU_LABELS.help}
+        </button>
+      )}
+      {hasSubMenuItems("about") && (
         <button
           type="button"
           className={styles.headerMenuSubmenuTrigger}
           role="menuitem"
-          onClick={() => setActiveSubMenu("help")}
+          onClick={() => setActiveSubMenu("about")}
         >
-          {SUB_MENU_LABELS.help}
+          {SUB_MENU_LABELS.about}
           <ChevronRight size={16} className={styles.headerMenuChevron} />
         </button>
       )}
@@ -189,7 +202,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const handleBack = () => {
     if (activeSubMenu === "about") setActiveSubMenu(ABOUT_PARENT);
-    else if (VIEW_CHILDREN.includes(activeSubMenu!)) setActiveSubMenu(VIEW_PARENT);
+    else if (VIEW_SUBMENU_IDS.includes(activeSubMenu!)) setActiveSubMenu(VIEW_PARENT_ID);
     else setActiveSubMenu(null);
   };
 
@@ -206,16 +219,27 @@ export function HeaderMenu(props: HeaderMenuProps) {
       </button>
       <div className={styles.headerMenuDivider} />
       <div className={styles.headerMenuSection}>{SUB_MENU_LABELS[activeSubMenu!]}</div>
-      {activeSubMenu === "help" && hasSubMenuItems("about") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("about")}
-        >
-          {SUB_MENU_LABELS.about}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
+      {activeSubMenu === "view" && (
+        <>
+          <button
+            type="button"
+            className={styles.headerMenuSubmenuTrigger}
+            role="menuitem"
+            onClick={() => setActiveSubMenu("display")}
+          >
+            {SUB_MENU_LABELS.display}
+            <ChevronRight size={16} className={styles.headerMenuChevron} />
+          </button>
+          <button
+            type="button"
+            className={styles.headerMenuSubmenuTrigger}
+            role="menuitem"
+            onClick={() => setActiveSubMenu("board")}
+          >
+            {SUB_MENU_LABELS.board}
+            <ChevronRight size={16} className={styles.headerMenuChevron} />
+          </button>
+        </>
       )}
       {activeSubMenu === "view" && (
         <>

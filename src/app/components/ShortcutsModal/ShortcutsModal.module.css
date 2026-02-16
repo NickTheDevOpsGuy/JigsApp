@@ -62,6 +62,7 @@
   justify-content: space-between;
   padding: 20px 24px;
   border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
 .titleRow {
@@ -100,7 +101,10 @@
 
 .content {
   padding: 20px 24px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -124,11 +128,14 @@
 .keys {
   white-space: nowrap;
   width: 45%;
+  vertical-align: top;
 }
 
 .action {
   color: var(--color-text-secondary);
   font-size: 0.95rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .key {
@@ -169,6 +176,7 @@
   background: var(--color-bg-card);
   border-top: 1px solid var(--color-border);
   text-align: center;
+  flex-shrink: 0;
 }
 
 .hint {
@@ -181,32 +189,91 @@
   padding: 2px 8px;
 }
 
-/* Mobile adjustments */
+/* Mobile: stacked layout, compact height, X always visible in header */
 @media (max-width: 500px) {
   .modal {
-    max-height: 90vh;
+    max-height: 75vh;
     border-radius: 12px;
+    max-width: 95%;
   }
 
   .header {
-    padding: 16px 20px;
+    padding: 12px 16px;
   }
 
   .content {
-    padding: 16px 20px;
+    padding: 12px 16px;
   }
 
   .titleRow h2 {
-    font-size: 1.2rem;
+    font-size: 1rem;
+  }
+
+  /* Stack key + action vertically so nothing gets cut off */
+  .table,
+  .table tbody,
+  .table tr {
+    display: block;
+  }
+
+  .table td {
+    display: block;
+    padding: 6px 0;
+    width: 100% !important;
+    border: none;
+  }
+
+  .table tr {
+    border-bottom: 1px solid var(--color-border);
+    padding: 8px 0;
+  }
+
+  .table tr:last-child {
+    border-bottom: none;
+  }
+
+  .keys {
+    white-space: normal;
+    margin-bottom: 2px;
   }
 
   .key {
-    padding: 3px 8px;
-    font-size: 0.8rem;
+    padding: 2px 6px;
+    font-size: 0.75rem;
   }
 
   .action {
     font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .mouseSection {
+    margin-top: 16px;
+    padding-top: 14px;
+  }
+
+  .mouseSection h3 {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+
+  .navNote {
+    margin-top: 10px;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .footer {
+    padding: 12px 16px;
+  }
+
+  .hint {
+    font-size: 0.75rem;
+  }
+
+  .hint .key {
+    font-size: 0.65rem;
+    padding: 2px 6px;
   }
 }
 

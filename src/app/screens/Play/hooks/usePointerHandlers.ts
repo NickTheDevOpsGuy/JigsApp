@@ -209,6 +209,15 @@ export function usePointerHandlers(args: {
       const piece = st.pieces.find((p) => p.id === pieceId);
       if (piece?.locked) return;
 
+      // Ignore new touch on piece when another pointer is already dragging (prevents multi-touch dragging)
+      if (
+        e.pointerType === "touch" &&
+        activePointerIdRef.current != null &&
+        activePointerIdRef.current !== e.pointerId
+      ) {
+        return;
+      }
+
       selectedIdRef.current = pieceId;
       setSelectedPieceId(pieceId);
       bump();

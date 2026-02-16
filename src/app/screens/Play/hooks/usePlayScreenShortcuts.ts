@@ -11,11 +11,13 @@ type UsePlayScreenShortcutsArgs = {
   setState: (st: PuzzleState) => void;
   isPaused: boolean;
   showShortcuts: boolean;
+  showHelpChoice: boolean;
   showNewGameModal: boolean;
   showTutorial: boolean;
   selectedPieceId: string | null;
   setSelectedPieceId: (id: string | null) => void;
   setShowShortcuts: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowHelpChoice: React.Dispatch<React.SetStateAction<boolean>>;
   setShowNewGameModal: React.Dispatch<React.SetStateAction<boolean>>;
   setShowPreview: React.Dispatch<React.SetStateAction<boolean>>;
   setShowGhostHint: React.Dispatch<React.SetStateAction<boolean>>;
@@ -34,11 +36,13 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
     setState,
     isPaused,
     showShortcuts,
+    showHelpChoice,
     showNewGameModal,
     showTutorial,
     selectedPieceId,
     setSelectedPieceId,
     setShowShortcuts,
+    setShowHelpChoice,
     setShowNewGameModal,
     setShowPreview,
     setShowGhostHint,
@@ -58,6 +62,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
           break;
         case "escape":
           if (showShortcuts) setShowShortcuts(false);
+          else if (showHelpChoice) setShowHelpChoice(false);
           else if (showNewGameModal) setShowNewGameModal(false);
           else if (isPaused) setIsPaused(false);
           break;
@@ -183,7 +188,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
           }
           break;
         case "showHelp":
-          setShowShortcuts((s) => !s);
+          setShowHelpChoice((s) => !s);
           break;
       }
     },
@@ -191,12 +196,14 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
       state,
       isPaused,
       showShortcuts,
+      showHelpChoice,
       showNewGameModal,
       manager,
       toggleFullscreen,
       selectedPieceId,
       setSelectedPieceId,
       setShowShortcuts,
+      setShowHelpChoice,
       setShowNewGameModal,
       setShowPreview,
       setShowGhostHint,

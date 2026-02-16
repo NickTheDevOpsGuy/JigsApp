@@ -163,12 +163,9 @@ export class PuzzleManager {
 
     const boardPieces = allPieces.filter((p) => !p.inTray);
 
-    const groupCounts = new Map<string, number>();
-    for (const p of boardPieces) {
-      groupCounts.set(p.groupId, (groupCounts.get(p.groupId) || 0) + 1);
-    }
-
-    const largestGroupSize = Math.max(...groupCounts.values(), 0);
+    // Progress = correctly placed pieces (at target position with correct rotation).
+    // Do not count pieces sitting loose on the board; only those snapped to correct spot.
+    const placedCount = boardPieces.filter((p) => this.isPieceCorrect(p)).length;
 
     if (boardPieces.length === 0) {
       this.state = { ...this.state, placedCount: 0, isComplete: false };
@@ -179,8 +176,6 @@ export class PuzzleManager {
     const allCorrectRotation = boardPieces.every((p) => p.rotation === p.targetRotation);
 
     // Win condition: all pieces must be at their correct board positions with correct rotation.
-    // (Previously only checked "all in one group" - allowed false wins when a piece locked
-    // over another but wasn't snapped to the right spot.)
     const isComplete =
       noTrayPieces &&
       allCorrectRotation &&
@@ -189,7 +184,7 @@ export class PuzzleManager {
 
     this.state = {
       ...this.state,
-      placedCount: largestGroupSize,
+      placedCount,
       isComplete,
     };
 

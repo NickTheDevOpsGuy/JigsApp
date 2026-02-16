@@ -39,8 +39,12 @@
   gap: 6px;
   position: sticky;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 2;
   min-width: 0;
+  /* Sticky filter row: stays visible when scrolling piece thumbnails */
+  box-shadow: 0 1px 0 var(--color-border);
 }
 
 .titleRow {
@@ -119,19 +123,20 @@
   color: var(--color-brand-primary);
 }
 
+/* Visual "you are here" scroll position indicator */
 .scrollIndicator {
   flex-shrink: 0;
-  height: 4px;
+  height: 6px;
   background: var(--color-bg-secondary);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
-  margin: 0 12px 4px;
+  margin: 0 12px 6px;
 }
 
 .scrollIndicatorFill {
   height: 100%;
   background: var(--color-brand-primary);
-  border-radius: 2px;
+  border-radius: 3px;
   transition: width 0.1s ease-out;
 }
 
@@ -155,8 +160,10 @@
 
 .scrollerSnap {
   scroll-snap-type: x mandatory;
+  scroll-snap-stop: always;
   scroll-padding-inline-start: 12px;
   scroll-padding-inline-end: max(16px, env(safe-area-inset-right, 0));
+  scroll-behavior: smooth;
 }
 
 .row {
@@ -167,7 +174,7 @@
 
 .scrollerSnap .pieceButton {
   scroll-snap-align: center;
-  scroll-snap-stop: normal;
+  scroll-snap-stop: always;
 }
 
 .pieceButton {
@@ -262,7 +269,7 @@
   .tray {
     margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px
       max(6px, env(safe-area-inset-right, 0));
-    height: 92px;
+    height: 130px;
   }
 
   .header {
