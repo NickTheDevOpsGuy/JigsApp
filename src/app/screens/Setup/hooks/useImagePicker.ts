@@ -32,7 +32,11 @@ function validateImageDimensions(
       }
     };
     img.onerror = () =>
-      reject(new Error("Failed to load image. The file may be corrupted. Please try another image."));
+      reject(
+        new Error(
+          "Failed to load image. The file may be corrupted. Please try another image.",
+        ),
+      );
     img.src = dataUrl;
   });
 }
@@ -131,7 +135,8 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
       setImgDataUrl(dataUrl);
       return true;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load image. Please try another.";
+      const message =
+        err instanceof Error ? err.message : "Failed to load image. Please try another.";
       setError(message);
       return false;
     } finally {
@@ -169,7 +174,8 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
       setImgDataUrl(dataUrl);
       return true;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load image. Please try another.";
+      const message =
+        err instanceof Error ? err.message : "Failed to load image. Please try another.";
       setError(message);
       return false;
     } finally {
@@ -184,10 +190,7 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
   };
 
   /** Validate current image for the given grid before starting. Sets error and returns false if invalid. */
-  const validateBeforeStart = async (
-    rows: number,
-    cols: number,
-  ): Promise<boolean> => {
+  const validateBeforeStart = async (rows: number, cols: number): Promise<boolean> => {
     if (!imgDataUrl) {
       setError("No image selected.");
       return false;

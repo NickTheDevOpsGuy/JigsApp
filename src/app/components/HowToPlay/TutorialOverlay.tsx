@@ -89,9 +89,10 @@ export function TutorialOverlay({
             bring them back to the board.
           </p>
           <p>
-            Filter by <strong>All</strong>, <strong>Edges</strong>, <strong>Center</strong>, or{" "}
-            <strong>Corners</strong> to find pieces quickly. For puzzles with 25+ pieces, use
-            compact mode to fit more thumbnails. Sort by grid position or color.
+            Filter by <strong>All</strong>, <strong>Edges</strong>,{" "}
+            <strong>Center</strong>, or <strong>Corners</strong> to find pieces quickly.
+            For puzzles with 25+ pieces, use compact mode to fit more thumbnails. Sort by
+            grid position or color.
           </p>
         </div>
 
