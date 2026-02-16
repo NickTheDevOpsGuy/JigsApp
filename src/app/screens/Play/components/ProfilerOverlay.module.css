@@ -1,0 +1,29 @@
+.overlay {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 8px 12px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-bg-card) 95%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.label {
+  opacity: 0.9;
+}
+
+.value {
+  font-weight: 600;
+}

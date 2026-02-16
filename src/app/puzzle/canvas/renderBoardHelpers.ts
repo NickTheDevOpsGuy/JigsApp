@@ -121,6 +121,37 @@ export function drawGridOverlay(
   ctx.restore();
 }
 
+/** Very subtle alignment grid matching puzzle piece boundaries. Helps spatial orientation. */
+export function drawAlignmentGrid(
+  ctx: CanvasRenderingContext2D,
+  cols: number,
+  rows: number,
+  tileW: number,
+  tileH: number,
+): void {
+  ctx.save();
+  ctx.strokeStyle = "rgba(0,0,0,0.04)";
+  ctx.lineWidth = 1;
+
+  const w = cols * tileW;
+  const h = rows * tileH;
+  for (let c = 0; c <= cols; c++) {
+    const x = c * tileW;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let r = 0; r <= rows; r++) {
+    const y = r * tileH;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 export function applyPieceShadow(
   ctx: CanvasRenderingContext2D,
   isDragging: boolean,

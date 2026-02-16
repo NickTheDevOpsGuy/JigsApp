@@ -23,7 +23,7 @@ import { getMyProfile, updateMyProfile } from "@/services/profileService";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
-import { getTodayDateString } from "@/daily/dailyPuzzle";
+import { getTodayDateString } from "@/daily/dailyPuzzleCore";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);

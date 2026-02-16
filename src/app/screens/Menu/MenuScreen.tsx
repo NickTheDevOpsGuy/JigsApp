@@ -11,8 +11,7 @@ import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { AboutModal } from "@/components/AboutModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
 import { Image, Camera, Package, HelpCircle } from "lucide-react";
-import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
-import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
+import { isTodayDailyCompleted } from "@/daily/dailyPuzzleCore";
 import { shouldShowChangelog } from "@/data/changelog";
 import { getMenuTagline } from "@/data/menuTips";
 
@@ -27,7 +26,7 @@ export function MenuScreen() {
   const [showAbout, setShowAbout] = useState(false);
 
   const todayCompleted = isTodayDailyCompleted();
-  const hasDaily = SAMPLE_PUZZLES.length > 0;
+  const hasDaily = true;
 
   useEffect(() => {
     if (shouldShowChangelog()) setShowWhatsNew(true);

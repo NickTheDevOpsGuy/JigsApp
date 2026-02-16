@@ -125,7 +125,10 @@ export function HeaderMenu(props: HeaderMenuProps) {
       : id === "about"
         ? aboutItems.length > 0
         : id === "view"
-          ? settingsItems.some((i) => i.subMenu === "display" || i.subMenu === "board")
+          ? settingsItems.some(
+              (i) =>
+                i.subMenu === "display" || i.subMenu === "board" || i.subMenu === "view",
+            )
           : settingsItems.some((i) => i.subMenu === id);
 
   const renderItem = (item: MenuItemConfig) => {

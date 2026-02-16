@@ -30,6 +30,14 @@ export function usePlayScreenManager(
     onPlacementStreak?: () => void;
     /** Ref to viewport scale for zoom-adaptive snap tolerance. */
     snapScaleRef?: MutableRefObject<number>;
+    /** Called each time snap logic is evaluated (for perf overlay). */
+    onSnapCheck?: () => void;
+    /** Ref updated when piece would snap but wrong rotation blocks it (position correct, rotation wrong). */
+    wrongRotationHintRef?: MutableRefObject<{
+      groupId: string;
+      pieceIds: string[];
+      triggeredAt: number;
+    } | null>;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -243,6 +251,15 @@ export function usePlayScreenManager(
             onPieceLocked: (ids) => {
               const now = performance.now();
               for (const id of ids) lockMapRef.current.set(id, now);
+            },
+            onSnapCheck: opts?.onSnapCheck,
+            onWrongRotationHint: (groupId, pieceIds) => {
+              const ref = opts?.wrongRotationHintRef;
+              if (!ref) return;
+              const now = performance.now();
+              const cur = ref.current;
+              if (cur && now - cur.triggeredAt < 5000) return;
+              ref.current = { groupId, pieceIds, triggeredAt: now };
             },
             onPuzzleComplete: () => {
               clearPuzzleState();

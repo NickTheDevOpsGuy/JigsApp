@@ -15,7 +15,7 @@ import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
 import { getBestTime } from "./timeMode";
-import { isDailyPuzzleSession } from "@/daily/dailyPuzzle";
+import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
@@ -38,6 +38,7 @@ import {
   TopBarButtons,
   HeaderMenu,
 } from "./components";
+import { ProfilerOverlay } from "./components";
 import { OnboardingTooltip } from "@/components/OnboardingTooltip";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
@@ -105,6 +106,8 @@ export function PlayScreen() {
     setPieceLockingEnabled,
     showGhostHint,
     setShowGhostHint,
+    showAlignmentGrid,
+    setShowAlignmentGrid,
     debug,
     showPreview,
     setShowPreview,
@@ -131,6 +134,9 @@ export function PlayScreen() {
     toggleSound,
     toggleHaptics,
     toggleDebug,
+    togglePerfOverlay,
+    immersiveMode,
+    toggleImmersiveMode,
   } = ui;
 
   const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
@@ -146,10 +152,27 @@ export function PlayScreen() {
   const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
   const [shareToast, setShareToast] = React.useState<string | null>(null);
   const lastMilestoneRef = React.useRef<number>(0);
+  const [immersiveReveal, setImmersiveReveal] = React.useState(false);
+  const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const viewport = useViewport();
   const snapScaleRef = React.useRef(1);
   snapScaleRef.current = viewport.viewport.scale;
+
+  const perfStatsRef = React.useRef({
+    fps: 0,
+    drawsPerSec: 0,
+    activeGroups: 0,
+    snapCheckCount: 0,
+    snapChecksPerSec: 0,
+  });
+  const wrongRotationHintRef = React.useRef<{
+    groupId: string;
+    pieceIds: string[];
+    triggeredAt: number;
+  } | null>(null);
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -166,6 +189,10 @@ export function PlayScreen() {
         ? session.state.pieces
         : undefined,
       snapScaleRef,
+      onSnapCheck: () => {
+        perfStatsRef.current.snapCheckCount++;
+      },
+      wrongRotationHintRef,
     },
   );
   const {
@@ -544,7 +571,10 @@ export function PlayScreen() {
     snapParticlesRef,
     debug,
     showGhostHint,
+    showAlignmentGrid,
     viewport: viewport.viewport,
+    perfStatsRef,
+    wrongRotationHintRef,
   });
 
   const handleTrayPieceClick = useCallback(
@@ -643,6 +673,25 @@ export function PlayScreen() {
   const total = state?.totalCount ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
+  const showImmersiveUi = !immersiveMode || immersiveReveal;
+  const scheduleImmersiveHide = React.useCallback(() => {
+    if (immersiveHideTimerRef.current) clearTimeout(immersiveHideTimerRef.current);
+    immersiveHideTimerRef.current = setTimeout(() => {
+      setImmersiveReveal(false);
+    }, 2200);
+  }, []);
+
+  React.useEffect(
+    () => () => {
+      if (immersiveHideTimerRef.current) clearTimeout(immersiveHideTimerRef.current);
+    },
+    [],
+  );
+  const handleImmersiveReveal = React.useCallback(() => {
+    if (!immersiveMode) return;
+    setImmersiveReveal(true);
+    if (immersiveHideTimerRef.current) clearTimeout(immersiveHideTimerRef.current);
+  }, [immersiveMode]);
   const bestTimeSeconds =
     timeMode === "best" && state?.grid
       ? getBestTime(state.grid.rows, state.grid.cols)
@@ -650,7 +699,21 @@ export function PlayScreen() {
 
   return (
     <div className={styles.page} ref={pageRef}>
-      <div className={styles.topBar}>
+      {immersiveMode && (
+        <div
+          className={styles.immersivePeekTop}
+          onPointerEnter={handleImmersiveReveal}
+          onPointerDown={handleImmersiveReveal}
+          role="button"
+          tabIndex={-1}
+          aria-label="Show menu and controls"
+        />
+      )}
+      <div
+        className={`${styles.topBarWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveTopHidden : ""}`}
+        onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
+      >
+        <div className={styles.topBar}>
         <div className={styles.topBarLeft}>
           <HeaderMenu
             title="Phuzzle"
@@ -679,6 +742,7 @@ export function PlayScreen() {
             hapticsEnabled={hapticsEnabled}
             pieceLockingEnabled={pieceLockingEnabled}
             showGhostHint={showGhostHint}
+            showAlignmentGrid={showAlignmentGrid}
             isFullscreen={ui.isFullscreen}
             canShowHaptics={isCoarsePointer && typeof navigator?.vibrate === "function"}
             canShowFullscreen={!!document.fullscreenEnabled}
@@ -691,6 +755,7 @@ export function PlayScreen() {
             onToggleHaptics={toggleHaptics}
             onTogglePieceLocking={() => setPieceLockingEnabled((p) => !p)}
             onToggleGhostHint={() => setShowGhostHint((g) => !g)}
+            onToggleAlignmentGrid={() => setShowAlignmentGrid((a) => !a)}
             onToggleFullscreen={toggleFullscreen}
             onCenterBoard={() => viewport.reset()}
             onZoomIn={() => viewport.zoomIn()}
@@ -699,6 +764,9 @@ export function PlayScreen() {
             onShowHowToPlay={() => setShowHowToPlay(true)}
             onShowHelpChoice={() => setShowHelpChoice(true)}
             onToggleDebug={toggleDebug}
+            onTogglePerfOverlay={togglePerfOverlay}
+            immersiveMode={immersiveMode}
+            onToggleImmersiveMode={toggleImmersiveMode}
             onSharePuzzle={isSupabaseConfigured() ? handleSharePuzzle : undefined}
           />
         </div>
@@ -728,6 +796,7 @@ export function PlayScreen() {
           onToggleDebug={toggleDebug}
           onNewPuzzle={() => setShowNewGameModal(true)}
         />
+        </div>
       </div>
 
       <ConfirmModal
@@ -762,12 +831,6 @@ export function PlayScreen() {
 
       <div className={styles.main} ref={mainRef}>
         <div className={styles.board} ref={boardRef}>
-          {!isLoading && total > 0 && placed === 0 && (
-            <div className={styles.emptyBoardHint} aria-hidden="true">
-              <span className={styles.emptyBoardEmoji}>🧩</span>
-              <p className={styles.emptyBoardText}>Drag a piece to start the puzzle</p>
-            </div>
-          )}
           {isLoading && (
             <div className={styles.loadingOverlay} aria-label="Loading puzzle">
               <div className={styles.spinner} />
@@ -832,13 +895,28 @@ export function PlayScreen() {
         </div>
       </div>
 
-      <PieceTray
-        ref={trayRef}
-        pieces={trayPieces}
-        image={imgRef.current}
-        grid={state?.grid ?? grid}
-        onPieceClick={handleTrayPieceClick}
-      />
+      {immersiveMode && (
+        <div
+          className={styles.immersivePeekBottom}
+          onPointerEnter={handleImmersiveReveal}
+          onPointerDown={handleImmersiveReveal}
+          role="button"
+          tabIndex={-1}
+          aria-label="Show piece drawer"
+        />
+      )}
+      <div
+        className={`${styles.trayWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
+        onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
+      >
+        <PieceTray
+          ref={trayRef}
+          pieces={trayPieces}
+          image={imgRef.current}
+          grid={state?.grid ?? grid}
+          onPieceClick={handleTrayPieceClick}
+        />
+      </div>
 
       <TutorialOverlay
         isOpen={showTutorial || showHowToPlay}
@@ -881,6 +959,15 @@ export function PlayScreen() {
           {shareToast}
         </div>
       )}
+      {onboarding.needsStartTip && placed === 0 && (
+        <div className={styles.onboardingOverlay}>
+          <OnboardingTooltip
+            message="Drag a piece to start"
+            onDismiss={onboarding.dismissStartTip}
+            showButton
+          />
+        </div>
+      )}
       {onboarding.needsTrayTip && (
         <div className={styles.onboardingOverlayTray}>
           <OnboardingTooltip
@@ -898,6 +985,12 @@ export function PlayScreen() {
             showButton
           />
         </div>
+      )}
+      {(import.meta.env.DEV || SHOW_DEBUG) && (
+        <ProfilerOverlay
+          statsRef={perfStatsRef}
+          visible={debug.showPerfOverlay}
+        />
       )}
     </div>
   );

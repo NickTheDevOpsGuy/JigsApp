@@ -8,7 +8,7 @@ import {
   recordDailyCompletion,
   DAILY_DATE_KEY,
   getCurrentStreak,
-} from "@/daily/dailyPuzzle";
+} from "@/daily/dailyPuzzleCore";
 import { recordCompletion } from "@/services/statsService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
 import { getCompletionMessage } from "@/data/completionMessages";

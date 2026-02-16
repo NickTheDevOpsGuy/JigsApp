@@ -49,6 +49,9 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks(id) {
+            if (id.includes("samplePuzzles") || id.includes("puzzlePacks")) {
+              return "puzzles";
+            }
             // Split vendor chunks to avoid a single >500kB bundle
             if (id.includes("node_modules")) {
               if (id.includes("react-dom") || id.includes("react/")) {

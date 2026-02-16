@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { soundManager } from "@/audio/sounds";
-import { PIECE_LOCKING_KEY, GHOST_HINT_KEY, type DebugFlags } from "../playScreenUtils";
+import {
+  PIECE_LOCKING_KEY,
+  GHOST_HINT_KEY,
+  IMMERSIVE_MODE_KEY,
+  ALIGNMENT_GRID_KEY,
+  type DebugFlags,
+} from "../playScreenUtils";
 
 export function usePlayScreenUI() {
   const [pieceLockingEnabled, setPieceLockingEnabled] = useState(() => {
@@ -19,12 +25,28 @@ export function usePlayScreenUI() {
     }
   });
 
+  const [showAlignmentGrid, setShowAlignmentGrid] = useState(() => {
+    try {
+      return localStorage.getItem(ALIGNMENT_GRID_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
   const [debug, setDebug] = useState<DebugFlags>({
     showGrid: false,
     showBounds: false,
     showIds: false,
+    showPerfOverlay: false,
   });
   const [showPreview, setShowPreview] = useState(false);
+  const [immersiveMode, setImmersiveMode] = useState(() => {
+    try {
+      return localStorage.getItem(IMMERSIVE_MODE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
   const [soundEnabled, setSoundEnabled] = useState(() =>
     typeof window !== "undefined" ? soundManager.isEnabled() : true,
   );
@@ -79,6 +101,22 @@ export function usePlayScreenUI() {
   }, [showGhostHint]);
 
   useEffect(() => {
+    try {
+      localStorage.setItem(ALIGNMENT_GRID_KEY, showAlignmentGrid ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [showAlignmentGrid]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(IMMERSIVE_MODE_KEY, immersiveMode ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [immersiveMode]);
+
+  useEffect(() => {
     setSoundEnabled(soundManager.isEnabled());
     setHapticsEnabled(soundManager.isHapticsEnabled());
   }, []);
@@ -105,15 +143,27 @@ export function usePlayScreenUI() {
     }));
   }, []);
 
+  const togglePerfOverlay = useCallback(() => {
+    setDebug((d) => ({ ...d, showPerfOverlay: !d.showPerfOverlay }));
+  }, []);
+
+  const toggleImmersiveMode = useCallback(() => {
+    setImmersiveMode((m) => !m);
+  }, []);
+
   return {
     pieceLockingEnabled,
     setPieceLockingEnabled,
     showGhostHint,
     setShowGhostHint,
+    showAlignmentGrid,
+    setShowAlignmentGrid,
     debug,
     setDebug,
     showPreview,
     setShowPreview,
+    immersiveMode,
+    setImmersiveMode,
     soundEnabled,
     setSoundEnabled,
     hapticsEnabled,
@@ -138,5 +188,7 @@ export function usePlayScreenUI() {
     toggleSound,
     toggleHaptics,
     toggleDebug,
+    togglePerfOverlay,
+    toggleImmersiveMode,
   };
 }

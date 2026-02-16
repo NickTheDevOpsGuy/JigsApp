@@ -5,6 +5,7 @@ export type DebugFlags = {
   showGrid: boolean;
   showBounds: boolean;
   showIds: boolean;
+  showPerfOverlay: boolean;
 };
 
 export type HeaderMenuProps = {
@@ -22,6 +23,7 @@ export type HeaderMenuProps = {
   hapticsEnabled: boolean;
   pieceLockingEnabled: boolean;
   showGhostHint: boolean;
+  showAlignmentGrid: boolean;
   isFullscreen: boolean;
   canShowHaptics: boolean;
   canShowFullscreen: boolean;
@@ -34,6 +36,7 @@ export type HeaderMenuProps = {
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
   onToggleGhostHint: () => void;
+  onToggleAlignmentGrid: () => void;
   onToggleFullscreen: () => void;
   onCenterBoard: () => void;
   onZoomIn: () => void;
@@ -43,6 +46,9 @@ export type HeaderMenuProps = {
   onShowHelpChoice: () => void;
   onShowAbout?: () => void;
   onToggleDebug: () => void;
+  onTogglePerfOverlay: () => void;
+  immersiveMode: boolean;
+  onToggleImmersiveMode: () => void;
   onSharePuzzle?: () => void | Promise<void>;
 };
 
@@ -143,6 +149,14 @@ export function buildMenuItems(
       /* No subMenu - stays at top level */
     },
     {
+      id: "perfOverlay",
+      section: "settings",
+      visible: props.canShowDebug,
+      label: props.debug.showPerfOverlay ? "Hide perf overlay" : "Perf overlay",
+      sortKey: "Perf overlay",
+      onClick: c(props.onTogglePerfOverlay),
+    },
+    {
       id: "fullscreen",
       section: "settings",
       visible: props.canShowFullscreen,
@@ -169,6 +183,24 @@ export function buildMenuItems(
       onClick: () => setOpen(false),
       isTheme: true,
       subMenu: "display",
+    },
+    {
+      id: "immersiveMode",
+      section: "settings",
+      visible: true,
+      label: props.immersiveMode ? "Immersive mode: on" : "Immersive mode: off",
+      sortKey: "0 Immersive",
+      onClick: c(props.onToggleImmersiveMode),
+      subMenu: "view",
+    },
+    {
+      id: "alignmentGrid",
+      section: "settings",
+      visible: true,
+      label: props.showAlignmentGrid ? "Alignment grid: on" : "Alignment grid: off",
+      sortKey: "1 Alignment grid",
+      onClick: c(props.onToggleAlignmentGrid),
+      subMenu: "view",
     },
     {
       id: "centerBoard",

@@ -153,3 +153,10 @@
   align-items: center;
   gap: 4px;
 }
+
+.loading {
+  margin: 0;
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
