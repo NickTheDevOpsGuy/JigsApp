@@ -9,6 +9,12 @@ Setup and reference guides for developers.
 | [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) | Leaderboards, stats, achievements, co-op sharing – full Supabase setup. Includes [Verifying Share / Co-op](./SUPABASE_SETUP.md#verifying-share--co-op). |
 | [LIGHTHOUSE.md](./LIGHTHOUSE.md)         | Lighthouse CI setup and fixing "GitHub token not set" warning.                                                                                          |
 
+## Reference
+
+| Document                     | Description                                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| [streak-freeze.md](./streak-freeze.md) | Streak freeze: one per week; offered when yesterday wasn't completed; keeps streak alive |
+
 ## Future Ideas
 
 | Document                 | Description                                    |

@@ -71,11 +71,12 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### Core gameplay
 
-- Drag and drop pieces with rotation
+- Drag and drop pieces with rotation (tap to rotate on mobile)
 - Board snap and neighbor snap (with near-snap nudge when pieces are close)
 - Group merging so connected pieces move together
 - Multiple grid sizes (3×3 to 8×8)
 - Image sources: gallery, file upload, camera capture
+- Puzzle packs – curated sets grouped by theme
 - Tray filters: All, Edges, Corners, Center (plus Grid and Color sorting)
 - Zoom and pan (animated, persistent per grid size, soft board clamp)
   - Desktop: scroll to zoom, middle mouse drag to pan
@@ -86,14 +87,17 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Reference image preview overlay
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
-- Settings organized into sub-menus (About, Help, Display with Theme, Gameplay with Controls, Audio, Advanced)
-- Optional piece borders and edge-piece highlight (View)
+- Settings organized into sub-menus: **About** (Help), **Display** (Theme, board options, effects), **Gameplay** (Controls, time display), **Audio**, **Advanced**
+- Optional piece borders, edge-piece highlight, immersive mode
 - Undo and redo
 - Ghost hint and ghost when idle (after a few seconds of inactivity)
 - Optional piece locking
 - Battery-saver detection (reduces confetti when low-power or data-saver)
-- Six themes (Light, Dark, Space, Ocean, Forest, Sunset) with system preference detection on first visit
+- Six themes (Light, Dark, Space, Ocean, Forest, Sunset) with system preference on first visit
 - Keyboard navigation in hamburger menu (Arrow keys, Escape)
+- Haptic feedback on supported devices (tap, snap, place, rotate)
+- Sound effects (toggle in Audio)
+- `prefers-reduced-motion` support for shorter animations
 
 ### Social and progress
 
@@ -102,6 +106,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Stats dashboard and leaderboards (Supabase)
 - Profile with display name and anonymous mode
 - Share completed puzzle image
+- **Co-op** – Play with Friend: share a link and work on the same puzzle together (requires Supabase)
 - Share app / invite testers button (native share on mobile, copy link on desktop)
 
 ### Analytics (optional)
@@ -117,7 +122,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 ### Planned
 
 - Import puzzle from URL
-- Offline-first gameplay (e.g. play without network after first load)
+- Full offline-first gameplay (app shells and assets cache today; puzzle images still need network on first load)
 
 ---
 
@@ -171,6 +176,7 @@ Useful scripts:
 | Doc                                            | Description                                                                                        |
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase setup: leaderboards, stats, achievements, co-op share; env vars, migrations, verification |
+| [doc/streak-freeze.md](doc/streak-freeze.md)   | Streak freeze: one per week, offered when yesterday wasn't completed                              |
 | [doc/README.md](doc/README.md)                 | Index of docs                                                                                      |
 
 ---
