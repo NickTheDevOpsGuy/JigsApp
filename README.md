@@ -37,6 +37,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 If the GIF link below is broken, check the folder name casing. GitHub is case-sensitive.  
 Common fixes:
+
 - `./assets/...` vs `./Assets/...`
 - `preview.gif` vs `Preview.gif`
 
@@ -47,6 +48,7 @@ Common fixes:
 ## What is Phuzzle?
 
 Phuzzle is a fully interactive jigsaw puzzle experience focused on:
+
 - Smooth snapping and merging
 - Satisfying interactions
 - Mobile-first usability
@@ -68,17 +70,19 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 ## Features
 
 ### Core gameplay
+
 - Drag and drop pieces with rotation
 - Board snap and neighbor snap
 - Group merging so connected pieces move together
 - Multiple grid sizes (3x3 to 6x6 and more)
 - Image sources: gallery, file upload, camera capture
 - Tray filters: All, Edges, Corners, Center (plus Grid and Color sorting)
-- Zoom and pan  
-  - Desktop: scroll to zoom, middle mouse drag to pan  
+- Zoom and pan
+  - Desktop: scroll to zoom, middle mouse drag to pan
   - Mobile: two-finger pinch zoom and pan, plus single-finger pan on empty space when zoomed
 
 ### UX and polish
+
 - Reference image preview overlay
 - Progress and timer modes
 - Completion confetti and fun completion messages
@@ -89,6 +93,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Optional piece locking
 
 ### Social and progress
+
 - Daily puzzle and streak tracking
 - Stats dashboard and leaderboards (Supabase)
 - Profile with display name and anonymous mode
@@ -96,8 +101,9 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Share app / invite testers button (native share on mobile, copy link on desktop)
 
 ### Analytics (optional)
-- PostHog integration behind env vars  
-  - Events like `puzzle_started` and `puzzle_completed`  
+
+- PostHog integration behind env vars
+  - Events like `puzzle_started` and `puzzle_completed`
   - No route inside the app
 
 ---
@@ -146,6 +152,7 @@ npm run dev
 ```
 
 Useful scripts:
+
 - `npm run build` production build
 - `npm run preview` preview production build locally
 - `npm run test` unit tests
@@ -171,13 +178,13 @@ Copy `.env.example` to `.env.local` (or `.env.development`) and set what you nee
 For Vercel:  
 Project Settings → Environment Variables
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `VITE_SHOW_DEBUG` | No | `true` to show debug overlay in play screen |
-| `VITE_SUPABASE_URL` | No | Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | No | Supabase anon key |
-| `VITE_POSTHOG_KEY` | No | PostHog project key |
-| `VITE_POSTHOG_HOST` | No | PostHog host (example: `https://us.i.posthog.com`) |
+| Variable                 | Required | Purpose                                            |
+| ------------------------ | -------- | -------------------------------------------------- |
+| `VITE_SHOW_DEBUG`        | No       | `true` to show debug overlay in play screen        |
+| `VITE_SUPABASE_URL`      | No       | Supabase project URL                               |
+| `VITE_SUPABASE_ANON_KEY` | No       | Supabase anon key                                  |
+| `VITE_POSTHOG_KEY`       | No       | PostHog project key                                |
+| `VITE_POSTHOG_HOST`      | No       | PostHog host (example: `https://us.i.posthog.com`) |
 
 PostHog UI: https://app.posthog.com/
 
@@ -510,6 +517,7 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 We love help.
 
 Before submitting a PR, run:
+
 - `npm run lint`
 - `npm run typecheck`
 - `npm run test`
