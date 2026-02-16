@@ -109,10 +109,7 @@ export function MenuScreen() {
         isOpen={showHowToPlay}
         onComplete={() => setShowHowToPlay(false)}
       />
-      <ShortcutsModal
-        isOpen={showShortcuts}
-        onClose={() => setShowShortcuts(false)}
-      />
+      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
       <AboutModal
         isOpen={showAbout}
         onClose={() => setShowAbout(false)}

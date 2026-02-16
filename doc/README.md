@@ -10,8 +10,8 @@ Setup and reference guides for developers.
 
 ## Future Ideas
 
-| Document | Description |
-| -------- | ----------- |
+| Document                 | Description                                    |
+| ------------------------ | ---------------------------------------------- |
 | [FUTURE.md](./FUTURE.md) | Planned features (piece heatmap overlay, etc.) |
 
 ## Session Notes
