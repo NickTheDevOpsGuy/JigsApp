@@ -62,6 +62,7 @@
   justify-content: space-between;
   padding: 20px 24px;
   border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
 .titleRow {
@@ -100,7 +101,10 @@
 
 .content {
   padding: 20px 24px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -172,6 +176,7 @@
   background: var(--color-bg-card);
   border-top: 1px solid var(--color-border);
   text-align: center;
+  flex-shrink: 0;
 }
 
 .hint {
@@ -184,10 +189,10 @@
   padding: 2px 8px;
 }
 
-/* Mobile: stacked layout to prevent action text truncation */
+/* Mobile: stacked layout, compact height, X always visible in header */
 @media (max-width: 500px) {
   .modal {
-    max-height: 90vh;
+    max-height: 75vh;
     border-radius: 12px;
     max-width: 95%;
   }

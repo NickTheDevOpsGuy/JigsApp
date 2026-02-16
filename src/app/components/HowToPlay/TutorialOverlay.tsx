@@ -50,7 +50,8 @@ export function TutorialOverlay({
 
   return (
     <Modal isOpen={isOpen} onClose={handleDismiss} title="How to Play">
-      <div className={styles.content}>
+      <div className={styles.wrapper}>
+        <div className={styles.scrollArea}>
         <p className={styles.intro}>
           Drag and drop pieces to assemble the puzzle. Match all pieces to complete the
           image!
@@ -88,7 +89,7 @@ export function TutorialOverlay({
             Drag pieces to the drawer to store them for later. Tap pieces in the drawer to
             bring them back to the board.
           </p>
-          <p>
+          <p className={styles.mobileCollapse}>
             Filter by <strong>All</strong>, <strong>Edges</strong>,{" "}
             <strong>Center</strong>, or <strong>Corners</strong> to find pieces quickly.
             For puzzles with 25+ pieces, use compact mode to fit more thumbnails. Sort by
@@ -97,7 +98,7 @@ export function TutorialOverlay({
         </div>
 
         {isTouch && (
-          <div className={styles.section}>
+          <div className={`${styles.section} ${styles.sectionZoom}`}>
             <h3 className={styles.sectionTitle}>📱 Zoom & Pan</h3>
             <p>
               Pinch with two fingers to zoom in or out on the board. Drag with two fingers
@@ -107,7 +108,7 @@ export function TutorialOverlay({
           </div>
         )}
 
-        <div className={styles.section}>
+        <div className={`${styles.section} ${styles.mobileCollapse}`}>
           <h3 className={styles.sectionTitle}>⏱ Time Modes</h3>
           <p>
             Choose how time is tracked from the <strong>Menu</strong> (☰) → Settings:
@@ -133,7 +134,7 @@ export function TutorialOverlay({
           </ul>
         </div>
 
-        <div className={styles.section}>
+        <div className={`${styles.section} ${styles.mobileCollapse}`}>
           <h3 className={styles.sectionTitle}>📋 Menu Options</h3>
           <p>
             Open the <strong>Menu</strong> (☰) for helpful options:
@@ -154,7 +155,7 @@ export function TutorialOverlay({
           </ul>
         </div>
 
-        <div className={styles.section}>
+        <div className={`${styles.section} ${styles.mobileCollapse}`}>
           <h3 className={styles.sectionTitle}>✨ Tips</h3>
           <ul className={styles.tips}>
             <li>Start with edge and corner pieces</li>
@@ -169,7 +170,8 @@ export function TutorialOverlay({
           </ul>
         </div>
 
-        <div className={styles.actions}>
+        </div>
+        <div className={styles.actionsSticky}>
           <Button variant="primary" onClick={handleDismiss} fullWidth>
             {showSkipLink ? "Start Puzzling!" : "Got it!"}
           </Button>
