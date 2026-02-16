@@ -203,6 +203,7 @@ PostHog UI: https://app.posthog.com/
 - E2E tests (Playwright)
   - `npm run test:e2e`
   - first run: `npx playwright install`
+  - ensure port 5173 is free (or stop `npm run dev`), or Playwright will start the app in CI
 
 ---
 

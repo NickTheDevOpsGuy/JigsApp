@@ -36,6 +36,9 @@
     "react-router-dom": "^7.12.0",
     "typescript-eslint": "^8.53.0"
   },
+  "overrides": {
+    "tmp": ">=0.2.4"
+  },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.49.0",
