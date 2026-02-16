@@ -7,6 +7,13 @@ Setup and reference guides for developers.
 | Document                                 | Description                                                                                                                                             |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) | Leaderboards, stats, achievements, co-op sharing – full Supabase setup. Includes [Verifying Share / Co-op](./SUPABASE_SETUP.md#verifying-share--co-op). |
+| [LIGHTHOUSE.md](./LIGHTHOUSE.md)         | Lighthouse CI setup and fixing "GitHub token not set" warning.                                                                                          |
+
+## Future Ideas
+
+| Document                 | Description                                    |
+| ------------------------ | ---------------------------------------------- |
+| [FUTURE.md](./FUTURE.md) | Planned features (piece heatmap overlay, etc.) |
 
 ## Session Notes
 

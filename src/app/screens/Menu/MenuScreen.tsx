@@ -5,8 +5,12 @@ import styles from "./MenuScreen.module.css";
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
+import { HelpChoiceModal } from "@/components/HelpChoiceModal";
+import { TutorialOverlay } from "@/components/HowToPlay";
+import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
+import { AboutModal } from "@/components/AboutModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
-import { Image, Camera, Package } from "lucide-react";
+import { Image, Camera, Package, HelpCircle } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzle";
 import { shouldShowChangelog } from "@/data/changelog";
@@ -17,6 +21,10 @@ export function MenuScreen() {
   const [tagline] = useState(() => getMenuTagline());
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
+  const [showHelpChoice, setShowHelpChoice] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   const todayCompleted = isTodayDailyCompleted();
   const hasDaily = SAMPLE_PUZZLES.length > 0;
@@ -70,9 +78,46 @@ export function MenuScreen() {
             <Camera size={22} />
             <span className={styles.actionLabel}>Snap a Picture</span>
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => setShowHelpChoice(true)}
+            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
+          >
+            <HelpCircle size={22} />
+            <span className={styles.actionLabel}>Help</span>
+          </Button>
         </div>
       </div>
 
+      <HelpChoiceModal
+        isOpen={showHelpChoice}
+        onClose={() => setShowHelpChoice(false)}
+        onHowToPlay={() => {
+          setShowHelpChoice(false);
+          setShowHowToPlay(true);
+        }}
+        onKeyboardShortcuts={() => {
+          setShowHelpChoice(false);
+          setShowShortcuts(true);
+        }}
+        onShowAbout={() => {
+          setShowHelpChoice(false);
+          setShowAbout(true);
+        }}
+      />
+      <TutorialOverlay
+        isOpen={showHowToPlay}
+        onComplete={() => setShowHowToPlay(false)}
+      />
+      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
+      <AboutModal
+        isOpen={showAbout}
+        onClose={() => setShowAbout(false)}
+        onShowWhatsNew={() => {
+          setShowAbout(false);
+          setShowWhatsNew(true);
+        }}
+      />
       <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <DailyDifficultyModal
         isOpen={showDailyModal}

@@ -790,6 +790,10 @@
   position: relative;
 }
 
+.headerMenuWrap .headerMenuTrigger:hover:not(:disabled) {
+  background: var(--color-action-hover);
+}
+
 .headerMenuPanel {
   position: absolute;
   top: 100%;
