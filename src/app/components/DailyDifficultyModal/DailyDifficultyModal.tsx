@@ -6,9 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { Modal } from "@/components/Modal/Modal";
 import {
   GRID_OPTIONS,
+  dismissFreezeOfferToday,
   getStreakFreezeCount,
   getYesterdayDateString,
   useStreakFreeze,
+  wasFreezeOfferDismissedToday,
   wasYesterdayMissed,
 } from "@/daily/dailyPuzzleCore";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
@@ -26,7 +28,10 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   >(null);
   const [freezeUsed, setFreezeUsed] = useState(false);
   const showFreezeOffer =
-    wasYesterdayMissed() && getStreakFreezeCount() > 0 && !freezeUsed;
+    wasYesterdayMissed() &&
+    getStreakFreezeCount() > 0 &&
+    !freezeUsed &&
+    !wasFreezeOfferDismissedToday();
 
   useEffect(() => {
     if (isOpen) {
@@ -73,9 +78,17 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       showCloseButton={true}
     >
       {showFreezeOffer && (
-        <div className={styles.freezeOffer} role="alert">
-          <span>
+        <div
+          className={styles.freezeOffer}
+          role="alert"
+          aria-labelledby="streak-freeze-label"
+          aria-describedby="streak-freeze-hint"
+        >
+          <span id="streak-freeze-label">
             You missed yesterday. Use your streak freeze to protect your streak?
+          </span>
+          <span id="streak-freeze-hint" className={styles.freezeHint}>
+            One per week — your streak won&apos;t break.
           </span>
           <div className={styles.freezeActions}>
             <button type="button" className={styles.freezeBtn} onClick={handleUseFreeze}>
@@ -84,7 +97,10 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
             <button
               type="button"
               className={styles.freezeSkip}
-              onClick={() => setFreezeUsed(true)}
+              onClick={() => {
+                setFreezeUsed(true);
+                dismissFreezeOfferToday();
+              }}
             >
               No thanks
             </button>

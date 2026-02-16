@@ -16,6 +16,7 @@ export const DAILY_DATE_KEY = "phuzzle:dailyDate";
 const DAILY_PREFIX = "phuzzle:daily:";
 const STREAK_FREEZE_KEY = "phuzzle:streakFreeze";
 const STREAK_FREEZE_WEEK_KEY = "phuzzle:streakFreezeWeek";
+const STREAK_FREEZE_DISMISSED_KEY = "phuzzle:streakFreezeDismissed";
 
 /** Get today's date string in user's local timezone (YYYY-MM-DD) */
 export function getTodayDateString(): string {
@@ -28,6 +29,27 @@ export function getYesterdayDateString(): string {
   const d = new Date();
   d.setDate(d.getDate() - 1);
   return d.toISOString().slice(0, 10);
+}
+
+/** True if user dismissed the streak freeze offer today (don't show again this session) */
+export function wasFreezeOfferDismissedToday(): boolean {
+  try {
+    return (
+      localStorage.getItem(`${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`) ===
+      "true"
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** Mark the streak freeze offer as dismissed for today */
+export function dismissFreezeOfferToday(): void {
+  try {
+    localStorage.setItem(`${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`, "true");
+  } catch {
+    /* ignore */
+  }
 }
 
 /** True if yesterday was not completed and no freeze was used for it */

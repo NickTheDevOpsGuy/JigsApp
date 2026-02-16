@@ -6,6 +6,14 @@
   border-radius: 10px;
   font-size: 14px;
   color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.freezeHint {
+  font-size: 12px;
+  color: var(--color-text-muted);
 }
 
 .freezeActions {
