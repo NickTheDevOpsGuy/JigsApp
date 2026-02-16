@@ -176,7 +176,7 @@ Useful scripts:
 | Doc                                            | Description                                                                                        |
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase setup: leaderboards, stats, achievements, co-op share; env vars, migrations, verification |
-| [doc/streak-freeze.md](doc/streak-freeze.md)   | Streak freeze: one per week, offered when yesterday wasn't completed                              |
+| [doc/streak-freeze.md](doc/streak-freeze.md)   | Streak freeze: one per week, offered when yesterday wasn't completed                               |
 | [doc/README.md](doc/README.md)                 | Index of docs                                                                                      |
 
 ---

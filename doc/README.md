@@ -11,8 +11,8 @@ Setup and reference guides for developers.
 
 ## Reference
 
-| Document                     | Description                                                                                      |
-| ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| Document                               | Description                                                                              |
+| -------------------------------------- | ---------------------------------------------------------------------------------------- |
 | [streak-freeze.md](./streak-freeze.md) | Streak freeze: one per week; offered when yesterday wasn't completed; keeps streak alive |
 
 ## Future Ideas
