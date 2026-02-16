@@ -460,12 +460,27 @@ export class PuzzleManager {
     const yMin = pad;
     const yMax = Math.max(pad, this.boardHeight - effH - pad);
 
+    const boardPieces = this.state.pieces.filter((p) => !p.inTray);
+    const MOVE_FROM_TRAY_RETRY_MAX = 24;
+
     let x = this.rand(xMin, xMax);
     let y = this.rand(yMin, yMax);
+    for (let retry = 0; retry < MOVE_FROM_TRAY_RETRY_MAX; retry++) {
+      x = _clamp(this.rand(xMin, xMax), 0, Math.max(0, this.boardWidth - effW));
+      y = _clamp(this.rand(yMin, yMax), 0, Math.max(0, this.boardHeight - effH));
 
-    // Clamp to ensure piece stays fully on canvas (handles edge cases)
-    x = _clamp(x, 0, Math.max(0, this.boardWidth - effW));
-    y = _clamp(y, 0, Math.max(0, this.boardHeight - effH));
+      let overlaps = false;
+      for (const p of boardPieces) {
+        const pr = p.rotation % 360;
+        const pw = pr === 90 || pr === 270 ? p.h : p.w;
+        const ph = pr === 90 || pr === 270 ? p.w : p.h;
+        if (!(x + effW <= p.x || p.x + pw <= x || y + effH <= p.y || p.y + ph <= y)) {
+          overlaps = true;
+          break;
+        }
+      }
+      if (!overlaps) break;
+    }
 
     this.zCounter += 1;
     this.updatePieces(
