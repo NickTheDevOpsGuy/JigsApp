@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import posthog from "posthog-js";
 import styles from "./PlayScreen.module.css";
@@ -559,9 +553,7 @@ export function PlayScreen() {
   const handleSharePuzzle = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
     if (sessionId) {
-      await (typeof navigator.share === "function"
-        ? nativeShare()
-        : copyShareLink());
+      await (typeof navigator.share === "function" ? nativeShare() : copyShareLink());
       return;
     }
     const s = stateRef.current;
