@@ -69,6 +69,7 @@ export function PlayScreen() {
     sessionId,
     session,
     sessionLoading,
+    isHost,
     createSession,
     copyShareLink,
     nativeShare,
@@ -753,7 +754,8 @@ export function PlayScreen() {
       : null;
 
   // Early-exit UI for co-op join flow (must be after all hooks to avoid React #300)
-  if (sessionIdFromUrl && sessionLoading) {
+  // Skip for host: they created the session, no need to show loading/error
+  if (!isHost && sessionIdFromUrl && sessionLoading) {
     return (
       <div className={styles.page}>
         <div className={styles.loadingOverlay} aria-label="Loading session">
@@ -763,7 +765,7 @@ export function PlayScreen() {
       </div>
     );
   }
-  if (sessionIdFromUrl && !session && !sessionLoading) {
+  if (!isHost && sessionIdFromUrl && !session && !sessionLoading) {
     return (
       <div className={styles.page}>
         <div className={styles.card} style={{ padding: 24 }}>
