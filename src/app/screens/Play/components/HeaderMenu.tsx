@@ -34,6 +34,10 @@ const ABOUT_PARENT = null as SubMenuId | null;
 const VIEW_CHILDREN: SubMenuId[] = ["display", "board"];
 const VIEW_PARENT: SubMenuId = "view";
 
+/** When in Display or Board, Back goes to View */
+const VIEW_CHILDREN: SubMenuId[] = ["display", "board"];
+const VIEW_PARENT: SubMenuId = "view";
+
 /** Settings submenus in alphabetical order */
 const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
   "audio",
@@ -219,6 +223,28 @@ export function HeaderMenu(props: HeaderMenuProps) {
       </button>
       <div className={styles.headerMenuDivider} />
       <div className={styles.headerMenuSection}>{SUB_MENU_LABELS[activeSubMenu!]}</div>
+      {activeSubMenu === "view" && (
+        <>
+          <button
+            type="button"
+            className={styles.headerMenuSubmenuTrigger}
+            role="menuitem"
+            onClick={() => setActiveSubMenu("display")}
+          >
+            {SUB_MENU_LABELS.display}
+            <ChevronRight size={16} className={styles.headerMenuChevron} />
+          </button>
+          <button
+            type="button"
+            className={styles.headerMenuSubmenuTrigger}
+            role="menuitem"
+            onClick={() => setActiveSubMenu("board")}
+          >
+            {SUB_MENU_LABELS.board}
+            <ChevronRight size={16} className={styles.headerMenuChevron} />
+          </button>
+        </>
+      )}
       {activeSubMenu === "view" && (
         <>
           <button
