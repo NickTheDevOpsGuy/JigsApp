@@ -34,10 +34,6 @@ const ABOUT_PARENT = null as SubMenuId | null;
 const VIEW_SUBMENU_IDS: SubMenuId[] = ["display", "board"];
 const VIEW_PARENT_ID: SubMenuId = "view";
 
-/** When in Display or Board, Back goes to View */
-const VIEW_CHILDREN: SubMenuId[] = ["display", "board"];
-const VIEW_PARENT: SubMenuId = "view";
-
 /** Settings submenus in alphabetical order */
 const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
   "audio",
