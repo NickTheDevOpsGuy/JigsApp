@@ -87,31 +87,6 @@ export function PlayScreen() {
     }
   }, [session]);
 
-  if (sessionIdFromUrl && sessionLoading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.loadingOverlay} aria-label="Loading session">
-          <div className={styles.spinner} />
-          <span>Joining puzzle session…</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (sessionIdFromUrl && !session && !sessionLoading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.card} style={{ padding: 24 }}>
-          <h2>Session not found</h2>
-          <p>The puzzle session may have expired or the link is invalid.</p>
-          <button type="button" onClick={() => navigate("/")}>
-            Back to menu
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   // ─── UI state (persisted in localStorage where applicable) ───
   const ui = usePlayScreenUI();
   const {
@@ -776,6 +751,31 @@ export function PlayScreen() {
     timeMode === "best" && state?.grid
       ? getBestTime(state.grid.rows, state.grid.cols)
       : null;
+
+  // Early-exit UI for co-op join flow (must be after all hooks to avoid React #300)
+  if (sessionIdFromUrl && sessionLoading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.loadingOverlay} aria-label="Loading session">
+          <div className={styles.spinner} />
+          <span>Joining puzzle session…</span>
+        </div>
+      </div>
+    );
+  }
+  if (sessionIdFromUrl && !session && !sessionLoading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.card} style={{ padding: 24 }}>
+          <h2>Session not found</h2>
+          <p>The puzzle session may have expired or the link is invalid.</p>
+          <button type="button" onClick={() => navigate("/")}>
+            Back to menu
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page} ref={pageRef}>

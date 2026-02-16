@@ -2,11 +2,18 @@
 
 Lighthouse runs in CI on every PR (perf, a11y, best-practices). Results save to `lhci-reports/`.
 
+## Token naming (what goes where)
+
+- **`github.token`** – This is a **GitHub Actions expression** (built-in context), not an env var name. Use `${{ github.token }}` in your workflow to get the token value. You don’t create a secret or env var named `github.token`.
+- **`GITHUB_TOKEN`** – GitHub Actions sets this env var automatically in every job. You usually don’t need to pass it yourself.
+- **`LHCI_UPLOAD__GITHUB_TOKEN`** – LHCI’s env var for `upload.githubToken`. The workflow passes `${{ github.token }}` into it so LHCI can post status checks if you switch to `temporary-public-storage`.
+- **`lighthouserc.cjs`** – Reads `process.env.GITHUB_TOKEN || process.env.LHCI_GITHUB_APP_TOKEN`. In GitHub Actions, `GITHUB_TOKEN` is already set, so the token is available without extra config.
+
 ## Fixing "GitHub token not set" Warning
 
 ### In CI (GitHub Actions)
 
-Already wired: the workflow passes `LHCI_UPLOAD__GITHUB_TOKEN: ${{ github.token }}` to the Lighthouse step, and `lighthouserc.cjs` reads `process.env.GITHUB_TOKEN`. No extra setup needed.
+No extra setup needed. `GITHUB_TOKEN` is set automatically by GitHub Actions. The workflow also passes `LHCI_UPLOAD__GITHUB_TOKEN: ${{ github.token }}` for LHCI’s upload config (redundant but explicit).
 
 ### Local Runs
 

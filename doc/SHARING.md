@@ -91,3 +91,21 @@ For **co-op**:
    - **SQL:** Run `alter publication supabase_realtime add table public.puzzle_sessions;` in the SQL Editor
 
 See [Verifying Share / Co-op](./SUPABASE_SETUP.md#verifying-share--co-op) in the Supabase doc for a step-by-step check.
+
+---
+
+## Troubleshooting
+
+### Co-op: WebSocket "closed before connection established"
+
+1. Add `puzzle_sessions` to the `supabase_realtime` publication (see [SUPABASE_SETUP.md § Enable Realtime](./SUPABASE_SETUP.md#5-enable-realtime-co-op-puzzles))
+2. Confirm `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set in Vercel (or your host) and **redeploy** after adding them
+3. Try incognito or disable ad blockers – some extensions block WebSocket connections
+
+### Vercel: "Failed to fetch" or blank screen after deploy
+
+This happens when cached HTML references old chunk files that no longer exist. The app now auto-reloads on chunk load failures. If it persists:
+
+1. **Hard refresh:** Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
+2. **Clear site data:** DevTools → Application → Storage → Clear site data
+3. Ensure the latest `vercel.json` (Cache-Control headers) and `index.html` (error handler) are deployed

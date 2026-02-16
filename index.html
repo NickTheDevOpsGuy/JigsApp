@@ -33,18 +33,30 @@
     <div id="root"></div>
     <script>
       // Reload when a lazy-loaded chunk fails (stale cache after deploy)
-      if (typeof window !== "undefined") {
+      (function () {
+        function isChunkLoadError(msg) {
+          return (
+            msg &&
+            (msg.includes("Failed to fetch dynamically imported module") ||
+              msg.includes("Importing a module script failed") ||
+              msg.includes("Loading chunk") ||
+              msg.includes("ChunkLoadError"))
+          );
+        }
         window.addEventListener("error", function (e) {
-          if (
-            e.message &&
-            (e.message.includes("Failed to fetch dynamically imported module") ||
-              e.message.includes("Importing a module script failed"))
-          ) {
+          if (isChunkLoadError(e.message)) {
             e.preventDefault();
             window.location.reload();
           }
         });
-      }
+        window.addEventListener("unhandledrejection", function (e) {
+          var msg = (e.reason && e.reason.message) || String(e.reason || "");
+          if (isChunkLoadError(msg)) {
+            e.preventDefault();
+            window.location.reload();
+          }
+        });
+      })();
     </script>
     <script type="module" src="/src/app/main.tsx"></script>
   </body>
