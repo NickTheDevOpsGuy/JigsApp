@@ -151,6 +151,21 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     gridRows = Math.min(maxRows, Math.ceil(total / gridCols));
   }
 
+  const SPAWN_RETRY_MAX = 12;
+
+  function wouldOverlap(
+    placed: Array<{ x: number; y: number }>,
+    nx: number,
+    ny: number,
+  ): boolean {
+    for (const p of placed) {
+      if (!(nx + w <= p.x || p.x + w <= nx || ny + h <= p.y || p.y + h <= ny)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   const positions: Array<{ x: number; y: number }> = [];
   const jitterSpace = Math.max(
     0,
@@ -175,12 +190,26 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     }
     const baseX = scatterZone.minX + col * effectiveCellW;
     const baseY = scatterZone.minY + row * effectiveCellH;
-    const jitterX = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
-    const jitterY = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
-    positions.push({
-      x: Math.max(scatterZone.minX, Math.min(scatterZone.maxX - w, baseX + jitterX)),
-      y: Math.max(scatterZone.minY, Math.min(scatterZone.maxY - h, baseY + jitterY)),
-    });
+
+    let x: number;
+    let y: number;
+    let retries = 0;
+    do {
+      const jitterX = jitterSpace > 0 ? randInt(-jitterSpace, jitterSpace) : 0;
+      const jitterY = jitterSpace > 0 ? randInt(-jitterSpace, jitterSpace) : 0;
+      x = Math.max(
+        scatterZone.minX,
+        Math.min(scatterZone.maxX - w, baseX + jitterX),
+      );
+      y = Math.max(
+        scatterZone.minY,
+        Math.min(scatterZone.maxY - h, baseY + jitterY),
+      );
+      retries++;
+      if (retries > SPAWN_RETRY_MAX) break;
+    } while (wouldOverlap(positions, x, y));
+
+    positions.push({ x, y });
   }
 
   // Shuffle so piece assignment is random

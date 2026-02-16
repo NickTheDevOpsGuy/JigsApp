@@ -151,9 +151,16 @@ export function usePointerHandlers(args: {
       const touchPointers = [...activePointersRef.current.entries()]
         .filter(([, p]) => p.pointerType === "touch")
         .map(([id, p]) => ({ id, ...p }));
+      const canvas = canvasRef.current as CanvasWithTouch;
+      const hasActivePieceDrag =
+        activePointerIdRef.current != null &&
+        (canvas?.pendingPieceId != null || manager.getDragState().activeId != null);
       if (viewport && touchPointers.length >= 2 && e.pointerType === "touch") {
+        if (hasActivePieceDrag) {
+          e.preventDefault();
+          return;
+        }
         const [p1, p2] = touchPointers;
-        const canvas = canvasRef.current as CanvasWithTouch;
         activePointerIdRef.current = null;
         resetTouchState(canvas);
         onDragPreview?.(null);
@@ -187,7 +194,6 @@ export function usePointerHandlers(args: {
         return;
       }
 
-      const canvas = canvasRef.current as CanvasWithTouch;
       const boardRect = boardRef.current.getBoundingClientRect();
       const ctx2d = canvas.getContext("2d");
       if (!ctx2d) return;
@@ -427,9 +433,17 @@ export function usePointerHandlers(args: {
 
     const onTouchStart = (e: TouchEvent) => {
       if (e.touches.length >= 2) {
+        const canvasWithTouch = canvas as CanvasWithTouch;
+        const hasActivePieceDrag =
+          activePointerIdRef.current != null &&
+          (canvasWithTouch.pendingPieceId != null ||
+            (manager?.getDragState?.().activeId ?? null) != null);
+        if (hasActivePieceDrag) {
+          e.preventDefault();
+          return;
+        }
         const p1 = e.touches[0];
         const p2 = e.touches[1];
-        const canvasWithTouch = canvas as CanvasWithTouch;
         activePointerIdRef.current = null;
         resetTouchState(canvasWithTouch);
         onDragPreview?.(null);
