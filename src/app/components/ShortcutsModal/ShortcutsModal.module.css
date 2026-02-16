@@ -124,11 +124,14 @@
 .keys {
   white-space: nowrap;
   width: 45%;
+  vertical-align: top;
 }
 
 .action {
   color: var(--color-text-secondary);
   font-size: 0.95rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .key {
@@ -181,7 +184,7 @@
   padding: 2px 8px;
 }
 
-/* Mobile adjustments: smaller text for easier reading */
+/* Mobile: stacked layout to prevent action text truncation */
 @media (max-width: 500px) {
   .modal {
     max-height: 90vh;
@@ -201,21 +204,42 @@
     font-size: 1rem;
   }
 
+  /* Stack key + action vertically so nothing gets cut off */
+  .table,
+  .table tbody,
+  .table tr {
+    display: block;
+  }
+
   .table td {
+    display: block;
+    padding: 6px 0;
+    width: 100% !important;
+    border: none;
+  }
+
+  .table tr {
+    border-bottom: 1px solid var(--color-border);
     padding: 8px 0;
   }
 
+  .table tr:last-child {
+    border-bottom: none;
+  }
+
   .keys {
-    width: 48%;
+    white-space: normal;
+    margin-bottom: 2px;
   }
 
   .key {
     padding: 2px 6px;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
 
   .action {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 
   .mouseSection {

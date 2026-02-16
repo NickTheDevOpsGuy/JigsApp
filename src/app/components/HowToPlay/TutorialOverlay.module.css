@@ -73,51 +73,52 @@
   color: var(--color-text-secondary);
 }
 
-/* Mobile: smaller text for easier reading without excessive scrolling */
-@media (max-width: 500px) {
+/* Mobile: readable layout, no cramped text */
+@media (max-width: 600px) {
   .content {
-    gap: 12px;
+    gap: 14px;
   }
 
   .intro {
-    font-size: 13px;
-  }
-
-  .section {
-    padding: 10px 12px;
-    border-radius: 8px;
-  }
-
-  .sectionTitle {
-    font-size: 13px;
-    margin-bottom: 4px;
-  }
-
-  .section p {
-    font-size: 12px;
-    line-height: 1.45;
-  }
-
-  .section p + p {
-    margin-top: 4px;
-  }
-
-  .tips {
-    font-size: 12px;
-    padding-left: 18px;
+    font-size: 14px;
     line-height: 1.5;
   }
 
+  .section {
+    padding: 14px 16px;
+    border-radius: 10px;
+  }
+
+  .sectionTitle {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .section p {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .section p + p {
+    margin-top: 6px;
+  }
+
+  .tips {
+    font-size: 13px;
+    padding-left: 20px;
+    line-height: 1.55;
+  }
+
   .tips li {
-    margin-bottom: 2px;
+    margin-bottom: 4px;
   }
 
   .actions {
-    margin-top: 6px;
-    gap: 8px;
+    margin-top: 8px;
+    gap: 10px;
   }
 
   .skipLink {
-    font-size: 12px;
+    font-size: 13px;
   }
 }
