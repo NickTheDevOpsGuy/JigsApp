@@ -14,7 +14,7 @@ Setup and reference guides for developers.
 | Document                               | Description                                                                              |
 | -------------------------------------- | ---------------------------------------------------------------------------------------- |
 | [streak-freeze.md](./streak-freeze.md) | Streak freeze: one per week; offered when yesterday wasn't completed; keeps streak alive |
-| [SHARING.md](./SHARING.md)             | Completion share (image, social) and co-op (Play with Friend); links to Supabase setup  |
+| [SHARING.md](./SHARING.md)             | Completion share (image, social) and co-op (Play with Friend); links to Supabase setup   |
 
 ## Future Ideas
 
