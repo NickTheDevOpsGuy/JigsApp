@@ -8,6 +8,7 @@ import {
   type SnapParticle,
   drawDebugBackdrop,
   drawGridOverlay,
+  drawAlignmentGrid,
   applyPieceShadow,
   clearPieceShadow,
   computeImageSourceRect,
@@ -22,6 +23,7 @@ export type DebugFlags = {
   showGrid: boolean;
   showBounds: boolean;
   showIds: boolean;
+  showPerfOverlay?: boolean;
 };
 
 export type AnimationState = {
@@ -36,6 +38,12 @@ export type AnimationState = {
   dragPreviewPieceId?: string | null;
   /** Interpolated display positions for dragged group (smoother drag, no touch/pointer changes) */
   dragDisplayOverrides?: Map<string, { x: number; y: number }>;
+  /** Piece IDs to show wrong-rotation hint (position correct, rotation blocks snap) */
+  wrongRotationHint?: { groupId: string; pieceIds: string[]; triggeredAt: number };
+  /** Snap preview during drag: soft glow when near, stronger when in range (rotation correct only) */
+  snapPreview?: { nearSnap: boolean; inSnapRange: boolean } | null;
+  /** Show very subtle alignment grid matching piece boundaries */
+  showAlignmentGrid?: boolean;
 };
 
 /** Cache for pre-rendered pieces - clip at (0,0) gives crisp edges, avoids blocky look when moving */
@@ -95,7 +103,7 @@ export function renderBoard(
 
   if (debug.showGrid) drawGridOverlay(ctx, cssW, cssH);
 
-  // Apply viewport transform for zoom/pan (pieces, ghosts, completion glow only)
+  // Apply viewport transform for zoom/pan (pieces, ghosts, alignment grid, completion glow)
   if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
     ctx.save();
     ctx.translate(viewport.panX, viewport.panY);
@@ -104,6 +112,13 @@ export function renderBoard(
 
   // Get grid from state
   const { cols, rows } = state.grid;
+
+  // Optional subtle alignment grid (Settings → View)
+  if (animState?.showAlignmentGrid) {
+    const tileW = assembledW / cols;
+    const tileH = assembledH / rows;
+    drawAlignmentGrid(ctx, cols, rows, tileW, tileH);
+  }
 
   // Ghost hint: draw misplaced pieces at their target positions (before real pieces)
   if (animState?.showGhostHint && !state.isComplete) {
@@ -226,6 +241,46 @@ function drawGhostHints(
   }
 }
 
+const WRONG_ROTATION_SHAKE_MS = 700;
+const WRONG_ROTATION_SHAKE_AMPLITUDE = 2.5;
+const WRONG_ROTATION_SHAKE_FREQ = 18;
+
+function wrongRotationShakeOffset(elapsedMs: number): { x: number; y: number } {
+  if (elapsedMs >= WRONG_ROTATION_SHAKE_MS) return { x: 0, y: 0 };
+  const decay = 1 - elapsedMs / WRONG_ROTATION_SHAKE_MS;
+  const t = elapsedMs * 0.001;
+  const x =
+    WRONG_ROTATION_SHAKE_AMPLITUDE * Math.sin(t * WRONG_ROTATION_SHAKE_FREQ) * decay;
+  const y =
+    WRONG_ROTATION_SHAKE_AMPLITUDE *
+    Math.cos(t * WRONG_ROTATION_SHAKE_FREQ * 0.7) *
+    decay;
+  return { x, y };
+}
+
+function drawWrongRotationIcon(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  pieceSize: number,
+  elapsedMs: number,
+) {
+  if (elapsedMs >= WRONG_ROTATION_SHAKE_MS) return;
+  const decay = 1 - elapsedMs / WRONG_ROTATION_SHAKE_MS;
+  const pulse = 0.6 + 0.4 * Math.sin(elapsedMs * 0.02);
+  const alpha = 0.85 * decay * pulse;
+  const size = Math.min(14, pieceSize * 0.35);
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = `${size}px sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "rgba(100, 100, 120, 0.9)";
+  ctx.fillText("↻", cx, cy);
+  ctx.restore();
+}
+
 function drawPiece(
   ctx: CanvasRenderingContext2D,
   p: Piece,
@@ -245,6 +300,16 @@ function drawPiece(
 ) {
   const isSelected = animState?.selectedPieceId === p.id && !p.isPlaced;
 
+  const hint = animState?.wrongRotationHint;
+  const showWrongRotationHint =
+    hint &&
+    hint.pieceIds.includes(p.id) &&
+    nowMs - hint.triggeredAt < WRONG_ROTATION_SHAKE_MS;
+  const shakeElapsedMs = hint ? nowMs - hint.triggeredAt : 0;
+  const shake = showWrongRotationHint
+    ? wrongRotationShakeOffset(shakeElapsedMs)
+    : { x: 0, y: 0 };
+
   const start = popMap.get(p.id);
   const popElapsedMs = start != null ? nowMs - start : 0;
   const popScale = start != null ? snapPopScale(popElapsedMs) : 1;
@@ -256,6 +321,16 @@ function drawPiece(
     const cy = p.y + p.h / 2;
     const radius = Math.max(p.w, p.h) * 0.55;
     drawSnapGlow(ctx, cx, cy, radius, snapGlowAlpha(popElapsedMs));
+  }
+
+  // Preview glow when piece is within snap tolerance during drag (rotation correct only)
+  const preview = animState?.snapPreview;
+  if (isDragging && preview && (preview.nearSnap || preview.inSnapRange)) {
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const radius = Math.max(p.w, p.h) * 0.58;
+    const alpha = preview.inSnapRange ? 0.11 : 0.05;
+    drawSnapGlow(ctx, cx, cy, radius, alpha);
   }
 
   let path: Path2D | null = null;
@@ -302,6 +377,10 @@ function drawPiece(
       lockElapsedMs,
       path,
       dpr,
+      shake.x,
+      shake.y,
+      showWrongRotationHint,
+      shakeElapsedMs,
     );
     return;
   }
@@ -356,6 +435,10 @@ function drawPiece(
       lockElapsedMs,
       path,
       dpr,
+      shake.x,
+      shake.y,
+      showWrongRotationHint,
+      shakeElapsedMs,
     );
     return;
   }
@@ -364,7 +447,7 @@ function drawPiece(
   const rect = computeImageSourceRect(p, img, cols, rows);
   ctx.save();
   applyPieceShadow(ctx, isDragging, p.isPlaced);
-  ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
+  ctx.translate(p.x + p.w / 2 + shake.x, p.y + p.h / 2 + shake.y);
   ctx.rotate((p.rotation * Math.PI) / 180);
   ctx.scale(scale, scale);
   ctx.translate(-p.w / 2, -p.h / 2);
@@ -398,6 +481,15 @@ function drawPiece(
     ctx.fillStyle = "rgba(0,0,0,0.7)";
     ctx.font = "12px system-ui";
     ctx.fillText(p.id, 8, 16);
+  }
+  if (showWrongRotationHint) {
+    drawWrongRotationIcon(
+      ctx,
+      p.w / 2 - 14,
+      -p.h / 2 + 14,
+      Math.min(p.w, p.h),
+      shakeElapsedMs,
+    );
   }
   if (isSelected) {
     ctx.strokeStyle = "#667eea";
@@ -436,11 +528,15 @@ function drawCachedPiece(
   lockElapsedMs: number,
   path: Path2D,
   dpr: number,
+  shakeX: number = 0,
+  shakeY: number = 0,
+  showWrongRotationHint: boolean = false,
+  wrongRotationElapsedMs: number = 0,
 ) {
   ctx.save();
   applyPieceShadow(ctx, isDragging, p.isPlaced);
-  let cx = p.x + p.w / 2;
-  let cy = p.y + p.h / 2;
+  let cx = p.x + p.w / 2 + shakeX;
+  let cy = p.y + p.h / 2 + shakeY;
   if (isDragging) {
     cx = Math.round(cx * dpr) / dpr;
     cy = Math.round(cy * dpr) / dpr;
@@ -463,6 +559,11 @@ function drawCachedPiece(
     ctx.rotate((p.rotation * Math.PI) / 180);
     ctx.translate(-p.w / 2, -p.h / 2);
     drawLockGlow(ctx, path, lockElapsedMs);
+  }
+  if (showWrongRotationHint) {
+    const iconX = cacheW / 2 - 14;
+    const iconY = -cacheH / 2 + 14;
+    drawWrongRotationIcon(ctx, iconX, iconY, Math.min(p.w, p.h), wrongRotationElapsedMs);
   }
   ctx.restore();
 }

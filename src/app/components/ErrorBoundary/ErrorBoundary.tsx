@@ -1,3 +1,6 @@
+/**
+ * ErrorBoundary – catches React errors, shows fallback + reload. Non-blocking for events.
+ */
 import React from "react";
 
 type ErrorBoundaryProps = {

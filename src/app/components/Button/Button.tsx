@@ -1,5 +1,6 @@
-//
-// src/app/components/Button/Button.tsx
+/**
+ * Button – primary, secondary, ghost, outline; sizes sm/md/lg.
+ */
 import React from "react";
 import styles from "./Button.module.css";
 

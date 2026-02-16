@@ -16,6 +16,10 @@ const PLACEMENT_STREAK_MS = 3000;
 const STREAK_COOLDOWN_MS = 5000;
 const SNAP_PARTICLE_COUNT = 8;
 
+/**
+ * usePlayScreenManager – creates PuzzleManager, wires events, provides board/canvas refs.
+ * Handles undo, snap particles, wrong-rotation hints, placement streaks.
+ */
 export function usePlayScreenManager(
   grid: { rows: number; cols: number },
   pieceLockingEnabled: boolean,
@@ -30,6 +34,18 @@ export function usePlayScreenManager(
     onPlacementStreak?: () => void;
     /** Ref to viewport scale for zoom-adaptive snap tolerance. */
     snapScaleRef?: MutableRefObject<number>;
+    /** Called each time snap logic is evaluated (for perf overlay). */
+    onSnapCheck?: () => void;
+    /** Ref updated when piece would snap but wrong rotation blocks it (position correct, rotation wrong). */
+    wrongRotationHintRef?: MutableRefObject<{
+      groupId: string;
+      pieceIds: string[];
+      triggeredAt: number;
+    } | null>;
+    /** Ref set to performance.now() when drag starts; used for piece_snapped analytics. */
+    dragStartTimeRef?: MutableRefObject<number | null>;
+    /** Called when piece snaps (place or merge) with time_to_snap_ms for analytics. */
+    onPieceSnappedAnalytics?: (timeToSnapMs: number) => void;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -199,6 +215,13 @@ export function usePlayScreenManager(
             onPiecePlaced: (p) => {
               const now = performance.now();
               const opts = optionsRef.current;
+              const startTime = opts?.dragStartTimeRef?.current;
+              if (
+                startTime != null &&
+                typeof opts?.onPieceSnappedAnalytics === "function"
+              ) {
+                opts.onPieceSnappedAnalytics(Math.round(now - startTime));
+              }
               lastInteractionRef.current = now;
               popMapRef.current.set(p.id, now);
               soundManager.play("place");
@@ -221,6 +244,13 @@ export function usePlayScreenManager(
             onPieceSnapped: (pieceIds, center) => {
               const now = performance.now();
               const opts = optionsRef.current;
+              const startTime = opts?.dragStartTimeRef?.current;
+              if (
+                startTime != null &&
+                typeof opts?.onPieceSnappedAnalytics === "function"
+              ) {
+                opts.onPieceSnappedAnalytics(Math.round(now - startTime));
+              }
               lastInteractionRef.current = now;
               soundManager.play("snap");
               opts?.haptic?.("snap");
@@ -243,6 +273,15 @@ export function usePlayScreenManager(
             onPieceLocked: (ids) => {
               const now = performance.now();
               for (const id of ids) lockMapRef.current.set(id, now);
+            },
+            onSnapCheck: opts?.onSnapCheck,
+            onWrongRotationHint: (groupId, pieceIds) => {
+              const ref = opts?.wrongRotationHintRef;
+              if (!ref) return;
+              const now = performance.now();
+              const cur = ref.current;
+              if (cur && now - cur.triggeredAt < 5000) return;
+              ref.current = { groupId, pieceIds, triggeredAt: now };
             },
             onPuzzleComplete: () => {
               clearPuzzleState();

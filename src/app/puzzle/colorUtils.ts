@@ -1,4 +1,6 @@
-// src/app/puzzle/colorUtils.ts
+/**
+ * colorUtils – average color sampling from piece regions for tray sorting.
+ */
 import type { Piece, GridSize } from "./types";
 
 export type ColorInfo = {

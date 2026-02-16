@@ -1,5 +1,7 @@
-// src/app/screens/Setup/SetupScreen.tsx
-import { useEffect, useState } from "react";
+/**
+ * SetupScreen – image picker (gallery/upload/camera), grid config, time mode, launch to Play.
+ */
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/samplePuzzles";
@@ -10,7 +12,8 @@ import { ArrowLeft, Trash2, Play, Camera } from "lucide-react";
 import { useImagePicker, useGridConfig, GRID_OPTIONS } from "./hooks";
 import { CameraCapture } from "./components/CameraCapture";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
-import { COUNTDOWN_OPTIONS, type TimeMode } from "../Play/timeMode";
+import { COUNTDOWN_OPTIONS, getBestTime, type TimeMode } from "../Play/timeMode";
+import { getSuggestedGrid } from "../Play/playScreenUtils";
 
 const TIME_MODE_LABELS: Record<TimeMode, string> = {
   elapsed: "Elapsed",
@@ -99,6 +102,8 @@ export function SetupScreen() {
 
   const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
     useTimeModeConfig();
+
+  const suggestedGrid = useMemo(() => getSuggestedGrid(getBestTime), []);
 
   // Load existing image on mount
   useEffect(() => {
@@ -252,6 +257,15 @@ export function SetupScreen() {
           {effectiveRows * effectiveCols} pieces
           {isCustom ? " · Custom" : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
         </p>
+        {suggestedGrid && gridIndex !== suggestedGrid.gridIndex && (
+          <button
+            type="button"
+            className={styles.difficultySuggestion}
+            onClick={() => setGridIndex(suggestedGrid.gridIndex)}
+          >
+            Based on your progress, try {suggestedGrid.rows}×{suggestedGrid.cols} next →
+          </button>
+        )}
         <Dropdown
           label="Difficulty"
           value={gridIndex}

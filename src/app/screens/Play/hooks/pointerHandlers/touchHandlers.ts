@@ -1,3 +1,7 @@
+/**
+ * Touch handlers for piece drag, tap-to-rotate, pinch zoom.
+ * Uses tap-vs-drag threshold (TAP_DRAG_THRESHOLD_PX) to distinguish taps from drags.
+ */
 import type React from "react";
 import { soundManager } from "@/audio/sounds";
 import type { CanvasWithTouch, ScreenToBoard } from "./types";
@@ -80,6 +84,7 @@ export function handleTouchMove(
     canvas.touchDragStarted = true;
     didDragRef.current = true;
     ctx.onPieceInteraction?.();
+    ctx.onDragStarted?.();
     const boardRect = boardRef.current.getBoundingClientRect();
     if (screenToBoard) {
       const { x: boardX, y: boardY } = screenToBoard(sx, sy, boardRect);
@@ -186,6 +191,7 @@ export function handleTouchUp(
       selectCycle,
     );
     setState(manager.getState());
+    ctx.onDragEnded?.();
   }
 
   resetTouchState(canvas);

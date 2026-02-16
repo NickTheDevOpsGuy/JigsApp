@@ -1,3 +1,7 @@
+/**
+ * useViewport – zoom/pan state for the puzzle board.
+ * screenToBoard converts client coords to board space; handleWheel, zoomIn/Out, reset.
+ */
 import { useCallback, useRef, useState } from "react";
 
 const isPanningRef = { current: false };

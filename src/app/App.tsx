@@ -1,4 +1,6 @@
-// src/app/App.tsx
+/**
+ * App – router, lazy-loaded screens, auth gate for protected routes.
+ */
 import { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 

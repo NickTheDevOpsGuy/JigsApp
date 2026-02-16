@@ -1,4 +1,6 @@
-// src/app/components/ShortcutsModal/ShortcutsModal.tsx
+/**
+ * ShortcutsModal – keyboard shortcuts reference overlay.
+ */
 import React from "react";
 import { X, Keyboard } from "lucide-react";
 import { SHORTCUTS } from "@/hooks/useKeyboardShortcuts";

@@ -1,3 +1,6 @@
+/**
+ * createInitialPieces – builds scrambled pieces with jigsaw edges, scatter positions, targets.
+ */
 import type { GridSize, Piece, PieceEdges } from "../types";
 import { buildPiecePath } from "../shape";
 

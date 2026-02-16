@@ -28,6 +28,75 @@
   padding-top: env(safe-area-inset-top, 0);
   background: var(--color-bg-elevated);
   border-bottom: 1px solid var(--color-border);
+  transition:
+    transform 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.topBarWrap {
+  flex-shrink: 0;
+  overflow: hidden;
+  max-height: 56px;
+  transition: max-height 0.25s ease;
+}
+
+.topBarWrap.immersiveTopHidden {
+  max-height: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.immersivePeekTop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  z-index: 50;
+  cursor: pointer;
+  padding-top: env(safe-area-inset-top, 0);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08), transparent);
+}
+
+.immersivePeekBottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  z-index: 50;
+  cursor: pointer;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.08), transparent);
+}
+
+[data-theme="dark"] .immersivePeekTop,
+[data-theme="ocean"] .immersivePeekTop,
+[data-theme="forest"] .immersivePeekTop {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.06), transparent);
+}
+
+[data-theme="dark"] .immersivePeekBottom,
+[data-theme="ocean"] .immersivePeekBottom,
+[data-theme="forest"] .immersivePeekBottom {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.06), transparent);
+}
+
+.trayWrap {
+  flex-shrink: 0;
+  overflow: hidden;
+  max-height: 240px;
+  transition:
+    max-height 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.trayWrap.immersiveHidden {
+  max-height: 0;
+  min-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .topBarLeft {
@@ -246,29 +315,6 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-}
-
-.emptyBoardHint {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.emptyBoardEmoji {
-  font-size: 48px;
-  line-height: 1;
-}
-
-.emptyBoardText {
-  margin: 0;
-  font-size: 14px;
-  color: var(--color-text-secondary);
 }
 
 .canvas {
@@ -611,6 +657,9 @@
   bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px 20px;
   border-radius: 12px;
   background: var(--color-overlay-content);
@@ -620,6 +669,28 @@
   box-shadow: var(--shadow-lg);
   z-index: 90;
   animation: engagementToastIn 0.3s ease-out;
+}
+
+.toastDismiss {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.toastDismiss:hover {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-card);
 }
 
 @keyframes engagementToastIn {

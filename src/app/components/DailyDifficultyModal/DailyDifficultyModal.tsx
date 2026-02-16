@@ -1,6 +1,10 @@
+/**
+ * DailyDifficultyModal – shows today's daily puzzle, grid picker, and launch action.
+ */
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "@/components/Modal/Modal";
-import { GRID_OPTIONS, getTodayDailyPuzzle, startDailyPuzzle } from "@/daily/dailyPuzzle";
+import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 import styles from "./DailyDifficultyModal.module.css";
 
@@ -11,13 +15,37 @@ type Props = {
 
 export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
-  const puzzle = getTodayDailyPuzzle();
+  const [dailyModule, setDailyModule] = useState<
+    typeof import("@/daily/dailyPuzzle") | null
+  >(null);
 
-  if (!puzzle) return null;
+  useEffect(() => {
+    if (isOpen) {
+      import("@/daily/dailyPuzzle").then(setDailyModule);
+    } else {
+      setDailyModule(null);
+    }
+  }, [isOpen]);
+
+  const puzzle = dailyModule ? dailyModule.getTodayDailyPuzzle() : null;
+
+  if (!isOpen) return null;
+  if (!dailyModule)
+    return (
+      <Modal isOpen onClose={onClose} title="Today's Puzzle" showCloseButton>
+        <p className={styles.subtitle}>Loading…</p>
+      </Modal>
+    );
+  if (!puzzle)
+    return (
+      <Modal isOpen onClose={onClose} title="Today's Puzzle" showCloseButton>
+        <p className={styles.subtitle}>No puzzles available.</p>
+      </Modal>
+    );
 
   const handleStart = (grid: { rows: number; cols: number }) => {
     clearPuzzleState();
-    const result = startDailyPuzzle(grid);
+    const result = dailyModule.startDailyPuzzle(grid);
     if (result) {
       onClose();
       navigate("/play");

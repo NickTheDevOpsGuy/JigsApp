@@ -1,4 +1,6 @@
-// src/app/puzzle/canvas/renderTrayPiece.ts
+/**
+ * renderTrayPiece – render single piece to offscreen canvas for tray thumbnails.
+ */
 import type { Piece } from "@/puzzle/types";
 
 /**

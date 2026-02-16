@@ -1,4 +1,6 @@
-// src/app/components/PieceTray/PieceTray.tsx
+/**
+ * PieceTray – horizontal scrollable tray of unplaced pieces; filter by section, sort by grid/color.
+ */
 import React, {
   forwardRef,
   useCallback,

@@ -1,24 +1,17 @@
 /**
- * puzzlePacks – curated packs; filter SAMPLE_PUZZLES by category or explicit IDs.
+ * Lightweight pack metadata only. No puzzle data or image imports.
+ * Load this for pack list; use loadPacksData() for full pack + puzzle details.
  */
-import type { SamplePuzzle } from "./samplePuzzles";
-import { SAMPLE_PUZZLES } from "./samplePuzzles";
-
-export type PuzzlePack = {
+export type PackMetadata = {
   id: string;
   name: string;
   description: string;
   emoji: string;
-  /** Category used to filter SAMPLE_PUZZLES, or explicit puzzle IDs */
   category?: string;
   puzzleIds?: string[];
 };
 
-/**
- * Curated puzzle packs grouped by theme.
- * Packs filter SAMPLE_PUZZLES by category when category is set.
- */
-export const PUZZLE_PACKS: PuzzlePack[] = [
+export const PACK_METADATA: PackMetadata[] = [
   {
     id: "cozy-animals",
     name: "Cozy Animals",
@@ -55,16 +48,3 @@ export const PUZZLE_PACKS: PuzzlePack[] = [
     category: "flowers",
   },
 ];
-
-/** Get puzzles belonging to a pack */
-export function getPuzzlesForPack(pack: PuzzlePack): SamplePuzzle[] {
-  if (pack.puzzleIds?.length) {
-    return pack.puzzleIds
-      .map((id) => SAMPLE_PUZZLES.find((p) => p.id === id))
-      .filter((p): p is SamplePuzzle => p != null);
-  }
-  if (pack.category) {
-    return SAMPLE_PUZZLES.filter((p) => p.category === pack.category);
-  }
-  return [];
-}

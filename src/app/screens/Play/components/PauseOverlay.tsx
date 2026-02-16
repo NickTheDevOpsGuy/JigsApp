@@ -1,3 +1,6 @@
+/**
+ * PauseOverlay – pause screen; resume or new puzzle (when countdown expired).
+ */
 import React from "react";
 import { Pause, Timer } from "lucide-react";
 import { Button } from "@/components/Button/Button";

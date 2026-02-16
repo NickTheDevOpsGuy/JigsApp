@@ -1,4 +1,6 @@
-// src/app/puzzle/shape.ts
+/**
+ * shape – buildPiecePath for jigsaw pieces; knob/tab geometry.
+ */
 import type { EdgeType, PieceEdges } from "./types";
 
 type ShapeArgs = {

@@ -1,9 +1,57 @@
+/**
+ * playScreenUtils – storage keys, parseGrid, computeTileSize, difficulty tiers.
+ */
 export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
 export const GHOST_HINT_KEY = "phuzzle:ghostHint";
+export const IMMERSIVE_MODE_KEY = "phuzzle:immersiveMode";
+export const ALIGNMENT_GRID_KEY = "phuzzle:alignmentGrid";
 
 export const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
+
+const PRESET_SIZES = [
+  { rows: 3, cols: 3 },
+  { rows: 4, cols: 4 },
+  { rows: 5, cols: 5 },
+  { rows: 6, cols: 6 },
+  { rows: 7, cols: 7 },
+  { rows: 8, cols: 8 },
+];
+
+/** Suggest next grid size based on best times. Returns gridIndex (0–5) and label, or null. */
+export function getSuggestedGrid(
+  getBestTime: (rows: number, cols: number) => number | null,
+): { gridIndex: number; rows: number; cols: number; label: string } | null {
+  try {
+    let largestCompleted = -1;
+    for (let i = 0; i < PRESET_SIZES.length; i++) {
+      const { rows, cols } = PRESET_SIZES[i];
+      if (getBestTime(rows, cols) != null) {
+        largestCompleted = i;
+      }
+    }
+    const nextIndex = largestCompleted + 1;
+    if (nextIndex >= PRESET_SIZES.length) return null;
+    const next = PRESET_SIZES[nextIndex];
+    const labels = [
+      "Easy 🌱",
+      "Medium ⚡",
+      "Hard 🔥",
+      "Expert 👑",
+      "Master 🧠",
+      "Legend 🔮",
+    ];
+    return {
+      gridIndex: nextIndex,
+      rows: next.rows,
+      cols: next.cols,
+      label: `${labels[nextIndex]} (${next.rows}×${next.cols})`,
+    };
+  } catch {
+    return null;
+  }
+}
 
 export function parseGrid(stored: string | null): { rows: number; cols: number } {
   if (!stored) return { rows: 4, cols: 4 };
@@ -99,4 +147,5 @@ export type DebugFlags = {
   showGrid: boolean;
   showBounds: boolean;
   showIds: boolean;
+  showPerfOverlay: boolean;
 };

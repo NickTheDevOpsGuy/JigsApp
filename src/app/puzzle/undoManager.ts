@@ -1,3 +1,6 @@
+/**
+ * undoManager – limited undo/redo stack for piece moves.
+ */
 import type { SavedPiece } from "./puzzleStorage";
 import type { Piece } from "./types";
 

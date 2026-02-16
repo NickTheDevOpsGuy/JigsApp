@@ -1,3 +1,6 @@
+/**
+ * config – puzzle defaults: snap tolerances, scatter, rotation step.
+ */
 export const PUZZLE_DEFAULTS = {
   scatterPadding: 16,
   pad: 18,

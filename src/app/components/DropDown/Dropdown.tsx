@@ -1,5 +1,6 @@
-//
-// src/app/components/DropDown/Dropdown.tsx
+/**
+ * Dropdown – select input for grid size, theme, etc.
+ */
 import React from "react";
 import styles from "./Dropdown.module.css";
 

@@ -1,8 +1,6 @@
-// src/app/audio/sounds.ts
-// Sound effects using Web Audio API - no external files needed
-// Haptic feedback using Vibration API
-// Theme-specific sound variants
-
+/**
+ * sounds – Web Audio API effects (snap, place, rotate, etc.), haptic feedback, theme variants.
+ */
 type SoundType = "snap" | "place" | "rotate" | "complete" | "pickup" | "undo";
 
 type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";

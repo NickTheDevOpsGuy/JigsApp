@@ -1,3 +1,6 @@
+/**
+ * AboutModal – about dialog with repo link, contributors, optional What's New.
+ */
 import { Modal } from "@/components/Modal/Modal";
 import styles from "./AboutModal.module.css";
 

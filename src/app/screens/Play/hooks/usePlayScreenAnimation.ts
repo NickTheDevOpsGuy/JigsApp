@@ -1,3 +1,7 @@
+/**
+ * usePlayScreenAnimation – RAF loop for canvas rendering.
+ * Drives renderBoard with piece cache, drag interpolation, snap particles, completion glow.
+ */
 import { useEffect, useRef } from "react";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
@@ -5,6 +9,7 @@ import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
 import { SHOW_DEBUG, type DebugFlags } from "../playScreenUtils";
 import type { ViewportState } from "./useViewport";
+import type { PerfStats } from "../components/ProfilerOverlay";
 
 export function usePlayScreenAnimation(args: {
   manager: PuzzleManager | null;
@@ -19,7 +24,14 @@ export function usePlayScreenAnimation(args: {
   snapParticlesRef?: React.RefObject<SnapParticle[]>;
   debug: DebugFlags;
   showGhostHint: boolean;
+  showAlignmentGrid: boolean;
   viewport: ViewportState;
+  perfStatsRef?: React.RefObject<PerfStats | null>;
+  wrongRotationHintRef?: React.RefObject<{
+    groupId: string;
+    pieceIds: string[];
+    triggeredAt: number;
+  } | null>;
 }) {
   const {
     manager,
@@ -34,7 +46,10 @@ export function usePlayScreenAnimation(args: {
     snapParticlesRef,
     debug,
     showGhostHint,
+    showAlignmentGrid,
     viewport,
+    perfStatsRef,
+    wrongRotationHintRef,
   } = args;
 
   const rafRef = useRef<number | null>(null);
@@ -48,6 +63,10 @@ export function usePlayScreenAnimation(args: {
   /** Interpolated positions for dragged group (smooth drag, no touch/pointer changes) */
   const dragDisplayRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const DRAG_LERP = 0.32;
+
+  const perfFrameTimesRef = useRef<number[]>([]);
+  const perfDrawCountRef = useRef(0);
+  const perfLastSecRef = useRef(0);
 
   /** For 100+ piece puzzles: throttle redraw to 30fps when idle to reduce CPU/GPU load. */
   const IDLE_TARGET_FPS = 30;
@@ -86,6 +105,34 @@ export function usePlayScreenAnimation(args: {
       }
       const dt = lastFrameTimeRef.current > 0 ? now - lastFrameTimeRef.current : 0;
       lastFrameTimeRef.current = now;
+
+      const showPerf = debug.showPerfOverlay && perfStatsRef?.current;
+      if (showPerf) {
+        const times = perfFrameTimesRef.current;
+        if (dt > 0) {
+          times.push(dt);
+          if (times.length > 60) times.shift();
+        }
+        perfDrawCountRef.current += 1;
+        const activeGroups = new Set(
+          st.pieces.filter((p) => !p.inTray).map((p) => p.groupId),
+        ).size;
+        const elapsed = now - perfLastSecRef.current;
+        if (elapsed >= 1000) {
+          const stats = perfStatsRef.current!;
+          const avg = times.length ? times.reduce((a, t) => a + t, 0) / times.length : 0;
+          stats.fps = avg > 0 ? Math.round(1000 / avg) : 0;
+          stats.drawsPerSec = perfDrawCountRef.current;
+          stats.activeGroups = activeGroups;
+          stats.snapChecksPerSec = stats.snapCheckCount;
+          stats.snapCheckCount = 0;
+          perfDrawCountRef.current = 0;
+          perfLastSecRef.current = now;
+        } else {
+          const stats = perfStatsRef.current!;
+          stats.activeGroups = activeGroups;
+        }
+      }
 
       if (SHOW_DEBUG) {
         performance.mark("render-frame-start");
@@ -160,6 +207,10 @@ export function usePlayScreenAnimation(args: {
       const lockMap = lockMapRef.current ?? new Map<string, number>();
       const pieceCache = pieceCacheRef.current;
       const snapParticles = snapParticlesRef?.current ?? [];
+      const hint = wrongRotationHintRef?.current;
+      const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
+      const snapPreview =
+        dragState.activeId && manager ? manager.getSnapPreviewState() : null;
       renderBoard(
         ctx,
         st,
@@ -178,8 +229,11 @@ export function usePlayScreenAnimation(args: {
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
           showGhostHint,
+          showAlignmentGrid,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
           dragDisplayOverrides: isDragging ? dragDisplayOverrides : undefined,
+          wrongRotationHint,
+          snapPreview,
         },
         pieceCache,
         viewport,
@@ -208,5 +262,15 @@ export function usePlayScreenAnimation(args: {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [manager, debug, showGhostHint, setState, viewport, snapParticlesRef]);
+  }, [
+    manager,
+    debug,
+    showGhostHint,
+    showAlignmentGrid,
+    setState,
+    viewport,
+    snapParticlesRef,
+    perfStatsRef,
+    wrongRotationHintRef,
+  ]);
 }

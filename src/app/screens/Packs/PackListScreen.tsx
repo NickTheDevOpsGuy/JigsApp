@@ -1,11 +1,23 @@
+/**
+ * PackListScreen – list puzzle packs with progress; links to PackDetailScreen.
+ */
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PackListScreen.module.css";
 import { ArrowLeft } from "lucide-react";
-import { PUZZLE_PACKS, getPuzzlesForPack } from "@/data/puzzlePacks";
+import { PACK_METADATA } from "@/data/packMetadata";
+import { loadPacksData } from "@/data/loadPacksData";
 import { getPackProgress } from "@/data/packCompletion";
 
 export function PackListScreen() {
   const nav = useNavigate();
+  const [packsData, setPacksData] = useState<Awaited<
+    ReturnType<typeof loadPacksData>
+  > | null>(null);
+
+  useEffect(() => {
+    loadPacksData().then(setPacksData);
+  }, []);
 
   return (
     <div className={styles.page}>
@@ -27,9 +39,13 @@ export function PackListScreen() {
         </p>
 
         <div className={styles.packGrid}>
-          {PUZZLE_PACKS.map((pack) => {
-            const puzzles = getPuzzlesForPack(pack);
-            const { completed, total } = getPackProgress(puzzles.map((p) => p.id));
+          {PACK_METADATA.map((pack) => {
+            const puzzlesData = packsData
+              ? packsData.getPuzzlesForPack(pack as (typeof packsData.PUZZLE_PACKS)[0])
+              : [];
+            const { completed, total } = packsData
+              ? getPackProgress(puzzlesData.map((p) => p.id))
+              : { completed: 0, total: 0 };
 
             return (
               <button
@@ -43,7 +59,7 @@ export function PackListScreen() {
                   <span className={styles.packName}>{pack.name}</span>
                   <span className={styles.packDesc}>{pack.description}</span>
                   <span className={styles.packProgress}>
-                    {completed}/{total} completed
+                    {packsData ? `${completed}/${total} completed` : "…"}
                   </span>
                 </div>
               </button>

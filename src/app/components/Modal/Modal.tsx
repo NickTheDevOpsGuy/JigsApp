@@ -1,5 +1,6 @@
-//
-// src/app/components/Modal/Modal.tsx
+/**
+ * Modal – overlay dialog with focus trap, escape-to-close, portal rendering.
+ */
 import React, { useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Modal.module.css";

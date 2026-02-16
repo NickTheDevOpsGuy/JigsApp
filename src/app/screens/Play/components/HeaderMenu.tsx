@@ -1,3 +1,6 @@
+/**
+ * HeaderMenu – hamburger menu with submenus (View, Game, Board, etc.).
+ */
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, ChevronLeft, ChevronRight } from "lucide-react";
@@ -125,7 +128,10 @@ export function HeaderMenu(props: HeaderMenuProps) {
       : id === "about"
         ? aboutItems.length > 0
         : id === "view"
-          ? settingsItems.some((i) => i.subMenu === "display" || i.subMenu === "board")
+          ? settingsItems.some(
+              (i) =>
+                i.subMenu === "display" || i.subMenu === "board" || i.subMenu === "view",
+            )
           : settingsItems.some((i) => i.subMenu === id);
 
   const renderItem = (item: MenuItemConfig) => {

@@ -1,3 +1,6 @@
+/**
+ * usePlayScreenShortcuts – wires useKeyboardShortcuts to Play screen actions.
+ */
 import React, { useCallback } from "react";
 import { soundManager } from "@/audio/sounds";
 import { useKeyboardShortcuts, ShortcutAction } from "@/hooks/useKeyboardShortcuts";

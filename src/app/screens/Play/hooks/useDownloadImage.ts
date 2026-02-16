@@ -1,3 +1,6 @@
+/**
+ * useDownloadImage – export completed puzzle as PNG with time overlay.
+ */
 import { useCallback } from "react";
 import type React from "react";
 import { formatTime } from "../playUtils";

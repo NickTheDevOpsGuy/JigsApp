@@ -2,7 +2,9 @@ import { SHOW_DEBUG } from "../../playScreenUtils";
 
 let lastMoveMs = 0;
 
-/** Throttled drag logging to help debug missing pointer events. */
+/**
+ * dragLog – dev-only drag event logging (throttled, guarded by VITE_SHOW_DEBUG).
+ */
 export function dragLog(
   event: "down" | "move" | "up" | "cancel" | "lostcapture",
   data: Record<string, unknown>,

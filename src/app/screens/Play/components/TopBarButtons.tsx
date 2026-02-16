@@ -1,3 +1,6 @@
+/**
+ * TopBarButtons – compact top bar: New Puzzle, shortcuts (desktop only).
+ */
 import React from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/Button/Button";

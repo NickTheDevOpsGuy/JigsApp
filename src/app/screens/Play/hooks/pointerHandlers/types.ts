@@ -1,3 +1,6 @@
+/**
+ * Pointer handler types: CanvasWithTouch, ScreenToBoard, thresholds.
+ */
 import type React from "react";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PieceId, PuzzleState } from "@/puzzle/types";
@@ -46,6 +49,10 @@ export type PointerHandlersContext = {
   haptic?: (kind: HapticKind) => void;
   onDragPreview?: (state: DragPreviewState) => void;
   onPieceInteraction?: () => void;
+  /** Called when a piece drag starts (mouse down or touch move past threshold). */
+  onDragStarted?: () => void;
+  /** Called when drag ends (pointer up). */
+  onDragEnded?: () => void;
   /** When set, use board-space API for zoom/pan viewport */
   screenToBoard?: ScreenToBoard;
   /** Timestamp of last tap-rotate; used to avoid click+touch double fire. */

@@ -214,14 +214,18 @@ Images are auto-discovered at any depth.
 │   │   ├── Phuzzle.yml
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
-├── doc
-│   ├── README.md
-│   └── SUPABASE_SETUP.md
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push
+├── doc
+│   ├── FUTURE.md
+│   ├── LIGHTHOUSE.md
+│   ├── README.md
+│   ├── SESSION_SUMMARY.md
+│   └── SUPABASE_SETUP.md
 ├── e2e
 │   └── home.spec.ts
+├── public
 │   ├── favicon.svg
 │   ├── icon-192.png
 │   └── icon-512.png
@@ -318,15 +322,18 @@ Images are auto-discovered at any depth.
 │   │   │       ├── WhatsNewModal.module.css
 │   │   │       └── WhatsNewModal.tsx
 │   │   ├── daily
-│   │   │   └── dailyPuzzle.ts
+│   │   │   ├── dailyPuzzle.ts
+│   │   │   └── dailyPuzzleCore.ts
 │   │   ├── data
 │   │   │   ├── achievements.ts
 │   │   │   ├── anonymousNames.ts
 │   │   │   ├── changelog.ts
 │   │   │   ├── completionMessages.ts
 │   │   │   ├── confettiColors.ts
+│   │   │   ├── loadPacksData.ts
 │   │   │   ├── menuTips.ts
 │   │   │   ├── packCompletion.ts
+│   │   │   ├── packMetadata.ts
 │   │   │   ├── puzzlePacks.ts
 │   │   │   └── samplePuzzles.ts
 │   │   ├── hooks
@@ -371,6 +378,10 @@ Images are auto-discovered at any depth.
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── PauseOverlay.tsx
 │   │   │   │   │   ├── PlayHUD.tsx
+│   │   │   │   │   ├── PlayToasts.tsx
+│   │   │   │   │   ├── PlayToasts.types.ts
+│   │   │   │   │   ├── ProfilerOverlay.module.css
+│   │   │   │   │   ├── ProfilerOverlay.tsx
 │   │   │   │   │   └── TopBarButtons.tsx
 │   │   │   │   ├── hooks
 │   │   │   │   │   ├── pointerHandlers
@@ -439,7 +450,6 @@ Images are auto-discovered at any depth.
 ├── test-results
 │   └── .last-run.json
 ├── .env.example
-├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml
@@ -453,7 +463,6 @@ Images are auto-discovered at any depth.
 ├── package.json
 ├── playwright.config.ts
 ├── README.md
-├── src.zip
 ├── tsconfig.app.json
 ├── tsconfig.app.tsbuildinfo
 ├── tsconfig.json

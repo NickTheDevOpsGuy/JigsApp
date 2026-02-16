@@ -1,3 +1,6 @@
+/**
+ * WhatsNewModal – changelog/release notes, marks as seen on close.
+ */
 import { Modal } from "@/components/Modal/Modal";
 import { Button } from "@/components/Button/Button";
 import { CHANGELOG_ENTRIES, markChangelogSeen } from "@/data/changelog";

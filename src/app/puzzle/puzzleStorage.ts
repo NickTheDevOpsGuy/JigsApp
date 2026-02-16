@@ -1,5 +1,6 @@
-// src/app/puzzle/puzzleStorage.ts
-
+/**
+ * puzzleStorage – save/load puzzle state to localStorage; restore from SavedPiece[].
+ */
 import type { Piece, GridSize } from "./types";
 
 const PUZZLE_STATE_KEY = "phuzzle:puzzleState";

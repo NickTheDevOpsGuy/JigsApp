@@ -1,3 +1,6 @@
+/**
+ * puzzleSessionService – co-op sessions: create, get, subscribe, update puzzle_sessions.
+ */
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import type { GridSize } from "@/puzzle/types";
 import type { SavedPiece } from "@/puzzle/puzzleStorage";

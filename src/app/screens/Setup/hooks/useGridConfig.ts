@@ -1,3 +1,6 @@
+/**
+ * useGridConfig – grid presets + custom; persisted in localStorage.
+ */
 import { useState, useEffect } from "react";
 
 const GRID_KEY = "phuzzle:gridSize";

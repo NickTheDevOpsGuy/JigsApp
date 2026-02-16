@@ -1,3 +1,6 @@
+/**
+ * HelpChoiceModal – help menu: How to Play, Shortcuts, About, Settings, Theme.
+ */
 import { Modal } from "@/components/Modal/Modal";
 import styles from "./HelpChoiceModal.module.css";
 

@@ -1,6 +1,9 @@
+/**
+ * confettiColors – theme-specific confetti palettes for completion celebration.
+ */
 import type { Theme } from "@/hooks/useTheme";
 
-/** Confetti color palettes per theme for completion celebration. */
+/** Confetti color palettes per theme. */
 export const CONFETTI_COLORS_BY_THEME: Record<Theme, string[]> = {
   light: ["#fbbf24", "#f59e0b", "#fcd34d", "#fde68a", "#fef3c7"],
   dark: ["#6366f1", "#818cf8", "#a5b4fc", "#c7d2fe", "#e0e7ff"],

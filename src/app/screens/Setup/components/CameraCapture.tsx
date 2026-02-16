@@ -1,3 +1,6 @@
+/**
+ * CameraCapture – getUserMedia for rear camera; capture frame as Blob.
+ */
 import { useRef, useEffect, useState } from "react";
 import { Camera } from "lucide-react";
 import { Button } from "@/components/Button/Button";

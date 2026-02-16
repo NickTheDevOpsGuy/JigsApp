@@ -1,3 +1,6 @@
+/**
+ * profileService – player_profiles: display name, show_on_leaderboard, region.
+ */
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import { getUserId, ensureSignedIn } from "@/supabase/auth";
 

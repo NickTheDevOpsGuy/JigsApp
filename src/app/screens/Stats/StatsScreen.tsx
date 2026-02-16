@@ -1,3 +1,6 @@
+/**
+ * StatsScreen – leaderboards, achievements, profile, streaks (Supabase).
+ */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BarChart3, Trophy, Award, User, Share2 } from "lucide-react";
@@ -23,7 +26,7 @@ import { getMyProfile, updateMyProfile } from "@/services/profileService";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
-import { getTodayDateString } from "@/daily/dailyPuzzle";
+import { getTodayDateString } from "@/daily/dailyPuzzleCore";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);

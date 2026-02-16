@@ -1,3 +1,6 @@
+/**
+ * usePlayScreenTimer – elapsed/countdown/active ticks; auto-pause on countdown expiry.
+ */
 import { useEffect } from "react";
 import { ACTIVE_IDLE_MS } from "../timeMode";
 import type { TimeMode } from "../timeMode";

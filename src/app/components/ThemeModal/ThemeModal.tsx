@@ -1,3 +1,6 @@
+/**
+ * ThemeModal – theme picker (light, dark, space, ocean, forest, sunset).
+ */
 import { Modal } from "@/components/Modal/Modal";
 import { useTheme, THEMES, THEME_LABELS, type Theme } from "@/hooks/useTheme";
 import { Sun, Moon, Rocket, Waves, TreePine, Sunset, Check } from "lucide-react";

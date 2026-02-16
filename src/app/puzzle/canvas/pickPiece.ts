@@ -1,4 +1,6 @@
-// src/app/puzzle/canvas/pickPiece.ts
+/**
+ * pickPiece – hit test by isPointInPath; returns topmost piece at (x,y).
+ */
 import type { Piece } from "@/puzzle/types";
 
 /**

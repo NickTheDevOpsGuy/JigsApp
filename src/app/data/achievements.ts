@@ -1,3 +1,6 @@
+/**
+ * Achievement definitions and IDs for pack progression.
+ */
 export type AchievementDef = {
   id: string;
   name: string;

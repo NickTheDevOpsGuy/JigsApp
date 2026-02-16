@@ -1,4 +1,6 @@
-// src/app/components/ThemeToggle/ThemeToggle.tsx
+/**
+ * ThemeToggle – compact theme picker (default) or full-width menu item variant.
+ */
 import { useState, useRef, useEffect } from "react";
 import { Palette, Check, Sun, Moon, Rocket, Waves, TreePine, Sunset } from "lucide-react";
 import { useTheme, THEMES, THEME_LABELS, type Theme } from "@/hooks/useTheme";

@@ -38,6 +38,26 @@
   color: var(--color-text-secondary);
 }
 
+.difficultySuggestion {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  margin: 0 0 4px 0;
+  background: var(--color-brand-light);
+  border: 1px solid var(--color-brand-primary);
+  border-radius: 10px;
+  color: var(--color-brand-primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.difficultySuggestion:hover {
+  background: var(--color-overlay-content);
+}
+
 .file {
   height: 48px;
   border-radius: 12px;

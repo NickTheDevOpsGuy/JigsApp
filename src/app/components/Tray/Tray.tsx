@@ -1,4 +1,6 @@
-// src/app/components/Tray/Tray.tsx
+/**
+ * Tray – legacy piece tray (corners/edges/center); PieceTray is the primary tray now.
+ */
 import React from "react";
 import type { Piece } from "@/puzzle/types";
 import styles from "./Tray.module.css";

@@ -1,8 +1,9 @@
+/**
+ * useCoarsePointer – true when primary pointer is coarse (touch-first). Safari polyfill.
+ */
 import { useEffect, useState } from "react";
 
 /**
- * True when the primary pointer is coarse (touch-first).
- *
  * Safari has multiple APIs across versions. We support both:
  * - matchMedia(...).addEventListener('change', ...)
  * - matchMedia(...).addListener(...)

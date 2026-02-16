@@ -1,5 +1,6 @@
-// src/app/puzzle/types.ts
-
+/**
+ * types – Piece, GridSize, PieceEdges, PuzzleState, DragState, etc.
+ */
 export type PieceId = string;
 
 export type GridSize = {
