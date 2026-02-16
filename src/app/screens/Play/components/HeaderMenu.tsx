@@ -31,8 +31,8 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
 const ABOUT_PARENT = null as SubMenuId | null;
 
 /** When in Display or Board, Back goes to View */
-const VIEW_CHILDREN: SubMenuId[] = ["display", "board"];
-const VIEW_PARENT: SubMenuId = "view";
+const VIEW_SUBMENU_IDS: SubMenuId[] = ["display", "board"];
+const VIEW_PARENT_ID: SubMenuId = "view";
 
 /** When in Display or Board, Back goes to View */
 const VIEW_CHILDREN: SubMenuId[] = ["display", "board"];
@@ -206,7 +206,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const handleBack = () => {
     if (activeSubMenu === "about") setActiveSubMenu(ABOUT_PARENT);
-    else if (VIEW_CHILDREN.includes(activeSubMenu!)) setActiveSubMenu(VIEW_PARENT);
+    else if (VIEW_SUBMENU_IDS.includes(activeSubMenu!)) setActiveSubMenu(VIEW_PARENT_ID);
     else setActiveSubMenu(null);
   };
 
