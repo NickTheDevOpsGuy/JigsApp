@@ -499,17 +499,12 @@ Team
 
 Built by:
 
-Nick
-• GitHub: https://github.com/NickTheDevOpsGuy
-• LinkedIn: https://www.linkedin.com/in/nicholas-a-clark/
+| Name              | LinkedIn                                                                 | GitHub                                                     |
+| ----------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| Nick Clark        | [nicholas-a-clark](https://www.linkedin.com/in/nicholas-a-clark)        | [@NickTheDevOpsGuy](https://github.com/NickTheDevOpsGuy)  |
+| Vinay Gajjar      | [vinaygajjar](https://www.linkedin.com/in/vinaygajjar)                  | [@v-gajjar](https://github.com/v-gajjar)                  |
+| Hannah Olbrich    | [hannaholbrich](https://www.linkedin.com/in/hannaholbrich)              | [@hannahro15](https://github.com/hannahro15)              |
 
-Vinay
-• GitHub: https://github.com/v-gajjar
-• LinkedIn: https://www.linkedin.com/in/vinaygajjar/
-
-Hannah
-• GitHub: https://github.com/hannahro15
-• LinkedIn: https://www.linkedin.com/in/hannaholbrich/
 
 With help from the wider community ❤️  
 See all contributors here → **[CONTRIBUTORS.md](./CONTRIBUTORS.md)**
