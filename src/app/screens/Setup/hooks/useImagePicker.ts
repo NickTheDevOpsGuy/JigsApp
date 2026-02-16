@@ -1,3 +1,6 @@
+/**
+ * useImagePicker – file input, paste, camera; validates dimensions per grid size.
+ */
 import { useState } from "react";
 import type { SamplePuzzle } from "@/data/samplePuzzles";
 

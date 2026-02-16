@@ -1,3 +1,6 @@
+/**
+ * usePuzzleSession – co-op session from URL param; create/join, push state, subscribe.
+ */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {

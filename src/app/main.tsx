@@ -1,3 +1,6 @@
+/**
+ * App entry point: React root, PostHog init, theme provider, error boundary.
+ */
 import React from "react";
 import ReactDOM from "react-dom/client";
 import posthog from "posthog-js";

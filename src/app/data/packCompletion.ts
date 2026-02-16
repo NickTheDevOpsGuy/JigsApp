@@ -1,3 +1,6 @@
+/**
+ * packCompletion – track completed puzzle IDs in localStorage for pack progress.
+ */
 const STORAGE_KEY = "phuzzle:completedPuzzles";
 const CURRENT_PUZZLE_KEY = "phuzzle:currentPuzzleId";
 

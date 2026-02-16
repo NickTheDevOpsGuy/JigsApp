@@ -1,3 +1,6 @@
+/**
+ * CompletionOverlay – puzzle complete: time, share buttons, new puzzle, menu.
+ */
 import React, { useEffect, useState } from "react";
 import { Plus, Menu, Download, Share2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/Button/Button";

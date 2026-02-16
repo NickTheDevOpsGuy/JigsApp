@@ -1,3 +1,6 @@
+/**
+ * Mouse handlers: left=drag, middle=pan, right=context menu. No tap threshold.
+ */
 import type React from "react";
 import { soundManager } from "@/audio/sounds";
 import type { CanvasWithTouch, ScreenToBoard } from "./types";

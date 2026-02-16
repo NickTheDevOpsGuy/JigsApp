@@ -1,3 +1,6 @@
+/**
+ * groupUtils – group bounds, row/col map, neighbor lookups for snap logic.
+ */
 import type { Piece } from "./types";
 
 export type GroupBounds = { minX: number; minY: number; maxX: number; maxY: number };

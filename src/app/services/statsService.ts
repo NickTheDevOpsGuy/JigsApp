@@ -1,3 +1,6 @@
+/**
+ * statsService – record completions, update player_stats (streaks, totals).
+ */
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import { ensureSignedIn } from "@/supabase/auth";
 import { getTodayDateString } from "@/daily/dailyPuzzleCore";

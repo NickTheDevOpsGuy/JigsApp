@@ -1,5 +1,7 @@
+/** Play screen component exports. */
 export { DragPreview } from "./DragPreview";
 export { HeaderMenu } from "./HeaderMenu";
+export { PlayToasts } from "./PlayToasts";
 export { PlayHUD } from "./PlayHUD";
 export { CompletionOverlay } from "./CompletionOverlay";
 export { PauseOverlay } from "./PauseOverlay";

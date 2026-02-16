@@ -1,3 +1,6 @@
+/**
+ * useHaptics – Vibration API for tap/rotate/snap/place/complete; best-effort on iOS.
+ */
 import { useCallback, useMemo } from "react";
 import { soundManager } from "@/audio/sounds";
 

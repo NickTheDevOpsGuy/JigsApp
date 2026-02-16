@@ -1,3 +1,6 @@
+/**
+ * PlayHUD – timer, pieces left, pause button (top bar center).
+ */
 import React, { useEffect, useState } from "react";
 import { Clock, Puzzle } from "lucide-react";
 import styles from "../PlayScreen.module.css";

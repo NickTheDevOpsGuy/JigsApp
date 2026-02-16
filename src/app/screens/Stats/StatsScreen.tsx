@@ -1,3 +1,6 @@
+/**
+ * StatsScreen – leaderboards, achievements, profile, streaks (Supabase).
+ */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, BarChart3, Trophy, Award, User, Share2 } from "lucide-react";

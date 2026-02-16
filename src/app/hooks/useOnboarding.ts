@@ -1,3 +1,6 @@
+/**
+ * useOnboarding – step-based tips: start (drag piece), tray, zoom. Persisted in localStorage.
+ */
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "phuzzle:onboarding";

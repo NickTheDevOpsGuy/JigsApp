@@ -16,6 +16,10 @@ const PLACEMENT_STREAK_MS = 3000;
 const STREAK_COOLDOWN_MS = 5000;
 const SNAP_PARTICLE_COUNT = 8;
 
+/**
+ * usePlayScreenManager – creates PuzzleManager, wires events, provides board/canvas refs.
+ * Handles undo, snap particles, wrong-rotation hints, placement streaks.
+ */
 export function usePlayScreenManager(
   grid: { rows: number; cols: number },
   pieceLockingEnabled: boolean,

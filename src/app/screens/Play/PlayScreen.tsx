@@ -1,3 +1,12 @@
+/**
+ * PlayScreen – main puzzle play UI.
+ *
+ * Responsibilities:
+ * - Session loading (local or co-op via URL param)
+ * - Puzzle state via usePlayScreenManager
+ * - Pointer/touch handling, viewport zoom/pan
+ * - Toasts (milestones, share, onboarding), modals, auto-save
+ */
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import posthog from "posthog-js";
@@ -35,11 +44,11 @@ import {
   PlayHUD,
   CompletionOverlay,
   PauseOverlay,
+  PlayToasts,
   TopBarButtons,
   HeaderMenu,
 } from "./components";
 import { ProfilerOverlay } from "./components";
-import { OnboardingTooltip } from "@/components/OnboardingTooltip";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
 import { isSupabaseConfigured } from "@/supabase/client";
@@ -100,6 +109,7 @@ export function PlayScreen() {
     );
   }
 
+  // ─── UI state (persisted in localStorage where applicable) ───
   const ui = usePlayScreenUI();
   const {
     pieceLockingEnabled,
@@ -214,6 +224,7 @@ export function PlayScreen() {
     snapParticlesRef,
   } = managerResult;
 
+  // ─── Onboarding & milestone toasts ───
   const placedForOnboarding = state?.placedCount ?? 0;
   const totalForOnboarding = state?.totalCount ?? 0;
   const onboarding = useOnboarding(placedForOnboarding, totalForOnboarding);
@@ -408,7 +419,7 @@ export function PlayScreen() {
     lastInteractionRef,
   });
 
-  // Auto-save: every 3 placements, on debounced state change, and before tab hide
+  // ─── Persistence (auto-save every N placements + debounce, co-op sync, tab hide flush) ───
   const SAVE_DEBOUNCE_MS = 500;
   const SAVE_EVERY_N_MOVES = 3;
   const lastSavedPlacedCountRef = React.useRef(0);
@@ -939,53 +950,19 @@ export function PlayScreen() {
         />
       )}
 
-      {onboarding.showFirstSnapToast && (
-        <div className={styles.engagementToast} role="status">
-          First piece! ✨
-        </div>
-      )}
-      {showStreakToast && (
-        <div className={styles.engagementToast} role="status">
-          🔥 On fire!
-        </div>
-      )}
-      {milestoneMessage && (
-        <div className={styles.engagementToast} role="status">
-          {milestoneMessage}
-        </div>
-      )}
-      {shareToast && (
-        <div className={styles.engagementToast} role="status">
-          {shareToast}
-        </div>
-      )}
-      {onboarding.needsStartTip && placed === 0 && (
-        <div className={styles.onboardingOverlay}>
-          <OnboardingTooltip
-            message="Drag a piece to start"
-            onDismiss={onboarding.dismissStartTip}
-            showButton
-          />
-        </div>
-      )}
-      {onboarding.needsTrayTip && (
-        <div className={styles.onboardingOverlayTray}>
-          <OnboardingTooltip
-            message="Use the tray below to store or recall pieces"
-            onDismiss={onboarding.dismissTrayTip}
-            showButton
-          />
-        </div>
-      )}
-      {onboarding.needsZoomTip && (
-        <div className={styles.onboardingOverlay}>
-          <OnboardingTooltip
-            message="Pinch or scroll to zoom on larger puzzles"
-            onDismiss={onboarding.dismissZoomTip}
-            showButton
-          />
-        </div>
-      )}
+      <PlayToasts
+        onboarding={onboarding}
+        placed={placed}
+        showFirstSnapToast={onboarding.showFirstSnapToast}
+        showStreakToast={showStreakToast}
+        milestoneMessage={milestoneMessage}
+        shareToast={shareToast}
+        classNames={{
+          engagementToast: styles.engagementToast,
+          onboardingOverlay: styles.onboardingOverlay,
+          onboardingOverlayTray: styles.onboardingOverlayTray,
+        }}
+      />
       {(import.meta.env.DEV || SHOW_DEBUG) && (
         <ProfilerOverlay
           statsRef={perfStatsRef}

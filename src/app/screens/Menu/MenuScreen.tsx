@@ -1,3 +1,6 @@
+/**
+ * MenuScreen – home: New Puzzle, Daily, Packs, Stats, Help, About.
+ */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MenuScreen.module.css";

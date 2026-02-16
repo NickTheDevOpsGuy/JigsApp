@@ -1,4 +1,6 @@
-// src/app/hooks/useTheme.tsx
+/**
+ * useTheme – theme context, persisted in localStorage; ThemeProvider wraps app.
+ */
 import {
   createContext,
   useContext,

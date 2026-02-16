@@ -1,3 +1,6 @@
+/**
+ * Shared pointer logic: finishDragWithTrayCheck, screen-to-board conversion.
+ */
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 
 export function finishDragWithTrayCheck(

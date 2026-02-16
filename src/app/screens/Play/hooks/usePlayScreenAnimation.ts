@@ -1,3 +1,7 @@
+/**
+ * usePlayScreenAnimation – RAF loop for canvas rendering.
+ * Drives renderBoard with piece cache, drag interpolation, snap particles, completion glow.
+ */
 import { useEffect, useRef } from "react";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";

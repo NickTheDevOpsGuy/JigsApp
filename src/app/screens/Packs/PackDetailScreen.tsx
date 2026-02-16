@@ -1,3 +1,6 @@
+/**
+ * PackDetailScreen – pack puzzle list with completion checkmarks; launch to Play.
+ */
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PackDetailScreen.module.css";

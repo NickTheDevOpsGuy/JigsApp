@@ -1,3 +1,7 @@
+/**
+ * usePointerHandlers – wires pointer/touch events on canvas, board, tray to PuzzleManager.
+ * Delegates to touchHandlers (touch) and mouseHandlers (mouse); handles pinch zoom and pan.
+ */
 import { useCallback, useEffect, useRef } from "react";
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";

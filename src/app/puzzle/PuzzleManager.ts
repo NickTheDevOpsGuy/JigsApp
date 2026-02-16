@@ -1,3 +1,7 @@
+/**
+ * PuzzleManager – core puzzle logic: pieces, snapping, groups, undo.
+ * Handles drag state, board/neighbor snap tolerances, piece locking, events.
+ */
 import type { MutableRefObject } from "react";
 import type { DragState, GridSize, Piece, PuzzleState } from "./types";
 import { createInitialPieces } from "./factories/createInitialPieces";

@@ -1,3 +1,6 @@
+/**
+ * Supabase generated types: Database, Json (tables: player_stats, etc.).
+ */
 export type Json =
   | string
   | number

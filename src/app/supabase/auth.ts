@@ -1,3 +1,6 @@
+/**
+ * auth – ensureSignedIn (anonymous), getUserId.
+ */
 import { supabase } from "./client";
 
 /** Ensure user is signed in (anonymous). Call on app init if using Supabase. */

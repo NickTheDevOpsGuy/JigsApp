@@ -1,3 +1,6 @@
+/**
+ * Pointer handler types: CanvasWithTouch, ScreenToBoard, thresholds.
+ */
 import type React from "react";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PieceId, PuzzleState } from "@/puzzle/types";

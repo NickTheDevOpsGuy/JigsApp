@@ -1,3 +1,6 @@
+/**
+ * HeaderMenu – hamburger menu with submenus (View, Game, Board, etc.).
+ */
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, ChevronLeft, ChevronRight } from "lucide-react";

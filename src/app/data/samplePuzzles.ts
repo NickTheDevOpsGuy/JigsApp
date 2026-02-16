@@ -1,5 +1,6 @@
-// src/app/data/samplePuzzles.ts
-
+/**
+ * samplePuzzles – puzzle catalog; auto-discovers from src/app/assets/puzzles/.
+ */
 export type SamplePuzzle = {
   id: string;
   name: string;

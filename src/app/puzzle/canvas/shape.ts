@@ -1,4 +1,6 @@
-// src/app/puzzle/shape.ts
+/**
+ * shape (canvas) – buildPiecePath for canvas rendering; knob/tab geometry.
+ */
 import type { EdgeType, PieceEdges } from "../types";
 
 type ShapeArgs = {

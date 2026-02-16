@@ -1,4 +1,6 @@
-// src/app/components/HowToPlay/TutorialOverlay.tsx
+/**
+ * TutorialOverlay – "How to Play" modal; first-time popup or from Help menu.
+ */
 import React, { useState } from "react";
 import { Button } from "@/components/Button/Button";
 import { Modal } from "@/components/Modal/Modal";

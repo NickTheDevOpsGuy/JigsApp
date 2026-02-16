@@ -1,3 +1,6 @@
+/**
+ * DailyDifficultyModal – shows today's daily puzzle, grid picker, and launch action.
+ */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "@/components/Modal/Modal";

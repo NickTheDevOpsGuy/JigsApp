@@ -1,3 +1,6 @@
+/**
+ * puzzlePacks – curated packs; filter SAMPLE_PUZZLES by category or explicit IDs.
+ */
 import type { SamplePuzzle } from "./samplePuzzles";
 import { SAMPLE_PUZZLES } from "./samplePuzzles";
 

@@ -1,3 +1,6 @@
+/**
+ * ProfilerOverlay – debug FPS, draws/sec, active groups (dev only).
+ */
 import { useEffect, useState } from "react";
 import styles from "./ProfilerOverlay.module.css";
 

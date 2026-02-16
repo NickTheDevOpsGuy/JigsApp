@@ -1,3 +1,6 @@
+/**
+ * useShareResults – share URLs (Twitter, etc.), copy, native share.
+ */
 import { useCallback, useMemo, useState } from "react";
 import type { PuzzleState } from "@/puzzle/types";
 import { formatTime } from "../playUtils";

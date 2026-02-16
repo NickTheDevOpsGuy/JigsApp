@@ -1,3 +1,7 @@
+/**
+ * Touch handlers for piece drag, tap-to-rotate, pinch zoom.
+ * Uses tap-vs-drag threshold (TAP_DRAG_THRESHOLD_PX) to distinguish taps from drags.
+ */
 import type React from "react";
 import { soundManager } from "@/audio/sounds";
 import type { CanvasWithTouch, ScreenToBoard } from "./types";

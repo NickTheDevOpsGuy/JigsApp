@@ -1,3 +1,6 @@
+/**
+ * playUtils – formatTime, createUndoRedoHandler.
+ */
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 

@@ -1,4 +1,6 @@
-// src/app/screens/NewGame/NewGameScreen.tsx
+/**
+ * NewGameScreen – route wrapper for /new; delegates to SetupScreen.
+ */
 import SetupScreen from "@/screens/Setup/SetupScreen";
 
 /**

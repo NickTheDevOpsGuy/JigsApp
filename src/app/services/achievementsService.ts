@@ -1,3 +1,6 @@
+/**
+ * achievementsService – check/unlock achievements from ACHIEVEMENT_DEFS; user_achievements table.
+ */
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import { ensureSignedIn } from "@/supabase/auth";
 import { ACHIEVEMENT_DEFS } from "@/data/achievements";

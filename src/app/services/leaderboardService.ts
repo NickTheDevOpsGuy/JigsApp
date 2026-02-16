@@ -1,3 +1,6 @@
+/**
+ * leaderboardService – daily, streaks, completion count, personal bests; anonymous names.
+ */
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";

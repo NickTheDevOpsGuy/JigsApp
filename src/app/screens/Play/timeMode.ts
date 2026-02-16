@@ -1,4 +1,6 @@
-/** Time tracking modes for different play styles */
+/**
+ * timeMode – elapsed, countdown, active, relaxed, best; localStorage for best times.
+ */
 export type TimeMode =
   | "elapsed" // Count up from 0 (default)
   | "countdown" // Start at limit, game over at 0

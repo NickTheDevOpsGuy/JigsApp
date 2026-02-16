@@ -1,3 +1,6 @@
+/**
+ * usePlayScreenUI – UI state (ghost hint, alignment grid, debug, etc.) with localStorage.
+ */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { soundManager } from "@/audio/sounds";
 import {

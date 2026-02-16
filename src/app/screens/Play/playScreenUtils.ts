@@ -1,3 +1,6 @@
+/**
+ * playScreenUtils – storage keys, parseGrid, computeTileSize, difficulty tiers.
+ */
 export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";

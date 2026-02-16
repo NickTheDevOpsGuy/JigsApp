@@ -1,4 +1,6 @@
-// src/app/screens/Setup/SetupScreen.tsx
+/**
+ * SetupScreen – image picker (gallery/upload/camera), grid config, time mode, launch to Play.
+ */
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./SetupScreen.module.css";

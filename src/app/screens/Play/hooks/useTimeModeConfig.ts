@@ -1,3 +1,6 @@
+/**
+ * useTimeModeConfig – time mode + countdown minutes, persisted in localStorage.
+ */
 import { useCallback, useEffect, useState } from "react";
 import {
   TIME_MODE_KEY,

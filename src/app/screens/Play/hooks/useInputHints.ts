@@ -1,3 +1,6 @@
+/**
+ * useInputHints – device-appropriate hints (tap vs right-click, etc.).
+ */
 import { useMemo } from "react";
 
 interface InputHints {

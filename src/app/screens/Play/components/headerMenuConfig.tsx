@@ -1,3 +1,7 @@
+/**
+ * Header menu item definitions and submenu grouping.
+ * buildMenuItems produces the flat list; HeaderMenu groups by subMenu for display.
+ */
 import type { TimeMode } from "../timeMode";
 import { COUNTDOWN_OPTIONS } from "../timeMode";
 

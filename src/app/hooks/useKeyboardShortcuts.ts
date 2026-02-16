@@ -1,6 +1,6 @@
-// src/app/hooks/useKeyboardShortcuts.ts
-// Cross-platform keyboard shortcuts for Phuzzle
-
+/**
+ * useKeyboardShortcuts – cross-platform shortcuts for play, menu, rotate, tray, undo, etc.
+ */
 import { useEffect, useCallback } from "react";
 
 export type ShortcutAction =
