@@ -19,6 +19,7 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   about: "ℹ️ About",
   advanced: "⚙️ Advanced",
   audio: "🔊 Audio",
+  contribute: "🤝 Contribute",
   controls: "🎮 Controls",
   display: "👁️ Display",
   gameplay: "🎯 Gameplay",
@@ -31,6 +32,7 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
 
 const SUBMENU_PARENT: Partial<Record<SubMenuId, SubMenuId>> = {
   controls: "gameplay",
+  contribute: "about",
   help: "about",
 };
 
@@ -124,13 +126,22 @@ export function HeaderMenu(props: HeaderMenuProps) {
         sensitivity: "base",
       }),
     );
+  const contributeItems = visibleItems
+    .filter((i) => i.section === "contribute")
+    .sort((a, b) =>
+      (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
+        sensitivity: "base",
+      }),
+    );
 
   const subMenuItems =
     activeSubMenu === "help"
       ? helpItems
       : activeSubMenu === "about"
         ? aboutItems
-        : settingsItems
+        : activeSubMenu === "contribute"
+          ? contributeItems
+          : settingsItems
             .filter((i) => i.subMenu === activeSubMenu)
             .sort((a, b) =>
               (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
@@ -142,8 +153,10 @@ export function HeaderMenu(props: HeaderMenuProps) {
     id === "help"
       ? helpItems.length > 0
       : id === "about"
-        ? aboutItems.length > 0
-        : settingsItems.some((i) => i.subMenu === id);
+        ? aboutItems.length > 0 || contributeItems.length > 0 || helpItems.length > 0
+        : id === "contribute"
+          ? contributeItems.length > 0
+          : settingsItems.some((i) => i.subMenu === id);
 
   const getAriaLabel = (item: MenuItemConfig): string => {
     if (item.ariaLabel) return item.ariaLabel;
@@ -207,10 +220,21 @@ export function HeaderMenu(props: HeaderMenuProps) {
           <ChevronRight size={16} className={styles.headerMenuChevron} />
         </button>
       )}
-      {subMenuItems.map((item, i) => (
-        <React.Fragment key={item.id}>
-          {renderItem(item)}
-          {activeSubMenu === "about" && i === 0 && hasSubMenuItems("help") && (
+      {activeSubMenu === "about" && (
+        <>
+          {hasSubMenuItems("contribute") && (
+            <button
+              type="button"
+              className={styles.headerMenuSubmenuTrigger}
+              role="menuitem"
+              onClick={() => setActiveSubMenu("contribute")}
+              aria-label="Contribute"
+            >
+              {SUB_MENU_LABELS.contribute}
+              <ChevronRight size={16} className={styles.headerMenuChevron} />
+            </button>
+          )}
+          {hasSubMenuItems("help") && (
             <button
               type="button"
               className={styles.headerMenuSubmenuTrigger}
@@ -222,7 +246,10 @@ export function HeaderMenu(props: HeaderMenuProps) {
               <ChevronRight size={16} className={styles.headerMenuChevron} />
             </button>
           )}
-        </React.Fragment>
+        </>
+      )}
+      {subMenuItems.map((item) => (
+        <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
       ))}
       {activeSubMenu === "display" && props.onOpenThemeModal && (
         <button

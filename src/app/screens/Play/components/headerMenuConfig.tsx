@@ -68,6 +68,7 @@ export type SubMenuId =
   | "about"
   | "advanced"
   | "audio"
+  | "contribute"
   | "controls"
   | "display"
   | "gameplay"
@@ -80,7 +81,7 @@ export type SubMenuId =
 export type MenuItemConfig = {
   id: string;
   label: string;
-  section: "nav" | "settings" | "help" | "about" | "other";
+  section: "nav" | "settings" | "help" | "about" | "contribute" | "other";
   visible: boolean;
   disabled?: boolean;
   onClick: () => void;
@@ -162,7 +163,7 @@ export function buildMenuItems(
       label: props.pieceLockingEnabled ? "Tap to Rotate ✨" : "Tap to Rotate 🌙",
       sortKey: "Tap to Rotate",
       onClick: c(props.onTogglePieceLocking),
-      subMenu: "gameplay",
+      subMenu: "controls",
     },
     {
       id: "showTimer",
@@ -171,7 +172,7 @@ export function buildMenuItems(
       label: showTimer ? "Show Timer ✨" : "Show Timer 🌙",
       sortKey: "Show Timer",
       onClick: c(() => props.setTimeMode(showTimer ? "relaxed" : "elapsed")),
-      subMenu: "gameplay",
+      subMenu: "controls",
     },
     // ─── Display ───
     {
@@ -287,26 +288,26 @@ export function buildMenuItems(
       onClick: c(props.onSharePuzzle ?? (() => {})),
       subMenu: "share",
     },
-    // ─── Help, About ───
+    // ─── Contribute (under About) ───
     {
       id: "repo",
-      section: "about",
+      section: "contribute",
       visible: true,
       label: "🌟 Get Involved",
       sortKey: "Get Involved",
       onClick: c(() => window.open(GITHUB_REPO_URL, "_blank", "noopener,noreferrer")),
-      subMenu: "about",
+      subMenu: "contribute",
     },
     {
       id: "contributors",
-      section: "about",
+      section: "contribute",
       visible: true,
       label: "👋 Meet the Team",
       sortKey: "Meet the Team",
       onClick: c(() =>
         window.open(GITHUB_CONTRIBUTORS_URL, "_blank", "noopener,noreferrer"),
       ),
-      subMenu: "about",
+      subMenu: "contribute",
     },
     {
       id: "howToPlay",
