@@ -15,6 +15,11 @@ jobs:
     name: 🧩 Phuzzle
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write  # for Lighthouse CI status checks (if enabled later)
+
     defaults:
       run:
         working-directory: .
@@ -55,4 +60,6 @@ jobs:
         run: npx playwright test --project=chromium
 
       - name: 🔦 Lighthouse CI (perf, a11y)
+        env:
+          LHCI_UPLOAD__GITHUB_TOKEN: ${{ github.token }}
         run: npx lhci autorun
