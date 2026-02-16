@@ -35,7 +35,9 @@ test.describe("Streak freeze offer", () => {
       localStorage.setItem("phuzzle:streakFreezeWeek", weekKey);
       localStorage.removeItem(`phuzzle:daily:${yesterday}:completed`);
       localStorage.removeItem(`phuzzle:streakFreeze:used:${yesterday}`);
-      localStorage.removeItem(`phuzzle:streakFreezeDismissed:${new Date().toISOString().slice(0, 10)}`);
+      localStorage.removeItem(
+        `phuzzle:streakFreezeDismissed:${new Date().toISOString().slice(0, 10)}`,
+      );
     });
 
     await page.goto("/");

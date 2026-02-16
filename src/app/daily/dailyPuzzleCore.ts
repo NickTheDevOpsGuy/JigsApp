@@ -46,7 +46,10 @@ export function wasFreezeOfferDismissedToday(): boolean {
 /** Mark the streak freeze offer as dismissed for today */
 export function dismissFreezeOfferToday(): void {
   try {
-    localStorage.setItem(`${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`, "true");
+    localStorage.setItem(
+      `${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`,
+      "true",
+    );
   } catch {
     /* ignore */
   }
