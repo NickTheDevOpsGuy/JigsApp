@@ -11,7 +11,9 @@ import { getPackProgress } from "@/data/packCompletion";
 
 export function PackListScreen() {
   const nav = useNavigate();
-  const [packsData, setPacksData] = useState<Awaited<ReturnType<typeof loadPacksData>> | null>(null);
+  const [packsData, setPacksData] = useState<Awaited<
+    ReturnType<typeof loadPacksData>
+  > | null>(null);
 
   useEffect(() => {
     loadPacksData().then(setPacksData);

@@ -208,8 +208,7 @@ export function usePlayScreenAnimation(args: {
       const pieceCache = pieceCacheRef.current;
       const snapParticles = snapParticlesRef?.current ?? [];
       const hint = wrongRotationHintRef?.current;
-      const wrongRotationHint =
-        hint && now - hint.triggeredAt < 700 ? hint : undefined;
+      const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
       const snapPreview =
         dragState.activeId && manager ? manager.getSnapPreviewState() : null;
       renderBoard(
@@ -263,5 +262,15 @@ export function usePlayScreenAnimation(args: {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [manager, debug, showGhostHint, showAlignmentGrid, setState, viewport, snapParticlesRef, perfStatsRef, wrongRotationHintRef]);
+  }, [
+    manager,
+    debug,
+    showGhostHint,
+    showAlignmentGrid,
+    setState,
+    viewport,
+    snapParticlesRef,
+    perfStatsRef,
+    wrongRotationHintRef,
+  ]);
 }

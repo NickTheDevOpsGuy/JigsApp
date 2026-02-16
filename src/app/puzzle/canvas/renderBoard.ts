@@ -245,14 +245,16 @@ const WRONG_ROTATION_SHAKE_MS = 700;
 const WRONG_ROTATION_SHAKE_AMPLITUDE = 2.5;
 const WRONG_ROTATION_SHAKE_FREQ = 18;
 
-function wrongRotationShakeOffset(
-  elapsedMs: number,
-): { x: number; y: number } {
+function wrongRotationShakeOffset(elapsedMs: number): { x: number; y: number } {
   if (elapsedMs >= WRONG_ROTATION_SHAKE_MS) return { x: 0, y: 0 };
   const decay = 1 - elapsedMs / WRONG_ROTATION_SHAKE_MS;
   const t = elapsedMs * 0.001;
-  const x = WRONG_ROTATION_SHAKE_AMPLITUDE * Math.sin(t * WRONG_ROTATION_SHAKE_FREQ) * decay;
-  const y = WRONG_ROTATION_SHAKE_AMPLITUDE * Math.cos(t * WRONG_ROTATION_SHAKE_FREQ * 0.7) * decay;
+  const x =
+    WRONG_ROTATION_SHAKE_AMPLITUDE * Math.sin(t * WRONG_ROTATION_SHAKE_FREQ) * decay;
+  const y =
+    WRONG_ROTATION_SHAKE_AMPLITUDE *
+    Math.cos(t * WRONG_ROTATION_SHAKE_FREQ * 0.7) *
+    decay;
   return { x, y };
 }
 
@@ -304,7 +306,9 @@ function drawPiece(
     hint.pieceIds.includes(p.id) &&
     nowMs - hint.triggeredAt < WRONG_ROTATION_SHAKE_MS;
   const shakeElapsedMs = hint ? nowMs - hint.triggeredAt : 0;
-  const shake = showWrongRotationHint ? wrongRotationShakeOffset(shakeElapsedMs) : { x: 0, y: 0 };
+  const shake = showWrongRotationHint
+    ? wrongRotationShakeOffset(shakeElapsedMs)
+    : { x: 0, y: 0 };
 
   const start = popMap.get(p.id);
   const popElapsedMs = start != null ? nowMs - start : 0;

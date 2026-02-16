@@ -163,9 +163,7 @@ export function PlayScreen() {
   const [shareToast, setShareToast] = React.useState<string | null>(null);
   const lastMilestoneRef = React.useRef<number>(0);
   const [immersiveReveal, setImmersiveReveal] = React.useState(false);
-  const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const viewport = useViewport();
   const snapScaleRef = React.useRef(1);
@@ -725,88 +723,88 @@ export function PlayScreen() {
         onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
       >
         <div className={styles.topBar}>
-        <div className={styles.topBarLeft}>
-          <HeaderMenu
-            title="Phuzzle"
-            canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
-            onUndo={createUndoRedoHandler(
-              manager ?? null,
-              "undo",
-              setState,
-              () => Boolean(manager?.canUndo()),
-              soundManager.play.bind(soundManager),
-            )}
-            canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
-            onRedo={createUndoRedoHandler(
-              manager ?? null,
-              "redo",
-              setState,
-              () => Boolean(manager?.canRedo()),
-              soundManager.play.bind(soundManager),
-            )}
-            timeMode={timeMode}
-            setTimeMode={setTimeMode}
-            countdownMinutes={countdownMinutes}
-            setCountdownMinutes={setCountdownMinutes}
+          <div className={styles.topBarLeft}>
+            <HeaderMenu
+              title="Phuzzle"
+              canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
+              onUndo={createUndoRedoHandler(
+                manager ?? null,
+                "undo",
+                setState,
+                () => Boolean(manager?.canUndo()),
+                soundManager.play.bind(soundManager),
+              )}
+              canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
+              onRedo={createUndoRedoHandler(
+                manager ?? null,
+                "redo",
+                setState,
+                () => Boolean(manager?.canRedo()),
+                soundManager.play.bind(soundManager),
+              )}
+              timeMode={timeMode}
+              setTimeMode={setTimeMode}
+              countdownMinutes={countdownMinutes}
+              setCountdownMinutes={setCountdownMinutes}
+              showPreview={showPreview}
+              soundEnabled={soundEnabled}
+              hapticsEnabled={hapticsEnabled}
+              pieceLockingEnabled={pieceLockingEnabled}
+              showGhostHint={showGhostHint}
+              showAlignmentGrid={showAlignmentGrid}
+              isFullscreen={ui.isFullscreen}
+              canShowHaptics={isCoarsePointer && typeof navigator?.vibrate === "function"}
+              canShowFullscreen={!!document.fullscreenEnabled}
+              canShowShortcuts={!isCoarsePointer}
+              canShowDebug={SHOW_DEBUG}
+              debug={debug}
+              onNewPuzzle={() => setShowNewGameModal(true)}
+              onTogglePreview={() => setShowPreview((p) => !p)}
+              onToggleSound={toggleSound}
+              onToggleHaptics={toggleHaptics}
+              onTogglePieceLocking={() => setPieceLockingEnabled((p) => !p)}
+              onToggleGhostHint={() => setShowGhostHint((g) => !g)}
+              onToggleAlignmentGrid={() => setShowAlignmentGrid((a) => !a)}
+              onToggleFullscreen={toggleFullscreen}
+              onCenterBoard={() => viewport.reset()}
+              onZoomIn={() => viewport.zoomIn()}
+              onZoomOut={() => viewport.zoomOut()}
+              onShowShortcuts={() => setShowShortcuts(true)}
+              onShowHowToPlay={() => setShowHowToPlay(true)}
+              onShowHelpChoice={() => setShowHelpChoice(true)}
+              onToggleDebug={toggleDebug}
+              onTogglePerfOverlay={togglePerfOverlay}
+              immersiveMode={immersiveMode}
+              onToggleImmersiveMode={toggleImmersiveMode}
+              onSharePuzzle={isSupabaseConfigured() ? handleSharePuzzle : undefined}
+            />
+          </div>
+          <div className={styles.topBarCenter}>
+            <PlayHUD
+              elapsedSeconds={elapsedSeconds}
+              piecesLeft={left}
+              totalPieces={total}
+              isPaused={isPaused}
+              isComplete={isComplete}
+              timeMode={timeMode}
+              countdownMinutes={countdownMinutes}
+              bestTimeSeconds={bestTimeSeconds}
+              onTogglePause={() => setIsPaused((p) => !p)}
+            />
+          </div>
+          <TopBarButtons
             showPreview={showPreview}
             soundEnabled={soundEnabled}
-            hapticsEnabled={hapticsEnabled}
-            pieceLockingEnabled={pieceLockingEnabled}
-            showGhostHint={showGhostHint}
-            showAlignmentGrid={showAlignmentGrid}
             isFullscreen={ui.isFullscreen}
-            canShowHaptics={isCoarsePointer && typeof navigator?.vibrate === "function"}
-            canShowFullscreen={!!document.fullscreenEnabled}
-            canShowShortcuts={!isCoarsePointer}
-            canShowDebug={SHOW_DEBUG}
-            debug={debug}
-            onNewPuzzle={() => setShowNewGameModal(true)}
+            showDebug={SHOW_DEBUG}
+            isCoarsePointer={isCoarsePointer}
             onTogglePreview={() => setShowPreview((p) => !p)}
             onToggleSound={toggleSound}
-            onToggleHaptics={toggleHaptics}
-            onTogglePieceLocking={() => setPieceLockingEnabled((p) => !p)}
-            onToggleGhostHint={() => setShowGhostHint((g) => !g)}
-            onToggleAlignmentGrid={() => setShowAlignmentGrid((a) => !a)}
             onToggleFullscreen={toggleFullscreen}
-            onCenterBoard={() => viewport.reset()}
-            onZoomIn={() => viewport.zoomIn()}
-            onZoomOut={() => viewport.zoomOut()}
             onShowShortcuts={() => setShowShortcuts(true)}
-            onShowHowToPlay={() => setShowHowToPlay(true)}
-            onShowHelpChoice={() => setShowHelpChoice(true)}
             onToggleDebug={toggleDebug}
-            onTogglePerfOverlay={togglePerfOverlay}
-            immersiveMode={immersiveMode}
-            onToggleImmersiveMode={toggleImmersiveMode}
-            onSharePuzzle={isSupabaseConfigured() ? handleSharePuzzle : undefined}
+            onNewPuzzle={() => setShowNewGameModal(true)}
           />
-        </div>
-        <div className={styles.topBarCenter}>
-          <PlayHUD
-            elapsedSeconds={elapsedSeconds}
-            piecesLeft={left}
-            totalPieces={total}
-            isPaused={isPaused}
-            isComplete={isComplete}
-            timeMode={timeMode}
-            countdownMinutes={countdownMinutes}
-            bestTimeSeconds={bestTimeSeconds}
-            onTogglePause={() => setIsPaused((p) => !p)}
-          />
-        </div>
-        <TopBarButtons
-          showPreview={showPreview}
-          soundEnabled={soundEnabled}
-          isFullscreen={ui.isFullscreen}
-          showDebug={SHOW_DEBUG}
-          isCoarsePointer={isCoarsePointer}
-          onTogglePreview={() => setShowPreview((p) => !p)}
-          onToggleSound={toggleSound}
-          onToggleFullscreen={toggleFullscreen}
-          onShowShortcuts={() => setShowShortcuts(true)}
-          onToggleDebug={toggleDebug}
-          onNewPuzzle={() => setShowNewGameModal(true)}
-        />
         </div>
       </div>
 
@@ -964,10 +962,7 @@ export function PlayScreen() {
         }}
       />
       {(import.meta.env.DEV || SHOW_DEBUG) && (
-        <ProfilerOverlay
-          statsRef={perfStatsRef}
-          visible={debug.showPerfOverlay}
-        />
+        <ProfilerOverlay statsRef={perfStatsRef} visible={debug.showPerfOverlay} />
       )}
     </div>
   );

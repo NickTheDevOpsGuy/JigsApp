@@ -729,7 +729,10 @@ export class PuzzleManager {
         Math.hypot(dx, dy) <= tolerance &&
         !this.wouldOverlapAnyOtherGroup(gid, dx, dy)
       ) {
-        this.events.onWrongRotationHint?.(gid, groupPieces.map((p) => p.id));
+        this.events.onWrongRotationHint?.(
+          gid,
+          groupPieces.map((p) => p.id),
+        );
       }
       return false;
     }

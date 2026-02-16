@@ -12,9 +12,39 @@ export type PackMetadata = {
 };
 
 export const PACK_METADATA: PackMetadata[] = [
-  { id: "cozy-animals", name: "Cozy Animals", description: "Cute critters to piece together", emoji: "🐻", category: "animals" },
-  { id: "retro-tech", name: "Retro Tech", description: "Nostalgic computers and terminals", emoji: "🖥️", category: "tech" },
-  { id: "space-exploration", name: "Space Exploration", description: "Cosmos, planets, and nebulas", emoji: "🪐", category: "space" },
-  { id: "food-photography", name: "Food Photography", description: "Delicious dishes to assemble", emoji: "🍽️", category: "food" },
-  { id: "floral", name: "Floral", description: "Flowers and botanicals", emoji: "🌸", category: "flowers" },
+  {
+    id: "cozy-animals",
+    name: "Cozy Animals",
+    description: "Cute critters to piece together",
+    emoji: "🐻",
+    category: "animals",
+  },
+  {
+    id: "retro-tech",
+    name: "Retro Tech",
+    description: "Nostalgic computers and terminals",
+    emoji: "🖥️",
+    category: "tech",
+  },
+  {
+    id: "space-exploration",
+    name: "Space Exploration",
+    description: "Cosmos, planets, and nebulas",
+    emoji: "🪐",
+    category: "space",
+  },
+  {
+    id: "food-photography",
+    name: "Food Photography",
+    description: "Delicious dishes to assemble",
+    emoji: "🍽️",
+    category: "food",
+  },
+  {
+    id: "floral",
+    name: "Floral",
+    description: "Flowers and botanicals",
+    emoji: "🌸",
+    category: "flowers",
+  },
 ];

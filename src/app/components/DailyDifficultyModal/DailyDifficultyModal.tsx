@@ -15,7 +15,9 @@ type Props = {
 
 export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
-  const [dailyModule, setDailyModule] = useState<typeof import("@/daily/dailyPuzzle") | null>(null);
+  const [dailyModule, setDailyModule] = useState<
+    typeof import("@/daily/dailyPuzzle") | null
+  >(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -28,8 +30,18 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const puzzle = dailyModule ? dailyModule.getTodayDailyPuzzle() : null;
 
   if (!isOpen) return null;
-  if (!dailyModule) return <Modal isOpen onClose={onClose} title="Today's Puzzle" showCloseButton><p className={styles.subtitle}>Loading…</p></Modal>;
-  if (!puzzle) return <Modal isOpen onClose={onClose} title="Today's Puzzle" showCloseButton><p className={styles.subtitle}>No puzzles available.</p></Modal>;
+  if (!dailyModule)
+    return (
+      <Modal isOpen onClose={onClose} title="Today's Puzzle" showCloseButton>
+        <p className={styles.subtitle}>Loading…</p>
+      </Modal>
+    );
+  if (!puzzle)
+    return (
+      <Modal isOpen onClose={onClose} title="Today's Puzzle" showCloseButton>
+        <p className={styles.subtitle}>No puzzles available.</p>
+      </Modal>
+    );
 
   const handleStart = (grid: { rows: number; cols: number }) => {
     clearPuzzleState();

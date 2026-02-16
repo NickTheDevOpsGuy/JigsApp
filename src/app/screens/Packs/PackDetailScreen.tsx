@@ -15,7 +15,9 @@ export function PackDetailScreen() {
   const nav = useNavigate();
   const { packId } = useParams<{ packId: string }>();
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
-  const [packsData, setPacksData] = useState<Awaited<ReturnType<typeof loadPacksData>> | null>(null);
+  const [packsData, setPacksData] = useState<Awaited<
+    ReturnType<typeof loadPacksData>
+  > | null>(null);
 
   useEffect(() => {
     loadPacksData().then(setPacksData);
@@ -23,7 +25,8 @@ export function PackDetailScreen() {
 
   const packMeta = PACK_METADATA.find((p) => p.id === packId);
   const pack = packsData?.PUZZLE_PACKS.find((p) => p.id === packId);
-  const puzzles: SamplePuzzle[] = pack && packsData ? packsData.getPuzzlesForPack(pack) : [];
+  const puzzles: SamplePuzzle[] =
+    pack && packsData ? packsData.getPuzzlesForPack(pack) : [];
   const completed = getCompletedPuzzleIds();
 
   const handlePlay = (puzzle: SamplePuzzle) => {
