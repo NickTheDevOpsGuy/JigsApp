@@ -92,6 +92,25 @@
   color: var(--color-text-secondary);
 }
 
+@media (max-width: 500px) {
+  .modal {
+    max-height: 88vh;
+    margin: 8px;
+  }
+
+  .header {
+    padding: 14px 16px;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .content {
+    padding: 16px;
+  }
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

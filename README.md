@@ -20,6 +20,7 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 - [Roadmap](#-roadmap)
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
+- [Documentation](#documentation)
 - [Testing](#testing)
 - [PWA](#pwa)
 - [Adding Sample Puzzles](#-adding-sample-puzzles)
@@ -66,72 +67,34 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ### Core Gameplay
 
-- Drag-and-drop jigsaw pieces with rotation
-- Classic interlocking piece shapes with board and neighbor snapping
-- Group merging — connected pieces move together
-- Multiple difficulty levels (3×3 to 6×6 grids, custom sizes)
+- Drag-and-drop jigsaw pieces with rotation; classic interlocking shapes with board and neighbor snapping; group merging
+- Difficulty: 3×3 to 6×6 grids, custom sizes
 - Image sources: gallery, file upload, or camera capture
-- Edge-piece tray filter — All, Edges, Corners, Center (Grid/Color sort)
-- Zoom and pan — scroll to zoom (toward cursor), middle-click drag to pan; on mobile: two-finger pinch/drag, single-finger drag on empty space when zoomed
+- Piece drawer with filters (All, Edges, Corners, Center) and grid/color sort; compact mode for 25+ piece puzzles
+- Zoom and pan: scroll wheel (desktop), two-finger pinch/drag (mobile), middle-click drag or single-finger on empty space when zoomed
 
 ### UX & Polish
 
-- Reference image preview overlay
-- Progress counter and timer (elapsed, countdown, active-only, relaxed, best time)
-- Confetti on completion (theme-colored); random completion headline (e.g. "You did it!", "Puzzle master!")
-- Sound effects (snap, rotate, place, complete, undo/redo)
-- Fullscreen mode · Multiple themes (Light, Dark, Space, Ocean, Forest, Sunset)
-- Theme as full action card on main menu (no floating toggle)
-- What's New popup for updates
-- Custom fonts (Inter, Fredoka) and Lucide icons
-- Difficulty emojis (Easy 🌱, Medium ⚡, Hard 🔥, Expert 👑) for daily and regular play
-- **Engagement polish:** Snap glow and placement bounce when pieces lock; neighbor-snap particle burst when groups merge; milestone callouts at 25%, 50%, 75%; "On fire!" toast when placing 3+ pieces quickly; rotating tip/quote on main menu; last-piece flourish (brief board pulse on completion)
-- **Play screen polish:** Completion overlay fits on mobile (scroll, responsive text); piece selection border is thin and auto-clears after 1s (tap empty space to clear); board size scales with piece count on mobile for easier planning
+- Timer (elapsed, countdown, active-only, relaxed, best time); confetti and completion headline; sound effects
+- Themes (Light, Dark, Space, Ocean, Forest, Sunset); fullscreen; What's New popup
+- Snap glow, placement bounce, milestone callouts (25%/50%/75%), "On fire!" toast for quick placements
 
-### Mobile Support
+### Mobile
 
-- Touch drag, tap to rotate, drag pieces to tray
-- Two-finger pinch to zoom, two-finger drag to pan (iOS & Android, touch-event-based for reliability)
-- Single-finger pan when zoomed — drag on empty space to pan
-- Haptic feedback (place, snap, rotate)
-- Camera capture for instant puzzles
-- Mobile-safe layouts and gestures (44px touch targets)
-- Mobile piece scaling — smaller pieces for higher piece counts
-- Larger puzzles (16+ pieces) start with ~30% of pieces in tray
-- Improved scatter spacing — less overlap on start
-- Longer play menu (80vh) — no cut-off on small screens
+- Touch drag, tap to rotate; two-finger pinch/pan; haptic feedback; camera capture; 44px touch targets; piece scaling for large puzzles
 
-### Social & Progress
+### Social & Progress (Supabase)
 
-- Daily puzzle — same for everyone (date-based), streak tracking
-- Player statistics dashboard (Supabase)
-- Leaderboards: daily puzzle, weekly totals, monthly totals, all-time completions, streaks, all-time best by grid
-- Anonymous mode: toggle in profile; anonymous players appear as fun raccoon names (e.g. Trash Eater 42, Feral Raccoon 7), are still tracked, and can opt in to show their display name anytime
-- Display names and profile (Stats → Profile)
-- Achievements system
-- Share completed puzzle image
+- Daily puzzle and streak tracking; leaderboards (daily, weekly, monthly, all-time, streaks)
+- Anonymous mode (raccoon names); profile and display name; achievements; share completed image or co-op link
 
-### Accessibility & Controls
+### Help & Controls
 
-- **Help menu** — Main menu and play screen: "Help" presents two clear options: **How to Play** (gameplay basics) and **Keyboard & Controls** (shortcuts, mouse/touch, zoom/pan). No duplicate content; each flow has a single focus.
-- Keyboard shortcuts (Tab, arrows, R to rotate, ? or F1 for help, Ctrl+Z/Y undo/redo)
-- First-time tutorial overlay
-- Settings sub-menus — Game (time, ghost, lock), View (theme, preview, fullscreen), Audio (sound, haptics)
-- Undo · Redo · Ghost hint · Lock pieces (optional)
-- Designed for relaxed, low-pressure play
+- Help menu (How to Play, Keyboard & Controls); ? or F1 for shortcuts; undo/redo; ghost hint; lock pieces
 
-### Persistence
+### Persistence & PWA
 
-- Auto-save puzzle progress
-- Resume across browser sessions
-- Resume prompt on return (Resume / Start Fresh / Back to Home)
-
-### PWA (Progressive Web App)
-
-- **Installable** — Add to Home Screen (iOS/Android) or Install app (Chrome/Edge) from the live site.
-- **Manifest** — Name, icons (192×192, 512×512), theme color, standalone display, start URL.
-- **Service worker** — Auto-updating; precaches JS, CSS, HTML, and assets for faster repeat loads and basic offline support.
-- **Apple** — `apple-mobile-web-app-capable`, `apple-touch-icon`, status bar style.
+- Auto-save; resume across sessions; installable PWA (Add to Home Screen, offline-capable)
 
 ---
 
@@ -179,6 +142,17 @@ npm run dev
 ```
 
 **Useful scripts:** `npm run build` (production build), `npm run test` (unit tests), `npm run test:e2e` (E2E; run `npx playwright install` once for browsers), `npm run preview` (preview production build locally).
+
+**Optional: Supabase (leaderboards, stats, co-op)** – See [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) for setup instructions.
+
+---
+
+## Documentation
+
+| Doc | Description |
+|-----|-------------|
+| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase setup: leaderboards, stats, achievements, co-op share; env vars, migrations, verification |
+| [doc/README.md](doc/README.md) | Index of docs |
 
 ---
 
@@ -240,6 +214,9 @@ Images are auto-discovered at any depth.
 │   │   ├── Phuzzle.yml
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
+├── doc
+│   ├── README.md
+│   └── SUPABASE_SETUP.md
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push

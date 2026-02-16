@@ -1,21 +1,19 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "3";
+export const CHANGELOG_VERSION = "4";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      "📱 Two-finger pinch zoom – Zoom and pan on mobile (iOS & Android) now works reliably",
-      "📸 Camera capture – Take a photo directly for your puzzle",
-      "📰 What's New popup – Stay updated on the latest features",
-      "📊 Stats & Achievements – Track progress, compete on leaderboards",
-      "📅 Daily puzzle – Same puzzle for everyone, streak tracking",
+      "📥 Piece drawer – Taller tray, compact mode for 25+ pieces, sticky filters, scroll snapping",
+      "🖐 Touch fixes – Single piece per touch (no multi-drag), reliable tap-to-rotate on mobile",
+      "🖼 Image validation – Grid-based resolution rules; friendly errors for corrupted images",
+      "📈 Milestone progress – Based on correctly placed pieces (undo/redo safe)",
+      "❓ Help menu – Pick How to Play or Keyboard & Controls; smaller text on mobile",
       "⏱ Time modes – Elapsed, countdown, active-only, relaxed, best time",
-      "🌙 Dark mode – Easy on the eyes",
-      "↩️ Undo – Reverse accidental moves",
-      "↪️ Redo – Re-apply undone moves (Ctrl+Shift+Z / ⌘⇧Z)",
-      "👻 Ghost hint – See where pieces belong when stuck",
+      "📊 Stats & Leaderboards – Daily puzzle, streaks, achievements (Supabase)",
+      "↩️ Undo / Redo · 👻 Ghost hint · 🔒 Lock pieces",
     ],
   },
 ];

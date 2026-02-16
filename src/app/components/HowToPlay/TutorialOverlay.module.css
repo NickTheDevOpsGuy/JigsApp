@@ -72,3 +72,52 @@
 .skipLink:hover {
   color: var(--color-text-secondary);
 }
+
+/* Mobile: smaller text for easier reading without excessive scrolling */
+@media (max-width: 500px) {
+  .content {
+    gap: 12px;
+  }
+
+  .intro {
+    font-size: 13px;
+  }
+
+  .section {
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .sectionTitle {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .section p {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .section p + p {
+    margin-top: 4px;
+  }
+
+  .tips {
+    font-size: 12px;
+    padding-left: 18px;
+    line-height: 1.5;
+  }
+
+  .tips li {
+    margin-bottom: 2px;
+  }
+
+  .actions {
+    margin-top: 6px;
+    gap: 8px;
+  }
+
+  .skipLink {
+    font-size: 12px;
+  }
+}

@@ -27,8 +27,8 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   view: "View",
 };
 
-/** When in About submenu, Back goes to Help */
-const ABOUT_PARENT: SubMenuId = "help";
+/** When in About submenu, Back goes to main menu (no longer nested under Help) */
+const ABOUT_PARENT = null as SubMenuId | null;
 
 /** When in Display or Board, Back goes to View */
 const VIEW_CHILDREN: SubMenuId[] = ["display", "board"];
@@ -157,14 +157,27 @@ export function HeaderMenu(props: HeaderMenuProps) {
   const renderMainMenu = () => (
     <>
       <div className={styles.headerMenuSection}>Help</div>
-      {hasSubMenuItems("help") && (
+      {hasSubMenuItems("help") && props.onShowHelpChoice && (
+        <button
+          type="button"
+          className={styles.headerMenuItem}
+          role="menuitem"
+          onClick={() => {
+            setOpen(false);
+            props.onShowHelpChoice();
+          }}
+        >
+          {SUB_MENU_LABELS.help}
+        </button>
+      )}
+      {hasSubMenuItems("about") && (
         <button
           type="button"
           className={styles.headerMenuSubmenuTrigger}
           role="menuitem"
-          onClick={() => setActiveSubMenu("help")}
+          onClick={() => setActiveSubMenu("about")}
         >
-          {SUB_MENU_LABELS.help}
+          {SUB_MENU_LABELS.about}
           <ChevronRight size={16} className={styles.headerMenuChevron} />
         </button>
       )}
@@ -206,17 +219,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
       </button>
       <div className={styles.headerMenuDivider} />
       <div className={styles.headerMenuSection}>{SUB_MENU_LABELS[activeSubMenu!]}</div>
-      {activeSubMenu === "help" && hasSubMenuItems("about") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("about")}
-        >
-          {SUB_MENU_LABELS.about}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
       {activeSubMenu === "view" && (
         <>
           <button
