@@ -65,19 +65,6 @@ export function SetupScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const {
-    imgDataUrl,
-    setImgDataUrl,
-    error,
-    isLoading,
-    selectedPuzzle,
-    clearError,
-    selectGalleryPuzzle,
-    pickFile,
-    setFromBlob,
-    clearImage,
-  } = useImagePicker();
-
-  const {
     gridIndex,
     setGridIndex,
     customRows,
@@ -91,6 +78,24 @@ export function SetupScreen() {
     minGrid,
     maxGrid,
   } = useGridConfig();
+
+  const {
+    imgDataUrl,
+    setImgDataUrl,
+    error,
+    setError,
+    isLoading,
+    selectedPuzzle,
+    clearError,
+    selectGalleryPuzzle,
+    pickFile,
+    setFromBlob,
+    clearImage,
+    validateBeforeStart,
+  } = useImagePicker({
+    gridRows: effectiveRows,
+    gridCols: effectiveCols,
+  });
 
   const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
     useTimeModeConfig();
@@ -125,8 +130,11 @@ export function SetupScreen() {
     if (!success) e.currentTarget.value = "";
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!imgDataUrl) return;
+
+    const valid = await validateBeforeStart(effectiveRows, effectiveCols);
+    if (!valid) return;
 
     try {
       localStorage.setItem(STORAGE_KEY, imgDataUrl);
@@ -137,6 +145,7 @@ export function SetupScreen() {
       nav("/play");
     } catch {
       console.error("Could not save to localStorage");
+      setError("Could not save. Please try again.");
     }
   };
 
