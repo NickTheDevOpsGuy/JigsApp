@@ -35,6 +35,12 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 ### Gameplay Demo
 
+If the GIF link below is broken, check the folder name casing. GitHub is case-sensitive.  
+Common fixes:
+
+- `./assets/...` vs `./Assets/...`
+- `preview.gif` vs `Preview.gif`
+
 [![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
 
 ---
@@ -44,14 +50,12 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 Phuzzle is a fully interactive jigsaw puzzle experience focused on:
 
 - Smooth snapping and merging
-- Satisfying, tactile interactions
+- Satisfying interactions
 - Mobile-first usability
 - Clean, maintainable game logic
 
-It started as a small side project and evolved into a surprisingly deep puzzle engine with strong UX polish.
-
-**Purpose:**  
-A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
+Purpose:  
+A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ---
 
@@ -65,36 +69,42 @@ A calm, cozy puzzle you can open anytime — part mindfulness, part challenge.
 
 ## Features
 
-### Core Gameplay
+### Core gameplay
 
-- Drag-and-drop jigsaw pieces with rotation; classic interlocking shapes with board and neighbor snapping; group merging
-- Difficulty: 3×3 to 6×6 grids, custom sizes
-- Image sources: gallery, file upload, or camera capture
-- Piece drawer with filters (All, Edges, Corners, Center) and grid/color sort; compact mode for 25+ piece puzzles
-- Zoom and pan: scroll wheel (desktop), two-finger pinch/drag (mobile), middle-click drag or single-finger on empty space when zoomed
+- Drag and drop pieces with rotation
+- Board snap and neighbor snap
+- Group merging so connected pieces move together
+- Multiple grid sizes (3x3 to 6x6 and more)
+- Image sources: gallery, file upload, camera capture
+- Tray filters: All, Edges, Corners, Center (plus Grid and Color sorting)
+- Zoom and pan
+  - Desktop: scroll to zoom, middle mouse drag to pan
+  - Mobile: two-finger pinch zoom and pan, plus single-finger pan on empty space when zoomed
 
-### UX & Polish
+### UX and polish
 
-- Timer (elapsed, countdown, active-only, relaxed, best time); confetti and completion headline; sound effects
-- Themes (Light, Dark, Space, Ocean, Forest, Sunset); fullscreen; What's New popup
-- Snap glow, placement bounce, milestone callouts (25%/50%/75%), "On fire!" toast for quick placements
+- Reference image preview overlay
+- Progress and timer modes
+- Completion confetti and fun completion messages
+- Settings organized into sub-menus (Game, View, Audio)
+- Optional piece borders (View)
+- Undo and redo
+- Ghost hint
+- Optional piece locking
 
-### Mobile
+### Social and progress
 
-- Touch drag, tap to rotate; two-finger pinch/pan; haptic feedback; camera capture; 44px touch targets; piece scaling for large puzzles
+- Daily puzzle and streak tracking
+- Stats dashboard and leaderboards (Supabase)
+- Profile with display name and anonymous mode
+- Share completed puzzle image
+- Share app / invite testers button (native share on mobile, copy link on desktop)
 
-### Social & Progress (Supabase)
+### Analytics (optional)
 
-- Daily puzzle and streak tracking; leaderboards (daily, weekly, monthly, all-time, streaks)
-- Anonymous mode (raccoon names); profile and display name; achievements; share completed image or co-op link
-
-### Help & Controls
-
-- Help menu (How to Play, Keyboard & Controls); ? or F1 for shortcuts; undo/redo; ghost hint; lock pieces
-
-### Persistence & PWA
-
-- Auto-save; resume across sessions; installable PWA (Add to Home Screen, offline-capable)
+- PostHog integration behind env vars
+  - Events like `puzzle_started` and `puzzle_completed`
+  - No route inside the app
 
 ---
 
@@ -141,7 +151,12 @@ npm install
 npm run dev
 ```
 
-**Useful scripts:** `npm run build` (production build), `npm run test` (unit tests), `npm run test:e2e` (E2E; run `npx playwright install` once for browsers), `npm run preview` (preview production build locally).
+Useful scripts:
+
+- `npm run build` production build
+- `npm run preview` preview production build locally
+- `npm run test` unit tests
+- `npm run test:e2e` E2E tests (run `npx playwright install` once)
 
 **Optional: Supabase (leaderboards, stats, co-op)** – See [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) for setup instructions.
 
@@ -156,28 +171,52 @@ npm run dev
 
 ---
 
+## Environment Variables
+
+Copy `.env.example` to `.env.local` (or `.env.development`) and set what you need.
+
+For Vercel:  
+Project Settings → Environment Variables
+
+| Variable                 | Required | Purpose                                            |
+| ------------------------ | -------- | -------------------------------------------------- |
+| `VITE_SHOW_DEBUG`        | No       | `true` to show debug overlay in play screen        |
+| `VITE_SUPABASE_URL`      | No       | Supabase project URL                               |
+| `VITE_SUPABASE_ANON_KEY` | No       | Supabase anon key                                  |
+| `VITE_POSTHOG_KEY`       | No       | PostHog project key                                |
+| `VITE_POSTHOG_HOST`      | No       | PostHog host (example: `https://us.i.posthog.com`) |
+
+PostHog UI: https://app.posthog.com/
+
+---
+
 ## Testing
 
-- **Unit tests (Vitest)** — `npm run test` (single run), `npm run test:watch` (watch), `npm run test:ui` (UI). Tests live next to source (`*.test.ts` / `*.test.tsx`). Config: `vite.config.ts` `test` block.
-- **E2E tests (Playwright)** — `npm run test:e2e` (starts dev server, runs `e2e/*.spec.ts`). First time: `npx playwright install`. Config: `playwright.config.ts`. CI runs Chromium only.
-
-Pre-push (Husky) runs: empty-file check, Prettier, ESLint, TypeScript, and unit tests.
+- Unit tests (Vitest)
+  - `npm run test` single run
+  - `npm run test:watch` watch mode
+  - `npm run test:ui` UI runner
+- E2E tests (Playwright)
+  - `npm run test:e2e`
+  - first run: `npx playwright install`
 
 ---
 
 ## PWA
 
-Phuzzle is a **Progressive Web App**: users can install it from the browser for a standalone app experience.
+Phuzzle is a Progressive Web App. You can install it from the browser.
 
-- **Manifest** — Generated at build; defines name, short name, icons, theme color, `display: standalone`, start URL. Icons: `public/icon-192.png`, `public/icon-512.png`.
-- **Service worker** — Generated by `vite-plugin-pwa` (Workbox); precaches built assets; `registerType: "autoUpdate"` so updates apply on next load.
-- **Install** — On supported browsers (Chrome, Edge, Safari, etc.), use “Install” / “Add to Home Screen” when visiting the deployed site (e.g. phuzzle.vercel.app). No app-store submission required.
+- Manifest and icons live in `public/`
+- Service worker generated by `vite-plugin-pwa`
+- Install via “Install app” or “Add to Home Screen” when visiting the deployed site
 
 ---
 
 ## Adding Sample Puzzles
 
-Drop images into `src/app/assets/puzzles/`. You can use **one level** (e.g. `animals/`) or **subfolders** (e.g. `animals/cute/`, `animals/realistic/`).
+Drop images into `src/app/assets/puzzles/`. Subfolders are supported.
+
+Example:
 
 ```
 src/app/assets/puzzles/
@@ -185,14 +224,11 @@ src/app/assets/puzzles/
     bear.png
     cute/
       kitten.png
-    realistic/
-      wolf.png
   nature/
     mountain.jpg
 ```
 
-Images are auto-discovered at any depth.  
-**Category** = path under `puzzles/` (e.g. `animals`, `animals/cute`, `animals/realistic`). **Puzzle name** = filename (kebab-case → Title Case).
+Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 
 ---
 
@@ -478,18 +514,16 @@ Images are auto-discovered at any depth.
 
 ## Contributing
 
-We <strong>love help</strong>.
+We love help.
 
-If you want to:
+Before submitting a PR, run:
 
-- fix bugs
-- improve performance
-- add features
-- learn how puzzle engines work
+- `npm run lint`
+- `npm run typecheck`
+- `npm run test`
+- `npm run build`
 
-Before submitting a PR: run `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`. E2E: `npm run test:e2e` (optional; requires `npx playwright install` once).
-
-**DM us** to join the Discord and get involved.
+DM us to join the Discord and get involved.
 
 No gatekeeping. No ego. Just building something fun together.
 
