@@ -71,11 +71,12 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### Core gameplay
 
-- Drag and drop pieces with rotation
+- Drag and drop pieces with rotation (tap to rotate on mobile)
 - Board snap and neighbor snap (with near-snap nudge when pieces are close)
 - Group merging so connected pieces move together
 - Multiple grid sizes (3×3 to 8×8)
 - Image sources: gallery, file upload, camera capture
+- Puzzle packs – curated sets grouped by theme
 - Tray filters: All, Edges, Corners, Center (plus Grid and Color sorting)
 - Zoom and pan (animated, persistent per grid size, soft board clamp)
   - Desktop: scroll to zoom, middle mouse drag to pan
@@ -86,14 +87,17 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Reference image preview overlay
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
-- Settings organized into sub-menus (About, Help, Display with Theme, Gameplay with Controls, Audio, Advanced)
-- Optional piece borders and edge-piece highlight (View)
+- Settings organized into sub-menus: **About** (Help), **Display** (Theme, board options, effects), **Gameplay** (Controls, time display), **Audio**, **Advanced**
+- Optional piece borders, edge-piece highlight, immersive mode
 - Undo and redo
 - Ghost hint and ghost when idle (after a few seconds of inactivity)
 - Optional piece locking
 - Battery-saver detection (reduces confetti when low-power or data-saver)
-- Six themes (Light, Dark, Space, Ocean, Forest, Sunset) with system preference detection on first visit
+- Six themes (Light, Dark, Space, Ocean, Forest, Sunset) with system preference on first visit
 - Keyboard navigation in hamburger menu (Arrow keys, Escape)
+- Haptic feedback on supported devices (tap, snap, place, rotate)
+- Sound effects (toggle in Audio)
+- `prefers-reduced-motion` support for shorter animations
 
 ### Social and progress
 
@@ -102,6 +106,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Stats dashboard and leaderboards (Supabase)
 - Profile with display name and anonymous mode
 - Share completed puzzle image
+- **Co-op** – Play with Friend: share a link and work on the same puzzle together (requires Supabase)
 - Share app / invite testers button (native share on mobile, copy link on desktop)
 
 ### Analytics (optional)
@@ -117,7 +122,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 ### Planned
 
 - Import puzzle from URL
-- Offline-first gameplay (e.g. play without network after first load)
+- Full offline-first gameplay (app shells and assets cache today; puzzle images still need network on first load)
 
 ---
 
@@ -171,6 +176,8 @@ Useful scripts:
 | Doc                                            | Description                                                                                        |
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase setup: leaderboards, stats, achievements, co-op share; env vars, migrations, verification |
+| [doc/SHARING.md](doc/SHARING.md)               | Completion share (image, social) and co-op (Play with Friend)                                      |
+| [doc/streak-freeze.md](doc/streak-freeze.md)   | Streak freeze: one per week, offered when yesterday wasn't completed                               |
 | [doc/README.md](doc/README.md)                 | Index of docs                                                                                      |
 
 ---
@@ -257,21 +264,56 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
+│   ├── _
+│   │   ├── .gitignore
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── pre-push
+│   │   ├── pre-rebase
+│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
+├── .lighthouseci
+│   ├── assertion-results.json
+│   ├── lhr-1771101136136.html
+│   ├── lhr-1771101136136.json
+│   ├── lhr-1771101150354.html
+│   └── lhr-1771101150354.json
 ├── doc
 │   ├── FUTURE.md
 │   ├── LIGHTHOUSE.md
 │   ├── README.md
 │   ├── SESSION_SUMMARY.md
+│   ├── SHARING.md
+│   ├── streak-freeze.md
 │   └── SUPABASE_SETUP.md
 ├── e2e
-│   └── home.spec.ts
+│   ├── home.spec.ts
+│   ├── streak-freeze.spec.ts
+│   └── theme.spec.ts
+├── lhci-reports
+│   ├── localhost-index_html-2026_02_14_20_32_05.report.html
+│   ├── localhost-index_html-2026_02_14_20_32_05.report.json
+│   ├── localhost-index_html-2026_02_14_20_32_19.report.html
+│   ├── localhost-index_html-2026_02_14_20_32_19.report.json
+│   └── manifest.json
 ├── public
 │   ├── favicon.svg
 │   ├── icon-192.png
 │   └── icon-512.png
 ├── scripts
+│   ├── check-bundle-size.sh
 │   └── precheck.sh
 ├── src
 │   ├── app
@@ -336,6 +378,9 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── TutorialOverlay.module.css
 │   │   │   │   └── TutorialOverlay.tsx
+│   │   │   ├── MenuTree
+│   │   │   │   ├── MenuTree.module.css
+│   │   │   │   └── MenuTree.tsx
 │   │   │   ├── Modal
 │   │   │   │   ├── Modal.module.css
 │   │   │   │   └── Modal.tsx
@@ -365,22 +410,28 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │       └── WhatsNewModal.tsx
 │   │   ├── daily
 │   │   │   ├── dailyPuzzle.ts
+│   │   │   ├── dailyPuzzleCore.test.ts
 │   │   │   └── dailyPuzzleCore.ts
 │   │   ├── data
 │   │   │   ├── achievements.ts
 │   │   │   ├── anonymousNames.ts
 │   │   │   ├── changelog.ts
+│   │   │   ├── completionMessages.test.ts
 │   │   │   ├── completionMessages.ts
 │   │   │   ├── confettiColors.ts
 │   │   │   ├── loadPacksData.ts
+│   │   │   ├── menuConfig.ts
 │   │   │   ├── menuTips.ts
 │   │   │   ├── packCompletion.ts
 │   │   │   ├── packMetadata.ts
 │   │   │   ├── puzzlePacks.ts
 │   │   │   └── samplePuzzles.ts
 │   │   ├── hooks
+│   │   │   ├── useBatterySaver.ts
 │   │   │   ├── useKeyboardShortcuts.ts
+│   │   │   ├── useMenuSettings.ts
 │   │   │   ├── useOnboarding.ts
+│   │   │   ├── useTheme.test.tsx
 │   │   │   └── useTheme.tsx
 │   │   ├── puzzle
 │   │   │   ├── canvas
@@ -393,7 +444,9 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   │   └── createInitialPieces.ts
 │   │   │   ├── colorUtils.ts
 │   │   │   ├── config.ts
+│   │   │   ├── groupUtils.test.ts
 │   │   │   ├── groupUtils.ts
+│   │   │   ├── PuzzleManager.test.ts
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleStorage.ts
 │   │   │   ├── shape.ts
@@ -480,6 +533,9 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   ├── App.tsx
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
+│   ├── hooks
+│   ├── test
+│   │   └── setup.ts
 │   └── types
 │       ├── canvas-confetti.d.ts
 │       └── vite-env.d.ts
@@ -490,8 +546,11 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   └── 003_puzzle_sessions.sql
 │   └── README.md
 ├── test-results
+│   ├── home-Home-Menu-shows-main-action-buttons-webkit-retry2
+│   │   └── error-context.md
 │   └── .last-run.json
 ├── .env.example
+├── .eslintcache
 ├── .gitignore
 ├── .prettierignore
 ├── .prettierrc.yml

@@ -31,6 +31,21 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Reload when a lazy-loaded chunk fails (stale cache after deploy)
+      if (typeof window !== "undefined") {
+        window.addEventListener("error", function (e) {
+          if (
+            e.message &&
+            (e.message.includes("Failed to fetch dynamically imported module") ||
+              e.message.includes("Importing a module script failed"))
+          ) {
+            e.preventDefault();
+            window.location.reload();
+          }
+        });
+      }
+    </script>
     <script type="module" src="/src/app/main.tsx"></script>
   </body>
 </html>

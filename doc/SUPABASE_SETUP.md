@@ -77,10 +77,25 @@ npx supabase db push
 
 Required for "Play with friend" real-time sessions.
 
-1. **Dashboard** → **Database** → **Replication**
-2. Add `puzzle_sessions` to the `supabase_realtime` publication
+### Option A: Supabase Dashboard (UI)
 
-The migration sets `REPLICA IDENTITY FULL` so Realtime can send full row data on updates.
+1. Open your [Supabase Dashboard](https://app.supabase.com) and select your project
+2. In the left sidebar, go to **Database** → **Replication** (or **Database** → **Publications**)
+3. Find the **supabase_realtime** publication
+4. Under **Tables** or **Source**, locate `puzzle_sessions` and **toggle it ON** to include it in the publication
+
+### Option B: SQL Editor
+
+If the table isn’t listed or you prefer SQL:
+
+1. **Dashboard** → **SQL Editor** → **New query**
+2. Run:
+
+```sql
+alter publication supabase_realtime add table public.puzzle_sessions;
+```
+
+The migration already sets `REPLICA IDENTITY FULL` on `puzzle_sessions`, so Realtime can send full row data on updates.
 
 ---
 
