@@ -142,12 +142,12 @@ export function HeaderMenu(props: HeaderMenuProps) {
         : activeSubMenu === "contribute"
           ? contributeItems
           : settingsItems
-            .filter((i) => i.subMenu === activeSubMenu)
-            .sort((a, b) =>
-              (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
-                sensitivity: "base",
-              }),
-            );
+              .filter((i) => i.subMenu === activeSubMenu)
+              .sort((a, b) =>
+                (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
+                  sensitivity: "base",
+                }),
+              );
 
   const hasSubMenuItems = (id: SubMenuId) =>
     id === "help"
