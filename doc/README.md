@@ -8,6 +8,12 @@ Setup and reference guides for developers.
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) | Leaderboards, stats, achievements, co-op sharing – full Supabase setup. Includes [Verifying Share / Co-op](./SUPABASE_SETUP.md#verifying-share--co-op). |
 
+## Future Ideas
+
+| Document | Description |
+| -------- | ----------- |
+| [FUTURE.md](./FUTURE.md) | Planned features (piece heatmap overlay, etc.) |
+
 ## Session Notes
 
 | Document                                   | Description                                                                                |

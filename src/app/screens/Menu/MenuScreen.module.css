@@ -66,6 +66,11 @@
   gap: 6px;
   min-height: 72px;
   padding: 12px;
+  transition: background-color 0.15s ease;
+}
+
+.actionCard:hover:not(:disabled) {
+  background: var(--color-action-hover);
 }
 
 /* Today's Puzzle – featured daily CTA */

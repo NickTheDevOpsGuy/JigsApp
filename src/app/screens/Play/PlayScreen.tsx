@@ -191,6 +191,13 @@ export function PlayScreen() {
   const totalForOnboarding = state?.totalCount ?? 0;
   const onboarding = useOnboarding(placedForOnboarding, totalForOnboarding);
 
+  // Auto-dismiss zoom tip when user zooms – they clearly know how
+  useEffect(() => {
+    if (onboarding.needsZoomTip && viewport.viewport.scale !== 1) {
+      onboarding.dismissZoomTip();
+    }
+  }, [viewport.viewport.scale, onboarding.needsZoomTip, onboarding.dismissZoomTip]);
+
   const stateRef = React.useRef(state);
   stateRef.current = state;
   const elapsedSecondsRef = React.useRef(elapsedSeconds);

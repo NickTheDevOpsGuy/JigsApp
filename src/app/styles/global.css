@@ -16,6 +16,7 @@
   --color-brand-primary: #0b63b8;
   --color-brand-hover: #0952a0;
   --color-brand-light: #dff1ff;
+  --color-action-hover: rgba(11, 99, 184, 0.18);
   --color-border: rgba(11, 99, 184, 0.2);
   --color-border-strong: rgba(11, 99, 184, 0.35);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -55,6 +56,7 @@ html.theme-light {
   --color-brand-primary: #0b63b8;
   --color-brand-hover: #0952a0;
   --color-brand-light: #dff1ff;
+  --color-action-hover: rgba(11, 99, 184, 0.18);
   --color-border: rgba(11, 99, 184, 0.2);
   --color-border-strong: rgba(11, 99, 184, 0.35);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -93,6 +95,7 @@ html.theme-dark {
   --color-brand-primary: #4a9ff5;
   --color-brand-hover: #58a6f7;
   --color-brand-light: #1c3a5c;
+  --color-action-hover: rgba(74, 159, 245, 0.25);
   --color-border: rgba(74, 159, 245, 0.2);
   --color-border-strong: rgba(74, 159, 245, 0.35);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -132,6 +135,7 @@ html.theme-space {
   --color-brand-primary: #a78bfa;
   --color-brand-hover: #c4b5fd;
   --color-brand-light: #2e2648;
+  --color-action-hover: rgba(167, 139, 250, 0.25);
   --color-border: rgba(167, 139, 250, 0.25);
   --color-border-strong: rgba(167, 139, 250, 0.4);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
@@ -171,6 +175,7 @@ html.theme-ocean {
   --color-brand-primary: #3b82f6;
   --color-brand-hover: #60a5fa;
   --color-brand-light: #1e3a5f;
+  --color-action-hover: rgba(59, 130, 246, 0.25);
   --color-border: rgba(59, 130, 246, 0.3);
   --color-border-strong: rgba(59, 130, 246, 0.45);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -210,6 +215,7 @@ html.theme-forest {
   --color-brand-primary: #66bb6a;
   --color-brand-hover: #81c784;
   --color-brand-light: #1a2e22;
+  --color-action-hover: rgba(102, 187, 106, 0.22);
   --color-border: rgba(102, 187, 106, 0.25);
   --color-border-strong: rgba(102, 187, 106, 0.4);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -249,6 +255,7 @@ html.theme-sunset {
   --color-brand-primary: #ff8c42;
   --color-brand-hover: #ffa366;
   --color-brand-light: #4d2e14;
+  --color-action-hover: rgba(255, 140, 66, 0.28);
   --color-border: rgba(255, 140, 66, 0.35);
   --color-border-strong: rgba(255, 140, 66, 0.5);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);

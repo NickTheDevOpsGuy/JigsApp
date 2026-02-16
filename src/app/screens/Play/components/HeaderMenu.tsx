@@ -271,6 +271,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
     <div className={styles.headerMenuWrap} ref={rootRef}>
       <Button
         size="sm"
+        className={styles.headerMenuTrigger}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={open ? "Close menu" : "Open menu"}
