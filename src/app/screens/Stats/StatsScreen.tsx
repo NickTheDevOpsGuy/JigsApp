@@ -102,8 +102,18 @@ export function StatsScreen() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const [raccoonName, setRaccoonName] = useState<string | null>(null);
+  const [leaderboardCompact, setLeaderboardCompact] = useState(true);
+  const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
 
   const configured = isSupabaseConfigured();
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 520px)");
+    setLeaderboardCompact(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setLeaderboardCompact(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const loadData = useCallback(async () => {
     if (!configured) return;
@@ -254,21 +264,44 @@ export function StatsScreen() {
       {entries.length === 0 ? (
         <p className={styles.empty}>{emptyMsg}</p>
       ) : (
-        <ol className={styles.leaderboard}>
-          {entries.map((entry) => (
-            <li
-              key={`${entry.rank}-${entry.displayName}`}
-              className={`${styles.leaderboardItem} ${
-                entry.rank <= 3 ? styles.leaderboardPodium : ""
-              }`}
-            >
-              <span className={styles.rank}>
-                {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-              </span>
-              <span className={styles.player}>{entry.displayName}</span>
-              <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
-            </li>
-          ))}
+        <ol
+          className={`${styles.leaderboard} ${
+            leaderboardCompact ? styles.leaderboardCompact : ""
+          }`}
+        >
+          {entries.map((entry) => {
+            const key = `time-${entry.rank}-${entry.displayName}`;
+            const isExpanded = expandedRowKey === key;
+            return (
+              <li
+                key={key}
+                className={`${styles.leaderboardItem} ${
+                  entry.rank <= 3 ? styles.leaderboardPodium : ""
+                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
+                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setExpandedRowKey(isExpanded ? null : key);
+                  }
+                }}
+              >
+                <span className={styles.rank}>
+                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+                </span>
+                <span className={styles.player}>{entry.displayName}</span>
+                <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
+                {isExpanded && (
+                  <div className={styles.leaderboardDetail}>
+                    {Math.floor(entry.elapsedSeconds / 60)}m{" "}
+                    {entry.elapsedSeconds % 60}s
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ol>
       )}
     </>
@@ -279,21 +312,45 @@ export function StatsScreen() {
       {entries.length === 0 ? (
         <p className={styles.empty}>No streaks yet. Complete daily puzzles!</p>
       ) : (
-        <ol className={styles.leaderboard}>
-          {entries.map((entry) => (
-            <li
-              key={`${entry.rank}-${entry.displayName}`}
-              className={`${styles.leaderboardItem} ${
-                entry.rank <= 3 ? styles.leaderboardPodium : ""
-              }`}
-            >
-              <span className={styles.rank}>
-                {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-              </span>
-              <span className={styles.player}>{entry.displayName}</span>
-              <span className={styles.time}>{entry.streak} days</span>
-            </li>
-          ))}
+        <ol
+          className={`${styles.leaderboard} ${
+            leaderboardCompact ? styles.leaderboardCompact : ""
+          }`}
+        >
+          {entries.map((entry) => {
+            const key = `streak-${entry.rank}-${entry.displayName}`;
+            const isExpanded = expandedRowKey === key;
+            return (
+              <li
+                key={key}
+                className={`${styles.leaderboardItem} ${
+                  entry.rank <= 3 ? styles.leaderboardPodium : ""
+                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
+                onClick={() =>
+                  setExpandedRowKey(isExpanded ? null : key)
+                }
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setExpandedRowKey(isExpanded ? null : key);
+                  }
+                }}
+              >
+                <span className={styles.rank}>
+                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+                </span>
+                <span className={styles.player}>{entry.displayName}</span>
+                <span className={styles.time}>{entry.streak} days</span>
+                {isExpanded && (
+                  <div className={styles.leaderboardDetail}>
+                    {entry.streak} day streak
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ol>
       )}
     </>
@@ -307,21 +364,45 @@ export function StatsScreen() {
       {entries.length === 0 ? (
         <p className={styles.empty}>{emptyMsg}</p>
       ) : (
-        <ol className={styles.leaderboard}>
-          {entries.map((entry) => (
-            <li
-              key={`${entry.rank}-${entry.displayName}`}
-              className={`${styles.leaderboardItem} ${
-                entry.rank <= 3 ? styles.leaderboardPodium : ""
-              }`}
-            >
-              <span className={styles.rank}>
-                {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-              </span>
-              <span className={styles.player}>{entry.displayName}</span>
-              <span className={styles.time}>{entry.count} puzzles</span>
-            </li>
-          ))}
+        <ol
+          className={`${styles.leaderboard} ${
+            leaderboardCompact ? styles.leaderboardCompact : ""
+          }`}
+        >
+          {entries.map((entry) => {
+            const key = `completion-${entry.rank}-${entry.displayName}`;
+            const isExpanded = expandedRowKey === key;
+            return (
+              <li
+                key={key}
+                className={`${styles.leaderboardItem} ${
+                  entry.rank <= 3 ? styles.leaderboardPodium : ""
+                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
+                onClick={() =>
+                  setExpandedRowKey(isExpanded ? null : key)
+                }
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setExpandedRowKey(isExpanded ? null : key);
+                  }
+                }}
+              >
+                <span className={styles.rank}>
+                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+                </span>
+                <span className={styles.player}>{entry.displayName}</span>
+                <span className={styles.time}>{entry.count} puzzles</span>
+                {isExpanded && (
+                  <div className={styles.leaderboardDetail}>
+                    {entry.count} total puzzles completed
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ol>
       )}
     </>
@@ -508,6 +589,15 @@ export function StatsScreen() {
                       </select>
                     </div>
                   )}
+                  <button
+                    type="button"
+                    className={styles.lbViewToggle}
+                    onClick={() => setLeaderboardCompact((c) => !c)}
+                    title={leaderboardCompact ? "Expand view" : "Compact view"}
+                    aria-label={leaderboardCompact ? "Expand view" : "Compact view"}
+                  >
+                    {leaderboardCompact ? "Expand" : "Compact"}
+                  </button>
                   <Button
                     size="sm"
                     variant="secondary"

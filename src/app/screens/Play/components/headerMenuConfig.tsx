@@ -27,6 +27,8 @@ export type HeaderMenuProps = {
   hapticsEnabled: boolean;
   pieceLockingEnabled: boolean;
   showGhostHint: boolean;
+  showGhostWhenIdle: boolean;
+  showEdgeHighlight: boolean;
   showAlignmentGrid: boolean;
   isFullscreen: boolean;
   canShowHaptics: boolean;
@@ -40,6 +42,8 @@ export type HeaderMenuProps = {
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
   onToggleGhostHint: () => void;
+  onToggleGhostWhenIdle: () => void;
+  onToggleEdgeHighlight: () => void;
   onToggleAlignmentGrid: () => void;
   onToggleFullscreen: () => void;
   onCenterBoard: () => void;
@@ -268,6 +272,24 @@ export function buildMenuItems(
       sortKey: "Ghost hint",
       onClick: c(props.onToggleGhostHint),
       subMenu: "game",
+    },
+    {
+      id: "ghostWhenIdle",
+      section: "settings",
+      visible: true,
+      label: props.showGhostWhenIdle ? "Ghost when idle: on" : "Ghost when idle: off",
+      sortKey: "Ghost when idle",
+      onClick: c(props.onToggleGhostWhenIdle),
+      subMenu: "view",
+    },
+    {
+      id: "edgeHighlight",
+      section: "settings",
+      visible: true,
+      label: props.showEdgeHighlight ? "Edge highlight: on" : "Edge highlight: off",
+      sortKey: "2 Edge highlight",
+      onClick: c(props.onToggleEdgeHighlight),
+      subMenu: "view",
     },
     {
       id: "haptics",

@@ -4,6 +4,7 @@
 import { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+import { initStreakFreeze } from "@/daily/dailyPuzzleCore";
 import { ensureSignedIn } from "@/supabase/auth";
 
 // Route-level code splitting: load screens on demand to keep initial chunk smaller
@@ -53,6 +54,7 @@ function PageFallback() {
 export function App() {
   useEffect(() => {
     ensureSignedIn();
+    initStreakFreeze();
   }, []);
 
   return (

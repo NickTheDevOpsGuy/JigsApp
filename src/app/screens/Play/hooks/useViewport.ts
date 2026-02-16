@@ -2,7 +2,7 @@
  * useViewport – zoom/pan state for the puzzle board.
  * screenToBoard converts client coords to board space; handleWheel, zoomIn/Out, reset.
  */
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const isPanningRef = { current: false };
 const isPinchingRef = { current: false };
@@ -11,6 +11,43 @@ const MIN_SCALE = 0.25;
 const MAX_SCALE = 4;
 const ZOOM_SENSITIVITY = 0.001;
 const ZOOM_STEP = 0.25;
+const ZOOM_ANIM_MS = 200;
+const VIEWPORT_STORAGE_PREFIX = "phuzzle:viewport:";
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function loadViewport(puzzleKey: string | null): ViewportState | null {
+  if (!puzzleKey || typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(`${VIEWPORT_STORAGE_PREFIX}${puzzleKey}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { scale?: number; panX?: number; panY?: number };
+    const scale = typeof parsed?.scale === "number" ? parsed.scale : 1;
+    const panX = typeof parsed?.panX === "number" ? parsed.panX : 0;
+    const panY = typeof parsed?.panY === "number" ? parsed.panY : 0;
+    if (scale >= MIN_SCALE && scale <= MAX_SCALE) {
+      return { scale, panX, panY };
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function saveViewport(puzzleKey: string | null, v: ViewportState): void {
+  if (!puzzleKey || typeof window === "undefined") return;
+  try {
+    localStorage.setItem(
+      `${VIEWPORT_STORAGE_PREFIX}${puzzleKey}`,
+      JSON.stringify({ scale: v.scale, panX: v.panX, panY: v.panY }),
+    );
+  } catch {
+    /* ignore */
+  }
+}
 
 export type ViewportState = {
   scale: number;
@@ -18,12 +55,25 @@ export type ViewportState = {
   panY: number;
 };
 
-export function useViewport() {
-  const [viewport, setViewport] = useState<ViewportState>({
-    scale: 1,
-    panX: 0,
-    panY: 0,
+export function useViewport(puzzleKey: string | null = null) {
+  const [viewport, setViewport] = useState<ViewportState>(() => {
+    const loaded = loadViewport(puzzleKey);
+    return loaded ?? { scale: 1, panX: 0, panY: 0 };
   });
+
+  const prevPuzzleKeyRef = useRef<string | null>(puzzleKey);
+  useEffect(() => {
+    if (puzzleKey !== prevPuzzleKeyRef.current) {
+      prevPuzzleKeyRef.current = puzzleKey;
+      const loaded = loadViewport(puzzleKey);
+      setViewport(loaded ?? { scale: 1, panX: 0, panY: 0 });
+    }
+  }, [puzzleKey]);
+
+  useEffect(() => {
+    if (!puzzleKey) return;
+    saveViewport(puzzleKey, viewport);
+  }, [puzzleKey, viewport.scale, viewport.panX, viewport.panY]);
 
   const screenToBoard = useCallback(
     (clientX: number, clientY: number, boardRect: DOMRect): { x: number; y: number } => {
@@ -166,29 +216,61 @@ export function useViewport() {
     setViewport({ scale: 1, panX: 0, panY: 0 });
   }, []);
 
-  const zoomIn = useCallback(() => {
-    setViewport((prev) => {
-      const newScale = Math.min(MAX_SCALE, prev.scale + ZOOM_STEP);
-      const factor = newScale / prev.scale;
-      return {
-        scale: newScale,
-        panX: prev.panX * factor,
-        panY: prev.panY * factor,
-      };
-    });
+  const animateTo = useCallback((target: ViewportState) => {
+    if (prefersReducedMotion()) {
+      setViewport(target);
+      return;
+    }
+    const start = viewportRef.current;
+    const startTime = performance.now();
+    let rafId: number;
+
+    const tick = () => {
+      const elapsed = performance.now() - startTime;
+      const t = Math.min(1, elapsed / ZOOM_ANIM_MS);
+      const eased = 1 - (1 - t) * (1 - t);
+      setViewport({
+        scale: start.scale + (target.scale - start.scale) * eased,
+        panX: start.panX + (target.panX - start.panX) * eased,
+        panY: start.panY + (target.panY - start.panY) * eased,
+      });
+      if (t < 1) rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
+  const zoomIn = useCallback(() => {
+    const prev = viewportRef.current;
+    const newScale = Math.min(MAX_SCALE, prev.scale + ZOOM_STEP);
+    const factor = newScale / prev.scale;
+    const target = {
+      scale: newScale,
+      panX: prev.panX * factor,
+      panY: prev.panY * factor,
+    };
+    if (prefersReducedMotion()) {
+      setViewport(target);
+    } else {
+      animateTo(target);
+    }
+  }, [animateTo]);
+
   const zoomOut = useCallback(() => {
-    setViewport((prev) => {
-      const newScale = Math.max(MIN_SCALE, prev.scale - ZOOM_STEP);
-      const factor = newScale / prev.scale;
-      return {
-        scale: newScale,
-        panX: prev.panX * factor,
-        panY: prev.panY * factor,
-      };
-    });
-  }, []);
+    const prev = viewportRef.current;
+    const newScale = Math.max(MIN_SCALE, prev.scale - ZOOM_STEP);
+    const factor = newScale / prev.scale;
+    const target = {
+      scale: newScale,
+      panX: prev.panX * factor,
+      panY: prev.panY * factor,
+    };
+    if (prefersReducedMotion()) {
+      setViewport(target);
+    } else {
+      animateTo(target);
+    }
+  }, [animateTo]);
 
   const handleWheel = useCallback(
     (e: React.WheelEvent<HTMLCanvasElement>, boardEl: HTMLDivElement | null) => {

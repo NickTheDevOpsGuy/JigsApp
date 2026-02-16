@@ -4,7 +4,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "@/components/Modal/Modal";
-import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
+import {
+  GRID_OPTIONS,
+  getStreakFreezeCount,
+  getYesterdayDateString,
+  useStreakFreeze,
+  wasYesterdayMissed,
+} from "@/daily/dailyPuzzleCore";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 import styles from "./DailyDifficultyModal.module.css";
 
@@ -18,6 +24,9 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const [dailyModule, setDailyModule] = useState<
     typeof import("@/daily/dailyPuzzle") | null
   >(null);
+  const [freezeUsed, setFreezeUsed] = useState(false);
+  const showFreezeOffer =
+    wasYesterdayMissed() && getStreakFreezeCount() > 0 && !freezeUsed;
 
   useEffect(() => {
     if (isOpen) {
@@ -43,6 +52,10 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       </Modal>
     );
 
+  const handleUseFreeze = () => {
+    if (useStreakFreeze(getYesterdayDateString())) setFreezeUsed(true);
+  };
+
   const handleStart = (grid: { rows: number; cols: number }) => {
     clearPuzzleState();
     const result = dailyModule.startDailyPuzzle(grid);
@@ -59,6 +72,27 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       title="Today's Puzzle"
       showCloseButton={true}
     >
+      {showFreezeOffer && (
+        <div className={styles.freezeOffer} role="alert">
+          <span>You missed yesterday. Use your streak freeze to protect your streak?</span>
+          <div className={styles.freezeActions}>
+            <button
+              type="button"
+              className={styles.freezeBtn}
+              onClick={handleUseFreeze}
+            >
+              Use Freeze
+            </button>
+            <button
+              type="button"
+              className={styles.freezeSkip}
+              onClick={() => setFreezeUsed(true)}
+            >
+              No thanks
+            </button>
+          </div>
+        </div>
+      )}
       <p className={styles.subtitle}>Same puzzle for everyone — pick your difficulty</p>
       <div className={styles.difficulties}>
         {GRID_OPTIONS.map((opt) => (

@@ -123,6 +123,31 @@
   color: var(--color-brand-primary);
 }
 
+.shuffleBtn {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.shuffleBtn:hover:not(:disabled) {
+  background: var(--color-bg-secondary);
+  color: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.shuffleBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Visual "you are here" scroll position indicator */
 .scrollIndicator {
   flex-shrink: 0;

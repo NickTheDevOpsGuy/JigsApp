@@ -8,6 +8,8 @@ import {
   GHOST_HINT_KEY,
   IMMERSIVE_MODE_KEY,
   ALIGNMENT_GRID_KEY,
+  GHOST_WHEN_IDLE_KEY,
+  EDGE_HIGHLIGHT_KEY,
   type DebugFlags,
 } from "../playScreenUtils";
 
@@ -31,6 +33,22 @@ export function usePlayScreenUI() {
   const [showAlignmentGrid, setShowAlignmentGrid] = useState(() => {
     try {
       return localStorage.getItem(ALIGNMENT_GRID_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const [showGhostWhenIdle, setShowGhostWhenIdle] = useState(() => {
+    try {
+      return localStorage.getItem(GHOST_WHEN_IDLE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const [showEdgeHighlight, setShowEdgeHighlight] = useState(() => {
+    try {
+      return localStorage.getItem(EDGE_HIGHLIGHT_KEY) === "true";
     } catch {
       return false;
     }
@@ -113,6 +131,22 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
+      localStorage.setItem(GHOST_WHEN_IDLE_KEY, showGhostWhenIdle ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [showGhostWhenIdle]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(EDGE_HIGHLIGHT_KEY, showEdgeHighlight ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [showEdgeHighlight]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(IMMERSIVE_MODE_KEY, immersiveMode ? "true" : "false");
     } catch {
       // ignore
@@ -154,6 +188,9 @@ export function usePlayScreenUI() {
     setImmersiveMode((m) => !m);
   }, []);
 
+  const toggleShowGhostWhenIdle = useCallback(() => setShowGhostWhenIdle((v) => !v), []);
+  const toggleShowEdgeHighlight = useCallback(() => setShowEdgeHighlight((v) => !v), []);
+
   return {
     pieceLockingEnabled,
     setPieceLockingEnabled,
@@ -161,6 +198,12 @@ export function usePlayScreenUI() {
     setShowGhostHint,
     showAlignmentGrid,
     setShowAlignmentGrid,
+    showGhostWhenIdle,
+    setShowGhostWhenIdle,
+    toggleShowGhostWhenIdle,
+    showEdgeHighlight,
+    setShowEdgeHighlight,
+    toggleShowEdgeHighlight,
     debug,
     setDebug,
     showPreview,

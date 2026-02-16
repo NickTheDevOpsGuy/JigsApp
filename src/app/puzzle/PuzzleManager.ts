@@ -261,13 +261,22 @@ export class PuzzleManager {
     );
   }
 
+  /** Soft overflow (px) beyond board edge before hard clamping. Avoids lost pieces. */
+  private static readonly SOFT_CLAMP_OVERFLOW = 80;
+
   private clampGroupDelta(groupId: string, dx: number, dy: number) {
     const b = this.getGroupBounds(groupId);
     if (!b) return { dx: 0, dy: 0 };
 
+    const overflow = PuzzleManager.SOFT_CLAMP_OVERFLOW;
+    const minDx = -this.pad - b.minX - overflow;
+    const maxDx = this.boardWidth + this.pad - b.maxX + overflow;
+    const minDy = -this.pad - b.minY - overflow;
+    const maxDy = this.boardHeight + this.pad - b.maxY + overflow;
+
     return {
-      dx: _clamp(dx, -this.pad - b.minX, this.boardWidth + this.pad - b.maxX),
-      dy: _clamp(dy, -this.pad - b.minY, this.boardHeight + this.pad - b.maxY),
+      dx: _clamp(dx, minDx, maxDx),
+      dy: _clamp(dy, minDy, maxDy),
     };
   }
 
@@ -625,14 +634,18 @@ export class PuzzleManager {
     // Try neighbor snap first (connect pieces), then board snap (align to grid).
     // Order matters: board-then-neighbor could undo the board snap by aligning to a floating neighbor.
     performance.mark("snap-neighbor-start");
-    this.trySnapActiveGroupToNeighbor();
+    const snappedNeighbor = this.trySnapActiveGroupToNeighbor();
     performance.mark("snap-neighbor-end");
     performance.measure("snap-neighbor", "snap-neighbor-start", "snap-neighbor-end");
 
     performance.mark("snap-board-start");
-    this.trySnapActiveGroupToBoard();
+    const snappedBoard = this.trySnapActiveGroupToBoard();
     performance.mark("snap-board-end");
     performance.measure("snap-board", "snap-board-start", "snap-board-end");
+
+    if (!snappedNeighbor && !snappedBoard) {
+      this.tryNearSnapNudge();
+    }
 
     // Clear drag state
     this.drag = {
@@ -848,6 +861,34 @@ export class PuzzleManager {
     this.events.onPieceSnapped?.(mergedIds, center);
 
     return true;
+  }
+
+  /** Gentle nudge when group is very close to board snap but didn't snap (e.g. just outside tolerance). */
+  private tryNearSnapNudge(): void {
+    const activeId = this.drag.activeId;
+    if (!activeId) return;
+
+    const active = this.findPiece(activeId);
+    if (!active || active.isPlaced || active.locked) return;
+
+    const gid = active.groupId;
+    if (!this.getGroupPieces(gid).every((p) => p.rotation === 0)) return;
+
+    const activeTile = this.tilePos(active);
+    const dx = active.targetX - activeTile.x;
+    const dy = active.targetY - activeTile.y;
+    const distance = Math.hypot(dx, dy);
+    const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
+    const nearThreshold = tolerance * 0.7;
+    const farThreshold = tolerance * 1.15;
+
+    if (distance <= nearThreshold || distance > farThreshold) return;
+    if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return;
+
+    const nudgeFactor = 0.35;
+    const nudgeDx = dx * nudgeFactor;
+    const nudgeDy = dy * nudgeFactor;
+    this.shiftGroup(gid, nudgeDx, nudgeDy);
   }
 
   private trySnapMergedGroupToBoard(groupId: string): void {

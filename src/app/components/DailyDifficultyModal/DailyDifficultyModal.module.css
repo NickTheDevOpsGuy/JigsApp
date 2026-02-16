@@ -1,3 +1,50 @@
+.freezeOffer {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.freezeActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.freezeBtn {
+  appearance: none;
+  border: none;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.freezeBtn:hover {
+  opacity: 0.95;
+}
+
+.freezeSkip {
+  appearance: none;
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-muted);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.freezeSkip:hover {
+  background: var(--color-bg-secondary);
+}
+
 .subtitle {
   margin: 0 0 20px;
   font-size: 14px;
