@@ -39,6 +39,8 @@ export function usePointerHandlers(args: {
   haptic?: (kind: HapticKind) => void;
   onDragPreview?: (state: DragPreviewState) => void;
   onPieceInteraction?: () => void;
+  onDragStarted?: () => void;
+  onDragEnded?: () => void;
   screenToBoard?: ScreenToBoard;
   viewport?: {
     startPan: (x: number, y: number) => void;
@@ -73,6 +75,8 @@ export function usePointerHandlers(args: {
     haptic,
     onDragPreview,
     onPieceInteraction,
+    onDragStarted,
+    onDragEnded,
     screenToBoard,
     viewport,
   } = args;
@@ -122,6 +126,8 @@ export function usePointerHandlers(args: {
     haptic,
     onDragPreview,
     onPieceInteraction,
+    onDragStarted,
+    onDragEnded,
     screenToBoard,
     viewport,
     activePointerIdRef,

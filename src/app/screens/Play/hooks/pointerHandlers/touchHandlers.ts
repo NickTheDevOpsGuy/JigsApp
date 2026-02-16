@@ -84,6 +84,7 @@ export function handleTouchMove(
     canvas.touchDragStarted = true;
     didDragRef.current = true;
     ctx.onPieceInteraction?.();
+    ctx.onDragStarted?.();
     const boardRect = boardRef.current.getBoundingClientRect();
     if (screenToBoard) {
       const { x: boardX, y: boardY } = screenToBoard(sx, sy, boardRect);
@@ -190,6 +191,7 @@ export function handleTouchUp(
       selectCycle,
     );
     setState(manager.getState());
+    ctx.onDragEnded?.();
   }
 
   resetTouchState(canvas);

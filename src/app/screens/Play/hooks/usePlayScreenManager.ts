@@ -42,6 +42,10 @@ export function usePlayScreenManager(
       pieceIds: string[];
       triggeredAt: number;
     } | null>;
+    /** Ref set to performance.now() when drag starts; used for piece_snapped analytics. */
+    dragStartTimeRef?: MutableRefObject<number | null>;
+    /** Called when piece snaps (place or merge) with time_to_snap_ms for analytics. */
+    onPieceSnappedAnalytics?: (timeToSnapMs: number) => void;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -211,6 +215,10 @@ export function usePlayScreenManager(
             onPiecePlaced: (p) => {
               const now = performance.now();
               const opts = optionsRef.current;
+              const startTime = opts?.dragStartTimeRef?.current;
+              if (startTime != null && typeof opts?.onPieceSnappedAnalytics === "function") {
+                opts.onPieceSnappedAnalytics(Math.round(now - startTime));
+              }
               lastInteractionRef.current = now;
               popMapRef.current.set(p.id, now);
               soundManager.play("place");
@@ -233,6 +241,10 @@ export function usePlayScreenManager(
             onPieceSnapped: (pieceIds, center) => {
               const now = performance.now();
               const opts = optionsRef.current;
+              const startTime = opts?.dragStartTimeRef?.current;
+              if (startTime != null && typeof opts?.onPieceSnappedAnalytics === "function") {
+                opts.onPieceSnappedAnalytics(Math.round(now - startTime));
+              }
               lastInteractionRef.current = now;
               soundManager.play("snap");
               opts?.haptic?.("snap");

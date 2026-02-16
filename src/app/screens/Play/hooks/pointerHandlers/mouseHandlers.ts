@@ -42,6 +42,7 @@ export function handleMouseDown(
     e.preventDefault();
 
     onPieceInteraction?.();
+    ctx.onDragStarted?.();
     if (screenToBoard) {
       const { x: boardX, y: boardY } = screenToBoard(e.clientX, e.clientY, boardRect);
       manager.pointerDownBoardSpace(pieceId, boardX, boardY);
@@ -135,6 +136,7 @@ export function handleMouseUp(
   finishDragWithTrayCheck(manager, e.clientX, e.clientY, isPointerOverTray, selectCycle);
   setState(manager.getState());
   didDragRef.current = false;
+  ctx.onDragEnded?.();
 
   try {
     canvas.releasePointerCapture(e.pointerId);

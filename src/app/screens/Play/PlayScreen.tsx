@@ -16,6 +16,7 @@ import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
+import type { Piece, PuzzleState } from "@/puzzle/types";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { consumeCurrentPuzzleId, recordPuzzleCompletion } from "@/data/packCompletion";
 import { soundManager } from "@/audio/sounds";
@@ -181,6 +182,8 @@ export function PlayScreen() {
     pieceIds: string[];
     triggeredAt: number;
   } | null>(null);
+  const dragStartTimeRef = React.useRef<number | null>(null);
+  const stateRef = React.useRef<PuzzleState | null>(null);
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -201,6 +204,16 @@ export function PlayScreen() {
         perfStatsRef.current.snapCheckCount++;
       },
       wrongRotationHintRef,
+      dragStartTimeRef,
+      onPieceSnappedAnalytics: (timeToSnapMs) => {
+        const g = stateRef.current?.grid;
+        const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
+        posthog.capture("piece_snapped", {
+          grid_size: gridSize,
+          device_type: isCoarsePointer ? "mobile" : "desktop",
+          time_to_snap_ms: timeToSnapMs,
+        });
+      },
     },
   );
   const {
@@ -222,20 +235,19 @@ export function PlayScreen() {
     snapParticlesRef,
   } = managerResult;
 
+  stateRef.current = state;
+
   // ─── Onboarding & milestone toasts ───
   const placedForOnboarding = state?.placedCount ?? 0;
   const totalForOnboarding = state?.totalCount ?? 0;
   const onboarding = useOnboarding(placedForOnboarding, totalForOnboarding);
 
-  // Auto-dismiss zoom tip when user zooms – they clearly know how
   useEffect(() => {
     if (onboarding.needsZoomTip && viewport.viewport.scale !== 1) {
       onboarding.dismissZoomTip();
     }
   }, [viewport.viewport.scale, onboarding.needsZoomTip, onboarding.dismissZoomTip]);
 
-  const stateRef = React.useRef(state);
-  stateRef.current = state;
   const elapsedSecondsRef = React.useRef(elapsedSeconds);
   elapsedSecondsRef.current = elapsedSeconds;
 
@@ -563,6 +575,19 @@ export function PlayScreen() {
     onPieceInteraction: () => {
       lastInteractionRef.current = performance.now();
     },
+    onDragStarted: () => {
+      const now = performance.now();
+      dragStartTimeRef.current = now;
+      const g = stateRef.current?.grid;
+      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
+      posthog.capture("drag_started", {
+        grid_size: gridSize,
+        device_type: isCoarsePointer ? "mobile" : "desktop",
+      });
+    },
+    onDragEnded: () => {
+      dragStartTimeRef.current = null;
+    },
     screenToBoard: viewport.screenToBoard,
     viewport,
   });
@@ -620,7 +645,7 @@ export function PlayScreen() {
       }
       const s = stateRef.current;
       const pieces = s?.pieces
-        ? s.pieces.map((p) => ({
+        ? s.pieces.map((p: Piece) => ({
             id: p.id,
             row: p.row,
             col: p.col,
