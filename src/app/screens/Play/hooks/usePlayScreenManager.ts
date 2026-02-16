@@ -216,7 +216,10 @@ export function usePlayScreenManager(
               const now = performance.now();
               const opts = optionsRef.current;
               const startTime = opts?.dragStartTimeRef?.current;
-              if (startTime != null && typeof opts?.onPieceSnappedAnalytics === "function") {
+              if (
+                startTime != null &&
+                typeof opts?.onPieceSnappedAnalytics === "function"
+              ) {
                 opts.onPieceSnappedAnalytics(Math.round(now - startTime));
               }
               lastInteractionRef.current = now;
@@ -242,7 +245,10 @@ export function usePlayScreenManager(
               const now = performance.now();
               const opts = optionsRef.current;
               const startTime = opts?.dragStartTimeRef?.current;
-              if (startTime != null && typeof opts?.onPieceSnappedAnalytics === "function") {
+              if (
+                startTime != null &&
+                typeof opts?.onPieceSnappedAnalytics === "function"
+              ) {
                 opts.onPieceSnappedAnalytics(Math.round(now - startTime));
               }
               lastInteractionRef.current = now;

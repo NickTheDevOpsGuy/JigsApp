@@ -9,7 +9,9 @@ import {
 } from "./groupUtils";
 import type { Piece } from "./types";
 
-function makePiece(overrides: Partial<Piece> & { id: string; row: number; col: number }): Piece {
+function makePiece(
+  overrides: Partial<Piece> & { id: string; row: number; col: number },
+): Piece {
   return {
     id: overrides.id,
     row: overrides.row,
@@ -92,12 +94,26 @@ describe("getGroupBounds", () => {
 
   it("returns bounds for single piece", () => {
     const p = makePiece({ id: "a", row: 0, col: 0, x: 10, y: 20, w: 50, h: 50 });
-    expect(getGroupBounds([p], p.groupId)).toEqual({ minX: 10, minY: 20, maxX: 60, maxY: 70 });
+    expect(getGroupBounds([p], p.groupId)).toEqual({
+      minX: 10,
+      minY: 20,
+      maxX: 60,
+      maxY: 70,
+    });
   });
 
   it("returns union bounds for multi-piece group", () => {
     const p1 = makePiece({ id: "a", row: 0, col: 0, x: 0, y: 0, w: 50, h: 50 });
-    const p2 = makePiece({ id: "b", row: 1, col: 0, x: 0, y: 60, w: 50, h: 50, groupId: p1.groupId });
+    const p2 = makePiece({
+      id: "b",
+      row: 1,
+      col: 0,
+      x: 0,
+      y: 60,
+      w: 50,
+      h: 50,
+      groupId: p1.groupId,
+    });
     const bounds = getGroupBounds([p1, p2], p1.groupId);
     expect(bounds).toEqual({ minX: 0, minY: 0, maxX: 50, maxY: 110 });
   });
@@ -110,14 +126,50 @@ describe("wouldOverlapAnyOtherGroup", () => {
   });
 
   it("returns false when groups do not overlap after move", () => {
-    const p1 = makePiece({ id: "a", row: 0, col: 0, x: 0, y: 0, w: 50, h: 50, groupId: "g1" });
-    const p2 = makePiece({ id: "b", row: 1, col: 0, x: 0, y: 100, w: 50, h: 50, groupId: "g2" });
+    const p1 = makePiece({
+      id: "a",
+      row: 0,
+      col: 0,
+      x: 0,
+      y: 0,
+      w: 50,
+      h: 50,
+      groupId: "g1",
+    });
+    const p2 = makePiece({
+      id: "b",
+      row: 1,
+      col: 0,
+      x: 0,
+      y: 100,
+      w: 50,
+      h: 50,
+      groupId: "g2",
+    });
     expect(wouldOverlapAnyOtherGroup([p1, p2], "g1", 100, 0)).toBe(false);
   });
 
   it("returns true when groups would overlap after move", () => {
-    const p1 = makePiece({ id: "a", row: 0, col: 0, x: 0, y: 0, w: 50, h: 50, groupId: "g1" });
-    const p2 = makePiece({ id: "b", row: 1, col: 0, x: 0, y: 60, w: 50, h: 50, groupId: "g2" });
+    const p1 = makePiece({
+      id: "a",
+      row: 0,
+      col: 0,
+      x: 0,
+      y: 0,
+      w: 50,
+      h: 50,
+      groupId: "g1",
+    });
+    const p2 = makePiece({
+      id: "b",
+      row: 1,
+      col: 0,
+      x: 0,
+      y: 60,
+      w: 50,
+      h: 50,
+      groupId: "g2",
+    });
     expect(wouldOverlapAnyOtherGroup([p1, p2], "g1", 0, 50)).toBe(true);
   });
 });

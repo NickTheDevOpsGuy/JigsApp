@@ -34,7 +34,14 @@ export function getSuggestedGrid(
     const nextIndex = largestCompleted + 1;
     if (nextIndex >= PRESET_SIZES.length) return null;
     const next = PRESET_SIZES[nextIndex];
-    const labels = ["Easy 🌱", "Medium ⚡", "Hard 🔥", "Expert 👑", "Master 🧠", "Legend 🔮"];
+    const labels = [
+      "Easy 🌱",
+      "Medium ⚡",
+      "Hard 🔥",
+      "Expert 👑",
+      "Master 🧠",
+      "Legend 🔮",
+    ];
     return {
       gridIndex: nextIndex,
       rows: next.rows,

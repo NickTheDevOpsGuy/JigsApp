@@ -37,8 +37,7 @@ describe("getSuggestedGrid", () => {
   });
 
   it("suggests 4x4 when 3x3 completed", () => {
-    const getBestTime = (r: number, c: number) =>
-      r === 3 && c === 3 ? 120 : null;
+    const getBestTime = (r: number, c: number) => (r === 3 && c === 3 ? 120 : null);
     const result = getSuggestedGrid(getBestTime);
     expect(result).toEqual({
       gridIndex: 1,
@@ -49,8 +48,7 @@ describe("getSuggestedGrid", () => {
   });
 
   it("suggests 6x6 when 5x5 completed", () => {
-    const getBestTime = (r: number, c: number) =>
-      r <= 5 && c <= 5 ? 60 : null;
+    const getBestTime = (r: number, c: number) => (r <= 5 && c <= 5 ? 60 : null);
     const result = getSuggestedGrid(getBestTime);
     expect(result).toEqual({
       gridIndex: 3,
