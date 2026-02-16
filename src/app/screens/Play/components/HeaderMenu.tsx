@@ -19,7 +19,7 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   about: "ℹ️ About",
   advanced: "⚙️ Advanced",
   audio: "🔊 Audio",
-  contribute: "🤝 Contribute",
+  contribute: "ℹ️ About Us",
   controls: "🎮 Controls",
   display: "👁️ Display",
   gameplay: "🎯 Gameplay",
@@ -228,7 +228,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
               className={styles.headerMenuSubmenuTrigger}
               role="menuitem"
               onClick={() => setActiveSubMenu("contribute")}
-              aria-label="Contribute"
+              aria-label="About Us"
             >
               {SUB_MENU_LABELS.contribute}
               <ChevronRight size={16} className={styles.headerMenuChevron} />
@@ -292,7 +292,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
             renderSubMenu()
           ) : (
             <>
-              <div className={styles.headerMenuSection}>ℹ️ About</div>
+              <div className={styles.headerMenuSection}>{SUB_MENU_LABELS.about}</div>
               {hasSubMenuItems("about") && (
                 <button
                   type="button"
