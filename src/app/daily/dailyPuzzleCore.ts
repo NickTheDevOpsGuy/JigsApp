@@ -34,8 +34,10 @@ export function getYesterdayDateString(): string {
 export function wasYesterdayMissed(): boolean {
   try {
     const yesterday = getYesterdayDateString();
-    const completed = localStorage.getItem(`${DAILY_PREFIX}${yesterday}:completed`) === "true";
-    const freezeUsed = localStorage.getItem(`${STREAK_FREEZE_KEY}:used:${yesterday}`) === "true";
+    const completed =
+      localStorage.getItem(`${DAILY_PREFIX}${yesterday}:completed`) === "true";
+    const freezeUsed =
+      localStorage.getItem(`${STREAK_FREEZE_KEY}:used:${yesterday}`) === "true";
     return !completed && !freezeUsed;
   } catch {
     return false;

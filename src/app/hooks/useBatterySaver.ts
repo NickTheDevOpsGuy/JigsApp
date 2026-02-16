@@ -6,7 +6,8 @@ import { useSyncExternalStore } from "react";
 
 function getSnapshot(): boolean {
   if (typeof navigator === "undefined") return false;
-  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } })
+    .connection?.saveData;
   if (saveData === true) return true;
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }

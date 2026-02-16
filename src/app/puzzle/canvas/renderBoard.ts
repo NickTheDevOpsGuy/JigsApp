@@ -127,14 +127,7 @@ export function renderBoard(
 
   // Ghost hint: draw misplaced pieces at their target positions (before real pieces)
   if (animState?.showGhostHint && !state.isComplete) {
-    drawGhostHints(
-      ctx,
-      state.pieces,
-      img,
-      cols,
-      rows,
-      animState.ghostAlpha ?? 0.35,
-    );
+    drawGhostHints(ctx, state.pieces, img, cols, rows, animState.ghostAlpha ?? 0.35);
   }
 
   // Determine dragged group

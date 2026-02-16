@@ -172,8 +172,7 @@ export function PlayScreen() {
   const [immersiveReveal, setImmersiveReveal] = React.useState(false);
   const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const viewportKey =
-    grid != null ? `vp:${grid.rows}x${grid.cols}` : null;
+  const viewportKey = grid != null ? `vp:${grid.rows}x${grid.cols}` : null;
   const viewport = useViewport(viewportKey);
   const snapScaleRef = React.useRef(1);
   snapScaleRef.current = viewport.viewport.scale;
@@ -433,7 +432,9 @@ export function PlayScreen() {
     toggleFullscreen,
     selectCycle,
     selectedIdRef,
-    onUndoSuccess: () => { undoCountRef.current += 1; },
+    onUndoSuccess: () => {
+      undoCountRef.current += 1;
+    },
   });
 
   usePlayScreenTimer({
@@ -798,7 +799,9 @@ export function PlayScreen() {
                 setState,
                 () => Boolean(manager?.canUndo()),
                 soundManager.play.bind(soundManager),
-                () => { undoCountRef.current += 1; },
+                () => {
+                  undoCountRef.current += 1;
+                },
               )}
               canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
               onRedo={createUndoRedoHandler(

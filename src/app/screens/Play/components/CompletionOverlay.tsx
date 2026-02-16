@@ -14,10 +14,7 @@ import {
 } from "@/daily/dailyPuzzleCore";
 import { recordCompletion } from "@/services/statsService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
-import {
-  getCompletionMessage,
-  getCompletionBadge,
-} from "@/data/completionMessages";
+import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
 
 interface ShareUrls {
   twitter: string;

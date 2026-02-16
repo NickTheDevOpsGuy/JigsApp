@@ -74,13 +74,11 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     >
       {showFreezeOffer && (
         <div className={styles.freezeOffer} role="alert">
-          <span>You missed yesterday. Use your streak freeze to protect your streak?</span>
+          <span>
+            You missed yesterday. Use your streak freeze to protect your streak?
+          </span>
           <div className={styles.freezeActions}>
-            <button
-              type="button"
-              className={styles.freezeBtn}
-              onClick={handleUseFreeze}
-            >
+            <button type="button" className={styles.freezeBtn} onClick={handleUseFreeze}>
               Use Freeze
             </button>
             <button

@@ -217,7 +217,8 @@ export function usePlayScreenAnimation(args: {
       const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
       const snapPreview =
         dragState.activeId && manager ? manager.getSnapPreviewState() : null;
-      const idleMs = lastInteractionRef?.current != null ? now - lastInteractionRef.current : 0;
+      const idleMs =
+        lastInteractionRef?.current != null ? now - lastInteractionRef.current : 0;
       const IDLE_GHOST_MS = 4000;
       const effectiveShowGhost =
         showGhostHint ||
