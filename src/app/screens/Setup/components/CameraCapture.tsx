@@ -1,5 +1,6 @@
 /**
- * CameraCapture – getUserMedia for rear camera; capture frame as Blob.
+ * CameraCapture – getUserMedia for camera; capture frame as Blob.
+ * Uses relaxed constraints for mobile compatibility. Falls back to file input with capture on failure.
  */
 import { useRef, useEffect, useState } from "react";
 import { Camera } from "lucide-react";
@@ -7,6 +8,30 @@ import { Button } from "@/components/Button/Button";
 import styles from "./CameraCapture.module.css";
 
 const MIN_SIZE = 200;
+
+/** Try increasingly permissive constraints – strict resolution causes OverconstrainedError on iOS/mobile. */
+async function getCameraStream(): Promise<MediaStream> {
+  const attempts: (boolean | MediaTrackConstraints)[] = [
+    { facingMode: "environment" },
+    { facingMode: "user" },
+    true,
+  ];
+
+  for (const video of attempts) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: video === true ? true : video,
+        audio: false,
+      });
+      return stream;
+    } catch {
+      continue;
+    }
+  }
+  throw new Error(
+    "Could not access camera. Please grant permission or use Upload instead.",
+  );
+}
 
 type CameraCaptureProps = {
   onCapture: (blob: Blob) => Promise<boolean>;
@@ -16,6 +41,7 @@ type CameraCaptureProps = {
 export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -26,10 +52,7 @@ export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
 
     const startCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment", width: { min: 640 }, height: { min: 480 } },
-          audio: false,
-        });
+        const stream = await getCameraStream();
 
         if (cancelled) {
           stream.getTracks().forEach((t) => t.stop());
@@ -69,6 +92,14 @@ export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
   }, [status]);
 
   const handleStart = () => setStatus("loading");
+
+  const handleFileCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const ok = await onCapture(file);
+    if (ok) setStatus("idle");
+  };
 
   const handleCapture = async () => {
     const video = videoRef.current;
@@ -114,10 +145,32 @@ export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
         <p className={styles.hint}>
           Requires HTTPS (or localhost) and camera permission.
         </p>
-        <Button variant="primary" onClick={handleStart} disabled={disabled}>
-          <Camera size={18} />
-          Start Camera
-        </Button>
+        <div className={styles.idleActions}>
+          <Button variant="primary" onClick={handleStart} disabled={disabled}>
+            <Camera size={18} />
+            Start Camera
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileCapture}
+            className={styles.fileInput}
+            aria-label="Take photo with camera app"
+          />
+          <Button
+            variant="secondary"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={disabled}
+          >
+            Open Camera App
+          </Button>
+        </div>
+        <p className={styles.hint}>
+          Use &quot;Open Camera App&quot; if live preview doesn&apos;t work on your
+          device.
+        </p>
       </div>
     );
   }
@@ -134,8 +187,28 @@ export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
     return (
       <div className={styles.placeholder}>
         <p className={styles.error}>{errorMsg}</p>
+        <p className={styles.hint}>
+          On mobile, you can use the button below to open your camera app instead.
+        </p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={handleFileCapture}
+          className={styles.fileInput}
+          aria-label="Take photo with camera"
+        />
+        <Button
+          variant="primary"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={disabled}
+        >
+          <Camera size={18} />
+          Open Camera App
+        </Button>
         <Button variant="secondary" onClick={() => setStatus("idle")}>
-          Try Again
+          Try Live Preview Again
         </Button>
       </div>
     );

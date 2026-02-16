@@ -12,7 +12,7 @@ import React, {
 import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
-import { Minimize2, Maximize2 } from "lucide-react";
+import { Minimize2, Maximize2, Shuffle } from "lucide-react";
 import styles from "./PieceTray.module.css";
 
 type TraySection = "all" | "corners" | "edges" | "center";
@@ -52,6 +52,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 ) {
   const [section, setSection] = useState<TraySection>("all");
   const [sortMode, setSortMode] = useState<SortMode>("grid");
+  const [shuffledOrder, setShuffledOrder] = useState<string[] | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScroll, setCanScroll] = useState(false);
@@ -91,18 +92,38 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     return next;
   };
 
+  const shuffleTray = useCallback(() => {
+    const ids = pieces.map((p) => p.id);
+    const shuffled = [...ids].sort(() => Math.random() - 0.5);
+    setShuffledOrder(shuffled);
+  }, [pieces]);
+
   const sections = useMemo(() => {
     const corners = pieces.filter((p) => isCorner(p, grid));
     const edges = pieces.filter((p) => isEdge(p, grid));
     const center = pieces.filter((p) => !isCorner(p, grid) && !isEdge(p, grid));
 
-    return {
-      all: sortPieces(pieces),
-      corners: sortPieces(corners),
-      edges: sortPieces(edges),
-      center: sortPieces(center),
+    const all = sortPieces(pieces);
+    const cornersS = sortPieces(corners);
+    const edgesS = sortPieces(edges);
+    const centerS = sortPieces(center);
+
+    const applyShuffle = (arr: Piece[]) => {
+      if (!shuffledOrder || arr.length === 0) return arr;
+      const orderMap = new Map(shuffledOrder.map((id, i) => [id, i]));
+      const inOrder = arr.filter((p) => orderMap.has(p.id));
+      const notInOrder = arr.filter((p) => !orderMap.has(p.id));
+      inOrder.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
+      return [...inOrder, ...notInOrder];
     };
-  }, [pieces, grid, sortMode, image, hueById]);
+
+    return {
+      all: applyShuffle(all),
+      corners: applyShuffle(cornersS),
+      edges: applyShuffle(edgesS),
+      center: applyShuffle(centerS),
+    };
+  }, [pieces, grid, sortMode, image, hueById, shuffledOrder]);
 
   const displayed = sections[section];
 
@@ -209,20 +230,37 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
             <button
               type="button"
               className={sortMode === "grid" ? styles.active : undefined}
-              onClick={() => setSortMode("grid")}
+              onClick={() => {
+                setSortMode("grid");
+                setShuffledOrder(null);
+              }}
             >
               Grid
             </button>
             <button
               type="button"
               className={sortMode === "color" ? styles.active : undefined}
-              onClick={() => setSortMode("color")}
+              onClick={() => {
+                setSortMode("color");
+                setShuffledOrder(null);
+              }}
               disabled={!image}
               title={!image ? "Load an image to enable color sorting" : undefined}
             >
               Color
             </button>
           </div>
+
+          <button
+            type="button"
+            className={styles.shuffleBtn}
+            onClick={shuffleTray}
+            disabled={pieces.length === 0}
+            aria-label="Shuffle tray"
+            title="Randomize piece order in tray"
+          >
+            <Shuffle size={14} />
+          </button>
         </div>
       </div>
 

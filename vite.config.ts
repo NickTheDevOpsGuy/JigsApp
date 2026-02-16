@@ -44,6 +44,7 @@ export default defineConfig(({ mode }) => {
       include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
       exclude: ["node_modules", "**/e2e/**"],
       globals: true,
+      setupFiles: ["./src/test/setup.ts"],
     },
     build: {
       rollupOptions: {

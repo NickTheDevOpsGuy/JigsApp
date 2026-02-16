@@ -25,6 +25,9 @@ export function usePlayScreenAnimation(args: {
   debug: DebugFlags;
   showGhostHint: boolean;
   showAlignmentGrid: boolean;
+  showGhostWhenIdle?: boolean;
+  showEdgeHighlight?: boolean;
+  lastInteractionRef?: React.RefObject<number>;
   viewport: ViewportState;
   perfStatsRef?: React.RefObject<PerfStats | null>;
   wrongRotationHintRef?: React.RefObject<{
@@ -47,6 +50,9 @@ export function usePlayScreenAnimation(args: {
     debug,
     showGhostHint,
     showAlignmentGrid,
+    showGhostWhenIdle,
+    showEdgeHighlight,
+    lastInteractionRef,
     viewport,
     perfStatsRef,
     wrongRotationHintRef,
@@ -211,6 +217,13 @@ export function usePlayScreenAnimation(args: {
       const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
       const snapPreview =
         dragState.activeId && manager ? manager.getSnapPreviewState() : null;
+      const idleMs =
+        lastInteractionRef?.current != null ? now - lastInteractionRef.current : 0;
+      const IDLE_GHOST_MS = 4000;
+      const effectiveShowGhost =
+        showGhostHint ||
+        (!!showGhostWhenIdle && idleMs >= IDLE_GHOST_MS && !st.isComplete);
+      const ghostAlpha = showGhostHint ? 0.35 : 0.2;
       renderBoard(
         ctx,
         st,
@@ -228,7 +241,9 @@ export function usePlayScreenAnimation(args: {
           selectedPieceId: selectedIdRef.current,
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
-          showGhostHint,
+          showGhostHint: effectiveShowGhost,
+          ghostAlpha,
+          showEdgeHighlight,
           showAlignmentGrid,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
           dragDisplayOverrides: isDragging ? dragDisplayOverrides : undefined,
@@ -266,7 +281,10 @@ export function usePlayScreenAnimation(args: {
     manager,
     debug,
     showGhostHint,
+    showGhostWhenIdle,
+    showEdgeHighlight,
     showAlignmentGrid,
+    lastInteractionRef,
     setState,
     viewport,
     snapParticlesRef,

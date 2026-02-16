@@ -86,7 +86,7 @@ export function MenuScreen() {
             className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
           >
             <HelpCircle size={22} />
-            <span className={styles.actionLabel}>Help</span>
+            <span className={styles.actionLabel}>❓ Help</span>
           </Button>
         </div>
       </div>

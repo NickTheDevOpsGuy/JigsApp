@@ -1,9 +1,9 @@
 /**
  * Header menu item definitions and submenu grouping.
- * buildMenuItems produces the flat list; HeaderMenu groups by subMenu for display.
+ * Structure: Gameplay, Display (Theme submenu opens modal), Audio, Advanced.
  */
 import type { TimeMode } from "../timeMode";
-import { COUNTDOWN_OPTIONS } from "../timeMode";
+import type { Theme } from "@/hooks/useTheme";
 
 export type DebugFlags = {
   showGrid: boolean;
@@ -27,6 +27,8 @@ export type HeaderMenuProps = {
   hapticsEnabled: boolean;
   pieceLockingEnabled: boolean;
   showGhostHint: boolean;
+  showGhostWhenIdle: boolean;
+  showEdgeHighlight: boolean;
   showAlignmentGrid: boolean;
   isFullscreen: boolean;
   canShowHaptics: boolean;
@@ -40,6 +42,8 @@ export type HeaderMenuProps = {
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
   onToggleGhostHint: () => void;
+  onToggleGhostWhenIdle: () => void;
+  onToggleEdgeHighlight: () => void;
   onToggleAlignmentGrid: () => void;
   onToggleFullscreen: () => void;
   onCenterBoard: () => void;
@@ -47,27 +51,31 @@ export type HeaderMenuProps = {
   onZoomOut: () => void;
   onShowShortcuts: () => void;
   onShowHowToPlay: () => void;
-  onShowHelpChoice: () => void;
   onShowAbout?: () => void;
   onToggleDebug: () => void;
   onTogglePerfOverlay: () => void;
   immersiveMode: boolean;
   onToggleImmersiveMode: () => void;
   onSharePuzzle?: () => void | Promise<void>;
+  theme?: Theme;
+  setTheme?: (t: Theme) => void;
+  onOpenThemeModal?: () => void;
+  onResetStats?: () => void;
+  onClearCache?: () => void;
 };
 
 export type SubMenuId =
   | "about"
+  | "advanced"
   | "audio"
-  | "board"
   | "controls"
   | "display"
-  | "game"
+  | "gameplay"
   | "help"
   | "navigation"
   | "share"
   | "stats"
-  | "view";
+  | "theme";
 
 export type MenuItemConfig = {
   id: string;
@@ -77,17 +85,15 @@ export type MenuItemConfig = {
   disabled?: boolean;
   onClick: () => void;
   isTheme?: boolean;
+  isThemeOption?: boolean;
+  themeValue?: Theme;
+  isSectionLabel?: boolean;
   sortKey?: string;
-  /** When set, item appears in this sub-menu instead of top-level settings */
   subMenu?: SubMenuId;
-};
-
-const TIME_MODE_LABELS: Record<TimeMode, string> = {
-  elapsed: "Elapsed",
-  countdown: "Countdown",
-  active: "Active only",
-  relaxed: "Relaxed (no timer)",
-  best: "Best time",
+  /** Screen reader label without emojis */
+  ariaLabel?: string;
+  /** Tooltip when disabled */
+  disabledTitle?: string;
 };
 
 const GITHUB_REPO_URL = "https://github.com/NickTheDevOpsGuy/phuzzle";
@@ -104,12 +110,15 @@ export function buildMenuItems(
     fn();
   };
 
+  const showTimer = props.timeMode !== "relaxed";
+
   return [
+    // ─── Navigation ───
     {
       id: "home",
       section: "settings",
       visible: true,
-      label: "Home",
+      label: "🏠 Home",
       sortKey: "Home",
       onClick: c(() => navigate("/")),
       subMenu: "navigation",
@@ -118,207 +127,172 @@ export function buildMenuItems(
       id: "new",
       section: "settings",
       visible: true,
-      label: "New puzzle",
+      label: "🧩 New puzzle",
       sortKey: "New puzzle",
       onClick: c(props.onNewPuzzle),
       subMenu: "navigation",
+    },
+    // ─── Gameplay ───
+    {
+      id: "redo",
+      section: "settings",
+      visible: true,
+      label: "↪️ Redo",
+      sortKey: "Redo",
+      disabled: !props.canRedo,
+      onClick: c(props.onRedo),
+      subMenu: "controls",
+      disabledTitle: "No moves to redo yet",
     },
     {
       id: "undo",
       section: "settings",
       visible: true,
-      label: "Undo",
+      label: "↩️ Undo",
       sortKey: "Undo",
       disabled: !props.canUndo,
       onClick: c(props.onUndo),
       subMenu: "controls",
+      disabledTitle: "No moves to undo yet",
     },
     {
-      id: "redo",
+      id: "lock",
       section: "settings",
       visible: true,
-      label: "Redo",
-      sortKey: "Redo",
-      disabled: !props.canRedo,
-      onClick: c(props.onRedo),
-      subMenu: "controls",
+      label: props.pieceLockingEnabled ? "Tap to Rotate ✨" : "Tap to Rotate 🌙",
+      sortKey: "Tap to Rotate",
+      onClick: c(props.onTogglePieceLocking),
+      subMenu: "gameplay",
     },
     {
-      id: "debug",
+      id: "showTimer",
       section: "settings",
-      visible: props.canShowDebug,
-      label: "Debug overlay",
-      sortKey: "Debug overlay",
-      onClick: c(props.onToggleDebug),
-      /* No subMenu - stays at top level */
+      visible: true,
+      label: showTimer ? "Show Timer ✨" : "Show Timer 🌙",
+      sortKey: "Show Timer",
+      onClick: c(() => props.setTimeMode(showTimer ? "relaxed" : "elapsed")),
+      subMenu: "gameplay",
     },
+    // ─── Display ───
     {
-      id: "perfOverlay",
+      id: "alignmentGrid",
       section: "settings",
-      visible: props.canShowDebug,
-      label: props.debug.showPerfOverlay ? "Hide perf overlay" : "Perf overlay",
-      sortKey: "Perf overlay",
-      onClick: c(props.onTogglePerfOverlay),
-    },
-    {
-      id: "fullscreen",
-      section: "settings",
-      visible: props.canShowFullscreen,
-      label: props.isFullscreen ? "Exit fullscreen" : "Fullscreen",
-      sortKey: "1 Fullscreen",
-      onClick: c(props.onToggleFullscreen),
+      visible: true,
+      label: props.showAlignmentGrid ? "Alignment Grid ✨" : "Alignment Grid 🌙",
+      sortKey: "Alignment Grid",
+      onClick: c(props.onToggleAlignmentGrid),
       subMenu: "display",
     },
     {
-      id: "preview",
+      id: "edgeHighlight",
       section: "settings",
       visible: true,
-      label: props.showPreview ? "Hide preview" : "Show preview",
-      sortKey: "2 Show preview",
-      onClick: c(props.onTogglePreview),
+      label: props.showEdgeHighlight ? "Edge Highlight ✨" : "Edge Highlight 🌙",
+      sortKey: "Edge Highlight",
+      onClick: c(props.onToggleEdgeHighlight),
       subMenu: "display",
     },
     {
-      id: "theme",
+      id: "ghostHint",
       section: "settings",
       visible: true,
-      label: "",
-      sortKey: "3 Theme",
-      onClick: () => setOpen(false),
-      isTheme: true,
+      label: props.showGhostHint ? "Ghost Hint ✨" : "Ghost Hint 🌙",
+      sortKey: "Ghost Hint",
+      onClick: c(props.onToggleGhostHint),
+      subMenu: "display",
+    },
+    {
+      id: "ghostWhenIdle",
+      section: "settings",
+      visible: true,
+      label: props.showGhostWhenIdle ? "Ghost When Idle ✨" : "Ghost When Idle 🌙",
+      sortKey: "Ghost When Idle",
+      onClick: c(props.onToggleGhostWhenIdle),
       subMenu: "display",
     },
     {
       id: "immersiveMode",
       section: "settings",
       visible: true,
-      label: props.immersiveMode ? "Immersive mode: on" : "Immersive mode: off",
-      sortKey: "0 Immersive",
+      label: props.immersiveMode ? "Immersive Mode ✨" : "Immersive Mode 🌙",
+      sortKey: "Immersive Mode",
       onClick: c(props.onToggleImmersiveMode),
-      subMenu: "view",
+      subMenu: "display",
     },
-    {
-      id: "alignmentGrid",
-      section: "settings",
-      visible: true,
-      label: props.showAlignmentGrid ? "Alignment grid: on" : "Alignment grid: off",
-      sortKey: "1 Alignment grid",
-      onClick: c(props.onToggleAlignmentGrid),
-      subMenu: "view",
-    },
-    {
-      id: "centerBoard",
-      section: "settings",
-      visible: true,
-      label: "Center board",
-      sortKey: "1 Center board",
-      onClick: c(props.onCenterBoard),
-      subMenu: "board",
-    },
-    {
-      id: "zoomIn",
-      section: "settings",
-      visible: true,
-      label: "Zoom in",
-      sortKey: "2 Zoom in",
-      onClick: c(props.onZoomIn),
-      subMenu: "board",
-    },
-    {
-      id: "zoomOut",
-      section: "settings",
-      visible: true,
-      label: "Zoom out",
-      sortKey: "3 Zoom out",
-      onClick: c(props.onZoomOut),
-      subMenu: "board",
-    },
-    {
-      id: "timeMode",
-      section: "settings",
-      visible: true,
-      label: `Time: ${TIME_MODE_LABELS[props.timeMode]} (tap to change)`,
-      sortKey: "Time",
-      onClick: c(() => {
-        const order: TimeMode[] = ["elapsed", "countdown", "active", "relaxed", "best"];
-        props.setTimeMode(order[(order.indexOf(props.timeMode) + 1) % order.length]);
-      }),
-      subMenu: "game",
-    },
-    {
-      id: "countdownMinutes",
-      section: "settings",
-      visible: props.timeMode === "countdown",
-      label: `Countdown: ${props.countdownMinutes} min`,
-      sortKey: "Countdown",
-      onClick: c(() => {
-        const idx = COUNTDOWN_OPTIONS.indexOf(
-          props.countdownMinutes as (typeof COUNTDOWN_OPTIONS)[number],
-        );
-        const i = idx >= 0 ? idx : 0;
-        props.setCountdownMinutes(COUNTDOWN_OPTIONS[(i + 1) % COUNTDOWN_OPTIONS.length]);
-      }),
-      subMenu: "game",
-    },
-    {
-      id: "ghost",
-      section: "settings",
-      visible: true,
-      label: props.showGhostHint ? "Ghost hint: on" : "Ghost hint: off",
-      sortKey: "Ghost hint",
-      onClick: c(props.onToggleGhostHint),
-      subMenu: "game",
-    },
+    // ─── Audio ───
     {
       id: "haptics",
       section: "settings",
       visible: props.canShowHaptics,
-      label: props.hapticsEnabled ? "Haptics: on" : "Haptics: off",
+      label: props.hapticsEnabled ? "Haptics ✨" : "Haptics 🌙",
       sortKey: "Haptics",
       onClick: c(props.onToggleHaptics),
       subMenu: "audio",
     },
     {
-      id: "lock",
-      section: "settings",
-      visible: true,
-      label: props.pieceLockingEnabled ? "Lock pieces: on" : "Lock pieces: off",
-      sortKey: "Lock pieces",
-      onClick: c(props.onTogglePieceLocking),
-      subMenu: "game",
-    },
-    {
       id: "sound",
       section: "settings",
       visible: true,
-      label: props.soundEnabled ? "Sound: on" : "Sound: off",
-      sortKey: "Sound",
+      label: props.soundEnabled ? "Sound Effects ✨" : "Sound Effects 🌙",
+      sortKey: "Sound Effects",
       onClick: c(props.onToggleSound),
       subMenu: "audio",
+    },
+    // ─── Advanced ───
+    {
+      id: "clearCache",
+      section: "settings",
+      visible: !!props.onClearCache,
+      label: "🗑️ Clear Cache",
+      sortKey: "Clear Cache",
+      onClick: c(props.onClearCache ?? (() => {})),
+      subMenu: "advanced",
+    },
+    {
+      id: "perfOverlay",
+      section: "settings",
+      visible: props.canShowDebug,
+      label: props.debug.showPerfOverlay
+        ? "📊 Performance Overlay ✨"
+        : "📊 Performance Overlay 🌙",
+      sortKey: "Performance Overlay",
+      onClick: c(props.onTogglePerfOverlay),
+      subMenu: "advanced",
+    },
+    {
+      id: "resetStats",
+      section: "settings",
+      visible: !!props.onResetStats,
+      label: "🔄 Reset Local Stats",
+      sortKey: "Reset Local Stats",
+      onClick: c(props.onResetStats ?? (() => {})),
+      subMenu: "advanced",
+    },
+    // ─── Stats, Share ───
+    {
+      id: "stats",
+      section: "settings",
+      visible: true,
+      label: "🏆 Leaderboards",
+      sortKey: "Leaderboards",
+      onClick: c(() => navigate("/stats")),
+      subMenu: "stats",
     },
     {
       id: "share",
       section: "settings",
       visible: !!props.onSharePuzzle,
-      label: "Play with friend?",
-      sortKey: "Share",
+      label: "👥 Play with friend?",
+      sortKey: "Play with friend",
       onClick: c(props.onSharePuzzle ?? (() => {})),
       subMenu: "share",
     },
-    {
-      id: "stats",
-      section: "settings",
-      visible: true,
-      label: "Leaderboards",
-      sortKey: "Stats",
-      onClick: c(() => navigate("/stats")),
-      subMenu: "stats",
-    },
+    // ─── Help, About ───
     {
       id: "repo",
       section: "about",
       visible: true,
-      label: "Get Involved",
+      label: "🌟 Get Involved",
       sortKey: "Get Involved",
       onClick: c(() => window.open(GITHUB_REPO_URL, "_blank", "noopener,noreferrer")),
       subMenu: "about",
@@ -327,7 +301,7 @@ export function buildMenuItems(
       id: "contributors",
       section: "about",
       visible: true,
-      label: "Meet the Team",
+      label: "👋 Meet the Team",
       sortKey: "Meet the Team",
       onClick: c(() =>
         window.open(GITHUB_CONTRIBUTORS_URL, "_blank", "noopener,noreferrer"),
@@ -338,7 +312,7 @@ export function buildMenuItems(
       id: "howToPlay",
       section: "help",
       visible: true,
-      label: "How to Play",
+      label: "📖 How to Play",
       sortKey: "How to Play",
       onClick: c(props.onShowHowToPlay),
       subMenu: "help",
@@ -347,7 +321,7 @@ export function buildMenuItems(
       id: "shortcuts",
       section: "help",
       visible: true,
-      label: "Keyboard & Controls",
+      label: "⌨️ Keyboard & Controls",
       sortKey: "Keyboard & Controls",
       onClick: c(props.onShowShortcuts),
       subMenu: "help",

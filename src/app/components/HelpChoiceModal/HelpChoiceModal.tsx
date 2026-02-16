@@ -33,8 +33,9 @@ export function HelpChoiceModal({
             onClose();
             onHowToPlay();
           }}
+          aria-label="How to Play"
         >
-          How to Play
+          📖 How to Play
         </button>
         <button
           type="button"
@@ -43,8 +44,9 @@ export function HelpChoiceModal({
             onClose();
             onKeyboardShortcuts();
           }}
+          aria-label="Keyboard and Controls"
         >
-          Keyboard & Controls
+          ⌨️ Keyboard & Controls
         </button>
         {onShowAbout && (
           <button
@@ -54,8 +56,9 @@ export function HelpChoiceModal({
               onClose();
               onShowAbout();
             }}
+            aria-label="About"
           >
-            About
+            ℹ️ About
           </button>
         )}
         {onOpenSettings && (
@@ -66,8 +69,9 @@ export function HelpChoiceModal({
               onClose();
               onOpenSettings();
             }}
+            aria-label="Settings"
           >
-            Settings
+            ⚙️ Settings
           </button>
         )}
         {onOpenTheme && (
@@ -78,8 +82,9 @@ export function HelpChoiceModal({
               onClose();
               onOpenTheme();
             }}
+            aria-label="Theme"
           >
-            Theme
+            🎨 Theme
           </button>
         )}
       </div>

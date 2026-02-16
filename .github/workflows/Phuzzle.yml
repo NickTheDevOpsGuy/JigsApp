@@ -50,6 +50,9 @@ jobs:
       - name: 🏗️ Build
         run: npm run build
 
+      - name: 📦 Bundle size check
+        run: npm run check:bundle
+
       - name: 🧪 Unit tests (Vitest)
         run: npm run test
 

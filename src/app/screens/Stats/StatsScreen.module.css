@@ -161,6 +161,59 @@
   border-bottom: none;
 }
 
+.leaderboardItem {
+  cursor: pointer;
+}
+
+.leaderboardCompact .leaderboardItem {
+  padding: 8px 12px;
+  min-height: 40px;
+  gap: 8px;
+}
+
+.leaderboardCompact .rank {
+  min-width: 28px;
+  font-size: 13px;
+}
+
+.leaderboardCompact .player {
+  font-size: 13px;
+}
+
+.leaderboardCompact .time {
+  font-size: 12px;
+}
+
+.leaderboardItemExpanded {
+  flex-wrap: wrap;
+}
+
+.leaderboardDetail {
+  flex: 1 1 100%;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
+}
+
+.lbViewToggle {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.lbViewToggle:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-brand-primary);
+}
+
 .rank {
   font-weight: 700;
   color: var(--color-brand-primary);

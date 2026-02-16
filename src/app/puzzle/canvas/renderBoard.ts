@@ -12,6 +12,7 @@ import {
   applyPieceShadow,
   clearPieceShadow,
   computeImageSourceRect,
+  DRAG_LIFT_PX,
 } from "./renderBoardHelpers";
 
 export type PopMap = Map<string, number>;
@@ -34,6 +35,10 @@ export type AnimationState = {
   completedAtMs: number | null;
   /** When true, show semi-transparent ghosts at correct positions for misplaced pieces */
   showGhostHint?: boolean;
+  /** Alpha for ghost overlay (default 0.35, lower for idle ghost) */
+  ghostAlpha?: number;
+  /** When true, show faint border on edge pieces (row 0, rows-1, col 0, cols-1) */
+  showEdgeHighlight?: boolean;
   /** When set, this piece is drawn in a DOM overlay instead of on canvas (for drag-to-tray) */
   dragPreviewPieceId?: string | null;
   /** Interpolated display positions for dragged group (smoother drag, no touch/pointer changes) */
@@ -122,7 +127,7 @@ export function renderBoard(
 
   // Ghost hint: draw misplaced pieces at their target positions (before real pieces)
   if (animState?.showGhostHint && !state.isComplete) {
-    drawGhostHints(ctx, state.pieces, img, cols, rows);
+    drawGhostHints(ctx, state.pieces, img, cols, rows, animState.ghostAlpha ?? 0.35);
   }
 
   // Determine dragged group
@@ -164,6 +169,13 @@ export function renderBoard(
       pieceCache,
       dpr,
     );
+    if (
+      animState?.showEdgeHighlight &&
+      !p.isPlaced &&
+      (p.row === 0 || p.row === rows - 1 || p.col === 0 || p.col === cols - 1)
+    ) {
+      drawEdgePieceHighlight(ctx, drawPieceData);
+    }
   }
 
   // Snap particles (board space, on top of pieces)
@@ -191,6 +203,7 @@ function drawGhostHints(
   img: HTMLImageElement,
   cols: number,
   rows: number,
+  alpha = 0.35,
 ) {
   const popMap = new Map<string, number>();
   const nowMs = performance.now();
@@ -218,7 +231,7 @@ function drawGhostHints(
     };
 
     ctx.save();
-    ctx.globalAlpha = 0.35;
+    ctx.globalAlpha = alpha;
     const ghostDpr = ctx.getTransform().a || 1;
     drawPiece(
       ctx,
@@ -447,7 +460,8 @@ function drawPiece(
   const rect = computeImageSourceRect(p, img, cols, rows);
   ctx.save();
   applyPieceShadow(ctx, isDragging, p.isPlaced);
-  ctx.translate(p.x + p.w / 2 + shake.x, p.y + p.h / 2 + shake.y);
+  const liftY = isDragging ? -DRAG_LIFT_PX : 0;
+  ctx.translate(p.x + p.w / 2 + shake.x, p.y + p.h / 2 + shake.y + liftY);
   ctx.rotate((p.rotation * Math.PI) / 180);
   ctx.scale(scale, scale);
   ctx.translate(-p.w / 2, -p.h / 2);
@@ -540,6 +554,7 @@ function drawCachedPiece(
   if (isDragging) {
     cx = Math.round(cx * dpr) / dpr;
     cy = Math.round(cy * dpr) / dpr;
+    cy -= DRAG_LIFT_PX;
   }
   ctx.translate(cx, cy);
   ctx.scale(scale, scale);
@@ -565,6 +580,25 @@ function drawCachedPiece(
     const iconY = -cacheH / 2 + 14;
     drawWrongRotationIcon(ctx, iconX, iconY, Math.min(p.w, p.h), wrongRotationElapsedMs);
   }
+  ctx.restore();
+}
+
+function drawEdgePieceHighlight(ctx: CanvasRenderingContext2D, p: Piece) {
+  let path: Path2D | null = null;
+  try {
+    if (p.shapePath && p.shapePath.length > 0) path = new Path2D(p.shapePath);
+  } catch {
+    path = null;
+  }
+  if (!path) return;
+  ctx.save();
+  ctx.globalAlpha = 0.35;
+  ctx.strokeStyle = "rgba(102, 126, 234, 0.5)";
+  ctx.lineWidth = 1.5;
+  ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
+  ctx.rotate((p.rotation * Math.PI) / 180);
+  ctx.translate(-p.w / 2, -p.h / 2);
+  ctx.stroke(path);
   ctx.restore();
 }
 

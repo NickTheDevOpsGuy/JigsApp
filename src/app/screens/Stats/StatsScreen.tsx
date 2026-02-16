@@ -2,7 +2,7 @@
  * StatsScreen – leaderboards, achievements, profile, streaks (Supabase).
  */
 import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, BarChart3, Trophy, Award, User, Share2 } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
@@ -26,7 +26,7 @@ import { getMyProfile, updateMyProfile } from "@/services/profileService";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
-import { getTodayDateString } from "@/daily/dailyPuzzleCore";
+import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -57,11 +57,31 @@ type LeaderboardType =
   | "completions"
   | "alltime";
 
+type StatsTab = "dashboard" | "profile" | "leaderboard" | "achievements";
+
 export function StatsScreen() {
   const nav = useNavigate();
-  const [activeTab, setActiveTab] = useState<
-    "dashboard" | "profile" | "leaderboard" | "achievements"
-  >("dashboard");
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<StatsTab>(() => {
+    if (
+      tabParam &&
+      ["dashboard", "profile", "leaderboard", "achievements"].includes(tabParam)
+    ) {
+      return tabParam as StatsTab;
+    }
+    return "dashboard";
+  });
+
+  const tabFromUrl = searchParams.get("tab");
+  useEffect(() => {
+    if (
+      tabFromUrl &&
+      ["dashboard", "profile", "leaderboard", "achievements"].includes(tabFromUrl)
+    ) {
+      setActiveTab(tabFromUrl as StatsTab);
+    }
+  }, [tabFromUrl]);
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("today");
   const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
   const [stats, setStats] = useState<{
@@ -102,8 +122,18 @@ export function StatsScreen() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const [raccoonName, setRaccoonName] = useState<string | null>(null);
+  const [leaderboardCompact, setLeaderboardCompact] = useState(true);
+  const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
 
   const configured = isSupabaseConfigured();
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 520px)");
+    setLeaderboardCompact(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setLeaderboardCompact(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const loadData = useCallback(async () => {
     if (!configured) return;
@@ -254,21 +284,43 @@ export function StatsScreen() {
       {entries.length === 0 ? (
         <p className={styles.empty}>{emptyMsg}</p>
       ) : (
-        <ol className={styles.leaderboard}>
-          {entries.map((entry) => (
-            <li
-              key={`${entry.rank}-${entry.displayName}`}
-              className={`${styles.leaderboardItem} ${
-                entry.rank <= 3 ? styles.leaderboardPodium : ""
-              }`}
-            >
-              <span className={styles.rank}>
-                {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-              </span>
-              <span className={styles.player}>{entry.displayName}</span>
-              <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
-            </li>
-          ))}
+        <ol
+          className={`${styles.leaderboard} ${
+            leaderboardCompact ? styles.leaderboardCompact : ""
+          }`}
+        >
+          {entries.map((entry) => {
+            const key = `time-${entry.rank}-${entry.displayName}`;
+            const isExpanded = expandedRowKey === key;
+            return (
+              <li
+                key={key}
+                className={`${styles.leaderboardItem} ${
+                  entry.rank <= 3 ? styles.leaderboardPodium : ""
+                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
+                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setExpandedRowKey(isExpanded ? null : key);
+                  }
+                }}
+              >
+                <span className={styles.rank}>
+                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+                </span>
+                <span className={styles.player}>{entry.displayName}</span>
+                <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
+                {isExpanded && (
+                  <div className={styles.leaderboardDetail}>
+                    {Math.floor(entry.elapsedSeconds / 60)}m {entry.elapsedSeconds % 60}s
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ol>
       )}
     </>
@@ -279,21 +331,43 @@ export function StatsScreen() {
       {entries.length === 0 ? (
         <p className={styles.empty}>No streaks yet. Complete daily puzzles!</p>
       ) : (
-        <ol className={styles.leaderboard}>
-          {entries.map((entry) => (
-            <li
-              key={`${entry.rank}-${entry.displayName}`}
-              className={`${styles.leaderboardItem} ${
-                entry.rank <= 3 ? styles.leaderboardPodium : ""
-              }`}
-            >
-              <span className={styles.rank}>
-                {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-              </span>
-              <span className={styles.player}>{entry.displayName}</span>
-              <span className={styles.time}>{entry.streak} days</span>
-            </li>
-          ))}
+        <ol
+          className={`${styles.leaderboard} ${
+            leaderboardCompact ? styles.leaderboardCompact : ""
+          }`}
+        >
+          {entries.map((entry) => {
+            const key = `streak-${entry.rank}-${entry.displayName}`;
+            const isExpanded = expandedRowKey === key;
+            return (
+              <li
+                key={key}
+                className={`${styles.leaderboardItem} ${
+                  entry.rank <= 3 ? styles.leaderboardPodium : ""
+                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
+                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setExpandedRowKey(isExpanded ? null : key);
+                  }
+                }}
+              >
+                <span className={styles.rank}>
+                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+                </span>
+                <span className={styles.player}>{entry.displayName}</span>
+                <span className={styles.time}>{entry.streak} days</span>
+                {isExpanded && (
+                  <div className={styles.leaderboardDetail}>
+                    {entry.streak} day streak
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ol>
       )}
     </>
@@ -307,21 +381,43 @@ export function StatsScreen() {
       {entries.length === 0 ? (
         <p className={styles.empty}>{emptyMsg}</p>
       ) : (
-        <ol className={styles.leaderboard}>
-          {entries.map((entry) => (
-            <li
-              key={`${entry.rank}-${entry.displayName}`}
-              className={`${styles.leaderboardItem} ${
-                entry.rank <= 3 ? styles.leaderboardPodium : ""
-              }`}
-            >
-              <span className={styles.rank}>
-                {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-              </span>
-              <span className={styles.player}>{entry.displayName}</span>
-              <span className={styles.time}>{entry.count} puzzles</span>
-            </li>
-          ))}
+        <ol
+          className={`${styles.leaderboard} ${
+            leaderboardCompact ? styles.leaderboardCompact : ""
+          }`}
+        >
+          {entries.map((entry) => {
+            const key = `completion-${entry.rank}-${entry.displayName}`;
+            const isExpanded = expandedRowKey === key;
+            return (
+              <li
+                key={key}
+                className={`${styles.leaderboardItem} ${
+                  entry.rank <= 3 ? styles.leaderboardPodium : ""
+                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
+                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setExpandedRowKey(isExpanded ? null : key);
+                  }
+                }}
+              >
+                <span className={styles.rank}>
+                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+                </span>
+                <span className={styles.player}>{entry.displayName}</span>
+                <span className={styles.time}>{entry.count} puzzles</span>
+                {isExpanded && (
+                  <div className={styles.leaderboardDetail}>
+                    {entry.count} total puzzles completed
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ol>
       )}
     </>
@@ -398,6 +494,10 @@ export function StatsScreen() {
                       {stats?.bestDailyStreak ?? 0}
                     </span>
                     <span className={styles.statLabel}>Best streak</span>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statValue}>{getStreakFreezeCount()}</span>
+                    <span className={styles.statLabel}>Streak freeze</span>
                   </div>
                 </div>
                 {personalBests.length > 0 && (
@@ -508,6 +608,15 @@ export function StatsScreen() {
                       </select>
                     </div>
                   )}
+                  <button
+                    type="button"
+                    className={styles.lbViewToggle}
+                    onClick={() => setLeaderboardCompact((c) => !c)}
+                    title={leaderboardCompact ? "Expand view" : "Compact view"}
+                    aria-label={leaderboardCompact ? "Expand view" : "Compact view"}
+                  >
+                    {leaderboardCompact ? "Expand" : "Compact"}
+                  </button>
                   <Button
                     size="sm"
                     variant="secondary"

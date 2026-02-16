@@ -14,11 +14,59 @@ export const GRID_OPTIONS = [
 
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";
 const DAILY_PREFIX = "phuzzle:daily:";
+const STREAK_FREEZE_KEY = "phuzzle:streakFreeze";
+const STREAK_FREEZE_WEEK_KEY = "phuzzle:streakFreezeWeek";
+const STREAK_FREEZE_DISMISSED_KEY = "phuzzle:streakFreezeDismissed";
 
 /** Get today's date string in user's local timezone (YYYY-MM-DD) */
 export function getTodayDateString(): string {
   const d = new Date();
   return d.toISOString().slice(0, 10);
+}
+
+/** Get yesterday's date string */
+export function getYesterdayDateString(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+/** True if user dismissed the streak freeze offer today (don't show again this session) */
+export function wasFreezeOfferDismissedToday(): boolean {
+  try {
+    return (
+      localStorage.getItem(`${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`) ===
+      "true"
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** Mark the streak freeze offer as dismissed for today */
+export function dismissFreezeOfferToday(): void {
+  try {
+    localStorage.setItem(
+      `${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`,
+      "true",
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+/** True if yesterday was not completed and no freeze was used for it */
+export function wasYesterdayMissed(): boolean {
+  try {
+    const yesterday = getYesterdayDateString();
+    const completed =
+      localStorage.getItem(`${DAILY_PREFIX}${yesterday}:completed`) === "true";
+    const freezeUsed =
+      localStorage.getItem(`${STREAK_FREEZE_KEY}:used:${yesterday}`) === "true";
+    return !completed && !freezeUsed;
+  } catch {
+    return false;
+  }
 }
 
 /** Check if current play session is a daily puzzle */
@@ -64,7 +112,62 @@ export function getTodayDailyTime(): number | null {
   }
 }
 
-/** Count consecutive days of completion ending today */
+/** Get count of available streak freeze tokens (1 per week, max 1). */
+export function getStreakFreezeCount(): number {
+  try {
+    const raw = localStorage.getItem(STREAK_FREEZE_KEY);
+    if (raw === null) return 1;
+    const count = parseInt(raw, 10);
+    return Number.isNaN(count) ? 1 : Math.min(1, Math.max(0, count));
+  } catch {
+    return 1;
+  }
+}
+
+/** Get the week key for this week (weeks since epoch, unique per week). */
+function getWeekKey(): string {
+  return String(Math.floor(Date.now() / 604800000));
+}
+
+/** Refill streak freeze to 1 at start of each week. Returns current count. */
+export function refreshStreakFreeze(): number {
+  try {
+    const weekKey = getWeekKey();
+    const storedWeek = localStorage.getItem(STREAK_FREEZE_WEEK_KEY);
+    if (storedWeek !== weekKey) {
+      localStorage.setItem(STREAK_FREEZE_KEY, "1");
+      localStorage.setItem(STREAK_FREEZE_WEEK_KEY, weekKey);
+      return 1;
+    }
+    return getStreakFreezeCount();
+  } catch {
+    return 1;
+  }
+}
+
+/** Use a streak freeze for a specific date (when user missed that day). Returns true if consumed. */
+export function useStreakFreeze(forDate: string): boolean {
+  const count = getStreakFreezeCount();
+  if (count <= 0) return false;
+  try {
+    localStorage.setItem(STREAK_FREEZE_KEY, String(count - 1));
+    localStorage.setItem(`${STREAK_FREEZE_KEY}:used:${forDate}`, "true");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Check if a streak freeze was used for a given date. */
+function wasFreezeUsedFor(dateStr: string): boolean {
+  try {
+    return localStorage.getItem(`${STREAK_FREEZE_KEY}:used:${dateStr}`) === "true";
+  } catch {
+    return false;
+  }
+}
+
+/** Count consecutive days of completion ending today. Treats freeze-used dates as complete. */
 export function getCurrentStreak(): number {
   const today = getTodayDateString();
   let streak = 0;
@@ -72,7 +175,10 @@ export function getCurrentStreak(): number {
 
   for (let i = 0; i < 365; i++) {
     const dateStr = d.toISOString().slice(0, 10);
-    if (localStorage.getItem(`${DAILY_PREFIX}${dateStr}:completed`) === "true") {
+    const completed =
+      localStorage.getItem(`${DAILY_PREFIX}${dateStr}:completed`) === "true" ||
+      wasFreezeUsedFor(dateStr);
+    if (completed) {
       streak++;
       d.setDate(d.getDate() - 1);
     } else {
@@ -80,4 +186,9 @@ export function getCurrentStreak(): number {
     }
   }
   return streak;
+}
+
+/** Call at app init to refresh freeze count for new week. */
+export function initStreakFreeze(): void {
+  refreshStreakFreeze();
 }

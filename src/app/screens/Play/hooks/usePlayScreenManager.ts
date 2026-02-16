@@ -46,6 +46,8 @@ export function usePlayScreenManager(
     dragStartTimeRef?: MutableRefObject<number | null>;
     /** Called when piece snaps (place or merge) with time_to_snap_ms for analytics. */
     onPieceSnappedAnalytics?: (timeToSnapMs: number) => void;
+    /** When true, reduce confetti and heavy animations (battery/data saver). */
+    batterySaverMode?: boolean;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -252,7 +254,7 @@ export function usePlayScreenManager(
                 opts.onPieceSnappedAnalytics(Math.round(now - startTime));
               }
               lastInteractionRef.current = now;
-              soundManager.play("snap");
+              soundManager.play("snap", { groupSize: pieceIds.length });
               opts?.haptic?.("snap");
               for (const id of pieceIds) popMapRef.current.set(id, now);
               if (center) {
@@ -286,16 +288,24 @@ export function usePlayScreenManager(
             onPuzzleComplete: () => {
               clearPuzzleState();
               soundManager.play("complete");
+              const opts = optionsRef.current;
               const prefersReducedMotion =
                 typeof window !== "undefined" &&
                 window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-              if (!prefersReducedMotion) {
+              const batterySaver = opts?.batterySaverMode ?? false;
+              if (!prefersReducedMotion && !batterySaver) {
+                const pieceCount = grid.rows * grid.cols;
+                const particleCount = Math.min(
+                  280,
+                  Math.max(60, Math.floor(pieceCount * 3.5)),
+                );
+                const spread = pieceCount <= 16 ? 50 : pieceCount <= 36 ? 65 : 80;
                 const theme = optionsRef.current?.themeRef?.current ?? "light";
                 const colors = CONFETTI_COLORS_BY_THEME[theme];
                 import("canvas-confetti").then((confetti) => {
                   confetti.default({
-                    particleCount: 150,
-                    spread: 70,
+                    particleCount,
+                    spread,
                     origin: { y: 0.6 },
                     colors,
                   });

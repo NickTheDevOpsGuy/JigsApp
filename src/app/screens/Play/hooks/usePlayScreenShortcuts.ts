@@ -30,6 +30,7 @@ type UsePlayScreenShortcutsArgs = {
   toggleFullscreen: () => void;
   selectCycle: (dir: 1 | -1) => void;
   selectedIdRef: React.MutableRefObject<string | null>;
+  onUndoSuccess?: () => void;
 };
 
 export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
@@ -55,6 +56,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
     toggleFullscreen,
     selectCycle,
     selectedIdRef: _selectedIdRef,
+    onUndoSuccess,
   } = args;
 
   const handleShortcut = useCallback(
@@ -160,6 +162,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
             setState,
             () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
             soundManager.play.bind(soundManager),
+            onUndoSuccess,
           )();
           break;
         case "redo":
@@ -215,6 +218,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
       setHapticsEnabled,
       selectCycle,
       setState,
+      onUndoSuccess,
     ],
   );
 

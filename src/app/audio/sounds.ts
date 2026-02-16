@@ -89,9 +89,9 @@ class SoundManager {
     }
   }
 
-  play(sound: SoundType) {
+  play(sound: SoundType, opts?: { groupSize?: number }) {
     // Trigger haptic feedback (works even if sound is muted)
-    this.triggerHaptic(sound);
+    this.triggerHaptic(sound, opts?.groupSize);
 
     if (!this.enabled) return;
 
@@ -108,7 +108,7 @@ class SoundManager {
         this.playPickup(ctx);
         break;
       case "snap":
-        this.playSnap(ctx);
+        this.playSnap(ctx, opts?.groupSize ?? 2);
         break;
       case "place":
         this.playPlace(ctx);
@@ -126,16 +126,18 @@ class SoundManager {
   }
 
   // Trigger haptic feedback based on sound type
-  private triggerHaptic(sound: SoundType) {
+  private triggerHaptic(sound: SoundType, groupSize?: number) {
     switch (sound) {
       case "pickup":
         // Light tap
         this.vibrate(10);
         break;
-      case "snap":
-        // Satisfying click
-        this.vibrate(25);
+      case "snap": {
+        // Scale by group size: small = subtle, large = stronger
+        const snapStrength = groupSize != null ? Math.min(50, 15 + groupSize * 6) : 25;
+        this.vibrate(snapStrength);
         break;
+      }
       case "place":
         // Heavier thunk
         this.vibrate(40);
@@ -244,80 +246,88 @@ class SoundManager {
     }
   }
 
-  private playSnap(ctx: AudioContext) {
+  private playSnap(ctx: AudioContext, groupSize: number = 2) {
     const theme = getTheme();
     const t = ctx.currentTime;
+    const clamp = (n: number) => Math.max(0, Math.min(1, n));
+    const volScale = clamp(0.5 + (groupSize - 2) * 0.06);
+    const freqScale = Math.max(0.65, 1 - (groupSize - 1) * 0.05);
     if (theme === "space") {
-      // Laser lock: crisp square-wave ping
+      const baseFreq = 660 * freqScale;
       this.playTone(ctx, {
-        freq: 660,
+        freq: baseFreq,
         type: "square",
-        vol: this.volume * 0.25,
-        duration: 0.08,
+        vol: this.volume * 0.25 * volScale,
+        duration: 0.06 + groupSize * 0.008,
         start: t,
       });
       this.playTone(ctx, {
-        freq: 1320,
+        freq: baseFreq * 2,
         type: "square",
-        vol: this.volume * 0.2,
-        duration: 0.1,
+        vol: this.volume * 0.2 * volScale,
+        duration: 0.08 + groupSize * 0.01,
         start: t + 0.02,
       });
     } else if (theme === "ocean") {
-      // Water droplet: clean sine pair
+      const baseFreq = 880 * freqScale;
       this.playTone(ctx, {
-        freq: 880,
+        freq: baseFreq,
         type: "sine",
-        vol: this.volume * 0.32,
-        duration: 0.07,
+        vol: this.volume * 0.32 * volScale,
+        duration: 0.05 + groupSize * 0.006,
         start: t,
       });
       this.playTone(ctx, {
-        freq: 1760,
+        freq: baseFreq * 2,
         type: "sine",
-        vol: this.volume * 0.18,
-        duration: 0.06,
+        vol: this.volume * 0.18 * volScale,
+        duration: 0.05 + groupSize * 0.005,
         start: t + 0.015,
       });
     } else if (theme === "forest") {
-      // Twig snap: woody mid-range
+      const baseFreq = 660 * freqScale;
       this.playTone(ctx, {
-        freq: 660,
+        freq: baseFreq,
         type: "sine",
-        vol: this.volume * 0.35,
-        duration: 0.06,
+        vol: this.volume * 0.35 * volScale,
+        duration: 0.05 + groupSize * 0.007,
         start: t,
       });
       this.playTone(ctx, {
-        freq: 990,
+        freq: baseFreq * 1.5,
         type: "sine",
-        vol: this.volume * 0.22,
-        duration: 0.08,
+        vol: this.volume * 0.22 * volScale,
+        duration: 0.06 + groupSize * 0.01,
         start: t + 0.02,
       });
     } else if (theme === "sunset") {
-      // Sunset: warm click, rounded triangle
+      const baseFreq = 880 * freqScale;
       this.playTone(ctx, {
-        freq: 880,
+        freq: baseFreq,
         type: "triangle",
-        vol: this.volume * 0.3,
-        duration: 0.09,
+        vol: this.volume * 0.3 * volScale,
+        duration: 0.07 + groupSize * 0.008,
         start: t,
       });
       this.playTone(ctx, {
-        freq: 1320,
+        freq: baseFreq * 1.5,
         type: "triangle",
-        vol: this.volume * 0.18,
-        duration: 0.07,
+        vol: this.volume * 0.18 * volScale,
+        duration: 0.06 + groupSize * 0.006,
         start: t + 0.02,
       });
     } else {
-      // Light/dark: default
-      this.playTone(ctx, { freq: 1200, vol: this.volume * 0.4, duration: 0.1, start: t });
+      const baseFreq = 1200 * freqScale;
       this.playTone(ctx, {
-        freq: 1800,
-        vol: this.volume * 0.2,
-        duration: 0.08,
+        freq: baseFreq,
+        vol: this.volume * 0.4 * volScale,
+        duration: 0.08 + groupSize * 0.008,
+        start: t,
+      });
+      this.playTone(ctx, {
+        freq: baseFreq * 1.5,
+        vol: this.volume * 0.2 * volScale,
+        duration: 0.06 + groupSize * 0.006,
         start: t + 0.02,
       });
     }

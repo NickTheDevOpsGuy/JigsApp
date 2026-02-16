@@ -21,10 +21,11 @@ import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { consumeCurrentPuzzleId, recordPuzzleCompletion } from "@/data/packCompletion";
 import { soundManager } from "@/audio/sounds";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
+import { ThemeModal } from "@/components/ThemeModal";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
-import { getBestTime } from "./timeMode";
+import { getBestTime, BEST_TIME_PREFIX } from "./timeMode";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
@@ -40,6 +41,7 @@ import { useViewport } from "./hooks/useViewport";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
+import { useBatterySaver } from "../../hooks/useBatterySaver";
 import {
   DragPreview,
   PlayHUD,
@@ -119,6 +121,10 @@ export function PlayScreen() {
     setShowGhostHint,
     showAlignmentGrid,
     setShowAlignmentGrid,
+    showGhostWhenIdle,
+    toggleShowGhostWhenIdle,
+    showEdgeHighlight,
+    toggleShowEdgeHighlight,
     debug,
     showPreview,
     setShowPreview,
@@ -136,6 +142,8 @@ export function PlayScreen() {
     setShowHelpChoice,
     showNewGameModal,
     setShowNewGameModal,
+    showThemeModal,
+    setShowThemeModal,
     selectedPieceId,
     setSelectedPieceId,
     pageRef,
@@ -154,7 +162,8 @@ export function PlayScreen() {
     useTimeModeConfig();
   const lastInteractionRef = React.useRef(performance.now());
   const [resumeChoice, setResumeChoice] = React.useState<ResumeChoice>(null);
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const batterySaverMode = useBatterySaver();
   const themeRef = React.useRef(theme);
   themeRef.current = theme;
   const haptics = useHaptics();
@@ -165,8 +174,11 @@ export function PlayScreen() {
   const lastMilestoneRef = React.useRef<number>(0);
   const [immersiveReveal, setImmersiveReveal] = React.useState(false);
   const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
+  const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
 
-  const viewport = useViewport();
+  const viewportKey = grid != null ? `vp:${grid.rows}x${grid.cols}` : null;
+  const viewport = useViewport(viewportKey);
   const snapScaleRef = React.useRef(1);
   snapScaleRef.current = viewport.viewport.scale;
 
@@ -184,6 +196,8 @@ export function PlayScreen() {
   } | null>(null);
   const dragStartTimeRef = React.useRef<number | null>(null);
   const stateRef = React.useRef<PuzzleState | null>(null);
+  const undoCountRef = React.useRef(0);
+  const abandonCapturedRef = React.useRef(false);
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -205,6 +219,7 @@ export function PlayScreen() {
       },
       wrongRotationHintRef,
       dragStartTimeRef,
+      batterySaverMode,
       onPieceSnappedAnalytics: (timeToSnapMs) => {
         const g = stateRef.current?.grid;
         const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
@@ -236,6 +251,11 @@ export function PlayScreen() {
   } = managerResult;
 
   stateRef.current = state;
+
+  useEffect(() => {
+    undoCountRef.current = 0;
+    abandonCapturedRef.current = false;
+  }, [puzzleKey]);
 
   // ─── Onboarding & milestone toasts ───
   const placedForOnboarding = state?.placedCount ?? 0;
@@ -417,6 +437,9 @@ export function PlayScreen() {
     toggleFullscreen,
     selectCycle,
     selectedIdRef,
+    onUndoSuccess: () => {
+      undoCountRef.current += 1;
+    },
   });
 
   usePlayScreenTimer({
@@ -484,6 +507,26 @@ export function PlayScreen() {
       const url = localStorage.getItem(STORAGE_KEY) || "";
       if (!url) return;
       savePuzzleState(url, s.grid, s.pieces, elapsedSecondsRef.current);
+
+      const placed = s.placedCount ?? 0;
+      const total = s.totalCount ?? 1;
+      const elapsed = elapsedSecondsRef.current;
+      const undos = undoCountRef.current;
+      const pct = total > 0 ? (placed / total) * 100 : 0;
+      const looksAbandoned =
+        placed === 0 ||
+        (elapsed < 45 && pct < 5) ||
+        (undos > 0 && placed > 0 && undos >= placed * 2);
+      if (looksAbandoned && !abandonCapturedRef.current) {
+        abandonCapturedRef.current = true;
+        posthog.capture("puzzle_abandoned", {
+          placed_count: placed,
+          total_count: total,
+          elapsed_seconds: elapsed,
+          undo_count: undos,
+          grid: s.grid ? `${s.grid.rows}x${s.grid.cols}` : "unknown",
+        });
+      }
     };
     const onVisibilityChange = () => {
       if (document.visibilityState === "hidden") flush();
@@ -503,7 +546,7 @@ export function PlayScreen() {
     const prefersReducedMotion =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!prefersReducedMotion) {
+    if (!prefersReducedMotion && !batterySaverMode) {
       import("canvas-confetti").then((confetti) => {
         const colors = CONFETTI_COLORS_BY_THEME[themeRef.current ?? "light"];
         confetti.default({
@@ -514,7 +557,7 @@ export function PlayScreen() {
         });
       });
     }
-  }, [onboarding.showFirstSnapToast]);
+  }, [onboarding.showFirstSnapToast, batterySaverMode]);
 
   // Analytics: first piece placed
   const firstSnapCapturedRef = useRef(false);
@@ -606,6 +649,9 @@ export function PlayScreen() {
     debug,
     showGhostHint,
     showAlignmentGrid,
+    showGhostWhenIdle,
+    showEdgeHighlight,
+    lastInteractionRef,
     viewport: viewport.viewport,
     perfStatsRef,
     wrongRotationHintRef,
@@ -751,6 +797,8 @@ export function PlayScreen() {
           <div className={styles.topBarLeft}>
             <HeaderMenu
               title="Phuzzle"
+              theme={theme}
+              setTheme={setTheme}
               canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
               onUndo={createUndoRedoHandler(
                 manager ?? null,
@@ -758,6 +806,9 @@ export function PlayScreen() {
                 setState,
                 () => Boolean(manager?.canUndo()),
                 soundManager.play.bind(soundManager),
+                () => {
+                  undoCountRef.current += 1;
+                },
               )}
               canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
               onRedo={createUndoRedoHandler(
@@ -768,7 +819,10 @@ export function PlayScreen() {
                 soundManager.play.bind(soundManager),
               )}
               timeMode={timeMode}
-              setTimeMode={setTimeMode}
+              setTimeMode={(modeOrFn) => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                setTimeMode(modeOrFn);
+              }}
               countdownMinutes={countdownMinutes}
               setCountdownMinutes={setCountdownMinutes}
               showPreview={showPreview}
@@ -776,6 +830,8 @@ export function PlayScreen() {
               hapticsEnabled={hapticsEnabled}
               pieceLockingEnabled={pieceLockingEnabled}
               showGhostHint={showGhostHint}
+              showGhostWhenIdle={showGhostWhenIdle}
+              showEdgeHighlight={showEdgeHighlight}
               showAlignmentGrid={showAlignmentGrid}
               isFullscreen={ui.isFullscreen}
               canShowHaptics={isCoarsePointer && typeof navigator?.vibrate === "function"}
@@ -784,24 +840,52 @@ export function PlayScreen() {
               canShowDebug={SHOW_DEBUG}
               debug={debug}
               onNewPuzzle={() => setShowNewGameModal(true)}
-              onTogglePreview={() => setShowPreview((p) => !p)}
+              onTogglePreview={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                setShowPreview((p) => !p);
+              }}
               onToggleSound={toggleSound}
               onToggleHaptics={toggleHaptics}
-              onTogglePieceLocking={() => setPieceLockingEnabled((p) => !p)}
-              onToggleGhostHint={() => setShowGhostHint((g) => !g)}
-              onToggleAlignmentGrid={() => setShowAlignmentGrid((a) => !a)}
+              onTogglePieceLocking={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                setPieceLockingEnabled((p) => !p);
+              }}
+              onToggleGhostHint={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                setShowGhostHint((g) => !g);
+              }}
+              onToggleGhostWhenIdle={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                toggleShowGhostWhenIdle();
+              }}
+              onToggleEdgeHighlight={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                toggleShowEdgeHighlight();
+              }}
+              onToggleAlignmentGrid={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                setShowAlignmentGrid((a) => !a);
+              }}
               onToggleFullscreen={toggleFullscreen}
               onCenterBoard={() => viewport.reset()}
               onZoomIn={() => viewport.zoomIn()}
               onZoomOut={() => viewport.zoomOut()}
               onShowShortcuts={() => setShowShortcuts(true)}
               onShowHowToPlay={() => setShowHowToPlay(true)}
-              onShowHelpChoice={() => setShowHelpChoice(true)}
               onToggleDebug={toggleDebug}
               onTogglePerfOverlay={togglePerfOverlay}
               immersiveMode={immersiveMode}
-              onToggleImmersiveMode={toggleImmersiveMode}
+              onToggleImmersiveMode={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                toggleImmersiveMode();
+              }}
               onSharePuzzle={isSupabaseConfigured() ? handleSharePuzzle : undefined}
+              onOpenThemeModal={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                setShowThemeModal(true);
+              }}
+              onResetStats={() => setShowResetStatsConfirm(true)}
+              onClearCache={() => setShowClearCacheConfirm(true)}
             />
           </div>
           <div className={styles.topBarCenter}>
@@ -852,6 +936,12 @@ export function PlayScreen() {
         onKeyboardShortcuts={() => setShowShortcuts(true)}
       />
 
+      <ThemeModal
+        isOpen={showThemeModal}
+        onClose={() => setShowThemeModal(false)}
+        hapticsEnabled={hapticsEnabled}
+      />
+
       <ConfirmModal
         isOpen={showNewGameModal}
         onClose={() => setShowNewGameModal(false)}
@@ -860,6 +950,59 @@ export function PlayScreen() {
         message="Your current progress will be lost. Are you sure you want to start a new puzzle?"
         confirmText="New Puzzle"
         cancelText="Keep Playing"
+        variant="danger"
+      />
+
+      <ConfirmModal
+        isOpen={showResetStatsConfirm}
+        onClose={() => setShowResetStatsConfirm(false)}
+        onConfirm={() => {
+          try {
+            const keysToRemove: string[] = [];
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (k?.startsWith(BEST_TIME_PREFIX)) keysToRemove.push(k);
+            }
+            keysToRemove.forEach((k) => localStorage.removeItem(k));
+          } catch {
+            /* ignore */
+          }
+          setShowResetStatsConfirm(false);
+        }}
+        title="Reset Local Stats?"
+        message="This will clear all local best times. This cannot be undone."
+        confirmText="Reset"
+        cancelText="Cancel"
+        variant="danger"
+      />
+
+      <ConfirmModal
+        isOpen={showClearCacheConfirm}
+        onClose={() => setShowClearCacheConfirm(false)}
+        onConfirm={() => {
+          clearPuzzleState();
+          try {
+            const keysToRemove: string[] = [];
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (
+                k?.startsWith("phuzzle:viewport:") ||
+                k === "phuzzle:puzzleState" ||
+                k === "phuzzle:puzzleStateBackup"
+              )
+                keysToRemove.push(k);
+            }
+            keysToRemove.forEach((k) => localStorage.removeItem(k));
+          } catch {
+            /* ignore */
+          }
+          setShowClearCacheConfirm(false);
+          navigate("/");
+        }}
+        title="Clear Cache?"
+        message="This will clear saved puzzle state and viewport settings. You will return to the menu."
+        confirmText="Clear"
+        cancelText="Cancel"
         variant="danger"
       />
 
@@ -909,6 +1052,7 @@ export function PlayScreen() {
             <CompletionOverlay
               elapsedSeconds={elapsedSeconds}
               grid={state?.grid}
+              undoCount={undoCountRef.current}
               isNewBest={
                 timeMode === "best" &&
                 state?.grid != null &&

@@ -14,7 +14,7 @@ import {
 } from "@/daily/dailyPuzzleCore";
 import { recordCompletion } from "@/services/statsService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
-import { getCompletionMessage } from "@/data/completionMessages";
+import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
 
 interface ShareUrls {
   twitter: string;
@@ -26,6 +26,7 @@ interface ShareUrls {
 interface CompletionOverlayProps {
   elapsedSeconds: number;
   grid?: { rows: number; cols: number };
+  undoCount?: number;
   isNewBest?: boolean;
   isDaily?: boolean;
   shareUrls: ShareUrls;
@@ -42,6 +43,7 @@ interface CompletionOverlayProps {
 export function CompletionOverlay({
   elapsedSeconds,
   grid,
+  undoCount = 0,
   isNewBest = false,
   isDaily = false,
   shareUrls,
@@ -56,6 +58,8 @@ export function CompletionOverlay({
 }: CompletionOverlayProps) {
   const [streak, setStreak] = useState<number>(0);
   const completionMessage = getCompletionMessage(elapsedSeconds);
+  const pieceCount = grid ? grid.rows * grid.cols : 0;
+  const badge = getCompletionBadge(elapsedSeconds, undoCount, pieceCount);
 
   useEffect(() => {
     if (isNewBest && grid) {
@@ -106,6 +110,11 @@ export function CompletionOverlay({
     <div className={styles.completeOverlay}>
       <div className={styles.completeContent}>
         <h2>🎉 {completionMessage}</h2>
+        {badge && (
+          <p className={styles.puzzleSize} aria-hidden="true">
+            {badge}
+          </p>
+        )}
         {puzzleSizeText != null && <p className={styles.puzzleSize}>{puzzleSizeText}</p>}
         <p>
           Finished in {formatTime(elapsedSeconds)}

@@ -154,6 +154,18 @@ export function TutorialOverlay({
                 <strong>Ghost hint:</strong> When on, shows a faint preview of where each
                 piece belongs—great when you&apos;re stuck!
               </li>
+              <li>
+                <strong>Ghost when idle:</strong> After a few seconds of no activity,
+                shows ghost hints automatically (Settings → View).
+              </li>
+              <li>
+                <strong>Edge highlight:</strong> Optional faint border on edge pieces
+                (Settings → View) to spot them quickly.
+              </li>
+              <li>
+                <strong>Daily streak freeze:</strong> If you miss a day, use your weekly
+                freeze to protect your streak (offered when opening Today&apos;s Puzzle).
+              </li>
             </ul>
           </div>
 

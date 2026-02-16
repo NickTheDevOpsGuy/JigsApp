@@ -18,6 +18,7 @@
 
 .card {
   width: min(520px, 100%);
+  max-width: 100%;
   background: var(--color-bg-card);
   border-radius: 18px;
   padding: 28px;
@@ -200,14 +201,14 @@
 }
 
 .menuTip {
-  margin: 12px 0 0;
+  margin: 10px 0 0;
   padding: 10px 14px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
   text-align: center;
   border-radius: 10px;
   background: var(--color-bg-secondary);
-  line-height: 1.4;
+  line-height: 1.45;
   max-width: 100%;
 }

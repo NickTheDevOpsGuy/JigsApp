@@ -1,7 +1,7 @@
 /**
  * Modal – overlay dialog with focus trap, escape-to-close, portal rendering.
  */
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Modal.module.css";
 import { Button } from "@/components/Button/Button";
@@ -29,6 +29,7 @@ export function Modal({
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveRef = useRef<HTMLElement | null>(null);
+  const titleId = useId();
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -79,6 +80,8 @@ export function Modal({
 
   if (!isOpen) return null;
 
+  const labelledById = title ? titleId : undefined;
+
   return createPortal(
     <div className={styles.overlay} onClick={onClose}>
       <div
@@ -87,10 +90,15 @@ export function Modal({
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
+        aria-labelledby={labelledById}
       >
         {(title || showCloseButton) && (
           <div className={styles.header}>
-            {title && <h2 className={styles.title}>{title}</h2>}
+            {title && (
+              <h2 id={titleId} className={styles.title}>
+                {title}
+              </h2>
+            )}
             {showCloseButton && (
               <button
                 type="button"

@@ -1,17 +1,19 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "4";
+export const CHANGELOG_VERSION = "5";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      "📥 Piece drawer – Taller tray, compact mode for 25+ pieces, sticky filters, scroll snapping",
-      "🖐 Touch fixes – Single piece per touch (no multi-drag), reliable tap-to-rotate on mobile",
-      "🖼 Image validation – Grid-based resolution rules; friendly errors for corrupted images",
-      "📈 Milestone progress – Based on correctly placed pieces (undo/redo safe)",
-      "❓ Help menu – Pick How to Play or Keyboard & Controls; smaller text on mobile",
-      "⏱ Time modes – Elapsed, countdown, active-only, relaxed, best time",
+      "❄️ Streak freeze – One per week; protect your daily streak if you miss a day",
+      "🔍 Zoom & pan – Animated zoom transitions, persistent per grid size, soft board clamp",
+      "👻 Ghost when idle – Faint ghost overlay after a few seconds of inactivity (Settings → View)",
+      "🔲 Edge piece highlight – Optional faint border on edge pieces (Settings → View)",
+      "🎯 Near-snap nudge – Gentle nudge when pieces are very close but not quite snapping",
+      "🏆 Dynamic completion badges – Speed Demon, Chill Mode, Precision Pro, and more",
+      "🔋 Battery-saver detection – Reduces confetti when low-power or data-saver is on",
+      "📥 Piece drawer – Taller tray, compact mode, sticky filters, scroll snapping",
       "📊 Stats & Leaderboards – Daily puzzle, streaks, achievements (Supabase)",
       "↩️ Undo / Redo · 👻 Ghost hint · 🔒 Lock pieces",
     ],

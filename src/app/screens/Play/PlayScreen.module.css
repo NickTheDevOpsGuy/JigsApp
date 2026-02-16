@@ -26,7 +26,9 @@
   gap: 10px;
   padding: 0 12px;
   padding-top: env(safe-area-inset-top, 0);
-  background: var(--color-bg-elevated);
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border);
   transition:
     transform 0.25s ease,
@@ -535,7 +537,9 @@
 
 .page:fullscreen .topBar,
 .page:-webkit-full-screen .topBar {
-  background: var(--color-bg-elevated);
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Pause overlay */
@@ -876,7 +880,9 @@
   max-height: min(80vh, 540px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: var(--color-bg-elevated);
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
@@ -897,7 +903,9 @@
 }
 
 .headerMenuItem {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   min-height: 44px;
   padding: 12px 16px;
@@ -964,6 +972,22 @@
   flex-shrink: 0;
   opacity: 0.6;
   transition: transform 0.15s ease;
+}
+
+.headerMenuChevronExpanded {
+  transform: rotate(90deg);
+}
+
+.headerMenuCheck {
+  flex-shrink: 0;
+  color: var(--color-brand-primary);
+}
+
+.headerMenuNested {
+  padding-left: 12px;
+  padding-bottom: 4px;
+  border-left: 2px solid var(--color-border);
+  margin-left: 12px;
 }
 
 .headerMenuSubmenuTrigger {

@@ -1,11 +1,18 @@
 .content {
-  max-height: 60vh;
+  max-height: 65vh;
   overflow-y: auto;
   font-size: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.content:focus-within {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 .section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .section:last-of-type {
@@ -13,7 +20,7 @@
 }
 
 .sectionTitle {
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.5rem;
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--color-brand-primary);
@@ -25,10 +32,10 @@
 }
 
 .item {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   color: var(--color-text-primary);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.5;
   letter-spacing: 0.01em;
 }
 
@@ -37,5 +44,35 @@
 }
 
 .actions {
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+/* Mobile: tighter layout, touch-friendly scroll */
+@media (max-width: 600px) {
+  .content {
+    max-height: min(55vh, 400px);
+    padding-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .section {
+    margin-bottom: 1rem;
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+  }
+
+  .list {
+    padding-left: 1.25rem;
+  }
+
+  .item {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .actions {
+    margin-top: 1rem;
+  }
 }

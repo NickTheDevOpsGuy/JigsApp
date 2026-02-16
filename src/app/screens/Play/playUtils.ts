@@ -28,12 +28,15 @@ export function createUndoRedoHandler(
   setState: (s: PuzzleState) => void,
   canRun: () => boolean,
   playSound: (s: "undo") => void,
+  onSuccess?: () => void,
 ) {
   return () => {
     const fn =
       action === "undo" ? (m: PuzzleManager) => m.undo() : (m: PuzzleManager) => m.redo();
-    if (runManagerAction(manager ?? null, fn, setState, () => canRun()))
+    if (runManagerAction(manager ?? null, fn, setState, () => canRun())) {
       playSound("undo");
+      onSuccess?.();
+    }
   };
 }
 

@@ -6,7 +6,14 @@
       (function () {
         var stored = localStorage.getItem("phuzzle-theme");
         var themes = ["light", "dark", "space", "ocean", "forest", "sunset"];
-        var theme = stored && themes.indexOf(stored) !== -1 ? stored : "light";
+        var theme;
+        if (stored && themes.indexOf(stored) !== -1) {
+          theme = stored;
+        } else {
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
         document.documentElement.className = "theme-" + theme;
       })();
     </script>

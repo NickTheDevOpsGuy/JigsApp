@@ -1,3 +1,67 @@
+.freezeOffer {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.freezeHint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.freezeActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.freezeBtn {
+  appearance: none;
+  border: none;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.freezeBtn:hover {
+  opacity: 0.95;
+}
+
+.freezeSkip {
+  appearance: none;
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-muted);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.freezeSkip:hover {
+  background: var(--color-bg-secondary);
+}
+
 .subtitle {
   margin: 0 0 20px;
   font-size: 14px;
@@ -50,5 +114,15 @@
 @media (max-width: 400px) {
   .difficulties {
     grid-template-columns: 1fr;
+  }
+
+  /* Stack freeze buttons for full-width touch targets on narrow screens */
+  .freezeActions {
+    flex-direction: column;
+  }
+
+  .freezeBtn,
+  .freezeSkip {
+    width: 100%;
   }
 }
