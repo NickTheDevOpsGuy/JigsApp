@@ -29,6 +29,7 @@ export function Modal({
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveRef = useRef<HTMLElement | null>(null);
+  const titleId = useId();
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -79,7 +80,6 @@ export function Modal({
 
   if (!isOpen) return null;
 
-  const titleId = useId();
   const labelledById = title ? titleId : undefined;
 
   return createPortal(
