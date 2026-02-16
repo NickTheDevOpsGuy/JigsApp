@@ -4,8 +4,8 @@ Setup and reference guides for developers.
 
 ## Setup Guides
 
-| Document | Description |
-|----------|-------------|
+| Document                                 | Description                                                                                                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) | Leaderboards, stats, achievements, co-op sharing – full Supabase setup. Includes [Verifying Share / Co-op](./SUPABASE_SETUP.md#verifying-share--co-op). |
 
 ## Quick Links

@@ -4,13 +4,13 @@ Phuzzle uses Supabase for **leaderboards**, **player stats**, **achievements**, 
 
 ## What Supabase Powers
 
-| Feature | Description |
-|--------|-------------|
-| **Leaderboards** | Daily puzzle, weekly/monthly totals, streaks, all-time completions, best times per grid size |
-| **Player Stats** | Puzzles completed, total play time, daily streaks |
-| **Achievements** | Unlock badges (first puzzle, streaks, speed demon, etc.) |
-| **Profile** | Display name, anonymous mode (raccoon names on leaderboards) |
-| **Co-op Sharing** | "Play with friend" – real-time collaborative puzzle sessions |
+| Feature           | Description                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| **Leaderboards**  | Daily puzzle, weekly/monthly totals, streaks, all-time completions, best times per grid size |
+| **Player Stats**  | Puzzles completed, total play time, daily streaks                                            |
+| **Achievements**  | Unlock badges (first puzzle, streaks, speed demon, etc.)                                     |
+| **Profile**       | Display name, anonymous mode (raccoon names on leaderboards)                                 |
+| **Co-op Sharing** | "Play with friend" – real-time collaborative puzzle sessions                                 |
 
 ---
 
@@ -102,13 +102,13 @@ If you see "Connect Supabase to track your stats...", check:
 
 ## Database Schema Overview
 
-| Table | Purpose |
-|-------|---------|
-| `player_stats` | One row per user: puzzles completed, play time, streaks |
-| `completions` | Each puzzle completion – used for leaderboards |
-| `player_profiles` | Display name, `show_on_leaderboard` (anonymous mode) |
-| `user_achievements` | Unlocked achievement IDs per user |
-| `puzzle_sessions` | Co-op sessions (pieces, elapsed time, completion state) |
+| Table               | Purpose                                                 |
+| ------------------- | ------------------------------------------------------- |
+| `player_stats`      | One row per user: puzzles completed, play time, streaks |
+| `completions`       | Each puzzle completion – used for leaderboards          |
+| `player_profiles`   | Display name, `show_on_leaderboard` (anonymous mode)    |
+| `user_achievements` | Unlocked achievement IDs per user                       |
+| `puzzle_sessions`   | Co-op sessions (pieces, elapsed time, completion state) |
 
 Row Level Security (RLS) is enabled on all tables:
 

@@ -149,10 +149,10 @@ npm run dev
 
 ## Documentation
 
-| Doc | Description |
-|-----|-------------|
+| Doc                                            | Description                                                                                        |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase setup: leaderboards, stats, achievements, co-op share; env vars, migrations, verification |
-| [doc/README.md](doc/README.md) | Index of docs |
+| [doc/README.md](doc/README.md)                 | Index of docs                                                                                      |
 
 ---
 
