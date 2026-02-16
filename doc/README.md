@@ -10,8 +10,8 @@ Setup and reference guides for developers.
 
 ## Session Notes
 
-| Document | Description |
-| -------- | ----------- |
+| Document                                   | Description                                                                                |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------ |
 | [SESSION_SUMMARY.md](./SESSION_SUMMARY.md) | Summary of development session changes (piece drawer, touch, validation, help, docs, etc.) |
 
 ## Quick Links
