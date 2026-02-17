@@ -59,8 +59,11 @@ export async function createPuzzleSession(
   return { sessionId: data.id };
 }
 
+const SESSION_EXPIRY_HOURS = 8;
+
 /**
  * Fetch session by ID (for joining via share link).
+ * Returns null if session is expired (no updates for 8h).
  */
 export async function getPuzzleSession(sessionId: string): Promise<PuzzleSession | null> {
   if (!isSupabaseConfigured() || !supabase) return null;
@@ -74,6 +77,10 @@ export async function getPuzzleSession(sessionId: string): Promise<PuzzleSession
     .single();
 
   if (error || !data) return null;
+
+  const updatedAt = data.updated_at as string;
+  const cutoff = new Date(Date.now() - SESSION_EXPIRY_HOURS * 60 * 60 * 1000).toISOString();
+  if (updatedAt < cutoff) return null;
 
   const state = data.state_json as PuzzleSessionState;
   const row = data as Record<string, unknown>;
@@ -117,6 +124,8 @@ export async function updatePuzzleSession(
   return true;
 }
 
+export type RealtimeStatus = "connected" | "reconnecting" | "disconnected" | null;
+
 export type SubscribeResult = {
   unsubscribe: () => void;
   setPresence: (data: Record<string, unknown>) => void;
@@ -126,11 +135,13 @@ export type SubscribeResult = {
  * Subscribe to session changes (Realtime) and presence.
  * - onUpdate: when another participant pushes state
  * - onPresenceChange: when connected players count changes
+ * - onStatusChange: when channel connection status changes
  */
 export function subscribePuzzleSession(
   sessionId: string,
   onUpdate: (state: PuzzleSessionState) => void,
   onPresenceChange?: (count: number) => void,
+  onStatusChange?: (status: RealtimeStatus) => void,
 ): SubscribeResult {
   if (!isSupabaseConfigured() || !supabase) {
     return { unsubscribe: () => {}, setPresence: () => {} };
@@ -138,6 +149,13 @@ export function subscribePuzzleSession(
 
   const channelName = `puzzle:${sessionId}`;
   const channel = supabase.channel(channelName);
+
+  const mapStatus = (status: string): RealtimeStatus => {
+    if (status === "SUBSCRIBED" || status === "CHANNEL_OPEN") return "connected";
+    if (status === "RECONNECTING" || status === "TIMED_OUT") return "reconnecting";
+    if (status === "CLOSED" || status === "CHANNEL_ERROR") return "disconnected";
+    return null;
+  };
 
   channel.on(
     "postgres_changes",
@@ -165,6 +183,7 @@ export function subscribePuzzleSession(
   }
 
   channel.subscribe(async (status) => {
+    onStatusChange?.(mapStatus(status));
     if (status === "SUBSCRIBED") {
       await channel.track({ joined_at: Date.now() });
     }

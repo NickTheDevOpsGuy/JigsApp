@@ -89,6 +89,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
 - Settings organized into sub-menus: **About** (Help), **Display** (Theme, board options, effects), **Gameplay** (Controls, time display), **Audio**, **Advanced**
 - Optional piece borders, edge-piece highlight, immersive mode
+- Edge and corner pieces display full image content (no cropping at straight edges)
 - Undo and redo
 - Ghost hint and ghost when idle (after a few seconds of inactivity)
 - Optional piece locking

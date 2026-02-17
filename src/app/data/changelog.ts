@@ -1,11 +1,12 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "5";
+export const CHANGELOG_VERSION = "6";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🧩 Edge & corner pieces – Full image content now visible on straight edges (no cropping)",
       "❄️ Streak freeze – One per week; protect your daily streak if you miss a day",
       "🔍 Zoom & pan – Animated zoom transitions, persistent per grid size, soft board clamp",
       "👻 Ghost when idle – Faint ghost overlay after a few seconds of inactivity (Settings → View)",

@@ -43,6 +43,8 @@ import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
 import { useBatterySaver } from "../../hooks/useBatterySaver";
 import {
+  CoopDebugPanel,
+  CoopStatusIndicator,
   DragPreview,
   PlayHUD,
   CompletionOverlay,
@@ -69,6 +71,8 @@ export function PlayScreen() {
     sessionId,
     session,
     sessionLoading,
+    creatingSession,
+    realtimeStatus,
     isHost,
     createSession,
     copyShareLink,
@@ -76,6 +80,11 @@ export function PlayScreen() {
     pushState,
     remoteState,
     clearRemoteState,
+    retryJoin,
+    joinError,
+    lastEventTimestamp,
+    lastDbWriteMs,
+    channelName,
   } = sessionResult;
 
   const grid = session ? session.grid : localGrid;
@@ -233,6 +242,21 @@ export function PlayScreen() {
     abandonCapturedRef.current = false;
   }, [puzzleKey]);
 
+  useEffect(() => {
+    if (!isHost && sessionIdFromUrl && session && !sessionLoading) {
+      posthog.capture("coop_join_success", {
+        grid_size: session.grid ? `${session.grid.rows}x${session.grid.cols}` : "unknown",
+        device_type: isCoarsePointer ? "mobile" : "desktop",
+      });
+    }
+  }, [isHost, sessionIdFromUrl, session, sessionLoading, isCoarsePointer]);
+
+  useEffect(() => {
+    if (!isHost && sessionIdFromUrl && sessionLoading) {
+      posthog.capture("coop_join_opened", { retry: false });
+    }
+  }, [isHost, sessionIdFromUrl, sessionLoading]);
+
   // ─── Onboarding & milestone toasts ───
   const placedForOnboarding = state?.placedCount ?? 0;
   const totalForOnboarding = state?.totalCount ?? 0;
@@ -313,8 +337,22 @@ export function PlayScreen() {
         time_mode: timeMode,
         elapsed_seconds: elapsedSeconds,
       });
+      if (sessionId) {
+        posthog.capture("coop_session_completed", {
+          grid_size: gridSize,
+          device_type: isCoarsePointer ? "mobile" : "desktop",
+          elapsed_seconds: elapsedSeconds,
+        });
+      }
     }
-  }, [state?.isComplete, state?.grid, elapsedSeconds, isCoarsePointer, timeMode]);
+  }, [
+    state?.isComplete,
+    state?.grid,
+    elapsedSeconds,
+    isCoarsePointer,
+    timeMode,
+    sessionId,
+  ]);
 
   // Analytics: on_fire_toast_shown when placement streak toast appears
   const onFireCapturedRef = useRef(false);
@@ -655,16 +693,25 @@ export function PlayScreen() {
   const handleSharePuzzle = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
     setShareToast(null);
+    const gridSize = stateRef.current?.grid
+      ? `${stateRef.current.grid.rows}x${stateRef.current.grid.cols}`
+      : "unknown";
     try {
       if (sessionId) {
-        const ok = await (typeof navigator.share === "function"
-          ? nativeShare()
-          : copyShareLink());
-        if (ok && typeof navigator.share !== "function") {
-          setShareToast("Link copied!");
+        posthog.capture("coop_share_clicked", { grid_size: gridSize });
+        let ok = false;
+        let usedNative = false;
+        if (typeof navigator.share === "function") {
+          ok = await nativeShare();
+          usedNative = ok;
+          if (!ok) ok = await copyShareLink();
+        } else {
+          ok = await copyShareLink();
         }
+        if (ok) setShareToast(usedNative ? "Shared!" : "Link copied!");
         return;
       }
+      posthog.capture("coop_share_clicked", { grid_size: gridSize });
       const s = stateRef.current;
       const pieces = s?.pieces
         ? s.pieces.map((p: Piece) => ({
@@ -691,27 +738,52 @@ export function PlayScreen() {
         setShareToast("Couldn't create share link. Check your connection.");
         return;
       }
+      posthog.capture("coop_session_created", {
+        grid_size: gridSize,
+        device_type: isCoarsePointer ? "mobile" : "desktop",
+      });
       const shareUrl = `${window.location.origin}/play?${SESSION_ID_PARAM}=${id}`;
-      try {
-        await (typeof navigator.share === "function"
-          ? navigator.share({
-              title: "Join my Phuzzle",
-              text: "Solve this puzzle with me!",
-              url: shareUrl,
-            })
-          : navigator.clipboard.writeText(shareUrl));
-        if (typeof navigator.share !== "function") {
-          setShareToast("Link copied!");
+      let shared = false;
+      if (typeof navigator.share === "function") {
+        try {
+          await navigator.share({
+            title: "Join my Phuzzle",
+            text: "Solve this puzzle with me!",
+            url: shareUrl,
+          });
+          shared = true;
+          setShareToast("Shared!");
+        } catch {
+          try {
+            await navigator.clipboard.writeText(shareUrl);
+            shared = true;
+            setShareToast("Link copied!");
+          } catch {
+            setShareToast("Share failed. Link is in address bar.");
+          }
         }
-      } catch {
-        /* user cancelled or failed */
+      } else {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          shared = true;
+          setShareToast("Link copied!");
+        } catch {
+          setShareToast("Couldn't copy. Link is in address bar.");
+        }
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn("Share failed:", err);
       setShareToast(msg || "Share failed. Try again.");
     }
-  }, [sessionId, nativeShare, copyShareLink, createSession, grid]);
+  }, [
+    sessionId,
+    nativeShare,
+    copyShareLink,
+    createSession,
+    grid,
+    isCoarsePointer,
+  ]);
   const handleDownloadImage = useDownloadImage({
     canvasRef,
     imgRef,
@@ -766,14 +838,49 @@ export function PlayScreen() {
     );
   }
   if (!isHost && sessionIdFromUrl && !session && !sessionLoading) {
+    const debugInfo = `sessionId=${sessionIdFromUrl}\ntime=${new Date().toISOString()}`;
+    posthog.capture("coop_join_failed", {
+      session_id: sessionIdFromUrl,
+      error_type: joinError?.message ?? "session_not_found",
+    });
     return (
       <div className={styles.page}>
-        <div className={styles.card} style={{ padding: 24 }}>
-          <h2>Session not found</h2>
-          <p>The puzzle session may have expired or the link is invalid.</p>
-          <button type="button" onClick={() => navigate("/")}>
-            Back to menu
-          </button>
+        <div className={styles.card} style={{ padding: 24, maxWidth: 360 }}>
+          <h2>Couldn't join session</h2>
+          <p>
+            The puzzle session may have expired, the link is invalid, or realtime
+            is blocked (e.g. by a browser extension).
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <button
+              type="button"
+              className={styles.primaryButton}
+              onClick={() => {
+                posthog.capture("coop_join_opened", { retry: true });
+                retryJoin();
+              }}
+            >
+              Try again
+            </button>
+            <button type="button" onClick={() => navigate("/")}>
+              Back to menu
+            </button>
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(
+                    `sessionId=${sessionIdFromUrl}\ntime=${new Date().toISOString()}`,
+                  );
+                } catch {
+                  /* ignore */
+                }
+              }}
+            >
+              Copy debug info
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -882,6 +989,7 @@ export function PlayScreen() {
                 toggleImmersiveMode();
               }}
               onSharePuzzle={isSupabaseConfigured() ? handleSharePuzzle : undefined}
+              shareDisabled={creatingSession}
               onOpenThemeModal={() => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 setShowThemeModal(true);
@@ -891,6 +999,12 @@ export function PlayScreen() {
             />
           </div>
           <div className={styles.topBarCenter}>
+            {sessionId && (
+              <CoopStatusIndicator
+                status={realtimeStatus}
+                connectedCount={sessionResult.connectedCount}
+              />
+            )}
             <PlayHUD
               elapsedSeconds={elapsedSeconds}
               piecesLeft={left}
@@ -1135,6 +1249,15 @@ export function PlayScreen() {
       />
       {(import.meta.env.DEV || SHOW_DEBUG) && (
         <ProfilerOverlay statsRef={perfStatsRef} visible={debug.showPerfOverlay} />
+      )}
+      {sessionId && (
+        <CoopDebugPanel
+          sessionId={sessionId}
+          connectedCount={sessionResult.connectedCount}
+          lastEventTimestamp={lastEventTimestamp}
+          lastDbWriteMs={lastDbWriteMs}
+          channelName={channelName}
+        />
       )}
     </div>
   );

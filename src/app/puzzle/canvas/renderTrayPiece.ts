@@ -2,6 +2,7 @@
  * renderTrayPiece – render single piece to offscreen canvas for tray thumbnails.
  */
 import type { Piece } from "@/puzzle/types";
+import { computeImageSourceRect } from "./renderBoardHelpers";
 
 /**
  * Render a single piece to a small canvas for use in the tray.
@@ -53,47 +54,20 @@ export function renderTrayPiece(
   ctx.save();
   ctx.clip(path);
 
-  // Calculate source slice (same logic as renderBoard)
-  const sourceW = img.naturalWidth;
-  const sourceH = img.naturalHeight;
-
   const cols = Math.round(assembledW / piece.tileW);
   const rows = Math.round(assembledH / piece.tileH);
-
-  const srcTileW = sourceW / cols;
-  const srcTileH = sourceH / rows;
-
-  const srcPadX = (piece.pad / piece.tileW) * srcTileW;
-  const srcPadY = (piece.pad / piece.tileH) * srcTileH;
-  let srcX = piece.col * srcTileW - srcPadX;
-  let srcY = piece.row * srcTileH - srcPadY;
-  let srcW = srcTileW + srcPadX * 2;
-  let srcH = srcTileH + srcPadY * 2;
-  let destX = 0;
-  let destY = 0;
-  let destW = piece.w;
-  let destH = piece.h;
-  if (srcX < 0) {
-    destX = (-srcX / srcW) * piece.w;
-    destW = piece.w - destX;
-    srcW = srcW + srcX;
-    srcX = 0;
-  }
-  if (srcY < 0) {
-    destY = (-srcY / srcH) * piece.h;
-    destH = piece.h - destY;
-    srcH = srcH + srcY;
-    srcY = 0;
-  }
-  if (srcX + srcW > sourceW) {
-    destW *= (sourceW - srcX) / srcW;
-    srcW = sourceW - srcX;
-  }
-  if (srcY + srcH > sourceH) {
-    destH *= (sourceH - srcY) / srcH;
-    srcH = sourceH - srcY;
-  }
-  ctx.drawImage(img, srcX, srcY, srcW, srcH, destX, destY, destW, destH);
+  const rect = computeImageSourceRect(piece, img, cols, rows);
+  ctx.drawImage(
+    img,
+    rect.srcX,
+    rect.srcY,
+    rect.srcW,
+    rect.srcH,
+    rect.destX,
+    rect.destY,
+    rect.destW,
+    rect.destH,
+  );
   ctx.restore();
 
   // Draw outline
