@@ -57,6 +57,7 @@ export type HeaderMenuProps = {
   immersiveMode: boolean;
   onToggleImmersiveMode: () => void;
   onSharePuzzle?: () => void | Promise<void>;
+  shareDisabled?: boolean;
   theme?: Theme;
   setTheme?: (t: Theme) => void;
   onOpenThemeModal?: () => void;
@@ -285,6 +286,8 @@ export function buildMenuItems(
       visible: !!props.onSharePuzzle,
       label: "👥 Play with friend?",
       sortKey: "Play with friend",
+      disabled: props.shareDisabled,
+      disabledTitle: props.shareDisabled ? "Creating session…" : undefined,
       onClick: c(props.onSharePuzzle ?? (() => {})),
       subMenu: "share",
     },

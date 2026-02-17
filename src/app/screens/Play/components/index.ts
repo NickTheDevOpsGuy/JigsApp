@@ -1,4 +1,6 @@
 /** Play screen component exports. */
+export { CoopDebugPanel } from "./CoopDebugPanel";
+export { CoopStatusIndicator } from "./CoopStatusIndicator";
 export { DragPreview } from "./DragPreview";
 export { HeaderMenu } from "./HeaderMenu";
 export { PlayToasts } from "./PlayToasts";

@@ -303,6 +303,71 @@
   }
 }
 
+.coopStatusIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
+}
+
+.coopStatusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.coopStatusLabel {
+  white-space: nowrap;
+}
+
+.coopStatusCount {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.card {
+  background: var(--color-bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.primaryButton {
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.primaryButton:hover {
+  filter: brightness(1.05);
+}
+
+.secondaryButton {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.secondaryButton:hover {
+  background: var(--color-bg-card);
+}
+
 .board {
   flex-shrink: 0;
   min-width: 0;

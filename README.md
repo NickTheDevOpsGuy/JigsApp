@@ -89,6 +89,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
 - Settings organized into sub-menus: **About** (Help), **Display** (Theme, board options, effects), **Gameplay** (Controls, time display), **Audio**, **Advanced**
 - Optional piece borders, edge-piece highlight, immersive mode
+- Edge and corner pieces display full image content (no cropping at straight edges)
 - Undo and redo
 - Ghost hint and ghost when idle (after a few seconds of inactivity)
 - Optional piece locking
@@ -273,24 +274,6 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   └── vercel-production.yml
 │   └── pull_request_template.md
 ├── .husky
-│   ├── _
-│   │   ├── .gitignore
-│   │   ├── applypatch-msg
-│   │   ├── commit-msg
-│   │   ├── h
-│   │   ├── husky.sh
-│   │   ├── post-applypatch
-│   │   ├── post-checkout
-│   │   ├── post-commit
-│   │   ├── post-merge
-│   │   ├── post-rewrite
-│   │   ├── pre-applypatch
-│   │   ├── pre-auto-gc
-│   │   ├── pre-commit
-│   │   ├── pre-merge-commit
-│   │   ├── pre-push
-│   │   ├── pre-rebase
-│   │   └── prepare-commit-msg
 │   ├── pre-commit
 │   └── pre-push
 ├── .lighthouseci
@@ -476,6 +459,8 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   ├── Play
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── CoopDebugPanel.tsx
+│   │   │   │   │   ├── CoopStatusIndicator.tsx
 │   │   │   │   │   ├── DragPreview.tsx
 │   │   │   │   │   ├── HeaderMenu.tsx
 │   │   │   │   │   ├── headerMenuConfig.tsx
@@ -552,7 +537,8 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   ├── migrations
 │   │   ├── 001_initial_schema.sql
 │   │   ├── 002_player_profiles.sql
-│   │   └── 003_puzzle_sessions.sql
+│   │   ├── 003_puzzle_sessions.sql
+│   │   └── 004_puzzle_sessions_expiration.sql
 │   └── README.md
 ├── test-results
 │   ├── home-Home-Menu-shows-main-action-buttons-webkit-retry2

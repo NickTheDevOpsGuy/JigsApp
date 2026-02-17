@@ -205,14 +205,20 @@ export function computeImageSourceRect(
   const srcTileH = sourceH / rows;
   const srcPadX = (p.pad / p.tileW) * srcTileW;
   const srcPadY = (p.pad / p.tileH) * srcTileH;
-  let srcX = p.col * srcTileW - srcPadX;
-  let srcY = p.row * srcTileH - srcPadY;
-  let srcW = srcTileW + srcPadX * 2;
-  let srcH = srcTileH + srcPadY * 2;
+  // Edge/corner pieces have flat sides—don't extend source past image bounds
+  const leftPad = p.col === 0 ? 0 : srcPadX;
+  const rightPad = p.col === cols - 1 ? 0 : srcPadX;
+  const topPad = p.row === 0 ? 0 : srcPadY;
+  const bottomPad = p.row === rows - 1 ? 0 : srcPadY;
+  let srcX = p.col * srcTileW - leftPad;
+  let srcY = p.row * srcTileH - topPad;
+  let srcW = srcTileW + leftPad + rightPad;
+  let srcH = srcTileH + topPad + bottomPad;
   let destX = 0;
   let destY = 0;
   let destW = p.w;
   let destH = p.h;
+  // Clamp to image bounds (safety for any floating point edge cases)
   if (srcX < 0) {
     destX = (-srcX / srcW) * p.w;
     destW = p.w - destX;

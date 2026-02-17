@@ -1,6 +1,12 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Home / Menu", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("phuzzle:lastSeenChangelog", "6");
+    });
+  });
+
   test("loads the app and shows the menu", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByAltText("Phuzzle logo")).toBeVisible();

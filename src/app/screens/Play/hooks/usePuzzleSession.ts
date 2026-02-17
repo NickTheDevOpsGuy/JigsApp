@@ -16,7 +16,7 @@ import type { Piece } from "@/puzzle/types";
 import type { SavedPiece } from "@/puzzle/puzzleStorage";
 import { isSupabaseConfigured } from "@/supabase/client";
 
-const SYNC_DEBOUNCE_MS = 150;
+const SYNC_THROTTLE_MS = 50; // ~20fps max during drag
 export const SESSION_ID_PARAM = "session";
 
 function piecesToSaved(pieces: Piece[]): SavedPiece[] {
@@ -35,11 +35,15 @@ function piecesToSaved(pieces: Piece[]): SavedPiece[] {
   }));
 }
 
+export type RealtimeStatus = "connected" | "reconnecting" | "disconnected" | null;
+
 export type PuzzleSessionResult = {
   sessionId: string | null;
   session: PuzzleSession | null;
   sessionLoading: boolean;
+  creatingSession: boolean;
   connectedCount: number;
+  realtimeStatus: RealtimeStatus;
   isHost: boolean;
   createSession: (
     imgUrl?: string,
@@ -53,6 +57,11 @@ export type PuzzleSessionResult = {
   pushState: (pieces: Piece[], elapsedSeconds: number, isComplete: boolean) => void;
   remoteState: PuzzleSessionState | null;
   clearRemoteState: () => void;
+  retryJoin: () => void;
+  joinError: Error | null;
+  lastEventTimestamp: number | null;
+  lastDbWriteMs: number | null;
+  channelName: string | null;
 };
 
 export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessionResult {
@@ -61,11 +70,20 @@ export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessio
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [session, setSession] = useState<PuzzleSession | null>(null);
   const [sessionLoading, setSessionLoading] = useState(!!sessionIdFromUrl);
+  const [creatingSession, setCreatingSession] = useState(false);
   const [connectedCount, setConnectedCount] = useState(0);
+  const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>(null);
   const [remoteState, setRemoteState] = useState<PuzzleSessionState | null>(null);
+  const [joinError, setJoinError] = useState<Error | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const isHostRef = useRef(false);
+  const createInFlightRef = useRef(false);
   const pushTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPushRef = useRef<number>(0);
+  const lastEventRef = useRef<number | null>(null);
+  const pendingStateRef = useRef<PuzzleSessionState | null>(null);
+  const [lastEventTimestamp, setLastEventTimestamp] = useState<number | null>(null);
+  const [lastDbWriteMs, setLastDbWriteMs] = useState<number | null>(null);
 
   const isHost = isHostRef.current;
 
@@ -77,14 +95,30 @@ export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessio
         elapsedSeconds,
         isComplete,
       };
+      pendingStateRef.current = state;
 
-      const doPush = () => {
-        lastPushRef.current = Date.now();
-        updatePuzzleSession(sessionId, state);
+      const doPush = async () => {
+        const pending = pendingStateRef.current;
+        if (!pending) return;
+        const t0 = Date.now();
+        lastPushRef.current = t0;
+        pendingStateRef.current = null;
+        await updatePuzzleSession(sessionId, pending);
+        setLastDbWriteMs(Math.round(Date.now() - t0));
       };
 
-      if (pushTimeoutRef.current) clearTimeout(pushTimeoutRef.current);
-      pushTimeoutRef.current = setTimeout(doPush, SYNC_DEBOUNCE_MS);
+      const now = Date.now();
+      const elapsed = now - lastPushRef.current;
+      if (elapsed >= SYNC_THROTTLE_MS || lastPushRef.current === 0) {
+        if (pushTimeoutRef.current) clearTimeout(pushTimeoutRef.current);
+        pushTimeoutRef.current = null;
+        doPush();
+      } else if (!pushTimeoutRef.current) {
+        pushTimeoutRef.current = setTimeout(() => {
+          pushTimeoutRef.current = null;
+          doPush();
+        }, SYNC_THROTTLE_MS - elapsed);
+      }
     },
     [sessionId],
   );
@@ -97,26 +131,34 @@ export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessio
       initialElapsed?: number,
     ): Promise<string | null> => {
       if (!isSupabaseConfigured()) return null;
+      if (createInFlightRef.current) return sessionId; // Prevent duplicate creation
       const url = imgUrl ?? imageUrl;
       const gr = g ?? grid;
       if (!url) return null;
-      const state: PuzzleSessionState = {
-        pieces: initialPieces ?? [],
-        elapsedSeconds: initialElapsed ?? 0,
-        isComplete: false,
-      };
-      const result = await createPuzzleSession(url, gr, state);
-      if ("error" in result) throw new Error(result.error);
-      isHostRef.current = true;
-      setSessionId(result.sessionId);
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.set(SESSION_ID_PARAM, result.sessionId);
-        return next;
-      });
-      return result.sessionId;
+      createInFlightRef.current = true;
+      setCreatingSession(true);
+      try {
+        const state: PuzzleSessionState = {
+          pieces: initialPieces ?? [],
+          elapsedSeconds: initialElapsed ?? 0,
+          isComplete: false,
+        };
+        const result = await createPuzzleSession(url, gr, state);
+        if ("error" in result) throw new Error(result.error);
+        isHostRef.current = true;
+        setSessionId(result.sessionId);
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.set(SESSION_ID_PARAM, result.sessionId);
+          return next;
+        });
+        return result.sessionId;
+      } finally {
+        createInFlightRef.current = false;
+        setCreatingSession(false);
+      }
     },
-    [imageUrl, grid, setSearchParams],
+    [imageUrl, grid, setSearchParams, sessionId],
   );
 
   const getShareUrl = useCallback(() => {
@@ -150,23 +192,37 @@ export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessio
     }
   }, [getShareUrl]);
 
+  const retryJoin = useCallback(() => {
+    setJoinError(null);
+    setRetryCount((c) => c + 1);
+  }, []);
+
   // Join: fetch session when we have sessionId in URL
   useEffect(() => {
     if (!sessionIdFromUrl || !isSupabaseConfigured()) {
       setSessionLoading(false);
+      setJoinError(null);
       return;
     }
 
     setSessionId(sessionIdFromUrl);
     setSessionLoading(true);
+    setJoinError(null);
 
     const load = async () => {
-      const s = await getPuzzleSession(sessionIdFromUrl);
-      setSession(s);
-      setSessionLoading(false);
+      try {
+        const s = await getPuzzleSession(sessionIdFromUrl);
+        setSession(s);
+        if (!s) setJoinError(new Error("Session not found"));
+      } catch (e) {
+        setJoinError(e instanceof Error ? e : new Error(String(e)));
+        setSession(null);
+      } finally {
+        setSessionLoading(false);
+      }
     };
     load();
-  }, [sessionIdFromUrl]);
+  }, [sessionIdFromUrl, retryCount]);
 
   // Subscribe to changes when we have a session
   useEffect(() => {
@@ -176,9 +232,12 @@ export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessio
       sessionId,
       (state) => {
         if (Date.now() - lastPushRef.current < 400) return;
+        lastEventRef.current = Date.now();
+        setLastEventTimestamp(lastEventRef.current);
         setRemoteState(state);
       },
       setConnectedCount,
+      setRealtimeStatus,
     );
 
     return () => {
@@ -191,7 +250,9 @@ export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessio
     sessionId,
     session,
     sessionLoading,
+    creatingSession,
     connectedCount,
+    realtimeStatus,
     isHost,
     createSession,
     getShareUrl,
@@ -200,5 +261,10 @@ export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessio
     pushState,
     remoteState,
     clearRemoteState: () => setRemoteState(null),
+    retryJoin,
+    joinError,
+    lastEventTimestamp,
+    lastDbWriteMs,
+    channelName: sessionId ? `puzzle:${sessionId}` : null,
   };
 }
