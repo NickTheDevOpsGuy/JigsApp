@@ -81,7 +81,6 @@ export function usePuzzleSession(imageUrl: string, grid: GridSize): PuzzleSessio
   const pushTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPushRef = useRef<number>(0);
   const lastEventRef = useRef<number | null>(null);
-  const lastDbWriteMsRef = useRef<number | null>(null);
   const pendingStateRef = useRef<PuzzleSessionState | null>(null);
   const [lastEventTimestamp, setLastEventTimestamp] = useState<number | null>(null);
   const [lastDbWriteMs, setLastDbWriteMs] = useState<number | null>(null);

@@ -743,7 +743,6 @@ export function PlayScreen() {
         device_type: isCoarsePointer ? "mobile" : "desktop",
       });
       const shareUrl = `${window.location.origin}/play?${SESSION_ID_PARAM}=${id}`;
-      let shared = false;
       if (typeof navigator.share === "function") {
         try {
           await navigator.share({
@@ -751,12 +750,10 @@ export function PlayScreen() {
             text: "Solve this puzzle with me!",
             url: shareUrl,
           });
-          shared = true;
           setShareToast("Shared!");
         } catch {
           try {
             await navigator.clipboard.writeText(shareUrl);
-            shared = true;
             setShareToast("Link copied!");
           } catch {
             setShareToast("Share failed. Link is in address bar.");
@@ -765,7 +762,6 @@ export function PlayScreen() {
       } else {
         try {
           await navigator.clipboard.writeText(shareUrl);
-          shared = true;
           setShareToast("Link copied!");
         } catch {
           setShareToast("Couldn't copy. Link is in address bar.");
@@ -832,6 +828,8 @@ export function PlayScreen() {
   }
   if (!isHost && sessionIdFromUrl && !session && !sessionLoading) {
     const debugInfo = `sessionId=${sessionIdFromUrl}\ntime=${new Date().toISOString()}`;
+    const copyDebug = () =>
+      navigator.clipboard.writeText(debugInfo).catch(() => {});
     posthog.capture("coop_join_failed", {
       session_id: sessionIdFromUrl,
       error_type: joinError?.message ?? "session_not_found",
@@ -861,15 +859,7 @@ export function PlayScreen() {
             <button
               type="button"
               className={styles.secondaryButton}
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(
-                    `sessionId=${sessionIdFromUrl}\ntime=${new Date().toISOString()}`,
-                  );
-                } catch {
-                  /* ignore */
-                }
-              }}
+              onClick={copyDebug}
             >
               Copy debug info
             </button>
