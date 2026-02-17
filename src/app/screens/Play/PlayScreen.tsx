@@ -828,8 +828,7 @@ export function PlayScreen() {
   }
   if (!isHost && sessionIdFromUrl && !session && !sessionLoading) {
     const debugInfo = `sessionId=${sessionIdFromUrl}\ntime=${new Date().toISOString()}`;
-    const copyDebug = () =>
-      navigator.clipboard.writeText(debugInfo).catch(() => {});
+    const copyDebug = () => navigator.clipboard.writeText(debugInfo).catch(() => {});
     posthog.capture("coop_join_failed", {
       session_id: sessionIdFromUrl,
       error_type: joinError?.message ?? "session_not_found",
@@ -856,11 +855,7 @@ export function PlayScreen() {
             <button type="button" onClick={() => navigate("/")}>
               Back to menu
             </button>
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              onClick={copyDebug}
-            >
+            <button type="button" className={styles.secondaryButton} onClick={copyDebug}>
               Copy debug info
             </button>
           </div>
