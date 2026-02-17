@@ -79,7 +79,9 @@ export async function getPuzzleSession(sessionId: string): Promise<PuzzleSession
   if (error || !data) return null;
 
   const updatedAt = data.updated_at as string;
-  const cutoff = new Date(Date.now() - SESSION_EXPIRY_HOURS * 60 * 60 * 1000).toISOString();
+  const cutoff = new Date(
+    Date.now() - SESSION_EXPIRY_HOURS * 60 * 60 * 1000,
+  ).toISOString();
   if (updatedAt < cutoff) return null;
 
   const state = data.state_json as PuzzleSessionState;

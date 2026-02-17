@@ -776,14 +776,7 @@ export function PlayScreen() {
       console.warn("Share failed:", err);
       setShareToast(msg || "Share failed. Try again.");
     }
-  }, [
-    sessionId,
-    nativeShare,
-    copyShareLink,
-    createSession,
-    grid,
-    isCoarsePointer,
-  ]);
+  }, [sessionId, nativeShare, copyShareLink, createSession, grid, isCoarsePointer]);
   const handleDownloadImage = useDownloadImage({
     canvasRef,
     imgRef,
@@ -848,8 +841,8 @@ export function PlayScreen() {
         <div className={styles.card} style={{ padding: 24, maxWidth: 360 }}>
           <h2>Couldn't join session</h2>
           <p>
-            The puzzle session may have expired, the link is invalid, or realtime
-            is blocked (e.g. by a browser extension).
+            The puzzle session may have expired, the link is invalid, or realtime is
+            blocked (e.g. by a browser extension).
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <button

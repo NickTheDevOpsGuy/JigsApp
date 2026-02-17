@@ -36,10 +36,7 @@ export function CoopStatusIndicator({
       aria-live="polite"
       title={label}
     >
-      <span
-        className={styles.coopStatusDot}
-        style={{ backgroundColor: dotColor }}
-      />
+      <span className={styles.coopStatusDot} style={{ backgroundColor: dotColor }} />
       <span className={styles.coopStatusLabel}>{label}</span>
       {connectedCount > 0 && (
         <span className={styles.coopStatusCount}>({connectedCount})</span>
