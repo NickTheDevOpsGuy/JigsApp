@@ -7,7 +7,7 @@
  * - Pointer/touch handling, viewport zoom/pan
  * - Toasts (milestones, share, onboarding), modals, auto-save
  */
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import posthog from "posthog-js";
 import styles from "./PlayScreen.module.css";
@@ -21,7 +21,7 @@ import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
-import { getBestTime, BEST_TIME_PREFIX } from "./timeMode";
+import { getBestTime } from "./timeMode";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenEffects } from "./hooks/usePlayScreenEffects";
