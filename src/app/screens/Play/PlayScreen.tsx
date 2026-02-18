@@ -1154,7 +1154,9 @@ export function PlayScreen() {
             <CompletionOverlay
               elapsedSeconds={elapsedSeconds}
               grid={state?.grid}
-              imageUrl={localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined}
+              imageUrl={
+                localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
+              }
               undoCount={undoCountRef.current}
               isNewBest={
                 timeMode === "best" &&

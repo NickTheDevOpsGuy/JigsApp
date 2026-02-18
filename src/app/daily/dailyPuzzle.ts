@@ -44,7 +44,7 @@ function hashString(s: string): number {
     h ^= s.charCodeAt(i);
     h = Math.imul(h, 16777619);
   }
-  return (h >>> 0);
+  return h >>> 0;
 }
 
 /** Get the puzzle for a given date (deterministic, good distribution). Same date = same puzzle for everyone. */
