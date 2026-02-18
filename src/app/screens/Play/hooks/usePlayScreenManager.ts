@@ -15,6 +15,10 @@ export type ResumeChoice = "resume" | "fresh" | null;
 const PLACEMENT_STREAK_MS = 3000;
 const STREAK_COOLDOWN_MS = 5000;
 const SNAP_PARTICLE_COUNT = 8;
+/** Time Attack: bonus window in ms. Placements within this window get combo multiplier. */
+const TIME_ATTACK_COMBO_MS = 4000;
+/** Time Attack: base bonus points per fast placement. */
+const TIME_ATTACK_BONUS_BASE = 5;
 
 /**
  * usePlayScreenManager – creates PuzzleManager, wires events, provides board/canvas refs.
@@ -50,6 +54,10 @@ export function usePlayScreenManager(
     batterySaverMode?: boolean;
     /** When true, snap tolerance increases after ~15s without placement. */
     relaxedModeEnabled?: boolean;
+    /** When true, track Time Attack bonus points and combo for scoring. */
+    isTimeAttack?: boolean;
+    /** Ref to current elapsed ms (for replay recording). */
+    elapsedMsRef?: MutableRefObject<number>;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -63,6 +71,10 @@ export function usePlayScreenManager(
   const placementTimesRef = useRef<number[]>([]);
   const lastStreakAtRef = useRef<number | null>(null);
   const relaxedToleranceMultiplierRef = useRef<number>(1);
+  const timeAttackComboRef = useRef(0);
+  const timeAttackLastPlacementRef = useRef<number | null>(null);
+  const timeAttackBonusRef = useRef(0);
+  const placementSequenceRef = useRef<{ elapsedMs: number; pieceIds: string[] }[]>([]);
   const sizingCleanupRef = useRef<(() => void) | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
@@ -184,7 +196,7 @@ export function usePlayScreenManager(
         if (hasSavedGame && savedState && resumeChoice === "resume") {
           setElapsedSeconds(savedState.elapsedSeconds);
         } else {
-          const isCountdown = timeMode === "countdown";
+          const isCountdown = timeMode === "countdown" || timeMode === "timeAttack";
           setElapsedSeconds(isCountdown ? countdownMinutes * 60 : 0);
         }
 
@@ -202,6 +214,10 @@ export function usePlayScreenManager(
         popMapRef.current.clear();
         lockMapRef.current.clear();
         snapParticlesRef.current = [];
+        timeAttackComboRef.current = 0;
+        timeAttackLastPlacementRef.current = null;
+        timeAttackBonusRef.current = 0;
+        placementSequenceRef.current = [];
         const canvas = canvasRef.current;
         if (canvas) {
           const ctx = canvas.getContext("2d");
@@ -260,6 +276,22 @@ export function usePlayScreenManager(
                 lastStreakAtRef.current = now;
                 opts?.onPlacementStreak?.();
               }
+              if (opts?.isTimeAttack) {
+                const last = timeAttackLastPlacementRef.current;
+                if (last != null && now - last <= TIME_ATTACK_COMBO_MS) {
+                  timeAttackComboRef.current += 1;
+                } else {
+                  timeAttackComboRef.current = 1;
+                }
+                timeAttackLastPlacementRef.current = now;
+                const bonus = TIME_ATTACK_BONUS_BASE * timeAttackComboRef.current;
+                timeAttackBonusRef.current += bonus;
+              }
+              const elapsedMs = opts?.elapsedMsRef?.current ?? 0;
+              placementSequenceRef.current.push({
+                elapsedMs,
+                pieceIds: [p.id],
+              });
             },
             onPieceSnapped: (pieceIds, center) => {
               const now = performance.now();
@@ -275,6 +307,22 @@ export function usePlayScreenManager(
               soundManager.play("snap", { groupSize: pieceIds.length });
               opts?.haptic?.("snap");
               for (const id of pieceIds) popMapRef.current.set(id, now);
+              if (opts?.isTimeAttack) {
+                const last = timeAttackLastPlacementRef.current;
+                if (last != null && now - last <= TIME_ATTACK_COMBO_MS) {
+                  timeAttackComboRef.current += 1;
+                } else {
+                  timeAttackComboRef.current = 1;
+                }
+                timeAttackLastPlacementRef.current = now;
+                const bonus = TIME_ATTACK_BONUS_BASE * timeAttackComboRef.current;
+                timeAttackBonusRef.current += bonus;
+              }
+              const elapsedMs = opts?.elapsedMsRef?.current ?? 0;
+              placementSequenceRef.current.push({
+                elapsedMs,
+                pieceIds,
+              });
               if (center) {
                 const particles = snapParticlesRef.current;
                 for (let i = 0; i < SNAP_PARTICLE_COUNT; i++) {
@@ -435,5 +483,7 @@ export function usePlayScreenManager(
     popMapRef,
     lockMapRef,
     snapParticlesRef,
+    timeAttackBonusRef,
+    placementSequenceRef,
   };
 }

@@ -11,6 +11,7 @@ import { Dropdown } from "@/components/DropDown/Dropdown";
 import { ArrowLeft, Trash2, Play, Camera } from "lucide-react";
 import { useImagePicker, useGridConfig, GRID_OPTIONS } from "./hooks";
 import { CameraCapture } from "./components/CameraCapture";
+import { ImageCropper } from "./components/ImageCropper";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
 import { COUNTDOWN_OPTIONS, getBestTime, type TimeMode } from "../Play/timeMode";
 import { getSuggestedGrid } from "../Play/playScreenUtils";
@@ -21,6 +22,7 @@ const TIME_MODE_LABELS: Record<TimeMode, string> = {
   active: "Active only",
   relaxed: "Relaxed (no timer)",
   best: "Best time",
+  timeAttack: "Time Attack",
 };
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
@@ -66,6 +68,7 @@ export function SetupScreen() {
     sourceParam === "camera" ? "camera" : sourceParam === "upload" ? "upload" : "gallery",
   );
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showCropper, setShowCropper] = useState(false);
 
   const {
     gridIndex,
@@ -285,12 +288,12 @@ export function SetupScreen() {
           value={timeMode}
           onChange={(val: string) => setTimeMode(val as TimeMode)}
           options={(
-            ["elapsed", "countdown", "active", "relaxed", "best"] as TimeMode[]
+            ["elapsed", "countdown", "active", "relaxed", "best", "timeAttack"] as TimeMode[]
           ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
           fullWidth
         />
 
-        {timeMode === "countdown" && (
+        {(timeMode === "countdown" || timeMode === "timeAttack") && (
           <Dropdown
             label="Countdown length"
             value={countdownMinutes}
@@ -350,6 +353,30 @@ export function SetupScreen() {
             <div className={styles.previewEmpty}>Select an image above</div>
           )}
         </div>
+
+        {showCropper && imgDataUrl && (
+          <ImageCropper
+            src={imgDataUrl}
+            rows={effectiveRows}
+            cols={effectiveCols}
+            onCrop={(result) => {
+              setImgDataUrl(result.dataUrl);
+              setShowCropper(false);
+              clearError();
+            }}
+            onCancel={() => setShowCropper(false)}
+          />
+        )}
+
+        {imgDataUrl && !showCropper && (
+          <button
+            type="button"
+            className={styles.cropTrigger}
+            onClick={() => setShowCropper(true)}
+          >
+            ✂️ Crop & position
+          </button>
+        )}
 
         <div className={styles.row}>
           <Button onClick={() => nav("/")}>

@@ -18,9 +18,9 @@ Setup and reference guides for developers.
 
 ## Future Ideas
 
-| Document                 | Description                                    |
-| ------------------------ | ---------------------------------------------- |
-| [FUTURE.md](./FUTURE.md) | Planned features (piece heatmap overlay, etc.) |
+| Document                 | Description                                                                                                                                   |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| [FUTURE.md](./FUTURE.md) | Planned features: crop before generation, replay animation, piece clusters, raccoon avatars, limited-time events, piece heatmap overlay, etc. |
 
 ## Session Notes
 

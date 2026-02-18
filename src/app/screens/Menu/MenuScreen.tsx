@@ -16,6 +16,7 @@ import { WhatsNewModal } from "@/components/WhatsNew";
 import { Image, Camera, Package, HelpCircle } from "lucide-react";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzleCore";
 import { shouldShowChangelog } from "@/data/changelog";
+import { getActiveEvent } from "@/data/puzzleEvents";
 import { getMenuTagline } from "@/data/menuTips";
 
 export function MenuScreen() {
@@ -30,6 +31,7 @@ export function MenuScreen() {
 
   const todayCompleted = isTodayDailyCompleted();
   const hasDaily = true;
+  const activeEvent = getActiveEvent();
 
   useEffect(() => {
     if (shouldShowChangelog()) setShowWhatsNew(true);
@@ -43,6 +45,11 @@ export function MenuScreen() {
           <p className={styles.menuTip}>{tagline}</p>
         </div>
 
+        {activeEvent && (
+          <div className={styles.eventBanner} role="status">
+            🎉 {activeEvent.name} — {activeEvent.startDate} to {activeEvent.endDate}
+          </div>
+        )}
         <div className={styles.actionsGrid}>
           <Button
             variant="primary"

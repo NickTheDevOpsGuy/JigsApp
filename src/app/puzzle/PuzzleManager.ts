@@ -457,6 +457,21 @@ export class PuzzleManager {
     );
   }
 
+  /** Merge multiple tray pieces into one cluster (same groupId). */
+  mergeTrayPiecesIntoCluster(pieceIds: string[]): void {
+    const trayPieces = pieceIds
+      .map((id) => this.findPiece(id))
+      .filter((p): p is Piece => !!p && p.inTray && !p.isPlaced && !p.locked);
+    if (trayPieces.length < 2) return;
+
+    this.pushUndoState();
+    const newGroupId = trayPieces[0].groupId;
+    this.updatePieces(
+      (p) => trayPieces.some((t) => t.id === p.id),
+      () => ({ groupId: newGroupId }),
+    );
+  }
+
   movePieceFromTray(pieceId: string) {
     const piece = this.findPiece(pieceId);
     if (!piece || !piece.inTray) return;
@@ -474,6 +489,8 @@ export class PuzzleManager {
     const yMin = pad;
     const yMax = Math.max(pad, this.boardHeight - effH - pad);
 
+    const groupPieces = this.getGroupPieces(piece.groupId).filter((p) => p.inTray);
+    const moveIds = groupPieces.map((p) => p.id);
     const boardPieces = this.state.pieces.filter((p) => !p.inTray);
     const MOVE_FROM_TRAY_RETRY_MAX = 24;
 
@@ -484,28 +501,55 @@ export class PuzzleManager {
       y = _clamp(this.rand(yMin, yMax), 0, Math.max(0, this.boardHeight - effH));
 
       let overlaps = false;
-      for (const p of boardPieces) {
-        const pr = p.rotation % 360;
-        const pw = pr === 90 || pr === 270 ? p.h : p.w;
-        const ph = pr === 90 || pr === 270 ? p.w : p.h;
-        if (!(x + effW <= p.x || p.x + pw <= x || y + effH <= p.y || p.y + ph <= y)) {
-          overlaps = true;
-          break;
+      const checkPiece = (px: number, py: number, pw: number, ph: number) => {
+        for (const p of boardPieces) {
+          const pr = p.rotation % 360;
+          const pwr = pr === 90 || pr === 270 ? p.h : p.w;
+          const phr = pr === 90 || pr === 270 ? p.w : p.h;
+          if (!(px + pw <= p.x || p.x + pwr <= px || py + ph <= p.y || p.y + phr <= py)) {
+            return true;
+          }
+        }
+        return false;
+      };
+      if (moveIds.length === 1) {
+        overlaps = checkPiece(x, y, effW, effH);
+      } else {
+        let ox = 0;
+        const oy = 0;
+        for (const pid of moveIds) {
+          const p = this.findPiece(pid)!;
+          const r = p.rotation % 360;
+          const pw = r === 90 || r === 270 ? p.h : p.w;
+          const _ph = r === 90 || r === 270 ? p.w : p.h;
+          if (checkPiece(x + ox, y + oy, pw, _ph)) {
+            overlaps = true;
+            break;
+          }
+          ox += pw + 4;
         }
       }
       if (!overlaps) break;
     }
 
     this.zCounter += 1;
-    this.updatePieces(
-      (p) => p.id === pieceId,
-      () => ({
-        inTray: false,
-        x,
-        y,
-        z: this.zCounter,
-      }),
-    );
+    let offsetX = 0;
+    const offsetY = 0;
+    for (const pid of moveIds) {
+      const p = this.findPiece(pid)!;
+      const r = p.rotation % 360;
+      const pw = r === 90 || r === 270 ? p.h : p.w;
+      this.updatePieces(
+        (piece) => piece.id === pid,
+        () => ({
+          inTray: false,
+          x: x + offsetX,
+          y: y + offsetY,
+          z: this.zCounter,
+        }),
+      );
+      offsetX += pw + 4;
+    }
   }
 
   setBoardSize(boardWidth: number, boardHeight: number) {

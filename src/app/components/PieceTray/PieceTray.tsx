@@ -26,6 +26,11 @@ type Props = {
   image: HTMLImageElement | null;
   grid: { rows: number; cols: number };
   onPieceClick: (pieceId: string) => void;
+  clusterMode?: boolean;
+  selectedIds?: Set<string>;
+  onSelectionToggle?: (pieceId: string) => void;
+  onCreateCluster?: (pieceIds: string[]) => void;
+  onClusterModeToggle?: () => void;
 };
 
 function isCorner(p: Piece, grid: { rows: number; cols: number }) {
@@ -47,7 +52,17 @@ function isEdge(p: Piece, grid: { rows: number; cols: number }) {
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
-  { pieces, image, grid, onPieceClick },
+  {
+    pieces,
+    image,
+    grid,
+    onPieceClick,
+    clusterMode = false,
+    selectedIds,
+    onSelectionToggle,
+    onCreateCluster,
+    onClusterModeToggle,
+  },
   ref,
 ) {
   const [section, setSection] = useState<TraySection>("all");
@@ -226,6 +241,24 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
             </button>
           </div>
 
+          {onClusterModeToggle && (
+            <button
+              type="button"
+              className={clusterMode ? styles.active : undefined}
+              onClick={onClusterModeToggle}
+            >
+              Cluster
+            </button>
+          )}
+          {clusterMode && selectedIds && selectedIds.size >= 2 && onCreateCluster && (
+            <button
+              type="button"
+              className={styles.clusterBtn}
+              onClick={() => onCreateCluster([...selectedIds])}
+            >
+              Create cluster ({selectedIds.size})
+            </button>
+          )}
           <div className={styles.segment} aria-label="Sort mode">
             <button
               type="button"
@@ -293,9 +326,21 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
               <button
                 key={p.id}
                 type="button"
-                className={styles.pieceButton}
-                onClick={() => onPieceClick(p.id)}
-                aria-label={`Place piece ${p.id}`}
+                className={`${styles.pieceButton} ${
+                  clusterMode && selectedIds?.has(p.id) ? styles.pieceSelected : ""
+                }`}
+                onClick={() => {
+                  if (clusterMode && onSelectionToggle) {
+                    onSelectionToggle(p.id);
+                  } else {
+                    onPieceClick(p.id);
+                  }
+                }}
+                aria-label={
+                  clusterMode
+                    ? `Select piece ${p.id}`
+                    : `Place piece ${p.id}`
+                }
               >
                 <div
                   className={styles.thumbWrap}

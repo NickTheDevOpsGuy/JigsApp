@@ -17,6 +17,7 @@ import {
   getPeriodLeaderboard,
   getAllTimeBestLeaderboard,
   getMyPersonalBests,
+  getTimeAttackLeaderboard,
   type LeaderboardEntry,
   type StreakEntry,
   type CompletionCountEntry,
@@ -27,6 +28,7 @@ import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
+import { AVATAR_HATS, AVATAR_GLASSES, AVATAR_HOODIES } from "@/data/avatarOptions";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -49,6 +51,7 @@ const PODIUM = ["🥇", "🥈", "🥉"];
 
 type LeaderboardType =
   | "today"
+  | "timeAttack"
   | "bestWeek"
   | "bestMonth"
   | "week"
@@ -94,6 +97,9 @@ export function StatsScreen() {
   const [profile, setProfile] = useState<{
     displayName: string;
     showOnLeaderboard: boolean;
+    avatarHat?: string | null;
+    avatarGlasses?: string | null;
+    avatarHoodie?: string | null;
   } | null>(null);
   const [displayNameInput, setDisplayNameInput] = useState("");
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -185,6 +191,9 @@ export function StatsScreen() {
       if (leaderboardType === "today") {
         const lb = await getDailyLeaderboard(getTodayDateString());
         setLeaderboard(lb);
+      } else if (leaderboardType === "timeAttack") {
+        const lb = await getTimeAttackLeaderboard();
+        setLeaderboard(lb);
       } else if (leaderboardType === "bestWeek") {
         const lb = await getPeriodLeaderboard("week");
         setLeaderboard(lb);
@@ -218,6 +227,9 @@ export function StatsScreen() {
     const updated = await updateMyProfile({
       displayName: displayNameInput.trim() || "Puzzler",
       showOnLeaderboard: profile?.showOnLeaderboard ?? true,
+      avatarHat: profile?.avatarHat ?? null,
+      avatarGlasses: profile?.avatarGlasses ?? null,
+      avatarHoodie: profile?.avatarHoodie ?? null,
     });
     if (updated) setProfile(updated);
     setProfileSaving(false);
@@ -228,7 +240,9 @@ export function StatsScreen() {
     const text =
       leaderboardType === "today"
         ? `Today's Daily Puzzle leaderboard - Phuzzle`
-        : leaderboardType === "streaks"
+        : leaderboardType === "timeAttack"
+          ? "Time Attack leaderboard - Phuzzle"
+          : leaderboardType === "streaks"
           ? "Streak leaderboard - Phuzzle"
           : leaderboardType === "completions"
             ? "Puzzle completions leaderboard - Phuzzle"
@@ -532,6 +546,86 @@ export function StatsScreen() {
                   maxLength={32}
                   aria-label="Display name"
                 />
+                <h3 className={styles.avatarSection}>🦝 Raccoon Avatar</h3>
+                <div className={styles.avatarRow}>
+                  {(() => {
+                    const unlockedIds = new Set(
+                      (achievements ?? []).filter((a) => a.unlocked).map((a) => a.id),
+                    );
+                    const isLocked = (o: { unlockAchievement?: string }) =>
+                      !!o.unlockAchievement && !unlockedIds.has(o.unlockAchievement);
+                    return (
+                      <>
+                        <label>
+                          <span className={styles.avatarLabel}>Hat</span>
+                          <select
+                            value={profile?.avatarHat ?? "none"}
+                            onChange={(e) =>
+                              setProfile((p) => ({
+                                ...p!,
+                                avatarHat: e.target.value || null,
+                              }))
+                            }
+                          >
+                            {AVATAR_HATS.map((o) => (
+                              <option
+                                key={o.id}
+                                value={o.id}
+                                disabled={isLocked(o)}
+                              >
+                                {o.label} {isLocked(o) ? "🔒" : ""}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          <span className={styles.avatarLabel}>Glasses</span>
+                          <select
+                            value={profile?.avatarGlasses ?? "none"}
+                            onChange={(e) =>
+                              setProfile((p) => ({
+                                ...p!,
+                                avatarGlasses: e.target.value || null,
+                              }))
+                            }
+                          >
+                            {AVATAR_GLASSES.map((o) => (
+                              <option
+                                key={o.id}
+                                value={o.id}
+                                disabled={isLocked(o)}
+                              >
+                                {o.label} {isLocked(o) ? "🔒" : ""}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          <span className={styles.avatarLabel}>Hoodie</span>
+                          <select
+                            value={profile?.avatarHoodie ?? "default"}
+                            onChange={(e) =>
+                              setProfile((p) => ({
+                                ...p!,
+                                avatarHoodie: e.target.value || null,
+                              }))
+                            }
+                          >
+                            {AVATAR_HOODIES.map((o) => (
+                              <option
+                                key={o.id}
+                                value={o.id}
+                                disabled={isLocked(o)}
+                              >
+                                {o.label} {isLocked(o) ? "🔒" : ""}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </>
+                    );
+                  })()}
+                </div>
                 <div className={styles.profileRow}>
                   <label className={styles.checkboxLabel}>
                     <input
@@ -574,6 +668,7 @@ export function StatsScreen() {
                     {(
                       [
                         ["today", "Today"],
+                        ["timeAttack", "Time Attack"],
                         ["bestWeek", "Best time (week)"],
                         ["bestMonth", "Best time (month)"],
                         ["week", "Weekly totals"],
@@ -629,6 +724,7 @@ export function StatsScreen() {
                 </div>
                 <h2>
                   {leaderboardType === "today" && "Today's daily puzzle"}
+                  {leaderboardType === "timeAttack" && "Time Attack"}
                   {leaderboardType === "bestWeek" && "Best time this week (daily)"}
                   {leaderboardType === "bestMonth" && "Best time this month (daily)"}
                   {leaderboardType === "week" && "Weekly totals"}
@@ -639,6 +735,11 @@ export function StatsScreen() {
                 </h2>
                 {leaderboardType === "today" &&
                   renderTimeLeaderboard(leaderboard, "No completions yet. Be the first!")}
+                {leaderboardType === "timeAttack" &&
+                  renderTimeLeaderboard(
+                    leaderboard,
+                    "No Time Attack completions yet. Try it!",
+                  )}
                 {leaderboardType === "bestWeek" &&
                   renderTimeLeaderboard(
                     leaderboard,

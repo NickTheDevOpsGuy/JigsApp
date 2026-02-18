@@ -38,6 +38,17 @@
   height: auto;
 }
 
+.eventBanner {
+  padding: 12px 16px;
+  background: var(--color-brand-light);
+  border: 1px solid var(--color-brand-primary);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--color-brand-primary);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
 .actionsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;

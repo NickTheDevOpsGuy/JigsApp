@@ -85,13 +85,13 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 ### UX and polish
 
 - Reference image preview overlay
-- Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
+- Progress and timer modes (elapsed, countdown, active-only, relaxed, best time, time attack)
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
 - Settings organized into sub-menus: **About** (Help), **Display** (Theme, board options, effects), **Gameplay** (Controls, time display), **Audio**, **Advanced**
 - Optional piece borders, edge-piece highlight, immersive mode
 - Edge and corner pieces display full image content (no cropping at straight edges)
 - Undo and redo
-- Ghost hint and ghost when idle (after a few seconds of inactivity)
+- Ghost hint, ghost when idle, and optional ghost image behind board (Settings → View)
 - Optional piece locking
 - Battery-saver detection (reduces confetti when low-power or data-saver)
 - Six themes (Light, Dark, Space, Ocean, Forest, Sunset) with system preference on first visit
@@ -104,7 +104,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 - Daily puzzle and streak tracking
 - **Streak freeze** – One per week; use when you miss a day to keep your streak. Offered when opening Today's Puzzle if yesterday wasn't completed. See [doc/streak-freeze.md](doc/streak-freeze.md).
-- Stats dashboard and leaderboards (Supabase)
+- Stats dashboard and leaderboards (daily, Time Attack, streaks, Supabase)
 - Profile with display name and anonymous mode
 - Share completed puzzle image
 - **Co-op** – Play with Friend: share a link and work on the same puzzle together (requires Supabase)
@@ -120,10 +120,20 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ## Roadmap
 
+### Recently Added
+
+- **Time Attack mode** – Competitive countdown with dedicated leaderboard
+- **Ghost image** – Faint completed puzzle behind board (Settings → View), disabled in daily/Time Attack
+- **Multi-tier achievements** – 10, 50, 100 puzzles; Speed Runner (5 under 5 min)
+
 ### Planned
 
 - Import puzzle from URL
 - Full offline-first gameplay (app shells and assets cache today; puzzle images still need network on first load)
+- Image crop/position before generation (zoom, pan, aspect ratio lock)
+- Puzzle replay animation (fast-forward build, scrubbable timeline)
+- Customizable raccoon avatars (hats, glasses, colors; unlock via achievements)
+- Limited-time puzzle events (Halloween, Winter, seasonal leaderboards)
 
 ---
 
@@ -538,7 +548,9 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   ├── 001_initial_schema.sql
 │   │   ├── 002_player_profiles.sql
 │   │   ├── 003_puzzle_sessions.sql
-│   │   └── 004_puzzle_sessions_expiration.sql
+│   │   ├── 004_puzzle_sessions_expiration.sql
+│   │   ├── 005_time_attack_completions.sql
+│   │   └── 006_avatars_and_events.sql
 │   └── README.md
 ├── test-results
 │   ├── home-Home-Menu-shows-main-action-buttons-webkit-retry2

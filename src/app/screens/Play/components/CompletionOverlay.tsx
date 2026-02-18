@@ -15,6 +15,10 @@ import {
 import { recordCompletion } from "@/services/statsService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
 import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
+import {
+  CONFETTI_COLORS_STREAK_3,
+  CONFETTI_COLORS_STREAK_7,
+} from "@/data/confettiColors";
 
 interface ShareUrls {
   twitter: string;
@@ -25,11 +29,14 @@ interface ShareUrls {
 
 interface CompletionOverlayProps {
   elapsedSeconds: number;
+  countdownMinutes?: number;
+  timeAttackBonus?: number;
   grid?: { rows: number; cols: number };
   imageUrl?: string;
   undoCount?: number;
   isNewBest?: boolean;
   isDaily?: boolean;
+  isTimeAttack?: boolean;
   shareUrls: ShareUrls;
   copied: boolean;
   canNativeShare: boolean;
@@ -39,15 +46,19 @@ interface CompletionOverlayProps {
   onDownloadImage: () => void;
   onNewPuzzle: () => void;
   onMenu: () => void;
+  onReplay?: () => void;
 }
 
 export function CompletionOverlay({
   elapsedSeconds,
+  countdownMinutes = 10,
+  timeAttackBonus = 0,
   grid,
   imageUrl,
   undoCount = 0,
   isNewBest = false,
   isDaily = false,
+  isTimeAttack = false,
   shareUrls,
   copied,
   canNativeShare,
@@ -57,6 +68,7 @@ export function CompletionOverlay({
   onDownloadImage,
   onNewPuzzle,
   onMenu,
+  onReplay,
 }: CompletionOverlayProps) {
   const [streak, setStreak] = useState<number>(0);
   const completionMessage = getCompletionMessage(elapsedSeconds);
@@ -78,6 +90,23 @@ export function CompletionOverlay({
       } catch {
         // ignore
       }
+      if (newStreak >= 3 || newStreak >= 7) {
+        const prefersReducedMotion =
+          typeof window !== "undefined" &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!prefersReducedMotion) {
+          import("canvas-confetti").then((confetti) => {
+            const colors =
+              newStreak >= 7 ? CONFETTI_COLORS_STREAK_7 : CONFETTI_COLORS_STREAK_3;
+            confetti.default({
+              particleCount: 120,
+              spread: 100,
+              origin: { y: 0.5 },
+              colors,
+            });
+          });
+        }
+      }
     }
   }, [isDaily, elapsedSeconds]);
 
@@ -85,15 +114,23 @@ export function CompletionOverlay({
     if (!grid) return;
     const run = async () => {
       const dailyStreak = isDaily ? getCurrentStreak() : 0;
+      const countdownTotal = countdownMinutes * 60;
+      const timeRemaining = Math.max(0, countdownTotal - elapsedSeconds);
+      const timeAttackScore = isTimeAttack
+        ? timeRemaining * 10 + timeAttackBonus
+        : undefined;
       const stats = await recordCompletion({
         elapsedSeconds,
         grid,
         isDaily: !!isDaily,
+        isTimeAttack,
+        timeAttackScore,
         dailyStreak,
       });
       if (stats) {
         await checkAndUnlockAchievements({
           puzzlesCompleted: stats.puzzlesCompleted,
+          puzzlesUnder5Min: stats.puzzlesUnder5Min,
           dailyStreak: stats.dailyStreak,
           bestDailyStreak: stats.bestDailyStreak,
           lastCompletion: { elapsedSeconds, grid },
@@ -101,7 +138,7 @@ export function CompletionOverlay({
       }
     };
     run();
-  }, [elapsedSeconds, grid, isDaily]);
+  }, [elapsedSeconds, grid, isDaily, isTimeAttack, timeAttackBonus, countdownMinutes]);
 
   const puzzleSizeText =
     grid != null
@@ -177,6 +214,11 @@ export function CompletionOverlay({
 
           {/* Utility buttons */}
           <div className={styles.shareButtons}>
+            {onReplay && (
+              <Button size="sm" onClick={onReplay}>
+                ▶ Replay
+              </Button>
+            )}
             <Button size="sm" onClick={onDownloadImage}>
               <Download size={16} />
               Download

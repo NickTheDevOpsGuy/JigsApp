@@ -46,6 +46,7 @@ import {
   PlayHUD,
   PlayScreenModals,
   CompletionOverlay,
+  ReplayModal,
   PauseOverlay,
   PlayToasts,
   TopBarButtons,
@@ -108,6 +109,8 @@ export function PlayScreen() {
     setShowAlignmentGrid,
     showGhostWhenIdle,
     toggleShowGhostWhenIdle,
+    showGhostImage,
+    toggleShowGhostImage,
     showEdgeHighlight,
     toggleShowEdgeHighlight,
     debug,
@@ -160,11 +163,15 @@ export function PlayScreen() {
   const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
+  const [showReplayModal, setShowReplayModal] = React.useState(false);
+  const [clusterMode, setClusterMode] = React.useState(false);
+  const [selectedTrayIds, setSelectedTrayIds] = React.useState<Set<string>>(new Set());
 
   const viewportKey = grid != null ? `vp:${grid.rows}x${grid.cols}` : null;
   const viewport = useViewport(viewportKey);
   const snapScaleRef = React.useRef(1);
   snapScaleRef.current = viewport.viewport.scale;
+  const elapsedMsRef = React.useRef(0);
 
   const perfStatsRef = React.useRef({
     fps: 0,
@@ -205,6 +212,8 @@ export function PlayScreen() {
       dragStartTimeRef,
       batterySaverMode,
       relaxedModeEnabled,
+      isTimeAttack: timeMode === "timeAttack",
+      elapsedMsRef,
       onPieceSnappedAnalytics: (timeToSnapMs) => {
         const g = stateRef.current?.grid;
         const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
@@ -233,6 +242,8 @@ export function PlayScreen() {
     popMapRef,
     lockMapRef,
     snapParticlesRef,
+    timeAttackBonusRef,
+    placementSequenceRef,
   } = managerResult;
 
   stateRef.current = state;
@@ -270,6 +281,9 @@ export function PlayScreen() {
 
   const elapsedSecondsRef = React.useRef(elapsedSeconds);
   elapsedSecondsRef.current = elapsedSeconds;
+  React.useEffect(() => {
+    elapsedMsRef.current = elapsedSeconds * 1000;
+  }, [elapsedSeconds]);
 
   usePlayScreenEffects({
     state,
@@ -529,6 +543,8 @@ export function PlayScreen() {
     viewport,
   });
 
+  const isCompetitiveOrDaily = isDailyPuzzleSession() || timeMode === "timeAttack";
+
   usePlayScreenAnimation({
     manager,
     setState,
@@ -544,7 +560,9 @@ export function PlayScreen() {
     showGhostHint,
     showAlignmentGrid,
     showGhostWhenIdle,
+    showGhostImage,
     showEdgeHighlight,
+    isCompetitiveOrDaily,
     lastInteractionRef,
     viewport: viewport.viewport,
     perfStatsRef,
@@ -562,6 +580,27 @@ export function PlayScreen() {
       bump();
     },
     [manager, setState, selectedIdRef, setSelectedPieceId, bump],
+  );
+
+  const handleTraySelectionToggle = useCallback((pieceId: string) => {
+    setSelectedTrayIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(pieceId)) next.delete(pieceId);
+      else next.add(pieceId);
+      return next;
+    });
+  }, []);
+
+  const handleCreateCluster = useCallback(
+    (pieceIds: string[]) => {
+      if (!manager) return;
+      manager.mergeTrayPiecesIntoCluster(pieceIds);
+      setState(manager.getState());
+      setSelectedTrayIds(new Set());
+      setClusterMode(false);
+      bump();
+    },
+    [manager, setState, bump],
   );
 
   const handleNewGame = useCallback(() => {
@@ -797,6 +836,11 @@ export function PlayScreen() {
               pieceLockingEnabled={pieceLockingEnabled}
               showGhostHint={showGhostHint}
               showGhostWhenIdle={showGhostWhenIdle}
+              showGhostImage={showGhostImage}
+              onToggleGhostImage={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                toggleShowGhostImage();
+              }}
               showEdgeHighlight={showEdgeHighlight}
               showAlignmentGrid={showAlignmentGrid}
               isFullscreen={ui.isFullscreen}
@@ -960,6 +1004,8 @@ export function PlayScreen() {
           {isComplete && (
             <CompletionOverlay
               elapsedSeconds={elapsedSeconds}
+              countdownMinutes={countdownMinutes}
+              timeAttackBonus={timeAttackBonusRef?.current ?? 0}
               grid={state?.grid}
               imageUrl={
                 localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
@@ -971,6 +1017,7 @@ export function PlayScreen() {
                 (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
               }
               isDaily={isDailyPuzzleSession()}
+              isTimeAttack={timeMode === "timeAttack"}
               shareUrls={share.shareUrls}
               copied={share.copied}
               canNativeShare={share.canNativeShare}
@@ -980,10 +1027,23 @@ export function PlayScreen() {
               onDownloadImage={handleDownloadImage}
               onNewPuzzle={handleNewGame}
               onMenu={() => navigate("/")}
+              onReplay={() => setShowReplayModal(true)}
             />
           )}
         </div>
       </div>
+
+      {showReplayModal && state && (
+        <ReplayModal
+          isOpen={showReplayModal}
+          onClose={() => setShowReplayModal(false)}
+          state={state}
+          imageUrl={
+            localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || ""
+          }
+          placementSequence={placementSequenceRef?.current ?? []}
+        />
+      )}
 
       {immersiveMode && (
         <div
@@ -1005,6 +1065,14 @@ export function PlayScreen() {
           image={imgRef.current}
           grid={state?.grid ?? grid}
           onPieceClick={handleTrayPieceClick}
+          clusterMode={clusterMode}
+          selectedIds={selectedTrayIds}
+          onSelectionToggle={handleTraySelectionToggle}
+          onCreateCluster={handleCreateCluster}
+          onClusterModeToggle={() => {
+            setClusterMode((c) => !c);
+            setSelectedTrayIds(new Set());
+          }}
         />
       </div>
 

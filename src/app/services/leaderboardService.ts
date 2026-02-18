@@ -69,6 +69,30 @@ async function resolveDisplayNames(
   return map;
 }
 
+/** Fetch streak flair for users (best_daily_streak >= 3). Returns " 🔥3" or " 🌟7" etc. */
+async function resolveStreakFlairs(userIds: string[]): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  const unique = [...new Set(userIds)];
+  if (unique.length === 0) return map;
+
+  try {
+    const { data } = await supabase!
+      .from("player_stats")
+      .select("user_id, best_daily_streak")
+      .in("user_id", unique)
+      .gte("best_daily_streak", 3);
+
+    for (const row of data ?? []) {
+      const s = row.best_daily_streak;
+      if (s >= 7) map.set(row.user_id, " 🌟7");
+      else if (s >= 3) map.set(row.user_id, " 🔥3");
+    }
+  } catch {
+    // player_stats may not exist
+  }
+  return map;
+}
+
 /** Fetch daily puzzle leaderboard for a given date. */
 export async function getDailyLeaderboard(
   dateStr: string,
@@ -87,14 +111,21 @@ export async function getDailyLeaderboard(
   if (error) return [];
 
   const userIds = (data ?? []).map((r) => r.user_id);
-  const names = await resolveDisplayNames(userIds, new Set());
+  const [names, flairs] = await Promise.all([
+    resolveDisplayNames(userIds, new Set()),
+    resolveStreakFlairs(userIds),
+  ]);
 
-  return (data ?? []).map((row, i) => ({
-    rank: i + 1,
-    elapsedSeconds: row.elapsed_seconds,
-    displayName: names.get(row.user_id) ?? `Player ${row.user_id.slice(0, 8)}`,
-    userId: row.user_id,
-  }));
+  return (data ?? []).map((row, i) => {
+    const base = names.get(row.user_id) ?? `Player ${row.user_id.slice(0, 8)}`;
+    const flair = flairs.get(row.user_id) ?? "";
+    return {
+      rank: i + 1,
+      elapsedSeconds: row.elapsed_seconds,
+      displayName: base + flair,
+      userId: row.user_id,
+    };
+  });
 }
 
 /** Fetch streak leaderboard (best daily streaks). */
@@ -274,6 +305,66 @@ export async function getWeeklyTotalsLeaderboard(
     count,
     displayName: names.get(userId) ?? `Player ${userId.slice(0, 8)}`,
   }));
+}
+
+/** Fetch Time Attack leaderboard (best scores in time attack mode). Uses time_attack_score when available. */
+export async function getTimeAttackLeaderboard(
+  limit = 10,
+): Promise<LeaderboardEntry[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  const { data, error } = await supabase!
+    .from("completions")
+    .select("user_id, elapsed_seconds, time_attack_score")
+    .eq("is_time_attack", true)
+    .limit(limit * 4);
+
+  if (error) return [];
+
+  const rows = data ?? [];
+  const bestByUser = new Map<string, { elapsed: number; score: number | null }>();
+  for (const row of rows) {
+    const score = (row as { time_attack_score?: number | null }).time_attack_score ?? null;
+    const cur = bestByUser.get(row.user_id);
+    const isBetter =
+      cur == null ||
+      (score != null && cur.score != null && score > cur.score) ||
+      (score == null && cur.score == null && row.elapsed_seconds < cur.elapsed) ||
+      (score != null && (cur.score == null || score > cur.score));
+    if (isBetter) {
+      bestByUser.set(row.user_id, {
+        elapsed: row.elapsed_seconds,
+        score,
+      });
+    }
+  }
+
+  const sorted = [...bestByUser.entries()]
+    .sort((a, b) => {
+      const sa = a[1].score;
+      const sb = b[1].score;
+      if (sa != null && sb != null) return sb - sa;
+      if (sa != null) return -1;
+      if (sb != null) return 1;
+      return a[1].elapsed - b[1].elapsed;
+    })
+    .slice(0, limit);
+
+  const userIds = sorted.map(([uid]) => uid);
+  const [names, flairs] = await Promise.all([
+    resolveDisplayNames(userIds, new Set()),
+    resolveStreakFlairs(userIds),
+  ]);
+
+  return sorted.map(([userId, { elapsed }], i) => {
+    const base = names.get(userId) ?? `Player ${userId.slice(0, 8)}`;
+    const flair = flairs.get(userId) ?? "";
+    return {
+      rank: i + 1,
+      elapsedSeconds: elapsed,
+      displayName: base + flair,
+    };
+  });
 }
 
 /** Fetch monthly totals leaderboard (completion count in last 30 days). Respects anonymous (show_on_leaderboard). */

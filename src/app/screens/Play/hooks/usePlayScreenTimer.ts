@@ -26,7 +26,7 @@ export function usePlayScreenTimer(args: {
 
   useEffect(() => {
     if (
-      timeMode === "countdown" &&
+      (timeMode === "countdown" || timeMode === "timeAttack") &&
       args.elapsedSeconds <= 0 &&
       !state?.isComplete &&
       !isPaused
@@ -37,7 +37,7 @@ export function usePlayScreenTimer(args: {
 
   useEffect(() => {
     if (state?.isComplete || isPaused) return;
-    const isCountdown = timeMode === "countdown";
+    const isCountdown = timeMode === "countdown" || timeMode === "timeAttack";
     const isActive = timeMode === "active";
 
     const id = setInterval(() => {
