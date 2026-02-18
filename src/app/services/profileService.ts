@@ -22,7 +22,9 @@ export async function getMyProfile(): Promise<PlayerProfile | null> {
 
   const { data, error } = await supabase!
     .from("player_profiles")
-    .select("display_name, show_on_leaderboard, region, avatar_hat, avatar_glasses, avatar_hoodie")
+    .select(
+      "display_name, show_on_leaderboard, region, avatar_hat, avatar_glasses, avatar_hoodie",
+    )
     .eq("user_id", userId)
     .single();
 
@@ -81,7 +83,9 @@ export async function updateMyProfile(args: {
       .from("player_profiles")
       .update(updates)
       .eq("user_id", userId)
-      .select("display_name, show_on_leaderboard, region, avatar_hat, avatar_glasses, avatar_hoodie")
+      .select(
+        "display_name, show_on_leaderboard, region, avatar_hat, avatar_glasses, avatar_hoodie",
+      )
       .single();
     if (error) return null;
     const d = data as Record<string, unknown>;
@@ -107,7 +111,9 @@ export async function updateMyProfile(args: {
       avatar_hoodie: updates.avatar_hoodie ?? null,
       ...updates,
     })
-    .select("display_name, show_on_leaderboard, region, avatar_hat, avatar_glasses, avatar_hoodie")
+    .select(
+      "display_name, show_on_leaderboard, region, avatar_hat, avatar_glasses, avatar_hoodie",
+    )
     .single();
 
   if (error) return null;

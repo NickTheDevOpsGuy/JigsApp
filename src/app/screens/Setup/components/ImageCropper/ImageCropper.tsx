@@ -142,7 +142,9 @@ export function ImageCropper({ src, rows, cols, onCrop, onCancel }: ImageCropper
 
   return (
     <div className={styles.cropperWrap}>
-      <p className={styles.hint}>Drag to pan • Scroll to zoom • Aspect ratio locked to grid</p>
+      <p className={styles.hint}>
+        Drag to pan • Scroll to zoom • Aspect ratio locked to grid
+      </p>
       <div
         className={styles.cropper}
         onWheel={handleWheel}

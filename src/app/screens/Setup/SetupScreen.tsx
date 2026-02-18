@@ -288,7 +288,14 @@ export function SetupScreen() {
           value={timeMode}
           onChange={(val: string) => setTimeMode(val as TimeMode)}
           options={(
-            ["elapsed", "countdown", "active", "relaxed", "best", "timeAttack"] as TimeMode[]
+            [
+              "elapsed",
+              "countdown",
+              "active",
+              "relaxed",
+              "best",
+              "timeAttack",
+            ] as TimeMode[]
           ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
           fullWidth
         />

@@ -308,9 +308,7 @@ export async function getWeeklyTotalsLeaderboard(
 }
 
 /** Fetch Time Attack leaderboard (best scores in time attack mode). Uses time_attack_score when available. */
-export async function getTimeAttackLeaderboard(
-  limit = 10,
-): Promise<LeaderboardEntry[]> {
+export async function getTimeAttackLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
   if (!isSupabaseConfigured()) return [];
 
   const { data, error } = await supabase!
@@ -324,7 +322,8 @@ export async function getTimeAttackLeaderboard(
   const rows = data ?? [];
   const bestByUser = new Map<string, { elapsed: number; score: number | null }>();
   for (const row of rows) {
-    const score = (row as { time_attack_score?: number | null }).time_attack_score ?? null;
+    const score =
+      (row as { time_attack_score?: number | null }).time_attack_score ?? null;
     const cur = bestByUser.get(row.user_id);
     const isBetter =
       cur == null ||

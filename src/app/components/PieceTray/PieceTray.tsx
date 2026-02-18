@@ -336,11 +336,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                     onPieceClick(p.id);
                   }
                 }}
-                aria-label={
-                  clusterMode
-                    ? `Select piece ${p.id}`
-                    : `Place piece ${p.id}`
-                }
+                aria-label={clusterMode ? `Select piece ${p.id}` : `Place piece ${p.id}`}
               >
                 <div
                   className={styles.thumbWrap}

@@ -137,7 +137,17 @@ export function renderBoard(
   ) {
     ctx.save();
     ctx.globalAlpha = 0.07;
-    ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, assembledW, assembledH);
+    ctx.drawImage(
+      img,
+      0,
+      0,
+      img.naturalWidth,
+      img.naturalHeight,
+      0,
+      0,
+      assembledW,
+      assembledH,
+    );
     ctx.restore();
   }
 

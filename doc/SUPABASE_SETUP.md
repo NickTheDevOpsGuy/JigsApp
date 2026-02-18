@@ -4,13 +4,13 @@ Phuzzle uses Supabase for **leaderboards**, **player stats**, **achievements**, 
 
 ## What Supabase Powers
 
-| Feature           | Description                                                                                  |
-| ----------------- | -------------------------------------------------------------------------------------------- |
+| Feature           | Description                                                                                               |
+| ----------------- | --------------------------------------------------------------------------------------------------------- |
 | **Leaderboards**  | Daily puzzle, Time Attack, weekly/monthly totals, streaks, all-time completions, best times per grid size |
-| **Player Stats**  | Puzzles completed, total play time, daily streaks                                            |
-| **Achievements**  | Unlock badges (first puzzle, streaks, speed demon, etc.)                                     |
-| **Profile**       | Display name, anonymous mode (raccoon names on leaderboards)                                 |
-| **Co-op Sharing** | "Play with friend" – real-time collaborative puzzle sessions                                 |
+| **Player Stats**  | Puzzles completed, total play time, daily streaks                                                         |
+| **Achievements**  | Unlock badges (first puzzle, streaks, speed demon, etc.)                                                  |
+| **Profile**       | Display name, anonymous mode (raccoon names on leaderboards)                                              |
+| **Co-op Sharing** | "Play with friend" – real-time collaborative puzzle sessions                                              |
 
 ---
 

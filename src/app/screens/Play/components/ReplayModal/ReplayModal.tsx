@@ -41,14 +41,17 @@ export function ReplayModal({
     return set;
   }, [placementSequence, replayStep]);
 
-  const replayState: PuzzleState = React.useMemo(() => ({
-    ...state,
-    pieces: state.pieces.map((p) => ({
-      ...p,
-      inTray: !placedIds.has(p.id),
-    })),
-    placedCount: placedIds.size,
-  }), [state, placedIds]);
+  const replayState: PuzzleState = React.useMemo(
+    () => ({
+      ...state,
+      pieces: state.pieces.map((p) => ({
+        ...p,
+        inTray: !placedIds.has(p.id),
+      })),
+      placedCount: placedIds.size,
+    }),
+    [state, placedIds],
+  );
 
   useEffect(() => {
     if (!isOpen || !imageUrl) return;
@@ -168,9 +171,7 @@ export function ReplayModal({
           />
           <Button
             size="sm"
-            onClick={() =>
-              setIsPlaying((p) => !p)
-            }
+            onClick={() => setIsPlaying((p) => !p)}
             disabled={replayStep >= placementSequence.length && !isPlaying}
           >
             {isPlaying ? <Pause size={16} /> : <Play size={16} />}

@@ -214,8 +214,7 @@ export function getMenuTree(): MenuNode[] {
               type: "toggle",
               id: "ghostImage",
               label: "Ghost Image (Behind Board)",
-              getLabel: (on) =>
-                on ? "Ghost Image: on" : "Ghost Image: off",
+              getLabel: (on) => (on ? "Ghost Image: on" : "Ghost Image: off"),
             },
           ],
         },

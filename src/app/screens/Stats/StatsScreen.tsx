@@ -243,10 +243,10 @@ export function StatsScreen() {
         : leaderboardType === "timeAttack"
           ? "Time Attack leaderboard - Phuzzle"
           : leaderboardType === "streaks"
-          ? "Streak leaderboard - Phuzzle"
-          : leaderboardType === "completions"
-            ? "Puzzle completions leaderboard - Phuzzle"
-            : "Leaderboard - Phuzzle";
+            ? "Streak leaderboard - Phuzzle"
+            : leaderboardType === "completions"
+              ? "Puzzle completions leaderboard - Phuzzle"
+              : "Leaderboard - Phuzzle";
     const url = window.location.origin;
     const shareText = `${text}\n${url}`;
     if (navigator.share) {
@@ -568,11 +568,7 @@ export function StatsScreen() {
                             }
                           >
                             {AVATAR_HATS.map((o) => (
-                              <option
-                                key={o.id}
-                                value={o.id}
-                                disabled={isLocked(o)}
-                              >
+                              <option key={o.id} value={o.id} disabled={isLocked(o)}>
                                 {o.label} {isLocked(o) ? "🔒" : ""}
                               </option>
                             ))}
@@ -590,11 +586,7 @@ export function StatsScreen() {
                             }
                           >
                             {AVATAR_GLASSES.map((o) => (
-                              <option
-                                key={o.id}
-                                value={o.id}
-                                disabled={isLocked(o)}
-                              >
+                              <option key={o.id} value={o.id} disabled={isLocked(o)}>
                                 {o.label} {isLocked(o) ? "🔒" : ""}
                               </option>
                             ))}
@@ -612,11 +604,7 @@ export function StatsScreen() {
                             }
                           >
                             {AVATAR_HOODIES.map((o) => (
-                              <option
-                                key={o.id}
-                                value={o.id}
-                                disabled={isLocked(o)}
-                              >
+                              <option key={o.id} value={o.id} disabled={isLocked(o)}>
                                 {o.label} {isLocked(o) ? "🔒" : ""}
                               </option>
                             ))}

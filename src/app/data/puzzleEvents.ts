@@ -29,7 +29,5 @@ export const PUZZLE_EVENTS: PuzzleEvent[] = [
 
 export function getActiveEvent(): PuzzleEvent | null {
   const now = new Date().toISOString().slice(0, 10);
-  return (
-    PUZZLE_EVENTS.find((e) => e.startDate <= now && e.endDate >= now) ?? null
-  );
+  return PUZZLE_EVENTS.find((e) => e.startDate <= now && e.endDate >= now) ?? null;
 }

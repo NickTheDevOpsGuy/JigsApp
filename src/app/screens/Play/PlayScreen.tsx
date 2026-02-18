@@ -1038,9 +1038,7 @@ export function PlayScreen() {
           isOpen={showReplayModal}
           onClose={() => setShowReplayModal(false)}
           state={state}
-          imageUrl={
-            localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || ""
-          }
+          imageUrl={localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || ""}
           placementSequence={placementSequenceRef?.current ?? []}
         />
       )}
