@@ -28,7 +28,6 @@ type Props = {
   onNewGame: () => void;
 };
 
-
 function clearLocalStorageByPrefix(prefix: string) {
   try {
     const keysToRemove: string[] = [];

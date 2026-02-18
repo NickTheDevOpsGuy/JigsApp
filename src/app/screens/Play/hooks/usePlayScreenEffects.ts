@@ -113,7 +113,14 @@ export function usePlayScreenEffects({
         });
       }
     }
-  }, [state?.isComplete, state?.grid, elapsedSeconds, isCoarsePointer, timeMode, sessionId]);
+  }, [
+    state?.isComplete,
+    state?.grid,
+    elapsedSeconds,
+    isCoarsePointer,
+    timeMode,
+    sessionId,
+  ]);
 
   useEffect(() => {
     if (showStreakToast && !onFireCapturedRef.current) {
