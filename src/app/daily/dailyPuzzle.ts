@@ -37,16 +37,22 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-function seedFromDate(dateStr: string): number {
-  return new Date(dateStr + "T12:00:00Z").getTime();
+/** Hash string to number for reproducible daily selection. */
+function hashString(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0);
 }
 
-/** Get the puzzle for a given date (deterministic). Grid is chosen by user. */
+/** Get the puzzle for a given date (deterministic, good distribution). Same date = same puzzle for everyone. */
 export function getDailyPuzzleForDate(dateStr: string): SamplePuzzle | null {
   const puzzles = SAMPLE_PUZZLES;
   if (puzzles.length === 0) return null;
 
-  const seed = seedFromDate(dateStr);
+  const seed = hashString(`phuzzle-daily-${dateStr}`);
   const rng = mulberry32(seed);
   const puzzleIndex = Math.floor(rng() * puzzles.length);
   return puzzles[puzzleIndex];

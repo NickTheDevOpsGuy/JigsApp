@@ -10,6 +10,7 @@ import {
   ALIGNMENT_GRID_KEY,
   GHOST_WHEN_IDLE_KEY,
   EDGE_HIGHLIGHT_KEY,
+  RELAXED_MODE_KEY,
   type DebugFlags,
 } from "../playScreenUtils";
 
@@ -49,6 +50,14 @@ export function usePlayScreenUI() {
   const [showEdgeHighlight, setShowEdgeHighlight] = useState(() => {
     try {
       return localStorage.getItem(EDGE_HIGHLIGHT_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const [relaxedModeEnabled, setRelaxedModeEnabled] = useState(() => {
+    try {
+      return localStorage.getItem(RELAXED_MODE_KEY) === "true";
     } catch {
       return false;
     }
@@ -148,6 +157,14 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
+      localStorage.setItem(RELAXED_MODE_KEY, relaxedModeEnabled ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [relaxedModeEnabled]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(IMMERSIVE_MODE_KEY, immersiveMode ? "true" : "false");
     } catch {
       // ignore
@@ -191,6 +208,7 @@ export function usePlayScreenUI() {
 
   const toggleShowGhostWhenIdle = useCallback(() => setShowGhostWhenIdle((v) => !v), []);
   const toggleShowEdgeHighlight = useCallback(() => setShowEdgeHighlight((v) => !v), []);
+  const toggleRelaxedMode = useCallback(() => setRelaxedModeEnabled((v) => !v), []);
 
   return {
     pieceLockingEnabled,
@@ -205,6 +223,9 @@ export function usePlayScreenUI() {
     showEdgeHighlight,
     setShowEdgeHighlight,
     toggleShowEdgeHighlight,
+    relaxedModeEnabled,
+    setRelaxedModeEnabled,
+    toggleRelaxedMode,
     debug,
     setDebug,
     showPreview,

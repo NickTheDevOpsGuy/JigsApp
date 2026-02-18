@@ -34,6 +34,8 @@ export type PuzzleManagerOptions = {
   snapToleranceNeighborPx?: number;
   /** Ref to viewport scale for zoom-adaptive tolerance. When set, effective = base / scale (capped). */
   snapScaleRef?: MutableRefObject<number>;
+  /** Ref to relaxed-mode multiplier (1 = normal, 1.5 = increased tolerance when idle). */
+  relaxedToleranceMultiplierRef?: MutableRefObject<number>;
   rotationStepDeg?: 90 | 180;
   /** Use tighter scatter pattern for mobile viewports. */
   isMobile?: boolean;
@@ -70,6 +72,7 @@ export class PuzzleManager {
   private snapToleranceBoardPx: number;
   private snapToleranceNeighborPx: number;
   private snapScaleRef: MutableRefObject<number> | undefined;
+  private relaxedToleranceMultiplierRef: MutableRefObject<number> | undefined;
   private isMobile: boolean;
   private scatterStartYRatio: number;
   private rotationStepDeg: 90 | 180;
@@ -97,11 +100,13 @@ export class PuzzleManager {
       snapToleranceBoardPx = 34,
       snapToleranceNeighborPx = 48,
       snapScaleRef,
+      relaxedToleranceMultiplierRef,
       scatterStartYRatio = 0.3,
       rotationStepDeg = 90,
       isMobile = false,
     } = options;
 
+    this.relaxedToleranceMultiplierRef = relaxedToleranceMultiplierRef;
     this.events = events;
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
@@ -724,7 +729,8 @@ export class PuzzleManager {
    */
   private getEffectiveTolerance(basePx: number): number {
     const mobileBump = this.isMobile ? 1.08 : 1;
-    const adjusted = basePx * mobileBump;
+    const relaxedMult = this.relaxedToleranceMultiplierRef?.current ?? 1;
+    const adjusted = basePx * mobileBump * relaxedMult;
     const scale = this.snapScaleRef?.current ?? 1;
     const clampedScale = Math.max(0.25, Math.min(4, scale));
     let effective = adjusted / clampedScale;

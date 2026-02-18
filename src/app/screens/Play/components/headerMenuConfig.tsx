@@ -26,6 +26,7 @@ export type HeaderMenuProps = {
   soundEnabled: boolean;
   hapticsEnabled: boolean;
   pieceLockingEnabled: boolean;
+  relaxedModeEnabled?: boolean;
   showGhostHint: boolean;
   showGhostWhenIdle: boolean;
   showEdgeHighlight: boolean;
@@ -41,6 +42,7 @@ export type HeaderMenuProps = {
   onToggleSound: () => void;
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
+  onToggleRelaxedMode?: () => void;
   onToggleGhostHint: () => void;
   onToggleGhostWhenIdle: () => void;
   onToggleEdgeHighlight: () => void;
@@ -164,6 +166,16 @@ export function buildMenuItems(
       label: props.pieceLockingEnabled ? "Tap to Rotate ✨" : "Tap to Rotate 🌙",
       sortKey: "Tap to Rotate",
       onClick: c(props.onTogglePieceLocking),
+      subMenu: "controls",
+    },
+    {
+      id: "relaxedMode",
+      section: "settings",
+      visible: !!props.onToggleRelaxedMode,
+      label: props.relaxedModeEnabled ? "Relaxed Mode ✨" : "Relaxed Mode 🌙",
+      sortKey: "Relaxed Mode",
+      ariaLabel: props.relaxedModeEnabled ? "Relaxed Mode on" : "Relaxed Mode off",
+      onClick: c(props.onToggleRelaxedMode ?? (() => {})),
       subMenu: "controls",
     },
     {

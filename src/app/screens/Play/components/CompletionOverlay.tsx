@@ -26,6 +26,7 @@ interface ShareUrls {
 interface CompletionOverlayProps {
   elapsedSeconds: number;
   grid?: { rows: number; cols: number };
+  imageUrl?: string;
   undoCount?: number;
   isNewBest?: boolean;
   isDaily?: boolean;
@@ -43,6 +44,7 @@ interface CompletionOverlayProps {
 export function CompletionOverlay({
   elapsedSeconds,
   grid,
+  imageUrl,
   undoCount = 0,
   isNewBest = false,
   isDaily = false,
@@ -109,6 +111,15 @@ export function CompletionOverlay({
   return (
     <div className={styles.completeOverlay}>
       <div className={styles.completeContent}>
+        {imageUrl && (
+          <div className={styles.completePreviewWrapper}>
+            <img
+              src={imageUrl}
+              alt="Completed puzzle"
+              className={styles.completePreviewImage}
+            />
+          </div>
+        )}
         <h2>🎉 {completionMessage}</h2>
         {badge && (
           <p className={styles.puzzleSize} aria-hidden="true">
