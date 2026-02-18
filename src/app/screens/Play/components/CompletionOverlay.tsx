@@ -111,6 +111,7 @@ export function CompletionOverlay({
   return (
     <div className={styles.completeOverlay}>
       <div className={styles.completeContent}>
+        <h2>🎉 {completionMessage}</h2>
         {imageUrl && (
           <div className={styles.completePreviewWrapper}>
             <img
@@ -120,7 +121,6 @@ export function CompletionOverlay({
             />
           </div>
         )}
-        <h2>🎉 {completionMessage}</h2>
         {badge && (
           <p className={styles.puzzleSize} aria-hidden="true">
             {badge}

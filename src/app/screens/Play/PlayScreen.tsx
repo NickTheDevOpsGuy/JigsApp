@@ -7,27 +7,24 @@
  * - Pointer/touch handling, viewport zoom/pan
  * - Toasts (milestones, share, onboarding), modals, auto-save
  */
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import posthog from "posthog-js";
 import styles from "./PlayScreen.module.css";
 
 import { PieceTray } from "@/components/PieceTray/PieceTray";
-import { ConfirmModal } from "@/components/Modal/Modal";
-import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
 import type { Piece, PuzzleState } from "@/puzzle/types";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
-import { consumeCurrentPuzzleId, recordPuzzleCompletion } from "@/data/packCompletion";
 import { soundManager } from "@/audio/sounds";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
-import { ThemeModal } from "@/components/ThemeModal";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
-import { getBestTime, BEST_TIME_PREFIX } from "./timeMode";
+import { getBestTime } from "./timeMode";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
+import { usePlayScreenEffects } from "./hooks/usePlayScreenEffects";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
 import { usePlayScreenAnimation } from "./hooks/usePlayScreenAnimation";
@@ -47,6 +44,7 @@ import {
   CoopStatusIndicator,
   DragPreview,
   PlayHUD,
+  PlayScreenModals,
   CompletionOverlay,
   PauseOverlay,
   PlayToasts,
@@ -158,7 +156,6 @@ export function PlayScreen() {
   const [showStreakToast, setShowStreakToast] = React.useState(false);
   const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
   const [shareToast, setShareToast] = React.useState<string | null>(null);
-  const lastMilestoneRef = React.useRef<number>(0);
   const [immersiveReveal, setImmersiveReveal] = React.useState(false);
   const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
@@ -274,122 +271,20 @@ export function PlayScreen() {
   const elapsedSecondsRef = React.useRef(elapsedSeconds);
   elapsedSecondsRef.current = elapsedSeconds;
 
-  // Milestone callouts at 25%, 33%, 50%, 66%, 75%
-  const MILESTONE_THRESHOLDS = [25, 33, 50, 66, 75] as const;
-  const milestoneMessages: Record<number, string> = {
-    25: "🥉 25% Early win.",
-    33: "📈 33% Making progress.",
-    50: "🥈 50% Big motivation spike.",
-    66: "💪 66% Momentum building.",
-    75: "🥇 75% Almost there!",
-  };
-  useEffect(() => {
-    if (!state || state.isComplete) return;
-    const placed = state.placedCount ?? 0;
-    const total = state.totalCount ?? 0;
-    if (total === 0) return;
-    const pct = (placed / total) * 100;
-    const hit = MILESTONE_THRESHOLDS.find(
-      (t) => pct >= t && lastMilestoneRef.current < t,
-    );
-    if (hit) {
-      lastMilestoneRef.current = hit;
-      setMilestoneMessage(milestoneMessages[hit]);
-      const g = state.grid;
-      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
-      posthog.capture("milestone_popup_shown", {
-        milestone_percent: hit,
-        grid_size: gridSize,
-        device_type: isCoarsePointer ? "mobile" : "desktop",
-        time_mode: timeMode,
-      });
-    }
-  }, [
-    state?.placedCount,
-    state?.totalCount,
-    state?.isComplete,
-    state?.grid,
-    isCoarsePointer,
-    timeMode,
-  ]);
-
-  useEffect(() => {
-    if (!milestoneMessage) return;
-    const t = setTimeout(() => setMilestoneMessage(null), 2000);
-    return () => clearTimeout(t);
-  }, [milestoneMessage]);
-
-  useEffect(() => {
-    if (!state) return;
-    if (state.placedCount === 0) lastMilestoneRef.current = 0;
-  }, [state?.placedCount, puzzleKey]);
-
-  // Record pack puzzle completion when puzzle is finished
-  const completionCapturedRef = useRef(false);
-  useEffect(() => {
-    if (!state?.isComplete) return;
-    const puzzleId = consumeCurrentPuzzleId();
-    if (puzzleId) recordPuzzleCompletion(puzzleId);
-    if (!completionCapturedRef.current) {
-      completionCapturedRef.current = true;
-      const g = state?.grid;
-      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
-      posthog.capture("puzzle_complete", {
-        grid_size: gridSize,
-        device_type: isCoarsePointer ? "mobile" : "desktop",
-        time_mode: timeMode,
-        elapsed_seconds: elapsedSeconds,
-      });
-      if (sessionId) {
-        posthog.capture("coop_session_completed", {
-          grid_size: gridSize,
-          device_type: isCoarsePointer ? "mobile" : "desktop",
-          elapsed_seconds: elapsedSeconds,
-        });
-      }
-    }
-  }, [
-    state?.isComplete,
-    state?.grid,
+  usePlayScreenEffects({
+    state,
+    puzzleKey,
     elapsedSeconds,
+    sessionId: sessionId ?? null,
     isCoarsePointer,
     timeMode,
-    sessionId,
-  ]);
-
-  // Analytics: on_fire_toast_shown when placement streak toast appears
-  const onFireCapturedRef = useRef(false);
-  useEffect(() => {
-    if (showStreakToast && !onFireCapturedRef.current) {
-      onFireCapturedRef.current = true;
-      const g = state?.grid;
-      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
-      posthog.capture("on_fire_toast_shown", {
-        grid_size: gridSize,
-        device_type: isCoarsePointer ? "mobile" : "desktop",
-        time_mode: timeMode,
-      });
-    }
-  }, [showStreakToast, state?.grid, isCoarsePointer, timeMode]);
-
-  useEffect(() => {
-    if (!showStreakToast) return;
-    const t = setTimeout(() => setShowStreakToast(false), 2000);
-    return () => clearTimeout(t);
-  }, [showStreakToast]);
-
-  useEffect(() => {
-    if (!shareToast) return;
-    const t = setTimeout(() => setShareToast(null), 3000);
-    return () => clearTimeout(t);
-  }, [shareToast]);
-
-  // Reset analytics refs when starting a new puzzle
-  useEffect(() => {
-    firstSnapCapturedRef.current = false;
-    onFireCapturedRef.current = false;
-    completionCapturedRef.current = false;
-  }, [puzzleKey]);
+    milestoneMessage,
+    setMilestoneMessage,
+    showStreakToast,
+    setShowStreakToast,
+    shareToast,
+    setShareToast,
+  });
 
   // Auto-clear piece selection after 1s so the blue border doesn’t stay until another click
   useEffect(() => {
@@ -575,24 +470,6 @@ export function PlayScreen() {
       });
     }
   }, [onboarding.showFirstSnapToast, batterySaverMode]);
-
-  // Analytics: first piece placed
-  const firstSnapCapturedRef = useRef(false);
-  useEffect(() => {
-    if (!state || firstSnapCapturedRef.current) return;
-    const placed = state.placedCount ?? 0;
-    if (placed >= 1) {
-      firstSnapCapturedRef.current = true;
-      const g = state.grid;
-      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
-      posthog.capture("first_piece_placed", {
-        time_to_first_snap_seconds: elapsedSeconds,
-        grid_size: gridSize,
-        device_type: isCoarsePointer ? "mobile" : "desktop",
-        time_mode: timeMode,
-      });
-    }
-  }, [state?.placedCount, state?.grid, elapsedSeconds, isCoarsePointer, timeMode]);
 
   // Analytics: exit before completion (on unmount)
   useEffect(() => {
@@ -791,7 +668,6 @@ export function PlayScreen() {
     dragPreview && state ? state.pieces.find((p) => p.id === dragPreview.pieceId) : null;
   const placed = state?.placedCount ?? 0;
   const total = state?.totalCount ?? 0;
-  const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
   const showImmersiveUi = !immersiveMode || immersiveReveal;
   const scheduleImmersiveHide = React.useCallback(() => {
@@ -993,7 +869,7 @@ export function PlayScreen() {
             )}
             <PlayHUD
               elapsedSeconds={elapsedSeconds}
-              piecesLeft={left}
+              placedCount={placed}
               totalPieces={total}
               isPaused={isPaused}
               isComplete={isComplete}
@@ -1019,93 +895,24 @@ export function PlayScreen() {
         </div>
       </div>
 
-      <ConfirmModal
-        isOpen={awaitingResumeChoice && resumeChoice === null}
-        onClose={() => setResumeChoice("fresh")}
-        onConfirm={() => setResumeChoice("resume")}
-        title="Resume Your Puzzle?"
-        message="You have a puzzle in progress. Would you like to continue where you left off?"
-        confirmText="Resume"
-        cancelText="Start Fresh"
-        variant="default"
-        primaryOnlyConfirm
-      />
-
-      <HelpChoiceModal
-        isOpen={showHelpChoice}
-        onClose={() => setShowHelpChoice(false)}
-        onHowToPlay={() => setShowHowToPlay(true)}
-        onKeyboardShortcuts={() => setShowShortcuts(true)}
-      />
-
-      <ThemeModal
-        isOpen={showThemeModal}
-        onClose={() => setShowThemeModal(false)}
+      <PlayScreenModals
+        awaitingResumeChoice={awaitingResumeChoice}
+        resumeChoice={resumeChoice}
+        setResumeChoice={setResumeChoice}
+        showHelpChoice={showHelpChoice}
+        setShowHelpChoice={setShowHelpChoice}
+        onShowHowToPlay={() => setShowHowToPlay(true)}
+        onShowShortcuts={() => setShowShortcuts(true)}
+        showThemeModal={showThemeModal}
+        setShowThemeModal={setShowThemeModal}
+        showNewGameModal={showNewGameModal}
+        setShowNewGameModal={setShowNewGameModal}
+        showResetStatsConfirm={showResetStatsConfirm}
+        setShowResetStatsConfirm={setShowResetStatsConfirm}
+        showClearCacheConfirm={showClearCacheConfirm}
+        setShowClearCacheConfirm={setShowClearCacheConfirm}
         hapticsEnabled={hapticsEnabled}
-      />
-
-      <ConfirmModal
-        isOpen={showNewGameModal}
-        onClose={() => setShowNewGameModal(false)}
-        onConfirm={handleNewGame}
-        title="Start New Puzzle?"
-        message="Your current progress will be lost. Are you sure you want to start a new puzzle?"
-        confirmText="New Puzzle"
-        cancelText="Keep Playing"
-        variant="danger"
-      />
-
-      <ConfirmModal
-        isOpen={showResetStatsConfirm}
-        onClose={() => setShowResetStatsConfirm(false)}
-        onConfirm={() => {
-          try {
-            const keysToRemove: string[] = [];
-            for (let i = 0; i < localStorage.length; i++) {
-              const k = localStorage.key(i);
-              if (k?.startsWith(BEST_TIME_PREFIX)) keysToRemove.push(k);
-            }
-            keysToRemove.forEach((k) => localStorage.removeItem(k));
-          } catch {
-            /* ignore */
-          }
-          setShowResetStatsConfirm(false);
-        }}
-        title="Reset Local Stats?"
-        message="This will clear all local best times. This cannot be undone."
-        confirmText="Reset"
-        cancelText="Cancel"
-        variant="danger"
-      />
-
-      <ConfirmModal
-        isOpen={showClearCacheConfirm}
-        onClose={() => setShowClearCacheConfirm(false)}
-        onConfirm={() => {
-          clearPuzzleState();
-          try {
-            const keysToRemove: string[] = [];
-            for (let i = 0; i < localStorage.length; i++) {
-              const k = localStorage.key(i);
-              if (
-                k?.startsWith("phuzzle:viewport:") ||
-                k === "phuzzle:puzzleState" ||
-                k === "phuzzle:puzzleStateBackup"
-              )
-                keysToRemove.push(k);
-            }
-            keysToRemove.forEach((k) => localStorage.removeItem(k));
-          } catch {
-            /* ignore */
-          }
-          setShowClearCacheConfirm(false);
-          navigate("/");
-        }}
-        title="Clear Cache?"
-        message="This will clear saved puzzle state and viewport settings. You will return to the menu."
-        confirmText="Clear"
-        cancelText="Cancel"
-        variant="danger"
+        onNewGame={handleNewGame}
       />
 
       <div className={styles.main} ref={mainRef}>

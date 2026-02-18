@@ -2,7 +2,7 @@
 export const COMPLETION_MESSAGES = [
   "Complete!",
   "You did it!",
-  "Puzzle master!",
+  "Puzzle Master!",
   "So satisfying!",
   "Nailed it!",
   "Piece of cake!",

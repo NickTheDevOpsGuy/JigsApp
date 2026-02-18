@@ -154,8 +154,8 @@ export class PuzzleManager {
 
   /* ---------------- Correctness / Win condition ---------------- */
 
-  /** Allow 2px tolerance for rounding from snap shifts */
-  private static readonly CORRECT_EPSILON_PX = 2;
+  /** Allow 4px tolerance for rounding from snap shifts and zoom drift */
+  private static readonly CORRECT_EPSILON_PX = 4;
 
   private isPieceCorrect(p: Piece) {
     if (p.rotation !== p.targetRotation) return false;

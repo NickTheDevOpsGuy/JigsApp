@@ -9,7 +9,7 @@ import type { TimeMode } from "../timeMode";
 
 interface PlayHUDProps {
   elapsedSeconds: number;
-  piecesLeft: number;
+  placedCount: number;
   totalPieces: number;
   isPaused: boolean;
   isComplete: boolean;
@@ -21,7 +21,7 @@ interface PlayHUDProps {
 
 export function PlayHUD({
   elapsedSeconds,
-  piecesLeft,
+  placedCount,
   totalPieces,
   isPaused: _isPaused,
   isComplete: _isComplete,
@@ -40,7 +40,7 @@ export function PlayHUD({
     setBounce(true);
     const t = setTimeout(() => setBounce(false), 300);
     return () => clearTimeout(t);
-  }, [piecesLeft]);
+  }, [placedCount]);
 
   return (
     <div className={styles.hud}>
@@ -58,12 +58,12 @@ export function PlayHUD({
       )}
       <div
         className={`${styles.hudPill} ${bounce ? styles.hudPillBounce : ""}`}
-        aria-label={`${piecesLeft} of ${totalPieces} pieces remaining`}
+        aria-label={`${placedCount} of ${totalPieces} pieces connected`}
         role="status"
       >
         <Puzzle size={14} />
         <span>
-          {piecesLeft} / {totalPieces}
+          {placedCount} / {totalPieces}
         </span>
       </div>
     </div>
