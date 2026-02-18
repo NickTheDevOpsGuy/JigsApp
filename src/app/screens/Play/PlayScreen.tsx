@@ -102,6 +102,8 @@ export function PlayScreen() {
   const {
     pieceLockingEnabled,
     setPieceLockingEnabled,
+    relaxedModeEnabled,
+    toggleRelaxedMode,
     showGhostHint,
     setShowGhostHint,
     showAlignmentGrid,
@@ -205,6 +207,7 @@ export function PlayScreen() {
       wrongRotationHintRef,
       dragStartTimeRef,
       batterySaverMode,
+      relaxedModeEnabled,
       onPieceSnappedAnalytics: (timeToSnapMs) => {
         const g = stateRef.current?.grid;
         const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
@@ -937,6 +940,11 @@ export function PlayScreen() {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 setPieceLockingEnabled((p) => !p);
               }}
+              relaxedModeEnabled={relaxedModeEnabled}
+              onToggleRelaxedMode={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                toggleRelaxedMode();
+              }}
               onToggleGhostHint={() => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 setShowGhostHint((g) => !g);
@@ -1146,6 +1154,9 @@ export function PlayScreen() {
             <CompletionOverlay
               elapsedSeconds={elapsedSeconds}
               grid={state?.grid}
+              imageUrl={
+                localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
+              }
               undoCount={undoCountRef.current}
               isNewBest={
                 timeMode === "best" &&

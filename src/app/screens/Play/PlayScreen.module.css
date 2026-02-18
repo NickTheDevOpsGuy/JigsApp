@@ -671,6 +671,8 @@
   z-index: 100;
   animation: fadeIn 0.5s ease-out;
   padding: 12px;
+  padding-top: max(12px, env(safe-area-inset-top, 0));
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
@@ -679,6 +681,13 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 600px) {
+  .completeOverlay {
+    align-items: flex-start;
+    padding-top: max(24px, env(safe-area-inset-top, 0));
+  }
 }
 
 .completeContent {
@@ -805,7 +814,30 @@
   margin: 0 0 0.5rem 0;
 }
 
+/* Floating puzzle preview on completion - pops off the canvas */
+.completePreviewWrapper {
+  margin: 0.5rem 0 1rem;
+}
+
+.completePreviewImage {
+  display: block;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 0 0 4px rgba(255, 255, 255, 0.15);
+  transform: translateZ(0) scale(1.02);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
 @media (max-width: 600px) {
+  .completeContent {
+    margin-top: 0;
+    margin-bottom: 24px;
+  }
   .completeContent h2 {
     font-size: 1.75rem;
     line-height: 1.25;
@@ -821,6 +853,9 @@
   .completeActions {
     flex-wrap: wrap;
     gap: 8px;
+  }
+  .completePreviewWrapper {
+    margin-bottom: 1rem;
   }
 }
 

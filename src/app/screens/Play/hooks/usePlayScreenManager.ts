@@ -48,6 +48,8 @@ export function usePlayScreenManager(
     onPieceSnappedAnalytics?: (timeToSnapMs: number) => void;
     /** When true, reduce confetti and heavy animations (battery/data saver). */
     batterySaverMode?: boolean;
+    /** When true, snap tolerance increases after ~15s without placement. */
+    relaxedModeEnabled?: boolean;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -60,9 +62,24 @@ export function usePlayScreenManager(
   const snapParticlesRef = useRef<SnapParticle[]>([]);
   const placementTimesRef = useRef<number[]>([]);
   const lastStreakAtRef = useRef<number | null>(null);
+  const relaxedToleranceMultiplierRef = useRef<number>(1);
   const sizingCleanupRef = useRef<(() => void) | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
+
+  const relaxedModeEnabled = options?.relaxedModeEnabled ?? false;
+  useEffect(() => {
+    if (!relaxedModeEnabled) {
+      relaxedToleranceMultiplierRef.current = 1;
+      return;
+    }
+    const RELAXED_IDLE_MS = 15000;
+    const interval = setInterval(() => {
+      const idle = performance.now() - lastInteractionRef.current;
+      relaxedToleranceMultiplierRef.current = idle > RELAXED_IDLE_MS ? 1.5 : 1;
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [relaxedModeEnabled]);
 
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
@@ -212,6 +229,7 @@ export function usePlayScreenManager(
             pieceHeight: pieceSize,
             isMobile,
             snapScaleRef: opts?.snapScaleRef,
+            relaxedToleranceMultiplierRef,
           },
           {
             onPiecePlaced: (p) => {
