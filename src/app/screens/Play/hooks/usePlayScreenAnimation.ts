@@ -106,9 +106,14 @@ export function usePlayScreenAnimation(args: {
         pieceCount >= HIGH_PIECE_COUNT_THRESHOLD && !isDragging && !inCompletionFlourish;
 
       if (throttleIdle && now - lastFrameTimeRef.current < IDLE_MIN_INTERVAL_MS) {
-        lastCompleteRef.current = st.isComplete;
-        lastPieceCountRef.current = st.placedCount;
-        setState(st);
+        if (
+          st.isComplete !== lastCompleteRef.current ||
+          st.placedCount !== lastPieceCountRef.current
+        ) {
+          lastCompleteRef.current = st.isComplete;
+          lastPieceCountRef.current = st.placedCount;
+          setState(st);
+        }
         rafRef.current = requestAnimationFrame(tick);
         return;
       }
@@ -263,9 +268,14 @@ export function usePlayScreenAnimation(args: {
         performance.measure("render-frame", "render-frame-start", "render-frame-end");
       }
 
-      lastCompleteRef.current = st.isComplete;
-      lastPieceCountRef.current = st.placedCount;
-      setState(st);
+      if (
+        st.isComplete !== lastCompleteRef.current ||
+        st.placedCount !== lastPieceCountRef.current
+      ) {
+        lastCompleteRef.current = st.isComplete;
+        lastPieceCountRef.current = st.placedCount;
+        setState(st);
+      }
 
       rafRef.current = requestAnimationFrame(tick);
     };
