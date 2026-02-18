@@ -1,5 +1,5 @@
-/* Google Fonts - Inter for UI, Fredoka for logo/title */
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+/* Google Fonts - Nunito */
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap");
 
 /* ============================================
    CSS Variables for Theme
@@ -302,7 +302,7 @@ body {
   background: var(--color-bg-primary);
   overflow-x: hidden;
   font-family:
-    "Inter",
+    "Nunito",
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
@@ -333,9 +333,9 @@ img {
    Utility Classes
    ============================================ */
 
-/* Playful/logo font */
+/* Display/headline font */
 .font-display {
-  font-family: "Fredoka", system-ui, sans-serif;
+  font-family: "Nunito", system-ui, sans-serif;
 }
 
 /* Monospace for timer */
