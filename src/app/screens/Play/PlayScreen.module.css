@@ -670,7 +670,8 @@
   justify-content: center;
   z-index: 200;
   animation: fadeIn 0.5s ease-out;
-  padding: max(8px, env(safe-area-inset-top, 0)) 12px max(8px, env(safe-area-inset-bottom, 0));
+  padding: max(8px, env(safe-area-inset-top, 0)) 12px
+    max(8px, env(safe-area-inset-bottom, 0));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
