@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { CHANGELOG_VERSION } from "../src/app/data/changelog";
 
 const FIXED_TODAY = new Date("2025-02-16T12:00:00Z");
 
@@ -7,17 +8,20 @@ test.describe("Streak freeze offer", () => {
     page,
   }) => {
     await page.clock.install({ time: FIXED_TODAY });
-    await page.addInitScript(() => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "7");
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      const yesterday = d.toISOString().slice(0, 10);
-      const weekKey = String(Math.floor(Date.now() / 604800000));
-      localStorage.setItem("phuzzle:streakFreeze", "1");
-      localStorage.setItem("phuzzle:streakFreezeWeek", weekKey);
-      localStorage.removeItem(`phuzzle:daily:${yesterday}:completed`);
-      localStorage.removeItem(`phuzzle:streakFreeze:used:${yesterday}`);
-    });
+    await page.addInitScript(
+      (changelogVersion) => {
+        localStorage.setItem("phuzzle:lastSeenChangelog", changelogVersion);
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        const yesterday = d.toISOString().slice(0, 10);
+        const weekKey = String(Math.floor(Date.now() / 604800000));
+        localStorage.setItem("phuzzle:streakFreeze", "1");
+        localStorage.setItem("phuzzle:streakFreezeWeek", weekKey);
+        localStorage.removeItem(`phuzzle:daily:${yesterday}:completed`);
+        localStorage.removeItem(`phuzzle:streakFreeze:used:${yesterday}`);
+      },
+      CHANGELOG_VERSION,
+    );
 
     await page.goto("/");
     await page.getByRole("button", { name: /today's puzzle/i }).click();
@@ -29,20 +33,23 @@ test.describe("Streak freeze offer", () => {
 
   test("hides offer after clicking No thanks and reopening", async ({ page }) => {
     await page.clock.install({ time: FIXED_TODAY });
-    await page.addInitScript(() => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "7");
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      const yesterday = d.toISOString().slice(0, 10);
-      const weekKey = String(Math.floor(Date.now() / 604800000));
-      localStorage.setItem("phuzzle:streakFreeze", "1");
-      localStorage.setItem("phuzzle:streakFreezeWeek", weekKey);
-      localStorage.removeItem(`phuzzle:daily:${yesterday}:completed`);
-      localStorage.removeItem(`phuzzle:streakFreeze:used:${yesterday}`);
-      localStorage.removeItem(
-        `phuzzle:streakFreezeDismissed:${new Date().toISOString().slice(0, 10)}`,
-      );
-    });
+    await page.addInitScript(
+      (changelogVersion) => {
+        localStorage.setItem("phuzzle:lastSeenChangelog", changelogVersion);
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        const yesterday = d.toISOString().slice(0, 10);
+        const weekKey = String(Math.floor(Date.now() / 604800000));
+        localStorage.setItem("phuzzle:streakFreeze", "1");
+        localStorage.setItem("phuzzle:streakFreezeWeek", weekKey);
+        localStorage.removeItem(`phuzzle:daily:${yesterday}:completed`);
+        localStorage.removeItem(`phuzzle:streakFreeze:used:${yesterday}`);
+        localStorage.removeItem(
+          `phuzzle:streakFreezeDismissed:${new Date().toISOString().slice(0, 10)}`,
+        );
+      },
+      CHANGELOG_VERSION,
+    );
 
     await page.goto("/");
     await page.getByRole("button", { name: /today's puzzle/i }).click();
@@ -58,17 +65,20 @@ test.describe("Streak freeze offer", () => {
 
   test("freeze buttons are keyboard accessible", async ({ page }) => {
     await page.clock.install({ time: FIXED_TODAY });
-    await page.addInitScript(() => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "7");
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      const yesterday = d.toISOString().slice(0, 10);
-      const weekKey = String(Math.floor(Date.now() / 604800000));
-      localStorage.setItem("phuzzle:streakFreeze", "1");
-      localStorage.setItem("phuzzle:streakFreezeWeek", weekKey);
-      localStorage.removeItem(`phuzzle:daily:${yesterday}:completed`);
-      localStorage.removeItem(`phuzzle:streakFreeze:used:${yesterday}`);
-    });
+    await page.addInitScript(
+      (changelogVersion) => {
+        localStorage.setItem("phuzzle:lastSeenChangelog", changelogVersion);
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        const yesterday = d.toISOString().slice(0, 10);
+        const weekKey = String(Math.floor(Date.now() / 604800000));
+        localStorage.setItem("phuzzle:streakFreeze", "1");
+        localStorage.setItem("phuzzle:streakFreezeWeek", weekKey);
+        localStorage.removeItem(`phuzzle:daily:${yesterday}:completed`);
+        localStorage.removeItem(`phuzzle:streakFreeze:used:${yesterday}`);
+      },
+      CHANGELOG_VERSION,
+    );
 
     await page.goto("/");
     await page.getByRole("button", { name: /today's puzzle/i }).click();
