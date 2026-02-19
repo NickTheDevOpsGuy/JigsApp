@@ -66,16 +66,24 @@
             window.location.reload();
           }
         }
-        window.addEventListener("error", function (e) {
-          if (e.target && e.target.tagName === "LINK" && e.target.rel === "stylesheet") {
-            scheduleReload();
-            return;
-          }
-          if (isChunkLoadError(e.message)) {
-            e.preventDefault();
-            scheduleReload();
-          }
-        }, true);
+        window.addEventListener(
+          "error",
+          function (e) {
+            if (
+              e.target &&
+              e.target.tagName === "LINK" &&
+              e.target.rel === "stylesheet"
+            ) {
+              scheduleReload();
+              return;
+            }
+            if (isChunkLoadError(e.message)) {
+              e.preventDefault();
+              scheduleReload();
+            }
+          },
+          true,
+        );
         window.addEventListener("unhandledrejection", function (e) {
           var msg = (e.reason && e.reason.message) || String(e.reason || "");
           if (isChunkLoadError(msg)) {
