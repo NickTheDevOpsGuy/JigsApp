@@ -1,12 +1,15 @@
 /* src/app/components/PieceTray/PieceTray.module.css */
 
 .tray {
-  height: 150px;
+  /* Height set via inline style from getTrayHeight() – varies by piece count */
+  min-height: 100px;
+  max-height: 220px;
   flex-shrink: 0;
   min-width: 0;
   max-width: 100%;
   width: 100%;
   box-sizing: border-box;
+  transition: height 0.25s ease;
 
   display: flex;
   flex-direction: column;
@@ -231,6 +234,21 @@
   outline-offset: 2px;
 }
 
+.pieceHighlighted {
+  box-shadow: 0 0 0 2px var(--color-brand-primary);
+  position: relative;
+  z-index: 1;
+}
+
+.pieceDimmed {
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+
+.pieceDimmed:hover {
+  opacity: 0.7;
+}
+
 .clusterBtn {
   padding: 6px 12px;
   font-size: 13px;
@@ -316,7 +334,7 @@
   .tray {
     margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px
       max(6px, env(safe-area-inset-right, 0));
-    height: 150px;
+    max-height: 200px;
   }
 
   .header {

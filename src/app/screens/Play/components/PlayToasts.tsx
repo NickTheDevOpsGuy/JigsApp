@@ -11,6 +11,7 @@ type Props = {
   showFirstSnapToast: boolean;
   showStreakToast: boolean;
   milestoneMessage: string | null;
+  borderCompleteToast: string | null;
   shareToast: string | null;
   classNames: {
     engagementToast: string;
@@ -26,6 +27,7 @@ export function PlayToasts({
   showFirstSnapToast,
   showStreakToast,
   milestoneMessage,
+  borderCompleteToast,
   shareToast,
   classNames: s,
 }: Props) {
@@ -44,6 +46,11 @@ export function PlayToasts({
       {milestoneMessage && (
         <div className={s.engagementToast} role="status">
           {milestoneMessage}
+        </div>
+      )}
+      {borderCompleteToast && (
+        <div className={s.engagementToast} role="status">
+          {borderCompleteToast}
         </div>
       )}
       {shareToast && (

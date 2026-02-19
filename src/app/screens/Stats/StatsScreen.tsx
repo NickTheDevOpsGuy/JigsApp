@@ -3,7 +3,15 @@
  */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, BarChart3, Trophy, Award, User, Share2 } from "lucide-react";
+import {
+  ArrowLeft,
+  BarChart3,
+  Trophy,
+  Award,
+  User,
+  Share2,
+  Calendar,
+} from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
 import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client";
@@ -29,6 +37,7 @@ import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
 import { AVATAR_HATS, AVATAR_GLASSES, AVATAR_HOODIES } from "@/data/avatarOptions";
+import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -86,7 +95,7 @@ export function StatsScreen() {
     }
   }, [tabFromUrl]);
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("today");
-  const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
+  const [allTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
   const [stats, setStats] = useState<{
     puzzlesCompleted: number;
     totalPlayTimeSeconds: number;
@@ -130,6 +139,7 @@ export function StatsScreen() {
   const [raccoonName, setRaccoonName] = useState<string | null>(null);
   const [leaderboardCompact, setLeaderboardCompact] = useState(true);
   const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
+  const [showDailyModal, setShowDailyModal] = useState(false);
 
   const configured = isSupabaseConfigured();
 
@@ -441,10 +451,12 @@ export function StatsScreen() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <Button size="sm" onClick={() => nav("/")}>
-            <ArrowLeft size={18} />
-            Back
-          </Button>
+          <div className={styles.backBtn}>
+            <Button size="sm" variant="secondary" onClick={() => nav("/")}>
+              <ArrowLeft size={18} />
+              Back
+            </Button>
+          </div>
           <h1 className={styles.title}>Leaderboard</h1>
         </div>
 
@@ -651,78 +663,81 @@ export function StatsScreen() {
 
             {activeTab === "leaderboard" && (
               <div className={styles.section}>
-                <div className={styles.leaderboardHeader}>
-                  <div className={styles.leaderboardTabs}>
-                    {(
-                      [
-                        ["today", "Today"],
-                        ["timeAttack", "Time Attack"],
-                        ["bestWeek", "Best time (week)"],
-                        ["bestMonth", "Best time (month)"],
-                        ["week", "Weekly totals"],
-                        ["month", "Monthly totals"],
-                        ["streaks", "Streaks"],
-                        ["completions", "All-time completions"],
-                        ["alltime", "All-time best"],
-                      ] as const
-                    ).map(([key, label]) => (
-                      <button
-                        key={key}
-                        className={leaderboardType === key ? styles.lbTabActive : ""}
-                        onClick={() => setLeaderboardType(key)}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                  {leaderboardType === "alltime" && (
-                    <div className={styles.allTimeGrid}>
-                      <label>Grid:</label>
-                      <select
-                        value={allTimeGrid}
-                        onChange={(e) =>
-                          setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")
-                        }
-                      >
-                        <option value="3x3">3×3</option>
-                        <option value="4x4">4×4</option>
-                        <option value="5x5">5×5</option>
-                        <option value="6x6">6×6</option>
-                      </select>
-                    </div>
-                  )}
+                <div className={styles.leaderboardFilters}>
                   <button
                     type="button"
-                    className={styles.lbViewToggle}
-                    onClick={() => setLeaderboardCompact((c) => !c)}
-                    title={leaderboardCompact ? "Expand view" : "Compact view"}
-                    aria-label={leaderboardCompact ? "Expand view" : "Compact view"}
+                    className={`${styles.filterPill} ${
+                      leaderboardType === "today" ? styles.filterPillActive : ""
+                    }`}
+                    onClick={() => setLeaderboardType("today")}
                   >
-                    {leaderboardCompact ? "Expand" : "Compact"}
+                    Today
                   </button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={handleShareLeaderboard}
-                    className={styles.shareBtn}
+                  <button
+                    type="button"
+                    className={`${styles.filterPill} ${
+                      leaderboardType === "bestWeek" ? styles.filterPillActive : ""
+                    }`}
+                    onClick={() => setLeaderboardType("bestWeek")}
                   >
-                    <Share2 size={16} />
+                    Week
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.filterPill} ${
+                      leaderboardType === "bestMonth" ? styles.filterPillActive : ""
+                    }`}
+                    onClick={() => setLeaderboardType("bestMonth")}
+                  >
+                    <Calendar size={14} />
+                    Month
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.filterPill} ${
+                      leaderboardCompact ? styles.filterPillActive : ""
+                    }`}
+                    onClick={() => setLeaderboardCompact((c) => !c)}
+                    title={leaderboardCompact ? "Compact view" : "Expand view"}
+                  >
+                    Compact
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.filterPill} ${styles.filterPillShare}`}
+                    onClick={handleShareLeaderboard}
+                  >
+                    <Share2 size={14} />
                     {shareCopied ? "Copied!" : "Share"}
-                  </Button>
+                  </button>
                 </div>
-                <h2>
-                  {leaderboardType === "today" && "Today's daily puzzle"}
-                  {leaderboardType === "timeAttack" && "Time Attack"}
-                  {leaderboardType === "bestWeek" && "Best time this week (daily)"}
-                  {leaderboardType === "bestMonth" && "Best time this month (daily)"}
-                  {leaderboardType === "week" && "Weekly totals"}
-                  {leaderboardType === "month" && "Monthly totals"}
-                  {leaderboardType === "streaks" && "Longest streaks"}
-                  {leaderboardType === "completions" && "All-time completions"}
-                  {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
-                </h2>
-                {leaderboardType === "today" &&
-                  renderTimeLeaderboard(leaderboard, "No completions yet. Be the first!")}
+
+                {leaderboardType === "today" && (
+                  <div className={styles.dailyPuzzleCard}>
+                    <div className={styles.dailyPuzzleMascot} aria-hidden>
+                      🦝
+                    </div>
+                    <div className={styles.dailyPuzzleContent}>
+                      <h2 className={styles.dailyPuzzleTitle}>
+                        Today&apos;s Daily Puzzle
+                      </h2>
+                      <p className={styles.dailyPuzzleDesc}>
+                        {leaderboard.length === 0
+                          ? "No completions yet. Be the first!"
+                          : `${leaderboard.length} completion${leaderboard.length === 1 ? "" : "s"} so far.`}
+                      </p>
+                      <button
+                        type="button"
+                        className={styles.dailyPuzzleBtn}
+                        onClick={() => setShowDailyModal(true)}
+                      >
+                        Start Puzzle
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {leaderboardType === "today" && renderTimeLeaderboard(leaderboard, "")}
                 {leaderboardType === "timeAttack" &&
                   renderTimeLeaderboard(
                     leaderboard,
@@ -762,6 +777,11 @@ export function StatsScreen() {
                   )}
               </div>
             )}
+
+            <DailyDifficultyModal
+              isOpen={showDailyModal}
+              onClose={() => setShowDailyModal(false)}
+            />
 
             {activeTab === "achievements" && (
               <div className={styles.section}>

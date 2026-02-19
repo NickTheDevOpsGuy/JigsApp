@@ -84,6 +84,8 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### UX and polish
 
+- **Border complete celebration** – Subtle confetti and "Border complete!" toast when all edge and corner pieces are placed (once per puzzle)
+- **Challenge mode** – Optional game mode (Menu → Gameplay): full image shown for 5 seconds at puzzle start, then solve from memory; no ghost image
 - Reference image preview overlay
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time, time attack)
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
@@ -102,6 +104,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### Social and progress
 
+- **Leaderboard** – Accessible from home menu; redesigned Stats screen with Today's Daily Puzzle card, filter pills (Today/Week/Month), and Start Puzzle button
 - Daily puzzle and streak tracking
 - **Streak freeze** – One per week; use when you miss a day to keep your streak. Offered when opening Today's Puzzle if yesterday wasn't completed. See [doc/streak-freeze.md](doc/streak-freeze.md).
 - Stats dashboard and leaderboards (daily, Time Attack, streaks, Supabase)
@@ -122,6 +125,9 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### Recently Added
 
+- **Border complete celebration** – Confetti + toast when border (edges + corners) is done
+- **Challenge mode** – 5-second full-image preview, then memory-based solving (Menu → Gameplay)
+- **Leaderboard redesign** – Today's Daily Puzzle card, raccoon mascot, filter pills, Leaderboard button on home
 - **Time Attack mode** – Competitive countdown with dedicated leaderboard
 - **Ghost image** – Faint completed puzzle behind board (Settings → View), disabled in daily/Time Attack
 - **Multi-tier achievements** – 10, 50, 100 puzzles; Speed Runner (5 under 5 min)
@@ -216,7 +222,8 @@ PostHog UI: https://app.posthog.com/
 
 ## Deployment Troubleshooting
 
-- **"Failed to fetch" or blank play screen** – Stale cache; the app auto-reloads. Hard refresh (Cmd+Shift+R) or clear site data if it persists.
+- **"Failed to fetch" or blank play screen** – Stale cache; the app auto-reloads on chunk/stylesheet load failure. Hard refresh (Cmd+Shift+R) or clear site data if it persists.
+- **CSS sometimes doesn't load on mobile** – Flaky networks can cause asset failures. The app now auto-reloads when stylesheets fail. Preconnect to Google Fonts reduces external request latency. If it keeps happening, try clearing the site cache or reinstalling the PWA.
 - **Co-op WebSocket fails** – See [doc/SHARING.md](doc/SHARING.md#troubleshooting) and [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md#troubleshooting).
 
 ---

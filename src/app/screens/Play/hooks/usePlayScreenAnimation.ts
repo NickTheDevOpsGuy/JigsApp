@@ -29,6 +29,8 @@ export function usePlayScreenAnimation(args: {
   showGhostImage?: boolean;
   showEdgeHighlight?: boolean;
   isCompetitiveOrDaily?: boolean;
+  /** When true, ghost image is disabled (memory-based challenge). */
+  challengeModeEnabled?: boolean;
   lastInteractionRef?: React.RefObject<number>;
   viewport: ViewportState;
   perfStatsRef?: React.RefObject<PerfStats | null>;
@@ -56,6 +58,7 @@ export function usePlayScreenAnimation(args: {
     showGhostImage,
     showEdgeHighlight,
     isCompetitiveOrDaily,
+    challengeModeEnabled,
     lastInteractionRef,
     viewport,
     perfStatsRef,
@@ -255,7 +258,7 @@ export function usePlayScreenAnimation(args: {
           completedAtMs: completedAtRef.current,
           showGhostHint: effectiveShowGhost,
           ghostAlpha,
-          showGhostImage: showGhostImage ?? false,
+          showGhostImage: (showGhostImage ?? false) && !challengeModeEnabled,
           isCompetitiveOrDaily: isCompetitiveOrDaily ?? false,
           showEdgeHighlight,
           showAlignmentGrid,
@@ -296,6 +299,7 @@ export function usePlayScreenAnimation(args: {
     showGhostHint,
     showGhostWhenIdle,
     showGhostImage,
+    challengeModeEnabled,
     showEdgeHighlight,
     showAlignmentGrid,
     isCompetitiveOrDaily,

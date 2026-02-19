@@ -12,6 +12,7 @@ import {
   EDGE_HIGHLIGHT_KEY,
   RELAXED_MODE_KEY,
   GHOST_IMAGE_KEY,
+  CHALLENGE_MODE_KEY,
   type DebugFlags,
 } from "../playScreenUtils";
 
@@ -72,11 +73,20 @@ export function usePlayScreenUI() {
     }
   });
 
+  const [challengeModeEnabled, setChallengeModeEnabled] = useState(() => {
+    try {
+      return localStorage.getItem(CHALLENGE_MODE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
   const [debug, setDebug] = useState<DebugFlags>({
     showGrid: false,
     showBounds: false,
     showIds: false,
     showPerfOverlay: false,
+    showSnapTolerance: false,
   });
   const [showPreview, setShowPreview] = useState(false);
   const [immersiveMode, setImmersiveMode] = useState(() => {
@@ -182,6 +192,14 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
+      localStorage.setItem(CHALLENGE_MODE_KEY, challengeModeEnabled ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [challengeModeEnabled]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(IMMERSIVE_MODE_KEY, immersiveMode ? "true" : "false");
     } catch {
       // ignore
@@ -219,6 +237,10 @@ export function usePlayScreenUI() {
     setDebug((d) => ({ ...d, showPerfOverlay: !d.showPerfOverlay }));
   }, []);
 
+  const toggleSnapTolerance = useCallback(() => {
+    setDebug((d) => ({ ...d, showSnapTolerance: !d.showSnapTolerance }));
+  }, []);
+
   const toggleImmersiveMode = useCallback(() => {
     setImmersiveMode((m) => !m);
   }, []);
@@ -227,6 +249,7 @@ export function usePlayScreenUI() {
   const toggleShowGhostImage = useCallback(() => setShowGhostImage((v) => !v), []);
   const toggleShowEdgeHighlight = useCallback(() => setShowEdgeHighlight((v) => !v), []);
   const toggleRelaxedMode = useCallback(() => setRelaxedModeEnabled((v) => !v), []);
+  const toggleChallengeMode = useCallback(() => setChallengeModeEnabled((v) => !v), []);
 
   return {
     pieceLockingEnabled,
@@ -247,6 +270,9 @@ export function usePlayScreenUI() {
     relaxedModeEnabled,
     setRelaxedModeEnabled,
     toggleRelaxedMode,
+    challengeModeEnabled,
+    setChallengeModeEnabled,
+    toggleChallengeMode,
     debug,
     setDebug,
     showPreview,
@@ -280,6 +306,7 @@ export function usePlayScreenUI() {
     toggleHaptics,
     toggleDebug,
     togglePerfOverlay,
+    toggleSnapTolerance,
     toggleImmersiveMode,
   };
 }

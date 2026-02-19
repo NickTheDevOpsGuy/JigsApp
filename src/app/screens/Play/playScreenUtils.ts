@@ -11,6 +11,7 @@ export const GHOST_WHEN_IDLE_KEY = "phuzzle:ghostWhenIdle";
 export const EDGE_HIGHLIGHT_KEY = "phuzzle:edgeHighlight";
 export const RELAXED_MODE_KEY = "phuzzle:relaxedMode";
 export const GHOST_IMAGE_KEY = "phuzzle:ghostImage";
+export const CHALLENGE_MODE_KEY = "phuzzle:challengeMode";
 
 export const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
 
@@ -147,9 +148,30 @@ export function computeTileSize(
   return Math.max(minTile, Math.min(maxTile, tile));
 }
 
+/** Piece is on the puzzle border (edge or corner). */
+export function isBorderPiece(
+  piece: { row: number; col: number },
+  grid: { rows: number; cols: number },
+): boolean {
+  const lastRow = grid.rows - 1;
+  const lastCol = grid.cols - 1;
+  return (
+    piece.row === 0 || piece.row === lastRow || piece.col === 0 || piece.col === lastCol
+  );
+}
+
+/** Check if all border pieces are placed. */
+export function isBorderComplete(
+  pieces: Array<{ row: number; col: number; isPlaced: boolean }>,
+  grid: { rows: number; cols: number },
+): boolean {
+  return pieces.filter((p) => isBorderPiece(p, grid)).every((p) => p.isPlaced);
+}
+
 export type DebugFlags = {
   showGrid: boolean;
   showBounds: boolean;
   showIds: boolean;
   showPerfOverlay: boolean;
+  showSnapTolerance: boolean;
 };

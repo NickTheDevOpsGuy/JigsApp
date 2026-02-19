@@ -13,7 +13,7 @@ import { TutorialOverlay } from "@/components/HowToPlay";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { AboutModal } from "@/components/AboutModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
-import { Image, Camera, Package, HelpCircle } from "lucide-react";
+import { Image, Camera, Package, HelpCircle, Trophy } from "lucide-react";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzleCore";
 import { shouldShowChangelog } from "@/data/changelog";
 import { getActiveEvent } from "@/data/puzzleEvents";
@@ -41,7 +41,17 @@ export function MenuScreen() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
+          <div className={styles.headerTop}>
+            <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
+            <button
+              type="button"
+              className={styles.helpIconBtn}
+              onClick={() => setShowHelpChoice(true)}
+              aria-label="Help"
+            >
+              <HelpCircle size={20} />
+            </button>
+          </div>
           <p className={styles.menuTip}>{tagline}</p>
         </div>
 
@@ -65,6 +75,14 @@ export function MenuScreen() {
 
           <Button
             variant="outline"
+            onClick={() => nav("/stats")}
+            className={styles.actionCard}
+          >
+            <Trophy size={22} />
+            <span className={styles.actionLabel}>Leaderboard</span>
+          </Button>
+          <Button
+            variant="outline"
             onClick={() => nav("/packs")}
             className={styles.actionCard}
           >
@@ -82,18 +100,10 @@ export function MenuScreen() {
           <Button
             variant="outline"
             onClick={() => nav("/new?source=camera")}
-            className={styles.actionCard}
+            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
           >
             <Camera size={22} />
             <span className={styles.actionLabel}>Snap a Picture</span>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowHelpChoice(true)}
-            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
-          >
-            <HelpCircle size={22} />
-            <span className={styles.actionLabel}>Help</span>
           </Button>
         </div>
       </div>

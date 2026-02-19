@@ -103,6 +103,8 @@ export function PlayScreen() {
     setPieceLockingEnabled,
     relaxedModeEnabled,
     toggleRelaxedMode,
+    challengeModeEnabled,
+    toggleChallengeMode,
     showGhostHint,
     setShowGhostHint,
     showAlignmentGrid,
@@ -142,6 +144,7 @@ export function PlayScreen() {
     toggleHaptics,
     toggleDebug,
     togglePerfOverlay,
+    toggleSnapTolerance,
     immersiveMode,
     toggleImmersiveMode,
   } = ui;
@@ -158,6 +161,9 @@ export function PlayScreen() {
   const isCoarsePointer = useCoarsePointer();
   const [showStreakToast, setShowStreakToast] = React.useState(false);
   const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
+  const [borderCompleteToast, setBorderCompleteToast] = React.useState<string | null>(
+    null,
+  );
   const [shareToast, setShareToast] = React.useState<string | null>(null);
   const [immersiveReveal, setImmersiveReveal] = React.useState(false);
   const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -253,6 +259,24 @@ export function PlayScreen() {
     abandonCapturedRef.current = false;
   }, [puzzleKey]);
 
+  // Challenge mode: show full image for 5 seconds at puzzle start, then remove preview
+  const [showChallengePreview, setShowChallengePreview] = React.useState(true);
+  useEffect(() => {
+    if (challengeModeEnabled) setShowChallengePreview(true);
+  }, [puzzleKey, challengeModeEnabled]);
+  useEffect(() => {
+    if (
+      !challengeModeEnabled ||
+      !state ||
+      isLoading ||
+      state.isComplete ||
+      !showChallengePreview
+    )
+      return;
+    const id = setTimeout(() => setShowChallengePreview(false), 5000);
+    return () => clearTimeout(id);
+  }, [challengeModeEnabled, state, isLoading, showChallengePreview]);
+
   useEffect(() => {
     if (!isHost && sessionIdFromUrl && session && !sessionLoading) {
       posthog.capture("coop_join_success", {
@@ -294,10 +318,14 @@ export function PlayScreen() {
     timeMode,
     milestoneMessage,
     setMilestoneMessage,
+    borderCompleteToast,
+    setBorderCompleteToast,
     showStreakToast,
     setShowStreakToast,
     shareToast,
     setShareToast,
+    batterySaverMode,
+    themeRef,
   });
 
   // Auto-clear piece selection after 1s so the blue border doesn’t stay until another click
@@ -563,6 +591,7 @@ export function PlayScreen() {
     showGhostImage,
     showEdgeHighlight,
     isCompetitiveOrDaily,
+    challengeModeEnabled,
     lastInteractionRef,
     viewport: viewport.viewport,
     perfStatsRef,
@@ -865,6 +894,11 @@ export function PlayScreen() {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 toggleRelaxedMode();
               }}
+              challengeModeEnabled={challengeModeEnabled}
+              onToggleChallengeMode={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                toggleChallengeMode();
+              }}
               onToggleGhostHint={() => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 setShowGhostHint((g) => !g);
@@ -889,6 +923,7 @@ export function PlayScreen() {
               onShowHowToPlay={() => setShowHowToPlay(true)}
               onToggleDebug={toggleDebug}
               onTogglePerfOverlay={togglePerfOverlay}
+              onToggleSnapTolerance={toggleSnapTolerance}
               immersiveMode={immersiveMode}
               onToggleImmersiveMode={() => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
@@ -979,6 +1014,23 @@ export function PlayScreen() {
             onContextMenu={handleContextMenu}
             onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
           />
+          {showChallengePreview &&
+            challengeModeEnabled &&
+            imgRef.current &&
+            !state?.isComplete && (
+              <div
+                className={styles.challengePreviewOverlay}
+                role="img"
+                aria-label="Puzzle preview - memorize the image"
+              >
+                <img
+                  src={imgRef.current.src}
+                  alt=""
+                  className={styles.challengePreviewImage}
+                />
+                <span className={styles.challengePreviewLabel}>Memorize… 5s</span>
+              </div>
+            )}
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>
               <img
@@ -1101,6 +1153,7 @@ export function PlayScreen() {
         showFirstSnapToast={onboarding.showFirstSnapToast}
         showStreakToast={showStreakToast}
         milestoneMessage={milestoneMessage}
+        borderCompleteToast={borderCompleteToast}
         shareToast={shareToast}
         classNames={{
           engagementToast: styles.engagementToast,

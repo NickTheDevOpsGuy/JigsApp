@@ -12,18 +12,9 @@ export function finishDragWithTrayCheck(
 ): void {
   const activeId = manager.getDragState().activeId;
   if (activeId && isPointerOverTray(clientX, clientY)) {
-    const st = manager.getState();
-    const piece = st.pieces.find((p) => p.id === activeId);
-    const groupSize = piece
-      ? st.pieces.filter((p) => p.groupId === piece.groupId).length
-      : 0;
-    if (groupSize === 1) {
-      manager.pointerUp();
-      manager.sendToTray(activeId);
-      selectCycle(1);
-    } else {
-      manager.pointerUp();
-    }
+    manager.pointerUp();
+    manager.sendToTray(activeId);
+    selectCycle(1);
   } else {
     manager.pointerUp();
   }

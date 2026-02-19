@@ -1,5 +1,6 @@
 // src/app/puzzle/canvas/renderBoard.ts
 import type { Piece, PuzzleState, DragState } from "@/puzzle/types";
+import { PUZZLE_DEFAULTS } from "@/puzzle/config";
 import {
   snapPopScale,
   snapGlowAlpha,
@@ -25,6 +26,7 @@ export type DebugFlags = {
   showBounds: boolean;
   showIds: boolean;
   showPerfOverlay?: boolean;
+  showSnapTolerance?: boolean;
 };
 
 export type AnimationState = {
@@ -117,6 +119,27 @@ export function renderBoard(
     ctx.save();
     ctx.translate(viewport.panX, viewport.panY);
     ctx.scale(viewport.scale, viewport.scale);
+  }
+
+  // Snap tolerance zones (dev only) – circles around valid board snap targets
+  if (
+    debug.showSnapTolerance &&
+    (import.meta.env.DEV || import.meta.env.VITE_SHOW_DEBUG === "true")
+  ) {
+    const scale = viewport?.scale ?? 1;
+    const clampedScale = Math.max(0.25, Math.min(4, scale));
+    const tolerance = PUZZLE_DEFAULTS.snapToleranceBoardPx / clampedScale;
+    const unplaced = state.pieces.filter((p) => !p.inTray && !p.isPlaced);
+    ctx.save();
+    ctx.strokeStyle = "rgba(100, 180, 255, 0.5)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    for (const p of unplaced) {
+      ctx.beginPath();
+      ctx.arc(p.targetX, p.targetY, tolerance, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   // Get grid from state

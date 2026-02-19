@@ -10,6 +10,7 @@ export type DebugFlags = {
   showBounds: boolean;
   showIds: boolean;
   showPerfOverlay: boolean;
+  showSnapTolerance: boolean;
 };
 
 export type HeaderMenuProps = {
@@ -27,6 +28,7 @@ export type HeaderMenuProps = {
   hapticsEnabled: boolean;
   pieceLockingEnabled: boolean;
   relaxedModeEnabled?: boolean;
+  challengeModeEnabled?: boolean;
   showGhostHint: boolean;
   showGhostWhenIdle: boolean;
   showGhostImage?: boolean;
@@ -44,6 +46,7 @@ export type HeaderMenuProps = {
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
   onToggleRelaxedMode?: () => void;
+  onToggleChallengeMode?: () => void;
   onToggleGhostHint: () => void;
   onToggleGhostWhenIdle: () => void;
   onToggleGhostImage?: () => void;
@@ -58,6 +61,7 @@ export type HeaderMenuProps = {
   onShowAbout?: () => void;
   onToggleDebug: () => void;
   onTogglePerfOverlay: () => void;
+  onToggleSnapTolerance: () => void;
   immersiveMode: boolean;
   onToggleImmersiveMode: () => void;
   onSharePuzzle?: () => void | Promise<void>;
@@ -181,6 +185,16 @@ export function buildMenuItems(
       subMenu: "controls",
     },
     {
+      id: "challengeMode",
+      section: "settings",
+      visible: !!props.onToggleChallengeMode,
+      label: props.challengeModeEnabled ? "Challenge Mode ✨" : "Challenge Mode 🌙",
+      sortKey: "Challenge Mode",
+      ariaLabel: props.challengeModeEnabled ? "Challenge Mode on" : "Challenge Mode off",
+      onClick: c(props.onToggleChallengeMode ?? (() => {})),
+      subMenu: "gameplay",
+    },
+    {
       id: "showTimer",
       section: "settings",
       visible: true,
@@ -283,6 +297,17 @@ export function buildMenuItems(
         : "📊 Performance Overlay 🌙",
       sortKey: "Performance Overlay",
       onClick: c(props.onTogglePerfOverlay),
+      subMenu: "advanced",
+    },
+    {
+      id: "snapTolerance",
+      section: "settings",
+      visible: props.canShowDebug,
+      label: props.debug.showSnapTolerance
+        ? "🎯 Snap Tolerance Zones ✨"
+        : "🎯 Snap Tolerance Zones 🌙",
+      sortKey: "Snap Tolerance",
+      onClick: c(props.onToggleSnapTolerance),
       subMenu: "advanced",
     },
     {

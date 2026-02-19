@@ -448,11 +448,9 @@ export class PuzzleManager {
 
     this.pushUndoState();
 
-    const groupPieces = this.getGroupPieces(piece.groupId);
-    if (groupPieces.length > 1) return;
-
+    // Move entire group to tray to maintain integrity; no accidental splits
     this.updatePieces(
-      (p) => p.id === pieceId,
+      (p) => p.groupId === piece.groupId,
       () => ({ inTray: true }),
     );
   }
@@ -913,7 +911,11 @@ export class PuzzleManager {
     return true;
   }
 
-  /** Gentle nudge when group is very close to board snap but didn't snap (e.g. just outside tolerance). */
+  /**
+   * Gentle nudge when a fully connected (merged) group is close to its correct
+   * global position but didn't snap. Applies only within a small tolerance window;
+   * no rotation correction. Large groups feel satisfying; no unexpected nudge from far.
+   */
   private tryNearSnapNudge(): void {
     const activeId = this.drag.activeId;
     if (!activeId) return;
@@ -922,20 +924,27 @@ export class PuzzleManager {
     if (!active || active.isPlaced || active.locked) return;
 
     const gid = active.groupId;
-    if (!this.getGroupPieces(gid).every((p) => p.rotation === 0)) return;
+    const groupPieces = this.getGroupPieces(gid);
+
+    // Only apply to fully connected (merged) groups; skip single pieces
+    if (groupPieces.length < 2) return;
+    if (!groupPieces.every((p) => p.rotation === 0)) return;
 
     const activeTile = this.tilePos(active);
     const dx = active.targetX - activeTile.x;
     const dy = active.targetY - activeTile.y;
     const distance = Math.hypot(dx, dy);
     const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
-    const nearThreshold = tolerance * 0.7;
-    const farThreshold = tolerance * 1.15;
+
+    // Small window: only nudge when just outside snap range, never from far
+    const nearThreshold = tolerance * 0.85;
+    const farThreshold = tolerance * 1.05;
 
     if (distance <= nearThreshold || distance > farThreshold) return;
     if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return;
 
-    const nudgeFactor = 0.35;
+    // Slightly stronger nudge for larger groups (more satisfying)
+    const nudgeFactor = Math.min(0.55, 0.4 + 0.03 * Math.min(groupPieces.length - 1, 5));
     const nudgeDx = dx * nudgeFactor;
     const nudgeDy = dy * nudgeFactor;
     this.shiftGroup(gid, nudgeDx, nudgeDy);

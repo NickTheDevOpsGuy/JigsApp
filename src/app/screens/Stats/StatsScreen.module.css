@@ -3,7 +3,7 @@
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  background: var(--color-bg-secondary);
+  background: #e8f4fc;
   padding: 24px;
   padding-bottom: max(24px, env(safe-area-inset-bottom, 0));
 }
@@ -11,10 +11,10 @@
 .card {
   width: min(520px, 100%);
   max-width: 100%;
-  background: var(--color-bg-card);
-  border-radius: 18px;
+  background: #ffffff;
+  border-radius: 20px;
   padding: 28px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 24px rgba(11, 99, 184, 0.08);
   overflow: hidden;
 }
 
@@ -23,12 +23,29 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
+  position: relative;
+}
+
+.header .backBtn {
+  position: absolute;
+  left: 0;
+  z-index: 1;
+}
+
+.header .title {
+  flex: 1;
+  text-align: center;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0b63b8;
 }
 
 .title {
   margin: 0;
   font-size: 24px;
-  color: var(--color-brand-primary);
+  font-weight: 700;
+  color: #0b63b8;
   flex: 1;
   min-width: 0;
 }
@@ -56,7 +73,7 @@
 .tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -68,31 +85,32 @@
 }
 
 .tabs button {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 12px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: var(--color-bg-elevated);
-  color: var(--color-text-primary);
+  padding: 12px 14px;
+  border: none;
+  border-radius: 999px;
+  background: #eef6fc;
+  color: #0b63b8;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .tabs button:hover {
-  background: var(--color-bg-primary);
+  background: #dff1ff;
 }
 
 .tabs .tabActive {
-  background: var(--color-brand-primary);
+  background: #0b63b8;
   color: white;
-  border-color: var(--color-brand-primary);
 }
 
 .section h2 {
@@ -202,11 +220,15 @@
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  min-height: 40px;
+  min-width: 120px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .lbViewToggle:hover {
@@ -378,7 +400,106 @@
   margin-top: 8px;
 }
 
-/* Leaderboard sub-tabs */
+/* Leaderboard filter pills */
+.leaderboardFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filterPill {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 999px;
+  background: #eef6fc;
+  color: #0b63b8;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filterPill:hover {
+  background: #dff1ff;
+}
+
+.filterPillActive {
+  background: #0b63b8;
+  color: white;
+}
+
+.filterPillShare {
+  margin-left: auto;
+}
+
+/* Today's Daily Puzzle card */
+.dailyPuzzleCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: #f8fbff;
+  border-radius: 16px;
+  border: 1px solid #e0eef9;
+  margin-bottom: 20px;
+}
+
+.dailyPuzzleMascot {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  background: #eef6fc;
+  border-radius: 50%;
+}
+
+.dailyPuzzleContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.dailyPuzzleTitle {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0b63b8;
+}
+
+.dailyPuzzleDesc {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #5a7a9a;
+}
+
+.dailyPuzzleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: #0b63b8;
+  color: white;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dailyPuzzleBtn:hover {
+  background: #0952a0;
+}
+
+/* Leaderboard sub-tabs (expanded view) */
 .leaderboardHeader {
   display: flex;
   flex-wrap: wrap;
@@ -406,25 +527,26 @@
 .leaderboardTabs button {
   padding: 10px 14px;
   font-size: 13px;
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  background: var(--color-bg-elevated);
-  color: var(--color-text-primary);
+  border: none;
+  border-radius: 999px;
+  background: #eef6fc;
+  color: #0b63b8;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
   min-height: 40px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .leaderboardTabs button:hover {
-  background: var(--color-bg-primary);
+  background: #dff1ff;
 }
 
 .leaderboardTabs .lbTabActive {
-  background: var(--color-brand-primary);
+  background: #0b63b8;
   color: white;
-  border-color: var(--color-brand-primary);
 }
 
 .allTimeGrid {
@@ -448,6 +570,8 @@
 .shareBtn {
   margin-left: auto;
   flex-shrink: 0;
+  min-height: 40px;
+  min-width: 120px;
 }
 
 /* PZ-071: Mobile leaderboard – card layout with expandable details */
@@ -552,7 +676,8 @@
   .tabs button {
     padding: 12px 8px;
     font-size: 13px;
-    min-width: 72px;
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .section h2 {
@@ -579,6 +704,7 @@
     padding: 10px 12px;
     font-size: 12px;
     min-height: 44px;
+    min-width: 100px;
     flex: 0 0 auto;
   }
 
@@ -657,6 +783,7 @@
     padding: 8px 10px;
     font-size: 11px;
     min-height: 40px;
+    min-width: 88px;
     flex-shrink: 0;
   }
 

@@ -4,6 +4,32 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
+## 🎉 Visual polish & new modes
+
+### Border complete celebration
+
+- **Mid-game motivation** – When all border (edge + corner) pieces are placed, a subtle confetti burst and "Border complete!" toast appear
+- **Once per puzzle** – Triggered only once per puzzle; resets when loading a new puzzle
+- **Accessibility** – Respects `batterySaverMode` and `prefers-reduced-motion`
+
+### Challenge mode
+
+- **Optional game mode** – Toggle in Menu → Gameplay → Challenge Mode
+- **5-second preview** – Full puzzle image shown for 5 seconds at puzzle start
+- **Memory-based solving** – After 5 seconds, preview is removed; ghost image disabled; solve from memory
+- **Persisted** – Setting saved in localStorage (`phuzzle:challengeMode`)
+
+### Leaderboard redesign
+
+- **Redesigned Stats screen** – Light blue background, white card, pill-shaped tabs
+- **Today's Daily Puzzle card** – Sub-card with raccoon mascot, "No completions yet. Be the first!", and Start Puzzle button (opens Daily Difficulty Modal)
+- **Filter pills** – Today, Week, Month (with calendar icon), Compact (view toggle), Share
+- **Leaderboard on home** – Button added to main menu for quick access to Stats/leaderboards
+
+**Files changed:** `playScreenUtils.ts`, `usePlayScreenEffects.ts`, `usePlayScreenUI.ts`, `usePlayScreenAnimation.ts`, `headerMenuConfig.tsx`, `PlayScreen.tsx`, `PlayScreen.module.css`, `PlayToasts.tsx`, `StatsScreen.tsx`, `StatsScreen.module.css`, `MenuScreen.tsx`, `changelog.ts`
+
+---
+
 ## 📱 Tap-to-rotate (mobile)
 
 - **Single tap on piece** — Rotates 90° on touch release. Uses distance (6px) and time (400ms) thresholds so drags never trigger accidental rotation.
