@@ -95,7 +95,7 @@ export function StatsScreen() {
     }
   }, [tabFromUrl]);
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("today");
-  const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
+  const [allTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
   const [stats, setStats] = useState<{
     puzzlesCompleted: number;
     totalPlayTimeSeconds: number;
