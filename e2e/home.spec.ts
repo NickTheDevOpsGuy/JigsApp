@@ -3,12 +3,9 @@ import { CHANGELOG_VERSION } from "../src/app/data/changelog";
 
 test.describe("Home / Menu", () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(
-      (version) => {
-        localStorage.setItem("phuzzle:lastSeenChangelog", version);
-      },
-      CHANGELOG_VERSION,
-    );
+    await page.addInitScript((version) => {
+      localStorage.setItem("phuzzle:lastSeenChangelog", version);
+    }, CHANGELOG_VERSION);
   });
 
   test("loads the app and shows the menu", async ({ page }) => {
