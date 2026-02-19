@@ -88,8 +88,9 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const [canScroll, setCanScroll] = useState(false);
 
   const totalPieces = grid.rows * grid.cols;
-  const [isNarrow, setIsNarrow] = useState(() =>
-    typeof window !== "undefined" && window.matchMedia("(max-width: 600px)").matches,
+  const [isNarrow, setIsNarrow] = useState(
+    () =>
+      typeof window !== "undefined" && window.matchMedia("(max-width: 600px)").matches,
   );
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 600px)");
@@ -396,55 +397,52 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         ) : (
           <div className={styles.row}>
             {displayed.map((p) => {
-              const isHighlighted =
-                colorHighlight && highlightedIds.has(p.id);
+              const isHighlighted = colorHighlight && highlightedIds.has(p.id);
               const isDimmed =
-                colorHighlight &&
-                highlightAnchorId != null &&
-                !highlightedIds.has(p.id);
+                colorHighlight && highlightAnchorId != null && !highlightedIds.has(p.id);
               return (
-              <button
-                key={p.id}
-                type="button"
-                className={`${styles.pieceButton} ${
-                  clusterMode && selectedIds?.has(p.id) ? styles.pieceSelected : ""
-                } ${isHighlighted ? styles.pieceHighlighted : ""} ${
-                  isDimmed ? styles.pieceDimmed : ""
-                }`}
-                onClick={() => {
-                  if (clusterMode && onSelectionToggle) {
-                    onSelectionToggle(p.id);
-                  } else if (colorHighlight) {
-                    setHighlightAnchorId(p.id);
-                  } else {
-                    onPieceClick(p.id);
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`${styles.pieceButton} ${
+                    clusterMode && selectedIds?.has(p.id) ? styles.pieceSelected : ""
+                  } ${isHighlighted ? styles.pieceHighlighted : ""} ${
+                    isDimmed ? styles.pieceDimmed : ""
+                  }`}
+                  onClick={() => {
+                    if (clusterMode && onSelectionToggle) {
+                      onSelectionToggle(p.id);
+                    } else if (colorHighlight) {
+                      setHighlightAnchorId(p.id);
+                    } else {
+                      onPieceClick(p.id);
+                    }
+                  }}
+                  aria-label={
+                    clusterMode
+                      ? `Select piece ${p.id}`
+                      : colorHighlight
+                        ? `Highlight pieces like ${p.id}`
+                        : `Place piece ${p.id}`
                   }
-                }}
-                aria-label={
-                  clusterMode
-                    ? `Select piece ${p.id}`
-                    : colorHighlight
-                      ? `Highlight pieces like ${p.id}`
-                      : `Place piece ${p.id}`
-                }
-              >
-                <div
-                  className={styles.thumbWrap}
-                  style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
                 >
-                  {image ? (
-                    <img
-                      className={styles.thumbImg}
-                      src={thumbsById.get(p.id)}
-                      alt=""
-                      draggable={false}
-                    />
-                  ) : (
-                    <div className={styles.thumbFallback} />
-                  )}
-                </div>
-              </button>
-            );
+                  <div
+                    className={styles.thumbWrap}
+                    style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+                  >
+                    {image ? (
+                      <img
+                        className={styles.thumbImg}
+                        src={thumbsById.get(p.id)}
+                        alt=""
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className={styles.thumbFallback} />
+                    )}
+                  </div>
+                </button>
+              );
             })}
           </div>
         )}

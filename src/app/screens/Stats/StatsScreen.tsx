@@ -3,7 +3,15 @@
  */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, BarChart3, Trophy, Award, User, Share2, Calendar } from "lucide-react";
+import {
+  ArrowLeft,
+  BarChart3,
+  Trophy,
+  Award,
+  User,
+  Share2,
+  Calendar,
+} from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
 import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client";
@@ -729,8 +737,7 @@ export function StatsScreen() {
                   </div>
                 )}
 
-                {leaderboardType === "today" &&
-                  renderTimeLeaderboard(leaderboard, "")}
+                {leaderboardType === "today" && renderTimeLeaderboard(leaderboard, "")}
                 {leaderboardType === "timeAttack" &&
                   renderTimeLeaderboard(
                     leaderboard,

@@ -161,8 +161,9 @@ export function PlayScreen() {
   const isCoarsePointer = useCoarsePointer();
   const [showStreakToast, setShowStreakToast] = React.useState(false);
   const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
-  const [borderCompleteToast, setBorderCompleteToast] =
-    React.useState<string | null>(null);
+  const [borderCompleteToast, setBorderCompleteToast] = React.useState<string | null>(
+    null,
+  );
   const [shareToast, setShareToast] = React.useState<string | null>(null);
   const [immersiveReveal, setImmersiveReveal] = React.useState(false);
   const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);

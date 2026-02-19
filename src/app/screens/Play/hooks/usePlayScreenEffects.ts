@@ -100,12 +100,7 @@ export function usePlayScreenEffects({
 
   // Border complete: subtle confetti + toast, once per puzzle
   useEffect(() => {
-    if (
-      !state ||
-      state.isComplete ||
-      !state.grid ||
-      borderCompleteShownRef.current
-    )
+    if (!state || state.isComplete || !state.grid || borderCompleteShownRef.current)
       return;
     if (!isBorderComplete(state.pieces, state.grid)) return;
     borderCompleteShownRef.current = true;
@@ -115,8 +110,7 @@ export function usePlayScreenEffects({
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!prefersReducedMotion && !batterySaverMode) {
       import("canvas-confetti").then((confetti) => {
-        const colors =
-          CONFETTI_COLORS_BY_THEME[themeRef.current ?? "light"];
+        const colors = CONFETTI_COLORS_BY_THEME[themeRef.current ?? "light"];
         confetti.default({
           particleCount: 50,
           spread: 55,

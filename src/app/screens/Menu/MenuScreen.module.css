@@ -62,7 +62,9 @@
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
   /* 44px min touch target for mobile (Apple HIG / Material) */
 }
 

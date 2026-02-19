@@ -156,10 +156,7 @@ export function isBorderPiece(
   const lastRow = grid.rows - 1;
   const lastCol = grid.cols - 1;
   return (
-    piece.row === 0 ||
-    piece.row === lastRow ||
-    piece.col === 0 ||
-    piece.col === lastCol
+    piece.row === 0 || piece.row === lastRow || piece.col === 0 || piece.col === lastCol
   );
 }
 
@@ -168,9 +165,7 @@ export function isBorderComplete(
   pieces: Array<{ row: number; col: number; isPlaced: boolean }>,
   grid: { rows: number; cols: number },
 ): boolean {
-  return pieces
-    .filter((p) => isBorderPiece(p, grid))
-    .every((p) => p.isPlaced);
+  return pieces.filter((p) => isBorderPiece(p, grid)).every((p) => p.isPlaced);
 }
 
 export type DebugFlags = {
