@@ -222,7 +222,8 @@ PostHog UI: https://app.posthog.com/
 
 ## Deployment Troubleshooting
 
-- **"Failed to fetch" or blank play screen** – Stale cache; the app auto-reloads. Hard refresh (Cmd+Shift+R) or clear site data if it persists.
+- **"Failed to fetch" or blank play screen** – Stale cache; the app auto-reloads on chunk/stylesheet load failure. Hard refresh (Cmd+Shift+R) or clear site data if it persists.
+- **CSS sometimes doesn't load on mobile** – Flaky networks can cause asset failures. The app now auto-reloads when stylesheets fail. Preconnect to Google Fonts reduces external request latency. If it keeps happening, try clearing the site cache or reinstalling the PWA.
 - **Co-op WebSocket fails** – See [doc/SHARING.md](doc/SHARING.md#troubleshooting) and [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md#troubleshooting).
 
 ---

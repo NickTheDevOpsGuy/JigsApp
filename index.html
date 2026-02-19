@@ -21,6 +21,8 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <meta name="theme-color" content="#0f766e" />
@@ -47,7 +49,7 @@
   <body>
     <div id="root"></div>
     <script>
-      // Reload when a lazy-loaded chunk fails (stale cache after deploy)
+      // Reload when a chunk or stylesheet fails to load (stale cache, flaky network)
       (function () {
         function isChunkLoadError(msg) {
           return (
@@ -58,18 +60,34 @@
               msg.includes("ChunkLoadError"))
           );
         }
-        window.addEventListener("error", function (e) {
-          if (isChunkLoadError(e.message)) {
-            e.preventDefault();
+        function scheduleReload() {
+          if (!window._phuzzleReloadScheduled) {
+            window._phuzzleReloadScheduled = true;
             window.location.reload();
           }
-        });
+        }
+        window.addEventListener("error", function (e) {
+          if (e.target && e.target.tagName === "LINK" && e.target.rel === "stylesheet") {
+            scheduleReload();
+            return;
+          }
+          if (isChunkLoadError(e.message)) {
+            e.preventDefault();
+            scheduleReload();
+          }
+        }, true);
         window.addEventListener("unhandledrejection", function (e) {
           var msg = (e.reason && e.reason.message) || String(e.reason || "");
           if (isChunkLoadError(msg)) {
             e.preventDefault();
-            window.location.reload();
+            scheduleReload();
           }
+        });
+        // Attach onerror to stylesheet links (catches load failures on older browsers)
+        document.addEventListener("DOMContentLoaded", function () {
+          document.querySelectorAll('link[rel="stylesheet"]').forEach(function (link) {
+            link.addEventListener("error", scheduleReload);
+          });
         });
       })();
     </script>
