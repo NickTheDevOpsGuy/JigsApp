@@ -10,9 +10,9 @@ import React, {
   useState,
 } from "react";
 import type { Piece } from "@/puzzle/types";
-import { getAverageColor } from "@/puzzle/colorUtils";
+import { getAverageColor, areColorsSimilar, type ColorInfo } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
-import { Minimize2, Maximize2, Shuffle } from "lucide-react";
+import { Minimize2, Maximize2, Shuffle, Palette } from "lucide-react";
 import styles from "./PieceTray.module.css";
 
 type TraySection = "all" | "corners" | "edges" | "center";
@@ -20,6 +20,19 @@ type SortMode = "grid" | "color";
 
 const THUMB_NORMAL = 56;
 const THUMB_COMPACT = 36;
+
+/** Tray height by total piece count: smaller for small puzzles, taller for large. */
+function getTrayHeight(totalPieces: number, isMobile: boolean): number {
+  const base = isMobile ? 110 : 100;
+  const cap = isMobile ? 200 : 220;
+  if (totalPieces <= 9) return base;
+  if (totalPieces <= 16) return base + 15;
+  if (totalPieces <= 25) return base + 30;
+  if (totalPieces <= 36) return base + 45;
+  if (totalPieces <= 64) return base + 65;
+  if (totalPieces <= 100) return base + 90;
+  return Math.min(cap, base + 110);
+}
 
 type Props = {
   pieces: Piece[];
@@ -68,25 +81,44 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const [section, setSection] = useState<TraySection>("all");
   const [sortMode, setSortMode] = useState<SortMode>("grid");
   const [shuffledOrder, setShuffledOrder] = useState<string[] | null>(null);
+  const [colorHighlight, setColorHighlight] = useState(false);
+  const [highlightAnchorId, setHighlightAnchorId] = useState<string | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScroll, setCanScroll] = useState(false);
+
+  const totalPieces = grid.rows * grid.cols;
+  const [isNarrow, setIsNarrow] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia("(max-width: 600px)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 600px)");
+    const handler = () => setIsNarrow(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  const trayHeight = getTrayHeight(totalPieces, isNarrow);
 
   // Compact mode: default on for 25+ pieces (mobile or desktop); user can toggle
   const compactDefault = pieces.length >= 25;
   const [compact, setCompact] = useState(compactDefault);
   const thumbSize = compact ? THUMB_COMPACT : THUMB_NORMAL;
 
-  // Precompute hue for stable-ish sorting.
-  const hueById = useMemo(() => {
-    const m = new Map<string, number>();
+  // Precompute color for sorting and highlight; computed once per puzzle.
+  const colorById = useMemo(() => {
+    const m = new Map<string, ColorInfo>();
     if (!image) return m;
     for (const p of pieces) {
-      const c = getAverageColor(image, p, grid);
-      m.set(p.id, c.hue);
+      m.set(p.id, getAverageColor(image, p, grid));
     }
     return m;
   }, [image, pieces, grid]);
+
+  const hueById = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const [id, c] of colorById) m.set(id, c.hue);
+    return m;
+  }, [colorById]);
 
   const byGrid = (a: Piece, b: Piece) =>
     a.row - b.row || a.col - b.col || a.id.localeCompare(b.id);
@@ -102,8 +134,12 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
   const sortPieces = (arr: Piece[]) => {
     const next = [...arr];
-    if (sortMode === "color" && image) next.sort(byHue);
-    else next.sort(byGrid);
+    const withinGroup = sortMode === "color" && image ? byHue : byGrid;
+    next.sort((a, b) => {
+      const groupCmp = a.groupId.localeCompare(b.groupId);
+      if (groupCmp !== 0) return groupCmp;
+      return withinGroup(a, b);
+    });
     return next;
   };
 
@@ -141,6 +177,18 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   }, [pieces, grid, sortMode, image, hueById, shuffledOrder]);
 
   const displayed = sections[section];
+
+  // Pieces with similar dominant color when highlight mode + anchor set
+  const highlightedIds = useMemo(() => {
+    if (!colorHighlight || !highlightAnchorId || !image) return new Set<string>();
+    const anchorColor = colorById.get(highlightAnchorId);
+    if (!anchorColor) return new Set<string>();
+    const set = new Set<string>();
+    for (const [id, c] of colorById) {
+      if (areColorsSimilar(anchorColor, c)) set.add(id);
+    }
+    return set;
+  }, [colorHighlight, highlightAnchorId, colorById, image]);
 
   const emptyText =
     pieces.length === 0
@@ -193,7 +241,11 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const showCompactToggle = pieces.length >= 25;
 
   return (
-    <div className={`${styles.tray} ${compact ? styles.trayCompact : ""}`} ref={ref}>
+    <div
+      className={`${styles.tray} ${compact ? styles.trayCompact : ""}`}
+      ref={ref}
+      style={{ height: trayHeight }}
+    >
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <span className={styles.title}>Piece Drawer ({pieces.length})</span>
@@ -286,6 +338,27 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
           <button
             type="button"
+            className={colorHighlight ? styles.active : undefined}
+            onClick={() => {
+              setColorHighlight((c) => !c);
+              if (colorHighlight) setHighlightAnchorId(null);
+            }}
+            disabled={!image}
+            title={
+              !image
+                ? "Load an image to enable"
+                : colorHighlight
+                  ? "Click a piece to highlight similar colors"
+                  : "Highlight pieces by dominant color (click a piece when on)"
+            }
+            aria-label={colorHighlight ? "Color highlight on" : "Color highlight off"}
+          >
+            <Palette size={14} />
+            Highlight
+          </button>
+
+          <button
+            type="button"
             className={styles.shuffleBtn}
             onClick={shuffleTray}
             disabled={pieces.length === 0}
@@ -322,21 +395,38 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
           <div className={styles.empty}>{emptyText}</div>
         ) : (
           <div className={styles.row}>
-            {displayed.map((p) => (
+            {displayed.map((p) => {
+              const isHighlighted =
+                colorHighlight && highlightedIds.has(p.id);
+              const isDimmed =
+                colorHighlight &&
+                highlightAnchorId != null &&
+                !highlightedIds.has(p.id);
+              return (
               <button
                 key={p.id}
                 type="button"
                 className={`${styles.pieceButton} ${
                   clusterMode && selectedIds?.has(p.id) ? styles.pieceSelected : ""
+                } ${isHighlighted ? styles.pieceHighlighted : ""} ${
+                  isDimmed ? styles.pieceDimmed : ""
                 }`}
                 onClick={() => {
                   if (clusterMode && onSelectionToggle) {
                     onSelectionToggle(p.id);
+                  } else if (colorHighlight) {
+                    setHighlightAnchorId(p.id);
                   } else {
                     onPieceClick(p.id);
                   }
                 }}
-                aria-label={clusterMode ? `Select piece ${p.id}` : `Place piece ${p.id}`}
+                aria-label={
+                  clusterMode
+                    ? `Select piece ${p.id}`
+                    : colorHighlight
+                      ? `Highlight pieces like ${p.id}`
+                      : `Place piece ${p.id}`
+                }
               >
                 <div
                   className={styles.thumbWrap}
@@ -354,7 +444,8 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                   )}
                 </div>
               </button>
-            ))}
+            );
+            })}
           </div>
         )}
       </div>

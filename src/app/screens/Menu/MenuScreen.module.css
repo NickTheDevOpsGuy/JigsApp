@@ -32,10 +32,43 @@
   margin-bottom: 20px;
 }
 
+.headerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  position: relative;
+}
+
 .logo {
   max-width: 100%;
   max-height: 28vh;
   height: auto;
+}
+
+.helpIconBtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  /* 44px min touch target for mobile (Apple HIG / Material) */
+}
+
+.helpIconBtn:hover {
+  background: var(--color-brand-light);
+  color: var(--color-brand-primary);
 }
 
 .eventBanner {

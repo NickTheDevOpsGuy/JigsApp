@@ -1,11 +1,15 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "8";
+export const CHANGELOG_VERSION = "9";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🎉 Border complete celebration – Subtle confetti and toast when you finish the puzzle border (mid-game motivation)",
+      "🧠 Challenge mode – Optional game mode (Menu → Gameplay): full image shown for 5 seconds at start, then solve from memory",
+      "🏆 Leaderboard redesign – Today's Daily Puzzle card with mascot, Start Puzzle button, Today/Week/Month filter pills",
+      "🏠 Leaderboard on home – Quick access to leaderboards from the main menu",
       "⏱️ Time Attack – Bonus points for fast placements, combo multiplier, score-based leaderboard",
       "🔥 Daily streak milestones – Special confetti for 3-day and 7-day streaks, raccoon name flair on leaderboards",
       "✂️ Crop & position – Zoom, pan, and crop images before generating puzzles (Setup → Crop & position)",

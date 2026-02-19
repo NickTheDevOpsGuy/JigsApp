@@ -6,6 +6,9 @@ Ideas and planned enhancements for Phuzzle.
 
 ## ✅ Recently Added
 
+- **Border Complete Celebration** – Confetti + "Border complete!" toast when all edge and corner pieces are placed (once per puzzle).
+- **Challenge Mode** – Menu → Gameplay. Full image shown 5 seconds at start, then solve from memory; no ghost image.
+- **Leaderboard Redesign** – Today's Daily Puzzle card with mascot, Start Puzzle button, filter pills; Leaderboard button on home menu.
 - **Ghost Image (Behind Board)** – Toggle under Settings → View / Assistance → Reference. Very low opacity (7%) to help align pieces. Auto-disabled in competitive/daily mode.
 - **Time Attack Mode** – Countdown-based competitive mode with dedicated leaderboard. Select in Setup or Time Mode.
 - **Multi-Tier Achievements** – 10, 50, 100 puzzles; 5 puzzles under 5 minutes (Speed Runner).

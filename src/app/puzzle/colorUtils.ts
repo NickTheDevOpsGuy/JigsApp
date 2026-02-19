@@ -124,3 +124,22 @@ function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: n
 export function rgbToCss(r: number, g: number, b: number): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
+
+/** Hue tolerance (degrees) for "similar color" highlighting. ~35° works well for sky/water. */
+export const HUE_SIMILARITY_TOLERANCE = 35;
+
+/**
+ * Check if two colors are similar (for piece grouping/highlighting).
+ * Uses hue as primary; low-saturation colors match more broadly.
+ */
+export function areColorsSimilar(a: ColorInfo, b: ColorInfo): boolean {
+  const hueDiff = Math.abs(a.hue - b.hue);
+  const hueDistance = Math.min(hueDiff, 360 - hueDiff);
+  if (hueDistance > HUE_SIMILARITY_TOLERANCE) return false;
+  // Low-saturation (grayscale) pieces: relax tolerance
+  const avgSat = (a.saturation + b.saturation) / 2;
+  if (avgSat < 0.15) {
+    return hueDistance <= HUE_SIMILARITY_TOLERANCE * 2;
+  }
+  return true;
+}

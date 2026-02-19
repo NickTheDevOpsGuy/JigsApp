@@ -5,7 +5,10 @@
 import { useEffect, useRef } from "react";
 import posthog from "posthog-js";
 import type { PuzzleState } from "@/puzzle/types";
+import type { Theme } from "@/hooks/useTheme";
 import { consumeCurrentPuzzleId, recordPuzzleCompletion } from "@/data/packCompletion";
+import { isBorderComplete } from "../playScreenUtils";
+import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 
 const MILESTONE_THRESHOLDS = [25, 33, 50, 66, 75] as const;
 const MILESTONE_MESSAGES: Record<number, string> = {
@@ -25,10 +28,14 @@ type Options = {
   timeMode: string;
   milestoneMessage: string | null;
   setMilestoneMessage: (m: string | null) => void;
+  borderCompleteToast: string | null;
+  setBorderCompleteToast: (m: string | null) => void;
   showStreakToast: boolean;
   setShowStreakToast: (v: boolean) => void;
   shareToast: string | null;
   setShareToast: (v: string | null) => void;
+  batterySaverMode: boolean;
+  themeRef: React.RefObject<Theme | undefined>;
 };
 
 export function usePlayScreenEffects({
@@ -40,15 +47,20 @@ export function usePlayScreenEffects({
   timeMode,
   milestoneMessage,
   setMilestoneMessage,
+  borderCompleteToast,
+  setBorderCompleteToast,
   showStreakToast,
   setShowStreakToast,
   shareToast,
   setShareToast,
+  batterySaverMode,
+  themeRef,
 }: Options) {
   const lastMilestoneRef = useRef(0);
   const firstSnapCapturedRef = useRef(false);
   const onFireCapturedRef = useRef(false);
   const completionCapturedRef = useRef(false);
+  const borderCompleteShownRef = useRef(false);
 
   useEffect(() => {
     if (!state || state.isComplete) return;
@@ -85,6 +97,41 @@ export function usePlayScreenEffects({
     const t = setTimeout(() => setMilestoneMessage(null), 2000);
     return () => clearTimeout(t);
   }, [milestoneMessage, setMilestoneMessage]);
+
+  // Border complete: subtle confetti + toast, once per puzzle
+  useEffect(() => {
+    if (
+      !state ||
+      state.isComplete ||
+      !state.grid ||
+      borderCompleteShownRef.current
+    )
+      return;
+    if (!isBorderComplete(state.pieces, state.grid)) return;
+    borderCompleteShownRef.current = true;
+    setBorderCompleteToast("Border complete!");
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!prefersReducedMotion && !batterySaverMode) {
+      import("canvas-confetti").then((confetti) => {
+        const colors =
+          CONFETTI_COLORS_BY_THEME[themeRef.current ?? "light"];
+        confetti.default({
+          particleCount: 50,
+          spread: 55,
+          origin: { y: 0.6 },
+          colors,
+        });
+      });
+    }
+  }, [state?.pieces, state?.grid, state?.isComplete, batterySaverMode]);
+
+  useEffect(() => {
+    if (!borderCompleteToast) return;
+    const t = setTimeout(() => setBorderCompleteToast(null), 2000);
+    return () => clearTimeout(t);
+  }, [borderCompleteToast, setBorderCompleteToast]);
 
   useEffect(() => {
     if (!state) return;
@@ -167,5 +214,6 @@ export function usePlayScreenEffects({
     firstSnapCapturedRef.current = false;
     onFireCapturedRef.current = false;
     completionCapturedRef.current = false;
+    borderCompleteShownRef.current = false;
   }, [puzzleKey]);
 }
