@@ -10,6 +10,7 @@ import {
   GHOST_WHEN_IDLE_KEY,
   EDGE_HIGHLIGHT_KEY,
   IMMERSIVE_MODE_KEY,
+  GHOST_IMAGE_KEY,
 } from "@/screens/Play/playScreenUtils";
 
 const TOGGLE_KEYS: Record<string, string> = {
@@ -19,6 +20,7 @@ const TOGGLE_KEYS: Record<string, string> = {
   ghostWhenIdle: GHOST_WHEN_IDLE_KEY,
   edgeHighlight: EDGE_HIGHLIGHT_KEY,
   immersiveMode: IMMERSIVE_MODE_KEY,
+  ghostImage: GHOST_IMAGE_KEY,
   sound: "__sound__",
   haptics: "__haptics__",
 };

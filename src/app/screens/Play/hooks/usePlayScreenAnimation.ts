@@ -26,7 +26,9 @@ export function usePlayScreenAnimation(args: {
   showGhostHint: boolean;
   showAlignmentGrid: boolean;
   showGhostWhenIdle?: boolean;
+  showGhostImage?: boolean;
   showEdgeHighlight?: boolean;
+  isCompetitiveOrDaily?: boolean;
   lastInteractionRef?: React.RefObject<number>;
   viewport: ViewportState;
   perfStatsRef?: React.RefObject<PerfStats | null>;
@@ -51,7 +53,9 @@ export function usePlayScreenAnimation(args: {
     showGhostHint,
     showAlignmentGrid,
     showGhostWhenIdle,
+    showGhostImage,
     showEdgeHighlight,
+    isCompetitiveOrDaily,
     lastInteractionRef,
     viewport,
     perfStatsRef,
@@ -251,6 +255,8 @@ export function usePlayScreenAnimation(args: {
           completedAtMs: completedAtRef.current,
           showGhostHint: effectiveShowGhost,
           ghostAlpha,
+          showGhostImage: showGhostImage ?? false,
+          isCompetitiveOrDaily: isCompetitiveOrDaily ?? false,
           showEdgeHighlight,
           showAlignmentGrid,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
@@ -289,8 +295,10 @@ export function usePlayScreenAnimation(args: {
     debug,
     showGhostHint,
     showGhostWhenIdle,
+    showGhostImage,
     showEdgeHighlight,
     showAlignmentGrid,
+    isCompetitiveOrDaily,
     lastInteractionRef,
     setState,
     viewport,

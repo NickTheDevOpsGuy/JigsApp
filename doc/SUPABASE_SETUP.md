@@ -4,13 +4,13 @@ Phuzzle uses Supabase for **leaderboards**, **player stats**, **achievements**, 
 
 ## What Supabase Powers
 
-| Feature           | Description                                                                                  |
-| ----------------- | -------------------------------------------------------------------------------------------- |
-| **Leaderboards**  | Daily puzzle, weekly/monthly totals, streaks, all-time completions, best times per grid size |
-| **Player Stats**  | Puzzles completed, total play time, daily streaks                                            |
-| **Achievements**  | Unlock badges (first puzzle, streaks, speed demon, etc.)                                     |
-| **Profile**       | Display name, anonymous mode (raccoon names on leaderboards)                                 |
-| **Co-op Sharing** | "Play with friend" – real-time collaborative puzzle sessions                                 |
+| Feature           | Description                                                                                               |
+| ----------------- | --------------------------------------------------------------------------------------------------------- |
+| **Leaderboards**  | Daily puzzle, Time Attack, weekly/monthly totals, streaks, all-time completions, best times per grid size |
+| **Player Stats**  | Puzzles completed, total play time, daily streaks                                                         |
+| **Achievements**  | Unlock badges (first puzzle, streaks, speed demon, etc.)                                                  |
+| **Profile**       | Display name, anonymous mode (raccoon names on leaderboards)                                              |
+| **Co-op Sharing** | "Play with friend" – real-time collaborative puzzle sessions                                              |
 
 ---
 
@@ -63,6 +63,9 @@ Run the migrations in order so tables and policies are created correctly.
    - `supabase/migrations/001_initial_schema.sql`
    - `supabase/migrations/002_player_profiles.sql`
    - `supabase/migrations/003_puzzle_sessions.sql`
+   - `supabase/migrations/004_puzzle_sessions_expiration.sql`
+   - `supabase/migrations/005_time_attack_completions.sql`
+   - `supabase/migrations/006_avatars_and_events.sql`
 
 ### Option B: Supabase CLI
 

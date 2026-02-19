@@ -21,6 +21,7 @@ const PLAY_ONLY_IDS = new Set([
   "time-countdown",
   "time-active",
   "time-relaxed",
+  "time-timeAttack",
   "shareCompletion",
   "playWithFriend",
 ]);

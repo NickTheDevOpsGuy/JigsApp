@@ -29,6 +29,7 @@ export type HeaderMenuProps = {
   relaxedModeEnabled?: boolean;
   showGhostHint: boolean;
   showGhostWhenIdle: boolean;
+  showGhostImage?: boolean;
   showEdgeHighlight: boolean;
   showAlignmentGrid: boolean;
   isFullscreen: boolean;
@@ -45,6 +46,7 @@ export type HeaderMenuProps = {
   onToggleRelaxedMode?: () => void;
   onToggleGhostHint: () => void;
   onToggleGhostWhenIdle: () => void;
+  onToggleGhostImage?: () => void;
   onToggleEdgeHighlight: () => void;
   onToggleAlignmentGrid: () => void;
   onToggleFullscreen: () => void;
@@ -222,6 +224,16 @@ export function buildMenuItems(
       label: props.showGhostWhenIdle ? "Ghost When Idle ✨" : "Ghost When Idle 🌙",
       sortKey: "Ghost When Idle",
       onClick: c(props.onToggleGhostWhenIdle),
+      subMenu: "display",
+    },
+    {
+      id: "ghostImage",
+      section: "settings",
+      visible: !!props.onToggleGhostImage,
+      label: props.showGhostImage ? "Ghost Image ✨" : "Ghost Image 🌙",
+      sortKey: "Ghost Image",
+      ariaLabel: props.showGhostImage ? "Ghost Image behind board on" : "Ghost Image off",
+      onClick: c(props.onToggleGhostImage ?? (() => {})),
       subMenu: "display",
     },
     {

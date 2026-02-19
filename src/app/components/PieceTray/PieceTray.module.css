@@ -226,6 +226,26 @@
   transform: scale(0.98);
 }
 
+.pieceSelected {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.clusterBtn {
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--color-brand-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.clusterBtn:hover {
+  opacity: 0.9;
+}
+
 .thumbWrap {
   width: var(--thumb-size, 56px);
   height: var(--thumb-size, 56px);

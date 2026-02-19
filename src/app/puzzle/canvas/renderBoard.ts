@@ -49,6 +49,10 @@ export type AnimationState = {
   snapPreview?: { nearSnap: boolean; inSnapRange: boolean } | null;
   /** Show very subtle alignment grid matching piece boundaries */
   showAlignmentGrid?: boolean;
+  /** Show faint ghost of completed puzzle behind board (5–10% opacity). Disabled in competitive/daily. */
+  showGhostImage?: boolean;
+  /** When true, ghost image is not shown (competitive/daily mode). */
+  isCompetitiveOrDaily?: boolean;
 };
 
 /** Cache for pre-rendered pieces - clip at (0,0) gives crisp edges, avoids blocky look when moving */
@@ -123,6 +127,28 @@ export function renderBoard(
     const tileW = assembledW / cols;
     const tileH = assembledH / rows;
     drawAlignmentGrid(ctx, cols, rows, tileW, tileH);
+  }
+
+  // Ghost image: faint full puzzle behind board (5–10% opacity). Disabled in competitive/daily.
+  if (
+    animState?.showGhostImage &&
+    !animState?.isCompetitiveOrDaily &&
+    !state.isComplete
+  ) {
+    ctx.save();
+    ctx.globalAlpha = 0.07;
+    ctx.drawImage(
+      img,
+      0,
+      0,
+      img.naturalWidth,
+      img.naturalHeight,
+      0,
+      0,
+      assembledW,
+      assembledH,
+    );
+    ctx.restore();
   }
 
   // Ghost hint: draw misplaced pieces at their target positions (before real pieces)

@@ -12,6 +12,7 @@ const TIME_MODE_LABELS: Record<string, string> = {
   active: "Active only",
   relaxed: "Relaxed (no timer)",
   best: "Best time",
+  timeAttack: "Time Attack",
 };
 
 export type MenuNode =
@@ -94,6 +95,11 @@ export function getMenuTree(): MenuNode[] {
                   type: "action",
                   id: "time-relaxed",
                   label: TIME_MODE_LABELS["relaxed"],
+                },
+                {
+                  type: "action",
+                  id: "time-timeAttack",
+                  label: TIME_MODE_LABELS["timeAttack"],
                 },
               ],
             },
@@ -203,6 +209,12 @@ export function getMenuTree(): MenuNode[] {
               id: "showPreview",
               label: "Show Reference Image",
               getLabel: (on) => (on ? "Show Reference: on" : "Show Reference: off"),
+            },
+            {
+              type: "toggle",
+              id: "ghostImage",
+              label: "Ghost Image (Behind Board)",
+              getLabel: (on) => (on ? "Ghost Image: on" : "Ghost Image: off"),
             },
           ],
         },

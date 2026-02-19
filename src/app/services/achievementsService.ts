@@ -14,6 +14,7 @@ export type AchievementWithUnlock = AchievementDef & {
 /** Check and unlock achievements based on stats. Call after recording completion. */
 export async function checkAndUnlockAchievements(args: {
   puzzlesCompleted: number;
+  puzzlesUnder5Min?: number;
   dailyStreak: number;
   bestDailyStreak: number;
   lastCompletion?: { elapsedSeconds: number; grid: { rows: number; cols: number } };
@@ -36,11 +37,15 @@ export async function checkAndUnlockAchievements(args: {
     last && last.grid.rows === 3 && last.grid.cols === 3 && last.elapsedSeconds < 60;
   const expertGrid = last && last.grid.rows === 6 && last.grid.cols === 6;
 
+  const puzzlesUnder5Min = args.puzzlesUnder5Min ?? 0;
   const toCheck: { id: string; condition: boolean }[] = [
     { id: "first_puzzle", condition: args.puzzlesCompleted >= 1 },
     { id: "five_puzzles", condition: args.puzzlesCompleted >= 5 },
+    { id: "ten_puzzles", condition: args.puzzlesCompleted >= 10 },
     { id: "twenty_puzzles", condition: args.puzzlesCompleted >= 20 },
     { id: "fifty_puzzles", condition: args.puzzlesCompleted >= 50 },
+    { id: "hundred_puzzles", condition: args.puzzlesCompleted >= 100 },
+    { id: "five_under_five", condition: puzzlesUnder5Min >= 5 },
     { id: "daily_streak_3", condition: args.bestDailyStreak >= 3 },
     { id: "daily_streak_7", condition: args.bestDailyStreak >= 7 },
     { id: "daily_streak_30", condition: args.bestDailyStreak >= 30 },

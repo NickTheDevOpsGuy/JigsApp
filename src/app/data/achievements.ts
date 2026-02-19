@@ -22,6 +22,12 @@ export const ACHIEVEMENT_DEFS: AchievementDef[] = [
     icon: "⭐",
   },
   {
+    id: "ten_puzzles",
+    name: "Dedicated Puzzler",
+    description: "Complete 10 puzzles",
+    icon: "🧩",
+  },
+  {
     id: "twenty_puzzles",
     name: "Puzzle Enthusiast",
     description: "Complete 20 puzzles",
@@ -32,6 +38,18 @@ export const ACHIEVEMENT_DEFS: AchievementDef[] = [
     name: "Puzzle Master",
     description: "Complete 50 puzzles",
     icon: "🏆",
+  },
+  {
+    id: "hundred_puzzles",
+    name: "Century Club",
+    description: "Complete 100 puzzles",
+    icon: "💯",
+  },
+  {
+    id: "five_under_five",
+    name: "Speed Runner",
+    description: "Complete 5 puzzles in under 5 minutes each",
+    icon: "⏱️",
   },
   {
     id: "daily_streak_3",

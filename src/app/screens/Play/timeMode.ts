@@ -1,12 +1,13 @@
 /**
- * timeMode – elapsed, countdown, active, relaxed, best; localStorage for best times.
+ * timeMode – elapsed, countdown, active, relaxed, best, timeAttack; localStorage for best times.
  */
 export type TimeMode =
   | "elapsed" // Count up from 0 (default)
   | "countdown" // Start at limit, game over at 0
   | "active" // Only count while moving pieces
   | "relaxed" // Same as elapsed but timer hidden
-  | "best"; // Track personal best per grid size
+  | "best" // Track personal best per grid size
+  | "timeAttack"; // Competitive: countdown + bonus points, combo, dedicated leaderboard
 
 export const TIME_MODE_KEY = "phuzzle:timeMode";
 export const COUNTDOWN_MINUTES_KEY = "phuzzle:countdownMinutes";

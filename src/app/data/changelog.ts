@@ -1,22 +1,28 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "6";
+export const CHANGELOG_VERSION = "8";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "⏱️ Time Attack – Bonus points for fast placements, combo multiplier, score-based leaderboard",
+      "🔥 Daily streak milestones – Special confetti for 3-day and 7-day streaks, raccoon name flair on leaderboards",
+      "✂️ Crop & position – Zoom, pan, and crop images before generating puzzles (Setup → Crop & position)",
+      "▶️ Puzzle replay – Record placement sequence, scrub through build, shareable animation",
+      "🧩 Custom piece clusters – Select multiple tray pieces, create clusters, drag clusters onto the board together",
+      "🦝 Customizable raccoon avatars – Hats, glasses, hoodie colors (unlock via achievements)",
+      "🎃 Limited-time puzzle events – Seasonal events (Halloween, Winter) with event banners and leaderboards",
+      "👁️ Ghost image – Optional faint completed puzzle behind board (Settings → View). Auto-disabled in daily/Time Attack",
+      "🏅 Multi-tier achievements – 10, 50, 100 puzzles; Speed Runner (5 under 5 min)",
       "🧩 Edge & corner pieces – Full image content now visible on straight edges (no cropping)",
       "❄️ Streak freeze – One per week; protect your daily streak if you miss a day",
       "🔍 Zoom & pan – Animated zoom transitions, persistent per grid size, soft board clamp",
-      "👻 Ghost when idle – Faint ghost overlay after a few seconds of inactivity (Settings → View)",
-      "🔲 Edge piece highlight – Optional faint border on edge pieces (Settings → View)",
+      "👻 Ghost when idle – Faint ghost overlay after a few seconds of inactivity",
+      "🔲 Edge piece highlight – Optional faint border on edge pieces",
       "🎯 Near-snap nudge – Gentle nudge when pieces are very close but not quite snapping",
       "🏆 Dynamic completion badges – Speed Demon, Chill Mode, Precision Pro, and more",
-      "🔋 Battery-saver detection – Reduces confetti when low-power or data-saver is on",
-      "📥 Piece drawer – Taller tray, compact mode, sticky filters, scroll snapping",
-      "📊 Stats & Leaderboards – Daily puzzle, streaks, achievements (Supabase)",
-      "↩️ Undo / Redo · 👻 Ghost hint · 🔒 Lock pieces",
+      "📊 Stats & Leaderboards – Daily, Time Attack, streaks, achievements (Supabase)",
     ],
   },
 ];

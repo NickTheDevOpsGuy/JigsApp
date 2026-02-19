@@ -90,6 +90,24 @@
   background: var(--color-bg-secondary);
 }
 
+.cropTrigger {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  color: var(--color-brand-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cropTrigger:hover {
+  background: var(--color-brand-light);
+}
+
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr;

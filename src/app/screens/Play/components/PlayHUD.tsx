@@ -31,7 +31,7 @@ export function PlayHUD({
   onTogglePause: _onTogglePause,
 }: PlayHUDProps) {
   const showTimer = timeMode !== "relaxed";
-  const isCountdown = timeMode === "countdown";
+  const isCountdown = timeMode === "countdown" || timeMode === "timeAttack";
   const countdownTotal = countdownMinutes * 60;
   const isLowTime = isCountdown && elapsedSeconds > 0 && elapsedSeconds <= 60;
   const [bounce, setBounce] = useState(false);

@@ -12,3 +12,20 @@ export const CONFETTI_COLORS_BY_THEME: Record<Theme, string[]> = {
   forest: ["#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#14532d"],
   sunset: ["#f97316", "#fb923c", "#fdba74", "#fed7aa", "#c2410c"],
 };
+
+/** Special confetti for streak milestones (3-day, 7-day). */
+export const CONFETTI_COLORS_STREAK_3 = [
+  "#fbbf24",
+  "#f59e0b",
+  "#fcd34d",
+  "#fef3c7",
+  "#fde047",
+];
+export const CONFETTI_COLORS_STREAK_7 = [
+  "#f97316",
+  "#ea580c",
+  "#fb923c",
+  "#fdba74",
+  "#fbbf24",
+  "#eab308",
+];
