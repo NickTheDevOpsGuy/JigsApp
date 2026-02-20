@@ -31,7 +31,11 @@ function validateImageDimensions(
       if (img.naturalWidth > 0 && img.naturalHeight > 0) {
         resolve({ width: img.naturalWidth, height: img.naturalHeight });
       } else {
-        reject(new Error("Image could not be loaded. Try a different image or format (PNG, JPG, WebP)."));
+        reject(
+          new Error(
+            "Image could not be loaded. Try a different image or format (PNG, JPG, WebP).",
+          ),
+        );
       }
     };
     img.onerror = () =>
@@ -154,7 +158,9 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
 
     try {
       if (!VALID_TYPES.includes(file.type)) {
-        throw new Error("Please choose a PNG, JPG, or WebP image. Other formats are not supported.");
+        throw new Error(
+          "Please choose a PNG, JPG, or WebP image. Other formats are not supported.",
+        );
       }
 
       if (file.size > MAX_FILE_SIZE) {
