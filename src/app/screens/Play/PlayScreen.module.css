@@ -416,7 +416,9 @@
   background: var(--color-bg-elevated);
   border-radius: 20px;
   border: 2px solid var(--color-border);
-  box-shadow: var(--shadow-md), inset 0 0 60px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 0 60px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   touch-action: none;
   -webkit-overflow-scrolling: auto;
@@ -438,7 +440,9 @@ html.theme-sunset .board {
     color-mix(in srgb, var(--color-bg-elevated) 92%, black) 50%,
     color-mix(in srgb, var(--color-bg-elevated) 88%, black) 100%
   );
-  box-shadow: var(--shadow-lg), inset 0 0 80px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    var(--shadow-lg),
+    inset 0 0 80px rgba(0, 0, 0, 0.15);
   border-color: var(--color-border-strong);
 }
 

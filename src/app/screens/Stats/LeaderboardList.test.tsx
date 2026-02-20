@@ -11,10 +11,15 @@ import {
   StreakLeaderboardList,
   CompletionLeaderboardList,
 } from "./LeaderboardList";
-import type { LeaderboardEntry, StreakEntry, CompletionCountEntry } from "@/services/leaderboardService";
+import type {
+  LeaderboardEntry,
+  StreakEntry,
+  CompletionCountEntry,
+} from "@/services/leaderboardService";
 
 vi.mock("@/screens/Play/playUtils", () => ({
-  formatTime: (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`,
+  formatTime: (s: number) =>
+    `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`,
 }));
 
 describe("LeaderboardList", () => {
@@ -91,9 +96,7 @@ describe("TimeLeaderboardList", () => {
 
 describe("StreakLeaderboardList", () => {
   it("shows streak entries", () => {
-    const entries: StreakEntry[] = [
-      { rank: 1, streak: 7, displayName: "Fire" },
-    ];
+    const entries: StreakEntry[] = [{ rank: 1, streak: 7, displayName: "Fire" }];
     render(
       <StreakLeaderboardList
         entries={entries}
@@ -110,9 +113,7 @@ describe("StreakLeaderboardList", () => {
 
 describe("CompletionLeaderboardList", () => {
   it("shows count entries", () => {
-    const entries: CompletionCountEntry[] = [
-      { rank: 1, count: 50, displayName: "Pro" },
-    ];
+    const entries: CompletionCountEntry[] = [{ rank: 1, count: 50, displayName: "Pro" }];
     render(
       <CompletionLeaderboardList
         entries={entries}

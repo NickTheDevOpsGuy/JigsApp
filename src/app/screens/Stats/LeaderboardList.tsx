@@ -1,7 +1,11 @@
 /**
  * LeaderboardList – generic expandable leaderboard for time, streak, and completion entries.
  */
-import type { LeaderboardEntry, StreakEntry, CompletionCountEntry } from "@/services/leaderboardService";
+import type {
+  LeaderboardEntry,
+  StreakEntry,
+  CompletionCountEntry,
+} from "@/services/leaderboardService";
 import { formatTime } from "@/screens/Play/playUtils";
 import styles from "./StatsScreen.module.css";
 
@@ -38,11 +42,9 @@ export function LeaderboardList({
   if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
 
   return (
-    <ol
-      className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}
-    >
+    <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
       {entries.map((entry, i) => {
-        const key = `${keyPrefix}-${entry.rank}-${("displayName" in entry ? entry.displayName : "")}`;
+        const key = `${keyPrefix}-${entry.rank}-${"displayName" in entry ? entry.displayName : ""}`;
         const isExpanded = expandedRowKey === key;
         return (
           <li
@@ -80,7 +82,10 @@ export function LeaderboardList({
 
 /** Preset for time-based leaderboards (elapsed seconds). */
 export function TimeLeaderboardList(
-  props: Omit<LeaderboardListProps, "getValue" | "getFlair" | "getDetail" | "keyPrefix"> & {
+  props: Omit<
+    LeaderboardListProps,
+    "getValue" | "getFlair" | "getDetail" | "keyPrefix"
+  > & {
     entries: LeaderboardEntry[];
   },
 ) {
@@ -135,9 +140,7 @@ export function CompletionLeaderboardList(
       {...props}
       keyPrefix="completion"
       getValue={(e) => `${(e as CompletionCountEntry).count} puzzles`}
-      getDetail={(e) =>
-        `${(e as CompletionCountEntry).count} total puzzles completed`
-      }
+      getDetail={(e) => `${(e as CompletionCountEntry).count} total puzzles completed`}
     />
   );
 }

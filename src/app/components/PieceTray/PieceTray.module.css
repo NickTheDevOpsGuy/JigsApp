@@ -45,7 +45,9 @@ html.theme-sunset .tray {
     color-mix(in srgb, var(--color-bg-elevated) 95%, black) 100%
   );
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .header {
@@ -260,17 +262,12 @@ html.theme-sunset .tray {
 @keyframes scatterIn {
   0% {
     opacity: 0;
-    transform:
-      translate(var(--scatter-dx, 0), var(--scatter-dy, 0))
-      scale(0.35)
+    transform: translate(var(--scatter-dx, 0), var(--scatter-dy, 0)) scale(0.35)
       rotate(calc(-1 * var(--scatter-rotation, 0deg)));
   }
   100% {
     opacity: 1;
-    transform:
-      translate(0, 0)
-      scale(1)
-      rotate(var(--scatter-rotation, 0deg));
+    transform: translate(0, 0) scale(1) rotate(var(--scatter-rotation, 0deg));
   }
 }
 

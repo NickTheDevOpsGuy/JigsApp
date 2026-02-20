@@ -45,12 +45,7 @@ function sampleRegion(
 /**
  * Soften a color for use as background (reduce saturation, lighten/darken).
  */
-function softenForBg(
-  r: number,
-  g: number,
-  b: number,
-  lighten: boolean = true,
-): string {
+function softenForBg(r: number, g: number, b: number, lighten: boolean = true): string {
   const factor = lighten ? 1.4 : 0.6;
   const mix = lighten ? 255 : 0;
   const nr = Math.round(Math.min(255, r * factor * 0.4 + mix * 0.6));
@@ -63,7 +58,9 @@ function softenForBg(
  * Extract 2–3 dominant colors from the puzzle image.
  * Uses corner + center sampling for performance.
  */
-export function extractDominantColors(img: HTMLImageElement | null): DominantColors | null {
+export function extractDominantColors(
+  img: HTMLImageElement | null,
+): DominantColors | null {
   if (!img || img.naturalWidth === 0 || img.naturalHeight === 0) return null;
 
   const canvas = document.createElement("canvas");

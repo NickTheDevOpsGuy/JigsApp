@@ -199,7 +199,7 @@ export function usePlayScreenManager(
                     : 0.72
                   : pieceCount <= 49
                     ? isMobile
-                      ? 0.70
+                      ? 0.7
                       : 0.65
                     : pieceCount <= 64
                       ? isMobile

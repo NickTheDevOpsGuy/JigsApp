@@ -3,13 +3,7 @@
  */
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  ArrowLeft,
-  BarChart3,
-  Trophy,
-  Award,
-  User,
-} from "lucide-react";
+import { ArrowLeft, BarChart3, Trophy, Award, User } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
 import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client";
@@ -35,10 +29,7 @@ import { getCompletionGrade } from "@/data/completionGrades";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
-import {
-  getTodayDateString,
-  getStreakFreezeCount,
-} from "@/daily/dailyPuzzleCore";
+import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
 import { useTodayCompletionCount } from "@/hooks/useTodayCompletionCount";
 import { formatTime, formatDuration } from "@/screens/Play/playUtils";
 import {

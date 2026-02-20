@@ -37,11 +37,10 @@ function getTrayHeight(totalPieces: number, isMobile: boolean): number {
 /** Deterministic values per piece for scatter animation. */
 function scatterVars(pieceId: string): { rotation: number; dx: number; dy: number } {
   let h = 0;
-  for (let i = 0; i < pieceId.length; i++)
-    h = (h << 5) - h + pieceId.charCodeAt(i);
+  for (let i = 0; i < pieceId.length; i++) h = (h << 5) - h + pieceId.charCodeAt(i);
   const h2 = h * 31 + pieceId.length;
   return {
-    rotation: ((h % 31) - 15),
+    rotation: (h % 31) - 15,
     dx: ((h % 17) - 8) * 4,
     dy: ((h2 % 17) - 8) * 4,
   };

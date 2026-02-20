@@ -232,8 +232,7 @@ export function PlayScreen() {
       isTimeAttack: timeMode === "timeAttack",
       isTimeDecay: timeMode === "timeDecay",
       onComboChange: timeMode === "timeAttack" ? setTimeAttackCombo : undefined,
-      onTimeDecayComboChange:
-        timeMode === "timeDecay" ? setTimeDecayCombo : undefined,
+      onTimeDecayComboChange: timeMode === "timeDecay" ? setTimeDecayCombo : undefined,
       elapsedMsRef,
       onPieceSnappedAnalytics: (timeToSnapMs) => {
         const g = stateRef.current?.grid;
@@ -872,10 +871,7 @@ export function PlayScreen() {
 
   return (
     <div className={styles.page} ref={pageRef}>
-      <PuzzleGradientBackground
-        img={imgRef.current}
-        puzzleKey={puzzleKey}
-      />
+      <PuzzleGradientBackground img={imgRef.current} puzzleKey={puzzleKey} />
       {immersiveMode && (
         <div
           className={styles.immersivePeekTop}
@@ -1108,11 +1104,7 @@ export function PlayScreen() {
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>
               <div className={styles.previewWithRing}>
-                <svg
-                  className={styles.previewRing}
-                  viewBox="0 0 128 128"
-                  aria-hidden
-                >
+                <svg className={styles.previewRing} viewBox="0 0 128 128" aria-hidden>
                   <circle
                     className={styles.previewRingBg}
                     cx="64"
@@ -1130,9 +1122,7 @@ export function PlayScreen() {
                     strokeWidth="4"
                     strokeDasharray={377}
                     strokeDashoffset={
-                      377 *
-                      (1 -
-                        (state && total > 0 ? Math.min(1, placed / total) : 0))
+                      377 * (1 - (state && total > 0 ? Math.min(1, placed / total) : 0))
                     }
                   />
                 </svg>

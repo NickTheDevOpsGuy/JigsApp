@@ -83,7 +83,9 @@ export function CompletionOverlay({
 }: CompletionOverlayProps) {
   const [streak, setStreak] = useState<number>(0);
   const [percentileResult, setPercentileResult] = useState<
-    { percentile: number; firstFinisher: false } | { percentile: null; firstFinisher: true } | null
+    | { percentile: number; firstFinisher: false }
+    | { percentile: null; firstFinisher: true }
+    | null
   >(null);
   const completionMessage = getCompletionMessage(elapsedSeconds);
   const pieceCount = grid ? grid.rows * grid.cols : 0;

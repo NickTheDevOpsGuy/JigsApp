@@ -45,21 +45,13 @@ describe("getPercentileRank", () => {
 
   it("returns firstFinisher when totalCount is 1", async () => {
     results.push({ count: 1, error: null });
-    const result = await getPercentileRank(
-      "2025-02-15",
-      { rows: 4, cols: 4 },
-      90,
-    );
+    const result = await getPercentileRank("2025-02-15", { rows: 4, cols: 4 }, 90);
     expect(result).toEqual({ percentile: null, firstFinisher: true });
   });
 
   it("returns percentile when totalCount >= 2", async () => {
     results.push({ count: 100, error: null }, { count: 11, error: null });
-    const result = await getPercentileRank(
-      "2025-02-15",
-      { rows: 4, cols: 4 },
-      90,
-    );
+    const result = await getPercentileRank("2025-02-15", { rows: 4, cols: 4 }, 90);
     expect(result).toEqual({
       percentile: 12,
       firstFinisher: false,
@@ -68,11 +60,7 @@ describe("getPercentileRank", () => {
 
   it("returns null on count error", async () => {
     results.push({ count: null, error: new Error("db") });
-    const result = await getPercentileRank(
-      "2025-02-15",
-      { rows: 4, cols: 4 },
-      90,
-    );
+    const result = await getPercentileRank("2025-02-15", { rows: 4, cols: 4 }, 90);
     expect(result).toBeNull();
   });
 });
@@ -81,8 +69,7 @@ describe("getTodayCompletionCount", () => {
   it("returns 0 when Supabase is not configured", async () => {
     const { isSupabaseConfigured } = await import("@/supabase/client");
     vi.mocked(isSupabaseConfigured).mockReturnValueOnce(false);
-    const { getTodayCompletionCount: getCount } =
-      await import("./leaderboardService");
+    const { getTodayCompletionCount: getCount } = await import("./leaderboardService");
     const result = await getCount();
     expect(result).toBe(0);
   });
