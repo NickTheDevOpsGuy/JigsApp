@@ -31,6 +31,7 @@ import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
 import { useTodayCompletionCount } from "@/hooks/useTodayCompletionCount";
+import { useTheme } from "@/hooks/useTheme";
 import { formatTime, formatDuration } from "@/screens/Play/playUtils";
 import {
   TimeLeaderboardList,

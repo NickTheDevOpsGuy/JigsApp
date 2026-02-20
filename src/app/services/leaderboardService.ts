@@ -487,64 +487,6 @@ export async function getTimeDecayLeaderboard(limit = 10): Promise<LeaderboardEn
   });
 }
 
-/** Fetch Time Decay leaderboard (best scores; higher = better). Score decays over time, placements add bonus. */
-export async function getTimeDecayLeaderboard(limit = 10): Promise<LeaderboardEntry[]> {
-  if (!isSupabaseConfigured()) return [];
-
-  const { data, error } = await supabase!
-    .from("completions")
-    .select("user_id, elapsed_seconds, time_decay_score")
-    .eq("is_time_decay", true)
-    .limit(limit * 4);
-
-  if (error) return [];
-
-  const rows = data ?? [];
-  const bestByUser = new Map<string, { elapsed: number; score: number | null }>();
-  for (const row of rows) {
-    const score = (row as { time_decay_score?: number | null }).time_decay_score ?? null;
-    const cur = bestByUser.get(row.user_id);
-    const isBetter =
-      cur == null ||
-      (score != null && cur.score != null && score > cur.score) ||
-      (score == null && cur.score == null && row.elapsed_seconds < cur.elapsed) ||
-      (score != null && (cur.score == null || score > cur.score));
-    if (isBetter) {
-      bestByUser.set(row.user_id, {
-        elapsed: row.elapsed_seconds,
-        score,
-      });
-    }
-  }
-
-  const sorted = [...bestByUser.entries()]
-    .sort((a, b) => {
-      const sa = a[1].score;
-      const sb = b[1].score;
-      if (sa != null && sb != null) return sb - sa;
-      if (sa != null) return -1;
-      if (sb != null) return 1;
-      return a[1].elapsed - b[1].elapsed;
-    })
-    .slice(0, limit);
-
-  const userIds = sorted.map(([uid]) => uid);
-  const [names, flairs] = await Promise.all([
-    resolveDisplayNames(userIds, new Set()),
-    resolveStreakFlairs(userIds),
-  ]);
-
-  return sorted.map(([userId, { elapsed }], i) => {
-    const base = names.get(userId) ?? `Player ${userId.slice(0, 8)}`;
-    const flair = flairs.get(userId) ?? "";
-    return {
-      rank: i + 1,
-      elapsedSeconds: elapsed,
-      displayName: base + flair,
-    };
-  });
-}
-
 /** Fetch monthly totals leaderboard (completion count in last 30 days). Respects anonymous (show_on_leaderboard). */
 export async function getMonthlyTotalsLeaderboard(
   limit = 10,
