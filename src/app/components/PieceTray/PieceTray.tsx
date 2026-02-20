@@ -5,33 +5,38 @@ import React, {
   forwardRef,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import type { Piece } from "@/puzzle/types";
 import { getAverageColor, areColorsSimilar, type ColorInfo } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
-import { Minimize2, Maximize2, Shuffle, Palette } from "lucide-react";
+import { Settings, ChevronRight, ChevronLeft } from "lucide-react";
 import styles from "./PieceTray.module.css";
+import playStyles from "@/screens/Play/PlayScreen.module.css";
 
 type TraySection = "all" | "corners" | "edges" | "center";
 type SortMode = "grid" | "color";
 
-const THUMB_NORMAL = 56;
-const THUMB_COMPACT = 36;
+const THUMB_NORMAL = 80;
+const THUMB_COMPACT = 64;
 
-/** Tray height by total piece count: smaller for small puzzles, taller for large. */
+const TRAY_COMPACT_KEY = "phuzzle:trayCompact";
+
+/** Tray height: fits thumbnails comfortably. */
 function getTrayHeight(totalPieces: number, isMobile: boolean): number {
-  const base = isMobile ? 160 : 100;
-  const cap = isMobile ? 320 : 220;
+  const base = isMobile ? 145 : 110;
+  const cap = isMobile ? 220 : 200;
   if (totalPieces <= 9) return base;
-  if (totalPieces <= 16) return base + 20;
-  if (totalPieces <= 25) return base + 40;
-  if (totalPieces <= 36) return base + 60;
-  if (totalPieces <= 64) return base + 80;
-  if (totalPieces <= 100) return base + 110;
-  return Math.min(cap, base + 140);
+  if (totalPieces <= 16) return base + 15;
+  if (totalPieces <= 25) return base + 25;
+  if (totalPieces <= 36) return base + 35;
+  if (totalPieces <= 64) return base + 45;
+  if (totalPieces <= 100) return base + 55;
+  return Math.min(cap, base + 65);
 }
 
 /** Deterministic values per piece for scatter animation. */
@@ -126,6 +131,16 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScroll, setCanScroll] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const [expandedSection, setExpandedSection] = useState<
+    "filter" | "sort" | "view" | "actions" | null
+  >(null);
+  const [menuPosition, setMenuPosition] = useState<{
+    left: number;
+    bottom: number;
+  } | null>(null);
+  const optionsRef = useRef<HTMLDivElement>(null);
+  const cogRef = useRef<HTMLButtonElement>(null);
 
   const totalPieces = grid.rows * grid.cols;
   const [isNarrow, setIsNarrow] = useState(
@@ -140,9 +155,22 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   }, []);
   const trayHeight = getTrayHeight(totalPieces, isNarrow);
 
-  // Compact mode: default on for 25+ pieces (mobile or desktop); user can toggle
-  const compactDefault = pieces.length >= 25;
-  const [compact, setCompact] = useState(compactDefault);
+  // Expanded by default; persist user preference for Compact
+  const [compact, setCompact] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem(TRAY_COMPACT_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(TRAY_COMPACT_KEY, String(compact));
+    } catch {
+      /* ignore */
+    }
+  }, [compact]);
   const thumbSize = compact ? THUMB_COMPACT : THUMB_NORMAL;
 
   // Precompute color for sorting and highlight; computed once per puzzle.
@@ -175,11 +203,11 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
   const sortPieces = (arr: Piece[]) => {
     const next = [...arr];
-    const withinGroup = sortMode === "color" && image ? byHue : byGrid;
+    const primarySort = sortMode === "color" && image ? byHue : byGrid;
     next.sort((a, b) => {
-      const groupCmp = a.groupId.localeCompare(b.groupId);
-      if (groupCmp !== 0) return groupCmp;
-      return withinGroup(a, b);
+      const cmp = primarySort(a, b);
+      if (cmp !== 0) return cmp;
+      return a.groupId.localeCompare(b.groupId);
     });
     return next;
   };
@@ -266,6 +294,13 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     setScrollProgress(pct);
   }, []);
 
+  const scrollBy = useCallback((delta: number) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const step = el.clientWidth * 0.8;
+    el.scrollBy({ left: delta * step, behavior: "smooth" });
+  }, []);
+
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
@@ -281,134 +316,285 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
   const showCompactToggle = pieces.length >= 25;
 
+  useLayoutEffect(() => {
+    if (!optionsOpen || !optionsRef.current) {
+      setMenuPosition(null);
+      return;
+    }
+    const rect = optionsRef.current.getBoundingClientRect();
+    setMenuPosition({
+      left: rect.left,
+      bottom: window.innerHeight - rect.top + 4,
+    });
+  }, [optionsOpen]);
+
+  useEffect(() => {
+    if (!optionsOpen) {
+      setExpandedSection(null);
+      return;
+    }
+    const onPointerDown = (e: PointerEvent) => {
+      const el = optionsRef.current;
+      const panel = document.getElementById("tray-options-portal");
+      if (!el || (e.target && el.contains(e.target as Node))) return;
+      if (cogRef.current && cogRef.current.contains(e.target as Node)) return;
+      if (panel && panel.contains(e.target as Node)) return;
+      setOptionsOpen(false);
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (expandedSection) setExpandedSection(null);
+        else setOptionsOpen(false);
+      }
+    };
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [optionsOpen, expandedSection]);
+
   return (
     <div
       className={`${styles.tray} ${compact ? styles.trayCompact : ""}`}
       ref={ref}
       style={{ height: trayHeight }}
     >
-      <div className={styles.header}>
+      <div className={styles.header} ref={optionsRef}>
         <div className={styles.titleRow}>
           <span className={styles.title}>Piece Drawer ({pieces.length})</span>
-          {showCompactToggle && (
-            <button
-              type="button"
-              className={styles.compactToggle}
-              onClick={() => setCompact((c) => !c)}
-              aria-label={compact ? "Expand thumbnails" : "Compact thumbnails"}
-              title={compact ? "Expand thumbnails" : "Compact thumbnails"}
-            >
-              {compact ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
-            </button>
+          {(colorHighlight || clusterMode) && (
+            <span className={styles.modeBadge} aria-live="polite">
+              {clusterMode ? "Cluster" : "Highlight"}
+            </span>
           )}
-        </div>
-        <div className={styles.controls}>
-          <div className={styles.segment} aria-label="Tray section">
-            <button
-              type="button"
-              className={section === "all" ? styles.active : undefined}
-              onClick={() => setSection("all")}
-            >
-              All
-            </button>
-            <button
-              type="button"
-              className={section === "edges" ? styles.active : undefined}
-              onClick={() => setSection("edges")}
-            >
-              Edges
-            </button>
-            <button
-              type="button"
-              className={section === "center" ? styles.active : undefined}
-              onClick={() => setSection("center")}
-            >
-              Center
-            </button>
-            <button
-              type="button"
-              className={section === "corners" ? styles.active : undefined}
-              onClick={() => setSection("corners")}
-            >
-              Corners
-            </button>
-          </div>
-
-          {onClusterModeToggle && (
-            <button
-              type="button"
-              className={clusterMode ? styles.active : undefined}
-              onClick={onClusterModeToggle}
-            >
-              Cluster
-            </button>
-          )}
-          {clusterMode && selectedIds && selectedIds.size >= 2 && onCreateCluster && (
-            <button
-              type="button"
-              className={styles.clusterBtn}
-              onClick={() => onCreateCluster([...selectedIds])}
-            >
-              Create cluster ({selectedIds.size})
-            </button>
-          )}
-          <div className={styles.segment} aria-label="Sort mode">
-            <button
-              type="button"
-              className={sortMode === "grid" ? styles.active : undefined}
-              onClick={() => {
-                setSortMode("grid");
-                setShuffledOrder(null);
-              }}
-            >
-              Grid
-            </button>
-            <button
-              type="button"
-              className={sortMode === "color" ? styles.active : undefined}
-              onClick={() => {
-                setSortMode("color");
-                setShuffledOrder(null);
-              }}
-              disabled={!image}
-              title={!image ? "Load an image to enable color sorting" : undefined}
-            >
-              Color
-            </button>
-          </div>
-
           <button
+            ref={cogRef}
             type="button"
-            className={colorHighlight ? styles.active : undefined}
-            onClick={() => {
-              setColorHighlight((c) => !c);
-              if (colorHighlight) setHighlightAnchorId(null);
-            }}
-            disabled={!image}
-            title={
-              !image
-                ? "Load an image to enable"
-                : colorHighlight
-                  ? "Click a piece to highlight similar colors"
-                  : "Highlight pieces by dominant color (click a piece when on)"
-            }
-            aria-label={colorHighlight ? "Color highlight on" : "Color highlight off"}
+            className={styles.cogBtn}
+            onClick={() => setOptionsOpen((o) => !o)}
+            aria-haspopup="menu"
+            aria-expanded={optionsOpen}
+            aria-label={optionsOpen ? "Close options" : "Open options"}
+            title="Options"
           >
-            <Palette size={14} />
-            Highlight
-          </button>
-
-          <button
-            type="button"
-            className={styles.shuffleBtn}
-            onClick={shuffleTray}
-            disabled={pieces.length === 0}
-            aria-label="Shuffle tray"
-            title="Randomize piece order in tray"
-          >
-            <Shuffle size={14} />
+            <Settings size={16} />
           </button>
         </div>
+
+        {optionsOpen &&
+          menuPosition &&
+          createPortal(
+            <div
+              id="tray-options-portal"
+              className={styles.trayOptionsPortal}
+              role="menu"
+              style={{
+                left: menuPosition.left,
+                bottom: menuPosition.bottom,
+              }}
+            >
+              <div className={playStyles.headerMenuSection}>Piece Drawer</div>
+              <button
+                type="button"
+                className={playStyles.headerMenuSubmenuTrigger}
+                role="menuitem"
+                onClick={() =>
+                  setExpandedSection((s) => (s === "filter" ? null : "filter"))
+                }
+              >
+                Filter
+                <ChevronRight
+                  size={16}
+                  className={`${playStyles.headerMenuChevron} ${expandedSection === "filter" ? playStyles.headerMenuChevronExpanded : ""}`}
+                />
+              </button>
+              {expandedSection === "filter" && (
+                <div className={playStyles.headerMenuNested}>
+                  {(["all", "edges", "center", "corners"] as const).map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      className={playStyles.headerMenuItem}
+                      role="menuitem"
+                      onClick={() => setSection(s)}
+                    >
+                      {s.charAt(0).toUpperCase() + s.slice(1)}
+                      {section === s && (
+                        <span className={playStyles.headerMenuCheck}>✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <button
+                type="button"
+                className={playStyles.headerMenuSubmenuTrigger}
+                role="menuitem"
+                onClick={() =>
+                  setExpandedSection((s) => (s === "sort" ? null : "sort"))
+                }
+              >
+                Sort
+                <ChevronRight
+                  size={16}
+                  className={`${playStyles.headerMenuChevron} ${expandedSection === "sort" ? playStyles.headerMenuChevronExpanded : ""}`}
+                />
+              </button>
+              {expandedSection === "sort" && (
+                <div className={playStyles.headerMenuNested}>
+                  <button
+                    type="button"
+                    className={playStyles.headerMenuItem}
+                    role="menuitem"
+                    onClick={() => {
+                      setSortMode("grid");
+                      setShuffledOrder(null);
+                    }}
+                  >
+                    Grid
+                    {sortMode === "grid" && (
+                      <span className={playStyles.headerMenuCheck}>✓</span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className={playStyles.headerMenuItem}
+                    role="menuitem"
+                    disabled={!image}
+                    title={
+                      !image ? "Load an image to enable color sorting" : undefined
+                    }
+                    onClick={() => {
+                      setSortMode("color");
+                      setShuffledOrder(null);
+                    }}
+                  >
+                    Color
+                    {sortMode === "color" && (
+                      <span className={playStyles.headerMenuCheck}>✓</span>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="button"
+                className={playStyles.headerMenuSubmenuTrigger}
+                role="menuitem"
+                onClick={() =>
+                  setExpandedSection((s) => (s === "view" ? null : "view"))
+                }
+              >
+                View
+                <ChevronRight
+                  size={16}
+                  className={`${playStyles.headerMenuChevron} ${expandedSection === "view" ? playStyles.headerMenuChevronExpanded : ""}`}
+                />
+              </button>
+              {expandedSection === "view" && (
+                <div className={playStyles.headerMenuNested}>
+                  {showCompactToggle && (
+                    <button
+                      type="button"
+                      className={playStyles.headerMenuItem}
+                      role="menuitem"
+                      onClick={() => setCompact((c) => !c)}
+                    >
+                      Compact
+                      {compact ? (
+                        <span className={playStyles.headerMenuCheck}>✓</span>
+                      ) : null}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={playStyles.headerMenuItem}
+                    role="menuitem"
+                    disabled={!image}
+                    title={
+                      !image
+                        ? "Load an image to enable"
+                        : "Highlight pieces by dominant color"
+                    }
+                    onClick={() => {
+                      const next = !colorHighlight;
+                      setColorHighlight(next);
+                      if (next && displayed.length > 0) {
+                        setHighlightAnchorId(displayed[0].id);
+                      } else {
+                        setHighlightAnchorId(null);
+                      }
+                    }}
+                  >
+                    Highlight
+                    {colorHighlight && (
+                      <span className={playStyles.headerMenuCheck}>✓</span>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="button"
+                className={playStyles.headerMenuSubmenuTrigger}
+                role="menuitem"
+                onClick={() =>
+                  setExpandedSection((s) =>
+                    s === "actions" ? null : "actions",
+                  )
+                }
+              >
+                Actions
+                <ChevronRight
+                  size={16}
+                  className={`${playStyles.headerMenuChevron} ${expandedSection === "actions" ? playStyles.headerMenuChevronExpanded : ""}`}
+                />
+              </button>
+              {expandedSection === "actions" && (
+                <div className={playStyles.headerMenuNested}>
+                  <button
+                    type="button"
+                    className={playStyles.headerMenuItem}
+                    role="menuitem"
+                    onClick={shuffleTray}
+                    disabled={pieces.length === 0}
+                  >
+                    Shuffle tray
+                  </button>
+                  {onClusterModeToggle && (
+                    <button
+                      type="button"
+                      className={playStyles.headerMenuItem}
+                      role="menuitem"
+                      onClick={onClusterModeToggle}
+                    >
+                      Cluster
+                      {clusterMode && (
+                        <span className={playStyles.headerMenuCheck}>✓</span>
+                      )}
+                    </button>
+                  )}
+                  {clusterMode &&
+                    selectedIds &&
+                    selectedIds.size >= 2 &&
+                    onCreateCluster && (
+                      <button
+                        type="button"
+                        className={playStyles.headerMenuItem}
+                        role="menuitem"
+                        onClick={() => onCreateCluster([...selectedIds])}
+                      >
+                        Create cluster ({selectedIds.size})
+                      </button>
+                    )}
+                </div>
+              )}
+            </div>,
+            document.body,
+          )}
       </div>
 
       {displayed.length > 0 && canScroll && (
@@ -427,11 +613,22 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         </div>
       )}
 
-      <div
-        className={`${styles.scroller} ${displayed.length > 0 ? styles.scrollerSnap : ""}`}
-        ref={scrollerRef}
-        role="list"
-      >
+      <div className={styles.scrollerWrap}>
+        {canScroll && displayed.length > 0 && scrollProgress > 0 && (
+          <button
+            type="button"
+            className={styles.scrollBtn}
+            onClick={() => scrollBy(-1)}
+            aria-label="Scroll left"
+          >
+            <ChevronLeft size={20} />
+          </button>
+        )}
+        <div
+          className={`${styles.scroller} ${displayed.length > 0 ? styles.scrollerSnap : ""}`}
+          ref={scrollerRef}
+          role="list"
+        >
         {displayed.length === 0 ? (
           <div className={styles.empty}>{emptyText}</div>
         ) : (
@@ -495,6 +692,17 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
               );
             })}
           </div>
+        )}
+        </div>
+        {canScroll && displayed.length > 0 && scrollProgress < 1 && (
+          <button
+            type="button"
+            className={styles.scrollBtn}
+            onClick={() => scrollBy(1)}
+            aria-label="Scroll right"
+          >
+            <ChevronRight size={20} />
+          </button>
         )}
       </div>
     </div>

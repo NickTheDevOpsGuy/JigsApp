@@ -1,11 +1,14 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "12";
+export const CHANGELOG_VERSION = "13";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "✂️ Alternate piece shapes – Replay with Classic, Irregular, or Hard mode cuts for more variety and separate best times per cut",
+      "✨ Near-completion anticipation – Subtle pulse and glow when 3 pieces remain (hidden during drag to avoid distraction)",
+      "📥 Export session stats – Download placement timestamps, snap counts, and idle durations as JSON (Profile tab or debug menu)",
       "📈 Player percentile ranking – Top X% shown in completion overlay per grid size (daily puzzle)",
       "🏅 First finisher badge – 'First finisher today!' when you're the only one to complete that grid",
       "⚡ Time Decay combo meter – Combo ×2+ in Time Decay mode; same feedback as Time Attack (3.5s window)",
@@ -28,7 +31,7 @@ export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
       "👁️ Ghost image – Optional faint completed puzzle behind board (Settings → View). Auto-disabled in daily/Time Attack",
       "🏅 Multi-tier achievements – 10, 50, 100 puzzles; Speed Runner (5 under 5 min)",
       "🧩 Edge & corner pieces – Full image content now visible on straight edges (no cropping)",
-      "❄️ Streak freeze – One per week; protect your daily streak if you miss a day",
+      "🛡️ Streak shield – Earn at 5-day streak; auto-protects if you miss a day (one per week)",
       "🔍 Zoom & pan – Animated zoom transitions, persistent per grid size, soft board clamp",
       "👻 Ghost when idle – Faint ghost overlay after a few seconds of inactivity",
       "🔲 Edge piece highlight – Optional faint border on edge pieces",

@@ -302,6 +302,7 @@ export function usePlayScreenAnimation(args: {
           rotationDisplayOverrides,
           wrongRotationHint,
           snapPreview,
+          piecesRemaining: st.totalCount - st.placedCount,
         },
         pieceCache,
         viewport,

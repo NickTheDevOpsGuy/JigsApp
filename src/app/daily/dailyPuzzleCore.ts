@@ -17,6 +17,11 @@ const DAILY_PREFIX = "phuzzle:daily:";
 const STREAK_FREEZE_KEY = "phuzzle:streakFreeze";
 const STREAK_FREEZE_WEEK_KEY = "phuzzle:streakFreezeWeek";
 const STREAK_FREEZE_DISMISSED_KEY = "phuzzle:streakFreezeDismissed";
+const STREAK_SHIELD_AUTO_APPLIED_KEY = "phuzzle:streakShieldAutoApplied";
+const STREAK_SHIELD_JUST_EARNED_KEY = "phuzzle:streakShieldJustEarned";
+
+/** Minimum streak to earn a shield (one per week max) */
+const STREAK_SHIELD_EARN_AT = 5;
 
 /** Get today's date string in user's local timezone (YYYY-MM-DD) */
 export function getTodayDateString(): string {
@@ -99,7 +104,9 @@ export function recordDailyCompletion(elapsedSeconds: number): number {
   } catch {
     /* ignore */
   }
-  return getCurrentStreak();
+  const streak = getCurrentStreak();
+  maybeGrantStreakShield(streak);
+  return streak;
 }
 
 /** Get today's completion time in seconds, or null if not completed */
@@ -112,15 +119,15 @@ export function getTodayDailyTime(): number | null {
   }
 }
 
-/** Get count of available streak freeze tokens (1 per week, max 1). */
+/** Get count of available streak shield tokens (earn at 5-day streak, max 1 per week). */
 export function getStreakFreezeCount(): number {
   try {
     const raw = localStorage.getItem(STREAK_FREEZE_KEY);
-    if (raw === null) return 1;
+    if (raw === null) return 0;
     const count = parseInt(raw, 10);
-    return Number.isNaN(count) ? 1 : Math.min(1, Math.max(0, count));
+    return Number.isNaN(count) ? 0 : Math.min(1, Math.max(0, count));
   } catch {
-    return 1;
+    return 0;
   }
 }
 
@@ -129,20 +136,71 @@ function getWeekKey(): string {
   return String(Math.floor(Date.now() / 604800000));
 }
 
-/** Refill streak freeze to 1 at start of each week. Returns current count. */
-export function refreshStreakFreeze(): number {
+/** Grant a streak shield if eligible: streak >= 5, count is 0, and haven't earned one this week. */
+function maybeGrantStreakShield(streak: number): void {
+  if (streak < STREAK_SHIELD_EARN_AT) return;
+  const count = getStreakFreezeCount();
+  if (count > 0) return;
   try {
     const weekKey = getWeekKey();
     const storedWeek = localStorage.getItem(STREAK_FREEZE_WEEK_KEY);
-    if (storedWeek !== weekKey) {
-      localStorage.setItem(STREAK_FREEZE_KEY, "1");
-      localStorage.setItem(STREAK_FREEZE_WEEK_KEY, weekKey);
-      return 1;
-    }
-    return getStreakFreezeCount();
+    if (storedWeek === weekKey) return;
+    localStorage.setItem(STREAK_FREEZE_KEY, "1");
+    localStorage.setItem(STREAK_FREEZE_WEEK_KEY, weekKey);
+    localStorage.setItem(STREAK_SHIELD_JUST_EARNED_KEY, "true");
   } catch {
-    return 1;
+    /* ignore */
   }
+}
+
+/** True if a shield was just earned (e.g. at 5-day streak). Clears flag when read. */
+export function wasShieldJustEarned(): boolean {
+  try {
+    const v = localStorage.getItem(STREAK_SHIELD_JUST_EARNED_KEY) === "true";
+    localStorage.removeItem(STREAK_SHIELD_JUST_EARNED_KEY);
+    return v;
+  } catch {
+    return false;
+  }
+}
+
+/** Auto-apply streak shield if user missed yesterday and has one. Returns true if applied. */
+export function tryAutoApplyStreakShield(): boolean {
+  if (!wasYesterdayMissed()) return false;
+  const count = getStreakFreezeCount();
+  if (count <= 0) return false;
+  const ok = useStreakFreeze(getYesterdayDateString());
+  if (ok) {
+    try {
+      localStorage.setItem(STREAK_SHIELD_AUTO_APPLIED_KEY, "true");
+    } catch {
+      /* ignore */
+    }
+  }
+  return ok;
+}
+
+/** True if a streak shield was auto-applied this session (e.g. to show a toast). */
+export function wasShieldAutoAppliedThisSession(): boolean {
+  try {
+    return localStorage.getItem(STREAK_SHIELD_AUTO_APPLIED_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+/** Clear the auto-applied flag (call after showing toast). */
+export function clearShieldAutoAppliedFlag(): void {
+  try {
+    localStorage.removeItem(STREAK_SHIELD_AUTO_APPLIED_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Legacy: no longer refills. Kept for compatibility. Returns current count. */
+export function refreshStreakFreeze(): number {
+  return getStreakFreezeCount();
 }
 
 /** Use a streak freeze for a specific date (when user missed that day). Returns true if consumed. */
@@ -188,7 +246,7 @@ export function getCurrentStreak(): number {
   return streak;
 }
 
-/** Call at app init to refresh freeze count for new week. */
+/** Call at app init: auto-apply shield if user missed yesterday and has one. */
 export function initStreakFreeze(): void {
-  refreshStreakFreeze();
+  tryAutoApplyStreakShield();
 }

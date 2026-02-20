@@ -24,6 +24,8 @@ export async function recordCompletion(args: {
   isTimeDecay?: boolean;
   timeDecayScore?: number;
   dailyStreak: number;
+  /** Piece shape: classic, irregular, or hard. Default classic. */
+  pieceCut?: string;
 }): Promise<PlayerStatsData | null> {
   if (!isSupabaseConfigured()) return null;
 
@@ -43,6 +45,7 @@ export async function recordCompletion(args: {
     time_attack_score: args.timeAttackScore ?? null,
     is_time_decay: args.isTimeDecay ?? false,
     time_decay_score: args.timeDecayScore ?? null,
+    piece_cut: args.pieceCut ?? "classic",
   });
 
   const { data: existing } = await supabase!

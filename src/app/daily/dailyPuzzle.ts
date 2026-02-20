@@ -26,6 +26,10 @@ export {
   dismissFreezeOfferToday,
   initStreakFreeze,
   refreshStreakFreeze,
+  tryAutoApplyStreakShield,
+  wasShieldAutoAppliedThisSession,
+  wasShieldJustEarned,
+  clearShieldAutoAppliedFlag,
 } from "./dailyPuzzleCore";
 
 function mulberry32(seed: number): () => number {

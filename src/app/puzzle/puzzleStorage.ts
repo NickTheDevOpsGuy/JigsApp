@@ -2,6 +2,7 @@
  * puzzleStorage – save/load puzzle state to localStorage; restore from SavedPiece[].
  */
 import type { Piece, GridSize } from "./types";
+import type { CutType } from "./cutType";
 
 const PUZZLE_STATE_KEY = "phuzzle:puzzleState";
 const PUZZLE_BACKUP_KEY = "phuzzle:puzzleStateBackup";
@@ -35,6 +36,8 @@ export type SavedPuzzleState = {
   pieces: SavedPiece[];
   elapsedSeconds: number;
   savedAt: number;
+  /** Piece shape variant. Omit = classic (legacy saves). */
+  cutType?: CutType;
 };
 
 export type LoadResult =
@@ -117,6 +120,11 @@ function validateState(raw: unknown): LoadResult {
       return { ok: false, reason: "invalid", cleared: false };
     }
 
+    const cutType = state.cutType as CutType | undefined;
+    const validCut: CutType[] = ["classic", "irregular", "hard"];
+    const resolvedCut: CutType =
+      cutType && validCut.includes(cutType) ? cutType : "classic";
+
     return {
       ok: true,
       state: {
@@ -126,6 +134,7 @@ function validateState(raw: unknown): LoadResult {
         pieces: pieces as SavedPiece[],
         elapsedSeconds,
         savedAt,
+        cutType: resolvedCut,
       },
     };
   } catch {
@@ -162,6 +171,7 @@ export function savePuzzleState(
   grid: GridSize,
   pieces: Piece[],
   elapsedSeconds: number,
+  cutType: CutType = "classic",
 ): void {
   const savedPieces: SavedPiece[] = pieces.map((p) => ({
     id: p.id,
@@ -184,6 +194,7 @@ export function savePuzzleState(
     pieces: savedPieces,
     elapsedSeconds,
     savedAt: Date.now(),
+    cutType,
   };
 
   try {
@@ -238,12 +249,17 @@ export function clearPuzzleState(): void {
 /**
  * Check if there's a valid saved game that matches current settings
  */
-export function hasSavedGame(imageUrl: string, grid: GridSize): boolean {
+export function hasSavedGame(
+  imageUrl: string,
+  grid: GridSize,
+  cutType: CutType = "classic",
+): boolean {
   const saved = loadPuzzleState();
   if (!saved) return false;
   return (
     saved.imageUrl === imageUrl &&
     saved.grid.rows === grid.rows &&
-    saved.grid.cols === grid.cols
+    saved.grid.cols === grid.cols &&
+    (saved.cutType ?? "classic") === cutType
   );
 }

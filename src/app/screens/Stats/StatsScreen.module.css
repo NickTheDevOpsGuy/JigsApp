@@ -1,17 +1,4 @@
-/* Stats/Leaderboard always uses light theme for readability */
 .page {
-  --color-bg-primary: #f3f7ff;
-  --color-bg-secondary: #dff1ff;
-  --color-bg-card: #eef8ff;
-  --color-bg-elevated: #ffffff;
-  --color-text-primary: #103257;
-  --color-text-secondary: #0b2e52;
-  --color-text-muted: #5a7a9b;
-  --color-brand-primary: #0b63b8;
-  --color-brand-hover: #0952a0;
-  --color-brand-light: #dff1ff;
-  --color-border: rgba(11, 99, 184, 0.2);
-  --color-border-strong: rgba(11, 99, 184, 0.35);
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -19,20 +6,20 @@
   align-items: center;
   justify-content: flex-start;
   background: var(--color-bg-primary);
-  padding: 24px;
-  padding-bottom: max(24px, env(safe-area-inset-bottom, 0));
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
 }
 
 .card {
-  width: min(520px, 100%);
+  width: min(560px, 100%);
   max-width: 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
   background: var(--color-bg-elevated);
-  border-radius: 20px;
-  padding: 28px;
+  border-radius: 16px;
+  padding: 16px 20px;
   box-shadow: var(--shadow-md);
   overflow: hidden;
 }
@@ -40,8 +27,8 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 12px;
   position: relative;
 }
 
@@ -62,7 +49,7 @@
 
 .title {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--color-brand-primary);
   flex: 1;
@@ -71,13 +58,43 @@
 
 .placeholder,
 .hint {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   color: var(--color-text-primary);
 }
 
 .hint {
   font-size: 13px;
   color: var(--color-text-secondary);
+}
+
+.dashboardTip {
+  padding: 12px 14px;
+  background: var(--color-bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.dashboardTip p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.dashboardTipLink {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-brand-primary);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.dashboardTipLink:hover {
+  color: var(--color-brand-hover);
 }
 
 .debug {
@@ -91,8 +108,8 @@
 
 .tabs {
   display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: 6px;
+  margin-bottom: 12px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -110,12 +127,12 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border: none;
   border-radius: 999px;
   background: var(--color-bg-secondary);
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
@@ -140,9 +157,15 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .section h2 {
-  margin: 0 0 16px;
-  font-size: 18px;
+  margin: 0;
+  font-size: 16px;
   color: var(--color-text-primary);
 }
 
@@ -154,28 +177,28 @@
 
 .statsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
 }
 
 .statCard {
-  padding: 16px;
-  background: var(--color-bg-elevated);
-  border-radius: 12px;
+  padding: 12px;
+  background: var(--color-bg-secondary);
+  border-radius: 10px;
   border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .statValue {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--color-brand-primary);
 }
 
 .statLabel {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-secondary);
 }
 
@@ -320,16 +343,16 @@
 .achievements {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .achievement {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  gap: 12px;
+  padding: 12px 14px;
   background: var(--color-bg-secondary);
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--color-border);
 }
 
@@ -339,7 +362,7 @@
 }
 
 .achievementIcon {
-  font-size: 32px;
+  font-size: 28px;
 }
 
 .achievementInfo {
@@ -465,9 +488,9 @@
 .leaderboardFilters {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .filterPill {
@@ -504,22 +527,22 @@
 .dailyPuzzleCard {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 20px;
+  gap: 16px;
+  padding: 14px 16px;
   background: var(--color-bg-secondary);
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid var(--color-border);
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .dailyPuzzleMascot {
   flex-shrink: 0;
-  width: 80px;
-  height: 80px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
+  font-size: 32px;
   background: var(--color-brand-light);
   border-radius: 50%;
 }
@@ -530,15 +553,15 @@
 }
 
 .dailyPuzzleTitle {
-  margin: 0 0 4px;
-  font-size: 18px;
+  margin: 0 0 2px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--color-brand-primary);
 }
 
 .dailyPuzzleDesc {
-  margin: 0 0 12px;
-  font-size: 14px;
+  margin: 0 0 8px;
+  font-size: 13px;
   color: var(--color-text-secondary);
 }
 
@@ -565,9 +588,9 @@
 .leaderboardHeader {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .leaderboardTabs {
@@ -713,47 +736,67 @@
 /* Mobile: Stats / Leaderboard */
 @media (max-width: 600px) {
   .page {
-    padding: 12px;
-    padding-top: 16px;
+    padding: 8px 12px;
+    padding-top: 12px;
     align-items: stretch;
   }
 
   .card {
-    padding: 20px 16px;
-    border-radius: 16px;
-    min-height: calc(100dvh - 48px);
+    padding: 14px 16px;
+    border-radius: 14px;
+    min-height: calc(100dvh - 40px);
   }
 
   .header {
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   .title {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .tabs {
-    gap: 6px;
-    margin-bottom: 20px;
+    gap: 4px;
+    margin-bottom: 12px;
   }
 
   .tabs button {
-    padding: 12px 8px;
-    font-size: 13px;
+    padding: 8px 6px;
+    font-size: 12px;
     flex: 1 1 0;
     min-width: 0;
   }
 
+  .section {
+    gap: 10px;
+  }
+
   .section h2 {
-    font-size: 16px;
-    margin-bottom: 12px;
+    font-size: 15px;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .statCard {
+    padding: 10px;
+  }
+
+  .statValue {
+    font-size: 18px;
+  }
+
+  .statLabel {
+    font-size: 11px;
   }
 
   .leaderboardHeader {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 10px;
   }
 
   .leaderboardTabs {
@@ -765,11 +808,32 @@
   }
 
   .leaderboardTabs button {
-    padding: 10px 12px;
+    padding: 8px 10px;
     font-size: 12px;
-    min-height: 44px;
-    min-width: 100px;
+    min-height: 40px;
+    min-width: 86px;
     flex: 0 0 auto;
+  }
+
+  .dailyPuzzleCard {
+    padding: 12px 14px;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .dailyPuzzleMascot {
+    width: 48px;
+    height: 48px;
+    font-size: 26px;
+  }
+
+  .dailyPuzzleTitle {
+    font-size: 15px;
+  }
+
+  .dailyPuzzleDesc {
+    font-size: 12px;
+    margin-bottom: 6px;
   }
 
   .allTimeGrid {
@@ -785,14 +849,6 @@
 
   /* Leaderboard card layout (PZ-071) – see rules above in same media query */
 
-  .statCard {
-    padding: 14px;
-  }
-
-  .statValue {
-    font-size: 20px;
-  }
-
   .empty {
     font-size: 14px;
     padding: 8px 0;
@@ -802,32 +858,44 @@
 /* PZ-041: Very narrow screens (e.g. 320px) – compact leaderboard layout */
 @media (max-width: 400px) {
   .page {
-    padding: 8px;
-    padding-top: 12px;
+    padding: 6px 10px;
+    padding-top: 10px;
   }
 
   .card {
-    padding: 14px 12px;
+    padding: 12px 14px;
   }
 
   .header {
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
   }
 
   .title {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .tabs button {
-    padding: 10px 6px;
-    font-size: 12px;
-    min-width: 64px;
+    padding: 8px 4px;
+    font-size: 11px;
+    min-width: 56px;
   }
 
   .leaderboardHeader {
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .statCard {
+    padding: 8px;
+  }
+
+  .statValue {
+    font-size: 16px;
+  }
+
+  .statLabel {
+    font-size: 10px;
   }
 
   /* Keep tabs in single scrollable row – no wrap, avoids 3+ rows on 320px */
@@ -878,14 +946,6 @@
     padding: 6px 10px;
     font-size: 13px;
     min-height: 36px;
-  }
-
-  .statCard {
-    padding: 12px;
-  }
-
-  .statValue {
-    font-size: 18px;
   }
 
   /* Single column for stats grid on very narrow */
@@ -970,16 +1030,16 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .personalBestItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  background: var(--color-bg-elevated);
-  border-radius: 10px;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--color-bg-secondary);
+  border-radius: 8px;
   border: 1px solid var(--color-border);
 }
 

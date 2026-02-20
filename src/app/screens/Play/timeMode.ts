@@ -1,6 +1,8 @@
 /**
  * timeMode – elapsed, countdown, active, relaxed, best, timeAttack; localStorage for best times.
  */
+import type { CutType } from "@/puzzle/cutType";
+
 export type TimeMode =
   | "elapsed" // Count up from 0 (default)
   | "countdown" // Start at limit, game over at 0
@@ -19,22 +21,35 @@ export const DEFAULT_COUNTDOWN_MINUTES = 10;
 export const COUNTDOWN_OPTIONS = [5, 10, 15, 20, 30] as const;
 export const ACTIVE_IDLE_MS = 2500; // Stop counting after 2.5s idle
 
-export function getBestTimeKey(rows: number, cols: number): string {
-  return `${BEST_TIME_PREFIX}${rows}x${cols}`;
+export function getBestTimeKey(
+  rows: number,
+  cols: number,
+  cutType: CutType = "classic",
+): string {
+  return `${BEST_TIME_PREFIX}${rows}x${cols}_${cutType}`;
 }
 
-export function getBestTime(rows: number, cols: number): number | null {
+export function getBestTime(
+  rows: number,
+  cols: number,
+  cutType: CutType = "classic",
+): number | null {
   try {
-    const raw = localStorage.getItem(getBestTimeKey(rows, cols));
+    const raw = localStorage.getItem(getBestTimeKey(rows, cols, cutType));
     return raw ? parseInt(raw, 10) : null;
   } catch {
     return null;
   }
 }
 
-export function setBestTime(rows: number, cols: number, seconds: number): void {
+export function setBestTime(
+  rows: number,
+  cols: number,
+  seconds: number,
+  cutType: CutType = "classic",
+): void {
   try {
-    localStorage.setItem(getBestTimeKey(rows, cols), String(seconds));
+    localStorage.setItem(getBestTimeKey(rows, cols, cutType), String(seconds));
   } catch {
     // ignore
   }

@@ -2,21 +2,31 @@
  * shape – buildPiecePath for jigsaw pieces; knob/tab geometry.
  */
 import type { EdgeType, PieceEdges } from "./types";
+import type { CutType } from "./cutType";
+import { CUT_DEPTH_RATIO, CUT_WIDTH_RATIO } from "./cutType";
 
 type ShapeArgs = {
   tileW: number;
   tileH: number;
   pad: number;
   edges: PieceEdges;
+  cutType?: CutType;
 };
 
-function knobDepth(tileW: number, tileH: number) {
-  return Math.round(Math.min(tileW, tileH) * 0.22);
+function knobDepth(tileW: number, tileH: number, cutType: CutType = "classic") {
+  const ratio = CUT_DEPTH_RATIO[cutType];
+  return Math.round(Math.min(tileW, tileH) * ratio);
 }
 
-function knobWidth(tileW: number, tileH: number, horizontal: boolean) {
+function knobWidth(
+  tileW: number,
+  tileH: number,
+  horizontal: boolean,
+  cutType: CutType = "classic",
+) {
   const base = horizontal ? tileW : tileH;
-  return Math.round(base * 0.36);
+  const ratio = CUT_WIDTH_RATIO[cutType];
+  return Math.round(base * ratio);
 }
 
 function edgeDir(edge: EdgeType): 0 | 1 | -1 {
@@ -25,11 +35,11 @@ function edgeDir(edge: EdgeType): 0 | 1 | -1 {
 }
 
 export function buildPiecePath(args: ShapeArgs): string {
-  const { tileW, tileH, pad, edges } = args;
+  const { tileW, tileH, pad, edges, cutType = "classic" } = args;
 
-  const kd = knobDepth(tileW, tileH);
-  const kwTop = knobWidth(tileW, tileH, true);
-  const kwSide = knobWidth(tileW, tileH, false);
+  const kd = knobDepth(tileW, tileH, cutType);
+  const kwTop = knobWidth(tileW, tileH, true, cutType);
+  const kwSide = knobWidth(tileW, tileH, false, cutType);
 
   // Tile rect inside the padded container
   const x0 = pad;

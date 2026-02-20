@@ -12,6 +12,7 @@ import {
   DAILY_DATE_KEY,
   getCurrentStreak,
   getTodayDateString,
+  wasShieldJustEarned,
 } from "@/daily/dailyPuzzleCore";
 import { recordCompletion } from "@/services/statsService";
 import { getPercentileRank } from "@/services/leaderboardService";
@@ -24,6 +25,7 @@ import {
   CONFETTI_COLORS_STREAK_3,
   CONFETTI_COLORS_STREAK_7,
 } from "@/data/confettiColors";
+import { CUT_TYPES, CUT_DISPLAY_NAMES } from "@/puzzle/cutType";
 
 interface ShareUrls {
   twitter: string;
@@ -55,6 +57,10 @@ interface CompletionOverlayProps {
   onNewPuzzle: () => void;
   onMenu: () => void;
   onReplay?: () => void;
+  /** Current piece cut type (for best-time and replay-with-cut). */
+  cutType?: import("@/puzzle/cutType").CutType;
+  /** Replay same puzzle with a different piece cut. */
+  onReplayWithCut?: (cut: import("@/puzzle/cutType").CutType) => void;
 }
 
 export function CompletionOverlay({
@@ -80,6 +86,8 @@ export function CompletionOverlay({
   onNewPuzzle,
   onMenu,
   onReplay,
+  cutType = "classic",
+  onReplayWithCut,
 }: CompletionOverlayProps) {
   const [streak, setStreak] = useState<number>(0);
   const [percentileResult, setPercentileResult] = useState<
@@ -108,9 +116,9 @@ export function CompletionOverlay({
 
   useEffect(() => {
     if (isNewBest && grid) {
-      setBestTime(grid.rows, grid.cols, elapsedSeconds);
+      setBestTime(grid.rows, grid.cols, elapsedSeconds, cutType);
     }
-  }, [isNewBest, grid, elapsedSeconds]);
+  }, [isNewBest, grid, elapsedSeconds, cutType]);
 
   useEffect(() => {
     if (isDaily) {
@@ -121,22 +129,25 @@ export function CompletionOverlay({
       } catch {
         // ignore
       }
-      if (newStreak >= 3 || newStreak >= 7) {
-        const prefersReducedMotion =
-          typeof window !== "undefined" &&
-          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (!prefersReducedMotion) {
-          import("canvas-confetti").then((confetti) => {
-            const colors =
-              newStreak >= 7 ? CONFETTI_COLORS_STREAK_7 : CONFETTI_COLORS_STREAK_3;
-            confetti.default({
-              particleCount: 120,
-              spread: 100,
-              origin: { y: 0.5 },
-              colors,
-            });
+      const shieldEarned = wasShieldJustEarned();
+      const prefersReducedMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!prefersReducedMotion && (shieldEarned || newStreak >= 3 || newStreak >= 7)) {
+        import("canvas-confetti").then((confetti) => {
+          const colors =
+            newStreak >= 7
+              ? CONFETTI_COLORS_STREAK_7
+              : shieldEarned || newStreak >= 5
+                ? CONFETTI_COLORS_STREAK_3
+                : CONFETTI_COLORS_STREAK_3;
+          confetti.default({
+            particleCount: shieldEarned ? 80 : 120,
+            spread: 100,
+            origin: { y: 0.5 },
+            colors,
           });
-        }
+        });
       }
     }
   }, [isDaily, elapsedSeconds]);
@@ -163,6 +174,7 @@ export function CompletionOverlay({
         isTimeDecay,
         timeDecayScore,
         dailyStreak,
+        pieceCut: cutType,
       });
       if (stats && isDaily && grid) {
         const result = await getPercentileRank(
@@ -318,6 +330,24 @@ export function CompletionOverlay({
             For LinkedIn: Download image + Copy text, then post manually
           </p>
         </div>
+
+        {onReplayWithCut && (
+          <div className={styles.replayWithCutSection}>
+            <p className={styles.replayWithCutLabel}>Replay with different piece shape:</p>
+            <div className={styles.replayWithCutButtons}>
+              {CUT_TYPES.map((cut) => (
+                <Button
+                  key={cut}
+                  size="sm"
+                  variant={cutType === cut ? "primary" : "secondary"}
+                  onClick={() => onReplayWithCut(cut)}
+                >
+                  {CUT_DISPLAY_NAMES[cut]}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className={styles.completeActions}>
           <Button variant="primary" onClick={onNewPuzzle}>

@@ -4,6 +4,10 @@
  */
 import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
+import {
+  downloadSessionStatsJson,
+  loadLastSessionMetrics,
+} from "../placementMetrics";
 
 export type DebugFlags = {
   showGrid: boolean;
@@ -317,6 +321,19 @@ export function buildMenuItems(
       label: "🔄 Reset Local Stats",
       sortKey: "Reset Local Stats",
       onClick: c(props.onResetStats ?? (() => {})),
+      subMenu: "advanced",
+    },
+    {
+      id: "exportSessionStats",
+      section: "settings",
+      visible: props.canShowDebug,
+      label: "📥 Export Session Stats (JSON)",
+      sortKey: "Export Session Stats",
+      onClick: c(() => downloadSessionStatsJson()),
+      disabled: !loadLastSessionMetrics(),
+      disabledTitle: !loadLastSessionMetrics()
+        ? "Complete a puzzle to export session data"
+        : undefined,
       subMenu: "advanced",
     },
     // ─── Stats, Share ───

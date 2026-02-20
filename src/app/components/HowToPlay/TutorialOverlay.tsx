@@ -92,10 +92,29 @@ export function TutorialOverlay({
               to bring them back to the board.
             </p>
             <p className={styles.mobileCollapse}>
-              Filter by <strong>All</strong>, <strong>Edges</strong>,{" "}
-              <strong>Center</strong>, or <strong>Corners</strong> to find pieces quickly.
-              For puzzles with 25+ pieces, use compact mode to fit more thumbnails. Sort
-              by grid position or color.
+              Tap the <strong>⚙️ options</strong> (cog) to open the menu:
+            </p>
+            <ul className={styles.tips}>
+              <li>
+                <strong>Filter:</strong> Show All, Edges, Center, or Corners to find
+                pieces quickly.
+              </li>
+              <li>
+                <strong>Sort:</strong> By grid position or by dominant color (requires
+                image loaded).
+              </li>
+              <li>
+                <strong>View:</strong> Compact mode (25+ pieces), or highlight pieces by
+                similar color.
+              </li>
+              <li>
+                <strong>Actions:</strong> Shuffle tray, or create clusters (select pieces,
+                then Create cluster—they move together).
+              </li>
+            </ul>
+            <p className={styles.mobileCollapse}>
+              Use the <strong>left/right arrows</strong> or swipe to scroll when there are
+              many pieces.
             </p>
           </div>
 
@@ -163,8 +182,8 @@ export function TutorialOverlay({
                 (Settings → View) to spot them quickly.
               </li>
               <li>
-                <strong>Daily streak freeze:</strong> If you miss a day, use your weekly
-                freeze to protect your streak (offered when opening Today&apos;s Puzzle).
+                <strong>Streak shield:</strong> Earn one at 5-day streak. Auto-protects if
+                you miss a day (one per week).
               </li>
             </ul>
           </div>

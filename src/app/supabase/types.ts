@@ -57,6 +57,7 @@ export interface Database {
           grid_cols: number;
           is_daily: boolean;
           created_at: string;
+          piece_cut?: string;
         };
         Insert: {
           id?: string;
@@ -67,6 +68,7 @@ export interface Database {
           grid_cols: number;
           is_daily: boolean;
           created_at?: string;
+          piece_cut?: string;
         };
         Update: Partial<{
           id: string;
@@ -77,6 +79,7 @@ export interface Database {
           grid_cols: number;
           is_daily: boolean;
           created_at: string;
+          piece_cut: string;
         }>;
       };
       user_achievements: {

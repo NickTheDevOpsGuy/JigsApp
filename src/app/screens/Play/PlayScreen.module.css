@@ -571,10 +571,7 @@ html.theme-sunset .board {
 
 @media (max-width: 600px) {
   .trayWrap {
-    max-height: 360px;
-  }
-  .tray {
-    height: 280px;
+    max-height: 520px;
   }
 }
 
@@ -1128,6 +1125,26 @@ html.theme-sunset .board {
   font-size: 0.75rem !important;
   opacity: 0.5 !important;
   margin: 0 !important;
+}
+
+.replayWithCutSection {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-overlay-content);
+  border-radius: 12px;
+}
+
+.replayWithCutLabel {
+  font-size: 0.9rem !important;
+  opacity: 0.7 !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.replayWithCutButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
 }
 
 .completeActions {

@@ -68,6 +68,7 @@ Run the migrations in order so tables and policies are created correctly.
    - `supabase/migrations/006_avatars_and_events.sql`
    - `supabase/migrations/007_time_decay_completions.sql`
    - `supabase/migrations/008_completions_realtime.sql`
+   - `supabase/migrations/009_piece_cut_completions.sql` (piece_cut for alternate piece shapes)
 
 ### Option B: Supabase CLI
 

@@ -1,3 +1,14 @@
+.shieldApplied {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: var(--color-brand-light);
+  border: 1px solid var(--color-brand-primary);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+}
+
 .freezeOffer {
   margin-bottom: 16px;
   padding: 12px 14px;

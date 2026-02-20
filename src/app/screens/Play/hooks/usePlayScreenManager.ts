@@ -4,7 +4,12 @@ import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
-import { STORAGE_KEY, computeTileSize } from "../playScreenUtils";
+import {
+  STORAGE_KEY,
+  computeTileSize,
+  getStoredPieceCut,
+} from "../playScreenUtils";
+import { MAX_DEPTH_RATIO } from "@/puzzle/cutType";
 import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
@@ -32,6 +37,8 @@ export function usePlayScreenManager(
   countdownMinutes: number,
   lastInteractionRef: MutableRefObject<number>,
   resumeChoice: ResumeChoice,
+  /** When changed (e.g. replay with different cut), forces manager re-creation. */
+  cutKey?: number,
   options?: {
     initialSessionPieces?: import("@/puzzle/puzzleStorage").SavedPiece[];
     haptic?: (kind: "place" | "snap" | "rotate") => void;
@@ -164,8 +171,8 @@ export function usePlayScreenManager(
         // Compute square tile size (smaller on mobile for better fit)
         const pieceSize = computeTileSize(availW, availH, grid, viewportW);
 
-        // Tabs extend ~22% beyond tile; board must fit assembled puzzle + pad margin (avoids clipped edges)
-        const minPad = Math.ceil(pieceSize * 0.22);
+        // Tabs extend beyond tile (up to 28% for irregular cut); board must fit assembled puzzle + pad margin
+        const minPad = Math.ceil(pieceSize * MAX_DEPTH_RATIO);
         const boardPad = Math.max(18, minPad);
 
         // Board: fit puzzle; scale by piece count so more pieces = smaller relative canvas (9×9 shouldn't dominate)
@@ -221,12 +228,14 @@ export function usePlayScreenManager(
         boardEl.style.width = `${boardW}px`;
         boardEl.style.height = `${boardH}px`;
 
+        const cutType = getStoredPieceCut();
         const savedState = loadPuzzleState();
         const hasSavedGame =
           savedState &&
           savedState.imageUrl === imageUrl &&
           savedState.grid.rows === grid.rows &&
-          savedState.grid.cols === grid.cols;
+          savedState.grid.cols === grid.cols &&
+          (savedState.cutType ?? "classic") === cutType;
 
         if (hasSavedGame && savedState && resumeChoice === "resume") {
           setElapsedSeconds(savedState.elapsedSeconds);
@@ -284,6 +293,7 @@ export function usePlayScreenManager(
             isMobile,
             snapScaleRef: opts?.snapScaleRef,
             relaxedToleranceMultiplierRef,
+            cutType,
           },
           {
             onPiecePlaced: (p) => {
@@ -514,6 +524,7 @@ export function usePlayScreenManager(
     countdownMinutes,
     lastInteractionRef,
     resumeChoice,
+    cutKey,
     options?.initialSessionPieces,
   ]);
 

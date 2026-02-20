@@ -5,6 +5,8 @@
 import type { MutableRefObject } from "react";
 import type { DragState, GridSize, Piece, PuzzleState } from "./types";
 import { createInitialPieces } from "./factories/createInitialPieces";
+import type { CutType } from "./cutType";
+import { CUT_DEPTH_RATIO } from "./cutType";
 import type { SavedPiece } from "./puzzleStorage";
 import { UndoManager } from "./undoManager";
 import {
@@ -39,6 +41,8 @@ export type PuzzleManagerOptions = {
   rotationStepDeg?: 90 | 180;
   /** Use tighter scatter pattern for mobile viewports. */
   isMobile?: boolean;
+  /** Piece shape variant: classic, irregular, or hard. */
+  cutType?: CutType;
 };
 
 export type PuzzleManagerEvents = {
@@ -104,6 +108,7 @@ export class PuzzleManager {
       scatterStartYRatio = 0.3,
       rotationStepDeg = 90,
       isMobile = false,
+      cutType = "classic",
     } = options;
 
     this.relaxedToleranceMultiplierRef = relaxedToleranceMultiplierRef;
@@ -116,8 +121,9 @@ export class PuzzleManager {
     this.isMobile = isMobile;
     this.scatterStartYRatio = scatterStartYRatio;
     this.rotationStepDeg = rotationStepDeg;
-    // Tabs extend ~22% beyond tile edge; pad must exceed that or shapes get clipped
-    const minPad = Math.ceil(Math.min(pieceWidth, pieceHeight) * 0.22);
+    // Pad must exceed knob depth for this cut type or shapes get clipped
+    const depthRatio = CUT_DEPTH_RATIO[cutType];
+    const minPad = Math.ceil(Math.min(pieceWidth, pieceHeight) * depthRatio);
     this.pad = Math.max(pad, minPad);
     this.tileW = pieceWidth;
     this.tileH = pieceHeight;
@@ -150,6 +156,7 @@ export class PuzzleManager {
       targetStartX: this.targetStartX,
       targetStartY: this.targetStartY,
       isMobile,
+      cutType,
     });
 
     this.state = {
@@ -436,6 +443,15 @@ export class PuzzleManager {
   }
 
   public rotatePiece(pieceId: string) {
+    this.rotatePieceBy(pieceId, this.rotationStepDeg);
+  }
+
+  /** Rotate group counter-clockwise (e.g. Shift+R). */
+  public rotatePieceCCW(pieceId: string) {
+    this.rotatePieceBy(pieceId, -this.rotationStepDeg);
+  }
+
+  private rotatePieceBy(pieceId: string, deg: number) {
     const piece = this.findPiece(pieceId);
     if (!piece || piece.isPlaced || piece.locked) return;
 
@@ -443,7 +459,7 @@ export class PuzzleManager {
 
     this.updatePieces(
       (p) => p.groupId === piece.groupId,
-      (p) => ({ rotation: (p.rotation + this.rotationStepDeg) % 360 }),
+      (p) => ({ rotation: ((p.rotation + deg) % 360 + 360) % 360 }),
     );
   }
 

@@ -192,8 +192,8 @@ export const SHORTCUTS = [
   },
   {
     keys: ["R"],
-    action: "🔄 Rotate selected piece",
-    ariaAction: "Rotate selected piece",
+    action: "🔄 Rotate clockwise",
+    ariaAction: "Rotate clockwise",
   },
   {
     keys: ["Shift+R"],

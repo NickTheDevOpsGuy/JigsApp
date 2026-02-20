@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   getTodayDateString,
   getYesterdayDateString,
@@ -8,6 +8,8 @@ import {
   refreshStreakFreeze,
   getCurrentStreak,
   initStreakFreeze,
+  recordDailyCompletion,
+  tryAutoApplyStreakShield,
   wasFreezeOfferDismissedToday,
   dismissFreezeOfferToday,
 } from "./dailyPuzzleCore";
@@ -85,8 +87,8 @@ describe("getStreakFreezeCount", () => {
     localStorage.clear();
   });
 
-  it("returns 1 when not set (default)", () => {
-    expect(getStreakFreezeCount()).toBe(1);
+  it("returns 0 when not set (shields earned at 5-day streak)", () => {
+    expect(getStreakFreezeCount()).toBe(0);
   });
 
   it("returns stored count when valid", () => {
@@ -140,18 +142,77 @@ describe("refreshStreakFreeze", () => {
     localStorage.clear();
   });
 
-  it("refills to 1 when stored week differs from current", () => {
+  it("returns current count (no longer auto-refills)", () => {
     localStorage.setItem(STREAK_FREEZE_KEY, "0");
-    localStorage.setItem(STREAK_FREEZE_WEEK_KEY, "0");
     const result = refreshStreakFreeze();
-    expect(result).toBe(1);
-    expect(getStreakFreezeCount()).toBe(1);
+    expect(result).toBe(0);
+    expect(getStreakFreezeCount()).toBe(0);
   });
 });
 
 describe("initStreakFreeze", () => {
   it("runs without error", () => {
     expect(() => initStreakFreeze()).not.toThrow();
+  });
+});
+
+describe("tryAutoApplyStreakShield", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("returns false when yesterday was completed", () => {
+    const yesterday = getYesterdayDateString();
+    localStorage.setItem(`phuzzle:daily:${yesterday}:completed`, "true");
+    expect(tryAutoApplyStreakShield()).toBe(false);
+  });
+
+  it("returns false when no shield available", () => {
+    expect(getStreakFreezeCount()).toBe(0);
+    expect(tryAutoApplyStreakShield()).toBe(false);
+  });
+
+  it("applies shield when yesterday missed and shield available", () => {
+    const yesterday = getYesterdayDateString();
+    localStorage.setItem(STREAK_FREEZE_KEY, "1");
+    const result = tryAutoApplyStreakShield();
+    expect(result).toBe(true);
+    expect(getStreakFreezeCount()).toBe(0);
+    expect(wasYesterdayMissed()).toBe(false);
+  });
+});
+
+describe("recordDailyCompletion / shield earning", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("grants shield at 5-day streak when count is 0", () => {
+    const today = getTodayDateString();
+    const d = new Date(today);
+    for (let i = 1; i <= 4; i++) {
+      d.setDate(d.getDate() - 1);
+      const dateStr = d.toISOString().slice(0, 10);
+      localStorage.setItem(`phuzzle:daily:${dateStr}:completed`, "true");
+    }
+    const streak = recordDailyCompletion(60);
+    expect(streak).toBe(5);
+    expect(getStreakFreezeCount()).toBe(1);
+  });
+
+  it("does not grant shield when streak is below 5", () => {
+    const today = getTodayDateString();
+    const d = new Date(today);
+    d.setDate(d.getDate() - 1);
+    const yesterday = d.toISOString().slice(0, 10);
+    localStorage.setItem(`phuzzle:daily:${yesterday}:completed`, "true");
+    recordDailyCompletion(60);
+    expect(getStreakFreezeCount()).toBe(0);
   });
 });
 

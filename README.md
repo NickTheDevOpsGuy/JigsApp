@@ -84,6 +84,9 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### UX and polish
 
+- **Alternate piece shapes** – Replay with Classic, Irregular, or Hard mode cuts; separate best times per cut (completion overlay)
+- **Near-completion effects** – Subtle pulse and glow when 3 pieces remain (hidden during drag)
+- **Export session stats** – Download placement timestamps, snap counts, idle durations as JSON (Profile tab or debug menu)
 - **Border complete celebration** – Subtle confetti and "Border complete!" toast when all edge and corner pieces are placed (once per puzzle)
 - **Challenge mode** – Optional game mode (Menu → Gameplay): full image shown for 5 seconds at puzzle start, then solve from memory; no ghost image
 - Reference image preview overlay
@@ -317,6 +320,7 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   └── SUPABASE_SETUP.md
 ├── e2e
 │   ├── home.spec.ts
+│   ├── piece-drawer.spec.ts
 │   ├── streak-freeze.spec.ts
 │   └── theme.spec.ts
 ├── lhci-reports
@@ -453,6 +457,7 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   ├── useTodayCompletionCount.test.ts
 │   │   │   └── useTodayCompletionCount.ts
 │   │   ├── puzzle
+│   │   │   ├── cutType.ts
 │   │   │   ├── canvas
 │   │   │   │   ├── pickPiece.ts
 │   │   │   │   ├── renderBoard.ts
@@ -573,7 +578,8 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   ├── 005_time_attack_completions.sql
 │   │   ├── 006_avatars_and_events.sql
 │   │   ├── 007_time_decay_completions.sql
-│   │   └── 008_completions_realtime.sql
+│   │   ├── 008_completions_realtime.sql
+│   │   └── 009_piece_cut_completions.sql
 │   └── README.md
 ├── test-results
 │   ├── home-Home-Menu-shows-main-action-buttons-webkit-retry2

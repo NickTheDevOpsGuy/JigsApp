@@ -43,7 +43,7 @@ export function LeaderboardList({
 
   return (
     <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
-      {entries.map((entry, i) => {
+      {entries.map((entry) => {
         const key = `${keyPrefix}-${entry.rank}-${"displayName" in entry ? entry.displayName : ""}`;
         const isExpanded = expandedRowKey === key;
         return (

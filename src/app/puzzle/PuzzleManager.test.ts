@@ -41,4 +41,64 @@ describe("PuzzleManager", () => {
     expect(manager.getDragState().activeId).toBeNull();
     expect(manager.canUndo()).toBe(true);
   });
+
+  it("rotatePiece rotates clockwise, rotatePieceCCW rotates counter-clockwise", () => {
+    const manager = createManager();
+    const pieces = manager.getState().pieces.filter(
+      (p) => !p.inTray && !p.isPlaced && !p.locked,
+    );
+    if (pieces.length === 0) return;
+    const piece = pieces[0];
+    const initialRotation = piece.rotation;
+
+    manager.rotatePiece(piece.id);
+    let state = manager.getState();
+    const afterCW =
+      state.pieces.find((p) => p.id === piece.id)?.rotation ?? initialRotation;
+    expect(afterCW).toBe((initialRotation + 90) % 360);
+
+    manager.rotatePieceCCW(piece.id);
+    state = manager.getState();
+    const afterCCW =
+      state.pieces.find((p) => p.id === piece.id)?.rotation ?? afterCW;
+    expect(afterCCW).toBe(initialRotation);
+  });
+
+  it("mergeTrayPiecesIntoCluster assigns same groupId to selected tray pieces", () => {
+    const manager = createManager();
+    const pieces = manager.getState().pieces.filter(
+      (p) => !p.inTray && !p.isPlaced && !p.locked,
+    );
+    if (pieces.length < 2) return;
+
+    const [p1, p2] = pieces;
+    manager.sendToTray(p1.id);
+    manager.sendToTray(p2.id);
+
+    const before = manager.getState();
+    expect(before.pieces.find((p) => p.id === p1.id)?.groupId).not.toBe(
+      before.pieces.find((p) => p.id === p2.id)?.groupId,
+    );
+
+    manager.mergeTrayPiecesIntoCluster([p1.id, p2.id]);
+
+    const after = manager.getState();
+    const g1 = after.pieces.find((p) => p.id === p1.id)?.groupId;
+    const g2 = after.pieces.find((p) => p.id === p2.id)?.groupId;
+    expect(g1).toBe(g2);
+  });
+
+  it("mergeTrayPiecesIntoCluster does nothing with fewer than 2 tray pieces", () => {
+    const manager = createManager();
+    const pieces = manager.getState().pieces.filter(
+      (p) => !p.inTray && !p.isPlaced && !p.locked,
+    );
+    if (pieces.length === 0) return;
+
+    manager.sendToTray(pieces[0].id);
+    const before = manager.getState();
+    manager.mergeTrayPiecesIntoCluster([pieces[0].id]);
+    const after = manager.getState();
+    expect(after).toEqual(before);
+  });
 });

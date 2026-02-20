@@ -1,7 +1,7 @@
 /**
  * StatsScreen – leaderboards, achievements, profile, streaks (Supabase).
  */
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, BarChart3, Trophy, Award, User } from "lucide-react";
 import { Button } from "@/components/Button/Button";
@@ -40,9 +40,11 @@ import {
 import { LeaderboardFilterPills } from "./LeaderboardFilterPills";
 import { AVATAR_HATS, AVATAR_GLASSES, AVATAR_HOODIES } from "@/data/avatarOptions";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
-import { loadLastSessionMetrics } from "@/screens/Play/placementMetrics";
-import { useTheme } from "@/hooks/useTheme";
-
+import {
+  loadLastSessionMetrics,
+  downloadSessionStatsJson,
+  getMetricsFromSaved,
+} from "@/screens/Play/placementMetrics";
 export type LeaderboardType =
   | "today"
   | "timeAttack"
@@ -59,16 +61,7 @@ type StatsTab = "dashboard" | "profile" | "leaderboard" | "achievements";
 
 export function StatsScreen() {
   const nav = useNavigate();
-  const { theme, setTheme } = useTheme();
   const [searchParams] = useSearchParams();
-  const prevThemeRef = useRef(theme);
-
-  // Force light theme on leaderboard for readability; restore on leave
-  useEffect(() => {
-    prevThemeRef.current = theme;
-    setTheme("light");
-    return () => setTheme(prevThemeRef.current);
-  }, [setTheme]);
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<StatsTab>(() => {
     if (
@@ -380,7 +373,7 @@ export function StatsScreen() {
                   </div>
                   <div className={styles.statCard}>
                     <span className={styles.statValue}>{getStreakFreezeCount()}</span>
-                    <span className={styles.statLabel}>Streak freeze</span>
+                    <span className={styles.statLabel}>Streak shield</span>
                   </div>
                 </div>
                 {personalBests.length > 0 && (
@@ -418,15 +411,32 @@ export function StatsScreen() {
                     </ol>
                   </>
                 )}
+                {personalBests.length === 0 && !loadLastSessionMetrics() && (
+                  <div className={styles.dashboardTip}>
+                    <p>
+                      Complete puzzles to see personal bests and speed metrics here. Try
+                      the{" "}
+                      <button
+                        type="button"
+                        className={styles.dashboardTipLink}
+                        onClick={() => setActiveTab("leaderboard")}
+                      >
+                        Leaderboard
+                      </button>{" "}
+                      tab to compete with others.
+                    </p>
+                  </div>
+                )}
                 {(() => {
-                  const pm = loadLastSessionMetrics();
-                  if (!pm) return null;
+                  const data = loadLastSessionMetrics();
+                  const pm = getMetricsFromSaved(data);
+                  if (!pm || !data) return null;
                   return (
                     <>
                       <h2>Placement Speed (Last Session)</h2>
                       <p className={styles.hint}>
                         Insights from your most recent puzzle
-                        {pm.grid ? ` (${pm.grid})` : ""}.
+                        {data.grid ? ` (${data.grid})` : ""}.
                       </p>
                       <div className={styles.statsGrid}>
                         <div className={styles.statCard}>
@@ -577,6 +587,27 @@ export function StatsScreen() {
                 >
                   {profileSaving ? "Saving…" : "Save"}
                 </Button>
+
+                <div className={styles.profileRow} style={{ marginTop: "1rem" }}>
+                  <h3 className={styles.avatarSection}>📊 Session Stats Export</h3>
+                  <p className={styles.hint}>
+                    Download last completed puzzle&apos;s placement timestamps, snap
+                    counts, and idle durations as JSON (for advanced users).
+                  </p>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => downloadSessionStatsJson()}
+                    disabled={!loadLastSessionMetrics()}
+                    title={
+                      loadLastSessionMetrics()
+                        ? "Download last session stats as JSON"
+                        : "Complete a puzzle to have session data to export"
+                    }
+                  >
+                    Export session stats (JSON)
+                  </Button>
+                </div>
               </div>
             )}
 

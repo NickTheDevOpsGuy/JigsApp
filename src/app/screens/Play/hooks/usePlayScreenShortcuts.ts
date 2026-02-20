@@ -120,7 +120,11 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
                 typeof window !== "undefined" &&
                 window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-              manager.rotatePiece(piece.id);
+              if (action === "rotateCCW") {
+                manager.rotatePieceCCW(piece.id);
+              } else {
+                manager.rotatePiece(piece.id);
+              }
               soundManager.play("rotate");
 
               if (!reducedMotion && rotationAnimRef) {

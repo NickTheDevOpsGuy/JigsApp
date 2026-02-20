@@ -19,7 +19,14 @@ import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 
-import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
+import {
+  STORAGE_KEY,
+  GRID_KEY,
+  SHOW_DEBUG,
+  parseGrid,
+  getStoredPieceCut,
+  setStoredPieceCut,
+} from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
 import { getBestTime } from "./timeMode";
 import { computeTimeDecayScore } from "./timeDecayScore";
@@ -90,6 +97,7 @@ export function PlayScreen() {
   } = sessionResult;
 
   const grid = session ? session.grid : localGrid;
+  const cutType = getStoredPieceCut();
 
   useLayoutEffect(() => {
     if (session) {
@@ -175,6 +183,7 @@ export function PlayScreen() {
   const [timeDecayCombo, setTimeDecayCombo] = React.useState(0);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
   const [showReplayModal, setShowReplayModal] = React.useState(false);
+  const [cutKey, setCutKey] = React.useState(0);
   const [clusterMode, setClusterMode] = React.useState(false);
   const [selectedTrayIds, setSelectedTrayIds] = React.useState<Set<string>>(new Set());
 
@@ -214,6 +223,7 @@ export function PlayScreen() {
     countdownMinutes,
     lastInteractionRef,
     resumeChoice,
+    cutKey,
     {
       haptic: hapticsEnabled ? haptics.vibrate : undefined,
       themeRef,
@@ -361,7 +371,8 @@ export function PlayScreen() {
     const seq = placementSequenceRef.current;
     const sessionDurationMs = elapsedSeconds * 1000;
     const metrics = computeSessionMetrics(seq, sessionDurationMs);
-    if (metrics) saveLastSessionMetrics(metrics, state.grid);
+    if (metrics)
+      saveLastSessionMetrics(metrics, state.grid, seq, elapsedSeconds);
   }, [state?.isComplete, state?.grid, elapsedSeconds, placementSequenceRef]);
 
   usePlayScreenEffects({
@@ -476,18 +487,18 @@ export function PlayScreen() {
     // Save immediately every N placements
     const movesSinceSave = placed - lastSavedPlacedCountRef.current;
     if (movesSinceSave >= SAVE_EVERY_N_MOVES) {
-      savePuzzleState(url, state.grid, state.pieces, elapsedSeconds);
+      savePuzzleState(url, state.grid, state.pieces, elapsedSeconds, cutType);
       lastSavedPlacedCountRef.current = placed;
       return;
     }
 
     // Otherwise debounce
     const id = setTimeout(
-      () => savePuzzleState(url, state.grid, state.pieces, elapsedSeconds),
+      () => savePuzzleState(url, state.grid, state.pieces, elapsedSeconds, cutType),
       SAVE_DEBOUNCE_MS,
     );
     return () => clearTimeout(id);
-  }, [state, elapsedSeconds]);
+  }, [state, elapsedSeconds, cutType]);
 
   // Co-op: push state to server when in session
   useEffect(() => {
@@ -516,7 +527,13 @@ export function PlayScreen() {
       if (!s || s.isComplete) return;
       const url = localStorage.getItem(STORAGE_KEY) || "";
       if (!url) return;
-      savePuzzleState(url, s.grid, s.pieces, elapsedSecondsRef.current);
+      savePuzzleState(
+        url,
+        s.grid,
+        s.pieces,
+        elapsedSecondsRef.current,
+        getStoredPieceCut(),
+      );
 
       const placed = s.placedCount ?? 0;
       const total = s.totalCount ?? 1;
@@ -816,7 +833,7 @@ export function PlayScreen() {
   }, [immersiveMode]);
   const bestTimeSeconds =
     timeMode === "best" && state?.grid
-      ? getBestTime(state.grid.rows, state.grid.cols)
+      ? getBestTime(state.grid.rows, state.grid.cols, cutType)
       : null;
 
   // Early-exit UI for co-op join flow (must be after all hooks to avoid React #300)
@@ -1177,6 +1194,12 @@ export function PlayScreen() {
               onNewPuzzle={handleNewGame}
               onMenu={() => navigate("/")}
               onReplay={() => setShowReplayModal(true)}
+              cutType={cutType}
+              onReplayWithCut={(cut) => {
+                setStoredPieceCut(cut);
+                clearPuzzleState();
+                setCutKey((k) => k + 1);
+              }}
             />
           )}
         </div>

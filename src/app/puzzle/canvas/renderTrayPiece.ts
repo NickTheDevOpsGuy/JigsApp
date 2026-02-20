@@ -16,16 +16,22 @@ export function renderTrayPiece(
   assembledH: number,
   scale: number = 0.5,
 ): HTMLCanvasElement {
+  const dpr = Math.min(window.devicePixelRatio || 1, 3); // Cap at 3x for performance
+  // Render at minimum 2x resolution for crisp thumbnails on any display
+  const drawScale = scale * Math.max(dpr, 2);
+
   // Canvas must fit rotated piece: 90°/270° swaps w/h
   const baseSize = Math.max(piece.w, piece.h);
   const canvas = document.createElement("canvas");
-  canvas.width = Math.ceil(baseSize * scale);
-  canvas.height = Math.ceil(baseSize * scale);
+  canvas.width = Math.ceil(baseSize * drawScale);
+  canvas.height = Math.ceil(baseSize * drawScale);
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
 
-  ctx.scale(scale, scale);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.scale(drawScale, drawScale);
 
   // Build clip path
   let path: Path2D | null = null;

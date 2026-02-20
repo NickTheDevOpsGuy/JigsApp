@@ -1,9 +1,11 @@
 /* src/app/components/PieceTray/PieceTray.module.css */
 
 .tray {
-  /* Height set via inline style from getTrayHeight() – varies by piece count */
-  min-height: 100px;
-  max-height: 220px;
+  position: relative;
+  z-index: 100;
+  /* Height set via inline style from getTrayHeight() */
+  min-height: 110px;
+  max-height: 200px;
   flex-shrink: 0;
   min-width: 0;
   max-width: 100%;
@@ -51,9 +53,9 @@ html.theme-sunset .tray {
 }
 
 .header {
-  padding: 6px 12px;
+  padding: 5px 10px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-bg-card);
   flex-shrink: 0;
@@ -65,6 +67,7 @@ html.theme-sunset .tray {
   left: 0;
   right: 0;
   z-index: 2;
+  pointer-events: auto;
   min-width: 0;
   /* Sticky filter row: stays visible when scrolling piece thumbnails */
   box-shadow: 0 1px 0 var(--color-border);
@@ -77,7 +80,20 @@ html.theme-sunset .tray {
 }
 
 .title {
+  flex: 1;
   font-weight: 600;
+  min-width: 0;
+}
+
+.modeBadge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--color-brand-light);
+  color: var(--color-brand-primary);
+  border: 1px solid var(--color-brand-primary);
 }
 
 .compactToggle {
@@ -102,6 +118,61 @@ html.theme-sunset .tray {
 
 .compactToggle:active {
   transform: scale(0.95);
+}
+
+.cogBtn {
+  appearance: none;
+  margin-left: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.cogBtn:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.cogBtn:active {
+  transform: scale(0.95);
+}
+
+/* Portal popup – fixed above tray, matches HeaderMenu look */
+.trayOptionsPortal {
+  position: fixed;
+  z-index: 1100;
+  min-width: 200px;
+  max-height: min(70vh, 400px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+  padding: 8px 0;
+  animation: trayMenuFadeIn 0.15s ease;
+}
+
+@keyframes trayMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .controls {
@@ -171,14 +242,49 @@ html.theme-sunset .tray {
   cursor: not-allowed;
 }
 
+.scrollerWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.scrollBtn {
+  flex-shrink: 0;
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scrollBtn:hover:not(:disabled) {
+  background: var(--color-bg-secondary);
+  color: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.scrollBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* Visual "you are here" scroll position indicator */
 .scrollIndicator {
   flex-shrink: 0;
-  height: 6px;
+  height: 4px;
   background: var(--color-bg-secondary);
-  border-radius: 3px;
+  border-radius: 2px;
   overflow: hidden;
-  margin: 0 12px 6px;
+  margin: 0 10px 4px;
 }
 
 .scrollIndicatorFill {
@@ -190,11 +296,12 @@ html.theme-sunset .tray {
 
 .scroller {
   flex: 1;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 8px 12px;
-  padding-inline-end: max(16px, env(safe-area-inset-right, 0));
-  padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+  padding: 6px 10px;
+  padding-inline-end: max(14px, env(safe-area-inset-right, 0));
+  padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
   display: flex;
   gap: 8px;
   align-items: center;
@@ -277,33 +384,18 @@ html.theme-sunset .tray {
 }
 
 .pieceHighlighted {
-  box-shadow: 0 0 0 2px var(--color-brand-primary);
+  box-shadow: 0 0 0 3px var(--color-brand-primary);
   position: relative;
   z-index: 1;
 }
 
 .pieceDimmed {
-  opacity: 0.4;
+  opacity: 0.35;
   transition: opacity 0.2s ease;
 }
 
 .pieceDimmed:hover {
-  opacity: 0.7;
-}
-
-.clusterBtn {
-  padding: 6px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  background: var(--color-brand-primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.clusterBtn:hover {
-  opacity: 0.9;
+  opacity: 0.65;
 }
 
 .thumbWrap {
@@ -350,16 +442,16 @@ html.theme-sunset .tray {
   font-size: 13px;
 }
 
-/* Compact mode: smaller thumbs for 25+ piece puzzles on mobile */
+/* Compact mode: smaller thumbs for density when user opts in */
 .trayCompact .thumbWrap {
-  width: 36px;
-  height: 36px;
+  width: 64px;
+  height: 64px;
 }
 
 .trayCompact .pieceButton {
-  min-width: 40px;
-  min-height: 40px;
-  padding: 2px;
+  min-width: 68px;
+  min-height: 68px;
+  padding: 4px;
 }
 
 .trayCompact .row {
@@ -367,9 +459,9 @@ html.theme-sunset .tray {
 }
 
 .trayCompact .scroller {
-  padding: 6px 12px;
-  padding-inline-end: max(16px, env(safe-area-inset-right, 0));
-  padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+  padding: 4px 10px;
+  padding-inline-end: max(14px, env(safe-area-inset-right, 0));
+  padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
 }
 
 /* Mobile adjustments */
@@ -388,6 +480,12 @@ html.theme-sunset .tray {
     font-size: 13px;
   }
 
+  .cogBtn {
+    padding: 8px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
   .help {
     display: none;
   }
@@ -404,28 +502,37 @@ html.theme-sunset .tray {
   }
 
   .thumbWrap {
-    width: 52px;
-    height: 52px;
+    width: 72px;
+    height: 72px;
   }
 
   .pieceButton {
-    min-width: 56px;
-    min-height: 56px;
+    min-width: 76px;
+    min-height: 76px;
     padding: 6px;
   }
 
   /* Mobile compact overrides */
   .trayCompact .thumbWrap {
-    width: 36px;
-    height: 36px;
+    width: 64px;
+    height: 64px;
   }
 
   .trayCompact .pieceButton {
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 68px;
+    min-height: 68px;
   }
 
   .trayCompact .scrollIndicator {
     margin: 0 6px 2px;
+  }
+
+  /* Larger scroll arrows for easier tapping on mobile */
+  .scrollBtn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 10px;
   }
 }

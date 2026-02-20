@@ -61,6 +61,8 @@ export type AnimationState = {
   showGhostImage?: boolean;
   /** When true, ghost image is not shown (competitive/daily mode). */
   isCompetitiveOrDaily?: boolean;
+  /** When 3, show subtle pulse and glow around final area (builds anticipation). */
+  piecesRemaining?: number;
 };
 
 /** Cache for pre-rendered pieces - clip at (0,0) gives crisp edges, avoids blocky look when moving */
@@ -152,9 +154,9 @@ export function renderBoard(
   const { cols, rows } = state.grid;
 
   // Optional subtle alignment grid (Settings → View)
+  const tileW = assembledW / cols;
+  const tileH = assembledH / rows;
   if (animState?.showAlignmentGrid) {
-    const tileW = assembledW / cols;
-    const tileH = assembledH / rows;
     drawAlignmentGrid(ctx, cols, rows, tileW, tileH);
   }
 
@@ -189,6 +191,26 @@ export function renderBoard(
   const draggedGroupId = dragState?.activeId
     ? (state.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
     : null;
+
+  // Near completion (3 pieces remaining): subtle pulse + glow around final area (hide during drag)
+  if (
+    animState?.piecesRemaining === 3 &&
+    !state.isComplete &&
+    !draggedGroupId
+  ) {
+    const remainingPieces = state.pieces.filter((p) => !p.isPlaced);
+    if (remainingPieces.length === 3) {
+      drawNearCompletionEffects(
+        ctx,
+        remainingPieces,
+        tileW,
+        tileH,
+        assembledW,
+        assembledH,
+        nowMs,
+      );
+    }
+  }
 
   // Draw order by z (lowest -> highest) - only pieces NOT in tray
   const pieces = [...state.pieces]
@@ -687,6 +709,71 @@ function strokePieceOutline(
     ctx.lineWidth = 1;
   }
   ctx.stroke(path);
+}
+
+/**
+ * Near completion: subtle pulse + glow around the 3 empty slots.
+ * Builds anticipation without distracting during precise placement.
+ */
+function drawNearCompletionEffects(
+  ctx: CanvasRenderingContext2D,
+  remainingPieces: Piece[],
+  tileW: number,
+  tileH: number,
+  assembledW: number,
+  assembledH: number,
+  nowMs: number,
+) {
+  if (remainingPieces.length !== 3) return;
+
+  ctx.save();
+
+  // 1) Subtle pulse – very soft overlay over assembled area (alpha 0.02–0.04)
+  const pulsePeriodMs = 1800;
+  const pulse = 0.5 + 0.5 * Math.sin((nowMs / pulsePeriodMs) * Math.PI * 2);
+  const pulseAlpha = 0.02 + 0.02 * pulse;
+  const cx = assembledW / 2;
+  const cy = assembledH / 2;
+  const rad = Math.max(assembledW, assembledH) / 2;
+  const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+  gradient.addColorStop(0, `rgba(255, 200, 120, ${pulseAlpha})`);
+  gradient.addColorStop(1, "rgba(255, 200, 120, 0)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, assembledW, assembledH);
+
+  // 2) Slight glow around final area – bounding box of 3 target slots
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const p of remainingPieces) {
+    const cx = p.targetX + tileW / 2;
+    const cy = p.targetY + tileH / 2;
+    minX = Math.min(minX, cx);
+    minY = Math.min(minY, cy);
+    maxX = Math.max(maxX, cx);
+    maxY = Math.max(maxY, cy);
+  }
+  const pad = Math.max(tileW, tileH) * 0.5;
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+  const radius = Math.hypot(maxX - minX + pad, maxY - minY + pad) * 0.6;
+  const glowAlpha = 0.03 + 0.02 * Math.sin((nowMs / 1500) * Math.PI * 2);
+  const glow = ctx.createRadialGradient(
+    centerX,
+    centerY,
+    0,
+    centerX,
+    centerY,
+    radius,
+  );
+  glow.addColorStop(0, `rgba(255, 210, 100, ${glowAlpha})`);
+  glow.addColorStop(0.6, `rgba(255, 200, 80, ${glowAlpha * 0.4})`);
+  glow.addColorStop(1, "rgba(255, 200, 80, 0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(centerX - radius, centerY - radius, radius * 2, radius * 2);
+
+  ctx.restore();
 }
 
 function drawCompletionGlow(

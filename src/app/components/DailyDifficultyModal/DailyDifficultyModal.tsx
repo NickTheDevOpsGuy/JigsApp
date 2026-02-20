@@ -6,11 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { Modal } from "@/components/Modal/Modal";
 import {
   GRID_OPTIONS,
+  clearShieldAutoAppliedFlag,
   dismissFreezeOfferToday,
   getStreakFreezeCount,
   getYesterdayDateString,
   useStreakFreeze,
   wasFreezeOfferDismissedToday,
+  wasShieldAutoAppliedThisSession,
   wasYesterdayMissed,
 } from "@/daily/dailyPuzzleCore";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
@@ -33,6 +35,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     getStreakFreezeCount() > 0 &&
     !freezeUsed &&
     !wasFreezeOfferDismissedToday();
+  const showShieldApplied = wasShieldAutoAppliedThisSession();
 
   useEffect(() => {
     if (isOpen) {
@@ -70,6 +73,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   };
 
   const handleStart = (grid: { rows: number; cols: number }) => {
+    clearShieldAutoAppliedFlag();
     clearPuzzleState();
     const result = dailyModule.startDailyPuzzle(grid);
     if (result) {
@@ -78,13 +82,23 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     }
   };
 
+  const handleClose = () => {
+    clearShieldAutoAppliedFlag();
+    onClose();
+  };
+
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title="🧩 Today's Puzzle"
       showCloseButton={true}
     >
+      {showShieldApplied && (
+        <div className={styles.shieldApplied} role="status">
+          🛡️ Streak shielded! Your streak is protected.
+        </div>
+      )}
       {showFreezeOffer && (
         <div
           className={styles.freezeOffer}
@@ -93,10 +107,10 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
           aria-describedby="streak-freeze-hint"
         >
           <span id="streak-freeze-label">
-            You missed yesterday. Use your streak freeze to protect your streak?
+            You missed yesterday. Use your streak shield to protect your streak?
           </span>
           <span id="streak-freeze-hint" className={styles.freezeHint}>
-            One per week — your streak won&apos;t break.
+            Earn at 5-day streak — one per week.
           </span>
           <div className={styles.freezeActions}>
             <button
@@ -105,7 +119,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
               className={styles.freezeBtn}
               onClick={handleUseFreeze}
             >
-              🧊 Use Freeze
+              🛡️ Use Shield
             </button>
             <button
               type="button"

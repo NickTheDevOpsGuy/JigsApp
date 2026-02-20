@@ -1,9 +1,34 @@
 /**
  * playScreenUtils – storage keys, parseGrid, computeTileSize, difficulty tiers.
  */
+import type { CutType } from "@/puzzle/cutType";
+
 export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
+export const PIECE_CUT_KEY = "phuzzle:pieceCut";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
+
+export type { CutType } from "@/puzzle/cutType";
+
+/** Get stored piece cut type. Default: classic. */
+export function getStoredPieceCut(): CutType {
+  try {
+    const raw = localStorage.getItem(PIECE_CUT_KEY);
+    if (raw === "irregular" || raw === "hard") return raw;
+  } catch {
+    // ignore
+  }
+  return "classic";
+}
+
+/** Store piece cut type. */
+export function setStoredPieceCut(cut: CutType): void {
+  try {
+    localStorage.setItem(PIECE_CUT_KEY, cut);
+  } catch {
+    // ignore
+  }
+}
 export const GHOST_HINT_KEY = "phuzzle:ghostHint";
 export const IMMERSIVE_MODE_KEY = "phuzzle:immersiveMode";
 export const ALIGNMENT_GRID_KEY = "phuzzle:alignmentGrid";
