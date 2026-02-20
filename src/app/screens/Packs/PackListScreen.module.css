@@ -108,3 +108,35 @@
   color: var(--color-text-muted);
   margin-top: 4px;
 }
+
+@media (max-width: 600px) {
+  .page {
+    padding: env(safe-area-inset-top) 12px max(16px, env(safe-area-inset-bottom));
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .packCard {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+
+  .packName {
+    font-size: 15px;
+  }
+
+  .packDesc {
+    font-size: 12px;
+  }
+}

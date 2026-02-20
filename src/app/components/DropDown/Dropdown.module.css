@@ -61,6 +61,19 @@
   pointer-events: none;
 }
 
+.compact {
+  gap: 4px;
+}
+
+.compact .label {
+  font-size: 12px;
+}
+
+.compact .select {
+  padding: 8px 32px 8px 10px;
+  font-size: 13px;
+}
+
 /* Mobile */
 @media (max-width: 600px) {
   .select {

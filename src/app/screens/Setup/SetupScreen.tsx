@@ -14,6 +14,7 @@ import { CameraCapture } from "./components/CameraCapture";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
 import { COUNTDOWN_OPTIONS, getBestTime, type TimeMode } from "../Play/timeMode";
 import { getSuggestedGrid } from "../Play/playScreenUtils";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const TIME_MODE_LABELS: Record<TimeMode, string> = {
   elapsed: "Elapsed",
@@ -104,6 +105,7 @@ export function SetupScreen() {
     useTimeModeConfig();
 
   const suggestedGrid = useMemo(() => getSuggestedGrid(getBestTime), []);
+  const isMobile = useMediaQuery("(max-width: 520px)");
 
   // Load existing image on mount
   useEffect(() => {
@@ -257,7 +259,7 @@ export function SetupScreen() {
           {effectiveRows * effectiveCols} pieces
           {isCustom ? " · Custom" : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
         </p>
-        {suggestedGrid && gridIndex !== suggestedGrid.gridIndex && (
+        {suggestedGrid && gridIndex !== suggestedGrid.gridIndex && !isMobile && (
           <button
             type="button"
             className={styles.difficultySuggestion}
@@ -266,42 +268,51 @@ export function SetupScreen() {
             Based on your progress, try {suggestedGrid.rows}×{suggestedGrid.cols} next →
           </button>
         )}
-        <Dropdown
-          label="Difficulty"
-          value={gridIndex}
-          onChange={(val: string) => setGridIndex(Number(val))}
-          options={GRID_OPTIONS.map((opt, i) => ({
-            value: i,
-            label:
-              opt.rows > 0
-                ? opt.label
-                : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
-          }))}
-          fullWidth
-        />
-
-        <Dropdown
-          label="Time mode"
-          value={timeMode}
-          onChange={(val: string) => setTimeMode(val as TimeMode)}
-          options={(
-            ["elapsed", "countdown", "active", "relaxed", "best"] as TimeMode[]
-          ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
-          fullWidth
-        />
-
-        {timeMode === "countdown" && (
+        <div className={styles.configGrid}>
           <Dropdown
-            label="Countdown length"
-            value={countdownMinutes}
-            onChange={(val: string) => setCountdownMinutes(Number(val))}
-            options={COUNTDOWN_OPTIONS.map((m) => ({
-              value: m,
-              label: `${m} minutes`,
+            label="Difficulty"
+            compact={isMobile}
+            value={gridIndex}
+            onChange={(val: string) => setGridIndex(Number(val))}
+            options={GRID_OPTIONS.map((opt, i) => ({
+              value: i,
+              label:
+                opt.rows > 0
+                  ? isMobile && opt.labelShort
+                    ? opt.labelShort
+                    : opt.label
+                  : isMobile
+                    ? `Custom ${customRows}×${customCols}`
+                    : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
             }))}
             fullWidth
           />
-        )}
+
+          <Dropdown
+            label="Time mode"
+            compact={isMobile}
+            value={timeMode}
+            onChange={(val: string) => setTimeMode(val as TimeMode)}
+            options={(
+              ["elapsed", "countdown", "active", "relaxed", "best"] as TimeMode[]
+            ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
+            fullWidth
+          />
+
+          {timeMode === "countdown" && (
+            <Dropdown
+              label="Countdown"
+              compact={isMobile}
+              value={countdownMinutes}
+              onChange={(val: string) => setCountdownMinutes(Number(val))}
+              options={COUNTDOWN_OPTIONS.map((m) => ({
+                value: m,
+                label: `${m} min`,
+              }))}
+              fullWidth
+            />
+          )}
+        </div>
 
         {isCustom && (
           <div className={styles.customGrid}>

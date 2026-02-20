@@ -103,9 +103,14 @@
 }
 
 @media (max-width: 600px) {
+  .overlay {
+    padding: 8px;
+    align-items: flex-start;
+  }
+
   .modal {
-    max-height: 70vh;
-    margin: 8px;
+    max-height: min(90dvh, 90vh);
+    margin: 0;
     overflow: hidden;
   }
 
@@ -120,7 +125,9 @@
 
   .content {
     padding: 12px 16px;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    min-height: 0;
   }
 }
 

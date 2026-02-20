@@ -58,6 +58,12 @@
   background: var(--color-overlay-content);
 }
 
+.configGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .file {
   height: 48px;
   border-radius: 12px;
@@ -373,9 +379,10 @@
 
   .card {
     padding: 10px 12px;
-    gap: 6px;
+    gap: 4px;
     min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -429,6 +436,16 @@
     display: none;
   }
 
+  .customGrid {
+    gap: 8px;
+  }
+
+  .customGridInput {
+    height: 38px;
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
   .galleryItem {
     flex: 0 0 64px;
     height: 62px;
@@ -446,18 +463,28 @@
     font-size: 12px;
   }
 
+  .configGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .configGrid > :last-child:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
   .preview {
     flex-shrink: 0;
   }
 
   .previewImg {
-    height: min(22vh, 110px);
-    max-height: 110px;
+    height: min(18vh, 90px);
+    max-height: 90px;
   }
 
   .previewEmpty {
-    padding: min(10vh, 48px) 0;
-    font-size: 14px;
+    padding: min(8vh, 40px) 0;
+    font-size: 13px;
   }
 
   .row {

@@ -72,6 +72,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  max-height: 50vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 4px;
 }
 
 .difficultyBtn {
@@ -114,6 +118,19 @@
 @media (max-width: 400px) {
   .difficulties {
     grid-template-columns: 1fr;
+    max-height: 55dvh;
+  }
+
+  .difficultyBtn {
+    padding: 12px 14px;
+  }
+
+  .difficultyLabel {
+    font-size: 14px;
+  }
+
+  .difficultyPieces {
+    font-size: 11px;
   }
 
   /* Stack freeze buttons for full-width touch targets on narrow screens */

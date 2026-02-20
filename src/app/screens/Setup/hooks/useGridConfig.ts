@@ -9,17 +9,19 @@ const MAX_GRID = 12;
 
 export type GridOption = {
   label: string;
+  /** Short label for mobile dropdowns (saves space) */
+  labelShort?: string;
   rows: number;
   cols: number;
 };
 
 export const GRID_OPTIONS: GridOption[] = [
-  { label: "Easy 🌱 (3×3 - 9 pieces)", rows: 3, cols: 3 },
-  { label: "Medium ⚡ (4×4 - 16 pieces)", rows: 4, cols: 4 },
-  { label: "Hard 🔥 (5×5 - 25 pieces)", rows: 5, cols: 5 },
-  { label: "Expert 👑 (6×6 - 36 pieces)", rows: 6, cols: 6 },
-  { label: "Master 🧠 (7×7 - 49 pieces)", rows: 7, cols: 7 },
-  { label: "Legend 🔮 (8×8 - 64 pieces)", rows: 8, cols: 8 },
+  { label: "Easy 🌱 (3×3 - 9 pieces)", labelShort: "3×3 Easy", rows: 3, cols: 3 },
+  { label: "Medium ⚡ (4×4 - 16 pieces)", labelShort: "4×4 Medium", rows: 4, cols: 4 },
+  { label: "Hard 🔥 (5×5 - 25 pieces)", labelShort: "5×5 Hard", rows: 5, cols: 5 },
+  { label: "Expert 👑 (6×6 - 36 pieces)", labelShort: "6×6 Expert", rows: 6, cols: 6 },
+  { label: "Master 🧠 (7×7 - 49 pieces)", labelShort: "7×7 Master", rows: 7, cols: 7 },
+  { label: "Legend 🔮 (8×8 - 64 pieces)", labelShort: "8×8 Legend", rows: 8, cols: 8 },
   { label: "Custom", rows: 0, cols: 0 },
 ];
 

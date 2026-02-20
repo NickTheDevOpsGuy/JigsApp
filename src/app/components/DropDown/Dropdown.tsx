@@ -16,6 +16,7 @@ type DropdownProps = {
   label?: string;
   disabled?: boolean;
   fullWidth?: boolean;
+  compact?: boolean;
   className?: string;
 };
 
@@ -26,11 +27,12 @@ export function Dropdown({
   label,
   disabled = false,
   fullWidth = false,
+  compact = false,
   className = "",
 }: DropdownProps) {
   return (
     <div
-      className={`${styles.wrapper} ${fullWidth ? styles.fullWidth : ""} ${className}`}
+      className={`${styles.wrapper} ${fullWidth ? styles.fullWidth : ""} ${compact ? styles.compact : ""} ${className}`}
     >
       {label && <label className={styles.label}>{label}</label>}
       <div className={styles.selectWrapper}>

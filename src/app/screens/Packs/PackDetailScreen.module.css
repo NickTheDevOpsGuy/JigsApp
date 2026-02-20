@@ -160,3 +160,43 @@
   text-align: center;
   color: var(--color-text-muted);
 }
+
+@media (max-width: 600px) {
+  .page {
+    padding: env(safe-area-inset-top) 12px max(16px, env(safe-area-inset-bottom));
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .packHeader {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .packEmoji {
+    font-size: 2rem;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .desc {
+    font-size: 13px;
+  }
+
+  .puzzleGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .puzzleCard {
+    padding: 10px;
+  }
+
+  .puzzleName {
+    font-size: 12px;
+  }
+}
