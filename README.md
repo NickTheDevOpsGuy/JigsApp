@@ -104,6 +104,13 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### Social and progress
 
+- **Player percentile ranking** – Top X% shown in completion overlay per grid size (daily puzzle)
+- **Snap proximity visual** – Glow intensity increases as you near the snap point while dragging
+- **Real-time today counter** – Live count of players who completed today's puzzle on the leaderboard (Supabase Realtime)
+- **Time Attack combo meter** – Combo ×2+ appears after quick consecutive placements; breaks on idle
+- **Time Decay combo meter** – Same combo feedback in Time Decay mode (3.5s window)
+- **First finisher badge** – "First finisher today!" when you're the only one to complete that grid size
+- **Reference preview progress ring** – Circular ring fills based on completion percentage
 - **Leaderboard** – Accessible from home menu; redesigned Stats screen with Today's Daily Puzzle card, filter pills (Today/Week/Month), and Start Puzzle button
 - Daily puzzle and streak tracking
 - **Streak freeze** – One per week; use when you miss a day to keep your streak. Offered when opening Today's Puzzle if yesterday wasn't completed. See [doc/streak-freeze.md](doc/streak-freeze.md).
@@ -442,7 +449,9 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   ├── useMenuSettings.ts
 │   │   │   ├── useOnboarding.ts
 │   │   │   ├── useTheme.test.tsx
-│   │   │   └── useTheme.tsx
+│   │   │   ├── useTheme.tsx
+│   │   │   ├── useTodayCompletionCount.test.ts
+│   │   │   └── useTodayCompletionCount.ts
 │   │   ├── puzzle
 │   │   │   ├── canvas
 │   │   │   │   ├── pickPiece.ts
@@ -528,10 +537,14 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   │   ├── SetupScreen.module.css
 │   │   │   │   └── SetupScreen.tsx
 │   │   │   └── Stats
+│   │   │       ├── LeaderboardFilterPills.tsx
+│   │   │       ├── LeaderboardList.test.tsx
+│   │   │       ├── LeaderboardList.tsx
 │   │   │       ├── StatsScreen.module.css
 │   │   │       └── StatsScreen.tsx
 │   │   ├── services
 │   │   │   ├── achievementsService.ts
+│   │   │   ├── leaderboardService.test.ts
 │   │   │   ├── leaderboardService.ts
 │   │   │   ├── profileService.ts
 │   │   │   ├── puzzleSessionService.ts
@@ -558,7 +571,9 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   ├── 003_puzzle_sessions.sql
 │   │   ├── 004_puzzle_sessions_expiration.sql
 │   │   ├── 005_time_attack_completions.sql
-│   │   └── 006_avatars_and_events.sql
+│   │   ├── 006_avatars_and_events.sql
+│   │   ├── 007_time_decay_completions.sql
+│   │   └── 008_completions_realtime.sql
 │   └── README.md
 ├── test-results
 │   ├── home-Home-Menu-shows-main-action-buttons-webkit-retry2

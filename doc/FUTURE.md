@@ -6,6 +6,9 @@ Ideas and planned enhancements for Phuzzle.
 
 ## ✅ Recently Added
 
+- **Piece Scatter Animation** – At puzzle start, pieces animate into the tray with a quick scatter effect: scale up, slight random rotation, offset-to-center motion. ~0.75s, ease-out-back. Respects `prefers-reduced-motion`.
+- **Animated Background Gradient** – Extracts 2–3 dominant colors from the puzzle image and renders a soft animated gradient behind the board. Respects `prefers-reduced-motion`. Cohesive with image; lightweight sampling (32×32).
+- **Streak Flame Animation** – Subtle animated flame icon (🔥3/🌟7) next to streak holders on daily/Time Attack/Time Decay leaderboards. Encourages daily participation; respects reduced motion.
 - **Placement Speed Metrics** – Time between snaps, snaps/min, idle %, and avg drag-to-snap time from your last session. View in Stats → Dashboard. Read-only metrics (no impact on touch or drag).
 - **Border Complete Celebration** – Confetti + "Border complete!" toast when all edge and corner pieces are placed (once per puzzle).
 - **Challenge Mode** – Menu → Gameplay. Full image shown 5 seconds at start, then solve from memory; no ghost image.
@@ -118,6 +121,66 @@ Ideas and planned enhancements for Phuzzle.
 - Unique raccoon name flair for long streaks
 
 **Success criteria:** Increased daily retention; clear visible streak progress.
+
+---
+
+## Community Difficulty Rating
+
+**Section:** Gameplay / Setup
+
+**Behavior:**
+
+- Aggregate average completion time per puzzle/grid
+- Show 1–5 flame icons as difficulty indicator
+- Updates dynamically with real data
+
+**Success criteria:** Helps players choose appropriate challenge; visible before starting puzzle.
+
+**Implementation notes:**
+
+- Requires backend aggregation: avg elapsed per grid size (and optionally per image hash)
+- New `difficulty_rating` or computed from completion stats
+- Display on Setup or pack selection screen
+
+---
+
+## Smart Hint
+
+**Section:** Gameplay
+
+**Behavior:**
+
+- Analyzes current board state
+- Highlights best candidate piece for placement
+- Cooldown between uses
+
+**Success criteria:** Helps stuck players; does not auto-solve puzzle.
+
+**Implementation notes:**
+
+- Heuristic: find unplaced piece with most placed neighbors, or best edge/pattern match
+- Highlight via ghost or glow; cooldown 30–60s
+- Settings toggle for hint availability
+
+---
+
+## Ghost Race Mode
+
+**Section:** Gameplay
+
+**Behavior:**
+
+- Replay ghost piece placements in real-time from another player's session
+- Semi-transparent ghost pieces
+- Time comparison indicator
+
+**Success criteria:** Clear visual distinction between live and ghost; separate leaderboard for race mode.
+
+**Implementation notes:**
+
+- Store placement timestamps + piece IDs in completion records
+- Playback: render ghost pieces at interpolated positions based on elapsed time
+- Requires schema for `placement_sequence` or similar; race-specific leaderboard
 
 ---
 

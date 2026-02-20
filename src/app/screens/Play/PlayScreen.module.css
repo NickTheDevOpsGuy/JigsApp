@@ -236,6 +236,44 @@
   }
 }
 
+.comboMeter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #f59e0b;
+  background: linear-gradient(135deg, #f59e0b20, #ef444420);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: #f59e0b;
+  font-weight: 700;
+  animation: comboPulse 0.6s ease-out;
+}
+
+@keyframes comboPulse {
+  0% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.comboLabel {
+  font-variant-numeric: tabular-nums;
+}
+
+.comboFire {
+  margin-left: 2px;
+}
+
+.comboMeterDecay {
+  background: linear-gradient(135deg, #0ea5e920, #06b6d420);
+  border-color: #0ea5e9;
+  color: #0ea5e9;
+}
+
 .hudPillTimer {
   composes: hudPill;
   flex-shrink: 0; /* Prevent timer from being squeezed off on mobile */
@@ -376,9 +414,9 @@
   min-height: 280px;
   position: relative;
   background: var(--color-bg-elevated);
-  border-radius: 16px;
+  border-radius: 20px;
   border: 2px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md), inset 0 0 60px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   touch-action: none;
   -webkit-overflow-scrolling: auto;
@@ -386,6 +424,22 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Dark theme: richer puzzle draw with subtle depth */
+html.theme-dark .board,
+html.theme-space .board,
+html.theme-ocean .board,
+html.theme-forest .board,
+html.theme-sunset .board {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--color-bg-elevated) 100%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg-elevated) 92%, black) 50%,
+    color-mix(in srgb, var(--color-bg-elevated) 88%, black) 100%
+  );
+  box-shadow: var(--shadow-lg), inset 0 0 80px rgba(0, 0, 0, 0.15);
+  border-color: var(--color-border-strong);
 }
 
 .canvas {
@@ -451,6 +505,32 @@
 
 .previewOverlay:hover {
   opacity: 1;
+}
+
+.previewWithRing {
+  position: relative;
+  display: inline-block;
+}
+
+.previewRing {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  transform: rotate(-90deg); /* Start from top */
+  pointer-events: none;
+}
+
+.previewRingBg {
+  stroke: var(--color-border);
+  opacity: 0.4;
+}
+
+.previewRingFill {
+  stroke: var(--color-accent);
+  stroke-linecap: round;
+  opacity: 0.9;
+  transition: stroke-dashoffset 0.3s ease;
 }
 
 .previewImage {
@@ -595,6 +675,16 @@
   }
   .hudPillTimer .timerSuffix {
     display: none;
+  }
+  .comboMeter {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .previewWithRing .previewRing {
+    inset: -3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
   }
   .main {
     padding: 4px;
@@ -858,6 +948,13 @@
   font-size: clamp(0.95rem, 2.2vw, 1.1rem) !important;
   font-weight: 600;
   margin: 0.4rem 0 0.25rem 0 !important;
+}
+
+.percentileBadge {
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  font-weight: 600;
+  color: var(--color-accent);
+  margin: 0.2rem 0 0.15rem 0;
 }
 
 .gradeS {

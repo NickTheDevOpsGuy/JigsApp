@@ -57,8 +57,12 @@ export function usePlayScreenManager(
     relaxedModeEnabled?: boolean;
     /** When true, track Time Attack bonus points and combo for scoring. */
     isTimeAttack?: boolean;
+    /** Called when Time Attack combo changes (for combo meter UI). */
+    onComboChange?: (combo: number) => void;
     /** When true, track Time Decay placement bonus (score decays over time, placements add). */
     isTimeDecay?: boolean;
+    /** Called when Time Decay combo changes (for combo meter UI). */
+    onTimeDecayComboChange?: (combo: number) => void;
     /** Ref to current elapsed ms (for replay recording). */
     elapsedMsRef?: MutableRefObject<number>;
   },
@@ -78,6 +82,7 @@ export function usePlayScreenManager(
   const timeAttackLastPlacementRef = useRef<number | null>(null);
   const timeAttackBonusRef = useRef(0);
   const timeDecayLastPlacementRef = useRef<number | null>(null);
+  const timeDecayComboRef = useRef(0);
   const timeDecayBonusRef = useRef(0);
   const placementSequenceRef = useRef<
     {
@@ -171,26 +176,38 @@ export function usePlayScreenManager(
         const pieceCount = grid.rows * grid.cols;
         const fillRatio = isMobile
           ? pieceCount >= 25
-            ? 0.98
+            ? 0.99
             : pieceCount >= 16
-              ? 0.96
-              : 0.95
+              ? 0.98
+              : 0.97
           : 0.88;
         // Scale down canvas for larger puzzles so the board doesn't get huge (e.g. 9×9)
         const pieceCountScale =
           pieceCount <= 9
             ? 1
             : pieceCount <= 16
-              ? 0.92
+              ? isMobile
+                ? 0.96
+                : 0.92
               : pieceCount <= 25
-                ? 0.82
+                ? isMobile
+                  ? 0.88
+                  : 0.82
                 : pieceCount <= 36
-                  ? 0.72
+                  ? isMobile
+                    ? 0.78
+                    : 0.72
                   : pieceCount <= 49
-                    ? 0.65
+                    ? isMobile
+                      ? 0.70
+                      : 0.65
                     : pieceCount <= 64
-                      ? 0.58
-                      : 0.52;
+                      ? isMobile
+                        ? 0.62
+                        : 0.58
+                      : isMobile
+                        ? 0.56
+                        : 0.52;
         const effectiveFill = fillRatio * pieceCountScale;
         let boardW = Math.max(minBoardW, Math.floor(availW * effectiveFill));
         let boardH = Math.max(minBoardH, Math.floor(availH * effectiveFill));
@@ -236,6 +253,7 @@ export function usePlayScreenManager(
         timeAttackLastPlacementRef.current = null;
         timeAttackBonusRef.current = 0;
         timeDecayLastPlacementRef.current = null;
+        timeDecayComboRef.current = 0;
         timeDecayBonusRef.current = 0;
         placementSequenceRef.current = [];
         const canvas = canvasRef.current;
@@ -306,15 +324,19 @@ export function usePlayScreenManager(
                 timeAttackLastPlacementRef.current = now;
                 const bonus = TIME_ATTACK_BONUS_BASE * timeAttackComboRef.current;
                 timeAttackBonusRef.current += bonus;
+                opts?.onComboChange?.(timeAttackComboRef.current);
               }
               if (opts?.isTimeDecay) {
                 const last = timeDecayLastPlacementRef.current;
                 if (last != null && now - last <= TIME_DECAY_COMBO_MS) {
+                  timeDecayComboRef.current += 1;
                   timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE * 2;
                 } else {
+                  timeDecayComboRef.current = 1;
                   timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE;
                 }
                 timeDecayLastPlacementRef.current = now;
+                opts?.onTimeDecayComboChange?.(timeDecayComboRef.current);
               }
               const elapsedMs = opts?.elapsedMsRef?.current ?? 0;
               const timeToSnapMs =
@@ -350,15 +372,19 @@ export function usePlayScreenManager(
                 timeAttackLastPlacementRef.current = now;
                 const bonus = TIME_ATTACK_BONUS_BASE * timeAttackComboRef.current;
                 timeAttackBonusRef.current += bonus;
+                opts?.onComboChange?.(timeAttackComboRef.current);
               }
               if (opts?.isTimeDecay) {
                 const last = timeDecayLastPlacementRef.current;
                 if (last != null && now - last <= TIME_DECAY_COMBO_MS) {
+                  timeDecayComboRef.current += 1;
                   timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE * 2;
                 } else {
+                  timeDecayComboRef.current = 1;
                   timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE;
                 }
                 timeDecayLastPlacementRef.current = now;
+                opts?.onTimeDecayComboChange?.(timeDecayComboRef.current);
               }
               const elapsedMs = opts?.elapsedMsRef?.current ?? 0;
               const timeToSnapMs =
@@ -532,5 +558,9 @@ export function usePlayScreenManager(
     timeAttackBonusRef,
     timeDecayBonusRef,
     placementSequenceRef,
+    timeAttackComboRef,
+    timeAttackLastPlacementRef,
+    timeDecayComboRef,
+    timeDecayLastPlacementRef,
   };
 }

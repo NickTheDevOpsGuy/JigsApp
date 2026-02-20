@@ -11,3 +11,4 @@ export { ReplayModal } from "./ReplayModal";
 export { PauseOverlay } from "./PauseOverlay";
 export { ProfilerOverlay } from "./ProfilerOverlay";
 export { TopBarButtons } from "./TopBarButtons";
+export { PuzzleGradientBackground } from "./PuzzleGradientBackground";

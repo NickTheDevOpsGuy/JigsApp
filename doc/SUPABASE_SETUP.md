@@ -66,6 +66,8 @@ Run the migrations in order so tables and policies are created correctly.
    - `supabase/migrations/004_puzzle_sessions_expiration.sql`
    - `supabase/migrations/005_time_attack_completions.sql`
    - `supabase/migrations/006_avatars_and_events.sql`
+   - `supabase/migrations/007_time_decay_completions.sql`
+   - `supabase/migrations/008_completions_realtime.sql`
 
 ### Option B: Supabase CLI
 
@@ -102,6 +104,25 @@ alter publication supabase_realtime add table public.puzzle_sessions;
 ```
 
 The migration already sets `REPLICA IDENTITY FULL` on `puzzle_sessions`, so Realtime can send full row data on updates.
+
+---
+
+## 5b. Enable Realtime (Today's Completion Counter)
+
+The **Stats** screen shows a live count of players who completed today's puzzle. This requires the `completions` table in the Realtime publication.
+
+### Option A: Supabase Dashboard (Publications)
+
+1. In **Database** → **Publications** → **supabase_realtime**
+2. Under **Tables**, find `completions` and **toggle it ON**
+
+### Option B: SQL Editor
+
+```sql
+alter publication supabase_realtime add table public.completions;
+```
+
+Without this, the today counter will show the initial fetch count but won't update in real time when others complete puzzles.
 
 ---
 

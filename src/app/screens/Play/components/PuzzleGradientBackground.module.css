@@ -1,0 +1,32 @@
+.gradient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    var(--gradient-c1, var(--color-bg-primary)) 0%,
+    var(--gradient-c2, var(--color-bg-primary)) 40%,
+    var(--gradient-c3, var(--color-bg-secondary)) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 12s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gradient {
+    animation: none;
+    background-size: 100% 100%;
+  }
+}
+
+@keyframes gradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}

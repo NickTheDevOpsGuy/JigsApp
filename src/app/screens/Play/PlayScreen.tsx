@@ -53,6 +53,7 @@ import {
   PlayToasts,
   TopBarButtons,
   HeaderMenu,
+  PuzzleGradientBackground,
 } from "./components";
 import { ProfilerOverlay } from "./components";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
@@ -170,6 +171,8 @@ export function PlayScreen() {
   const [immersiveReveal, setImmersiveReveal] = React.useState(false);
   const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
+  const [timeAttackCombo, setTimeAttackCombo] = React.useState(0);
+  const [timeDecayCombo, setTimeDecayCombo] = React.useState(0);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
   const [showReplayModal, setShowReplayModal] = React.useState(false);
   const [clusterMode, setClusterMode] = React.useState(false);
@@ -228,6 +231,9 @@ export function PlayScreen() {
       relaxedModeEnabled,
       isTimeAttack: timeMode === "timeAttack",
       isTimeDecay: timeMode === "timeDecay",
+      onComboChange: timeMode === "timeAttack" ? setTimeAttackCombo : undefined,
+      onTimeDecayComboChange:
+        timeMode === "timeDecay" ? setTimeDecayCombo : undefined,
       elapsedMsRef,
       onPieceSnappedAnalytics: (timeToSnapMs) => {
         const g = stateRef.current?.grid;
@@ -260,9 +266,40 @@ export function PlayScreen() {
     timeAttackBonusRef,
     timeDecayBonusRef,
     placementSequenceRef,
+    timeAttackLastPlacementRef,
+    timeDecayLastPlacementRef,
   } = managerResult;
 
   stateRef.current = state;
+
+  // Time Attack: reset combo display when idle > 4s (combo window)
+  useEffect(() => {
+    if (timeMode !== "timeAttack") return;
+    const id = setInterval(() => {
+      const last = timeAttackLastPlacementRef?.current;
+      if (last != null && performance.now() - last > 4000) {
+        setTimeAttackCombo((c) => (c > 0 ? 0 : c));
+      }
+    }, 500);
+    return () => clearInterval(id);
+  }, [timeMode, timeAttackLastPlacementRef]);
+
+  // Time Decay: reset combo display when idle > 3.5s (combo window)
+  useEffect(() => {
+    if (timeMode !== "timeDecay") return;
+    const id = setInterval(() => {
+      const last = timeDecayLastPlacementRef?.current;
+      if (last != null && performance.now() - last > 3500) {
+        setTimeDecayCombo((c) => (c > 0 ? 0 : c));
+      }
+    }, 500);
+    return () => clearInterval(id);
+  }, [timeMode, timeDecayLastPlacementRef]);
+
+  useEffect(() => {
+    setTimeAttackCombo(0);
+    setTimeDecayCombo(0);
+  }, [puzzleKey]);
 
   useEffect(() => {
     undoCountRef.current = 0;
@@ -835,6 +872,10 @@ export function PlayScreen() {
 
   return (
     <div className={styles.page} ref={pageRef}>
+      <PuzzleGradientBackground
+        img={imgRef.current}
+        puzzleKey={puzzleKey}
+      />
       {immersiveMode && (
         <div
           className={styles.immersivePeekTop}
@@ -986,6 +1027,8 @@ export function PlayScreen() {
                     )
                   : undefined
               }
+              timeAttackCombo={timeMode === "timeAttack" ? timeAttackCombo : 0}
+              timeDecayCombo={timeMode === "timeDecay" ? timeDecayCombo : 0}
               onTogglePause={() => setIsPaused((p) => !p)}
             />
           </div>
@@ -1064,11 +1107,41 @@ export function PlayScreen() {
             )}
           {showPreview && imgRef.current && (
             <div className={styles.previewOverlay}>
-              <img
-                src={imgRef.current.src}
-                alt="Puzzle preview"
-                className={styles.previewImage}
-              />
+              <div className={styles.previewWithRing}>
+                <svg
+                  className={styles.previewRing}
+                  viewBox="0 0 128 128"
+                  aria-hidden
+                >
+                  <circle
+                    className={styles.previewRingBg}
+                    cx="64"
+                    cy="64"
+                    r="60"
+                    fill="none"
+                    strokeWidth="4"
+                  />
+                  <circle
+                    className={styles.previewRingFill}
+                    cx="64"
+                    cy="64"
+                    r="60"
+                    fill="none"
+                    strokeWidth="4"
+                    strokeDasharray={377}
+                    strokeDashoffset={
+                      377 *
+                      (1 -
+                        (state && total > 0 ? Math.min(1, placed / total) : 0))
+                    }
+                  />
+                </svg>
+                <img
+                  src={imgRef.current.src}
+                  alt="Puzzle preview"
+                  className={styles.previewImage}
+                />
+              </div>
             </div>
           )}
           {isPaused && (
@@ -1148,6 +1221,7 @@ export function PlayScreen() {
           pieces={trayPieces}
           image={imgRef.current}
           grid={state?.grid ?? grid}
+          puzzleKey={puzzleKey}
           onPieceClick={handleTrayPieceClick}
           clusterMode={clusterMode}
           selectedIds={selectedTrayIds}

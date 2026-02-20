@@ -50,7 +50,11 @@ export type AnimationState = {
   /** Piece IDs to show wrong-rotation hint (position correct, rotation blocks snap) */
   wrongRotationHint?: { groupId: string; pieceIds: string[]; triggeredAt: number };
   /** Snap preview during drag: soft glow when near, stronger when in range (rotation correct only) */
-  snapPreview?: { nearSnap: boolean; inSnapRange: boolean } | null;
+  snapPreview?: {
+    nearSnap: boolean;
+    inSnapRange: boolean;
+    proximity: number;
+  } | null;
   /** Show very subtle alignment grid matching piece boundaries */
   showAlignmentGrid?: boolean;
   /** Show faint ghost of completed puzzle behind board (5–10% opacity). Disabled in competitive/daily. */
@@ -392,12 +396,14 @@ function drawPiece(
   }
 
   // Preview glow when piece is within snap tolerance during drag (rotation correct only)
+  // Proximity 0–1 drives intensity: stronger when closer to snap point
   const preview = animState?.snapPreview;
   if (isDragging && preview && (preview.nearSnap || preview.inSnapRange)) {
     const cx = p.x + p.w / 2;
     const cy = p.y + p.h / 2;
     const radius = Math.max(p.w, p.h) * 0.58;
-    const alpha = preview.inSnapRange ? 0.11 : 0.05;
+    const baseAlpha = preview.inSnapRange ? 0.11 : 0.05;
+    const alpha = baseAlpha * (0.4 + 0.6 * preview.proximity);
     drawSnapGlow(ctx, cx, cy, radius, alpha);
   }
 

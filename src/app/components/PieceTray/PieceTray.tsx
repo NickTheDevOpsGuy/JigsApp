@@ -34,11 +34,25 @@ function getTrayHeight(totalPieces: number, isMobile: boolean): number {
   return Math.min(cap, base + 140);
 }
 
+/** Deterministic values per piece for scatter animation. */
+function scatterVars(pieceId: string): { rotation: number; dx: number; dy: number } {
+  let h = 0;
+  for (let i = 0; i < pieceId.length; i++)
+    h = (h << 5) - h + pieceId.charCodeAt(i);
+  const h2 = h * 31 + pieceId.length;
+  return {
+    rotation: ((h % 31) - 15),
+    dx: ((h % 17) - 8) * 4,
+    dy: ((h2 % 17) - 8) * 4,
+  };
+}
+
 type Props = {
   pieces: Piece[];
   image: HTMLImageElement | null;
   grid: { rows: number; cols: number };
   onPieceClick: (pieceId: string) => void;
+  puzzleKey?: string | number;
   clusterMode?: boolean;
   selectedIds?: Set<string>;
   onSelectionToggle?: (pieceId: string) => void;
@@ -70,6 +84,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     image,
     grid,
     onPieceClick,
+    puzzleKey,
     clusterMode = false,
     selectedIds,
     onSelectionToggle,
@@ -79,6 +94,32 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   ref,
 ) {
   const [section, setSection] = useState<TraySection>("all");
+  const [scatterActive, setScatterActive] = useState(false);
+  const lastScatterKeyRef = useRef<string | number | null>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mq.matches);
+    const handler = () => setPrefersReducedMotion(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    if (
+      puzzleKey == null ||
+      prefersReducedMotion ||
+      pieces.length === 0 ||
+      lastScatterKeyRef.current === puzzleKey
+    ) {
+      return;
+    }
+    lastScatterKeyRef.current = puzzleKey;
+    setScatterActive(true);
+    const id = setTimeout(() => setScatterActive(false), 900);
+    return () => clearTimeout(id);
+  }, [puzzleKey, prefersReducedMotion, pieces.length]);
   const [sortMode, setSortMode] = useState<SortMode>("grid");
   const [shuffledOrder, setShuffledOrder] = useState<string[] | null>(null);
   const [colorHighlight, setColorHighlight] = useState(false);
@@ -400,6 +441,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
               const isHighlighted = colorHighlight && highlightedIds.has(p.id);
               const isDimmed =
                 colorHighlight && highlightAnchorId != null && !highlightedIds.has(p.id);
+              const doScatter = scatterActive && !prefersReducedMotion;
               return (
                 <button
                   key={p.id}
@@ -408,7 +450,16 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                     clusterMode && selectedIds?.has(p.id) ? styles.pieceSelected : ""
                   } ${isHighlighted ? styles.pieceHighlighted : ""} ${
                     isDimmed ? styles.pieceDimmed : ""
-                  }`}
+                  } ${doScatter ? styles.pieceScatter : ""}`}
+                  style={
+                    doScatter
+                      ? ({
+                          "--scatter-rotation": `${scatterVars(p.id).rotation}deg`,
+                          "--scatter-dx": `${scatterVars(p.id).dx}px`,
+                          "--scatter-dy": `${scatterVars(p.id).dy}px`,
+                        } as React.CSSProperties)
+                      : undefined
+                  }
                   onClick={() => {
                     if (clusterMode && onSelectionToggle) {
                       onSelectionToggle(p.id);

@@ -20,6 +20,7 @@
   border-radius: 16px;
   border: 1px solid var(--color-border);
   margin: 0 12px max(12px, env(safe-area-inset-bottom, 0)) 12px;
+  box-shadow: var(--shadow-sm);
 
   font-size: 13px;
   line-height: 1.35;
@@ -30,6 +31,21 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Dark themes: richer tray styling to match puzzle draw */
+html.theme-dark .tray,
+html.theme-space .tray,
+html.theme-ocean .tray,
+html.theme-forest .tray,
+html.theme-sunset .tray {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-bg-elevated) 100%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg-elevated) 95%, black) 100%
+  );
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .header {
@@ -228,6 +244,34 @@
 
 .pieceButton:active {
   transform: scale(0.98);
+}
+
+.pieceScatter {
+  animation: scatterIn 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: center center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pieceScatter {
+    animation: none;
+  }
+}
+
+@keyframes scatterIn {
+  0% {
+    opacity: 0;
+    transform:
+      translate(var(--scatter-dx, 0), var(--scatter-dy, 0))
+      scale(0.35)
+      rotate(calc(-1 * var(--scatter-rotation, 0deg)));
+  }
+  100% {
+    opacity: 1;
+    transform:
+      translate(0, 0)
+      scale(1)
+      rotate(var(--scatter-rotation, 0deg));
+  }
 }
 
 .pieceSelected {

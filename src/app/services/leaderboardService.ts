@@ -4,11 +4,13 @@
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
+import { getTodayDateString } from "@/daily/dailyPuzzleCore";
 
 export type LeaderboardEntry = {
   rank: number;
   elapsedSeconds: number;
   displayName: string;
+  streakFlair?: string;
   userId?: string;
 };
 
@@ -93,6 +95,64 @@ async function resolveStreakFlairs(userIds: string[]): Promise<Map<string, strin
   return map;
 }
 
+export type PercentileResult =
+  | { percentile: number; firstFinisher: false }
+  | { percentile: null; firstFinisher: true };
+
+/** Percentile rank for a completion. Returns "Top X%" or firstFinisher when alone. */
+export async function getPercentileRank(
+  puzzleDate: string,
+  grid: { rows: number; cols: number },
+  elapsedSeconds: number,
+): Promise<PercentileResult | null> {
+  if (!isSupabaseConfigured()) return null;
+
+  const { count: totalCount, error: countError } = await supabase!
+    .from("completions")
+    .select("id", { count: "exact", head: true })
+    .eq("puzzle_date", puzzleDate)
+    .eq("is_daily", true)
+    .eq("grid_rows", grid.rows)
+    .eq("grid_cols", grid.cols);
+
+  if (countError || totalCount == null || totalCount < 1) return null;
+
+  if (totalCount === 1) return { percentile: null, firstFinisher: true };
+
+  const { count: betterCount, error: betterError } = await supabase!
+    .from("completions")
+    .select("id", { count: "exact", head: true })
+    .eq("puzzle_date", puzzleDate)
+    .eq("is_daily", true)
+    .eq("grid_rows", grid.rows)
+    .eq("grid_cols", grid.cols)
+    .lt("elapsed_seconds", elapsedSeconds);
+
+  if (betterError || betterCount == null) return null;
+
+  const rank = betterCount + 1;
+  const percentile = Math.round((rank / totalCount) * 100);
+  return {
+    percentile: Math.min(100, Math.max(1, percentile)),
+    firstFinisher: false,
+  };
+}
+
+/** Count of players who completed today's daily puzzle (any grid). For real-time display. */
+export async function getTodayCompletionCount(): Promise<number> {
+  if (!isSupabaseConfigured()) return 0;
+
+  const today = getTodayDateString();
+  const { count, error } = await supabase!
+    .from("completions")
+    .select("user_id", { count: "exact", head: true })
+    .eq("puzzle_date", today)
+    .eq("is_daily", true);
+
+  if (error) return 0;
+  return count ?? 0;
+}
+
 /** Fetch daily puzzle leaderboard for a given date. */
 export async function getDailyLeaderboard(
   dateStr: string,
@@ -122,7 +182,8 @@ export async function getDailyLeaderboard(
     return {
       rank: i + 1,
       elapsedSeconds: row.elapsed_seconds,
-      displayName: base + flair,
+      displayName: base,
+      streakFlair: flair || undefined,
       userId: row.user_id,
     };
   });
@@ -361,7 +422,8 @@ export async function getTimeAttackLeaderboard(limit = 10): Promise<LeaderboardE
     return {
       rank: i + 1,
       elapsedSeconds: elapsed,
-      displayName: base + flair,
+      displayName: base,
+      streakFlair: flair || undefined,
     };
   });
 }
@@ -419,7 +481,8 @@ export async function getTimeDecayLeaderboard(limit = 10): Promise<LeaderboardEn
     return {
       rank: i + 1,
       elapsedSeconds: elapsed,
-      displayName: base + flair,
+      displayName: base,
+      streakFlair: flair || undefined,
     };
   });
 }

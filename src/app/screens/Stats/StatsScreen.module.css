@@ -1,4 +1,17 @@
+/* Stats/Leaderboard always uses light theme for readability */
 .page {
+  --color-bg-primary: #f3f7ff;
+  --color-bg-secondary: #dff1ff;
+  --color-bg-card: #eef8ff;
+  --color-bg-elevated: #ffffff;
+  --color-text-primary: #103257;
+  --color-text-secondary: #0b2e52;
+  --color-text-muted: #5a7a9b;
+  --color-brand-primary: #0b63b8;
+  --color-brand-hover: #0952a0;
+  --color-brand-light: #dff1ff;
+  --color-border: rgba(11, 99, 184, 0.2);
+  --color-border-strong: rgba(11, 99, 184, 0.35);
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -264,6 +277,33 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.streakFlame {
+  flex-shrink: 0;
+  font-size: 0.95em;
+  animation: streakFlamePulse 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streakFlame {
+    animation: none;
+  }
+}
+
+@keyframes streakFlamePulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
 }
 
 .time {

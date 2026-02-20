@@ -17,6 +17,8 @@ interface PlayHUDProps {
   countdownMinutes?: number;
   bestTimeSeconds?: number | null;
   timeDecayScore?: number;
+  timeAttackCombo?: number;
+  timeDecayCombo?: number;
   onTogglePause: () => void;
 }
 
@@ -30,6 +32,8 @@ export function PlayHUD({
   countdownMinutes = 10,
   bestTimeSeconds,
   timeDecayScore,
+  timeAttackCombo = 0,
+  timeDecayCombo = 0,
   onTogglePause: _onTogglePause,
 }: PlayHUDProps) {
   const showTimer = timeMode !== "relaxed" && timeMode !== "timeDecay";
@@ -47,6 +51,17 @@ export function PlayHUD({
 
   return (
     <div className={styles.hud}>
+      {(timeAttackCombo >= 2 || timeDecayCombo >= 2) && (
+        <div
+          className={`${styles.comboMeter} ${timeDecayCombo >= 2 ? styles.comboMeterDecay : ""}`}
+          aria-label={`Combo ×${timeAttackCombo >= 2 ? timeAttackCombo : timeDecayCombo}`}
+        >
+          <span className={styles.comboLabel}>
+            ×{timeAttackCombo >= 2 ? timeAttackCombo : timeDecayCombo}
+          </span>
+          <span className={styles.comboFire}>🔥</span>
+        </div>
+      )}
       {showScore && timeDecayScore != null && (
         <div className={styles.hudPillTimer}>
           <span className={styles.timerText}>Score {timeDecayScore}</span>

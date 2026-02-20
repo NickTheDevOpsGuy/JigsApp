@@ -53,7 +53,9 @@ function PageFallback() {
 
 export function App() {
   useEffect(() => {
-    ensureSignedIn();
+    void (async () => {
+      await ensureSignedIn();
+    })();
     initStreakFreeze();
   }, []);
 

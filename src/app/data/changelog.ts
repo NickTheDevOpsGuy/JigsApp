@@ -1,11 +1,18 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "10";
+export const CHANGELOG_VERSION = "12";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📈 Player percentile ranking – Top X% shown in completion overlay per grid size (daily puzzle)",
+      "🏅 First finisher badge – 'First finisher today!' when you're the only one to complete that grid",
+      "⚡ Time Decay combo meter – Combo ×2+ in Time Decay mode; same feedback as Time Attack (3.5s window)",
+      "✨ Snap proximity visual – Glow intensity increases as you near the snap point while dragging",
+      "📊 Real-time today counter – Live count of players who completed today's puzzle on the leaderboard (Supabase Realtime)",
+      "🔥 Time Attack combo meter – Combo ×2+ appears after quick consecutive placements; breaks on idle",
+      "⭕ Reference preview progress ring – Circular ring fills based on completion percentage",
       "📊 Placement speed metrics – Time between snaps, snaps/min, idle %, and avg drag-to-snap time from your last session (Stats → Dashboard)",
       "🎉 Border complete celebration – Subtle confetti and toast when you finish the puzzle border (mid-game motivation)",
       "🧠 Challenge mode – Optional game mode (Menu → Gameplay): full image shown for 5 seconds at start, then solve from memory",

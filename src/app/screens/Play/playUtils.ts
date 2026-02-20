@@ -46,6 +46,18 @@ export function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
+/** Format duration for display (e.g. "1h 30m" or "5m 12s"). */
+export function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  if (m >= 60) {
+    const h = Math.floor(m / 60);
+    const rm = m % 60;
+    return `${h}h ${rm}m`;
+  }
+  return `${m}m ${s}s`;
+}
+
 export function isTypingTarget(el: EventTarget | null): boolean {
   const t = el as HTMLElement | null;
   if (!t) return false;

@@ -9,8 +9,6 @@ import {
   Trophy,
   Award,
   User,
-  Share2,
-  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
@@ -37,32 +35,24 @@ import { getCompletionGrade } from "@/data/completionGrades";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
-import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
+import {
+  getTodayDateString,
+  getStreakFreezeCount,
+} from "@/daily/dailyPuzzleCore";
+import { useTodayCompletionCount } from "@/hooks/useTodayCompletionCount";
+import { formatTime, formatDuration } from "@/screens/Play/playUtils";
+import {
+  TimeLeaderboardList,
+  StreakLeaderboardList,
+  CompletionLeaderboardList,
+} from "./LeaderboardList";
+import { LeaderboardFilterPills } from "./LeaderboardFilterPills";
 import { AVATAR_HATS, AVATAR_GLASSES, AVATAR_HOODIES } from "@/data/avatarOptions";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { loadLastSessionMetrics } from "@/screens/Play/placementMetrics";
 import { useTheme } from "@/hooks/useTheme";
 
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  if (m >= 60) {
-    const h = Math.floor(m / 60);
-    const rm = m % 60;
-    return `${h}h ${rm}m`;
-  }
-  return `${m}m ${s}s`;
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-const PODIUM = ["🥇", "🥈", "🥉"];
-
-type LeaderboardType =
+export type LeaderboardType =
   | "today"
   | "timeAttack"
   | "timeDecay"
@@ -152,6 +142,7 @@ export function StatsScreen() {
   const [shareCopied, setShareCopied] = useState(false);
   const [raccoonName, setRaccoonName] = useState<string | null>(null);
   const [leaderboardCompact, setLeaderboardCompact] = useState(true);
+  const todayCompletionCount = useTodayCompletionCount();
   const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
   const [showDailyModal, setShowDailyModal] = useState(false);
 
@@ -199,14 +190,15 @@ export function StatsScreen() {
       setLoading(false);
       return;
     }
-    loadData();
+    void loadData();
   }, [configured, loadData]);
 
   useEffect(() => {
     if (!configured) return;
-    getUserId().then((uid) => {
+    void (async () => {
+      const uid = await getUserId();
       if (uid) setRaccoonName(getAnonymousDisplayName(uid));
-    });
+    })();
   }, [configured]);
 
   useEffect(() => {
@@ -245,7 +237,7 @@ export function StatsScreen() {
         setLeaderboard(lb);
       }
     };
-    loadLb();
+    void loadLb();
   }, [configured, activeTab, leaderboardType, allTimeGrid]);
 
   const handleSaveProfile = async () => {
@@ -260,10 +252,10 @@ export function StatsScreen() {
     });
     if (updated) setProfile(updated);
     setProfileSaving(false);
-    loadData();
+    void loadData();
   };
 
-  const handleShareLeaderboard = () => {
+  const handleShareLeaderboard = async () => {
     const text =
       leaderboardType === "today"
         ? `Today's Daily Puzzle leaderboard - Phuzzle`
@@ -279,16 +271,15 @@ export function StatsScreen() {
     const url = window.location.origin;
     const shareText = `${text}\n${url}`;
     if (navigator.share) {
-      navigator.share({
+      await navigator.share({
         title: "Phuzzle Leaderboard",
         text: shareText,
         url,
       });
-    } else {
-      navigator.clipboard?.writeText(shareText).then(() => {
-        setShareCopied(true);
-        setTimeout(() => setShareCopied(false), 2000);
-      });
+    } else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(shareText);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
     }
   };
 
@@ -321,150 +312,6 @@ export function StatsScreen() {
       </div>
     );
   }
-
-  const renderTimeLeaderboard = (entries: LeaderboardEntry[], emptyMsg: string) => (
-    <>
-      {entries.length === 0 ? (
-        <p className={styles.empty}>{emptyMsg}</p>
-      ) : (
-        <ol
-          className={`${styles.leaderboard} ${
-            leaderboardCompact ? styles.leaderboardCompact : ""
-          }`}
-        >
-          {entries.map((entry) => {
-            const key = `time-${entry.rank}-${entry.displayName}`;
-            const isExpanded = expandedRowKey === key;
-            return (
-              <li
-                key={key}
-                className={`${styles.leaderboardItem} ${
-                  entry.rank <= 3 ? styles.leaderboardPodium : ""
-                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
-                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setExpandedRowKey(isExpanded ? null : key);
-                  }
-                }}
-              >
-                <span className={styles.rank}>
-                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-                </span>
-                <span className={styles.player}>{entry.displayName}</span>
-                <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
-                {isExpanded && (
-                  <div className={styles.leaderboardDetail}>
-                    {Math.floor(entry.elapsedSeconds / 60)}m {entry.elapsedSeconds % 60}s
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-      )}
-    </>
-  );
-
-  const renderStreakLeaderboard = (entries: StreakEntry[]) => (
-    <>
-      {entries.length === 0 ? (
-        <p className={styles.empty}>No streaks yet. Complete daily puzzles!</p>
-      ) : (
-        <ol
-          className={`${styles.leaderboard} ${
-            leaderboardCompact ? styles.leaderboardCompact : ""
-          }`}
-        >
-          {entries.map((entry) => {
-            const key = `streak-${entry.rank}-${entry.displayName}`;
-            const isExpanded = expandedRowKey === key;
-            return (
-              <li
-                key={key}
-                className={`${styles.leaderboardItem} ${
-                  entry.rank <= 3 ? styles.leaderboardPodium : ""
-                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
-                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setExpandedRowKey(isExpanded ? null : key);
-                  }
-                }}
-              >
-                <span className={styles.rank}>
-                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-                </span>
-                <span className={styles.player}>{entry.displayName}</span>
-                <span className={styles.time}>{entry.streak} days</span>
-                {isExpanded && (
-                  <div className={styles.leaderboardDetail}>
-                    {entry.streak} day streak
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-      )}
-    </>
-  );
-
-  const renderCompletionLeaderboard = (
-    entries: CompletionCountEntry[],
-    emptyMsg = "No completions yet. Play puzzles!",
-  ) => (
-    <>
-      {entries.length === 0 ? (
-        <p className={styles.empty}>{emptyMsg}</p>
-      ) : (
-        <ol
-          className={`${styles.leaderboard} ${
-            leaderboardCompact ? styles.leaderboardCompact : ""
-          }`}
-        >
-          {entries.map((entry) => {
-            const key = `completion-${entry.rank}-${entry.displayName}`;
-            const isExpanded = expandedRowKey === key;
-            return (
-              <li
-                key={key}
-                className={`${styles.leaderboardItem} ${
-                  entry.rank <= 3 ? styles.leaderboardPodium : ""
-                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
-                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setExpandedRowKey(isExpanded ? null : key);
-                  }
-                }}
-              >
-                <span className={styles.rank}>
-                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-                </span>
-                <span className={styles.player}>{entry.displayName}</span>
-                <span className={styles.time}>{entry.count} puzzles</span>
-                {isExpanded && (
-                  <div className={styles.leaderboardDetail}>
-                    {entry.count} total puzzles completed
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-      )}
-    </>
-  );
 
   return (
     <div className={styles.page}>
@@ -744,72 +591,14 @@ export function StatsScreen() {
 
             {activeTab === "leaderboard" && (
               <div className={styles.section}>
-                <div className={styles.leaderboardFilters}>
-                  <button
-                    type="button"
-                    className={`${styles.filterPill} ${
-                      leaderboardType === "today" ? styles.filterPillActive : ""
-                    }`}
-                    onClick={() => setLeaderboardType("today")}
-                  >
-                    Today
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.filterPill} ${
-                      leaderboardType === "bestWeek" ? styles.filterPillActive : ""
-                    }`}
-                    onClick={() => setLeaderboardType("bestWeek")}
-                  >
-                    Week
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.filterPill} ${
-                      leaderboardType === "bestMonth" ? styles.filterPillActive : ""
-                    }`}
-                    onClick={() => setLeaderboardType("bestMonth")}
-                  >
-                    <Calendar size={14} />
-                    Month
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.filterPill} ${
-                      leaderboardType === "timeAttack" ? styles.filterPillActive : ""
-                    }`}
-                    onClick={() => setLeaderboardType("timeAttack")}
-                  >
-                    Time Attack
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.filterPill} ${
-                      leaderboardType === "timeDecay" ? styles.filterPillActive : ""
-                    }`}
-                    onClick={() => setLeaderboardType("timeDecay")}
-                  >
-                    Time Decay
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.filterPill} ${
-                      leaderboardCompact ? styles.filterPillActive : ""
-                    }`}
-                    onClick={() => setLeaderboardCompact((c) => !c)}
-                    title={leaderboardCompact ? "Compact view" : "Expand view"}
-                  >
-                    Compact
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.filterPill} ${styles.filterPillShare}`}
-                    onClick={handleShareLeaderboard}
-                  >
-                    <Share2 size={14} />
-                    {shareCopied ? "Copied!" : "Share"}
-                  </button>
-                </div>
+                <LeaderboardFilterPills
+                  leaderboardType={leaderboardType}
+                  onLeaderboardTypeChange={setLeaderboardType}
+                  leaderboardCompact={leaderboardCompact}
+                  onCompactToggle={() => setLeaderboardCompact((c) => !c)}
+                  shareCopied={shareCopied}
+                  onShare={handleShareLeaderboard}
+                />
 
                 {leaderboardType === "today" && (
                   <div className={styles.dailyPuzzleCard}>
@@ -821,9 +610,9 @@ export function StatsScreen() {
                         Today&apos;s Daily Puzzle
                       </h2>
                       <p className={styles.dailyPuzzleDesc}>
-                        {leaderboard.length === 0
+                        {todayCompletionCount === 0
                           ? "No completions yet. Be the first!"
-                          : `${leaderboard.length} completion${leaderboard.length === 1 ? "" : "s"} so far.`}
+                          : `${todayCompletionCount} completion${todayCompletionCount === 1 ? "" : "s"} today`}
                       </p>
                       <button
                         type="button"
@@ -836,49 +625,96 @@ export function StatsScreen() {
                   </div>
                 )}
 
-                {leaderboardType === "today" && renderTimeLeaderboard(leaderboard, "")}
-                {leaderboardType === "timeAttack" &&
-                  renderTimeLeaderboard(
-                    leaderboard,
-                    "No Time Attack completions yet. Try it!",
-                  )}
-                {leaderboardType === "timeDecay" &&
-                  renderTimeLeaderboard(
-                    leaderboard,
-                    "No Time Decay completions yet. Try it!",
-                  )}
-                {leaderboardType === "bestWeek" &&
-                  renderTimeLeaderboard(
-                    leaderboard,
-                    "No daily completions this week yet.",
-                  )}
-                {leaderboardType === "bestMonth" &&
-                  renderTimeLeaderboard(
-                    leaderboard,
-                    "No daily completions this month yet.",
-                  )}
-                {leaderboardType === "week" &&
-                  renderCompletionLeaderboard(
-                    weeklyTotalsLeaderboard,
-                    "No completions in the last 7 days.",
-                  )}
-                {leaderboardType === "month" &&
-                  renderCompletionLeaderboard(
-                    monthlyTotalsLeaderboard,
-                    "No completions in the last 30 days.",
-                  )}
-                {leaderboardType === "streaks" &&
-                  renderStreakLeaderboard(streakLeaderboard)}
-                {leaderboardType === "completions" &&
-                  renderCompletionLeaderboard(
-                    completionLeaderboard,
-                    "No completions yet. Play puzzles!",
-                  )}
-                {leaderboardType === "alltime" &&
-                  renderTimeLeaderboard(
-                    leaderboard,
-                    "No completions for this grid size yet.",
-                  )}
+                {leaderboardType === "today" && (
+                  <TimeLeaderboardList
+                    entries={leaderboard}
+                    emptyMsg="No completions yet."
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
+                {leaderboardType === "timeAttack" && (
+                  <TimeLeaderboardList
+                    entries={leaderboard}
+                    emptyMsg="No Time Attack completions yet. Try it!"
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
+                {leaderboardType === "timeDecay" && (
+                  <TimeLeaderboardList
+                    entries={leaderboard}
+                    emptyMsg="No Time Decay completions yet. Try it!"
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
+                {leaderboardType === "bestWeek" && (
+                  <TimeLeaderboardList
+                    entries={leaderboard}
+                    emptyMsg="No daily completions this week yet."
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
+                {leaderboardType === "bestMonth" && (
+                  <TimeLeaderboardList
+                    entries={leaderboard}
+                    emptyMsg="No daily completions this month yet."
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
+                {leaderboardType === "week" && (
+                  <CompletionLeaderboardList
+                    entries={weeklyTotalsLeaderboard}
+                    emptyMsg="No completions in the last 7 days."
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
+                {leaderboardType === "month" && (
+                  <CompletionLeaderboardList
+                    entries={monthlyTotalsLeaderboard}
+                    emptyMsg="No completions in the last 30 days."
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
+                {leaderboardType === "streaks" && (
+                  <StreakLeaderboardList
+                    entries={streakLeaderboard}
+                    emptyMsg="No streaks yet. Complete daily puzzles!"
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
+                {leaderboardType === "completions" && (
+                  <CompletionLeaderboardList
+                    entries={completionLeaderboard}
+                    emptyMsg="No completions yet. Play puzzles!"
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
+                {leaderboardType === "alltime" && (
+                  <TimeLeaderboardList
+                    entries={leaderboard}
+                    emptyMsg="No completions for this grid size yet."
+                    compact={leaderboardCompact}
+                    expandedRowKey={expandedRowKey}
+                    onToggleExpand={setExpandedRowKey}
+                  />
+                )}
               </div>
             )}
 

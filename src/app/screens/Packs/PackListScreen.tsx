@@ -16,7 +16,10 @@ export function PackListScreen() {
   > | null>(null);
 
   useEffect(() => {
-    loadPacksData().then(setPacksData);
+    void (async () => {
+      const data = await loadPacksData();
+      setPacksData(data);
+    })();
   }, []);
 
   return (

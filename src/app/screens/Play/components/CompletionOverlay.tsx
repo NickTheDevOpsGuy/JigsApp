@@ -11,8 +11,10 @@ import {
   recordDailyCompletion,
   DAILY_DATE_KEY,
   getCurrentStreak,
+  getTodayDateString,
 } from "@/daily/dailyPuzzleCore";
 import { recordCompletion } from "@/services/statsService";
+import { getPercentileRank } from "@/services/leaderboardService";
 import { computeTimeDecayScore } from "../timeDecayScore";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
 import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
@@ -80,6 +82,9 @@ export function CompletionOverlay({
   onReplay,
 }: CompletionOverlayProps) {
   const [streak, setStreak] = useState<number>(0);
+  const [percentileResult, setPercentileResult] = useState<
+    { percentile: number; firstFinisher: false } | { percentile: null; firstFinisher: true } | null
+  >(null);
   const completionMessage = getCompletionMessage(elapsedSeconds);
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const badge = getCompletionBadge(elapsedSeconds, undoCount, pieceCount);
@@ -157,6 +162,14 @@ export function CompletionOverlay({
         timeDecayScore,
         dailyStreak,
       });
+      if (stats && isDaily && grid) {
+        const result = await getPercentileRank(
+          getTodayDateString(),
+          grid,
+          elapsedSeconds,
+        );
+        setPercentileResult(result);
+      }
       if (stats) {
         await checkAndUnlockAchievements({
           puzzlesCompleted: stats.puzzlesCompleted,
@@ -167,7 +180,7 @@ export function CompletionOverlay({
         });
       }
     };
-    run();
+    void run();
   }, [
     elapsedSeconds,
     grid,
@@ -200,6 +213,20 @@ export function CompletionOverlay({
         {grade != null && (
           <p className={styles.gradeBadge} aria-label={`Grade ${grade}`}>
             Grade <span className={styles[`grade${grade}`]}>{grade}</span>
+          </p>
+        )}
+        {percentileResult != null && (
+          <p
+            className={styles.percentileBadge}
+            aria-label={
+              percentileResult.firstFinisher
+                ? "First finisher today"
+                : `Top ${percentileResult.percentile}%`
+            }
+          >
+            {percentileResult.firstFinisher
+              ? "First finisher today!"
+              : `Top ${percentileResult.percentile}%`}
           </p>
         )}
         {badge && (

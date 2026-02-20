@@ -20,7 +20,10 @@ export function PackDetailScreen() {
   > | null>(null);
 
   useEffect(() => {
-    loadPacksData().then(setPacksData);
+    void (async () => {
+      const data = await loadPacksData();
+      setPacksData(data);
+    })();
   }, []);
 
   const packMeta = PACK_METADATA.find((p) => p.id === packId);
