@@ -41,6 +41,7 @@ export function Dropdown({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
+          aria-label={label}
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>

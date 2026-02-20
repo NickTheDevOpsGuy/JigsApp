@@ -72,6 +72,17 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
+## 📱 Recent updates (mobile, a11y, offline, tests)
+
+- **Mobile layout** — Setup screen difficulty + time mode in 2-column grid on mobile; shorter dropdown labels; compact mode; tray height 142px. Daily difficulty modal scrollable. Pack list/detail and Stats tweaked for small screens.
+- **Accessibility** — ARIA labels on Setup (tabs, buttons, file input), Menu actions, Dropdowns; `role="alert"` on errors; focus-visible for input/select; tab panel semantics.
+- **Offline indicator** — Banner when `navigator.onLine` is false: “You’re offline. Puzzles work; leaderboards and co-op need internet.”
+- **Loading/error screens** — PageFallback and ErrorBoundary use `100dvh` and safe-area padding.
+- **Image validation** — Friendlier error messages; 50MB upload limit; shorter labels on mobile.
+- **Tests** — New: `puzzleStorage.test.ts` (save/load/clear/hasSavedGame), expanded `PuzzleManager.test.ts`, `useImagePicker.test.ts`. E2E: setup→play flow, play screen load, packs and stats.
+
+---
+
 ## 📄 Documentation
 
 - **README** — Tap-to-rotate reliability (distance/time thresholds, multi-touch fix). Piece tray (compact mode, scroll snapping, scroll indicator). Adding Sample Puzzles: nested subfolders, `import.meta.glob`, supported formats, rebuild note.

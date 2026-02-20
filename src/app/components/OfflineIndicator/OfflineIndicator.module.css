@@ -1,0 +1,32 @@
+.banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  background: var(--color-bg-elevated);
+  border-top: 2px solid var(--color-border-strong);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .banner {
+    font-size: 12px;
+    padding: 8px 12px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}

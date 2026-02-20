@@ -41,4 +41,26 @@ describe("PuzzleManager", () => {
     expect(manager.getDragState().activeId).toBeNull();
     expect(manager.canUndo()).toBe(true);
   });
+
+  it("reports correct placedCount and isComplete", () => {
+    const manager = createManager({ rows: 2, cols: 2 });
+    const state = manager.getState();
+    expect(state.placedCount).toBe(0);
+    expect(state.isComplete).toBe(false);
+  });
+
+  it("undo restores piece position after drag", () => {
+    const manager = createManager();
+    const pieceId = manager.getState().pieces[0].id;
+    const initialY = manager.getState().pieces[0].y;
+
+    manager.pointerDownBoardSpace(pieceId, 50, 50);
+    manager.pointerMoveBoardSpace(50, 120);
+    manager.pointerUp();
+
+    expect(manager.canUndo()).toBe(true);
+    manager.undo();
+    const afterUndo = manager.getState().pieces.find((p) => p.id === pieceId)!;
+    expect(afterUndo.y).toBe(initialY);
+  });
 });

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { initStreakFreeze } from "@/daily/dailyPuzzleCore";
 import { ensureSignedIn } from "@/supabase/auth";
+import { OfflineIndicator } from "@/components/OfflineIndicator/OfflineIndicator";
 
 // Route-level code splitting: load screens on demand to keep initial chunk smaller
 const MenuScreen = lazy(() =>
@@ -61,6 +62,7 @@ export function App() {
 
   return (
     <BrowserRouter>
+      <OfflineIndicator />
       <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route path="/" element={<MenuScreen />} />

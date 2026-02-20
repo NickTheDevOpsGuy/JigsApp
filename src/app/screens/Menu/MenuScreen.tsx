@@ -49,6 +49,7 @@ export function MenuScreen() {
             onClick={() => setShowDailyModal(true)}
             disabled={!hasDaily}
             className={`${styles.actionCard} ${styles.actionCardFeatured}`}
+            aria-label={todayCompleted ? "Today's Puzzle (completed)" : "Today's Puzzle"}
           >
             <span className={styles.dailyEmoji}>🧩</span>
             <span className={styles.actionLabel}>
@@ -60,6 +61,7 @@ export function MenuScreen() {
             variant="outline"
             onClick={() => nav("/packs")}
             className={styles.actionCard}
+            aria-label="Puzzle Packs"
           >
             <Package size={22} />
             <span className={styles.actionLabel}>Puzzle Packs</span>
@@ -68,6 +70,7 @@ export function MenuScreen() {
             variant="outline"
             onClick={() => nav("/new")}
             className={styles.actionCard}
+            aria-label="Choose Photo"
           >
             <Image size={22} />
             <span className={styles.actionLabel}>Choose Photo</span>
@@ -76,6 +79,7 @@ export function MenuScreen() {
             variant="outline"
             onClick={() => nav("/new?source=camera")}
             className={styles.actionCard}
+            aria-label="Snap a Picture"
           >
             <Camera size={22} />
             <span className={styles.actionLabel}>Snap a Picture</span>
@@ -84,6 +88,7 @@ export function MenuScreen() {
             variant="outline"
             onClick={() => setShowHelpChoice(true)}
             className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
+            aria-label="Help"
           >
             <HelpCircle size={22} />
             <span className={styles.actionLabel}>Help</span>

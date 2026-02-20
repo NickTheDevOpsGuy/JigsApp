@@ -45,6 +45,7 @@ function GalleryThumbnail({
       className={`${styles.galleryItem} ${isSelected ? styles.galleryItemSelected : ""}`}
       onClick={onSelect}
       disabled={isLoading}
+      data-testid="gallery-item"
     >
       {imgError ? (
         <div className={styles.galleryItemPlaceholder} title="Image unavailable">
@@ -173,9 +174,14 @@ export function SetupScreen() {
         </h1>
 
         {error && (
-          <div className={styles.error}>
+          <div className={styles.error} role="alert">
             <span>{error}</span>
-            <button className={styles.errorClose} onClick={clearError}>
+            <button
+              type="button"
+              className={styles.errorClose}
+              onClick={clearError}
+              aria-label="Dismiss error"
+            >
               ×
             </button>
           </div>
@@ -184,20 +190,29 @@ export function SetupScreen() {
         {/* Standard workflow: source tabs + gallery/upload/camera */}
         {!isPackFlow && (
           <>
-            <div className={styles.tabs}>
+            <div className={styles.tabs} role="tablist" aria-label="Image source">
               <button
+                role="tab"
+                aria-selected={imageSource === "gallery"}
+                aria-controls="image-source-panel"
                 className={`${styles.tab} ${imageSource === "gallery" ? styles.tabActive : ""}`}
                 onClick={() => setImageSource("gallery")}
               >
                 🖼️ Gallery
               </button>
               <button
+                role="tab"
+                aria-selected={imageSource === "upload"}
+                aria-controls="image-source-panel"
                 className={`${styles.tab} ${imageSource === "upload" ? styles.tabActive : ""}`}
                 onClick={() => setImageSource("upload")}
               >
                 📤 Upload
               </button>
               <button
+                role="tab"
+                aria-selected={imageSource === "camera"}
+                aria-controls="image-source-panel"
                 className={`${styles.tab} ${imageSource === "camera" ? styles.tabActive : ""}`}
                 onClick={() => setImageSource("camera")}
               >
@@ -206,6 +221,7 @@ export function SetupScreen() {
               </button>
             </div>
 
+            <div id="image-source-panel" role="tabpanel">
             {imageSource === "gallery" ? (
               <>
                 <div className={styles.categories}>
@@ -242,6 +258,7 @@ export function SetupScreen() {
               <label className={styles.label}>
                 Choose a Photo (PNG/JPG/WebP)
                 <input
+                  aria-label="Choose a photo (PNG, JPG, or WebP)"
                   className={styles.file}
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
@@ -252,6 +269,7 @@ export function SetupScreen() {
             ) : (
               <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
             )}
+            </div>
           </>
         )}
 
@@ -363,12 +381,12 @@ export function SetupScreen() {
         </div>
 
         <div className={styles.row}>
-          <Button onClick={() => nav("/")}>
+          <Button onClick={() => nav("/")} aria-label="Back to menu">
             <ArrowLeft size={18} />
             Back
           </Button>
 
-          <Button onClick={handleClear} disabled={isLoading}>
+          <Button onClick={handleClear} disabled={isLoading} aria-label="Clear image">
             <Trash2 size={18} />
             🗑️ Clear
           </Button>
@@ -377,6 +395,7 @@ export function SetupScreen() {
             variant="primary"
             onClick={handleStart}
             disabled={isLoading || !imgDataUrl}
+            aria-label="Start puzzle"
           >
             <Play size={18} />
             🧩 Start Puzzle
