@@ -14,7 +14,10 @@ export const CONFETTI_COLORS_BY_THEME: Record<Theme, string[]> = {
 };
 
 /** Snap glow & particle colors per theme (RGB base for alpha blending). */
-export const SNAP_GLOW_COLORS_BY_THEME: Record<Theme, { rgb: string; mid: string; particle: string }> = {
+export const SNAP_GLOW_COLORS_BY_THEME: Record<
+  Theme,
+  { rgb: string; mid: string; particle: string }
+> = {
   light: { rgb: "80, 150, 255", mid: "60, 130, 235", particle: "255, 200, 100" },
   dark: { rgb: "74, 159, 245", mid: "96, 165, 250", particle: "148, 163, 184" },
   space: { rgb: "167, 139, 250", mid: "196, 181, 253", particle: "196, 181, 253" },

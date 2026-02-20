@@ -215,7 +215,11 @@ export function PlayScreen() {
     startMs: number;
   } | null>(null);
   const snapPositionAnimRef = React.useRef<{
-    items: Array<{ id: string; from: { x: number; y: number }; to: { x: number; y: number } }>;
+    items: Array<{
+      id: string;
+      from: { x: number; y: number };
+      to: { x: number; y: number };
+    }>;
     startMs: number;
   } | null>(null);
 

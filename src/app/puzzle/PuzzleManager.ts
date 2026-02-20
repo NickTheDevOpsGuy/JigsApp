@@ -45,7 +45,11 @@ export type PuzzleManagerOptions = {
   cutType?: CutType;
 };
 
-export type SnapMoveItem = { id: string; from: { x: number; y: number }; to: { x: number; y: number } };
+export type SnapMoveItem = {
+  id: string;
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+};
 
 export type PuzzleManagerEvents = {
   onPiecePlaced?: (piece: Piece) => void;

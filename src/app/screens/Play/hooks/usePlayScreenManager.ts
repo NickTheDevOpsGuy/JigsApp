@@ -383,7 +383,9 @@ export function usePlayScreenManager(
                     });
                   }
                   const maxAge = 700;
-                  snapParticlesRef.current = particles.filter((p_) => now - p_.t0 < maxAge);
+                  snapParticlesRef.current = particles.filter(
+                    (p_) => now - p_.t0 < maxAge,
+                  );
                 }
               }
             },

@@ -30,7 +30,11 @@ export function usePlayScreenAnimation(args: {
   dragPreviewPieceIdRef: React.RefObject<string | null>;
   snapParticlesRef?: React.RefObject<SnapParticle[]>;
   snapPositionAnimRef?: React.MutableRefObject<{
-    items: Array<{ id: string; from: { x: number; y: number }; to: { x: number; y: number } }>;
+    items: Array<{
+      id: string;
+      from: { x: number; y: number };
+      to: { x: number; y: number };
+    }>;
     startMs: number;
   } | null>;
   debug: DebugFlags;
@@ -133,8 +137,7 @@ export function usePlayScreenAnimation(args: {
       const snapParticles = snapParticlesRef?.current ?? [];
       const popMap = popMapRef.current ?? new Map<string, number>();
       const hasActiveSnapEffects =
-        snapParticles.length > 0 ||
-        [...popMap.values()].some((t) => now - t < 600);
+        snapParticles.length > 0 || [...popMap.values()].some((t) => now - t < 600);
       const throttleIdle =
         pieceCount >= HIGH_PIECE_COUNT_THRESHOLD &&
         !isDragging &&

@@ -60,7 +60,10 @@ export function PlayToasts({
         </div>
       )}
       {onboarding.needsStartTip && placed === 0 && (
-        <div className={`${s.engagementToast} ${s.engagementToastStartTip}`} role="status">
+        <div
+          className={`${s.engagementToast} ${s.engagementToastStartTip}`}
+          role="status"
+        >
           <span>Drag a piece to start</span>
           <button
             type="button"
