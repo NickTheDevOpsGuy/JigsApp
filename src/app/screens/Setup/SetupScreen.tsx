@@ -222,53 +222,53 @@ export function SetupScreen() {
             </div>
 
             <div id="image-source-panel" role="tabpanel">
-            {imageSource === "gallery" ? (
-              <>
-                <div className={styles.categories}>
-                  {CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.id}
-                      className={`${styles.categoryBtn} ${selectedCategory === cat.id ? styles.categoryBtnActive : ""}`}
-                      onClick={() => setSelectedCategory(cat.id)}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
+              {imageSource === "gallery" ? (
+                <>
+                  <div className={styles.categories}>
+                    {CATEGORIES.map((cat) => (
+                      <button
+                        key={cat.id}
+                        className={`${styles.categoryBtn} ${selectedCategory === cat.id ? styles.categoryBtnActive : ""}`}
+                        onClick={() => setSelectedCategory(cat.id)}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
 
-                <div className={styles.gallery}>
-                  {filteredPuzzles.length === 0 ? (
-                    <div className={styles.galleryEmpty}>
-                      No puzzles in this category yet
-                    </div>
-                  ) : (
-                    filteredPuzzles.map((puzzle) => (
-                      <GalleryThumbnail
-                        key={puzzle.id}
-                        puzzle={puzzle}
-                        isSelected={selectedPuzzle?.id === puzzle.id}
-                        isLoading={isLoading}
-                        onSelect={() => selectGalleryPuzzle(puzzle)}
-                      />
-                    ))
-                  )}
-                </div>
-              </>
-            ) : imageSource === "upload" ? (
-              <label className={styles.label}>
-                Choose a Photo (PNG/JPG/WebP)
-                <input
-                  aria-label="Choose a photo (PNG, JPG, or WebP)"
-                  className={styles.file}
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={handlePickFile}
-                  disabled={isLoading}
-                />
-              </label>
-            ) : (
-              <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
-            )}
+                  <div className={styles.gallery}>
+                    {filteredPuzzles.length === 0 ? (
+                      <div className={styles.galleryEmpty}>
+                        No puzzles in this category yet
+                      </div>
+                    ) : (
+                      filteredPuzzles.map((puzzle) => (
+                        <GalleryThumbnail
+                          key={puzzle.id}
+                          puzzle={puzzle}
+                          isSelected={selectedPuzzle?.id === puzzle.id}
+                          isLoading={isLoading}
+                          onSelect={() => selectGalleryPuzzle(puzzle)}
+                        />
+                      ))
+                    )}
+                  </div>
+                </>
+              ) : imageSource === "upload" ? (
+                <label className={styles.label}>
+                  Choose a Photo (PNG/JPG/WebP)
+                  <input
+                    aria-label="Choose a photo (PNG, JPG, or WebP)"
+                    className={styles.file}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={handlePickFile}
+                    disabled={isLoading}
+                  />
+                </label>
+              ) : (
+                <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
+              )}
             </div>
           </>
         )}

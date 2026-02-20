@@ -45,7 +45,8 @@ export class ErrorBoundary extends React.Component<
             alignItems: "center",
             justifyContent: "center",
             minHeight: "100dvh",
-            padding: "max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom))",
+            padding:
+              "max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom))",
             fontFamily: "system-ui, sans-serif",
             textAlign: "center",
             background: "var(--color-bg-primary, #f3f7ff)",
