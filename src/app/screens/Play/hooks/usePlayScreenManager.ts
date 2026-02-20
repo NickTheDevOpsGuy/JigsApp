@@ -9,6 +9,7 @@ import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
+import { TIME_DECAY_COMBO_MS, TIME_DECAY_PLACEMENT_BONUS_BASE } from "../timeDecayScore";
 
 export type ResumeChoice = "resume" | "fresh" | null;
 
@@ -56,6 +57,8 @@ export function usePlayScreenManager(
     relaxedModeEnabled?: boolean;
     /** When true, track Time Attack bonus points and combo for scoring. */
     isTimeAttack?: boolean;
+    /** When true, track Time Decay placement bonus (score decays over time, placements add). */
+    isTimeDecay?: boolean;
     /** Ref to current elapsed ms (for replay recording). */
     elapsedMsRef?: MutableRefObject<number>;
   },
@@ -74,7 +77,16 @@ export function usePlayScreenManager(
   const timeAttackComboRef = useRef(0);
   const timeAttackLastPlacementRef = useRef<number | null>(null);
   const timeAttackBonusRef = useRef(0);
-  const placementSequenceRef = useRef<{ elapsedMs: number; pieceIds: string[] }[]>([]);
+  const timeDecayLastPlacementRef = useRef<number | null>(null);
+  const timeDecayBonusRef = useRef(0);
+  const placementSequenceRef = useRef<
+    {
+      elapsedMs: number;
+      pieceIds: string[];
+      timestampMs?: number;
+      timeToSnapMs?: number;
+    }[]
+  >([]);
   const sizingCleanupRef = useRef<(() => void) | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
@@ -147,9 +159,15 @@ export function usePlayScreenManager(
         // Compute square tile size (smaller on mobile for better fit)
         const pieceSize = computeTileSize(availW, availH, grid, viewportW);
 
+        // Tabs extend ~22% beyond tile; board must fit assembled puzzle + pad margin (avoids clipped edges)
+        const minPad = Math.ceil(pieceSize * 0.22);
+        const boardPad = Math.max(18, minPad);
+
         // Board: fit puzzle; scale by piece count so more pieces = smaller relative canvas (9×9 shouldn't dominate)
-        const minBoardW = grid.cols * pieceSize;
-        const minBoardH = grid.rows * pieceSize;
+        const assembledW = grid.cols * pieceSize;
+        const assembledH = grid.rows * pieceSize;
+        const minBoardW = assembledW + 2 * boardPad;
+        const minBoardH = assembledH + 2 * boardPad;
         const pieceCount = grid.rows * grid.cols;
         const fillRatio = isMobile
           ? pieceCount >= 25
@@ -217,6 +235,8 @@ export function usePlayScreenManager(
         timeAttackComboRef.current = 0;
         timeAttackLastPlacementRef.current = null;
         timeAttackBonusRef.current = 0;
+        timeDecayLastPlacementRef.current = null;
+        timeDecayBonusRef.current = 0;
         placementSequenceRef.current = [];
         const canvas = canvasRef.current;
         if (canvas) {
@@ -287,10 +307,23 @@ export function usePlayScreenManager(
                 const bonus = TIME_ATTACK_BONUS_BASE * timeAttackComboRef.current;
                 timeAttackBonusRef.current += bonus;
               }
+              if (opts?.isTimeDecay) {
+                const last = timeDecayLastPlacementRef.current;
+                if (last != null && now - last <= TIME_DECAY_COMBO_MS) {
+                  timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE * 2;
+                } else {
+                  timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE;
+                }
+                timeDecayLastPlacementRef.current = now;
+              }
               const elapsedMs = opts?.elapsedMsRef?.current ?? 0;
+              const timeToSnapMs =
+                startTime != null ? Math.round(now - startTime) : undefined;
               placementSequenceRef.current.push({
                 elapsedMs,
                 pieceIds: [p.id],
+                timestampMs: now,
+                timeToSnapMs,
               });
             },
             onPieceSnapped: (pieceIds, center) => {
@@ -318,10 +351,23 @@ export function usePlayScreenManager(
                 const bonus = TIME_ATTACK_BONUS_BASE * timeAttackComboRef.current;
                 timeAttackBonusRef.current += bonus;
               }
+              if (opts?.isTimeDecay) {
+                const last = timeDecayLastPlacementRef.current;
+                if (last != null && now - last <= TIME_DECAY_COMBO_MS) {
+                  timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE * 2;
+                } else {
+                  timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE;
+                }
+                timeDecayLastPlacementRef.current = now;
+              }
               const elapsedMs = opts?.elapsedMsRef?.current ?? 0;
+              const timeToSnapMs =
+                startTime != null ? Math.round(now - startTime) : undefined;
               placementSequenceRef.current.push({
                 elapsedMs,
                 pieceIds,
+                timestampMs: now,
+                timeToSnapMs,
               });
               if (center) {
                 const particles = snapParticlesRef.current;
@@ -484,6 +530,7 @@ export function usePlayScreenManager(
     lockMapRef,
     snapParticlesRef,
     timeAttackBonusRef,
+    timeDecayBonusRef,
     placementSequenceRef,
   };
 }

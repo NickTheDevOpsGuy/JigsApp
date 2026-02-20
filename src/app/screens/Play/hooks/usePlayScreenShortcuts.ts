@@ -30,6 +30,12 @@ type UsePlayScreenShortcutsArgs = {
   toggleFullscreen: () => void;
   selectCycle: (dir: 1 | -1) => void;
   selectedIdRef: React.MutableRefObject<string | null>;
+  rotationAnimRef?: React.MutableRefObject<{
+    pieceIds: string[];
+    from: number;
+    to: number;
+    startMs: number;
+  } | null>;
   onUndoSuccess?: () => void;
 };
 
@@ -56,6 +62,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
     toggleFullscreen,
     selectCycle,
     selectedIdRef: _selectedIdRef,
+    rotationAnimRef,
     onUndoSuccess,
   } = args;
 
@@ -108,8 +115,28 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
               setSelectedPieceId(piece.id);
             }
             if (piece) {
+              const oldRotation = piece.rotation;
+              const reducedMotion =
+                typeof window !== "undefined" &&
+                window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
               manager.rotatePiece(piece.id);
               soundManager.play("rotate");
+
+              if (!reducedMotion && rotationAnimRef) {
+                const st = manager.getState();
+                const groupPieces = st.pieces.filter((p) => p.groupId === piece!.groupId);
+                const newPiece = groupPieces.find((p) => p.id === piece!.id);
+                if (newPiece) {
+                  rotationAnimRef.current = {
+                    pieceIds: groupPieces.map((p) => p.id),
+                    from: oldRotation,
+                    to: newPiece.rotation,
+                    startMs: performance.now(),
+                  };
+                }
+              }
+
               setState(manager.getState());
             }
           }

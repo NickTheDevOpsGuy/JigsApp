@@ -26,18 +26,21 @@ import {
   getAllTimeBestLeaderboard,
   getMyPersonalBests,
   getTimeAttackLeaderboard,
+  getTimeDecayLeaderboard,
   type LeaderboardEntry,
   type StreakEntry,
   type CompletionCountEntry,
   type PersonalBestEntry,
 } from "@/services/leaderboardService";
 import { getMyProfile, updateMyProfile } from "@/services/profileService";
+import { getCompletionGrade } from "@/data/completionGrades";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
 import { AVATAR_HATS, AVATAR_GLASSES, AVATAR_HOODIES } from "@/data/avatarOptions";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
+import { loadLastSessionMetrics } from "@/screens/Play/placementMetrics";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -61,6 +64,7 @@ const PODIUM = ["🥇", "🥈", "🥉"];
 type LeaderboardType =
   | "today"
   | "timeAttack"
+  | "timeDecay"
   | "bestWeek"
   | "bestMonth"
   | "week"
@@ -204,6 +208,9 @@ export function StatsScreen() {
       } else if (leaderboardType === "timeAttack") {
         const lb = await getTimeAttackLeaderboard();
         setLeaderboard(lb);
+      } else if (leaderboardType === "timeDecay") {
+        const lb = await getTimeDecayLeaderboard();
+        setLeaderboard(lb);
       } else if (leaderboardType === "bestWeek") {
         const lb = await getPeriodLeaderboard("week");
         setLeaderboard(lb);
@@ -252,11 +259,13 @@ export function StatsScreen() {
         ? `Today's Daily Puzzle leaderboard - Phuzzle`
         : leaderboardType === "timeAttack"
           ? "Time Attack leaderboard - Phuzzle"
-          : leaderboardType === "streaks"
-            ? "Streak leaderboard - Phuzzle"
-            : leaderboardType === "completions"
-              ? "Puzzle completions leaderboard - Phuzzle"
-              : "Leaderboard - Phuzzle";
+          : leaderboardType === "timeDecay"
+            ? "Time Decay leaderboard - Phuzzle"
+            : leaderboardType === "streaks"
+              ? "Streak leaderboard - Phuzzle"
+              : leaderboardType === "completions"
+                ? "Puzzle completions leaderboard - Phuzzle"
+                : "Leaderboard - Phuzzle";
     const url = window.location.origin;
     const shareText = `${text}\n${url}`;
     if (navigator.share) {
@@ -530,18 +539,80 @@ export function StatsScreen() {
                   <>
                     <h2>Personal Bests</h2>
                     <ol className={styles.personalBests}>
-                      {personalBests.slice(0, 10).map((pb, i) => (
-                        <li key={i} className={styles.personalBestItem}>
-                          <span className={styles.pbGrid}>{pb.gridSize}</span>
-                          <span className={styles.pbTime}>
-                            {formatTime(pb.elapsedSeconds)}
-                          </span>
-                          {pb.isDaily && <span className={styles.pbDaily}>Daily</span>}
-                        </li>
-                      ))}
+                      {personalBests.slice(0, 10).map((pb, i) => {
+                        const [rows, cols] = pb.gridSize.split("×").map(Number);
+                        const grade =
+                          rows && cols
+                            ? getCompletionGrade({
+                                elapsedSeconds: pb.elapsedSeconds,
+                                grid: { rows, cols },
+                                timeMode: "elapsed",
+                              })
+                            : null;
+                        return (
+                          <li key={i} className={styles.personalBestItem}>
+                            <span className={styles.pbGrid}>{pb.gridSize}</span>
+                            {grade != null && (
+                              <span
+                                className={`${styles.gradeBadge} ${styles[`grade${grade}`]}`}
+                                aria-label={`Grade ${grade}`}
+                              >
+                                {grade}
+                              </span>
+                            )}
+                            <span className={styles.pbTime}>
+                              {formatTime(pb.elapsedSeconds)}
+                            </span>
+                            {pb.isDaily && <span className={styles.pbDaily}>Daily</span>}
+                          </li>
+                        );
+                      })}
                     </ol>
                   </>
                 )}
+                {(() => {
+                  const pm = loadLastSessionMetrics();
+                  if (!pm) return null;
+                  return (
+                    <>
+                      <h2>Placement Speed (Last Session)</h2>
+                      <p className={styles.hint}>
+                        Insights from your most recent puzzle
+                        {pm.grid ? ` (${pm.grid})` : ""}.
+                      </p>
+                      <div className={styles.statsGrid}>
+                        <div className={styles.statCard}>
+                          <span className={styles.statValue}>
+                            {pm.avgTimeBetweenSnapsMs >= 1000
+                              ? `${(pm.avgTimeBetweenSnapsMs / 1000).toFixed(1)}s`
+                              : `${Math.round(pm.avgTimeBetweenSnapsMs)}ms`}
+                          </span>
+                          <span className={styles.statLabel}>Avg time between snaps</span>
+                        </div>
+                        <div className={styles.statCard}>
+                          <span className={styles.statValue}>
+                            {pm.avgSnapVelocityPerMin.toFixed(1)}
+                          </span>
+                          <span className={styles.statLabel}>Snaps per min</span>
+                        </div>
+                        <div className={styles.statCard}>
+                          <span className={styles.statValue}>
+                            {pm.idlePercent.toFixed(0)}%
+                          </span>
+                          <span className={styles.statLabel}>Idle time</span>
+                        </div>
+                        <div className={styles.statCard}>
+                          <span className={styles.statValue}>
+                            {pm.avgTimeToSnapMs >= 1000
+                              ? `${(pm.avgTimeToSnapMs / 1000).toFixed(1)}s`
+                              : `${Math.round(pm.avgTimeToSnapMs)}ms`}
+                          </span>
+                          <span className={styles.statLabel}>Avg drag-to-snap time</span>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             )}
 
@@ -695,6 +766,24 @@ export function StatsScreen() {
                   <button
                     type="button"
                     className={`${styles.filterPill} ${
+                      leaderboardType === "timeAttack" ? styles.filterPillActive : ""
+                    }`}
+                    onClick={() => setLeaderboardType("timeAttack")}
+                  >
+                    Time Attack
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.filterPill} ${
+                      leaderboardType === "timeDecay" ? styles.filterPillActive : ""
+                    }`}
+                    onClick={() => setLeaderboardType("timeDecay")}
+                  >
+                    Time Decay
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.filterPill} ${
                       leaderboardCompact ? styles.filterPillActive : ""
                     }`}
                     onClick={() => setLeaderboardCompact((c) => !c)}
@@ -742,6 +831,11 @@ export function StatsScreen() {
                   renderTimeLeaderboard(
                     leaderboard,
                     "No Time Attack completions yet. Try it!",
+                  )}
+                {leaderboardType === "timeDecay" &&
+                  renderTimeLeaderboard(
+                    leaderboard,
+                    "No Time Decay completions yet. Try it!",
                   )}
                 {leaderboardType === "bestWeek" &&
                   renderTimeLeaderboard(

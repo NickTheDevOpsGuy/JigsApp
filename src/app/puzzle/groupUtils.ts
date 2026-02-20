@@ -90,6 +90,11 @@ export function wouldOverlapAnyOtherGroup(
       const gpRight = gpX + gp.w;
       const gpBottom = gpY + gp.h;
       for (const op of otherPieces) {
+        // Grid-adjacent pieces overlap in tab regions by design; allow that
+        const dr = Math.abs(gp.row - op.row);
+        const dc = Math.abs(gp.col - op.col);
+        if (dr + dc === 1) continue;
+
         const opRight = op.x + op.w;
         const opBottom = op.y + op.h;
         if (!(gpRight <= op.x || gpX >= opRight || gpBottom <= op.y || gpY >= opBottom)) {

@@ -4,6 +4,7 @@
  */
 import { useEffect, useRef } from "react";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
+import { getRotationEaseProgress } from "@/puzzle/rotationEase";
 import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
@@ -39,6 +40,12 @@ export function usePlayScreenAnimation(args: {
     pieceIds: string[];
     triggeredAt: number;
   } | null>;
+  rotationAnimRef?: React.MutableRefObject<{
+    pieceIds: string[];
+    from: number;
+    to: number;
+    startMs: number;
+  } | null>;
 }) {
   const {
     manager,
@@ -63,6 +70,7 @@ export function usePlayScreenAnimation(args: {
     viewport,
     perfStatsRef,
     wrongRotationHintRef,
+    rotationAnimRef,
   } = args;
 
   const rafRef = useRef<number | null>(null);
@@ -235,10 +243,37 @@ export function usePlayScreenAnimation(args: {
       const idleMs =
         lastInteractionRef?.current != null ? now - lastInteractionRef.current : 0;
       const IDLE_GHOST_MS = 4000;
-      const effectiveShowGhost =
-        showGhostHint ||
-        (!!showGhostWhenIdle && idleMs >= IDLE_GHOST_MS && !st.isComplete);
-      const ghostAlpha = showGhostHint ? 0.35 : 0.2;
+      const GHOST_RAMP_MS = 5000;
+
+      let effectiveShowGhost: boolean;
+      let ghostAlpha: number;
+
+      if (showGhostHint) {
+        effectiveShowGhost = true;
+        ghostAlpha = 0.35;
+      } else if (showGhostWhenIdle && idleMs >= IDLE_GHOST_MS && !st.isComplete) {
+        effectiveShowGhost = true;
+        const excessIdle = idleMs - IDLE_GHOST_MS;
+        const rawProgress = Math.min(1, excessIdle / GHOST_RAMP_MS);
+        const easeInOut = (t: number) =>
+          t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        ghostAlpha = easeInOut(rawProgress) * 0.25;
+      } else {
+        effectiveShowGhost = false;
+        ghostAlpha = 0;
+      }
+
+      let rotationDisplayOverrides: Map<string, number> | undefined;
+      const anim = rotationAnimRef?.current;
+      if (anim) {
+        const deg = getRotationEaseProgress(anim.from, anim.to, anim.startMs, now);
+        if (deg != null) {
+          rotationDisplayOverrides = new Map(anim.pieceIds.map((id) => [id, deg]));
+        } else {
+          rotationAnimRef.current = null;
+        }
+      }
+
       renderBoard(
         ctx,
         st,
@@ -264,6 +299,7 @@ export function usePlayScreenAnimation(args: {
           showAlignmentGrid,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
           dragDisplayOverrides: isDragging ? dragDisplayOverrides : undefined,
+          rotationDisplayOverrides,
           wrongRotationHint,
           snapPreview,
         },
@@ -309,5 +345,6 @@ export function usePlayScreenAnimation(args: {
     snapParticlesRef,
     perfStatsRef,
     wrongRotationHintRef,
+    rotationAnimRef,
   ]);
 }

@@ -11,10 +11,11 @@ Setup and reference guides for developers.
 
 ## Reference
 
-| Document                               | Description                                                                              |
-| -------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [streak-freeze.md](./streak-freeze.md) | Streak freeze: one per week; offered when yesterday wasn't completed; keeps streak alive |
-| [SHARING.md](./SHARING.md)             | Completion share (image, social) and co-op (Play with Friend); links to Supabase setup   |
+| Document                                         | Description                                                                                     |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| [streak-freeze.md](./streak-freeze.md)           | Streak freeze: one per week; offered when yesterday wasn't completed; keeps streak alive        |
+| [SHARING.md](./SHARING.md)                       | Completion share (image, social) and co-op (Play with Friend); links to Supabase setup          |
+| [../README.md#-features](../README.md#-features) | Placement speed metrics: last-session time-between-snaps, idle %, snaps/min (Stats → Dashboard) |
 
 ## Future Ideas
 

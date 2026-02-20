@@ -53,12 +53,11 @@
 .placeholder,
 .hint {
   margin: 0 0 16px;
-  color: var(--color-text-secondary);
+  color: #334155;
 }
 
 .hint {
   font-size: 13px;
-  opacity: 0.8;
 }
 
 .debug {
@@ -94,8 +93,8 @@
   padding: 12px 14px;
   border: none;
   border-radius: 999px;
-  background: #eef6fc;
-  color: #0b63b8;
+  background: #d4e9f7;
+  color: #074a8a;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -105,7 +104,8 @@
 }
 
 .tabs button:hover {
-  background: #dff1ff;
+  background: #b8daf2;
+  color: #053a6d;
 }
 
 .tabs .tabActive {
@@ -116,7 +116,7 @@
 .section h2 {
   margin: 0 0 16px;
   font-size: 18px;
-  color: var(--color-text-primary);
+  color: #1e293b;
 }
 
 .loading,
@@ -274,15 +274,14 @@
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: var(--color-bg-elevated);
+  background: #e2e8f0;
   border-radius: 12px;
-  border: 1px solid var(--color-border);
-  opacity: 0.6;
+  border: 1px solid #cbd5e1;
 }
 
 .achievementUnlocked {
-  opacity: 1;
-  border-color: var(--color-brand-primary);
+  background: #e0f2fe;
+  border-color: #0b63b8;
 }
 
 .achievementIcon {
@@ -298,12 +297,20 @@
 
 .achievementName {
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #1e293b;
 }
 
 .achievementDesc {
   font-size: 13px;
-  color: var(--color-text-secondary);
+  color: #475569;
+}
+
+.achievementUnlocked .achievementName {
+  color: #0c4a6e;
+}
+
+.achievementUnlocked .achievementDesc {
+  color: #0369a1;
 }
 
 .achievementBadge {
@@ -366,7 +373,7 @@
 
 .avatarLabel {
   font-size: 12px;
-  color: var(--color-text-secondary);
+  color: #334155;
 }
 
 .avatarRow select {
@@ -387,7 +394,7 @@
   align-items: center;
   gap: 10px;
   font-size: 14px;
-  color: var(--color-text-primary);
+  color: #1e293b;
   cursor: pointer;
 }
 
@@ -415,8 +422,8 @@
   font-weight: 500;
   border: none;
   border-radius: 999px;
-  background: #eef6fc;
-  color: #0b63b8;
+  background: #d4e9f7;
+  color: #074a8a;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
@@ -426,7 +433,8 @@
 }
 
 .filterPill:hover {
-  background: #dff1ff;
+  background: #b8daf2;
+  color: #053a6d;
 }
 
 .filterPillActive {
@@ -529,8 +537,8 @@
   font-size: 13px;
   border: none;
   border-radius: 999px;
-  background: #eef6fc;
-  color: #0b63b8;
+  background: #d4e9f7;
+  color: #074a8a;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
@@ -541,7 +549,8 @@
 }
 
 .leaderboardTabs button:hover {
-  background: #dff1ff;
+  background: #b8daf2;
+  color: #053a6d;
 }
 
 .leaderboardTabs .lbTabActive {
@@ -936,4 +945,27 @@
   background: var(--color-brand-light);
   padding: 2px 8px;
   border-radius: 6px;
+}
+
+.gradeBadge {
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.gradeS {
+  color: #fbbf24;
+}
+
+.gradeA {
+  color: #94a3b8;
+}
+
+.gradeB {
+  color: #cd7f32;
+}
+
+.gradeC {
+  color: var(--color-text-muted);
 }

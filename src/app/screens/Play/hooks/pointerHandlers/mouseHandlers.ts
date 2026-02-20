@@ -25,10 +25,32 @@ export function handleMouseDown(
     e.preventDefault();
     if (!canRotatePiece(pieceId)) return false;
 
+    const piece = manager.getPiece(pieceId);
+    if (!piece) return false;
+    const oldRotation = piece.rotation;
+    const reducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     onPieceInteraction?.();
     manager.rotatePiece(pieceId);
     soundManager.play("rotate");
     haptic?.("rotate");
+
+    if (!reducedMotion && ctx.rotationAnimRef) {
+      const st = manager.getState();
+      const groupPieces = st.pieces.filter((p) => p.groupId === piece.groupId);
+      const newPiece = groupPieces.find((p) => p.id === pieceId);
+      if (newPiece) {
+        ctx.rotationAnimRef.current = {
+          pieceIds: groupPieces.map((p) => p.id),
+          from: oldRotation,
+          to: newPiece.rotation,
+          startMs: performance.now(),
+        };
+      }
+    }
+
     setState(manager.getState());
     return true;
   }

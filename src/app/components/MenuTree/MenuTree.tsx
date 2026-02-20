@@ -22,6 +22,7 @@ const PLAY_ONLY_IDS = new Set([
   "time-active",
   "time-relaxed",
   "time-timeAttack",
+  "time-timeDecay",
   "shareCompletion",
   "playWithFriend",
 ]);

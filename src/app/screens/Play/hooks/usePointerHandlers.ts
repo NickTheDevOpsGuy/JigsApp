@@ -41,6 +41,12 @@ export function usePointerHandlers(args: {
   onPieceInteraction?: () => void;
   onDragStarted?: () => void;
   onDragEnded?: () => void;
+  rotationAnimRef?: React.MutableRefObject<{
+    pieceIds: string[];
+    from: number;
+    to: number;
+    startMs: number;
+  } | null>;
   screenToBoard?: ScreenToBoard;
   viewport?: {
     startPan: (x: number, y: number) => void;
@@ -77,6 +83,7 @@ export function usePointerHandlers(args: {
     onPieceInteraction,
     onDragStarted,
     onDragEnded,
+    rotationAnimRef,
     screenToBoard,
     viewport,
   } = args;
@@ -128,6 +135,7 @@ export function usePointerHandlers(args: {
     onPieceInteraction,
     onDragStarted,
     onDragEnded,
+    rotationAnimRef,
     screenToBoard,
     viewport,
     activePointerIdRef,

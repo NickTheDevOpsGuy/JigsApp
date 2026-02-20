@@ -150,6 +150,8 @@ describe("wouldOverlapAnyOtherGroup", () => {
   });
 
   it("returns true when groups would overlap after move", () => {
+    // Use pieces that are NOT grid-adjacent (dr+dc !== 1)
+    // so the overlap check is not skipped (grid-neighbors are allowed to overlap)
     const p1 = makePiece({
       id: "a",
       row: 0,
@@ -162,15 +164,16 @@ describe("wouldOverlapAnyOtherGroup", () => {
     });
     const p2 = makePiece({
       id: "b",
-      row: 1,
-      col: 0,
-      x: 0,
-      y: 60,
+      row: 0,
+      col: 2,
+      x: 100,
+      y: 0,
       w: 50,
       h: 50,
       groupId: "g2",
     });
-    expect(wouldOverlapAnyOtherGroup([p1, p2], "g1", 0, 50)).toBe(true);
+    // Move g1 right by 60: p1 goes to (60,0), overlaps with p2 at (100,0)
+    expect(wouldOverlapAnyOtherGroup([p1, p2], "g1", 60, 0)).toBe(true);
   });
 });
 

@@ -23,6 +23,7 @@ const TIME_MODE_LABELS: Record<TimeMode, string> = {
   relaxed: "Relaxed (no timer)",
   best: "Best time",
   timeAttack: "Time Attack",
+  timeDecay: "Time Decay",
 };
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
@@ -295,6 +296,7 @@ export function SetupScreen() {
               "relaxed",
               "best",
               "timeAttack",
+              "timeDecay",
             ] as TimeMode[]
           ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
           fullWidth

@@ -13,8 +13,11 @@ import {
   getCurrentStreak,
 } from "@/daily/dailyPuzzleCore";
 import { recordCompletion } from "@/services/statsService";
+import { computeTimeDecayScore } from "../timeDecayScore";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
 import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
+import { getCompletionGrade } from "@/data/completionGrades";
+import type { TimeMode } from "../timeMode";
 import {
   CONFETTI_COLORS_STREAK_3,
   CONFETTI_COLORS_STREAK_7,
@@ -31,12 +34,15 @@ interface CompletionOverlayProps {
   elapsedSeconds: number;
   countdownMinutes?: number;
   timeAttackBonus?: number;
+  timeDecayBonus?: number;
   grid?: { rows: number; cols: number };
   imageUrl?: string;
   undoCount?: number;
+  timeMode?: TimeMode;
   isNewBest?: boolean;
   isDaily?: boolean;
   isTimeAttack?: boolean;
+  isTimeDecay?: boolean;
   shareUrls: ShareUrls;
   copied: boolean;
   canNativeShare: boolean;
@@ -53,12 +59,15 @@ export function CompletionOverlay({
   elapsedSeconds,
   countdownMinutes = 10,
   timeAttackBonus = 0,
+  timeDecayBonus = 0,
   grid,
   imageUrl,
   undoCount = 0,
+  timeMode = "elapsed",
   isNewBest = false,
   isDaily = false,
   isTimeAttack = false,
+  isTimeDecay = false,
   shareUrls,
   copied,
   canNativeShare,
@@ -74,6 +83,21 @@ export function CompletionOverlay({
   const completionMessage = getCompletionMessage(elapsedSeconds);
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const badge = getCompletionBadge(elapsedSeconds, undoCount, pieceCount);
+  const timeDecayScoreForGrade =
+    isTimeDecay && pieceCount > 0
+      ? computeTimeDecayScore(elapsedSeconds, pieceCount, timeDecayBonus)
+      : undefined;
+  const grade =
+    grid != null
+      ? getCompletionGrade({
+          elapsedSeconds,
+          grid,
+          timeMode,
+          countdownMinutes,
+          undoCount,
+          timeDecayScore: timeDecayScoreForGrade,
+        })
+      : null;
 
   useEffect(() => {
     if (isNewBest && grid) {
@@ -119,12 +143,18 @@ export function CompletionOverlay({
       const timeAttackScore = isTimeAttack
         ? timeRemaining * 10 + timeAttackBonus
         : undefined;
+      const pieceCount = grid.rows * grid.cols;
+      const timeDecayScore = isTimeDecay
+        ? computeTimeDecayScore(elapsedSeconds, pieceCount, timeDecayBonus)
+        : undefined;
       const stats = await recordCompletion({
         elapsedSeconds,
         grid,
         isDaily: !!isDaily,
         isTimeAttack,
         timeAttackScore,
+        isTimeDecay,
+        timeDecayScore,
         dailyStreak,
       });
       if (stats) {
@@ -138,7 +168,16 @@ export function CompletionOverlay({
       }
     };
     run();
-  }, [elapsedSeconds, grid, isDaily, isTimeAttack, timeAttackBonus, countdownMinutes]);
+  }, [
+    elapsedSeconds,
+    grid,
+    isDaily,
+    isTimeAttack,
+    timeAttackBonus,
+    isTimeDecay,
+    timeDecayBonus,
+    countdownMinutes,
+  ]);
 
   const puzzleSizeText =
     grid != null
@@ -158,6 +197,11 @@ export function CompletionOverlay({
             />
           </div>
         )}
+        {grade != null && (
+          <p className={styles.gradeBadge} aria-label={`Grade ${grade}`}>
+            Grade <span className={styles[`grade${grade}`]}>{grade}</span>
+          </p>
+        )}
         {badge && (
           <p className={styles.puzzleSize} aria-hidden="true">
             {badge}
@@ -165,7 +209,13 @@ export function CompletionOverlay({
         )}
         {puzzleSizeText != null && <p className={styles.puzzleSize}>{puzzleSizeText}</p>}
         <p>
-          Finished in {formatTime(elapsedSeconds)}
+          {isTimeDecay ? (
+            <>
+              Score: {computeTimeDecayScore(elapsedSeconds, pieceCount, timeDecayBonus)}
+            </>
+          ) : (
+            <>Finished in {formatTime(elapsedSeconds)}</>
+          )}
           {isNewBest && <span className={styles.newBest}> — New best!</span>}
           {isDaily && (
             <span className={styles.dailyBadge}>

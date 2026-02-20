@@ -84,8 +84,8 @@ export class PuzzleManager {
   private tileW: number;
   private tileH: number;
 
-  private readonly targetStartX: number = 0;
-  private readonly targetStartY: number = 0;
+  private readonly targetStartX: number;
+  private readonly targetStartY: number;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {
@@ -121,6 +121,18 @@ export class PuzzleManager {
     this.pad = Math.max(pad, minPad);
     this.tileW = pieceWidth;
     this.tileH = pieceHeight;
+
+    const assembledW = grid.cols * pieceWidth;
+    const assembledH = grid.rows * pieceHeight;
+    // Center assembled puzzle on board with pad margin so edge piece tabs aren't clipped
+    this.targetStartX = Math.max(
+      this.pad,
+      Math.min((boardWidth - assembledW) / 2, boardWidth - assembledW - this.pad),
+    );
+    this.targetStartY = Math.max(
+      this.pad,
+      Math.min((boardHeight - assembledH) / 2, boardHeight - assembledH - this.pad),
+    );
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
     this.zCounter = 10;

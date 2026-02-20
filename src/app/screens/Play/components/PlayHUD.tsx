@@ -16,6 +16,7 @@ interface PlayHUDProps {
   timeMode: TimeMode;
   countdownMinutes?: number;
   bestTimeSeconds?: number | null;
+  timeDecayScore?: number;
   onTogglePause: () => void;
 }
 
@@ -28,9 +29,11 @@ export function PlayHUD({
   timeMode,
   countdownMinutes = 10,
   bestTimeSeconds,
+  timeDecayScore,
   onTogglePause: _onTogglePause,
 }: PlayHUDProps) {
-  const showTimer = timeMode !== "relaxed";
+  const showTimer = timeMode !== "relaxed" && timeMode !== "timeDecay";
+  const showScore = timeMode === "timeDecay";
   const isCountdown = timeMode === "countdown" || timeMode === "timeAttack";
   const countdownTotal = countdownMinutes * 60;
   const isLowTime = isCountdown && elapsedSeconds > 0 && elapsedSeconds <= 60;
@@ -44,7 +47,12 @@ export function PlayHUD({
 
   return (
     <div className={styles.hud}>
-      {showTimer && (
+      {showScore && timeDecayScore != null && (
+        <div className={styles.hudPillTimer}>
+          <span className={styles.timerText}>Score {timeDecayScore}</span>
+        </div>
+      )}
+      {showTimer && !showScore && (
         <div className={`${styles.hudPillTimer} ${isLowTime ? styles.timerLow : ""}`}>
           <Clock size={14} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
