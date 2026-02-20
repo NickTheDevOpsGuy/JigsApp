@@ -449,7 +449,6 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   │   ├── MenuScreen.module.css
 │   │   │   │   └── MenuScreen.tsx
 │   │   │   ├── NewGame
-│   │   │   │   ├── NewGameScreen.module.css
 │   │   │   │   └── NewGameScreen.tsx
 │   │   │   ├── Packs
 │   │   │   │   ├── PackDetailScreen.module.css

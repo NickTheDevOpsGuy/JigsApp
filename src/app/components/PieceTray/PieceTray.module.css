@@ -296,7 +296,7 @@
   .tray {
     margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px
       max(6px, env(safe-area-inset-right, 0));
-    height: 138px;
+    height: 142px;
   }
 
   .header {

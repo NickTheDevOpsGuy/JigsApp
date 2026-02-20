@@ -42,7 +42,9 @@ function PageFallback() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: "100vh",
+        minHeight: "100dvh",
+        paddingTop: "env(safe-area-inset-top)",
+        paddingBottom: "env(safe-area-inset-bottom)",
         fontFamily: "system-ui, sans-serif",
       }}
     >
