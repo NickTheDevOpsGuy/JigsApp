@@ -1,7 +1,7 @@
 /**
  * StatsScreen – leaderboards, achievements, profile, streaks (Supabase).
  */
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, BarChart3, Trophy, Award, User } from "lucide-react";
 import { Button } from "@/components/Button/Button";
@@ -61,7 +61,16 @@ type StatsTab = "dashboard" | "profile" | "leaderboard" | "achievements";
 
 export function StatsScreen() {
   const nav = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [searchParams] = useSearchParams();
+  const prevThemeRef = useRef(theme);
+
+  // Force light theme on leaderboard for readability; restore on leave
+  useEffect(() => {
+    prevThemeRef.current = theme;
+    setTheme("light");
+    return () => setTheme(prevThemeRef.current);
+  }, [setTheme]);
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<StatsTab>(() => {
     if (

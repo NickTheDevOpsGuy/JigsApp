@@ -352,6 +352,15 @@ export function usePlayScreenManager(
                 timeDecayLastPlacementRef.current = now;
                 opts?.onTimeDecayComboChange?.(timeDecayComboRef.current);
               }
+              if (opts?.isTimeDecay) {
+                const last = timeDecayLastPlacementRef.current;
+                if (last != null && now - last <= TIME_DECAY_COMBO_MS) {
+                  timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE * 2;
+                } else {
+                  timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE;
+                }
+                timeDecayLastPlacementRef.current = now;
+              }
               const elapsedMs = opts?.elapsedMsRef?.current ?? 0;
               const timeToSnapMs =
                 startTime != null ? Math.round(now - startTime) : undefined;
@@ -426,6 +435,15 @@ export function usePlayScreenManager(
                 }
                 timeDecayLastPlacementRef.current = now;
                 opts?.onTimeDecayComboChange?.(timeDecayComboRef.current);
+              }
+              if (opts?.isTimeDecay) {
+                const last = timeDecayLastPlacementRef.current;
+                if (last != null && now - last <= TIME_DECAY_COMBO_MS) {
+                  timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE * 2;
+                } else {
+                  timeDecayBonusRef.current += TIME_DECAY_PLACEMENT_BONUS_BASE;
+                }
+                timeDecayLastPlacementRef.current = now;
               }
               const elapsedMs = opts?.elapsedMsRef?.current ?? 0;
               const timeToSnapMs =
