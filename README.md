@@ -73,6 +73,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 - Drag and drop pieces with rotation (tap to rotate on mobile)
 - Board snap and neighbor snap (with near-snap nudge when pieces are close)
+- **Snap feedback** – Glow, expanding ring, and particle burst when pieces snap (desktop and mobile); respects reduced motion and battery saver
 - Group merging so connected pieces move together
 - Multiple grid sizes (3×3 to 8×8)
 - Image sources: gallery, file upload, camera capture
@@ -84,6 +85,9 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### UX and polish
 
+- **Unified play layout** – Desktop and mobile share the same clean top bar (menu, HUD); New Puzzle via completion overlay or menu navigation
+- **Onboarding tip** – "Drag a piece to start" positioned at top center of canvas for clear visibility
+- **Piece drawer** – Cog (options) inline with "Piece Drawer" title; filter, sort, view, and actions; responsive tray height for thumbnails on desktop and mobile
 - **Alternate piece shapes** – Replay with Classic, Irregular, or Hard mode cuts; separate best times per cut (completion overlay)
 - **Near-completion effects** – Subtle pulse and glow when 3 pieces remain (hidden during drag)
 - **Export session stats** – Download placement timestamps, snap counts, idle durations as JSON (Profile tab or debug menu)
@@ -136,6 +140,8 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### Recently Added
 
+- **Snap visual feedback** – Glow, ring, and particles on piece snap; mobile-friendly sizing; throttle bypass so effects always render
+- **Simplified play screen** – Unified layout (desktop matches mobile); "Drag a piece to start" at top center; piece drawer cog inline with title
 - **Border complete celebration** – Confetti + toast when border (edges + corners) is done
 - **Challenge mode** – 5-second full-image preview, then memory-based solving (Menu → Gameplay)
 - **Leaderboard redesign** – Today's Daily Puzzle card, raccoon mascot, filter pills, Leaderboard button on home
