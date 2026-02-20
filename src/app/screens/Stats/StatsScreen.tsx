@@ -1,7 +1,7 @@
 /**
  * StatsScreen – leaderboards, achievements, profile, streaks (Supabase).
  */
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -41,6 +41,7 @@ import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCor
 import { AVATAR_HATS, AVATAR_GLASSES, AVATAR_HOODIES } from "@/data/avatarOptions";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { loadLastSessionMetrics } from "@/screens/Play/placementMetrics";
+import { useTheme } from "@/hooks/useTheme";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -77,7 +78,16 @@ type StatsTab = "dashboard" | "profile" | "leaderboard" | "achievements";
 
 export function StatsScreen() {
   const nav = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [searchParams] = useSearchParams();
+  const prevThemeRef = useRef(theme);
+
+  // Force light theme on leaderboard for readability; restore on leave
+  useEffect(() => {
+    prevThemeRef.current = theme;
+    setTheme("light");
+    return () => setTheme(prevThemeRef.current);
+  }, [setTheme]);
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<StatsTab>(() => {
     if (

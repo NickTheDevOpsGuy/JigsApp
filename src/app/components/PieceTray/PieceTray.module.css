@@ -334,14 +334,17 @@
 /* Mobile adjustments */
 @media (max-width: 600px) {
   .tray {
-    margin: 0 max(6px, env(safe-area-inset-left, 0))
-      max(12px, env(safe-area-inset-bottom, 0)) max(6px, env(safe-area-inset-right, 0));
-    max-height: 200px;
+    margin: 0 max(8px, env(safe-area-inset-left, 0))
+      max(16px, env(safe-area-inset-bottom, 0)) max(8px, env(safe-area-inset-right, 0));
+    max-height: 320px;
+    min-height: 140px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
   }
 
   .header {
-    padding: 4px 8px;
-    font-size: 12px;
+    padding: 10px 12px;
+    font-size: 13px;
   }
 
   .help {
@@ -349,24 +352,25 @@
   }
 
   .controls {
-    padding: 3px 6px;
-    gap: 4px;
+    gap: 6px;
   }
 
   .segment button,
   .sort button {
-    padding: 3px 6px;
-    font-size: 10px;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 8px;
   }
 
   .thumbWrap {
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
   }
 
   .pieceButton {
-    min-width: 48px;
-    min-height: 48px;
+    min-width: 56px;
+    min-height: 56px;
+    padding: 6px;
   }
 
   /* Mobile compact overrides */

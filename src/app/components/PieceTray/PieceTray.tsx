@@ -23,15 +23,15 @@ const THUMB_COMPACT = 36;
 
 /** Tray height by total piece count: smaller for small puzzles, taller for large. */
 function getTrayHeight(totalPieces: number, isMobile: boolean): number {
-  const base = isMobile ? 110 : 100;
-  const cap = isMobile ? 200 : 220;
+  const base = isMobile ? 160 : 100;
+  const cap = isMobile ? 320 : 220;
   if (totalPieces <= 9) return base;
-  if (totalPieces <= 16) return base + 15;
-  if (totalPieces <= 25) return base + 30;
-  if (totalPieces <= 36) return base + 45;
-  if (totalPieces <= 64) return base + 65;
-  if (totalPieces <= 100) return base + 90;
-  return Math.min(cap, base + 110);
+  if (totalPieces <= 16) return base + 20;
+  if (totalPieces <= 25) return base + 40;
+  if (totalPieces <= 36) return base + 60;
+  if (totalPieces <= 64) return base + 80;
+  if (totalPieces <= 100) return base + 110;
+  return Math.min(cap, base + 140);
 }
 
 type Props = {
