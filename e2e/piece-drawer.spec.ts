@@ -27,9 +27,9 @@ test.describe("Piece Drawer", () => {
   test("opens options menu when cog is clicked", async ({ page }) => {
     await page.goto("/play");
 
-    await expect(
-      page.getByRole("button", { name: /open options|options/i }),
-    ).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole("button", { name: /open options|options/i })).toBeVisible(
+      { timeout: 15000 },
+    );
     await page.getByRole("button", { name: /open options|options/i }).click();
 
     await expect(page.getByRole("menu")).toBeVisible();
@@ -42,9 +42,9 @@ test.describe("Piece Drawer", () => {
   // Flaky: menu often not found after cog click when run as 2nd/3rd test. Sort/View/Actions pass.
   test.skip("can expand Filter and select section", async ({ page }) => {
     await page.goto("/play");
-    await expect(
-      page.getByRole("button", { name: /open options|options/i }),
-    ).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole("button", { name: /open options|options/i })).toBeVisible(
+      { timeout: 15000 },
+    );
     await page.getByRole("button", { name: /open options|options/i }).click();
     await expect(page.getByRole("menu")).toBeVisible({ timeout: 10000 });
     const menu = page.getByRole("menu");
@@ -54,7 +54,10 @@ test.describe("Piece Drawer", () => {
 
     await page.getByRole("button", { name: /open options|options/i }).click();
     await expect(page.getByRole("menu")).toBeVisible({ timeout: 10000 });
-    await page.getByRole("menu").getByRole("menuitem", { name: /^filter$/i }).click();
+    await page
+      .getByRole("menu")
+      .getByRole("menuitem", { name: /^filter$/i })
+      .click();
     await expect(
       page.getByRole("menu").getByText("Edges", { exact: true }),
     ).toContainText("✓");

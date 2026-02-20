@@ -44,9 +44,9 @@ describe("PuzzleManager", () => {
 
   it("rotatePiece rotates clockwise, rotatePieceCCW rotates counter-clockwise", () => {
     const manager = createManager();
-    const pieces = manager.getState().pieces.filter(
-      (p) => !p.inTray && !p.isPlaced && !p.locked,
-    );
+    const pieces = manager
+      .getState()
+      .pieces.filter((p) => !p.inTray && !p.isPlaced && !p.locked);
     if (pieces.length === 0) return;
     const piece = pieces[0];
     const initialRotation = piece.rotation;
@@ -59,16 +59,15 @@ describe("PuzzleManager", () => {
 
     manager.rotatePieceCCW(piece.id);
     state = manager.getState();
-    const afterCCW =
-      state.pieces.find((p) => p.id === piece.id)?.rotation ?? afterCW;
+    const afterCCW = state.pieces.find((p) => p.id === piece.id)?.rotation ?? afterCW;
     expect(afterCCW).toBe(initialRotation);
   });
 
   it("mergeTrayPiecesIntoCluster assigns same groupId to selected tray pieces", () => {
     const manager = createManager();
-    const pieces = manager.getState().pieces.filter(
-      (p) => !p.inTray && !p.isPlaced && !p.locked,
-    );
+    const pieces = manager
+      .getState()
+      .pieces.filter((p) => !p.inTray && !p.isPlaced && !p.locked);
     if (pieces.length < 2) return;
 
     const [p1, p2] = pieces;
@@ -90,9 +89,9 @@ describe("PuzzleManager", () => {
 
   it("mergeTrayPiecesIntoCluster does nothing with fewer than 2 tray pieces", () => {
     const manager = createManager();
-    const pieces = manager.getState().pieces.filter(
-      (p) => !p.inTray && !p.isPlaced && !p.locked,
-    );
+    const pieces = manager
+      .getState()
+      .pieces.filter((p) => !p.inTray && !p.isPlaced && !p.locked);
     if (pieces.length === 0) return;
 
     manager.sendToTray(pieces[0].id);

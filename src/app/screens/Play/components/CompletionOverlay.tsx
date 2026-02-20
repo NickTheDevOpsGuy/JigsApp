@@ -333,7 +333,9 @@ export function CompletionOverlay({
 
         {onReplayWithCut && (
           <div className={styles.replayWithCutSection}>
-            <p className={styles.replayWithCutLabel}>Replay with different piece shape:</p>
+            <p className={styles.replayWithCutLabel}>
+              Replay with different piece shape:
+            </p>
             <div className={styles.replayWithCutButtons}>
               {CUT_TYPES.map((cut) => (
                 <Button

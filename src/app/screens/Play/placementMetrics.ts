@@ -150,7 +150,9 @@ export type SessionStatsExport = {
 };
 
 /** Build exportable session stats JSON (for download). */
-export function buildSessionStatsExport(data: SavedSessionData | null): SessionStatsExport | null {
+export function buildSessionStatsExport(
+  data: SavedSessionData | null,
+): SessionStatsExport | null {
   const metrics = getMetricsFromSaved(data ?? null);
   if (!metrics || !data || metrics.snapCount === 0) return null;
   const events = data.placementEvents ?? [];

@@ -433,9 +433,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                 type="button"
                 className={playStyles.headerMenuSubmenuTrigger}
                 role="menuitem"
-                onClick={() =>
-                  setExpandedSection((s) => (s === "sort" ? null : "sort"))
-                }
+                onClick={() => setExpandedSection((s) => (s === "sort" ? null : "sort"))}
               >
                 Sort
                 <ChevronRight
@@ -464,9 +462,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                     className={playStyles.headerMenuItem}
                     role="menuitem"
                     disabled={!image}
-                    title={
-                      !image ? "Load an image to enable color sorting" : undefined
-                    }
+                    title={!image ? "Load an image to enable color sorting" : undefined}
                     onClick={() => {
                       setSortMode("color");
                       setShuffledOrder(null);
@@ -484,9 +480,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                 type="button"
                 className={playStyles.headerMenuSubmenuTrigger}
                 role="menuitem"
-                onClick={() =>
-                  setExpandedSection((s) => (s === "view" ? null : "view"))
-                }
+                onClick={() => setExpandedSection((s) => (s === "view" ? null : "view"))}
               >
                 View
                 <ChevronRight
@@ -542,9 +536,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                 className={playStyles.headerMenuSubmenuTrigger}
                 role="menuitem"
                 onClick={() =>
-                  setExpandedSection((s) =>
-                    s === "actions" ? null : "actions",
-                  )
+                  setExpandedSection((s) => (s === "actions" ? null : "actions"))
                 }
               >
                 Actions
@@ -629,70 +621,72 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
           ref={scrollerRef}
           role="list"
         >
-        {displayed.length === 0 ? (
-          <div className={styles.empty}>{emptyText}</div>
-        ) : (
-          <div className={styles.row}>
-            {displayed.map((p) => {
-              const isHighlighted = colorHighlight && highlightedIds.has(p.id);
-              const isDimmed =
-                colorHighlight && highlightAnchorId != null && !highlightedIds.has(p.id);
-              const doScatter = scatterActive && !prefersReducedMotion;
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`${styles.pieceButton} ${
-                    clusterMode && selectedIds?.has(p.id) ? styles.pieceSelected : ""
-                  } ${isHighlighted ? styles.pieceHighlighted : ""} ${
-                    isDimmed ? styles.pieceDimmed : ""
-                  } ${doScatter ? styles.pieceScatter : ""}`}
-                  style={
-                    doScatter
-                      ? ({
-                          "--scatter-rotation": `${scatterVars(p.id).rotation}deg`,
-                          "--scatter-dx": `${scatterVars(p.id).dx}px`,
-                          "--scatter-dy": `${scatterVars(p.id).dy}px`,
-                        } as React.CSSProperties)
-                      : undefined
-                  }
-                  onClick={() => {
-                    if (clusterMode && onSelectionToggle) {
-                      onSelectionToggle(p.id);
-                    } else if (colorHighlight) {
-                      setHighlightAnchorId(p.id);
-                    } else {
-                      onPieceClick(p.id);
+          {displayed.length === 0 ? (
+            <div className={styles.empty}>{emptyText}</div>
+          ) : (
+            <div className={styles.row}>
+              {displayed.map((p) => {
+                const isHighlighted = colorHighlight && highlightedIds.has(p.id);
+                const isDimmed =
+                  colorHighlight &&
+                  highlightAnchorId != null &&
+                  !highlightedIds.has(p.id);
+                const doScatter = scatterActive && !prefersReducedMotion;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`${styles.pieceButton} ${
+                      clusterMode && selectedIds?.has(p.id) ? styles.pieceSelected : ""
+                    } ${isHighlighted ? styles.pieceHighlighted : ""} ${
+                      isDimmed ? styles.pieceDimmed : ""
+                    } ${doScatter ? styles.pieceScatter : ""}`}
+                    style={
+                      doScatter
+                        ? ({
+                            "--scatter-rotation": `${scatterVars(p.id).rotation}deg`,
+                            "--scatter-dx": `${scatterVars(p.id).dx}px`,
+                            "--scatter-dy": `${scatterVars(p.id).dy}px`,
+                          } as React.CSSProperties)
+                        : undefined
                     }
-                  }}
-                  aria-label={
-                    clusterMode
-                      ? `Select piece ${p.id}`
-                      : colorHighlight
-                        ? `Highlight pieces like ${p.id}`
-                        : `Place piece ${p.id}`
-                  }
-                >
-                  <div
-                    className={styles.thumbWrap}
-                    style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+                    onClick={() => {
+                      if (clusterMode && onSelectionToggle) {
+                        onSelectionToggle(p.id);
+                      } else if (colorHighlight) {
+                        setHighlightAnchorId(p.id);
+                      } else {
+                        onPieceClick(p.id);
+                      }
+                    }}
+                    aria-label={
+                      clusterMode
+                        ? `Select piece ${p.id}`
+                        : colorHighlight
+                          ? `Highlight pieces like ${p.id}`
+                          : `Place piece ${p.id}`
+                    }
                   >
-                    {image ? (
-                      <img
-                        className={styles.thumbImg}
-                        src={thumbsById.get(p.id)}
-                        alt=""
-                        draggable={false}
-                      />
-                    ) : (
-                      <div className={styles.thumbFallback} />
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        )}
+                    <div
+                      className={styles.thumbWrap}
+                      style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+                    >
+                      {image ? (
+                        <img
+                          className={styles.thumbImg}
+                          src={thumbsById.get(p.id)}
+                          alt=""
+                          draggable={false}
+                        />
+                      ) : (
+                        <div className={styles.thumbFallback} />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
         {canScroll && displayed.length > 0 && scrollProgress < 1 && (
           <button

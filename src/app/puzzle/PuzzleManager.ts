@@ -459,7 +459,7 @@ export class PuzzleManager {
 
     this.updatePieces(
       (p) => p.groupId === piece.groupId,
-      (p) => ({ rotation: ((p.rotation + deg) % 360 + 360) % 360 }),
+      (p) => ({ rotation: (((p.rotation + deg) % 360) + 360) % 360 }),
     );
   }
 

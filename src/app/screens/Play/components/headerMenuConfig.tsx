@@ -4,10 +4,7 @@
  */
 import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
-import {
-  downloadSessionStatsJson,
-  loadLastSessionMetrics,
-} from "../placementMetrics";
+import { downloadSessionStatsJson, loadLastSessionMetrics } from "../placementMetrics";
 
 export type DebugFlags = {
   showGrid: boolean;

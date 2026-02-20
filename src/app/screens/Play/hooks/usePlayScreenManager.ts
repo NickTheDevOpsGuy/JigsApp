@@ -4,11 +4,7 @@ import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
-import {
-  STORAGE_KEY,
-  computeTileSize,
-  getStoredPieceCut,
-} from "../playScreenUtils";
+import { STORAGE_KEY, computeTileSize, getStoredPieceCut } from "../playScreenUtils";
 import { MAX_DEPTH_RATIO } from "@/puzzle/cutType";
 import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";

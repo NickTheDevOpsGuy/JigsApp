@@ -371,8 +371,7 @@ export function PlayScreen() {
     const seq = placementSequenceRef.current;
     const sessionDurationMs = elapsedSeconds * 1000;
     const metrics = computeSessionMetrics(seq, sessionDurationMs);
-    if (metrics)
-      saveLastSessionMetrics(metrics, state.grid, seq, elapsedSeconds);
+    if (metrics) saveLastSessionMetrics(metrics, state.grid, seq, elapsedSeconds);
   }, [state?.isComplete, state?.grid, elapsedSeconds, placementSequenceRef]);
 
   usePlayScreenEffects({

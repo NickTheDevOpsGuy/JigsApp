@@ -193,11 +193,7 @@ export function renderBoard(
     : null;
 
   // Near completion (3 pieces remaining): subtle pulse + glow around final area (hide during drag)
-  if (
-    animState?.piecesRemaining === 3 &&
-    !state.isComplete &&
-    !draggedGroupId
-  ) {
+  if (animState?.piecesRemaining === 3 && !state.isComplete && !draggedGroupId) {
     const remainingPieces = state.pieces.filter((p) => !p.isPlaced);
     if (remainingPieces.length === 3) {
       drawNearCompletionEffects(
@@ -759,14 +755,7 @@ function drawNearCompletionEffects(
   const centerY = (minY + maxY) / 2;
   const radius = Math.hypot(maxX - minX + pad, maxY - minY + pad) * 0.6;
   const glowAlpha = 0.03 + 0.02 * Math.sin((nowMs / 1500) * Math.PI * 2);
-  const glow = ctx.createRadialGradient(
-    centerX,
-    centerY,
-    0,
-    centerX,
-    centerY,
-    radius,
-  );
+  const glow = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
   glow.addColorStop(0, `rgba(255, 210, 100, ${glowAlpha})`);
   glow.addColorStop(0.6, `rgba(255, 200, 80, ${glowAlpha * 0.4})`);
   glow.addColorStop(1, "rgba(255, 200, 80, 0)");
