@@ -160,4 +160,20 @@
   .dropdown {
     min-width: 140px;
   }
+
+  .themeOption {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .themeOptions {
+    gap: 10px;
+  }
+
+  .dropdownItem {
+    min-height: 44px;
+    padding: 12px 14px;
+  }
 }

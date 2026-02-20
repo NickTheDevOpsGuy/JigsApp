@@ -4,9 +4,12 @@ import { PUZZLE_DEFAULTS } from "@/puzzle/config";
 import {
   snapPopScale,
   snapGlowAlpha,
+  SNAP_GLOW_MS,
   drawSnapGlow,
+  drawSnapRing,
   drawSnapParticles,
   type SnapParticle,
+  type SnapGlowColors,
   drawDebugBackdrop,
   drawGridOverlay,
   drawAlignmentGrid,
@@ -55,6 +58,10 @@ export type AnimationState = {
     inSnapRange: boolean;
     proximity: number;
   } | null;
+  /** Display position overrides during snap-to-target animation */
+  snapPositionOverrides?: Map<string, { x: number; y: number }>;
+  /** Theme-aware colors for snap glow, ring, particles */
+  snapGlowColors?: SnapGlowColors;
   /** Show very subtle alignment grid matching piece boundaries */
   showAlignmentGrid?: boolean;
   /** Show faint ghost of completed puzzle behind board (5–10% opacity). Disabled in competitive/daily. */
@@ -63,6 +70,8 @@ export type AnimationState = {
   isCompetitiveOrDaily?: boolean;
   /** When 3, show subtle pulse and glow around final area (builds anticipation). */
   piecesRemaining?: number;
+  /** Scale factor for snap effects (glow/ring/particles) – e.g. 1.3 on mobile for better visibility */
+  snapEffectScale?: number;
 };
 
 /** Cache for pre-rendered pieces - clip at (0,0) gives crisp edges, avoids blocky look when moving */
@@ -215,17 +224,22 @@ export function renderBoard(
     .sort((a, b) => a.z - b.z);
 
   const LOCK_GLOW_MS = 500;
-  const overrides = animState?.dragDisplayOverrides;
+  const dragOverrides = animState?.dragDisplayOverrides;
+  const snapOverrides = animState?.snapPositionOverrides;
   const rotationOverrides = animState?.rotationDisplayOverrides;
   for (const p of pieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
     const lockAt = lockMap.get(p.id);
     const lockElapsedMs = lockAt != null ? nowMs - lockAt : 0;
     const showLockGlow = lockAt != null && lockElapsedMs < LOCK_GLOW_MS;
-    let drawPieceData =
-      isDragging && overrides?.has(p.id)
-        ? { ...p, x: overrides.get(p.id)!.x, y: overrides.get(p.id)!.y }
-        : p;
+    let drawPieceData = p;
+    if (isDragging && dragOverrides?.has(p.id)) {
+      const pos = dragOverrides.get(p.id)!;
+      drawPieceData = { ...p, x: pos.x, y: pos.y };
+    } else if (snapOverrides?.has(p.id)) {
+      const pos = snapOverrides.get(p.id)!;
+      drawPieceData = { ...p, x: pos.x, y: pos.y };
+    }
     if (rotationOverrides?.has(p.id)) {
       drawPieceData = { ...drawPieceData, rotation: rotationOverrides.get(p.id)! };
     }
@@ -257,7 +271,14 @@ export function renderBoard(
 
   // Snap particles (board space, on top of pieces)
   if (snapParticles && snapParticles.length > 0) {
-    drawSnapParticles(ctx, snapParticles, nowMs);
+    const effectScale = animState?.snapEffectScale ?? 1;
+    drawSnapParticles(
+      ctx,
+      snapParticles,
+      nowMs,
+      animState?.snapGlowColors?.particle,
+      effectScale,
+    );
   }
 
   if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
@@ -405,12 +426,16 @@ function drawPiece(
   const popScale = start != null ? snapPopScale(popElapsedMs) : 1;
   const scale = popScale;
 
-  // Subtle snap glow behind piece (placement or neighbor merge)
-  if (start != null && popElapsedMs < 280) {
+  // Subtle snap glow + expanding ring behind piece (placement or neighbor merge)
+  if (start != null && popElapsedMs < SNAP_GLOW_MS) {
     const cx = p.x + p.w / 2;
     const cy = p.y + p.h / 2;
-    const radius = Math.max(p.w, p.h) * 0.55;
-    drawSnapGlow(ctx, cx, cy, radius, snapGlowAlpha(popElapsedMs));
+    const effectScale = animState?.snapEffectScale ?? 1;
+    const baseRadius = Math.max(p.w, p.h) * 0.72;
+    const radius = Math.max(baseRadius * effectScale, 28);
+    const colors = animState?.snapGlowColors;
+    drawSnapGlow(ctx, cx, cy, radius, snapGlowAlpha(popElapsedMs), colors);
+    drawSnapRing(ctx, cx, cy, radius, popElapsedMs, colors);
   }
 
   // Preview glow when piece is within snap tolerance during drag (rotation correct only)
@@ -422,7 +447,7 @@ function drawPiece(
     const radius = Math.max(p.w, p.h) * 0.58;
     const baseAlpha = preview.inSnapRange ? 0.11 : 0.05;
     const alpha = baseAlpha * (0.4 + 0.6 * preview.proximity);
-    drawSnapGlow(ctx, cx, cy, radius, alpha);
+    drawSnapGlow(ctx, cx, cy, radius, alpha, animState?.snapGlowColors);
   }
 
   let path: Path2D | null = null;

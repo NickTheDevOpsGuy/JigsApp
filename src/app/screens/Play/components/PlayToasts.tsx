@@ -15,6 +15,7 @@ type Props = {
   shareToast: string | null;
   classNames: {
     engagementToast: string;
+    engagementToastStartTip: string;
     toastDismiss: string;
     onboardingOverlay: string;
     onboardingOverlayTray: string;
@@ -59,7 +60,7 @@ export function PlayToasts({
         </div>
       )}
       {onboarding.needsStartTip && placed === 0 && (
-        <div className={s.engagementToast} role="status">
+        <div className={`${s.engagementToast} ${s.engagementToastStartTip}`} role="status">
           <span>Drag a piece to start</span>
           <button
             type="button"

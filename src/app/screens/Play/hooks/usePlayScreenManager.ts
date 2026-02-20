@@ -9,6 +9,7 @@ import { MAX_DEPTH_RATIO } from "@/puzzle/cutType";
 import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
+import type { SnapMoveItem } from "@/puzzle/PuzzleManager";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 import { TIME_DECAY_COMBO_MS, TIME_DECAY_PLACEMENT_BONUS_BASE } from "../timeDecayScore";
 
@@ -16,7 +17,9 @@ export type ResumeChoice = "resume" | "fresh" | null;
 
 const PLACEMENT_STREAK_MS = 3000;
 const STREAK_COOLDOWN_MS = 5000;
-const SNAP_PARTICLE_COUNT = 8;
+const SNAP_PARTICLE_COUNT_SINGLE = 12;
+const SNAP_PARTICLE_COUNT_PAIR = 14;
+const SNAP_PARTICLE_COUNT_GROUP = 18;
 /** Time Attack: bonus window in ms. Placements within this window get combo multiplier. */
 const TIME_ATTACK_COMBO_MS = 4000;
 /** Time Attack: base bonus points per fast placement. */
@@ -68,6 +71,11 @@ export function usePlayScreenManager(
     onTimeDecayComboChange?: (combo: number) => void;
     /** Ref to current elapsed ms (for replay recording). */
     elapsedMsRef?: MutableRefObject<number>;
+    /** Ref for snap-to-position animation. When set, onSnapMoveStart populates it. */
+    snapPositionAnimRef?: MutableRefObject<{
+      items: SnapMoveItem[];
+      startMs: number;
+    } | null>;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -353,6 +361,31 @@ export function usePlayScreenManager(
                 timestampMs: now,
                 timeToSnapMs,
               });
+              // Subtle particle burst on board placement (single piece = fewer particles)
+              const opts2 = optionsRef.current;
+              if (!opts2?.batterySaverMode) {
+                const prefersReducedMotion =
+                  typeof window !== "undefined" &&
+                  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                if (!prefersReducedMotion) {
+                  const cx = p.x + p.w / 2;
+                  const cy = p.y + p.h / 2;
+                  const particles = snapParticlesRef.current;
+                  const count = SNAP_PARTICLE_COUNT_SINGLE;
+                  for (let i = 0; i < count; i++) {
+                    const angle = (i / count) * Math.PI * 2 + (now % 1);
+                    const spawnR = 4 + (now % 3);
+                    particles.push({
+                      x: cx + Math.cos(angle) * spawnR,
+                      y: cy + Math.sin(angle) * spawnR,
+                      t0: now,
+                      a: angle,
+                    });
+                  }
+                  const maxAge = 700;
+                  snapParticlesRef.current = particles.filter((p_) => now - p_.t0 < maxAge);
+                }
+              }
             },
             onPieceSnapped: (pieceIds, center) => {
               const now = performance.now();
@@ -402,18 +435,32 @@ export function usePlayScreenManager(
                 timeToSnapMs,
               });
               if (center) {
-                const particles = snapParticlesRef.current;
-                for (let i = 0; i < SNAP_PARTICLE_COUNT; i++) {
-                  const angle = (i / SNAP_PARTICLE_COUNT) * Math.PI * 2 + (now % 1);
-                  const r = 4 + (now % 3);
-                  particles.push({
-                    x: center.x + Math.cos(angle) * r,
-                    y: center.y + Math.sin(angle) * r,
-                    t0: now,
-                  });
+                const opts3 = optionsRef.current;
+                const skipParticles =
+                  opts3?.batterySaverMode ||
+                  (typeof window !== "undefined" &&
+                    window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+                if (!skipParticles) {
+                  const particles = snapParticlesRef.current;
+                  const count =
+                    pieceIds.length >= 3
+                      ? SNAP_PARTICLE_COUNT_GROUP
+                      : pieceIds.length === 2
+                        ? SNAP_PARTICLE_COUNT_PAIR
+                        : SNAP_PARTICLE_COUNT_SINGLE;
+                  for (let i = 0; i < count; i++) {
+                    const angle = (i / count) * Math.PI * 2 + (now % 1);
+                    const spawnR = 4 + (now % 3);
+                    particles.push({
+                      x: center.x + Math.cos(angle) * spawnR,
+                      y: center.y + Math.sin(angle) * spawnR,
+                      t0: now,
+                      a: angle,
+                    });
+                  }
+                  const maxAge = 700;
+                  snapParticlesRef.current = particles.filter((p) => now - p.t0 < maxAge);
                 }
-                const maxAge = 500;
-                snapParticlesRef.current = particles.filter((p) => now - p.t0 < maxAge);
               }
             },
             onPieceLocked: (ids) => {
@@ -428,6 +475,16 @@ export function usePlayScreenManager(
               const cur = ref.current;
               if (cur && now - cur.triggeredAt < 5000) return;
               ref.current = { groupId, pieceIds, triggeredAt: now };
+            },
+            onSnapMoveStart: (items) => {
+              const ref = opts?.snapPositionAnimRef;
+              if (!ref) return;
+              const prefersReducedMotion =
+                typeof window !== "undefined" &&
+                window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+              const batterySaver = opts?.batterySaverMode ?? false;
+              if (prefersReducedMotion || batterySaver) return;
+              ref.current = { items, startMs: performance.now() };
             },
             onPuzzleComplete: () => {
               clearPuzzleState();

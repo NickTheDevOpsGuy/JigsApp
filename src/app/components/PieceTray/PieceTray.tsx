@@ -26,9 +26,9 @@ const THUMB_COMPACT = 64;
 
 const TRAY_COMPACT_KEY = "phuzzle:trayCompact";
 
-/** Tray height: fits thumbnails comfortably. */
+/** Tray height: fits thumbnails comfortably (header + thumb row + padding). */
 function getTrayHeight(totalPieces: number, isMobile: boolean): number {
-  const base = isMobile ? 145 : 110;
+  const base = isMobile ? 155 : 125;
   const cap = isMobile ? 220 : 200;
   if (totalPieces <= 9) return base;
   if (totalPieces <= 16) return base + 15;
@@ -363,24 +363,26 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     >
       <div className={styles.header} ref={optionsRef}>
         <div className={styles.titleRow}>
-          <span className={styles.title}>Piece Drawer ({pieces.length})</span>
+          <span className={styles.titleWithCog}>
+            <span className={styles.title}>Piece Drawer ({pieces.length})</span>
+            <button
+              ref={cogRef}
+              type="button"
+              className={styles.cogBtn}
+              onClick={() => setOptionsOpen((o) => !o)}
+              aria-haspopup="menu"
+              aria-expanded={optionsOpen}
+              aria-label={optionsOpen ? "Close options" : "Open options"}
+              title="Options"
+            >
+              <Settings size={16} />
+            </button>
+          </span>
           {(colorHighlight || clusterMode) && (
             <span className={styles.modeBadge} aria-live="polite">
               {clusterMode ? "Cluster" : "Highlight"}
             </span>
           )}
-          <button
-            ref={cogRef}
-            type="button"
-            className={styles.cogBtn}
-            onClick={() => setOptionsOpen((o) => !o)}
-            aria-haspopup="menu"
-            aria-expanded={optionsOpen}
-            aria-label={optionsOpen ? "Close options" : "Open options"}
-            title="Options"
-          >
-            <Settings size={16} />
-          </button>
         </div>
 
         {optionsOpen &&

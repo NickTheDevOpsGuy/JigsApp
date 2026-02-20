@@ -58,7 +58,6 @@ import {
   ReplayModal,
   PauseOverlay,
   PlayToasts,
-  TopBarButtons,
   HeaderMenu,
   PuzzleGradientBackground,
 } from "./components";
@@ -215,6 +214,10 @@ export function PlayScreen() {
     to: number;
     startMs: number;
   } | null>(null);
+  const snapPositionAnimRef = React.useRef<{
+    items: Array<{ id: string; from: { x: number; y: number }; to: { x: number; y: number } }>;
+    startMs: number;
+  } | null>(null);
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -253,6 +256,7 @@ export function PlayScreen() {
           time_to_snap_ms: timeToSnapMs,
         });
       },
+      snapPositionAnimRef,
     },
   );
   const {
@@ -658,6 +662,8 @@ export function PlayScreen() {
     selectedIdRef,
     dragPreviewPieceIdRef,
     snapParticlesRef,
+    snapPositionAnimRef,
+    themeRef,
     debug,
     showGhostHint,
     showAlignmentGrid,
@@ -1045,19 +1051,6 @@ export function PlayScreen() {
               onTogglePause={() => setIsPaused((p) => !p)}
             />
           </div>
-          <TopBarButtons
-            showPreview={showPreview}
-            soundEnabled={soundEnabled}
-            isFullscreen={ui.isFullscreen}
-            showDebug={SHOW_DEBUG}
-            isCoarsePointer={isCoarsePointer}
-            onTogglePreview={() => setShowPreview((p) => !p)}
-            onToggleSound={toggleSound}
-            onToggleFullscreen={toggleFullscreen}
-            onShowShortcuts={() => setShowShortcuts(true)}
-            onToggleDebug={toggleDebug}
-            onNewPuzzle={() => setShowNewGameModal(true)}
-          />
         </div>
       </div>
 
@@ -1278,6 +1271,7 @@ export function PlayScreen() {
         shareToast={shareToast}
         classNames={{
           engagementToast: styles.engagementToast,
+          engagementToastStartTip: styles.engagementToastStartTip,
           toastDismiss: styles.toastDismiss,
           onboardingOverlay: styles.onboardingOverlay,
           onboardingOverlayTray: styles.onboardingOverlayTray,

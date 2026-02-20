@@ -79,11 +79,11 @@ export function MenuScreen() {
 
           <Button
             variant="outline"
-            onClick={() => nav("/stats")}
+            onClick={() => nav("/new")}
             className={styles.actionCard}
           >
-            <Trophy size={22} />
-            <span className={styles.actionLabel}>Leaderboard</span>
+            <Image size={22} />
+            <span className={styles.actionLabel}>Choose Photo</span>
           </Button>
           <Button
             variant="outline"
@@ -95,11 +95,11 @@ export function MenuScreen() {
           </Button>
           <Button
             variant="outline"
-            onClick={() => nav("/new")}
+            onClick={() => nav("/stats")}
             className={styles.actionCard}
           >
-            <Image size={22} />
-            <span className={styles.actionLabel}>Choose Photo</span>
+            <Trophy size={22} />
+            <span className={styles.actionLabel}>Leaderboard</span>
           </Button>
           <Button
             variant="outline"

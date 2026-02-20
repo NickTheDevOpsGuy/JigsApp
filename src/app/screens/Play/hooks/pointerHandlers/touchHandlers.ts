@@ -5,7 +5,7 @@
 import type React from "react";
 import { soundManager } from "@/audio/sounds";
 import type { CanvasWithTouch, ScreenToBoard } from "./types";
-import { TAP_DRAG_THRESHOLD_PX, TAP_DRAG_THRESHOLD_TOUCH_PX, TAP_MAX_MS } from "./types";
+import { TAP_DRAG_THRESHOLD_TOUCH_PX, TAP_MAX_MS } from "./types";
 import type { PointerHandlersContext } from "./types";
 import { finishDragWithTrayCheck } from "./shared";
 import { dragLog } from "./dragLog";

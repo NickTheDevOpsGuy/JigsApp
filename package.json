@@ -14,9 +14,7 @@
     "format:check": "prettier . --check",
     "typecheck": "tsc --noEmit",
     "precheck": "bash ./scripts/precheck.sh",
-
     "prepare": "node -e \"process.exit(process.env.NODE_ENV === 'production' ? 0 : 1)\" || husky install",
-
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -38,7 +36,9 @@
     "typescript-eslint": "^8.53.0"
   },
   "overrides": {
-    "tmp": ">=0.2.4"
+    "tmp": ">=0.2.4",
+    "minimatch": ">=10.2.1",
+    "glob": ">=11.0.0"
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",

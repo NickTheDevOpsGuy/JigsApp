@@ -138,6 +138,7 @@
   transition: all 0.15s;
   white-space: nowrap;
   box-sizing: border-box;
+  min-height: 44px;
 }
 
 .tabs button:hover {
@@ -275,7 +276,7 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  min-height: 40px;
+  min-height: 44px;
   min-width: 120px;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -494,7 +495,7 @@
 }
 
 .filterPill {
-  padding: 8px 14px;
+  padding: 10px 14px;
   font-size: 13px;
   font-weight: 500;
   border: none;
@@ -507,6 +508,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 44px;
 }
 
 .filterPill:hover {
@@ -620,7 +622,7 @@
   transition: all 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
-  min-height: 40px;
+  min-height: 44px;
   text-align: center;
   box-sizing: border-box;
 }
@@ -810,7 +812,7 @@
   .leaderboardTabs button {
     padding: 8px 10px;
     font-size: 12px;
-    min-height: 40px;
+    min-height: 44px;
     min-width: 86px;
     flex: 0 0 auto;
   }
@@ -914,7 +916,7 @@
   .leaderboardTabs button {
     padding: 8px 10px;
     font-size: 11px;
-    min-height: 40px;
+    min-height: 44px;
     min-width: 88px;
     flex-shrink: 0;
   }

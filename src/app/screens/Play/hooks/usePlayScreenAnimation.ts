@@ -4,10 +4,16 @@
  */
 import { useEffect, useRef } from "react";
 import type { PuzzleManager } from "@/puzzle/PuzzleManager";
-import { getRotationEaseProgress } from "@/puzzle/rotationEase";
+import {
+  getRotationEaseProgress,
+  getPositionEaseProgress,
+  SNAP_MOVE_EASE_MS,
+} from "@/puzzle/rotationEase";
 import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
+import { SNAP_GLOW_COLORS_BY_THEME } from "@/data/confettiColors";
+import type { Theme } from "@/hooks/useTheme";
 import { SHOW_DEBUG, type DebugFlags } from "../playScreenUtils";
 import type { ViewportState } from "./useViewport";
 import type { PerfStats } from "../components/ProfilerOverlay";
@@ -23,6 +29,10 @@ export function usePlayScreenAnimation(args: {
   selectedIdRef: React.RefObject<string | null>;
   dragPreviewPieceIdRef: React.RefObject<string | null>;
   snapParticlesRef?: React.RefObject<SnapParticle[]>;
+  snapPositionAnimRef?: React.MutableRefObject<{
+    items: Array<{ id: string; from: { x: number; y: number }; to: { x: number; y: number } }>;
+    startMs: number;
+  } | null>;
   debug: DebugFlags;
   showGhostHint: boolean;
   showAlignmentGrid: boolean;
@@ -46,6 +56,7 @@ export function usePlayScreenAnimation(args: {
     to: number;
     startMs: number;
   } | null>;
+  themeRef?: React.RefObject<Theme | undefined>;
 }) {
   const {
     manager,
@@ -58,6 +69,7 @@ export function usePlayScreenAnimation(args: {
     selectedIdRef,
     dragPreviewPieceIdRef,
     snapParticlesRef,
+    snapPositionAnimRef,
     debug,
     showGhostHint,
     showAlignmentGrid,
@@ -71,6 +83,7 @@ export function usePlayScreenAnimation(args: {
     perfStatsRef,
     wrongRotationHintRef,
     rotationAnimRef,
+    themeRef,
   } = args;
 
   const rafRef = useRef<number | null>(null);
@@ -117,8 +130,16 @@ export function usePlayScreenAnimation(args: {
         st.isComplete && completedAtRef.current ? now - completedAtRef.current : Infinity;
       const inCompletionFlourish = completionElapsed < 800;
       const pieceCount = st.pieces.length;
+      const snapParticles = snapParticlesRef?.current ?? [];
+      const popMap = popMapRef.current ?? new Map<string, number>();
+      const hasActiveSnapEffects =
+        snapParticles.length > 0 ||
+        [...popMap.values()].some((t) => now - t < 600);
       const throttleIdle =
-        pieceCount >= HIGH_PIECE_COUNT_THRESHOLD && !isDragging && !inCompletionFlourish;
+        pieceCount >= HIGH_PIECE_COUNT_THRESHOLD &&
+        !isDragging &&
+        !inCompletionFlourish &&
+        !hasActiveSnapEffects;
 
       if (throttleIdle && now - lastFrameTimeRef.current < IDLE_MIN_INTERVAL_MS) {
         if (
@@ -232,10 +253,8 @@ export function usePlayScreenAnimation(args: {
         dragDisplayOverrides.clear();
       }
 
-      const popMap = popMapRef.current ?? new Map<string, number>();
       const lockMap = lockMapRef.current ?? new Map<string, number>();
       const pieceCache = pieceCacheRef.current;
-      const snapParticles = snapParticlesRef?.current ?? [];
       const hint = wrongRotationHintRef?.current;
       const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
       const snapPreview =
@@ -274,6 +293,38 @@ export function usePlayScreenAnimation(args: {
         }
       }
 
+      let snapPositionOverrides: Map<string, { x: number; y: number }> | undefined;
+      const snapAnim = snapPositionAnimRef?.current;
+      if (snapAnim) {
+        const overrides = new Map<string, { x: number; y: number }>();
+        let allDone = true;
+        for (const item of snapAnim.items) {
+          const x = getPositionEaseProgress(
+            item.from.x,
+            item.to.x,
+            snapAnim.startMs,
+            now,
+            SNAP_MOVE_EASE_MS,
+          );
+          const y = getPositionEaseProgress(
+            item.from.y,
+            item.to.y,
+            snapAnim.startMs,
+            now,
+            SNAP_MOVE_EASE_MS,
+          );
+          if (x != null && y != null) {
+            overrides.set(item.id, { x, y });
+            allDone = false;
+          }
+        }
+        if (allDone && snapPositionAnimRef) {
+          (snapPositionAnimRef as { current: typeof snapAnim | null }).current = null;
+        } else {
+          snapPositionOverrides = overrides;
+        }
+      }
+
       renderBoard(
         ctx,
         st,
@@ -302,7 +353,12 @@ export function usePlayScreenAnimation(args: {
           rotationDisplayOverrides,
           wrongRotationHint,
           snapPreview,
+          snapPositionOverrides,
+          snapGlowColors: themeRef?.current
+            ? SNAP_GLOW_COLORS_BY_THEME[themeRef.current]
+            : undefined,
           piecesRemaining: st.totalCount - st.placedCount,
+          snapEffectScale: cssW < 600 ? 1.35 : 1,
         },
         pieceCache,
         viewport,
@@ -344,6 +400,8 @@ export function usePlayScreenAnimation(args: {
     setState,
     viewport,
     snapParticlesRef,
+    snapPositionAnimRef,
+    themeRef,
     perfStatsRef,
     wrongRotationHintRef,
     rotationAnimRef,

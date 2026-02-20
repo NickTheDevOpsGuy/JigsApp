@@ -3,9 +3,9 @@
 .tray {
   position: relative;
   z-index: 100;
-  /* Height set via inline style from getTrayHeight() */
-  min-height: 110px;
-  max-height: 200px;
+  /* Height set via inline style from getTrayHeight() – 125px min fits header + 80px thumb row on desktop */
+  min-height: 125px;
+  max-height: 220px;
   flex-shrink: 0;
   min-width: 0;
   max-width: 100%;
@@ -76,11 +76,19 @@ html.theme-sunset .tray {
 .titleRow {
   display: flex;
   align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.titleWithCog {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
 .title {
-  flex: 1;
   font-weight: 600;
   min-width: 0;
 }
@@ -122,11 +130,11 @@ html.theme-sunset .tray {
 
 .cogBtn {
   appearance: none;
-  margin-left: 8px;
+  margin-left: 0;
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
-  padding: 6px;
+  padding: 6px 8px;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
@@ -464,18 +472,24 @@ html.theme-sunset .tray {
   padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
 }
 
-/* Mobile: match desktop styling, only touch-target adjustments */
+/* Mobile: match desktop styling, touch targets, ensure piece thumbnails aren't cut off */
 @media (max-width: 600px) {
   .tray {
     /* Same border-radius, margins, and sizing as desktop */
     margin: 0 max(8px, env(safe-area-inset-left, 0))
       max(12px, env(safe-area-inset-bottom, 0)) max(8px, env(safe-area-inset-right, 0));
+    min-height: 155px; /* Match getTrayHeight mobile base – enough for header + 80px thumb row */
+  }
+
+  .titleWithCog {
+    gap: 8px; /* Slightly more space between title and cog on touch */
   }
 
   .cogBtn {
     /* Touch target; keep desktop proportions otherwise */
     min-width: 44px;
     min-height: 44px;
+    padding: 8px;
   }
 
   .help {

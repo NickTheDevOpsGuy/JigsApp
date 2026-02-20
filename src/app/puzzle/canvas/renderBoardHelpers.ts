@@ -5,68 +5,111 @@
 
 import type { Piece } from "@/puzzle/types";
 
-const SNAP_GLOW_MS = 280;
+export const SNAP_GLOW_MS = 450;
 
 export function snapPopScale(tMs: number): number {
   if (tMs <= 0) return 1;
-  if (tMs >= 200) return 1;
+  if (tMs >= 180) return 1;
 
-  if (tMs < 80) {
-    const k = tMs / 80;
-    return 1 + 0.08 * easeOutBack(k);
+  if (tMs < 50) {
+    const k = tMs / 50;
+    return 1 + 0.18 * easeOutBack(k);
   }
 
-  const k = (tMs - 80) / 120;
-  return 1.08 - 0.08 * easeOutBounce(k);
+  const k = (tMs - 50) / 130;
+  return 1.18 - 0.18 * easeOutBounce(k);
 }
 
 /** Alpha for snap glow (0 = no glow, fades out over SNAP_GLOW_MS). */
 export function snapGlowAlpha(elapsedMs: number): number {
   if (elapsedMs <= 0 || elapsedMs >= SNAP_GLOW_MS) return 0;
-  return 0.14 * (1 - elapsedMs / SNAP_GLOW_MS);
+  return 0.52 * (1 - elapsedMs / SNAP_GLOW_MS);
 }
 
-/** Draw a subtle radial glow at (cx, cy). Used for snap/placement feedback. */
+export type SnapGlowColors = {
+  rgb: string;
+  mid: string;
+  particle: string;
+};
+
+const DEFAULT_SNAP_COLORS: SnapGlowColors = {
+  rgb: "255, 220, 130",
+  mid: "255, 200, 100",
+  particle: "255, 200, 100",
+};
+
+/** Draw a subtle radial glow at (cx, cy). Used for snap/placement feedback. Theme-aware when colors provided. */
 export function drawSnapGlow(
   ctx: CanvasRenderingContext2D,
   cx: number,
   cy: number,
   radius: number,
   alpha: number,
+  colors: SnapGlowColors = DEFAULT_SNAP_COLORS,
 ): void {
   if (alpha <= 0) return;
   ctx.save();
   const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-  gradient.addColorStop(0, `rgba(255, 220, 130, ${alpha})`);
-  gradient.addColorStop(0.5, `rgba(255, 200, 100, ${alpha * 0.4})`);
-  gradient.addColorStop(1, "rgba(255, 200, 100, 0)");
+  gradient.addColorStop(0, `rgba(${colors.rgb}, ${alpha})`);
+  gradient.addColorStop(0.5, `rgba(${colors.mid}, ${alpha * 0.4})`);
+  gradient.addColorStop(1, `rgba(${colors.mid}, 0)`);
   ctx.fillStyle = gradient;
   ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
   ctx.restore();
 }
 
-export type SnapParticle = { x: number; y: number; t0: number };
+const SNAP_RING_MS = 320;
 
-const SNAP_PARTICLE_MS = 450;
+/** Draw an expanding ring at (cx, cy) for snap feedback. Theme-aware when colors provided. */
+export function drawSnapRing(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  baseRadius: number,
+  elapsedMs: number,
+  colors: SnapGlowColors = DEFAULT_SNAP_COLORS,
+): void {
+  if (elapsedMs <= 0 || elapsedMs >= SNAP_RING_MS) return;
+  const life = 1 - elapsedMs / SNAP_RING_MS;
+  const alpha = 0.82 * life * life;
+  if (alpha <= 0) return;
+  const ringRadius = baseRadius * 0.4 + baseRadius * 0.9 * (1 - life);
+  ctx.save();
+  ctx.strokeStyle = `rgba(${colors.rgb}, ${alpha})`;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
 
-/** Draw small particles for neighbor-snap celebration. */
+export type SnapParticle = { x: number; y: number; t0: number; a?: number };
+
+const SNAP_PARTICLE_MS = 550;
+
+/** Draw particles for snap celebration. Theme-aware when colors provided. */
 export function drawSnapParticles(
   ctx: CanvasRenderingContext2D,
   particles: SnapParticle[],
   nowMs: number,
+  particleRgb: string = "255, 200, 100",
+  effectScale: number = 1,
 ): void {
   ctx.save();
+  const rBase = 5;
+  const rSpread = 8;
+  const driftBase = 22;
   for (const p of particles) {
     const elapsed = nowMs - p.t0;
     if (elapsed >= SNAP_PARTICLE_MS) continue;
     const life = 1 - elapsed / SNAP_PARTICLE_MS;
-    const alpha = 0.6 * life * life;
-    const r = 3 + 4 * (1 - life);
-    const drift = 8 * (1 - life);
-    const angle = (p.t0 % 8) * 0.78;
+    const alpha = 0.95 * life * life;
+    const r = (rBase + rSpread * (1 - life)) * effectScale;
+    const drift = driftBase * (1 - life) * effectScale;
+    const angle = p.a ?? (p.t0 % 8) * 0.78;
     const dx = Math.cos(angle) * drift;
     const dy = Math.sin(angle) * drift;
-    ctx.fillStyle = `rgba(255, 200, 100, ${alpha})`;
+    ctx.fillStyle = `rgba(${particleRgb}, ${alpha})`;
     ctx.beginPath();
     ctx.arc(p.x + dx, p.y + dy, r, 0, Math.PI * 2);
     ctx.fill();

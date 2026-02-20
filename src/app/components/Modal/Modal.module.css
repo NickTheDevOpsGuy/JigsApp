@@ -118,6 +118,13 @@
     font-size: 1rem;
   }
 
+  .closeButton {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+    margin: -6px -6px -6px 0;
+  }
+
   .content {
     padding: 12px 16px;
     -webkit-overflow-scrolling: touch;

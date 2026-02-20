@@ -45,6 +45,8 @@ export type PuzzleManagerOptions = {
   cutType?: CutType;
 };
 
+export type SnapMoveItem = { id: string; from: { x: number; y: number }; to: { x: number; y: number } };
+
 export type PuzzleManagerEvents = {
   onPiecePlaced?: (piece: Piece) => void;
   /** Called when a group snaps to a neighbor (merge). Pass merged group piece IDs and optional center (board space) for particles. */
@@ -55,6 +57,8 @@ export type PuzzleManagerEvents = {
   onSnapCheck?: () => void;
   /** Called when a group would snap to board but rotation blocks it (position correct, rotation wrong). */
   onWrongRotationHint?: (groupId: string, pieceIds: string[]) => void;
+  /** Called right before pieces move to snap position. Enables smooth animate-to-target. */
+  onSnapMoveStart?: (items: SnapMoveItem[]) => void;
 };
 function _clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(n, max));
@@ -515,27 +519,44 @@ export class PuzzleManager {
 
     this.pushUndoState();
 
-    // Use effective dimensions for rotated pieces (90°/270° swap w and h in screen space)
-    const rot = piece.rotation % 360;
-    const effW = rot === 90 || rot === 270 ? piece.h : piece.w;
-    const effH = rot === 90 || rot === 270 ? piece.w : piece.h;
-
-    const pad = 16;
-    const xMin = pad;
-    const xMax = Math.max(pad, this.boardWidth - effW - pad);
-    const yMin = pad;
-    const yMax = Math.max(pad, this.boardHeight - effH - pad);
-
     const groupPieces = this.getGroupPieces(piece.groupId).filter((p) => p.inTray);
     const moveIds = groupPieces.map((p) => p.id);
     const boardPieces = this.state.pieces.filter((p) => !p.inTray);
     const MOVE_FROM_TRAY_RETRY_MAX = 24;
 
+    // Compute total group dimensions (horizontal layout: piece widths + gaps)
+    let totalGroupW = 0;
+    const groupHeights: number[] = [];
+    for (const pid of moveIds) {
+      const p = this.findPiece(pid)!;
+      const r = p.rotation % 360;
+      const pw = r === 90 || r === 270 ? p.h : p.w;
+      const ph = r === 90 || r === 270 ? p.w : p.h;
+      totalGroupW += pw + (totalGroupW > 0 ? 4 : 0);
+      groupHeights.push(ph);
+    }
+    const maxGroupH = groupHeights.length > 0 ? Math.max(...groupHeights) : piece.h;
+
+    const pad = 16;
+    // Ensure entire group fits on canvas (no off-screen pieces)
+    const xMin = pad;
+    const xMax = Math.max(pad, this.boardWidth - totalGroupW - pad);
+    const yMin = pad;
+    const yMax = Math.max(pad, this.boardHeight - maxGroupH - pad);
+
     let x = this.rand(xMin, xMax);
     let y = this.rand(yMin, yMax);
     for (let retry = 0; retry < MOVE_FROM_TRAY_RETRY_MAX; retry++) {
-      x = _clamp(this.rand(xMin, xMax), 0, Math.max(0, this.boardWidth - effW));
-      y = _clamp(this.rand(yMin, yMax), 0, Math.max(0, this.boardHeight - effH));
+      x = _clamp(
+        this.rand(xMin, xMax),
+        pad,
+        Math.max(pad, this.boardWidth - totalGroupW - pad),
+      );
+      y = _clamp(
+        this.rand(yMin, yMax),
+        pad,
+        Math.max(pad, this.boardHeight - maxGroupH - pad),
+      );
 
       let overlaps = false;
       const checkPiece = (px: number, py: number, pw: number, ph: number) => {
@@ -549,22 +570,18 @@ export class PuzzleManager {
         }
         return false;
       };
-      if (moveIds.length === 1) {
-        overlaps = checkPiece(x, y, effW, effH);
-      } else {
-        let ox = 0;
-        const oy = 0;
-        for (const pid of moveIds) {
-          const p = this.findPiece(pid)!;
-          const r = p.rotation % 360;
-          const pw = r === 90 || r === 270 ? p.h : p.w;
-          const _ph = r === 90 || r === 270 ? p.w : p.h;
-          if (checkPiece(x + ox, y + oy, pw, _ph)) {
-            overlaps = true;
-            break;
-          }
-          ox += pw + 4;
+      let ox = 0;
+      const oy = 0;
+      for (const pid of moveIds) {
+        const p = this.findPiece(pid)!;
+        const r = p.rotation % 360;
+        const pw = r === 90 || r === 270 ? p.h : p.w;
+        const ph = r === 90 || r === 270 ? p.w : p.h;
+        if (checkPiece(x + ox, y + oy, pw, ph)) {
+          overlaps = true;
+          break;
         }
+        ox += pw + 4;
       }
       if (!overlaps) break;
     }
@@ -860,6 +877,13 @@ export class PuzzleManager {
     if (Math.hypot(dx, dy) > tolerance) return false;
     if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
 
+    const items: SnapMoveItem[] = groupPieces.map((p) => ({
+      id: p.id,
+      from: { x: p.x, y: p.y },
+      to: { x: p.targetX - p.pad, y: p.targetY - p.pad },
+    }));
+    this.events.onSnapMoveStart?.(items);
+
     this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
     this.setGroupToExactTargetPositions(gid);
 
@@ -928,6 +952,13 @@ export class PuzzleManager {
     }
 
     if (!best) return false;
+
+    const items: SnapMoveItem[] = groupPieces.map((p) => ({
+      id: p.id,
+      from: { x: p.x, y: p.y },
+      to: { x: p.x + Math.round(best.dx), y: p.y + Math.round(best.dy) },
+    }));
+    this.events.onSnapMoveStart?.(items);
 
     this.shiftGroupUnclamped(gid, Math.round(best.dx), Math.round(best.dy));
     this.mergeGroups(gid, best.into);
@@ -1001,6 +1032,13 @@ export class PuzzleManager {
     const dy = ref.targetY - tile.y;
 
     if (this.wouldOverlapAnyOtherGroup(groupId, dx, dy)) return;
+
+    const items: SnapMoveItem[] = groupPieces.map((p) => ({
+      id: p.id,
+      from: { x: p.x, y: p.y },
+      to: { x: p.targetX - p.pad, y: p.targetY - p.pad },
+    }));
+    this.events.onSnapMoveStart?.(items);
 
     this.shiftGroupUnclamped(groupId, Math.round(dx), Math.round(dy));
     this.setGroupToExactTargetPositions(groupId);

@@ -134,15 +134,6 @@ export function buildMenuItems(
       onClick: c(() => navigate("/")),
       subMenu: "navigation",
     },
-    {
-      id: "new",
-      section: "settings",
-      visible: true,
-      label: "🧩 New puzzle",
-      sortKey: "New puzzle",
-      onClick: c(props.onNewPuzzle),
-      subMenu: "navigation",
-    },
     // ─── Gameplay ───
     {
       id: "redo",
