@@ -127,17 +127,11 @@ export class PuzzleManager {
     // Center assembled puzzle on board with pad margin so edge piece tabs aren't clipped
     this.targetStartX = Math.max(
       this.pad,
-      Math.min(
-        (boardWidth - assembledW) / 2,
-        boardWidth - assembledW - this.pad,
-      ),
+      Math.min((boardWidth - assembledW) / 2, boardWidth - assembledW - this.pad),
     );
     this.targetStartY = Math.max(
       this.pad,
-      Math.min(
-        (boardHeight - assembledH) / 2,
-        boardHeight - assembledH - this.pad,
-      ),
+      Math.min((boardHeight - assembledH) / 2, boardHeight - assembledH - this.pad),
     );
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };

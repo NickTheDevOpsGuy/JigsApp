@@ -210,7 +210,9 @@ export function CompletionOverlay({
         {puzzleSizeText != null && <p className={styles.puzzleSize}>{puzzleSizeText}</p>}
         <p>
           {isTimeDecay ? (
-            <>Score: {computeTimeDecayScore(elapsedSeconds, pieceCount, timeDecayBonus)}</>
+            <>
+              Score: {computeTimeDecayScore(elapsedSeconds, pieceCount, timeDecayBonus)}
+            </>
           ) : (
             <>Finished in {formatTime(elapsedSeconds)}</>
           )}

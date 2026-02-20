@@ -251,11 +251,7 @@ export function usePlayScreenAnimation(args: {
       if (showGhostHint) {
         effectiveShowGhost = true;
         ghostAlpha = 0.35;
-      } else if (
-        showGhostWhenIdle &&
-        idleMs >= IDLE_GHOST_MS &&
-        !st.isComplete
-      ) {
+      } else if (showGhostWhenIdle && idleMs >= IDLE_GHOST_MS && !st.isComplete) {
         effectiveShowGhost = true;
         const excessIdle = idleMs - IDLE_GHOST_MS;
         const rawProgress = Math.min(1, excessIdle / GHOST_RAMP_MS);
@@ -270,16 +266,9 @@ export function usePlayScreenAnimation(args: {
       let rotationDisplayOverrides: Map<string, number> | undefined;
       const anim = rotationAnimRef?.current;
       if (anim) {
-        const deg = getRotationEaseProgress(
-          anim.from,
-          anim.to,
-          anim.startMs,
-          now,
-        );
+        const deg = getRotationEaseProgress(anim.from, anim.to, anim.startMs, now);
         if (deg != null) {
-          rotationDisplayOverrides = new Map(
-            anim.pieceIds.map((id) => [id, deg]),
-          );
+          rotationDisplayOverrides = new Map(anim.pieceIds.map((id) => [id, deg]));
         } else {
           rotationAnimRef.current = null;
         }

@@ -64,4 +64,4 @@ export type PointerHandlersContext = {
     to: number;
     startMs: number;
   } | null>;
-}
+};

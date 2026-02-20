@@ -125,9 +125,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
 
               if (!reducedMotion && rotationAnimRef) {
                 const st = manager.getState();
-                const groupPieces = st.pieces.filter(
-                  (p) => p.groupId === piece!.groupId,
-                );
+                const groupPieces = st.pieces.filter((p) => p.groupId === piece!.groupId);
                 const newPiece = groupPieces.find((p) => p.id === piece!.id);
                 if (newPiece) {
                   rotationAnimRef.current = {

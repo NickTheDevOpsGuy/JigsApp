@@ -9,10 +9,7 @@ import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
-import {
-  TIME_DECAY_COMBO_MS,
-  TIME_DECAY_PLACEMENT_BONUS_BASE,
-} from "../timeDecayScore";
+import { TIME_DECAY_COMBO_MS, TIME_DECAY_PLACEMENT_BONUS_BASE } from "../timeDecayScore";
 
 export type ResumeChoice = "resume" | "fresh" | null;
 
@@ -83,7 +80,12 @@ export function usePlayScreenManager(
   const timeDecayLastPlacementRef = useRef<number | null>(null);
   const timeDecayBonusRef = useRef(0);
   const placementSequenceRef = useRef<
-    { elapsedMs: number; pieceIds: string[]; timestampMs?: number; timeToSnapMs?: number }[]
+    {
+      elapsedMs: number;
+      pieceIds: string[];
+      timestampMs?: number;
+      timeToSnapMs?: number;
+    }[]
   >([]);
   const sizingCleanupRef = useRef<(() => void) | null>(null);
   const optionsRef = useRef(options);

@@ -381,8 +381,7 @@ export async function getTimeDecayLeaderboard(limit = 10): Promise<LeaderboardEn
   const rows = data ?? [];
   const bestByUser = new Map<string, { elapsed: number; score: number | null }>();
   for (const row of rows) {
-    const score =
-      (row as { time_decay_score?: number | null }).time_decay_score ?? null;
+    const score = (row as { time_decay_score?: number | null }).time_decay_score ?? null;
     const cur = bestByUser.get(row.user_id);
     const isBetter =
       cur == null ||

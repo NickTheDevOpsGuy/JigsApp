@@ -335,11 +335,9 @@
 @media (max-width: 600px) {
   .tray {
     margin: 0 max(6px, env(safe-area-inset-left, 0))
-      max(12px, env(safe-area-inset-bottom, 0))
-      max(6px, env(safe-area-inset-right, 0));
+      max(12px, env(safe-area-inset-bottom, 0)) max(6px, env(safe-area-inset-right, 0));
     max-height: 200px;
   }
-
 
   .header {
     padding: 4px 8px;

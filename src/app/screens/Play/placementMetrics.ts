@@ -50,14 +50,11 @@ export function computeSessionMetrics(
     .filter((v): v is number => typeof v === "number" && v >= 0);
   const totalActiveMs = timeToSnapValues.reduce((a, b) => a + b, 0);
   const avgTimeToSnapMs =
-    timeToSnapValues.length > 0
-      ? totalActiveMs / timeToSnapValues.length
-      : 0;
+    timeToSnapValues.length > 0 ? totalActiveMs / timeToSnapValues.length : 0;
 
   // Idle = session - active. Idle percent.
   const idleMs = Math.max(0, sessionDurationMs - totalActiveMs);
-  const idlePercent =
-    sessionDurationMs > 0 ? (idleMs / sessionDurationMs) * 100 : 0;
+  const idlePercent = sessionDurationMs > 0 ? (idleMs / sessionDurationMs) * 100 : 0;
 
   return {
     snapCount,
@@ -86,10 +83,12 @@ export function saveLastSessionMetrics(
   }
 }
 
-export function loadLastSessionMetrics(): (SessionPlacementMetrics & {
-  grid?: string;
-  savedAt?: number;
-}) | null {
+export function loadLastSessionMetrics():
+  | (SessionPlacementMetrics & {
+      grid?: string;
+      savedAt?: number;
+    })
+  | null {
   try {
     const raw = localStorage.getItem(PLACEMENT_METRICS_KEY);
     return raw ? JSON.parse(raw) : null;

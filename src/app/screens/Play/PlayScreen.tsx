@@ -23,10 +23,7 @@ import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils"
 import { createUndoRedoHandler } from "./playUtils";
 import { getBestTime } from "./timeMode";
 import { computeTimeDecayScore } from "./timeDecayScore";
-import {
-  computeSessionMetrics,
-  saveLastSessionMetrics,
-} from "./placementMetrics";
+import { computeSessionMetrics, saveLastSessionMetrics } from "./placementMetrics";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenEffects } from "./hooks/usePlayScreenEffects";

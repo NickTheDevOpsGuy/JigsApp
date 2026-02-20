@@ -430,8 +430,7 @@ function drawPiece(
   const cacheH = rot90 ? Math.ceil(p.w) : Math.ceil(p.h);
   const cachePxW = Math.ceil(cacheW * dpr);
   const cachePxH = Math.ceil(cacheH * dpr);
-  const cached =
-    cacheKey && pieceCache ? (pieceCache.get(cacheKey) ?? null) : null;
+  const cached = cacheKey && pieceCache ? (pieceCache.get(cacheKey) ?? null) : null;
   if (cached && cached.width === cachePxW && cached.height === cachePxH) {
     drawCachedPiece(
       ctx,

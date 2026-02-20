@@ -262,10 +262,10 @@ export function StatsScreen() {
           : leaderboardType === "timeDecay"
             ? "Time Decay leaderboard - Phuzzle"
             : leaderboardType === "streaks"
-            ? "Streak leaderboard - Phuzzle"
-            : leaderboardType === "completions"
-              ? "Puzzle completions leaderboard - Phuzzle"
-              : "Leaderboard - Phuzzle";
+              ? "Streak leaderboard - Phuzzle"
+              : leaderboardType === "completions"
+                ? "Puzzle completions leaderboard - Phuzzle"
+                : "Leaderboard - Phuzzle";
     const url = window.location.origin;
     const shareText = `${text}\n${url}`;
     if (navigator.share) {
@@ -563,9 +563,7 @@ export function StatsScreen() {
                             <span className={styles.pbTime}>
                               {formatTime(pb.elapsedSeconds)}
                             </span>
-                            {pb.isDaily && (
-                              <span className={styles.pbDaily}>Daily</span>
-                            )}
+                            {pb.isDaily && <span className={styles.pbDaily}>Daily</span>}
                           </li>
                         );
                       })}
@@ -589,9 +587,7 @@ export function StatsScreen() {
                               ? `${(pm.avgTimeBetweenSnapsMs / 1000).toFixed(1)}s`
                               : `${Math.round(pm.avgTimeBetweenSnapsMs)}ms`}
                           </span>
-                          <span className={styles.statLabel}>
-                            Avg time between snaps
-                          </span>
+                          <span className={styles.statLabel}>Avg time between snaps</span>
                         </div>
                         <div className={styles.statCard}>
                           <span className={styles.statValue}>
@@ -611,9 +607,7 @@ export function StatsScreen() {
                               ? `${(pm.avgTimeToSnapMs / 1000).toFixed(1)}s`
                               : `${Math.round(pm.avgTimeToSnapMs)}ms`}
                           </span>
-                          <span className={styles.statLabel}>
-                            Avg drag-to-snap time
-                          </span>
+                          <span className={styles.statLabel}>Avg drag-to-snap time</span>
                         </div>
                       </div>
                     </>
