@@ -14,6 +14,7 @@ import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { AboutModal } from "@/components/AboutModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
 import { Image, Camera, Package, HelpCircle, Trophy } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzleCore";
 import { shouldShowChangelog } from "@/data/changelog";
 import { getActiveEvent } from "@/data/puzzleEvents";
@@ -42,6 +43,9 @@ export function MenuScreen() {
       <div className={styles.card}>
         <div className={styles.header}>
           <div className={styles.headerTop}>
+            <div className={styles.headerIconLeft}>
+              <ThemeToggle variant="default" />
+            </div>
             <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
             <button
               type="button"

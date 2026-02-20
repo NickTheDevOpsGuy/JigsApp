@@ -487,10 +487,10 @@
 
 @media (max-width: 600px) {
   .trayWrap {
-    max-height: 280px;
+    max-height: 360px;
   }
   .tray {
-    height: 240px;
+    height: 280px;
   }
 }
 

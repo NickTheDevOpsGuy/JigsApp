@@ -335,6 +335,14 @@
   color: var(--color-text-secondary);
 }
 
+.achievementUnlocked .achievementName {
+  color: var(--color-brand-primary);
+}
+
+.achievementUnlocked .achievementDesc {
+  color: var(--color-text-secondary);
+}
+
 .achievementBadge {
   color: var(--color-brand-primary);
   font-weight: 700;

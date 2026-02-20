@@ -39,7 +39,7 @@ function getStoredTheme(): Theme {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && THEMES.includes(stored as Theme)) return stored as Theme;
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+    // Default to light (no system preference override)
   } catch {
     // localStorage might not be available
   }
