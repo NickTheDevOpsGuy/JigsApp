@@ -1,16 +1,19 @@
 .page {
   min-height: 100vh;
   min-height: 100dvh;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background: var(--color-bg-secondary);
   padding: 24px;
   padding-bottom: max(24px, env(safe-area-inset-bottom, 0));
+  box-sizing: border-box;
 }
 
 .card {
-  width: min(520px, 100%);
-  max-width: 100%;
+  width: 100%;
+  max-width: 520px;
   background: var(--color-bg-card);
   border-radius: 18px;
   padding: 28px;
@@ -198,23 +201,6 @@
   border-top: 1px solid var(--color-border);
 }
 
-.lbViewToggle {
-  appearance: none;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-elevated);
-  color: var(--color-text-secondary);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.lbViewToggle:hover {
-  background: var(--color-bg-secondary);
-  color: var(--color-brand-primary);
-}
-
 .rank {
   font-weight: 700;
   color: var(--color-brand-primary);
@@ -344,12 +330,12 @@
   margin-top: 8px;
 }
 
-/* Leaderboard sub-tabs */
+/* Leaderboard header – dropdown + controls, same layout as mobile */
 .leaderboardHeader {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 12px;
-  align-items: center;
+  align-items: stretch;
   margin-bottom: 16px;
 }
 
@@ -371,52 +357,12 @@
   box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
-.leaderboardTabs {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 8px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding-bottom: 4px;
-  flex: 1;
-  min-width: 0;
-}
-
-.leaderboardTabs::-webkit-scrollbar {
-  display: none;
-}
-
-.leaderboardTabs button {
-  padding: 10px 14px;
-  font-size: 13px;
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  background: var(--color-bg-elevated);
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-  flex-shrink: 0;
-  min-height: 40px;
-}
-
-.leaderboardTabs button:hover {
-  background: var(--color-bg-primary);
-}
-
-.leaderboardTabs .lbTabActive {
-  background: var(--color-brand-primary);
-  color: white;
-  border-color: var(--color-brand-primary);
-}
-
 .allTimeGrid {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  flex-shrink: 0;
+  order: 2;
 }
 
 .allTimeGrid select {
@@ -430,8 +376,8 @@
 }
 
 .shareBtn {
-  margin-left: auto;
-  flex-shrink: 0;
+  align-self: flex-end;
+  order: 3;
 }
 
 /* PZ-071: Mobile leaderboard – card layout with expandable details */
@@ -560,25 +506,8 @@
   }
 
   .leaderboardHeader {
-    flex-direction: column;
-    align-items: stretch;
     gap: 12px;
     margin-bottom: 12px;
-  }
-
-  .leaderboardTabs {
-    order: 1;
-    margin: 0 -4px;
-    flex-wrap: wrap;
-    gap: 6px;
-    justify-content: flex-start;
-  }
-
-  .leaderboardTabs button {
-    padding: 10px 12px;
-    font-size: 12px;
-    min-height: 44px;
-    flex: 0 0 auto;
   }
 
   .allTimeGrid {
@@ -637,26 +566,6 @@
   .leaderboardHeader {
     gap: 10px;
     margin-bottom: 10px;
-  }
-
-  /* Keep tabs in single scrollable row – no wrap, avoids 3+ rows on 320px */
-  .leaderboardTabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    margin: 0 -4px;
-  }
-
-  .leaderboardTabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .leaderboardTabs button {
-    padding: 8px 10px;
-    font-size: 11px;
-    min-height: 40px;
-    flex-shrink: 0;
   }
 
   .leaderboardItem {
@@ -721,16 +630,11 @@
     padding: 2px 6px;
   }
 
-  /* Share + All-time grid on one row when both visible; tabs full width above */
+  /* Share + All-time grid on one row when both visible */
   .leaderboardHeader {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-  }
-
-  .leaderboardTabs {
-    width: 100%;
-    flex: 1 1 100%;
   }
 
   .allTimeGrid {

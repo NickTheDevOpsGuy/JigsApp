@@ -123,19 +123,11 @@ export function StatsScreen() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const [raccoonName, setRaccoonName] = useState<string | null>(null);
-  const [leaderboardCompact, setLeaderboardCompact] = useState(true);
+  const leaderboardCompact = true;
   const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
 
   const configured = isSupabaseConfigured();
   const isNarrow = useMediaQuery("(max-width: 520px)");
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 520px)");
-    setLeaderboardCompact(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setLeaderboardCompact(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
 
   const loadData = useCallback(async () => {
     if (!configured) return;
@@ -574,48 +566,23 @@ export function StatsScreen() {
             {activeTab === "leaderboard" && (
               <div className={styles.section}>
                 <div className={styles.leaderboardHeader}>
-                  {isNarrow ? (
-                    <select
-                      className={styles.leaderboardSelect}
-                      value={leaderboardType}
-                      onChange={(e) =>
-                        setLeaderboardType(e.target.value as LeaderboardType)
-                      }
-                      aria-label="Leaderboard view"
-                    >
-                      <option value="today">Today</option>
-                      <option value="bestWeek">Best time (week)</option>
-                      <option value="bestMonth">Best time (month)</option>
-                      <option value="week">Weekly totals</option>
-                      <option value="month">Monthly totals</option>
-                      <option value="streaks">Streaks</option>
-                      <option value="completions">All-time completions</option>
-                      <option value="alltime">All-time best</option>
-                    </select>
-                  ) : (
-                    <div className={styles.leaderboardTabs}>
-                      {(
-                        [
-                          ["today", "Today"],
-                          ["bestWeek", "Best time (week)"],
-                          ["bestMonth", "Best time (month)"],
-                          ["week", "Weekly totals"],
-                          ["month", "Monthly totals"],
-                          ["streaks", "Streaks"],
-                          ["completions", "All-time completions"],
-                          ["alltime", "All-time best"],
-                        ] as const
-                      ).map(([key, label]) => (
-                        <button
-                          key={key}
-                          className={leaderboardType === key ? styles.lbTabActive : ""}
-                          onClick={() => setLeaderboardType(key)}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <select
+                    className={styles.leaderboardSelect}
+                    value={leaderboardType}
+                    onChange={(e) =>
+                      setLeaderboardType(e.target.value as LeaderboardType)
+                    }
+                    aria-label="Leaderboard view"
+                  >
+                    <option value="today">Today</option>
+                    <option value="bestWeek">Best time (week)</option>
+                    <option value="bestMonth">Best time (month)</option>
+                    <option value="week">Weekly totals</option>
+                    <option value="month">Monthly totals</option>
+                    <option value="streaks">Streaks</option>
+                    <option value="completions">All-time completions</option>
+                    <option value="alltime">All-time best</option>
+                  </select>
                   {leaderboardType === "alltime" && (
                     <div className={styles.allTimeGrid}>
                       <label htmlFor="alltime-grid-select">Grid:</label>
@@ -632,17 +599,6 @@ export function StatsScreen() {
                         <option value="6x6">6×6</option>
                       </select>
                     </div>
-                  )}
-                  {!isNarrow && (
-                    <button
-                      type="button"
-                      className={styles.lbViewToggle}
-                      onClick={() => setLeaderboardCompact((c) => !c)}
-                      title={leaderboardCompact ? "Expand view" : "Compact view"}
-                      aria-label={leaderboardCompact ? "Expand view" : "Compact view"}
-                    >
-                      {leaderboardCompact ? "Expand" : "Compact"}
-                    </button>
                   )}
                   <Button
                     size="sm"
