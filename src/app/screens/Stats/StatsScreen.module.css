@@ -74,12 +74,13 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 12px 10px;
+  padding: 10px 8px;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--color-bg-elevated);
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
@@ -114,13 +115,13 @@
 }
 
 .statCard {
-  padding: 16px;
+  padding: 14px 16px;
   background: var(--color-bg-elevated);
   border-radius: 12px;
   border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .statValue {
@@ -352,6 +353,24 @@
   margin-bottom: 16px;
 }
 
+.leaderboardSelect {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.leaderboardSelect:focus {
+  outline: none;
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
+}
+
 .leaderboardTabs {
   display: flex;
   flex-wrap: nowrap;
@@ -511,7 +530,22 @@
 
   .tabs {
     gap: 6px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+  }
+
+  .tabs button {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+
+  .leaderboardHeader {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .leaderboardSelect {
+    order: 1;
+    width: 100%;
   }
 
   .tabs button {

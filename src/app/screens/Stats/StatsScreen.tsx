@@ -27,6 +27,7 @@ import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -126,6 +127,7 @@ export function StatsScreen() {
   const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
 
   const configured = isSupabaseConfigured();
+  const isNarrow = useMediaQuery("(max-width: 520px)");
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 520px)");
@@ -254,7 +256,7 @@ export function StatsScreen() {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
-          <h1 className={styles.title}>Leaderboard</h1>
+          <h1 className={styles.title}>Stats</h1>
           <p className={styles.placeholder}>
             Connect Supabase to track your stats, compete on leaderboards, and unlock
             achievements.
@@ -431,37 +433,41 @@ export function StatsScreen() {
             <ArrowLeft size={18} />
             Back
           </Button>
-          <h1 className={styles.title}>Leaderboard</h1>
+          <h1 className={styles.title}>Stats</h1>
         </div>
 
         <div className={styles.tabs}>
           <button
             className={activeTab === "dashboard" ? styles.tabActive : ""}
             onClick={() => setActiveTab("dashboard")}
+            aria-label="Dashboard"
           >
-            <BarChart3 size={18} />
-            Dashboard
+            <BarChart3 size={18} aria-hidden />
+            <span>{isNarrow ? "Dash" : "Dashboard"}</span>
           </button>
           <button
             className={activeTab === "profile" ? styles.tabActive : ""}
             onClick={() => setActiveTab("profile")}
+            aria-label="Profile"
           >
-            <User size={18} />
-            Profile
+            <User size={18} aria-hidden />
+            <span>Profile</span>
           </button>
           <button
             className={activeTab === "leaderboard" ? styles.tabActive : ""}
             onClick={() => setActiveTab("leaderboard")}
+            aria-label="Leaderboard"
           >
-            <Trophy size={18} />
-            Leaderboard
+            <Trophy size={18} aria-hidden />
+            <span>{isNarrow ? "Board" : "Leaderboard"}</span>
           </button>
           <button
             className={activeTab === "achievements" ? styles.tabActive : ""}
             onClick={() => setActiveTab("achievements")}
+            aria-label="Achievements"
           >
-            <Award size={18} />
-            Achievements
+            <Award size={18} aria-hidden />
+            <span>{isNarrow ? "Badges" : "Achievements"}</span>
           </button>
         </div>
 
@@ -553,9 +559,7 @@ export function StatsScreen() {
                   </p>
                 )}
                 <p className={styles.hint}>
-                  Uncheck "Show my name" to appear as your raccoon name on leaderboards.
-                  You’re still tracked—turn this back on anytime to show your display
-                  name.
+                  Off = raccoon name on boards. You&apos;re still tracked.
                 </p>
                 <Button
                   onClick={handleSaveProfile}
@@ -570,32 +574,53 @@ export function StatsScreen() {
             {activeTab === "leaderboard" && (
               <div className={styles.section}>
                 <div className={styles.leaderboardHeader}>
-                  <div className={styles.leaderboardTabs}>
-                    {(
-                      [
-                        ["today", "Today"],
-                        ["bestWeek", "Best time (week)"],
-                        ["bestMonth", "Best time (month)"],
-                        ["week", "Weekly totals"],
-                        ["month", "Monthly totals"],
-                        ["streaks", "Streaks"],
-                        ["completions", "All-time completions"],
-                        ["alltime", "All-time best"],
-                      ] as const
-                    ).map(([key, label]) => (
-                      <button
-                        key={key}
-                        className={leaderboardType === key ? styles.lbTabActive : ""}
-                        onClick={() => setLeaderboardType(key)}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
+                  {isNarrow ? (
+                    <select
+                      className={styles.leaderboardSelect}
+                      value={leaderboardType}
+                      onChange={(e) =>
+                        setLeaderboardType(e.target.value as LeaderboardType)
+                      }
+                      aria-label="Leaderboard view"
+                    >
+                      <option value="today">Today</option>
+                      <option value="bestWeek">Best time (week)</option>
+                      <option value="bestMonth">Best time (month)</option>
+                      <option value="week">Weekly totals</option>
+                      <option value="month">Monthly totals</option>
+                      <option value="streaks">Streaks</option>
+                      <option value="completions">All-time completions</option>
+                      <option value="alltime">All-time best</option>
+                    </select>
+                  ) : (
+                    <div className={styles.leaderboardTabs}>
+                      {(
+                        [
+                          ["today", "Today"],
+                          ["bestWeek", "Best time (week)"],
+                          ["bestMonth", "Best time (month)"],
+                          ["week", "Weekly totals"],
+                          ["month", "Monthly totals"],
+                          ["streaks", "Streaks"],
+                          ["completions", "All-time completions"],
+                          ["alltime", "All-time best"],
+                        ] as const
+                      ).map(([key, label]) => (
+                        <button
+                          key={key}
+                          className={leaderboardType === key ? styles.lbTabActive : ""}
+                          onClick={() => setLeaderboardType(key)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {leaderboardType === "alltime" && (
                     <div className={styles.allTimeGrid}>
-                      <label>Grid:</label>
+                      <label htmlFor="alltime-grid-select">Grid:</label>
                       <select
+                        id="alltime-grid-select"
                         value={allTimeGrid}
                         onChange={(e) =>
                           setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")
@@ -608,15 +633,17 @@ export function StatsScreen() {
                       </select>
                     </div>
                   )}
-                  <button
-                    type="button"
-                    className={styles.lbViewToggle}
-                    onClick={() => setLeaderboardCompact((c) => !c)}
-                    title={leaderboardCompact ? "Expand view" : "Compact view"}
-                    aria-label={leaderboardCompact ? "Expand view" : "Compact view"}
-                  >
-                    {leaderboardCompact ? "Expand" : "Compact"}
-                  </button>
+                  {!isNarrow && (
+                    <button
+                      type="button"
+                      className={styles.lbViewToggle}
+                      onClick={() => setLeaderboardCompact((c) => !c)}
+                      title={leaderboardCompact ? "Expand view" : "Compact view"}
+                      aria-label={leaderboardCompact ? "Expand view" : "Compact view"}
+                    >
+                      {leaderboardCompact ? "Expand" : "Compact"}
+                    </button>
+                  )}
                   <Button
                     size="sm"
                     variant="secondary"
