@@ -109,7 +109,7 @@ export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
     const h = video.videoHeight;
     if (w < MIN_SIZE || h < MIN_SIZE) {
       setErrorMsg(
-        `Camera resolution too low (${w}×${h}). Need at least ${MIN_SIZE}×${MIN_SIZE}.`,
+        `Camera image too small (${w}×${h}px). Need at least ${MIN_SIZE}×${MIN_SIZE}px, or use "Open Camera App" for better quality.`,
       );
       return;
     }

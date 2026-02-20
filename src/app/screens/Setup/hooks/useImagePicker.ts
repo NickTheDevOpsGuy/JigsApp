@@ -4,7 +4,7 @@
 import { useState } from "react";
 import type { SamplePuzzle } from "@/data/samplePuzzles";
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB – high-res phone/camera photos
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB – high-res phone/camera/DSLR
 const VALID_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
 /** Min pixels per piece edge for readable puzzle pieces. */
@@ -31,13 +31,13 @@ function validateImageDimensions(
       if (img.naturalWidth > 0 && img.naturalHeight > 0) {
         resolve({ width: img.naturalWidth, height: img.naturalHeight });
       } else {
-        reject(new Error("Image could not be loaded. The file may be corrupted."));
+        reject(new Error("Image could not be loaded. Try a different image or format (PNG, JPG, WebP)."));
       }
     };
     img.onerror = () =>
       reject(
         new Error(
-          "Failed to load image. The file may be corrupted. Please try another image.",
+          "Could not load that image. Try a different file or format (PNG, JPG, WebP).",
         ),
       );
     img.src = dataUrl;
@@ -60,7 +60,7 @@ export function validateImageForGrid(
             : undefined;
         return {
           ok: false,
-          error: `Image is too small (${width}×${height}px) for a ${rows}×${cols} puzzle. Use at least ${minDim}×${minDim}px for clear pieces.`,
+          error: `Image is too small (${width}×${height}px) for a ${rows}×${cols} puzzle. Need at least ${minDim}×${minDim}px, or try a smaller grid.`,
           suggestion,
         };
       }
@@ -68,7 +68,7 @@ export function validateImageForGrid(
     },
     (err) => ({
       ok: false,
-      error: err instanceof Error ? err.message : "Failed to load image.",
+      error: err instanceof Error ? err.message : "Could not load image. Try another.",
     }),
   );
 }
@@ -79,13 +79,13 @@ function readFileAsDataUrl(file: File): Promise<string> {
     reader.onload = () => {
       const result = reader.result;
       if (typeof result !== "string" || !result.startsWith("data:image/")) {
-        reject(new Error("Could not read file as an image."));
+        reject(new Error("Could not read that file as an image. Try PNG, JPG, or WebP."));
         return;
       }
       resolve(result);
     };
     reader.onerror = () =>
-      reject(new Error("Failed to read file. Please try another image."));
+      reject(new Error("Could not read file. Try a different image."));
     reader.readAsDataURL(file);
   });
 }
@@ -94,7 +94,7 @@ function readBlobAsDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error("Failed to read image"));
+    reader.onerror = () => reject(new Error("Could not read image."));
     reader.readAsDataURL(blob);
   });
 }
@@ -139,7 +139,7 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
       return true;
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to load image. Please try another.";
+        err instanceof Error ? err.message : "Could not load image. Try another.";
       setError(message);
       return false;
     } finally {
@@ -154,13 +154,13 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
 
     try {
       if (!VALID_TYPES.includes(file.type)) {
-        throw new Error("Please choose a PNG, JPG, or WebP image.");
+        throw new Error("Please choose a PNG, JPG, or WebP image. Other formats are not supported.");
       }
 
       if (file.size > MAX_FILE_SIZE) {
         const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
         throw new Error(
-          `Image is too large (${sizeMB}MB). Please choose one under 25MB.`,
+          `Image is too large (${sizeMB}MB). Please choose one under 50MB, or try a smaller/resized version.`,
         );
       }
 
@@ -178,7 +178,7 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
       return true;
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to load image. Please try another.";
+        err instanceof Error ? err.message : "Could not load image. Try another.";
       setError(message);
       return false;
     } finally {
@@ -195,7 +195,7 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
   /** Validate current image for the given grid before starting. Sets error and returns false if invalid. */
   const validateBeforeStart = async (rows: number, cols: number): Promise<boolean> => {
     if (!imgDataUrl) {
-      setError("No image selected.");
+      setError("No image selected. Choose one from the gallery, upload, or camera.");
       return false;
     }
     const result = await validateImageForGrid(imgDataUrl, rows, cols);
