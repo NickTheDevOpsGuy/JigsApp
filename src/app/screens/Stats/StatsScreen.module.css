@@ -130,7 +130,7 @@
 .section h2 {
   margin: 0 0 16px;
   font-size: 18px;
-  color: var(--color-text-primary);
+  color: #1e293b;
 }
 
 .loading,
@@ -311,11 +311,27 @@
 
 .achievementName {
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #1e293b;
 }
 
 .achievementDesc {
   font-size: 13px;
+  color: #475569;
+}
+
+.achievementUnlocked .achievementName {
+  color: #0c4a6e;
+}
+
+.achievementUnlocked .achievementDesc {
+  color: #0369a1;
+}
+
+.achievementUnlocked .achievementName {
+  color: var(--color-brand-primary);
+}
+
+.achievementUnlocked .achievementDesc {
   color: var(--color-text-secondary);
 }
 
@@ -387,7 +403,7 @@
 
 .avatarLabel {
   font-size: 12px;
-  color: var(--color-text-secondary);
+  color: #334155;
 }
 
 .avatarRow select {
@@ -408,7 +424,7 @@
   align-items: center;
   gap: 10px;
   font-size: 14px;
-  color: var(--color-text-primary);
+  color: #1e293b;
   cursor: pointer;
 }
 
