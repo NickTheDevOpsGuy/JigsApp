@@ -964,7 +964,6 @@ export function PlayScreen() {
               canShowShortcuts={!isCoarsePointer}
               canShowDebug={SHOW_DEBUG}
               debug={debug}
-              onNewPuzzle={() => setShowNewGameModal(true)}
               onTogglePreview={() => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 setShowPreview((p) => !p);

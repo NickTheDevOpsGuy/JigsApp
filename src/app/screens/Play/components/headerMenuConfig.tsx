@@ -41,7 +41,6 @@ export type HeaderMenuProps = {
   canShowShortcuts: boolean;
   canShowDebug: boolean;
   debug: DebugFlags;
-  onNewPuzzle: () => void;
   onTogglePreview: () => void;
   onToggleSound: () => void;
   onToggleHaptics: () => void;

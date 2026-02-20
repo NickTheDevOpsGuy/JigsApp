@@ -4,6 +4,16 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
+## ✨ Snap feedback & play screen (latest)
+
+- **Snap visual effects** – Glow, expanding ring, and particle burst when pieces snap; visible on desktop and mobile; throttle bypass so effects always render; respects reduced motion and battery saver
+- **Simplified layout** – New Puzzle button removed from top bar and menu; desktop matches mobile; New Puzzle via completion overlay or menu navigation
+- **Onboarding tip** – "Drag a piece to start" repositioned to top center of canvas for clear visibility
+- **Piece drawer** – Cog (options) inline with "Piece Drawer" title; improved tray height for thumbnails on desktop and mobile; no piece cutoff
+- **Cleanup** – Removed unused `TopBarButtons.tsx` and `onNewPuzzle` from HeaderMenu
+
+---
+
 ## 🎉 Visual polish & new modes
 
 ### Border complete celebration

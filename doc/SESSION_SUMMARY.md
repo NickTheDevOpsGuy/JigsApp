@@ -200,7 +200,7 @@ Summary of all changes on `bugfix/layout` and related work. Includes piece drawe
 | Input          | `usePointerHandlers.ts`, `touchHandlers.ts`, `types.ts`                                                                                          |
 | Image          | `useImagePicker.ts`, `SetupScreen.tsx`                                                                                                           |
 | Game logic     | `PuzzleManager.ts`, `createInitialPieces.ts`, `renderBoard.ts`                                                                                   |
-| Play screen    | `PlayScreen.tsx`, `PlayScreen.module.css`, `CompletionOverlay.tsx`, `HeaderMenu.tsx`, `PlayHUD.tsx`, `TopBarButtons.tsx`, `headerMenuConfig.tsx` |
+| Play screen    | `PlayScreen.tsx`, `PlayScreen.module.css`, `CompletionOverlay.tsx`, `HeaderMenu.tsx`, `PlayHUD.tsx`, `headerMenuConfig.tsx` |
 | Help/Modals    | `Modal.module.css`, `TutorialOverlay.tsx`, `ShortcutsModal.module.css`, `HelpChoiceModal.tsx`                                                    |
 | Packs          | `PackListScreen.tsx`, `PackDetailScreen.tsx`, `packCompletion.ts`, `puzzlePacks.ts`                                                              |
 | Sessions/Co-op | `usePuzzleSession.ts`, `puzzleSessionService.ts`, `003_puzzle_sessions.sql`                                                                      |

@@ -508,8 +508,7 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   │   │   ├── PlayToasts.tsx
 │   │   │   │   │   ├── PlayToasts.types.ts
 │   │   │   │   │   ├── ProfilerOverlay.module.css
-│   │   │   │   │   ├── ProfilerOverlay.tsx
-│   │   │   │   │   └── TopBarButtons.tsx
+│   │   │   │   │   └── ProfilerOverlay.tsx
 │   │   │   │   ├── hooks
 │   │   │   │   │   ├── pointerHandlers
 │   │   │   │   │   │   ├── dragLog.ts
