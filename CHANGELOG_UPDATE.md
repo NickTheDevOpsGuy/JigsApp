@@ -72,7 +72,10 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 📱 Recent updates (mobile, a11y, offline, tests)
+## 📱 Recent updates (mobile, a11y, offline, tests, Stats, home)
+
+- **Home screen** — Removed Help from main actions. Added corner buttons: Stats/Leaderboard (trophy) on left, Help (?) on right. Opens Help choice modal (How to Play, Keyboard & Controls, About).
+- **Stats screen** — Renamed "Leaderboard" to "Stats". On mobile: dropdown instead of 8 leaderboard sub-tabs; shorter main tab labels (Dash, Board, Badges); hidden Expand/Compact; shorter Profile hint.
 
 - **Mobile layout** — Setup screen difficulty + time mode in 2-column grid on mobile; shorter dropdown labels; compact mode; tray height 142px. Daily difficulty modal scrollable. Pack list/detail and Stats tweaked for small screens.
 - **Accessibility** — ARIA labels on Setup (tabs, buttons, file input), Menu actions, Dropdowns; `role="alert"` on errors; focus-visible for input/select; tab panel semantics.

@@ -23,6 +23,36 @@
   border-radius: 18px;
   padding: 28px;
   box-shadow: var(--shadow-lg);
+  position: relative;
+}
+
+.homeBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.cornerBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  background: var(--color-bg-elevated);
+  color: var(--color-brand-primary);
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cornerBtn:hover {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand-primary);
 }
 
 .header {

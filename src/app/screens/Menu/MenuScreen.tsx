@@ -13,7 +13,7 @@ import { TutorialOverlay } from "@/components/HowToPlay";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { AboutModal } from "@/components/AboutModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
-import { Image, Camera, Package, HelpCircle } from "lucide-react";
+import { Image, Camera, Package, Trophy } from "lucide-react";
 import { isTodayDailyCompleted } from "@/daily/dailyPuzzleCore";
 import { shouldShowChangelog } from "@/data/changelog";
 import { getMenuTagline } from "@/data/menuTips";
@@ -38,6 +38,25 @@ export function MenuScreen() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
+        <div className={styles.homeBar}>
+          <button
+            type="button"
+            className={styles.cornerBtn}
+            onClick={() => nav("/stats")}
+            aria-label="Stats and leaderboard"
+          >
+            <Trophy size={24} />
+          </button>
+          <button
+            type="button"
+            className={styles.cornerBtn}
+            onClick={() => setShowHelpChoice(true)}
+            aria-label="Help"
+          >
+            ?
+          </button>
+        </div>
+
         <div className={styles.header}>
           <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
           <p className={styles.menuTip}>{tagline}</p>
@@ -83,15 +102,6 @@ export function MenuScreen() {
           >
             <Camera size={22} />
             <span className={styles.actionLabel}>Snap a Picture</span>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowHelpChoice(true)}
-            className={`${styles.actionCard} ${styles.actionCardFullWidth}`}
-            aria-label="Help"
-          >
-            <HelpCircle size={22} />
-            <span className={styles.actionLabel}>Help</span>
           </Button>
         </div>
       </div>
