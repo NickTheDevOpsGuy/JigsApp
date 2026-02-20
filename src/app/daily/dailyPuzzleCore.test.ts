@@ -9,7 +9,6 @@ import {
   getCurrentStreak,
   initStreakFreeze,
   recordDailyCompletion,
-  tryAutoApplyStreakShield,
   wasFreezeOfferDismissedToday,
   dismissFreezeOfferToday,
 } from "./dailyPuzzleCore";
@@ -153,32 +152,6 @@ describe("refreshStreakFreeze", () => {
 describe("initStreakFreeze", () => {
   it("runs without error", () => {
     expect(() => initStreakFreeze()).not.toThrow();
-  });
-});
-
-describe("tryAutoApplyStreakShield", () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  it("returns false when yesterday was completed", () => {
-    const yesterday = getYesterdayDateString();
-    localStorage.setItem(`phuzzle:daily:${yesterday}:completed`, "true");
-    expect(tryAutoApplyStreakShield()).toBe(false);
-  });
-
-  it("returns false when no shield available", () => {
-    expect(getStreakFreezeCount()).toBe(0);
-    expect(tryAutoApplyStreakShield()).toBe(false);
-  });
-
-  it("applies shield when yesterday missed and shield available", () => {
-    const yesterday = getYesterdayDateString();
-    localStorage.setItem(STREAK_FREEZE_KEY, "1");
-    const result = tryAutoApplyStreakShield();
-    expect(result).toBe(true);
-    expect(getStreakFreezeCount()).toBe(0);
-    expect(wasYesterdayMissed()).toBe(false);
   });
 });
 

@@ -164,22 +164,6 @@ export function wasShieldJustEarned(): boolean {
   }
 }
 
-/** Auto-apply streak shield if user missed yesterday and has one. Returns true if applied. */
-export function tryAutoApplyStreakShield(): boolean {
-  if (!wasYesterdayMissed()) return false;
-  const count = getStreakFreezeCount();
-  if (count <= 0) return false;
-  const ok = useStreakFreeze(getYesterdayDateString());
-  if (ok) {
-    try {
-      localStorage.setItem(STREAK_SHIELD_AUTO_APPLIED_KEY, "true");
-    } catch {
-      /* ignore */
-    }
-  }
-  return ok;
-}
-
 /** True if a streak shield was auto-applied this session (e.g. to show a toast). */
 export function wasShieldAutoAppliedThisSession(): boolean {
   try {
@@ -246,7 +230,7 @@ export function getCurrentStreak(): number {
   return streak;
 }
 
-/** Call at app init: auto-apply shield if user missed yesterday and has one. */
+/** Call at app init: no-op. Streak freeze offer is shown in DailyDifficultyModal when user opens Today's Puzzle. */
 export function initStreakFreeze(): void {
-  tryAutoApplyStreakShield();
+  /* Streak freeze is offered in DailyDifficultyModal; we do not auto-apply at init. */
 }

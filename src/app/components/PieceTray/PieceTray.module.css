@@ -464,24 +464,16 @@ html.theme-sunset .tray {
   padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
 }
 
-/* Mobile adjustments */
+/* Mobile: match desktop styling, only touch-target adjustments */
 @media (max-width: 600px) {
   .tray {
+    /* Same border-radius, margins, and sizing as desktop */
     margin: 0 max(8px, env(safe-area-inset-left, 0))
-      max(16px, env(safe-area-inset-bottom, 0)) max(8px, env(safe-area-inset-right, 0));
-    max-height: 320px;
-    min-height: 140px;
-    border-radius: 20px;
-    box-shadow: var(--shadow-md);
-  }
-
-  .header {
-    padding: 10px 12px;
-    font-size: 13px;
+      max(12px, env(safe-area-inset-bottom, 0)) max(8px, env(safe-area-inset-right, 0));
   }
 
   .cogBtn {
-    padding: 8px;
+    /* Touch target; keep desktop proportions otherwise */
     min-width: 44px;
     min-height: 44px;
   }
@@ -490,49 +482,11 @@ html.theme-sunset .tray {
     display: none;
   }
 
-  .controls {
-    gap: 6px;
-  }
-
-  .segment button,
-  .sort button {
-    padding: 6px 10px;
-    font-size: 12px;
-    border-radius: 8px;
-  }
-
-  .thumbWrap {
-    width: 72px;
-    height: 72px;
-  }
-
-  .pieceButton {
-    min-width: 76px;
-    min-height: 76px;
-    padding: 6px;
-  }
-
-  /* Mobile compact overrides */
-  .trayCompact .thumbWrap {
-    width: 64px;
-    height: 64px;
-  }
-
-  .trayCompact .pieceButton {
-    min-width: 68px;
-    min-height: 68px;
-  }
-
-  .trayCompact .scrollIndicator {
-    margin: 0 6px 2px;
-  }
-
   /* Larger scroll arrows for easier tapping on mobile */
   .scrollBtn {
     width: 44px;
     height: 44px;
     min-width: 44px;
     min-height: 44px;
-    border-radius: 10px;
   }
 }

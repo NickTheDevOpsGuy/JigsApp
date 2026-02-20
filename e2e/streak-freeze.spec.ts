@@ -24,7 +24,7 @@ test.describe("Streak freeze offer", () => {
     await page.getByRole("button", { name: /today's puzzle/i }).click();
 
     await expect(page.getByText(/you missed yesterday/i)).toBeVisible();
-    await expect(page.getByRole("button", { name: /use freeze/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /use shield/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /no thanks/i })).toBeVisible();
   });
 

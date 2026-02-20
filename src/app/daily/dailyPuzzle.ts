@@ -26,7 +26,6 @@ export {
   dismissFreezeOfferToday,
   initStreakFreeze,
   refreshStreakFreeze,
-  tryAutoApplyStreakShield,
   wasShieldAutoAppliedThisSession,
   wasShieldJustEarned,
   clearShieldAutoAppliedFlag,
