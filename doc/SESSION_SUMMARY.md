@@ -194,18 +194,18 @@ Summary of all changes on `bugfix/layout` and related work. Includes piece drawe
 
 ## Files Changed (Representative)
 
-| Area           | Files                                                                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Piece Drawer   | `PieceTray.tsx`, `PieceTray.module.css`                                                                                                          |
-| Input          | `usePointerHandlers.ts`, `touchHandlers.ts`, `types.ts`                                                                                          |
-| Image          | `useImagePicker.ts`, `SetupScreen.tsx`                                                                                                           |
-| Game logic     | `PuzzleManager.ts`, `createInitialPieces.ts`, `renderBoard.ts`                                                                                   |
+| Area           | Files                                                                                                                       |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Piece Drawer   | `PieceTray.tsx`, `PieceTray.module.css`                                                                                     |
+| Input          | `usePointerHandlers.ts`, `touchHandlers.ts`, `types.ts`                                                                     |
+| Image          | `useImagePicker.ts`, `SetupScreen.tsx`                                                                                      |
+| Game logic     | `PuzzleManager.ts`, `createInitialPieces.ts`, `renderBoard.ts`                                                              |
 | Play screen    | `PlayScreen.tsx`, `PlayScreen.module.css`, `CompletionOverlay.tsx`, `HeaderMenu.tsx`, `PlayHUD.tsx`, `headerMenuConfig.tsx` |
-| Help/Modals    | `Modal.module.css`, `TutorialOverlay.tsx`, `ShortcutsModal.module.css`, `HelpChoiceModal.tsx`                                                    |
-| Packs          | `PackListScreen.tsx`, `PackDetailScreen.tsx`, `packCompletion.ts`, `puzzlePacks.ts`                                                              |
-| Sessions/Co-op | `usePuzzleSession.ts`, `puzzleSessionService.ts`, `003_puzzle_sessions.sql`                                                                      |
-| Onboarding     | `useOnboarding.ts`, `OnboardingTooltip.tsx`                                                                                                      |
-| Stats          | `StatsScreen.tsx`, `StatsScreen.module.css`                                                                                                      |
-| Time           | `timeMode.ts`, `useTimeModeConfig.ts`, `usePlayScreenTimer.ts`, `PlayHUD.tsx`                                                                    |
-| Docs           | `doc/`, `README.md`, `CHANGELOG_UPDATE.md`                                                                                                       |
-| Changelog      | `changelog.ts`                                                                                                                                   |
+| Help/Modals    | `Modal.module.css`, `TutorialOverlay.tsx`, `ShortcutsModal.module.css`, `HelpChoiceModal.tsx`                               |
+| Packs          | `PackListScreen.tsx`, `PackDetailScreen.tsx`, `packCompletion.ts`, `puzzlePacks.ts`                                         |
+| Sessions/Co-op | `usePuzzleSession.ts`, `puzzleSessionService.ts`, `003_puzzle_sessions.sql`                                                 |
+| Onboarding     | `useOnboarding.ts`, `OnboardingTooltip.tsx`                                                                                 |
+| Stats          | `StatsScreen.tsx`, `StatsScreen.module.css`                                                                                 |
+| Time           | `timeMode.ts`, `useTimeModeConfig.ts`, `usePlayScreenTimer.ts`, `PlayHUD.tsx`                                               |
+| Docs           | `doc/`, `README.md`, `CHANGELOG_UPDATE.md`                                                                                  |
+| Changelog      | `changelog.ts`                                                                                                              |
