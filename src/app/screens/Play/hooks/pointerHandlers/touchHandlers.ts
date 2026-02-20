@@ -5,7 +5,11 @@
 import type React from "react";
 import { soundManager } from "@/audio/sounds";
 import type { CanvasWithTouch, ScreenToBoard } from "./types";
-import { TAP_DRAG_THRESHOLD_PX, TAP_MAX_MS } from "./types";
+import {
+  TAP_DRAG_THRESHOLD_PX,
+  TAP_DRAG_THRESHOLD_TOUCH_PX,
+  TAP_MAX_MS,
+} from "./types";
 import type { PointerHandlersContext } from "./types";
 import { finishDragWithTrayCheck } from "./shared";
 import { dragLog } from "./dragLog";
@@ -79,8 +83,9 @@ export function handleTouchMove(
   if (!useBoardSpace && !pendingRect) return false;
 
   const dist = Math.hypot(e.clientX - sx, e.clientY - sy);
+  const threshold = ctx.tapDragThresholdPx ?? TAP_DRAG_THRESHOLD_TOUCH_PX;
 
-  if (!canvas.touchDragStarted && dist >= TAP_DRAG_THRESHOLD_PX) {
+  if (!canvas.touchDragStarted && dist >= threshold) {
     canvas.touchDragStarted = true;
     didDragRef.current = true;
     ctx.onPieceInteraction?.();
@@ -166,8 +171,9 @@ export function handleTouchUp(
       const elapsed =
         (canvas.touchStartTime ?? 0) > 0 ? now - canvas.touchStartTime! : Infinity;
       const pid = canvas.pendingPieceId;
+      const threshold = ctx.tapDragThresholdPx ?? TAP_DRAG_THRESHOLD_TOUCH_PX;
       if (
-        dist < TAP_DRAG_THRESHOLD_PX &&
+        dist < threshold &&
         elapsed < TAP_MAX_MS &&
         pid &&
         canRotatePiece(pid)

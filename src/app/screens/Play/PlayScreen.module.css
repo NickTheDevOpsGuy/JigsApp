@@ -571,7 +571,7 @@ html.theme-sunset .board {
 
 @media (max-width: 600px) {
   .trayWrap {
-    max-height: 520px;
+    max-height: 240px; /* Match desktop for consistent piece drawer */
   }
 }
 
@@ -688,13 +688,13 @@ html.theme-sunset .board {
     height: calc(100% + 6px);
   }
   .main {
-    padding: 4px;
-    gap: 6px;
+    padding: 8px;
+    gap: 12px;
   }
   .board {
-    min-height: 240px;
+    min-height: 280px;
     border-width: 2px;
-    border-radius: 12px;
+    border-radius: 20px;
   }
   .previewOverlay {
     bottom: 8px;

@@ -18,6 +18,9 @@ export type CanvasWithTouch = HTMLCanvasElement & {
 /** Max movement (px) before touch is treated as drag instead of tap. */
 export const TAP_DRAG_THRESHOLD_PX = 8;
 
+/** Larger threshold for touch (coarse pointer) – fingers less precise than mouse. */
+export const TAP_DRAG_THRESHOLD_TOUCH_PX = 14;
+
 /** Max duration (ms) for touch down→up to count as a tap (avoids slow-tap/hesitation). */
 export const TAP_MAX_MS = 350;
 
@@ -55,6 +58,10 @@ export type PointerHandlersContext = {
   onDragEnded?: () => void;
   /** When set, use board-space API for zoom/pan viewport */
   screenToBoard?: ScreenToBoard;
+  /** Tap-vs-drag threshold in px (touch uses larger value for finger imprecision). */
+  tapDragThresholdPx?: number;
+  /** When true, expand tray hit area for easier drop-to-tray. */
+  isCoarsePointer?: boolean;
   /** Timestamp of last tap-rotate; used to avoid click+touch double fire. */
   lastTapRotateTimeRef?: React.MutableRefObject<number>;
   /** When set, rotation easing anim runs; animation loop reads this. */

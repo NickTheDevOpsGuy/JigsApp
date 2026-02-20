@@ -13,6 +13,7 @@ import type {
   DragPreviewState,
   ScreenToBoard,
 } from "./pointerHandlers/types";
+import { TAP_DRAG_THRESHOLD_TOUCH_PX } from "./pointerHandlers/types";
 import {
   handleTouchDown,
   handleTouchMove,
@@ -48,6 +49,8 @@ export function usePointerHandlers(args: {
     startMs: number;
   } | null>;
   screenToBoard?: ScreenToBoard;
+  /** When true (touch device), use larger tap threshold and expand tray drop zone. */
+  isCoarsePointer?: boolean;
   viewport?: {
     startPan: (x: number, y: number) => void;
     handlePanMove: (x: number, y: number) => void;
@@ -85,6 +88,7 @@ export function usePointerHandlers(args: {
     onDragEnded,
     rotationAnimRef,
     screenToBoard,
+    isCoarsePointer = false,
     viewport,
   } = args;
 
@@ -106,14 +110,16 @@ export function usePointerHandlers(args: {
       const el = trayRef.current;
       if (!el) return false;
       const rect = el.getBoundingClientRect();
+      // On touch: expand hit area so dropping "near" tray counts (finger lift imprecision)
+      const pad = isCoarsePointer ? 24 : 0;
       return (
-        clientX >= rect.left &&
-        clientX <= rect.right &&
-        clientY >= rect.top &&
-        clientY <= rect.bottom
+        clientX >= rect.left - pad &&
+        clientX <= rect.right + pad &&
+        clientY >= rect.top - pad &&
+        clientY <= rect.bottom + pad
       );
     },
-    [trayRef],
+    [trayRef, isCoarsePointer],
   );
 
   const activePointerIdRef = useRef<number | null>(null);
@@ -137,6 +143,8 @@ export function usePointerHandlers(args: {
     onDragEnded,
     rotationAnimRef,
     screenToBoard,
+    tapDragThresholdPx: TAP_DRAG_THRESHOLD_TOUCH_PX, // touch always uses forgiving threshold
+    isCoarsePointer,
     viewport,
     activePointerIdRef,
     lastTapRotateTimeRef,

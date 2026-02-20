@@ -641,6 +641,7 @@ export function PlayScreen() {
       dragStartTimeRef.current = null;
     },
     screenToBoard: viewport.screenToBoard,
+    isCoarsePointer,
     viewport,
   });
 
