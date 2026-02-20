@@ -173,10 +173,31 @@ export function handleTouchUp(
         canRotatePiece(pid)
       ) {
         if (ctx.lastTapRotateTimeRef) ctx.lastTapRotateTimeRef.current = now;
+        const piece = manager.getPiece(pid);
+        const oldRotation = piece?.rotation ?? 0;
+        const reducedMotion =
+          typeof window !== "undefined" &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
         onPieceInteraction?.();
         manager.rotatePiece(pid);
         soundManager.play("rotate");
         haptic?.("rotate");
+
+        if (!reducedMotion && piece && ctx.rotationAnimRef) {
+          const st = manager.getState();
+          const groupPieces = st.pieces.filter((p) => p.groupId === piece.groupId);
+          const newPiece = groupPieces.find((p) => p.id === pid);
+          if (newPiece) {
+            ctx.rotationAnimRef.current = {
+              pieceIds: groupPieces.map((p) => p.id),
+              from: oldRotation,
+              to: newPiece.rotation,
+              startMs: performance.now(),
+            };
+          }
+        }
+
         setState(manager.getState());
       }
     }

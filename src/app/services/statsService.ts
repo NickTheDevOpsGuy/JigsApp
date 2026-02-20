@@ -21,6 +21,8 @@ export async function recordCompletion(args: {
   isDaily: boolean;
   isTimeAttack?: boolean;
   timeAttackScore?: number;
+  isTimeDecay?: boolean;
+  timeDecayScore?: number;
   dailyStreak: number;
 }): Promise<PlayerStatsData | null> {
   if (!isSupabaseConfigured()) return null;
@@ -39,6 +41,8 @@ export async function recordCompletion(args: {
     is_daily: args.isDaily,
     is_time_attack: args.isTimeAttack ?? false,
     time_attack_score: args.timeAttackScore ?? null,
+    is_time_decay: args.isTimeDecay ?? false,
+    time_decay_score: args.timeDecayScore ?? null,
   });
 
   const { data: existing } = await supabase!

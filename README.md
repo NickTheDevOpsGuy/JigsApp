@@ -108,6 +108,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Daily puzzle and streak tracking
 - **Streak freeze** – One per week; use when you miss a day to keep your streak. Offered when opening Today's Puzzle if yesterday wasn't completed. See [doc/streak-freeze.md](doc/streak-freeze.md).
 - Stats dashboard and leaderboards (daily, Time Attack, streaks, Supabase)
+- **Placement speed metrics** – Time between snaps, average snap velocity, idle time %, and avg drag-to-snap time from your last session; view in Stats → Dashboard. Purely additive (no impact on touch or drag behavior).
 - Profile with display name and anonymous mode
 - Share completed puzzle image
 - **Co-op** – Play with Friend: share a link and work on the same puzzle together (requires Supabase)

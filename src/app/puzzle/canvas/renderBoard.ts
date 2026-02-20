@@ -45,6 +45,8 @@ export type AnimationState = {
   dragPreviewPieceId?: string | null;
   /** Interpolated display positions for dragged group (smoother drag, no touch/pointer changes) */
   dragDisplayOverrides?: Map<string, { x: number; y: number }>;
+  /** Display rotation overrides during easing animation (Map<pieceId, degrees>) */
+  rotationDisplayOverrides?: Map<string, number>;
   /** Piece IDs to show wrong-rotation hint (position correct, rotation blocks snap) */
   wrongRotationHint?: { groupId: string; pieceIds: string[]; triggeredAt: number };
   /** Snap preview during drag: soft glow when near, stronger when in range (rotation correct only) */
@@ -192,15 +194,19 @@ export function renderBoard(
 
   const LOCK_GLOW_MS = 500;
   const overrides = animState?.dragDisplayOverrides;
+  const rotationOverrides = animState?.rotationDisplayOverrides;
   for (const p of pieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
     const lockAt = lockMap.get(p.id);
     const lockElapsedMs = lockAt != null ? nowMs - lockAt : 0;
     const showLockGlow = lockAt != null && lockElapsedMs < LOCK_GLOW_MS;
-    const drawPieceData =
+    let drawPieceData =
       isDragging && overrides?.has(p.id)
         ? { ...p, x: overrides.get(p.id)!.x, y: overrides.get(p.id)!.y }
         : p;
+    if (rotationOverrides?.has(p.id)) {
+      drawPieceData = { ...drawPieceData, rotation: rotationOverrides.get(p.id)! };
+    }
     drawPiece(
       ctx,
       drawPieceData,
@@ -416,13 +422,16 @@ function drawPiece(
   }
 
   // Use cached pre-rendered piece when available - rotation baked in, rendered at dpr for crisp edges
-  const cacheKey = `${p.id}_r${p.rotation}_d${dpr}`;
+  // Skip cache for intermediate angles (rotation easing animation)
+  const isStandardRotation = p.rotation % 90 === 0;
+  const cacheKey = isStandardRotation ? `${p.id}_r${p.rotation}_d${dpr}` : null;
   const rot90 = p.rotation === 90 || p.rotation === 270;
   const cacheW = rot90 ? Math.ceil(p.h) : Math.ceil(p.w);
   const cacheH = rot90 ? Math.ceil(p.w) : Math.ceil(p.h);
   const cachePxW = Math.ceil(cacheW * dpr);
   const cachePxH = Math.ceil(cacheH * dpr);
-  const cached = pieceCache?.get(cacheKey);
+  const cached =
+    cacheKey && pieceCache ? (pieceCache.get(cacheKey) ?? null) : null;
   if (cached && cached.width === cachePxW && cached.height === cachePxH) {
     drawCachedPiece(
       ctx,
@@ -447,9 +456,9 @@ function drawPiece(
     return;
   }
 
-  // Cache miss: render piece at dpr resolution with rotation baked in
+  // Cache miss: render piece at dpr resolution with rotation baked in (skip for intermediate angles)
   let cacheCanvas: HTMLCanvasElement | null = cached ?? null;
-  if (!cacheCanvas && pieceCache) {
+  if (!cacheCanvas && pieceCache && isStandardRotation) {
     const off = document.createElement("canvas");
     off.width = cachePxW;
     off.height = cachePxH;
@@ -476,7 +485,7 @@ function drawPiece(
         rect.destH,
       );
       offCtx.restore();
-      pieceCache.set(cacheKey, off);
+      if (cacheKey) pieceCache.set(cacheKey, off);
       cacheCanvas = off;
     }
   }

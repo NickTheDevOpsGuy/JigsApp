@@ -13,6 +13,7 @@ const TIME_MODE_LABELS: Record<string, string> = {
   relaxed: "Relaxed (no timer)",
   best: "Best time",
   timeAttack: "Time Attack",
+  timeDecay: "Time Decay",
 };
 
 export type MenuNode =
@@ -100,6 +101,11 @@ export function getMenuTree(): MenuNode[] {
                   type: "action",
                   id: "time-timeAttack",
                   label: TIME_MODE_LABELS["timeAttack"],
+                },
+                {
+                  type: "action",
+                  id: "time-timeDecay",
+                  label: TIME_MODE_LABELS["timeDecay"],
                 },
               ],
             },

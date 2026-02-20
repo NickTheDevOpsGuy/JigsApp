@@ -57,4 +57,11 @@ export type PointerHandlersContext = {
   screenToBoard?: ScreenToBoard;
   /** Timestamp of last tap-rotate; used to avoid click+touch double fire. */
   lastTapRotateTimeRef?: React.MutableRefObject<number>;
-};
+  /** When set, rotation easing anim runs; animation loop reads this. */
+  rotationAnimRef?: React.MutableRefObject<{
+    pieceIds: string[];
+    from: number;
+    to: number;
+    startMs: number;
+  } | null>;
+}

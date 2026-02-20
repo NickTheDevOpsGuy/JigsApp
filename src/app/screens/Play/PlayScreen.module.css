@@ -8,7 +8,9 @@
   flex-direction: column;
   background: var(--color-bg-primary);
   overscroll-behavior: none;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding-bottom: env(safe-area-inset-bottom, 0);
   /* PZ-045: Prevent text selection and Safari callouts on touch */
   -webkit-touch-callout: none;
@@ -841,6 +843,31 @@
   font-size: clamp(0.8rem, 2vw, 0.95rem);
   opacity: 0.85;
   margin: 0 0 0.25rem 0;
+}
+
+.gradeBadge {
+  font-size: clamp(0.95rem, 2.2vw, 1.1rem) !important;
+  font-weight: 600;
+  margin: 0.4rem 0 0.25rem 0 !important;
+}
+
+.gradeS {
+  color: #fbbf24;
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+}
+
+.gradeA {
+  color: #94a3b8;
+  text-shadow: 0 0 8px rgba(148, 163, 184, 0.3);
+}
+
+.gradeB {
+  color: #cd7f32;
+  text-shadow: 0 0 8px rgba(205, 127, 50, 0.3);
+}
+
+.gradeC {
+  color: var(--color-text-secondary);
 }
 
 /* Puzzle thumbnail under completion message - centered, 140px, glow */

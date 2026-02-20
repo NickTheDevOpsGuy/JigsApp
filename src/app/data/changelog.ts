@@ -1,11 +1,12 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "9";
+export const CHANGELOG_VERSION = "10";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📊 Placement speed metrics – Time between snaps, snaps/min, idle %, and avg drag-to-snap time from your last session (Stats → Dashboard)",
       "🎉 Border complete celebration – Subtle confetti and toast when you finish the puzzle border (mid-game motivation)",
       "🧠 Challenge mode – Optional game mode (Menu → Gameplay): full image shown for 5 seconds at start, then solve from memory",
       "🏆 Leaderboard redesign – Today's Daily Puzzle card with mascot, Start Puzzle button, Today/Week/Month filter pills",

@@ -22,6 +22,11 @@ import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
 import { getBestTime } from "./timeMode";
+import { computeTimeDecayScore } from "./timeDecayScore";
+import {
+  computeSessionMetrics,
+  saveLastSessionMetrics,
+} from "./placementMetrics";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenEffects } from "./hooks/usePlayScreenEffects";
@@ -195,6 +200,12 @@ export function PlayScreen() {
   const stateRef = React.useRef<PuzzleState | null>(null);
   const undoCountRef = React.useRef(0);
   const abandonCapturedRef = React.useRef(false);
+  const rotationAnimRef = React.useRef<{
+    pieceIds: string[];
+    from: number;
+    to: number;
+    startMs: number;
+  } | null>(null);
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -219,6 +230,7 @@ export function PlayScreen() {
       batterySaverMode,
       relaxedModeEnabled,
       isTimeAttack: timeMode === "timeAttack",
+      isTimeDecay: timeMode === "timeDecay",
       elapsedMsRef,
       onPieceSnappedAnalytics: (timeToSnapMs) => {
         const g = stateRef.current?.grid;
@@ -249,6 +261,7 @@ export function PlayScreen() {
     lockMapRef,
     snapParticlesRef,
     timeAttackBonusRef,
+    timeDecayBonusRef,
     placementSequenceRef,
   } = managerResult;
 
@@ -308,6 +321,15 @@ export function PlayScreen() {
   React.useEffect(() => {
     elapsedMsRef.current = elapsedSeconds * 1000;
   }, [elapsedSeconds]);
+
+  // Save placement speed metrics on completion
+  useEffect(() => {
+    if (!state?.isComplete || !state?.grid || !placementSequenceRef) return;
+    const seq = placementSequenceRef.current;
+    const sessionDurationMs = elapsedSeconds * 1000;
+    const metrics = computeSessionMetrics(seq, sessionDurationMs);
+    if (metrics) saveLastSessionMetrics(metrics, state.grid);
+  }, [state?.isComplete, state?.grid, elapsedSeconds, placementSequenceRef]);
 
   usePlayScreenEffects({
     state,
@@ -391,6 +413,7 @@ export function PlayScreen() {
     toggleFullscreen,
     selectCycle,
     selectedIdRef,
+    rotationAnimRef,
     onUndoSuccess: () => {
       undoCountRef.current += 1;
     },
@@ -549,6 +572,7 @@ export function PlayScreen() {
     selectedIdRef,
     bump,
     didDragRef,
+    rotationAnimRef,
     haptic: haptics.vibrate,
     onDragPreview: setDragPreview,
     onPieceInteraction: () => {
@@ -596,6 +620,7 @@ export function PlayScreen() {
     viewport: viewport.viewport,
     perfStatsRef,
     wrongRotationHintRef,
+    rotationAnimRef,
   });
 
   const handleTrayPieceClick = useCallback(
@@ -955,6 +980,15 @@ export function PlayScreen() {
               timeMode={timeMode}
               countdownMinutes={countdownMinutes}
               bestTimeSeconds={bestTimeSeconds}
+              timeDecayScore={
+                timeMode === "timeDecay" && state?.grid
+                  ? computeTimeDecayScore(
+                      elapsedSeconds,
+                      state.grid.rows * state.grid.cols,
+                      timeDecayBonusRef?.current ?? 0,
+                    )
+                  : undefined
+              }
               onTogglePause={() => setIsPaused((p) => !p)}
             />
           </div>
@@ -1058,11 +1092,13 @@ export function PlayScreen() {
               elapsedSeconds={elapsedSeconds}
               countdownMinutes={countdownMinutes}
               timeAttackBonus={timeAttackBonusRef?.current ?? 0}
+              timeDecayBonus={timeDecayBonusRef?.current ?? 0}
               grid={state?.grid}
               imageUrl={
                 localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
               }
               undoCount={undoCountRef.current}
+              timeMode={timeMode}
               isNewBest={
                 timeMode === "best" &&
                 state?.grid != null &&
@@ -1070,6 +1106,7 @@ export function PlayScreen() {
               }
               isDaily={isDailyPuzzleSession()}
               isTimeAttack={timeMode === "timeAttack"}
+              isTimeDecay={timeMode === "timeDecay"}
               shareUrls={share.shareUrls}
               copied={share.copied}
               canNativeShare={share.canNativeShare}

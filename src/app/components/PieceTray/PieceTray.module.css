@@ -19,7 +19,7 @@
   -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   border: 1px solid var(--color-border);
-  margin: 0 12px 12px 12px;
+  margin: 0 12px max(12px, env(safe-area-inset-bottom, 0)) 12px;
 
   font-size: 13px;
   line-height: 1.35;
@@ -176,6 +176,7 @@
   overflow-y: hidden;
   padding: 8px 12px;
   padding-inline-end: max(16px, env(safe-area-inset-right, 0));
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
   display: flex;
   gap: 8px;
   align-items: center;
@@ -327,15 +328,18 @@
 .trayCompact .scroller {
   padding: 6px 12px;
   padding-inline-end: max(16px, env(safe-area-inset-right, 0));
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
 }
 
 /* Mobile adjustments */
 @media (max-width: 600px) {
   .tray {
-    margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px
+    margin: 0 max(6px, env(safe-area-inset-left, 0))
+      max(12px, env(safe-area-inset-bottom, 0))
       max(6px, env(safe-area-inset-right, 0));
     max-height: 200px;
   }
+
 
   .header {
     padding: 4px 8px;

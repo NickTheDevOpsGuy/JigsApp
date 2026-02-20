@@ -6,6 +6,7 @@ Ideas and planned enhancements for Phuzzle.
 
 ## ✅ Recently Added
 
+- **Placement Speed Metrics** – Time between snaps, snaps/min, idle %, and avg drag-to-snap time from your last session. View in Stats → Dashboard. Read-only metrics (no impact on touch or drag).
 - **Border Complete Celebration** – Confetti + "Border complete!" toast when all edge and corner pieces are placed (once per puzzle).
 - **Challenge Mode** – Menu → Gameplay. Full image shown 5 seconds at start, then solve from memory; no ghost image.
 - **Leaderboard Redesign** – Today's Daily Puzzle card with mascot, Start Puzzle button, filter pills; Leaderboard button on home menu.
