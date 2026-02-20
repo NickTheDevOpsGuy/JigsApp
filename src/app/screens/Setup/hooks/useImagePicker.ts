@@ -4,7 +4,7 @@
 import { useState } from "react";
 import type { SamplePuzzle } from "@/data/samplePuzzles";
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB – high-res phone/camera photos
 const VALID_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
 /** Min pixels per piece edge for readable puzzle pieces. */
@@ -160,7 +160,7 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
       if (file.size > MAX_FILE_SIZE) {
         const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
         throw new Error(
-          `Image is too large (${sizeMB}MB). Please choose one under 10MB.`,
+          `Image is too large (${sizeMB}MB). Please choose one under 25MB.`,
         );
       }
 

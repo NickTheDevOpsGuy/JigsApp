@@ -34,8 +34,8 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,ico,svg,png,woff2}"],
-          // Allow puzzle images up to ~10 MB (default 2 MiB fails on large sample images)
-          maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+          // Allow puzzle images up to ~25 MB (default 2 MiB fails on large sample images)
+          maximumFileSizeToCacheInBytes: 25 * 1024 * 1024,
         },
       }),
     ],
