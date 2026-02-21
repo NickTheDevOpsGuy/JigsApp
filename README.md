@@ -310,12 +310,6 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 ├── .husky
 │   ├── pre-commit
 │   └── pre-push
-├── .lighthouseci
-│   ├── assertion-results.json
-│   ├── lhr-1771101136136.html
-│   ├── lhr-1771101136136.json
-│   ├── lhr-1771101150354.html
-│   └── lhr-1771101150354.json
 ├── doc
 │   ├── FUTURE.md
 │   ├── LIGHTHOUSE.md
@@ -332,12 +326,6 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   ├── setup-play.spec.ts
 │   ├── streak-freeze.spec.ts
 │   └── theme.spec.ts
-├── lhci-reports
-│   ├── localhost-index_html-2026_02_14_20_32_05.report.html
-│   ├── localhost-index_html-2026_02_14_20_32_05.report.json
-│   ├── localhost-index_html-2026_02_14_20_32_19.report.html
-│   ├── localhost-index_html-2026_02_14_20_32_19.report.json
-│   └── manifest.json
 ├── public
 │   ├── favicon.svg
 │   ├── icon-192.png
@@ -578,10 +566,6 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   ├── migrations
 │   │   └── 001_full_schema.sql
 │   └── README.md
-├── test-results
-│   ├── home-Home-Menu-shows-main-action-buttons-webkit-retry2
-│   │   └── error-context.md
-│   └── .last-run.json
 ├── .env.example
 ├── .eslintcache
 ├── .gitignore
