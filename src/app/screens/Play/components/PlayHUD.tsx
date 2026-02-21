@@ -23,7 +23,7 @@ export function PlayHUD({
   elapsedSeconds,
   piecesLeft,
   totalPieces,
-  isPaused,
+  isPaused: _isPaused,
   isComplete: _isComplete,
   timeMode,
   countdownMinutes = 10,
