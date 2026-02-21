@@ -468,218 +468,223 @@ export function StatsScreen() {
             <p className={styles.loading}>Loading...</p>
           ) : (
             <>
-            {activeTab === "dashboard" && (
-              <div className={styles.section}>
-                <h2>Your Statistics</h2>
-                <div className={styles.statsGrid}>
-                  <div className={styles.statCard}>
-                    <span className={styles.statValue}>
-                      {stats?.puzzlesCompleted ?? 0}
-                    </span>
-                    <span className={styles.statLabel}>Puzzles completed</span>
-                  </div>
-                  <div className={styles.statCard}>
-                    <span className={styles.statValue}>
-                      {formatDuration(stats?.totalPlayTimeSeconds ?? 0)}
-                    </span>
-                    <span className={styles.statLabel}>Total play time</span>
-                  </div>
-                  <div className={styles.statCard}>
-                    <span className={styles.statValue}>{stats?.dailyStreak ?? 0}</span>
-                    <span className={styles.statLabel}>Current streak</span>
-                  </div>
-                  <div className={styles.statCard}>
-                    <span className={styles.statValue}>
-                      {stats?.bestDailyStreak ?? 0}
-                    </span>
-                    <span className={styles.statLabel}>Best streak</span>
-                  </div>
-                  <div className={styles.statCard}>
-                    <span className={styles.statValue}>{getStreakFreezeCount()}</span>
-                    <span className={styles.statLabel}>Streak freeze</span>
-                  </div>
-                </div>
-                {personalBests.length > 0 && (
-                  <>
-                    <h2>Personal Bests</h2>
-                    <ol className={styles.personalBests}>
-                      {personalBests.slice(0, 10).map((pb, i) => (
-                        <li key={i} className={styles.personalBestItem}>
-                          <span className={styles.pbGrid}>{pb.gridSize}</span>
-                          <span className={styles.pbTime}>
-                            {formatTime(pb.elapsedSeconds)}
-                          </span>
-                          {pb.isDaily && <span className={styles.pbDaily}>Daily</span>}
-                        </li>
-                      ))}
-                    </ol>
-                  </>
-                )}
-              </div>
-            )}
-
-            {activeTab === "profile" && (
-              <div className={styles.section}>
-                <h2>Display Name</h2>
-                <p className={styles.hint}>Set your name to appear on leaderboards.</p>
-                <input
-                  type="text"
-                  className={styles.displayNameInput}
-                  value={displayNameInput}
-                  onChange={(e) => setDisplayNameInput(e.target.value)}
-                  placeholder="Puzzler"
-                  maxLength={32}
-                  aria-label="Display name"
-                />
-                <div className={styles.profileRow}>
-                  <label className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      checked={profile?.showOnLeaderboard ?? true}
-                      onChange={(e) =>
-                        setProfile((p) => ({
-                          ...p!,
-                          showOnLeaderboard: e.target.checked,
-                        }))
-                      }
-                    />
-                    <span>Show my name on leaderboards</span>
-                  </label>
-                </div>
-                {raccoonName && (
-                  <p className={styles.raccoonPreview}>
-                    🦝 Your raccoon name: <strong>{raccoonName}</strong>
-                  </p>
-                )}
-                <p className={styles.hint}>
-                  Off = raccoon name on boards. You&apos;re still tracked.
-                </p>
-                <Button
-                  onClick={handleSaveProfile}
-                  disabled={profileSaving}
-                  className={styles.saveBtn}
-                >
-                  {profileSaving ? "Saving…" : "Save"}
-                </Button>
-              </div>
-            )}
-
-            {activeTab === "leaderboard" && (
-              <div className={styles.section}>
-                <div className={styles.leaderboardHeader}>
-                  <select
-                    className={styles.leaderboardSelect}
-                    value={leaderboardType}
-                    onChange={(e) =>
-                      setLeaderboardType(e.target.value as LeaderboardType)
-                    }
-                    aria-label="Leaderboard view"
-                  >
-                    <option value="today">Today</option>
-                    <option value="bestWeek">Best time (week)</option>
-                    <option value="bestMonth">Best time (month)</option>
-                    <option value="week">Weekly totals</option>
-                    <option value="month">Monthly totals</option>
-                    <option value="streaks">Streaks</option>
-                    <option value="completions">All-time completions</option>
-                    <option value="alltime">All-time best</option>
-                  </select>
-                  {leaderboardType === "alltime" && (
-                    <div className={styles.allTimeGrid}>
-                      <label htmlFor="alltime-grid-select">Grid:</label>
-                      <select
-                        id="alltime-grid-select"
-                        value={allTimeGrid}
-                        onChange={(e) =>
-                          setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")
-                        }
-                      >
-                        <option value="3x3">3×3</option>
-                        <option value="4x4">4×4</option>
-                        <option value="5x5">5×5</option>
-                        <option value="6x6">6×6</option>
-                      </select>
+              {activeTab === "dashboard" && (
+                <div className={styles.section}>
+                  <h2>Your Statistics</h2>
+                  <div className={styles.statsGrid}>
+                    <div className={styles.statCard}>
+                      <span className={styles.statValue}>
+                        {stats?.puzzlesCompleted ?? 0}
+                      </span>
+                      <span className={styles.statLabel}>Puzzles completed</span>
                     </div>
+                    <div className={styles.statCard}>
+                      <span className={styles.statValue}>
+                        {formatDuration(stats?.totalPlayTimeSeconds ?? 0)}
+                      </span>
+                      <span className={styles.statLabel}>Total play time</span>
+                    </div>
+                    <div className={styles.statCard}>
+                      <span className={styles.statValue}>{stats?.dailyStreak ?? 0}</span>
+                      <span className={styles.statLabel}>Current streak</span>
+                    </div>
+                    <div className={styles.statCard}>
+                      <span className={styles.statValue}>
+                        {stats?.bestDailyStreak ?? 0}
+                      </span>
+                      <span className={styles.statLabel}>Best streak</span>
+                    </div>
+                    <div className={styles.statCard}>
+                      <span className={styles.statValue}>{getStreakFreezeCount()}</span>
+                      <span className={styles.statLabel}>Streak freeze</span>
+                    </div>
+                  </div>
+                  {personalBests.length > 0 && (
+                    <>
+                      <h2>Personal Bests</h2>
+                      <ol className={styles.personalBests}>
+                        {personalBests.slice(0, 10).map((pb, i) => (
+                          <li key={i} className={styles.personalBestItem}>
+                            <span className={styles.pbGrid}>{pb.gridSize}</span>
+                            <span className={styles.pbTime}>
+                              {formatTime(pb.elapsedSeconds)}
+                            </span>
+                            {pb.isDaily && <span className={styles.pbDaily}>Daily</span>}
+                          </li>
+                        ))}
+                      </ol>
+                    </>
                   )}
+                </div>
+              )}
+
+              {activeTab === "profile" && (
+                <div className={styles.section}>
+                  <h2>Display Name</h2>
+                  <p className={styles.hint}>Set your name to appear on leaderboards.</p>
+                  <input
+                    type="text"
+                    className={styles.displayNameInput}
+                    value={displayNameInput}
+                    onChange={(e) => setDisplayNameInput(e.target.value)}
+                    placeholder="Puzzler"
+                    maxLength={32}
+                    aria-label="Display name"
+                  />
+                  <div className={styles.profileRow}>
+                    <label className={styles.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={profile?.showOnLeaderboard ?? true}
+                        onChange={(e) =>
+                          setProfile((p) => ({
+                            ...p!,
+                            showOnLeaderboard: e.target.checked,
+                          }))
+                        }
+                      />
+                      <span>Show my name on leaderboards</span>
+                    </label>
+                  </div>
+                  {raccoonName && (
+                    <p className={styles.raccoonPreview}>
+                      🦝 Your raccoon name: <strong>{raccoonName}</strong>
+                    </p>
+                  )}
+                  <p className={styles.hint}>
+                    Off = raccoon name on boards. You&apos;re still tracked.
+                  </p>
                   <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={handleShareLeaderboard}
-                    className={styles.shareBtn}
+                    onClick={handleSaveProfile}
+                    disabled={profileSaving}
+                    className={styles.saveBtn}
                   >
-                    <Share2 size={16} />
-                    {shareCopied ? "Copied!" : "Share"}
+                    {profileSaving ? "Saving…" : "Save"}
                   </Button>
                 </div>
-                <h2>
-                  {leaderboardType === "today" && "Today's daily puzzle"}
-                  {leaderboardType === "bestWeek" && "Best time this week (daily)"}
-                  {leaderboardType === "bestMonth" && "Best time this month (daily)"}
-                  {leaderboardType === "week" && "Weekly totals"}
-                  {leaderboardType === "month" && "Monthly totals"}
-                  {leaderboardType === "streaks" && "Longest streaks"}
-                  {leaderboardType === "completions" && "All-time completions"}
-                  {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
-                </h2>
-                {leaderboardType === "today" &&
-                  renderTimeLeaderboard(leaderboard, "No completions yet. Be the first!")}
-                {leaderboardType === "bestWeek" &&
-                  renderTimeLeaderboard(
-                    leaderboard,
-                    "No daily completions this week yet.",
-                  )}
-                {leaderboardType === "bestMonth" &&
-                  renderTimeLeaderboard(
-                    leaderboard,
-                    "No daily completions this month yet.",
-                  )}
-                {leaderboardType === "week" &&
-                  renderCompletionLeaderboard(
-                    weeklyTotalsLeaderboard,
-                    "No completions in the last 7 days.",
-                  )}
-                {leaderboardType === "month" &&
-                  renderCompletionLeaderboard(
-                    monthlyTotalsLeaderboard,
-                    "No completions in the last 30 days.",
-                  )}
-                {leaderboardType === "streaks" &&
-                  renderStreakLeaderboard(streakLeaderboard)}
-                {leaderboardType === "completions" &&
-                  renderCompletionLeaderboard(
-                    completionLeaderboard,
-                    "No completions yet. Play puzzles!",
-                  )}
-                {leaderboardType === "alltime" &&
-                  renderTimeLeaderboard(
-                    leaderboard,
-                    "No completions for this grid size yet.",
-                  )}
-              </div>
-            )}
+              )}
 
-            {activeTab === "achievements" && (
-              <div className={styles.section}>
-                <h2>Achievements</h2>
-                <div className={styles.achievements}>
-                  {achievements.map((a) => (
-                    <div
-                      key={a.id}
-                      className={`${styles.achievement} ${
-                        a.unlocked ? styles.achievementUnlocked : ""
-                      }`}
+              {activeTab === "leaderboard" && (
+                <div className={styles.section}>
+                  <div className={styles.leaderboardHeader}>
+                    <select
+                      className={styles.leaderboardSelect}
+                      value={leaderboardType}
+                      onChange={(e) =>
+                        setLeaderboardType(e.target.value as LeaderboardType)
+                      }
+                      aria-label="Leaderboard view"
                     >
-                      <span className={styles.achievementIcon}>{a.icon}</span>
-                      <div className={styles.achievementInfo}>
-                        <span className={styles.achievementName}>{a.name}</span>
-                        <span className={styles.achievementDesc}>{a.description}</span>
+                      <option value="today">Today</option>
+                      <option value="bestWeek">Best time (week)</option>
+                      <option value="bestMonth">Best time (month)</option>
+                      <option value="week">Weekly totals</option>
+                      <option value="month">Monthly totals</option>
+                      <option value="streaks">Streaks</option>
+                      <option value="completions">All-time completions</option>
+                      <option value="alltime">All-time best</option>
+                    </select>
+                    {leaderboardType === "alltime" && (
+                      <div className={styles.allTimeGrid}>
+                        <label htmlFor="alltime-grid-select">Grid:</label>
+                        <select
+                          id="alltime-grid-select"
+                          value={allTimeGrid}
+                          onChange={(e) =>
+                            setAllTimeGrid(
+                              e.target.value as "3x3" | "4x4" | "5x5" | "6x6",
+                            )
+                          }
+                        >
+                          <option value="3x3">3×3</option>
+                          <option value="4x4">4×4</option>
+                          <option value="5x5">5×5</option>
+                          <option value="6x6">6×6</option>
+                        </select>
                       </div>
-                      {a.unlocked && <span className={styles.achievementBadge}>✓</span>}
-                    </div>
-                  ))}
+                    )}
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={handleShareLeaderboard}
+                      className={styles.shareBtn}
+                    >
+                      <Share2 size={16} />
+                      {shareCopied ? "Copied!" : "Share"}
+                    </Button>
+                  </div>
+                  <h2>
+                    {leaderboardType === "today" && "Today's daily puzzle"}
+                    {leaderboardType === "bestWeek" && "Best time this week (daily)"}
+                    {leaderboardType === "bestMonth" && "Best time this month (daily)"}
+                    {leaderboardType === "week" && "Weekly totals"}
+                    {leaderboardType === "month" && "Monthly totals"}
+                    {leaderboardType === "streaks" && "Longest streaks"}
+                    {leaderboardType === "completions" && "All-time completions"}
+                    {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
+                  </h2>
+                  {leaderboardType === "today" &&
+                    renderTimeLeaderboard(
+                      leaderboard,
+                      "No completions yet. Be the first!",
+                    )}
+                  {leaderboardType === "bestWeek" &&
+                    renderTimeLeaderboard(
+                      leaderboard,
+                      "No daily completions this week yet.",
+                    )}
+                  {leaderboardType === "bestMonth" &&
+                    renderTimeLeaderboard(
+                      leaderboard,
+                      "No daily completions this month yet.",
+                    )}
+                  {leaderboardType === "week" &&
+                    renderCompletionLeaderboard(
+                      weeklyTotalsLeaderboard,
+                      "No completions in the last 7 days.",
+                    )}
+                  {leaderboardType === "month" &&
+                    renderCompletionLeaderboard(
+                      monthlyTotalsLeaderboard,
+                      "No completions in the last 30 days.",
+                    )}
+                  {leaderboardType === "streaks" &&
+                    renderStreakLeaderboard(streakLeaderboard)}
+                  {leaderboardType === "completions" &&
+                    renderCompletionLeaderboard(
+                      completionLeaderboard,
+                      "No completions yet. Play puzzles!",
+                    )}
+                  {leaderboardType === "alltime" &&
+                    renderTimeLeaderboard(
+                      leaderboard,
+                      "No completions for this grid size yet.",
+                    )}
                 </div>
-              </div>
-            )}
+              )}
+
+              {activeTab === "achievements" && (
+                <div className={styles.section}>
+                  <h2>Achievements</h2>
+                  <div className={styles.achievements}>
+                    {achievements.map((a) => (
+                      <div
+                        key={a.id}
+                        className={`${styles.achievement} ${
+                          a.unlocked ? styles.achievementUnlocked : ""
+                        }`}
+                      >
+                        <span className={styles.achievementIcon}>{a.icon}</span>
+                        <div className={styles.achievementInfo}>
+                          <span className={styles.achievementName}>{a.name}</span>
+                          <span className={styles.achievementDesc}>{a.description}</span>
+                        </div>
+                        {a.unlocked && <span className={styles.achievementBadge}>✓</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
