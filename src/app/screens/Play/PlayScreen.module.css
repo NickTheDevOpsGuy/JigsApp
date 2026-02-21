@@ -315,6 +315,17 @@
   }
 }
 
+@media (max-width: 600px) {
+  .playBody .trayWrap {
+    height: 155px;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .playBody .trayWrap.trayWrapLarge {
+    height: 165px;
+  }
+}
+
 .main {
   flex: 1;
   min-height: 0;
@@ -573,8 +584,21 @@
 /* Mobile */
 @media (max-width: 600px) {
   .page {
-    /* Clear mobile browser nav bar (~48–56px) so tray isn't cut off */
-    padding-bottom: max(60px, calc(env(safe-area-inset-bottom, 0) + 48px));
+    /* Clear mobile browser nav bar (~56px) + safe-area so tray isn't cut off */
+    padding-bottom: max(88px, calc(env(safe-area-inset-bottom, 0) + 56px));
+  }
+
+  .playBody {
+    gap: 8px;
+  }
+
+  .main {
+    padding: 6px 8px;
+    gap: 8px;
+  }
+
+  .board {
+    min-height: 200px;
   }
 
   .topBar {
@@ -613,11 +637,11 @@
     display: none;
   }
   .main {
-    padding: 8px;
-    gap: 12px;
+    padding: 6px 8px;
+    gap: 8px;
   }
   .board {
-    min-height: 240px;
+    min-height: 200px;
     border-width: 2px;
     border-radius: var(--radius-card, 16px);
   }
