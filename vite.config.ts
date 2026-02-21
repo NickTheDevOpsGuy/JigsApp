@@ -56,7 +56,8 @@ export default defineConfig(({ mode }) => {
             // Screen chunks: use short names to avoid CSS preload failures.
             // Vite/Rollup can truncate or misderive chunk names from long module paths
             // (e.g. "NewGameScreen" → "NewGameScree"), causing "Unable to preload CSS" errors.
-            if (id.includes("screens/NewGame") || id.includes("screens/Setup")) return "setup";
+            if (id.includes("screens/NewGame") || id.includes("screens/Setup"))
+              return "setup";
             if (id.includes("screens/Menu")) return "menu";
             if (id.includes("screens/Play")) return "play";
             if (id.includes("screens/Stats")) return "stats";
