@@ -264,67 +264,27 @@
   color: var(--color-text-primary);
 }
 
-/* Unified layout: Tray 20%, Board 60%, Stats 20% – same on desktop and mobile */
+/* Layout: board on top, tray below – like pre-layout behavior (desktop and mobile) */
 .playBody {
   flex: 1;
   min-height: 0;
-  display: grid;
-  grid-template-columns: 20% 1fr 20%;
-  grid-template-rows: 1fr;
-  gap: 0;
-}
-
-.playBody .trayWrap {
-  grid-column: 1;
-  max-height: none;
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 
 .playBody .main {
-  grid-column: 2;
+  flex: 1;
+  min-height: 0;
 }
 
-.playBody .statsSidebar {
-  grid-column: 3;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-4, 16px);
-  background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
-  border-left: 1px solid var(--color-border);
+.playBody .trayWrap {
+  flex-shrink: 0;
+  height: 150px;
 }
 
-.playBody .statsSidebar .hud {
-  flex-direction: column;
-  gap: var(--space-3, 12px);
-}
-
-/* Mobile: narrower sidebars (15%) so board gets more space; min 48px so tray/stats usable */
-@media (max-width: 600px) {
-  .playBody {
-    grid-template-columns: minmax(48px, 15%) 1fr minmax(48px, 15%);
-  }
-
-  .playBody .statsSidebar {
-    padding: var(--space-2, 6px);
-    border-left-width: 1px;
-  }
-
-  .playBody .statsSidebar .hud {
-    gap: 6px;
-  }
-
-  .playBody .statsSidebar .hudPill,
-  .playBody .statsSidebar .hudPillTimer {
-    padding: 3px 5px;
-    font-size: 10px;
-  }
-
-  .playBody .statsSidebar .hudPill span {
-    font-size: 9px;
+@media (max-width: 900px) {
+  .playBody .trayWrap {
+    height: 160px;
   }
 }
 

@@ -1,11 +1,13 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "7";
+export const CHANGELOG_VERSION = "8";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📐 Layout reverted – Board on top, tray below. HUD in top bar. Tray 150px (desktop), 160px (mobile).",
+      "🔤 Font – Nunito for UI (replaced Inter); Arial removed from fallback stack.",
       "💀 Extreme (9×9) – New 81-piece preset between Legend and Custom",
       "📊 Piece counts in labels – Difficulty dropdowns now show piece count (e.g. 🌱 3×3 (9 pieces))",
       "📱 Stats on mobile – Leaderboard and Stats screens fit and scroll properly on small screens",

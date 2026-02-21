@@ -13,6 +13,7 @@ import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
 import { Minimize2, Maximize2, Shuffle } from "lucide-react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import styles from "./PieceTray.module.css";
 
 type TraySection = "all" | "corners" | "edges" | "center";
@@ -50,6 +51,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   { pieces, image, grid, onPieceClick },
   ref,
 ) {
+  const isMobile = useMediaQuery("(max-width: 600px)");
   const [section, setSection] = useState<TraySection>("all");
   const [sortMode, setSortMode] = useState<SortMode>("grid");
   const [shuffledOrder, setShuffledOrder] = useState<string[] | null>(null);
@@ -58,6 +60,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const [canScroll, setCanScroll] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const swipeStartY = useRef<number | null>(null);
+  const effectiveCollapsed = isMobile ? false : collapsed;
 
   // Compact mode: default on for 25+ pieces (mobile or desktop); user can toggle
   const compactDefault = pieces.length >= 25;
@@ -183,16 +186,19 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     swipeStartY.current = clientY;
   }, []);
 
-  const handleSwipeEnd = useCallback((clientY: number) => {
-    const start = swipeStartY.current;
-    if (start == null) return;
-    swipeStartY.current = null;
-    const delta = start - clientY;
-    if (Math.abs(delta) < 30) return;
-    if (delta > 0)
-      setCollapsed(false); // swipe up = expand
-    else setCollapsed(true); // swipe down = collapse
-  }, []);
+  const handleSwipeEnd = useCallback(
+    (clientY: number) => {
+      if (isMobile) return;
+      const start = swipeStartY.current;
+      if (start == null) return;
+      swipeStartY.current = null;
+      const delta = start - clientY;
+      if (Math.abs(delta) < 30) return;
+      if (delta > 0) setCollapsed(false);
+      else setCollapsed(true);
+    },
+    [isMobile],
+  );
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => handleSwipeStart(e.touches[0].clientY),
@@ -217,24 +223,26 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
   return (
     <div
-      className={`${styles.tray} ${compact ? styles.trayCompact : ""} ${collapsed ? styles.trayCollapsed : ""} ${isLargeGrid ? styles.trayLarge : ""}`}
+      className={`${styles.tray} ${compact ? styles.trayCompact : ""} ${effectiveCollapsed ? styles.trayCollapsed : ""} ${isLargeGrid ? styles.trayLarge : ""}`}
       ref={ref}
     >
       <div
         className={styles.handle}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
+        onTouchStart={isMobile ? undefined : handleTouchStart}
+        onTouchEnd={isMobile ? undefined : handleTouchEnd}
+        onPointerDown={isMobile ? undefined : handlePointerDown}
+        onPointerUp={isMobile ? undefined : handlePointerUp}
         onPointerLeave={() => (swipeStartY.current = null)}
         onClick={(e) => {
+          if (isMobile) return;
           e.stopPropagation();
           setCollapsed((c) => !c);
         }}
         role="button"
         tabIndex={0}
-        aria-label={collapsed ? "Expand piece drawer" : "Collapse piece drawer"}
+        aria-label={effectiveCollapsed ? "Expand piece drawer" : "Collapse piece drawer"}
         onKeyDown={(e) => {
+          if (isMobile) return;
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             setCollapsed((c) => !c);
@@ -242,7 +250,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         }}
       >
         <span className={styles.handleBar} />
-        {collapsed && (
+        {effectiveCollapsed && (
           <span className={styles.handleLabel}>Piece Drawer ({pieces.length})</span>
         )}
       </div>
@@ -331,7 +339,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         </div>
       </div>
 
-      {!collapsed && displayed.length > 0 && canScroll && (
+      {!effectiveCollapsed && displayed.length > 0 && canScroll && (
         <div
           className={styles.scrollIndicator}
           role="progressbar"
@@ -347,7 +355,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         </div>
       )}
 
-      {!collapsed && (
+      {!effectiveCollapsed && (
         <div
           className={`${styles.scroller} ${displayed.length > 0 ? styles.scrollerSnap : ""}`}
           ref={scrollerRef}

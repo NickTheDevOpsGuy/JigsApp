@@ -1,5 +1,5 @@
-/* Google Fonts - Inter for UI, Fredoka for logo/title */
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+/* Google Fonts - Nunito for UI, Fredoka for logo/title */
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap");
 
 /* ============================================
    CSS Variables for Theme
@@ -319,13 +319,12 @@ body {
   background: var(--color-bg-primary);
   overflow-x: hidden;
   font-family:
-    "Inter",
+    "Nunito",
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     Roboto,
-    Arial,
     sans-serif;
   color: var(--color-text-primary);
   transition:

@@ -1109,18 +1109,6 @@ export function PlayScreen() {
       />
 
       <div className={styles.playBody}>
-        <div
-          className={`${styles.trayWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
-          onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
-        >
-          <PieceTray
-            ref={trayRef}
-            pieces={trayPieces}
-            image={imgRef.current}
-            grid={state?.grid ?? grid}
-            onPieceClick={handleTrayPieceClick}
-          />
-        </div>
         <div className={styles.main} ref={mainRef}>
           <div className={styles.board} ref={boardRef}>
             {isLoading && (
@@ -1194,18 +1182,16 @@ export function PlayScreen() {
             )}
           </div>
         </div>
-
-        <div className={styles.statsSidebar} aria-label="Game stats">
-          <PlayHUD
-            elapsedSeconds={elapsedSeconds}
-            piecesLeft={left}
-            totalPieces={total}
-            isPaused={isPaused}
-            isComplete={isComplete}
-            timeMode={timeMode}
-            countdownMinutes={countdownMinutes}
-            bestTimeSeconds={bestTimeSeconds}
-            onTogglePause={() => setIsPaused((p) => !p)}
+        <div
+          className={`${styles.trayWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
+          onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
+        >
+          <PieceTray
+            ref={trayRef}
+            pieces={trayPieces}
+            image={imgRef.current}
+            grid={state?.grid ?? grid}
+            onPieceClick={handleTrayPieceClick}
           />
         </div>
       </div>

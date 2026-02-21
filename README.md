@@ -86,8 +86,8 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 - **Home** — Corner buttons: Stats (trophy) left, Help (?) right. Main actions: Today's Puzzle, Packs, Choose Photo, Snap a Picture.
 - **Stats** — Dashboard, Profile, Leaderboard (dropdown for views), Achievements. Anonymous mode with raccoon names.
-- **Desktop play** — Tray 20%, Board 60%, Stats sidebar 20% (min-width 901px). Mobile: stacked layout.
-- **Piece tray** — 28vh expanded (32vh for 25+ pieces). On mobile: 8vh collapsed with tap/swipe handle.
+- **Play layout** — Board on top, tray below (150px desktop, 160px mobile). HUD (timer, pieces) in top bar.
+- **Piece tray** — Fixed height below board. Compact mode for 25+ pieces; horizontal scroll.
 
 ### UX and polish
 
@@ -135,10 +135,10 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ---
 
-## Mobile layout (PDF)
+## Mobile layout
 
 - **Board** — 94vw width, max 520px on mobile; 65–70% viewport height.
-- **Piece tray** — 28vh expanded, 32vh for large grids (25+ pieces), 8vh collapsed. Swipe or tap handle to expand/collapse.
+- **Piece tray** — 160px height below board; horizontal scroll. No collapse.
 - **Piece scaling** — Min 42px on mobile; zoom scales if needed.
 - **Snap** — 120ms pop + glow animation.
 - **Header** — 56px max.

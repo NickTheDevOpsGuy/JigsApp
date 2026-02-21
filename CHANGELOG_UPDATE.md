@@ -4,7 +4,14 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 🧩 Grid presets, piece counts & undo (latest)
+## 📐 Layout revert (latest)
+
+- **Play screen** – Reverted to board on top, tray below. No stats sidebar; HUD in top bar only. Tray 150px (desktop), 160px (mobile). No collapse on mobile.
+- **Font** – Nunito for UI; Arial removed from fallback stack.
+
+---
+
+## 🧩 Grid presets, piece counts & undo
 
 - **Extreme (9×9)** – New 81-piece preset between Legend and Custom (Setup and Today's Puzzle).
 - **Piece counts in labels** – All difficulty dropdowns show piece count: "🌱 3×3 (9 pieces)", "Custom 5×5 (25 pieces)", etc. (mobile and desktop).
@@ -12,14 +19,14 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 - **Custom grid hint** – When choosing 81+ pieces, a brief note: "Larger puzzles may run slower on some devices."
 - **Undo cap** – 50 steps for puzzles ≤64 pieces, 25 for 81+ to reduce memory on low-end devices. Previously fixed at 30.
 - **Stats/leaderboard on mobile** – Layout and scrolling fixed so content fits and scrolls inside the card (flex, overflow-y: auto, cardContent wrapper).
-- **E2E coverage** – Stats mobile viewport test; Setup and Daily modal 9×9 preset tests; changelog version bumped to 7 in all E2E specs.
+- **E2E coverage** – Stats mobile viewport test; Setup and Daily modal 9×9 preset tests; changelog v8 in all E2E specs.
 
 ---
 
-## 📐 Layout & mobile (PDF spec — latest)
+## 📐 Layout & mobile (reverted – see Layout revert above)
 
-- **Desktop play** — 20% tray, 60% board, 20% stats sidebar (min-width 901px). Responsive breakpoint documented.
-- **Tray heights** — 28vh expanded; 32vh for large grids (25+ pieces); 8vh collapsed on mobile. Swipe or tap handle to expand/collapse.
+- **Play layout** — Board on top, tray below. HUD in top bar. Tray 150px / 160px. No sidebar.
+- **Previously** — Had 20/60/20 grid with stats sidebar; reverted per user preference.
 - **Board** — 94vw width, max 520px on mobile; 65–70% viewport height.
 - **Piece scaling** — Minimum 42px on mobile; zoom scales if needed.
 - **Snap animation** — 120ms pop + glow.
