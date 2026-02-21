@@ -8,7 +8,16 @@ import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/samplePuzzles";
 import { setCurrentPuzzleId } from "@/data/packCompletion";
 import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
-import { ArrowLeft, Trash2, Play, Camera, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowLeft,
+  Trash2,
+  Play,
+  Camera,
+  ChevronLeft,
+  ChevronRight,
+  Image,
+  Upload,
+} from "lucide-react";
 import { useImagePicker, useGridConfig, GRID_OPTIONS } from "./hooks";
 import { CameraCapture } from "./components/CameraCapture";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
@@ -230,7 +239,8 @@ export function SetupScreen() {
                   className={`${styles.tab} ${imageSource === "gallery" ? styles.tabActive : ""}`}
                   onClick={() => setImageSource("gallery")}
                 >
-                  🖼️ Gallery
+                  <Image size={16} />
+                  Gallery
                 </button>
                 <button
                   role="tab"
@@ -239,7 +249,8 @@ export function SetupScreen() {
                   className={`${styles.tab} ${imageSource === "upload" ? styles.tabActive : ""}`}
                   onClick={() => setImageSource("upload")}
                 >
-                  📤 Upload
+                  <Upload size={16} />
+                  Upload
                 </button>
                 <button
                   role="tab"
@@ -249,7 +260,7 @@ export function SetupScreen() {
                   onClick={() => setImageSource("camera")}
                 >
                   <Camera size={16} />
-                  📷 Camera
+                  Camera
                 </button>
               </div>
 

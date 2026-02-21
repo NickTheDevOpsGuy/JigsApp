@@ -289,7 +289,7 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 
 ---
 
-<details>
+<details>  
 <summary>📁 Click to expand file structure</summary>
 
 ```plaintext

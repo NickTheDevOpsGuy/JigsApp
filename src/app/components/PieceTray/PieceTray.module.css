@@ -16,7 +16,7 @@
   -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   border: 1px solid var(--color-border);
-  margin: 0 16px 16px 16px;
+  margin: 0 12px 12px 12px;
   font-size: 13px;
   line-height: 1.35;
   color: var(--color-text-secondary);
@@ -80,7 +80,7 @@
 }
 
 .header {
-  padding: 6px 12px;
+  padding: 6px 12px 14px 12px;
   font-weight: 600;
   font-size: 14px;
   border-bottom: 1px solid var(--color-border);
@@ -157,33 +157,6 @@
   cursor: not-allowed;
 }
 
-.compactToggle {
-  appearance: none;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-elevated);
-  color: var(--color-text-secondary);
-  padding: 4px 6px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-  touch-action: manipulation;
-  min-width: 36px;
-  min-height: 36px;
-}
-
-.compactToggle:hover {
-  background: var(--color-bg-secondary);
-  color: var(--color-brand-primary);
-  border-color: var(--color-brand-primary);
-}
-
-.compactToggle:active {
-  transform: scale(0.95);
-}
-
 /* Visual "you are here" scroll position indicator */
 .scrollIndicator {
   flex-shrink: 0;
@@ -249,7 +222,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
-  padding: 8px 12px;
+  padding: 12px 12px 8px 12px;
   padding-inline-end: max(16px, env(safe-area-inset-right, 0));
   display: flex;
   gap: 8px;
@@ -287,8 +260,8 @@
   border: none;
   background: transparent;
   padding: 4px;
-  min-width: 52px;
-  min-height: 52px;
+  min-width: 56px;
+  min-height: 56px;
   cursor: pointer;
   border-radius: 6px;
   transition: all 0.15s ease;
@@ -306,8 +279,8 @@
 }
 
 .thumbWrap {
-  width: var(--thumb-size, 64px);
-  height: var(--thumb-size, 64px);
+  width: var(--thumb-size, 68px);
+  height: var(--thumb-size, 68px);
 
   /* IMPORTANT:
      Do NOT clip the thumbnail, otherwise jigsaw tabs/slots get cut off. */
@@ -358,13 +331,13 @@
 
 /* Compact mode: 25–48 piece puzzles */
 .trayCompact .thumbWrap {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
 }
 
 .trayCompact .pieceButton {
-  min-width: 56px;
-  min-height: 56px;
+  min-width: 58px;
+  min-height: 58px;
   padding: 2px;
 }
 
@@ -373,19 +346,19 @@
 }
 
 .trayCompact .scroller {
-  padding: 6px 12px;
+  padding: 12px 12px 6px 12px;
   padding-inline-end: max(16px, env(safe-area-inset-right, 0));
 }
 
 /* Extra-compact for 49+ pieces – larger than before for visibility */
 .trayExtraCompact .thumbWrap {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
 }
 
 .trayExtraCompact .pieceButton {
-  min-width: 50px;
-  min-height: 50px;
+  min-width: 52px;
+  min-height: 52px;
   padding: 2px;
 }
 
@@ -394,7 +367,7 @@
 }
 
 .trayExtraCompact .scroller {
-  padding: 6px 10px;
+  padding: 12px 10px 6px 10px;
   padding-inline-end: max(14px, env(safe-area-inset-right, 0));
 }
 

@@ -12,15 +12,15 @@ import React, {
 import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
-import { Minimize2, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import styles from "./PieceTray.module.css";
 
 type TrayFilter = "all" | "edges" | "colors";
 
-const THUMB_NORMAL = 64;
-const THUMB_COMPACT = 52;
-const THUMB_EXTRA_COMPACT = 46;
+const THUMB_NORMAL = 68;
+const THUMB_COMPACT = 54;
+const THUMB_EXTRA_COMPACT = 48;
 
 type Props = {
   pieces: Piece[];
@@ -65,17 +65,12 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   // Compact mode: 25+ pieces; extra-compact for 49+ to avoid layout/performance issues
   const compactDefault = pieces.length >= 25;
   const extraCompactDefault = pieces.length >= 49;
-  const [compact, setCompact] = useState(compactDefault);
+  const compact = compactDefault;
   const thumbSize = extraCompactDefault
     ? THUMB_EXTRA_COMPACT
     : compact
       ? THUMB_COMPACT
       : THUMB_NORMAL;
-
-  useEffect(() => {
-    if (pieces.length >= 25) setCompact(true);
-    else if (pieces.length < 25) setCompact(false);
-  }, [pieces.length]);
 
   // Precompute hue for stable-ish sorting.
   const hueById = useMemo(() => {
@@ -236,8 +231,6 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     };
   }, [updateScrollProgress, displayed.length]);
 
-  const showCompactToggle = pieces.length >= 25;
-
   const handleSwipeStart = useCallback((clientY: number) => {
     swipeStartY.current = clientY;
   }, []);
@@ -314,17 +307,6 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <span className={styles.title}>Piece Drawer ({pieces.length})</span>
-          {showCompactToggle && (
-            <button
-              type="button"
-              className={styles.compactToggle}
-              onClick={() => setCompact((c) => !c)}
-              aria-label={compact ? "Expand thumbnails" : "Compact thumbnails"}
-              title={compact ? "Expand thumbnails" : "Compact thumbnails"}
-            >
-              {compact ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
-            </button>
-          )}
         </div>
         <div className={styles.controls} aria-label="Tray filters">
           <div className={styles.segment} role="group" aria-label="Filter">
