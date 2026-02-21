@@ -783,12 +783,14 @@
   animation: engagementToastIn 0.3s ease-out;
 }
 
-/* HUD (timer, pieces): top center of canvas */
+/* HUD (timer, pause, pieces): top center of canvas */
 .hudOverlay {
   position: absolute;
   top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
   z-index: 15;
   pointer-events: none;
 }
@@ -805,6 +807,12 @@
   font: inherit;
   color: inherit;
   background: var(--color-bg-card);
+  padding: 6px 10px;
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hudPillPause:hover {

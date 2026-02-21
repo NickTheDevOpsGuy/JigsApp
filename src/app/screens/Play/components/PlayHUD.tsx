@@ -56,6 +56,15 @@ export function PlayHUD({
           )}
         </div>
       )}
+      <button
+        type="button"
+        className={styles.hudPillPause}
+        onClick={onTogglePause}
+        aria-label="Pause"
+        title="Pause"
+      >
+        <Pause size={14} />
+      </button>
       <div
         className={`${styles.hudPill} ${bounce ? styles.hudPillBounce : ""}`}
         aria-label={`${piecesLeft} of ${totalPieces} pieces remaining`}
@@ -66,16 +75,6 @@ export function PlayHUD({
           {piecesLeft} / {totalPieces}
         </span>
       </div>
-      <button
-        type="button"
-        className={styles.hudPillPause}
-        onClick={onTogglePause}
-        aria-label="Pause"
-        title="Pause"
-      >
-        <Pause size={14} />
-        <span>Pause</span>
-      </button>
     </div>
   );
 }
