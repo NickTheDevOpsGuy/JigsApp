@@ -96,9 +96,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
           aria-labelledby="streak-freeze-label"
           aria-describedby="streak-freeze-hint"
         >
-          <span id="streak-freeze-label">
-            Missed yesterday? Use your freeze.
-          </span>
+          <span id="streak-freeze-label">Missed yesterday? Use your freeze.</span>
           <span id="streak-freeze-hint" className={styles.freezeHint}>
             1 per week
           </span>
