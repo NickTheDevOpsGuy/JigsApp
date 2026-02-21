@@ -201,8 +201,12 @@
   line-height: 1;
 }
 
-.errorClose:hover {
+.errorClose:hover,
+.errorClose:focus-visible,
+.errorClose:active {
   color: var(--color-error-hover);
+  background: var(--color-bg-card);
+  border-radius: 6px;
 }
 
 .select {

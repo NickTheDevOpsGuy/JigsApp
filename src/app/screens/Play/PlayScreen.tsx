@@ -992,17 +992,6 @@ export function PlayScreen() {
                 connectedCount={sessionResult.connectedCount}
               />
             )}
-            <PlayHUD
-              elapsedSeconds={elapsedSeconds}
-              piecesLeft={left}
-              totalPieces={total}
-              isPaused={isPaused}
-              isComplete={isComplete}
-              timeMode={timeMode}
-              countdownMinutes={countdownMinutes}
-              bestTimeSeconds={bestTimeSeconds}
-              onTogglePause={() => setIsPaused((p) => !p)}
-            />
           </div>
           <TopBarButtons
             showPreview={showPreview}
@@ -1116,6 +1105,21 @@ export function PlayScreen() {
               <div className={styles.loadingOverlay} aria-label="Loading puzzle">
                 <div className={styles.spinner} />
                 <span>Loading puzzle…</span>
+              </div>
+            )}
+            {!isComplete && !isPaused && (
+              <div className={styles.hudOverlay} aria-live="polite">
+                <PlayHUD
+                  elapsedSeconds={elapsedSeconds}
+                  piecesLeft={left}
+                  totalPieces={total}
+                  isPaused={isPaused}
+                  isComplete={isComplete}
+                  timeMode={timeMode}
+                  countdownMinutes={countdownMinutes}
+                  bestTimeSeconds={bestTimeSeconds}
+                  onTogglePause={() => setIsPaused((p) => !p)}
+                />
               </div>
             )}
             {onboarding.needsStartTip && placed === 0 && (

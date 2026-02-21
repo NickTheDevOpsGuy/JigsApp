@@ -2,7 +2,7 @@
  * PlayHUD – timer, pieces left, pause button (top bar center).
  */
 import React, { useEffect, useState } from "react";
-import { Clock, Puzzle } from "lucide-react";
+import { Clock, Pause, Puzzle } from "lucide-react";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
 import type { TimeMode } from "../timeMode";
@@ -23,12 +23,12 @@ export function PlayHUD({
   elapsedSeconds,
   piecesLeft,
   totalPieces,
-  isPaused: _isPaused,
+  isPaused,
   isComplete: _isComplete,
   timeMode,
   countdownMinutes = 10,
   bestTimeSeconds,
-  onTogglePause: _onTogglePause,
+  onTogglePause,
 }: PlayHUDProps) {
   const showTimer = timeMode !== "relaxed";
   const isCountdown = timeMode === "countdown";
@@ -66,6 +66,16 @@ export function PlayHUD({
           {piecesLeft} / {totalPieces}
         </span>
       </div>
+      <button
+        type="button"
+        className={styles.hudPillPause}
+        onClick={onTogglePause}
+        aria-label="Pause"
+        title="Pause"
+      >
+        <Pause size={14} />
+        <span>Pause</span>
+      </button>
     </div>
   );
 }

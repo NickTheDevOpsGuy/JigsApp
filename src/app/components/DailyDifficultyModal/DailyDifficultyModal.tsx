@@ -97,10 +97,10 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
           aria-describedby="streak-freeze-hint"
         >
           <span id="streak-freeze-label">
-            You missed yesterday. Use your streak freeze to protect your streak?
+            Missed yesterday? Use your freeze.
           </span>
           <span id="streak-freeze-hint" className={styles.freezeHint}>
-            One per week — your streak won&apos;t break.
+            1 per week
           </span>
           <div className={styles.freezeActions}>
             <button

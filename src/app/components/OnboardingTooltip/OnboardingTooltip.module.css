@@ -56,7 +56,9 @@
   cursor: pointer;
 }
 
-.dismissIcon:hover {
-  color: var(--color-text-secondary);
+.dismissIcon:hover,
+.dismissIcon:focus-visible,
+.dismissIcon:active {
+  color: var(--color-brand-primary);
   background: var(--color-bg-card);
 }
