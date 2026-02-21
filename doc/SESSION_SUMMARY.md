@@ -4,6 +4,19 @@ Summary of all changes on `bugfix/layout` and related work. Includes piece drawe
 
 ---
 
+## Grid Presets, Piece Counts & Undo (Latest)
+
+- **Extreme 9×9** – New 81-piece preset between Legend and Custom (Setup, Today's Puzzle)
+- **Piece counts in labels** – All difficulty dropdowns show count: "🌱 3×3 (9 pieces)", "Custom 5×5 (25 pieces)" (mobile & desktop)
+- **Suggested difficulty** – "Based on your progress, try X×Y next" includes 9×9 when 8×8 completed
+- **Custom grid hint** – "Larger puzzles may run slower on some devices" when choosing 81+ pieces
+- **Undo cap** – 50 steps for ≤64 pieces, 25 for 81+ (reduces memory on large puzzles)
+- **Stats/leaderboard mobile** – `cardContent` flex/scroll layout; content fits and scrolls inside card; `data-testid="stats-card-content"`
+- **E2E** – Stats mobile viewport test; Setup and Daily 9×9 preset tests; changelog v7 in all specs; Playwright 4 workers
+- **Docs** – `changelog.ts` v7, README grid section, CHANGELOG_UPDATE, E2E coverage note
+
+---
+
 ## Piece Drawer (Mobile & Desktop)
 
 - **Compact mode** – Default on for 25+ pieces (mobile and desktop); user can toggle via expand/collapse button
@@ -141,9 +154,10 @@ Summary of all changes on `bugfix/layout` and related work. Includes piece drawe
 ## Testing
 
 - **Vitest** – Unit tests in `vite.config.ts`; e.g. `playScreenUtils.test.ts`
-- **Playwright** – E2E in `e2e/`; `home.spec.ts` (menu, buttons)
+- **Playwright** – E2E in `e2e/`; `home.spec.ts` (menu, buttons); Stats mobile, Setup/Daily 9×9; 4 workers
 - **CI** – Lint, typecheck, format, build, unit tests, E2E (Chromium) on PRs
 - **Pre-push** – Husky: Prettier, ESLint, TypeScript, unit tests
+- **Manual** – Before release: verify Stats scrolling and 9×9 preset on a real device
 
 ---
 
@@ -167,9 +181,10 @@ Summary of all changes on `bugfix/layout` and related work. Includes piece drawe
 
 ---
 
-## Changelog (v4)
+## Changelog
 
-- Piece drawer, touch fixes, image validation, milestone progress, help menu
+- **v7** – Extreme 9×9, piece counts in labels, Stats mobile fix, undo cap, custom hint, E2E coverage
+- **v4** – Piece drawer, touch fixes, image validation, milestone progress, help menu
 - Time modes, Stats & Leaderboards, Undo/Redo, ghost hint, lock pieces
 
 ---

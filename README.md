@@ -74,7 +74,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - Drag and drop pieces with rotation (tap to rotate on mobile)
 - Board snap and neighbor snap (with near-snap nudge when pieces are close)
 - Group merging so connected pieces move together
-- Multiple grid sizes (3×3 to 8×8)
+- Multiple grid sizes (3×3 to 9×9 presets; custom up to 12×12)
 - Image sources: gallery, file upload, camera capture
 - Puzzle packs – curated sets grouped by theme
 - Tray filters: All, Edges, Corners, Center (plus Grid and Color sorting)
@@ -142,6 +142,14 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - **Piece scaling** — Min 42px on mobile; zoom scales if needed.
 - **Snap** — 120ms pop + glow animation.
 - **Header** — 56px max.
+
+---
+
+## Grid sizes & difficulty
+
+Presets: Easy (3×3) → Medium (4×4) → Hard (5×5) → Expert (6×6) → Master (7×7) → Legend (8×8) → Extreme (9×9). Custom grids up to 12×12. Difficulty dropdowns show piece count (e.g. "🌱 3×3 (9 pieces)"). "Based on your progress" suggests the next preset (including 9×9) when you've completed smaller grids. Custom grids 81+ pieces show a hint that larger puzzles may run slower on some devices.
+
+**Undo cap** – 50 steps for puzzles ≤64 pieces, 25 for 81+ to reduce memory use on large puzzles.
 
 ---
 
@@ -239,6 +247,7 @@ PostHog UI: https://app.posthog.com/
   - `npm run test:e2e`
   - first run: `npx playwright install`
   - ensure port 5173 is free (or stop `npm run dev`), or Playwright will start the app in CI
+  - Covers Stats mobile layout, Setup/Daily 9×9 preset, and core flows
 - Performance (Lighthouse CI)
   - `npm run lhci` — builds, then runs Lighthouse (perf, a11y, best-practices)
   - Reports in `./lhci-reports`

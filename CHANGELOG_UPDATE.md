@@ -1,6 +1,18 @@
 # Phuzzle — Recent Changes Summary
 
-A single post summarizing all recent updates: UX polish, leaderboards, performance, testing, PWA, tap-to-rotate, layout (PDF spec), and docs.
+A single post summarizing all recent updates: UX polish, leaderboards, performance, testing, PWA, tap-to-rotate, layout (PDF spec), grid presets, and docs.
+
+---
+
+## 🧩 Grid presets, piece counts & undo (latest)
+
+- **Extreme (9×9)** – New 81-piece preset between Legend and Custom (Setup and Today's Puzzle).
+- **Piece counts in labels** – All difficulty dropdowns show piece count: "🌱 3×3 (9 pieces)", "Custom 5×5 (25 pieces)", etc. (mobile and desktop).
+- **Suggested difficulty** – "Based on your progress, try X×Y next" now suggests 9×9 when 8×8 is completed.
+- **Custom grid hint** – When choosing 81+ pieces, a brief note: "Larger puzzles may run slower on some devices."
+- **Undo cap** – 50 steps for puzzles ≤64 pieces, 25 for 81+ to reduce memory on low-end devices. Previously fixed at 30.
+- **Stats/leaderboard on mobile** – Layout and scrolling fixed so content fits and scrolls inside the card (flex, overflow-y: auto, cardContent wrapper).
+- **E2E coverage** – Stats mobile viewport test; Setup and Daily modal 9×9 preset tests; changelog version bumped to 7 in all E2E specs.
 
 ---
 

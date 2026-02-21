@@ -214,6 +214,13 @@
   padding-bottom: 8px;
 }
 
+.customGridHint {
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: 0.85;
+  color: var(--color-text-secondary);
+}
+
 /* Tabs for Gallery/Upload */
 .tabs {
   display: flex;

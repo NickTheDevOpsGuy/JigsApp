@@ -60,6 +60,13 @@ export const GRID_OPTIONS: GridOption[] = [
     rows: 8,
     cols: 8,
   },
+  {
+    label: "Extreme 💀 (9×9 - 81 pieces)",
+    labelShort: "9×9 Extreme (81 pieces)",
+    labelIcon: "💀 9×9 (81 pieces)",
+    rows: 9,
+    cols: 9,
+  },
   { label: "Custom", rows: 0, cols: 0 },
 ];
 

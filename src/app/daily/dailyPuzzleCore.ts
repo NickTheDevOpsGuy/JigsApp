@@ -10,6 +10,7 @@ export const GRID_OPTIONS = [
   { rows: 6, cols: 6, label: "Expert 👑 (36 pieces)", labelCompact: "👑 6×6 (36 pieces)", pieces: 36 },
   { rows: 7, cols: 7, label: "Master 🧠 (49 pieces)", labelCompact: "🧠 7×7 (49 pieces)", pieces: 49 },
   { rows: 8, cols: 8, label: "Legend 🔮 (64 pieces)", labelCompact: "🔮 8×8 (64 pieces)", pieces: 64 },
+  { rows: 9, cols: 9, label: "Extreme 💀 (81 pieces)", labelCompact: "💀 9×9 (81 pieces)", pieces: 81 },
 ] as const;
 
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";

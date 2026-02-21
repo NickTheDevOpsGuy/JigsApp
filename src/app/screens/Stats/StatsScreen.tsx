@@ -463,7 +463,7 @@ export function StatsScreen() {
           </button>
         </div>
 
-        <div className={styles.cardContent}>
+        <div className={styles.cardContent} data-testid="stats-card-content">
           {loading ? (
             <p className={styles.loading}>Loading...</p>
           ) : (

@@ -58,7 +58,18 @@ describe("getSuggestedGrid", () => {
     });
   });
 
-  it("returns null when all preset sizes completed", () => {
+  it("suggests 9×9 when 8×8 completed", () => {
+    const getBestTime = (r: number, c: number) => (r <= 8 && c <= 8 ? 60 : null);
+    const result = getSuggestedGrid(getBestTime);
+    expect(result).toEqual({
+      gridIndex: 6,
+      rows: 9,
+      cols: 9,
+      label: "Extreme 💀 (9×9)",
+    });
+  });
+
+  it("returns null when all preset sizes completed (including 9×9)", () => {
     const getBestTime = () => 90;
     const result = getSuggestedGrid(getBestTime);
     expect(result).toBeNull();

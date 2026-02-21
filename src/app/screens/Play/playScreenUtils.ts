@@ -20,9 +20,20 @@ const PRESET_SIZES = [
   { rows: 6, cols: 6 },
   { rows: 7, cols: 7 },
   { rows: 8, cols: 8 },
+  { rows: 9, cols: 9 },
 ];
 
-/** Suggest next grid size based on best times. Returns gridIndex (0–5) and label, or null. */
+const PRESET_LABELS = [
+  "Easy 🌱",
+  "Medium ⚡",
+  "Hard 🔥",
+  "Expert 👑",
+  "Master 🧠",
+  "Legend 🔮",
+  "Extreme 💀",
+];
+
+/** Suggest next grid size based on best times. Returns gridIndex (0–6), rows, cols, and label, or null. */
 export function getSuggestedGrid(
   getBestTime: (rows: number, cols: number) => number | null,
 ): { gridIndex: number; rows: number; cols: number; label: string } | null {
@@ -37,19 +48,11 @@ export function getSuggestedGrid(
     const nextIndex = largestCompleted + 1;
     if (nextIndex >= PRESET_SIZES.length) return null;
     const next = PRESET_SIZES[nextIndex];
-    const labels = [
-      "Easy 🌱",
-      "Medium ⚡",
-      "Hard 🔥",
-      "Expert 👑",
-      "Master 🧠",
-      "Legend 🔮",
-    ];
     return {
       gridIndex: nextIndex,
       rows: next.rows,
       cols: next.cols,
-      label: `${labels[nextIndex]} (${next.rows}×${next.cols})`,
+      label: `${PRESET_LABELS[nextIndex]} (${next.rows}×${next.cols})`,
     };
   } catch {
     return null;

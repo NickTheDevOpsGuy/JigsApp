@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Setup → Play flow", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "6");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "7");
     });
   });
 
@@ -33,5 +33,15 @@ test.describe("Setup → Play flow", () => {
     await expect(
       page.getByRole("status", { name: /pieces remaining/i }).first(),
     ).toBeVisible();
+  });
+
+  test("Setup difficulty dropdown includes 9×9 Extreme preset", async ({ page }) => {
+    await page.goto("/new");
+    await page.getByRole("tab", { name: /gallery/i }).click();
+    await page.getByTestId("gallery-item").first().click();
+
+    const difficultySelect = page.getByLabel(/difficulty/i);
+    await expect(difficultySelect).toBeVisible();
+    await expect(page.locator("option", { hasText: /9×9.*81 pieces/ })).toHaveCount(1);
   });
 });

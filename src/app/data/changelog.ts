@@ -1,11 +1,16 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "6";
+export const CHANGELOG_VERSION = "7";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "💀 Extreme (9×9) – New 81-piece preset between Legend and Custom",
+      "📊 Piece counts in labels – Difficulty dropdowns now show piece count (e.g. 🌱 3×3 (9 pieces))",
+      "📱 Stats on mobile – Leaderboard and Stats screens fit and scroll properly on small screens",
+      "↩️ Smarter undo – 50 steps for ≤64 pieces, 25 for 81+ to protect memory on large puzzles",
+      "💡 Custom grid hint – Brief note when choosing 81+ pieces that larger puzzles may run slower on some devices",
       "🧩 Edge & corner pieces – Full image content now visible on straight edges (no cropping)",
       "❄️ Streak freeze – One per week; protect your daily streak if you miss a day",
       "🔍 Zoom & pan – Animated zoom transitions, persistent per grid size, soft board clamp",

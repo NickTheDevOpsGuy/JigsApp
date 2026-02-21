@@ -18,6 +18,7 @@ Brief description of what this PR does and why.
 - [ ] `npm run test` (unit tests) passes
 - [ ] `npm run build` succeeds
 - [ ] If UI/routing changed: tested PWA install/update (or noted N/A)
+- [ ] If Stats/mobile/layout changed: quick manual check on real device
 
 ## Checklist
 
@@ -41,6 +42,10 @@ Brief description of what this PR does and why.
 ## Screenshots (if applicable)
 
 <!-- Add screenshots here if your changes affect the UI -->
+
+## Release Notes
+
+For user-facing changes, copy relevant sections from `CHANGELOG_UPDATE.md` into the PR description or release notes.
 
 ## Additional Notes
 

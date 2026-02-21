@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Packs and Stats", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "6");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "7");
     });
   });
 
@@ -23,5 +23,17 @@ test.describe("Packs and Stats", () => {
     await expect(page.getByRole("button", { name: /back/i }).first()).toBeVisible({
       timeout: 5000,
     });
+  });
+
+  test("Stats screen fits on mobile viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/stats");
+
+    await expect(page).toHaveURL(/\/stats/);
+    await expect(page.getByRole("button", { name: /back/i }).first()).toBeVisible({
+      timeout: 5000,
+    });
+    await expect(page.getByTestId("stats-card-content")).toBeAttached();
+    await expect(page.getByRole("tab", { name: /dashboard|dash/i })).toBeVisible();
   });
 });

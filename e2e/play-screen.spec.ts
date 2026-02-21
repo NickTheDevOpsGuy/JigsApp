@@ -7,7 +7,7 @@ test.describe("Play screen", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(
       async ({ img, grid }) => {
-        localStorage.setItem("phuzzle:lastSeenChangelog", "6");
+        localStorage.setItem("phuzzle:lastSeenChangelog", "7");
         localStorage.setItem("phuzzle:imageDataUrl", img);
         localStorage.setItem("phuzzle:gridSize", grid);
       },

@@ -56,7 +56,10 @@ function _clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(n, max));
 }
 
-const UNDO_HISTORY_LIMIT = 30;
+/** Undo limit: 50 for ≤64 pieces, 25 for 81+ to reduce memory on large puzzles. */
+function getUndoLimit(pieceCount: number): number {
+  return pieceCount <= 64 ? 50 : 25;
+}
 
 export class PuzzleManager {
   private state: PuzzleState;
@@ -64,7 +67,7 @@ export class PuzzleManager {
   private zCounter: number;
   private events: PuzzleManagerEvents;
 
-  private readonly undoManager = new UndoManager(UNDO_HISTORY_LIMIT);
+  private readonly undoManager: UndoManager;
 
   private boardWidth: number;
   private boardHeight: number;
@@ -148,6 +151,8 @@ export class PuzzleManager {
       totalCount: pieces.length,
       isComplete: false,
     };
+
+    this.undoManager = new UndoManager(getUndoLimit(pieces.length));
 
     this.recomputeDerivedState();
   }

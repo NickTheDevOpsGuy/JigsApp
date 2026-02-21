@@ -335,40 +335,47 @@ export function SetupScreen() {
         </div>
 
         {isCustom && (
-          <div className={styles.customGrid}>
-            <label className={styles.customGridLabel}>
-              Rows
-              <input
-                type="number"
-                min={minGrid}
-                max={maxGrid}
-                value={customRows}
-                onChange={(e) => {
-                  const v = parseInt(e.target.value, 10);
-                  setCustomRows(
-                    isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
-                  );
-                }}
-                className={styles.customGridInput}
-              />
-            </label>
-            <span className={styles.customGridTimes}>×</span>
-            <label className={styles.customGridLabel}>
-              Cols
-              <input
-                type="number"
-                min={minGrid}
-                max={maxGrid}
-                value={customCols}
-                onChange={(e) => {
-                  const v = parseInt(e.target.value, 10);
-                  setCustomCols(
-                    isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
-                  );
-                }}
-                className={styles.customGridInput}
-              />
-            </label>
+          <div>
+            <div className={styles.customGrid}>
+              <label className={styles.customGridLabel}>
+                Rows
+                <input
+                  type="number"
+                  min={minGrid}
+                  max={maxGrid}
+                  value={customRows}
+                  onChange={(e) => {
+                    const v = parseInt(e.target.value, 10);
+                    setCustomRows(
+                      isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
+                    );
+                  }}
+                  className={styles.customGridInput}
+                />
+              </label>
+              <span className={styles.customGridTimes}>×</span>
+              <label className={styles.customGridLabel}>
+                Cols
+                <input
+                  type="number"
+                  min={minGrid}
+                  max={maxGrid}
+                  value={customCols}
+                  onChange={(e) => {
+                    const v = parseInt(e.target.value, 10);
+                    setCustomCols(
+                      isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
+                    );
+                  }}
+                  className={styles.customGridInput}
+                />
+              </label>
+            </div>
+            {customRows * customCols >= 81 && (
+              <p className={styles.customGridHint}>
+                Larger puzzles may run slower on some devices.
+              </p>
+            )}
           </div>
         )}
 

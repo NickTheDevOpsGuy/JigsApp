@@ -74,7 +74,7 @@ export function usePlayScreenAnimation(args: {
   const perfDrawCountRef = useRef(0);
   const perfLastSecRef = useRef(0);
 
-  /** For 100+ piece puzzles: throttle redraw to 30fps when idle to reduce CPU/GPU load. */
+  /** For 50+ piece puzzles: throttle redraw to 30fps when idle to reduce CPU/GPU load. */
   const IDLE_TARGET_FPS = 30;
   const IDLE_MIN_INTERVAL_MS = 1000 / IDLE_TARGET_FPS;
   const HIGH_PIECE_COUNT_THRESHOLD = 50;
