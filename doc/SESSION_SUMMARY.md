@@ -225,7 +225,7 @@ Summary of all changes on `bugfix/layout` and related work. Includes piece drawe
 | Image          | `useImagePicker.ts`, `SetupScreen.tsx`                                                                                                           |
 | Game logic     | `PuzzleManager.ts`, `createInitialPieces.ts`, `renderBoard.ts`                                                                                   |
 | Play screen    | `PlayScreen.tsx`, `PlayScreen.module.css`, `CompletionOverlay.tsx`, `HeaderMenu.tsx`, `PlayHUD.tsx`, `TopBarButtons.tsx`, `headerMenuConfig.tsx` |
-| Layout revert  | `PlayScreen.tsx`, `PlayScreen.module.css`, `PieceTray.tsx`, `PieceTray.module.css`, `global.css`                                                |
+| Layout revert  | `PlayScreen.tsx`, `PlayScreen.module.css`, `PieceTray.tsx`, `PieceTray.module.css`, `global.css`                                                 |
 | Help/Modals    | `Modal.module.css`, `TutorialOverlay.tsx`, `ShortcutsModal.module.css`, `HelpChoiceModal.tsx`                                                    |
 | Packs          | `PackListScreen.tsx`, `PackDetailScreen.tsx`, `packCompletion.ts`, `puzzlePacks.ts`                                                              |
 | Sessions/Co-op | `usePuzzleSession.ts`, `puzzleSessionService.ts`, `003_puzzle_sessions.sql`                                                                      |
