@@ -18,9 +18,9 @@ import styles from "./PieceTray.module.css";
 
 type TrayFilter = "all" | "edges" | "colors";
 
-const THUMB_NORMAL = 56;
-const THUMB_COMPACT = 44;
-const THUMB_EXTRA_COMPACT = 40;
+const THUMB_NORMAL = 64;
+const THUMB_COMPACT = 52;
+const THUMB_EXTRA_COMPACT = 46;
 
 type Props = {
   pieces: Piece[];

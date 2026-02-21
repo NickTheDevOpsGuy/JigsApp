@@ -16,7 +16,7 @@
   -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   border: 1px solid var(--color-border);
-  margin: 0 12px 12px 12px;
+  margin: 0 16px 16px 16px;
   font-size: 13px;
   line-height: 1.35;
   color: var(--color-text-secondary);
@@ -287,8 +287,8 @@
   border: none;
   background: transparent;
   padding: 4px;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 52px;
+  min-height: 52px;
   cursor: pointer;
   border-radius: 6px;
   transition: all 0.15s ease;
@@ -306,8 +306,8 @@
 }
 
 .thumbWrap {
-  width: var(--thumb-size, 56px);
-  height: var(--thumb-size, 56px);
+  width: var(--thumb-size, 64px);
+  height: var(--thumb-size, 64px);
 
   /* IMPORTANT:
      Do NOT clip the thumbnail, otherwise jigsaw tabs/slots get cut off. */
@@ -358,13 +358,13 @@
 
 /* Compact mode: 25–48 piece puzzles */
 .trayCompact .thumbWrap {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
 }
 
 .trayCompact .pieceButton {
-  min-width: 48px;
-  min-height: 48px;
+  min-width: 56px;
+  min-height: 56px;
   padding: 2px;
 }
 
@@ -379,13 +379,13 @@
 
 /* Extra-compact for 49+ pieces – larger than before for visibility */
 .trayExtraCompact .thumbWrap {
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
 }
 
 .trayExtraCompact .pieceButton {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 50px;
+  min-height: 50px;
   padding: 2px;
 }
 
@@ -429,8 +429,8 @@
   }
 
   .tray {
-    margin: 0 8px 8px 8px;
-    margin-bottom: max(8px, env(safe-area-inset-bottom));
+    margin: 0 12px 12px 12px;
+    margin-bottom: max(12px, env(safe-area-inset-bottom));
   }
 
   .segment button {

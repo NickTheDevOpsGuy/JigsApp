@@ -312,8 +312,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3, 12px);
-  padding: var(--space-2, 8px);
+  gap: 16px;
+  padding: 12px;
 }
 
 .loadingOverlay {
@@ -596,8 +596,8 @@
     display: none;
   }
   .main {
-    padding: var(--space-1, 4px);
-    gap: var(--space-2, 6px);
+    padding: 8px;
+    gap: 12px;
   }
   .board {
     min-height: 240px;
@@ -713,9 +713,9 @@
   justify-content: flex-start;
   z-index: 300;
   animation: fadeIn 0.5s ease-out;
-  padding: 16px;
-  padding-top: max(16px, env(safe-area-inset-top, 0));
-  padding-bottom: max(24px, env(safe-area-inset-bottom, 0) + 16px);
+  padding: 20px;
+  padding-top: max(20px, env(safe-area-inset-top, 0));
+  padding-bottom: max(28px, env(safe-area-inset-bottom, 0) + 20px);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -733,11 +733,11 @@
     position: fixed;
     inset: 0;
     justify-content: flex-start;
-    padding: 12px;
+    padding: 16px;
     padding-top: max(24px, env(safe-area-inset-top, 0));
-    padding-bottom: max(32px, env(safe-area-inset-bottom, 0) + 20px);
-    padding-left: max(12px, env(safe-area-inset-left, 0));
-    padding-right: max(12px, env(safe-area-inset-right, 0));
+    padding-bottom: max(32px, env(safe-area-inset-bottom, 0) + 24px);
+    padding-left: max(16px, env(safe-area-inset-left, 0));
+    padding-right: max(16px, env(safe-area-inset-right, 0));
   }
 }
 
