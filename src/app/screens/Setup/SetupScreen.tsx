@@ -360,9 +360,7 @@ export function SetupScreen() {
 
           <p className={styles.difficultySummary}>
             {effectiveRows * effectiveCols} pieces
-            {isCustom
-              ? " · Custom"
-              : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
+            {isCustom ? " · Custom" : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
           </p>
           {suggestedGrid && gridIndex !== suggestedGrid.gridIndex && (
             <button
