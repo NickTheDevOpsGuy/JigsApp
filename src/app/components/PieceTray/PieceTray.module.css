@@ -16,7 +16,7 @@
   -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   border: 1px solid var(--color-border);
-  margin: 0 12px 12px 12px;
+  margin: 0 12px 16px 12px;
   font-size: 13px;
   line-height: 1.35;
   color: var(--color-text-secondary);
@@ -402,8 +402,8 @@
   }
 
   .tray {
-    margin: 0 12px 12px 12px;
-    margin-bottom: max(12px, env(safe-area-inset-bottom));
+    margin: 0 12px 16px 12px;
+    margin-bottom: max(16px, env(safe-area-inset-bottom));
   }
 
   .header {

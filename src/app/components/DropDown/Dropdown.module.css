@@ -70,14 +70,14 @@
 }
 
 .compact .select {
-  padding: 8px 32px 8px 10px;
-  font-size: 13px;
+  padding: 10px 36px 10px 14px;
+  font-size: 14px;
 }
 
 /* Mobile */
 @media (max-width: 600px) {
   .select {
-    padding: 10px 36px 10px 12px;
+    padding: 12px 40px 12px 14px;
     font-size: 14px;
   }
 

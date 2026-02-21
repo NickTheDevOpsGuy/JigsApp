@@ -47,6 +47,9 @@ export default defineConfig(({ mode }) => {
       setupFiles: ["./src/test/setup.ts"],
     },
     build: {
+      // Single CSS bundle avoids "Unable to preload CSS for /assets/..." errors on Vercel.
+      // Per-chunk CSS can fail when filenames are truncated or misresolved after deploy.
+      cssCodeSplit: false,
       rollupOptions: {
         output: {
           manualChunks(id) {
