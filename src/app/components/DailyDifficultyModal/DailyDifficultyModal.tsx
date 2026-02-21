@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Modal } from "@/components/Modal/Modal";
+import { Dropdown } from "@/components/DropDown/Dropdown";
 import {
   GRID_OPTIONS,
   dismissFreezeOfferToday,
@@ -29,6 +30,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     typeof import("@/daily/dailyPuzzle") | null
   >(null);
   const [freezeUsed, setFreezeUsed] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
   const showFreezeOffer =
     wasYesterdayMissed() &&
@@ -123,27 +125,49 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
         </div>
       )}
       <p className={styles.subtitle}>Same puzzle for everyone — pick your difficulty</p>
-      <div className={styles.difficulties}>
-        {GRID_OPTIONS.map((opt) => (
+      {isMobile ? (
+        <div className={styles.difficultyMobile}>
+          <Dropdown
+            label="Difficulty"
+            compact
+            fullWidth
+            value={selectedIndex}
+            onChange={(val) => setSelectedIndex(Number(val))}
+            options={GRID_OPTIONS.map((opt, i) => ({
+              value: i,
+              label: opt.labelCompact,
+            }))}
+          />
           <button
-            key={`${opt.rows}x${opt.cols}`}
             type="button"
-            className={styles.difficultyBtn}
-            onClick={() => handleStart({ rows: opt.rows, cols: opt.cols })}
+            className={styles.startBtn}
+            onClick={() =>
+              handleStart({
+                rows: GRID_OPTIONS[selectedIndex].rows,
+                cols: GRID_OPTIONS[selectedIndex].cols,
+              })
+            }
           >
-            {isMobile ? (
-              <span className={styles.difficultyLabel}>{opt.labelCompact}</span>
-            ) : (
-              <>
-                <span className={styles.difficultyLabel}>{opt.label}</span>
-                <span className={styles.difficultyPieces}>
-                  {opt.rows}×{opt.cols} · {opt.pieces} pieces
-                </span>
-              </>
-            )}
+            Start daily puzzle
           </button>
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className={styles.difficulties}>
+          {GRID_OPTIONS.map((opt) => (
+            <button
+              key={`${opt.rows}x${opt.cols}`}
+              type="button"
+              className={styles.difficultyBtn}
+              onClick={() => handleStart({ rows: opt.rows, cols: opt.cols })}
+            >
+              <span className={styles.difficultyLabel}>{opt.label}</span>
+              <span className={styles.difficultyPieces}>
+                {opt.rows}×{opt.cols} · {opt.pieces} pieces
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
     </Modal>
   );
 }

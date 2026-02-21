@@ -69,6 +69,37 @@
   color: var(--color-text-muted);
 }
 
+.difficultyMobile {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: max(24px, env(safe-area-inset-bottom, 0));
+}
+
+.startBtn {
+  appearance: none;
+  border: none;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.startBtn:hover {
+  opacity: 0.95;
+}
+
+.startBtn:active {
+  transform: scale(0.98);
+}
+
 .difficulties {
   display: grid;
   grid-template-columns: 1fr 1fr;
