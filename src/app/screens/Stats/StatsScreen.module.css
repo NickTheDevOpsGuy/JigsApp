@@ -9,8 +9,8 @@
   align-items: center;
   justify-content: flex-start;
   background: var(--color-bg-secondary);
-  padding: 20px;
-  padding-bottom: max(20px, env(safe-area-inset-bottom, 0));
+  padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
   overflow-x: hidden;
 }
 
@@ -45,7 +45,7 @@
   min-width: 0;
   background: var(--color-bg-card);
   border-radius: 18px;
-  padding: 24px;
+  padding: 20px;
   box-shadow: var(--shadow-lg);
 }
 
@@ -53,7 +53,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 17px;
+  margin-bottom: 12px;
   flex-shrink: 0;
 }
 
@@ -67,7 +67,7 @@
 
 .placeholder,
 .hint {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   color: var(--color-text-secondary);
 }
 
@@ -89,7 +89,7 @@
 .tabs {
   display: flex;
   gap: 7px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -131,7 +131,7 @@
 }
 
 .section h2 {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   font-size: 18px;
   color: var(--color-text-primary);
 }

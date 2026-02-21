@@ -118,6 +118,13 @@
   gap: 12px;
   flex: 1 1 auto;
   justify-content: center;
+  min-width: 0;
+}
+
+.topBarHud {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .coopIndicator {
@@ -575,6 +582,9 @@
   }
   .btnText {
     display: none;
+  }
+  .headerMenuTrigger .btnText {
+    display: inline;
   }
   .iconBtn {
     padding: 6px 8px;

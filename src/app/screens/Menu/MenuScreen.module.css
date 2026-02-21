@@ -7,8 +7,8 @@
   display: grid;
   place-items: center;
   background: var(--color-bg-secondary);
-  padding: 20px;
-  padding-bottom: max(20px, env(safe-area-inset-bottom, 0));
+  padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
@@ -24,7 +24,7 @@
   max-width: 100%;
   background: var(--color-bg-card);
   border-radius: 18px;
-  padding: 24px;
+  padding: 20px;
   box-shadow: var(--shadow-lg);
   position: relative;
 }
@@ -33,7 +33,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .cornerBtn {
@@ -62,7 +62,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .logo {
@@ -74,7 +74,7 @@
 .actionsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 .actionCardFullWidth,

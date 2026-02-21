@@ -61,7 +61,8 @@
   <body>
     <div id="root"></div>
     <script>
-      // Reload when a lazy-loaded chunk fails (stale cache after deploy)
+      // Reload when a lazy-loaded chunk fails (stale cache after deploy).
+      // Unregister SW and use cache-busting URL so we fetch fresh index.html.
       (function () {
         function isChunkLoadError(msg) {
           return (
@@ -70,22 +71,44 @@
               msg.includes("Importing a module script failed") ||
               msg.includes("Loading chunk") ||
               msg.includes("ChunkLoadError") ||
-              msg.includes("Unable to preload CSS"))
+              msg.includes("Unable to preload CSS") ||
+              msg.includes("preload"))
           );
+        }
+        function hardReload() {
+          var key = "phuzzle:reload";
+          var last = parseInt(sessionStorage.getItem(key) || "0", 10);
+          if (Date.now() - last < 5000) return;
+          sessionStorage.setItem(key, String(Date.now()));
+          if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              regs.forEach(function (r) {
+                r.unregister();
+              });
+              doReload();
+            }).catch(doReload);
+          } else {
+            doReload();
+          }
+        }
+        function doReload() {
+          var q = location.search ? location.search + "&" : "?";
+          location.replace(location.pathname + q + "_cb=" + Date.now());
         }
         window.addEventListener("error", function (e) {
           if (isChunkLoadError(e.message)) {
             e.preventDefault();
-            window.location.reload();
+            hardReload();
           }
         });
         window.addEventListener("unhandledrejection", function (e) {
           var msg = (e.reason && e.reason.message) || String(e.reason || "");
           if (isChunkLoadError(msg)) {
             e.preventDefault();
-            window.location.reload();
+            hardReload();
           }
         });
+        window.addEventListener("vite:preloadError", hardReload);
       })();
     </script>
     <script type="module" src="/src/app/main.tsx"></script>

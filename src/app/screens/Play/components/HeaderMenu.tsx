@@ -279,11 +279,11 @@ export function HeaderMenu(props: HeaderMenuProps) {
         className={styles.headerMenuTrigger}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open ? "Close settings" : "Open settings"}
         onClick={() => setOpen((s) => !s)}
       >
         <Menu size={16} />
-        <span className={styles.btnText}>Menu</span>
+        <span className={styles.btnText}>Settings</span>
       </Button>
 
       {open && (

@@ -1,7 +1,7 @@
 .freezeOffer {
   flex-shrink: 0;
-  margin-bottom: 20px;
-  padding: 18px 20px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border-strong);
   border-radius: 10px;
@@ -71,7 +71,7 @@
 }
 
 .subtitle {
-  margin: 0 0 20px;
+  margin: 0 0 14px;
   font-size: 14px;
   line-height: 1.4;
   color: var(--color-text-secondary);
@@ -81,8 +81,8 @@
 .difficultyMobile {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: max(24px, env(safe-area-inset-bottom, 0));
+  gap: 12px;
+  margin-bottom: max(20px, env(safe-area-inset-bottom, 0));
 }
 
 .startBtn {
