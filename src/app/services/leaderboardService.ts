@@ -69,6 +69,94 @@ async function resolveDisplayNames(
   return map;
 }
 
+/** Fetch today's daily puzzle completion count (for live counter). */
+export async function getTodayCompletionCount(dateStr: string): Promise<number> {
+  if (!isSupabaseConfigured()) return 0;
+
+  const { count, error } = await supabase!
+    .from("completions")
+    .select("id", { count: "exact", head: true })
+    .eq("puzzle_date", dateStr)
+    .eq("is_daily", true);
+
+  if (error) return 0;
+  return count ?? 0;
+}
+
+/** Subscribe to realtime updates of today's completion count. Requires completions in Supabase Realtime publication. */
+export function subscribeTodayCompletionCount(
+  dateStr: string,
+  onCount: (count: number) => void,
+): () => void {
+  if (!isSupabaseConfigured() || !supabase) return () => {};
+
+  const channelName = `daily-completions:${dateStr}`;
+  const channel = supabase.channel(channelName);
+
+  const refetch = async () => {
+    const count = await getTodayCompletionCount(dateStr);
+    onCount(count);
+  };
+
+  channel.on(
+    "postgres_changes",
+    {
+      event: "INSERT",
+      schema: "public",
+      table: "completions",
+      filter: `puzzle_date=eq.${dateStr}`,
+    },
+    () => {
+      refetch();
+    },
+  );
+
+  channel.subscribe(async (status) => {
+    if (status === "SUBSCRIBED") {
+      await refetch();
+    }
+  });
+
+  return () => supabase!.removeChannel(channel);
+}
+
+/** Get percentile rank for a completion time at a given grid size. Returns "Top X%" (e.g. Top 12). */
+export async function getPercentileRank(
+  rows: number,
+  cols: number,
+  elapsedSeconds: number,
+): Promise<{ topPercent: number; totalPlayers: number } | null> {
+  if (!isSupabaseConfigured()) return null;
+
+  const { data, error } = await supabase!
+    .from("completions")
+    .select("user_id, elapsed_seconds")
+    .eq("grid_rows", rows)
+    .eq("grid_cols", cols)
+    .order("elapsed_seconds", { ascending: true });
+
+  if (error || !data || data.length === 0) return null;
+
+  const bestByUser = new Map<string, number>();
+  for (const row of data) {
+    const cur = bestByUser.get(row.user_id);
+    if (cur == null || row.elapsed_seconds < cur) {
+      bestByUser.set(row.user_id, row.elapsed_seconds);
+    }
+  }
+
+  const userId = await getUserId();
+  if (userId) bestByUser.delete(userId);
+
+  const sortedTimes = [...bestByUser.values()].sort((a, b) => a - b);
+  const withCurrent = [...sortedTimes, elapsedSeconds].sort((a, b) => a - b);
+  const rank = withCurrent.indexOf(elapsedSeconds) + 1;
+  const total = withCurrent.length;
+  const topPercent = Math.round(((total - rank + 1) / total) * 100);
+
+  return { topPercent, totalPlayers: total };
+}
+
 /** Fetch daily puzzle leaderboard for a given date. */
 export async function getDailyLeaderboard(
   dateStr: string,

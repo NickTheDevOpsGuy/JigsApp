@@ -15,8 +15,8 @@
 @media (max-width: 600px) {
   .page {
     height: 100dvh;
-    padding: 12px;
-    padding-top: 16px;
+    padding: 10px 12px;
+    padding-top: max(12px, env(safe-area-inset-top));
   }
 
   .card {
@@ -133,6 +133,13 @@
 }
 
 .loading,
+.todayCompletionCount {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--color-brand-primary);
+  font-weight: 600;
+}
+
 .empty {
   color: var(--color-text-primary);
   margin: 0;

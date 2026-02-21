@@ -1,28 +1,46 @@
 .page {
   min-height: 100vh;
   min-height: 100dvh;
+  height: 100dvh;
   background: var(--color-bg-secondary);
-  padding: 20px;
-  padding-bottom: max(20px, env(safe-area-inset-bottom, 0));
+  padding: 12px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .card {
   width: min(520px, 100%);
+  max-width: 100%;
+  height: min(90vh, 700px);
+  max-height: min(90vh, 700px);
+  min-width: 0;
+  min-height: 0;
   background: var(--color-bg-card);
   border-radius: 18px;
-  padding: 24px;
+  padding: 16px;
   box-shadow: var(--shadow-lg);
-  display: grid;
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cardBody {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .title {
-  margin: 0 0 6px;
-  font-size: 20px;
+  margin: 0 0 2px;
+  font-size: 18px;
   color: var(--color-brand-primary);
+  flex-shrink: 0;
 }
 
 .label {
@@ -33,25 +51,27 @@
 }
 
 .difficultySummary {
-  margin: 0 0 4px 0;
-  font-size: 14px;
+  margin: 0 0 2px 0;
+  font-size: 12px;
   color: var(--color-text-secondary);
+  flex-shrink: 0;
 }
 
 .difficultySuggestion {
   display: block;
   width: 100%;
-  padding: 10px 14px;
-  margin: 0 0 4px 0;
+  padding: 6px 10px;
+  margin: 0;
   background: var(--color-brand-light);
   border: 1px solid var(--color-brand-primary);
-  border-radius: 10px;
+  border-radius: 8px;
   color: var(--color-brand-primary);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .difficultySuggestion:hover {
@@ -61,12 +81,13 @@
 .configGrid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .file {
-  height: 48px;
-  border-radius: 12px;
+  height: 40px;
+  border-radius: 10px;
   border: 1px solid var(--color-border-strong);
   padding: 10px 12px;
   background: var(--color-bg-elevated);
@@ -74,26 +95,45 @@
 }
 
 .preview {
-  width: 100%;
-  border-radius: 16px;
+  flex: 1;
+  min-height: 60px;
+  max-height: 140px;
+  min-width: 0;
+  border-radius: 12px;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .previewEmpty {
-  padding: 64px 0;
+  padding: 16px;
   text-align: center;
   color: var(--color-brand-primary);
   font-weight: 800;
+  font-size: 13px;
 }
 
 .previewImg {
   width: 100%;
-  height: 240px;
+  height: 100%;
+  max-height: 140px;
   object-fit: contain;
+  object-position: center;
   display: block;
   background: var(--color-bg-secondary);
+}
+
+.actionRow {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
 }
 
 .row {
@@ -105,8 +145,8 @@
 
 .primary,
 .secondary {
-  height: 52px;
-  border-radius: 12px;
+  height: 44px;
+  border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -255,11 +295,18 @@
   box-shadow: var(--shadow-sm);
 }
 
+.imageSourcePanel {
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
 /* Category filter */
 .categories {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
+  margin-bottom: 6px;
+  flex-shrink: 0;
 }
 
 .categoryBtn {
@@ -283,34 +330,85 @@
   border-color: var(--color-brand-primary);
 }
 
-/* Gallery grid */
+/* Gallery: scroll buttons + horizontal scroll */
+.galleryWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.galleryScrollBtn {
+  flex-shrink: 0;
+  appearance: none;
+  border: none;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  padding: 8px 4px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.galleryScrollBtn:hover:not(:disabled) {
+  background: var(--color-brand-light);
+  color: var(--color-brand-primary);
+}
+
+.galleryScrollBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .gallery {
-  --thumb: 108px; /* tweak 96–120 to taste */
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--thumb), 1fr));
-  grid-auto-rows: var(--thumb); /* KEY: rows get a real height */
-  gap: 12px;
-  max-height: 240px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 8px;
+  --thumb: 80px;
+  flex: 0 0 auto;
+  min-width: 0;
+  max-height: 106px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px;
   background: var(--color-bg-card);
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--color-border);
-  align-content: start; /* don’t stretch rows weirdly */
+  align-items: stretch;
+}
+
+.gallery::-webkit-scrollbar {
+  height: 8px;
+}
+
+.gallery::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 4px;
 }
 
 .galleryEmpty {
-  grid-column: 1 / -1;
+  flex: 1 1 100%;
+  min-width: 100%;
   text-align: center;
-  padding: 32px;
+  padding: 16px;
   color: var(--color-brand-primary);
   opacity: 0.7;
+  font-size: 13px;
 }
 
 .galleryItem {
-  width: 100%;
-  height: 100%; /* KEY: fill the grid cell */
+  flex: 0 0 var(--thumb, 80px);
+  width: var(--thumb, 80px);
+  height: var(--thumb, 80px);
   border: 3px solid transparent;
   border-radius: 12px;
   overflow: hidden;
@@ -318,10 +416,10 @@
   background: var(--color-bg-elevated);
   padding: 0;
   position: relative;
-  display: block; /* keep it simple */
+  display: block;
   transition: all 0.2s;
   box-shadow: var(--shadow-sm);
-  min-width: 0; /* helps inside grid */
+  min-width: 0;
 }
 
 .galleryItem:hover {
@@ -372,12 +470,14 @@
   font-weight: 600;
 }
 
-/* Mobile: horizontal gallery + fit one screenful */
+/* Mobile */
 @media (max-width: 520px) {
   .page {
     padding: 8px;
     padding-top: max(8px, env(safe-area-inset-top));
     padding-bottom: max(8px, env(safe-area-inset-bottom));
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
     min-height: 100dvh;
     height: 100dvh;
     overflow: hidden;
@@ -385,12 +485,45 @@
   }
 
   .card {
-    padding: 10px 12px;
-    gap: 4px;
+    flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+    max-height: 100%;
+    padding: 10px 12px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .cardBody {
+    gap: 8px;
+  }
+
+  .actionRow {
+    flex-shrink: 0;
+    margin-top: 0;
+    padding-top: 12px;
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .actionRow > *:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .actionRow button {
+    min-height: 44px;
+  }
+
+  .previewEmpty {
+    padding: 16px;
+    font-size: 13px;
+  }
+
+  .previewImg {
+    height: 100%;
+    max-height: 100px;
+    width: 100%;
+    object-fit: contain;
   }
 
   .title {
@@ -425,18 +558,22 @@
     flex-shrink: 0;
   }
 
+  /* Mobile: horizontal scroll with arrow buttons */
+  .galleryWrap {
+    width: 100%;
+  }
+
   .gallery {
+    flex: 0 0 auto;
     display: flex;
-    grid-template-columns: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 8px;
     overflow-x: auto;
     overflow-y: hidden;
-    max-height: none;
-    height: 70px;
-    gap: 6px;
-    padding: 4px;
-    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    padding: 6px;
   }
 
   .gallery::-webkit-scrollbar {
@@ -454,15 +591,31 @@
   }
 
   .galleryItem {
-    flex: 0 0 64px;
-    height: 62px;
-    scroll-snap-align: start;
+    flex: 0 0 56px;
+    width: 56px;
+    height: 56px;
+    min-width: 0;
     border-radius: 8px;
     border-width: 2px;
   }
 
+  .galleryWrap {
+    max-height: 68px;
+  }
+
+  .gallery {
+    max-height: 68px;
+    padding: 4px;
+    gap: 6px;
+  }
+
   .galleryItemName {
     display: none;
+  }
+
+  .galleryEmpty {
+    flex: 1 1 100%;
+    min-width: 100%;
   }
 
   .difficultySummary {
@@ -473,7 +626,7 @@
   .configGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 6px;
   }
 
   .configGrid > :last-child:nth-child(3) {
@@ -481,23 +634,31 @@
   }
 
   .preview {
-    flex-shrink: 0;
+    flex: 1;
+    flex-shrink: 1;
+    min-height: 60px;
+    max-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .previewImg {
-    height: min(18vh, 90px);
+    width: 100%;
+    height: 100%;
     max-height: 90px;
+    object-fit: contain;
   }
 
   .previewEmpty {
-    padding: min(8vh, 40px) 0;
-    font-size: 13px;
+    padding: 12px;
+    font-size: 12px;
   }
 
   .row {
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-top: 4px;
+    gap: 8px;
+    margin-top: 2px;
   }
 
   .row > *:last-child {
@@ -524,7 +685,36 @@
 
   .card {
     padding: 8px 10px;
-    gap: 4px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .cardBody {
+    gap: 6px;
+  }
+
+  .actionRow {
+    padding-top: 8px;
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+  }
+
+  .actionRow button {
+    min-height: 40px;
+    font-size: 13px;
+  }
+
+  .preview {
+    min-height: 50px;
+    max-height: 70px;
+  }
+
+  .previewImg {
+    height: 100%;
+    max-height: 70px;
+  }
+
+  .previewEmpty {
+    padding: 8px;
+    font-size: 11px;
   }
 
   .title {
@@ -537,21 +727,19 @@
   }
 
   .gallery {
-    height: 60px;
+    gap: 4px;
+    max-height: 56px;
+    padding: 4px;
   }
 
   .galleryItem {
-    flex: 0 0 56px;
-    height: 56px;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
   }
 
-  .previewImg {
-    height: min(18vh, 80px);
-  }
-
-  .previewEmpty {
-    padding: min(8vh, 36px) 0;
-    font-size: 13px;
+  .galleryWrap {
+    max-height: 56px;
   }
 
   .primary,

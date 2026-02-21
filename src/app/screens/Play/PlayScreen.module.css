@@ -88,6 +88,8 @@
 
 .trayWrap {
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   max-height: 320px;
   transition:
@@ -156,6 +158,13 @@
   align-items: center;
   gap: 8px;
   flex: 0 0 auto;
+}
+
+/* Hide New Puzzle button on desktop – use hamburger menu instead */
+@media (min-width: 601px) {
+  .topBarRight {
+    display: none;
+  }
 }
 
 .title {
@@ -282,9 +291,18 @@
   height: 150px;
 }
 
+/* More tray height for large puzzles (49+ pieces) – prevents cramped layout */
+.playBody .trayWrap.trayWrapLarge {
+  height: 190px;
+}
+
 @media (max-width: 900px) {
   .playBody .trayWrap {
-    height: 120px;
+    height: 145px;
+  }
+
+  .playBody .trayWrap.trayWrapLarge {
+    height: 175px;
   }
 }
 
@@ -695,9 +713,9 @@
   justify-content: flex-start;
   z-index: 100;
   animation: fadeIn 0.5s ease-out;
-  padding: 10px;
-  padding-top: max(10px, env(safe-area-inset-top, 0));
-  padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top, 0));
+  padding-bottom: max(24px, env(safe-area-inset-bottom, 0) + 16px);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -712,8 +730,11 @@
 @media (max-width: 600px) {
   .completeOverlay {
     justify-content: flex-start;
-    padding-top: max(20px, env(safe-area-inset-top, 0));
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
+    padding: 12px;
+    padding-top: max(24px, env(safe-area-inset-top, 0));
+    padding-bottom: max(32px, env(safe-area-inset-bottom, 0) + 20px);
+    padding-left: max(12px, env(safe-area-inset-left, 0));
+    padding-right: max(12px, env(safe-area-inset-right, 0));
   }
 }
 
@@ -743,7 +764,7 @@
 /* Onboarding tooltips */
 .onboardingOverlay {
   position: fixed;
-  top: 72px;
+  top: 96px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 85;
@@ -752,17 +773,17 @@
 
 .onboardingOverlayTray {
   position: fixed;
-  bottom: 140px;
+  top: 96px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 85;
   animation: engagementToastIn 0.3s ease-out;
 }
 
-/* Engagement toasts: streak, milestones */
+/* Engagement toasts: streak, milestones, start tip - top center of canvas */
 .engagementToast {
   position: fixed;
-  bottom: 100px;
+  top: 96px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -842,18 +863,20 @@
   margin: 0 0 0.5rem 0;
 }
 
-/* Floating puzzle preview on completion - pops off the canvas */
+/* Floating puzzle preview on completion - centered under the words */
 .completePreviewWrapper {
   margin: 0.5rem 0 1rem;
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .completePreviewImage {
   display: block;
   width: 120px;
   height: 120px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 12px;
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.4),
@@ -900,12 +923,15 @@
   .completePreviewWrapper {
     margin: 0.6rem auto 1rem;
     width: 100%;
+    justify-content: center;
+    align-items: center;
   }
   .completePreviewImage {
-    width: 100px;
-    height: 100px;
-    max-width: min(140px, 40vw);
-    max-height: min(140px, 40vw);
+    width: min(140px, 45vw);
+    height: min(140px, 45vw);
+    max-width: 140px;
+    max-height: 140px;
+    object-fit: contain;
   }
 }
 
@@ -917,13 +943,25 @@
   .completeContent p {
     font-size: 0.85rem;
   }
+  .completeContent .puzzleSize {
+    font-size: 0.75rem;
+  }
   .shareSection {
     padding: 0.5rem;
+  }
+  .completePreviewImage {
+    width: min(100px, 38vw);
+    height: min(100px, 38vw);
   }
 }
 
 .newBest {
   color: #fbbf24;
+  font-weight: 600;
+}
+
+.percentileRank {
+  color: var(--color-brand-primary);
   font-weight: 600;
 }
 
@@ -1050,8 +1088,9 @@
   left: 0;
   margin-top: 4px;
   min-width: 200px;
-  max-height: min(80vh, 540px);
+  max-height: min(95dvh, 600px);
   overflow-y: auto;
+  overflow-x: visible;
   -webkit-overflow-scrolling: touch;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
   backdrop-filter: blur(12px);
@@ -1206,6 +1245,36 @@
 .headerMenuHelpSubmenu {
   padding-left: 16px;
   padding-bottom: 4px;
+}
+
+/* Compact header menu on small screens – fit without scrolling */
+@media (max-height: 700px), (max-width: 500px) {
+  .headerMenuPanel {
+    max-height: min(92dvh, 520px);
+    padding: 4px 0;
+  }
+
+  .headerMenuItem,
+  .headerMenuSubmenuTrigger,
+  .headerMenuBack {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .headerMenuSection {
+    padding: 6px 12px 2px;
+    font-size: 10px;
+  }
+
+  .headerMenuDivider {
+    margin: 4px 0;
+  }
+
+  .headerMenuNested {
+    padding-left: 8px;
+    margin-left: 8px;
+  }
 }
 
 /* Drag preview overlay - piece floats on top when dragging to tray */

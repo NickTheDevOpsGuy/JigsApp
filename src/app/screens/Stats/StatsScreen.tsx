@@ -10,6 +10,8 @@ import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client
 import { getMyStats } from "@/services/statsService";
 import {
   getDailyLeaderboard,
+  getTodayCompletionCount,
+  subscribeTodayCompletionCount,
   getStreakLeaderboard,
   getCompletionCountLeaderboard,
   getWeeklyTotalsLeaderboard,
@@ -109,6 +111,7 @@ export function StatsScreen() {
     CompletionCountEntry[]
   >([]);
   const [personalBests, setPersonalBests] = useState<PersonalBestEntry[]>([]);
+  const [todayCompletionCount, setTodayCompletionCount] = useState<number>(0);
   const [achievements, setAchievements] = useState<
     {
       id: string;
@@ -141,8 +144,9 @@ export function StatsScreen() {
     setDisplayNameInput(p?.displayName ?? "");
     setAchievements(a ?? []);
     const today = getTodayDateString();
-    const [lb, slb, clb, wklb, molb, pb] = await Promise.all([
+    const [lb, todayCount, slb, clb, wklb, molb, pb] = await Promise.all([
       getDailyLeaderboard(today),
+      getTodayCompletionCount(today),
       getStreakLeaderboard(),
       getCompletionCountLeaderboard(),
       getWeeklyTotalsLeaderboard(),
@@ -150,6 +154,7 @@ export function StatsScreen() {
       getMyPersonalBests(),
     ]);
     setLeaderboard(lb);
+    setTodayCompletionCount(todayCount);
     setStreakLeaderboard(slb);
     setCompletionLeaderboard(clb);
     setWeeklyTotalsLeaderboard(wklb);
@@ -172,6 +177,13 @@ export function StatsScreen() {
       if (uid) setRaccoonName(getAnonymousDisplayName(uid));
     });
   }, [configured]);
+
+  useEffect(() => {
+    if (!configured || activeTab !== "leaderboard" || leaderboardType !== "today") return;
+    const today = getTodayDateString();
+    const unsub = subscribeTodayCompletionCount(today, setTodayCompletionCount);
+    return unsub;
+  }, [configured, activeTab, leaderboardType]);
 
   useEffect(() => {
     if (!configured || activeTab !== "leaderboard") return;
@@ -249,25 +261,27 @@ export function StatsScreen() {
       <div className={styles.page}>
         <div className={styles.card}>
           <h1 className={styles.title}>Stats</h1>
-          <p className={styles.placeholder}>
-            Connect Supabase to track your stats, compete on leaderboards, and unlock
-            achievements.
-          </p>
-          <p className={styles.hint}>
-            Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment.
-          </p>
-          <p className={styles.debug}>
-            VITE_SUPABASE_URL: {status.url ? "✓ set" : "✗ missing"} ·
-            VITE_SUPABASE_ANON_KEY: {status.key ? "✓ set" : "✗ missing"}
-          </p>
-          <p className={styles.hint}>
-            Local: add to .env.development and restart dev server. Vercel: add in project
-            Settings → Environment Variables, then redeploy.
-          </p>
-          <Button onClick={() => nav("/")}>
-            <ArrowLeft size={18} />
-            Back
-          </Button>
+          <div className={styles.cardContent} data-testid="stats-card-content">
+            <p className={styles.placeholder}>
+              Connect Supabase to track your stats, compete on leaderboards, and unlock
+              achievements.
+            </p>
+            <p className={styles.hint}>
+              Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment.
+            </p>
+            <p className={styles.debug}>
+              VITE_SUPABASE_URL: {status.url ? "✓ set" : "✗ missing"} ·
+              VITE_SUPABASE_ANON_KEY: {status.key ? "✓ set" : "✗ missing"}
+            </p>
+            <p className={styles.hint}>
+              Local: add to .env.development and restart dev server. Vercel: add in
+              project Settings → Environment Variables, then redeploy.
+            </p>
+            <Button onClick={() => nav("/")}>
+              <ArrowLeft size={18} />
+              Back
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -623,6 +637,12 @@ export function StatsScreen() {
                     {leaderboardType === "completions" && "All-time completions"}
                     {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
                   </h2>
+                  {leaderboardType === "today" && (
+                    <p className={styles.todayCompletionCount} aria-live="polite">
+                      {todayCompletionCount} player{todayCompletionCount !== 1 ? "s" : ""}{" "}
+                      completed today
+                    </p>
+                  )}
                   {leaderboardType === "today" &&
                     renderTimeLeaderboard(
                       leaderboard,

@@ -182,7 +182,7 @@ Summary of all changes on `bugfix/layout` and related work. Includes piece drawe
 
 - **`doc/`** – `SUPABASE_SETUP.md`, `README.md` index, `SESSION_SUMMARY.md`
 - **README** – Tap-to-rotate, piece tray, sample puzzles path, Supabase link, doc structure
-- **Supabase Realtime** – `ALTER PUBLICATION supabase_realtime ADD TABLE puzzle_sessions` (SQL Editor)
+- **Supabase Realtime** – `001_full_schema.sql` adds `puzzle_sessions` and `completions` to publication (idempotent)
 - **PR template** – Testing checklist
 - **CONTRIBUTORS** – “ClocksAbound” → “Phuzzle”
 - **.gitignore** – `test-results/`, `playwright-report/`, `.vitest/`
@@ -228,7 +228,7 @@ Summary of all changes on `bugfix/layout` and related work. Includes piece drawe
 | Layout revert  | `PlayScreen.tsx`, `PlayScreen.module.css`, `PieceTray.tsx`, `PieceTray.module.css`, `global.css`                                                 |
 | Help/Modals    | `Modal.module.css`, `TutorialOverlay.tsx`, `ShortcutsModal.module.css`, `HelpChoiceModal.tsx`                                                    |
 | Packs          | `PackListScreen.tsx`, `PackDetailScreen.tsx`, `packCompletion.ts`, `puzzlePacks.ts`                                                              |
-| Sessions/Co-op | `usePuzzleSession.ts`, `puzzleSessionService.ts`, `003_puzzle_sessions.sql`                                                                      |
+| Sessions/Co-op | `usePuzzleSession.ts`, `puzzleSessionService.ts`, `001_full_schema.sql`                                                                          |
 | Onboarding     | `useOnboarding.ts`, `OnboardingTooltip.tsx`                                                                                                      |
 | Stats          | `StatsScreen.tsx`, `StatsScreen.module.css`                                                                                                      |
 | Time           | `timeMode.ts`, `useTimeModeConfig.ts`, `usePlayScreenTimer.ts`, `PlayHUD.tsx`                                                                    |

@@ -373,8 +373,14 @@ canvas {
   transition: none !important;
 }
 
-/* Mobile typography (PDF: H1 22px, H2 18px, Body 15px) */
+/* Mobile: fill viewport, avoid white bars when address bar shows/hides */
 @media (max-width: 600px) {
+  html,
+  body,
+  #root {
+    min-height: 100dvh;
+    height: 100%;
+  }
   body {
     font-size: var(--font-body-mobile, 15px);
   }

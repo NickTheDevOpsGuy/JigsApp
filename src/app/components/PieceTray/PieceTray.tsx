@@ -12,15 +12,15 @@ import React, {
 import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
-import { Minimize2, Maximize2, Shuffle } from "lucide-react";
+import { Minimize2, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import styles from "./PieceTray.module.css";
 
-type TraySection = "all" | "corners" | "edges" | "center";
-type SortMode = "grid" | "color";
+type TrayFilter = "all" | "edges" | "colors" | "random";
 
 const THUMB_NORMAL = 56;
-const THUMB_COMPACT = 36;
+const THUMB_COMPACT = 44;
+const THUMB_EXTRA_COMPACT = 40;
 
 type Props = {
   pieces: Piece[];
@@ -52,20 +52,31 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   ref,
 ) {
   const isMobile = useMediaQuery("(max-width: 600px)");
-  const [section, setSection] = useState<TraySection>("all");
-  const [sortMode, setSortMode] = useState<SortMode>("grid");
+  const [filter, setFilter] = useState<TrayFilter>("all");
   const [shuffledOrder, setShuffledOrder] = useState<string[] | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScroll, setCanScroll] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const swipeStartY = useRef<number | null>(null);
   const effectiveCollapsed = isMobile ? false : collapsed;
 
-  // Compact mode: default on for 25+ pieces (mobile or desktop); user can toggle
+  // Compact mode: 25+ pieces; extra-compact for 49+ to avoid layout/performance issues
   const compactDefault = pieces.length >= 25;
+  const extraCompactDefault = pieces.length >= 49;
   const [compact, setCompact] = useState(compactDefault);
-  const thumbSize = compact ? THUMB_COMPACT : THUMB_NORMAL;
+  const thumbSize = extraCompactDefault
+    ? THUMB_EXTRA_COMPACT
+    : compact
+      ? THUMB_COMPACT
+      : THUMB_NORMAL;
+
+  useEffect(() => {
+    if (pieces.length >= 25) setCompact(true);
+    else if (pieces.length < 25) setCompact(false);
+  }, [pieces.length]);
 
   // Precompute hue for stable-ish sorting.
   const hueById = useMemo(() => {
@@ -90,29 +101,17 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     return ha - hb || byGrid(a, b);
   };
 
-  const sortPieces = (arr: Piece[]) => {
-    const next = [...arr];
-    if (sortMode === "color" && image) next.sort(byHue);
-    else next.sort(byGrid);
-    return next;
-  };
-
   const shuffleTray = useCallback(() => {
     const ids = pieces.map((p) => p.id);
     const shuffled = [...ids].sort(() => Math.random() - 0.5);
     setShuffledOrder(shuffled);
+    setFilter("random");
   }, [pieces]);
 
-  const sections = useMemo(() => {
-    const corners = pieces.filter((p) => isCorner(p, grid));
+  const displayed = useMemo(() => {
     const edges = pieces.filter((p) => isEdge(p, grid));
-    const center = pieces.filter((p) => !isCorner(p, grid) && !isEdge(p, grid));
-
-    const all = sortPieces(pieces);
-    const cornersS = sortPieces(corners);
-    const edgesS = sortPieces(edges);
-    const centerS = sortPieces(center);
-
+    const allByGrid = [...pieces].sort(byGrid);
+    const allByHue = image ? [...pieces].sort(byHue) : allByGrid;
     const applyShuffle = (arr: Piece[]) => {
       if (!shuffledOrder || arr.length === 0) return arr;
       const orderMap = new Map(shuffledOrder.map((id, i) => [id, i]));
@@ -122,57 +121,132 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       return [...inOrder, ...notInOrder];
     };
 
-    return {
-      all: applyShuffle(all),
-      corners: applyShuffle(cornersS),
-      edges: applyShuffle(edgesS),
-      center: applyShuffle(centerS),
-    };
-  }, [pieces, grid, sortMode, image, hueById, shuffledOrder]);
-
-  const displayed = sections[section];
+    switch (filter) {
+      case "edges":
+        return [...edges].sort(byGrid);
+      case "colors":
+        return allByHue;
+      case "random":
+        return applyShuffle(pieces);
+      default:
+        return allByGrid;
+    }
+  }, [pieces, grid, filter, image, hueById, shuffledOrder]);
 
   const emptyText =
     pieces.length === 0
       ? "All pieces on board! Drag pieces here to store them."
       : "Drag pieces here to store them";
 
-  // Generate jigsaw-shaped thumbnails using the same clip path as the board renderer.
-  const thumbsById = useMemo(() => {
-    const m = new Map<string, string>();
-    if (!image) return m;
+  // Generate jigsaw-shaped thumbnails. For 50+ pieces, batch per frame to avoid blocking.
+  const [thumbsById, setThumbsById] = useState<Map<string, string>>(new Map());
+  const [imageLoadCount, setImageLoadCount] = useState(0);
+  const BATCH_SIZE = 12;
+  const displayedRef = useRef(displayed);
+  displayedRef.current = displayed;
+
+  useEffect(() => {
+    if (!image || displayed.length === 0) {
+      setThumbsById(new Map());
+      return;
+    }
+    if (!image.complete || image.naturalWidth === 0) {
+      const onLoad = () => setImageLoadCount((c) => c + 1);
+      image.addEventListener("load", onLoad);
+      return () => image.removeEventListener("load", onLoad);
+    }
     const padding = compact ? 4 : 6;
     const maxW = thumbSize - padding;
     const maxH = thumbSize - padding;
+    const assembledW = grid.cols * (displayed[0]?.tileW ?? 1);
+    const assembledH = grid.rows * (displayed[0]?.tileH ?? 1);
 
-    for (const p of displayed) {
-      const scale = Math.min(maxW / p.w, maxH / p.h);
-      const assembledW = grid.cols * p.tileW;
-      const assembledH = grid.rows * p.tileH;
-      const c = renderTrayPiece(p, image, assembledW, assembledH, scale);
-      m.set(p.id, c.toDataURL("image/png"));
+    const renderOne = (p: Piece): string | null => {
+      try {
+        if (!p.w || !p.h || p.w <= 0 || p.h <= 0) return null;
+        const scale = Math.min(maxW / p.w, maxH / p.h);
+        if (!Number.isFinite(scale) || scale <= 0) return null;
+        const c = renderTrayPiece(p, image, assembledW, assembledH, scale);
+        return c.toDataURL("image/png");
+      } catch {
+        return null;
+      }
+    };
+
+    if (displayed.length < 60) {
+      const m = new Map<string, string>();
+      for (const p of displayed) {
+        const data = renderOne(p);
+        if (data) m.set(p.id, data);
+      }
+      setThumbsById(m);
+      return;
     }
 
-    return m;
-  }, [displayed, image, grid, thumbSize, compact]);
+    setThumbsById(new Map());
+    let cancelled = false;
+    let index = 0;
+
+    const processBatch = () => {
+      if (cancelled) return;
+      const current = displayedRef.current;
+      const next = new Map<string, string>();
+      const end = Math.min(index + BATCH_SIZE, current.length);
+      for (let i = index; i < end; i++) {
+        const p = current[i];
+        const data = renderOne(p);
+        if (data) next.set(p.id, data);
+      }
+      setThumbsById((prev) => {
+        const merged = new Map(prev);
+        next.forEach((v, k) => merged.set(k, v));
+        return merged;
+      });
+      index += BATCH_SIZE;
+      if (index < displayedRef.current.length) {
+        requestAnimationFrame(processBatch);
+      }
+    };
+
+    processBatch();
+    return () => {
+      cancelled = true;
+    };
+  }, [displayed, image, grid, thumbSize, compact, imageLoadCount]);
 
   const updateScrollProgress = useCallback(() => {
     const el = scrollerRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
     const maxScroll = scrollWidth - clientWidth;
-    // Only show indicator when there's meaningful overflow (avoids rounding/subpixel false positives)
-    setCanScroll(maxScroll > 8);
+    const hasOverflow = maxScroll > 8;
+    setCanScroll(hasOverflow);
+    setCanScrollLeft(hasOverflow && scrollLeft > 4);
+    setCanScrollRight(hasOverflow && scrollLeft < maxScroll - 4);
     const pct = maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, scrollLeft / maxScroll));
     setScrollProgress(pct);
+  }, []);
+
+  const scrollBy = useCallback((delta: number) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: delta, behavior: "smooth" });
   }, []);
 
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
-    updateScrollProgress();
+    const run = () => {
+      updateScrollProgress();
+      if (displayed.length > 20) {
+        requestAnimationFrame(() => requestAnimationFrame(updateScrollProgress));
+        setTimeout(updateScrollProgress, 150);
+        setTimeout(updateScrollProgress, 400);
+      }
+    };
+    run();
     el.addEventListener("scroll", updateScrollProgress);
-    const ro = new ResizeObserver(updateScrollProgress);
+    const ro = new ResizeObserver(run);
     ro.observe(el);
     return () => {
       el.removeEventListener("scroll", updateScrollProgress);
@@ -220,10 +294,11 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
   const pieceCount = grid.rows * grid.cols;
   const isLargeGrid = pieceCount >= 25;
+  const likelyOverflows = displayed.length >= 8;
 
   return (
     <div
-      className={`${styles.tray} ${compact ? styles.trayCompact : ""} ${effectiveCollapsed ? styles.trayCollapsed : ""} ${isLargeGrid ? styles.trayLarge : ""}`}
+      className={`${styles.tray} ${compact ? styles.trayCompact : ""} ${extraCompactDefault ? styles.trayExtraCompact : ""} ${effectiveCollapsed ? styles.trayCollapsed : ""} ${isLargeGrid ? styles.trayLarge : ""}`}
       ref={ref}
     >
       <div
@@ -269,79 +344,45 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
             </button>
           )}
         </div>
-        <div className={styles.controls}>
-          <div className={styles.controlGroup}>
-            <span className={styles.controlLabel}>Filter</span>
-            <div className={styles.segment} aria-label="Tray section">
-              <button
-                type="button"
-                className={section === "all" ? styles.active : undefined}
-                onClick={() => setSection("all")}
-              >
-                All
-              </button>
-              <button
-                type="button"
-                className={section === "edges" ? styles.active : undefined}
-                onClick={() => setSection("edges")}
-              >
-                Edges
-              </button>
-              <button
-                type="button"
-                className={section === "center" ? styles.active : undefined}
-                onClick={() => setSection("center")}
-              >
-                Center
-              </button>
-              <button
-                type="button"
-                className={section === "corners" ? styles.active : undefined}
-                onClick={() => setSection("corners")}
-              >
-                Corners
-              </button>
-            </div>
+        <div className={styles.controls} aria-label="Tray filters">
+          <div className={styles.segment} role="group" aria-label="Filter">
+            <button
+              type="button"
+              className={filter === "all" ? styles.active : undefined}
+              onClick={() => setFilter("all")}
+              aria-pressed={filter === "all"}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              className={filter === "edges" ? styles.active : undefined}
+              onClick={() => setFilter("edges")}
+              aria-pressed={filter === "edges"}
+            >
+              Edges
+            </button>
+            <button
+              type="button"
+              className={filter === "colors" ? styles.active : undefined}
+              onClick={() => image && setFilter("colors")}
+              disabled={!image}
+              aria-pressed={filter === "colors"}
+              title={!image ? "Load an image to enable color sort" : undefined}
+            >
+              Colors
+            </button>
+            <button
+              type="button"
+              className={filter === "random" ? styles.active : undefined}
+              onClick={shuffleTray}
+              disabled={pieces.length === 0}
+              aria-pressed={filter === "random"}
+              title="Shuffle piece order"
+            >
+              Random
+            </button>
           </div>
-
-          <div className={styles.controlGroup}>
-            <span className={styles.controlLabel}>Sort by</span>
-            <div className={styles.segment} aria-label="Sort mode">
-              <button
-                type="button"
-                className={sortMode === "grid" ? styles.active : undefined}
-                onClick={() => {
-                  setSortMode("grid");
-                  setShuffledOrder(null);
-                }}
-              >
-                Position
-              </button>
-              <button
-                type="button"
-                className={sortMode === "color" ? styles.active : undefined}
-                onClick={() => {
-                  setSortMode("color");
-                  setShuffledOrder(null);
-                }}
-                disabled={!image}
-                title={!image ? "Load an image to enable color sorting" : undefined}
-              >
-                Color
-              </button>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className={styles.shuffleBtn}
-            onClick={shuffleTray}
-            disabled={pieces.length === 0}
-            aria-label="Shuffle tray"
-            title="Randomize piece order in tray"
-          >
-            <Shuffle size={14} />
-          </button>
         </div>
       </div>
 
@@ -362,41 +403,67 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       )}
 
       {!effectiveCollapsed && (
-        <div
-          className={`${styles.scroller} ${displayed.length > 0 ? styles.scrollerSnap : ""}`}
-          ref={scrollerRef}
-          role="list"
-        >
-          {displayed.length === 0 ? (
-            <div className={styles.empty}>{emptyText}</div>
-          ) : (
-            <div className={styles.row}>
-              {displayed.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={styles.pieceButton}
-                  onClick={() => onPieceClick(p.id)}
-                  aria-label={`Place piece ${p.id}`}
-                >
-                  <div
-                    className={styles.thumbWrap}
-                    style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+        <div className={styles.scrollerWrap}>
+          {likelyOverflows && (
+            <button
+              type="button"
+              className={styles.scrollBtn}
+              onClick={() => scrollBy(-180)}
+              disabled={!canScrollLeft}
+              aria-label="Scroll left"
+              title="Scroll left"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          )}
+          <div
+            className={`${styles.scroller} ${displayed.length > 0 && displayed.length < 25 ? styles.scrollerSnap : ""}`}
+            ref={scrollerRef}
+            role="list"
+          >
+            {displayed.length === 0 ? (
+              <div className={styles.empty}>{emptyText}</div>
+            ) : (
+              <div className={styles.row}>
+                {displayed.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={styles.pieceButton}
+                    onClick={() => onPieceClick(p.id)}
+                    aria-label={`Place piece ${p.id}`}
                   >
-                    {image ? (
-                      <img
-                        className={styles.thumbImg}
-                        src={thumbsById.get(p.id)}
-                        alt=""
-                        draggable={false}
-                      />
-                    ) : (
-                      <div className={styles.thumbFallback} />
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
+                    <div
+                      className={styles.thumbWrap}
+                      style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+                    >
+                      {image && thumbsById.has(p.id) ? (
+                        <img
+                          className={styles.thumbImg}
+                          src={thumbsById.get(p.id)}
+                          alt=""
+                          draggable={false}
+                        />
+                      ) : (
+                        <div className={styles.thumbFallback} />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {likelyOverflows && (
+            <button
+              type="button"
+              className={styles.scrollBtn}
+              onClick={() => scrollBy(180)}
+              disabled={!canScrollRight}
+              aria-label="Scroll right"
+              title="Scroll right"
+            >
+              <ChevronRight size={20} />
+            </button>
           )}
         </div>
       )}

@@ -4,7 +4,33 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 📐 Layout revert (latest)
+## 📊 Analytics & UX (latest)
+
+### Live completion counter
+
+- **Leaderboard** – Real-time count of players who completed today's daily puzzle
+- **Supabase Realtime** – Subscribes to INSERTs on `completions` for today; updates without refresh
+- **Files** – `leaderboardService.ts` (`getTodayCompletionCount`, `subscribeTodayCompletionCount`), `StatsScreen.tsx`, `001_full_schema.sql`
+
+### Percentile ranking
+
+- **Completion overlay** – Shows "Top X%" (e.g. Top 12%) after puzzle completion
+- **Per grid size** – Calculated against best times for that grid (3×3, 4×4, etc.)
+- **Files** – `leaderboardService.ts` (`getPercentileRank`), `CompletionOverlay.tsx`, `PlayScreen.module.css` (`.percentileRank`)
+
+### Snap proximity visual
+
+- **While dragging** – Glow behind piece intensifies as you get closer to the correct snap point
+- **Proximity-based** – `getSnapPreviewState()` now returns `proximity` (0–1); renderBoard uses it for alpha
+- **Files** – `PuzzleManager.ts`, `renderBoard.ts`, `renderBoardHelpers.ts`
+
+### Supabase changes
+
+- **Single migration** – `001_full_schema.sql` consolidates all tables, RLS, policies, Realtime. Idempotent (safe to re-run). Run `supabase db push` or SQL Editor.
+
+---
+
+## 📐 Layout revert
 
 - **Play screen** – Reverted to board on top, tray below. No stats sidebar; HUD in top bar only. Tray 150px (desktop), 160px (mobile). No collapse on mobile.
 - **Font** – Nunito for UI; Arial removed from fallback stack.
@@ -19,7 +45,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 - **Custom grid hint** – When choosing 81+ pieces, a brief note: "Larger puzzles may run slower on some devices."
 - **Undo cap** – 50 steps for puzzles ≤64 pieces, 25 for 81+ to reduce memory on low-end devices. Previously fixed at 30.
 - **Stats/leaderboard on mobile** – Layout and scrolling fixed so content fits and scrolls inside the card (flex, overflow-y: auto, cardContent wrapper).
-- **E2E coverage** – Stats mobile viewport test; Setup and Daily modal 9×9 preset tests; changelog v8 in all E2E specs.
+- **E2E coverage** – Stats mobile viewport test; Setup and Daily modal 9×9 preset tests; changelog v9 in all E2E specs.
 
 ---
 

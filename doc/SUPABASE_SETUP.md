@@ -52,17 +52,14 @@ Anonymous auth lets users track stats and appear on leaderboards without signing
 
 ---
 
-## 4. Run Database Migrations
+## 4. Run Database Migration
 
-Run the migrations in order so tables and policies are created correctly.
+A single migration file creates all tables, RLS policies, and Realtime publications. It is idempotent (safe to run multiple times).
 
 ### Option A: Supabase Dashboard (SQL Editor)
 
 1. **Dashboard** → **SQL Editor** → **New query**
-2. Copy and run each file in order:
-   - `supabase/migrations/001_initial_schema.sql`
-   - `supabase/migrations/002_player_profiles.sql`
-   - `supabase/migrations/003_puzzle_sessions.sql`
+2. Copy and run `supabase/migrations/001_full_schema.sql` (idempotent – safe to re-run)
 
 ### Option B: Supabase CLI
 
@@ -73,9 +70,9 @@ npx supabase db push
 
 ---
 
-## 5. Enable Realtime (Co-op Puzzles)
+## 5. Enable Realtime
 
-Required for "Play with friend" real-time sessions.
+Required for "Play with friend" co-op sessions and the live today's completion counter on the leaderboard.
 
 ### Option A: Supabase Dashboard (Publications)
 
@@ -83,9 +80,9 @@ Required for "Play with friend" real-time sessions.
 2. In the left sidebar, go to **Database** → **Publications**
    - Direct URL: `https://app.supabase.com/project/<your-project-ref>/database/publications`
 3. Click the **supabase_realtime** publication
-4. Under **Tables**, find `puzzle_sessions` and **toggle it ON**
+4. Under **Tables**, enable `puzzle_sessions` (co-op) and `completions` (live today's count)
 
-If `puzzle_sessions` is missing, run the migrations first (step 4 above).
+If tables are missing, run the migration first (step 4 above).
 
 ### Option B: SQL Editor
 
@@ -96,9 +93,10 @@ If the table isn’t listed or you prefer SQL:
 
 ```sql
 alter publication supabase_realtime add table public.puzzle_sessions;
+alter publication supabase_realtime add table public.completions;
 ```
 
-The migration already sets `REPLICA IDENTITY FULL` on `puzzle_sessions`, so Realtime can send full row data on updates.
+The migration `001_full_schema.sql` adds both idempotently. It also sets `REPLICA IDENTITY FULL` on `puzzle_sessions` so Realtime can send full row data on updates.
 
 ---
 
@@ -150,7 +148,7 @@ Row Level Security (RLS) is enabled on all tables:
 
 **Co-op sessions not syncing / WebSocket "closed before connection established"**
 
-- **Realtime publication:** Ensure `puzzle_sessions` is in the `supabase_realtime` publication (see [Enable Realtime](#5-enable-realtime-co-op-puzzles))
+- **Realtime publication:** Ensure `puzzle_sessions` and `completions` are in the `supabase_realtime` publication (see [Enable Realtime](#5-enable-realtime))
 - **API keys:** Use the **anon** or **publishable** key from Supabase → Settings → API. Both `eyJ...` (JWT) and `sb_publishable_...` formats work
 - **Vercel env vars:** Ensure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set in Vercel → Project → Settings → Environment Variables, then **redeploy**
 - **Browser extensions:** Ad blockers or privacy tools can block WebSockets; try incognito or disable them
@@ -181,5 +179,5 @@ Row Level Security (RLS) is enabled on all tables:
 
 - `src/app/supabase/client.ts` – Supabase client and config
 - `src/app/supabase/auth.ts` – Anonymous auth helpers
-- `supabase/migrations/` – SQL migrations
+- `supabase/migrations/001_full_schema.sql` – Single migration (idempotent)
 - `supabase/README.md` – Shorter reference

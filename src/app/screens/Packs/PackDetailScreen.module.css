@@ -3,15 +3,19 @@
   min-height: 100dvh;
   padding: env(safe-area-inset-top) 16px 24px;
   background: var(--color-bg-primary);
+  overflow-x: hidden;
 }
 
 .card {
   max-width: 520px;
+  width: 100%;
+  min-width: 0;
   margin: 0 auto;
   background: var(--color-bg-card);
   border-radius: 16px;
   padding: 20px;
   box-shadow: var(--shadow-md);
+  overflow-x: hidden;
 }
 
 .header {
@@ -62,13 +66,31 @@
   color: var(--color-text-secondary);
 }
 
+/* Desktop: horizontal scroll left-to-right, constrain to card */
 .puzzleGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.puzzleGrid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.puzzleGrid::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 4px;
 }
 
 .puzzleCard {
+  flex: 0 0 140px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -82,6 +104,7 @@
   transition:
     border-color 0.15s,
     background 0.15s;
+  min-width: 0;
 }
 
 .puzzleCard:hover:not(:disabled) {
@@ -163,16 +186,19 @@
 
 @media (max-width: 600px) {
   .page {
-    padding: env(safe-area-inset-top) 12px max(16px, env(safe-area-inset-bottom));
+    min-height: 100dvh;
+    padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    box-sizing: border-box;
   }
 
   .card {
-    padding: 16px;
+    padding: 14px 12px;
   }
 
   .packHeader {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   .packEmoji {
@@ -187,13 +213,24 @@
     font-size: 13px;
   }
 
+  /* Mobile: wrapping grid – no scroll needed */
   .puzzleGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    overflow: visible;
+    flex-wrap: unset;
+  }
+
+  .puzzleGrid::-webkit-scrollbar {
+    display: none;
   }
 
   .puzzleCard {
-    padding: 10px;
+    flex: unset;
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
   }
 
   .puzzleName {

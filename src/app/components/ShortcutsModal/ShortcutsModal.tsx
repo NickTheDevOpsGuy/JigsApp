@@ -28,26 +28,28 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
         </div>
 
         <div className={styles.content}>
-          <table className={styles.table}>
-            <tbody>
-              {SHORTCUTS.map((shortcut, i) => (
-                <tr
-                  key={i}
-                  aria-label={`${shortcut.ariaAction}: ${shortcut.keys.join(" or ")}`}
-                >
-                  <td className={styles.keys}>
-                    {shortcut.keys.map((key, j) => (
-                      <React.Fragment key={j}>
-                        {j > 0 && <span className={styles.separator}>or</span>}
-                        <kbd className={styles.key}>{formatKey(key)}</kbd>
-                      </React.Fragment>
-                    ))}
-                  </td>
-                  <td className={styles.action}>{shortcut.action}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className={styles.keyboardSection}>
+            <table className={styles.table}>
+              <tbody>
+                {SHORTCUTS.map((shortcut, i) => (
+                  <tr
+                    key={i}
+                    aria-label={`${shortcut.ariaAction}: ${shortcut.keys.join(" or ")}`}
+                  >
+                    <td className={styles.keys}>
+                      {shortcut.keys.map((key, j) => (
+                        <React.Fragment key={j}>
+                          {j > 0 && <span className={styles.separator}>or</span>}
+                          <kbd className={styles.key}>{formatKey(key)}</kbd>
+                        </React.Fragment>
+                      ))}
+                    </td>
+                    <td className={styles.action}>{shortcut.action}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <div className={styles.mouseSection}>
             <h3>🖱️ Mouse / Touch Controls</h3>

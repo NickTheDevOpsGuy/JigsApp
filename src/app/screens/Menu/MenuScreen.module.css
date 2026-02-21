@@ -130,17 +130,25 @@
 }
 
 @media (max-width: 600px) {
-  .card {
-    padding: 20px;
+  .page {
+    min-height: 100dvh;
+    padding: 10px 12px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
   }
 
-  .page {
-    padding: 16px;
+  .card {
+    padding: 14px 16px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .actionCard {
-    min-height: 64px;
+    min-height: 60px;
     padding: 10px;
+    gap: 4px;
   }
 
   .actionLabel {
@@ -148,16 +156,20 @@
   }
 
   .dailyEmoji {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .header {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+  }
+
+  .actionsGrid {
+    gap: 10px;
   }
 
   .menuTip {
-    margin: 10px 0 0;
-    padding: 8px 12px;
+    margin: 8px 0 0;
+    padding: 8px 10px;
     font-size: 12px;
   }
 }

@@ -1184,7 +1184,7 @@ export function PlayScreen() {
           </div>
         </div>
         <div
-          className={`${styles.trayWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
+          className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
           onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
         >
           <PieceTray

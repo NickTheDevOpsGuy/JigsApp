@@ -84,11 +84,9 @@ For **co-op**:
 
 1. **Supabase project** – Create a project at [supabase.com](https://supabase.com).
 2. **Environment variables** – Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (see [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)).
-3. **Database migrations** – Run all migrations, including `003_puzzle_sessions.sql` for the `puzzle_sessions` table.
+3. **Database migrations** – Run `supabase/migrations/001_full_schema.sql` (includes `puzzle_sessions`).
 4. **Anonymous auth** – Enable Anonymous sign-ins in Supabase Auth.
-5. **Realtime** – Add `puzzle_sessions` to the `supabase_realtime` publication:
-   - **Dashboard (UI):** Database → Replication (or Publications) → find `supabase_realtime` → toggle `puzzle_sessions` ON
-   - **SQL:** Run `alter publication supabase_realtime add table public.puzzle_sessions;` in the SQL Editor
+5. **Realtime** – The migration adds `puzzle_sessions` and `completions`. If needed: Database → Replication → toggle both ON, or run the ALTER PUBLICATION commands from [SUPABASE_SETUP.md § Enable Realtime](./SUPABASE_SETUP.md#5-enable-realtime).
 
 See [Verifying Share / Co-op](./SUPABASE_SETUP.md#verifying-share--co-op) in the Supabase doc for a step-by-step check.
 
@@ -98,7 +96,7 @@ See [Verifying Share / Co-op](./SUPABASE_SETUP.md#verifying-share--co-op) in the
 
 ### Co-op: WebSocket "closed before connection established"
 
-1. Add `puzzle_sessions` to the `supabase_realtime` publication (see [SUPABASE_SETUP.md § Enable Realtime](./SUPABASE_SETUP.md#5-enable-realtime-co-op-puzzles))
+1. Ensure `puzzle_sessions` and `completions` are in the Realtime publication (migration adds both; see [SUPABASE_SETUP.md § Enable Realtime](./SUPABASE_SETUP.md#5-enable-realtime))
 2. Confirm `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set in Vercel (or your host) and **redeploy** after adding them
 3. Try incognito or disable ad blockers – some extensions block WebSocket connections
 

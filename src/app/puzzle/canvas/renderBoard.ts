@@ -45,8 +45,8 @@ export type AnimationState = {
   dragDisplayOverrides?: Map<string, { x: number; y: number }>;
   /** Piece IDs to show wrong-rotation hint (position correct, rotation blocks snap) */
   wrongRotationHint?: { groupId: string; pieceIds: string[]; triggeredAt: number };
-  /** Snap preview during drag: soft glow when near, stronger when in range (rotation correct only) */
-  snapPreview?: { nearSnap: boolean; inSnapRange: boolean } | null;
+  /** Snap preview during drag: soft glow when near, stronger when in range (rotation correct only). proximity 0–1 for intensity. */
+  snapPreview?: { nearSnap: boolean; inSnapRange: boolean; proximity: number } | null;
   /** Show very subtle alignment grid matching piece boundaries */
   showAlignmentGrid?: boolean;
 };
@@ -336,13 +336,15 @@ function drawPiece(
     drawSnapGlow(ctx, cx, cy, radius, snapGlowAlpha(popElapsedMs));
   }
 
-  // Preview glow when piece is within snap tolerance during drag (rotation correct only)
+  // Preview glow when piece is within snap tolerance during drag (rotation correct only).
+  // Intensity scales with proximity: stronger when closer to snap point.
   const preview = animState?.snapPreview;
   if (isDragging && preview && (preview.nearSnap || preview.inSnapRange)) {
     const cx = p.x + p.w / 2;
     const cy = p.y + p.h / 2;
     const radius = Math.max(p.w, p.h) * 0.58;
-    const alpha = preview.inSnapRange ? 0.11 : 0.05;
+    const baseAlpha = preview.inSnapRange ? 0.14 : 0.06;
+    const alpha = baseAlpha * (0.4 + 0.6 * preview.proximity);
     drawSnapGlow(ctx, cx, cy, radius, alpha);
   }
 

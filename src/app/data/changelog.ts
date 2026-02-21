@@ -1,11 +1,14 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "8";
+export const CHANGELOG_VERSION = "9";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📊 Live completion counter – See how many players completed today's puzzle in real time on the leaderboard",
+      "🏅 Top X% – Your percentile ranking (e.g. Top 12%) shown on the completion overlay, per grid size",
+      "✨ Snap proximity glow – Visual feedback while dragging: glow intensifies as you near the snap point",
       "📐 Layout reverted – Board on top, tray below. HUD in top bar. Tray 150px (desktop), 160px (mobile).",
       "🔤 Font – Nunito for UI (replaced Inter); Arial removed from fallback stack.",
       "💀 Extreme (9×9) – New 81-piece preset between Legend and Custom",

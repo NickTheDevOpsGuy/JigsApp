@@ -14,6 +14,7 @@ import {
 } from "@/daily/dailyPuzzleCore";
 import { recordCompletion } from "@/services/statsService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
+import { getPercentileRank } from "@/services/leaderboardService";
 import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
 
 interface CompletionOverlayProps {
@@ -48,6 +49,10 @@ export function CompletionOverlay({
   onMenu,
 }: CompletionOverlayProps) {
   const [streak, setStreak] = useState<number>(0);
+  const [percentile, setPercentile] = useState<{
+    topPercent: number;
+    totalPlayers: number;
+  } | null>(null);
   const completionMessage = getCompletionMessage(elapsedSeconds);
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const badge = getCompletionBadge(elapsedSeconds, undoCount, pieceCount);
@@ -69,6 +74,11 @@ export function CompletionOverlay({
       }
     }
   }, [isDaily, elapsedSeconds]);
+
+  useEffect(() => {
+    if (!grid) return;
+    getPercentileRank(grid.rows, grid.cols, elapsedSeconds).then(setPercentile);
+  }, [grid?.rows, grid?.cols, elapsedSeconds]);
 
   useEffect(() => {
     if (!grid) return;
@@ -109,6 +119,9 @@ export function CompletionOverlay({
         {puzzleSizeText != null && <p className={styles.puzzleSize}>{puzzleSizeText}</p>}
         <p>
           Finished in {formatTime(elapsedSeconds)}
+          {percentile && percentile.totalPlayers >= 5 && (
+            <span className={styles.percentileRank}> · Top {percentile.topPercent}%</span>
+          )}
           {isNewBest && <span className={styles.newBest}> — New best!</span>}
           {isDaily && (
             <span className={styles.dailyBadge}>

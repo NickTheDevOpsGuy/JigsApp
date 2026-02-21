@@ -11,10 +11,11 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .actionsSticky {
@@ -28,7 +29,7 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .intro {
@@ -41,7 +42,7 @@
 .section {
   background: var(--color-bg-card);
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 10px 12px;
 }
 
 .sectionTitle {

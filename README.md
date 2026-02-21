@@ -91,6 +91,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ### UX and polish
 
+- **Snap proximity glow** – Visual feedback while dragging: glow intensifies as you near the correct snap point
 - Reference image preview overlay
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
@@ -118,9 +119,11 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - **Co-op** – Play with Friend: share a link and work on the same puzzle together (requires Supabase)
 - Share app / invite testers button (native share on mobile, copy link on desktop)
 
-### Analytics (optional)
+### Analytics
 
-- PostHog integration behind env vars
+- **Live completion counter** – Real-time count of players who completed today's puzzle (Stats → Leaderboard → Today)
+- **Percentile ranking** – "Top X%" shown on completion overlay, calculated per grid size
+- PostHog integration behind env vars (optional)
   - Events like `puzzle_started`, `puzzle_completed`, `puzzle_abandoned`
   - No route inside the app
 
@@ -202,7 +205,7 @@ Useful scripts:
 
 | Doc                                            | Description                                                                                        |
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase setup: leaderboards, stats, achievements, co-op share; env vars, migrations, verification |
+| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase setup: leaderboards, stats, achievements, co-op share; single migration file (idempotent) |
 | [doc/SHARING.md](doc/SHARING.md)               | Completion share (image, social) and co-op (Play with Friend)                                      |
 | [doc/streak-freeze.md](doc/streak-freeze.md)   | Streak freeze: one per week, offered when yesterday wasn't completed                               |
 | [doc/README.md](doc/README.md)                 | Index of docs                                                                                      |
@@ -573,10 +576,7 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │       └── vite-env.d.ts
 ├── supabase
 │   ├── migrations
-│   │   ├── 001_initial_schema.sql
-│   │   ├── 002_player_profiles.sql
-│   │   ├── 003_puzzle_sessions.sql
-│   │   └── 004_puzzle_sessions_expiration.sql
+│   │   └── 001_full_schema.sql
 │   └── README.md
 ├── test-results
 │   ├── home-Home-Menu-shows-main-action-buttons-webkit-retry2

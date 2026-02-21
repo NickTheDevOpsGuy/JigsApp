@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Today's Puzzle modal", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "8");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "9");
     });
   });
 

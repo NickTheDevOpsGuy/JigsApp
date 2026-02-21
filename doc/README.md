@@ -31,4 +31,4 @@ Setup and reference guides for developers.
 ## Quick Links
 
 - **Main README** – [../README.md](../README.md) – Features, getting started, project structure
-- **Supabase migrations** – [../supabase/migrations/](../supabase/migrations/) – SQL schema
+- **Supabase migrations** – [../supabase/migrations/](../supabase/migrations/) – Single file `001_full_schema.sql` (idempotent)

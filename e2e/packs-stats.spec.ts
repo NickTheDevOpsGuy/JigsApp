@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Packs and Stats", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "8");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "9");
     });
   });
 
@@ -33,7 +33,12 @@ test.describe("Packs and Stats", () => {
     await expect(page.getByRole("button", { name: /back/i }).first()).toBeVisible({
       timeout: 5000,
     });
-    await expect(page.getByTestId("stats-card-content")).toBeAttached();
-    await expect(page.getByRole("tab", { name: /dashboard|dash/i })).toBeVisible();
+    await expect(page.getByTestId("stats-card-content")).toBeVisible({ timeout: 5000 });
+    // With Supabase: tabs (Dashboard, etc.). Without: Connect Supabase message.
+    await expect(
+      page
+        .getByRole("tab", { name: /dashboard|dash/i })
+        .or(page.getByText(/connect supabase/i)),
+    ).toBeVisible({ timeout: 5000 });
   });
 });

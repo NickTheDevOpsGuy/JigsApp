@@ -1,14 +1,14 @@
 /**
  * SetupScreen – image picker (gallery/upload/camera), grid config, time mode, launch to Play.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/samplePuzzles";
 import { setCurrentPuzzleId } from "@/data/packCompletion";
 import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
-import { ArrowLeft, Trash2, Play, Camera } from "lucide-react";
+import { ArrowLeft, Trash2, Play, Camera, ChevronLeft, ChevronRight } from "lucide-react";
 import { useImagePicker, useGridConfig, GRID_OPTIONS } from "./hooks";
 import { CameraCapture } from "./components/CameraCapture";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
@@ -107,6 +107,42 @@ export function SetupScreen() {
 
   const suggestedGrid = useMemo(() => getSuggestedGrid(getBestTime), []);
   const isMobile = useMediaQuery("(max-width: 520px)");
+  const filteredPuzzles =
+    selectedCategory === "all"
+      ? SAMPLE_PUZZLES
+      : SAMPLE_PUZZLES.filter((p) => p.category === selectedCategory);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  useEffect(() => {
+    const el = galleryRef.current;
+    if (!el) return;
+    const update = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      const maxScroll = scrollWidth - clientWidth;
+      const hasOverflow = maxScroll > 8;
+      setCanScrollLeft(hasOverflow && scrollLeft > 4);
+      setCanScrollRight(hasOverflow && scrollLeft < maxScroll - 4);
+    };
+    update();
+    el.addEventListener("scroll", update);
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    setTimeout(update, 100);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, [filteredPuzzles.length, selectedCategory]);
+
+  // Scroll preview into view when image is selected
+  useEffect(() => {
+    if (imgDataUrl && previewRef.current) {
+      previewRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [imgDataUrl]);
 
   // Load existing image on mount
   useEffect(() => {
@@ -125,11 +161,6 @@ export function SetupScreen() {
       setCurrentPuzzleId(puzzleIdParam);
     }
   }, [puzzleIdParam, selectGalleryPuzzle]);
-
-  const filteredPuzzles =
-    selectedCategory === "all"
-      ? SAMPLE_PUZZLES
-      : SAMPLE_PUZZLES.filter((p) => p.category === selectedCategory);
 
   const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -169,227 +200,271 @@ export function SetupScreen() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>
-          {isPackFlow && selectedPuzzle ? selectedPuzzle.name : "🧩 New Puzzle"}
-        </h1>
+        <div className={styles.cardBody}>
+          <h1 className={styles.title}>
+            {isPackFlow && selectedPuzzle ? selectedPuzzle.name : "🧩 New Puzzle"}
+          </h1>
 
-        {error && (
-          <div className={styles.error} role="alert">
-            <span>{error}</span>
+          {error && (
+            <div className={styles.error} role="alert">
+              <span>{error}</span>
+              <button
+                type="button"
+                className={styles.errorClose}
+                onClick={clearError}
+                aria-label="Dismiss error"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          {/* Standard workflow: source tabs + gallery/upload/camera */}
+          {!isPackFlow && (
+            <>
+              <div className={styles.tabs} role="tablist" aria-label="Image source">
+                <button
+                  role="tab"
+                  aria-selected={imageSource === "gallery"}
+                  aria-controls="image-source-panel"
+                  className={`${styles.tab} ${imageSource === "gallery" ? styles.tabActive : ""}`}
+                  onClick={() => setImageSource("gallery")}
+                >
+                  🖼️ Gallery
+                </button>
+                <button
+                  role="tab"
+                  aria-selected={imageSource === "upload"}
+                  aria-controls="image-source-panel"
+                  className={`${styles.tab} ${imageSource === "upload" ? styles.tabActive : ""}`}
+                  onClick={() => setImageSource("upload")}
+                >
+                  📤 Upload
+                </button>
+                <button
+                  role="tab"
+                  aria-selected={imageSource === "camera"}
+                  aria-controls="image-source-panel"
+                  className={`${styles.tab} ${imageSource === "camera" ? styles.tabActive : ""}`}
+                  onClick={() => setImageSource("camera")}
+                >
+                  <Camera size={16} />
+                  📷 Camera
+                </button>
+              </div>
+
+              <div
+                id="image-source-panel"
+                className={styles.imageSourcePanel}
+                role="tabpanel"
+              >
+                {imageSource === "gallery" ? (
+                  <>
+                    <div className={styles.categories}>
+                      {CATEGORIES.map((cat) => (
+                        <button
+                          key={cat.id}
+                          className={`${styles.categoryBtn} ${selectedCategory === cat.id ? styles.categoryBtnActive : ""}`}
+                          onClick={() => setSelectedCategory(cat.id)}
+                        >
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className={styles.galleryWrap}>
+                      {isMobile && filteredPuzzles.length > 4 && (
+                        <button
+                          type="button"
+                          className={styles.galleryScrollBtn}
+                          onClick={() =>
+                            galleryRef.current?.scrollBy({
+                              left: -200,
+                              behavior: "smooth",
+                            })
+                          }
+                          disabled={!canScrollLeft}
+                          aria-label="Scroll left"
+                        >
+                          <ChevronLeft size={24} />
+                        </button>
+                      )}
+                      <div className={styles.gallery} ref={galleryRef} role="list">
+                        {filteredPuzzles.length === 0 ? (
+                          <div className={styles.galleryEmpty}>
+                            No puzzles in this category yet
+                          </div>
+                        ) : (
+                          filteredPuzzles.map((puzzle) => (
+                            <GalleryThumbnail
+                              key={puzzle.id}
+                              puzzle={puzzle}
+                              isSelected={selectedPuzzle?.id === puzzle.id}
+                              isLoading={isLoading}
+                              onSelect={() => selectGalleryPuzzle(puzzle)}
+                            />
+                          ))
+                        )}
+                      </div>
+                      {isMobile && filteredPuzzles.length > 4 && (
+                        <button
+                          type="button"
+                          className={styles.galleryScrollBtn}
+                          onClick={() =>
+                            galleryRef.current?.scrollBy({
+                              left: 200,
+                              behavior: "smooth",
+                            })
+                          }
+                          disabled={!canScrollRight}
+                          aria-label="Scroll right"
+                        >
+                          <ChevronRight size={24} />
+                        </button>
+                      )}
+                    </div>
+                  </>
+                ) : imageSource === "upload" ? (
+                  <label className={styles.label}>
+                    Choose a Photo (PNG/JPG/WebP)
+                    <input
+                      aria-label="Choose a photo (PNG, JPG, or WebP)"
+                      className={styles.file}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={handlePickFile}
+                      disabled={isLoading}
+                    />
+                  </label>
+                ) : (
+                  <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
+                )}
+              </div>
+            </>
+          )}
+
+          {!isMobile && (
+            <p className={styles.difficultySummary}>
+              {effectiveRows * effectiveCols} pieces
+              {isCustom
+                ? " · Custom"
+                : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
+            </p>
+          )}
+          {suggestedGrid && gridIndex !== suggestedGrid.gridIndex && !isMobile && (
             <button
               type="button"
-              className={styles.errorClose}
-              onClick={clearError}
-              aria-label="Dismiss error"
+              className={styles.difficultySuggestion}
+              onClick={() => setGridIndex(suggestedGrid.gridIndex)}
             >
-              ×
+              Based on your progress, try {suggestedGrid.rows}×{suggestedGrid.cols} next →
             </button>
-          </div>
-        )}
-
-        {/* Standard workflow: source tabs + gallery/upload/camera */}
-        {!isPackFlow && (
-          <>
-            <div className={styles.tabs} role="tablist" aria-label="Image source">
-              <button
-                role="tab"
-                aria-selected={imageSource === "gallery"}
-                aria-controls="image-source-panel"
-                className={`${styles.tab} ${imageSource === "gallery" ? styles.tabActive : ""}`}
-                onClick={() => setImageSource("gallery")}
-              >
-                🖼️ Gallery
-              </button>
-              <button
-                role="tab"
-                aria-selected={imageSource === "upload"}
-                aria-controls="image-source-panel"
-                className={`${styles.tab} ${imageSource === "upload" ? styles.tabActive : ""}`}
-                onClick={() => setImageSource("upload")}
-              >
-                📤 Upload
-              </button>
-              <button
-                role="tab"
-                aria-selected={imageSource === "camera"}
-                aria-controls="image-source-panel"
-                className={`${styles.tab} ${imageSource === "camera" ? styles.tabActive : ""}`}
-                onClick={() => setImageSource("camera")}
-              >
-                <Camera size={16} />
-                📷 Camera
-              </button>
-            </div>
-
-            <div id="image-source-panel" role="tabpanel">
-              {imageSource === "gallery" ? (
-                <>
-                  <div className={styles.categories}>
-                    {CATEGORIES.map((cat) => (
-                      <button
-                        key={cat.id}
-                        className={`${styles.categoryBtn} ${selectedCategory === cat.id ? styles.categoryBtnActive : ""}`}
-                        onClick={() => setSelectedCategory(cat.id)}
-                      >
-                        {cat.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className={styles.gallery}>
-                    {filteredPuzzles.length === 0 ? (
-                      <div className={styles.galleryEmpty}>
-                        No puzzles in this category yet
-                      </div>
-                    ) : (
-                      filteredPuzzles.map((puzzle) => (
-                        <GalleryThumbnail
-                          key={puzzle.id}
-                          puzzle={puzzle}
-                          isSelected={selectedPuzzle?.id === puzzle.id}
-                          isLoading={isLoading}
-                          onSelect={() => selectGalleryPuzzle(puzzle)}
-                        />
-                      ))
-                    )}
-                  </div>
-                </>
-              ) : imageSource === "upload" ? (
-                <label className={styles.label}>
-                  Choose a Photo (PNG/JPG/WebP)
-                  <input
-                    aria-label="Choose a photo (PNG, JPG, or WebP)"
-                    className={styles.file}
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    onChange={handlePickFile}
-                    disabled={isLoading}
-                  />
-                </label>
-              ) : (
-                <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
-              )}
-            </div>
-          </>
-        )}
-
-        <p className={styles.difficultySummary}>
-          {effectiveRows * effectiveCols} pieces
-          {isCustom ? " · Custom" : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
-        </p>
-        {suggestedGrid && gridIndex !== suggestedGrid.gridIndex && !isMobile && (
-          <button
-            type="button"
-            className={styles.difficultySuggestion}
-            onClick={() => setGridIndex(suggestedGrid.gridIndex)}
-          >
-            Based on your progress, try {suggestedGrid.rows}×{suggestedGrid.cols} next →
-          </button>
-        )}
-        <div className={styles.configGrid}>
-          <Dropdown
-            label="Difficulty"
-            compact={isMobile}
-            value={gridIndex}
-            onChange={(val: string) => setGridIndex(Number(val))}
-            options={GRID_OPTIONS.map((opt, i) => ({
-              value: i,
-              label:
-                opt.rows > 0
-                  ? isMobile && opt.labelIcon
-                    ? opt.labelIcon
-                    : isMobile && opt.labelShort
-                      ? opt.labelShort
-                      : opt.label
-                  : isMobile
-                    ? `Custom ${customRows}×${customCols} (${customRows * customCols} pieces)`
-                    : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
-            }))}
-            fullWidth
-          />
-
-          <Dropdown
-            label="Time mode"
-            compact={isMobile}
-            value={timeMode}
-            onChange={(val: string) => setTimeMode(val as TimeMode)}
-            options={(
-              ["elapsed", "countdown", "active", "relaxed", "best"] as TimeMode[]
-            ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
-            fullWidth
-          />
-
-          {timeMode === "countdown" && (
+          )}
+          <div className={styles.configGrid}>
             <Dropdown
-              label="Countdown"
+              label="Difficulty"
               compact={isMobile}
-              value={countdownMinutes}
-              onChange={(val: string) => setCountdownMinutes(Number(val))}
-              options={COUNTDOWN_OPTIONS.map((m) => ({
-                value: m,
-                label: `${m} min`,
+              value={gridIndex}
+              onChange={(val: string) => setGridIndex(Number(val))}
+              options={GRID_OPTIONS.map((opt, i) => ({
+                value: i,
+                label:
+                  opt.rows > 0
+                    ? isMobile && opt.labelIcon
+                      ? opt.labelIcon
+                      : isMobile && opt.labelShort
+                        ? opt.labelShort
+                        : opt.label
+                    : isMobile
+                      ? `Custom ${customRows}×${customCols} (${customRows * customCols} pieces)`
+                      : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
               }))}
               fullWidth
             />
-          )}
-        </div>
 
-        {isCustom && (
-          <div>
-            <div className={styles.customGrid}>
-              <label className={styles.customGridLabel}>
-                Rows
-                <input
-                  type="number"
-                  min={minGrid}
-                  max={maxGrid}
-                  value={customRows}
-                  onChange={(e) => {
-                    const v = parseInt(e.target.value, 10);
-                    setCustomRows(
-                      isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
-                    );
-                  }}
-                  className={styles.customGridInput}
-                />
-              </label>
-              <span className={styles.customGridTimes}>×</span>
-              <label className={styles.customGridLabel}>
-                Cols
-                <input
-                  type="number"
-                  min={minGrid}
-                  max={maxGrid}
-                  value={customCols}
-                  onChange={(e) => {
-                    const v = parseInt(e.target.value, 10);
-                    setCustomCols(
-                      isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
-                    );
-                  }}
-                  className={styles.customGridInput}
-                />
-              </label>
-            </div>
-            {customRows * customCols >= 81 && (
-              <p className={styles.customGridHint}>
-                Larger puzzles may run slower on some devices.
-              </p>
+            <Dropdown
+              label="Time mode"
+              compact={isMobile}
+              value={timeMode}
+              onChange={(val: string) => setTimeMode(val as TimeMode)}
+              options={(
+                ["elapsed", "countdown", "active", "relaxed", "best"] as TimeMode[]
+              ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
+              fullWidth
+            />
+
+            {timeMode === "countdown" && (
+              <Dropdown
+                label="Countdown"
+                compact={isMobile}
+                value={countdownMinutes}
+                onChange={(val: string) => setCountdownMinutes(Number(val))}
+                options={COUNTDOWN_OPTIONS.map((m) => ({
+                  value: m,
+                  label: `${m} min`,
+                }))}
+                fullWidth
+              />
             )}
           </div>
-        )}
 
-        <div className={styles.preview}>
-          {isLoading ? (
-            <div className={styles.previewEmpty}>Loading...</div>
-          ) : imgDataUrl ? (
-            <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
-          ) : (
-            <div className={styles.previewEmpty}>Select an image above</div>
+          {isCustom && (
+            <div>
+              <div className={styles.customGrid}>
+                <label className={styles.customGridLabel}>
+                  Rows
+                  <input
+                    type="number"
+                    min={minGrid}
+                    max={maxGrid}
+                    value={customRows}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value, 10);
+                      setCustomRows(
+                        isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
+                      );
+                    }}
+                    className={styles.customGridInput}
+                  />
+                </label>
+                <span className={styles.customGridTimes}>×</span>
+                <label className={styles.customGridLabel}>
+                  Cols
+                  <input
+                    type="number"
+                    min={minGrid}
+                    max={maxGrid}
+                    value={customCols}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value, 10);
+                      setCustomCols(
+                        isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
+                      );
+                    }}
+                    className={styles.customGridInput}
+                  />
+                </label>
+              </div>
+              {customRows * customCols >= 81 && (
+                <p className={styles.customGridHint}>
+                  Larger puzzles may run slower on some devices.
+                </p>
+              )}
+            </div>
           )}
+
+          <div className={styles.preview} ref={previewRef}>
+            {isLoading ? (
+              <div className={styles.previewEmpty}>Loading...</div>
+            ) : imgDataUrl ? (
+              <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
+            ) : (
+              <div className={styles.previewEmpty}>Select an image above</div>
+            )}
+          </div>
         </div>
 
-        <div className={styles.row}>
+        <div className={styles.actionRow}>
           <Button onClick={() => nav("/")} aria-label="Back to menu">
             <ArrowLeft size={18} />
             Back
@@ -397,7 +472,7 @@ export function SetupScreen() {
 
           <Button onClick={handleClear} disabled={isLoading} aria-label="Clear image">
             <Trash2 size={18} />
-            🗑️ Clear
+            Clear
           </Button>
 
           <Button
@@ -407,7 +482,7 @@ export function SetupScreen() {
             aria-label="Start puzzle"
           >
             <Play size={18} />
-            🧩 Start Puzzle
+            Start Puzzle
           </Button>
         </div>
       </div>

@@ -18,11 +18,9 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ## 3. Run the migrations
 
-In the Supabase dashboard **SQL Editor**, run each migration in order:
+In the Supabase dashboard **SQL Editor**, run the migration:
 
-1. `migrations/001_initial_schema.sql` – player_stats, completions, user_achievements, RLS
-2. `migrations/002_player_profiles.sql` – player_profiles (display name, show_on_leaderboard for anonymous mode)
-3. `migrations/003_puzzle_sessions.sql` – puzzle_sessions (co-op real-time sharing)
+1. `migrations/001_full_schema.sql` – All tables, RLS, policies, Realtime (idempotent – safe to re-run)
 
 Or use the Supabase CLI:
 
@@ -34,12 +32,9 @@ supabase db push
 
 In **Authentication > Providers**, enable **Anonymous sign-ins**. This lets users track stats without creating an account.
 
-## Enable Realtime for co-op puzzles
+## Enable Realtime
 
-For shared puzzle sessions (real-time co-op), add `puzzle_sessions` to the Realtime publication:
-
-1. In Supabase dashboard: **Database > Replication**
-2. Enable replication for the **puzzle_sessions** table
+The migration adds `puzzle_sessions` and `completions` to the Realtime publication. If needed, enable in **Database > Replication** for both tables.
 
 ## Tables
 

@@ -35,7 +35,7 @@
   border: 1px solid var(--color-border);
   max-width: 480px;
   width: 90%;
-  max-height: 85vh;
+  max-height: min(95dvh, 640px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -102,11 +102,44 @@
 }
 
 .content {
-  padding: 20px 24px;
+  padding: 16px 20px;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Two-column layout on wider screens – fits without scrolling */
+@media (min-width: 680px) {
+  .content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
+    align-items: start;
+  }
+
+  .keyboardSection {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .mouseSection:nth-of-type(1) {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .mouseSection:nth-of-type(2) {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+.keyboardSection {
+  margin: 0;
 }
 
 .table {
@@ -123,7 +156,7 @@
 }
 
 .table td {
-  padding: 10px 0;
+  padding: 6px 0;
   vertical-align: middle;
 }
 
@@ -161,14 +194,14 @@
 }
 
 .mouseSection {
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 14px;
+  padding-top: 12px;
   border-top: 1px solid var(--color-border);
 }
 
 .mouseSection h3 {
-  margin: 0 0 16px 0;
-  font-size: 1rem;
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -194,7 +227,7 @@
 /* Mobile: stacked layout, compact height, X always visible in header */
 @media (max-width: 500px) {
   .modal {
-    max-height: 75vh;
+    max-height: min(92dvh, 580px);
     border-radius: 12px;
     max-width: 95%;
   }

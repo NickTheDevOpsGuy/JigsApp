@@ -322,8 +322,13 @@ export class PuzzleManager {
   /**
    * Preview state for snap glow during drag. Only when rotation is correct.
    * nearSnap = within 1.5x tolerance (soft outline). inSnapRange = within tolerance, will snap on release.
+   * proximity = 0–1, stronger when closer to snap point (for intensity-based visual feedback).
    */
-  public getSnapPreviewState(): { nearSnap: boolean; inSnapRange: boolean } | null {
+  public getSnapPreviewState(): {
+    nearSnap: boolean;
+    inSnapRange: boolean;
+    proximity: number;
+  } | null {
     const activeId = this.drag.activeId;
     if (!activeId) return null;
 
@@ -339,12 +344,16 @@ export class PuzzleManager {
     const dy = active.targetY - activeTile.y;
     const distance = Math.hypot(dx, dy);
     const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
+    const nearThreshold = tolerance * 1.5;
     const wouldOverlap = this.wouldOverlapAnyOtherGroup(gid, dx, dy);
 
     const inSnapRange = distance <= tolerance && !wouldOverlap;
-    const nearSnap = distance <= tolerance * 1.5 && !wouldOverlap;
+    const nearSnap = distance <= nearThreshold && !wouldOverlap;
 
-    return { nearSnap: nearSnap || inSnapRange, inSnapRange };
+    // Proximity: 1 = at snap point, 0 = at edge of nearSnap zone. Smooth gradient for visual feedback.
+    const proximity = nearSnap ? Math.max(0, 1 - distance / nearThreshold) : 0;
+
+    return { nearSnap: nearSnap || inSnapRange, inSnapRange, proximity };
   }
 
   /* ---------------- Public API ---------------- */

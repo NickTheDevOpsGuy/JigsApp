@@ -111,11 +111,15 @@
 
 @media (max-width: 600px) {
   .page {
-    padding: env(safe-area-inset-top) 12px max(16px, env(safe-area-inset-bottom));
+    min-height: 100dvh;
+    padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    box-sizing: border-box;
   }
 
   .card {
-    padding: 16px;
+    padding: 14px 12px;
+    margin-bottom: 0;
   }
 
   .title {
@@ -124,11 +128,15 @@
 
   .subtitle {
     font-size: 13px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+  }
+
+  .packGrid {
+    gap: 10px;
   }
 
   .packCard {
-    padding: 12px 14px;
+    padding: 12px;
     gap: 12px;
   }
 
