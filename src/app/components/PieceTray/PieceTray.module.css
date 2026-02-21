@@ -2,7 +2,7 @@
 
 .tray {
   height: 28vh;
-  min-height: 120px;
+  min-height: 100px;
   transition: height 0.25s ease;
   flex-shrink: 0;
   min-width: 0;
@@ -63,11 +63,11 @@
   color: var(--color-text-secondary);
 }
 
-/* Collapsed: 8vh, hide header content and scroller (PDF) */
+/* Collapsed: 8vh desktop, 6vh mobile; hide header content and scroller (PDF) */
 .trayCollapsed,
 .trayLarge.trayCollapsed {
   height: 8vh;
-  min-height: 56px;
+  min-height: 48px;
 }
 
 .trayCollapsed .header {
@@ -341,33 +341,29 @@
   padding-inline-end: max(16px, env(safe-area-inset-right, 0));
 }
 
-/* Mobile adjustments – collapse only on mobile */
-@media (min-width: 601px) {
-  .handle {
-    display: none;
-  }
+/* Unified sidebar layout: tray fills column at all breakpoints */
+.tray,
+.trayLarge,
+.trayCollapsed,
+.trayLarge.trayCollapsed {
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+}
+
+/* Hide collapse handle – tray is always visible in sidebar */
+.handle {
+  display: none;
 }
 
 @media (max-width: 600px) {
   .tray {
-    margin: 0 max(6px, env(safe-area-inset-left, 0)) 6px
-      max(6px, env(safe-area-inset-right, 0));
-    height: 28vh;
-    min-height: 120px;
-  }
-
-  .trayCollapsed {
-    height: 8vh;
-    min-height: 48px;
-  }
-
-  .trayLarge:not(.trayCollapsed) {
-    height: 32vh;
+    margin: 0 4px 4px 4px;
   }
 
   .header {
-    padding: 4px 8px;
-    font-size: 12px;
+    padding: 4px 6px;
+    font-size: 11px;
   }
 
   .help {
@@ -375,38 +371,37 @@
   }
 
   .controls {
-    padding: 3px 6px;
-    gap: 4px;
+    padding: 2px 4px;
+    gap: 2px;
   }
 
   .segment button,
   .sort button {
-    padding: 3px 6px;
-    font-size: 10px;
+    padding: 2px 4px;
+    font-size: 9px;
   }
 
   .thumbWrap {
-    width: 44px;
-    height: 44px;
-  }
-
-  .pieceButton {
-    min-width: 48px;
-    min-height: 48px;
-  }
-
-  /* Mobile compact overrides */
-  .trayCompact .thumbWrap {
     width: 36px;
     height: 36px;
   }
 
-  .trayCompact .pieceButton {
+  .pieceButton {
     min-width: 40px;
     min-height: 40px;
   }
 
+  .trayCompact .thumbWrap {
+    width: 28px;
+    height: 28px;
+  }
+
+  .trayCompact .pieceButton {
+    min-width: 32px;
+    min-height: 32px;
+  }
+
   .trayCompact .scrollIndicator {
-    margin: 0 6px 2px;
+    margin: 0 4px 2px;
   }
 }

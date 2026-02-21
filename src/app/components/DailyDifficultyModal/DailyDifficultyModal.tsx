@@ -3,6 +3,7 @@
  */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Modal } from "@/components/Modal/Modal";
 import {
   GRID_OPTIONS,
@@ -23,6 +24,7 @@ type Props = {
 
 export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
+  const isMobile = useMediaQuery("(max-width: 520px)");
   const [dailyModule, setDailyModule] = useState<
     typeof import("@/daily/dailyPuzzle") | null
   >(null);
@@ -129,10 +131,16 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
             className={styles.difficultyBtn}
             onClick={() => handleStart({ rows: opt.rows, cols: opt.cols })}
           >
-            <span className={styles.difficultyLabel}>{opt.label}</span>
-            <span className={styles.difficultyPieces}>
-              {opt.rows}×{opt.cols} · {opt.pieces} pieces
-            </span>
+            {isMobile ? (
+              <span className={styles.difficultyLabel}>{opt.labelCompact}</span>
+            ) : (
+              <>
+                <span className={styles.difficultyLabel}>{opt.label}</span>
+                <span className={styles.difficultyPieces}>
+                  {opt.rows}×{opt.cols} · {opt.pieces} pieces
+                </span>
+              </>
+            )}
           </button>
         ))}
       </div>

@@ -296,9 +296,11 @@ export function SetupScreen() {
               value: i,
               label:
                 opt.rows > 0
-                  ? isMobile && opt.labelShort
-                    ? opt.labelShort
-                    : opt.label
+                  ? isMobile && opt.labelIcon
+                    ? opt.labelIcon
+                    : isMobile && opt.labelShort
+                      ? opt.labelShort
+                      : opt.label
                   : isMobile
                     ? `Custom ${customRows}×${customCols}`
                     : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,

@@ -55,7 +55,8 @@
             (msg.includes("Failed to fetch dynamically imported module") ||
               msg.includes("Importing a module script failed") ||
               msg.includes("Loading chunk") ||
-              msg.includes("ChunkLoadError"))
+              msg.includes("ChunkLoadError") ||
+              msg.includes("Unable to preload CSS"))
           );
         }
         window.addEventListener("error", function (e) {

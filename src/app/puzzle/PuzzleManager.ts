@@ -468,11 +468,16 @@ export class PuzzleManager {
     const effW = rot === 90 || rot === 270 ? piece.h : piece.w;
     const effH = rot === 90 || rot === 270 ? piece.w : piece.h;
 
+    // Piece (x,y) is container top-left; rotated bbox is centered at (x+w/2, y+h/2) with size effW×effH
+    // Bbox top-left = (x + piece.w/2 - effW/2, y + piece.h/2 - effH/2)
+    const offsetX = (piece.w - effW) / 2;
+    const offsetY = (piece.h - effH) / 2;
+
     const pad = 16;
-    const xMin = pad;
-    const xMax = Math.max(pad, this.boardWidth - effW - pad);
-    const yMin = pad;
-    const yMax = Math.max(pad, this.boardHeight - effH - pad);
+    const xMin = pad - offsetX;
+    const xMax = Math.max(xMin, this.boardWidth - effW - pad - offsetX);
+    const yMin = pad - offsetY;
+    const yMax = Math.max(yMin, this.boardHeight - effH - pad - offsetY);
 
     const boardPieces = this.state.pieces.filter((p) => !p.inTray);
     const MOVE_FROM_TRAY_RETRY_MAX = 24;
@@ -480,15 +485,37 @@ export class PuzzleManager {
     let x = this.rand(xMin, xMax);
     let y = this.rand(yMin, yMax);
     for (let retry = 0; retry < MOVE_FROM_TRAY_RETRY_MAX; retry++) {
-      x = _clamp(this.rand(xMin, xMax), 0, Math.max(0, this.boardWidth - effW));
-      y = _clamp(this.rand(yMin, yMax), 0, Math.max(0, this.boardHeight - effH));
+      x = _clamp(
+        this.rand(xMin, xMax),
+        pad - offsetX,
+        Math.max(pad - offsetX, this.boardWidth - effW - pad - offsetX),
+      );
+      y = _clamp(
+        this.rand(yMin, yMax),
+        pad - offsetY,
+        Math.max(pad - offsetY, this.boardHeight - effH - pad - offsetY),
+      );
 
+      // Overlap: our bbox is (x+offsetX, y+offsetY, effW, effH)
+      const ourLeft = x + offsetX;
+      const ourTop = y + offsetY;
       let overlaps = false;
       for (const p of boardPieces) {
         const pr = p.rotation % 360;
         const pw = pr === 90 || pr === 270 ? p.h : p.w;
         const ph = pr === 90 || pr === 270 ? p.w : p.h;
-        if (!(x + effW <= p.x || p.x + pw <= x || y + effH <= p.y || p.y + ph <= y)) {
+        const pOffX = (p.w - pw) / 2;
+        const pOffY = (p.h - ph) / 2;
+        const pLeft = p.x + pOffX;
+        const pTop = p.y + pOffY;
+        if (
+          !(
+            ourLeft + effW <= pLeft ||
+            pLeft + pw <= ourLeft ||
+            ourTop + effH <= pTop ||
+            pTop + ph <= ourTop
+          )
+        ) {
           overlaps = true;
           break;
         }

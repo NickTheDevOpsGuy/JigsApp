@@ -34,7 +34,7 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("list")).toBeVisible({ timeout: 15000 });
   });
 
-  test("tray handle visible on mobile, toggles collapse", async ({ page }) => {
+  test("tray visible on mobile (sidebar layout)", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/play");
 
@@ -43,11 +43,7 @@ test.describe("Play screen", () => {
     ).toBeVisible({
       timeout: 15000,
     });
-    const handle = page.getByRole("button", { name: /collapse piece drawer/i });
-    await expect(handle).toBeVisible();
-    await handle.click();
-    await expect(
-      page.getByRole("button", { name: /expand piece drawer/i }),
-    ).toBeVisible();
+    // Unified layout: tray in left sidebar, always visible (no collapse handle)
+    await expect(page.getByRole("list")).toBeVisible({ timeout: 5000 });
   });
 });

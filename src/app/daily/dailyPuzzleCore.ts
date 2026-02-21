@@ -4,12 +4,12 @@
  * For puzzle selection, dynamically import dailyPuzzle.
  */
 export const GRID_OPTIONS = [
-  { rows: 3, cols: 3, label: "Easy 🌱", pieces: 9 },
-  { rows: 4, cols: 4, label: "Medium ⚡", pieces: 16 },
-  { rows: 5, cols: 5, label: "Hard 🔥", pieces: 25 },
-  { rows: 6, cols: 6, label: "Expert 👑", pieces: 36 },
-  { rows: 7, cols: 7, label: "Master 🧠", pieces: 49 },
-  { rows: 8, cols: 8, label: "Legend 🔮", pieces: 64 },
+  { rows: 3, cols: 3, label: "Easy 🌱", labelCompact: "🌱 3×3", pieces: 9 },
+  { rows: 4, cols: 4, label: "Medium ⚡", labelCompact: "⚡ 4×4", pieces: 16 },
+  { rows: 5, cols: 5, label: "Hard 🔥", labelCompact: "🔥 5×5", pieces: 25 },
+  { rows: 6, cols: 6, label: "Expert 👑", labelCompact: "👑 6×6", pieces: 36 },
+  { rows: 7, cols: 7, label: "Master 🧠", labelCompact: "🧠 7×7", pieces: 49 },
+  { rows: 8, cols: 8, label: "Legend 🔮", labelCompact: "🔮 8×8", pieces: 64 },
 ] as const;
 
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";
