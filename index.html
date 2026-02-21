@@ -81,12 +81,15 @@
           if (Date.now() - last < 5000) return;
           sessionStorage.setItem(key, String(Date.now()));
           if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function (regs) {
-              regs.forEach(function (r) {
-                r.unregister();
-              });
-              doReload();
-            }).catch(doReload);
+            navigator.serviceWorker
+              .getRegistrations()
+              .then(function (regs) {
+                regs.forEach(function (r) {
+                  r.unregister();
+                });
+                doReload();
+              })
+              .catch(doReload);
           } else {
             doReload();
           }
