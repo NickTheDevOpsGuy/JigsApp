@@ -1,6 +1,21 @@
 # Phuzzle — Recent Changes Summary
 
-A single post summarizing all recent updates: UX polish, leaderboards, performance, testing, PWA, tap-to-rotate, and docs.
+A single post summarizing all recent updates: UX polish, leaderboards, performance, testing, PWA, tap-to-rotate, layout (PDF spec), and docs.
+
+---
+
+## 📐 Layout & mobile (PDF spec — latest)
+
+- **Desktop play** — 20% tray, 60% board, 20% stats sidebar (min-width 901px). Responsive breakpoint documented.
+- **Tray heights** — 28vh expanded; 32vh for large grids (25+ pieces); 8vh collapsed on mobile. Swipe or tap handle to expand/collapse.
+- **Board** — 94vw width, max 520px on mobile; 65–70% viewport height.
+- **Piece scaling** — Minimum 42px on mobile; zoom scales if needed.
+- **Snap animation** — 120ms pop + glow.
+- **Completion screen** — Share Result primary CTA; Download and Copy secondary. Simpler layout.
+- **Today's Puzzle modal** — Difficulty overflow fix on mobile (removed fixed height).
+- **Visual system** — Spacing variables, typography, ~15% less vertical padding.
+- **Dead code** — Removed `shareUrls` and `openShareWindow` from `useShareResults`.
+- **E2E tests** — Added: `daily-modal.spec.ts`, `play-screen.spec.ts`, `setup-play.spec.ts`, `packs-stats.spec.ts`.
 
 ---
 

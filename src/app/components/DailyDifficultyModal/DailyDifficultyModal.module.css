@@ -1,4 +1,5 @@
 .freezeOffer {
+  flex-shrink: 0;
   margin-bottom: 16px;
   padding: 12px 14px;
   background: var(--color-bg-secondary);
@@ -72,10 +73,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  max-height: 50vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-right: 4px;
+  margin-bottom: max(24px, env(safe-area-inset-bottom, 0));
 }
 
 .difficultyBtn {
@@ -118,7 +116,6 @@
 @media (max-width: 400px) {
   .difficulties {
     grid-template-columns: 1fr;
-    max-height: 55dvh;
   }
 
   .difficultyBtn {

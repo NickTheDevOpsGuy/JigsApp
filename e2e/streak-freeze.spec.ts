@@ -7,7 +7,7 @@ test.describe("Streak freeze offer", () => {
     page,
   }) => {
     await page.clock.install({ time: FIXED_TODAY });
-    await page.addInitScript(() => {
+    await page.addInitScript(async () => {
       localStorage.setItem("phuzzle:lastSeenChangelog", "6");
       const d = new Date();
       d.setDate(d.getDate() - 1);
@@ -29,7 +29,7 @@ test.describe("Streak freeze offer", () => {
 
   test("hides offer after clicking No thanks and reopening", async ({ page }) => {
     await page.clock.install({ time: FIXED_TODAY });
-    await page.addInitScript(() => {
+    await page.addInitScript(async () => {
       localStorage.setItem("phuzzle:lastSeenChangelog", "6");
       const d = new Date();
       d.setDate(d.getDate() - 1);
@@ -58,7 +58,7 @@ test.describe("Streak freeze offer", () => {
 
   test("freeze buttons are keyboard accessible", async ({ page }) => {
     await page.clock.install({ time: FIXED_TODAY });
-    await page.addInitScript(() => {
+    await page.addInitScript(async () => {
       localStorage.setItem("phuzzle:lastSeenChangelog", "6");
       const d = new Date();
       d.setDate(d.getDate() - 1);

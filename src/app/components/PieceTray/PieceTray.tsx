@@ -56,6 +56,8 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScroll, setCanScroll] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const swipeStartY = useRef<number | null>(null);
 
   // Compact mode: default on for 25+ pieces (mobile or desktop); user can toggle
   const compactDefault = pieces.length >= 25;
@@ -177,8 +179,73 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
   const showCompactToggle = pieces.length >= 25;
 
+  const handleSwipeStart = useCallback((clientY: number) => {
+    swipeStartY.current = clientY;
+  }, []);
+
+  const handleSwipeEnd = useCallback((clientY: number) => {
+    const start = swipeStartY.current;
+    if (start == null) return;
+    swipeStartY.current = null;
+    const delta = start - clientY;
+    if (Math.abs(delta) < 30) return;
+    if (delta > 0)
+      setCollapsed(false); // swipe up = expand
+    else setCollapsed(true); // swipe down = collapse
+  }, []);
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => handleSwipeStart(e.touches[0].clientY),
+    [handleSwipeStart],
+  );
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) =>
+      e.changedTouches[0] && handleSwipeEnd(e.changedTouches[0].clientY),
+    [handleSwipeEnd],
+  );
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => handleSwipeStart(e.clientY),
+    [handleSwipeStart],
+  );
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => handleSwipeEnd(e.clientY),
+    [handleSwipeEnd],
+  );
+
+  const pieceCount = grid.rows * grid.cols;
+  const isLargeGrid = pieceCount >= 25;
+
   return (
-    <div className={`${styles.tray} ${compact ? styles.trayCompact : ""}`} ref={ref}>
+    <div
+      className={`${styles.tray} ${compact ? styles.trayCompact : ""} ${collapsed ? styles.trayCollapsed : ""} ${isLargeGrid ? styles.trayLarge : ""}`}
+      ref={ref}
+    >
+      <div
+        className={styles.handle}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={() => (swipeStartY.current = null)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setCollapsed((c) => !c);
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={collapsed ? "Expand piece drawer" : "Collapse piece drawer"}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setCollapsed((c) => !c);
+          }
+        }}
+      >
+        <span className={styles.handleBar} />
+        {collapsed && (
+          <span className={styles.handleLabel}>Piece Drawer ({pieces.length})</span>
+        )}
+      </div>
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <span className={styles.title}>Piece Drawer ({pieces.length})</span>
@@ -264,7 +331,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         </div>
       </div>
 
-      {displayed.length > 0 && canScroll && (
+      {!collapsed && displayed.length > 0 && canScroll && (
         <div
           className={styles.scrollIndicator}
           role="progressbar"
@@ -280,43 +347,45 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         </div>
       )}
 
-      <div
-        className={`${styles.scroller} ${displayed.length > 0 ? styles.scrollerSnap : ""}`}
-        ref={scrollerRef}
-        role="list"
-      >
-        {displayed.length === 0 ? (
-          <div className={styles.empty}>{emptyText}</div>
-        ) : (
-          <div className={styles.row}>
-            {displayed.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                className={styles.pieceButton}
-                onClick={() => onPieceClick(p.id)}
-                aria-label={`Place piece ${p.id}`}
-              >
-                <div
-                  className={styles.thumbWrap}
-                  style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+      {!collapsed && (
+        <div
+          className={`${styles.scroller} ${displayed.length > 0 ? styles.scrollerSnap : ""}`}
+          ref={scrollerRef}
+          role="list"
+        >
+          {displayed.length === 0 ? (
+            <div className={styles.empty}>{emptyText}</div>
+          ) : (
+            <div className={styles.row}>
+              {displayed.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={styles.pieceButton}
+                  onClick={() => onPieceClick(p.id)}
+                  aria-label={`Place piece ${p.id}`}
                 >
-                  {image ? (
-                    <img
-                      className={styles.thumbImg}
-                      src={thumbsById.get(p.id)}
-                      alt=""
-                      draggable={false}
-                    />
-                  ) : (
-                    <div className={styles.thumbFallback} />
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+                  <div
+                    className={styles.thumbWrap}
+                    style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+                  >
+                    {image ? (
+                      <img
+                        className={styles.thumbImg}
+                        src={thumbsById.get(p.id)}
+                        alt=""
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className={styles.thumbFallback} />
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 });

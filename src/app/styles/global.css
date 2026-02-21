@@ -5,6 +5,23 @@
    CSS Variables for Theme
    ============================================ */
 :root {
+  /* Visual system – spacing scale (PDF) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  /* Corner radius (PDF) */
+  --radius-btn: 10px;
+  --radius-card: 16px;
+  --radius-board: 20px;
+  /* Typography mobile (PDF: H1 22px, H2 18px, Body 15px) */
+  --font-h1-mobile: 22px;
+  --font-h2-mobile: 18px;
+  --font-body-mobile: 15px;
+
   /* Light theme colors */
   --color-bg-primary: #f3f7ff;
   --color-bg-secondary: #dff1ff;
@@ -355,6 +372,19 @@ img {
 img,
 canvas {
   transition: none !important;
+}
+
+/* Mobile typography (PDF: H1 22px, H2 18px, Body 15px) */
+@media (max-width: 600px) {
+  body {
+    font-size: var(--font-body-mobile, 15px);
+  }
+  h1 {
+    font-size: var(--font-h1-mobile, 22px);
+  }
+  h2 {
+    font-size: var(--font-h2-mobile, 18px);
+  }
 }
 
 /* Focus rings for keyboard users - visible only when focusing via keyboard */

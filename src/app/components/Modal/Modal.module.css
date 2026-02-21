@@ -109,9 +109,11 @@
   }
 
   .modal {
-    max-height: min(90dvh, 90vh);
+    max-height: min(calc(100dvh - 16px), 90vh);
     margin: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .header {

@@ -11,7 +11,7 @@ test.describe("Theme", () => {
   // then run with --debug to step through with Playwright Inspector.
   test.skip("opens theme modal from hamburger and switches theme", async ({ page }) => {
     await page.addInitScript(
-      ({ img, grid }) => {
+      async ({ img, grid }) => {
         localStorage.setItem("phuzzle:imageDataUrl", img);
         localStorage.setItem("phuzzle:gridSize", grid);
       },
