@@ -6,7 +6,7 @@ const TINY_IMAGE =
 test.describe("Play screen", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(
-      ({ img, grid }) => {
+      async ({ img, grid }) => {
         localStorage.setItem("phuzzle:lastSeenChangelog", "6");
         localStorage.setItem("phuzzle:imageDataUrl", img);
         localStorage.setItem("phuzzle:gridSize", grid);

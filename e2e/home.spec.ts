@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Home / Menu", () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
+    await page.addInitScript(async () => {
       localStorage.setItem("phuzzle:lastSeenChangelog", "6");
     });
   });

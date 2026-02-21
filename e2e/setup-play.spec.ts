@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Setup → Play flow", () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
+    await page.addInitScript(async () => {
       localStorage.setItem("phuzzle:lastSeenChangelog", "6");
     });
   });
@@ -30,6 +30,6 @@ test.describe("Setup → Play flow", () => {
     await page.getByRole("button", { name: /start puzzle/i }).click();
 
     await expect(page).toHaveURL(/\/play/);
-    await expect(page.getByRole("status", { name: /pieces remaining/i })).toBeVisible();
+    await expect(page.getByRole("status", { name: /pieces remaining/i }).first()).toBeVisible();
   });
 });
