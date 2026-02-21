@@ -65,7 +65,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-size: 14px;
   text-align: center;
   padding: 20px;

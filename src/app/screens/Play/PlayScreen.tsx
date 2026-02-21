@@ -672,6 +672,7 @@ export function PlayScreen() {
     viewport: viewport.viewport,
     perfStatsRef,
     wrongRotationHintRef,
+    batterySaverMode,
   });
 
   const handleTrayPieceClick = useCallback(

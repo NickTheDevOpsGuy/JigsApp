@@ -29,7 +29,7 @@
   --color-bg-elevated: #ffffff;
   --color-text-primary: #103257;
   --color-text-secondary: #0b2e52;
-  --color-text-muted: #5a7a9b;
+  --color-text-muted: #3d6b94;
   --color-brand-primary: #0b63b8;
   --color-brand-hover: #0952a0;
   --color-brand-light: #dff1ff;
@@ -69,7 +69,7 @@ html.theme-light {
   --color-bg-elevated: #ffffff;
   --color-text-primary: #103257;
   --color-text-secondary: #0b2e52;
-  --color-text-muted: #5a7a9b;
+  --color-text-muted: #3d6b94;
   --color-brand-primary: #0b63b8;
   --color-brand-hover: #0952a0;
   --color-brand-light: #dff1ff;
@@ -108,7 +108,7 @@ html.theme-dark {
   --color-bg-elevated: #1a2128;
   --color-text-primary: #e6edf3;
   --color-text-secondary: #c9d1d9;
-  --color-text-muted: #8b949e;
+  --color-text-muted: #a0adbb;
   --color-brand-primary: #4a9ff5;
   --color-brand-hover: #58a6f7;
   --color-brand-light: #1c3a5c;
@@ -148,7 +148,7 @@ html.theme-space {
   --color-bg-elevated: #221e42;
   --color-text-primary: #e8e4f5;
   --color-text-secondary: #b8b0d8;
-  --color-text-muted: #7a6fa8;
+  --color-text-muted: #9a8fc4;
   --color-brand-primary: #a78bfa;
   --color-brand-hover: #c4b5fd;
   --color-brand-light: #2e2648;
@@ -188,7 +188,7 @@ html.theme-ocean {
   --color-bg-elevated: #1a3560;
   --color-text-primary: #e8f4fc;
   --color-text-secondary: #b8d9f5;
-  --color-text-muted: #7eb3e8;
+  --color-text-muted: #98c9f0;
   --color-brand-primary: #3b82f6;
   --color-brand-hover: #60a5fa;
   --color-brand-light: #1e3a5f;
@@ -228,7 +228,7 @@ html.theme-forest {
   --color-bg-elevated: #1f3d2e;
   --color-text-primary: #e8f5e9;
   --color-text-secondary: #c8e6c9;
-  --color-text-muted: #81c784;
+  --color-text-muted: #9ed99f;
   --color-brand-primary: #66bb6a;
   --color-brand-hover: #81c784;
   --color-brand-light: #1a2e22;
@@ -268,7 +268,7 @@ html.theme-sunset {
   --color-bg-elevated: #4d2e14;
   --color-text-primary: #fff4e6;
   --color-text-secondary: #ffe4c4;
-  --color-text-muted: #e6b88a;
+  --color-text-muted: #f0c9a0;
   --color-brand-primary: #ff8c42;
   --color-brand-hover: #ffa366;
   --color-brand-light: #4d2e14;

@@ -69,7 +69,8 @@
 
 .hint {
   font-size: 13px;
-  opacity: 0.8;
+  color: var(--color-text-secondary);
+  opacity: 0.95;
 }
 
 .debug {
@@ -133,7 +134,7 @@
 
 .loading,
 .empty {
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -221,7 +222,7 @@
 .leaderboardDetail {
   flex: 1 1 100%;
   font-size: 12px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   margin-top: 4px;
   padding-top: 4px;
   border-top: 1px solid var(--color-border);
@@ -268,7 +269,7 @@
   background: var(--color-bg-elevated);
   border-radius: 12px;
   border: 1px solid var(--color-border);
-  opacity: 0.6;
+  opacity: 0.85;
 }
 
 .achievementUnlocked {
@@ -729,7 +730,7 @@
 
 .pbDaily {
   font-size: 12px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   background: var(--color-brand-light);
   padding: 2px 8px;
   border-radius: 6px;

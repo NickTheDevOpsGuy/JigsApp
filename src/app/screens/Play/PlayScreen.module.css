@@ -284,7 +284,7 @@
 
 @media (max-width: 900px) {
   .playBody .trayWrap {
-    height: 100px;
+    height: 120px;
   }
 }
 
@@ -307,7 +307,7 @@
   justify-content: center;
   gap: 16px;
   background: var(--color-bg-primary);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-size: 14px;
   z-index: 10;
 }
@@ -332,7 +332,7 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   padding: 4px 8px;
   border-radius: 8px;
   background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
@@ -489,7 +489,7 @@
 .trayHelp {
   font-weight: 400;
   font-size: 11px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .trayScroll {
@@ -525,14 +525,14 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-style: italic;
 }
 
 .debugInfo {
   padding: 6px 12px;
   font-size: 11px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   border-top: 1px solid var(--color-border);
   background: var(--color-bg-card);
 }
@@ -789,7 +789,7 @@
   padding: 0;
   font-size: 18px;
   line-height: 1;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   background: none;
   border: none;
   border-radius: 6px;
@@ -832,19 +832,21 @@
 
 .completeContent p {
   font-size: 1.25rem;
-  opacity: 0.9;
+  opacity: 1;
   margin: 0 0 1.5rem 0;
 }
 
 .completeContent .puzzleSize {
   font-size: 0.95rem;
-  opacity: 0.85;
+  opacity: 0.95;
   margin: 0 0 0.5rem 0;
 }
 
 /* Floating puzzle preview on completion - pops off the canvas */
 .completePreviewWrapper {
   margin: 0.5rem 0 1rem;
+  display: flex;
+  justify-content: center;
 }
 
 .completePreviewImage {
@@ -896,11 +898,14 @@
     gap: 6px;
   }
   .completePreviewWrapper {
-    margin: 0.35rem 0 0.6rem;
+    margin: 0.6rem auto 1rem;
+    width: 100%;
   }
   .completePreviewImage {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
+    max-width: min(140px, 40vw);
+    max-height: min(140px, 40vw);
   }
 }
 
@@ -950,7 +955,7 @@
 
 .shareLabel {
   font-size: 0.9rem !important;
-  opacity: 0.7 !important;
+  opacity: 0.95 !important;
   margin-bottom: 0.75rem !important;
 }
 
@@ -992,7 +997,7 @@
 
 .shareHint {
   font-size: 0.75rem !important;
-  opacity: 0.5 !important;
+  opacity: 0.85 !important;
   margin: 0 !important;
 }
 
@@ -1106,7 +1111,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .headerMenuToggle {
@@ -1138,7 +1143,7 @@
 
 .headerMenuChevron {
   flex-shrink: 0;
-  opacity: 0.6;
+  opacity: 0.85;
   transition: transform 0.15s ease;
 }
 

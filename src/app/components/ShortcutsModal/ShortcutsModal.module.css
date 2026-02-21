@@ -86,7 +86,7 @@
   border: none;
   padding: 8px;
   cursor: pointer;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -155,7 +155,7 @@
 }
 
 .separator {
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-size: 0.8rem;
   margin: 0 6px;
 }
@@ -182,7 +182,7 @@
 }
 
 .hint {
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 

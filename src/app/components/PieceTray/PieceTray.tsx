@@ -270,60 +270,66 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
           )}
         </div>
         <div className={styles.controls}>
-          <div className={styles.segment} aria-label="Tray section">
-            <button
-              type="button"
-              className={section === "all" ? styles.active : undefined}
-              onClick={() => setSection("all")}
-            >
-              All
-            </button>
-            <button
-              type="button"
-              className={section === "edges" ? styles.active : undefined}
-              onClick={() => setSection("edges")}
-            >
-              Edges
-            </button>
-            <button
-              type="button"
-              className={section === "center" ? styles.active : undefined}
-              onClick={() => setSection("center")}
-            >
-              Center
-            </button>
-            <button
-              type="button"
-              className={section === "corners" ? styles.active : undefined}
-              onClick={() => setSection("corners")}
-            >
-              Corners
-            </button>
+          <div className={styles.controlGroup}>
+            <span className={styles.controlLabel}>Filter</span>
+            <div className={styles.segment} aria-label="Tray section">
+              <button
+                type="button"
+                className={section === "all" ? styles.active : undefined}
+                onClick={() => setSection("all")}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                className={section === "edges" ? styles.active : undefined}
+                onClick={() => setSection("edges")}
+              >
+                Edges
+              </button>
+              <button
+                type="button"
+                className={section === "center" ? styles.active : undefined}
+                onClick={() => setSection("center")}
+              >
+                Center
+              </button>
+              <button
+                type="button"
+                className={section === "corners" ? styles.active : undefined}
+                onClick={() => setSection("corners")}
+              >
+                Corners
+              </button>
+            </div>
           </div>
 
-          <div className={styles.segment} aria-label="Sort mode">
-            <button
-              type="button"
-              className={sortMode === "grid" ? styles.active : undefined}
-              onClick={() => {
-                setSortMode("grid");
-                setShuffledOrder(null);
-              }}
-            >
-              Grid
-            </button>
-            <button
-              type="button"
-              className={sortMode === "color" ? styles.active : undefined}
-              onClick={() => {
-                setSortMode("color");
-                setShuffledOrder(null);
-              }}
-              disabled={!image}
-              title={!image ? "Load an image to enable color sorting" : undefined}
-            >
-              Color
-            </button>
+          <div className={styles.controlGroup}>
+            <span className={styles.controlLabel}>Sort by</span>
+            <div className={styles.segment} aria-label="Sort mode">
+              <button
+                type="button"
+                className={sortMode === "grid" ? styles.active : undefined}
+                onClick={() => {
+                  setSortMode("grid");
+                  setShuffledOrder(null);
+                }}
+              >
+                Position
+              </button>
+              <button
+                type="button"
+                className={sortMode === "color" ? styles.active : undefined}
+                onClick={() => {
+                  setSortMode("color");
+                  setShuffledOrder(null);
+                }}
+                disabled={!image}
+                title={!image ? "Load an image to enable color sorting" : undefined}
+              >
+                Color
+              </button>
+            </div>
           </div>
 
           <button

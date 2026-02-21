@@ -14,7 +14,7 @@
 
 .freezeHint {
   font-size: 12px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .freezeActions {
@@ -48,7 +48,7 @@
   appearance: none;
   border: 1px solid var(--color-border-strong);
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   padding: 10px 16px;
   border-radius: 8px;
   font-size: 14px;
@@ -66,7 +66,7 @@
 .subtitle {
   margin: 0 0 20px;
   font-size: 14px;
-  color: var(--color-text-muted);
+  color: var(--color-text-primary);
 }
 
 .difficultyMobile {
@@ -139,11 +139,23 @@
   font-size: 14px;
   line-height: 1.2;
   letter-spacing: -0.02em;
+  color: var(--color-text-primary);
 }
 
 .difficultyPieces {
   font-size: 11px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
+}
+
+/* Improve contrast for dropdown/start on mobile in dark themes */
+.difficultyMobile label {
+  color: var(--color-text-primary);
+}
+
+.difficultyMobile select {
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-strong);
 }
 
 @media (max-width: 400px) {

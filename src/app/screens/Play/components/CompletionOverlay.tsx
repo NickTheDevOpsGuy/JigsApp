@@ -100,15 +100,6 @@ export function CompletionOverlay({
   return (
     <div className={styles.completeOverlay}>
       <div className={styles.completeContent}>
-        {imageUrl && (
-          <div className={styles.completePreviewWrapper}>
-            <img
-              src={imageUrl}
-              alt="Completed puzzle"
-              className={styles.completePreviewImage}
-            />
-          </div>
-        )}
         <h2>🎉 {completionMessage}</h2>
         {badge && (
           <p className={styles.puzzleSize} aria-hidden="true">
@@ -128,6 +119,15 @@ export function CompletionOverlay({
             </span>
           )}
         </p>
+        {imageUrl && (
+          <div className={styles.completePreviewWrapper}>
+            <img
+              src={imageUrl}
+              alt="Completed puzzle"
+              className={styles.completePreviewImage}
+            />
+          </div>
+        )}
 
         <div className={styles.shareSection}>
           {/* Primary CTA: Share Result */}

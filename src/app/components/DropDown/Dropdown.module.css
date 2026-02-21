@@ -13,7 +13,7 @@
 .label {
   font-weight: 600;
   font-size: 14px;
-  color: var(--color-brand-primary);
+  color: var(--color-text-primary);
 }
 
 .selectWrapper {
@@ -57,7 +57,7 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 10px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   pointer-events: none;
 }
 

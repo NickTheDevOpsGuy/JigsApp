@@ -121,6 +121,9 @@
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
+  touch-action: manipulation;
+  min-width: 36px;
+  min-height: 36px;
 }
 
 .compactToggle:hover {
@@ -141,8 +144,22 @@
   min-width: 0;
 }
 
-.segment,
-.sort {
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controlLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.segment {
   display: flex;
   gap: 4px;
 }
@@ -161,6 +178,7 @@
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
+  touch-action: manipulation;
 }
 
 .segment button:hover,
@@ -187,6 +205,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
+  touch-action: manipulation;
 }
 
 .shuffleBtn:hover:not(:disabled) {
@@ -265,6 +284,7 @@
   border-radius: 6px;
   transition: all 0.15s ease;
   flex-shrink: 0;
+  touch-action: manipulation;
 }
 
 .pieceButton:hover {
@@ -315,7 +335,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-style: italic;
   font-size: 13px;
 }
@@ -387,8 +407,10 @@
 
   .segment button,
   .sort button {
-    padding: 4px 8px;
-    font-size: 11px;
+    padding: 8px 10px;
+    font-size: 12px;
+    min-height: 40px;
+    min-width: 44px;
   }
 
   .thumbWrap {

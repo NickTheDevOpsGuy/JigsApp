@@ -121,7 +121,7 @@
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   background: var(--color-bg-primary);
 }
 
@@ -148,7 +148,7 @@
 
 .playHint {
   font-size: 11px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -158,7 +158,7 @@
   margin: 0;
   padding: 24px;
   text-align: center;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 @media (max-width: 600px) {

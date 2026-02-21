@@ -82,7 +82,7 @@
   border: none;
   padding: 4px;
   cursor: pointer;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   border-radius: 8px;
   transition: all 0.15s ease;
 }
@@ -94,7 +94,7 @@
 
 .content {
   padding: 24px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   flex: 1;
   min-height: 0;
   overflow: hidden;

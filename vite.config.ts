@@ -18,8 +18,8 @@ export default defineConfig(({ mode }) => {
           short_name: "Phuzzle",
           description:
             "A cozy jigsaw puzzle game. Upload an image, break it into pieces, and snap them together.",
-          theme_color: "#0f766e",
-          background_color: "#f8fafc",
+          theme_color: "#f3f7ff",
+          background_color: "#f3f7ff",
           display: "standalone",
           start_url: "/",
           icons: [
