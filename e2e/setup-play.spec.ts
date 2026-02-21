@@ -30,6 +30,8 @@ test.describe("Setup → Play flow", () => {
     await page.getByRole("button", { name: /start puzzle/i }).click();
 
     await expect(page).toHaveURL(/\/play/);
-    await expect(page.getByRole("status", { name: /pieces remaining/i }).first()).toBeVisible();
+    await expect(
+      page.getByRole("status", { name: /pieces remaining/i }).first(),
+    ).toBeVisible();
   });
 });
