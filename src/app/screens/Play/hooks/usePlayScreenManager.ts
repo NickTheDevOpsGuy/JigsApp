@@ -126,9 +126,7 @@ export function usePlayScreenManager(
         const rectW = Math.floor(rect.width);
         const rectH = Math.floor(rect.height);
         // Mobile: board 94vw max 520px per PDF
-        const mobileMaxBoardW = isMobile
-          ? Math.min(viewportW * 0.94, 520)
-          : Infinity;
+        const mobileMaxBoardW = isMobile ? Math.min(viewportW * 0.94, 520) : Infinity;
         const fallbackW =
           isMobile && (rectW < minAvail || rectW === 0)
             ? Math.min(viewportW - 24, mobileMaxBoardW)

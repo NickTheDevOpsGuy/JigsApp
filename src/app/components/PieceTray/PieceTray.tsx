@@ -183,18 +183,16 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     swipeStartY.current = clientY;
   }, []);
 
-  const handleSwipeEnd = useCallback(
-    (clientY: number) => {
-      const start = swipeStartY.current;
-      if (start == null) return;
-      swipeStartY.current = null;
-      const delta = start - clientY;
-      if (Math.abs(delta) < 30) return;
-      if (delta > 0) setCollapsed(false); // swipe up = expand
-      else setCollapsed(true); // swipe down = collapse
-    },
-    [],
-  );
+  const handleSwipeEnd = useCallback((clientY: number) => {
+    const start = swipeStartY.current;
+    if (start == null) return;
+    swipeStartY.current = null;
+    const delta = start - clientY;
+    if (Math.abs(delta) < 30) return;
+    if (delta > 0)
+      setCollapsed(false); // swipe up = expand
+    else setCollapsed(true); // swipe down = collapse
+  }, []);
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => handleSwipeStart(e.touches[0].clientY),
@@ -350,43 +348,43 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       )}
 
       {!collapsed && (
-      <div
-        className={`${styles.scroller} ${displayed.length > 0 ? styles.scrollerSnap : ""}`}
-        ref={scrollerRef}
-        role="list"
-      >
-        {displayed.length === 0 ? (
-          <div className={styles.empty}>{emptyText}</div>
-        ) : (
-          <div className={styles.row}>
-            {displayed.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                className={styles.pieceButton}
-                onClick={() => onPieceClick(p.id)}
-                aria-label={`Place piece ${p.id}`}
-              >
-                <div
-                  className={styles.thumbWrap}
-                  style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+        <div
+          className={`${styles.scroller} ${displayed.length > 0 ? styles.scrollerSnap : ""}`}
+          ref={scrollerRef}
+          role="list"
+        >
+          {displayed.length === 0 ? (
+            <div className={styles.empty}>{emptyText}</div>
+          ) : (
+            <div className={styles.row}>
+              {displayed.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={styles.pieceButton}
+                  onClick={() => onPieceClick(p.id)}
+                  aria-label={`Place piece ${p.id}`}
                 >
-                  {image ? (
-                    <img
-                      className={styles.thumbImg}
-                      src={thumbsById.get(p.id)}
-                      alt=""
-                      draggable={false}
-                    />
-                  ) : (
-                    <div className={styles.thumbFallback} />
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+                  <div
+                    className={styles.thumbWrap}
+                    style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+                  >
+                    {image ? (
+                      <img
+                        className={styles.thumbImg}
+                        src={thumbsById.get(p.id)}
+                        alt=""
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className={styles.thumbFallback} />
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

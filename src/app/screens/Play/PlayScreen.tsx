@@ -1109,85 +1109,91 @@ export function PlayScreen() {
       />
 
       <div className={styles.playBody}>
-      <div
-        className={`${styles.trayWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
-        onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
-      >
-        <PieceTray
-          ref={trayRef}
-          pieces={trayPieces}
-          image={imgRef.current}
-          grid={state?.grid ?? grid}
-          onPieceClick={handleTrayPieceClick}
-        />
-      </div>
-        <div className={styles.main} ref={mainRef}>
-        <div className={styles.board} ref={boardRef}>
-          {isLoading && (
-            <div className={styles.loadingOverlay} aria-label="Loading puzzle">
-              <div className={styles.spinner} />
-              <span>Loading puzzle…</span>
-            </div>
-          )}
-          <canvas
-            key={puzzleKey}
-            className={styles.canvas}
-            ref={canvasRef}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerCancel}
-            onLostPointerCapture={handleLostPointerCapture}
-            onContextMenu={handleContextMenu}
-            onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
+        <div
+          className={`${styles.trayWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
+          onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
+        >
+          <PieceTray
+            ref={trayRef}
+            pieces={trayPieces}
+            image={imgRef.current}
+            grid={state?.grid ?? grid}
+            onPieceClick={handleTrayPieceClick}
           />
-          {showPreview && imgRef.current && (
-            <div className={styles.previewOverlay}>
-              <img
-                src={imgRef.current.src}
-                alt="Puzzle preview"
-                className={styles.previewImage}
-              />
-            </div>
-          )}
-          {isPaused && (
-            <PauseOverlay
-              onResume={() => setIsPaused(false)}
-              isCountdownExpired={
-                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
-              }
-              onNewPuzzle={
-                timeMode === "countdown" && elapsedSeconds <= 0 && !isComplete && isPaused
-                  ? handleNewGame
-                  : undefined
-              }
-            />
-          )}
-          {isComplete && (
-            <CompletionOverlay
-              elapsedSeconds={elapsedSeconds}
-              grid={state?.grid}
-              imageUrl={
-                localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
-              }
-              undoCount={undoCountRef.current}
-              isNewBest={
-                timeMode === "best" &&
-                state?.grid != null &&
-                (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
-              }
-              isDaily={isDailyPuzzleSession()}
-              copied={share.copied}
-              canNativeShare={share.canNativeShare}
-              onCopyResults={share.handleCopyResults}
-              onNativeShare={share.handleNativeShare}
-              onDownloadImage={handleDownloadImage}
-              onNewPuzzle={handleNewGame}
-              onMenu={() => navigate("/")}
-            />
-          )}
         </div>
-      </div>
+        <div className={styles.main} ref={mainRef}>
+          <div className={styles.board} ref={boardRef}>
+            {isLoading && (
+              <div className={styles.loadingOverlay} aria-label="Loading puzzle">
+                <div className={styles.spinner} />
+                <span>Loading puzzle…</span>
+              </div>
+            )}
+            <canvas
+              key={puzzleKey}
+              className={styles.canvas}
+              ref={canvasRef}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
+              onLostPointerCapture={handleLostPointerCapture}
+              onContextMenu={handleContextMenu}
+              onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
+            />
+            {showPreview && imgRef.current && (
+              <div className={styles.previewOverlay}>
+                <img
+                  src={imgRef.current.src}
+                  alt="Puzzle preview"
+                  className={styles.previewImage}
+                />
+              </div>
+            )}
+            {isPaused && (
+              <PauseOverlay
+                onResume={() => setIsPaused(false)}
+                isCountdownExpired={
+                  timeMode === "countdown" &&
+                  elapsedSeconds <= 0 &&
+                  !isComplete &&
+                  isPaused
+                }
+                onNewPuzzle={
+                  timeMode === "countdown" &&
+                  elapsedSeconds <= 0 &&
+                  !isComplete &&
+                  isPaused
+                    ? handleNewGame
+                    : undefined
+                }
+              />
+            )}
+            {isComplete && (
+              <CompletionOverlay
+                elapsedSeconds={elapsedSeconds}
+                grid={state?.grid}
+                imageUrl={
+                  localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
+                }
+                undoCount={undoCountRef.current}
+                isNewBest={
+                  timeMode === "best" &&
+                  state?.grid != null &&
+                  (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
+                }
+                isDaily={isDailyPuzzleSession()}
+                copied={share.copied}
+                canNativeShare={share.canNativeShare}
+                onCopyResults={share.handleCopyResults}
+                onNativeShare={share.handleNativeShare}
+                onDownloadImage={handleDownloadImage}
+                onNewPuzzle={handleNewGame}
+                onMenu={() => navigate("/")}
+              />
+            )}
+          </div>
+        </div>
 
         <div className={styles.statsSidebar} aria-label="Game stats">
           <PlayHUD

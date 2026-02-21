@@ -35,7 +35,9 @@ test.describe("Today's Puzzle modal", () => {
     await page.getByRole("button", { name: /easy/i }).click();
 
     await expect(page).toHaveURL(/\/play/);
-    await expect(page.getByRole("status", { name: /pieces remaining/i }).first()).toBeVisible({
+    await expect(
+      page.getByRole("status", { name: /pieces remaining/i }).first(),
+    ).toBeVisible({
       timeout: 10000,
     });
   });

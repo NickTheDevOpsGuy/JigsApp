@@ -132,12 +132,20 @@ export function CompletionOverlay({
         <div className={styles.shareSection}>
           {/* Primary CTA: Share Result */}
           {canNativeShare ? (
-            <Button variant="primary" onClick={onNativeShare} className={styles.sharePrimary}>
+            <Button
+              variant="primary"
+              onClick={onNativeShare}
+              className={styles.sharePrimary}
+            >
               <Share2 size={20} />
               Share Result
             </Button>
           ) : (
-            <Button variant="primary" onClick={onCopyResults} className={styles.sharePrimary}>
+            <Button
+              variant="primary"
+              onClick={onCopyResults}
+              className={styles.sharePrimary}
+            >
               {copied ? <Check size={20} /> : <Copy size={20} />}
               {copied ? "Copied!" : "Copy & Share"}
             </Button>
