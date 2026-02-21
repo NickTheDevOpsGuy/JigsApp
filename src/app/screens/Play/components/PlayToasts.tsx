@@ -7,7 +7,6 @@ import type { OnboardingState } from "./PlayToasts.types";
 
 type Props = {
   onboarding: OnboardingState;
-  placed: number;
   showFirstSnapToast: boolean;
   showStreakToast: boolean;
   milestoneMessage: string | null;
@@ -22,7 +21,6 @@ type Props = {
 
 export function PlayToasts({
   onboarding,
-  placed,
   showFirstSnapToast,
   showStreakToast,
   milestoneMessage,
@@ -49,19 +47,6 @@ export function PlayToasts({
       {shareToast && (
         <div className={s.engagementToast} role="status">
           {shareToast}
-        </div>
-      )}
-      {onboarding.needsStartTip && placed === 0 && (
-        <div className={s.engagementToast} role="status">
-          <span>Drag a piece to start</span>
-          <button
-            type="button"
-            className={s.toastDismiss}
-            onClick={onboarding.dismissStartTip}
-            aria-label="Dismiss"
-          >
-            ×
-          </button>
         </div>
       )}
       {onboarding.needsTrayTip && (

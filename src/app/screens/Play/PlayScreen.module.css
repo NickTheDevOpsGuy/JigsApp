@@ -780,7 +780,27 @@
   animation: engagementToastIn 0.3s ease-out;
 }
 
-/* Engagement toasts: streak, milestones, start tip - top center of canvas */
+/* Start hint: top center of canvas (inside board) */
+.startHintOverlay {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: var(--color-overlay-content);
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  animation: engagementToastIn 0.3s ease-out;
+}
+
+/* Engagement toasts: streak, milestones - top center of viewport */
 .engagementToast {
   position: fixed;
   top: 96px;

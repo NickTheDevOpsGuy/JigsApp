@@ -157,32 +157,6 @@
   cursor: not-allowed;
 }
 
-.shuffleBtn {
-  appearance: none;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-elevated);
-  color: var(--color-text-secondary);
-  padding: 5px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-  touch-action: manipulation;
-}
-
-.shuffleBtn:hover:not(:disabled) {
-  background: var(--color-bg-secondary);
-  color: var(--color-brand-primary);
-  border-color: var(--color-brand-primary);
-}
-
-.shuffleBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .compactToggle {
   appearance: none;
   border: 1px solid var(--color-border);
@@ -439,7 +413,7 @@
   display: none;
 }
 
-/* Mobile: fixed height, no collapse – tray below board */
+/* Mobile: same filters [All] [Edges] [Color] as desktop, tighter margins */
 @media (max-width: 600px) {
   .tray,
   .trayLarge,
@@ -456,69 +430,10 @@
 
   .tray {
     margin: 0 8px 8px 8px;
-  }
-
-  .header {
-    padding: 4px 8px;
-    font-size: 11px;
-    gap: 4px;
-  }
-
-  .titleRow {
-    gap: 6px;
-  }
-
-  .title {
-    font-size: 12px;
-  }
-
-  .controls {
-    padding: 2px 0;
-    gap: 4px;
+    margin-bottom: max(8px, env(safe-area-inset-bottom));
   }
 
   .segment button {
     padding: 6px 8px;
-    font-size: 11px;
-  }
-
-  .compactToggle {
-    min-width: 32px;
-    min-height: 32px;
-    padding: 2px 4px;
-  }
-
-  .thumbWrap {
-    width: 40px;
-    height: 40px;
-  }
-
-  .pieceButton {
-    min-width: 44px;
-    min-height: 44px;
-  }
-
-  .trayCompact .thumbWrap {
-    width: 36px;
-    height: 36px;
-  }
-
-  .trayCompact .pieceButton {
-    min-width: 40px;
-    min-height: 40px;
-  }
-
-  .trayExtraCompact .thumbWrap {
-    width: 34px;
-    height: 34px;
-  }
-
-  .trayExtraCompact .pieceButton {
-    min-width: 38px;
-    min-height: 38px;
-  }
-
-  .scrollIndicator {
-    margin: 0 8px 4px;
   }
 }

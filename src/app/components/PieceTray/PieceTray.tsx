@@ -16,7 +16,7 @@ import { Minimize2, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import styles from "./PieceTray.module.css";
 
-type TrayFilter = "all" | "edges" | "colors" | "random";
+type TrayFilter = "all" | "edges" | "colors";
 
 const THUMB_NORMAL = 56;
 const THUMB_COMPACT = 44;
@@ -53,7 +53,6 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 ) {
   const isMobile = useMediaQuery("(max-width: 600px)");
   const [filter, setFilter] = useState<TrayFilter>("all");
-  const [shuffledOrder, setShuffledOrder] = useState<string[] | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScroll, setCanScroll] = useState(false);
@@ -101,37 +100,20 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     return ha - hb || byGrid(a, b);
   };
 
-  const shuffleTray = useCallback(() => {
-    const ids = pieces.map((p) => p.id);
-    const shuffled = [...ids].sort(() => Math.random() - 0.5);
-    setShuffledOrder(shuffled);
-    setFilter("random");
-  }, [pieces]);
-
   const displayed = useMemo(() => {
     const edges = pieces.filter((p) => isEdge(p, grid));
     const allByGrid = [...pieces].sort(byGrid);
     const allByHue = image ? [...pieces].sort(byHue) : allByGrid;
-    const applyShuffle = (arr: Piece[]) => {
-      if (!shuffledOrder || arr.length === 0) return arr;
-      const orderMap = new Map(shuffledOrder.map((id, i) => [id, i]));
-      const inOrder = arr.filter((p) => orderMap.has(p.id));
-      const notInOrder = arr.filter((p) => !orderMap.has(p.id));
-      inOrder.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
-      return [...inOrder, ...notInOrder];
-    };
 
     switch (filter) {
       case "edges":
         return [...edges].sort(byGrid);
       case "colors":
         return allByHue;
-      case "random":
-        return applyShuffle(pieces);
       default:
         return allByGrid;
     }
-  }, [pieces, grid, filter, image, hueById, shuffledOrder]);
+  }, [pieces, grid, filter, image, hueById]);
 
   const emptyText =
     pieces.length === 0
@@ -370,17 +352,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
               aria-pressed={filter === "colors"}
               title={!image ? "Load an image to enable color sort" : undefined}
             >
-              Colors
-            </button>
-            <button
-              type="button"
-              className={filter === "random" ? styles.active : undefined}
-              onClick={shuffleTray}
-              disabled={pieces.length === 0}
-              aria-pressed={filter === "random"}
-              title="Shuffle piece order"
-            >
-              Random
+              Color
             </button>
           </div>
         </div>

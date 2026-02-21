@@ -1118,6 +1118,19 @@ export function PlayScreen() {
                 <span>Loading puzzle…</span>
               </div>
             )}
+            {onboarding.needsStartTip && placed === 0 && (
+              <div className={styles.startHintOverlay} role="status">
+                <span>Drag a piece to start</span>
+                <button
+                  type="button"
+                  className={styles.toastDismiss}
+                  onClick={onboarding.dismissStartTip}
+                  aria-label="Dismiss"
+                >
+                  ×
+                </button>
+              </div>
+            )}
             <canvas
               key={puzzleKey}
               className={styles.canvas}
@@ -1231,7 +1244,6 @@ export function PlayScreen() {
 
       <PlayToasts
         onboarding={onboarding}
-        placed={placed}
         showFirstSnapToast={onboarding.showFirstSnapToast}
         showStreakToast={showStreakToast}
         milestoneMessage={milestoneMessage}
