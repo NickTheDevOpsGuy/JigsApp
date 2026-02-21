@@ -9,20 +9,40 @@
   padding: 20px;
   padding-bottom: max(20px, env(safe-area-inset-bottom, 0));
   box-sizing: border-box;
-  overflow-y: auto;
+}
+
+/* Mobile: full viewport, card fills and content scrolls */
+@media (max-width: 600px) {
+  .page {
+    height: 100dvh;
+    padding: 12px;
+    padding-top: 16px;
+  }
+
+  .card {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .cardContent {
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 .card {
   width: 100%;
   max-width: 520px;
-  max-height: calc(100dvh - 40px);
   background: var(--color-bg-card);
   border-radius: 18px;
   padding: 24px;
   box-shadow: var(--shadow-lg);
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .header {
@@ -30,6 +50,7 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 17px;
+  flex-shrink: 0;
 }
 
 .title {
@@ -68,6 +89,7 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding-bottom: 2px;
+  flex-shrink: 0;
 }
 
 .tabs::-webkit-scrollbar {
@@ -457,17 +479,11 @@
   }
 }
 
-/* Mobile: Stats / Leaderboard */
+/* Mobile: Stats / Leaderboard – compact layout */
 @media (max-width: 600px) {
-  .page {
-    padding: 12px;
-    align-items: flex-start;
-    padding-top: 16px;
-  }
-
   .card {
-    padding: 20px 16px;
-    padding-bottom: max(24px, env(safe-area-inset-bottom, 0));
+    padding: 16px 12px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
     border-radius: 16px;
   }
 

@@ -302,7 +302,7 @@ export function SetupScreen() {
                       ? opt.labelShort
                       : opt.label
                   : isMobile
-                    ? `Custom ${customRows}×${customCols}`
+                    ? `Custom ${customRows}×${customCols} (${customRows * customCols} pieces)`
                     : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
             }))}
             fullWidth

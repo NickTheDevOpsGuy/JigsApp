@@ -463,10 +463,11 @@ export function StatsScreen() {
           </button>
         </div>
 
-        {loading ? (
-          <p className={styles.loading}>Loading...</p>
-        ) : (
-          <>
+        <div className={styles.cardContent}>
+          {loading ? (
+            <p className={styles.loading}>Loading...</p>
+          ) : (
+            <>
             {activeTab === "dashboard" && (
               <div className={styles.section}>
                 <h2>Your Statistics</h2>
@@ -679,8 +680,9 @@ export function StatsScreen() {
                 </div>
               </div>
             )}
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
