@@ -284,7 +284,7 @@ export function SetupScreen() {
                     </div>
 
                     <div className={styles.galleryWrap}>
-                      {isMobile && filteredPuzzles.length > 4 && (
+                      {filteredPuzzles.length > 4 && (
                         <button
                           type="button"
                           className={styles.galleryScrollBtn}
@@ -300,7 +300,11 @@ export function SetupScreen() {
                           <ChevronLeft size={24} />
                         </button>
                       )}
-                      <div className={styles.gallery} ref={galleryRef} role="list">
+                      <div
+                        className={`${styles.gallery} ${filteredPuzzles.length > 4 ? styles.galleryWithButtons : ""}`}
+                        ref={galleryRef}
+                        role="list"
+                      >
                         {filteredPuzzles.length === 0 ? (
                           <div className={styles.galleryEmpty}>
                             No puzzles in this category yet
@@ -317,7 +321,7 @@ export function SetupScreen() {
                           ))
                         )}
                       </div>
-                      {isMobile && filteredPuzzles.length > 4 && (
+                      {filteredPuzzles.length > 4 && (
                         <button
                           type="button"
                           className={styles.galleryScrollBtn}
@@ -354,15 +358,13 @@ export function SetupScreen() {
             </>
           )}
 
-          {!isMobile && (
-            <p className={styles.difficultySummary}>
-              {effectiveRows * effectiveCols} pieces
-              {isCustom
-                ? " · Custom"
-                : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
-            </p>
-          )}
-          {suggestedGrid && gridIndex !== suggestedGrid.gridIndex && !isMobile && (
+          <p className={styles.difficultySummary}>
+            {effectiveRows * effectiveCols} pieces
+            {isCustom
+              ? " · Custom"
+              : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
+          </p>
+          {suggestedGrid && gridIndex !== suggestedGrid.gridIndex && (
             <button
               type="button"
               className={styles.difficultySuggestion}

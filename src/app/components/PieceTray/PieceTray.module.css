@@ -413,14 +413,21 @@
 
   .scroller {
     padding: 8px 12px 6px 12px;
+    padding-inline-end: max(28px, env(safe-area-inset-right, 0));
+  }
+
+  .scrollerSnap {
+    scroll-padding-inline-end: max(28px, env(safe-area-inset-right, 0));
   }
 
   .trayCompact .scroller {
     padding: 8px 12px 4px 12px;
+    padding-inline-end: max(28px, env(safe-area-inset-right, 0));
   }
 
   .trayExtraCompact .scroller {
     padding: 8px 10px 4px 10px;
+    padding-inline-end: max(24px, env(safe-area-inset-right, 0));
   }
 
   .segment button {
