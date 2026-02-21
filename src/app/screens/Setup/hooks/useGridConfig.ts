@@ -18,12 +18,48 @@ export type GridOption = {
 };
 
 export const GRID_OPTIONS: GridOption[] = [
-  { label: "Easy 🌱 (3×3 - 9 pieces)", labelShort: "3×3 Easy", labelIcon: "🌱 3×3", rows: 3, cols: 3 },
-  { label: "Medium ⚡ (4×4 - 16 pieces)", labelShort: "4×4 Medium", labelIcon: "⚡ 4×4", rows: 4, cols: 4 },
-  { label: "Hard 🔥 (5×5 - 25 pieces)", labelShort: "5×5 Hard", labelIcon: "🔥 5×5", rows: 5, cols: 5 },
-  { label: "Expert 👑 (6×6 - 36 pieces)", labelShort: "6×6 Expert", labelIcon: "👑 6×6", rows: 6, cols: 6 },
-  { label: "Master 🧠 (7×7 - 49 pieces)", labelShort: "7×7 Master", labelIcon: "🧠 7×7", rows: 7, cols: 7 },
-  { label: "Legend 🔮 (8×8 - 64 pieces)", labelShort: "8×8 Legend", labelIcon: "🔮 8×8", rows: 8, cols: 8 },
+  {
+    label: "Easy 🌱 (3×3 - 9 pieces)",
+    labelShort: "3×3 Easy",
+    labelIcon: "🌱 3×3",
+    rows: 3,
+    cols: 3,
+  },
+  {
+    label: "Medium ⚡ (4×4 - 16 pieces)",
+    labelShort: "4×4 Medium",
+    labelIcon: "⚡ 4×4",
+    rows: 4,
+    cols: 4,
+  },
+  {
+    label: "Hard 🔥 (5×5 - 25 pieces)",
+    labelShort: "5×5 Hard",
+    labelIcon: "🔥 5×5",
+    rows: 5,
+    cols: 5,
+  },
+  {
+    label: "Expert 👑 (6×6 - 36 pieces)",
+    labelShort: "6×6 Expert",
+    labelIcon: "👑 6×6",
+    rows: 6,
+    cols: 6,
+  },
+  {
+    label: "Master 🧠 (7×7 - 49 pieces)",
+    labelShort: "7×7 Master",
+    labelIcon: "🧠 7×7",
+    rows: 7,
+    cols: 7,
+  },
+  {
+    label: "Legend 🔮 (8×8 - 64 pieces)",
+    labelShort: "8×8 Legend",
+    labelIcon: "🔮 8×8",
+    rows: 8,
+    cols: 8,
+  },
   { label: "Custom", rows: 0, cols: 0 },
 ];
 
