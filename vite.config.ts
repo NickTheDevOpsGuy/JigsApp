@@ -53,6 +53,15 @@ export default defineConfig(({ mode }) => {
             if (id.includes("samplePuzzles") || id.includes("puzzlePacks")) {
               return "puzzles";
             }
+            // Screen chunks: use short names to avoid CSS preload failures.
+            // Vite/Rollup can truncate or misderive chunk names from long module paths
+            // (e.g. "NewGameScreen" → "NewGameScree"), causing "Unable to preload CSS" errors.
+            if (id.includes("screens/NewGame") || id.includes("screens/Setup")) return "setup";
+            if (id.includes("screens/Menu")) return "menu";
+            if (id.includes("screens/Play")) return "play";
+            if (id.includes("screens/Stats")) return "stats";
+            if (id.includes("screens/Packs/PackListScreen")) return "pack-list";
+            if (id.includes("screens/Packs/PackDetailScreen")) return "pack-detail";
             // Split vendor chunks to avoid a single >500kB bundle
             if (id.includes("node_modules")) {
               if (id.includes("react-dom") || id.includes("react/")) {

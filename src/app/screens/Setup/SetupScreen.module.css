@@ -483,18 +483,21 @@
 /* Mobile */
 @media (max-width: 520px) {
   .page {
-    padding: 12px;
-    padding-top: max(12px, env(safe-area-inset-top));
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
-    padding-left: max(12px, env(safe-area-inset-left));
-    padding-right: max(12px, env(safe-area-inset-right));
-    align-items: stretch;
+    padding: 18px;
+    padding-top: max(18px, env(safe-area-inset-top));
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+    padding-left: max(18px, env(safe-area-inset-left));
+    padding-right: max(18px, env(safe-area-inset-right));
+    align-items: flex-start;
+    justify-content: flex-start;
   }
 
   .card {
-    padding: 16px;
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    width: 100%;
+    padding: 20px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
     max-width: 100%;
+    flex-shrink: 0;
   }
 
   .cardBody {
@@ -505,7 +508,7 @@
     flex-shrink: 0;
     margin-top: 4px;
     padding-top: 16px;
-    padding-bottom: max(4px, env(safe-area-inset-bottom));
+    padding-bottom: 8px;
     gap: 8px;
     grid-template-columns: 1fr 1fr;
     border-top: 1px solid var(--color-border);
@@ -649,13 +652,13 @@
   }
 
   .preview {
-    flex: 1;
-    flex-shrink: 1;
     min-height: 60px;
     max-height: 90px;
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
 
   .previewImg {
@@ -695,12 +698,16 @@
 /* Very short mobile screens: extra compact */
 @media (max-width: 520px) and (max-height: 650px) {
   .page {
-    padding: 6px;
+    padding: 12px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
   }
 
   .card {
-    padding: 8px 10px;
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    padding: 14px 16px;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
 
   .cardBody {
@@ -709,7 +716,7 @@
 
   .actionRow {
     padding-top: 8px;
-    padding-bottom: max(4px, env(safe-area-inset-bottom));
+    padding-bottom: 6px;
   }
 
   .actionRow button {

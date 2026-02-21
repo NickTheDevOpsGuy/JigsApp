@@ -386,7 +386,7 @@
   display: none;
 }
 
-/* Mobile: same filters [All] [Edges] [Color] as desktop, tighter margins */
+/* Mobile: same filters [All] [Edges] [Color] as desktop, tighter vertical spacing */
 @media (max-width: 600px) {
   .tray,
   .trayLarge,
@@ -404,6 +404,23 @@
   .tray {
     margin: 0 12px 12px 12px;
     margin-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .header {
+    padding: 6px 12px 10px 12px;
+    gap: 4px;
+  }
+
+  .scroller {
+    padding: 8px 12px 6px 12px;
+  }
+
+  .trayCompact .scroller {
+    padding: 8px 12px 4px 12px;
+  }
+
+  .trayExtraCompact .scroller {
+    padding: 8px 10px 4px 10px;
   }
 
   .segment button {
