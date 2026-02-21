@@ -18,7 +18,7 @@ test.describe("Play screen", () => {
   test("loads play screen with puzzle", async ({ page }) => {
     await page.goto("/play");
 
-    await expect(page.getByRole("status", { name: /pieces remaining/i })).toBeVisible({
+    await expect(page.getByRole("status", { name: /pieces remaining/i }).first()).toBeVisible({
       timeout: 15000,
     });
     await expect(page.getByRole("button", { name: /menu/i })).toBeVisible({
@@ -30,5 +30,18 @@ test.describe("Play screen", () => {
     await page.goto("/play");
 
     await expect(page.getByRole("list")).toBeVisible({ timeout: 15000 });
+  });
+
+  test("tray handle visible on mobile, toggles collapse", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/play");
+
+    await expect(page.getByRole("status", { name: /pieces remaining/i }).first()).toBeVisible({
+      timeout: 15000,
+    });
+    const handle = page.getByRole("button", { name: /collapse piece drawer/i });
+    await expect(handle).toBeVisible();
+    await handle.click();
+    await expect(page.getByRole("button", { name: /expand piece drawer/i })).toBeVisible();
   });
 });

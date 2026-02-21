@@ -125,11 +125,17 @@ export function usePlayScreenManager(
         // If container measures too early (tiny board on first paint), fall back to window dimensions
         const rectW = Math.floor(rect.width);
         const rectH = Math.floor(rect.height);
+        // Mobile: board 94vw max 520px per PDF
+        const mobileMaxBoardW = isMobile
+          ? Math.min(viewportW * 0.94, 520)
+          : Infinity;
         const fallbackW =
-          isMobile && (rectW < minAvail || rectW === 0) ? viewportW - 24 : rectW;
+          isMobile && (rectW < minAvail || rectW === 0)
+            ? Math.min(viewportW - 24, mobileMaxBoardW)
+            : rectW;
         const fallbackH =
           isMobile && (rectH < minAvail || rectH === 0) ? viewportH - 24 : rectH;
-        const availW = Math.max(minAvail, fallbackW - 24);
+        const availW = Math.max(minAvail, Math.min(fallbackW - 24, mobileMaxBoardW - 24));
         const availH = Math.max(minAvail, fallbackH - 24);
 
         // Compute square tile size (smaller on mobile for better fit)
@@ -165,7 +171,10 @@ export function usePlayScreenManager(
         let boardW = Math.max(minBoardW, Math.floor(availW * effectiveFill));
         let boardH = Math.max(minBoardH, Math.floor(availH * effectiveFill));
         if (isMobile) {
-          const maxW = Math.max(minBoardW, (rectW > 0 ? rectW : viewportW) - 16);
+          const maxW = Math.min(
+            Math.max(minBoardW, (rectW > 0 ? rectW : viewportW) - 16),
+            mobileMaxBoardW,
+          );
           const maxH = Math.max(minBoardH, (rectH > 0 ? rectH : viewportH) - 16);
           boardW = Math.min(boardW, maxW);
           boardH = Math.min(boardH, maxH);

@@ -1108,7 +1108,20 @@ export function PlayScreen() {
         variant="danger"
       />
 
-      <div className={styles.main} ref={mainRef}>
+      <div className={styles.playBody}>
+      <div
+        className={`${styles.trayWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
+        onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
+      >
+        <PieceTray
+          ref={trayRef}
+          pieces={trayPieces}
+          image={imgRef.current}
+          grid={state?.grid ?? grid}
+          onPieceClick={handleTrayPieceClick}
+        />
+      </div>
+        <div className={styles.main} ref={mainRef}>
         <div className={styles.board} ref={boardRef}>
           {isLoading && (
             <div className={styles.loadingOverlay} aria-label="Loading puzzle">
@@ -1164,10 +1177,8 @@ export function PlayScreen() {
                 (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
               }
               isDaily={isDailyPuzzleSession()}
-              shareUrls={share.shareUrls}
               copied={share.copied}
               canNativeShare={share.canNativeShare}
-              onOpenShareWindow={share.openShareWindow}
               onCopyResults={share.handleCopyResults}
               onNativeShare={share.handleNativeShare}
               onDownloadImage={handleDownloadImage}
@@ -1175,6 +1186,21 @@ export function PlayScreen() {
               onMenu={() => navigate("/")}
             />
           )}
+        </div>
+      </div>
+
+        <div className={styles.statsSidebar} aria-label="Game stats">
+          <PlayHUD
+            elapsedSeconds={elapsedSeconds}
+            piecesLeft={left}
+            totalPieces={total}
+            isPaused={isPaused}
+            isComplete={isComplete}
+            timeMode={timeMode}
+            countdownMinutes={countdownMinutes}
+            bestTimeSeconds={bestTimeSeconds}
+            onTogglePause={() => setIsPaused((p) => !p)}
+          />
         </div>
       </div>
 
@@ -1188,18 +1214,6 @@ export function PlayScreen() {
           aria-label="Show piece drawer"
         />
       )}
-      <div
-        className={`${styles.trayWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
-        onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
-      >
-        <PieceTray
-          ref={trayRef}
-          pieces={trayPieces}
-          image={imgRef.current}
-          grid={state?.grid ?? grid}
-          onPieceClick={handleTrayPieceClick}
-        />
-      </div>
 
       <TutorialOverlay
         isOpen={showTutorial || showHowToPlay}

@@ -2,8 +2,8 @@
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--color-bg-secondary);
-  padding: 24px;
-  padding-bottom: max(24px, env(safe-area-inset-bottom, 0));
+  padding: 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 0));
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -13,7 +13,7 @@
   width: min(520px, 100%);
   background: var(--color-bg-card);
   border-radius: 18px;
-  padding: 28px;
+  padding: 24px;
   box-shadow: var(--shadow-lg);
   display: grid;
   gap: 16px;

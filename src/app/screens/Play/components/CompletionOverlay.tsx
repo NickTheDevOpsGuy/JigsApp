@@ -16,13 +16,6 @@ import { recordCompletion } from "@/services/statsService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
 import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
 
-interface ShareUrls {
-  twitter: string;
-  facebook: string;
-  reddit: string;
-  whatsapp: string;
-}
-
 interface CompletionOverlayProps {
   elapsedSeconds: number;
   grid?: { rows: number; cols: number };
@@ -30,10 +23,8 @@ interface CompletionOverlayProps {
   undoCount?: number;
   isNewBest?: boolean;
   isDaily?: boolean;
-  shareUrls: ShareUrls;
   copied: boolean;
   canNativeShare: boolean;
-  onOpenShareWindow: (url: string) => void;
   onCopyResults: () => void;
   onNativeShare: () => void;
   onDownloadImage: () => void;
@@ -48,10 +39,8 @@ export function CompletionOverlay({
   undoCount = 0,
   isNewBest = false,
   isDaily = false,
-  shareUrls,
   copied,
   canNativeShare,
-  onOpenShareWindow,
   onCopyResults,
   onNativeShare,
   onDownloadImage,
@@ -141,61 +130,31 @@ export function CompletionOverlay({
         </p>
 
         <div className={styles.shareSection}>
-          <p className={styles.shareLabel}>Share your result:</p>
-
-          {/* Social buttons */}
-          <div className={styles.socialButtons}>
-            <button
-              className={styles.socialBtn}
-              onClick={() => onOpenShareWindow(shareUrls.twitter)}
-              title="Share on X/Twitter"
-            >
-              𝕏
-            </button>
-            <button
-              className={styles.socialBtn}
-              onClick={() => onOpenShareWindow(shareUrls.facebook)}
-              title="Share on Facebook"
-            >
-              f
-            </button>
-            <button
-              className={styles.socialBtn}
-              onClick={() => onOpenShareWindow(shareUrls.reddit)}
-              title="Share on Reddit"
-            >
-              ⬆
-            </button>
-            <button
-              className={styles.socialBtn}
-              onClick={() => onOpenShareWindow(shareUrls.whatsapp)}
-              title="Share on WhatsApp"
-            >
-              💬
-            </button>
-          </div>
-
-          {/* Utility buttons */}
+          {/* Primary CTA: Share Result */}
+          {canNativeShare ? (
+            <Button variant="primary" onClick={onNativeShare} className={styles.sharePrimary}>
+              <Share2 size={20} />
+              Share Result
+            </Button>
+          ) : (
+            <Button variant="primary" onClick={onCopyResults} className={styles.sharePrimary}>
+              {copied ? <Check size={20} /> : <Copy size={20} />}
+              {copied ? "Copied!" : "Copy & Share"}
+            </Button>
+          )}
+          {/* Secondary: Download, Copy (Copy only when primary is Share) */}
           <div className={styles.shareButtons}>
-            <Button size="sm" onClick={onDownloadImage}>
+            <Button size="sm" variant="secondary" onClick={onDownloadImage}>
               <Download size={16} />
               Download
             </Button>
-            <Button size="sm" onClick={onCopyResults}>
-              {copied ? <Check size={16} /> : <Copy size={16} />}
-              {copied ? "Copied!" : "Copy"}
-            </Button>
             {canNativeShare && (
-              <Button size="sm" onClick={onNativeShare}>
-                <Share2 size={16} />
-                More
+              <Button size="sm" variant="secondary" onClick={onCopyResults}>
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? "Copied!" : "Copy"}
               </Button>
             )}
           </div>
-
-          <p className={styles.shareHint}>
-            For LinkedIn: Download image + Copy text, then post manually
-          </p>
         </div>
 
         <div className={styles.completeActions}>

@@ -112,16 +112,16 @@ export function computeTileSize(
         maxTile = 80;
         break;
       case "medium":
-        minTile = 36;
+        minTile = 42;
         maxTile = 60;
         break;
       case "hard":
-        minTile = 28;
+        minTile = 42;
         maxTile = 44;
         break;
       default:
-        minTile = 24;
-        maxTile = 36;
+        minTile = 42;
+        maxTile = 44;
     }
   } else {
     switch (tier) {

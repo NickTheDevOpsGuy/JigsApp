@@ -82,11 +82,19 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
   - Desktop: scroll to zoom, middle mouse drag to pan
   - Mobile: two-finger pinch zoom and pan, plus single-finger pan on empty space when zoomed
 
+### Layout
+
+- **Home** — Corner buttons: Stats (trophy) left, Help (?) right. Main actions: Today's Puzzle, Packs, Choose Photo, Snap a Picture.
+- **Stats** — Dashboard, Profile, Leaderboard (dropdown for views), Achievements. Anonymous mode with raccoon names.
+- **Desktop play** — Tray 20%, Board 60%, Stats sidebar 20% (min-width 901px). Mobile: stacked layout.
+- **Piece tray** — 28vh expanded (32vh for 25+ pieces). On mobile: 8vh collapsed with tap/swipe handle.
+
 ### UX and polish
 
 - Reference image preview overlay
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
+- **Completion screen** — Share Result primary CTA; Download and Copy secondary.
 - Settings organized into sub-menus: **About** (Help), **Display** (Theme, board options, effects), **Gameplay** (Controls, time display), **Audio**, **Advanced**
 - Optional piece borders, edge-piece highlight, immersive mode
 - Edge and corner pieces display full image content (no cropping at straight edges)
@@ -124,6 +132,16 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 - Import puzzle from URL
 - Full offline-first gameplay (app shells and assets cache today; puzzle images still need network on first load)
+
+---
+
+## Mobile layout (PDF)
+
+- **Board** — 94vw width, max 520px on mobile; 65–70% viewport height.
+- **Piece tray** — 28vh expanded, 32vh for large grids (25+ pieces), 8vh collapsed. Swipe or tap handle to expand/collapse.
+- **Piece scaling** — Min 42px on mobile; zoom scales if needed.
+- **Snap** — 120ms pop + glow animation.
+- **Header** — 56px max.
 
 ---
 
@@ -295,7 +313,11 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   ├── streak-freeze.md
 │   └── SUPABASE_SETUP.md
 ├── e2e
+│   ├── daily-modal.spec.ts
 │   ├── home.spec.ts
+│   ├── packs-stats.spec.ts
+│   ├── play-screen.spec.ts
+│   ├── setup-play.spec.ts
 │   ├── streak-freeze.spec.ts
 │   └── theme.spec.ts
 ├── lhci-reports
@@ -380,6 +402,9 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   ├── Modal
 │   │   │   │   ├── Modal.module.css
 │   │   │   │   └── Modal.tsx
+│   │   │   ├── OfflineIndicator
+│   │   │   │   ├── OfflineIndicator.module.css
+│   │   │   │   └── OfflineIndicator.tsx
 │   │   │   ├── OnboardingTooltip
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── OnboardingTooltip.module.css
@@ -425,6 +450,7 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   ├── hooks
 │   │   │   ├── useBatterySaver.ts
 │   │   │   ├── useKeyboardShortcuts.ts
+│   │   │   ├── useMediaQuery.ts
 │   │   │   ├── useMenuSettings.ts
 │   │   │   ├── useOnboarding.ts
 │   │   │   ├── useTheme.test.tsx

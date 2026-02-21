@@ -6,8 +6,8 @@
   align-items: center;
   justify-content: center;
   background: var(--color-bg-secondary);
-  padding: 24px;
-  padding-bottom: max(24px, env(safe-area-inset-bottom, 0));
+  padding: 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 0));
   box-sizing: border-box;
 }
 
@@ -16,7 +16,7 @@
   max-width: 520px;
   background: var(--color-bg-card);
   border-radius: 18px;
-  padding: 28px;
+  padding: 24px;
   box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
@@ -24,8 +24,8 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 17px;
 }
 
 .title {
@@ -58,8 +58,8 @@
 
 .tabs {
   display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 7px;
+  margin-bottom: 20px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;

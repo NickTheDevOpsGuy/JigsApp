@@ -89,7 +89,7 @@
 .trayWrap {
   flex-shrink: 0;
   overflow: hidden;
-  max-height: 240px;
+  max-height: 320px;
   transition:
     max-height 0.25s ease,
     opacity 0.2s ease;
@@ -264,14 +264,65 @@
   color: var(--color-text-primary);
 }
 
+/* Desktop: Tray 20%, Board 60%, Stats 20% (PDF) */
+.playBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 901px) {
+  .playBody {
+    display: grid;
+    grid-template-columns: 20% 1fr 20%;
+    grid-template-rows: 1fr;
+    gap: 0;
+  }
+
+  .playBody .trayWrap {
+    grid-column: 1;
+    max-height: none;
+  }
+
+  .playBody .main {
+    grid-column: 2;
+  }
+
+  .playBody .statsSidebar {
+    grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4, 16px);
+    background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
+    border-left: 1px solid var(--color-border);
+  }
+
+  .playBody .statsSidebar .hud {
+    flex-direction: column;
+    gap: var(--space-3, 12px);
+  }
+}
+
+.statsSidebar {
+  display: none;
+}
+
 .main {
   flex: 1;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 8px;
+  gap: var(--space-3, 12px);
+  padding: var(--space-2, 8px);
+  order: 1;
+}
+
+.playBody .trayWrap {
+  order: 2;
 }
 
 .loadingOverlay {
@@ -374,7 +425,7 @@
   min-height: 280px;
   position: relative;
   background: var(--color-bg-elevated);
-  border-radius: 16px;
+  border-radius: var(--radius-board, 20px);
   border: 2px solid var(--color-border);
   box-shadow: var(--shadow-md);
   overflow: hidden;
@@ -522,7 +573,7 @@
 /* Mobile */
 @media (max-width: 600px) {
   .topBar {
-    height: 48px;
+    height: 56px;
     padding: 0 8px;
     padding-top: env(safe-area-inset-top, 0);
     gap: 4px;
@@ -554,13 +605,13 @@
     display: none;
   }
   .main {
-    padding: 4px;
-    gap: 6px;
+    padding: var(--space-1, 4px);
+    gap: var(--space-2, 6px);
   }
   .board {
     min-height: 240px;
     border-width: 2px;
-    border-radius: 12px;
+    border-radius: var(--radius-card, 16px);
   }
   .previewOverlay {
     bottom: 8px;
@@ -670,9 +721,9 @@
   justify-content: center;
   z-index: 100;
   animation: fadeIn 0.5s ease-out;
-  padding: 12px;
-  padding-top: max(12px, env(safe-area-inset-top, 0));
-  padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+  padding: 10px;
+  padding-top: max(10px, env(safe-area-inset-top, 0));
+  padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
@@ -686,7 +737,7 @@
 @media (max-width: 600px) {
   .completeOverlay {
     align-items: flex-start;
-    padding-top: max(24px, env(safe-area-inset-top, 0));
+    padding-top: max(20px, env(safe-area-inset-top, 0));
   }
 }
 
@@ -836,26 +887,56 @@
 @media (max-width: 600px) {
   .completeContent {
     margin-top: 0;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
+    padding: 0 4px;
   }
   .completeContent h2 {
-    font-size: 1.75rem;
-    line-height: 1.25;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
   }
   .completeContent p {
-    font-size: 1rem;
-    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  .completeContent .puzzleSize {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
   }
   .shareSection {
-    padding: 0.75rem;
-    margin-bottom: 1rem;
+    padding: 0.6rem;
+    margin-bottom: 0.75rem;
+  }
+  .sharePrimary {
+    min-height: 44px;
+    font-size: 0.95rem;
+  }
+  .shareButtons {
+    gap: 6px;
   }
   .completeActions {
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
   }
   .completePreviewWrapper {
-    margin-bottom: 1rem;
+    margin: 0.35rem 0 0.6rem;
+  }
+  .completePreviewImage {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* Very small phones - fit without scroll */
+@media (max-width: 380px) {
+  .completeContent h2 {
+    font-size: 1.25rem;
+  }
+  .completeContent p {
+    font-size: 0.85rem;
+  }
+  .shareSection {
+    padding: 0.5rem;
   }
 }
 
@@ -878,6 +959,16 @@
   padding: 1rem;
   background: var(--color-overlay-content);
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.sharePrimary {
+  width: 100%;
+  min-height: 48px;
+  font-size: 1rem;
 }
 
 .shareLabel {

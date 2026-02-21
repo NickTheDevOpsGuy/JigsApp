@@ -5,18 +5,18 @@
 
 import type { Piece } from "@/puzzle/types";
 
-const SNAP_GLOW_MS = 280;
+const SNAP_GLOW_MS = 120;
 
 export function snapPopScale(tMs: number): number {
   if (tMs <= 0) return 1;
-  if (tMs >= 200) return 1;
+  if (tMs >= 120) return 1;
 
-  if (tMs < 80) {
-    const k = tMs / 80;
+  if (tMs < 40) {
+    const k = tMs / 40;
     return 1 + 0.08 * easeOutBack(k);
   }
 
-  const k = (tMs - 80) / 120;
+  const k = (tMs - 40) / 80;
   return 1.08 - 0.08 * easeOutBounce(k);
 }
 
