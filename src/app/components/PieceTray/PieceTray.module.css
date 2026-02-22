@@ -407,7 +407,8 @@
   }
 
   .tray {
-    margin: 0 max(8px, env(safe-area-inset-right, 0)) 12px max(4px, env(safe-area-inset-left, 0));
+    margin: 0 max(8px, env(safe-area-inset-right, 0)) 12px
+      max(4px, env(safe-area-inset-left, 0));
     margin-bottom: max(16px, env(safe-area-inset-bottom, 0));
   }
 
