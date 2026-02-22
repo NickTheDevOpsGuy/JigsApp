@@ -585,7 +585,7 @@
 @media (max-width: 600px) {
   .page {
     /* Clear mobile browser nav bar (~56px) + safe-area so tray isn't cut off */
-    padding-bottom: max(88px, calc(env(safe-area-inset-bottom, 0) + 56px));
+    padding-bottom: max(100px, calc(env(safe-area-inset-bottom, 0) + 64px));
   }
 
   .playBody {
@@ -598,7 +598,7 @@
   }
 
   .board {
-    min-height: 200px;
+    min-height: 180px;
   }
 
   .topBar {

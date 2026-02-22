@@ -569,10 +569,10 @@
   }
 
   .preview {
-    width: min(90vw, 60vh, 280px);
-    height: min(90vw, 60vh, 280px);
+    width: min(95vw, 70vh, 320px);
+    height: min(95vw, 70vh, 320px);
     aspect-ratio: 1 / 1;
-    min-height: 220px;
+    min-height: 240px;
     align-self: center;
     flex-shrink: 0;
   }
@@ -752,9 +752,9 @@
   }
 
   .preview {
-    width: min(80vw, 52vh, 240px);
-    height: min(80vw, 52vh, 240px);
-    min-height: 160px;
+    width: min(92vw, 65vh, 280px);
+    height: min(92vw, 65vh, 280px);
+    min-height: 180px;
   }
 
   .previewImg {
