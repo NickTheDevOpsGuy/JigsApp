@@ -25,7 +25,7 @@
   min-height: 0;
   background: var(--color-bg-card);
   border-radius: 16px;
-  padding: 16px 20px;
+  padding: 20px 24px;
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
@@ -36,7 +36,7 @@
 .cardBody {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
   min-width: 0;
   overflow-x: hidden;
 }
@@ -44,27 +44,28 @@
 /* Desktop: wider card, more spacing, larger preview */
 @media (min-width: 768px) {
   .page {
-    padding: 24px;
+    padding: 28px;
   }
 
   .card {
     max-width: 720px;
-    padding: 24px 32px;
+    padding: 28px 36px;
   }
 
   .cardBody {
-    gap: 16px;
+    gap: 20px;
   }
 
   .preview {
     width: min(480px, 50vh);
     height: min(480px, 50vh);
     min-height: 280px;
+    margin: 8px 0;
   }
 }
 
 .title {
-  margin: 0 0 0;
+  margin: 0 0 8px 0;
   font-size: 17px;
   color: var(--color-brand-primary);
   flex-shrink: 0;
@@ -78,7 +79,7 @@
 }
 
 .difficultySummary {
-  margin: 0 0 2px 0;
+  margin: 0 0 4px 0;
   font-size: 12px;
   color: var(--color-text-secondary);
   flex-shrink: 0;
@@ -108,9 +109,10 @@
 .configGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
   padding: 0;
+  margin: 4px 0;
 }
 
 .configGrid > *:nth-child(n + 3) {
@@ -141,6 +143,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin: 12px 0;
 }
 
 .previewEmpty {
@@ -164,9 +167,9 @@
   flex-shrink: 0;
   display: grid;
   grid-template-columns: 1fr 1fr 2fr;
-  gap: 8px;
-  margin-top: 2px;
-  padding-top: 10px;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 16px;
   border-top: 1px solid var(--color-border);
 }
 
@@ -304,8 +307,9 @@
   display: flex;
   gap: 4px;
   background: var(--color-brand-light);
-  padding: 3px 4px;
+  padding: 4px 6px;
   border-radius: 10px;
+  margin-bottom: 4px;
 }
 
 .tab {
@@ -336,14 +340,15 @@
 .imageSourcePanel {
   flex-shrink: 0;
   min-width: 0; /* allows shrinking in flex chain, prevents overflow */
+  margin: 8px 0;
 }
 
 /* Category filter */
 .categories {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   flex-wrap: wrap;
-  margin-bottom: 2px;
+  margin-bottom: 10px;
   flex-shrink: 0;
   min-width: 0; /* allows horizontal scroll on mobile without expanding parent */
 }
@@ -373,10 +378,11 @@
 .galleryWrap {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
   flex-shrink: 0;
   overflow: hidden;
+  margin-bottom: 4px;
 }
 
 .galleryScrollBtn {
@@ -414,13 +420,13 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
-  padding: 6px;
-  padding-inline-end: max(16px, env(safe-area-inset-right, 0));
+  padding: 10px;
+  padding-inline-end: max(20px, env(safe-area-inset-right, 0));
   background: var(--color-bg-card);
   border-radius: 10px;
   border: 1px solid var(--color-border);
@@ -520,12 +526,12 @@
   font-weight: 600;
 }
 
-/* Mobile – full-height flex, anchor Start at bottom, tighter gaps */
+/* Mobile – full-height flex, anchor Start at bottom */
 @media (max-width: 520px) {
   .page {
     min-height: 100dvh;
     height: 100dvh;
-    padding: 10px;
+    padding: 14px;
     padding-top: max(10px, env(safe-area-inset-top));
     padding-bottom: max(10px, env(safe-area-inset-bottom));
     padding-left: max(10px, env(safe-area-inset-left));
@@ -542,8 +548,8 @@
     flex-direction: column;
     min-height: 0;
     width: 100%;
-    padding: 14px 16px;
-    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    padding: 18px 20px;
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
     max-width: 100%;
   }
 
@@ -558,14 +564,14 @@
   }
 
   .cardBody {
-    gap: 4px;
+    gap: 12px;
   }
 
   .actionRow {
     flex-shrink: 0;
     margin-top: auto;
-    padding-top: 10px;
-    padding-bottom: max(6px, env(safe-area-inset-bottom));
+    padding-top: 16px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
     gap: 10px;
     grid-template-columns: 1fr 1fr;
     border-top: 1px solid var(--color-border);
@@ -597,6 +603,7 @@
     min-height: 180px;
     align-self: center;
     flex-shrink: 1;
+    margin: 12px 0;
   }
 
   .previewImg {
@@ -761,12 +768,12 @@
   }
 
   .card {
-    padding: 12px 14px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    padding: 14px 16px;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
 
   .cardBody {
-    gap: 5px;
+    gap: 8px;
   }
 
   .actionRow {
