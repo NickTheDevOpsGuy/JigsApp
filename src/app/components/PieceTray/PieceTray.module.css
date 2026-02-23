@@ -102,15 +102,13 @@
 .titleRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
 .title {
   font-weight: 600;
-  flex: 1;
-  min-width: 0;
+  flex-shrink: 0;
 }
 
 .controls {
@@ -402,8 +400,16 @@
   }
 
   .header {
-    padding: 10px 14px 12px 14px;
-    gap: 8px;
+    padding: 6px 10px 8px 10px;
+    gap: 4px;
+  }
+
+  .titleRow {
+    min-height: 28px;
+  }
+
+  .title {
+    font-size: 13px;
   }
 
   .tray {

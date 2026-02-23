@@ -884,7 +884,7 @@ export function PlayScreen() {
         className={`${styles.topBarWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveTopHidden : ""}`}
         onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
       >
-        <div className={styles.topBar}>
+          <div className={styles.topBar}>
           <div className={styles.topBarLeft}>
             <HeaderMenu
               title="Phuzzle"

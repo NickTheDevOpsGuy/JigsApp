@@ -13,10 +13,11 @@ import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { TrayFilterButton } from "@/screens/Play/components/TrayFilterButton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import styles from "./PieceTray.module.css";
 
-type TrayFilter = "all" | "edges" | "colors";
+export type TrayFilter = "all" | "edges" | "colors";
 
 const THUMB_NORMAL = 68;
 const THUMB_COMPACT = 54;
@@ -307,36 +308,11 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <span className={styles.title}>Piece Drawer ({pieces.length})</span>
-        </div>
-        <div className={styles.controls} aria-label="Tray filters">
-          <div className={styles.segment} role="group" aria-label="Filter">
-            <button
-              type="button"
-              className={filter === "all" ? styles.active : undefined}
-              onClick={() => setFilter("all")}
-              aria-pressed={filter === "all"}
-            >
-              All
-            </button>
-            <button
-              type="button"
-              className={filter === "edges" ? styles.active : undefined}
-              onClick={() => setFilter("edges")}
-              aria-pressed={filter === "edges"}
-            >
-              Edges
-            </button>
-            <button
-              type="button"
-              className={filter === "colors" ? styles.active : undefined}
-              onClick={() => image && setFilter("colors")}
-              disabled={!image}
-              aria-pressed={filter === "colors"}
-              title={!image ? "Load an image to enable color sort" : undefined}
-            >
-              Color
-            </button>
-          </div>
+          <TrayFilterButton
+            value={filter}
+            onChange={setFilter}
+            hasImage={!!image}
+          />
         </div>
       </div>
 
