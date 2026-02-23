@@ -3,7 +3,7 @@
  * Handles drag state, board/neighbor snap tolerances, piece locking, events.
  */
 import type { MutableRefObject } from "react";
-import type { DragState, GridSize, Piece, PuzzleState } from "./types";
+import type { DragState, GridSize, Piece, PieceCutType, PuzzleState } from "./types";
 import { createInitialPieces } from "./factories/createInitialPieces";
 import type { SavedPiece } from "./puzzleStorage";
 import { UndoManager } from "./undoManager";
@@ -39,6 +39,8 @@ export type PuzzleManagerOptions = {
   rotationStepDeg?: 90 | 180;
   /** Use tighter scatter pattern for mobile viewports. */
   isMobile?: boolean;
+  /** Piece cut style (classic, irregular, hard). */
+  cutType?: PieceCutType;
 };
 
 export type PuzzleManagerEvents = {
@@ -119,8 +121,9 @@ export class PuzzleManager {
     this.isMobile = isMobile;
     this.scatterStartYRatio = scatterStartYRatio;
     this.rotationStepDeg = rotationStepDeg;
-    // Tabs extend ~22% beyond tile edge; pad must exceed that or shapes get clipped
-    const minPad = Math.ceil(Math.min(pieceWidth, pieceHeight) * 0.22);
+    const cutType = options.cutType ?? "classic";
+    const depthPct = cutType === "irregular" ? 0.26 : cutType === "hard" ? 0.14 : 0.22;
+    const minPad = Math.ceil(Math.min(pieceWidth, pieceHeight) * depthPct);
     this.pad = Math.max(pad, minPad);
     this.tileW = pieceWidth;
     this.tileH = pieceHeight;
@@ -141,6 +144,7 @@ export class PuzzleManager {
       targetStartX: this.targetStartX,
       targetStartY: this.targetStartY,
       isMobile,
+      cutType,
     });
 
     this.state = {

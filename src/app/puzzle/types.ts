@@ -10,6 +10,9 @@ export type GridSize = {
 
 export type EdgeType = "flat" | "tab" | "blank";
 
+/** Piece cut style: classic (default), irregular (varied), hard (subtle tabs) */
+export type PieceCutType = "classic" | "irregular" | "hard";
+
 export type PieceEdges = {
   top: EdgeType;
   right: EdgeType;

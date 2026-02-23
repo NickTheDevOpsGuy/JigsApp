@@ -3,8 +3,11 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { soundManager } from "@/audio/sounds";
+import type { PieceCutType } from "@/puzzle/types";
 import {
   PIECE_LOCKING_KEY,
+  CUT_TYPE_KEY,
+  PROGRESSIVE_REVEAL_KEY,
   GHOST_HINT_KEY,
   IMMERSIVE_MODE_KEY,
   ALIGNMENT_GRID_KEY,
@@ -58,6 +61,23 @@ export function usePlayScreenUI() {
   const [relaxedModeEnabled, setRelaxedModeEnabled] = useState(() => {
     try {
       return localStorage.getItem(RELAXED_MODE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const [pieceCutType, setPieceCutType] = useState<PieceCutType>(() => {
+    try {
+      const raw = localStorage.getItem(CUT_TYPE_KEY);
+      return raw === "irregular" || raw === "hard" ? raw : "classic";
+    } catch {
+      return "classic";
+    }
+  });
+
+  const [progressiveRevealMode, setProgressiveRevealMode] = useState(() => {
+    try {
+      return localStorage.getItem(PROGRESSIVE_REVEAL_KEY) === "true";
     } catch {
       return false;
     }
@@ -165,6 +185,22 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
+      localStorage.setItem(CUT_TYPE_KEY, pieceCutType);
+    } catch {
+      // ignore
+    }
+  }, [pieceCutType]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(PROGRESSIVE_REVEAL_KEY, progressiveRevealMode ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [progressiveRevealMode]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(IMMERSIVE_MODE_KEY, immersiveMode ? "true" : "false");
     } catch {
       // ignore
@@ -226,6 +262,10 @@ export function usePlayScreenUI() {
     relaxedModeEnabled,
     setRelaxedModeEnabled,
     toggleRelaxedMode,
+    pieceCutType,
+    setPieceCutType,
+    progressiveRevealMode,
+    setProgressiveRevealMode,
     debug,
     setDebug,
     showPreview,

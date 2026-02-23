@@ -58,6 +58,10 @@ export type HeaderMenuProps = {
   onTogglePerfOverlay: () => void;
   immersiveMode: boolean;
   onToggleImmersiveMode: () => void;
+  pieceCutType?: "classic" | "irregular" | "hard";
+  onPieceCutTypeChange?: (cut: "classic" | "irregular" | "hard") => void;
+  progressiveRevealMode?: boolean;
+  onToggleProgressiveReveal?: () => void;
   onSharePuzzle?: () => void | Promise<void>;
   shareDisabled?: boolean;
   theme?: Theme;
@@ -240,6 +244,32 @@ export function buildMenuItems(
       label: props.immersiveMode ? "Immersive Mode ✨" : "Immersive Mode 🌙",
       sortKey: "Immersive Mode",
       onClick: c(props.onToggleImmersiveMode),
+      subMenu: "display",
+    },
+    {
+      id: "progressiveReveal",
+      section: "settings",
+      visible: true,
+      label: props.progressiveRevealMode ? "Progressive Reveal ✨" : "Progressive Reveal 🌙",
+      sortKey: "Progressive Reveal",
+      onClick: c(props.onToggleProgressiveReveal ?? (() => {})),
+      subMenu: "display",
+    },
+    {
+      id: "pieceCut",
+      section: "settings",
+      visible: !!props.onPieceCutTypeChange,
+      label: `Piece shape: ${(props.pieceCutType ?? "classic") === "classic" ? "Classic" : (props.pieceCutType ?? "classic") === "irregular" ? "Irregular" : "Hard"}`,
+      sortKey: "Piece shape",
+      onClick: c(() => {
+        const next =
+          (props.pieceCutType ?? "classic") === "classic"
+            ? "irregular"
+            : (props.pieceCutType ?? "classic") === "irregular"
+              ? "hard"
+              : "classic";
+        props.onPieceCutTypeChange?.(next);
+      }),
       subMenu: "display",
     },
     // ─── Audio ───

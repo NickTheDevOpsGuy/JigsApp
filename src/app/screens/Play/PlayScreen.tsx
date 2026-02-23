@@ -53,6 +53,8 @@ import {
   TopBarButtons,
   HeaderMenu,
 } from "./components";
+import { ProgressivePreviewOverlay } from "./components/ProgressivePreviewOverlay";
+import { SnapComboMeter } from "./components/SnapComboMeter";
 import { ProfilerOverlay } from "./components";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
@@ -143,6 +145,10 @@ export function PlayScreen() {
     togglePerfOverlay,
     immersiveMode,
     toggleImmersiveMode,
+    pieceCutType,
+    setPieceCutType,
+    progressiveRevealMode,
+    setProgressiveRevealMode,
   } = ui;
 
   const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
@@ -232,6 +238,7 @@ export function PlayScreen() {
     canvasRef,
     trayRef,
     mainRef,
+    snapCombo,
     imgRef,
     popMapRef,
     lockMapRef,
@@ -975,6 +982,16 @@ export function PlayScreen() {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 toggleImmersiveMode();
               }}
+              progressiveRevealMode={progressiveRevealMode}
+              onToggleProgressiveReveal={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                setProgressiveRevealMode((v) => !v);
+              }}
+              pieceCutType={pieceCutType}
+              onPieceCutTypeChange={(cut) => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                setPieceCutType(cut);
+              }}
               onSharePuzzle={isSupabaseConfigured() ? handleSharePuzzle : undefined}
               shareDisabled={creatingSession}
               onOpenThemeModal={() => {
@@ -1136,6 +1153,7 @@ export function PlayScreen() {
                   </button>
                 </div>
               )}
+              <SnapComboMeter combo={snapCombo} />
               <canvas
                 key={puzzleKey}
                 className={styles.canvas}
@@ -1148,7 +1166,16 @@ export function PlayScreen() {
                 onContextMenu={handleContextMenu}
                 onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
               />
-              {showPreview && imgRef.current && (
+              {progressiveRevealMode && imgRef.current && state?.pieces && (
+                <div className={styles.previewOverlay}>
+                  <ProgressivePreviewOverlay
+                    image={imgRef.current}
+                    pieces={state.pieces}
+                    grid={state.grid}
+                  />
+                </div>
+              )}
+              {!progressiveRevealMode && showPreview && imgRef.current && (
                 <div className={styles.previewOverlay}>
                   <img
                     src={imgRef.current.src}

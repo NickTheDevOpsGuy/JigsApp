@@ -8,7 +8,7 @@ test.describe("Streak freeze offer", () => {
   }) => {
     await page.clock.install({ time: FIXED_TODAY });
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "9");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "10");
       const d = new Date();
       d.setDate(d.getDate() - 1);
       const yesterday = d.toISOString().slice(0, 10);
@@ -30,7 +30,7 @@ test.describe("Streak freeze offer", () => {
   test("hides offer after clicking No thanks and reopening", async ({ page }) => {
     await page.clock.install({ time: FIXED_TODAY });
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "9");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "10");
       const d = new Date();
       d.setDate(d.getDate() - 1);
       const yesterday = d.toISOString().slice(0, 10);
@@ -59,7 +59,7 @@ test.describe("Streak freeze offer", () => {
   test("freeze buttons are keyboard accessible", async ({ page }) => {
     await page.clock.install({ time: FIXED_TODAY });
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "9");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "10");
       const d = new Date();
       d.setDate(d.getDate() - 1);
       const yesterday = d.toISOString().slice(0, 10);

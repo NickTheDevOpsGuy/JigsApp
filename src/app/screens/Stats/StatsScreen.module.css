@@ -369,6 +369,10 @@
 }
 
 /* Leaderboard header – dropdown + controls, same layout as mobile */
+.countdownWrap {
+  margin-bottom: 16px;
+}
+
 .leaderboardHeader {
   display: flex;
   flex-direction: column;

@@ -11,10 +11,12 @@ Setup and reference guides for developers.
 
 ## Reference
 
-| Document                               | Description                                                                              |
-| -------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [streak-freeze.md](./streak-freeze.md) | Streak freeze: one per week; offered when yesterday wasn't completed; keeps streak alive |
-| [SHARING.md](./SHARING.md)             | Completion share (image, social) and co-op (Play with Friend); links to Supabase setup   |
+| Document                                     | Description                                                                              |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [streak-freeze.md](./streak-freeze.md)      | Streak freeze: earn after 5-day streak; auto-applied when day missed; keeps streak alive |
+| [SHARING.md](./SHARING.md)                   | Completion share (image, social) and co-op (Play with Friend); links to Supabase setup   |
+| [CHANGES.md](./CHANGES.md) | Full feature list (gameplay, layout, UX, social, analytics) |
+| [FEATURES_IMPLEMENTED.md](./FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, progressive reveal, snap combo) |
 
 ## Future Ideas
 

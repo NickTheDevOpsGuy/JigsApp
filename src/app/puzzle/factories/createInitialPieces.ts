@@ -1,8 +1,14 @@
 /**
  * createInitialPieces – builds scrambled pieces with jigsaw edges, scatter positions, targets.
  */
-import type { GridSize, Piece, PieceEdges } from "../types";
+import type { GridSize, Piece, PieceEdges, PieceCutType } from "../types";
 import { buildPiecePath } from "../shape";
+
+const CUT_DEPTH_PCT: Record<PieceCutType, number> = {
+  classic: 0.22,
+  irregular: 0.26,
+  hard: 0.14,
+};
 
 type CreateInitialPiecesArgs = {
   grid: GridSize;
@@ -18,6 +24,8 @@ type CreateInitialPiecesArgs = {
   targetStartY: number;
   /** When true, use tighter scatter for mobile (fewer columns, more rows). */
   isMobile?: boolean;
+  /** Piece cut style (default: classic) */
+  cutType?: PieceCutType;
 };
 
 function randInt(min: number, max: number) {
@@ -79,13 +87,13 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     targetStartX,
     targetStartY,
     isMobile = false,
+    cutType = "classic",
   } = args;
 
   const total = grid.cols * grid.rows;
   const edges = buildEdgesForGrid(grid);
-
-  // Tabs/blanks extend ~22% beyond tile edge (see shape.ts knobDepth). Pad must exceed that or shapes get clipped.
-  const minPad = Math.ceil(Math.min(tileW, tileH) * 0.22);
+  const depthPct = CUT_DEPTH_PCT[cutType];
+  const minPad = Math.ceil(Math.min(tileW, tileH) * depthPct);
   const effectivePad = Math.max(pad, minPad);
 
   const w = tileW + effectivePad * 2;
@@ -252,6 +260,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
       tileH,
       pad: effectivePad,
       edges: edges[i],
+      cutType,
     });
 
     pieces.push({

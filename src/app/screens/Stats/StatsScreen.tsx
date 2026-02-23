@@ -30,6 +30,7 @@ import { getAnonymousDisplayName } from "@/data/anonymousNames";
 import { getMyAchievements } from "@/services/achievementsService";
 import { getTodayDateString, getStreakFreezeCount } from "@/daily/dailyPuzzleCore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { DailyCountdown } from "@/components/DailyCountdown/DailyCountdown";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -580,6 +581,14 @@ export function StatsScreen() {
 
               {activeTab === "leaderboard" && (
                 <div className={styles.section}>
+                  <div className={styles.countdownWrap}>
+                    <DailyCountdown
+                      prominent
+                      onUnlock={() => {
+                        if (leaderboardType === "today") loadData();
+                      }}
+                    />
+                  </div>
                   <div className={styles.leaderboardHeader}>
                     <select
                       className={styles.leaderboardSelect}

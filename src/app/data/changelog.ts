@@ -1,11 +1,17 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "9";
+export const CHANGELOG_VERSION = "10";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "⏱️ Daily countdown – Server-synced timer to next daily unlock on the Leaderboard; celebration when new puzzle is ready",
+      "🛡️ Streak shield – Earn one freeze per week after a 5-day streak; auto-applied if you miss a day",
+      "🧩 Alternate piece shapes – Classic, Irregular, Hard (Settings → Display → Piece shape)",
+      "🖼️ Progressive reveal – Hide full reference; reveal only regions where pieces are placed (Settings → Display)",
+      "⚡ Snap combo – Combo meter when 2+ placements within 2.5s; breaks on idle",
+      "🔽 Filter in tray – Compact Filter dropdown in Piece Drawer (All, Edges, Color)",
       "📊 Live completion counter – See how many players completed today's puzzle in real time on the leaderboard",
       "🏅 Top X% – Your percentile ranking (e.g. Top 12%) shown on the completion overlay, per grid size",
       "✨ Snap proximity glow – Visual feedback while dragging: glow intensifies as you near the snap point",

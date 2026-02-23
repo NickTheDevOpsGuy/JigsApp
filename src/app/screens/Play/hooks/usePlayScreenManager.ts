@@ -4,7 +4,7 @@ import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
-import { STORAGE_KEY } from "../playScreenUtils";
+import { STORAGE_KEY, CUT_TYPE_KEY } from "../playScreenUtils";
 import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
@@ -14,6 +14,7 @@ export type ResumeChoice = "resume" | "fresh" | null;
 
 const PLACEMENT_STREAK_MS = 3000;
 const STREAK_COOLDOWN_MS = 5000;
+const SNAP_COMBO_IDLE_MS = 2500;
 const SNAP_PARTICLE_COUNT = 8;
 
 /**
@@ -84,6 +85,7 @@ export function usePlayScreenManager(
   const [manager, setManager] = useState<PuzzleManager | null>(null);
   const [state, setState] = useState<PuzzleState | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [snapCombo, setSnapCombo] = useState(0);
   const [awaitingResumeChoice, setAwaitingResumeChoice] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [puzzleKey, setPuzzleKey] = useState(0);
@@ -175,6 +177,12 @@ export function usePlayScreenManager(
           clearPuzzleState();
         }
 
+        const cutTypeRaw = localStorage.getItem(CUT_TYPE_KEY);
+        const cutType =
+          cutTypeRaw === "irregular" || cutTypeRaw === "hard"
+            ? cutTypeRaw
+            : "classic";
+
         const opts = optionsRef.current;
         const next = new PuzzleManager(
           {
@@ -185,6 +193,7 @@ export function usePlayScreenManager(
             pieceWidth,
             pieceHeight,
             isMobile,
+            cutType,
             snapScaleRef: opts?.snapScaleRef,
             relaxedToleranceMultiplierRef,
           },
@@ -203,12 +212,16 @@ export function usePlayScreenManager(
               popMapRef.current.set(p.id, now);
               soundManager.play("place");
               opts?.haptic?.("place");
-              // Placement streak: 3+ placements in 3s triggers "On fire!"
               placementTimesRef.current.push(now);
               const cutoff = now - PLACEMENT_STREAK_MS;
+              const comboCutoff = now - SNAP_COMBO_IDLE_MS;
               placementTimesRef.current = placementTimesRef.current.filter(
                 (t) => t > cutoff,
               );
+              const combo = placementTimesRef.current.filter(
+                (t) => t > comboCutoff,
+              ).length;
+              setSnapCombo(combo);
               if (
                 placementTimesRef.current.length >= 3 &&
                 (lastStreakAtRef.current == null ||
@@ -359,6 +372,20 @@ export function usePlayScreenManager(
     manager?.setPieceLockingEnabled(pieceLockingEnabled);
   }, [manager, pieceLockingEnabled]);
 
+  // Decay combo when idle (recompute from placement times)
+  useEffect(() => {
+    const id = setInterval(() => {
+      const now = performance.now();
+      const comboCutoff = now - SNAP_COMBO_IDLE_MS;
+      const recent = placementTimesRef.current.filter((t) => t > comboCutoff);
+      setSnapCombo((prev) => {
+        const next = recent.length;
+        return next !== prev ? next : prev;
+      });
+    }, 400);
+    return () => clearInterval(id);
+  }, []);
+
   // Resize observer: keep manager board size in sync with DOM (no min clamp so coordinate system matches canvas)
   useEffect(() => {
     const boardEl = boardRef.current;
@@ -404,5 +431,7 @@ export function usePlayScreenManager(
     popMapRef,
     lockMapRef,
     snapParticlesRef,
+    snapCombo,
+    setSnapCombo,
   };
 }

@@ -69,63 +69,13 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ## Features
 
-### Core gameplay
+- **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap; group merging; 3×3 to 9×9 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan
+- **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak). See [doc/streak-freeze.md](doc/streak-freeze.md)
+- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard), completion confetti and badges, six themes
+- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image, co-op (Play with Friend via link)
+- **Analytics** — Live completion counter, percentile ranking (Top X%)
 
-- Drag and drop pieces with rotation (tap to rotate on mobile)
-- Board snap and neighbor snap (with near-snap nudge when pieces are close)
-- Group merging so connected pieces move together
-- Multiple grid sizes (3×3 to 9×9 presets; custom up to 12×12)
-- Image sources: gallery, file upload, camera capture
-- Puzzle packs – curated sets grouped by theme
-- Tray filters: All, Edges, Corners, Center (plus Grid and Color sorting)
-- Zoom and pan (animated, persistent per grid size, soft board clamp)
-  - Desktop: scroll to zoom, middle mouse drag to pan
-  - Mobile: two-finger pinch zoom and pan, plus single-finger pan on empty space when zoomed
-
-### Layout
-
-- **Home** — Corner buttons: Stats (trophy) left, Help (?) right. Main actions: Today's Puzzle, Packs, Choose Photo, Snap a Picture.
-- **Stats** — Dashboard, Profile, Leaderboard (dropdown for views), Achievements. Anonymous mode with raccoon names.
-- **Play layout** — Board on top, tray below (150px desktop, 160px mobile). HUD (timer, pieces) in top bar.
-- **Piece tray** — Fixed height below board. Compact mode for 25+ pieces; horizontal scroll.
-
-### UX and polish
-
-- **Snap proximity glow** – Visual feedback while dragging: glow intensifies as you near the correct snap point
-- Reference image preview overlay
-- Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
-- Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
-- **Completion screen** — Share Result primary CTA; Download and Copy secondary.
-- Settings organized into sub-menus: **About** (Help), **Display** (Theme, board options, effects), **Gameplay** (Controls, time display), **Audio**, **Advanced**
-- Optional piece borders, edge-piece highlight, immersive mode
-- Edge and corner pieces display full image content (no cropping at straight edges)
-- Undo and redo
-- Ghost hint and ghost when idle (after a few seconds of inactivity)
-- Optional piece locking
-- Battery-saver detection (reduces confetti when low-power or data-saver)
-- Six themes (Light, Dark, Space, Ocean, Forest, Sunset) with system preference on first visit
-- Keyboard navigation in hamburger menu (Arrow keys, Escape)
-- Haptic feedback on supported devices (tap, snap, place, rotate)
-- Sound effects (toggle in Audio)
-- `prefers-reduced-motion` support for shorter animations
-
-### Social and progress
-
-- Daily puzzle and streak tracking
-- **Streak freeze** – One per week; use when you miss a day to keep your streak. Offered when opening Today's Puzzle if yesterday wasn't completed. See [doc/streak-freeze.md](doc/streak-freeze.md).
-- Stats dashboard and leaderboards (Supabase)
-- Profile with display name and anonymous mode
-- Share completed puzzle image
-- **Co-op** – Play with Friend: share a link and work on the same puzzle together (requires Supabase)
-- Share app / invite testers button (native share on mobile, copy link on desktop)
-
-### Analytics
-
-- **Live completion counter** – Real-time count of players who completed today's puzzle (Stats → Leaderboard → Today)
-- **Percentile ranking** – "Top X%" shown on completion overlay, calculated per grid size
-- PostHog integration behind env vars (optional)
-  - Events like `puzzle_started`, `puzzle_completed`, `puzzle_abandoned`
-  - No route inside the app
+Full feature list → [doc/CHANGES.md](doc/CHANGES.md)
 
 ---
 
@@ -203,12 +153,14 @@ Useful scripts:
 
 ## Documentation
 
-| Doc                                            | Description                                                                                        |
-| ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase setup: leaderboards, stats, achievements, co-op share; single migration file (idempotent) |
-| [doc/SHARING.md](doc/SHARING.md)               | Completion share (image, social) and co-op (Play with Friend)                                      |
-| [doc/streak-freeze.md](doc/streak-freeze.md)   | Streak freeze: one per week, offered when yesterday wasn't completed                               |
-| [doc/README.md](doc/README.md)                 | Index of docs                                                                                      |
+| Doc                                                     | Description                                                                                        |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)          | Supabase setup: leaderboards, stats, achievements, co-op share; single migration file (idempotent) |
+| [doc/SHARING.md](doc/SHARING.md)                        | Completion share (image, social) and co-op (Play with Friend)                                      |
+| [doc/streak-freeze.md](doc/streak-freeze.md)            | Streak freeze: earn after 5-day streak, auto-applied when day missed                               |
+| [doc/CHANGES.md](doc/CHANGES.md)                        | Full feature list                                                                                  |
+| [doc/FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                         |
+| [doc/README.md](doc/README.md)                          | Index of docs                                                                                      |
 
 ---
 
@@ -311,6 +263,8 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   ├── pre-commit
 │   └── pre-push
 ├── doc
+│   ├── CHANGES.md
+│   ├── FEATURES_IMPLEMENTED.md
 │   ├── FUTURE.md
 │   ├── LIGHTHOUSE.md
 │   ├── README.md
@@ -378,6 +332,9 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   ├── Button
 │   │   │   │   ├── Button.module.css
 │   │   │   │   └── Button.tsx
+│   │   │   ├── DailyCountdown
+│   │   │   │   ├── DailyCountdown.module.css
+│   │   │   │   └── DailyCountdown.tsx
 │   │   │   ├── DailyDifficultyModal
 │   │   │   │   ├── DailyDifficultyModal.module.css
 │   │   │   │   ├── DailyDifficultyModal.tsx
@@ -496,11 +453,16 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── PauseOverlay.tsx
 │   │   │   │   │   ├── PlayHUD.tsx
+│   │   │   │   │   ├── ProgressivePreviewOverlay.tsx
 │   │   │   │   │   ├── PlayToasts.tsx
 │   │   │   │   │   ├── PlayToasts.types.ts
 │   │   │   │   │   ├── ProfilerOverlay.module.css
 │   │   │   │   │   ├── ProfilerOverlay.tsx
-│   │   │   │   │   └── TopBarButtons.tsx
+│   │   │   │   │   ├── SnapComboMeter.tsx
+│   │   │   │   │   ├── SnapComboMeter.module.css
+│   │   │   │   │   ├── TopBarButtons.tsx
+│   │   │   │   │   ├── TrayFilterButton.tsx
+│   │   │   │   │   ├── TrayFilterButton.module.css
 │   │   │   │   ├── hooks
 │   │   │   │   │   ├── pointerHandlers
 │   │   │   │   │   │   ├── dragLog.ts
@@ -544,6 +506,7 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   ├── services
 │   │   │   ├── achievementsService.ts
 │   │   │   ├── leaderboardService.ts
+│   │   │   ├── serverTimeService.ts
 │   │   │   ├── profileService.ts
 │   │   │   ├── puzzleSessionService.ts
 │   │   │   └── statsService.ts

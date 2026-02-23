@@ -163,3 +163,17 @@ BEGIN
     ALTER PUBLICATION supabase_realtime ADD TABLE completions;
   END IF;
 END $$;
+
+-- =============================================================================
+-- Server time RPC (for daily countdown sync; idempotent)
+-- =============================================================================
+CREATE OR REPLACE FUNCTION get_server_utc_now()
+RETURNS TIMESTAMPTZ
+LANGUAGE SQL
+STABLE
+AS $$
+  SELECT NOW() AT TIME ZONE 'UTC';
+$$;
+
+GRANT EXECUTE ON FUNCTION get_server_utc_now() TO anon;
+GRANT EXECUTE ON FUNCTION get_server_utc_now() TO authenticated;
