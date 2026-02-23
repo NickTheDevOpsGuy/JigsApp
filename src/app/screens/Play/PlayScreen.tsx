@@ -1117,88 +1117,88 @@ export function PlayScreen() {
         <div className={styles.main} ref={mainRef}>
           <div className={styles.boardWrapper}>
             <div className={styles.board} ref={boardRef}>
-            {isLoading && (
-              <div className={styles.loadingOverlay} aria-label="Loading puzzle">
-                <div className={styles.spinner} />
-                <span>Loading puzzle…</span>
-              </div>
-            )}
-            {onboarding.needsStartTip && placed === 0 && (
-              <div className={styles.startHintOverlay} role="status">
-                <span>Drag a piece to start</span>
-                <button
-                  type="button"
-                  className={styles.toastDismiss}
-                  onClick={onboarding.dismissStartTip}
-                  aria-label="Dismiss"
-                >
-                  ×
-                </button>
-              </div>
-            )}
-            <canvas
-              key={puzzleKey}
-              className={styles.canvas}
-              ref={canvasRef}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerCancel}
-              onLostPointerCapture={handleLostPointerCapture}
-              onContextMenu={handleContextMenu}
-              onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
-            />
-            {showPreview && imgRef.current && (
-              <div className={styles.previewOverlay}>
-                <img
-                  src={imgRef.current.src}
-                  alt="Puzzle preview"
-                  className={styles.previewImage}
+              {isLoading && (
+                <div className={styles.loadingOverlay} aria-label="Loading puzzle">
+                  <div className={styles.spinner} />
+                  <span>Loading puzzle…</span>
+                </div>
+              )}
+              {onboarding.needsStartTip && placed === 0 && (
+                <div className={styles.startHintOverlay} role="status">
+                  <span>Drag a piece to start</span>
+                  <button
+                    type="button"
+                    className={styles.toastDismiss}
+                    onClick={onboarding.dismissStartTip}
+                    aria-label="Dismiss"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              <canvas
+                key={puzzleKey}
+                className={styles.canvas}
+                ref={canvasRef}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerCancel}
+                onLostPointerCapture={handleLostPointerCapture}
+                onContextMenu={handleContextMenu}
+                onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
+              />
+              {showPreview && imgRef.current && (
+                <div className={styles.previewOverlay}>
+                  <img
+                    src={imgRef.current.src}
+                    alt="Puzzle preview"
+                    className={styles.previewImage}
+                  />
+                </div>
+              )}
+              {isPaused && (
+                <PauseOverlay
+                  onResume={() => setIsPaused(false)}
+                  isCountdownExpired={
+                    timeMode === "countdown" &&
+                    elapsedSeconds <= 0 &&
+                    !isComplete &&
+                    isPaused
+                  }
+                  onNewPuzzle={
+                    timeMode === "countdown" &&
+                    elapsedSeconds <= 0 &&
+                    !isComplete &&
+                    isPaused
+                      ? handleNewGame
+                      : undefined
+                  }
                 />
-              </div>
-            )}
-            {isPaused && (
-              <PauseOverlay
-                onResume={() => setIsPaused(false)}
-                isCountdownExpired={
-                  timeMode === "countdown" &&
-                  elapsedSeconds <= 0 &&
-                  !isComplete &&
-                  isPaused
-                }
-                onNewPuzzle={
-                  timeMode === "countdown" &&
-                  elapsedSeconds <= 0 &&
-                  !isComplete &&
-                  isPaused
-                    ? handleNewGame
-                    : undefined
-                }
-              />
-            )}
-            {isComplete && (
-              <CompletionOverlay
-                elapsedSeconds={elapsedSeconds}
-                grid={state?.grid}
-                imageUrl={
-                  localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
-                }
-                undoCount={undoCountRef.current}
-                isNewBest={
-                  timeMode === "best" &&
-                  state?.grid != null &&
-                  (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
-                }
-                isDaily={isDailyPuzzleSession()}
-                copied={share.copied}
-                canNativeShare={share.canNativeShare}
-                onCopyResults={share.handleCopyResults}
-                onNativeShare={share.handleNativeShare}
-                onDownloadImage={handleDownloadImage}
-                onNewPuzzle={handleNewGame}
-                onMenu={() => navigate("/")}
-              />
-            )}
+              )}
+              {isComplete && (
+                <CompletionOverlay
+                  elapsedSeconds={elapsedSeconds}
+                  grid={state?.grid}
+                  imageUrl={
+                    localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
+                  }
+                  undoCount={undoCountRef.current}
+                  isNewBest={
+                    timeMode === "best" &&
+                    state?.grid != null &&
+                    (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
+                  }
+                  isDaily={isDailyPuzzleSession()}
+                  copied={share.copied}
+                  canNativeShare={share.canNativeShare}
+                  onCopyResults={share.handleCopyResults}
+                  onNativeShare={share.handleNativeShare}
+                  onDownloadImage={handleDownloadImage}
+                  onNewPuzzle={handleNewGame}
+                  onMenu={() => navigate("/")}
+                />
+              )}
             </div>
           </div>
         </div>
