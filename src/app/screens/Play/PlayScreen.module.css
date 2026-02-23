@@ -317,12 +317,12 @@
 
 @media (max-width: 600px) {
   .playBody .trayWrap {
-    height: 155px;
+    height: 125px;
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 165px;
+    height: 140px;
   }
 }
 
@@ -596,16 +596,33 @@
 @media (max-width: 600px) {
   .page {
     /* Clear mobile browser nav bar (~56px) + safe-area so tray isn't cut off */
-    padding-bottom: max(100px, calc(env(safe-area-inset-bottom, 0) + 64px));
+    padding-bottom: max(80px, calc(env(safe-area-inset-bottom, 0) + 56px));
   }
 
   .playBody {
-    gap: 8px;
+    gap: 6px;
   }
 
   .main {
-    padding: 6px 8px;
-    gap: 8px;
+    padding: 4px 6px;
+    gap: 6px;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .boardWrapper {
+    width: min(96vw, calc(100vw - 16px));
+    max-width: 100%;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .board {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
   }
 
   .topBar {
@@ -763,7 +780,7 @@
   margin: 0;
 }
 
-/* Completion overlay – full viewport so content isn't cut off */
+/* Completion overlay – full viewport, centered content */
 .completeOverlay {
   position: fixed;
   inset: 0;
@@ -772,7 +789,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   z-index: 300;
   animation: fadeIn 0.5s ease-out;
   padding: 20px;
@@ -791,10 +808,9 @@
 
 @media (max-width: 600px) {
   .completeOverlay {
-    /* Full viewport on mobile so content isn't cut off by board height */
     position: fixed;
     inset: 0;
-    justify-content: flex-start;
+    justify-content: center;
     padding: 16px;
     padding-top: max(24px, env(safe-area-inset-top, 0));
     padding-bottom: max(32px, env(safe-area-inset-bottom, 0) + 24px);
@@ -1000,13 +1016,7 @@
   width: 120px;
   height: 120px;
   object-fit: contain;
-  border-radius: 12px;
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    0 0 0 4px rgba(255, 255, 255, 0.15);
-  transform: translateZ(0) scale(1.02);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
 }
 
 @media (max-width: 600px) {
@@ -1099,9 +1109,7 @@
 
 .shareSection {
   margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: var(--color-overlay-content);
-  border-radius: 12px;
+  padding: 1rem 0;
   display: flex;
   flex-direction: column;
   align-items: center;
