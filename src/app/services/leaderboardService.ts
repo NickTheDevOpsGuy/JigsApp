@@ -253,16 +253,10 @@ export async function getAllTimeBestLeaderboard(
 
   if (error) return [];
 
-  const bestByUser = new Map<
-    string,
-    { elapsedSeconds: number; completedAt?: string }
-  >();
+  const bestByUser = new Map<string, { elapsedSeconds: number; completedAt?: string }>();
   for (const row of data ?? []) {
     const cur = bestByUser.get(row.user_id);
-    if (
-      cur == null ||
-      row.elapsed_seconds < cur.elapsedSeconds
-    ) {
+    if (cur == null || row.elapsed_seconds < cur.elapsedSeconds) {
       bestByUser.set(row.user_id, {
         elapsedSeconds: row.elapsed_seconds,
         completedAt: row.created_at,
@@ -325,10 +319,7 @@ export async function getPeriodLeaderboard(
   const bestByUser = new Map<string, { elapsedSeconds: number; completedAt?: string }>();
   for (const row of data ?? []) {
     const cur = bestByUser.get(row.user_id);
-    if (
-      cur == null ||
-      row.elapsed_seconds < cur.elapsedSeconds
-    ) {
+    if (cur == null || row.elapsed_seconds < cur.elapsedSeconds) {
       bestByUser.set(row.user_id, {
         elapsedSeconds: row.elapsed_seconds,
         completedAt: row.created_at,
