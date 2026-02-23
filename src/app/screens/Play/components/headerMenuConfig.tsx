@@ -189,6 +189,15 @@ export function buildMenuItems(
     },
     // ─── Display ───
     {
+      id: "showPreview",
+      section: "settings",
+      visible: true,
+      label: props.showPreview ? "Preview ✨" : "Preview 🌙",
+      sortKey: "0 Preview",
+      onClick: c(props.onTogglePreview),
+      subMenu: "display",
+    },
+    {
       id: "alignmentGrid",
       section: "settings",
       visible: true,
