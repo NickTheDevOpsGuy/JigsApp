@@ -308,11 +308,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <span className={styles.title}>Piece Drawer ({pieces.length})</span>
-          <TrayFilterButton
-            value={filter}
-            onChange={setFilter}
-            hasImage={!!image}
-          />
+          <TrayFilterButton value={filter} onChange={setFilter} hasImage={!!image} />
         </div>
       </div>
 

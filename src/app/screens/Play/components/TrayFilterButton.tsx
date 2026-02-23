@@ -1,12 +1,7 @@
 /**
  * TrayFilterButton – compact "Filter" dropdown; pops up above trigger on desktop and mobile.
  */
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, Filter } from "lucide-react";
 import styles from "./TrayFilterButton.module.css";
@@ -25,11 +20,7 @@ interface TrayFilterButtonProps {
   hasImage: boolean;
 }
 
-export function TrayFilterButton({
-  value,
-  onChange,
-  hasImage,
-}: TrayFilterButtonProps) {
+export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButtonProps) {
   const [open, setOpen] = useState(false);
   const [menuRect, setMenuRect] = useState<{
     bottom: number;
@@ -122,7 +113,7 @@ export function TrayFilterButton({
               </button>
             ))}
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );
