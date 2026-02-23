@@ -4,7 +4,7 @@ import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
-import { STORAGE_KEY, computeTileSize } from "../playScreenUtils";
+import { STORAGE_KEY } from "../playScreenUtils";
 import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
@@ -117,46 +117,19 @@ export function usePlayScreenManager(
 
       const runSizing = () => {
         if (!mainEl || !boardEl) return;
-        const rect = mainEl.getBoundingClientRect();
-        const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
-        const viewportH = typeof window !== "undefined" ? window.innerHeight : 768;
-        const isMobile = viewportW < 600;
-        const minAvail = isMobile ? 260 : 400;
-        // If container measures too early (tiny board on first paint), fall back to window dimensions
+        const rect = boardEl.getBoundingClientRect();
         const rectW = Math.floor(rect.width);
         const rectH = Math.floor(rect.height);
-        // Mobile: board 94vw max 520px per PDF
-        const mobileMaxBoardW = isMobile ? Math.min(viewportW * 0.94, 520) : Infinity;
-        const fallbackW =
-          isMobile && (rectW < minAvail || rectW === 0)
-            ? Math.min(viewportW - 24, mobileMaxBoardW)
-            : rectW;
-        const fallbackH =
-          isMobile && (rectH < minAvail || rectH === 0) ? viewportH - 24 : rectH;
-        const availW = Math.max(minAvail, Math.min(fallbackW - 24, mobileMaxBoardW - 24));
-        const availH = Math.max(minAvail, fallbackH - 24);
+        if (rectW <= 0 || rectH <= 0) return;
 
-        // Compute square tile size (smaller on mobile for better fit)
-        const pieceSize = computeTileSize(availW, availH, grid, viewportW);
+        const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
+        const isMobile = viewportW < 600;
 
-        // Board: match piece size – larger pieces = larger canvas, smaller = smaller
-        const minBoardW = grid.cols * pieceSize;
-        const minBoardH = grid.rows * pieceSize;
-        // Canvas scales with piece size; cap by available space
-        let boardW = Math.min(minBoardW, availW);
-        let boardH = Math.min(minBoardH, availH);
-        if (isMobile) {
-          const maxW = Math.min(
-            Math.max(minBoardW, (rectW > 0 ? rectW : viewportW) - 16),
-            mobileMaxBoardW,
-          );
-          const maxH = Math.max(minBoardH, (rectH > 0 ? rectH : viewportH) - 16);
-          boardW = Math.min(boardW, maxW);
-          boardH = Math.min(boardH, maxH);
-        }
-
-        boardEl.style.width = `${boardW}px`;
-        boardEl.style.height = `${boardH}px`;
+        // Canvas drives piece size: piece dimensions from container rect
+        const boardW = rectW;
+        const boardH = rectH;
+        const pieceWidth = boardW / grid.cols;
+        const pieceHeight = boardH / grid.rows;
 
         const savedState = loadPuzzleState();
         const hasSavedGame =
@@ -209,8 +182,8 @@ export function usePlayScreenManager(
             boardWidth: boardW,
             boardHeight: boardH,
             grid,
-            pieceWidth: pieceSize,
-            pieceHeight: pieceSize,
+            pieceWidth,
+            pieceHeight,
             isMobile,
             snapScaleRef: opts?.snapScaleRef,
             relaxedToleranceMultiplierRef,
@@ -339,14 +312,15 @@ export function usePlayScreenManager(
         setIsLoading(false);
       };
 
-      // ResizeObserver: measure when layout is stable (more reliable than rAF on mobile).
-      // Observer fires after layout; double rAF inside callback if it fires too early.
+      // ResizeObserver: measure board when CSS layout is stable (board sized by aspect-ratio).
       let didRun = false;
       const ro = new ResizeObserver(() => {
         if (didRun) return;
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             if (didRun || !mainEl || !boardEl) return;
+            const r = boardEl.getBoundingClientRect();
+            if (r.width <= 0 || r.height <= 0) return;
             didRun = true;
             ro.disconnect();
             clearTimeout(fallbackId);
@@ -354,7 +328,7 @@ export function usePlayScreenManager(
           });
         });
       });
-      ro.observe(mainEl);
+      ro.observe(boardEl);
       const fallbackId = setTimeout(() => {
         if (!didRun) {
           didRun = true;
@@ -385,21 +359,32 @@ export function usePlayScreenManager(
     manager?.setPieceLockingEnabled(pieceLockingEnabled);
   }, [manager, pieceLockingEnabled]);
 
-  // Resize observer
+  // Resize observer: keep manager board size in sync with DOM (no min clamp so coordinate system matches canvas)
   useEffect(() => {
     const boardEl = boardRef.current;
     if (!boardEl || !manager) return;
 
+    let debounceId: ReturnType<typeof setTimeout> | null = null;
+    const DEBOUNCE_MS = 80;
+
     const ro = new ResizeObserver(() => {
-      const rect = boardEl.getBoundingClientRect();
-      const w = Math.max(320, Math.floor(rect.width));
-      const h = Math.max(240, Math.floor(rect.height));
-      manager.setBoardSize(w, h);
-      setState(manager.getState());
+      if (debounceId) clearTimeout(debounceId);
+      debounceId = setTimeout(() => {
+        debounceId = null;
+        const rect = boardEl.getBoundingClientRect();
+        const w = Math.floor(rect.width);
+        const h = Math.floor(rect.height);
+        if (w <= 0 || h <= 0) return;
+        manager.setBoardSize(w, h);
+        setState(manager.getState());
+      }, DEBOUNCE_MS);
     });
 
     ro.observe(boardEl);
-    return () => ro.disconnect();
+    return () => {
+      if (debounceId) clearTimeout(debounceId);
+      ro.disconnect();
+    };
   }, [manager]);
 
   return {

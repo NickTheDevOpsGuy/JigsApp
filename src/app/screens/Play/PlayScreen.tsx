@@ -1115,7 +1115,8 @@ export function PlayScreen() {
 
       <div className={styles.playBody}>
         <div className={styles.main} ref={mainRef}>
-          <div className={styles.board} ref={boardRef}>
+          <div className={styles.boardWrapper}>
+            <div className={styles.board} ref={boardRef}>
             {isLoading && (
               <div className={styles.loadingOverlay} aria-label="Loading puzzle">
                 <div className={styles.spinner} />
@@ -1198,6 +1199,7 @@ export function PlayScreen() {
                 onMenu={() => navigate("/")}
               />
             )}
+            </div>
           </div>
         </div>
         <div

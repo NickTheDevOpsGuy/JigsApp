@@ -430,10 +430,21 @@
   background: var(--color-bg-card);
 }
 
-.board {
+.boardWrapper {
+  width: min(90vw, 700px);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
   flex-shrink: 0;
-  min-width: 0;
-  min-height: 280px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.board {
+  width: min(90vw, 600px);
+  aspect-ratio: 1 / 1;
+  max-width: 100%;
+  max-height: 100%;
   position: relative;
   background: var(--color-bg-elevated);
   border-radius: var(--radius-board, 20px);
@@ -597,10 +608,6 @@
     gap: 8px;
   }
 
-  .board {
-    min-height: 180px;
-  }
-
   .topBar {
     height: 56px;
     padding: 0 8px;
@@ -641,7 +648,6 @@
     gap: 8px;
   }
   .board {
-    min-height: 200px;
     border-width: 2px;
     border-radius: var(--radius-card, 16px);
   }
