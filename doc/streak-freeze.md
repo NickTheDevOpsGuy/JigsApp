@@ -10,13 +10,13 @@ Streak freeze lets users protect their daily streak when they miss a day. **One 
 
 ## Storage keys
 
-| Key                                        | Meaning                                               |
-| ------------------------------------------ | ----------------------------------------------------- |
-| `phuzzle:streakFreeze`                     | Count of available tokens (0 or 1)                    |
-| `phuzzle:streakFreezeWeek`                 | Week key; used for weekly reset                        |
-| `phuzzle:streakFreezeEarnedWeek`           | Week when freeze was earned (max 1 per week)           |
-| `phuzzle:streakFreeze:used:YYYY-MM-DD`     | Freeze was used for this date                          |
-| `phuzzle:streakFreezeDismissed:YYYY-MM-DD` | User dismissed the offer on this date (if shown)       |
+| Key                                        | Meaning                                          |
+| ------------------------------------------ | ------------------------------------------------ |
+| `phuzzle:streakFreeze`                     | Count of available tokens (0 or 1)               |
+| `phuzzle:streakFreezeWeek`                 | Week key; used for weekly reset                  |
+| `phuzzle:streakFreezeEarnedWeek`           | Week when freeze was earned (max 1 per week)     |
+| `phuzzle:streakFreeze:used:YYYY-MM-DD`     | Freeze was used for this date                    |
+| `phuzzle:streakFreezeDismissed:YYYY-MM-DD` | User dismissed the offer on this date (if shown) |
 
 ## Logic (`dailyPuzzleCore.ts`)
 

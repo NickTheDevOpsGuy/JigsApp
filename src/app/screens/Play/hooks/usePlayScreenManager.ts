@@ -179,9 +179,7 @@ export function usePlayScreenManager(
 
         const cutTypeRaw = localStorage.getItem(CUT_TYPE_KEY);
         const cutType =
-          cutTypeRaw === "irregular" || cutTypeRaw === "hard"
-            ? cutTypeRaw
-            : "classic";
+          cutTypeRaw === "irregular" || cutTypeRaw === "hard" ? cutTypeRaw : "classic";
 
         const opts = optionsRef.current;
         const next = new PuzzleManager(

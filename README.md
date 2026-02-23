@@ -153,14 +153,14 @@ Useful scripts:
 
 ## Documentation
 
-| Doc                                                     | Description                                                                                        |
-| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)          | Supabase setup: leaderboards, stats, achievements, co-op share; single migration file (idempotent) |
-| [doc/SHARING.md](doc/SHARING.md)                        | Completion share (image, social) and co-op (Play with Friend)                                      |
-| [doc/streak-freeze.md](doc/streak-freeze.md)            | Streak freeze: earn after 5-day streak, auto-applied when day missed                               |
-| [doc/CHANGES.md](doc/CHANGES.md)                        | Full feature list                                                                                  |
-| [doc/FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                         |
-| [doc/README.md](doc/README.md)                          | Index of docs                                                                                      |
+| Doc                                                        | Description                                                                                        |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share; single migration file (idempotent) |
+| [doc/SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                      |
+| [doc/streak-freeze.md](doc/streak-freeze.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                               |
+| [doc/CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                  |
+| [doc/FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                        |
+| [doc/README.md](doc/README.md)                             | Index of docs                                                                                      |
 
 ---
 

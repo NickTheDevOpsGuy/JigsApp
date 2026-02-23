@@ -193,7 +193,10 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(PROGRESSIVE_REVEAL_KEY, progressiveRevealMode ? "true" : "false");
+      localStorage.setItem(
+        PROGRESSIVE_REVEAL_KEY,
+        progressiveRevealMode ? "true" : "false",
+      );
     } catch {
       // ignore
     }

@@ -250,7 +250,9 @@ export function buildMenuItems(
       id: "progressiveReveal",
       section: "settings",
       visible: true,
-      label: props.progressiveRevealMode ? "Progressive Reveal ✨" : "Progressive Reveal 🌙",
+      label: props.progressiveRevealMode
+        ? "Progressive Reveal ✨"
+        : "Progressive Reveal 🌙",
       sortKey: "Progressive Reveal",
       onClick: c(props.onToggleProgressiveReveal ?? (() => {})),
       subMenu: "display",

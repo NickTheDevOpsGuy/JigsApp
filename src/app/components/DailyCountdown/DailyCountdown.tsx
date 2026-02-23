@@ -73,9 +73,7 @@ export function DailyCountdown({ prominent, onUnlock }: DailyCountdownProps) {
       role="timer"
       aria-live="polite"
       aria-label={
-        justUnlocked
-          ? "New daily puzzle is ready"
-          : `Next daily puzzle in ${display}`
+        justUnlocked ? "New daily puzzle is ready" : `Next daily puzzle in ${display}`
       }
     >
       <Clock size={prominent ? 20 : 16} className={styles.icon} />
