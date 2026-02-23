@@ -317,14 +317,17 @@
 
 @media (max-width: 600px) {
   .playBody .trayWrap {
-    height: 130px;
+    width: 100%;
+    max-width: min(90vw, 420px);
+    height: 120px;
     flex-shrink: 0;
-    padding: 0 12px 12px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+    padding: 0 0 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+    align-self: center;
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 145px;
+    height: 135px;
   }
 }
 
@@ -594,31 +597,37 @@
   margin: 10px 0;
 }
 
-/* Mobile – no scroll, centered layout like desktop */
+/* Mobile – no scroll, aligned layout like desktop */
 @media (max-width: 600px) {
   .page {
     height: 100dvh;
     min-height: 100dvh;
     overflow: hidden;
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
   }
 
   .playBody {
-    gap: 12px;
+    gap: 10px;
     min-height: 0;
     overflow: hidden;
+    padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .main {
-    padding: 12px 16px;
-    gap: 12px;
+    width: 100%;
+    max-width: min(90vw, 420px);
+    padding: 10px 0;
+    gap: 10px;
     align-items: center;
     justify-content: center;
     min-height: 0;
   }
 
   .boardWrapper {
-    width: min(90vw, calc(100vw - 32px));
+    width: 100%;
     max-width: 100%;
     flex: 1;
     min-height: 0;
@@ -633,7 +642,7 @@
   }
 
   .topBar {
-    height: 56px;
+    height: 52px;
     padding: 0 12px;
     padding-top: env(safe-area-inset-top, 0);
     gap: 8px;

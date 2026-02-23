@@ -407,10 +407,11 @@
   }
 
   .tray {
-    margin: 0 4px 0 4px;
-    margin-bottom: max(8px, env(safe-area-inset-bottom, 0));
+    margin: 0;
+    margin-bottom: max(4px, env(safe-area-inset-bottom, 0));
     border-radius: 12px;
     padding: 0;
+    width: 100%;
   }
 
   .segment button {
