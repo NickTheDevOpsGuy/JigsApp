@@ -386,7 +386,7 @@
   display: none;
 }
 
-/* Mobile: same filters [All] [Edges] [Color] as desktop, tighter vertical spacing */
+/* Mobile: padding around buttons, match desktop feel */
 @media (max-width: 600px) {
   .tray,
   .trayLarge,
@@ -402,19 +402,27 @@
   }
 
   .header {
-    padding: 6px 12px 10px 12px;
-    gap: 4px;
+    padding: 10px 14px 12px 14px;
+    gap: 8px;
   }
 
   .tray {
-    margin: 0 max(8px, env(safe-area-inset-right, 0)) 12px
-      max(4px, env(safe-area-inset-left, 0));
-    margin-bottom: max(16px, env(safe-area-inset-bottom, 0));
+    margin: 0 4px 0 4px;
+    margin-bottom: max(8px, env(safe-area-inset-bottom, 0));
+    border-radius: 12px;
+    padding: 0;
+  }
+
+  .segment button {
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 8px;
   }
 
   .scroller {
-    padding: 8px 12px 6px 12px;
+    padding: 10px 14px 10px 14px;
     padding-inline-end: max(56px, calc(env(safe-area-inset-right, 0) + 24px));
+    gap: 8px;
   }
 
   .scrollerSnap {
@@ -422,16 +430,12 @@
   }
 
   .trayCompact .scroller {
-    padding: 8px 12px 4px 12px;
+    padding: 10px 14px 8px 14px;
     padding-inline-end: max(56px, calc(env(safe-area-inset-right, 0) + 24px));
   }
 
   .trayExtraCompact .scroller {
-    padding: 8px 10px 4px 10px;
+    padding: 10px 12px 8px 12px;
     padding-inline-end: max(48px, calc(env(safe-area-inset-right, 0) + 20px));
-  }
-
-  .segment button {
-    padding: 6px 8px;
   }
 }

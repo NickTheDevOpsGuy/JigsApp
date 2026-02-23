@@ -317,12 +317,14 @@
 
 @media (max-width: 600px) {
   .playBody .trayWrap {
-    height: 125px;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    height: 130px;
+    flex-shrink: 0;
+    padding: 0 12px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 140px;
+    height: 145px;
   }
 }
 
@@ -592,26 +594,31 @@
   margin: 10px 0;
 }
 
-/* Mobile */
+/* Mobile – no scroll, centered layout like desktop */
 @media (max-width: 600px) {
   .page {
-    /* Clear mobile browser nav bar (~56px) + safe-area so tray isn't cut off */
-    padding-bottom: max(80px, calc(env(safe-area-inset-bottom, 0) + 56px));
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
   }
 
   .playBody {
-    gap: 6px;
+    gap: 12px;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .main {
-    padding: 4px 6px;
-    gap: 6px;
-    align-items: stretch;
+    padding: 12px 16px;
+    gap: 12px;
+    align-items: center;
     justify-content: center;
+    min-height: 0;
   }
 
   .boardWrapper {
-    width: min(96vw, calc(100vw - 16px));
+    width: min(90vw, calc(100vw - 32px));
     max-width: 100%;
     flex: 1;
     min-height: 0;
@@ -627,9 +634,9 @@
 
   .topBar {
     height: 56px;
-    padding: 0 8px;
+    padding: 0 12px;
     padding-top: env(safe-area-inset-top, 0);
-    gap: 4px;
+    gap: 8px;
   }
   .title {
     display: none;
@@ -641,28 +648,24 @@
     display: inline;
   }
   .iconBtn {
-    padding: 6px 8px;
+    padding: 8px 10px;
     font-size: 12px;
     border-radius: 8px;
   }
   .hud {
-    gap: 4px;
+    gap: 6px;
   }
   .hudPill {
-    padding: 4px 8px;
-    font-size: 11px;
-    gap: 4px;
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   .hudPillTimer {
-    padding: 4px 6px;
-    font-size: 11px;
+    padding: 6px 8px;
+    font-size: 12px;
   }
   .hudPillTimer .timerSuffix {
     display: none;
-  }
-  .main {
-    padding: 6px 8px;
-    gap: 8px;
   }
   .board {
     border-width: 2px;
