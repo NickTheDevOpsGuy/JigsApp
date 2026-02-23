@@ -49,6 +49,27 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function formatCompletedAt(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const isToday =
+    d.getDate() === now.getDate() &&
+    d.getMonth() === now.getMonth() &&
+    d.getFullYear() === now.getFullYear();
+  if (isToday) {
+    return d.toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+  return d.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 const PODIUM = ["🥇", "🥈", "🥉"];
 
 type LeaderboardType =
@@ -322,9 +343,17 @@ export function StatsScreen() {
                 </span>
                 <span className={styles.player}>{entry.displayName}</span>
                 <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
+                {entry.completedAt && (
+                  <span className={styles.completedAt}>
+                    {formatCompletedAt(entry.completedAt)}
+                  </span>
+                )}
                 {isExpanded && (
                   <div className={styles.leaderboardDetail}>
                     {Math.floor(entry.elapsedSeconds / 60)}m {entry.elapsedSeconds % 60}s
+                    {entry.completedAt && (
+                      <> · Completed at {formatCompletedAt(entry.completedAt)}</>
+                    )}
                   </div>
                 )}
               </li>

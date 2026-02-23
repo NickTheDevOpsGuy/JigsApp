@@ -680,13 +680,12 @@
     border-width: 2px;
     border-radius: var(--radius-card, 16px);
   }
-  .previewOverlay {
-    bottom: 8px;
-    right: 8px;
+  .previewPanel {
+    padding: 6px;
   }
   .previewImage {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
   }
 
   /* Smaller hint so it doesn't stretch on mobile */

@@ -266,6 +266,17 @@
   font-size: 14px;
 }
 
+.completedAt {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.leaderboardCompact .completedAt {
+  font-size: 11px;
+}
+
 .achievements {
   display: flex;
   flex-direction: column;
@@ -448,10 +459,11 @@
     content: none;
   }
 
-  /* Top row: Rank | Name | Score */
+  /* Top row: Rank | Name | Score (+ completed at) */
   .leaderboardItem > .rank,
   .leaderboardItem > .player,
-  .leaderboardItem > .time {
+  .leaderboardItem > .time,
+  .leaderboardItem > .completedAt {
     flex: none;
   }
 
@@ -479,10 +491,19 @@
     font-size: 15px;
   }
 
-  .leaderboardItem .time {
+  .leaderboardItem .time,
+  .leaderboardItem .completedAt {
     grid-row: 1;
     grid-column: 3;
+  }
+
+  .leaderboardItem .time {
     font-size: 14px;
+  }
+
+  .leaderboardItem .completedAt {
+    font-size: 12px;
+    text-align: right;
   }
 
   .leaderboardItem .leaderboardDetail {
@@ -622,6 +643,10 @@
 
   .leaderboardItem .time {
     font-size: 12px;
+  }
+
+  .leaderboardItem .completedAt {
+    font-size: 11px;
   }
 
   .allTimeGrid {

@@ -1228,6 +1228,25 @@ export function PlayScreen() {
               )}
             </div>
           </div>
+          {(showPreview || progressiveRevealMode) && imgRef.current && (
+            <div className={styles.previewPanel}>
+              {progressiveRevealMode && state?.pieces ? (
+                <ProgressivePreviewOverlay
+                  image={imgRef.current}
+                  pieces={state.pieces}
+                  grid={state.grid}
+                  width={140}
+                  height={140}
+                />
+              ) : (
+                <img
+                  src={imgRef.current.src}
+                  alt="Puzzle preview"
+                  className={styles.previewImage}
+                />
+              )}
+            </div>
+          )}
         </div>
         <div
           className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}

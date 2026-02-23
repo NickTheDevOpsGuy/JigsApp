@@ -10,6 +10,8 @@ export type LeaderboardEntry = {
   elapsedSeconds: number;
   displayName: string;
   userId?: string;
+  /** ISO timestamp when the puzzle was completed (for "Completed at" display). */
+  completedAt?: string;
 };
 
 export type StreakEntry = {
@@ -166,7 +168,7 @@ export async function getDailyLeaderboard(
 
   const { data, error } = await supabase!
     .from("completions")
-    .select("user_id, elapsed_seconds")
+    .select("user_id, elapsed_seconds, created_at")
     .eq("puzzle_date", dateStr)
     .eq("is_daily", true)
     .order("elapsed_seconds", { ascending: true })
@@ -182,6 +184,7 @@ export async function getDailyLeaderboard(
     elapsedSeconds: row.elapsed_seconds,
     displayName: names.get(row.user_id) ?? `Player ${row.user_id.slice(0, 8)}`,
     userId: row.user_id,
+    completedAt: row.created_at,
   }));
 }
 
@@ -243,32 +246,44 @@ export async function getAllTimeBestLeaderboard(
 
   const { data, error } = await supabase!
     .from("completions")
-    .select("user_id, elapsed_seconds")
+    .select("user_id, elapsed_seconds, created_at")
     .eq("grid_rows", rows)
     .eq("grid_cols", cols)
     .order("elapsed_seconds", { ascending: true });
 
   if (error) return [];
 
-  const bestByUser = new Map<string, number>();
+  const bestByUser = new Map<
+    string,
+    { elapsedSeconds: number; completedAt?: string }
+  >();
   for (const row of data ?? []) {
     const cur = bestByUser.get(row.user_id);
-    if (cur == null || row.elapsed_seconds < cur) {
-      bestByUser.set(row.user_id, row.elapsed_seconds);
+    if (
+      cur == null ||
+      row.elapsed_seconds < cur.elapsedSeconds
+    ) {
+      bestByUser.set(row.user_id, {
+        elapsedSeconds: row.elapsed_seconds,
+        completedAt: row.created_at,
+      });
     }
   }
 
-  const sorted = [...bestByUser.entries()].sort((a, b) => a[1] - b[1]).slice(0, limit);
+  const sorted = [...bestByUser.entries()]
+    .sort((a, b) => a[1].elapsedSeconds - b[1].elapsedSeconds)
+    .slice(0, limit);
 
   const names = await resolveDisplayNames(
     sorted.map(([uid]) => uid),
     new Set(),
   );
 
-  return sorted.map(([userId, elapsedSeconds], i) => ({
+  return sorted.map(([userId, { elapsedSeconds, completedAt }], i) => ({
     rank: i + 1,
     elapsedSeconds,
     displayName: names.get(userId) ?? `Player ${userId.slice(0, 8)}`,
+    completedAt,
   }));
 }
 
@@ -298,7 +313,7 @@ export async function getPeriodLeaderboard(
 
   const { data, error } = await supabase!
     .from("completions")
-    .select("user_id, elapsed_seconds")
+    .select("user_id, elapsed_seconds, created_at")
     .eq("is_daily", true)
     .gte("puzzle_date", start)
     .lte("puzzle_date", end)
@@ -306,26 +321,35 @@ export async function getPeriodLeaderboard(
 
   if (error) return [];
 
-  // Best time per user in period
-  const bestByUser = new Map<string, number>();
+  // Best time per user in period (keep created_at of best completion)
+  const bestByUser = new Map<string, { elapsedSeconds: number; completedAt?: string }>();
   for (const row of data ?? []) {
     const cur = bestByUser.get(row.user_id);
-    if (cur == null || row.elapsed_seconds < cur) {
-      bestByUser.set(row.user_id, row.elapsed_seconds);
+    if (
+      cur == null ||
+      row.elapsed_seconds < cur.elapsedSeconds
+    ) {
+      bestByUser.set(row.user_id, {
+        elapsedSeconds: row.elapsed_seconds,
+        completedAt: row.created_at,
+      });
     }
   }
 
-  const sorted = [...bestByUser.entries()].sort((a, b) => a[1] - b[1]).slice(0, limit);
+  const sorted = [...bestByUser.entries()]
+    .sort((a, b) => a[1].elapsedSeconds - b[1].elapsedSeconds)
+    .slice(0, limit);
 
   const names = await resolveDisplayNames(
     sorted.map(([uid]) => uid),
     new Set(),
   );
 
-  return sorted.map(([userId, elapsedSeconds], i) => ({
+  return sorted.map(([userId, { elapsedSeconds, completedAt }], i) => ({
     rank: i + 1,
     elapsedSeconds,
     displayName: names.get(userId) ?? `Player ${userId.slice(0, 8)}`,
+    completedAt,
   }));
 }
 
