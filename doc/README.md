@@ -9,7 +9,7 @@ This folder contains developer docs for Phuzzle.
 
 ## Reference
 
-- [STREAK-FREEZ.md](docs/STREAK-FREEZE.d) - Streak freeze (streak shield) behavior and storage keys
+- [STREAK-FREEZE.md](docs/STREAK-FREEZE.md) - Streak freeze (streak shield) behavior and storage keys
 - [SHARING.md](doc/SHARING.md) - Completion share and co-op share flows
 - [CHANGES.md](doc/CHANGES.md) - Full feature list
 - [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) - Feature history and migrations
