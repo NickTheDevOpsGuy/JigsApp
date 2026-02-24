@@ -1,35 +1,56 @@
 # Lighthouse CI
 
-Lighthouse runs in CI on every PR (perf, a11y, best-practices). Results save to `lhci-reports/`.
+Lighthouse runs in CI on every PR (performance, accessibility, best practices). Reports are saved to `lhci-reports/`.
+
+This doc also explains the common "GitHub token not set" warning and how tokens map between GitHub Actions and LHCI.
+
+---
 
 ## Token naming (what goes where)
 
-- **`github.token`** – This is a **GitHub Actions expression** (built-in context), not an env var name. Use `${{ github.token }}` in your workflow to get the token value. You don’t create a secret or env var named `github.token`.
-- **`GITHUB_TOKEN`** – GitHub Actions sets this env var automatically in every job. You usually don’t need to pass it yourself.
-- **`LHCI_UPLOAD__GITHUB_TOKEN`** – LHCI’s env var for `upload.githubToken`. The workflow passes `${{ github.token }}` into it so LHCI can post status checks if you switch to `temporary-public-storage`.
-- **`lighthouserc.cjs`** – Reads `process.env.GITHUB_TOKEN || process.env.LHCI_GITHUB_APP_TOKEN`. In GitHub Actions, `GITHUB_TOKEN` is already set, so the token is available without extra config.
+- `github.token` - A GitHub Actions expression (built-in context), not a secret name. Use `${{ github.token }}` to get the token value.
+- `GITHUB_TOKEN` - Environment variable automatically set by GitHub Actions in every job.
+- `LHCI_UPLOAD__GITHUB_TOKEN` - LHCI env var for `upload.githubToken`. Passing `${{ github.token }}` into this enables optional status checks when using LHCI upload modes that post back to GitHub.
+- `lighthouserc.cjs` - Reads `process.env.GITHUB_TOKEN || process.env.LHCI_GITHUB_APP_TOKEN`. In GitHub Actions, `GITHUB_TOKEN` is already set.
 
-## Fixing "GitHub token not set" Warning
+---
+
+## Fixing "GitHub token not set" warning
 
 ### In CI (GitHub Actions)
 
-No extra setup needed. `GITHUB_TOKEN` is set automatically by GitHub Actions. The workflow also passes `LHCI_UPLOAD__GITHUB_TOKEN: ${{ github.token }}` for LHCI’s upload config (redundant but explicit).
+No extra setup is required. GitHub sets `GITHUB_TOKEN` automatically. The workflow may also pass:
 
-### Local Runs
+```yaml
+env:
+  LHCI_UPLOAD__GITHUB_TOKEN: ${{ github.token }}
+```
+
+That is redundant but explicit.
+
+### Local runs
 
 To remove the warning locally, set one of:
 
 ```bash
-# Option 1: Inline when running
+# Option 1: inline
 LHCI_UPLOAD__GITHUB_TOKEN=ghp_xxx npx lhci autorun
 
-# Option 2: Export in your shell
-export LHCI_UPLOAD__GITHUB_TOKEN=ghp_your_personal_access_token
+# Option 2: export in your shell
+export LHCI_UPLOAD__GITHUB_TOKEN=ghp_xxx
 npx lhci autorun
 ```
 
-Create a token: GitHub → Settings → Developer settings → Personal access tokens → fine-grained (or classic) → no extra scopes needed for the healthcheck.
+Token creation: GitHub -> Settings -> Developer settings -> Personal access tokens.
 
-### Skip Token (Warning Is Harmless)
+Notes:
 
-You can ignore the warning. Lighthouse still runs, asserts, and writes reports. The token is only used for optional PR status checks when using `temporary-public-storage` instead of `filesystem`.
+- For filesystem output only, a token is not required.
+- A token is only used for optional GitHub status checks when using upload modes like `temporary-public-storage`.
+
+---
+
+## Where to find the output
+
+- Local: `./lhci-reports`
+- CI artifacts: the workflow uploads reports if configured to do so

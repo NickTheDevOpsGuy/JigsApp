@@ -4,7 +4,7 @@ Ideas and planned enhancements for Phuzzle.
 
 ---
 
-## ✅ Piece Heatmap Overlay (Post-Completion) — Implemented
+## ✅ Piece Heatmap Overlay (Post-Completion) - Implemented
 
 **Section:** Completion / Stats
 
@@ -23,7 +23,7 @@ Ideas and planned enhancements for Phuzzle.
 
 ---
 
-## ✅ Seasonal Puzzle Packs — Implemented
+## ✅ Seasonal Puzzle Packs - Implemented
 
 **Status:** Done. Pack list detects current season (spring, summer, fall, winter) and surfaces the matching pack as "Season's pick" at the top.
 
@@ -37,8 +37,8 @@ Ideas and planned enhancements for Phuzzle.
 
 ## Other Implemented Features (from previous sessions)
 
-- **Speedrun mode** — Quadrant timers (TL, TR, BL, BR) with PB comparison
-- **Camera zoom-out** — 600ms ease-out on completion
-- **Circular progress ring** — Around board, color shift at 75% / 95%
-- **Drift mode** — Unplaced pieces nudge every ~10s
-- **Snap sound picker** — Dedicated preference in Theme modal (Default, Classic, Soft, Punchy, Muted)
+- **Speedrun mode** - Quadrant timers (TL, TR, BL, BR) with PB comparison
+- **Camera zoom-out** - 600ms ease-out on completion
+- **Circular progress ring** - Around board, color shift at 75% / 95%
+- **Drift mode** - Unplaced pieces nudge every ~10s
+- **Snap sound picker** - Dedicated preference in Theme modal (Default, Classic, Soft, Punchy, Muted)

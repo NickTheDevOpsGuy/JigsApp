@@ -1,36 +1,28 @@
-# Phuzzle Documentation
+# Phuzzle documentation
 
-Setup and reference guides for developers.
+This folder contains developer docs for Phuzzle.
 
-## Setup Guides
+## Setup guides
 
-| Document                                 | Description                                                                                                                                             |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) | Leaderboards, stats, achievements, co-op sharing – full Supabase setup. Includes [Verifying Share / Co-op](./SUPABASE_SETUP.md#verifying-share--co-op). |
-| [LIGHTHOUSE.md](./LIGHTHOUSE.md)         | Lighthouse CI setup and fixing "GitHub token not set" warning.                                                                                          |
+- `SUPABASE_SETUP.md` - Supabase setup for leaderboards, stats, achievements, and co-op
+- `LIGHTHOUSE.md` - Lighthouse CI setup and token troubleshooting
 
 ## Reference
 
-| Document                                             | Description                                                                              |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [streak-freeze.md](./streak-freeze.md)               | Streak freeze: earn after 5-day streak; auto-applied when day missed; keeps streak alive |
-| [SHARING.md](./SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend); links to Supabase setup   |
-| [CHANGES.md](./CHANGES.md)                           | Full feature list (gameplay, layout, UX, social, analytics, puzzle packs, seasonal)      |
-| [FEATURES_IMPLEMENTED.md](./FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, progressive reveal, snap combo)    |
+- [STREAK-FREEZ.md](docs/STREAK-FREEZE.d) - Streak freeze (streak shield) behavior and storage keys
+- [SHARING.md](doc/SHARING.md) - Completion share and co-op share flows
+- [CHANGES.md](doc/CHANGES.md) - Full feature list
+- [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) - Feature history and migrations
 
-## Future Ideas
+## Future ideas
 
-| Document                 | Description                                    |
-| ------------------------ | ---------------------------------------------- |
-| [FUTURE.md](./FUTURE.md) | Planned features (piece heatmap overlay, etc.) |
+- [FUTURE.md](doc/FUTURE.md) - Planned and brainstormed features
 
-## Session Notes
+## Session notes
 
-| Document                                   | Description                                                                                |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| [SESSION_SUMMARY.md](./SESSION_SUMMARY.md) | Summary of development session changes (piece drawer, touch, validation, help, docs, etc.) |
+- [SESSION_SUMMARY.md](doc/SESSION_SUMMARY.md) - Development session summary (long form)
 
-## Quick Links
+## Quick links
 
-- **Main README** – [../README.md](../README.md) – Features, getting started, project structure
-- **Supabase migrations** – [../supabase/migrations/](../supabase/migrations/) – Single file `001_full_schema.sql` (idempotent)
+- Main README: [README.md](doc/README.md)
+- Supabase migrations: `supabase/migrations/`

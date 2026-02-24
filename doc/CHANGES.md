@@ -1,4 +1,4 @@
-# Phuzzle — Full Feature List
+# Phuzzle - Full Feature List
 
 Detailed list of features. See [README](../README.md) for a quick overview.
 
@@ -19,10 +19,10 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ## Layout
 
-- **Home** — Corner buttons: Stats (trophy) left, Help (?) right. Main actions: Today's Puzzle, Packs, Choose Photo, Snap a Picture.
-- **Stats** — Dashboard, Profile, Leaderboard (dropdown for views), Achievements. Anonymous mode with raccoon names.
-- **Play layout** — Board on top, tray below (150px desktop, 160px mobile). HUD (timer, pieces) in top bar.
-- **Piece tray** — Fixed height below board. Compact mode for 25+ pieces; horizontal scroll.
+- **Home** - Corner buttons: Stats (trophy) left, Help (?) right. Main actions: Today's Puzzle, Packs, Choose Photo, Snap a Picture.
+- **Stats** - Dashboard, Profile, Leaderboard (dropdown for views), Achievements. Anonymous mode with raccoon names.
+- **Play layout** - Board on top, tray below (150px desktop, 160px mobile). HUD (timer, pieces) in top bar.
+- **Piece tray** - Fixed height below board. Compact mode for 25+ pieces; horizontal scroll.
 
 ## UX and polish
 
@@ -30,7 +30,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - Reference image preview (full or progressive reveal mode)
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
-- **Completion screen** — Share Result primary CTA; Download and Copy secondary.
+- **Completion screen** - Share Result primary CTA; Download and Copy secondary.
 - Settings: **About** (Help), **Display** (Theme, piece shape, board options, effects), **Gameplay** (Controls, time), **Audio**, **Advanced**
 - Optional piece borders, edge-piece highlight, immersive mode
 - Edge and corner pieces display full image content (no cropping)

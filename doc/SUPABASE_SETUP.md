@@ -1,65 +1,83 @@
-# Supabase Setup for Phuzzle
+# Supabase setup for Phuzzle
 
-Phuzzle uses Supabase for **leaderboards**, **player stats**, **achievements**, and **co-op puzzle sharing**. The app works without Supabase, but these features require a configured project.
+Phuzzle integrates with Supabase for leaderboards, player stats, achievements, profiles, and co-op puzzle sharing.
 
-## What Supabase Powers
+The app runs without Supabase, but these features require a configured project:
 
-| Feature           | Description                                                                                  |
-| ----------------- | -------------------------------------------------------------------------------------------- |
-| **Leaderboards**  | Daily puzzle, weekly/monthly totals, streaks, all-time completions, best times per grid size |
-| **Player Stats**  | Puzzles completed, total play time, daily streaks                                            |
-| **Achievements**  | Unlock badges (first puzzle, streaks, speed demon, etc.)                                     |
-| **Profile**       | Display name, anonymous mode (raccoon names on leaderboards)                                 |
-| **Co-op Sharing** | "Play with friend" – real-time collaborative puzzle sessions                                 |
+- Leaderboards
+- Player stats
+- Achievements
+- Profiles (display name, anonymous mode)
+- Co-op sharing (Realtime session sync)
 
 ---
 
-## 1. Create a Supabase Project
+## What Supabase powers
 
-1. Go to [supabase.com](https://supabase.com) and sign in
+| Feature | Description |
+| --- | --- |
+| Leaderboards | Daily puzzle, weekly and monthly totals, streaks, all-time completions, best times per grid size |
+| Player stats | Puzzles completed, total play time, daily streaks |
+| Achievements | Unlock badges (first puzzle, streaks, speed runs, etc.) |
+| Profile | Display name and anonymous mode (raccoon names on leaderboards) |
+| Co-op sharing | "Play with friend" real-time collaborative puzzle sessions |
+
+---
+
+## 1. Create a Supabase project
+
+1. Go to https://supabase.com and sign in
 2. Click **New Project**
 3. Choose organization, name, database password, and region
-4. Wait for the project to finish provisioning
+4. Wait for provisioning to complete
 
 ---
 
-## 2. Environment Variables
+## 2. Configure environment variables
 
-Create or update `.env` in the project root (or `.env.local`):
+Create or update `.env.local`:
 
 ```env
 VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_ANON_KEY=your_anon_public_key
 ```
 
-**Where to find these:**
+Where to find these:
 
-- **Supabase Dashboard** → **Settings** → **API**
-- **Project URL** → `VITE_SUPABASE_URL`
-- **anon public** key → `VITE_SUPABASE_ANON_KEY`
+- Supabase Dashboard -> Settings -> API
+- Project URL -> `VITE_SUPABASE_URL`
+- anon public key -> `VITE_SUPABASE_ANON_KEY`
 
-**Production (e.g. Vercel):** Add the same variables to your hosting provider’s environment settings.
+Notes:
+
+- Vite only exposes environment variables prefixed with `VITE_`.
+- Restart the dev server after changing env files.
+- In production (Vercel), add the same vars in Project Settings -> Environment Variables, then redeploy.
 
 ---
 
-## 3. Enable Anonymous Auth
+## 3. Enable anonymous auth
 
-1. **Supabase Dashboard** → **Authentication** → **Providers**
+Anonymous auth lets users track stats and appear on leaderboards without signing up. The session persists in the browser.
+
+1. Supabase Dashboard -> Authentication -> Providers
 2. Enable **Anonymous sign-ins**
 3. Save
 
-Anonymous auth lets users track stats and appear on leaderboards without signing up. They get a persistent session stored in the browser.
-
 ---
 
-## 4. Run Database Migration
+## 4. Run database migration
 
-A single migration file creates all tables, RLS policies, and Realtime publications. It is idempotent (safe to run multiple times).
+A single migration creates all tables, indexes, RLS policies, RPCs, and Realtime publication configuration. It is idempotent (safe to run multiple times).
 
-### Option A: Supabase Dashboard (SQL Editor)
+Migration file:
 
-1. **Dashboard** → **SQL Editor** → **New query**
-2. Copy and run `supabase/migrations/001_full_schema.sql` (idempotent – safe to re-run)
+- `supabase/migrations/001_full_schema.sql`
+
+### Option A: Dashboard (SQL editor)
+
+1. Dashboard -> SQL Editor -> New query
+2. Copy and run `supabase/migrations/001_full_schema.sql`
 
 ### Option B: Supabase CLI
 
@@ -70,114 +88,120 @@ npx supabase db push
 
 ---
 
-## 5. Enable Realtime
+## 5. Enable Realtime (co-op and live counts)
 
-Required for "Play with friend" co-op sessions and the live today's completion counter on the leaderboard.
+Realtime is required for:
 
-### Option A: Supabase Dashboard (Publications)
+- Co-op sessions (`puzzle_sessions`)
+- Live "today's completions" counter (`completions`)
 
-1. Open your [Supabase Dashboard](https://app.supabase.com) and select your project
-2. In the left sidebar, go to **Database** → **Publications**
-   - Direct URL: `https://app.supabase.com/project/<your-project-ref>/database/publications`
-3. Click the **supabase_realtime** publication
-4. Under **Tables**, enable `puzzle_sessions` (co-op) and `completions` (live today's count)
+### Option A: Dashboard (publications)
 
-If tables are missing, run the migration first (step 4 above).
+1. Database -> Publications
+2. Open `supabase_realtime`
+3. Under Tables, enable:
+   - `puzzle_sessions`
+   - `completions`
 
-### Option B: SQL Editor
+If tables are missing, run the migration first.
 
-If the table isn’t listed or you prefer SQL:
-
-1. **Dashboard** → **SQL Editor** → **New query**
-2. Run:
+### Option B: SQL editor
 
 ```sql
 alter publication supabase_realtime add table public.puzzle_sessions;
 alter publication supabase_realtime add table public.completions;
 ```
 
-The migration `001_full_schema.sql` adds both idempotently. It also sets `REPLICA IDENTITY FULL` on `puzzle_sessions` so Realtime can send full row data on updates.
+Note: The migration sets `REPLICA IDENTITY FULL` on `puzzle_sessions` so Realtime can send full row data on updates.
 
 ---
 
-## 6. Verify Setup
+## 6. Verify setup
 
 1. Start the app: `npm run dev`
 2. Open the app in the browser
-3. Go to **Leaderboard** (Menu → Leaderboards)
-4. If Supabase is configured, you’ll see leaderboard tabs
-5. Complete a puzzle to confirm stats and achievements are recorded
+3. Go to Leaderboards (Menu -> Leaderboards)
+4. Complete a puzzle to confirm stats and achievements record
 
 If you see "Connect Supabase to track your stats...", check:
 
 - `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set
-- Dev server was restarted after adding env vars
-- Migrations completed without errors
+- The dev server was restarted after adding env vars
+- The migration ran without errors
+- Anonymous auth is enabled
 
 ---
 
-## Database Schema Overview
+## Database schema overview
 
-| Table               | Purpose                                                 |
-| ------------------- | ------------------------------------------------------- |
-| `player_stats`      | One row per user: puzzles completed, play time, streaks |
-| `completions`       | Each puzzle completion – used for leaderboards          |
-| `player_profiles`   | Display name, `show_on_leaderboard` (anonymous mode)    |
-| `user_achievements` | Unlocked achievement IDs per user                       |
-| `puzzle_sessions`   | Co-op sessions (pieces, elapsed time, completion state) |
+| Table | Purpose |
+| --- | --- |
+| `player_stats` | One row per user: puzzles completed, play time, streaks |
+| `completions` | Each puzzle completion; used for leaderboards |
+| `player_profiles` | Display name and leaderboard visibility |
+| `user_achievements` | Unlocked achievements per user |
+| `puzzle_sessions` | Co-op sessions (pieces, elapsed time, completion state) |
 
-Row Level Security (RLS) is enabled on all tables:
+---
 
-- Users can insert/update only their own stats, profiles, and achievements
-- Completions are readable by everyone (for leaderboards)
-- Puzzle sessions allow create/read/update for anyone (shareable links)
+## Security model (RLS)
+
+Row Level Security (RLS) is enabled on all tables.
+
+Policies enforce:
+
+- Users can insert and update only their own stats, profiles, and achievements
+- `completions` are readable by everyone (for leaderboards)
+- `puzzle_sessions` are share-link driven and allow create/read/update for participants
+
+If leaderboards are empty despite completing puzzles, verify that RLS policies were created successfully by the migration.
 
 ---
 
 ## Troubleshooting
 
-**Anonymous sign-in fails**
+### Anonymous sign-in fails
 
 - Confirm Anonymous auth is enabled
-- Check Supabase Auth settings (e.g. email confirmations not required for anonymous)
+- Check Supabase Auth settings for restrictions that might block session creation
 
-**Leaderboards empty**
+### Leaderboards empty
 
-- Complete at least one puzzle (especially a daily puzzle)
-- Ensure RLS policies were created and migrations ran successfully
+- Complete at least one puzzle (daily counts show on "Today")
+- Ensure migrations ran successfully
+- Ensure your client is authenticated (anonymous session created)
 
-**Co-op sessions not syncing / WebSocket "closed before connection established"**
+### Co-op sessions not syncing or WebSocket closes immediately
 
-- **Realtime publication:** Ensure `puzzle_sessions` and `completions` are in the `supabase_realtime` publication (see [Enable Realtime](#5-enable-realtime))
-- **API keys:** Use the **anon** or **publishable** key from Supabase → Settings → API. Both `eyJ...` (JWT) and `sb_publishable_...` formats work
-- **Vercel env vars:** Ensure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set in Vercel → Project → Settings → Environment Variables, then **redeploy**
-- **Browser extensions:** Ad blockers or privacy tools can block WebSockets; try incognito or disable them
+- Realtime publication: ensure `puzzle_sessions` and `completions` are in `supabase_realtime` (see section 5)
+- API keys: use the anon public key (or Supabase publishable key if your project uses it)
+- Vercel env vars: ensure vars are set and you redeployed after changes
+- Browser extensions: ad blockers or privacy tools can block WebSockets; try incognito
 
-**Environment variables not loading**
+### Environment variables not loading
 
-- Ensure variable names start with `VITE_` (Vite only exposes those to the client)
-- Restart dev server after changing env files
-
----
-
-## Verifying Share / Co-op
-
-**"Play with friend"** (Menu → Help → Share → Play with friend?):
-
-1. Ensure Supabase is configured (env vars, migrations, anonymous auth).
-2. Start a puzzle (any image, any grid).
-3. Open Menu (☰) → Share → **Play with friend?**
-4. A session is created and you get a share URL (clipboard or native share sheet).
-5. Open that URL in another tab or send to another device — the same puzzle loads.
-6. Move a piece in one tab — it should appear in the other (Realtime sync).
-
-**Completion share** (after finishing a puzzle) works without Supabase: Twitter, Facebook, Reddit, WhatsApp, Copy link, or native share.
+- Ensure variable names start with `VITE_`
+- Restart the dev server after changing env files
+- Confirm no `.env` syntax errors
 
 ---
 
-## Related Files
+## Verifying share and co-op
 
-- `src/app/supabase/client.ts` – Supabase client and config
-- `src/app/supabase/auth.ts` – Anonymous auth helpers
-- `supabase/migrations/001_full_schema.sql` – Single migration (idempotent)
-- `supabase/README.md` – Shorter reference
+1. Ensure Supabase is configured (env vars, migration, anonymous auth, Realtime)
+2. Start a puzzle (any image, any grid)
+3. Open Menu -> Share -> Play with friend
+4. A session is created and you get a share URL
+5. Open that URL in another tab or device
+6. Move a piece in one tab and confirm it appears in the other (Realtime sync)
+
+Completion share (after finishing a puzzle) works without Supabase.
+
+---
+
+## Related files
+
+- `src/app/supabase/client.ts` - Supabase client and config
+- `src/app/supabase/auth.ts` - Anonymous auth helpers
+- `supabase/migrations/001_full_schema.sql` - Migration (idempotent)
+- `supabase/README.md` - Short reference
