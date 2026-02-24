@@ -11,7 +11,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - Group merging so connected pieces move together
 - Multiple grid sizes (3×3 to 9×9 presets; custom up to 12×12)
 - Image sources: gallery, file upload, camera capture
-- Puzzle packs – curated sets grouped by theme
+- Puzzle packs – curated sets grouped by theme; folder = category (e.g. `puzzles/animals/` → Cozy Animals). Seasonal packs surface as "Season's pick" (spring, summer, fall, winter).
 - **Tray filters** – All, Edges, Color (Filter dropdown in Piece Drawer; pop-up menu)
 - Zoom and pan (animated, persistent per grid size, soft board clamp)
   - Desktop: scroll to zoom, middle mouse drag to pan

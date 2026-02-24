@@ -23,6 +23,18 @@ Ideas and planned enhancements for Phuzzle.
 
 ---
 
+## ✅ Seasonal Puzzle Packs — Implemented
+
+**Status:** Done. Pack list detects current season (spring, summer, fall, winter) and surfaces the matching pack as "Season's pick" at the top.
+
+**Behavior:**
+
+- `getCurrentSeason()` maps date to season (Northern Hemisphere)
+- Packs with optional `season` field in `packMetadata.ts` / `puzzlePacks.ts`
+- Season's pick shown first with badge and highlighted styling
+
+---
+
 ## Other Implemented Features (from previous sessions)
 
 - **Speedrun mode** — Quadrant timers (TL, TR, BL, BR) with PB comparison

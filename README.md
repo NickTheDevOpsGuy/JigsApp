@@ -223,7 +223,17 @@ Phuzzle is a Progressive Web App. You can install it from the browser.
 
 ## Adding Sample Puzzles
 
-Drop images into `src/app/assets/puzzles/`. Subfolders are supported.
+Drop images into `src/app/assets/puzzles/`. Subfolders are supported. Images are auto-discovered at build time (no config needed).
+
+**Folder name = category.** Packs filter puzzles by category:
+
+| Pack              | Category  | Folder             |
+| ----------------- | --------- | ------------------ |
+| Cozy Animals      | `animals` | `puzzles/animals/` |
+| Floral            | `flowers` | `puzzles/flowers/` |
+| Food Photography  | `food`    | `puzzles/food/`    |
+| Space Exploration | `space`   | `puzzles/space/`   |
+| Retro Tech        | `tech`    | `puzzles/tech/`    |
 
 Example:
 
@@ -231,13 +241,23 @@ Example:
 src/app/assets/puzzles/
   animals/
     bear.png
+    fox.png
     cute/
       kitten.png
+  flowers/
+    daisy.png
+    sunflower.png
   nature/
     mountain.jpg
 ```
 
-Category is the path under `puzzles/`. Puzzle name is derived from the filename.
+- **Category** = path under `puzzles/` (e.g. `animals`, `animals/cute`, `flowers`)
+- **Puzzle name** = filename (kebab-case → Title Case)
+- **Formats** = jpg, jpeg, png, webp
+
+Add images to an existing folder and they appear in that pack. Add a new folder and create a pack with `category: "folder-name"` in `packMetadata.ts` and `puzzlePacks.ts`.
+
+**Seasonal packs** – Packs can have a `season` (spring, summer, fall, winter). The matching pack is shown as "Season's pick" at the top of the pack list.
 
 ---
 
@@ -516,6 +536,9 @@ Category is the path under `puzzles/`. Puzzle name is derived from the filename.
 │   │   │   ├── auth.ts
 │   │   │   ├── client.ts
 │   │   │   └── types.ts
+│   │   ├── utils
+│   │   │   ├── seasons.test.ts
+│   │   │   └── seasons.ts
 │   │   ├── App.tsx
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts

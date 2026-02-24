@@ -54,6 +54,13 @@
 - **Prestige** – At level 5+, reset to Lv1, earn ★ badge; puzzles completed & challenge wins kept
 - **Files**: `statsService.ts`, `prestigeService.ts`, `002_cut_type_xp_prestige_challenge.sql`, `StatsScreen.tsx`
 
+## 9. Seasonal Puzzle Packs ✓
+
+- **Season detection** – `getCurrentSeason()` maps current date to spring, summer, fall, or winter (Northern Hemisphere)
+- **Pack metadata** – Packs can have optional `season` field in `packMetadata.ts` and `puzzlePacks.ts`
+- **Season's pick** – Matching pack is shown first in the pack list with highlighted styling and "Season's pick" badge
+- **Files**: `utils/seasons.ts`, `utils/seasons.test.ts`, `packMetadata.ts`, `puzzlePacks.ts`, `PackListScreen.tsx`
+
 ## Migration Required
 
 Run `supabase/migrations/002_cut_type_xp_prestige_challenge.sql` to add:

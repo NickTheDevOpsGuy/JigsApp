@@ -1,11 +1,12 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "11";
+export const CHANGELOG_VERSION = "12";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🌸 Seasonal packs – Pack list highlights the season's pick (spring, summer, fall, winter) at the top with a badge",
       "🗺️ Heatmap – Post-completion overlay shows which pieces you moved most (red = hot, blue = cold)",
       "⏱️ Speedrun mode – Quadrant timers (TL, TR, BL, BR) with per-quadrant personal bests",
       "🔍 Zoom-out on complete – 600ms camera zoom when the last piece snaps in",
