@@ -80,7 +80,10 @@ class SoundManager {
       this.hapticsEnabled = haptics === "true";
     }
     const snap = localStorage.getItem(SNAP_SOUND_KEY);
-    if (snap !== null && ["default", "classic", "soft", "punchy", "muted"].includes(snap)) {
+    if (
+      snap !== null &&
+      ["default", "classic", "soft", "punchy", "muted"].includes(snap)
+    ) {
       this.snapSoundPref = snap as SnapSoundPref;
     }
   }
@@ -270,18 +273,55 @@ class SoundManager {
     }
   }
 
-  private playSnapByPref(ctx: AudioContext, pref: Exclude<SnapSoundPref, "default" | "muted">, groupSize: number) {
+  private playSnapByPref(
+    ctx: AudioContext,
+    pref: Exclude<SnapSoundPref, "default" | "muted">,
+    groupSize: number,
+  ) {
     const t = ctx.currentTime;
     const volScale = Math.max(0.5, Math.min(1, 0.5 + (groupSize - 2) * 0.06));
     if (pref === "classic") {
-      this.playTone(ctx, { freq: 1200 * volScale, vol: this.volume * 0.35 * volScale, duration: 0.07, start: t });
-      this.playTone(ctx, { freq: 1800 * volScale, vol: this.volume * 0.2 * volScale, duration: 0.05, start: t + 0.02 });
+      this.playTone(ctx, {
+        freq: 1200 * volScale,
+        vol: this.volume * 0.35 * volScale,
+        duration: 0.07,
+        start: t,
+      });
+      this.playTone(ctx, {
+        freq: 1800 * volScale,
+        vol: this.volume * 0.2 * volScale,
+        duration: 0.05,
+        start: t + 0.02,
+      });
     } else if (pref === "soft") {
-      this.playTone(ctx, { freq: 880 * volScale, type: "sine", vol: this.volume * 0.18 * volScale, duration: 0.08, start: t });
-      this.playTone(ctx, { freq: 1320 * volScale, type: "sine", vol: this.volume * 0.1 * volScale, duration: 0.06, start: t + 0.025 });
+      this.playTone(ctx, {
+        freq: 880 * volScale,
+        type: "sine",
+        vol: this.volume * 0.18 * volScale,
+        duration: 0.08,
+        start: t,
+      });
+      this.playTone(ctx, {
+        freq: 1320 * volScale,
+        type: "sine",
+        vol: this.volume * 0.1 * volScale,
+        duration: 0.06,
+        start: t + 0.025,
+      });
     } else if (pref === "punchy") {
-      this.playTone(ctx, { freq: 200, type: "square", vol: this.volume * 0.2 * volScale, duration: 0.03, start: t });
-      this.playTone(ctx, { freq: 1400 * volScale, vol: this.volume * 0.45 * volScale, duration: 0.06, start: t + 0.01 });
+      this.playTone(ctx, {
+        freq: 200,
+        type: "square",
+        vol: this.volume * 0.2 * volScale,
+        duration: 0.03,
+        start: t,
+      });
+      this.playTone(ctx, {
+        freq: 1400 * volScale,
+        vol: this.volume * 0.45 * volScale,
+        duration: 0.06,
+        start: t + 0.01,
+      });
     }
   }
 

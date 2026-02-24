@@ -25,12 +25,7 @@ import { ThemeModal } from "@/components/ThemeModal";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
-import {
-  getBestTime,
-  BEST_TIME_PREFIX,
-  getQuadrantPb,
-  setQuadrantPb,
-} from "./timeMode";
+import { getBestTime, BEST_TIME_PREFIX, getQuadrantPb, setQuadrantPb } from "./timeMode";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";

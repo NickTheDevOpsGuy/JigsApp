@@ -593,7 +593,9 @@ export function StatsScreen() {
                     {typeof stats?.challengeWins === "number" &&
                       stats.challengeWins > 0 && (
                         <div className={styles.statCard}>
-                          <span className={styles.statValue}>🏆 {stats.challengeWins}</span>
+                          <span className={styles.statValue}>
+                            🏆 {stats.challengeWins}
+                          </span>
                           <span className={styles.statLabel}>Challenge wins</span>
                         </div>
                       )}
@@ -772,8 +774,7 @@ export function StatsScreen() {
                     {leaderboardType === "completions" && "All-time completions"}
                     {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
                   </h2>
-                  {(leaderboardType === "today" ||
-                    leaderboardType === "challenge") && (
+                  {(leaderboardType === "today" || leaderboardType === "challenge") && (
                     <p className={styles.todayCompletionCount} aria-live="polite">
                       {todayCompletionCount} player{todayCompletionCount !== 1 ? "s" : ""}{" "}
                       completed today

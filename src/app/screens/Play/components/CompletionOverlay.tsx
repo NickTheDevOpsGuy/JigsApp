@@ -202,10 +202,7 @@ export function CompletionOverlay({
                 <>
                   <HeatmapOverlay grid={grid} pieces={pieces} />
                   {(() => {
-                    const maxDrag = Math.max(
-                      0,
-                      ...pieces.map((p) => p.dragCount ?? 0),
-                    );
+                    const maxDrag = Math.max(0, ...pieces.map((p) => p.dragCount ?? 0));
                     if (maxDrag > 0) {
                       return (
                         <p className={styles.heatmapCaption}>

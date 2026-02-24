@@ -1,10 +1,5 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import {
-  getQuadrant,
-  getQuadrantPb,
-  setQuadrantPb,
-  getQuadrantPbKey,
-} from "./timeMode";
+import { getQuadrant, getQuadrantPb, setQuadrantPb, getQuadrantPbKey } from "./timeMode";
 
 let store: Record<string, string> = {};
 const localStorageMock = {

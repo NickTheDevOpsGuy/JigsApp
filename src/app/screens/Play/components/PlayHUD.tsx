@@ -54,7 +54,7 @@ export function PlayHUD({
     <div className={styles.hud}>
       {isSpeedrun && quadrantTimes && (
         <div className={styles.quadrantTimers}>
-          {( [0, 1, 2, 3] as const ).map((q) => {
+          {([0, 1, 2, 3] as const).map((q) => {
             const t = quadrantTimes[q];
             const pb = quadrantPbs?.[q];
             return (

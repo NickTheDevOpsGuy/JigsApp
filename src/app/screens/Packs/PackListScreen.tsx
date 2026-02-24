@@ -23,10 +23,7 @@ export function PackListScreen() {
   );
   const orderedPacks = useMemo(() => {
     if (!seasonPack) return PACK_METADATA;
-    return [
-      seasonPack,
-      ...PACK_METADATA.filter((p) => p.id !== seasonPack.id),
-    ];
+    return [seasonPack, ...PACK_METADATA.filter((p) => p.id !== seasonPack.id)];
   }, [seasonPack]);
 
   useEffect(() => {
@@ -80,9 +77,7 @@ export function PackListScreen() {
                 <div className={styles.packInfo}>
                   <span className={styles.packName}>{pack.name}</span>
                   {isSeasonPick && (
-                    <span className={styles.seasonBadge}>
-                      Season&apos;s pick
-                    </span>
+                    <span className={styles.seasonBadge}>Season&apos;s pick</span>
                   )}
                   <span className={styles.packDesc}>{pack.description}</span>
                   <span className={styles.packProgress}>

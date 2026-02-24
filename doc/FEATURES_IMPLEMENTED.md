@@ -57,5 +57,6 @@
 ## Migration Required
 
 Run `supabase/migrations/002_cut_type_xp_prestige_challenge.sql` to add:
+
 - `completions.cut_type`
 - `player_stats.xp`, `level`, `prestige_count`, `challenge_wins`

@@ -212,9 +212,9 @@ export function usePlayScreenManager(
                 opts.onPieceSnappedAnalytics(Math.round(now - startTime));
               }
               lastInteractionRef.current = now;
-              const groupPieces = next.getState().pieces.filter(
-                (piece) => piece.groupId === p.groupId,
-              );
+              const groupPieces = next
+                .getState()
+                .pieces.filter((piece) => piece.groupId === p.groupId);
               for (const piece of groupPieces) {
                 popMapRef.current.set(piece.id, now);
               }
@@ -415,7 +415,13 @@ export function usePlayScreenManager(
 
   useEffect(() => {
     const line =
-      snapCombo >= 6 ? "Unstoppable!" : snapCombo >= 4 ? "Combo!" : snapCombo >= 2 ? "Nice!" : null;
+      snapCombo >= 6
+        ? "Unstoppable!"
+        : snapCombo >= 4
+          ? "Combo!"
+          : snapCombo >= 2
+            ? "Nice!"
+            : null;
     setAnnouncerLine(line);
   }, [snapCombo]);
 

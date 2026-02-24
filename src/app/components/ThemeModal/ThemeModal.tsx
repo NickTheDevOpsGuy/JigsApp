@@ -60,28 +60,33 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
   const snapSound = soundManager.getSnapSoundPref();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Theme & Sounds" showCloseButton={true}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Theme & Sounds"
+      showCloseButton={true}
+    >
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Theme</h3>
         <div className={styles.options}>
           {THEMES.map((t) => (
-          <button
-            key={t}
-            ref={(el) => {
-              optionRefs.current[t] = el;
-            }}
-            type="button"
-            className={`${styles.option} ${theme === t ? styles.optionActive : ""}`}
-            onClick={() => handleSelect(t)}
-            aria-label={`${THEME_LABELS[t]}${theme === t ? ", selected" : ""}`}
-          >
-            <span className={styles.optionIcon} style={{ color: THEME_COLORS[t] }}>
-              {THEME_EMOJIS[t]}
-            </span>
-            <span>{THEME_LABELS[t]}</span>
-            {theme === t && <Check size={18} className={styles.checkIcon} />}
-          </button>
-        ))}
+            <button
+              key={t}
+              ref={(el) => {
+                optionRefs.current[t] = el;
+              }}
+              type="button"
+              className={`${styles.option} ${theme === t ? styles.optionActive : ""}`}
+              onClick={() => handleSelect(t)}
+              aria-label={`${THEME_LABELS[t]}${theme === t ? ", selected" : ""}`}
+            >
+              <span className={styles.optionIcon} style={{ color: THEME_COLORS[t] }}>
+                {THEME_EMOJIS[t]}
+              </span>
+              <span>{THEME_LABELS[t]}</span>
+              {theme === t && <Check size={18} className={styles.checkIcon} />}
+            </button>
+          ))}
         </div>
       </div>
       <div className={styles.section}>
@@ -94,12 +99,15 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
               className={`${styles.option} ${snapSound === opt.value ? styles.optionActive : ""}`}
               onClick={() => {
                 soundManager.setSnapSoundPref(opt.value);
-                if (hapticsEnabled && typeof navigator?.vibrate === "function") navigator.vibrate(10);
+                if (hapticsEnabled && typeof navigator?.vibrate === "function")
+                  navigator.vibrate(10);
               }}
               aria-label={`${opt.label}${snapSound === opt.value ? ", selected" : ""}`}
             >
               <span>{opt.label}</span>
-              {snapSound === opt.value && <Check size={18} className={styles.checkIcon} />}
+              {snapSound === opt.value && (
+                <Check size={18} className={styles.checkIcon} />
+              )}
             </button>
           ))}
         </div>

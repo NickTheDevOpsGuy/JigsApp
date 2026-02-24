@@ -94,7 +94,11 @@
 
 .packCardSeasonal {
   border-color: var(--color-brand-primary);
-  background: color-mix(in srgb, var(--color-brand-primary) 12%, var(--color-bg-elevated));
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 12%,
+    var(--color-bg-elevated)
+  );
 }
 
 .packCardSeasonal:hover {

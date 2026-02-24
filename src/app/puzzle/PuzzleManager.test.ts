@@ -69,10 +69,7 @@ describe("PuzzleManager", () => {
     const before = manager.getState().pieces.map((p) => ({ id: p.id, x: p.x, y: p.y }));
     manager.driftUnplacedPieces();
     const after = manager.getState().pieces;
-    const moved = after.some(
-      (p, i) => p.x !== before[i].x || p.y !== before[i].y,
-    );
+    const moved = after.some((p, i) => p.x !== before[i].x || p.y !== before[i].y);
     expect(moved).toBe(true);
   });
-
 });

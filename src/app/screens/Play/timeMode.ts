@@ -40,7 +40,12 @@ export function setBestTime(rows: number, cols: number, seconds: number): void {
 }
 
 /** Quadrant indices: 0=TL, 1=TR, 2=BL, 3=BR */
-export function getQuadrant(row: number, col: number, rows: number, cols: number): 0 | 1 | 2 | 3 {
+export function getQuadrant(
+  row: number,
+  col: number,
+  rows: number,
+  cols: number,
+): 0 | 1 | 2 | 3 {
   const midR = rows / 2;
   const midC = cols / 2;
   if (row < midR && col < midC) return 0;
@@ -53,7 +58,11 @@ const QUADRANT_PB_PREFIX = "phuzzle:quadrantPb_";
 export function getQuadrantPbKey(rows: number, cols: number, q: 0 | 1 | 2 | 3): string {
   return `${QUADRANT_PB_PREFIX}${rows}x${cols}_q${q}`;
 }
-export function getQuadrantPb(rows: number, cols: number, q: 0 | 1 | 2 | 3): number | null {
+export function getQuadrantPb(
+  rows: number,
+  cols: number,
+  q: 0 | 1 | 2 | 3,
+): number | null {
   try {
     const raw = localStorage.getItem(getQuadrantPbKey(rows, cols, q));
     return raw ? parseInt(raw, 10) : null;
@@ -61,7 +70,12 @@ export function getQuadrantPb(rows: number, cols: number, q: 0 | 1 | 2 | 3): num
     return null;
   }
 }
-export function setQuadrantPb(rows: number, cols: number, q: 0 | 1 | 2 | 3, seconds: number): void {
+export function setQuadrantPb(
+  rows: number,
+  cols: number,
+  q: 0 | 1 | 2 | 3,
+  seconds: number,
+): void {
   try {
     localStorage.setItem(getQuadrantPbKey(rows, cols, q), String(seconds));
   } catch {
