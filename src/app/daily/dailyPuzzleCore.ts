@@ -212,6 +212,12 @@ export function refreshStreakFreeze(): number {
 
 /** Auto-apply streak freeze if yesterday was missed and we have one. Returns true if applied. */
 export function tryAutoApplyStreakFreeze(): boolean {
+  try {
+    // E2E/QA: set phuzzle:testDisableAutoStreakFreeze=true to skip auto-apply and test manual offer
+    if (localStorage.getItem("phuzzle:testDisableAutoStreakFreeze") === "true") return false;
+  } catch {
+    /* ignore */
+  }
   if (!wasYesterdayMissed() || getStreakFreezeCount() <= 0) return false;
   return useStreakFreeze(getYesterdayDateString());
 }

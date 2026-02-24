@@ -8,7 +8,8 @@ test.describe("Streak freeze offer", () => {
   }) => {
     await page.clock.install({ time: FIXED_TODAY });
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "10");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "12");
+      localStorage.setItem("phuzzle:testDisableAutoStreakFreeze", "true");
       const d = new Date();
       d.setDate(d.getDate() - 1);
       const yesterday = d.toISOString().slice(0, 10);
@@ -22,7 +23,7 @@ test.describe("Streak freeze offer", () => {
     await page.goto("/");
     await page.getByRole("button", { name: /today's puzzle/i }).click();
 
-    await expect(page.getByText(/you missed yesterday/i)).toBeVisible();
+    await expect(page.getByText(/missed yesterday/i)).toBeVisible();
     await expect(page.getByRole("button", { name: /use freeze/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /no thanks/i })).toBeVisible();
   });
@@ -30,7 +31,8 @@ test.describe("Streak freeze offer", () => {
   test("hides offer after clicking No thanks and reopening", async ({ page }) => {
     await page.clock.install({ time: FIXED_TODAY });
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "10");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "12");
+      localStorage.setItem("phuzzle:testDisableAutoStreakFreeze", "true");
       const d = new Date();
       d.setDate(d.getDate() - 1);
       const yesterday = d.toISOString().slice(0, 10);
@@ -47,19 +49,20 @@ test.describe("Streak freeze offer", () => {
     await page.goto("/");
     await page.getByRole("button", { name: /today's puzzle/i }).click();
 
-    await expect(page.getByText(/you missed yesterday/i)).toBeVisible();
+    await expect(page.getByText(/missed yesterday/i)).toBeVisible();
     await page.getByRole("button", { name: /no thanks/i }).click();
 
     await page.getByRole("button", { name: "Close" }).click();
     await page.getByRole("button", { name: /today's puzzle/i }).click();
 
-    await expect(page.getByText(/you missed yesterday/i)).not.toBeVisible();
+    await expect(page.getByText(/missed yesterday/i)).not.toBeVisible();
   });
 
   test("freeze buttons are keyboard accessible", async ({ page }) => {
     await page.clock.install({ time: FIXED_TODAY });
     await page.addInitScript(async () => {
-      localStorage.setItem("phuzzle:lastSeenChangelog", "10");
+      localStorage.setItem("phuzzle:lastSeenChangelog", "12");
+      localStorage.setItem("phuzzle:testDisableAutoStreakFreeze", "true");
       const d = new Date();
       d.setDate(d.getDate() - 1);
       const yesterday = d.toISOString().slice(0, 10);
@@ -73,7 +76,7 @@ test.describe("Streak freeze offer", () => {
     await page.goto("/");
     await page.getByRole("button", { name: /today's puzzle/i }).click();
 
-    await expect(page.getByText(/you missed yesterday/i)).toBeVisible();
+    await expect(page.getByText(/missed yesterday/i)).toBeVisible();
 
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
@@ -81,6 +84,6 @@ test.describe("Streak freeze offer", () => {
     await noThanks.focus();
     await expect(noThanks).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect(page.getByText(/you missed yesterday/i)).not.toBeVisible();
+    await expect(page.getByText(/missed yesterday/i)).not.toBeVisible();
   });
 });

@@ -85,8 +85,8 @@ describe("getStreakFreezeCount", () => {
     localStorage.clear();
   });
 
-  it("returns 1 when not set (default)", () => {
-    expect(getStreakFreezeCount()).toBe(1);
+  it("returns 0 when not set (default)", () => {
+    expect(getStreakFreezeCount()).toBe(0);
   });
 
   it("returns stored count when valid", () => {
@@ -140,12 +140,12 @@ describe("refreshStreakFreeze", () => {
     localStorage.clear();
   });
 
-  it("refills to 1 when stored week differs from current", () => {
+  it("updates week key when stored week differs from current", () => {
     localStorage.setItem(STREAK_FREEZE_KEY, "0");
     localStorage.setItem(STREAK_FREEZE_WEEK_KEY, "0");
     const result = refreshStreakFreeze();
-    expect(result).toBe(1);
-    expect(getStreakFreezeCount()).toBe(1);
+    expect(result).toBe(0);
+    expect(getStreakFreezeCount()).toBe(0);
   });
 });
 

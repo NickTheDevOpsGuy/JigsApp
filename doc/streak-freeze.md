@@ -17,6 +17,7 @@ Streak freeze lets users protect their daily streak when they miss a day. **One 
 | `phuzzle:streakFreezeEarnedWeek`           | Week when freeze was earned (max 1 per week)     |
 | `phuzzle:streakFreeze:used:YYYY-MM-DD`     | Freeze was used for this date                    |
 | `phuzzle:streakFreezeDismissed:YYYY-MM-DD` | User dismissed the offer on this date (if shown) |
+| `phuzzle:testDisableAutoStreakFreeze`     | E2E only: `"true"` disables auto-apply for manual-offer tests |
 
 ## Logic (`dailyPuzzleCore.ts`)
 
@@ -32,3 +33,7 @@ Streak freeze lets users protect their daily streak when they miss a day. **One 
 ## Init
 
 `initStreakFreeze()` is called at app startup in `App.tsx` to refresh the week key and **auto-apply** a freeze if yesterday was missed.
+
+## E2E tests
+
+Set `phuzzle:testDisableAutoStreakFreeze` to `"true"` in `localStorage` (via `page.addInitScript`) to disable auto-apply. This lets e2e tests verify the manual offer flow (see `e2e/streak-freeze.spec.ts`).

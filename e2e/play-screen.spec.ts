@@ -7,7 +7,7 @@ test.describe("Play screen", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(
       async ({ img, grid }) => {
-        localStorage.setItem("phuzzle:lastSeenChangelog", "10");
+        localStorage.setItem("phuzzle:lastSeenChangelog", "12");
         localStorage.setItem("phuzzle:imageDataUrl", img);
         localStorage.setItem("phuzzle:gridSize", grid);
       },
@@ -23,7 +23,7 @@ test.describe("Play screen", () => {
     ).toBeVisible({
       timeout: 15000,
     });
-    await expect(page.getByRole("button", { name: /menu/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /settings/i })).toBeVisible({
       timeout: 5000,
     });
   });
