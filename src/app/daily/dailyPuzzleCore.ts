@@ -214,7 +214,8 @@ export function refreshStreakFreeze(): number {
 export function tryAutoApplyStreakFreeze(): boolean {
   try {
     // E2E/QA: set phuzzle:testDisableAutoStreakFreeze=true to skip auto-apply and test manual offer
-    if (localStorage.getItem("phuzzle:testDisableAutoStreakFreeze") === "true") return false;
+    if (localStorage.getItem("phuzzle:testDisableAutoStreakFreeze") === "true")
+      return false;
   } catch {
     /* ignore */
   }
