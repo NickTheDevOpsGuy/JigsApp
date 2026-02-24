@@ -53,8 +53,6 @@ function HeatmapOverlay({
   pieces: Piece[];
 }) {
   const maxDrag = Math.max(1, ...pieces.map((p) => p.dragCount ?? 0));
-  const tileW = 100 / grid.cols;
-  const tileH = 100 / grid.rows;
 
   return (
     <div
