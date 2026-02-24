@@ -630,14 +630,19 @@
     height: 100dvh;
     min-height: 100dvh;
     overflow: hidden;
+    overflow-x: hidden;
     padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
   }
 
   .playBody {
     gap: 10px;
     min-height: 0;
+    min-width: 0;
     overflow: hidden;
+    overflow-x: hidden;
     padding: 0 12px;
+    padding-left: max(12px, env(safe-area-inset-left, 0));
+    padding-right: max(12px, env(safe-area-inset-right, 0));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -651,6 +656,8 @@
     align-items: center;
     justify-content: center;
     min-height: 0;
+    min-width: 0;
+    overflow-x: hidden;
   }
 
   .boardWrapper {
@@ -668,10 +675,11 @@
     flex: 1;
     min-height: 0;
     min-width: 0;
+    width: 100%;
+    max-width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 100%;
   }
 
   .board {
