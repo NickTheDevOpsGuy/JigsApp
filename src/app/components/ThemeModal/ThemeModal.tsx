@@ -1,11 +1,20 @@
 /**
- * ThemeModal – theme picker (light, dark, space, ocean, forest, sunset).
+ * ThemeModal – theme picker + snap sound picker.
  */
 import { useEffect, useRef } from "react";
 import { Modal } from "@/components/Modal/Modal";
 import { useTheme, THEMES, THEME_LABELS, type Theme } from "@/hooks/useTheme";
+import { soundManager, type SnapSoundPref } from "@/audio/sounds";
 import { Check } from "lucide-react";
 import styles from "./ThemeModal.module.css";
+
+const SNAP_SOUND_OPTIONS: { value: SnapSoundPref; label: string }[] = [
+  { value: "default", label: "Default (theme)" },
+  { value: "classic", label: "Classic" },
+  { value: "soft", label: "Soft" },
+  { value: "punchy", label: "Punchy" },
+  { value: "muted", label: "Muted" },
+];
 
 const THEME_EMOJIS: Record<Theme, string> = {
   light: "☀️",
@@ -48,10 +57,14 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
     }
   }, [isOpen, theme]);
 
+  const snapSound = soundManager.getSnapSoundPref();
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Theme" showCloseButton={true}>
-      <div className={styles.options}>
-        {THEMES.map((t) => (
+    <Modal isOpen={isOpen} onClose={onClose} title="Theme & Sounds" showCloseButton={true}>
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Theme</h3>
+        <div className={styles.options}>
+          {THEMES.map((t) => (
           <button
             key={t}
             ref={(el) => {
@@ -69,6 +82,27 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
             {theme === t && <Check size={18} className={styles.checkIcon} />}
           </button>
         ))}
+        </div>
+      </div>
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Snap sound</h3>
+        <div className={styles.options}>
+          {SNAP_SOUND_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`${styles.option} ${snapSound === opt.value ? styles.optionActive : ""}`}
+              onClick={() => {
+                soundManager.setSnapSoundPref(opt.value);
+                if (hapticsEnabled && typeof navigator?.vibrate === "function") navigator.vibrate(10);
+              }}
+              aria-label={`${opt.label}${snapSound === opt.value ? ", selected" : ""}`}
+            >
+              <span>{opt.label}</span>
+              {snapSound === opt.value && <Check size={18} className={styles.checkIcon} />}
+            </button>
+          ))}
+        </div>
       </div>
     </Modal>
   );

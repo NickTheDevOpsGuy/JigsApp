@@ -5,6 +5,10 @@ type SoundType = "snap" | "place" | "rotate" | "complete" | "pickup" | "undo";
 
 type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
 
+export type SnapSoundPref = "default" | "classic" | "soft" | "punchy" | "muted";
+
+const SNAP_SOUND_KEY = "phuzzle:snapSound";
+
 function getTheme(): Theme {
   if (typeof document === "undefined") return "light";
   const classList = document.documentElement.classList;
@@ -75,6 +79,25 @@ class SoundManager {
     if (haptics !== null) {
       this.hapticsEnabled = haptics === "true";
     }
+    const snap = localStorage.getItem(SNAP_SOUND_KEY);
+    if (snap !== null && ["default", "classic", "soft", "punchy", "muted"].includes(snap)) {
+      this.snapSoundPref = snap as SnapSoundPref;
+    }
+  }
+
+  private snapSoundPref: SnapSoundPref = "default";
+
+  setSnapSoundPref(pref: SnapSoundPref) {
+    this.snapSoundPref = pref;
+    try {
+      localStorage.setItem(SNAP_SOUND_KEY, pref);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  getSnapSoundPref(): SnapSoundPref {
+    return this.snapSoundPref;
   }
 
   // Vibrate if supported and enabled
@@ -108,6 +131,7 @@ class SoundManager {
         this.playPickup(ctx);
         break;
       case "snap":
+        if (this.snapSoundPref === "muted") break;
         this.playSnap(ctx, opts?.groupSize ?? 2);
         break;
       case "place":
@@ -246,7 +270,28 @@ class SoundManager {
     }
   }
 
+  private playSnapByPref(ctx: AudioContext, pref: Exclude<SnapSoundPref, "default" | "muted">, groupSize: number) {
+    const t = ctx.currentTime;
+    const volScale = Math.max(0.5, Math.min(1, 0.5 + (groupSize - 2) * 0.06));
+    if (pref === "classic") {
+      this.playTone(ctx, { freq: 1200 * volScale, vol: this.volume * 0.35 * volScale, duration: 0.07, start: t });
+      this.playTone(ctx, { freq: 1800 * volScale, vol: this.volume * 0.2 * volScale, duration: 0.05, start: t + 0.02 });
+    } else if (pref === "soft") {
+      this.playTone(ctx, { freq: 880 * volScale, type: "sine", vol: this.volume * 0.18 * volScale, duration: 0.08, start: t });
+      this.playTone(ctx, { freq: 1320 * volScale, type: "sine", vol: this.volume * 0.1 * volScale, duration: 0.06, start: t + 0.025 });
+    } else if (pref === "punchy") {
+      this.playTone(ctx, { freq: 200, type: "square", vol: this.volume * 0.2 * volScale, duration: 0.03, start: t });
+      this.playTone(ctx, { freq: 1400 * volScale, vol: this.volume * 0.45 * volScale, duration: 0.06, start: t + 0.01 });
+    }
+  }
+
   private playSnap(ctx: AudioContext, groupSize: number = 2) {
+    const pref = this.snapSoundPref;
+    if (pref === "muted") return;
+    if (pref !== "default") {
+      this.playSnapByPref(ctx, pref, groupSize);
+      return;
+    }
     const theme = getTheme();
     const t = ctx.currentTime;
     const clamp = (n: number) => Math.max(0, Math.min(1, n));
@@ -335,6 +380,8 @@ class SoundManager {
 
   private playPlace(ctx: AudioContext) {
     const theme = getTheme();
+    const t = ctx.currentTime;
+    const softClickVol = this.volume * 0.15;
     if (theme === "space") {
       // Deep thunk: magnetic clamp
       this.playTone(ctx, {
@@ -343,6 +390,13 @@ class SoundManager {
         vol: this.volume * 0.3,
         duration: 0.2,
         freqRamp: { to: 80, at: 0.15 },
+      });
+      this.playTone(ctx, {
+        freq: 1200,
+        type: "sine",
+        vol: softClickVol,
+        duration: 0.04,
+        start: t,
       });
     } else if (theme === "ocean") {
       // Plop: water settling
@@ -353,6 +407,13 @@ class SoundManager {
         duration: 0.16,
         freqRamp: { to: 180, at: 0.12 },
       });
+      this.playTone(ctx, {
+        freq: 1400,
+        type: "sine",
+        vol: softClickVol,
+        duration: 0.035,
+        start: t,
+      });
     } else if (theme === "forest") {
       // Soft thud: mossy landing
       this.playTone(ctx, {
@@ -361,6 +422,13 @@ class SoundManager {
         vol: this.volume * 0.38,
         duration: 0.18,
         freqRamp: { to: 140, at: 0.12 },
+      });
+      this.playTone(ctx, {
+        freq: 1100,
+        type: "sine",
+        vol: softClickVol,
+        duration: 0.04,
+        start: t,
       });
     } else if (theme === "sunset") {
       // Sunset: warm settle, cozy drop
@@ -371,6 +439,13 @@ class SoundManager {
         duration: 0.17,
         freqRamp: { to: 165, at: 0.11 },
       });
+      this.playTone(ctx, {
+        freq: 1300,
+        type: "triangle",
+        vol: softClickVol,
+        duration: 0.035,
+        start: t,
+      });
     } else {
       // Light/dark: default
       this.playTone(ctx, {
@@ -379,6 +454,13 @@ class SoundManager {
         vol: this.volume * 0.5,
         duration: 0.15,
         freqRamp: { to: 200, at: 0.1 },
+      });
+      this.playTone(ctx, {
+        freq: 1000,
+        type: "sine",
+        vol: softClickVol,
+        duration: 0.045,
+        start: t,
       });
     }
   }

@@ -39,6 +39,7 @@ export function piecesToSaved(pieces: Piece[]): SavedPiece[] {
     locked: p.locked,
     groupId: p.groupId,
     inTray: p.inTray,
+    dragCount: p.dragCount ?? 0,
   }));
 }
 

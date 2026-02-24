@@ -26,6 +26,7 @@ export type SavedPiece = {
   locked: boolean;
   groupId: string;
   inTray: boolean;
+  dragCount?: number;
 };
 
 export type SavedPuzzleState = {
@@ -175,6 +176,7 @@ export function savePuzzleState(
     locked: p.locked,
     groupId: p.groupId,
     inTray: p.inTray,
+    dragCount: p.dragCount ?? 0,
   }));
 
   const state: SavedPuzzleState = {

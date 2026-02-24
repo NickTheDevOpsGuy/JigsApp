@@ -5,7 +5,7 @@ import type { PuzzleState } from "@/puzzle/types";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { STORAGE_KEY, CUT_TYPE_KEY } from "../playScreenUtils";
-import type { TimeMode } from "../timeMode";
+import { getQuadrant, type TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
@@ -51,6 +51,10 @@ export function usePlayScreenManager(
     batterySaverMode?: boolean;
     /** When true, snap tolerance increases after ~15s without placement. */
     relaxedModeEnabled?: boolean;
+    /** Ref to current elapsed seconds (for quadrant timers in speedrun). */
+    elapsedSecondsRef?: MutableRefObject<number>;
+    /** Called when first piece in a quadrant is placed (speedrun mode). */
+    onQuadrantPlaced?: (quadrant: 0 | 1 | 2 | 3, elapsedSeconds: number) => void;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -86,6 +90,7 @@ export function usePlayScreenManager(
   const [state, setState] = useState<PuzzleState | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [snapCombo, setSnapCombo] = useState(0);
+  const [announcerLine, setAnnouncerLine] = useState<string | null>(null);
   const [awaitingResumeChoice, setAwaitingResumeChoice] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [puzzleKey, setPuzzleKey] = useState(0);
@@ -207,9 +212,33 @@ export function usePlayScreenManager(
                 opts.onPieceSnappedAnalytics(Math.round(now - startTime));
               }
               lastInteractionRef.current = now;
-              popMapRef.current.set(p.id, now);
+              const groupPieces = next.getState().pieces.filter(
+                (piece) => piece.groupId === p.groupId,
+              );
+              for (const piece of groupPieces) {
+                popMapRef.current.set(piece.id, now);
+              }
+              const cx = p.x + p.w / 2;
+              const cy = p.y + p.h / 2;
+              const particles = snapParticlesRef.current;
+              for (let i = 0; i < SNAP_PARTICLE_COUNT; i++) {
+                const angle = (i / SNAP_PARTICLE_COUNT) * Math.PI * 2 + (now % 1);
+                const r = 3 + (now % 2);
+                particles.push({
+                  x: cx + Math.cos(angle) * r,
+                  y: cy + Math.sin(angle) * r,
+                  t0: now,
+                });
+              }
+              const maxAge = 500;
+              snapParticlesRef.current = particles.filter(
+                (part) => now - part.t0 < maxAge,
+              );
               soundManager.play("place");
               opts?.haptic?.("place");
+              const elapsed = opts?.elapsedSecondsRef?.current ?? 0;
+              const q = getQuadrant(p.row, p.col, grid.rows, grid.cols);
+              opts?.onQuadrantPlaced?.(q, elapsed);
               placementTimesRef.current.push(now);
               const cutoff = now - PLACEMENT_STREAK_MS;
               const comboCutoff = now - SNAP_COMBO_IDLE_MS;
@@ -384,6 +413,18 @@ export function usePlayScreenManager(
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    const line =
+      snapCombo >= 6 ? "Unstoppable!" : snapCombo >= 4 ? "Combo!" : snapCombo >= 2 ? "Nice!" : null;
+    setAnnouncerLine(line);
+  }, [snapCombo]);
+
+  useEffect(() => {
+    if (!announcerLine) return;
+    const t = setTimeout(() => setAnnouncerLine(null), 1500);
+    return () => clearTimeout(t);
+  }, [announcerLine]);
+
   // Resize observer: keep manager board size in sync with DOM (no min clamp so coordinate system matches canvas)
   useEffect(() => {
     const boardEl = boardRef.current;
@@ -419,6 +460,8 @@ export function usePlayScreenManager(
     setState,
     elapsedSeconds,
     setElapsedSeconds,
+    snapCombo,
+    announcerLine,
     awaitingResumeChoice,
     isLoading,
     boardRef,
@@ -429,7 +472,5 @@ export function usePlayScreenManager(
     popMapRef,
     lockMapRef,
     snapParticlesRef,
-    snapCombo,
-    setSnapCombo,
   };
 }

@@ -5,19 +5,19 @@
 
 import type { Piece } from "@/puzzle/types";
 
-const SNAP_GLOW_MS = 120;
+const SNAP_GLOW_MS = 180;
 
 export function snapPopScale(tMs: number): number {
   if (tMs <= 0) return 1;
-  if (tMs >= 120) return 1;
+  if (tMs >= 150) return 1;
 
-  if (tMs < 40) {
-    const k = tMs / 40;
-    return 1 + 0.08 * easeOutBack(k);
+  if (tMs < 50) {
+    const k = tMs / 50;
+    return 1 + 0.12 * easeOutBack(k);
   }
 
-  const k = (tMs - 40) / 80;
-  return 1.08 - 0.08 * easeOutBounce(k);
+  const k = (tMs - 50) / 100;
+  return 1.12 - 0.12 * easeOutBounce(k);
 }
 
 /** Alpha for snap glow (0 = no glow, fades out over SNAP_GLOW_MS). */

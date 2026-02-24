@@ -267,6 +267,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
       id: `p${i + 1}`,
       row,
       col,
+      dragCount: 0,
       x: pos.x,
       y: pos.y,
       z: 1,

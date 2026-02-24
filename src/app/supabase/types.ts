@@ -23,6 +23,10 @@ export interface Database {
           last_played_at: string;
           created_at: string;
           updated_at: string;
+          xp?: number;
+          level?: number;
+          prestige_count?: number;
+          challenge_wins?: number;
         };
         Insert: {
           id?: string;
@@ -45,6 +49,10 @@ export interface Database {
           last_played_at?: string;
           created_at?: string;
           updated_at?: string;
+          xp?: number;
+          level?: number;
+          prestige_count?: number;
+          challenge_wins?: number;
         };
       };
       completions: {
@@ -57,6 +65,7 @@ export interface Database {
           grid_cols: number;
           is_daily: boolean;
           created_at: string;
+          cut_type?: string;
         };
         Insert: {
           id?: string;
@@ -67,6 +76,7 @@ export interface Database {
           grid_cols: number;
           is_daily: boolean;
           created_at?: string;
+          cut_type?: string;
         };
         Update: Partial<{
           id: string;

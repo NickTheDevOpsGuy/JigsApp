@@ -6,7 +6,8 @@ export type TimeMode =
   | "countdown" // Start at limit, game over at 0
   | "active" // Only count while moving pieces
   | "relaxed" // Same as elapsed but timer hidden
-  | "best"; // Track personal best per grid size
+  | "best" // Track personal best per grid size
+  | "speedrun"; // Quadrant timers + PB comparison
 
 export const TIME_MODE_KEY = "phuzzle:timeMode";
 export const COUNTDOWN_MINUTES_KEY = "phuzzle:countdownMinutes";
@@ -33,6 +34,36 @@ export function getBestTime(rows: number, cols: number): number | null {
 export function setBestTime(rows: number, cols: number, seconds: number): void {
   try {
     localStorage.setItem(getBestTimeKey(rows, cols), String(seconds));
+  } catch {
+    // ignore
+  }
+}
+
+/** Quadrant indices: 0=TL, 1=TR, 2=BL, 3=BR */
+export function getQuadrant(row: number, col: number, rows: number, cols: number): 0 | 1 | 2 | 3 {
+  const midR = rows / 2;
+  const midC = cols / 2;
+  if (row < midR && col < midC) return 0;
+  if (row < midR && col >= midC) return 1;
+  if (row >= midR && col < midC) return 2;
+  return 3;
+}
+
+const QUADRANT_PB_PREFIX = "phuzzle:quadrantPb_";
+export function getQuadrantPbKey(rows: number, cols: number, q: 0 | 1 | 2 | 3): string {
+  return `${QUADRANT_PB_PREFIX}${rows}x${cols}_q${q}`;
+}
+export function getQuadrantPb(rows: number, cols: number, q: 0 | 1 | 2 | 3): number | null {
+  try {
+    const raw = localStorage.getItem(getQuadrantPbKey(rows, cols, q));
+    return raw ? parseInt(raw, 10) : null;
+  } catch {
+    return null;
+  }
+}
+export function setQuadrantPb(rows: number, cols: number, q: 0 | 1 | 2 | 3, seconds: number): void {
+  try {
+    localStorage.setItem(getQuadrantPbKey(rows, cols, q), String(seconds));
   } catch {
     // ignore
   }

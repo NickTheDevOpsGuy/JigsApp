@@ -18,15 +18,15 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ## 3. Run the migrations
 
-In the Supabase dashboard **SQL Editor**, run the migration:
+**Option A – SQL Editor:** Paste and run `migrations/20260223120000_full_schema.sql` in the Supabase dashboard **SQL Editor**. It’s idempotent (safe to re-run).
 
-1. `migrations/001_full_schema.sql` – All tables, RLS, policies, Realtime (idempotent – safe to re-run)
-
-Or use the Supabase CLI:
+**Option B – Supabase CLI:**
 
 ```bash
-supabase db push
+npx supabase db push
 ```
+
+If you use a global Supabase workdir (e.g. `~/supabase`), ensure your project migrations exist there or run from the project directory.
 
 ## 4. Enable anonymous auth
 

@@ -329,7 +329,7 @@ function drawPiece(
   const scale = popScale;
 
   // Subtle snap glow behind piece (placement or neighbor merge)
-  if (start != null && popElapsedMs < 280) {
+  if (start != null && popElapsedMs < 320) {
     const cx = p.x + p.w / 2;
     const cy = p.y + p.h / 2;
     const radius = Math.max(p.w, p.h) * 0.55;

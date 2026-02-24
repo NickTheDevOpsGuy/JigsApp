@@ -216,29 +216,49 @@ export function useViewport(puzzleKey: string | null = null) {
     setViewport({ scale: 1, panX: 0, panY: 0 });
   }, []);
 
-  const animateTo = useCallback((target: ViewportState) => {
-    if (prefersReducedMotion()) {
-      setViewport(target);
-      return;
-    }
-    const start = viewportRef.current;
-    const startTime = performance.now();
-    let rafId: number;
+  const animateTo = useCallback(
+    (target: ViewportState, durationMs?: number) => {
+      if (prefersReducedMotion()) {
+        setViewport(target);
+        return;
+      }
+      const start = viewportRef.current;
+      const startTime = performance.now();
+      const duration = durationMs ?? ZOOM_ANIM_MS;
+      let rafId: number;
 
-    const tick = () => {
-      const elapsed = performance.now() - startTime;
-      const t = Math.min(1, elapsed / ZOOM_ANIM_MS);
-      const eased = 1 - (1 - t) * (1 - t);
-      setViewport({
-        scale: start.scale + (target.scale - start.scale) * eased,
-        panX: start.panX + (target.panX - start.panX) * eased,
-        panY: start.panY + (target.panY - start.panY) * eased,
-      });
-      if (t < 1) rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, []);
+      const tick = () => {
+        const elapsed = performance.now() - startTime;
+        const t = Math.min(1, elapsed / duration);
+        const eased = 1 - (1 - t) * (1 - t);
+        setViewport({
+          scale: start.scale + (target.scale - start.scale) * eased,
+          panX: start.panX + (target.panX - start.panX) * eased,
+          panY: start.panY + (target.panY - start.panY) * eased,
+        });
+        if (t < 1) rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(rafId);
+    },
+    [],
+  );
+
+  /** Zoom out on completion: 600ms ease-out to show full puzzle. */
+  const zoomOutOnComplete = useCallback(() => {
+    if (prefersReducedMotion()) return;
+    const v = viewportRef.current;
+    const targetScale = Math.max(MIN_SCALE, Math.min(0.7, v.scale * 0.85));
+    const factor = targetScale / v.scale;
+    animateTo(
+      {
+        scale: targetScale,
+        panX: v.panX * factor,
+        panY: v.panY * factor,
+      },
+      600,
+    );
+  }, [animateTo]);
 
   const zoomIn = useCallback(() => {
     const prev = viewportRef.current;
@@ -304,6 +324,7 @@ export function useViewport(puzzleKey: string | null = null) {
     reset,
     zoomIn,
     zoomOut,
+    zoomOutOnComplete,
     handleWheel,
     startPan,
     handlePanMove,

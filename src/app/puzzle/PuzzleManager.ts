@@ -594,8 +594,9 @@ export class PuzzleManager {
     this.zCounter += 1;
     this.updatePieces(
       (p) => p.groupId === piece.groupId,
-      () => ({
+      (p) => ({
         z: this.zCounter,
+        dragCount: (p.dragCount ?? 0) + 1,
       }),
     );
 
@@ -743,6 +744,7 @@ export class PuzzleManager {
             isPlaced: saved.isPlaced,
             locked: saved.locked ?? false,
             inTray: saved.inTray,
+            dragCount: saved.dragCount ?? p.dragCount ?? 0,
           };
         }
         return p;
@@ -824,6 +826,14 @@ export class PuzzleManager {
     if (Math.hypot(dx, dy) > tolerance) return false;
     if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
 
+    // Only allow snap when ALL pieces in the group would land at their targets (prevents locking wrong groups)
+    for (const p of groupPieces) {
+      const t = this.tilePos(p);
+      const offX = Math.abs(p.targetX - t.x - dx);
+      const offY = Math.abs(p.targetY - t.y - dy);
+      if (offX > 2 || offY > 2) return false;
+    }
+
     this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
     this.setGroupToExactTargetPositions(gid);
 
@@ -861,16 +871,19 @@ export class PuzzleManager {
     const rowColMap = buildRowColMap(this.state.pieces);
 
     // Only check boundary pieces: those with a neighbor outside this group (possible snap target).
+    // Exclude tray pieces – they use different coordinates and must not be snap targets.
     const boundaryPieces = groupPieces.filter((gp) => {
       const neighbors = getSolvedNeighborsFromMap(gp, rowColMap);
-      return neighbors.some((n) => !groupIdSet.has(n.id) && n.rotation === 0);
+      return neighbors.some(
+        (n) => !n.inTray && !groupIdSet.has(n.id) && n.rotation === 0,
+      );
     });
 
     let best: null | { dx: number; dy: number; dist: number; into: string } = null;
 
     for (const gp of boundaryPieces) {
       for (const n of getSolvedNeighborsFromMap(gp, rowColMap)) {
-        if (n.groupId === gid || n.rotation !== 0) continue;
+        if (n.groupId === gid || n.rotation !== 0 || n.inTray) continue;
 
         const gpTile = this.tilePos(gp);
         const nTile = this.tilePos(n);
@@ -961,5 +974,21 @@ export class PuzzleManager {
 
   private rand(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  /**
+   * Drift mode: apply small random nudge to unplaced pieces (groups).
+   * Called every ~10s when experimental drift is enabled.
+   */
+  public driftUnplacedPieces(): void {
+    if (this.state.isComplete) return;
+    const seen = new Set<string>();
+    for (const p of this.state.pieces) {
+      if (p.isPlaced || p.locked || seen.has(p.groupId)) continue;
+      seen.add(p.groupId);
+      const dx = this.rand(-8, 8);
+      const dy = this.rand(-8, 8);
+      if (dx !== 0 || dy !== 0) this.shiftGroup(p.groupId, dx, dy);
+    }
   }
 }

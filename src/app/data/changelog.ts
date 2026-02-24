@@ -1,11 +1,17 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "10";
+export const CHANGELOG_VERSION = "11";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🗺️ Heatmap – Post-completion overlay shows which pieces you moved most (red = hot, blue = cold)",
+      "⏱️ Speedrun mode – Quadrant timers (TL, TR, BL, BR) with per-quadrant personal bests",
+      "🔍 Zoom-out on complete – 600ms camera zoom when the last piece snaps in",
+      "⭕ Circular progress – Ring around the board fills as you place pieces; color shifts at 75% and 95%",
+      "🌀 Drift mode – Unplaced pieces gently drift every ~10s (Settings → Gameplay)",
+      "🔊 Snap sound picker – Choose Default, Classic, Soft, Punchy, or Muted (Theme modal)",
       "⏱️ Daily countdown – Server-synced timer to next daily unlock on the Leaderboard; celebration when new puzzle is ready",
       "🛡️ Streak shield – Earn one freeze per week after a 5-day streak; auto-applied if you miss a day",
       "🧩 Alternate piece shapes – Classic, Irregular, Hard (Settings → Display → Piece shape)",

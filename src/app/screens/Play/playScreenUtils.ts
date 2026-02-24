@@ -10,6 +10,7 @@ export const ALIGNMENT_GRID_KEY = "phuzzle:alignmentGrid";
 export const GHOST_WHEN_IDLE_KEY = "phuzzle:ghostWhenIdle";
 export const EDGE_HIGHLIGHT_KEY = "phuzzle:edgeHighlight";
 export const RELAXED_MODE_KEY = "phuzzle:relaxedMode";
+export const DRIFT_MODE_KEY = "phuzzle:driftMode";
 export const CUT_TYPE_KEY = "phuzzle:cutType";
 export const PROGRESSIVE_REVEAL_KEY = "phuzzle:progressiveReveal";
 

@@ -266,6 +266,14 @@
   font-size: 14px;
 }
 
+.timeCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
 .completedAt {
   font-size: 12px;
   color: var(--color-text-secondary);
@@ -410,6 +418,7 @@
   box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
+.cutTypeFilter,
 .allTimeGrid {
   display: flex;
   align-items: center;
@@ -418,6 +427,7 @@
   order: 2;
 }
 
+.cutTypeFilter select,
 .allTimeGrid select {
   padding: 8px 12px;
   border-radius: 8px;
@@ -426,6 +436,29 @@
   color: var(--color-text-primary);
   font-size: 14px;
   min-height: 40px;
+}
+
+.championBadge {
+  font-size: 1em;
+  vertical-align: middle;
+}
+
+.prestigeBadge {
+  color: var(--color-brand-primary);
+  font-size: 0.9em;
+}
+
+.prestigeSection {
+  margin: 16px 0;
+  padding: 12px;
+  background: var(--color-bg-elevated);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+}
+
+.prestigeSection h3 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
 }
 
 .shareBtn {
@@ -459,11 +492,10 @@
     content: none;
   }
 
-  /* Top row: Rank | Name | Score (+ completed at) */
+  /* Top row: Rank | Name | Time (+ completed at stacked) */
   .leaderboardItem > .rank,
   .leaderboardItem > .player,
-  .leaderboardItem > .time,
-  .leaderboardItem > .completedAt {
+  .leaderboardItem > .timeCol {
     flex: none;
   }
 
@@ -491,10 +523,18 @@
     font-size: 15px;
   }
 
-  .leaderboardItem .time,
-  .leaderboardItem .completedAt {
+  .leaderboardItem .timeCol {
     grid-row: 1;
     grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .leaderboardItem .timeCol .time {
+    white-space: nowrap;
   }
 
   .leaderboardItem .time {
@@ -503,7 +543,6 @@
 
   .leaderboardItem .completedAt {
     font-size: 12px;
-    text-align: right;
   }
 
   .leaderboardItem .leaderboardDetail {

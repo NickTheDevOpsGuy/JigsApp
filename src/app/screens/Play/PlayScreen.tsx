@@ -25,7 +25,12 @@ import { ThemeModal } from "@/components/ThemeModal";
 
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
-import { getBestTime, BEST_TIME_PREFIX } from "./timeMode";
+import {
+  getBestTime,
+  BEST_TIME_PREFIX,
+  getQuadrantPb,
+  setQuadrantPb,
+} from "./timeMode";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
@@ -53,6 +58,7 @@ import {
   TopBarButtons,
   HeaderMenu,
 } from "./components";
+import { CircularProgressRing } from "./components/CircularProgressRing";
 import { ProgressivePreviewOverlay } from "./components/ProgressivePreviewOverlay";
 import { SnapComboMeter } from "./components/SnapComboMeter";
 import { ProfilerOverlay } from "./components";
@@ -106,6 +112,8 @@ export function PlayScreen() {
     setPieceLockingEnabled,
     relaxedModeEnabled,
     toggleRelaxedMode,
+    driftModeEnabled,
+    toggleDriftMode,
     showGhostHint,
     setShowGhostHint,
     showAlignmentGrid,
@@ -191,6 +199,10 @@ export function PlayScreen() {
   const stateRef = React.useRef<PuzzleState | null>(null);
   const undoCountRef = React.useRef(0);
   const abandonCapturedRef = React.useRef(false);
+  const elapsedSecondsRef = React.useRef(0);
+  const [quadrantTimes, setQuadrantTimes] = React.useState<
+    Record<0 | 1 | 2 | 3, number | null>
+  >({ 0: null, 1: null, 2: null, 3: null });
 
   const managerResult = usePlayScreenManager(
     grid,
@@ -214,6 +226,21 @@ export function PlayScreen() {
       dragStartTimeRef,
       batterySaverMode,
       relaxedModeEnabled,
+      elapsedSecondsRef,
+      onQuadrantPlaced:
+        timeMode === "speedrun" && grid
+          ? (q, sec) => {
+              setQuadrantTimes((prev) => {
+                if (prev[q] != null) return prev;
+                const next = { ...prev, [q]: sec };
+                const pb = getQuadrantPb(grid.rows, grid.cols, q);
+                if (pb == null || sec < pb) {
+                  setQuadrantPb(grid.rows, grid.cols, q, sec);
+                }
+                return next;
+              });
+            }
+          : undefined,
       onPieceSnappedAnalytics: (timeToSnapMs) => {
         const g = stateRef.current?.grid;
         const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
@@ -239,6 +266,7 @@ export function PlayScreen() {
     trayRef,
     mainRef,
     snapCombo,
+    announcerLine,
     imgRef,
     popMapRef,
     lockMapRef,
@@ -250,6 +278,7 @@ export function PlayScreen() {
   useEffect(() => {
     undoCountRef.current = 0;
     abandonCapturedRef.current = false;
+    setQuadrantTimes({ 0: null, 1: null, 2: null, 3: null });
   }, [puzzleKey]);
 
   useEffect(() => {
@@ -278,7 +307,6 @@ export function PlayScreen() {
     }
   }, [viewport.viewport.scale, onboarding.needsZoomTip, onboarding.dismissZoomTip]);
 
-  const elapsedSecondsRef = React.useRef(elapsedSeconds);
   elapsedSecondsRef.current = elapsedSeconds;
 
   // Milestone callouts at 25%, 33%, 50%, 66%, 75%
@@ -331,12 +359,31 @@ export function PlayScreen() {
     if (state.placedCount === 0) lastMilestoneRef.current = 0;
   }, [state?.placedCount, puzzleKey]);
 
-  // Record pack puzzle completion when puzzle is finished
+  // Camera zoom-out on completion (600ms ease-out)
+  const zoomOnCompleteRunRef = useRef(false);
+  useEffect(() => {
+    if (!state?.isComplete || zoomOnCompleteRunRef.current || batterySaverMode) return;
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    zoomOnCompleteRunRef.current = true;
+    viewport.zoomOutOnComplete();
+  }, [state?.isComplete, batterySaverMode, viewport.zoomOutOnComplete]);
+
+  // Record pack puzzle completion and adaptive difficulty when puzzle is finished
   const completionCapturedRef = useRef(false);
   useEffect(() => {
     if (!state?.isComplete) return;
     const puzzleId = consumeCurrentPuzzleId();
     if (puzzleId) recordPuzzleCompletion(puzzleId);
+    const g = state?.grid;
+    if (g) {
+      import("@/services/adaptiveDifficultyService").then(({ recordCompletion }) => {
+        recordCompletion(g.rows, g.cols, elapsedSeconds);
+      });
+    }
     if (!completionCapturedRef.current) {
       completionCapturedRef.current = true;
       const g = state?.grid;
@@ -396,6 +443,7 @@ export function PlayScreen() {
     firstSnapCapturedRef.current = false;
     onFireCapturedRef.current = false;
     completionCapturedRef.current = false;
+    zoomOnCompleteRunRef.current = false;
   }, [puzzleKey]);
 
   // Auto-clear piece selection after 1s so the blue border doesn’t stay until another click
@@ -408,6 +456,18 @@ export function PlayScreen() {
     }, 1000);
     return () => clearTimeout(t);
   }, [selectedPieceId, setSelectedPieceId, selectedIdRef, bump]);
+
+  // Drift mode: nudge unplaced pieces every ~10s
+  useEffect(() => {
+    const complete = state?.isComplete ?? false;
+    if (!driftModeEnabled || !manager || complete || isPaused) return;
+    const id = setInterval(() => {
+      if (!manager || stateRef.current?.isComplete) return;
+      manager.driftUnplacedPieces();
+      setState(manager.getState());
+    }, 10000);
+    return () => clearInterval(id);
+  }, [driftModeEnabled, manager, state?.isComplete, isPaused, setState]);
 
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
 
@@ -953,6 +1013,11 @@ export function PlayScreen() {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 toggleRelaxedMode();
               }}
+              driftModeEnabled={driftModeEnabled}
+              onToggleDriftMode={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                toggleDriftMode();
+              }}
               onToggleGhostHint={() => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 setShowGhostHint((g) => !g);
@@ -1020,6 +1085,17 @@ export function PlayScreen() {
                   timeMode={timeMode}
                   countdownMinutes={countdownMinutes}
                   bestTimeSeconds={bestTimeSeconds}
+                  quadrantTimes={timeMode === "speedrun" ? quadrantTimes : undefined}
+                  quadrantPbs={
+                    timeMode === "speedrun" && grid
+                      ? {
+                          0: getQuadrantPb(grid.rows, grid.cols, 0),
+                          1: getQuadrantPb(grid.rows, grid.cols, 1),
+                          2: getQuadrantPb(grid.rows, grid.cols, 2),
+                          3: getQuadrantPb(grid.rows, grid.cols, 3),
+                        }
+                      : undefined
+                  }
                   onTogglePause={() => setIsPaused((p) => !p)}
                 />
               </div>
@@ -1134,6 +1210,12 @@ export function PlayScreen() {
         <div className={styles.main} ref={mainRef}>
           <div className={styles.boardWrapper}>
             <div className={styles.board} ref={boardRef}>
+              {!isComplete && total > 0 && (
+                <CircularProgressRing
+                  progress={placed / total}
+                  className={styles.boardProgressRing}
+                />
+              )}
               {isLoading && (
                 <div className={styles.loadingOverlay} aria-label="Loading puzzle">
                   <div className={styles.spinner} />
@@ -1207,6 +1289,7 @@ export function PlayScreen() {
                 <CompletionOverlay
                   elapsedSeconds={elapsedSeconds}
                   grid={state?.grid}
+                  pieces={state?.pieces ?? []}
                   imageUrl={
                     localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
                   }
@@ -1217,6 +1300,7 @@ export function PlayScreen() {
                     (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
                   }
                   isDaily={isDailyPuzzleSession()}
+                  cutType={pieceCutType}
                   copied={share.copied}
                   canNativeShare={share.canNativeShare}
                   onCopyResults={share.handleCopyResults}
@@ -1299,9 +1383,11 @@ export function PlayScreen() {
         showFirstSnapToast={onboarding.showFirstSnapToast}
         showStreakToast={showStreakToast}
         milestoneMessage={milestoneMessage}
+        announcerLine={announcerLine}
         shareToast={shareToast}
         classNames={{
           engagementToast: styles.engagementToast,
+          announcerToast: styles.announcerToast,
           toastDismiss: styles.toastDismiss,
           onboardingOverlay: styles.onboardingOverlay,
           onboardingOverlayTray: styles.onboardingOverlayTray,

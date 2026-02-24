@@ -95,6 +95,9 @@ export type Piece = {
   // Tray management
   inTray: boolean;
   edges: PieceEdges; // Store edge configuration for tray sorting
+
+  /** Drag count for heatmap (how many times this piece was picked up/dragged). */
+  dragCount?: number;
 };
 
 // "Magnet" preview for the currently dragged group.

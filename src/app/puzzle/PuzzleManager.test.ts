@@ -63,4 +63,16 @@ describe("PuzzleManager", () => {
     const afterUndo = manager.getState().pieces.find((p) => p.id === pieceId)!;
     expect(afterUndo.y).toBe(initialY);
   });
+
+  it("driftUnplacedPieces nudges unplaced groups", () => {
+    const manager = createManager({ rows: 2, cols: 2 });
+    const before = manager.getState().pieces.map((p) => ({ id: p.id, x: p.x, y: p.y }));
+    manager.driftUnplacedPieces();
+    const after = manager.getState().pieces;
+    const moved = after.some(
+      (p, i) => p.x !== before[i].x || p.y !== before[i].y,
+    );
+    expect(moved).toBe(true);
+  });
+
 });

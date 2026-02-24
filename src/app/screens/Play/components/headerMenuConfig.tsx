@@ -43,6 +43,8 @@ export type HeaderMenuProps = {
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
   onToggleRelaxedMode?: () => void;
+  driftModeEnabled?: boolean;
+  onToggleDriftMode?: () => void;
   onToggleGhostHint: () => void;
   onToggleGhostWhenIdle: () => void;
   onToggleEdgeHighlight: () => void;
@@ -180,6 +182,16 @@ export function buildMenuItems(
       sortKey: "Relaxed Mode",
       ariaLabel: props.relaxedModeEnabled ? "Relaxed Mode on" : "Relaxed Mode off",
       onClick: c(props.onToggleRelaxedMode ?? (() => {})),
+      subMenu: "controls",
+    },
+    {
+      id: "driftMode",
+      section: "settings",
+      visible: !!props.onToggleDriftMode,
+      label: props.driftModeEnabled ? "Drift Mode ✨" : "Drift Mode 🌙",
+      sortKey: "Drift Mode",
+      ariaLabel: props.driftModeEnabled ? "Drift Mode on" : "Drift Mode off",
+      onClick: c(props.onToggleDriftMode ?? (() => {})),
       subMenu: "controls",
     },
     {

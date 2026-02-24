@@ -1,6 +1,4 @@
-/**
- * puzzlePacks – curated packs; filter SAMPLE_PUZZLES by category or explicit IDs.
- */
+import type { Season } from "@/utils/seasons";
 import type { SamplePuzzle } from "./samplePuzzles";
 import { SAMPLE_PUZZLES } from "./samplePuzzles";
 
@@ -12,6 +10,8 @@ export type PuzzlePack = {
   /** Category used to filter SAMPLE_PUZZLES, or explicit puzzle IDs */
   category?: string;
   puzzleIds?: string[];
+  /** Pack surfaces as "Season's pick" when current season matches */
+  season?: Season;
 };
 
 /**
@@ -25,6 +25,7 @@ export const PUZZLE_PACKS: PuzzlePack[] = [
     description: "Cute critters to piece together",
     emoji: "🐻",
     category: "animals",
+    season: "winter",
   },
   {
     id: "retro-tech",
@@ -39,6 +40,7 @@ export const PUZZLE_PACKS: PuzzlePack[] = [
     description: "Cosmos, planets, and nebulas",
     emoji: "🪐",
     category: "space",
+    season: "summer",
   },
   {
     id: "food-photography",
@@ -46,6 +48,7 @@ export const PUZZLE_PACKS: PuzzlePack[] = [
     description: "Delicious dishes to assemble",
     emoji: "🍽️",
     category: "food",
+    season: "fall",
   },
   {
     id: "floral",
@@ -53,6 +56,7 @@ export const PUZZLE_PACKS: PuzzlePack[] = [
     description: "Flowers and botanicals",
     emoji: "🌸",
     category: "flowers",
+    season: "spring",
   },
 ];
 

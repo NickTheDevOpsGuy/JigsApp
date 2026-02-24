@@ -36,8 +36,26 @@
 - **Breaks on idle** – Combo resets after 2.5s without placement
 - **Files**: `SnapComboMeter.tsx`, `usePlayScreenManager.ts`, `PlayScreen.tsx`
 
-## Not Implemented (Future)
+## 6. Separate Stats per Cut Type ✓
 
-- **24-hour speed challenges** – Separate challenge tab, special leaderboard, badge (requires new DB schema, scheduling)
-- **XP system + Prestige** – Reset XP for cosmetic badge (requires new progression system)
-- **Separate stats per cut type** – Leaderboard filtering by cut (schema change)
+- **Cut type filter** – Leaderboard views (Today, Challenge, Best week/month, All-time) can filter by Classic, Irregular, or Hard
+- **Stored with completions** – `cut_type` column in completions table (migration 002)
+- **Files**: `002_cut_type_xp_prestige_challenge.sql`, `leaderboardService.ts`, `statsService.ts`, `StatsScreen.tsx`
+
+## 7. 24-Hour Speed Challenge ✓
+
+- **Challenge tab** – Same as Today's daily but framed as "24-hour speed challenge" with winner badge (🏆)
+- **Challenge wins** – Stored in `player_stats.challenge_wins`; awarded when tied for #1 on daily
+- **Files**: `statsService.ts`, `StatsScreen.tsx`
+
+## 8. XP System + Prestige Reset ✓
+
+- **XP on completion** – 10 per piece + 5 bonus; level thresholds: 2=100, 3=250, +150 per level
+- **Prestige** – At level 5+, reset to Lv1, earn ★ badge; puzzles completed & challenge wins kept
+- **Files**: `statsService.ts`, `prestigeService.ts`, `002_cut_type_xp_prestige_challenge.sql`, `StatsScreen.tsx`
+
+## Migration Required
+
+Run `supabase/migrations/002_cut_type_xp_prestige_challenge.sql` to add:
+- `completions.cut_type`
+- `player_stats.xp`, `level`, `prestige_count`, `challenge_wins`

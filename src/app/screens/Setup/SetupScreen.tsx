@@ -22,7 +22,7 @@ import { useImagePicker, useGridConfig, GRID_OPTIONS } from "./hooks";
 import { CameraCapture } from "./components/CameraCapture";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
 import { COUNTDOWN_OPTIONS, getBestTime, type TimeMode } from "../Play/timeMode";
-import { getSuggestedGrid } from "../Play/playScreenUtils";
+import { getAdaptiveSuggestion } from "@/services/adaptiveDifficultyService";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const TIME_MODE_LABELS: Record<TimeMode, string> = {
@@ -31,6 +31,7 @@ const TIME_MODE_LABELS: Record<TimeMode, string> = {
   active: "Active only",
   relaxed: "Relaxed (no timer)",
   best: "Best time",
+  speedrun: "Speedrun (quadrants)",
 };
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
@@ -114,7 +115,7 @@ export function SetupScreen() {
   const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
     useTimeModeConfig();
 
-  const suggestedGrid = useMemo(() => getSuggestedGrid(getBestTime), []);
+  const suggestedGrid = useMemo(() => getAdaptiveSuggestion(getBestTime), []);
   const isMobile = useMediaQuery("(max-width: 520px)");
   const filteredPuzzles =
     selectedCategory === "all"
@@ -362,13 +363,15 @@ export function SetupScreen() {
             {effectiveRows * effectiveCols} pieces
             {isCustom ? " · Custom" : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
           </p>
-          {suggestedGrid && gridIndex !== suggestedGrid.gridIndex && (
+          {suggestedGrid &&
+            gridIndex !== suggestedGrid.gridIndex &&
+            suggestedGrid.gridIndex < GRID_OPTIONS.length - 1 && (
             <button
               type="button"
               className={styles.difficultySuggestion}
               onClick={() => setGridIndex(suggestedGrid.gridIndex)}
             >
-              Based on your progress, try {suggestedGrid.rows}×{suggestedGrid.cols} next →
+              {suggestedGrid.hint}
             </button>
           )}
           <div className={styles.configGrid}>
@@ -399,7 +402,7 @@ export function SetupScreen() {
               value={timeMode}
               onChange={(val: string) => setTimeMode(val as TimeMode)}
               options={(
-                ["elapsed", "countdown", "active", "relaxed", "best"] as TimeMode[]
+                ["elapsed", "countdown", "active", "relaxed", "best", "speedrun"] as TimeMode[]
               ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
               fullWidth
             />

@@ -159,18 +159,25 @@ export async function getPercentileRank(
   return { topPercent, totalPlayers: total };
 }
 
+export type PieceCutType = "classic" | "irregular" | "hard" | "all";
+
 /** Fetch daily puzzle leaderboard for a given date. */
 export async function getDailyLeaderboard(
   dateStr: string,
   limit = 10,
+  cutType: PieceCutType = "all",
 ): Promise<LeaderboardEntry[]> {
   if (!isSupabaseConfigured()) return [];
 
-  const { data, error } = await supabase!
+  let query = supabase!
     .from("completions")
     .select("user_id, elapsed_seconds, created_at")
     .eq("puzzle_date", dateStr)
-    .eq("is_daily", true)
+    .eq("is_daily", true);
+  if (cutType !== "all") {
+    query = query.eq("cut_type", cutType);
+  }
+  const { data, error } = await query
     .order("elapsed_seconds", { ascending: true })
     .limit(limit);
 
@@ -241,15 +248,19 @@ export async function getAllTimeBestLeaderboard(
   rows: number,
   cols: number,
   limit = 10,
+  cutType: PieceCutType = "all",
 ): Promise<LeaderboardEntry[]> {
   if (!isSupabaseConfigured()) return [];
 
-  const { data, error } = await supabase!
+  let query = supabase!
     .from("completions")
     .select("user_id, elapsed_seconds, created_at")
     .eq("grid_rows", rows)
-    .eq("grid_cols", cols)
-    .order("elapsed_seconds", { ascending: true });
+    .eq("grid_cols", cols);
+  if (cutType !== "all") {
+    query = query.eq("cut_type", cutType);
+  }
+  const { data, error } = await query.order("elapsed_seconds", { ascending: true });
 
   if (error) return [];
 
@@ -300,18 +311,22 @@ function getDateRange(period: "week" | "month"): { start: string; end: string } 
 export async function getPeriodLeaderboard(
   period: "week" | "month",
   limit = 10,
+  cutType: PieceCutType = "all",
 ): Promise<LeaderboardEntry[]> {
   if (!isSupabaseConfigured()) return [];
 
   const { start, end } = getDateRange(period);
 
-  const { data, error } = await supabase!
+  let query = supabase!
     .from("completions")
     .select("user_id, elapsed_seconds, created_at")
     .eq("is_daily", true)
     .gte("puzzle_date", start)
-    .lte("puzzle_date", end)
-    .order("elapsed_seconds", { ascending: true });
+    .lte("puzzle_date", end);
+  if (cutType !== "all") {
+    query = query.eq("cut_type", cutType);
+  }
+  const { data, error } = await query.order("elapsed_seconds", { ascending: true });
 
   if (error) return [];
 

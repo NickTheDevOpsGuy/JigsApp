@@ -23,7 +23,9 @@ import {
   type StreakEntry,
   type CompletionCountEntry,
   type PersonalBestEntry,
+  type PieceCutType,
 } from "@/services/leaderboardService";
+import { prestigeReset } from "@/services/prestigeService";
 import { getMyProfile, updateMyProfile } from "@/services/profileService";
 import { getUserId } from "@/supabase/auth";
 import { getAnonymousDisplayName } from "@/data/anonymousNames";
@@ -46,6 +48,11 @@ function formatDuration(seconds: number): string {
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
+  if (m >= 60) {
+    const h = Math.floor(m / 60);
+    const rm = m % 60;
+    return `${h}h ${rm}m`;
+  }
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
@@ -74,6 +81,7 @@ const PODIUM = ["🥇", "🥈", "🥉"];
 
 type LeaderboardType =
   | "today"
+  | "challenge"
   | "bestWeek"
   | "bestMonth"
   | "week"
@@ -109,12 +117,17 @@ export function StatsScreen() {
   }, [tabFromUrl]);
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("today");
   const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
+  const [cutTypeFilter, setCutTypeFilter] = useState<PieceCutType>("all");
   const [stats, setStats] = useState<{
     puzzlesCompleted: number;
     totalPlayTimeSeconds: number;
     dailyStreak: number;
     bestDailyStreak: number;
     lastPlayedAt: string | null;
+    xp?: number;
+    level?: number;
+    prestigeCount?: number;
+    challengeWins?: number;
   } | null>(null);
   const [profile, setProfile] = useState<{
     displayName: string;
@@ -167,7 +180,7 @@ export function StatsScreen() {
     setAchievements(a ?? []);
     const today = getTodayDateString();
     const [lb, todayCount, slb, clb, wklb, molb, pb] = await Promise.all([
-      getDailyLeaderboard(today),
+      getDailyLeaderboard(today, 10, "all"),
       getTodayCompletionCount(today),
       getStreakLeaderboard(),
       getCompletionCountLeaderboard(),
@@ -201,7 +214,12 @@ export function StatsScreen() {
   }, [configured]);
 
   useEffect(() => {
-    if (!configured || activeTab !== "leaderboard" || leaderboardType !== "today") return;
+    if (
+      !configured ||
+      activeTab !== "leaderboard" ||
+      (leaderboardType !== "today" && leaderboardType !== "challenge")
+    )
+      return;
     const today = getTodayDateString();
     const unsub = subscribeTodayCompletionCount(today, setTodayCompletionCount);
     return unsub;
@@ -210,14 +228,16 @@ export function StatsScreen() {
   useEffect(() => {
     if (!configured || activeTab !== "leaderboard") return;
     const loadLb = async () => {
-      if (leaderboardType === "today") {
-        const lb = await getDailyLeaderboard(getTodayDateString());
+      const today = getTodayDateString();
+      const cutType = cutTypeFilter === "all" ? "all" : cutTypeFilter;
+      if (leaderboardType === "today" || leaderboardType === "challenge") {
+        const lb = await getDailyLeaderboard(today, 10, cutType);
         setLeaderboard(lb);
       } else if (leaderboardType === "bestWeek") {
-        const lb = await getPeriodLeaderboard("week");
+        const lb = await getPeriodLeaderboard("week", 10, cutType);
         setLeaderboard(lb);
       } else if (leaderboardType === "bestMonth") {
-        const lb = await getPeriodLeaderboard("month");
+        const lb = await getPeriodLeaderboard("month", 10, cutType);
         setLeaderboard(lb);
       } else if (leaderboardType === "week") {
         const wklb = await getWeeklyTotalsLeaderboard();
@@ -233,12 +253,12 @@ export function StatsScreen() {
         setCompletionLeaderboard(clb);
       } else if (leaderboardType === "alltime") {
         const [r, c] = allTimeGrid.split("x").map(Number);
-        const lb = await getAllTimeBestLeaderboard(r, c);
+        const lb = await getAllTimeBestLeaderboard(r, c, 10, cutType);
         setLeaderboard(lb);
       }
     };
     loadLb();
-  }, [configured, activeTab, leaderboardType, allTimeGrid]);
+  }, [configured, activeTab, leaderboardType, allTimeGrid, cutTypeFilter]);
 
   const handleSaveProfile = async () => {
     if (!configured) return;
@@ -309,7 +329,11 @@ export function StatsScreen() {
     );
   }
 
-  const renderTimeLeaderboard = (entries: LeaderboardEntry[], emptyMsg: string) => (
+  const renderTimeLeaderboard = (
+    entries: LeaderboardEntry[],
+    emptyMsg: string,
+    showChampionBadge = false,
+  ) => (
     <>
       {entries.length === 0 ? (
         <p className={styles.empty}>{emptyMsg}</p>
@@ -341,13 +365,23 @@ export function StatsScreen() {
                 <span className={styles.rank}>
                   {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
                 </span>
-                <span className={styles.player}>{entry.displayName}</span>
-                <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
-                {entry.completedAt && (
-                  <span className={styles.completedAt}>
-                    {formatCompletedAt(entry.completedAt)}
-                  </span>
-                )}
+                <span className={styles.player}>
+                  {entry.displayName}
+                  {showChampionBadge && entry.rank === 1 && (
+                    <span className={styles.championBadge} title="Challenge winner">
+                      {" "}
+                      🏆
+                    </span>
+                  )}
+                </span>
+                <span className={styles.timeCol}>
+                  <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
+                  {entry.completedAt && (
+                    <span className={styles.completedAt}>
+                      {formatCompletedAt(entry.completedAt)}
+                    </span>
+                  )}
+                </span>
                 {isExpanded && (
                   <div className={styles.leaderboardDetail}>
                     {Math.floor(entry.elapsedSeconds / 60)}m {entry.elapsedSeconds % 60}s
@@ -542,6 +576,27 @@ export function StatsScreen() {
                       <span className={styles.statValue}>{getStreakFreezeCount()}</span>
                       <span className={styles.statLabel}>Streak freeze</span>
                     </div>
+                    {typeof stats?.level === "number" && (
+                      <div className={styles.statCard}>
+                        <span className={styles.statValue}>
+                          Lv{stats.level}
+                          {(stats.prestigeCount ?? 0) > 0 && (
+                            <span className={styles.prestigeBadge}>
+                              {" "}
+                              ★{stats.prestigeCount}
+                            </span>
+                          )}
+                        </span>
+                        <span className={styles.statLabel}>Level</span>
+                      </div>
+                    )}
+                    {typeof stats?.challengeWins === "number" &&
+                      stats.challengeWins > 0 && (
+                        <div className={styles.statCard}>
+                          <span className={styles.statValue}>🏆 {stats.challengeWins}</span>
+                          <span className={styles.statLabel}>Challenge wins</span>
+                        </div>
+                      )}
                   </div>
                   {personalBests.length > 0 && (
                     <>
@@ -595,6 +650,25 @@ export function StatsScreen() {
                       🦝 Your raccoon name: <strong>{raccoonName}</strong>
                     </p>
                   )}
+                  {stats && (stats.level ?? 1) >= 5 && (
+                    <div className={styles.prestigeSection}>
+                      <h3>Prestige</h3>
+                      <p className={styles.hint}>
+                        Reset to Level 1 and earn a rare cosmetic badge. Your puzzles
+                        completed and challenge wins are kept.
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={async () => {
+                          const result = await prestigeReset();
+                          if (result) loadData();
+                        }}
+                      >
+                        Prestige Reset ★
+                      </Button>
+                    </div>
+                  )}
                   <p className={styles.hint}>
                     Off = raccoon name on boards. You&apos;re still tracked.
                   </p>
@@ -628,6 +702,7 @@ export function StatsScreen() {
                       aria-label="Leaderboard view"
                     >
                       <option value="today">Today</option>
+                      <option value="challenge">24h Challenge</option>
                       <option value="bestWeek">Best time (week)</option>
                       <option value="bestMonth">Best time (month)</option>
                       <option value="week">Weekly totals</option>
@@ -636,6 +711,27 @@ export function StatsScreen() {
                       <option value="completions">All-time completions</option>
                       <option value="alltime">All-time best</option>
                     </select>
+                    {(leaderboardType === "today" ||
+                      leaderboardType === "challenge" ||
+                      leaderboardType === "bestWeek" ||
+                      leaderboardType === "bestMonth" ||
+                      leaderboardType === "alltime") && (
+                      <div className={styles.cutTypeFilter}>
+                        <label htmlFor="cut-type-select">Shape:</label>
+                        <select
+                          id="cut-type-select"
+                          value={cutTypeFilter}
+                          onChange={(e) =>
+                            setCutTypeFilter(e.target.value as PieceCutType)
+                          }
+                        >
+                          <option value="all">All</option>
+                          <option value="classic">Classic</option>
+                          <option value="irregular">Irregular</option>
+                          <option value="hard">Hard</option>
+                        </select>
+                      </div>
+                    )}
                     {leaderboardType === "alltime" && (
                       <div className={styles.allTimeGrid}>
                         <label htmlFor="alltime-grid-select">Grid:</label>
@@ -667,6 +763,7 @@ export function StatsScreen() {
                   </div>
                   <h2>
                     {leaderboardType === "today" && "Today's daily puzzle"}
+                    {leaderboardType === "challenge" && "24-hour speed challenge"}
                     {leaderboardType === "bestWeek" && "Best time this week (daily)"}
                     {leaderboardType === "bestMonth" && "Best time this month (daily)"}
                     {leaderboardType === "week" && "Weekly totals"}
@@ -675,16 +772,18 @@ export function StatsScreen() {
                     {leaderboardType === "completions" && "All-time completions"}
                     {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
                   </h2>
-                  {leaderboardType === "today" && (
+                  {(leaderboardType === "today" ||
+                    leaderboardType === "challenge") && (
                     <p className={styles.todayCompletionCount} aria-live="polite">
                       {todayCompletionCount} player{todayCompletionCount !== 1 ? "s" : ""}{" "}
                       completed today
                     </p>
                   )}
-                  {leaderboardType === "today" &&
+                  {(leaderboardType === "today" || leaderboardType === "challenge") &&
                     renderTimeLeaderboard(
                       leaderboard,
                       "No completions yet. Be the first!",
+                      leaderboardType === "challenge",
                     )}
                   {leaderboardType === "bestWeek" &&
                     renderTimeLeaderboard(

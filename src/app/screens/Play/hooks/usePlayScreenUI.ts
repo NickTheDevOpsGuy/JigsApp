@@ -14,6 +14,7 @@ import {
   GHOST_WHEN_IDLE_KEY,
   EDGE_HIGHLIGHT_KEY,
   RELAXED_MODE_KEY,
+  DRIFT_MODE_KEY,
   type DebugFlags,
 } from "../playScreenUtils";
 
@@ -61,6 +62,14 @@ export function usePlayScreenUI() {
   const [relaxedModeEnabled, setRelaxedModeEnabled] = useState(() => {
     try {
       return localStorage.getItem(RELAXED_MODE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const [driftModeEnabled, setDriftModeEnabled] = useState(() => {
+    try {
+      return localStorage.getItem(DRIFT_MODE_KEY) === "true";
     } catch {
       return false;
     }
@@ -185,6 +194,14 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
+      localStorage.setItem(DRIFT_MODE_KEY, driftModeEnabled ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [driftModeEnabled]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(CUT_TYPE_KEY, pieceCutType);
     } catch {
       // ignore
@@ -248,6 +265,7 @@ export function usePlayScreenUI() {
   const toggleShowGhostWhenIdle = useCallback(() => setShowGhostWhenIdle((v) => !v), []);
   const toggleShowEdgeHighlight = useCallback(() => setShowEdgeHighlight((v) => !v), []);
   const toggleRelaxedMode = useCallback(() => setRelaxedModeEnabled((v) => !v), []);
+  const toggleDriftMode = useCallback(() => setDriftModeEnabled((v) => !v), []);
 
   return {
     pieceLockingEnabled,
@@ -265,6 +283,9 @@ export function usePlayScreenUI() {
     relaxedModeEnabled,
     setRelaxedModeEnabled,
     toggleRelaxedMode,
+    driftModeEnabled,
+    setDriftModeEnabled,
+    toggleDriftMode,
     pieceCutType,
     setPieceCutType,
     progressiveRevealMode,
