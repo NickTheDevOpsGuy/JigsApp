@@ -75,7 +75,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image, co-op (Play with Friend via link)
 - **Analytics** — Live completion counter, percentile ranking (Top X%)
 
-Full feature list → [doc/CHANGES.md](doc/CHANGES.md)
+Full feature list → [CHANGES.md](doc/CHANGES.md)
 
 ---
 
