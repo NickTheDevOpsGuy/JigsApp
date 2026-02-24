@@ -119,19 +119,23 @@ Rendering and interaction are tuned for large puzzles:
 ## Tech Stack
 
 **Frontend**
+
 - React
 - TypeScript
 - HTML Canvas
 
 **Build & Tooling**
+
 - Vite
 - vite-plugin-pwa (Workbox)
 
 **Testing**
+
 - Vitest (Unit)
 - Playwright (E2E)
 
 **Infrastructure**
+
 - GitHub Actions (CI/CD)
 - Vercel (Hosting)
 
