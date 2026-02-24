@@ -24,6 +24,10 @@ const isTouchDevice = () => {
   }
 };
 
+function Keycap({ children }: { children: React.ReactNode }) {
+  return <kbd className={styles.keycap}>{children}</kbd>;
+}
+
 type TutorialOverlayProps = {
   isOpen: boolean;
   onComplete: () => void;
@@ -51,139 +55,163 @@ export function TutorialOverlay({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleDismiss} title="How to Play">
+    <Modal isOpen={isOpen} onClose={handleDismiss} title="How to Play" variant="tutorial">
       <div className={styles.wrapper}>
-        <div className={styles.scrollArea}>
-          <p className={styles.intro}>
-            Drag and drop pieces to assemble the puzzle. Match all pieces to complete the
-            image!
-          </p>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📐 Rows & Columns</h3>
-            <p>
-              When creating a puzzle, <strong>rows</strong> and <strong>columns</strong>{" "}
-              set how many pieces the image is split into. A 4×4 grid = 16 pieces; 6×6 =
-              36 pieces. More pieces = harder puzzle.
-            </p>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>🧩 Moving Pieces</h3>
-            <p>
-              {isTouch ? "Touch and drag" : "Click and drag"} pieces to move them around
-              the board.
-            </p>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>🔄 Rotating Pieces</h3>
-            <p>
-              {isTouch
-                ? "Tap a piece to rotate it 90°."
-                : "Right-click a piece to rotate it 90°."}
-            </p>
-          </div>
-
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>📥 Piece Drawer</h3>
-            <p>
-              Drag pieces to the drawer to store them for later. Tap pieces in the drawer
-              to bring them back to the board.
-            </p>
-            <p className={styles.mobileCollapse}>
-              Filter by <strong>All</strong>, <strong>Edges</strong>,{" "}
-              <strong>Center</strong>, or <strong>Corners</strong> to find pieces quickly.
-              For puzzles with 25+ pieces, use compact mode to fit more thumbnails. Sort
-              by grid position or color.
-            </p>
-          </div>
-
-          {isTouch && (
-            <div className={`${styles.section} ${styles.sectionZoom}`}>
-              <h3 className={styles.sectionTitle}>📱 Zoom & Pan</h3>
+        {/* Row 1: How it Works (2 wide) */}
+        <div className={styles.row}>
+          <h3 className={styles.rowTitle}>How it Works</h3>
+          <div className={styles.rowGrid}>
+            <section className={styles.section}>
+              <h4 className={styles.sectionTitle}>Rows & Columns</h4>
               <p>
-                Pinch with two fingers to zoom in or out on the board. Drag with two
-                fingers to pan, or drag with one finger on empty space when zoomed. Great
-                for larger puzzles!
+                When creating a puzzle, <strong>rows</strong> and <strong>columns</strong>{" "}
+                set how many pieces the image is split into. A 4×4 grid = 16 pieces; 6×6 =
+                36 pieces. More pieces = harder puzzle.
               </p>
-            </div>
-          )}
-
-          <div className={`${styles.section} ${styles.mobileCollapse}`}>
-            <h3 className={styles.sectionTitle}>⏱ Time Modes</h3>
-            <p>
-              Choose how time is tracked from the <strong>Menu</strong> (☰) → Settings:
-            </p>
-            <ul className={styles.tips}>
-              <li>
-                <strong>Elapsed:</strong> Timer counts up from zero (default).
-              </li>
-              <li>
-                <strong>Countdown:</strong> Race against the clock—finish before time runs
-                out!
-              </li>
-              <li>
-                <strong>Active only:</strong> Timer pauses when you stop moving
-                pieces—great for multitasking.
-              </li>
-              <li>
-                <strong>Relaxed:</strong> Timer hidden—no pressure, just puzzle.
-              </li>
-              <li>
-                <strong>Best time:</strong> Track your personal best for each grid size.
-              </li>
-            </ul>
+            </section>
+            <section className={styles.section}>
+              <h4 className={styles.sectionTitle}>Moving Pieces</h4>
+              <p>
+                {isTouch ? "Touch and drag" : "Click and drag"} pieces to move them around
+                the board.
+              </p>
+            </section>
+            <section className={styles.section}>
+              <h4 className={styles.sectionTitle}>Rotating Pieces</h4>
+              <p>
+                {isTouch
+                  ? "Tap a piece to rotate it 90°."
+                  : "Right-click a piece to rotate it 90°."}
+              </p>
+            </section>
+            <section className={styles.section}>
+              <h4 className={styles.sectionTitle}>Piece Drawer</h4>
+              <p>
+                Drag pieces to the drawer to store them for later. Tap pieces in the
+                drawer to bring them back to the board.
+              </p>
+            </section>
           </div>
+        </div>
 
-          <div className={`${styles.section} ${styles.mobileCollapse}`}>
-            <h3 className={styles.sectionTitle}>📋 Menu Options</h3>
-            <p>
-              Open the <strong>Menu</strong> (☰) for helpful options:
-            </p>
-            <ul className={styles.tips}>
-              <li>
-                <strong>Undo / Redo:</strong> Reverse or re-apply moves from the menu or{" "}
-                {isTouch ? "use the menu" : "press Ctrl+Z / Ctrl+Shift+Z (⌘Z / ⌘⇧Z)"}.
-              </li>
-              <li>
-                <strong>Lock pieces:</strong> When on, pieces that snap into place become
-                locked so you can&apos;t accidentally move them.
-              </li>
-              <li>
-                <strong>Ghost hint:</strong> When on, shows a faint preview of where each
-                piece belongs—great when you&apos;re stuck!
-              </li>
-              <li>
-                <strong>Ghost when idle:</strong> After a few seconds of no activity,
-                shows ghost hints automatically (Settings → View).
-              </li>
-              <li>
-                <strong>Edge highlight:</strong> Optional faint border on edge pieces
-                (Settings → View) to spot them quickly.
-              </li>
-              <li>
-                <strong>Daily streak freeze:</strong> If you miss a day, use your weekly
-                freeze to protect your streak (offered when opening Today&apos;s Puzzle).
-              </li>
-            </ul>
+        {/* Row 2: Controls (2 wide) */}
+        <div className={styles.row}>
+          <h3 className={styles.rowTitle}>Controls</h3>
+          <div className={styles.rowGrid}>
+            <section className={styles.section}>
+              <h4 className={styles.sectionTitle}>Time Modes</h4>
+              <p>
+                Choose how time is tracked from <Keycap>☰ Menu</Keycap> → Settings:
+              </p>
+              <ul className={styles.tips}>
+                <li>
+                  <strong>Elapsed</strong> — Timer counts up from zero
+                </li>
+                <li>
+                  <strong>Countdown</strong> — Race against the clock
+                </li>
+                <li>
+                  <strong>Active only</strong> — Timer pauses when you stop
+                </li>
+                <li>
+                  <strong>Relaxed</strong> — Timer hidden
+                </li>
+                <li>
+                  <strong>Best time</strong> — Track your PBs per grid size
+                </li>
+              </ul>
+            </section>
+            <section className={styles.section}>
+              <h4 className={styles.sectionTitle}>Menu Options</h4>
+              <p>
+                Open <Keycap>☰ Menu</Keycap> for helpful options:
+              </p>
+              <ul className={styles.tips}>
+                <li>
+                  <strong>Undo / Redo</strong> —{" "}
+                  {isTouch ? (
+                    "From menu"
+                  ) : (
+                    <>
+                      <Keycap>Ctrl+Z</Keycap> / <Keycap>Ctrl+Shift+Z</Keycap>
+                    </>
+                  )}
+                </li>
+                <li>
+                  <strong>Ghost when idle</strong> — Auto-shows after a few seconds
+                </li>
+                <li>
+                  <strong>Edge highlight</strong> — Optional faint border on edges
+                </li>
+                <li>
+                  <strong>Daily streak freeze</strong> — Protect your streak
+                </li>
+              </ul>
+            </section>
+            {isTouch && (
+              <section className={styles.section}>
+                <h4 className={styles.sectionTitle}>Zoom & Pan</h4>
+                <p>
+                  Pinch with two fingers to zoom in or out. Drag with two fingers to pan,
+                  or one finger on empty space when zoomed.
+                </p>
+              </section>
+            )}
           </div>
+        </div>
 
-          <div className={`${styles.section} ${styles.mobileCollapse}`}>
-            <h3 className={styles.sectionTitle}>✨ Tips</h3>
+        {/* Row 3: Tools (2 wide) */}
+        <div className={styles.row}>
+          <h3 className={styles.rowTitle}>Tools</h3>
+          <div className={styles.rowGrid}>
+            <section className={styles.section}>
+              <h4 className={styles.sectionTitle}>Piece Drawer</h4>
+              <p>
+                Filter by <strong>All</strong>, <strong>Edges</strong>,{" "}
+                <strong>Center</strong>, or <strong>Corners</strong>. Sort by grid
+                position or color.
+              </p>
+            </section>
+            <section className={styles.section}>
+              <h4 className={styles.sectionTitle}>Preview & Hints</h4>
+              <ul className={styles.tips}>
+                <li>
+                  <strong>Preview</strong> — See the full image (Menu or{" "}
+                  <Keycap>P</Keycap>)
+                </li>
+                <li>
+                  <strong>Ghost hint</strong> — Faint preview of where each piece goes.
+                  {isTouch ? (
+                    " Great when stuck!"
+                  ) : (
+                    <>
+                      {" "}
+                      Press <Keycap>G</Keycap> when stuck.
+                    </>
+                  )}
+                </li>
+                <li>
+                  <strong>Lock pieces</strong> — Snap = locked, no accidental moves
+                </li>
+              </ul>
+            </section>
+          </div>
+        </div>
+
+        {/* Row 4: Tips (full width) */}
+        <div className={styles.row}>
+          <h3 className={styles.rowTitle}>Tips</h3>
+          <section className={styles.section}>
             <ul className={styles.tips}>
               <li>Start with edge and corner pieces</li>
               <li>Group pieces by color or pattern</li>
               <li>Use the Preview button to see the full image</li>
               <li>Pieces snap together when correctly aligned</li>
-              <li>Undo / Redo moves (Menu or Ctrl+Z / Ctrl+Shift+Z)</li>
-              <li>Turn on Ghost hint (Menu or press G) when stuck</li>
-              <li>
-                Turn on Lock pieces (Menu) to prevent accidentally moving placed pieces
-              </li>
+              <li>Turn on Ghost hint when stuck</li>
             </ul>
-          </div>
+          </section>
         </div>
+
         <div className={styles.actionsSticky}>
           <Button variant="primary" onClick={handleDismiss} fullWidth>
             {showSkipLink ? "Start Puzzling!" : "Got it!"}

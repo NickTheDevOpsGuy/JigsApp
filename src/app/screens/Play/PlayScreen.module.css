@@ -350,7 +350,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 8px;
   padding: 12px;
 }
 
@@ -456,7 +456,29 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 6px;
   position: relative;
+}
+
+.boardProgressFrame {
+  --progress: 0;
+  --progress-color: var(--color-brand-primary, #3b82f6);
+  padding: 8px;
+  border-radius: calc(var(--radius-board, 20px) + 8px);
+  background: conic-gradient(
+    from -90deg,
+    var(--progress-color) 0deg,
+    var(--progress-color) calc(var(--progress) * 360deg),
+    var(--color-border) calc(var(--progress) * 360deg),
+    var(--color-border) 360deg
+  );
+  transition: background 0.3s ease;
+}
+
+.boardProgressFrame:not([style]) {
+  padding: 8px;
+  border-radius: calc(var(--radius-board, 20px) + 8px);
+  background: var(--color-border);
 }
 
 .board {
@@ -470,39 +492,6 @@
   border: 2px solid var(--color-border);
   box-shadow: var(--shadow-md);
   overflow: hidden;
-}
-
-.boardProgressRing {
-  position: absolute;
-  inset: 2px;
-  width: calc(100% - 4px);
-  height: calc(100% - 4px);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.circularProgressRing {
-  position: absolute;
-  inset: -4px;
-  width: calc(100% + 8px);
-  height: calc(100% + 8px);
-  pointer-events: none;
-}
-
-.circularProgressBg {
-  stroke: var(--color-border);
-  opacity: 0.4;
-}
-
-.circularProgressFill {
-  transform: rotate(-90deg);
-  transform-origin: center;
-  touch-action: none;
-  -webkit-overflow-scrolling: auto;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .canvas {
@@ -520,22 +509,19 @@
   backface-visibility: hidden;
 }
 
-.previewOverlay {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
+.previewPanel {
+  position: fixed;
+  top: calc(56px + 12px + env(safe-area-inset-top, 0));
+  right: max(12px, env(safe-area-inset-right, 0));
   background: var(--color-bg-elevated);
   border-radius: 8px;
-  padding: 4px;
-  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  box-shadow: var(--shadow-md);
   border: 1px solid var(--color-border);
-  z-index: 10;
-  opacity: 0.9;
-  transition: opacity 0.2s ease;
-}
-
-.previewOverlay:hover {
-  opacity: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
 }
 
 .previewImage {
@@ -661,7 +647,7 @@
     width: 100%;
     max-width: min(90vw, 420px);
     padding: 10px 0;
-    gap: 10px;
+    gap: 6px;
     align-items: center;
     justify-content: center;
     min-height: 0;
@@ -673,6 +659,13 @@
     flex: 1;
     min-height: 0;
     min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .boardWrapper .boardProgressFrame {
+    flex: 1;
+    min-height: 0;
   }
 
   .board {
@@ -729,6 +722,8 @@
     border-radius: var(--radius-card, 16px);
   }
   .previewPanel {
+    top: calc(52px + 10px + env(safe-area-inset-top, 0));
+    right: max(10px, env(safe-area-inset-right, 0));
     padding: 6px;
   }
   .previewImage {

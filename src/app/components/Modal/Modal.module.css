@@ -19,6 +19,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.overlayTutorial {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -47,6 +52,14 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+.modalTutorial {
+  max-width: 680px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  background: var(--color-bg-elevated);
 }
 
 @keyframes slideUp {
@@ -107,6 +120,12 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.contentTutorial {
+  padding: 20px 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 @media (max-width: 600px) {

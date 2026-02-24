@@ -5,6 +5,7 @@
    CSS Variables for Theme
    ============================================ */
 :root {
+  --color-text-on-brand: #ffffff;
   /* Visual system – spacing scale (PDF) */
   --space-1: 4px;
   --space-2: 8px;

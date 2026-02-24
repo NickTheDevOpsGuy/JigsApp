@@ -3,7 +3,7 @@
  */
 import { useState, useEffect } from "react";
 
-const GRID_KEY = "phuzzle:gridSize";
+export const GRID_KEY = "phuzzle:gridSize";
 const MIN_GRID = 2;
 const MAX_GRID = 12;
 
@@ -102,6 +102,10 @@ export function useGridConfig() {
     localStorage.setItem(GRID_KEY, `${effectiveRows}x${effectiveCols}`);
   };
 
+  const clearGrid = () => {
+    localStorage.removeItem(GRID_KEY);
+  };
+
   return {
     gridIndex,
     setGridIndex,
@@ -113,6 +117,7 @@ export function useGridConfig() {
     effectiveRows,
     effectiveCols,
     saveGrid,
+    clearGrid,
     minGrid: MIN_GRID,
     maxGrid: MAX_GRID,
   };

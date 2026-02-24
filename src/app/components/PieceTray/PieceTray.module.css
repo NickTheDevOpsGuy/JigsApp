@@ -106,6 +106,48 @@
   min-width: 0;
 }
 
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.randomBtn {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.randomBtn:hover:not(:disabled) {
+  background: var(--color-bg-card);
+  border-color: var(--color-brand-primary);
+}
+
+.randomBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.randomBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.randomLabel {
+  white-space: nowrap;
+}
+
 .title {
   font-weight: 600;
   flex-shrink: 0;
@@ -406,6 +448,14 @@
 
   .titleRow {
     min-height: 28px;
+  }
+
+  .randomBtn {
+    padding: 6px 8px;
+  }
+
+  .randomLabel {
+    display: none;
   }
 
   .title {

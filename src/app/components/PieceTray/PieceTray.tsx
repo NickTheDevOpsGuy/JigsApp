@@ -12,7 +12,7 @@ import React, {
 import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Shuffle } from "lucide-react";
 import { TrayFilterButton } from "@/screens/Play/components/TrayFilterButton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import styles from "./PieceTray.module.css";
@@ -54,6 +54,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 ) {
   const isMobile = useMediaQuery("(max-width: 600px)");
   const [filter, setFilter] = useState<TrayFilter>("all");
+  const [shuffleKey, setShuffleKey] = useState(0);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScroll, setCanScroll] = useState(false);
@@ -96,20 +97,33 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     return ha - hb || byGrid(a, b);
   };
 
+  const shuffleArray = useCallback(<T,>(arr: T[]): T[] => {
+    const out = [...arr];
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  }, []);
+
   const displayed = useMemo(() => {
     const edges = pieces.filter((p) => isEdge(p, grid));
     const allByGrid = [...pieces].sort(byGrid);
     const allByHue = image ? [...pieces].sort(byHue) : allByGrid;
 
+    let result: Piece[];
     switch (filter) {
       case "edges":
-        return [...edges].sort(byGrid);
+        result = [...edges].sort(byGrid);
+        break;
       case "colors":
-        return allByHue;
+        result = allByHue;
+        break;
       default:
-        return allByGrid;
+        result = allByGrid;
     }
-  }, [pieces, grid, filter, image, hueById]);
+    return shuffleKey > 0 ? shuffleArray(result) : result;
+  }, [pieces, grid, filter, image, hueById, shuffleKey, shuffleArray]);
 
   const emptyText =
     pieces.length === 0
@@ -308,7 +322,20 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <span className={styles.title}>Piece Drawer ({pieces.length})</span>
-          <TrayFilterButton value={filter} onChange={setFilter} hasImage={!!image} />
+          <div className={styles.headerControls}>
+            <TrayFilterButton value={filter} onChange={setFilter} hasImage={!!image} />
+            <button
+              type="button"
+              className={styles.randomBtn}
+              onClick={() => setShuffleKey((k) => k + 1)}
+              disabled={pieces.length === 0}
+              aria-label="Randomize piece order"
+              title="Randomize order"
+            >
+              <Shuffle size={16} />
+              <span className={styles.randomLabel}>Random</span>
+            </button>
+          </div>
         </div>
       </div>
 

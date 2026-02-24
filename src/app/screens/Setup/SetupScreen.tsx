@@ -18,7 +18,7 @@ import {
   Image,
   Upload,
 } from "lucide-react";
-import { useImagePicker, useGridConfig, GRID_OPTIONS } from "./hooks";
+import { useImagePicker, useGridConfig, GRID_OPTIONS, GRID_KEY } from "./hooks";
 import { CameraCapture } from "./components/CameraCapture";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
 import { COUNTDOWN_OPTIONS, getBestTime, type TimeMode } from "../Play/timeMode";
@@ -90,9 +90,14 @@ export function SetupScreen() {
     effectiveRows,
     effectiveCols,
     saveGrid,
+    clearGrid,
     minGrid,
     maxGrid,
   } = useGridConfig();
+
+  const [rememberChoice, setRememberChoice] = useState(
+    () => !!localStorage.getItem(GRID_KEY),
+  );
 
   const {
     imgDataUrl,
@@ -187,7 +192,11 @@ export function SetupScreen() {
 
     try {
       localStorage.setItem(STORAGE_KEY, imgDataUrl);
-      saveGrid();
+      if (rememberChoice) {
+        saveGrid();
+      } else {
+        clearGrid();
+      }
       localStorage.removeItem("phuzzle:dailyDate");
       if (selectedPuzzle) setCurrentPuzzleId(selectedPuzzle.id);
       else setCurrentPuzzleId(null);
@@ -473,6 +482,16 @@ export function SetupScreen() {
               )}
             </div>
           )}
+
+          <label className={styles.rememberLabel}>
+            <input
+              type="checkbox"
+              checked={rememberChoice}
+              onChange={(e) => setRememberChoice(e.target.checked)}
+              className={styles.rememberCheckbox}
+            />
+            <span>Remember my choice</span>
+          </label>
 
           <div className={styles.preview} ref={previewRef}>
             {isLoading ? (

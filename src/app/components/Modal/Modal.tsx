@@ -18,6 +18,8 @@ type ModalProps = {
   title?: string;
   children: React.ReactNode;
   showCloseButton?: boolean;
+  /** "tutorial" for wider modal, softer shadow, stronger blur */
+  variant?: "default" | "tutorial";
 };
 
 export function Modal({
@@ -26,6 +28,7 @@ export function Modal({
   title,
   children,
   showCloseButton = true,
+  variant = "default",
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveRef = useRef<HTMLElement | null>(null);
@@ -83,10 +86,13 @@ export function Modal({
   const labelledById = title ? titleId : undefined;
 
   return createPortal(
-    <div className={styles.overlay} onClick={onClose}>
+    <div
+      className={`${styles.overlay} ${variant === "tutorial" ? styles.overlayTutorial : ""}`.trim()}
+      onClick={onClose}
+    >
       <div
         ref={modalRef}
-        className={styles.modal}
+        className={`${styles.modal} ${variant === "tutorial" ? styles.modalTutorial : ""}`.trim()}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -111,7 +117,11 @@ export function Modal({
             )}
           </div>
         )}
-        <div className={styles.content}>{children}</div>
+        <div
+          className={`${styles.content} ${variant === "tutorial" ? styles.contentTutorial : ""}`.trim()}
+        >
+          {children}
+        </div>
       </div>
     </div>,
     document.body,

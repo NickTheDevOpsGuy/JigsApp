@@ -53,7 +53,6 @@ import {
   TopBarButtons,
   HeaderMenu,
 } from "./components";
-import { CircularProgressRing } from "./components/CircularProgressRing";
 import { ProgressivePreviewOverlay } from "./components/ProgressivePreviewOverlay";
 import { SnapComboMeter } from "./components/SnapComboMeter";
 import { ProfilerOverlay } from "./components";
@@ -1204,128 +1203,99 @@ export function PlayScreen() {
       <div className={styles.playBody}>
         <div className={styles.main} ref={mainRef}>
           <div className={styles.boardWrapper}>
-            <div className={styles.board} ref={boardRef}>
-              {!isComplete && total > 0 && (
-                <CircularProgressRing
-                  progress={placed / total}
-                  className={styles.boardProgressRing}
+            <div
+              className={styles.boardProgressFrame}
+              style={
+                total > 0
+                  ? {
+                      ["--progress" as string]: placed / total,
+                      ["--progress-color" as string]: "var(--color-progress-75, #22c55e)",
+                    }
+                  : undefined
+              }
+            >
+              <div className={styles.board} ref={boardRef}>
+                {isLoading && (
+                  <div className={styles.loadingOverlay} aria-label="Loading puzzle">
+                    <div className={styles.spinner} />
+                    <span>Loading puzzle…</span>
+                  </div>
+                )}
+                {onboarding.needsStartTip && placed === 0 && (
+                  <div className={styles.startHintOverlay} role="status">
+                    <span>Drag a piece to start</span>
+                    <button
+                      type="button"
+                      className={styles.toastDismiss}
+                      onClick={onboarding.dismissStartTip}
+                      aria-label="Dismiss"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+                <SnapComboMeter combo={snapCombo} />
+                <canvas
+                  key={puzzleKey}
+                  className={styles.canvas}
+                  ref={canvasRef}
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerCancel={handlePointerCancel}
+                  onLostPointerCapture={handleLostPointerCapture}
+                  onContextMenu={handleContextMenu}
+                  onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
                 />
-              )}
-              {isLoading && (
-                <div className={styles.loadingOverlay} aria-label="Loading puzzle">
-                  <div className={styles.spinner} />
-                  <span>Loading puzzle…</span>
-                </div>
-              )}
-              {onboarding.needsStartTip && placed === 0 && (
-                <div className={styles.startHintOverlay} role="status">
-                  <span>Drag a piece to start</span>
-                  <button
-                    type="button"
-                    className={styles.toastDismiss}
-                    onClick={onboarding.dismissStartTip}
-                    aria-label="Dismiss"
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-              <SnapComboMeter combo={snapCombo} />
-              <canvas
-                key={puzzleKey}
-                className={styles.canvas}
-                ref={canvasRef}
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerUp}
-                onPointerCancel={handlePointerCancel}
-                onLostPointerCapture={handleLostPointerCapture}
-                onContextMenu={handleContextMenu}
-                onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
-              />
-              {progressiveRevealMode && imgRef.current && state?.pieces && (
-                <div className={styles.previewOverlay}>
-                  <ProgressivePreviewOverlay
-                    image={imgRef.current}
-                    pieces={state.pieces}
-                    grid={state.grid}
+                {isPaused && (
+                  <PauseOverlay
+                    onResume={() => setIsPaused(false)}
+                    isCountdownExpired={
+                      timeMode === "countdown" &&
+                      elapsedSeconds <= 0 &&
+                      !isComplete &&
+                      isPaused
+                    }
+                    onNewPuzzle={
+                      timeMode === "countdown" &&
+                      elapsedSeconds <= 0 &&
+                      !isComplete &&
+                      isPaused
+                        ? handleNewGame
+                        : undefined
+                    }
                   />
-                </div>
-              )}
-              {!progressiveRevealMode && showPreview && imgRef.current && (
-                <div className={styles.previewOverlay}>
-                  <img
-                    src={imgRef.current.src}
-                    alt="Puzzle preview"
-                    className={styles.previewImage}
+                )}
+                {isComplete && (
+                  <CompletionOverlay
+                    elapsedSeconds={elapsedSeconds}
+                    grid={state?.grid}
+                    pieces={state?.pieces ?? []}
+                    imageUrl={
+                      localStorage.getItem(STORAGE_KEY) ||
+                      imgRef.current?.src ||
+                      undefined
+                    }
+                    undoCount={undoCountRef.current}
+                    isNewBest={
+                      timeMode === "best" &&
+                      state?.grid != null &&
+                      (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
+                    }
+                    isDaily={isDailyPuzzleSession()}
+                    cutType={pieceCutType}
+                    copied={share.copied}
+                    canNativeShare={share.canNativeShare}
+                    onCopyResults={share.handleCopyResults}
+                    onNativeShare={share.handleNativeShare}
+                    onDownloadImage={handleDownloadImage}
+                    onNewPuzzle={handleNewGame}
+                    onMenu={() => navigate("/")}
                   />
-                </div>
-              )}
-              {isPaused && (
-                <PauseOverlay
-                  onResume={() => setIsPaused(false)}
-                  isCountdownExpired={
-                    timeMode === "countdown" &&
-                    elapsedSeconds <= 0 &&
-                    !isComplete &&
-                    isPaused
-                  }
-                  onNewPuzzle={
-                    timeMode === "countdown" &&
-                    elapsedSeconds <= 0 &&
-                    !isComplete &&
-                    isPaused
-                      ? handleNewGame
-                      : undefined
-                  }
-                />
-              )}
-              {isComplete && (
-                <CompletionOverlay
-                  elapsedSeconds={elapsedSeconds}
-                  grid={state?.grid}
-                  pieces={state?.pieces ?? []}
-                  imageUrl={
-                    localStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
-                  }
-                  undoCount={undoCountRef.current}
-                  isNewBest={
-                    timeMode === "best" &&
-                    state?.grid != null &&
-                    (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
-                  }
-                  isDaily={isDailyPuzzleSession()}
-                  cutType={pieceCutType}
-                  copied={share.copied}
-                  canNativeShare={share.canNativeShare}
-                  onCopyResults={share.handleCopyResults}
-                  onNativeShare={share.handleNativeShare}
-                  onDownloadImage={handleDownloadImage}
-                  onNewPuzzle={handleNewGame}
-                  onMenu={() => navigate("/")}
-                />
-              )}
+                )}
+              </div>
             </div>
           </div>
-          {(showPreview || progressiveRevealMode) && imgRef.current && (
-            <div className={styles.previewPanel}>
-              {progressiveRevealMode && state?.pieces ? (
-                <ProgressivePreviewOverlay
-                  image={imgRef.current}
-                  pieces={state.pieces}
-                  grid={state.grid}
-                  width={140}
-                  height={140}
-                />
-              ) : (
-                <img
-                  src={imgRef.current.src}
-                  alt="Puzzle preview"
-                  className={styles.previewImage}
-                />
-              )}
-            </div>
-          )}
         </div>
         <div
           className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
@@ -1340,6 +1310,26 @@ export function PlayScreen() {
           />
         </div>
       </div>
+
+      {(showPreview || progressiveRevealMode) && imgRef.current && (
+        <div className={styles.previewPanel}>
+          {progressiveRevealMode && state?.pieces ? (
+            <ProgressivePreviewOverlay
+              image={imgRef.current}
+              pieces={state.pieces}
+              grid={state.grid}
+              width={140}
+              height={140}
+            />
+          ) : (
+            <img
+              src={imgRef.current.src}
+              alt="Puzzle preview"
+              className={styles.previewImage}
+            />
+          )}
+        </div>
+      )}
 
       {immersiveMode && (
         <div
@@ -1361,7 +1351,22 @@ export function PlayScreen() {
         showSkipLink={showTutorial}
       />
 
-      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
+      <ShortcutsModal
+        isOpen={showShortcuts}
+        onClose={() => setShowShortcuts(false)}
+        disabledIds={
+          state && manager
+            ? [
+                ...(!manager.canUndo() || isPaused || state.isComplete
+                  ? (["undo"] as const)
+                  : []),
+                ...(!manager.canRedo() || isPaused || state.isComplete
+                  ? (["redo"] as const)
+                  : []),
+              ]
+            : undefined
+        }
+      />
 
       {dragPreviewPiece && dragPreview && imgRef.current && (
         <DragPreview

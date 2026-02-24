@@ -56,6 +56,7 @@ export const GRID_OPTIONS = [
 ] as const;
 
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";
+const DAILY_PREFERRED_GRID_KEY = "phuzzle:dailyPreferredGrid";
 const DAILY_PREFIX = "phuzzle:daily:";
 const STREAK_FREEZE_KEY = "phuzzle:streakFreeze";
 const STREAK_FREEZE_WEEK_KEY = "phuzzle:streakFreezeWeek";
@@ -66,6 +67,37 @@ const STREAK_FREEZE_DISMISSED_KEY = "phuzzle:streakFreezeDismissed";
 export function getTodayDateString(): string {
   const d = new Date();
   return d.toISOString().slice(0, 10);
+}
+
+/** Get user's preferred daily difficulty index (0–6), or null if not set */
+export function getDailyPreferredDifficultyIndex(): number | null {
+  try {
+    const raw = localStorage.getItem(DAILY_PREFERRED_GRID_KEY);
+    if (raw === null) return null;
+    const idx = parseInt(raw, 10);
+    if (Number.isNaN(idx) || idx < 0 || idx >= GRID_OPTIONS.length) return null;
+    return idx;
+  } catch {
+    return null;
+  }
+}
+
+/** Save user's preferred daily difficulty index for future sessions */
+export function setDailyPreferredDifficultyIndex(index: number): void {
+  try {
+    localStorage.setItem(DAILY_PREFERRED_GRID_KEY, String(index));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Clear saved daily difficulty preference */
+export function clearDailyPreferredDifficulty(): void {
+  try {
+    localStorage.removeItem(DAILY_PREFERRED_GRID_KEY);
+  } catch {
+    /* ignore */
+  }
 }
 
 /** Get yesterday's date string */

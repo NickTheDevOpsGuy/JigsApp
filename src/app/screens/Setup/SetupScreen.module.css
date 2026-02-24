@@ -302,6 +302,21 @@
   color: var(--color-text-secondary);
 }
 
+.rememberLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.rememberCheckbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-brand-primary);
+}
+
 /* Tabs for Gallery/Upload */
 .tabs {
   display: flex;

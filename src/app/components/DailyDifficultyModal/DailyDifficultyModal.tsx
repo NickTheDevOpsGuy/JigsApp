@@ -1,11 +1,23 @@
 /**
- * DailyDifficultyModal – shows today's daily puzzle, grid picker, and launch action.
+ * DailyDifficultyModal – Today's Puzzle with difficulty picker (mockup design).
  */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import {
+  Puzzle,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  Leaf,
+  Zap,
+  Flame,
+  Crown,
+  Gem,
+  Sparkles,
+  Square,
+} from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
-import { Dropdown } from "@/components/DropDown/Dropdown";
 import {
   GRID_OPTIONS,
   dismissFreezeOfferToday,
@@ -14,9 +26,26 @@ import {
   useStreakFreeze,
   wasFreezeOfferDismissedToday,
   wasYesterdayMissed,
+  getDailyPreferredDifficultyIndex,
+  setDailyPreferredDifficultyIndex,
+  clearDailyPreferredDifficulty,
 } from "@/daily/dailyPuzzleCore";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 import styles from "./DailyDifficultyModal.module.css";
+
+const DIFFICULTY_ICONS = [Leaf, Zap, Flame, Crown, Gem, Sparkles, Square] as const;
+const DIFFICULTY_COLORS = [
+  "var(--color-easy, #22c55e)",
+  "var(--color-medium, #3b82f6)",
+  "var(--color-hard, #f97316)",
+  "var(--color-expert, #ef4444)",
+  "var(--color-master, #a855f7)",
+  "var(--color-legend, #eab308)",
+  "var(--color-extreme, #64748b)",
+] as const;
+
+const PRIMARY_COUNT = 3; // Easy, Medium, Hard
+const RECOMMENDED_INDEX = 1; // Medium
 
 type Props = {
   isOpen: boolean;
@@ -30,8 +59,12 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     typeof import("@/daily/dailyPuzzle") | null
   >(null);
   const [freezeUsed, setFreezeUsed] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const preferredIdx = getDailyPreferredDifficultyIndex();
+  const [showMore, setShowMore] = useState(false);
+  const [rememberChoice, setRememberChoice] = useState(!!preferredIdx);
   const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(preferredIdx ?? RECOMMENDED_INDEX);
+
   const showFreezeOffer =
     wasYesterdayMissed() &&
     getStreakFreezeCount() > 0 &&
@@ -41,6 +74,8 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   useEffect(() => {
     if (isOpen) {
       import("@/daily/dailyPuzzle").then(setDailyModule);
+      const idx = getDailyPreferredDifficultyIndex();
+      setSelectedIndex(idx ?? RECOMMENDED_INDEX);
     } else {
       setDailyModule(null);
     }
@@ -73,22 +108,39 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     if (useStreakFreeze(getYesterdayDateString())) setFreezeUsed(true);
   };
 
-  const handleStart = (grid: { rows: number; cols: number }) => {
+  const handleStart = () => {
     clearPuzzleState();
-    const result = dailyModule.startDailyPuzzle(grid);
+    const grid = GRID_OPTIONS[selectedIndex];
+    const result = dailyModule.startDailyPuzzle({
+      rows: grid.rows,
+      cols: grid.cols,
+    });
     if (result) {
+      if (rememberChoice) {
+        setDailyPreferredDifficultyIndex(selectedIndex);
+      } else {
+        clearDailyPreferredDifficulty();
+      }
       onClose();
       navigate("/play");
     }
   };
 
+  const primaryOptions = GRID_OPTIONS.slice(0, PRIMARY_COUNT);
+  const moreOptions = GRID_OPTIONS.slice(PRIMARY_COUNT);
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="🧩 Today's Puzzle"
+      title="Today's Puzzle"
       showCloseButton={true}
     >
+      <div className={styles.headerCustom}>
+        <Puzzle size={24} className={styles.headerIcon} />
+        <p className={styles.subtitle}>Same puzzle for everyone</p>
+      </div>
+
       {showFreezeOffer && (
         <div
           className={styles.freezeOffer}
@@ -122,50 +174,101 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
           </div>
         </div>
       )}
-      <p className={styles.subtitle}>Same puzzle for everyone — pick your difficulty</p>
-      {isMobile ? (
-        <div className={styles.difficultyMobile}>
-          <Dropdown
-            label="Difficulty"
-            compact
-            fullWidth
-            value={selectedIndex}
-            onChange={(val) => setSelectedIndex(Number(val))}
-            options={GRID_OPTIONS.map((opt, i) => ({
-              value: i,
-              label: opt.labelCompact,
-            }))}
-          />
-          <button
-            type="button"
-            className={styles.startBtn}
-            onClick={() =>
-              handleStart({
-                rows: GRID_OPTIONS[selectedIndex].rows,
-                cols: GRID_OPTIONS[selectedIndex].cols,
-              })
-            }
-          >
-            Start daily puzzle
-          </button>
-        </div>
-      ) : (
-        <div className={styles.difficulties}>
-          {GRID_OPTIONS.map((opt) => (
-            <button
+
+      <div className={styles.difficultySection}>
+        <div className={isMobile ? styles.difficultyStack : styles.difficultyRow}>
+          {primaryOptions.map((opt, i) => (
+            <DifficultyCard
               key={`${opt.rows}x${opt.cols}`}
-              type="button"
-              className={styles.difficultyBtn}
-              onClick={() => handleStart({ rows: opt.rows, cols: opt.cols })}
-            >
-              <span className={styles.difficultyLabel}>{opt.label}</span>
-              <span className={styles.difficultyPieces}>
-                {opt.rows}×{opt.cols} · {opt.pieces} pieces
-              </span>
-            </button>
+              opt={opt}
+              index={i}
+              selected={selectedIndex === i}
+              recommended={i === RECOMMENDED_INDEX}
+              onSelect={() => setSelectedIndex(i)}
+            />
           ))}
         </div>
-      )}
+
+        <button
+          type="button"
+          className={styles.moreOptionsBtn}
+          onClick={() => setShowMore((v) => !v)}
+          aria-expanded={showMore}
+        >
+          More Options
+          {showMore ? (
+            <ChevronUp size={18} className={styles.moreOptionsIcon} />
+          ) : (
+            <ChevronDown size={18} className={styles.moreOptionsIcon} />
+          )}
+        </button>
+
+        {showMore && (
+          <div className={styles.moreOptionsList}>
+            {moreOptions.map((opt, i) => {
+              const idx = PRIMARY_COUNT + i;
+              return (
+                <DifficultyCard
+                  key={`${opt.rows}x${opt.cols}`}
+                  opt={opt}
+                  index={idx}
+                  selected={selectedIndex === idx}
+                  onSelect={() => setSelectedIndex(idx)}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <label className={styles.rememberLabel}>
+        <input
+          type="checkbox"
+          checked={rememberChoice}
+          onChange={(e) => setRememberChoice(e.target.checked)}
+          className={styles.rememberCheckbox}
+        />
+        <span>Remember my choice</span>
+      </label>
+
+      <button type="button" className={styles.startBtn} onClick={handleStart}>
+        Start Puzzle
+        <span className={styles.startBtnArrow}>→</span>
+      </button>
     </Modal>
+  );
+}
+
+function DifficultyCard({
+  opt,
+  index,
+  selected,
+  recommended,
+  onSelect,
+}: {
+  opt: (typeof GRID_OPTIONS)[number];
+  index: number;
+  selected: boolean;
+  recommended?: boolean;
+  onSelect: () => void;
+}) {
+  const Icon = DIFFICULTY_ICONS[index];
+  const color = DIFFICULTY_COLORS[index];
+  return (
+    <button
+      type="button"
+      className={`${styles.difficultyCard} ${selected ? styles.difficultyCardSelected : ""}`}
+      onClick={onSelect}
+    >
+      {recommended && <span className={styles.recommendedBadge}>Recommended</span>}
+      <div className={styles.difficultyCardIcon} style={{ color }}>
+        <Icon size={24} />
+      </div>
+      <span className={styles.difficultyCardLabel}>{opt.label.split(" ")[0]}</span>
+      <span className={styles.difficultyCardMeta}>
+        {opt.rows}×{opt.cols} · {opt.pieces} pieces
+      </span>
+      {selected && <Check size={18} className={styles.difficultyCardCheck} />}
+    </button>
   );
 }

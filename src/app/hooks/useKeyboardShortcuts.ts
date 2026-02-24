@@ -175,42 +175,133 @@ export function useKeyboardShortcuts({
   }, [handleKeyDown]);
 }
 
-// Shortcut definitions for the help modal
+// Shortcut definitions for the help modal (flat list, backward compatible)
 export const SHORTCUTS = [
-  { keys: ["Ctrl+Z", "⌘Z"], action: "↩️ Undo last move", ariaAction: "Undo last move" },
   {
-    keys: ["Ctrl+Shift+Z", "⌘⇧Z", "Ctrl+Y", "⌘Y"],
-    action: "↪️ Redo last undone move",
-    ariaAction: "Redo last undone move",
-  },
-  { keys: ["Space"], action: "⏸️ Pause / Resume", ariaAction: "Pause or Resume" },
-  { keys: ["Tab"], action: "➡️ Select next piece", ariaAction: "Select next piece" },
-  {
-    keys: ["Shift+Tab"],
-    action: "⬅️ Select previous piece",
-    ariaAction: "Select previous piece",
+    keys: ["↑ ↓ ← →"],
+    action: "Move piece",
+    ariaAction: "Move piece",
+    id: "arrows" as const,
   },
   {
     keys: ["R"],
-    action: "🔄 Rotate selected piece",
-    ariaAction: "Rotate selected piece",
+    action: "Rotate piece",
+    ariaAction: "Rotate piece",
+    id: "rotateCW" as const,
   },
   {
     keys: ["Shift+R"],
-    action: "🔄 Rotate counter-clockwise",
+    action: "Rotate counter-clockwise",
     ariaAction: "Rotate counter-clockwise",
+    id: "rotateCCW" as const,
   },
   {
-    keys: ["↑ ↓ ← →"],
-    action: "⬆️⬇️ Move selected piece",
-    ariaAction: "Move selected piece",
+    keys: ["T"],
+    action: "Store piece in drawer",
+    ariaAction: "Store piece",
+    id: "sendToTray" as const,
   },
-  { keys: ["P"], action: "👁️ Toggle preview", ariaAction: "Toggle preview" },
-  { keys: ["F"], action: "🖥️ Fullscreen", ariaAction: "Fullscreen" },
-  { keys: ["M"], action: "🔊 Mute / Unmute sound", ariaAction: "Mute or Unmute sound" },
-  { keys: ["H"], action: "📳 Toggle haptics", ariaAction: "Toggle haptics" },
-  { keys: ["G"], action: "👻 Toggle ghost hint", ariaAction: "Toggle ghost hint" },
-  { keys: ["N"], action: "🧩 New puzzle", ariaAction: "New puzzle" },
-  { keys: ["?", "F1"], action: "⌨️ Show shortcuts", ariaAction: "Show shortcuts" },
-  { keys: ["Esc"], action: "✖️ Close / Unpause", ariaAction: "Close or Unpause" },
+  {
+    keys: ["G"],
+    action: "Toggle ghost hint",
+    ariaAction: "Toggle ghost hint",
+    id: "ghost" as const,
+  },
+  {
+    keys: ["Space"],
+    action: "Pause / Resume",
+    ariaAction: "Pause or Resume",
+    id: "pause" as const,
+  },
+  {
+    keys: ["Tab"],
+    action: "Select next piece",
+    ariaAction: "Select next piece",
+    id: "nextPiece" as const,
+  },
+  {
+    keys: ["Shift+Tab"],
+    action: "Select previous piece",
+    ariaAction: "Select previous piece",
+    id: "prevPiece" as const,
+  },
+  {
+    keys: ["P"],
+    action: "Toggle preview",
+    ariaAction: "Toggle preview",
+    id: "preview" as const,
+  },
+  {
+    keys: ["F"],
+    action: "Fullscreen",
+    ariaAction: "Fullscreen",
+    id: "fullscreen" as const,
+  },
+  { keys: ["Ctrl+Z", "⌘Z"], action: "Undo", ariaAction: "Undo", id: "undo" as const },
+  {
+    keys: ["Ctrl+Shift+Z", "⌘⇧Z", "Ctrl+Y", "⌘Y"],
+    action: "Redo",
+    ariaAction: "Redo",
+    id: "redo" as const,
+  },
+  {
+    keys: ["M"],
+    action: "Mute / Unmute",
+    ariaAction: "Mute or Unmute",
+    id: "sound" as const,
+  },
+  {
+    keys: ["H"],
+    action: "Toggle haptics",
+    ariaAction: "Toggle haptics",
+    id: "haptics" as const,
+  },
+  { keys: ["N"], action: "New puzzle", ariaAction: "New puzzle", id: "newGame" as const },
+  {
+    keys: ["?", "F1"],
+    action: "Show shortcuts",
+    ariaAction: "Show shortcuts",
+    id: "showHelp" as const,
+  },
+  {
+    keys: ["Esc"],
+    action: "Close / Unpause",
+    ariaAction: "Close or Unpause",
+    id: "escape" as const,
+  },
 ] as const;
+
+// Grouped by intent per PDF v2: Gameplay, Navigation & View, System, Input Reference
+export type ShortcutId = (typeof SHORTCUTS)[number]["id"];
+export type ShortcutGroupId = "gameplay" | "navigation" | "system";
+
+export const SHORTCUT_GROUPS: {
+  id: ShortcutGroupId;
+  title: string;
+  shortcutIds: ShortcutId[];
+}[] = [
+  {
+    id: "gameplay",
+    title: "Gameplay",
+    shortcutIds: [
+      "arrows",
+      "rotateCW",
+      "rotateCCW",
+      "sendToTray",
+      "ghost",
+      "pause",
+      "nextPiece",
+      "prevPiece",
+    ],
+  },
+  {
+    id: "navigation",
+    title: "Navigation & View",
+    shortcutIds: ["preview", "fullscreen"],
+  },
+  {
+    id: "system",
+    title: "System",
+    shortcutIds: ["undo", "redo", "sound", "haptics", "newGame", "showHelp", "escape"],
+  },
+];
