@@ -153,8 +153,8 @@ Useful scripts:
 
 ## Documentation
 
-| Doc                                                        | Description                                                                                        |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Doc                                                    | Description                                                                                        |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
 | [SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share; single migration file (idempotent) |
 | [SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                      |
 | [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                               |

@@ -38,14 +38,14 @@ Rules:
 
 ## Storage keys (localStorage)
 
-| Key                                        | Purpose |
-| ------------------------------------------ | ------- |
-| `phuzzle:streakFreeze`                     | Available freeze count (0 or 1) |
-| `phuzzle:streakFreezeWeek`                 | Current week key (used to detect week rollover) |
+| Key                                        | Purpose                                                                           |
+| ------------------------------------------ | --------------------------------------------------------------------------------- |
+| `phuzzle:streakFreeze`                     | Available freeze count (0 or 1)                                                   |
+| `phuzzle:streakFreezeWeek`                 | Current week key (used to detect week rollover)                                   |
 | `phuzzle:streakFreezeEarnedWeek`           | Week key in which the freeze was last earned (prevents earning twice in one week) |
-| `phuzzle:streakFreeze:used:YYYY-MM-DD`     | Freeze was used to cover this date |
-| `phuzzle:streakFreezeDismissed:YYYY-MM-DD` | User dismissed the offer for this date (if shown) |
-| `phuzzle:testDisableAutoStreakFreeze`      | E2E only: `"true"` disables auto-apply |
+| `phuzzle:streakFreeze:used:YYYY-MM-DD`     | Freeze was used to cover this date                                                |
+| `phuzzle:streakFreezeDismissed:YYYY-MM-DD` | User dismissed the offer for this date (if shown)                                 |
+| `phuzzle:testDisableAutoStreakFreeze`      | E2E only: `"true"` disables auto-apply                                            |
 
 ---
 

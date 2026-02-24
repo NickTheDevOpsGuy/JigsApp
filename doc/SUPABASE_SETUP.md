@@ -14,13 +14,13 @@ The app runs without Supabase, but these features require a configured project:
 
 ## What Supabase powers
 
-| Feature | Description |
-| --- | --- |
-| Leaderboards | Daily puzzle, weekly and monthly totals, streaks, all-time completions, best times per grid size |
-| Player stats | Puzzles completed, total play time, daily streaks |
-| Achievements | Unlock badges (first puzzle, streaks, speed runs, etc.) |
-| Profile | Display name and anonymous mode (raccoon names on leaderboards) |
-| Co-op sharing | "Play with friend" real-time collaborative puzzle sessions |
+| Feature       | Description                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| Leaderboards  | Daily puzzle, weekly and monthly totals, streaks, all-time completions, best times per grid size |
+| Player stats  | Puzzles completed, total play time, daily streaks                                                |
+| Achievements  | Unlock badges (first puzzle, streaks, speed runs, etc.)                                          |
+| Profile       | Display name and anonymous mode (raccoon names on leaderboards)                                  |
+| Co-op sharing | "Play with friend" real-time collaborative puzzle sessions                                       |
 
 ---
 
@@ -134,13 +134,13 @@ If you see "Connect Supabase to track your stats...", check:
 
 ## Database schema overview
 
-| Table | Purpose |
-| --- | --- |
-| `player_stats` | One row per user: puzzles completed, play time, streaks |
-| `completions` | Each puzzle completion; used for leaderboards |
-| `player_profiles` | Display name and leaderboard visibility |
-| `user_achievements` | Unlocked achievements per user |
-| `puzzle_sessions` | Co-op sessions (pieces, elapsed time, completion state) |
+| Table               | Purpose                                                 |
+| ------------------- | ------------------------------------------------------- |
+| `player_stats`      | One row per user: puzzles completed, play time, streaks |
+| `completions`       | Each puzzle completion; used for leaderboards           |
+| `player_profiles`   | Display name and leaderboard visibility                 |
+| `user_achievements` | Unlocked achievements per user                          |
+| `puzzle_sessions`   | Co-op sessions (pieces, elapsed time, completion state) |
 
 ---
 
