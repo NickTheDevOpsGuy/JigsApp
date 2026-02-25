@@ -363,7 +363,7 @@ export function StatsScreen() {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
-          <h1 className={styles.title}>Stats</h1>
+          <h1 className={styles.title}>Leaderboard</h1>
           <div className={styles.cardContent} data-testid="stats-card-content">
             <p className={styles.placeholder}>
               Connect Supabase to track your stats, compete on leaderboards, and unlock

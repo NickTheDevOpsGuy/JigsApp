@@ -291,7 +291,7 @@ export function getMenuTree(): MenuNode[] {
     {
       type: "folder",
       id: "stats",
-      label: "Stats",
+      label: "Leaderboards",
       children: [
         { type: "navigate", id: "statsOverview", label: "Overview", path: "/stats" },
         { type: "navigate", id: "statsStreaks", label: "Streaks", path: "/stats" },

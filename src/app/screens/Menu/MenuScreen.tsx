@@ -43,7 +43,7 @@ export function MenuScreen() {
             type="button"
             className={styles.cornerBtn}
             onClick={() => nav("/stats")}
-            aria-label="Stats and leaderboard"
+            aria-label="Leaderboard"
           >
             <Trophy size={24} />
           </button>
