@@ -78,13 +78,16 @@ export function useGridConfig() {
   useEffect(() => {
     const existingGrid = localStorage.getItem(GRID_KEY);
     if (existingGrid) {
+      const normalized = existingGrid.replace("×", "x").replace(/\s+/g, "");
       const idx = GRID_OPTIONS.findIndex(
-        (g) => g.rows > 0 && `${g.rows}x${g.cols}` === existingGrid,
+        (g) => g.rows > 0 && `${g.rows}x${g.cols}` === normalized,
       );
       if (idx >= 0) {
         setGridIndex(idx);
       } else {
-        const [r, c] = existingGrid.split("x").map(Number);
+        const match = normalized.match(/^(\d+)x(\d+)$/i);
+        const r = match ? Number(match[1]) : NaN;
+        const c = match ? Number(match[2]) : NaN;
         if (r >= MIN_GRID && r <= MAX_GRID && c >= MIN_GRID && c <= MAX_GRID) {
           setGridIndex(GRID_OPTIONS.length - 1); // Custom
           setCustomRows(r);

@@ -68,7 +68,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const [freezeUsed, setFreezeUsed] = useState(false);
   const preferredIdx = getDailyPreferredDifficultyIndex();
   const [showMore, setShowMore] = useState(false);
-  const [rememberChoice, setRememberChoice] = useState(!!preferredIdx);
+  const [rememberChoice, setRememberChoice] = useState(preferredIdx !== null);
   const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(preferredIdx ?? RECOMMENDED_INDEX);
   const [modifier, setModifier] = useState<VisualModifier>("none");
@@ -118,7 +118,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
 
   const handleStart = () => {
     clearPuzzleState();
-    const grid = GRID_OPTIONS[selectedIndex];
+    const grid = GRID_OPTIONS[selectedIndex] ?? GRID_OPTIONS[RECOMMENDED_INDEX];
     const result = dailyModule.startDailyPuzzle(
       {
         rows: grid.rows,

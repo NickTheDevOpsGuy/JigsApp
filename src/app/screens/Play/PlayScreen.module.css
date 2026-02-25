@@ -1137,7 +1137,7 @@
 
 .completeContent h2 {
   font-family: "Fredoka", sans-serif;
-  font-size: 3rem;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
   background: linear-gradient(
@@ -1154,13 +1154,13 @@
 }
 
 .completeContent p {
-  font-size: 1.25rem;
+  font-size: clamp(0.95rem, 2.2vw, 1.05rem);
   opacity: 1;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 0.8rem 0;
 }
 
 .completeContent .puzzleSize {
-  font-size: 0.95rem;
+  font-size: clamp(0.82rem, 1.8vw, 0.9rem);
   opacity: 0.95;
   margin: 0 0 0.5rem 0;
 }
@@ -1386,6 +1386,7 @@
   display: flex;
   gap: 8px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .shareCardToggle {

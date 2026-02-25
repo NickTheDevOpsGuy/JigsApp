@@ -51,6 +51,13 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function formatGap(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}m ${s}s`;
+}
+
 function formatCompletedAt(iso: string): string {
   const d = new Date(iso);
   const now = new Date();
@@ -176,6 +183,7 @@ export function StatsScreen() {
   const [raccoonName, setRaccoonName] = useState<string | null>(null);
   const leaderboardCompact = true;
   const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
+  const [rowAnimEpoch, setRowAnimEpoch] = useState(0);
 
   const configured = isSupabaseConfigured();
   const isNarrow = useMediaQuery("(max-width: 520px)");
@@ -227,6 +235,7 @@ export function StatsScreen() {
       getWeeklyTotalsLeaderboard(),
     ]);
     setLeaderboard(lb);
+    setRowAnimEpoch((n) => n + 1);
     setTodayCompletionCount(todayCount);
     setWeeklyTotalsLeaderboard(wklb);
     await loadWeeklyAlbum();
@@ -280,16 +289,19 @@ export function StatsScreen() {
       if (leaderboardType === "today") {
         const lb = await getDailyLeaderboard(today, 10, cutType, visualModifier);
         setLeaderboard(lb);
+        setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "week") {
         const [wklb] = await Promise.all([
           getWeeklyTotalsLeaderboard(),
           loadWeeklyAlbum(),
         ]);
         setWeeklyTotalsLeaderboard(wklb);
+        setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "alltime") {
         const [r, c] = allTimeGrid.split("x").map(Number);
         const lb = await getAllTimeBestLeaderboard(r, c, 10, cutType, visualModifier);
         setLeaderboard(lb);
+        setRowAnimEpoch((n) => n + 1);
       }
     };
     loadLb();
@@ -414,15 +426,22 @@ export function StatsScreen() {
             leaderboardCompact ? styles.leaderboardCompact : ""
           }`}
         >
-          {entries.map((entry) => {
-            const key = `time-${entry.rank}-${entry.displayName}`;
+          {entries.map((entry, index) => {
+            const key = `time-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
             const isExpanded = expandedRowKey === key;
+            const leader = entries[0]?.elapsedSeconds ?? entry.elapsedSeconds;
+            const next = entries[index + 1]?.elapsedSeconds;
+            const gapInfo =
+              index === 0 && typeof next === "number"
+                ? `+${formatGap(next - entry.elapsedSeconds)} ahead of #2`
+                : `+${formatGap(entry.elapsedSeconds - leader)} from #1`;
             return (
               <li
                 key={key}
                 className={`${styles.leaderboardItem} ${
                   entry.rank <= 3 ? styles.leaderboardPodium : ""
-                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
+                } ${isExpanded ? styles.leaderboardItemExpanded : ""} ${styles.leaderboardRowEnter}`}
+                style={{ animationDelay: `${index * 45}ms` }}
                 onClick={() => setExpandedRowKey(isExpanded ? null : key)}
                 role="button"
                 tabIndex={0}
@@ -447,11 +466,7 @@ export function StatsScreen() {
                 </span>
                 <span className={styles.timeCol}>
                   <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
-                  {entry.completedAt && (
-                    <span className={styles.completedAt}>
-                      {formatCompletedAt(entry.completedAt)}
-                    </span>
-                  )}
+                  <span className={styles.gapInfo}>{gapInfo}</span>
                 </span>
                 {isExpanded && (
                   <div className={styles.leaderboardDetail}>
@@ -483,14 +498,15 @@ export function StatsScreen() {
           }`}
         >
           {entries.map((entry) => {
-            const key = `completion-${entry.rank}-${entry.displayName}`;
+            const key = `completion-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
             const isExpanded = expandedRowKey === key;
             return (
               <li
                 key={key}
                 className={`${styles.leaderboardItem} ${
                   entry.rank <= 3 ? styles.leaderboardPodium : ""
-                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
+                } ${isExpanded ? styles.leaderboardItemExpanded : ""} ${styles.leaderboardRowEnter}`}
+                style={{ animationDelay: `${(entry.rank - 1) * 45}ms` }}
                 onClick={() => setExpandedRowKey(isExpanded ? null : key)}
                 role="button"
                 tabIndex={0}
@@ -706,6 +722,7 @@ export function StatsScreen() {
                   <div className={styles.countdownWrap}>
                     <DailyCountdown
                       prominent
+                      variant="anticipation"
                       onUnlock={() => {
                         if (leaderboardType === "today") loadData();
                       }}
@@ -745,60 +762,6 @@ export function StatsScreen() {
                         All-time
                       </button>
                     </div>
-                    {(leaderboardType === "today" || leaderboardType === "alltime") && (
-                      <div className={styles.cutTypeFilter}>
-                        <label htmlFor="cut-type-select">Shape:</label>
-                        <select
-                          id="cut-type-select"
-                          value={cutTypeFilter}
-                          onChange={(e) =>
-                            setCutTypeFilter(e.target.value as PieceCutType)
-                          }
-                        >
-                          <option value="all">All</option>
-                          <option value="classic">Classic</option>
-                          <option value="irregular">Irregular</option>
-                          <option value="hard">Hard</option>
-                        </select>
-                      </div>
-                    )}
-                    {(leaderboardType === "today" || leaderboardType === "alltime") && (
-                      <div className={styles.cutTypeFilter}>
-                        <label htmlFor="modifier-select">Modifier:</label>
-                        <select
-                          id="modifier-select"
-                          value={modifierFilter}
-                          onChange={(e) =>
-                            setModifierFilter(e.target.value as VisualModifierFilter)
-                          }
-                        >
-                          <option value="all">All</option>
-                          <option value="none">None</option>
-                          <option value="fog">Fog</option>
-                          <option value="night">Night</option>
-                          <option value="sepia">Sepia</option>
-                        </select>
-                      </div>
-                    )}
-                    {leaderboardType === "alltime" && (
-                      <div className={styles.allTimeGrid}>
-                        <label htmlFor="alltime-grid-select">Grid:</label>
-                        <select
-                          id="alltime-grid-select"
-                          value={allTimeGrid}
-                          onChange={(e) =>
-                            setAllTimeGrid(
-                              e.target.value as "3x3" | "4x4" | "5x5" | "6x6",
-                            )
-                          }
-                        >
-                          <option value="3x3">3×3</option>
-                          <option value="4x4">4×4</option>
-                          <option value="5x5">5×5</option>
-                          <option value="6x6">6×6</option>
-                        </select>
-                      </div>
-                    )}
                     {leaderboardType === "week" && (
                       <div className={styles.weekSubviewSwitch}>
                         <button
@@ -821,39 +784,111 @@ export function StatsScreen() {
                         </button>
                       </div>
                     )}
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={
-                        leaderboardType === "week" && weekSubview === "album"
-                          ? handleShareWeeklyAlbum
-                          : handleShareLeaderboard
-                      }
-                      className={styles.shareBtn}
-                    >
-                      <Share2 size={16} />
-                      {leaderboardType === "week" && weekSubview === "album"
-                        ? albumShareCopied
-                          ? "Copied!"
-                          : "Share Card"
-                        : shareCopied
-                          ? "Copied!"
-                          : "Share"}
-                    </Button>
+                    <div className={styles.controlsRow}>
+                      {(leaderboardType === "today" || leaderboardType === "alltime") && (
+                        <>
+                          <select
+                            id="cut-type-select"
+                            className={styles.inlineFilterSelect}
+                            value={cutTypeFilter}
+                            onChange={(e) =>
+                              setCutTypeFilter(e.target.value as PieceCutType)
+                            }
+                            aria-label="Filter by shape"
+                          >
+                            <option value="all">All Shapes</option>
+                            <option value="classic">Classic Shape</option>
+                            <option value="irregular">Irregular Shape</option>
+                            <option value="hard">Hard Shape</option>
+                          </select>
+                          <select
+                            id="modifier-select"
+                            className={styles.inlineFilterSelect}
+                            value={modifierFilter}
+                            onChange={(e) =>
+                              setModifierFilter(e.target.value as VisualModifierFilter)
+                            }
+                            aria-label="Filter by modifier"
+                          >
+                            <option value="all">All Modifiers</option>
+                            <option value="none">No Modifier</option>
+                            <option value="fog">Fog Modifier</option>
+                            <option value="night">Night Modifier</option>
+                            <option value="sepia">Sepia Modifier</option>
+                          </select>
+                        </>
+                      )}
+                      {leaderboardType === "alltime" && (
+                        <select
+                          id="alltime-grid-select"
+                          className={styles.inlineFilterSelect}
+                          value={allTimeGrid}
+                          onChange={(e) =>
+                            setAllTimeGrid(
+                              e.target.value as "3x3" | "4x4" | "5x5" | "6x6",
+                            )
+                          }
+                          aria-label="Filter all-time by grid size"
+                        >
+                          <option value="3x3">3x3 Grid</option>
+                          <option value="4x4">4x4 Grid</option>
+                          <option value="5x5">5x5 Grid</option>
+                          <option value="6x6">6x6 Grid</option>
+                        </select>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={
+                          leaderboardType === "week" && weekSubview === "album"
+                            ? handleShareWeeklyAlbum
+                            : handleShareLeaderboard
+                        }
+                        className={styles.shareIconBtn}
+                        aria-label={
+                          leaderboardType === "week" && weekSubview === "album"
+                            ? albumShareCopied
+                              ? "Copied weekly album share text"
+                              : "Share weekly album"
+                            : shareCopied
+                              ? "Copied leaderboard share text"
+                              : "Share leaderboard"
+                        }
+                        title={
+                          leaderboardType === "week" && weekSubview === "album"
+                            ? albumShareCopied
+                              ? "Copied!"
+                              : "Share album"
+                            : shareCopied
+                              ? "Copied!"
+                              : "Share leaderboard"
+                        }
+                      >
+                        <Share2 size={16} />
+                      </Button>
+                    </div>
                   </div>
                   <h2>
-                    {leaderboardType === "today" && "Today's daily puzzle"}
+                    {leaderboardType === "today" && "Today's Daily"}
                     {leaderboardType === "week" &&
                       (weekSubview === "rankings"
-                        ? `Weekly rankings (${weekRangeLabel})`
-                        : `Weekly album (${weekRangeLabel})`)}
+                        ? `Weekly Rankings (${weekRangeLabel})`
+                        : `Weekly Album (${weekRangeLabel})`)}
                     {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
                   </h2>
                   {leaderboardType === "today" && (
                     <p className={styles.todayCompletionCount} aria-live="polite">
-                      {todayCompletionCount} player{todayCompletionCount !== 1 ? "s" : ""}{" "}
-                      completed today
+                      {todayCompletionCount} completion
+                      {todayCompletionCount !== 1 ? "s" : ""} so far
                     </p>
+                  )}
+                  {leaderboardType === "week" && weekSubview === "rankings" && (
+                    <div className={styles.weekProgressStrip}>
+                      <span>Weekly Album Progress</span>
+                      <strong>
+                        [{weeklyBlocks}] {weeklyCompleted}/7
+                      </strong>
+                    </div>
                   )}
                   {leaderboardType === "today" &&
                     renderTimeLeaderboard(

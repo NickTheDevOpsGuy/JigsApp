@@ -151,8 +151,8 @@
 .loading,
 .todayCompletionCount {
   margin: 0 0 12px;
-  font-size: 14px;
-  color: var(--color-brand-primary);
+  font-size: 13px;
+  color: var(--color-text-secondary);
   font-weight: 600;
 }
 
@@ -281,10 +281,14 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--color-border);
-  min-height: 48px;
+  min-height: 44px;
   box-sizing: border-box;
+}
+
+.leaderboardItem:nth-child(even) {
+  background: color-mix(in srgb, var(--color-bg-secondary) 45%, var(--color-bg-elevated));
 }
 
 .leaderboardItem:last-child {
@@ -296,8 +300,8 @@
 }
 
 .leaderboardCompact .leaderboardItem {
-  padding: 8px 12px;
-  min-height: 40px;
+  padding: 7px 11px;
+  min-height: 36px;
   gap: 8px;
 }
 
@@ -337,7 +341,9 @@
 .player {
   flex: 1;
   min-width: 0;
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -345,13 +351,14 @@
 
 .time {
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-weight: 800;
+  color: var(--color-text-primary);
   flex-shrink: 0;
 }
 
 .leaderboardItem .time {
-  font-size: 14px;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .timeCol {
@@ -366,7 +373,28 @@
   font-size: 12px;
   color: var(--color-text-secondary);
   flex-shrink: 0;
-  opacity: 0.9;
+  opacity: 0.65;
+}
+
+.gapInfo {
+  font-size: 11px;
+  color: var(--color-brand-primary);
+  font-weight: 600;
+}
+
+.leaderboardRowEnter {
+  animation: rowFadeIn 0.24s ease both;
+}
+
+@keyframes rowFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .leaderboardCompact .completedAt {
@@ -477,15 +505,15 @@
 
 /* Leaderboard header – dropdown + controls, same layout as mobile */
 .countdownWrap {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .leaderboardHeader {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   align-items: stretch;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .boardModeSwitch {
@@ -548,24 +576,53 @@
   box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
-.cutTypeFilter,
-.allTimeGrid {
+.controlsRow {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
-  order: 2;
+  flex-wrap: wrap;
 }
 
-.cutTypeFilter select,
-.allTimeGrid select {
-  padding: 8px 12px;
+.inlineFilterSelect {
+  min-height: 36px;
+  padding: 7px 10px;
   border-radius: 8px;
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-primary);
-  font-size: 14px;
-  min-height: 40px;
+  font-size: 12px;
+}
+
+.shareIconBtn {
+  margin-left: auto;
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.weekProgressStrip {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 40%, var(--color-border));
+  background: color-mix(in srgb, var(--color-brand-primary) 10%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.weekProgressStrip strong {
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 
 .championBadge {
@@ -589,11 +646,6 @@
 .prestigeSection h3 {
   margin: 0 0 8px 0;
   font-size: 1rem;
-}
-
-.shareBtn {
-  align-self: flex-end;
-  order: 3;
 }
 
 .weekAlbumWrap {
@@ -823,15 +875,17 @@
     margin-bottom: 12px;
   }
 
-  .allTimeGrid {
-    order: 2;
-    justify-content: flex-start;
+  .controlsRow {
+    gap: 6px;
   }
 
-  .shareBtn {
-    order: 3;
+  .inlineFilterSelect {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .shareIconBtn {
     margin-left: 0;
-    margin-right: 0;
   }
 
   /* Leaderboard card layout (PZ-071) – see rules above in same media query */
@@ -908,11 +962,7 @@
     font-size: 11px;
   }
 
-  .allTimeGrid {
-    font-size: 12px;
-  }
-
-  .allTimeGrid select {
+  .inlineFilterSelect {
     padding: 6px 10px;
     font-size: 13px;
     min-height: 36px;
@@ -951,20 +1001,11 @@
     padding: 2px 6px;
   }
 
-  /* Share + All-time grid on one row when both visible */
+  /* Share + filters stay compact on very narrow widths */
   .leaderboardHeader {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-  }
-
-  .allTimeGrid {
-    order: 2;
-  }
-
-  .shareBtn {
-    order: 2;
-    margin-left: auto;
   }
 
   /* Tighter achievements */

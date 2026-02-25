@@ -40,6 +40,35 @@
   font-weight: 600;
 }
 
+.anticipation {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  row-gap: 1px;
+  align-items: center;
+}
+
+.anticipation .icon {
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.anticipation .label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  opacity: 0.95;
+}
+
+.anticipation .time {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
 .celebrating {
   animation: pulse 0.6s ease-out;
 }

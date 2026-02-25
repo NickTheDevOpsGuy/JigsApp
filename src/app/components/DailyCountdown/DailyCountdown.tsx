@@ -19,14 +19,27 @@ function formatCountdown(seconds: number): string {
   return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
+function formatCompactCountdown(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
 interface DailyCountdownProps {
   /** When true, use larger/prominent styling */
   prominent?: boolean;
+  /** Visual style variant for leaderboard anticipation mode. */
+  variant?: "default" | "anticipation";
   /** Callback when countdown hits 0 */
   onUnlock?: () => void;
 }
 
-export function DailyCountdown({ prominent, onUnlock }: DailyCountdownProps) {
+export function DailyCountdown({
+  prominent,
+  variant = "default",
+  onUnlock,
+}: DailyCountdownProps) {
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [celebrating, setCelebrating] = useState(false);
   const [synced, setSynced] = useState(false);
@@ -63,23 +76,34 @@ export function DailyCountdown({ prominent, onUnlock }: DailyCountdownProps) {
   if (secondsLeft == null) return null;
 
   const justUnlocked = secondsLeft <= 0;
-  const display = justUnlocked ? "00:00:00" : formatCountdown(secondsLeft);
+  const display =
+    variant === "anticipation"
+      ? justUnlocked
+        ? "0m"
+        : formatCompactCountdown(secondsLeft)
+      : justUnlocked
+        ? "00:00:00"
+        : formatCountdown(secondsLeft);
+  const label =
+    variant === "anticipation"
+      ? justUnlocked
+        ? "New puzzle live"
+        : "Next puzzle drops in"
+      : justUnlocked
+        ? "New daily ready!"
+        : "Next daily in";
 
   return (
     <div
       className={`${styles.countdown} ${prominent ? styles.prominent : ""} ${
-        celebrating ? styles.celebrating : ""
-      }`}
+        variant === "anticipation" ? styles.anticipation : ""
+      } ${celebrating ? styles.celebrating : ""}`}
       role="timer"
       aria-live="polite"
-      aria-label={
-        justUnlocked ? "New daily puzzle is ready" : `Next daily puzzle in ${display}`
-      }
+      aria-label={justUnlocked ? "New daily puzzle is ready" : `${label} ${display}`}
     >
       <Clock size={prominent ? 20 : 16} className={styles.icon} />
-      <span className={styles.label}>
-        {justUnlocked ? "New daily ready!" : "Next daily in"}
-      </span>
+      <span className={styles.label}>{label}</span>
       <span className={styles.time}>{display}</span>
       {celebrating && (
         <div className={styles.confetti} aria-hidden>

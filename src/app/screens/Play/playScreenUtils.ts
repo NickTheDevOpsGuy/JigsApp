@@ -65,8 +65,13 @@ export function getSuggestedGrid(
 
 export function parseGrid(stored: string | null): { rows: number; cols: number } {
   if (!stored) return { rows: 4, cols: 4 };
-  const [r, c] = stored.split("x").map(Number);
-  if (r && c) return { rows: r, cols: c };
+  const match = stored.match(/^\s*(\d+)\s*[x×]\s*(\d+)\s*$/i);
+  if (!match) return { rows: 4, cols: 4 };
+  const r = Number(match[1]);
+  const c = Number(match[2]);
+  if (Number.isFinite(r) && Number.isFinite(c) && r > 0 && c > 0) {
+    return { rows: r, cols: c };
+  }
   return { rows: 4, cols: 4 };
 }
 

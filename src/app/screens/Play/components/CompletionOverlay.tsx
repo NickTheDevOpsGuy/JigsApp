@@ -3,7 +3,6 @@
  */
 import React, { useEffect, useCallback, useState } from "react";
 import { X, Plus, Share2, Copy, Check, Download, Menu, Image } from "lucide-react";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
@@ -92,7 +91,6 @@ export function CompletionOverlay({
   } | null>(null);
   const [useSeasonalFrame, setUseSeasonalFrame] = useState(true);
   const { shareCard, isGenerating } = useShareCardImage();
-  const isDesktop = useMediaQuery("(min-width: 601px)");
   const completionMessage = getCompletionMessage(elapsedSeconds);
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const badge = getCompletionBadge(elapsedSeconds, undoCount, pieceCount);
@@ -265,18 +263,16 @@ export function CompletionOverlay({
               Seasonal frame
             </label>
           </div>
-          {isDesktop && (
-            <div className={styles.completeActionsSecondary}>
-              <Button size="sm" variant="secondary" onClick={onDownloadImage}>
-                <Download size={16} />
-                Download
-              </Button>
-              <Button size="sm" variant="secondary" onClick={onMenu}>
-                <Menu size={16} />
-                Menu
-              </Button>
-            </div>
-          )}
+          <div className={styles.completeActionsSecondary}>
+            <Button size="sm" variant="secondary" onClick={onDownloadImage}>
+              <Download size={16} />
+              Download
+            </Button>
+            <Button size="sm" variant="secondary" onClick={onMenu}>
+              <Menu size={16} />
+              Menu
+            </Button>
+          </div>
         </div>
       </div>
     </div>
