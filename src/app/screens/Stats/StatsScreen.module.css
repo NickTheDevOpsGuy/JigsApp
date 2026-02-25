@@ -188,6 +188,82 @@
   color: var(--color-text-secondary);
 }
 
+.retentionHero {
+  text-align: center;
+  padding: 8px 4px 2px;
+}
+
+.retentionHeading {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.retentionDivider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 12px 0;
+}
+
+.retentionBig {
+  margin: 10px 0 4px;
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: var(--color-brand-primary);
+}
+
+.retentionSub {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.weeklyBlocks {
+  margin: 12px 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.overallBlock {
+  padding: 2px 0;
+}
+
+.overallRows {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.overallRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.overallRow strong {
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.nextUnlock {
+  padding: 2px 0 4px;
+}
+
+.nextUnlockText {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
 .leaderboard {
   list-style: none;
   margin: 0;

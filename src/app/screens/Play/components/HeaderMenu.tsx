@@ -19,7 +19,7 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   about: "ℹ️ About",
   advanced: "⚙️ Advanced",
   audio: "🔊 Audio",
-  contribute: "ℹ️ About Us",
+  contribute: "ℹ️ About",
   controls: "🎮 Controls",
   display: "👁️ Display",
   gameplay: "🎯 Gameplay",
@@ -168,11 +168,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const renderItem = (item: MenuItemConfig) => {
     if (item.isSectionLabel) {
-      return (
-        <div key={item.id} className={styles.headerMenuSection} style={{ marginTop: 8 }}>
-          {item.label}
-        </div>
-      );
+      return null;
     }
     return (
       <button
@@ -207,7 +203,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
         Back
       </button>
       <div className={styles.headerMenuDivider} />
-      <div className={styles.headerMenuSection}>{SUB_MENU_LABELS[activeSubMenu!]}</div>
       {activeSubMenu === "gameplay" && hasSubMenuItems("controls") && (
         <button
           type="button"
@@ -228,7 +223,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
               className={styles.headerMenuSubmenuTrigger}
               role="menuitem"
               onClick={() => setActiveSubMenu("contribute")}
-              aria-label="About Us"
+              aria-label="About"
             >
               {SUB_MENU_LABELS.contribute}
               <ChevronRight size={16} className={styles.headerMenuChevron} />
@@ -292,7 +287,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
             renderSubMenu()
           ) : (
             <>
-              <div className={styles.headerMenuSection}>{SUB_MENU_LABELS.about}</div>
               {hasSubMenuItems("about") && (
                 <button
                   type="button"
@@ -306,7 +300,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
                 </button>
               )}
               <div className={styles.headerMenuDivider} />
-              <div className={styles.headerMenuSection}>⚙️ Settings</div>
               {mainMenuSubmenus.map((id) => (
                 <React.Fragment key={id}>
                   <button

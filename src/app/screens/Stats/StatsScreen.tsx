@@ -524,6 +524,12 @@ export function StatsScreen() {
     </>
   );
 
+  const currentStreak = stats?.dailyStreak ?? 0;
+  const weeklyCompleted = Math.max(0, Math.min(7, weeklyAlbumProgress));
+  const weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
+  const weeklyBlocks = `${"■".repeat(weeklyCompleted)}${"□".repeat(weeklyRemaining)}`;
+  const masteryPuzzlesRemaining = Math.max(0, 1 - (stats?.masteryStreak ?? 0));
+
   return (
     <div className={styles.page}>
       <div className={styles.card}>
@@ -578,86 +584,56 @@ export function StatsScreen() {
             <>
               {activeTab === "dashboard" && (
                 <div className={styles.section}>
-                  <h2>Your Statistics</h2>
-                  <div className={styles.statsGrid}>
-                    <div className={styles.statCard}>
-                      <span className={styles.statValue}>
-                        {stats?.puzzlesCompleted ?? 0}
-                      </span>
-                      <span className={styles.statLabel}>Puzzles completed</span>
-                    </div>
-                    <div className={styles.statCard}>
-                      <span className={styles.statValue}>
-                        {formatDuration(stats?.totalPlayTimeSeconds ?? 0)}
-                      </span>
-                      <span className={styles.statLabel}>Total play time</span>
-                    </div>
-                    <div className={styles.statCard}>
-                      <span className={styles.statValue}>{stats?.dailyStreak ?? 0}</span>
-                      <span className={styles.statLabel}>Current streak</span>
-                    </div>
-                    <div className={styles.statCard}>
-                      <span className={styles.statValue}>
-                        {stats?.bestDailyStreak ?? 0}
-                      </span>
-                      <span className={styles.statLabel}>Best streak</span>
-                    </div>
-                    <div className={styles.statCard}>
-                      <span className={styles.statValue}>
-                        {stats?.masteryStreak ?? 0}
-                      </span>
-                      <span className={styles.statLabel}>Mastery streak</span>
-                    </div>
-                    <div className={styles.statCard}>
-                      <span className={styles.statValue}>
-                        {stats?.bestMasteryStreak ?? 0}
-                      </span>
-                      <span className={styles.statLabel}>Best mastery streak</span>
-                    </div>
-                    <div className={styles.statCard}>
-                      <span className={styles.statValue}>{getStreakFreezeCount()}</span>
-                      <span className={styles.statLabel}>Streak freeze</span>
-                    </div>
-                    {typeof stats?.level === "number" && (
-                      <div className={styles.statCard}>
-                        <span className={styles.statValue}>
-                          Lv{stats.level}
-                          {(stats.prestigeCount ?? 0) > 0 && (
-                            <span className={styles.prestigeBadge}>
-                              {" "}
-                              ★{stats.prestigeCount}
-                            </span>
-                          )}
-                        </span>
-                        <span className={styles.statLabel}>Level</span>
-                      </div>
-                    )}
-                    {typeof stats?.challengeWins === "number" &&
-                      stats.challengeWins > 0 && (
-                        <div className={styles.statCard}>
-                          <span className={styles.statValue}>
-                            🏆 {stats.challengeWins}
-                          </span>
-                          <span className={styles.statLabel}>Challenge wins</span>
-                        </div>
-                      )}
+                  <div className={styles.retentionHero}>
+                    <p className={styles.retentionHeading}>🔥 CURRENT STREAK</p>
+                    <div className={styles.retentionDivider} />
+                    <p className={styles.retentionBig}>{currentStreak} days</p>
+                    <p className={styles.retentionSub}>Keep it alive.</p>
+                    <p className={styles.weeklyBlocks}>
+                      [{weeklyBlocks}] {weeklyCompleted} / 7 this week
+                    </p>
+                    <p className={styles.retentionSub}>
+                      {weeklyRemaining === 0
+                        ? "Weekly Album badge unlocked!"
+                        : `${weeklyRemaining} day${weeklyRemaining === 1 ? "" : "s"} until Weekly Album badge`}
+                    </p>
                   </div>
-                  {personalBests.length > 0 && (
-                    <>
-                      <h2>Personal Bests</h2>
-                      <ol className={styles.personalBests}>
-                        {personalBests.slice(0, 10).map((pb, i) => (
-                          <li key={i} className={styles.personalBestItem}>
-                            <span className={styles.pbGrid}>{pb.gridSize}</span>
-                            <span className={styles.pbTime}>
-                              {formatTime(pb.elapsedSeconds)}
-                            </span>
-                            {pb.isDaily && <span className={styles.pbDaily}>Daily</span>}
-                          </li>
-                        ))}
-                      </ol>
-                    </>
-                  )}
+                  <div className={styles.retentionDivider} />
+
+                  <div className={styles.overallBlock}>
+                    <p className={styles.retentionHeading}>📊 OVERALL PROGRESS</p>
+                    <div className={styles.overallRows}>
+                      <div className={styles.overallRow}>
+                        <span>Puzzles Completed</span>
+                        <strong>{stats?.puzzlesCompleted ?? 0}</strong>
+                      </div>
+                      <div className={styles.overallRow}>
+                        <span>Total Play Time</span>
+                        <strong>
+                          {formatDuration(stats?.totalPlayTimeSeconds ?? 0)}
+                        </strong>
+                      </div>
+                      <div className={styles.overallRow}>
+                        <span>Best Streak</span>
+                        <strong>{stats?.bestDailyStreak ?? 0} days</strong>
+                      </div>
+                      <div className={styles.overallRow}>
+                        <span>Streak Freeze</span>
+                        <strong>{getStreakFreezeCount()} available</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.retentionDivider} />
+
+                  <div className={styles.nextUnlock}>
+                    <p className={styles.retentionHeading}>🏅 NEXT UNLOCK</p>
+                    <p className={styles.nextUnlockText}>
+                      {masteryPuzzlesRemaining > 0
+                        ? `Complete ${masteryPuzzlesRemaining} more puzzle${masteryPuzzlesRemaining === 1 ? "" : "s"} without hints to earn Mastery Badge`
+                        : "Mastery Badge earned. Keep the no-hint streak going."}
+                    </p>
+                  </div>
                 </div>
               )}
 
