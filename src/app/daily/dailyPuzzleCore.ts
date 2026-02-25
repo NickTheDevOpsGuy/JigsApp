@@ -56,12 +56,25 @@ export const GRID_OPTIONS = [
 ] as const;
 
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";
+export const DAILY_MODIFIER_KEY = "phuzzle:dailyModifier";
 const DAILY_PREFERRED_GRID_KEY = "phuzzle:dailyPreferredGrid";
 const DAILY_PREFIX = "phuzzle:daily:";
 const STREAK_FREEZE_KEY = "phuzzle:streakFreeze";
 const STREAK_FREEZE_WEEK_KEY = "phuzzle:streakFreezeWeek";
 const STREAK_FREEZE_EARNED_WEEK_KEY = "phuzzle:streakFreezeEarnedWeek";
 const STREAK_FREEZE_DISMISSED_KEY = "phuzzle:streakFreezeDismissed";
+
+export type DailyVisualModifier = "none" | "fog" | "night" | "sepia";
+
+/** Read selected daily visual modifier for current run. */
+export function getDailyVisualModifier(): DailyVisualModifier {
+  try {
+    const raw = localStorage.getItem(DAILY_MODIFIER_KEY);
+    return raw === "fog" || raw === "night" || raw === "sepia" ? raw : "none";
+  } catch {
+    return "none";
+  }
+}
 
 /** Get today's date string in user's local timezone (YYYY-MM-DD) */
 export function getTodayDateString(): string {

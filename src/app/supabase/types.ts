@@ -27,6 +27,9 @@ export interface Database {
           level?: number;
           prestige_count?: number;
           challenge_wins?: number;
+          mastery_streak?: number;
+          best_mastery_streak?: number;
+          mastery_last_date?: string;
         };
         Insert: {
           id?: string;
@@ -53,6 +56,9 @@ export interface Database {
           level?: number;
           prestige_count?: number;
           challenge_wins?: number;
+          mastery_streak?: number;
+          best_mastery_streak?: number;
+          mastery_last_date?: string;
         };
       };
       completions: {
@@ -66,6 +72,8 @@ export interface Database {
           is_daily: boolean;
           created_at: string;
           cut_type?: string;
+          is_mastery?: boolean;
+          visual_modifier?: string;
         };
         Insert: {
           id?: string;
@@ -77,6 +85,8 @@ export interface Database {
           is_daily: boolean;
           created_at?: string;
           cut_type?: string;
+          is_mastery?: boolean;
+          visual_modifier?: string;
         };
         Update: Partial<{
           id: string;
@@ -87,6 +97,8 @@ export interface Database {
           grid_cols: number;
           is_daily: boolean;
           created_at: string;
+          is_mastery: boolean;
+          visual_modifier: string;
         }>;
       };
       user_achievements: {

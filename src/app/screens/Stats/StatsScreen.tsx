@@ -12,18 +12,15 @@ import {
   getDailyLeaderboard,
   getTodayCompletionCount,
   subscribeTodayCompletionCount,
-  getStreakLeaderboard,
-  getCompletionCountLeaderboard,
   getWeeklyTotalsLeaderboard,
-  getMonthlyTotalsLeaderboard,
-  getPeriodLeaderboard,
+  getCalendarWeekRange,
+  getMyWeeklyAlbumCompletions,
   getAllTimeBestLeaderboard,
   getMyPersonalBests,
   type LeaderboardEntry,
-  type StreakEntry,
-  type CompletionCountEntry,
   type PersonalBestEntry,
   type PieceCutType,
+  type VisualModifierFilter,
 } from "@/services/leaderboardService";
 import { prestigeReset } from "@/services/prestigeService";
 import { getMyProfile, updateMyProfile } from "@/services/profileService";
@@ -77,18 +74,39 @@ function formatCompletedAt(iso: string): string {
   });
 }
 
+function getDatesInWeek(weekStart: string): string[] {
+  const start = new Date(`${weekStart}T00:00:00.000Z`);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start);
+    d.setUTCDate(start.getUTCDate() + i);
+    return d.toISOString().slice(0, 10);
+  });
+}
+
+function formatWeekRangeLabel(start: string, end: string): string {
+  const s = new Date(`${start}T00:00:00.000Z`);
+  const e = new Date(`${end}T00:00:00.000Z`);
+  const sText = s.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const eText = e.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return `${sText} - ${eText}`;
+}
+
 const PODIUM = ["🥇", "🥈", "🥉"];
 
 type LeaderboardType =
   | "today"
-  | "challenge"
-  | "bestWeek"
-  | "bestMonth"
   | "week"
-  | "month"
-  | "streaks"
-  | "completions"
   | "alltime";
+type WeekSubview = "rankings" | "album";
+type WeeklyAlbumSlot = {
+  date: string;
+  dayLabel: string;
+  imageUrl: string | null;
+  completed: boolean;
+  mastery: boolean;
+  isToday: boolean;
+  isFuture: boolean;
+};
 
 type StatsTab = "dashboard" | "profile" | "leaderboard" | "achievements";
 
@@ -116,13 +134,17 @@ export function StatsScreen() {
     }
   }, [tabFromUrl]);
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("today");
+  const [weekSubview, setWeekSubview] = useState<WeekSubview>("rankings");
   const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
   const [cutTypeFilter, setCutTypeFilter] = useState<PieceCutType>("all");
+  const [modifierFilter, setModifierFilter] = useState<VisualModifierFilter>("all");
   const [stats, setStats] = useState<{
     puzzlesCompleted: number;
     totalPlayTimeSeconds: number;
     dailyStreak: number;
     bestDailyStreak: number;
+    masteryStreak: number;
+    bestMasteryStreak: number;
     lastPlayedAt: string | null;
     xp?: number;
     level?: number;
@@ -135,16 +157,12 @@ export function StatsScreen() {
   } | null>(null);
   const [displayNameInput, setDisplayNameInput] = useState("");
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [streakLeaderboard, setStreakLeaderboard] = useState<StreakEntry[]>([]);
-  const [completionLeaderboard, setCompletionLeaderboard] = useState<
-    CompletionCountEntry[]
-  >([]);
   const [weeklyTotalsLeaderboard, setWeeklyTotalsLeaderboard] = useState<
-    CompletionCountEntry[]
+    { rank: number; count: number; displayName: string }[]
   >([]);
-  const [monthlyTotalsLeaderboard, setMonthlyTotalsLeaderboard] = useState<
-    CompletionCountEntry[]
-  >([]);
+  const [weeklyAlbumSlots, setWeeklyAlbumSlots] = useState<WeeklyAlbumSlot[]>([]);
+  const [weeklyAlbumProgress, setWeeklyAlbumProgress] = useState(0);
+  const [weekRangeLabel, setWeekRangeLabel] = useState("");
   const [personalBests, setPersonalBests] = useState<PersonalBestEntry[]>([]);
   const [todayCompletionCount, setTodayCompletionCount] = useState<number>(0);
   const [achievements, setAchievements] = useState<
@@ -160,12 +178,42 @@ export function StatsScreen() {
   const [loading, setLoading] = useState(true);
   const [profileSaving, setProfileSaving] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [albumShareCopied, setAlbumShareCopied] = useState(false);
   const [raccoonName, setRaccoonName] = useState<string | null>(null);
   const leaderboardCompact = true;
   const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
 
   const configured = isSupabaseConfigured();
   const isNarrow = useMediaQuery("(max-width: 520px)");
+
+  const loadWeeklyAlbum = useCallback(async () => {
+    if (!configured) return;
+    const today = getTodayDateString();
+    const weekRange = getCalendarWeekRange(today);
+    setWeekRangeLabel(formatWeekRangeLabel(weekRange.start, weekRange.end));
+    const [completionRows, dailyModule] = await Promise.all([
+      getMyWeeklyAlbumCompletions(weekRange.start, weekRange.end),
+      import("@/daily/dailyPuzzle"),
+    ]);
+    const completionMap = new Map(completionRows.map((r) => [r.date, r]));
+    const weekDates = getDatesInWeek(weekRange.start);
+    const slots: WeeklyAlbumSlot[] = weekDates.map((date) => {
+      const puzzle = dailyModule.getDailyPuzzleForDate(date);
+      const flags = completionMap.get(date);
+      const d = new Date(`${date}T00:00:00.000Z`);
+      return {
+        date,
+        dayLabel: d.toLocaleDateString(undefined, { weekday: "short" }),
+        imageUrl: puzzle?.fullImage ?? null,
+        completed: !!flags?.completed,
+        mastery: !!flags?.mastery,
+        isToday: date === today,
+        isFuture: date > today,
+      };
+    });
+    setWeeklyAlbumSlots(slots);
+    setWeeklyAlbumProgress(slots.filter((slot) => slot.completed).length);
+  }, [configured]);
 
   const loadData = useCallback(async () => {
     if (!configured) return;
@@ -179,24 +227,19 @@ export function StatsScreen() {
     setDisplayNameInput(p?.displayName ?? "");
     setAchievements(a ?? []);
     const today = getTodayDateString();
-    const [lb, todayCount, slb, clb, wklb, molb, pb] = await Promise.all([
-      getDailyLeaderboard(today, 10, "all"),
+    const [lb, todayCount, wklb, pb] = await Promise.all([
+      getDailyLeaderboard(today, 10, "all", "all"),
       getTodayCompletionCount(today),
-      getStreakLeaderboard(),
-      getCompletionCountLeaderboard(),
       getWeeklyTotalsLeaderboard(),
-      getMonthlyTotalsLeaderboard(),
       getMyPersonalBests(),
     ]);
     setLeaderboard(lb);
     setTodayCompletionCount(todayCount);
-    setStreakLeaderboard(slb);
-    setCompletionLeaderboard(clb);
     setWeeklyTotalsLeaderboard(wklb);
-    setMonthlyTotalsLeaderboard(molb);
     setPersonalBests(pb);
+    await loadWeeklyAlbum();
     setLoading(false);
-  }, [configured]);
+  }, [configured, loadWeeklyAlbum]);
 
   useEffect(() => {
     if (!configured) {
@@ -214,10 +257,26 @@ export function StatsScreen() {
   }, [configured]);
 
   useEffect(() => {
+    if (!configured || activeTab !== "leaderboard") return;
+    const today = getTodayDateString();
+    const weekStart = getCalendarWeekRange(today).start;
+    const nudgeKey = `phuzzle:weeklyAlbumNudge:${weekStart}`;
+    try {
+      if (localStorage.getItem(nudgeKey) === "true") {
+        setLeaderboardType("week");
+        setWeekSubview("album");
+        localStorage.removeItem(nudgeKey);
+      }
+    } catch {
+      // ignore
+    }
+  }, [configured, activeTab]);
+
+  useEffect(() => {
     if (
       !configured ||
       activeTab !== "leaderboard" ||
-      (leaderboardType !== "today" && leaderboardType !== "challenge")
+      leaderboardType !== "today"
     )
       return;
     const today = getTodayDateString();
@@ -230,35 +289,29 @@ export function StatsScreen() {
     const loadLb = async () => {
       const today = getTodayDateString();
       const cutType = cutTypeFilter === "all" ? "all" : cutTypeFilter;
-      if (leaderboardType === "today" || leaderboardType === "challenge") {
-        const lb = await getDailyLeaderboard(today, 10, cutType);
-        setLeaderboard(lb);
-      } else if (leaderboardType === "bestWeek") {
-        const lb = await getPeriodLeaderboard("week", 10, cutType);
-        setLeaderboard(lb);
-      } else if (leaderboardType === "bestMonth") {
-        const lb = await getPeriodLeaderboard("month", 10, cutType);
+      const visualModifier = modifierFilter;
+      if (leaderboardType === "today") {
+        const lb = await getDailyLeaderboard(today, 10, cutType, visualModifier);
         setLeaderboard(lb);
       } else if (leaderboardType === "week") {
-        const wklb = await getWeeklyTotalsLeaderboard();
+        const [wklb] = await Promise.all([getWeeklyTotalsLeaderboard(), loadWeeklyAlbum()]);
         setWeeklyTotalsLeaderboard(wklb);
-      } else if (leaderboardType === "month") {
-        const molb = await getMonthlyTotalsLeaderboard();
-        setMonthlyTotalsLeaderboard(molb);
-      } else if (leaderboardType === "streaks") {
-        const slb = await getStreakLeaderboard();
-        setStreakLeaderboard(slb);
-      } else if (leaderboardType === "completions") {
-        const clb = await getCompletionCountLeaderboard();
-        setCompletionLeaderboard(clb);
       } else if (leaderboardType === "alltime") {
         const [r, c] = allTimeGrid.split("x").map(Number);
-        const lb = await getAllTimeBestLeaderboard(r, c, 10, cutType);
+        const lb = await getAllTimeBestLeaderboard(r, c, 10, cutType, visualModifier);
         setLeaderboard(lb);
       }
     };
     loadLb();
-  }, [configured, activeTab, leaderboardType, allTimeGrid, cutTypeFilter]);
+  }, [
+    configured,
+    activeTab,
+    leaderboardType,
+    allTimeGrid,
+    cutTypeFilter,
+    modifierFilter,
+    loadWeeklyAlbum,
+  ]);
 
   const handleSaveProfile = async () => {
     if (!configured) return;
@@ -276,11 +329,9 @@ export function StatsScreen() {
     const text =
       leaderboardType === "today"
         ? `Today's Daily Puzzle leaderboard - Phuzzle`
-        : leaderboardType === "streaks"
-          ? "Streak leaderboard - Phuzzle"
-          : leaderboardType === "completions"
-            ? "Puzzle completions leaderboard - Phuzzle"
-            : "Leaderboard - Phuzzle";
+        : leaderboardType === "week"
+          ? "Weekly leaderboard - Phuzzle"
+          : "All-time leaderboard - Phuzzle";
     const url = window.location.origin;
     const shareText = `${text}\n${url}`;
     if (navigator.share) {
@@ -295,6 +346,36 @@ export function StatsScreen() {
         setTimeout(() => setShareCopied(false), 2000);
       });
     }
+  };
+
+  const handleShareWeeklyAlbum = async () => {
+    const marks = weeklyAlbumSlots.map((slot) => (slot.completed ? "🟩" : "⬜")).join("");
+    const masteryMarks = weeklyAlbumSlots
+      .map((slot) => (slot.mastery ? "⚡" : "·"))
+      .join("");
+    const shareText = [
+      "🧩 Phuzzle Weekly Collection Album",
+      `${weeklyAlbumProgress}/7 daily puzzles completed`,
+      marks,
+      `Mastery: ${masteryMarks}`,
+      weeklyAlbumProgress === 7 ? "🏅 Perfect Week Badge unlocked!" : "",
+      window.location.origin,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    if (navigator.share) {
+      await navigator.share({
+        title: "Phuzzle Weekly Album",
+        text: shareText,
+        url: window.location.origin,
+      });
+      return;
+    }
+
+    await navigator.clipboard?.writeText(shareText);
+    setAlbumShareCopied(true);
+    setTimeout(() => setAlbumShareCopied(false), 2000);
   };
 
   if (!configured) {
@@ -398,55 +479,8 @@ export function StatsScreen() {
     </>
   );
 
-  const renderStreakLeaderboard = (entries: StreakEntry[]) => (
-    <>
-      {entries.length === 0 ? (
-        <p className={styles.empty}>No streaks yet. Complete daily puzzles!</p>
-      ) : (
-        <ol
-          className={`${styles.leaderboard} ${
-            leaderboardCompact ? styles.leaderboardCompact : ""
-          }`}
-        >
-          {entries.map((entry) => {
-            const key = `streak-${entry.rank}-${entry.displayName}`;
-            const isExpanded = expandedRowKey === key;
-            return (
-              <li
-                key={key}
-                className={`${styles.leaderboardItem} ${
-                  entry.rank <= 3 ? styles.leaderboardPodium : ""
-                } ${isExpanded ? styles.leaderboardItemExpanded : ""}`}
-                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setExpandedRowKey(isExpanded ? null : key);
-                  }
-                }}
-              >
-                <span className={styles.rank}>
-                  {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-                </span>
-                <span className={styles.player}>{entry.displayName}</span>
-                <span className={styles.time}>{entry.streak} days</span>
-                {isExpanded && (
-                  <div className={styles.leaderboardDetail}>
-                    {entry.streak} day streak
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-      )}
-    </>
-  );
-
   const renderCompletionLeaderboard = (
-    entries: CompletionCountEntry[],
+    entries: { rank: number; count: number; displayName: string }[],
     emptyMsg = "No completions yet. Play puzzles!",
   ) => (
     <>
@@ -530,6 +564,7 @@ export function StatsScreen() {
           >
             <Trophy size={18} aria-hidden />
             <span>{isNarrow ? "Board" : "Leaderboard"}</span>
+            <span className={styles.tabMiniProgress}>{weeklyAlbumProgress}/7</span>
           </button>
           <button
             className={activeTab === "achievements" ? styles.tabActive : ""}
@@ -571,6 +606,16 @@ export function StatsScreen() {
                         {stats?.bestDailyStreak ?? 0}
                       </span>
                       <span className={styles.statLabel}>Best streak</span>
+                    </div>
+                    <div className={styles.statCard}>
+                      <span className={styles.statValue}>{stats?.masteryStreak ?? 0}</span>
+                      <span className={styles.statLabel}>Mastery streak</span>
+                    </div>
+                    <div className={styles.statCard}>
+                      <span className={styles.statValue}>
+                        {stats?.bestMasteryStreak ?? 0}
+                      </span>
+                      <span className={styles.statLabel}>Best mastery streak</span>
                     </div>
                     <div className={styles.statCard}>
                       <span className={styles.statValue}>{getStreakFreezeCount()}</span>
@@ -652,6 +697,10 @@ export function StatsScreen() {
                       🦝 Your raccoon name: <strong>{raccoonName}</strong>
                     </p>
                   )}
+                  <p className={styles.hint}>
+                    🏅 Mastery badge: complete the daily puzzle with no hints and no undo.
+                    Current mastery streak: <strong>{stats?.masteryStreak ?? 0}</strong>.
+                  </p>
                   {stats && (stats.level ?? 1) >= 5 && (
                     <div className={styles.prestigeSection}>
                       <h3>Prestige</h3>
@@ -695,29 +744,36 @@ export function StatsScreen() {
                     />
                   </div>
                   <div className={styles.leaderboardHeader}>
-                    <select
-                      className={styles.leaderboardSelect}
-                      value={leaderboardType}
-                      onChange={(e) =>
-                        setLeaderboardType(e.target.value as LeaderboardType)
-                      }
-                      aria-label="Leaderboard view"
-                    >
-                      <option value="today">Today</option>
-                      <option value="challenge">24h Challenge</option>
-                      <option value="bestWeek">Best time (week)</option>
-                      <option value="bestMonth">Best time (month)</option>
-                      <option value="week">Weekly totals</option>
-                      <option value="month">Monthly totals</option>
-                      <option value="streaks">Streaks</option>
-                      <option value="completions">All-time completions</option>
-                      <option value="alltime">All-time best</option>
-                    </select>
-                    {(leaderboardType === "today" ||
-                      leaderboardType === "challenge" ||
-                      leaderboardType === "bestWeek" ||
-                      leaderboardType === "bestMonth" ||
-                      leaderboardType === "alltime") && (
+                    <div className={styles.boardModeSwitch} role="tablist" aria-label="Board mode">
+                      <button
+                        type="button"
+                        className={`${styles.boardModeBtn} ${
+                          leaderboardType === "today" ? styles.boardModeBtnActive : ""
+                        }`}
+                        onClick={() => setLeaderboardType("today")}
+                      >
+                        Today
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.boardModeBtn} ${
+                          leaderboardType === "week" ? styles.boardModeBtnActive : ""
+                        }`}
+                        onClick={() => setLeaderboardType("week")}
+                      >
+                        Week ({weeklyAlbumProgress}/7)
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.boardModeBtn} ${
+                          leaderboardType === "alltime" ? styles.boardModeBtnActive : ""
+                        }`}
+                        onClick={() => setLeaderboardType("alltime")}
+                      >
+                        All-time
+                      </button>
+                    </div>
+                    {(leaderboardType === "today" || leaderboardType === "alltime") && (
                       <div className={styles.cutTypeFilter}>
                         <label htmlFor="cut-type-select">Shape:</label>
                         <select
@@ -731,6 +787,24 @@ export function StatsScreen() {
                           <option value="classic">Classic</option>
                           <option value="irregular">Irregular</option>
                           <option value="hard">Hard</option>
+                        </select>
+                      </div>
+                    )}
+                    {(leaderboardType === "today" || leaderboardType === "alltime") && (
+                      <div className={styles.cutTypeFilter}>
+                        <label htmlFor="modifier-select">Modifier:</label>
+                        <select
+                          id="modifier-select"
+                          value={modifierFilter}
+                          onChange={(e) =>
+                            setModifierFilter(e.target.value as VisualModifierFilter)
+                          }
+                        >
+                          <option value="all">All</option>
+                          <option value="none">None</option>
+                          <option value="fog">Fog</option>
+                          <option value="night">Night</option>
+                          <option value="sepia">Sepia</option>
                         </select>
                       </div>
                     )}
@@ -753,66 +827,115 @@ export function StatsScreen() {
                         </select>
                       </div>
                     )}
+                    {leaderboardType === "week" && (
+                      <div className={styles.weekSubviewSwitch}>
+                        <button
+                          type="button"
+                          className={`${styles.weekSubviewBtn} ${
+                            weekSubview === "rankings" ? styles.weekSubviewBtnActive : ""
+                          }`}
+                          onClick={() => setWeekSubview("rankings")}
+                        >
+                          Rankings
+                        </button>
+                        <button
+                          type="button"
+                          className={`${styles.weekSubviewBtn} ${
+                            weekSubview === "album" ? styles.weekSubviewBtnActive : ""
+                          }`}
+                          onClick={() => setWeekSubview("album")}
+                        >
+                          Album
+                        </button>
+                      </div>
+                    )}
                     <Button
                       size="sm"
                       variant="secondary"
-                      onClick={handleShareLeaderboard}
+                      onClick={
+                        leaderboardType === "week" && weekSubview === "album"
+                          ? handleShareWeeklyAlbum
+                          : handleShareLeaderboard
+                      }
                       className={styles.shareBtn}
                     >
                       <Share2 size={16} />
-                      {shareCopied ? "Copied!" : "Share"}
+                      {leaderboardType === "week" && weekSubview === "album"
+                        ? albumShareCopied
+                          ? "Copied!"
+                          : "Share Card"
+                        : shareCopied
+                          ? "Copied!"
+                          : "Share"}
                     </Button>
                   </div>
                   <h2>
                     {leaderboardType === "today" && "Today's daily puzzle"}
-                    {leaderboardType === "challenge" && "24-hour speed challenge"}
-                    {leaderboardType === "bestWeek" && "Best time this week (daily)"}
-                    {leaderboardType === "bestMonth" && "Best time this month (daily)"}
-                    {leaderboardType === "week" && "Weekly totals"}
-                    {leaderboardType === "month" && "Monthly totals"}
-                    {leaderboardType === "streaks" && "Longest streaks"}
-                    {leaderboardType === "completions" && "All-time completions"}
+                    {leaderboardType === "week" &&
+                      (weekSubview === "rankings"
+                        ? `Weekly rankings (${weekRangeLabel})`
+                        : `Weekly album (${weekRangeLabel})`)}
                     {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
                   </h2>
-                  {(leaderboardType === "today" || leaderboardType === "challenge") && (
+                  {leaderboardType === "today" && (
                     <p className={styles.todayCompletionCount} aria-live="polite">
                       {todayCompletionCount} player{todayCompletionCount !== 1 ? "s" : ""}{" "}
                       completed today
                     </p>
                   )}
-                  {(leaderboardType === "today" || leaderboardType === "challenge") &&
-                    renderTimeLeaderboard(
-                      leaderboard,
-                      "No completions yet. Be the first!",
-                      leaderboardType === "challenge",
-                    )}
-                  {leaderboardType === "bestWeek" &&
-                    renderTimeLeaderboard(
-                      leaderboard,
-                      "No daily completions this week yet.",
-                    )}
-                  {leaderboardType === "bestMonth" &&
-                    renderTimeLeaderboard(
-                      leaderboard,
-                      "No daily completions this month yet.",
-                    )}
+                  {leaderboardType === "today" &&
+                    renderTimeLeaderboard(leaderboard, "No completions yet. Be the first!")}
                   {leaderboardType === "week" &&
+                    weekSubview === "rankings" &&
                     renderCompletionLeaderboard(
                       weeklyTotalsLeaderboard,
                       "No completions in the last 7 days.",
                     )}
-                  {leaderboardType === "month" &&
-                    renderCompletionLeaderboard(
-                      monthlyTotalsLeaderboard,
-                      "No completions in the last 30 days.",
-                    )}
-                  {leaderboardType === "streaks" &&
-                    renderStreakLeaderboard(streakLeaderboard)}
-                  {leaderboardType === "completions" &&
-                    renderCompletionLeaderboard(
-                      completionLeaderboard,
-                      "No completions yet. Play puzzles!",
-                    )}
+                  {leaderboardType === "week" && weekSubview === "album" && (
+                    <div className={styles.weekAlbumWrap}>
+                      <p className={styles.todayCompletionCount}>
+                        Weekly collection: {weeklyAlbumProgress}/7 completed
+                      </p>
+                      <div className={styles.weekAlbumGrid}>
+                        {weeklyAlbumSlots.map((slot) => (
+                          <div
+                            key={slot.date}
+                            className={`${styles.weekAlbumSlot} ${
+                              slot.completed ? styles.weekAlbumSlotDone : ""
+                            } ${slot.isToday ? styles.weekAlbumSlotToday : ""}`}
+                          >
+                            <div className={styles.weekAlbumTop}>
+                              <span>{slot.dayLabel}</span>
+                              {slot.completed && slot.mastery && <span title="Mastery">⚡</span>}
+                            </div>
+                            {slot.completed && slot.imageUrl ? (
+                              <img
+                                src={slot.imageUrl}
+                                alt={`Daily puzzle for ${slot.dayLabel}`}
+                                className={styles.weekAlbumImage}
+                              />
+                            ) : (
+                              <div className={styles.weekAlbumHidden}>
+                                {slot.isFuture ? "Locked" : "?"}
+                              </div>
+                            )}
+                            <div className={styles.weekAlbumFooter}>
+                              {slot.completed
+                                ? "Collected"
+                                : slot.isFuture
+                                  ? "Upcoming"
+                                  : "Missing"}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {weeklyAlbumProgress === 7 && (
+                        <div className={styles.weekBonusBadge}>
+                          🏅 Full week complete! Bonus badge unlocked.
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {leaderboardType === "alltime" &&
                     renderTimeLeaderboard(
                       leaderboard,

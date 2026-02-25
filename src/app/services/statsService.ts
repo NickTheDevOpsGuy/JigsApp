@@ -10,6 +10,8 @@ export type PlayerStatsData = {
   totalPlayTimeSeconds: number;
   dailyStreak: number;
   bestDailyStreak: number;
+  masteryStreak: number;
+  bestMasteryStreak: number;
   lastPlayedAt: string | null;
   xp?: number;
   level?: number;
@@ -60,6 +62,7 @@ async function maybeAwardChallengeWin(
 }
 
 export type PieceCutType = "classic" | "irregular" | "hard";
+export type VisualModifier = "none" | "fog" | "night" | "sepia";
 
 /** Record a puzzle completion and update stats. */
 export async function recordCompletion(args: {
@@ -67,7 +70,10 @@ export async function recordCompletion(args: {
   grid: { rows: number; cols: number };
   isDaily: boolean;
   dailyStreak: number;
+  usedUndo: boolean;
+  usedHint: boolean;
   cutType?: PieceCutType;
+  visualModifier?: VisualModifier;
 }): Promise<PlayerStatsData | null> {
   if (!isSupabaseConfigured()) return null;
 
@@ -75,7 +81,12 @@ export async function recordCompletion(args: {
   if (!userId) return null;
 
   const today = getTodayDateString();
+  const yesterday = new Date(`${today}T00:00:00.000Z`);
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
   const cutType = args.cutType ?? "classic";
+  const visualModifier = args.visualModifier ?? "none";
+  const isMasteryCompletion = args.isDaily && !args.usedUndo && !args.usedHint;
 
   await supabase!.from("completions").insert({
     user_id: userId,
@@ -84,7 +95,9 @@ export async function recordCompletion(args: {
     grid_rows: args.grid.rows,
     grid_cols: args.grid.cols,
     is_daily: args.isDaily,
+    is_mastery: isMasteryCompletion,
     cut_type: cutType,
+    visual_modifier: visualModifier,
   });
 
   const { data: existing } = await supabase!
@@ -95,6 +108,45 @@ export async function recordCompletion(args: {
 
   const newStreak = args.isDaily ? args.dailyStreak : 0;
   const prevBest = existing?.best_daily_streak ?? 0;
+  const prevMasteryStreak = existing?.mastery_streak ?? 0;
+  const prevBestMasteryStreak = existing?.best_mastery_streak ?? 0;
+  const prevMasteryLastDate = existing?.mastery_last_date ?? null;
+
+  let todayHasMastery = false;
+  if (args.isDaily) {
+    const { data: masteryToday } = await supabase!
+      .from("completions")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("puzzle_date", today)
+      .eq("is_daily", true)
+      .eq("is_mastery", true)
+      .limit(1);
+    todayHasMastery = (masteryToday?.length ?? 0) > 0;
+  }
+
+  let newMasteryStreak = prevMasteryStreak;
+  let newBestMasteryStreak = prevBestMasteryStreak;
+  let newMasteryLastDate = prevMasteryLastDate;
+
+  if (args.isDaily) {
+    if (todayHasMastery) {
+      if (prevMasteryLastDate === today) {
+        // already counted this date
+        newMasteryStreak = prevMasteryStreak;
+      } else if (prevMasteryLastDate === yesterdayStr) {
+        newMasteryStreak = prevMasteryStreak + 1;
+      } else {
+        newMasteryStreak = 1;
+      }
+      newMasteryLastDate = today;
+      newBestMasteryStreak = Math.max(prevBestMasteryStreak, newMasteryStreak);
+    } else {
+      // Daily solved, but not a mastery solve today → break mastery streak.
+      newMasteryStreak = 0;
+      newBestMasteryStreak = prevBestMasteryStreak;
+    }
+  }
 
   const XP_PER_PIECE = 10;
   const XP_COMPLETION_BONUS = 5;
@@ -110,6 +162,9 @@ export async function recordCompletion(args: {
       (existing?.total_play_time_seconds ?? 0) + args.elapsedSeconds,
     daily_streak: newStreak,
     best_daily_streak: Math.max(prevBest, newStreak),
+    mastery_streak: newMasteryStreak,
+    best_mastery_streak: newBestMasteryStreak,
+    mastery_last_date: newMasteryLastDate,
     last_played_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     xp: newXp,
@@ -138,6 +193,8 @@ export async function recordCompletion(args: {
     totalPlayTimeSeconds: updates.total_play_time_seconds,
     dailyStreak: updates.daily_streak,
     bestDailyStreak: updates.best_daily_streak,
+    masteryStreak: updates.mastery_streak,
+    bestMasteryStreak: updates.best_mastery_streak,
     lastPlayedAt: updates.last_played_at,
   };
 }
@@ -161,12 +218,16 @@ export async function getMyStats(): Promise<PlayerStatsData | null> {
     level?: number;
     prestige_count?: number;
     challenge_wins?: number;
+    mastery_streak?: number;
+    best_mastery_streak?: number;
   };
   return {
     puzzlesCompleted: data.puzzles_completed,
     totalPlayTimeSeconds: data.total_play_time_seconds,
     dailyStreak: data.daily_streak,
     bestDailyStreak: data.best_daily_streak,
+    masteryStreak: row.mastery_streak ?? 0,
+    bestMasteryStreak: row.best_mastery_streak ?? 0,
     lastPlayedAt: data.last_played_at,
     xp: row.xp ?? 0,
     level: row.level ?? 1,

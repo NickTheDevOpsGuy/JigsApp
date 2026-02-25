@@ -7,11 +7,12 @@
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import type { SamplePuzzle } from "@/data/samplePuzzles";
 
-import { getTodayDateString, DAILY_DATE_KEY } from "./dailyPuzzleCore";
+import { getTodayDateString, DAILY_DATE_KEY, DAILY_MODIFIER_KEY } from "./dailyPuzzleCore";
 
 export {
   GRID_OPTIONS,
   DAILY_DATE_KEY,
+  DAILY_MODIFIER_KEY,
   getTodayDateString,
   getYesterdayDateString,
   getDailyPreferredDifficultyIndex,
@@ -29,6 +30,8 @@ export {
   dismissFreezeOfferToday,
   initStreakFreeze,
   refreshStreakFreeze,
+  getDailyVisualModifier,
+  type DailyVisualModifier,
 } from "./dailyPuzzleCore";
 
 function mulberry32(seed: number): () => number {
@@ -67,7 +70,10 @@ export function getTodayDailyPuzzle(): SamplePuzzle | null {
 }
 
 /** Start the daily puzzle with user-chosen grid size */
-export function startDailyPuzzle(grid: { rows: number; cols: number }): {
+export function startDailyPuzzle(
+  grid: { rows: number; cols: number },
+  modifier: "none" | "fog" | "night" | "sepia" = "none",
+): {
   imageUrl: string;
   grid: { rows: number; cols: number };
 } | null {
@@ -80,6 +86,7 @@ export function startDailyPuzzle(grid: { rows: number; cols: number }): {
     localStorage.setItem("phuzzle:imageDataUrl", puzzle.fullImage);
     localStorage.setItem("phuzzle:gridSize", `${grid.rows}x${grid.cols}`);
     localStorage.setItem(DAILY_DATE_KEY, dateStr);
+    localStorage.setItem(DAILY_MODIFIER_KEY, modifier);
   } catch (e) {
     console.warn("Failed to set daily puzzle:", e);
   }

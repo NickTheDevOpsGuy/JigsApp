@@ -46,6 +46,13 @@ const DIFFICULTY_COLORS = [
 
 const PRIMARY_COUNT = 3; // Easy, Medium, Hard
 const RECOMMENDED_INDEX = 1; // Medium
+const MODIFIER_OPTIONS = [
+  { value: "none", label: "None" },
+  { value: "fog", label: "Fog" },
+  { value: "night", label: "Night" },
+  { value: "sepia", label: "Sepia" },
+] as const;
+type VisualModifier = (typeof MODIFIER_OPTIONS)[number]["value"];
 
 type Props = {
   isOpen: boolean;
@@ -64,6 +71,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const [rememberChoice, setRememberChoice] = useState(!!preferredIdx);
   const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(preferredIdx ?? RECOMMENDED_INDEX);
+  const [modifier, setModifier] = useState<VisualModifier>("none");
 
   const showFreezeOffer =
     wasYesterdayMissed() &&
@@ -114,7 +122,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     const result = dailyModule.startDailyPuzzle({
       rows: grid.rows,
       cols: grid.cols,
-    });
+    }, modifier);
     if (result) {
       if (rememberChoice) {
         setDailyPreferredDifficultyIndex(selectedIndex);
@@ -219,6 +227,25 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
             })}
           </div>
         )}
+      </div>
+
+      <div className={styles.modifierSection}>
+        <p className={styles.modifierLabel}>Optional Modifier</p>
+        <p className={styles.modifierHint}>This affects the run and leaderboard bracket.</p>
+        <div className={styles.modifierList}>
+          {MODIFIER_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`${styles.modifierBtn} ${
+                modifier === opt.value ? styles.modifierBtnSelected : ""
+              }`}
+              onClick={() => setModifier(opt.value)}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <label className={styles.rememberLabel}>

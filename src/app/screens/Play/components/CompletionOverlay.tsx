@@ -2,7 +2,7 @@
  * CompletionOverlay – puzzle complete: message, image, New Puzzle, Share. X or Esc to close.
  */
 import React, { useEffect, useCallback, useState } from "react";
-import { X, Plus, Share2, Copy, Check, Download, Menu } from "lucide-react";
+import { X, Plus, Share2, Copy, Check, Download, Menu, Image } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
@@ -12,14 +12,17 @@ import {
   recordDailyCompletion,
   DAILY_DATE_KEY,
   getCurrentStreak,
+  getTodayDateString,
 } from "@/daily/dailyPuzzleCore";
 import { recordCompletion } from "@/services/statsService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
 import { getPercentileRank } from "@/services/leaderboardService";
 import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
 import type { Piece } from "@/puzzle/types";
+import { useShareCardImage } from "../hooks/useShareCardImage";
 
 type PieceCutType = "classic" | "irregular" | "hard";
+type VisualModifier = "none" | "fog" | "night" | "sepia";
 
 interface CompletionOverlayProps {
   elapsedSeconds: number;
@@ -27,6 +30,10 @@ interface CompletionOverlayProps {
   imageUrl?: string;
   pieces?: Piece[];
   undoCount?: number;
+  moveCount?: number;
+  accuracyPercent?: number;
+  usedHint?: boolean;
+  visualModifier?: VisualModifier;
   isNewBest?: boolean;
   isDaily?: boolean;
   cutType?: PieceCutType;
@@ -46,6 +53,10 @@ export function CompletionOverlay({
   imageUrl,
   pieces = [],
   undoCount = 0,
+  moveCount = 0,
+  accuracyPercent = 100,
+  usedHint = false,
+  visualModifier = "none",
   isNewBest = false,
   isDaily = false,
   cutType = "classic",
@@ -74,14 +85,18 @@ export function CompletionOverlay({
   }, [handleClose]);
 
   const [streak, setStreak] = useState<number>(0);
+  const [masteryStreak, setMasteryStreak] = useState<number>(0);
   const [percentile, setPercentile] = useState<{
     topPercent: number;
     totalPlayers: number;
   } | null>(null);
+  const [useSeasonalFrame, setUseSeasonalFrame] = useState(true);
+  const { shareCard, isGenerating } = useShareCardImage();
   const isDesktop = useMediaQuery("(min-width: 601px)");
   const completionMessage = getCompletionMessage(elapsedSeconds);
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const badge = getCompletionBadge(elapsedSeconds, undoCount, pieceCount);
+  const isMasteryDaily = isDaily && !usedHint && undoCount === 0;
 
   useEffect(() => {
     if (isNewBest && grid) {
@@ -94,6 +109,16 @@ export function CompletionOverlay({
       const newStreak = recordDailyCompletion(elapsedSeconds);
       setStreak(newStreak);
       try {
+        const today = new Date(`${getTodayDateString()}T00:00:00.000Z`);
+        const day = today.getUTCDay();
+        const diffToMonday = day === 0 ? 6 : day - 1;
+        today.setUTCDate(today.getUTCDate() - diffToMonday);
+        const weekKey = today.toISOString().slice(0, 10);
+        localStorage.setItem(`phuzzle:weeklyAlbumNudge:${weekKey}`, "true");
+      } catch {
+        // ignore
+      }
+      try {
         localStorage.removeItem(DAILY_DATE_KEY);
       } catch {
         // ignore
@@ -103,8 +128,8 @@ export function CompletionOverlay({
 
   useEffect(() => {
     if (!grid) return;
-    getPercentileRank(grid.rows, grid.cols, elapsedSeconds).then(setPercentile);
-  }, [grid?.rows, grid?.cols, elapsedSeconds]);
+    getPercentileRank(grid.rows, grid.cols, elapsedSeconds, visualModifier).then(setPercentile);
+  }, [grid?.rows, grid?.cols, elapsedSeconds, visualModifier]);
 
   useEffect(() => {
     if (!grid) return;
@@ -115,9 +140,13 @@ export function CompletionOverlay({
         grid,
         isDaily: !!isDaily,
         dailyStreak,
+        usedUndo: undoCount > 0,
+        usedHint,
         cutType,
+        visualModifier,
       });
       if (stats) {
+        setMasteryStreak(stats.masteryStreak ?? 0);
         await checkAndUnlockAchievements({
           puzzlesCompleted: stats.puzzlesCompleted,
           dailyStreak: stats.dailyStreak,
@@ -127,10 +156,28 @@ export function CompletionOverlay({
       }
     };
     run();
-  }, [elapsedSeconds, grid, isDaily, cutType]);
+  }, [elapsedSeconds, grid, isDaily, cutType, undoCount, usedHint, visualModifier]);
 
   const puzzleSizeText =
     grid != null ? `${grid.rows}×${grid.cols} · ${grid.rows * grid.cols} pieces` : null;
+  const handleShareCard = useCallback(async () => {
+    await shareCard({
+      imageUrl,
+      elapsedSeconds,
+      moveCount,
+      accuracyPercent,
+      percentile,
+      useSeasonalFrame,
+    });
+  }, [
+    shareCard,
+    imageUrl,
+    elapsedSeconds,
+    moveCount,
+    accuracyPercent,
+    percentile,
+    useSeasonalFrame,
+  ]);
 
   return (
     <div className={styles.completeOverlay}>
@@ -165,6 +212,14 @@ export function CompletionOverlay({
             </span>
           )}
         </p>
+        {isMasteryDaily && (
+          <p className={styles.dailyBadge}>
+            🏅 Mastery clear — no hints, no undo!
+            {masteryStreak > 0 && (
+              <span className={styles.streak}> {masteryStreak} day mastery streak ⚡</span>
+            )}
+          </p>
+        )}
         {imageUrl && (
           <div className={styles.completePreviewWrapper}>
             <img
@@ -192,6 +247,18 @@ export function CompletionOverlay({
                 {copied ? "Copied!" : "Share Result"}
               </Button>
             )}
+            <Button variant="secondary" onClick={handleShareCard} disabled={isGenerating}>
+              <Image size={18} />
+              {isGenerating ? "Generating..." : "Share Card PNG"}
+            </Button>
+            <label className={styles.shareCardToggle}>
+              <input
+                type="checkbox"
+                checked={useSeasonalFrame}
+                onChange={(e) => setUseSeasonalFrame(e.target.checked)}
+              />
+              Seasonal frame
+            </label>
           </div>
           {isDesktop && (
             <div className={styles.completeActionsSecondary}>

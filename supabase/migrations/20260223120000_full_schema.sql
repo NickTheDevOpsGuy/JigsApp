@@ -28,6 +28,9 @@ BEGIN
     ALTER TABLE player_stats ADD COLUMN IF NOT EXISTS level INTEGER NOT NULL DEFAULT 1;
     ALTER TABLE player_stats ADD COLUMN IF NOT EXISTS prestige_count INTEGER NOT NULL DEFAULT 0;
     ALTER TABLE player_stats ADD COLUMN IF NOT EXISTS challenge_wins INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE player_stats ADD COLUMN IF NOT EXISTS mastery_streak INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE player_stats ADD COLUMN IF NOT EXISTS best_mastery_streak INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE player_stats ADD COLUMN IF NOT EXISTS mastery_last_date DATE;
   END IF;
 END $$;
 
@@ -50,6 +53,8 @@ DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'completions') THEN
     ALTER TABLE completions ADD COLUMN IF NOT EXISTS cut_type TEXT NOT NULL DEFAULT 'classic';
+    ALTER TABLE completions ADD COLUMN IF NOT EXISTS is_mastery BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE completions ADD COLUMN IF NOT EXISTS visual_modifier TEXT NOT NULL DEFAULT 'none';
   END IF;
 END $$;
 
@@ -60,6 +65,12 @@ DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'completions' AND column_name = 'cut_type') THEN
     CREATE INDEX IF NOT EXISTS idx_completions_cut_type ON completions(cut_type);
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'completions' AND column_name = 'is_mastery') THEN
+    CREATE INDEX IF NOT EXISTS idx_completions_is_mastery ON completions(is_mastery);
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'completions' AND column_name = 'visual_modifier') THEN
+    CREATE INDEX IF NOT EXISTS idx_completions_visual_modifier ON completions(visual_modifier);
   END IF;
 END $$;
 

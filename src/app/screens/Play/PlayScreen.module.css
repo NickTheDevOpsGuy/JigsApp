@@ -494,6 +494,32 @@
   overflow: hidden;
 }
 
+.modifierFog .board,
+.modifierFog .previewPanel,
+.modifierFog .trayWrap {
+  filter: contrast(calc(1 - var(--fog-strength, 0))) brightness(calc(1 - var(--fog-strength, 0) * 0.45));
+}
+
+.modifierNight .board,
+.modifierNight .previewPanel,
+.modifierNight .trayWrap {
+  filter: brightness(0.72) saturate(0.82);
+}
+
+.modifierNight .board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+.modifierSepia .board,
+.modifierSepia .previewPanel,
+.modifierSepia .trayWrap {
+  filter: sepia(0.78) saturate(0.75) contrast(1.05);
+}
+
 .canvas {
   width: 100%;
   height: 100%;
@@ -1355,6 +1381,20 @@
   display: flex;
   gap: 8px;
   justify-content: center;
+}
+
+.shareCardToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  user-select: none;
+}
+
+.shareCardToggle input {
+  width: 14px;
+  height: 14px;
 }
 
 /* Help choice modal */

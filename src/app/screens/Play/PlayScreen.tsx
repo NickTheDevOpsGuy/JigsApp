@@ -26,7 +26,7 @@ import { ThemeModal } from "@/components/ThemeModal";
 import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
 import { getBestTime, BEST_TIME_PREFIX, getQuadrantPb, setQuadrantPb } from "./timeMode";
-import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
+import { isDailyPuzzleSession, getDailyVisualModifier } from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
@@ -193,6 +193,8 @@ export function PlayScreen() {
   const dragStartTimeRef = React.useRef<number | null>(null);
   const stateRef = React.useRef<PuzzleState | null>(null);
   const undoCountRef = React.useRef(0);
+  const moveCountRef = React.useRef(0);
+  const usedHintRef = React.useRef(false);
   const abandonCapturedRef = React.useRef(false);
   const elapsedSecondsRef = React.useRef(0);
   const [quadrantTimes, setQuadrantTimes] = React.useState<
@@ -272,10 +274,19 @@ export function PlayScreen() {
 
   useEffect(() => {
     undoCountRef.current = 0;
+    moveCountRef.current = 0;
     abandonCapturedRef.current = false;
+    usedHintRef.current = showGhostHint || showGhostWhenIdle;
     setQuadrantTimes({ 0: null, 1: null, 2: null, 3: null });
     setCompletionDismissed(false);
-  }, [puzzleKey]);
+  }, [puzzleKey, showGhostHint, showGhostWhenIdle]);
+
+  useEffect(() => {
+    if (state?.isComplete) return;
+    if (showGhostHint || showGhostWhenIdle) {
+      usedHintRef.current = true;
+    }
+  }, [showGhostHint, showGhostWhenIdle, state?.isComplete]);
 
   useEffect(() => {
     if (!isHost && sessionIdFromUrl && session && !sessionLoading) {
@@ -699,6 +710,7 @@ export function PlayScreen() {
       lastInteractionRef.current = performance.now();
     },
     onDragStarted: () => {
+      moveCountRef.current += 1;
       const now = performance.now();
       dragStartTimeRef.current = now;
       const g = stateRef.current?.grid;
@@ -742,6 +754,7 @@ export function PlayScreen() {
     (pieceId: string) => {
       if (!manager) return;
       lastInteractionRef.current = performance.now();
+      moveCountRef.current += 1;
       manager.movePieceFromTray(pieceId);
       setState(manager.getState());
       selectedIdRef.current = pieceId;
@@ -857,6 +870,9 @@ export function PlayScreen() {
   const total = state?.totalCount ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
+  const dailyVisualModifier = isDailyPuzzleSession() ? getDailyVisualModifier() : "none";
+  const fogStrength =
+    dailyVisualModifier === "fog" && total > 0 ? (1 - placed / total) * 0.45 : 0;
   const showImmersiveUi = !immersiveMode || immersiveReveal;
   const scheduleImmersiveHide = React.useCallback(() => {
     if (immersiveHideTimerRef.current) clearTimeout(immersiveHideTimerRef.current);
@@ -932,7 +948,23 @@ export function PlayScreen() {
   }
 
   return (
-    <div className={styles.page} ref={pageRef}>
+    <div
+      className={`${styles.page} ${
+        dailyVisualModifier === "fog"
+          ? styles.modifierFog
+          : dailyVisualModifier === "night"
+            ? styles.modifierNight
+            : dailyVisualModifier === "sepia"
+              ? styles.modifierSepia
+              : ""
+      }`}
+      style={
+        dailyVisualModifier === "fog"
+          ? { ["--fog-strength" as string]: String(Math.max(0, Math.min(0.45, fogStrength))) }
+          : undefined
+      }
+      ref={pageRef}
+    >
       {immersiveMode && (
         <div
           className={styles.immersivePeekTop}
@@ -1279,6 +1311,18 @@ export function PlayScreen() {
                       undefined
                     }
                     undoCount={undoCountRef.current}
+                    moveCount={moveCountRef.current}
+                    accuracyPercent={
+                      state?.totalCount && state.totalCount > 0
+                        ? Math.round(
+                            (state.totalCount /
+                              Math.max(moveCountRef.current, state.totalCount)) *
+                              100,
+                          )
+                        : 100
+                    }
+                    usedHint={usedHintRef.current}
+                    visualModifier={dailyVisualModifier}
                     isNewBest={
                       timeMode === "best" &&
                       state?.grid != null &&

@@ -33,6 +33,29 @@ export type PersonalBestEntry = {
   isDaily: boolean;
 };
 
+export type WeeklyAlbumCompletion = {
+  date: string;
+  completed: boolean;
+  mastery: boolean;
+};
+
+export type VisualModifierFilter = "all" | "none" | "fog" | "night" | "sepia";
+
+/** Calendar week range (Mon-Sun) for a reference date string (YYYY-MM-DD). */
+export function getCalendarWeekRange(referenceDate: string): { start: string; end: string } {
+  const ref = new Date(`${referenceDate}T00:00:00.000Z`);
+  const day = ref.getUTCDay(); // Sun=0..Sat=6
+  const diffToMonday = day === 0 ? 6 : day - 1;
+  const monday = new Date(ref);
+  monday.setUTCDate(ref.getUTCDate() - diffToMonday);
+  const sunday = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  return {
+    start: monday.toISOString().slice(0, 10),
+    end: sunday.toISOString().slice(0, 10),
+  };
+}
+
 /** Resolve display names from user IDs. Anonymous mode (show_on_leaderboard = false) → fun raccoon name. */
 async function resolveDisplayNames(
   userIds: string[],
@@ -85,6 +108,42 @@ export async function getTodayCompletionCount(dateStr: string): Promise<number> 
   return count ?? 0;
 }
 
+/** Fetch current user's completion flags for each daily date in a range. */
+export async function getMyWeeklyAlbumCompletions(
+  startDate: string,
+  endDate: string,
+): Promise<WeeklyAlbumCompletion[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  const userId = await getUserId();
+  if (!userId) return [];
+
+  const { data, error } = await supabase!
+    .from("completions")
+    .select("puzzle_date, is_mastery")
+    .eq("user_id", userId)
+    .eq("is_daily", true)
+    .gte("puzzle_date", startDate)
+    .lte("puzzle_date", endDate)
+    .order("puzzle_date", { ascending: true });
+
+  if (error || !data) return [];
+
+  const byDate = new Map<string, { completed: boolean; mastery: boolean }>();
+  for (const row of data) {
+    const cur = byDate.get(row.puzzle_date) ?? { completed: false, mastery: false };
+    cur.completed = true;
+    cur.mastery = cur.mastery || row.is_mastery === true;
+    byDate.set(row.puzzle_date, cur);
+  }
+
+  return [...byDate.entries()].map(([date, flags]) => ({
+    date,
+    completed: flags.completed,
+    mastery: flags.mastery,
+  }));
+}
+
 /** Subscribe to realtime updates of today's completion count. Requires completions in Supabase Realtime publication. */
 export function subscribeTodayCompletionCount(
   dateStr: string,
@@ -127,15 +186,17 @@ export async function getPercentileRank(
   rows: number,
   cols: number,
   elapsedSeconds: number,
+  visualModifier: Exclude<VisualModifierFilter, "all"> = "none",
 ): Promise<{ topPercent: number; totalPlayers: number } | null> {
   if (!isSupabaseConfigured()) return null;
 
-  const { data, error } = await supabase!
+  let query = supabase!
     .from("completions")
     .select("user_id, elapsed_seconds")
     .eq("grid_rows", rows)
-    .eq("grid_cols", cols)
-    .order("elapsed_seconds", { ascending: true });
+    .eq("grid_cols", cols);
+  query = query.eq("visual_modifier", visualModifier);
+  const { data, error } = await query.order("elapsed_seconds", { ascending: true });
 
   if (error || !data || data.length === 0) return null;
 
@@ -166,6 +227,7 @@ export async function getDailyLeaderboard(
   dateStr: string,
   limit = 10,
   cutType: PieceCutType = "all",
+  visualModifier: VisualModifierFilter = "all",
 ): Promise<LeaderboardEntry[]> {
   if (!isSupabaseConfigured()) return [];
 
@@ -176,6 +238,9 @@ export async function getDailyLeaderboard(
     .eq("is_daily", true);
   if (cutType !== "all") {
     query = query.eq("cut_type", cutType);
+  }
+  if (visualModifier !== "all") {
+    query = query.eq("visual_modifier", visualModifier);
   }
   const { data, error } = await query
     .order("elapsed_seconds", { ascending: true })
@@ -218,6 +283,29 @@ export async function getStreakLeaderboard(limit = 10): Promise<StreakEntry[]> {
   }));
 }
 
+/** Fetch mastery streak leaderboard (best no-hint/no-undo daily streaks). */
+export async function getMasteryStreakLeaderboard(limit = 10): Promise<StreakEntry[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  const { data, error } = await supabase!
+    .from("player_stats")
+    .select("user_id, best_mastery_streak")
+    .gt("best_mastery_streak", 0)
+    .order("best_mastery_streak", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+
+  const userIds = (data ?? []).map((r) => r.user_id);
+  const names = await resolveDisplayNames(userIds, new Set());
+
+  return (data ?? []).map((row, i) => ({
+    rank: i + 1,
+    streak: row.best_mastery_streak,
+    displayName: names.get(row.user_id) ?? `Player ${row.user_id.slice(0, 8)}`,
+  }));
+}
+
 /** Fetch completion count leaderboard. */
 export async function getCompletionCountLeaderboard(
   limit = 10,
@@ -249,6 +337,7 @@ export async function getAllTimeBestLeaderboard(
   cols: number,
   limit = 10,
   cutType: PieceCutType = "all",
+  visualModifier: VisualModifierFilter = "all",
 ): Promise<LeaderboardEntry[]> {
   if (!isSupabaseConfigured()) return [];
 
@@ -259,6 +348,9 @@ export async function getAllTimeBestLeaderboard(
     .eq("grid_cols", cols);
   if (cutType !== "all") {
     query = query.eq("cut_type", cutType);
+  }
+  if (visualModifier !== "all") {
+    query = query.eq("visual_modifier", visualModifier);
   }
   const { data, error } = await query.order("elapsed_seconds", { ascending: true });
 

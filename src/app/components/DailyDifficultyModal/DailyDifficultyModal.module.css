@@ -248,6 +248,48 @@
   cursor: pointer;
 }
 
+.modifierSection {
+  margin: 6px 0 16px;
+}
+
+.modifierLabel {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.modifierHint {
+  margin: 4px 0 10px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.modifierList {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.modifierBtn {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border-radius: 10px;
+  min-height: 40px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modifierBtnSelected {
+  border-color: var(--color-brand-primary);
+  background: color-mix(in srgb, var(--color-brand-light) 55%, var(--color-bg-elevated));
+  box-shadow: 0 0 0 1px var(--color-brand-primary);
+}
+
 .rememberCheckbox {
   width: 18px;
   height: 18px;
@@ -293,6 +335,10 @@
 
   .difficultyRow {
     grid-template-columns: 1fr;
+  }
+
+  .modifierList {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
