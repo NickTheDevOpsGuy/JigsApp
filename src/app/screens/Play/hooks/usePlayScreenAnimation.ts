@@ -161,17 +161,15 @@ export function usePlayScreenAnimation(args: {
         }
       }
 
+      // DPR pattern: CSS size from container; backing store = cssSize × dpr; draw in CSS space
       const rect = boardEl.getBoundingClientRect();
       const cssW = Math.max(1, Math.floor(rect.width));
       const cssH = Math.max(1, Math.floor(rect.height));
       const dpr = window.devicePixelRatio || 1;
 
-      if (
-        canvas.width !== Math.floor(cssW * dpr) ||
-        canvas.height !== Math.floor(cssH * dpr)
-      ) {
-        const targetW = Math.floor(cssW * dpr);
-        const targetH = Math.floor(cssH * dpr);
+      const targetW = Math.floor(cssW * dpr);
+      const targetH = Math.floor(cssH * dpr);
+      if (canvas.width !== targetW || canvas.height !== targetH) {
         canvas.width = targetW;
         canvas.height = targetH;
         canvas.style.width = `${cssW}px`;
@@ -185,6 +183,7 @@ export function usePlayScreenAnimation(args: {
       }
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = batterySaverMode ? "low" : "high";
+      // Scale context so all drawing uses CSS-space coords (piece math uses cssSize, not canvas.width)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const assembledW = st.grid.cols * firstPiece.tileW;
       const assembledH = st.grid.rows * firstPiece.tileH;

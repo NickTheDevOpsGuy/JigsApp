@@ -1,8 +1,9 @@
 /**
- * CompletionOverlay – puzzle complete: time, share buttons, heatmap, new puzzle, menu.
+ * CompletionOverlay – puzzle complete: message, image, New Puzzle, Share. X or Esc to close.
  */
-import React, { useEffect, useState } from "react";
-import { Plus, Menu, Download, Share2, Copy, Check } from "lucide-react";
+import React, { useEffect, useCallback, useState } from "react";
+import { X, Plus, Share2, Copy, Check, Download, Menu } from "lucide-react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
@@ -36,54 +37,7 @@ interface CompletionOverlayProps {
   onDownloadImage: () => void;
   onNewPuzzle: () => void;
   onMenu: () => void;
-}
-
-/** Map dragCount to heat intensity 0–1 (blue=cold, red=hot). */
-function heatIntensity(dragCount: number, maxCount: number): number {
-  if (maxCount <= 0) return 0;
-  return Math.min(1, dragCount / Math.max(1, maxCount));
-}
-
-/** Heatmap overlay: shows which pieces were moved most (red=hot, blue=cold). */
-function HeatmapOverlay({
-  grid,
-  pieces,
-}: {
-  grid: { rows: number; cols: number };
-  pieces: Piece[];
-}) {
-  const maxDrag = Math.max(1, ...pieces.map((p) => p.dragCount ?? 0));
-
-  return (
-    <div
-      className={styles.heatmapOverlay}
-      role="img"
-      aria-label="Heatmap showing which pieces were moved most during play; red indicates many moves, blue indicates few"
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${grid.cols}, 1fr)`,
-        gridTemplateRows: `repeat(${grid.rows}, 1fr)`,
-      }}
-    >
-      {pieces
-        .filter((p) => !p.inTray)
-        .sort((a, b) => a.row * grid.cols + a.col - (b.row * grid.cols + b.col))
-        .map((p) => {
-          const intensity = heatIntensity(p.dragCount ?? 0, maxDrag);
-          const r = Math.round(255 * intensity);
-          const b = Math.round(255 * (1 - intensity));
-          const opacity = intensity > 0 ? 0.4 + intensity * 0.35 : 0;
-          return (
-            <div
-              key={p.id}
-              style={{
-                background: `rgba(${r}, 60, ${b}, ${opacity})`,
-              }}
-            />
-          );
-        })}
-    </div>
-  );
+  onClose: () => void;
 }
 
 export function CompletionOverlay({
@@ -102,12 +56,29 @@ export function CompletionOverlay({
   onDownloadImage,
   onNewPuzzle,
   onMenu,
+  onClose,
 }: CompletionOverlayProps) {
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        handleClose();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [handleClose]);
+
   const [streak, setStreak] = useState<number>(0);
   const [percentile, setPercentile] = useState<{
     topPercent: number;
     totalPlayers: number;
   } | null>(null);
+  const isDesktop = useMediaQuery("(min-width: 601px)");
   const completionMessage = getCompletionMessage(elapsedSeconds);
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const badge = getCompletionBadge(elapsedSeconds, undoCount, pieceCount);
@@ -160,11 +131,19 @@ export function CompletionOverlay({
 
   const puzzleSizeText =
     grid != null
-      ? `${grid.rows}×${grid.cols} puzzle · ${grid.rows * grid.cols} pieces`
+      ? `${grid.rows}×${grid.cols} · ${grid.rows * grid.cols} pieces`
       : null;
 
   return (
     <div className={styles.completeOverlay}>
+      <button
+        type="button"
+        className={styles.completeCloseBtn}
+        onClick={handleClose}
+        aria-label="Close"
+      >
+        <X size={24} />
+      </button>
       <div className={styles.completeContent}>
         <h2>🎉 {completionMessage}</h2>
         {badge && (
@@ -190,77 +169,44 @@ export function CompletionOverlay({
         </p>
         {imageUrl && (
           <div className={styles.completePreviewWrapper}>
-            <div className={styles.completePreviewInner}>
-              <img
-                src={imageUrl}
-                alt="Completed puzzle"
-                className={styles.completePreviewImage}
-              />
-              {grid && pieces.length > 0 && (
-                <>
-                  <HeatmapOverlay grid={grid} pieces={pieces} />
-                  {(() => {
-                    const maxDrag = Math.max(0, ...pieces.map((p) => p.dragCount ?? 0));
-                    if (maxDrag > 0) {
-                      return (
-                        <p className={styles.heatmapCaption}>
-                          My trickiest piece was moved {maxDrag} times!
-                        </p>
-                      );
-                    }
-                    return null;
-                  })()}
-                </>
-              )}
-            </div>
+            <img
+              src={imageUrl}
+              alt="Completed puzzle"
+              className={styles.completePreviewImage}
+            />
           </div>
         )}
 
-        <div className={styles.shareSection}>
-          {/* Primary CTA: Share Result */}
-          {canNativeShare ? (
-            <Button
-              variant="primary"
-              onClick={onNativeShare}
-              className={styles.sharePrimary}
-            >
-              <Share2 size={20} />
-              Share Result
+        <div className={styles.completeActions}>
+          <div className={styles.completeActionsPrimary}>
+            <Button variant="primary" onClick={onNewPuzzle}>
+              <Plus size={18} />
+              New Puzzle
             </Button>
-          ) : (
-            <Button
-              variant="primary"
-              onClick={onCopyResults}
-              className={styles.sharePrimary}
-            >
-              {copied ? <Check size={20} /> : <Copy size={20} />}
-              {copied ? "Copied!" : "Copy & Share"}
-            </Button>
-          )}
-          {/* Secondary: Download, Copy (Copy only when primary is Share) */}
-          <div className={styles.shareButtons}>
-            <Button size="sm" variant="secondary" onClick={onDownloadImage}>
-              <Download size={16} />
-              Download
-            </Button>
-            {canNativeShare && (
-              <Button size="sm" variant="secondary" onClick={onCopyResults}>
-                {copied ? <Check size={16} /> : <Copy size={16} />}
-                {copied ? "Copied!" : "Copy"}
+            {canNativeShare ? (
+              <Button variant="secondary" onClick={onNativeShare}>
+                <Share2 size={18} />
+                Share Result
+              </Button>
+            ) : (
+              <Button variant="secondary" onClick={onCopyResults}>
+                {copied ? <Check size={18} /> : <Copy size={18} />}
+                {copied ? "Copied!" : "Share Result"}
               </Button>
             )}
           </div>
-        </div>
-
-        <div className={styles.completeActions}>
-          <Button variant="primary" onClick={onNewPuzzle}>
-            <Plus size={16} />
-            New Puzzle
-          </Button>
-          <Button variant="secondary" onClick={onMenu}>
-            <Menu size={16} />
-            Menu
-          </Button>
+          {isDesktop && (
+            <div className={styles.completeActionsSecondary}>
+              <Button size="sm" variant="secondary" onClick={onDownloadImage}>
+                <Download size={16} />
+                Download
+              </Button>
+              <Button size="sm" variant="secondary" onClick={onMenu}>
+                <Menu size={16} />
+                Menu
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

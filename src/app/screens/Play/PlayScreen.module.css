@@ -880,6 +880,34 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.completeCloseBtn {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top, 0));
+  right: max(16px, env(safe-area-inset-right, 0));
+  appearance: none;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  z-index: 10;
+}
+
+.completeCloseBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.completeCloseBtn:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
 @media (max-width: 600px) {
   .completeOverlay {
     position: fixed;
@@ -1150,6 +1178,13 @@
   border-radius: 8px;
 }
 
+@media (min-width: 601px) {
+  .completePreviewImage {
+    width: 180px;
+    height: 180px;
+  }
+}
+
 @media (max-width: 600px) {
   .completeContent {
     margin-top: 0;
@@ -1180,7 +1215,8 @@
   .shareButtons {
     gap: 6px;
   }
-  .completeActions {
+  .completeActions,
+  .completeActionsPrimary {
     flex-wrap: wrap;
     gap: 6px;
   }
@@ -1303,7 +1339,21 @@
 
 .completeActions {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 12px;
+}
+
+.completeActionsPrimary {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.completeActionsSecondary {
+  display: flex;
+  gap: 8px;
   justify-content: center;
 }
 

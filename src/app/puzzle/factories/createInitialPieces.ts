@@ -244,8 +244,8 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     const col = i % grid.cols;
     const row = Math.floor(i / grid.cols);
 
-    const targetX = targetStartX + col * tileW;
-    const targetY = targetStartY + row * tileH;
+    const targetX = Math.round(targetStartX + col * tileW);
+    const targetY = Math.round(targetStartY + row * tileH);
 
     const startInTray = trayIndices.has(i);
     const rawPos = positions[i];

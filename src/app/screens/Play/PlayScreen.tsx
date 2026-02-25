@@ -171,6 +171,7 @@ export function PlayScreen() {
   const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
+  const [completionDismissed, setCompletionDismissed] = React.useState(false);
 
   const viewportKey = grid != null ? `vp:${grid.rows}x${grid.cols}` : null;
   const viewport = useViewport(viewportKey);
@@ -273,6 +274,7 @@ export function PlayScreen() {
     undoCountRef.current = 0;
     abandonCapturedRef.current = false;
     setQuadrantTimes({ 0: null, 1: null, 2: null, 3: null });
+    setCompletionDismissed(false);
   }, [puzzleKey]);
 
   useEffect(() => {
@@ -1266,7 +1268,7 @@ export function PlayScreen() {
                     }
                   />
                 )}
-                {isComplete && (
+                {isComplete && !completionDismissed && (
                   <CompletionOverlay
                     elapsedSeconds={elapsedSeconds}
                     grid={state?.grid}
@@ -1291,6 +1293,7 @@ export function PlayScreen() {
                     onDownloadImage={handleDownloadImage}
                     onNewPuzzle={handleNewGame}
                     onMenu={() => navigate("/")}
+                    onClose={() => setCompletionDismissed(true)}
                   />
                 )}
               </div>
