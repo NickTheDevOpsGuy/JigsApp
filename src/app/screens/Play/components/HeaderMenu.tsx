@@ -258,7 +258,9 @@ export function HeaderMenu(props: HeaderMenuProps) {
             max={160}
             step={5}
             value={Math.round(props.snapToleranceOverride * 100)}
-            onChange={(e) => props.onSnapToleranceOverrideChange(Number(e.target.value) / 100)}
+            onChange={(e) =>
+              props.onSnapToleranceOverrideChange(Number(e.target.value) / 100)
+            }
             className={styles.headerMenuRange}
             aria-label="Snap tolerance override"
           />

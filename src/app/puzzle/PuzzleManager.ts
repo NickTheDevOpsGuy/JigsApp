@@ -793,13 +793,14 @@ export class PuzzleManager {
     let effective = basePx * mobileBump;
 
     if (scale < 1) {
-      const zoomOutBoost = this.isMobile ? 1 + (1 - scale) * 1.25 : 1 + (1 - scale) * 0.75;
+      const zoomOutBoost = this.isMobile
+        ? 1 + (1 - scale) * 1.25
+        : 1 + (1 - scale) * 0.75;
       effective *= zoomOutBoost;
     } else if (scale > 1) {
-      const zoomInTighten =
-        this.isMobile
-          ? 1 / (1 + (scale - 1) * 0.45)
-          : 1 / (1 + (scale - 1) * 0.8);
+      const zoomInTighten = this.isMobile
+        ? 1 / (1 + (scale - 1) * 0.45)
+        : 1 / (1 + (scale - 1) * 0.8);
       effective *= zoomInTighten;
     }
 

@@ -135,7 +135,10 @@ export function usePointerHandlers(args: {
   };
 
   const activePointersRef = useRef<
-    Map<number, { clientX: number; clientY: number; pointerType: string; updatedAtMs: number }>
+    Map<
+      number,
+      { clientX: number; clientY: number; pointerType: string; updatedAtMs: number }
+    >
   >(new Map());
   const TOUCH_POINTER_STALE_MS = 1500;
   const pruneStaleTouchPointers = useCallback(() => {
