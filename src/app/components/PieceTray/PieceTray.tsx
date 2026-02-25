@@ -13,7 +13,10 @@ import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
 import { ChevronLeft, ChevronRight, Shuffle } from "lucide-react";
-import { TrayFilterButton, type TrayFilter } from "@/screens/Play/components/TrayFilterButton";
+import {
+  TrayFilterButton,
+  type TrayFilter,
+} from "@/screens/Play/components/TrayFilterButton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import styles from "./PieceTray.module.css";
 
