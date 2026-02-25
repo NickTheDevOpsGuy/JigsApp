@@ -51,7 +51,7 @@ export function CompletionOverlay({
   elapsedSeconds,
   grid,
   imageUrl,
-  pieces = [],
+  pieces: _pieces = [],
   undoCount = 0,
   moveCount = 0,
   accuracyPercent = 100,

@@ -16,9 +16,7 @@ import {
   getCalendarWeekRange,
   getMyWeeklyAlbumCompletions,
   getAllTimeBestLeaderboard,
-  getMyPersonalBests,
   type LeaderboardEntry,
-  type PersonalBestEntry,
   type PieceCutType,
   type VisualModifierFilter,
 } from "@/services/leaderboardService";
@@ -160,7 +158,6 @@ export function StatsScreen() {
   const [weeklyAlbumSlots, setWeeklyAlbumSlots] = useState<WeeklyAlbumSlot[]>([]);
   const [weeklyAlbumProgress, setWeeklyAlbumProgress] = useState(0);
   const [weekRangeLabel, setWeekRangeLabel] = useState("");
-  const [personalBests, setPersonalBests] = useState<PersonalBestEntry[]>([]);
   const [todayCompletionCount, setTodayCompletionCount] = useState<number>(0);
   const [achievements, setAchievements] = useState<
     {
@@ -224,16 +221,14 @@ export function StatsScreen() {
     setDisplayNameInput(p?.displayName ?? "");
     setAchievements(a ?? []);
     const today = getTodayDateString();
-    const [lb, todayCount, wklb, pb] = await Promise.all([
+    const [lb, todayCount, wklb] = await Promise.all([
       getDailyLeaderboard(today, 10, "all", "all"),
       getTodayCompletionCount(today),
       getWeeklyTotalsLeaderboard(),
-      getMyPersonalBests(),
     ]);
     setLeaderboard(lb);
     setTodayCompletionCount(todayCount);
     setWeeklyTotalsLeaderboard(wklb);
-    setPersonalBests(pb);
     await loadWeeklyAlbum();
     setLoading(false);
   }, [configured, loadWeeklyAlbum]);
