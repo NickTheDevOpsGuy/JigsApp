@@ -3,7 +3,6 @@
  */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   Puzzle,
   ChevronDown,
@@ -61,7 +60,6 @@ type Props = {
 
 export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
-  const isMobile = useMediaQuery("(max-width: 520px)");
   const [dailyModule, setDailyModule] = useState<
     typeof import("@/daily/dailyPuzzle") | null
   >(null);
@@ -72,7 +70,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(preferredIdx ?? RECOMMENDED_INDEX);
   const [modifier, setModifier] = useState<VisualModifier>("none");
-  const [showModifier, setShowModifier] = useState(!isMobile);
+  const [showModifier, setShowModifier] = useState(false);
 
   const showFreezeOffer =
     wasYesterdayMissed() &&
@@ -85,11 +83,11 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       import("@/daily/dailyPuzzle").then(setDailyModule);
       const idx = getDailyPreferredDifficultyIndex();
       setSelectedIndex(idx ?? RECOMMENDED_INDEX);
-      setShowModifier(!isMobile);
+      setShowModifier(false);
     } else {
       setDailyModule(null);
     }
-  }, [isOpen, isMobile]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (showFreezeOffer && useFreezeBtnRef.current) {
@@ -189,7 +187,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       )}
 
       <div className={styles.difficultySection}>
-        <div className={isMobile ? styles.difficultyStack : styles.difficultyRow}>
+        <div className={styles.difficultyStack}>
           {primaryOptions.map((opt, i) => (
             <DifficultyCard
               key={`${opt.rows}x${opt.cols}`}
@@ -197,7 +195,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
               index={i}
               selected={selectedIndex === i}
               recommended={i === RECOMMENDED_INDEX}
-              compact={isMobile}
+              compact
               onSelect={() => setSelectedIndex(i)}
             />
           ))}
@@ -227,7 +225,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
                   opt={opt}
                   index={idx}
                   selected={selectedIndex === idx}
-                  compact={isMobile}
+                  compact
                   onSelect={() => setSelectedIndex(idx)}
                 />
               );
