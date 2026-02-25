@@ -130,9 +130,7 @@ export function CompletionOverlay({
   }, [elapsedSeconds, grid, isDaily, cutType]);
 
   const puzzleSizeText =
-    grid != null
-      ? `${grid.rows}×${grid.cols} · ${grid.rows * grid.cols} pieces`
-      : null;
+    grid != null ? `${grid.rows}×${grid.cols} · ${grid.rows * grid.cols} pieces` : null;
 
   return (
     <div className={styles.completeOverlay}>
