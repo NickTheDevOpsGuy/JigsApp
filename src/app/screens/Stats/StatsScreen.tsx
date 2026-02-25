@@ -562,7 +562,7 @@ export function StatsScreen() {
               <span>Profile</span>
             </button>
             <button
-              className={activeTab === "leaderboard" ? styles.tabActive : ""}
+              className=""
               onClick={() => setActiveTab("leaderboard")}
               aria-label="Leaderboard"
             >
