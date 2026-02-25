@@ -117,7 +117,7 @@
 .difficultyCard {
   position: relative;
   appearance: none;
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   border-radius: 12px;
   padding: 16px;
@@ -140,9 +140,9 @@
 }
 
 .difficultyCardSelected {
-  border-color: var(--color-brand-primary);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 60%, var(--color-border));
   background: color-mix(in srgb, var(--color-brand-light) 50%, var(--color-bg-elevated));
-  box-shadow: 0 0 0 1px var(--color-brand-primary);
+  box-shadow: none;
 }
 
 .recommendedBadge {
@@ -171,6 +171,19 @@
 .difficultyCardMeta {
   font-size: 11px;
   color: var(--color-text-secondary);
+}
+
+.difficultyCardLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recommendedInline {
+  font-size: 11px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
 }
 
 .difficultyCardCheck {
@@ -249,7 +262,7 @@
 }
 
 .modifierSection {
-  margin: 6px 0 16px;
+  margin: 6px 0 14px;
 }
 
 .modifierLabel {
@@ -329,16 +342,96 @@
 }
 
 @media (max-width: 520px) {
-  .difficultyCard {
-    min-height: 90px;
-  }
-
   .difficultyRow {
     grid-template-columns: 1fr;
   }
 
+  .difficultyStack {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .difficultyCard {
+    min-height: 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+  }
+
+  .difficultyCard:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .difficultyCardIcon {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .difficultyCardIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .difficultyCardLabel {
+    font-size: 14px;
+  }
+
+  .difficultyCardMeta {
+    font-size: 12px;
+  }
+
+  .difficultyCardCheck {
+    position: static;
+    margin-left: auto;
+    width: 14px;
+    height: 14px;
+    padding: 2px;
+  }
+
+  .moreOptionsBtn {
+    min-height: 40px;
+    padding: 9px 12px;
+    justify-content: space-between;
+    font-size: 13px;
+  }
+
+  .moreOptionsList {
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .moreOptionsList .difficultyCard {
+    min-height: 0;
+    padding: 9px 12px;
+  }
+
+  .modifierHint {
+    margin: 6px 2px 8px;
+    font-size: 11px;
+  }
+
   .modifierList {
     grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .modifierBtn {
+    min-height: 36px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .rememberLabel {
+    margin-bottom: 12px;
+    font-size: 13px;
   }
 }
 

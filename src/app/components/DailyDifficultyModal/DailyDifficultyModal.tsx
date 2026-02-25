@@ -72,6 +72,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(preferredIdx ?? RECOMMENDED_INDEX);
   const [modifier, setModifier] = useState<VisualModifier>("none");
+  const [showModifier, setShowModifier] = useState(!isMobile);
 
   const showFreezeOffer =
     wasYesterdayMissed() &&
@@ -84,10 +85,11 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       import("@/daily/dailyPuzzle").then(setDailyModule);
       const idx = getDailyPreferredDifficultyIndex();
       setSelectedIndex(idx ?? RECOMMENDED_INDEX);
+      setShowModifier(!isMobile);
     } else {
       setDailyModule(null);
     }
-  }, [isOpen]);
+  }, [isOpen, isMobile]);
 
   useEffect(() => {
     if (showFreezeOffer && useFreezeBtnRef.current) {
@@ -195,6 +197,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
               index={i}
               selected={selectedIndex === i}
               recommended={i === RECOMMENDED_INDEX}
+              compact={isMobile}
               onSelect={() => setSelectedIndex(i)}
             />
           ))}
@@ -224,6 +227,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
                   opt={opt}
                   index={idx}
                   selected={selectedIndex === idx}
+                  compact={isMobile}
                   onSelect={() => setSelectedIndex(idx)}
                 />
               );
@@ -233,24 +237,40 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       </div>
 
       <div className={styles.modifierSection}>
-        <p className={styles.modifierLabel}>Optional Modifier</p>
-        <p className={styles.modifierHint}>
-          This affects the run and leaderboard bracket.
-        </p>
-        <div className={styles.modifierList}>
-          {MODIFIER_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              className={`${styles.modifierBtn} ${
-                modifier === opt.value ? styles.modifierBtnSelected : ""
-              }`}
-              onClick={() => setModifier(opt.value)}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        <button
+          type="button"
+          className={styles.moreOptionsBtn}
+          onClick={() => setShowModifier((v) => !v)}
+          aria-expanded={showModifier}
+        >
+          Optional Modifier
+          {showModifier ? (
+            <ChevronUp size={18} className={styles.moreOptionsIcon} />
+          ) : (
+            <ChevronDown size={18} className={styles.moreOptionsIcon} />
+          )}
+        </button>
+        {showModifier && (
+          <>
+            <p className={styles.modifierHint}>
+              This affects the run and leaderboard bracket.
+            </p>
+            <div className={styles.modifierList}>
+              {MODIFIER_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className={`${styles.modifierBtn} ${
+                    modifier === opt.value ? styles.modifierBtnSelected : ""
+                  }`}
+                  onClick={() => setModifier(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <label className={styles.rememberLabel}>
@@ -276,12 +296,14 @@ function DifficultyCard({
   index,
   selected,
   recommended,
+  compact,
   onSelect,
 }: {
   opt: (typeof GRID_OPTIONS)[number];
   index: number;
   selected: boolean;
   recommended?: boolean;
+  compact?: boolean;
   onSelect: () => void;
 }) {
   const Icon = DIFFICULTY_ICONS[index];
@@ -292,14 +314,26 @@ function DifficultyCard({
       className={`${styles.difficultyCard} ${selected ? styles.difficultyCardSelected : ""}`}
       onClick={onSelect}
     >
-      {recommended && <span className={styles.recommendedBadge}>Recommended</span>}
+      {recommended && !compact && <span className={styles.recommendedBadge}>Recommended</span>}
       <div className={styles.difficultyCardIcon} style={{ color }}>
         <Icon size={24} />
       </div>
-      <span className={styles.difficultyCardLabel}>{opt.label.split(" ")[0]}</span>
-      <span className={styles.difficultyCardMeta}>
-        {opt.rows}×{opt.cols} · {opt.pieces} pieces
-      </span>
+      {compact ? (
+        <span className={styles.difficultyCardLine}>
+          <span className={styles.difficultyCardLabel}>{opt.label.split(" ")[0]}</span>
+          <span className={styles.difficultyCardMeta}>
+            {opt.rows}×{opt.cols} ({opt.pieces})
+          </span>
+          {recommended && <span className={styles.recommendedInline}>Recommended</span>}
+        </span>
+      ) : (
+        <>
+          <span className={styles.difficultyCardLabel}>{opt.label.split(" ")[0]}</span>
+          <span className={styles.difficultyCardMeta}>
+            {opt.rows}×{opt.cols} · {opt.pieces} pieces
+          </span>
+        </>
+      )}
       {selected && <Check size={18} className={styles.difficultyCardCheck} />}
     </button>
   );
