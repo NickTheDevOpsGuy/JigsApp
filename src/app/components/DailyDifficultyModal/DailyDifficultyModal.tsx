@@ -314,7 +314,9 @@ function DifficultyCard({
       className={`${styles.difficultyCard} ${selected ? styles.difficultyCardSelected : ""}`}
       onClick={onSelect}
     >
-      {recommended && !compact && <span className={styles.recommendedBadge}>Recommended</span>}
+      {recommended && !compact && (
+        <span className={styles.recommendedBadge}>Recommended</span>
+      )}
       <div className={styles.difficultyCardIcon} style={{ color }}>
         <Icon size={24} />
       </div>
