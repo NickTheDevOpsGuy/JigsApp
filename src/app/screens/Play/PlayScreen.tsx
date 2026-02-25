@@ -23,7 +23,13 @@ import { soundManager } from "@/audio/sounds";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { ThemeModal } from "@/components/ThemeModal";
 
-import { STORAGE_KEY, GRID_KEY, SHOW_DEBUG, parseGrid } from "./playScreenUtils";
+import {
+  STORAGE_KEY,
+  GRID_KEY,
+  GRID_ONCE_KEY,
+  SHOW_DEBUG,
+  parseGrid,
+} from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
 import { getBestTime, BEST_TIME_PREFIX, getQuadrantPb, setQuadrantPb } from "./timeMode";
 import { isDailyPuzzleSession, getDailyVisualModifier } from "@/daily/dailyPuzzleCore";
@@ -65,8 +71,23 @@ export function PlayScreen() {
   const [searchParams] = useSearchParams();
   const sessionIdFromUrl = searchParams.get(SESSION_ID_PARAM);
 
-  const localGrid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
+  const localGrid = useMemo(() => {
+    try {
+      const once = localStorage.getItem(GRID_ONCE_KEY);
+      return parseGrid(once ?? localStorage.getItem(GRID_KEY));
+    } catch {
+      return parseGrid(null);
+    }
+  }, []);
   const localImageUrl = localStorage.getItem(STORAGE_KEY) ?? "";
+
+  useEffect(() => {
+    try {
+      localStorage.removeItem(GRID_ONCE_KEY);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const sessionResult = usePuzzleSession(localImageUrl, localGrid);
   const {

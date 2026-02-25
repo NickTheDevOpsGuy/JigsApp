@@ -63,6 +63,29 @@
   color: var(--color-brand-primary);
   flex: 1;
   min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.titleProgress {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-text-secondary);
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg-elevated) 80%, transparent);
+}
+
+.headerShareBtn {
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .placeholder,
@@ -532,6 +555,20 @@
   cursor: pointer;
 }
 
+.boardModeBtn + .boardModeBtn {
+  position: relative;
+}
+
+.boardModeBtn + .boardModeBtn::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: color-mix(in srgb, var(--color-border) 90%, transparent);
+}
+
 .boardModeBtnActive {
   background: var(--color-brand-primary);
   color: #fff;
@@ -580,10 +617,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .inlineFilterSelect {
+  flex: 1 1 0;
+  min-width: 0;
   min-height: 36px;
   padding: 7px 10px;
   border-radius: 8px;
@@ -591,17 +630,6 @@
   background: var(--color-bg-elevated);
   color: var(--color-text-primary);
   font-size: 12px;
-}
-
-.shareIconBtn {
-  margin-left: auto;
-  min-width: 36px;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .weekProgressStrip {
@@ -827,6 +855,11 @@
     font-size: 20px;
   }
 
+  .titleProgress {
+    font-size: 12px;
+    padding: 2px 6px;
+  }
+
   .tabs {
     gap: 6px;
     margin-bottom: 18px;
@@ -876,16 +909,13 @@
   }
 
   .controlsRow {
+    flex-wrap: wrap;
     gap: 6px;
   }
 
   .inlineFilterSelect {
     flex: 1 1 0;
     min-width: 0;
-  }
-
-  .shareIconBtn {
-    margin-left: 0;
   }
 
   /* Leaderboard card layout (PZ-071) – see rules above in same media query */
@@ -922,6 +952,10 @@
 
   .title {
     font-size: 17px;
+  }
+
+  .titleProgress {
+    font-size: 11px;
   }
 
   .tabs button {

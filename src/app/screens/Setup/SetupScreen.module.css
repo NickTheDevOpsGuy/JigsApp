@@ -166,11 +166,15 @@
 .actionRow {
   flex-shrink: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
+  grid-template-columns: 1fr 1fr 1.35fr;
   gap: 10px;
   margin-top: 8px;
   padding-top: 16px;
   border-top: 1px solid var(--color-border);
+}
+
+.startBtn {
+  min-height: 40px;
 }
 
 .row {
@@ -603,6 +607,10 @@
   }
 
   .actionRow .primary {
+    min-height: 52px;
+  }
+
+  .startBtn {
     min-height: 52px;
   }
 

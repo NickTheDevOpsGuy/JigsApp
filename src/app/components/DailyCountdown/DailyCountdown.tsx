@@ -102,9 +102,21 @@ export function DailyCountdown({
       aria-live="polite"
       aria-label={justUnlocked ? "New daily puzzle is ready" : `${label} ${display}`}
     >
-      <Clock size={prominent ? 20 : 16} className={styles.icon} />
-      <span className={styles.label}>{label}</span>
-      <span className={styles.time}>{display}</span>
+      {variant === "anticipation" ? (
+        <>
+          <div className={styles.anticipationTop}>
+            <Clock size={prominent ? 20 : 16} className={styles.icon} />
+            <span className={styles.time}>{display}</span>
+          </div>
+          <span className={styles.label}>{label}</span>
+        </>
+      ) : (
+        <>
+          <Clock size={prominent ? 20 : 16} className={styles.icon} />
+          <span className={styles.label}>{label}</span>
+          <span className={styles.time}>{display}</span>
+        </>
+      )}
       {celebrating && (
         <div className={styles.confetti} aria-hidden>
           {[...Array(12)].map((_, i) => (

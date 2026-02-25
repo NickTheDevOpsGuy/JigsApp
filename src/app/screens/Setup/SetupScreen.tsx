@@ -24,6 +24,7 @@ import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
 import { COUNTDOWN_OPTIONS, getBestTime, type TimeMode } from "../Play/timeMode";
 import { getAdaptiveSuggestion } from "@/services/adaptiveDifficultyService";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { GRID_ONCE_KEY } from "../Play/playScreenUtils";
 
 const TIME_MODE_LABELS: Record<TimeMode, string> = {
   elapsed: "Elapsed",
@@ -192,6 +193,8 @@ export function SetupScreen() {
 
     try {
       localStorage.setItem(STORAGE_KEY, imgDataUrl);
+      // Always pin the selected grid for the very next run.
+      localStorage.setItem(GRID_ONCE_KEY, `${effectiveRows}x${effectiveCols}`);
       if (rememberChoice) {
         saveGrid();
       } else {
@@ -517,6 +520,8 @@ export function SetupScreen() {
 
           <Button
             variant="primary"
+            size="sm"
+            className={styles.startBtn}
             onClick={handleStart}
             disabled={isLoading || !imgDataUrl}
             aria-label="Start puzzle"

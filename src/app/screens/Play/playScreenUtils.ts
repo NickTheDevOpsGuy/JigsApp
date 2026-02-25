@@ -3,6 +3,7 @@
  */
 export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
+export const GRID_ONCE_KEY = "phuzzle:gridSizeOnce";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
 export const GHOST_HINT_KEY = "phuzzle:ghostHint";
 export const IMMERSIVE_MODE_KEY = "phuzzle:immersiveMode";

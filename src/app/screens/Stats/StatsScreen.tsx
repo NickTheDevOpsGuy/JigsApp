@@ -58,27 +58,6 @@ function formatGap(seconds: number): string {
   return `${m}m ${s}s`;
 }
 
-function formatCompletedAt(iso: string): string {
-  const d = new Date(iso);
-  const now = new Date();
-  const isToday =
-    d.getDate() === now.getDate() &&
-    d.getMonth() === now.getMonth() &&
-    d.getFullYear() === now.getFullYear();
-  if (isToday) {
-    return d.toLocaleTimeString(undefined, {
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  }
-  return d.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
 function getDatesInWeek(weekStart: string): string[] {
   const start = new Date(`${weekStart}T00:00:00.000Z`);
   return Array.from({ length: 7 }, (_, i) => {
@@ -182,7 +161,6 @@ export function StatsScreen() {
   const [albumShareCopied, setAlbumShareCopied] = useState(false);
   const [raccoonName, setRaccoonName] = useState<string | null>(null);
   const leaderboardCompact = true;
-  const [expandedRowKey, setExpandedRowKey] = useState<string | null>(null);
   const [rowAnimEpoch, setRowAnimEpoch] = useState(0);
 
   const configured = isSupabaseConfigured();
@@ -428,29 +406,20 @@ export function StatsScreen() {
         >
           {entries.map((entry, index) => {
             const key = `time-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
-            const isExpanded = expandedRowKey === key;
-            const leader = entries[0]?.elapsedSeconds ?? entry.elapsedSeconds;
             const next = entries[index + 1]?.elapsedSeconds;
             const gapInfo =
               index === 0 && typeof next === "number"
                 ? `+${formatGap(next - entry.elapsedSeconds)} ahead of #2`
-                : `+${formatGap(entry.elapsedSeconds - leader)} from #1`;
+                : index === 1 && typeof next === "number"
+                  ? `+${formatGap(next - entry.elapsedSeconds)} ahead of #3`
+                  : null;
             return (
               <li
                 key={key}
                 className={`${styles.leaderboardItem} ${
                   entry.rank <= 3 ? styles.leaderboardPodium : ""
-                } ${isExpanded ? styles.leaderboardItemExpanded : ""} ${styles.leaderboardRowEnter}`}
+                } ${styles.leaderboardRowEnter}`}
                 style={{ animationDelay: `${index * 45}ms` }}
-                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setExpandedRowKey(isExpanded ? null : key);
-                  }
-                }}
               >
                 <span className={styles.rank}>
                   {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
@@ -466,16 +435,8 @@ export function StatsScreen() {
                 </span>
                 <span className={styles.timeCol}>
                   <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
-                  <span className={styles.gapInfo}>{gapInfo}</span>
+                  {gapInfo && <span className={styles.gapInfo}>{gapInfo}</span>}
                 </span>
-                {isExpanded && (
-                  <div className={styles.leaderboardDetail}>
-                    {Math.floor(entry.elapsedSeconds / 60)}m {entry.elapsedSeconds % 60}s
-                    {entry.completedAt && (
-                      <> · Completed at {formatCompletedAt(entry.completedAt)}</>
-                    )}
-                  </div>
-                )}
               </li>
             );
           })}
@@ -499,34 +460,19 @@ export function StatsScreen() {
         >
           {entries.map((entry) => {
             const key = `completion-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
-            const isExpanded = expandedRowKey === key;
             return (
               <li
                 key={key}
                 className={`${styles.leaderboardItem} ${
                   entry.rank <= 3 ? styles.leaderboardPodium : ""
-                } ${isExpanded ? styles.leaderboardItemExpanded : ""} ${styles.leaderboardRowEnter}`}
+                } ${styles.leaderboardRowEnter}`}
                 style={{ animationDelay: `${(entry.rank - 1) * 45}ms` }}
-                onClick={() => setExpandedRowKey(isExpanded ? null : key)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setExpandedRowKey(isExpanded ? null : key);
-                  }
-                }}
               >
                 <span className={styles.rank}>
                   {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
                 </span>
                 <span className={styles.player}>{entry.displayName}</span>
                 <span className={styles.time}>{entry.count} puzzles</span>
-                {isExpanded && (
-                  <div className={styles.leaderboardDetail}>
-                    {entry.count} total puzzles completed
-                  </div>
-                )}
               </li>
             );
           })}
@@ -540,6 +486,14 @@ export function StatsScreen() {
   const weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
   const weeklyBlocks = `${"■".repeat(weeklyCompleted)}${"□".repeat(weeklyRemaining)}`;
   const masteryPuzzlesRemaining = Math.max(0, 1 - (stats?.masteryStreak ?? 0));
+  const headerTitle =
+    activeTab === "leaderboard"
+      ? "Leaderboard"
+      : activeTab === "dashboard"
+        ? "Dashboard"
+        : activeTab === "profile"
+          ? "Profile"
+          : "Achievements";
 
   return (
     <div className={styles.page}>
@@ -549,44 +503,83 @@ export function StatsScreen() {
             <ArrowLeft size={18} />
             Back
           </Button>
-          <h1 className={styles.title}>Stats</h1>
+          <h1 className={styles.title}>
+            {headerTitle}
+            {activeTab === "leaderboard" && (
+              <span className={styles.titleProgress}>{weeklyAlbumProgress}/7</span>
+            )}
+          </h1>
+          {activeTab === "leaderboard" && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={
+                leaderboardType === "week" && weekSubview === "album"
+                  ? handleShareWeeklyAlbum
+                  : handleShareLeaderboard
+              }
+              className={styles.headerShareBtn}
+              aria-label={
+                leaderboardType === "week" && weekSubview === "album"
+                  ? albumShareCopied
+                    ? "Copied weekly album share text"
+                    : "Share weekly album"
+                  : shareCopied
+                    ? "Copied leaderboard share text"
+                    : "Share leaderboard"
+              }
+              title={
+                leaderboardType === "week" && weekSubview === "album"
+                  ? albumShareCopied
+                    ? "Copied!"
+                    : "Share album"
+                  : shareCopied
+                    ? "Copied!"
+                    : "Share leaderboard"
+              }
+            >
+              <Share2 size={16} />
+            </Button>
+          )}
         </div>
 
-        <div className={styles.tabs}>
-          <button
-            className={activeTab === "dashboard" ? styles.tabActive : ""}
-            onClick={() => setActiveTab("dashboard")}
-            aria-label="Dashboard"
-          >
-            <BarChart3 size={18} aria-hidden />
-            <span>{isNarrow ? "Dash" : "Dashboard"}</span>
-          </button>
-          <button
-            className={activeTab === "profile" ? styles.tabActive : ""}
-            onClick={() => setActiveTab("profile")}
-            aria-label="Profile"
-          >
-            <User size={18} aria-hidden />
-            <span>Profile</span>
-          </button>
-          <button
-            className={activeTab === "leaderboard" ? styles.tabActive : ""}
-            onClick={() => setActiveTab("leaderboard")}
-            aria-label="Leaderboard"
-          >
-            <Trophy size={18} aria-hidden />
-            <span>{isNarrow ? "Board" : "Leaderboard"}</span>
-            <span className={styles.tabMiniProgress}>{weeklyAlbumProgress}/7</span>
-          </button>
-          <button
-            className={activeTab === "achievements" ? styles.tabActive : ""}
-            onClick={() => setActiveTab("achievements")}
-            aria-label="Achievements"
-          >
-            <Award size={18} aria-hidden />
-            <span>{isNarrow ? "Badges" : "Achievements"}</span>
-          </button>
-        </div>
+        {activeTab !== "leaderboard" && (
+          <div className={styles.tabs}>
+            <button
+              className={activeTab === "dashboard" ? styles.tabActive : ""}
+              onClick={() => setActiveTab("dashboard")}
+              aria-label="Dashboard"
+            >
+              <BarChart3 size={18} aria-hidden />
+              <span>{isNarrow ? "Dash" : "Dashboard"}</span>
+            </button>
+            <button
+              className={activeTab === "profile" ? styles.tabActive : ""}
+              onClick={() => setActiveTab("profile")}
+              aria-label="Profile"
+            >
+              <User size={18} aria-hidden />
+              <span>Profile</span>
+            </button>
+            <button
+              className={activeTab === "leaderboard" ? styles.tabActive : ""}
+              onClick={() => setActiveTab("leaderboard")}
+              aria-label="Leaderboard"
+            >
+              <Trophy size={18} aria-hidden />
+              <span>{isNarrow ? "Board" : "Leaderboard"}</span>
+              <span className={styles.tabMiniProgress}>{weeklyAlbumProgress}/7</span>
+            </button>
+            <button
+              className={activeTab === "achievements" ? styles.tabActive : ""}
+              onClick={() => setActiveTab("achievements")}
+              aria-label="Achievements"
+            >
+              <Award size={18} aria-hidden />
+              <span>{isNarrow ? "Badges" : "Achievements"}</span>
+            </button>
+          </div>
+        )}
 
         <div className={styles.cardContent} data-testid="stats-card-content">
           {loading ? (
@@ -836,36 +829,6 @@ export function StatsScreen() {
                           <option value="6x6">6x6 Grid</option>
                         </select>
                       )}
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={
-                          leaderboardType === "week" && weekSubview === "album"
-                            ? handleShareWeeklyAlbum
-                            : handleShareLeaderboard
-                        }
-                        className={styles.shareIconBtn}
-                        aria-label={
-                          leaderboardType === "week" && weekSubview === "album"
-                            ? albumShareCopied
-                              ? "Copied weekly album share text"
-                              : "Share weekly album"
-                            : shareCopied
-                              ? "Copied leaderboard share text"
-                              : "Share leaderboard"
-                        }
-                        title={
-                          leaderboardType === "week" && weekSubview === "album"
-                            ? albumShareCopied
-                              ? "Copied!"
-                              : "Share album"
-                            : shareCopied
-                              ? "Copied!"
-                              : "Share leaderboard"
-                        }
-                      >
-                        <Share2 size={16} />
-                      </Button>
                     </div>
                   </div>
                   <h2>

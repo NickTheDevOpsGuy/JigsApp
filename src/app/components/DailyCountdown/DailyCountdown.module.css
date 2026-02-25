@@ -41,29 +41,27 @@
 }
 
 .anticipation {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-  column-gap: 8px;
-  row-gap: 1px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 4px;
+  width: 100%;
 }
 
-.anticipation .icon {
-  grid-row: 1 / span 2;
-  align-self: center;
+.anticipationTop {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .anticipation .label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  opacity: 0.95;
+  font-size: 15px;
+  font-weight: 500;
+  opacity: 0.92;
 }
 
 .anticipation .time {
-  font-size: 28px;
+  font-size: 40px;
   line-height: 1;
   font-weight: 800;
   color: var(--color-text-primary);
