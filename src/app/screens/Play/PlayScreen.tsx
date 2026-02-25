@@ -960,7 +960,11 @@ export function PlayScreen() {
       }`}
       style={
         dailyVisualModifier === "fog"
-          ? { ["--fog-strength" as string]: String(Math.max(0, Math.min(0.45, fogStrength))) }
+          ? {
+              ["--fog-strength" as string]: String(
+                Math.max(0, Math.min(0.45, fogStrength)),
+              ),
+            }
           : undefined
       }
       ref={pageRef}

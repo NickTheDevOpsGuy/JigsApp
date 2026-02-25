@@ -10,7 +10,10 @@ type Percentile = { topPercent: number; totalPlayers: number } | null;
 function getRankFromPercentile(percentile: Percentile): string {
   if (!percentile || percentile.totalPlayers < 2) return "Unranked";
   const ratio = Math.max(0, Math.min(1, percentile.topPercent / 100));
-  const rank = Math.max(1, percentile.totalPlayers - Math.round(ratio * percentile.totalPlayers) + 1);
+  const rank = Math.max(
+    1,
+    percentile.totalPlayers - Math.round(ratio * percentile.totalPlayers) + 1,
+  );
   return `#${rank}/${percentile.totalPlayers}`;
 }
 
@@ -105,7 +108,9 @@ export function useShareCardImage() {
           canvas.toBlob(resolve, "image/png"),
         );
         if (!blob) return;
-        const file = new File([blob], "phuzzle-completion-card.png", { type: "image/png" });
+        const file = new File([blob], "phuzzle-completion-card.png", {
+          type: "image/png",
+        });
 
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({
@@ -131,4 +136,3 @@ export function useShareCardImage() {
 
   return { shareCard, isGenerating };
 }
-

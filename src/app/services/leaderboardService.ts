@@ -42,7 +42,10 @@ export type WeeklyAlbumCompletion = {
 export type VisualModifierFilter = "all" | "none" | "fog" | "night" | "sepia";
 
 /** Calendar week range (Mon-Sun) for a reference date string (YYYY-MM-DD). */
-export function getCalendarWeekRange(referenceDate: string): { start: string; end: string } {
+export function getCalendarWeekRange(referenceDate: string): {
+  start: string;
+  end: string;
+} {
   const ref = new Date(`${referenceDate}T00:00:00.000Z`);
   const day = ref.getUTCDay(); // Sun=0..Sat=6
   const diffToMonday = day === 0 ? 6 : day - 1;

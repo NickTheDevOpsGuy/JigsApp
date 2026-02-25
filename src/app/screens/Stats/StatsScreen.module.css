@@ -585,7 +585,8 @@
 }
 
 .weekBonusBadge {
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 40%, var(--color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 40%, var(--color-border));
   background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
   color: var(--color-text-primary);
   border-radius: 10px;

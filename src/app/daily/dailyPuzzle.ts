@@ -7,7 +7,11 @@
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import type { SamplePuzzle } from "@/data/samplePuzzles";
 
-import { getTodayDateString, DAILY_DATE_KEY, DAILY_MODIFIER_KEY } from "./dailyPuzzleCore";
+import {
+  getTodayDateString,
+  DAILY_DATE_KEY,
+  DAILY_MODIFIER_KEY,
+} from "./dailyPuzzleCore";
 
 export {
   GRID_OPTIONS,

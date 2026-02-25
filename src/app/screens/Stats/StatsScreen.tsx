@@ -93,10 +93,7 @@ function formatWeekRangeLabel(start: string, end: string): string {
 
 const PODIUM = ["🥇", "🥈", "🥉"];
 
-type LeaderboardType =
-  | "today"
-  | "week"
-  | "alltime";
+type LeaderboardType = "today" | "week" | "alltime";
 type WeekSubview = "rankings" | "album";
 type WeeklyAlbumSlot = {
   date: string;
@@ -273,12 +270,7 @@ export function StatsScreen() {
   }, [configured, activeTab]);
 
   useEffect(() => {
-    if (
-      !configured ||
-      activeTab !== "leaderboard" ||
-      leaderboardType !== "today"
-    )
-      return;
+    if (!configured || activeTab !== "leaderboard" || leaderboardType !== "today") return;
     const today = getTodayDateString();
     const unsub = subscribeTodayCompletionCount(today, setTodayCompletionCount);
     return unsub;
@@ -294,7 +286,10 @@ export function StatsScreen() {
         const lb = await getDailyLeaderboard(today, 10, cutType, visualModifier);
         setLeaderboard(lb);
       } else if (leaderboardType === "week") {
-        const [wklb] = await Promise.all([getWeeklyTotalsLeaderboard(), loadWeeklyAlbum()]);
+        const [wklb] = await Promise.all([
+          getWeeklyTotalsLeaderboard(),
+          loadWeeklyAlbum(),
+        ]);
         setWeeklyTotalsLeaderboard(wklb);
       } else if (leaderboardType === "alltime") {
         const [r, c] = allTimeGrid.split("x").map(Number);
@@ -608,7 +603,9 @@ export function StatsScreen() {
                       <span className={styles.statLabel}>Best streak</span>
                     </div>
                     <div className={styles.statCard}>
-                      <span className={styles.statValue}>{stats?.masteryStreak ?? 0}</span>
+                      <span className={styles.statValue}>
+                        {stats?.masteryStreak ?? 0}
+                      </span>
                       <span className={styles.statLabel}>Mastery streak</span>
                     </div>
                     <div className={styles.statCard}>
@@ -744,7 +741,11 @@ export function StatsScreen() {
                     />
                   </div>
                   <div className={styles.leaderboardHeader}>
-                    <div className={styles.boardModeSwitch} role="tablist" aria-label="Board mode">
+                    <div
+                      className={styles.boardModeSwitch}
+                      role="tablist"
+                      aria-label="Board mode"
+                    >
                       <button
                         type="button"
                         className={`${styles.boardModeBtn} ${
@@ -884,7 +885,10 @@ export function StatsScreen() {
                     </p>
                   )}
                   {leaderboardType === "today" &&
-                    renderTimeLeaderboard(leaderboard, "No completions yet. Be the first!")}
+                    renderTimeLeaderboard(
+                      leaderboard,
+                      "No completions yet. Be the first!",
+                    )}
                   {leaderboardType === "week" &&
                     weekSubview === "rankings" &&
                     renderCompletionLeaderboard(
@@ -906,7 +910,9 @@ export function StatsScreen() {
                           >
                             <div className={styles.weekAlbumTop}>
                               <span>{slot.dayLabel}</span>
-                              {slot.completed && slot.mastery && <span title="Mastery">⚡</span>}
+                              {slot.completed && slot.mastery && (
+                                <span title="Mastery">⚡</span>
+                              )}
                             </div>
                             {slot.completed && slot.imageUrl ? (
                               <img

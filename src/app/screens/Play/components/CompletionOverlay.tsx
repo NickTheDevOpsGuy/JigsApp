@@ -128,7 +128,9 @@ export function CompletionOverlay({
 
   useEffect(() => {
     if (!grid) return;
-    getPercentileRank(grid.rows, grid.cols, elapsedSeconds, visualModifier).then(setPercentile);
+    getPercentileRank(grid.rows, grid.cols, elapsedSeconds, visualModifier).then(
+      setPercentile,
+    );
   }, [grid?.rows, grid?.cols, elapsedSeconds, visualModifier]);
 
   useEffect(() => {
@@ -216,7 +218,10 @@ export function CompletionOverlay({
           <p className={styles.dailyBadge}>
             🏅 Mastery clear — no hints, no undo!
             {masteryStreak > 0 && (
-              <span className={styles.streak}> {masteryStreak} day mastery streak ⚡</span>
+              <span className={styles.streak}>
+                {" "}
+                {masteryStreak} day mastery streak ⚡
+              </span>
             )}
           </p>
         )}

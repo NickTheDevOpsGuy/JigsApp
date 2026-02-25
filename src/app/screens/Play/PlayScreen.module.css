@@ -497,7 +497,8 @@
 .modifierFog .board,
 .modifierFog .previewPanel,
 .modifierFog .trayWrap {
-  filter: contrast(calc(1 - var(--fog-strength, 0))) brightness(calc(1 - var(--fog-strength, 0) * 0.45));
+  filter: contrast(calc(1 - var(--fog-strength, 0)))
+    brightness(calc(1 - var(--fog-strength, 0) * 0.45));
 }
 
 .modifierNight .board,
@@ -511,7 +512,11 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.42) 100%);
+  background: radial-gradient(
+    circle at center,
+    transparent 45%,
+    rgba(0, 0, 0, 0.42) 100%
+  );
 }
 
 .modifierSepia .board,

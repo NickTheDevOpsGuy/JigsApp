@@ -119,10 +119,13 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const handleStart = () => {
     clearPuzzleState();
     const grid = GRID_OPTIONS[selectedIndex];
-    const result = dailyModule.startDailyPuzzle({
-      rows: grid.rows,
-      cols: grid.cols,
-    }, modifier);
+    const result = dailyModule.startDailyPuzzle(
+      {
+        rows: grid.rows,
+        cols: grid.cols,
+      },
+      modifier,
+    );
     if (result) {
       if (rememberChoice) {
         setDailyPreferredDifficultyIndex(selectedIndex);
@@ -231,7 +234,9 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
 
       <div className={styles.modifierSection}>
         <p className={styles.modifierLabel}>Optional Modifier</p>
-        <p className={styles.modifierHint}>This affects the run and leaderboard bracket.</p>
+        <p className={styles.modifierHint}>
+          This affects the run and leaderboard bracket.
+        </p>
         <div className={styles.modifierList}>
           {MODIFIER_OPTIONS.map((opt) => (
             <button
