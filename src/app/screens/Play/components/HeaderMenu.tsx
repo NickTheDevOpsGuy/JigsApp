@@ -246,6 +246,27 @@ export function HeaderMenu(props: HeaderMenuProps) {
       {subMenuItems.map((item) => (
         <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
       ))}
+      {activeSubMenu === "display" && (
+        <div className={styles.headerMenuRangeWrap}>
+          <label htmlFor="snap-tolerance-range" className={styles.headerMenuRangeLabel}>
+            Snap Assist: {Math.round(props.snapToleranceOverride * 100)}%
+          </label>
+          <input
+            id="snap-tolerance-range"
+            type="range"
+            min={60}
+            max={160}
+            step={5}
+            value={Math.round(props.snapToleranceOverride * 100)}
+            onChange={(e) => props.onSnapToleranceOverrideChange(Number(e.target.value) / 100)}
+            className={styles.headerMenuRange}
+            aria-label="Snap tolerance override"
+          />
+          <p className={styles.headerMenuRangeHint}>
+            Lower = tighter snaps, higher = more forgiving.
+          </p>
+        </div>
+      )}
       {activeSubMenu === "display" && props.onOpenThemeModal && (
         <button
           type="button"

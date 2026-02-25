@@ -135,8 +135,17 @@ export function usePointerHandlers(args: {
   };
 
   const activePointersRef = useRef<
-    Map<number, { clientX: number; clientY: number; pointerType: string }>
+    Map<number, { clientX: number; clientY: number; pointerType: string; updatedAtMs: number }>
   >(new Map());
+  const TOUCH_POINTER_STALE_MS = 1500;
+  const pruneStaleTouchPointers = useCallback(() => {
+    const now = performance.now();
+    for (const [id, p] of activePointersRef.current.entries()) {
+      if (p.pointerType === "touch" && now - p.updatedAtMs > TOUCH_POINTER_STALE_MS) {
+        activePointersRef.current.delete(id);
+      }
+    }
+  }, []);
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -146,7 +155,9 @@ export function usePointerHandlers(args: {
         clientX: e.clientX,
         clientY: e.clientY,
         pointerType: e.pointerType,
+        updatedAtMs: performance.now(),
       });
+      pruneStaleTouchPointers();
 
       const touchPointers = [...activePointersRef.current.entries()]
         .filter(([, p]) => p.pointerType === "touch")
@@ -168,6 +179,7 @@ export function usePointerHandlers(args: {
         setSelectedPieceId(null);
         manager.pointerUp();
         setState(manager.getState());
+        viewport.endPan();
         try {
           canvas.releasePointerCapture(p1.id);
           canvas.releasePointerCapture(p2.id);
@@ -282,13 +294,20 @@ export function usePointerHandlers(args: {
         clientX: e.clientX,
         clientY: e.clientY,
         pointerType: e.pointerType,
+        updatedAtMs: performance.now(),
       });
+      pruneStaleTouchPointers();
 
       if (viewport?.isPinching?.()) {
         const touchPointers = [...activePointersRef.current.entries()]
           .filter(([, p]) => p.pointerType === "touch")
           .map(([, p]) => p);
-        if (touchPointers.length >= 2 && boardRef.current) {
+        if (touchPointers.length < 2) {
+          viewport.endPinch();
+          e.preventDefault();
+          return;
+        }
+        if (boardRef.current) {
           const boardRect = boardRef.current.getBoundingClientRect();
           viewport.handlePinchMove(touchPointers[0], touchPointers[1], boardRect);
         }
@@ -451,6 +470,7 @@ export function usePointerHandlers(args: {
         setSelectedPieceId(null);
         manager?.pointerUp();
         if (manager) setState(manager.getState());
+        viewport.endPan();
         viewport.startPinch(
           { clientX: p1.clientX, clientY: p1.clientY },
           { clientX: p2.clientX, clientY: p2.clientY },
@@ -505,6 +525,7 @@ export function usePointerHandlers(args: {
     setState,
     setSelectedPieceId,
     selectedIdRef,
+    pruneStaleTouchPointers,
   ]);
 
   return {

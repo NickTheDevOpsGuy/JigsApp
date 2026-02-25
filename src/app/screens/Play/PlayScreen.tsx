@@ -151,6 +151,8 @@ export function PlayScreen() {
     setPieceCutType,
     progressiveRevealMode,
     setProgressiveRevealMode,
+    snapToleranceOverride,
+    setSnapToleranceOverride,
   } = ui;
 
   const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
@@ -219,6 +221,7 @@ export function PlayScreen() {
       onSnapCheck: () => {
         perfStatsRef.current.snapCheckCount++;
       },
+      snapToleranceOverride,
       wrongRotationHintRef,
       dragStartTimeRef,
       batterySaverMode,
@@ -1097,6 +1100,8 @@ export function PlayScreen() {
               }}
               onResetStats={() => setShowResetStatsConfirm(true)}
               onClearCache={() => setShowClearCacheConfirm(true)}
+              snapToleranceOverride={snapToleranceOverride}
+              onSnapToleranceOverrideChange={(value) => setSnapToleranceOverride(value)}
             />
           </div>
           <div className={styles.topBarCenter}>

@@ -71,6 +71,8 @@ export type HeaderMenuProps = {
   onOpenThemeModal?: () => void;
   onResetStats?: () => void;
   onClearCache?: () => void;
+  snapToleranceOverride: number;
+  onSnapToleranceOverrideChange: (value: number) => void;
 };
 
 export type SubMenuId =

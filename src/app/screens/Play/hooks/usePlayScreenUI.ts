@@ -15,6 +15,7 @@ import {
   EDGE_HIGHLIGHT_KEY,
   RELAXED_MODE_KEY,
   DRIFT_MODE_KEY,
+  SNAP_TOLERANCE_OVERRIDE_KEY,
   type DebugFlags,
 } from "../playScreenUtils";
 
@@ -72,6 +73,17 @@ export function usePlayScreenUI() {
       return localStorage.getItem(DRIFT_MODE_KEY) === "true";
     } catch {
       return false;
+    }
+  });
+
+  const [snapToleranceOverride, setSnapToleranceOverride] = useState<number>(() => {
+    try {
+      const raw = localStorage.getItem(SNAP_TOLERANCE_OVERRIDE_KEY);
+      const parsed = raw != null ? Number(raw) : 1;
+      if (!Number.isFinite(parsed)) return 1;
+      return Math.min(1.6, Math.max(0.6, parsed));
+    } catch {
+      return 1;
     }
   });
 
@@ -202,6 +214,14 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
+      localStorage.setItem(SNAP_TOLERANCE_OVERRIDE_KEY, String(snapToleranceOverride));
+    } catch {
+      // ignore
+    }
+  }, [snapToleranceOverride]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(CUT_TYPE_KEY, pieceCutType);
     } catch {
       // ignore
@@ -286,6 +306,8 @@ export function usePlayScreenUI() {
     driftModeEnabled,
     setDriftModeEnabled,
     toggleDriftMode,
+    snapToleranceOverride,
+    setSnapToleranceOverride,
     pieceCutType,
     setPieceCutType,
     progressiveRevealMode,

@@ -13,6 +13,7 @@ export const RELAXED_MODE_KEY = "phuzzle:relaxedMode";
 export const DRIFT_MODE_KEY = "phuzzle:driftMode";
 export const CUT_TYPE_KEY = "phuzzle:cutType";
 export const PROGRESSIVE_REVEAL_KEY = "phuzzle:progressiveReveal";
+export const SNAP_TOLERANCE_OVERRIDE_KEY = "phuzzle:snapToleranceOverride";
 
 export const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
 

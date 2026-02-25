@@ -36,6 +36,8 @@ export type PuzzleManagerOptions = {
   snapScaleRef?: MutableRefObject<number>;
   /** Ref to relaxed-mode multiplier (1 = normal, 1.5 = increased tolerance when idle). */
   relaxedToleranceMultiplierRef?: MutableRefObject<number>;
+  /** Ref to user override multiplier from settings slider. */
+  snapToleranceOverrideRef?: MutableRefObject<number>;
   rotationStepDeg?: 90 | 180;
   /** Use tighter scatter pattern for mobile viewports. */
   isMobile?: boolean;
@@ -78,6 +80,7 @@ export class PuzzleManager {
   private snapToleranceNeighborPx: number;
   private snapScaleRef: MutableRefObject<number> | undefined;
   private relaxedToleranceMultiplierRef: MutableRefObject<number> | undefined;
+  private snapToleranceOverrideRef: MutableRefObject<number> | undefined;
   private isMobile: boolean;
   private scatterStartYRatio: number;
   private rotationStepDeg: 90 | 180;
@@ -106,6 +109,7 @@ export class PuzzleManager {
       snapToleranceNeighborPx = 48,
       snapScaleRef,
       relaxedToleranceMultiplierRef,
+      snapToleranceOverrideRef,
       scatterStartYRatio = 0.3,
       rotationStepDeg = 90,
       isMobile = false,
@@ -119,6 +123,7 @@ export class PuzzleManager {
     this.snapToleranceNeighborPx = snapToleranceNeighborPx;
     this.snapScaleRef = snapScaleRef;
     this.isMobile = isMobile;
+    this.snapToleranceOverrideRef = snapToleranceOverrideRef;
     this.scatterStartYRatio = scatterStartYRatio;
     this.rotationStepDeg = rotationStepDeg;
     const cutType = options.cutType ?? "classic";
@@ -275,8 +280,11 @@ export class PuzzleManager {
     );
   }
 
-  /** Soft overflow (px) beyond board edge before hard clamping. Avoids lost pieces. */
-  private static readonly SOFT_CLAMP_OVERFLOW = 80;
+  /**
+   * Soft overflow (px) beyond board edge before hard clamping.
+   * Keep this small so pieces remain reachable on touch devices.
+   */
+  private static readonly SOFT_CLAMP_OVERFLOW = 24;
 
   private clampGroupDelta(groupId: string, dx: number, dy: number) {
     const b = this.getGroupBounds(groupId);
@@ -775,22 +783,31 @@ export class PuzzleManager {
    * Mobile gets a small bump (~8%) for touch imprecision.
    */
   private getEffectiveTolerance(basePx: number): number {
-    // Mobile needs a bit more forgiveness (touch imprecision + iOS Safari event jitter)
-    const mobileBump = this.isMobile ? 1.15 : 1;
+    const scale = Math.max(0.25, Math.min(4, this.snapScaleRef?.current ?? 1));
     const relaxedMult = this.relaxedToleranceMultiplierRef?.current ?? 1;
-    const adjusted = basePx * mobileBump * relaxedMult;
-    const scale = this.snapScaleRef?.current ?? 1;
-    const clampedScale = Math.max(0.25, Math.min(4, scale));
-    let effective = adjusted / clampedScale;
+    const overrideMult = Math.max(
+      0.6,
+      Math.min(1.6, this.snapToleranceOverrideRef?.current ?? 1),
+    );
+    const mobileBump = this.isMobile ? 1.2 : 1;
+    let effective = basePx * mobileBump;
+
     if (scale < 1) {
-      const maxMultiplier = scale <= 0.5 ? 2.5 : 2 + (1 - scale);
-      effective = Math.min(effective, adjusted * maxMultiplier);
-    } else {
-      // When zoomed in, don't over-tighten. Too-small tolerances cause "these obviously match" misses.
-      // Keep a floor so snapping remains consistent across zoom levels and devices.
-      effective = Math.max(effective, adjusted * 0.5);
+      const zoomOutBoost = this.isMobile ? 1 + (1 - scale) * 1.25 : 1 + (1 - scale) * 0.75;
+      effective *= zoomOutBoost;
+    } else if (scale > 1) {
+      const zoomInTighten =
+        this.isMobile
+          ? 1 / (1 + (scale - 1) * 0.45)
+          : 1 / (1 + (scale - 1) * 0.8);
+      effective *= zoomInTighten;
     }
-    return effective;
+
+    effective *= relaxedMult * overrideMult;
+
+    const minMult = this.isMobile ? 0.45 : 0.35;
+    const maxMult = this.isMobile ? 3 : 2.5;
+    return _clamp(effective, basePx * minMult, basePx * maxMult);
   }
 
   private trySnapActiveGroupToBoard(): boolean {

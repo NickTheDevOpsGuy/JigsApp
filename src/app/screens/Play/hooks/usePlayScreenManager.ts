@@ -35,6 +35,8 @@ export function usePlayScreenManager(
     onPlacementStreak?: () => void;
     /** Ref to viewport scale for zoom-adaptive snap tolerance. */
     snapScaleRef?: MutableRefObject<number>;
+    /** User override multiplier for snap tolerance (settings slider). */
+    snapToleranceOverride?: number;
     /** Called each time snap logic is evaluated (for perf overlay). */
     onSnapCheck?: () => void;
     /** Ref updated when piece would snap but wrong rotation blocks it (position correct, rotation wrong). */
@@ -68,11 +70,15 @@ export function usePlayScreenManager(
   const placementTimesRef = useRef<number[]>([]);
   const lastStreakAtRef = useRef<number | null>(null);
   const relaxedToleranceMultiplierRef = useRef<number>(1);
+  const snapToleranceOverrideRef = useRef<number>(1);
   const sizingCleanupRef = useRef<(() => void) | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
   const relaxedModeEnabled = options?.relaxedModeEnabled ?? false;
+  useEffect(() => {
+    snapToleranceOverrideRef.current = options?.snapToleranceOverride ?? 1;
+  }, [options?.snapToleranceOverride]);
   useEffect(() => {
     if (!relaxedModeEnabled) {
       relaxedToleranceMultiplierRef.current = 1;
@@ -199,6 +205,7 @@ export function usePlayScreenManager(
             cutType,
             snapScaleRef: opts?.snapScaleRef,
             relaxedToleranceMultiplierRef,
+            snapToleranceOverrideRef,
           },
           {
             onPiecePlaced: (p) => {
