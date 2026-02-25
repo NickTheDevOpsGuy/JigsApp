@@ -13,11 +13,9 @@ import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
 import { ChevronLeft, ChevronRight, Shuffle } from "lucide-react";
-import { TrayFilterButton } from "@/screens/Play/components/TrayFilterButton";
+import { TrayFilterButton, type TrayFilter } from "@/screens/Play/components/TrayFilterButton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import styles from "./PieceTray.module.css";
-
-export type TrayFilter = "all" | "edges" | "colors";
 
 const THUMB_NORMAL = 68;
 const THUMB_COMPACT = 54;
@@ -107,12 +105,16 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   }, []);
 
   const displayed = useMemo(() => {
+    const corners = pieces.filter((p) => isCorner(p, grid));
     const edges = pieces.filter((p) => isEdge(p, grid));
     const allByGrid = [...pieces].sort(byGrid);
     const allByHue = image ? [...pieces].sort(byHue) : allByGrid;
 
     let result: Piece[];
     switch (filter) {
+      case "corners":
+        result = [...corners].sort(byGrid);
+        break;
       case "edges":
         result = [...edges].sort(byGrid);
         break;

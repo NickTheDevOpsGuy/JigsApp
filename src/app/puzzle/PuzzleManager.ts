@@ -775,7 +775,8 @@ export class PuzzleManager {
    * Mobile gets a small bump (~8%) for touch imprecision.
    */
   private getEffectiveTolerance(basePx: number): number {
-    const mobileBump = this.isMobile ? 1.08 : 1;
+    // Mobile needs a bit more forgiveness (touch imprecision + iOS Safari event jitter)
+    const mobileBump = this.isMobile ? 1.15 : 1;
     const relaxedMult = this.relaxedToleranceMultiplierRef?.current ?? 1;
     const adjusted = basePx * mobileBump * relaxedMult;
     const scale = this.snapScaleRef?.current ?? 1;
@@ -785,7 +786,9 @@ export class PuzzleManager {
       const maxMultiplier = scale <= 0.5 ? 2.5 : 2 + (1 - scale);
       effective = Math.min(effective, adjusted * maxMultiplier);
     } else {
-      effective = Math.max(effective, adjusted * 0.35);
+      // When zoomed in, don't over-tighten. Too-small tolerances cause "these obviously match" misses.
+      // Keep a floor so snapping remains consistent across zoom levels and devices.
+      effective = Math.max(effective, adjusted * 0.5);
     }
     return effective;
   }

@@ -134,6 +134,16 @@ export function buildMenuItems(
       subMenu: "navigation",
     },
     {
+      id: "resetView",
+      section: "settings",
+      visible: true,
+      label: "🎯 Reset view",
+      ariaLabel: "Reset zoom and pan",
+      sortKey: "Reset view",
+      onClick: c(props.onCenterBoard),
+      subMenu: "navigation",
+    },
+    {
       id: "new",
       section: "settings",
       visible: true,
