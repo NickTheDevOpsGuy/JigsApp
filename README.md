@@ -1,10 +1,10 @@
 [![CI](https://github.com/NickTheDevOpsGuy/phuzzle/actions/workflows/Phuzzle.yml/badge.svg)](https://github.com/NickTheDevOpsGuy/phuzzle/actions/workflows/Phuzzle.yml)
+![Last Commit](https://img.shields.io/github/last-commit/NickTheDevOpsGuy/phuzzle)
+![License](https://img.shields.io/github/license/NickTheDevOpsGuy/phuzzle)
+
 ![Built with React](https://img.shields.io/badge/Built%20with-React-61dafb?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38bdf8?logo=tailwind-css&logoColor=white)
-![License](https://img.shields.io/github/license/NickTheDevOpsGuy/phuzzle)
-![Last Commit](https://img.shields.io/github/last-commit/NickTheDevOpsGuy/phuzzle)
-![Contributions welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)
 
 # Phuzzle
 
