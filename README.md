@@ -163,14 +163,14 @@ Useful scripts:
 
 ## Documentation
 
-| Doc                                                    | Description                                                                                        |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Doc                                                    | Description                                                                                               |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
 | [SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share, daily comments; migrations (tables + RLS) |
-| [SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                      |
-| [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                               |
-| [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                  |
-| [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                        |
-| [README.md](doc/README.md)                             | Index of docs                                                                                      |
+| [SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                             |
+| [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                                      |
+| [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                         |
+| [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                               |
+| [README.md](doc/README.md)                             | Index of docs                                                                                             |
 
 ---
 

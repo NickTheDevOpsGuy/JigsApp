@@ -38,7 +38,9 @@ export async function fetchDailyComments(puzzleDate: string): Promise<DailyComme
   return (data ?? []) as DailyComment[];
 }
 
-export async function fetchDailyReactions(puzzleDate: string): Promise<DailyReactionCount[]> {
+export async function fetchDailyReactions(
+  puzzleDate: string,
+): Promise<DailyReactionCount[]> {
   if (!isSupabaseConfigured() || !supabase) return [];
   const userId = await getUserId();
   const { data, error } = await supabase

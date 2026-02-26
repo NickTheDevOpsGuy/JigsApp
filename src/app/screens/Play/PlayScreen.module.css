@@ -185,7 +185,10 @@
   color: var(--color-text-primary);
   padding: 8px 12px;
   cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    transform 0.1s ease;
 }
 
 .undoRedoBtn:last-child {

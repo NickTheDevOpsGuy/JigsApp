@@ -199,12 +199,16 @@ export function HeaderMenu(props: HeaderMenuProps) {
           className={styles.headerMenuToggleRow}
           role="menuitemcheckbox"
           aria-checked={item.checked}
-        aria-label={getAriaLabel(item)}
-        disabled={item.disabled}
-        title={item.disabled && item.disabledTitle ? item.disabledTitle : `Toggle ${item.label}`}
-        onClick={item.onClick}
-      >
-        <span className={styles.headerMenuToggleLabel}>{item.label}</span>
+          aria-label={getAriaLabel(item)}
+          disabled={item.disabled}
+          title={
+            item.disabled && item.disabledTitle
+              ? item.disabledTitle
+              : `Toggle ${item.label}`
+          }
+          onClick={item.onClick}
+        >
+          <span className={styles.headerMenuToggleLabel}>{item.label}</span>
           <span
             className={`${styles.headerMenuSwitch} ${item.checked ? styles.headerMenuSwitchOn : ""}`}
             aria-hidden
@@ -223,7 +227,11 @@ export function HeaderMenu(props: HeaderMenuProps) {
         onClick={item.onClick}
         aria-label={getAriaLabel(item)}
         aria-checked={item.radioSelected}
-        title={item.disabled && item.disabledTitle ? item.disabledTitle : item.ariaLabel ?? item.sortKey ?? item.label}
+        title={
+          item.disabled && item.disabledTitle
+            ? item.disabledTitle
+            : (item.ariaLabel ?? item.sortKey ?? item.label)
+        }
       >
         <span className={styles.headerMenuToggleLabel}>{item.label}</span>
         {item.radioSelected && (
@@ -284,10 +292,10 @@ export function HeaderMenu(props: HeaderMenuProps) {
               className={styles.headerMenuSubmenuTrigger}
               role="menuitem"
               onClick={() => setActiveSubMenu("help")}
-          aria-label="Help"
-                  title="How to play and keyboard shortcuts"
-                >
-                  {SUB_MENU_LABELS.help}
+              aria-label="Help"
+              title="How to play and keyboard shortcuts"
+            >
+              {SUB_MENU_LABELS.help}
               <ChevronRight size={16} className={styles.headerMenuChevron} />
             </button>
           )}
@@ -391,19 +399,19 @@ export function HeaderMenu(props: HeaderMenuProps) {
               <div className={styles.headerMenuDivider} />
               {mainMenuSubmenus.map((id) => (
                 <React.Fragment key={id}>
-                <button
-                  type="button"
-                  className={styles.headerMenuSubmenuTrigger}
-                  role="menuitem"
-                  onClick={() => {
-                    if (id === "advanced") setAdvancedExpanded((e) => !e);
-                    else setActiveSubMenu(id);
-                  }}
-                  aria-label={
-                    SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
-                  }
-                  title={getSubmenuDescription(id)}
-                >
+                  <button
+                    type="button"
+                    className={styles.headerMenuSubmenuTrigger}
+                    role="menuitem"
+                    onClick={() => {
+                      if (id === "advanced") setAdvancedExpanded((e) => !e);
+                      else setActiveSubMenu(id);
+                    }}
+                    aria-label={
+                      SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
+                    }
+                    title={getSubmenuDescription(id)}
+                  >
                     {SUB_MENU_LABELS[id]}
                     <ChevronRight
                       size={16}

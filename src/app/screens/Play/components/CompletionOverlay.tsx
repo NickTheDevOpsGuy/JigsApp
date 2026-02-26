@@ -253,9 +253,7 @@ export function CompletionOverlay({
           </div>
         </div>
 
-        {isDaily && (
-          <DailyReactions puzzleDate={getTodayDateString()} />
-        )}
+        {isDaily && <DailyReactions puzzleDate={getTodayDateString()} />}
 
         <Modal
           isOpen={sharePopupOpen}

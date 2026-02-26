@@ -20,7 +20,12 @@ export function UndoRedoButtons({
   onRedo,
 }: UndoRedoButtonsProps) {
   return (
-    <div className={styles.undoRedoSegment} role="group" aria-label="Undo and redo" title="Undo and redo">
+    <div
+      className={styles.undoRedoSegment}
+      role="group"
+      aria-label="Undo and redo"
+      title="Undo and redo"
+    >
       <button
         type="button"
         className={styles.undoRedoBtn}

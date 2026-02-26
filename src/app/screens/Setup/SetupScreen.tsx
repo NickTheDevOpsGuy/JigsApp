@@ -392,13 +392,13 @@ export function SetupScreen() {
               compact={isMobile}
               value={gridIndex}
               onChange={(val: string) => setGridIndex(Number(val))}
-                options={GRID_OPTIONS.map((opt, i) => ({
-                  value: i,
-                  label:
-                    opt.rows > 0
-                      ? opt.label
-                      : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
-                }))}
+              options={GRID_OPTIONS.map((opt, i) => ({
+                value: i,
+                label:
+                  opt.rows > 0
+                    ? opt.label
+                    : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
+              }))}
               fullWidth
             />
 

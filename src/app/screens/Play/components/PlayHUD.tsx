@@ -81,7 +81,11 @@ export function PlayHUD({
       {showTimer && !isSpeedrun && (
         <div
           className={`${styles.hudPillTimer} ${isLowTime ? styles.timerLow : ""}`}
-          title={isCountdown ? `Countdown timer (${formatTime(countdownTotal)} total)` : "Elapsed time"}
+          title={
+            isCountdown
+              ? `Countdown timer (${formatTime(countdownTotal)} total)`
+              : "Elapsed time"
+          }
         >
           <Clock size={14} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>

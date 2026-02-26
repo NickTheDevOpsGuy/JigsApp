@@ -41,7 +41,11 @@ export function DailyReactions({ puzzleDate }: DailyReactionsProps) {
       fetchDailyReactions(puzzleDate),
     ]);
     setComments(c);
-    setReactions(r.length > 0 ? r : getReactionEmojis().map((e) => ({ emoji: e, count: 0, userReacted: false })));
+    setReactions(
+      r.length > 0
+        ? r
+        : getReactionEmojis().map((e) => ({ emoji: e, count: 0, userReacted: false })),
+    );
     setLoading(false);
   }, [puzzleDate]);
 

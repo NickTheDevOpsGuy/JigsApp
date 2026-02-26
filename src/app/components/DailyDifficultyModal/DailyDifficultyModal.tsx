@@ -218,8 +218,14 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
 
       <div className={styles.challengeModeSection}>
         <p className={styles.challengeModeLabel}>Challenge Mode</p>
-        <p className={styles.challengeModeHint}>Leaderboard bracket — only one active at a time.</p>
-        <div className={styles.challengeModeRadioList} role="radiogroup" aria-label="Challenge mode">
+        <p className={styles.challengeModeHint}>
+          Leaderboard bracket — only one active at a time.
+        </p>
+        <div
+          className={styles.challengeModeRadioList}
+          role="radiogroup"
+          aria-label="Challenge mode"
+        >
           {MODIFIER_OPTIONS.map((opt) => (
             <label
               key={opt.value}

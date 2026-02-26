@@ -14,14 +14,14 @@ The app runs without Supabase, but these features require a configured project:
 
 ## What Supabase powers
 
-| Feature       | Description                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------------------ |
-| Leaderboards  | Daily puzzle, weekly and monthly totals, streaks, all-time completions, best times per grid size   |
-| Player stats  | Puzzles completed, total play time, daily streaks                                                |
-| Achievements  | Unlock badges (first puzzle, streaks, speed runs, etc.)                                           |
-| Profile       | Display name and anonymous mode (raccoon names on leaderboards)                                 |
-| Co-op sharing | "Play with friend" real-time collaborative puzzle sessions                                      |
-| Daily comments | Emoji reactions and 280-char comments on daily puzzle completion; report for moderation        |
+| Feature        | Description                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| Leaderboards   | Daily puzzle, weekly and monthly totals, streaks, all-time completions, best times per grid size |
+| Player stats   | Puzzles completed, total play time, daily streaks                                                |
+| Achievements   | Unlock badges (first puzzle, streaks, speed runs, etc.)                                          |
+| Profile        | Display name and anonymous mode (raccoon names on leaderboards)                                  |
+| Co-op sharing  | "Play with friend" real-time collaborative puzzle sessions                                       |
+| Daily comments | Emoji reactions and 280-char comments on daily puzzle completion; report for moderation          |
 
 ---
 

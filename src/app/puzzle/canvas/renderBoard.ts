@@ -145,8 +145,7 @@ export function renderBoard(
     .sort((a, b) => a.z - b.z);
 
   const LOCK_GLOW_MS = 500;
-  const overrides =
-    animState?.undoSnapBackOverrides ?? animState?.dragDisplayOverrides;
+  const overrides = animState?.undoSnapBackOverrides ?? animState?.dragDisplayOverrides;
   // Ensure dragged group is drawn last (top z-order)
   const sortedPieces =
     draggedGroupId != null
@@ -162,10 +161,9 @@ export function renderBoard(
     const lockAt = lockMap.get(p.id);
     const lockElapsedMs = lockAt != null ? nowMs - lockAt : 0;
     const showLockGlow = lockAt != null && lockElapsedMs < LOCK_GLOW_MS;
-    const drawPieceData =
-      overrides?.has(p.id)
-        ? { ...p, x: overrides.get(p.id)!.x, y: overrides.get(p.id)!.y }
-        : p;
+    const drawPieceData = overrides?.has(p.id)
+      ? { ...p, x: overrides.get(p.id)!.x, y: overrides.get(p.id)!.y }
+      : p;
     drawPiece(
       ctx,
       drawPieceData,
