@@ -3,7 +3,7 @@
  */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, BarChart3, Trophy, Award, User, Share2 } from "lucide-react";
+import { ArrowLeft, BarChart3, Trophy, Award, User, Share2, Filter, ChevronDown } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "./StatsScreen.module.css";
 import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client";
@@ -119,6 +119,7 @@ export function StatsScreen() {
   const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
   const [cutTypeFilter, setCutTypeFilter] = useState<PieceCutType>("all");
   const [modifierFilter, setModifierFilter] = useState<VisualModifierFilter>("all");
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [stats, setStats] = useState<{
     puzzlesCompleted: number;
     totalPlayTimeSeconds: number;
@@ -497,7 +498,11 @@ export function StatsScreen() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <div className={styles.header}>
+        <div
+          className={`${styles.header} ${
+            activeTab === "leaderboard" ? styles.headerLeaderboard : ""
+          }`}
+        >
           <Button size="sm" onClick={() => nav("/")}>
             <ArrowLeft size={18} />
             Back
@@ -508,38 +513,40 @@ export function StatsScreen() {
               <span className={styles.titleProgress}>{weeklyAlbumProgress}/7</span>
             )}
           </h1>
-          {activeTab === "leaderboard" && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={
-                leaderboardType === "week" && weekSubview === "album"
-                  ? handleShareWeeklyAlbum
-                  : handleShareLeaderboard
-              }
-              className={styles.headerShareBtn}
-              aria-label={
-                leaderboardType === "week" && weekSubview === "album"
-                  ? albumShareCopied
-                    ? "Copied weekly album share text"
-                    : "Share weekly album"
-                  : shareCopied
-                    ? "Copied leaderboard share text"
-                    : "Share leaderboard"
-              }
-              title={
-                leaderboardType === "week" && weekSubview === "album"
-                  ? albumShareCopied
-                    ? "Copied!"
-                    : "Share album"
-                  : shareCopied
-                    ? "Copied!"
-                    : "Share leaderboard"
-              }
-            >
-              <Share2 size={16} />
-            </Button>
-          )}
+          {activeTab === "leaderboard" ? (
+            <div className={styles.headerActions}>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={
+                  leaderboardType === "week" && weekSubview === "album"
+                    ? handleShareWeeklyAlbum
+                    : handleShareLeaderboard
+                }
+                className={styles.headerIconBtn}
+                aria-label={
+                  leaderboardType === "week" && weekSubview === "album"
+                    ? albumShareCopied
+                      ? "Copied weekly album share text"
+                      : "Share weekly album"
+                    : shareCopied
+                      ? "Copied leaderboard share text"
+                      : "Share leaderboard"
+                }
+                title={
+                  leaderboardType === "week" && weekSubview === "album"
+                    ? albumShareCopied
+                      ? "Copied!"
+                      : "Share album"
+                    : shareCopied
+                      ? "Copied!"
+                      : "Share leaderboard"
+                }
+              >
+                <Share2 size={18} />
+              </Button>
+            </div>
+          ) : null}
         </div>
 
         {activeTab !== "leaderboard" && (
@@ -712,15 +719,6 @@ export function StatsScreen() {
 
               {activeTab === "leaderboard" && (
                 <div className={styles.section}>
-                  <div className={styles.countdownWrap}>
-                    <DailyCountdown
-                      prominent
-                      variant="anticipation"
-                      onUnlock={() => {
-                        if (leaderboardType === "today") loadData();
-                      }}
-                    />
-                  </div>
                   <div className={styles.leaderboardHeader}>
                     <div
                       className={styles.boardModeSwitch}
@@ -743,7 +741,7 @@ export function StatsScreen() {
                         }`}
                         onClick={() => setLeaderboardType("week")}
                       >
-                        Week ({weeklyAlbumProgress}/7)
+                        Week
                       </button>
                       <button
                         type="button"
@@ -755,6 +753,85 @@ export function StatsScreen() {
                         All-time
                       </button>
                     </div>
+                    {leaderboardType === "today" && (
+                      <div className={styles.countdownWrap}>
+                        <DailyCountdown
+                          variant="untilReset"
+                          onUnlock={() => {
+                            if (leaderboardType === "today") loadData();
+                          }}
+                        />
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      className={styles.filtersBar}
+                      onClick={() => setFiltersOpen((o) => !o)}
+                      aria-expanded={filtersOpen}
+                      aria-label="Filters"
+                    >
+                      <Filter size={18} />
+                      <span>Filters</span>
+                      <ChevronDown
+                        size={18}
+                        className={filtersOpen ? styles.filtersChevronOpen : ""}
+                      />
+                    </button>
+                    {filtersOpen && (
+                      <div className={styles.controlsRow}>
+                        {(leaderboardType === "today" || leaderboardType === "alltime") && (
+                          <>
+                            <select
+                              id="cut-type-select"
+                              className={styles.inlineFilterSelect}
+                              value={cutTypeFilter}
+                              onChange={(e) =>
+                                setCutTypeFilter(e.target.value as PieceCutType)
+                              }
+                              aria-label="Filter by shape"
+                            >
+                              <option value="all">All Shapes</option>
+                              <option value="classic">Classic Shape</option>
+                              <option value="irregular">Irregular Shape</option>
+                              <option value="hard">Hard Shape</option>
+                            </select>
+                            <select
+                              id="modifier-select"
+                              className={styles.inlineFilterSelect}
+                              value={modifierFilter}
+                              onChange={(e) =>
+                                setModifierFilter(e.target.value as VisualModifierFilter)
+                              }
+                              aria-label="Filter by modifier"
+                            >
+                              <option value="all">All Modifiers</option>
+                              <option value="none">No Modifier</option>
+                              <option value="fog">Fog Modifier</option>
+                              <option value="night">Night Modifier</option>
+                              <option value="sepia">Sepia Modifier</option>
+                            </select>
+                          </>
+                        )}
+                        {leaderboardType === "alltime" && (
+                          <select
+                            id="alltime-grid-select"
+                            className={styles.inlineFilterSelect}
+                            value={allTimeGrid}
+                            onChange={(e) =>
+                              setAllTimeGrid(
+                                e.target.value as "3x3" | "4x4" | "5x5" | "6x6",
+                              )
+                            }
+                            aria-label="Filter all-time by grid size"
+                          >
+                            <option value="3x3">3x3 Grid</option>
+                            <option value="4x4">4x4 Grid</option>
+                            <option value="5x5">5x5 Grid</option>
+                            <option value="6x6">6x6 Grid</option>
+                          </select>
+                        )}
+                      </div>
+                    )}
                     {leaderboardType === "week" && (
                       <div className={styles.weekSubviewSwitch}>
                         <button
@@ -777,68 +854,16 @@ export function StatsScreen() {
                         </button>
                       </div>
                     )}
-                    <div className={styles.controlsRow}>
-                      {(leaderboardType === "today" || leaderboardType === "alltime") && (
-                        <>
-                          <select
-                            id="cut-type-select"
-                            className={styles.inlineFilterSelect}
-                            value={cutTypeFilter}
-                            onChange={(e) =>
-                              setCutTypeFilter(e.target.value as PieceCutType)
-                            }
-                            aria-label="Filter by shape"
-                          >
-                            <option value="all">All Shapes</option>
-                            <option value="classic">Classic Shape</option>
-                            <option value="irregular">Irregular Shape</option>
-                            <option value="hard">Hard Shape</option>
-                          </select>
-                          <select
-                            id="modifier-select"
-                            className={styles.inlineFilterSelect}
-                            value={modifierFilter}
-                            onChange={(e) =>
-                              setModifierFilter(e.target.value as VisualModifierFilter)
-                            }
-                            aria-label="Filter by modifier"
-                          >
-                            <option value="all">All Modifiers</option>
-                            <option value="none">No Modifier</option>
-                            <option value="fog">Fog Modifier</option>
-                            <option value="night">Night Modifier</option>
-                            <option value="sepia">Sepia Modifier</option>
-                          </select>
-                        </>
-                      )}
-                      {leaderboardType === "alltime" && (
-                        <select
-                          id="alltime-grid-select"
-                          className={styles.inlineFilterSelect}
-                          value={allTimeGrid}
-                          onChange={(e) =>
-                            setAllTimeGrid(
-                              e.target.value as "3x3" | "4x4" | "5x5" | "6x6",
-                            )
-                          }
-                          aria-label="Filter all-time by grid size"
-                        >
-                          <option value="3x3">3x3 Grid</option>
-                          <option value="4x4">4x4 Grid</option>
-                          <option value="5x5">5x5 Grid</option>
-                          <option value="6x6">6x6 Grid</option>
-                        </select>
-                      )}
-                    </div>
                   </div>
-                  <h2>
-                    {leaderboardType === "today" && "Today's Daily"}
-                    {leaderboardType === "week" &&
-                      (weekSubview === "rankings"
-                        ? `Weekly Rankings (${weekRangeLabel})`
-                        : `Weekly Album (${weekRangeLabel})`)}
-                    {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
-                  </h2>
+                  {(leaderboardType === "week" || leaderboardType === "alltime") && (
+                    <h2 className={styles.leaderboardSubtitle}>
+                      {leaderboardType === "week" &&
+                        (weekSubview === "rankings"
+                          ? `Weekly Rankings (${weekRangeLabel})`
+                          : `Weekly Album (${weekRangeLabel})`)}
+                      {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
+                    </h2>
+                  )}
                   {leaderboardType === "today" && (
                     <p className={styles.todayCompletionCount} aria-live="polite">
                       {todayCompletionCount} completion

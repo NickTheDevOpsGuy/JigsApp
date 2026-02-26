@@ -88,6 +88,41 @@
   justify-content: center;
 }
 
+/* Leaderboard: Back | centered title | Filter + Share icons */
+.headerLeaderboard {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.headerLeaderboard .title {
+  justify-content: center;
+  text-align: center;
+}
+
+.headerLeaderboard .titleProgress {
+  display: none;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.headerIconBtn {
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
 .placeholder,
 .hint {
   margin: 0 0 12px;
@@ -174,9 +209,12 @@
 .loading,
 .todayCompletionCount {
   margin: 0 0 12px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-text-secondary);
-  font-weight: 600;
+}
+
+.todayCompletionCount {
+  font-weight: 500;
 }
 
 .empty {
@@ -284,34 +322,23 @@
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.leaderboard {
-  border-radius: 12px;
-  border: 1px solid var(--color-border);
-  overflow: hidden;
-  background: var(--color-bg-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: none;
+  background: transparent;
 }
 
 .leaderboardItem {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--color-border);
-  min-height: 44px;
+  padding: 12px 14px;
+  min-height: 48px;
   box-sizing: border-box;
-}
-
-.leaderboardItem:nth-child(even) {
-  background: color-mix(in srgb, var(--color-bg-secondary) 45%, var(--color-bg-elevated));
-}
-
-.leaderboardItem:last-child {
-  border-bottom: none;
-}
-
-.leaderboardItem {
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
   cursor: pointer;
 }
 
@@ -519,9 +546,11 @@
   margin-top: 8px;
 }
 
-/* Leaderboard header – dropdown + controls, same layout as mobile */
+/* Leaderboard header – segment, countdown, filters */
 .countdownWrap {
-  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
 }
 
 .leaderboardHeader {
@@ -529,43 +558,75 @@
   flex-direction: column;
   gap: 10px;
   align-items: stretch;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
+/* Single segmented bar: Today | Week | All-time */
 .boardModeSwitch {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
 }
 
 .boardModeBtn {
-  padding: 10px 8px;
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  background: var(--color-bg-elevated);
-  color: var(--color-text-primary);
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
 
-.boardModeBtn + .boardModeBtn {
-  position: relative;
-}
-
-.boardModeBtn + .boardModeBtn::before {
-  content: "";
-  position: absolute;
-  left: -5px;
-  top: 8px;
-  bottom: 8px;
-  width: 1px;
-  background: color-mix(in srgb, var(--color-border) 90%, transparent);
+.boardModeBtn:not(:last-child) {
+  border-right: 1px solid var(--color-border);
 }
 
 .boardModeBtnActive {
   background: var(--color-brand-primary);
   color: #fff;
   border-color: var(--color-brand-primary);
+}
+
+.boardModeBtnActive + .boardModeBtn {
+  border-left-color: var(--color-brand-primary);
+}
+
+/* Filters bar: icon + "Filters" + chevron */
+.filtersBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+}
+
+.filtersBar:hover {
+  background: var(--color-bg-card);
+}
+
+.filtersChevronOpen {
+  transform: rotate(180deg);
+  margin-left: auto;
+}
+
+.leaderboardSubtitle {
+  font-size: 16px;
+  margin: 0 0 10px 0;
+  color: var(--color-text-secondary);
 }
 
 .weekSubviewSwitch {

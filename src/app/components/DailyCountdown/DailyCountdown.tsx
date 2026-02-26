@@ -30,7 +30,7 @@ interface DailyCountdownProps {
   /** When true, use larger/prominent styling */
   prominent?: boolean;
   /** Visual style variant for leaderboard anticipation mode. */
-  variant?: "default" | "anticipation";
+  variant?: "default" | "anticipation" | "untilReset";
   /** Callback when countdown hits 0 */
   onUnlock?: () => void;
 }
@@ -85,24 +85,34 @@ export function DailyCountdown({
         ? "00:00:00"
         : formatCountdown(secondsLeft);
   const label =
-    variant === "anticipation"
-      ? justUnlocked
-        ? "New puzzle live"
-        : "Next puzzle drops in"
-      : justUnlocked
-        ? "New daily ready!"
-        : "Next daily in";
+    variant === "untilReset"
+      ? "until reset"
+      : variant === "anticipation"
+        ? justUnlocked
+          ? "New puzzle live"
+          : "Next puzzle drops in"
+        : justUnlocked
+          ? "New daily ready!"
+          : "Next daily in";
+
+  const isUntilReset = variant === "untilReset";
 
   return (
     <div
       className={`${styles.countdown} ${prominent ? styles.prominent : ""} ${
         variant === "anticipation" ? styles.anticipation : ""
-      } ${celebrating ? styles.celebrating : ""}`}
+      } ${isUntilReset ? styles.untilReset : ""} ${celebrating ? styles.celebrating : ""}`}
       role="timer"
       aria-live="polite"
-      aria-label={justUnlocked ? "New daily puzzle is ready" : `${label} ${display}`}
+      aria-label={justUnlocked ? "New daily puzzle is ready" : `${display} ${label}`}
     >
-      {variant === "anticipation" ? (
+      {isUntilReset ? (
+        <>
+          <Clock size={16} className={styles.icon} />
+          <span className={styles.time}>{display}</span>
+          <span className={styles.label}>{label}</span>
+        </>
+      ) : variant === "anticipation" ? (
         <>
           <div className={styles.anticipationTop}>
             <Clock size={prominent ? 20 : 16} className={styles.icon} />

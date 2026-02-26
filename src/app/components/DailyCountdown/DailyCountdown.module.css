@@ -40,6 +40,30 @@
   font-weight: 600;
 }
 
+/* One-line "Xh Xm until reset" for leaderboard */
+.untilReset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.untilReset .time {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.untilReset .label {
+  font-weight: 400;
+  opacity: 0.9;
+}
+
 .anticipation {
   display: flex;
   flex-direction: column;
