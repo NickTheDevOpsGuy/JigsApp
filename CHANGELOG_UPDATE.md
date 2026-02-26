@@ -4,6 +4,38 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
+## 🧩 Latest (undo animation, drag lift, daily comments, win screen)
+
+### Undo snap-back animation
+- **Single-step undo** — Undo reverts last placement/drag; piece animates back to prior position (~280ms ease-out)
+- **Ctrl/Cmd+Z** — Keyboard shortcut triggers same animation
+- **Files** — `playUtils.ts` (`createUndoRedoHandler`, `UndoSnapBackFrom`), `usePlayScreenAnimation.ts` (`undoSnapBackRef`), `renderBoard.ts` (`undoSnapBackOverrides`), `HeaderMenu.tsx` (shortcuts)
+
+### Drag lift (visual polish)
+- **Stronger shadow** — Dragged piece: blur 28px, offset 8×12px, opacity 0.55
+- **Scale-up** — 1.02× when dragging (piece feels physically lifted)
+- **Top z-order** — Dragged group always drawn last
+- **Files** — `renderBoardHelpers.ts` (`DRAG_SCALE`, `applyPieceShadow`), `renderBoard.ts` (sort by dragged group)
+
+### Daily puzzle comments & reactions
+- **Emoji reactions** — 👍 🎉 🔥 ✨ 💪 after daily completion; one per user per day
+- **Comments** — 280 char limit; post after completion; report button for moderation
+- **Tables** — `daily_comments`, `daily_reactions`, `daily_comment_reports`
+- **Files** — `dailyCommentsService.ts`, `DailyReactions` component, `CompletionOverlay.tsx` (when `isDaily`)
+
+### Win screen & Share Result
+- **Removed New Puzzle** — From completion overlay; users go to Menu to start new
+- **Share Result popup** — Single button opens modal with Share Card PNG, Seasonal frame checkbox, Download; modal has X close
+- **Piece Shape submenu** — Settings → Gameplay → Piece Shape (Classic/Irregular/Hard) with heading and "Applies to next puzzle" hint
+- **Submenu headings** — Section headings with underline under each submenu for orientation
+
+### Supabase migrations
+- **Two migrations** — `20260225120000_tables.sql` (tables, indexes, realtime, server-time RPC), `20260225120001_rls.sql` (RLS + policies)
+- **Idempotent** — Both skip existing objects; run via `npx supabase db push` or SQL Editor
+- **File structure** — Migrations in `supabase/migrations/` with timestamp prefixes
+
+---
+
 ## 📊 Analytics & UX (latest)
 
 ### Live completion counter

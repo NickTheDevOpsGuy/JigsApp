@@ -1,11 +1,15 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "12";
+export const CHANGELOG_VERSION = "13";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "↩️ Undo snap-back – Undo animates pieces back to their prior position (Ctrl/Cmd+Z or button)",
+      "🔼 Drag lift – Dragged pieces feel physically lifted (stronger shadow, slight scale)",
+      "💬 Daily comments & reactions – React with emoji (👍 🎉 🔥 ✨ 💪) and leave a 280-char comment after completing today's puzzle",
+      "📤 Share Result popup – New completion flow: Share Result opens modal with Share Card PNG, Seasonal frame, and Download",
       "🌸 Seasonal packs – Pack list highlights the season's pick (spring, summer, fall, winter) at the top with a badge",
       "🗺️ Heatmap – Post-completion overlay shows which pieces you moved most (red = hot, blue = cold)",
       "⏱️ Speedrun mode – Quadrant timers (TL, TR, BL, BR) with per-quadrant personal bests",

@@ -26,11 +26,13 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ## UX and polish
 
+- **Undo snap-back animation** – Undo (button or Ctrl/Cmd+Z) animates pieces back to prior position (~280ms)
+- **Drag lift** – Dragged piece: stronger shadow, 1.02× scale, guaranteed top z-order
 - **Snap proximity glow** – Visual feedback while dragging: glow intensifies as you near the correct snap point
 - Reference image preview (full or progressive reveal mode)
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
-- **Completion screen** - Share Result primary CTA; Download and Copy secondary.
+- **Completion screen** - Share Result button opens popup (Share Card PNG, Seasonal frame, Download); Menu button; removed New Puzzle
 - Settings: **About** (Help), **Display** (Theme, piece shape, board options, effects), **Gameplay** (Controls, time), **Audio**, **Advanced**
 - Optional piece borders, edge-piece highlight, immersive mode
 - Edge and corner pieces display full image content (no cropping)
@@ -38,7 +40,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - Ghost hint and ghost when idle
 - Optional piece locking
 - **Snap combo meter** – Appears when 2+ placements within 2.5s; breaks on idle
-- **Alternate piece shapes** – Classic, Irregular, Hard (Settings → Display → Piece shape)
+- **Alternate piece shapes** – Classic, Irregular, Hard (Settings → Gameplay → Piece Shape submenu; "Applies to next puzzle")
 - **Progressive reveal** – Hide full reference; reveal only regions where pieces are correctly placed
 - Battery-saver detection (reduces confetti when low-power or data-saver)
 - Six themes (Light, Dark, Space, Ocean, Forest, Sunset)
@@ -49,6 +51,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ## Social and progress
 
+- **Daily puzzle comments & reactions** – After completing today's puzzle: emoji reactions (👍 🎉 🔥 ✨ 💪), 280-char comments, report for moderation
 - Daily puzzle and streak tracking
 - **Daily countdown** – Server-synced timer to next daily unlock on Leaderboard; celebration when ready
 - **Streak freeze (streak shield)** – Earn one per week after a 5-day streak; auto-applied if you miss a day. See [streak-freeze.md](./streak-freeze.md).

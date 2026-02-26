@@ -16,11 +16,12 @@ The app runs without Supabase, but these features require a configured project:
 
 | Feature       | Description                                                                                      |
 | ------------- | ------------------------------------------------------------------------------------------------ |
-| Leaderboards  | Daily puzzle, weekly and monthly totals, streaks, all-time completions, best times per grid size |
+| Leaderboards  | Daily puzzle, weekly and monthly totals, streaks, all-time completions, best times per grid size   |
 | Player stats  | Puzzles completed, total play time, daily streaks                                                |
-| Achievements  | Unlock badges (first puzzle, streaks, speed runs, etc.)                                          |
-| Profile       | Display name and anonymous mode (raccoon names on leaderboards)                                  |
-| Co-op sharing | "Play with friend" real-time collaborative puzzle sessions                                       |
+| Achievements  | Unlock badges (first puzzle, streaks, speed runs, etc.)                                           |
+| Profile       | Display name and anonymous mode (raccoon names on leaderboards)                                 |
+| Co-op sharing | "Play with friend" real-time collaborative puzzle sessions                                      |
+| Daily comments | Emoji reactions and 280-char comments on daily puzzle completion; report for moderation        |
 
 ---
 
@@ -68,23 +69,26 @@ Anonymous auth lets users track stats and appear on leaderboards without signing
 
 ## 4. Run database migration
 
-A single migration creates all tables, indexes, RLS policies, RPCs, and Realtime publication configuration. It is idempotent (safe to run multiple times).
+Two migration files create tables and RLS. Both are idempotent (safe to run multiple times).
 
-Migration file:
+Migration files (run in order):
 
-- `supabase/migrations/001_full_schema.sql`
+- `supabase/migrations/20260225120000_tables.sql` — tables, indexes, realtime, server-time RPC
+- `supabase/migrations/20260225120001_rls.sql` — RLS enable + policies
 
-### Option A: Dashboard (SQL editor)
-
-1. Dashboard -> SQL Editor -> New query
-2. Copy and run `supabase/migrations/001_full_schema.sql`
-
-### Option B: Supabase CLI
+### Option A: Supabase CLI
 
 ```bash
-npx supabase link --project-ref YOUR_PROJECT_REF
 npx supabase db push
 ```
+
+### Option B: Dashboard (SQL editor)
+
+1. Dashboard -> SQL Editor -> New query
+2. Copy and run `supabase/migrations/20260225120000_tables.sql`
+3. New query: copy and run `supabase/migrations/20260225120001_rls.sql`
+
+For CLI, run `npx supabase db push` from project root (after `npx supabase link` if needed).
 
 ---
 

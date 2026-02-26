@@ -69,10 +69,10 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ## Features
 
-- **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap; group merging; 3×3 to 9×9 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan
-- **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak). See [doc/streak-freeze.md](doc/streak-freeze.md)
-- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard), completion confetti and badges, six themes
-- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image, co-op (Play with Friend via link)
+- **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap; group merging; 3×3 to 9×9 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan; undo/redo with snap-back animation (Ctrl/Cmd+Z); drag lift (stronger shadow, scale)
+- **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/streak-freeze.md](doc/streak-freeze.md)
+- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), completion confetti and badges, six themes
+- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image, Share Result popup (Share Card PNG, Download), co-op (Play with Friend via link)
 - **Analytics** — Live completion counter, percentile ranking (Top X%)
 
 Full feature list → [CHANGES.md](doc/CHANGES.md)
@@ -165,7 +165,7 @@ Useful scripts:
 
 | Doc                                                    | Description                                                                                        |
 | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| [SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share; single migration file (idempotent) |
+| [SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share, daily comments; migrations (tables + RLS) |
 | [SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                      |
 | [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                               |
 | [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                  |
@@ -355,6 +355,10 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   ├── audio
 │   │   │   └── sounds.ts
 │   │   ├── components
+│   │   │   ├── DailyReactions
+│   │   │   │   ├── DailyReactions.module.css
+│   │   │   │   ├── DailyReactions.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── AboutModal
 │   │   │   │   ├── AboutModal.module.css
 │   │   │   │   ├── AboutModal.tsx
@@ -488,7 +492,8 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── PlayToasts.types.ts
 │   │   │   │   │   ├── ProfilerOverlay.module.css
 │   │   │   │   │   ├── ProfilerOverlay.tsx
-│   │   │   │   │   ├── SnapComboMeter.tsx
+│   │   │   │   │   ├── UndoRedoButtons.tsx
+│   │   │   │   ├── SnapComboMeter.tsx
 │   │   │   │   │   ├── SnapComboMeter.module.css
 │   │   │   │   │   ├── TopBarButtons.tsx
 │   │   │   │   │   ├── TrayFilterButton.tsx
@@ -511,7 +516,8 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── usePuzzleSession.ts
-│   │   │   │   │   ├── useShareResults.ts
+│   │   │   │   │   ├── useShareCardImage.ts
+│   │   │   │   ├── useShareResults.ts
 │   │   │   │   │   ├── useTimeModeConfig.ts
 │   │   │   │   │   └── useViewport.ts
 │   │   │   │   ├── PlayScreen.module.css
@@ -534,6 +540,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │       ├── StatsScreen.module.css
 │   │   │       └── StatsScreen.tsx
 │   │   ├── services
+│   │   │   ├── dailyCommentsService.ts
 │   │   │   ├── achievementsService.ts
 │   │   │   ├── leaderboardService.ts
 │   │   │   ├── serverTimeService.ts
@@ -560,7 +567,8 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │       └── vite-env.d.ts
 ├── supabase
 │   ├── migrations
-│   │   └── 001_full_schema.sql
+│   │   ├── 20260225120000_tables.sql
+│   │   └── 20260225120001_rls.sql
 │   └── README.md
 ├── .env.example
 ├── .eslintcache
