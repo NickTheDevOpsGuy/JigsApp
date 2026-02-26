@@ -160,7 +160,9 @@ export function buildMenuItems(
       visible: !!props.onToggleDeliberateDetach,
       label: "Deliberate Detach",
       sortKey: "Deliberate Detach",
-      ariaLabel: props.deliberateDetachEnabled ? "Deliberate detach on" : "Deliberate detach off",
+      ariaLabel: props.deliberateDetachEnabled
+        ? "Deliberate detach on"
+        : "Deliberate detach off",
       onClick: c(props.onToggleDeliberateDetach ?? (() => {})),
       subMenu: "controls",
       isToggle: true,
@@ -252,7 +254,9 @@ export function buildMenuItems(
       visible: !!props.onToggleClusterOutline,
       label: "Cluster Outlines",
       sortKey: "Cluster Outlines",
-      ariaLabel: props.showClusterOutline ? "Cluster outlines on" : "Cluster outlines off",
+      ariaLabel: props.showClusterOutline
+        ? "Cluster outlines on"
+        : "Cluster outlines off",
       onClick: c(props.onToggleClusterOutline ?? (() => {})),
       subMenu: "assistance",
       isToggle: true,

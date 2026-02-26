@@ -114,8 +114,15 @@
 }
 
 @keyframes piecePulse {
-  0%, 100% { box-shadow: none; transform: scale(1); }
-  50% { box-shadow: 0 0 0 3px var(--color-accent); transform: scale(1.08); }
+  0%,
+  100% {
+    box-shadow: none;
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 3px var(--color-accent);
+    transform: scale(1.08);
+  }
 }
 
 .pieceButtonPulse {

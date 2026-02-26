@@ -228,7 +228,10 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(DELIBERATE_DETACH_KEY, deliberateDetachEnabled ? "true" : "false");
+      localStorage.setItem(
+        DELIBERATE_DETACH_KEY,
+        deliberateDetachEnabled ? "true" : "false",
+      );
     } catch {
       // ignore
     }
@@ -329,7 +332,10 @@ export function usePlayScreenUI() {
 
   const toggleShowGhostWhenIdle = useCallback(() => setShowGhostWhenIdle((v) => !v), []);
   const toggleShowEdgeHighlight = useCallback(() => setShowEdgeHighlight((v) => !v), []);
-  const toggleShowClusterOutline = useCallback(() => setShowClusterOutline((v) => !v), []);
+  const toggleShowClusterOutline = useCallback(
+    () => setShowClusterOutline((v) => !v),
+    [],
+  );
   const toggleDeliberateDetach = useCallback(
     () => setDeliberateDetachEnabled((v) => !v),
     [],

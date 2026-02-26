@@ -205,7 +205,9 @@ export function PlayScreen() {
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
   const [completionDismissed, setCompletionDismissed] = React.useState(false);
-  const [highlightedPieceIds, setHighlightedPieceIds] = React.useState<Set<string>>(new Set());
+  const [highlightedPieceIds, setHighlightedPieceIds] = React.useState<Set<string>>(
+    new Set(),
+  );
   const lastReferenceTapRef = React.useRef(0);
   const [boardSize, setBoardSize] = React.useState({ w: 800, h: 600 });
   const [lives, setLives] = React.useState(3);
@@ -1480,7 +1482,9 @@ export function PlayScreen() {
             image={imgRef.current}
             grid={state?.grid ?? grid}
             onPieceClick={handleTrayPieceClick}
-            highlightedPieceIds={highlightedPieceIds.size > 0 ? highlightedPieceIds : undefined}
+            highlightedPieceIds={
+              highlightedPieceIds.size > 0 ? highlightedPieceIds : undefined
+            }
           />
         </div>
       </div>
@@ -1504,7 +1508,9 @@ export function PlayScreen() {
                 const r = row + dr;
                 const c = col + dc;
                 if (r >= 0 && r < rows && c >= 0 && c < cols) {
-                  const p = state.pieces.find((x) => x.row === r && x.col === c && x.inTray);
+                  const p = state.pieces.find(
+                    (x) => x.row === r && x.col === c && x.inTray,
+                  );
                   if (p) candidates.push(p);
                 }
               }
@@ -1602,15 +1608,14 @@ export function PlayScreen() {
           onboardingOverlayTray: styles.onboardingOverlayTray,
         }}
       />
-      {((import.meta.env.DEV || SHOW_DEBUG) ||
+      {(import.meta.env.DEV ||
+        SHOW_DEBUG ||
         searchParams.has("debug") ||
         searchParams.has("perf")) && (
         <ProfilerOverlay
           statsRef={perfStatsRef}
           visible={
-            debug.showPerfOverlay ||
-            searchParams.has("debug") ||
-            searchParams.has("perf")
+            debug.showPerfOverlay || searchParams.has("debug") || searchParams.has("perf")
           }
         />
       )}
