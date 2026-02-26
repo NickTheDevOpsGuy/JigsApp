@@ -221,7 +221,18 @@ export function usePointerHandlers(args: {
       ctx2d.setTransform(1, 0, 0, 1, 0, 0);
       const st = manager.getState();
       const boardPieces = st.pieces.filter((p) => !p.inTray);
-      const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY);
+      // Reject hits outside assembled board (e.g. letterbox / empty area) to avoid blue outline on empty click
+      const first = st.pieces[0];
+      const assembledW = first ? st.grid.cols * first.tileW : 0;
+      const assembledH = first ? st.grid.rows * first.tileH : 0;
+      const inBounds =
+        assembledW > 0 &&
+        assembledH > 0 &&
+        pickX >= -2 &&
+        pickY >= -2 &&
+        pickX <= assembledW + 2 &&
+        pickY <= assembledH + 2;
+      let pieceId = inBounds ? pickPieceId(ctx2d, boardPieces, pickX, pickY) : null;
       if (!pieceId) {
         selectedIdRef.current = null;
         setSelectedPieceId(null);

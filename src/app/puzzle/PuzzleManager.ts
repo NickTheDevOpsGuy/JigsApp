@@ -261,8 +261,8 @@ export class PuzzleManager {
     this.updatePieces(
       (p) => p.groupId === groupId,
       (p) => ({
-        x: p.targetX - p.pad,
-        y: p.targetY - p.pad,
+        x: Math.round(p.targetX - p.pad),
+        y: Math.round(p.targetY - p.pad),
       }),
     );
   }
@@ -878,6 +878,42 @@ export class PuzzleManager {
     return true;
   }
 
+  /**
+   * Rotate the group to 0° around its geometric center so neighbor snap can run.
+   * Preserves the group's visual position on the board.
+   */
+  private rotateGroupToZero(groupId: string): void {
+    const groupPieces = this.getGroupPieces(groupId);
+    if (groupPieces.length === 0) return;
+    const rot = groupPieces[0].rotation;
+    if (rot === 0) return;
+
+    const centerX =
+      groupPieces.reduce((s, p) => s + p.x + p.w / 2, 0) / groupPieces.length;
+    const centerY =
+      groupPieces.reduce((s, p) => s + p.y + p.h / 2, 0) / groupPieces.length;
+    const rad = (-rot * Math.PI) / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      (p) => {
+        const cx = p.x + p.w / 2;
+        const cy = p.y + p.h / 2;
+        const dx = cx - centerX;
+        const dy = cy - centerY;
+        const newCx = centerX + dx * cos - dy * sin;
+        const newCy = centerY + dx * sin + dy * cos;
+        return {
+          x: Math.round(newCx - p.w / 2),
+          y: Math.round(newCy - p.h / 2),
+          rotation: 0,
+        };
+      },
+    );
+  }
+
   private trySnapActiveGroupToNeighbor(): boolean {
     this.events.onSnapCheck?.();
     const activeId = this.drag.activeId;
@@ -888,14 +924,21 @@ export class PuzzleManager {
 
     const gid = active.groupId;
     const groupPieces = this.getGroupPieces(gid);
-    if (!groupPieces.every((p) => p.rotation === 0)) return false;
+    // Allow neighbor snap at any angle: rotate group to 0 first if needed, then snap
+    if (!groupPieces.every((p) => p.rotation === 0)) {
+      this.rotateGroupToZero(gid);
+      // Refresh after rotation
+      const activeAfter = this.findPiece(activeId);
+      if (!activeAfter) return false;
+    }
 
-    const groupIdSet = new Set(groupPieces.map((p) => p.id));
+    const currentGroupPieces = this.getGroupPieces(gid);
+    const groupIdSet = new Set(currentGroupPieces.map((p) => p.id));
     const rowColMap = buildRowColMap(this.state.pieces);
 
     // Only check boundary pieces: those with a neighbor outside this group (possible snap target).
     // Exclude tray pieces – they use different coordinates and must not be snap targets.
-    const boundaryPieces = groupPieces.filter((gp) => {
+    const boundaryPieces = currentGroupPieces.filter((gp) => {
       const neighbors = getSolvedNeighborsFromMap(gp, rowColMap);
       return neighbors.some(
         (n) => !n.inTray && !groupIdSet.has(n.id) && n.rotation === 0,

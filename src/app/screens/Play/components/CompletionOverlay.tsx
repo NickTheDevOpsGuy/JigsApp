@@ -1,8 +1,8 @@
 /**
- * CompletionOverlay – puzzle complete: message, image, Share Result, Menu. X or Esc to close.
+ * CompletionOverlay – puzzle complete: message, image, Share Result. X or Esc to close.
  */
 import React, { useEffect, useCallback, useState } from "react";
-import { X, Share2, Download, Menu, Image } from "lucide-react";
+import { X, Share2, Download, Image } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { Modal } from "@/components/Modal/Modal";
 import styles from "../PlayScreen.module.css";
@@ -43,7 +43,6 @@ interface CompletionOverlayProps {
   onCopyResults?: () => void;
   onNativeShare?: () => void;
   onDownloadImage: () => void;
-  onMenu: () => void;
   onClose: () => void;
 }
 
@@ -65,7 +64,6 @@ export function CompletionOverlay({
   onCopyResults: _onCopyResults,
   onNativeShare: _onNativeShare,
   onDownloadImage,
-  onMenu,
   onClose,
 }: CompletionOverlayProps) {
   const handleClose = useCallback(() => {
@@ -261,12 +259,6 @@ export function CompletionOverlay({
             >
               <Share2 size={18} />
               Share Result
-            </Button>
-          </div>
-          <div className={styles.completeActionsSecondary}>
-            <Button size="sm" variant="secondary" onClick={onMenu}>
-              <Menu size={16} />
-              Menu
             </Button>
           </div>
         </div>

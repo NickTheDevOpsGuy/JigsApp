@@ -1486,7 +1486,6 @@ export function PlayScreen() {
                     onCopyResults={share.handleCopyResults}
                     onNativeShare={share.handleNativeShare}
                     onDownloadImage={handleDownloadImage}
-                    onMenu={() => navigate("/")}
                     onClose={() => setCompletionDismissed(true)}
                   />
                 )}
