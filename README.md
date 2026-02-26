@@ -1,4 +1,4 @@
-![CI](https://github.com/NickTheDevOpsGuy/phuzzle/actions/workflows/Phuzzle.yml/badge.svg)
+![CI](https://github.com/NickTheDevOpsGuy/phuzzle/workflows/Phuzzle.yml/badge.svg)
 ![React](https://img.shields.io/badge/Built%20with-React-61DAFB?logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Powered%20by-Vite-646CFF?logo=vite&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
