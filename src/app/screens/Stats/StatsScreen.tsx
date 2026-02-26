@@ -593,7 +593,8 @@ export function StatsScreen() {
                     <p className={styles.retentionBig}>{currentStreak} days</p>
                     <p className={styles.retentionSub}>Keep it alive.</p>
                     <p className={styles.retentionSub}>
-                      <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong> days
+                      <strong>{weeklyCompleted}</strong> <strong>/</strong>{" "}
+                      <strong>7</strong> days
                     </p>
                     <p className={styles.retentionSub}>
                       {weeklyRemaining === 0
@@ -847,7 +848,8 @@ export function StatsScreen() {
                   {leaderboardType === "week" && weekSubview === "rankings" && (
                     <div className={styles.weekProgressStrip}>
                       <span>Weekly Album Progress</span>
-                      <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong> days
+                      <strong>{weeklyCompleted}</strong> <strong>/</strong>{" "}
+                      <strong>7</strong> days
                     </div>
                   )}
                   {leaderboardType === "today" &&
