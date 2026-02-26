@@ -244,13 +244,6 @@
   color: var(--color-text-secondary);
 }
 
-.weeklyBlocks {
-  margin: 12px 0 6px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
 .overallBlock {
   padding: 2px 0;
 }

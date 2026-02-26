@@ -484,7 +484,6 @@ export function StatsScreen() {
   const currentStreak = stats?.dailyStreak ?? 0;
   const weeklyCompleted = Math.max(0, Math.min(7, weeklyAlbumProgress));
   const weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
-  const weeklyBlocks = `${"■".repeat(weeklyCompleted)}${"□".repeat(weeklyRemaining)}`;
   const masteryPuzzlesRemaining = Math.max(0, 1 - (stats?.masteryStreak ?? 0));
   const headerTitle =
     activeTab === "leaderboard"
@@ -593,8 +592,8 @@ export function StatsScreen() {
                     <div className={styles.retentionDivider} />
                     <p className={styles.retentionBig}>{currentStreak} days</p>
                     <p className={styles.retentionSub}>Keep it alive.</p>
-                    <p className={styles.weeklyBlocks}>
-                      [{weeklyBlocks}] {weeklyCompleted} / 7 this week
+                    <p className={styles.retentionSub}>
+                      <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong> days
                     </p>
                     <p className={styles.retentionSub}>
                       {weeklyRemaining === 0
@@ -848,9 +847,7 @@ export function StatsScreen() {
                   {leaderboardType === "week" && weekSubview === "rankings" && (
                     <div className={styles.weekProgressStrip}>
                       <span>Weekly Album Progress</span>
-                      <strong>
-                        [{weeklyBlocks}] {weeklyCompleted}/7
-                      </strong>
+                      <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong> days
                     </div>
                   )}
                   {leaderboardType === "today" &&
