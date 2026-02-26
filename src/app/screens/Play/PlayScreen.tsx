@@ -48,6 +48,7 @@ import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
 import { useBatterySaver } from "../../hooks/useBatterySaver";
+import { Crosshair } from "lucide-react";
 import {
   CoopDebugPanel,
   CoopStatusIndicator,
@@ -58,6 +59,7 @@ import {
   PlayToasts,
   TopBarButtons,
   HeaderMenu,
+  UndoRedoButtons,
 } from "./components";
 import { ProgressivePreviewOverlay } from "./components/ProgressivePreviewOverlay";
 import { SnapComboMeter } from "./components/SnapComboMeter";
@@ -478,6 +480,7 @@ export function PlayScreen() {
   }, [puzzleKey]);
 
   // Auto-clear piece selection after 1s so the blue border doesn’t stay until another click
+  const [selectionExtendTrigger, setSelectionExtendTrigger] = React.useState(0);
   useEffect(() => {
     if (selectedPieceId == null) return;
     const t = setTimeout(() => {
@@ -486,7 +489,7 @@ export function PlayScreen() {
       bump();
     }, 1000);
     return () => clearTimeout(t);
-  }, [selectedPieceId, setSelectedPieceId, selectedIdRef, bump]);
+  }, [selectedPieceId, selectionExtendTrigger, setSelectedPieceId, selectedIdRef, bump]);
 
   // Drift mode: nudge unplaced pieces every ~10s
   useEffect(() => {
@@ -554,6 +557,13 @@ export function PlayScreen() {
     selectedIdRef,
     onUndoSuccess: () => {
       undoCountRef.current += 1;
+    },
+    onExtendSelection: () => setSelectionExtendTrigger((t) => t + 1),
+    onSnapBackAnimate: (fromPositions) => {
+      undoSnapBackRef.current = {
+        fromPositions,
+        startMs: performance.now(),
+      };
     },
   });
 
@@ -709,6 +719,10 @@ export function PlayScreen() {
   } | null>(null);
   const dragPreviewPieceIdRef = React.useRef<string | null>(null);
   dragPreviewPieceIdRef.current = dragPreview?.pieceId ?? null;
+  const undoSnapBackRef = React.useRef<{
+    fromPositions: import("./playUtils").UndoSnapBackFrom;
+    startMs: number;
+  } | null>(null);
 
   const {
     handlePointerDown,
@@ -772,6 +786,10 @@ export function PlayScreen() {
     perfStatsRef,
     wrongRotationHintRef,
     batterySaverMode,
+    undoSnapBackRef,
+    onUndoSnapBackComplete: () => {
+      undoSnapBackRef.current = null;
+    },
   });
 
   const handleTrayPieceClick = useCallback(
@@ -892,6 +910,7 @@ export function PlayScreen() {
     dragPreview && state ? state.pieces.find((p) => p.id === dragPreview.pieceId) : null;
   const placed = state?.placedCount ?? 0;
   const total = state?.totalCount ?? 0;
+  const piecesOnBoard = state?.pieces.filter((p) => !p.inTray).length ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
   const dailyVisualModifier = isDailyPuzzleSession() ? getDailyVisualModifier() : "none";
@@ -1001,6 +1020,7 @@ export function PlayScreen() {
           role="button"
           tabIndex={-1}
           aria-label="Show menu and controls"
+          title="Show menu and controls"
         />
       )}
       <div
@@ -1013,25 +1033,6 @@ export function PlayScreen() {
               title="Phuzzle"
               theme={theme}
               setTheme={setTheme}
-              canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
-              onUndo={createUndoRedoHandler(
-                manager ?? null,
-                "undo",
-                setState,
-                () => Boolean(manager?.canUndo()),
-                soundManager.play.bind(soundManager),
-                () => {
-                  undoCountRef.current += 1;
-                },
-              )}
-              canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
-              onRedo={createUndoRedoHandler(
-                manager ?? null,
-                "redo",
-                setState,
-                () => Boolean(manager?.canRedo()),
-                soundManager.play.bind(soundManager),
-              )}
               timeMode={timeMode}
               setTimeMode={(modeOrFn) => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
@@ -1091,7 +1092,6 @@ export function PlayScreen() {
                 setShowAlignmentGrid((a) => !a);
               }}
               onToggleFullscreen={toggleFullscreen}
-              onCenterBoard={() => viewport.reset()}
               onZoomIn={() => viewport.zoomIn()}
               onZoomOut={() => viewport.zoomOut()}
               onShowShortcuts={() => setShowShortcuts(true)}
@@ -1124,6 +1124,49 @@ export function PlayScreen() {
               snapToleranceOverride={snapToleranceOverride}
               onSnapToleranceOverrideChange={(value) => setSnapToleranceOverride(value)}
             />
+            <UndoRedoButtons
+              canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
+              onUndo={createUndoRedoHandler(
+                manager ?? null,
+                "undo",
+                setState,
+                () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
+                soundManager.play.bind(soundManager),
+                () => {
+                  undoCountRef.current += 1;
+                },
+                (fromPositions) => {
+                  undoSnapBackRef.current = {
+                    fromPositions,
+                    startMs: performance.now(),
+                  };
+                },
+              )}
+              canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
+              onRedo={createUndoRedoHandler(
+                manager ?? null,
+                "redo",
+                setState,
+                () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
+                soundManager.play.bind(soundManager),
+                undefined,
+                (fromPositions) => {
+                  undoSnapBackRef.current = {
+                    fromPositions,
+                    startMs: performance.now(),
+                  };
+                },
+              )}
+            />
+            <button
+              type="button"
+              className={styles.iconBtn}
+              onClick={() => viewport.reset()}
+              aria-label="Reset view"
+              title="Reset zoom and pan to center"
+            >
+              <Crosshair size={16} />
+            </button>
           </div>
           <div className={styles.topBarCenter}>
             {sessionId && (
@@ -1285,7 +1328,7 @@ export function PlayScreen() {
                     <span>Loading puzzle…</span>
                   </div>
                 )}
-                {onboarding.needsStartTip && placed === 0 && (
+                {onboarding.needsStartTip && piecesOnBoard === 0 && (
                   <div className={styles.startHintOverlay} role="status">
                     <span>Drag a piece to start</span>
                     <button
@@ -1365,7 +1408,6 @@ export function PlayScreen() {
                     onCopyResults={share.handleCopyResults}
                     onNativeShare={share.handleNativeShare}
                     onDownloadImage={handleDownloadImage}
-                    onNewPuzzle={handleNewGame}
                     onMenu={() => navigate("/")}
                     onClose={() => setCompletionDismissed(true)}
                   />
@@ -1416,6 +1458,7 @@ export function PlayScreen() {
           role="button"
           tabIndex={-1}
           aria-label="Show piece drawer"
+          title="Show piece drawer"
         />
       )}
 

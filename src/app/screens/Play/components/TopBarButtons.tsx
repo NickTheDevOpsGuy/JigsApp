@@ -36,6 +36,7 @@ export function TopBarButtons({ isCoarsePointer, onNewPuzzle }: TopBarButtonsPro
         variant="primary"
         onClick={onNewPuzzle}
         aria-label="Start new puzzle"
+        title="Start a new puzzle"
       >
         <Plus size={16} />
         <span className={styles.btnText}>New Puzzle</span>

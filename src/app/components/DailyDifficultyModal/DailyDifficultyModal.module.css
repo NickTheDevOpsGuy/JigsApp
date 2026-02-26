@@ -269,6 +269,63 @@
   cursor: pointer;
 }
 
+.challengeModeSection {
+  margin: 16px 0 14px;
+}
+
+.challengeModeLabel {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.challengeModeHint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.challengeModeRadioList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.challengeModeOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.challengeModeOption:hover {
+  background: var(--color-bg-card);
+  border-color: var(--color-brand-primary);
+}
+
+.challengeModeOptionSelected {
+  border-color: var(--color-brand-primary);
+  background: color-mix(in srgb, var(--color-brand-light) 55%, var(--color-bg-elevated));
+}
+
+.challengeModeRadio {
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--color-brand-primary);
+}
+
+.challengeModeOptionText {
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
 .modifierSection {
   margin: 6px 0 14px;
 }

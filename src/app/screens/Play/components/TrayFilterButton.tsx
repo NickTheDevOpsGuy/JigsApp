@@ -76,6 +76,7 @@ export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButton
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label={`Filter pieces: ${LABELS[value]}`}
+        title={`Filter pieces: ${LABELS[value]}`}
       >
         <Filter size={16} />
         <span className={styles.label}>Filter</span>

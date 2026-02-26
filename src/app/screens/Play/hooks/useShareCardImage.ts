@@ -81,7 +81,15 @@ export function useShareCardImage() {
         const imageBox = { x: 110, y: 170, w: 860, h: 860 };
         ctx.fillStyle = "rgba(255,255,255,0.04)";
         ctx.fillRect(imageBox.x, imageBox.y, imageBox.w, imageBox.h);
-        ctx.drawImage(img, imageBox.x, imageBox.y, imageBox.w, imageBox.h);
+        // Scale image to fit within box, centered (object-fit: contain)
+        const imgW = img.naturalWidth;
+        const imgH = img.naturalHeight;
+        const scale = Math.min(imageBox.w / imgW, imageBox.h / imgH);
+        const drawW = imgW * scale;
+        const drawH = imgH * scale;
+        const drawX = imageBox.x + (imageBox.w - drawW) / 2;
+        const drawY = imageBox.y + (imageBox.h - drawH) / 2;
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
         ctx.fillStyle = palette.accent;
         ctx.textAlign = "center";

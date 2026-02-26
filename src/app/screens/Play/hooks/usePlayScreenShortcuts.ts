@@ -31,6 +31,10 @@ type UsePlayScreenShortcutsArgs = {
   selectCycle: (dir: 1 | -1) => void;
   selectedIdRef: React.MutableRefObject<string | null>;
   onUndoSuccess?: () => void;
+  /** Called when a keyboard action uses the selection; resets the 1s auto-clear timer */
+  onExtendSelection?: () => void;
+  /** Trigger snap-back animation after undo/redo (Ctrl/Cmd+Z) */
+  onSnapBackAnimate?: (fromPositions: import("../playUtils").UndoSnapBackFrom) => void;
 };
 
 export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
@@ -57,6 +61,8 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
     selectCycle,
     selectedIdRef: _selectedIdRef,
     onUndoSuccess,
+    onExtendSelection,
+    onSnapBackAnimate,
   } = args;
 
   const handleShortcut = useCallback(
@@ -111,6 +117,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
               manager.rotatePiece(piece.id);
               soundManager.play("rotate");
               setState(manager.getState());
+              onExtendSelection?.();
             }
           }
           break;
@@ -151,6 +158,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
               manager.nudgeGroup(selectedPieceId, dx, dy);
               manager.snapGroupNow(selectedPieceId, true);
               setState(manager.getState());
+              onExtendSelection?.();
             }
           }
           break;
@@ -163,6 +171,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
             () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
             soundManager.play.bind(soundManager),
             onUndoSuccess,
+            onSnapBackAnimate,
           )();
           break;
         case "redo":
@@ -172,6 +181,8 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
             setState,
             () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
             soundManager.play.bind(soundManager),
+            undefined,
+            onSnapBackAnimate,
           )();
           break;
         case "sendToTray":
@@ -181,6 +192,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
               manager.sendToTray(selectedPieceId);
               setState(manager.getState());
               selectCycle(1);
+              onExtendSelection?.();
             }
           }
           break;
@@ -190,6 +202,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
             if (piece && !piece.isPlaced && !piece.inTray && !piece.locked) {
               manager.snapGroupNow(selectedPieceId);
               setState(manager.getState());
+              onExtendSelection?.();
             }
           }
           break;
@@ -219,6 +232,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
       selectCycle,
       setState,
       onUndoSuccess,
+      onSnapBackAnimate,
     ],
   );
 

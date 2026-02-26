@@ -13,6 +13,7 @@ import {
   clearPieceShadow,
   computeImageSourceRect,
   DRAG_LIFT_PX,
+  DRAG_SCALE,
 } from "./renderBoardHelpers";
 
 export type PopMap = Map<string, number>;
@@ -43,6 +44,8 @@ export type AnimationState = {
   dragPreviewPieceId?: string | null;
   /** Interpolated display positions for dragged group (smoother drag, no touch/pointer changes) */
   dragDisplayOverrides?: Map<string, { x: number; y: number }>;
+  /** Snap-back animation: override positions during undo/redo */
+  undoSnapBackOverrides?: Map<string, { x: number; y: number }>;
   /** Piece IDs to show wrong-rotation hint (position correct, rotation blocks snap) */
   wrongRotationHint?: { groupId: string; pieceIds: string[]; triggeredAt: number };
   /** Snap preview during drag: soft glow when near, stronger when in range (rotation correct only). proximity 0–1 for intensity. */
@@ -142,14 +145,25 @@ export function renderBoard(
     .sort((a, b) => a.z - b.z);
 
   const LOCK_GLOW_MS = 500;
-  const overrides = animState?.dragDisplayOverrides;
-  for (const p of pieces) {
+  const overrides =
+    animState?.undoSnapBackOverrides ?? animState?.dragDisplayOverrides;
+  // Ensure dragged group is drawn last (top z-order)
+  const sortedPieces =
+    draggedGroupId != null
+      ? [...pieces].sort((a, b) => {
+          const aInGroup = a.groupId === draggedGroupId ? 1 : 0;
+          const bInGroup = b.groupId === draggedGroupId ? 1 : 0;
+          if (aInGroup !== bInGroup) return aInGroup - bInGroup;
+          return a.z - b.z;
+        })
+      : pieces;
+  for (const p of sortedPieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;
     const lockAt = lockMap.get(p.id);
     const lockElapsedMs = lockAt != null ? nowMs - lockAt : 0;
     const showLockGlow = lockAt != null && lockElapsedMs < LOCK_GLOW_MS;
     const drawPieceData =
-      isDragging && overrides?.has(p.id)
+      overrides?.has(p.id)
         ? { ...p, x: overrides.get(p.id)!.x, y: overrides.get(p.id)!.y }
         : p;
     drawPiece(
@@ -326,7 +340,7 @@ function drawPiece(
   const start = popMap.get(p.id);
   const popElapsedMs = start != null ? nowMs - start : 0;
   const popScale = start != null ? snapPopScale(popElapsedMs) : 1;
-  const scale = popScale;
+  const scale = popScale * (isDragging ? DRAG_SCALE : 1);
 
   // Subtle snap glow behind piece (placement or neighbor merge)
   if (start != null && popElapsedMs < 320) {

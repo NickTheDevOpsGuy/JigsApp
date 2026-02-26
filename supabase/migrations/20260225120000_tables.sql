@@ -1,8 +1,6 @@
--- Phuzzle Supabase schema (idempotent - safe to re-run)
--- Single migration: creates tables if missing, adds columns if missing.
--- Run in Supabase SQL Editor or: npx supabase db push
+-- 20260225120000 Phuzzle tables (idempotent – safe to re-run, skips existing objects)
+-- Run via npx supabase db push, or paste in Supabase SQL Editor
 
--- gen_random_uuid() is built-in (PostgreSQL 13+). uuid-ossp optional.
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- =============================================================================
@@ -20,7 +18,6 @@ CREATE TABLE IF NOT EXISTS player_stats (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Add XP/Prestige/Challenge columns if table exists but columns missing
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'player_stats') THEN
@@ -48,7 +45,6 @@ CREATE TABLE IF NOT EXISTS completions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Add cut_type if table exists but column missing
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'completions') THEN
@@ -120,79 +116,47 @@ CREATE TABLE IF NOT EXISTS puzzle_sessions (
 CREATE INDEX IF NOT EXISTS idx_puzzle_sessions_updated ON puzzle_sessions(updated_at);
 
 -- =============================================================================
--- RLS (only enable if table exists and RLS not already enabled)
+-- 6. Daily comments (280 char limit, post-completion)
 -- =============================================================================
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'player_stats') AND
-     NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'player_stats' AND c.relrowsecurity) THEN
-    ALTER TABLE player_stats ENABLE ROW LEVEL SECURITY;
-  END IF;
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'completions') AND
-     NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'completions' AND c.relrowsecurity) THEN
-    ALTER TABLE completions ENABLE ROW LEVEL SECURITY;
-  END IF;
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_achievements') AND
-     NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'user_achievements' AND c.relrowsecurity) THEN
-    ALTER TABLE user_achievements ENABLE ROW LEVEL SECURITY;
-  END IF;
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'player_profiles') AND
-     NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'player_profiles' AND c.relrowsecurity) THEN
-    ALTER TABLE player_profiles ENABLE ROW LEVEL SECURITY;
-  END IF;
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'puzzle_sessions') AND
-     NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'puzzle_sessions' AND c.relrowsecurity) THEN
-    ALTER TABLE puzzle_sessions ENABLE ROW LEVEL SECURITY;
-  END IF;
-END $$;
+CREATE TABLE IF NOT EXISTS daily_comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  puzzle_date DATE NOT NULL,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  body TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT daily_comments_body_length CHECK (char_length(body) <= 280)
+);
+
+CREATE INDEX IF NOT EXISTS idx_daily_comments_puzzle_date ON daily_comments(puzzle_date);
+CREATE INDEX IF NOT EXISTS idx_daily_comments_created_at ON daily_comments(created_at DESC);
 
 -- =============================================================================
--- Policies (idempotent: drop if exists, then create – only on existing tables)
+-- 7. Daily reactions (emoji, one per user per puzzle_date)
 -- =============================================================================
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'player_stats') THEN
-    DROP POLICY IF EXISTS "Users can manage own stats" ON player_stats;
-    CREATE POLICY "Users can manage own stats" ON player_stats
-      FOR ALL USING (auth.uid() = user_id);
-  END IF;
+CREATE TABLE IF NOT EXISTS daily_reactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  puzzle_date DATE NOT NULL,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  emoji TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(puzzle_date, user_id)
+);
 
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'completions') THEN
-    DROP POLICY IF EXISTS "Users can insert own completions" ON completions;
-    CREATE POLICY "Users can insert own completions" ON completions
-      FOR INSERT WITH CHECK (auth.uid() = user_id);
-    DROP POLICY IF EXISTS "Anyone can read completions" ON completions;
-    CREATE POLICY "Anyone can read completions" ON completions
-      FOR SELECT USING (true);
-  END IF;
+CREATE INDEX IF NOT EXISTS idx_daily_reactions_puzzle_date ON daily_reactions(puzzle_date);
 
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_achievements') THEN
-    DROP POLICY IF EXISTS "Users can manage own achievements" ON user_achievements;
-    CREATE POLICY "Users can manage own achievements" ON user_achievements
-      FOR ALL USING (auth.uid() = user_id);
-  END IF;
+-- =============================================================================
+-- 8. Comment reports (moderation support)
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS daily_comment_reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  comment_id UUID NOT NULL REFERENCES daily_comments(id) ON DELETE CASCADE,
+  reporter_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  reason TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(comment_id, reporter_id)
+);
 
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'player_profiles') THEN
-    DROP POLICY IF EXISTS "Users can manage own profile" ON player_profiles;
-    CREATE POLICY "Users can manage own profile" ON player_profiles
-      FOR ALL USING (auth.uid() = user_id);
-    DROP POLICY IF EXISTS "Anyone can read profiles for leaderboards" ON player_profiles;
-    CREATE POLICY "Anyone can read profiles for leaderboards" ON player_profiles
-      FOR SELECT USING (true);
-  END IF;
-
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'puzzle_sessions') THEN
-    DROP POLICY IF EXISTS "Anyone can insert puzzle_sessions" ON puzzle_sessions;
-    CREATE POLICY "Anyone can insert puzzle_sessions" ON puzzle_sessions
-      FOR INSERT WITH CHECK (true);
-    DROP POLICY IF EXISTS "Anyone can select puzzle_sessions" ON puzzle_sessions;
-    CREATE POLICY "Anyone can select puzzle_sessions" ON puzzle_sessions
-      FOR SELECT USING (true);
-    DROP POLICY IF EXISTS "Anyone can update puzzle_sessions" ON puzzle_sessions;
-    CREATE POLICY "Anyone can update puzzle_sessions" ON puzzle_sessions
-      FOR UPDATE USING (true);
-  END IF;
-END $$;
+CREATE INDEX IF NOT EXISTS idx_daily_comment_reports_comment ON daily_comment_reports(comment_id);
 
 -- =============================================================================
 -- Replica identity (for Realtime UPDATE/DELETE)
@@ -204,15 +168,8 @@ BEGIN
   END IF;
 END $$;
 
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'puzzle_sessions') THEN
-    COMMENT ON TABLE puzzle_sessions IS 'Real-time co-op sessions. Expire after 8h inactivity. See puzzleSessionService.';
-  END IF;
-END $$;
-
 -- =============================================================================
--- Realtime publications (co-op + live today completion counter)
+-- Realtime publications (co-op + live completion counter)
 -- =============================================================================
 DO $$
 BEGIN
@@ -227,7 +184,7 @@ BEGIN
 END $$;
 
 -- =============================================================================
--- Server time RPC (for daily countdown sync; idempotent)
+-- Server time RPC (for daily countdown sync)
 -- =============================================================================
 CREATE OR REPLACE FUNCTION get_server_utc_now()
 RETURNS TIMESTAMPTZ

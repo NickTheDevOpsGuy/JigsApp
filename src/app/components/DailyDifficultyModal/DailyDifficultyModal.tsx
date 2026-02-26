@@ -3,19 +3,7 @@
  */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Puzzle,
-  ChevronDown,
-  ChevronUp,
-  Check,
-  Leaf,
-  Zap,
-  Flame,
-  Crown,
-  Gem,
-  Sparkles,
-  Square,
-} from "lucide-react";
+import { Puzzle, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import {
   GRID_OPTIONS,
@@ -32,7 +20,6 @@ import {
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 import styles from "./DailyDifficultyModal.module.css";
 
-const DIFFICULTY_ICONS = [Leaf, Zap, Flame, Crown, Gem, Sparkles, Square] as const;
 const DIFFICULTY_COLORS = [
   "var(--color-easy, #22c55e)",
   "var(--color-medium, #3b82f6)",
@@ -47,9 +34,9 @@ const PRIMARY_COUNT = 3; // Easy, Medium, Hard
 const RECOMMENDED_INDEX = 1; // Medium
 const MODIFIER_OPTIONS = [
   { value: "none", label: "None" },
-  { value: "fog", label: "Fog" },
-  { value: "night", label: "Night" },
-  { value: "sepia", label: "Sepia" },
+  { value: "fog", label: "Fog – Reduced contrast until placed" },
+  { value: "night", label: "Night – Dark palette + vignette" },
+  { value: "sepia", label: "Sepia – Vintage tone" },
 ] as const;
 type VisualModifier = (typeof MODIFIER_OPTIONS)[number]["value"];
 
@@ -70,7 +57,6 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(preferredIdx ?? RECOMMENDED_INDEX);
   const [modifier, setModifier] = useState<VisualModifier>("none");
-  const [showModifier, setShowModifier] = useState(false);
 
   const showFreezeOffer =
     wasYesterdayMissed() &&
@@ -83,7 +69,6 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       import("@/daily/dailyPuzzle").then(setDailyModule);
       const idx = getDailyPreferredDifficultyIndex();
       setSelectedIndex(idx ?? RECOMMENDED_INDEX);
-      setShowModifier(false);
     } else {
       setDailyModule(null);
     }
@@ -194,8 +179,6 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
               opt={opt}
               index={i}
               selected={selectedIndex === i}
-              recommended={i === RECOMMENDED_INDEX}
-              compact
               onSelect={() => setSelectedIndex(i)}
             />
           ))}
@@ -225,7 +208,6 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
                   opt={opt}
                   index={idx}
                   selected={selectedIndex === idx}
-                  compact
                   onSelect={() => setSelectedIndex(idx)}
                 />
               );
@@ -234,41 +216,29 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
         )}
       </div>
 
-      <div className={styles.modifierSection}>
-        <button
-          type="button"
-          className={styles.moreOptionsBtn}
-          onClick={() => setShowModifier((v) => !v)}
-          aria-expanded={showModifier}
-        >
-          Optional Modifier
-          {showModifier ? (
-            <ChevronUp size={18} className={styles.moreOptionsIcon} />
-          ) : (
-            <ChevronDown size={18} className={styles.moreOptionsIcon} />
-          )}
-        </button>
-        {showModifier && (
-          <>
-            <p className={styles.modifierHint}>
-              This affects the run and leaderboard bracket.
-            </p>
-            <div className={styles.modifierList}>
-              {MODIFIER_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  className={`${styles.modifierBtn} ${
-                    modifier === opt.value ? styles.modifierBtnSelected : ""
-                  }`}
-                  onClick={() => setModifier(opt.value)}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+      <div className={styles.challengeModeSection}>
+        <p className={styles.challengeModeLabel}>Challenge Mode</p>
+        <p className={styles.challengeModeHint}>Leaderboard bracket — only one active at a time.</p>
+        <div className={styles.challengeModeRadioList} role="radiogroup" aria-label="Challenge mode">
+          {MODIFIER_OPTIONS.map((opt) => (
+            <label
+              key={opt.value}
+              className={`${styles.challengeModeOption} ${
+                modifier === opt.value ? styles.challengeModeOptionSelected : ""
+              }`}
+            >
+              <input
+                type="radio"
+                name="challenge-mode"
+                value={opt.value}
+                checked={modifier === opt.value}
+                onChange={() => setModifier(opt.value)}
+                className={styles.challengeModeRadio}
+              />
+              <span className={styles.challengeModeOptionText}>{opt.label}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
       <label className={styles.rememberLabel}>
@@ -293,47 +263,24 @@ function DifficultyCard({
   opt,
   index,
   selected,
-  recommended,
-  compact,
   onSelect,
 }: {
   opt: (typeof GRID_OPTIONS)[number];
   index: number;
   selected: boolean;
-  recommended?: boolean;
-  compact?: boolean;
   onSelect: () => void;
 }) {
-  const Icon = DIFFICULTY_ICONS[index];
   const color = DIFFICULTY_COLORS[index];
   return (
     <button
       type="button"
       className={`${styles.difficultyCard} ${selected ? styles.difficultyCardSelected : ""}`}
       onClick={onSelect}
+      style={{ "--difficulty-accent": color } as React.CSSProperties}
     >
-      {recommended && !compact && (
-        <span className={styles.recommendedBadge}>Recommended</span>
-      )}
-      <div className={styles.difficultyCardIcon} style={{ color }}>
-        <Icon size={24} />
-      </div>
-      {compact ? (
-        <span className={styles.difficultyCardLine}>
-          <span className={styles.difficultyCardLabel}>{opt.label.split(" ")[0]}</span>
-          <span className={styles.difficultyCardMeta}>
-            {opt.rows}×{opt.cols} ({opt.pieces})
-          </span>
-          {recommended && <span className={styles.recommendedInline}>Recommended</span>}
-        </span>
-      ) : (
-        <>
-          <span className={styles.difficultyCardLabel}>{opt.label.split(" ")[0]}</span>
-          <span className={styles.difficultyCardMeta}>
-            {opt.rows}×{opt.cols} · {opt.pieces} pieces
-          </span>
-        </>
-      )}
+      <span className={styles.difficultyCardLine}>
+        <span className={styles.difficultyCardLabel}>{opt.label}</span>
+      </span>
       {selected && <Check size={18} className={styles.difficultyCardCheck} />}
     </button>
   );

@@ -24,11 +24,18 @@ interface PlayHUDProps {
 
 const QUAD_LABELS = ["TL", "TR", "BL", "BR"] as const;
 
+const QUAD_FULL_NAMES: Record<number, string> = {
+  0: "Top-left quadrant",
+  1: "Top-right quadrant",
+  2: "Bottom-left quadrant",
+  3: "Bottom-right quadrant",
+};
+
 export function PlayHUD({
   elapsedSeconds,
   piecesLeft,
   totalPieces,
-  isPaused: _isPaused,
+  isPaused,
   isComplete: _isComplete,
   timeMode,
   countdownMinutes = 10,
@@ -37,6 +44,7 @@ export function PlayHUD({
   quadrantPbs,
   onTogglePause,
 }: PlayHUDProps) {
+  const pauseTitle = isPaused ? "Resume the timer" : "Pause the timer";
   const showTimer = timeMode !== "relaxed";
   const isCountdown = timeMode === "countdown";
   const isSpeedrun = timeMode === "speedrun";
@@ -58,7 +66,11 @@ export function PlayHUD({
             const t = quadrantTimes[q];
             const pb = quadrantPbs?.[q];
             return (
-              <span key={q} className={styles.quadrantTimer} title={QUAD_LABELS[q]}>
+              <span
+                key={q}
+                className={styles.quadrantTimer}
+                title={`${QUAD_FULL_NAMES[q] ?? QUAD_LABELS[q]}: ${t != null ? formatTime(t) : "—"}`}
+              >
                 {QUAD_LABELS[q]}:{t != null ? formatTime(t) : "-"}
                 {pb != null && t != null && t <= pb && t > 0 && "★"}
               </span>
@@ -67,7 +79,10 @@ export function PlayHUD({
         </div>
       )}
       {showTimer && !isSpeedrun && (
-        <div className={`${styles.hudPillTimer} ${isLowTime ? styles.timerLow : ""}`}>
+        <div
+          className={`${styles.hudPillTimer} ${isLowTime ? styles.timerLow : ""}`}
+          title={isCountdown ? `Countdown timer (${formatTime(countdownTotal)} total)` : "Elapsed time"}
+        >
           <Clock size={14} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
           {isCountdown && (
@@ -79,7 +94,7 @@ export function PlayHUD({
         </div>
       )}
       {showTimer && isSpeedrun && (
-        <div className={styles.hudPillTimer}>
+        <div className={styles.hudPillTimer} title="Elapsed time (speedrun)">
           <Clock size={14} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
         </div>
@@ -88,14 +103,15 @@ export function PlayHUD({
         type="button"
         className={styles.hudPillPause}
         onClick={onTogglePause}
-        aria-label="Pause"
-        title="Pause"
+        aria-label={isPaused ? "Resume" : "Pause"}
+        title={pauseTitle}
       >
         <Pause size={14} />
       </button>
       <div
         className={`${styles.hudPill} ${bounce ? styles.hudPillBounce : ""}`}
         aria-label={`${piecesLeft} of ${totalPieces} pieces remaining`}
+        title={`${piecesLeft} of ${totalPieces} pieces remaining`}
         role="status"
       >
         <Puzzle size={14} />

@@ -21,7 +21,10 @@ export function runManagerAction(
   return true;
 }
 
-/** Undo/redo with sound. Returns handler for use in onClick. */
+/** Captured positions for undo/redo snap-back animation */
+export type UndoSnapBackFrom = Map<string, { x: number; y: number }>;
+
+/** Undo/redo with sound and optional snap-back animation. Returns handler for use in onClick. */
 export function createUndoRedoHandler(
   manager: PuzzleManager | null,
   action: "undo" | "redo",
@@ -29,13 +32,21 @@ export function createUndoRedoHandler(
   canRun: () => boolean,
   playSound: (s: "undo") => void,
   onSuccess?: () => void,
+  onSnapBackAnimate?: (fromPositions: UndoSnapBackFrom) => void,
 ) {
   return () => {
+    if (!manager || !canRun()) return;
+    const state = manager.getState();
+    const fromPositions = new Map<string, { x: number; y: number }>();
+    for (const p of state.pieces) {
+      if (!p.inTray) fromPositions.set(p.id, { x: p.x, y: p.y });
+    }
     const fn =
       action === "undo" ? (m: PuzzleManager) => m.undo() : (m: PuzzleManager) => m.redo();
-    if (runManagerAction(manager ?? null, fn, setState, () => canRun())) {
+    if (runManagerAction(manager, fn, setState, () => canRun())) {
       playSound("undo");
       onSuccess?.();
+      onSnapBackAnimate?.(fromPositions);
     }
   };
 }

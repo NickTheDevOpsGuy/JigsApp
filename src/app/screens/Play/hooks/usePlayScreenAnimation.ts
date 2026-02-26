@@ -7,6 +7,7 @@ import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
+import type { UndoSnapBackFrom } from "../playUtils";
 import { SHOW_DEBUG, type DebugFlags } from "../playScreenUtils";
 import type { ViewportState } from "./useViewport";
 import type { PerfStats } from "../components/ProfilerOverlay";
@@ -37,6 +38,13 @@ export function usePlayScreenAnimation(args: {
   } | null>;
   /** When true (data-saver / reduced-motion): throttle more aggressively, use lower canvas quality */
   batterySaverMode?: boolean;
+  /** Ref for undo/redo snap-back animation; set from outside when undo/redo runs */
+  undoSnapBackRef?: React.RefObject<{
+    fromPositions: UndoSnapBackFrom;
+    startMs: number;
+  } | null>;
+  /** Called when undo snap-back animation completes (so parent can clear ref) */
+  onUndoSnapBackComplete?: () => void;
 }) {
   const {
     manager,
@@ -59,6 +67,8 @@ export function usePlayScreenAnimation(args: {
     perfStatsRef,
     wrongRotationHintRef,
     batterySaverMode = false,
+    undoSnapBackRef,
+    onUndoSnapBackComplete,
   } = args;
 
   const rafRef = useRef<number | null>(null);
@@ -211,6 +221,29 @@ export function usePlayScreenAnimation(args: {
         dragDisplayOverrides.clear();
       }
 
+      const UNDO_SNAPBACK_MS = 280;
+      const undoSnapBack = undoSnapBackRef?.current;
+      let undoSnapBackOverrides: Map<string, { x: number; y: number }> | undefined;
+      if (undoSnapBack) {
+        const elapsed = now - undoSnapBack.startMs;
+        if (elapsed >= UNDO_SNAPBACK_MS) {
+          onUndoSnapBackComplete?.();
+        } else {
+          const t = elapsed / UNDO_SNAPBACK_MS;
+          const easeOut = 1 - Math.pow(1 - t, 1.5);
+          undoSnapBackOverrides = new Map();
+          for (const p of st.pieces) {
+            if (p.inTray) continue;
+            const from = undoSnapBack.fromPositions.get(p.id);
+            if (!from) continue;
+            undoSnapBackOverrides.set(p.id, {
+              x: from.x + (p.x - from.x) * easeOut,
+              y: from.y + (p.y - from.y) * easeOut,
+            });
+          }
+        }
+      }
+
       const popMap = popMapRef.current ?? new Map<string, number>();
       const lockMap = lockMapRef.current ?? new Map<string, number>();
       const pieceCache = pieceCacheRef.current;
@@ -249,6 +282,7 @@ export function usePlayScreenAnimation(args: {
           showAlignmentGrid,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
           dragDisplayOverrides: isDragging ? dragDisplayOverrides : undefined,
+          undoSnapBackOverrides,
           wrongRotationHint,
           snapPreview,
         },
@@ -281,6 +315,7 @@ export function usePlayScreenAnimation(args: {
     };
   }, [
     manager,
+    undoSnapBackRef,
     debug,
     showGhostHint,
     showGhostWhenIdle,

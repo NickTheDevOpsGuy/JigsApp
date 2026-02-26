@@ -1,6 +1,6 @@
 # Supabase Setup for Phuzzle
 
-Phuzzle uses Supabase for player statistics, leaderboards, and achievements. The app is a PWA (installable from the browser); Supabase is used when the user is online.
+Phuzzle uses Supabase for player statistics, leaderboards, achievements, and daily puzzle comments/reactions. The app is a PWA (installable from the browser); Supabase is used when the user is online.
 
 ## 1. Create a Supabase project
 
@@ -16,30 +16,34 @@ VITE_SUPABASE_URL=https://xxxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-## 3. Run the migrations
+## 3. Run the migrations (idempotent – safe to re-run)
 
-**Option A – SQL Editor:** Paste and run `migrations/20260223120000_full_schema.sql` in the Supabase dashboard **SQL Editor**. It’s idempotent (safe to re-run).
-
-**Option B – Supabase CLI:**
+**Option A – Supabase CLI:**
 
 ```bash
 npx supabase db push
 ```
 
-If you use a global Supabase workdir (e.g. `~/supabase`), ensure your project migrations exist there or run from the project directory.
+**Option B – SQL Editor:** Run in order: `migrations/20260225120000_tables.sql` then `migrations/20260225120001_rls.sql`
+
+- **20260225120000_tables.sql** – Tables, indexes, replica identity, realtime, `get_server_utc_now()`
+- **20260225120001_rls.sql** – RLS enable + policies
 
 ## 4. Enable anonymous auth
 
 In **Authentication > Providers**, enable **Anonymous sign-ins**. This lets users track stats without creating an account.
 
-## Enable Realtime
+## Realtime
 
-The migration adds `puzzle_sessions` and `completions` to the Realtime publication. If needed, enable in **Database > Replication** for both tables.
+The `tables.sql` script adds `puzzle_sessions` and `completions` to the Realtime publication. If needed, enable in **Database > Replication** for both tables.
 
 ## Tables
 
 - **player_stats** – One row per user: puzzles completed, play time, streaks
-- **completions** – Each puzzle completion (used for daily, weekly, monthly, and all-time leaderboards)
-- **player_profiles** – Display name and `show_on_leaderboard` (anonymous mode)
+- **completions** – Each puzzle completion (leaderboards)
+- **player_profiles** – Display name and `show_on_leaderboard`
 - **user_achievements** – Unlocked achievements per user
-- **puzzle_sessions** – UUID session state for co-op puzzles (pieces, elapsed time, completion)
+- **puzzle_sessions** – Session state for co-op puzzles
+- **daily_comments** – Comments on daily puzzles (280 chars)
+- **daily_reactions** – Emoji reactions on daily puzzles
+- **daily_comment_reports** – Report flags for moderation

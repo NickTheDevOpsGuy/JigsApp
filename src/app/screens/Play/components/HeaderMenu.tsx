@@ -3,7 +3,7 @@
  */
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, ChevronLeft, ChevronRight } from "lucide-react";
+import { Menu, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 import {
@@ -16,31 +16,55 @@ import {
 export type { HeaderMenuProps } from "./headerMenuConfig";
 
 const SUB_MENU_LABELS: Record<SubMenuId, string> = {
-  about: "ℹ️ About",
-  advanced: "⚙️ Advanced",
-  audio: "🔊 Audio",
-  contribute: "ℹ️ About",
-  controls: "🎮 Controls",
-  display: "👁️ Display",
-  gameplay: "🎯 Gameplay",
-  help: "❓ Help",
-  navigation: "🧭 Navigate",
-  share: "👥 Share",
-  stats: "🏆 Leaderboards",
-  theme: "🎨 Theme",
+  about: "About",
+  advanced: "System",
+  audio: "Audio",
+  assistance: "Assistance",
+  contribute: "About",
+  controls: "Gameplay",
+  display: "Appearance",
+  gameplay: "Gameplay",
+  help: "Help",
+  navigation: "Navigate",
+  pieceShape: "Piece Shape",
+  share: "Share",
+  stats: "Leaderboards",
+  theme: "Theme",
 };
 
 const SUBMENU_PARENT: Partial<Record<SubMenuId, SubMenuId>> = {
-  controls: "gameplay",
   contribute: "about",
   help: "about",
+  pieceShape: "controls",
 };
 
+const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
+  about: "About Phuzzle and how to get involved",
+  advanced: "Cache, performance overlay, reset stats",
+  assistance: "Visual hints: alignment grid, edge highlight, ghost hints",
+  audio: "Sound effects and haptic feedback",
+  contribute: "About Phuzzle and how to get involved",
+  controls: "Tap to rotate, timer, piece shape, snap assist",
+  display: "Preview, immersive mode, and theme",
+  gameplay: "Tap to rotate, timer, piece shape, snap assist",
+  help: "How to play and keyboard shortcuts",
+  navigation: "Home and new puzzle",
+  pieceShape: "Applies to next puzzle",
+  share: "Play with a friend (co-op)",
+  stats: "View leaderboards",
+  theme: "Change color theme",
+};
+
+function getSubmenuDescription(id: SubMenuId): string {
+  return SUBMENU_DESCRIPTIONS[id] ?? SUB_MENU_LABELS[id];
+}
+
 const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
-  "advanced",
-  "audio",
   "display",
-  "gameplay",
+  "assistance",
+  "controls",
+  "audio",
+  "advanced",
   "navigation",
   "share",
   "stats",
@@ -82,7 +106,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         if (!panel) return;
         const focusable = Array.from(
           panel.querySelectorAll<HTMLElement>(
-            "button[role='menuitem'], [role='menuitem']",
+            "button[role='menuitem'], button[role='menuitemcheckbox'], [role='menuitem'], [role='menuitemcheckbox']",
           ),
         ).filter((el) => !(el as HTMLButtonElement).disabled);
         const idx = focusable.indexOf(document.activeElement as HTMLElement);
@@ -160,15 +184,35 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const getAriaLabel = (item: MenuItemConfig): string => {
     if (item.ariaLabel) return item.ariaLabel;
-    const base = item.sortKey ?? item.label;
-    if (item.label.includes("✨")) return `${base}, on`;
-    if (item.label.includes("🌙")) return `${base}, off`;
-    return base;
+    return item.sortKey ?? item.label;
   };
 
   const renderItem = (item: MenuItemConfig) => {
     if (item.isSectionLabel) {
       return null;
+    }
+    if (item.isToggle) {
+      return (
+        <button
+          key={item.id}
+          type="button"
+          className={styles.headerMenuToggleRow}
+          role="menuitemcheckbox"
+          aria-checked={item.checked}
+        aria-label={getAriaLabel(item)}
+        disabled={item.disabled}
+        title={item.disabled && item.disabledTitle ? item.disabledTitle : `Toggle ${item.label}`}
+        onClick={item.onClick}
+      >
+        <span className={styles.headerMenuToggleLabel}>{item.label}</span>
+          <span
+            className={`${styles.headerMenuSwitch} ${item.checked ? styles.headerMenuSwitchOn : ""}`}
+            aria-hidden
+          >
+            <span className={styles.headerMenuSwitchThumb} />
+          </span>
+        </button>
+      );
     }
     return (
       <button
@@ -178,9 +222,13 @@ export function HeaderMenu(props: HeaderMenuProps) {
         disabled={item.disabled}
         onClick={item.onClick}
         aria-label={getAriaLabel(item)}
-        title={item.disabled && item.disabledTitle ? item.disabledTitle : undefined}
+        aria-checked={item.radioSelected}
+        title={item.disabled && item.disabledTitle ? item.disabledTitle : item.ariaLabel ?? item.sortKey ?? item.label}
       >
-        {item.label}
+        <span className={styles.headerMenuToggleLabel}>{item.label}</span>
+        {item.radioSelected && (
+          <Check size={16} className={styles.headerMenuCheck} aria-hidden />
+        )}
       </button>
     );
   };
@@ -198,22 +246,23 @@ export function HeaderMenu(props: HeaderMenuProps) {
         role="menuitem"
         onClick={handleBack}
         aria-label="Back"
+        title="Back to main menu"
       >
         <ChevronLeft size={16} />
         Back
       </button>
       <div className={styles.headerMenuDivider} />
-      {activeSubMenu === "gameplay" && hasSubMenuItems("controls") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("controls")}
-          aria-label="Controls"
-        >
-          {SUB_MENU_LABELS.controls}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
+      {activeSubMenu && activeSubMenu !== "about" && (
+        <div className={styles.headerMenuSubmenuHeadingWrap}>
+          <h3 className={styles.headerMenuSubmenuHeading}>
+            {SUB_MENU_LABELS[activeSubMenu]}
+          </h3>
+          {activeSubMenu === "pieceShape" && (
+            <p className={styles.headerMenuSubmenuHint}>
+              {SUBMENU_DESCRIPTIONS.pieceShape}
+            </p>
+          )}
+        </div>
       )}
       {activeSubMenu === "about" && (
         <>
@@ -235,18 +284,32 @@ export function HeaderMenu(props: HeaderMenuProps) {
               className={styles.headerMenuSubmenuTrigger}
               role="menuitem"
               onClick={() => setActiveSubMenu("help")}
-              aria-label="Help"
-            >
-              {SUB_MENU_LABELS.help}
+          aria-label="Help"
+                  title="How to play and keyboard shortcuts"
+                >
+                  {SUB_MENU_LABELS.help}
               <ChevronRight size={16} className={styles.headerMenuChevron} />
             </button>
           )}
         </>
       )}
+      {activeSubMenu === "controls" && hasSubMenuItems("pieceShape") && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => setActiveSubMenu("pieceShape")}
+          aria-label="Piece Shape"
+          title="Applies to next puzzle"
+        >
+          {SUB_MENU_LABELS.pieceShape}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
+      )}
       {subMenuItems.map((item) => (
         <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
       ))}
-      {activeSubMenu === "display" && (
+      {activeSubMenu === "controls" && (
         <div className={styles.headerMenuRangeWrap}>
           <label htmlFor="snap-tolerance-range" className={styles.headerMenuRangeLabel}>
             Snap Assist: {Math.round(props.snapToleranceOverride * 100)}%
@@ -279,6 +342,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
             props.onOpenThemeModal!();
           }}
           aria-label="Theme"
+          title="Change color theme"
           data-testid="open-theme-modal"
         >
           {SUB_MENU_LABELS.theme}
@@ -298,6 +362,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={open ? "Close settings" : "Open settings"}
+        title={open ? "Close settings" : "Open settings menu"}
         onClick={() => setOpen((s) => !s)}
       >
         <Menu size={16} />
@@ -317,6 +382,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
                   role="menuitem"
                   onClick={() => setActiveSubMenu("about")}
                   aria-label="About"
+                  title="About Phuzzle, help, and contributors"
                 >
                   {SUB_MENU_LABELS.about}
                   <ChevronRight size={16} className={styles.headerMenuChevron} />
@@ -325,18 +391,19 @@ export function HeaderMenu(props: HeaderMenuProps) {
               <div className={styles.headerMenuDivider} />
               {mainMenuSubmenus.map((id) => (
                 <React.Fragment key={id}>
-                  <button
-                    type="button"
-                    className={styles.headerMenuSubmenuTrigger}
-                    role="menuitem"
-                    onClick={() => {
-                      if (id === "advanced") setAdvancedExpanded((e) => !e);
-                      else setActiveSubMenu(id);
-                    }}
-                    aria-label={
-                      SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
-                    }
-                  >
+                <button
+                  type="button"
+                  className={styles.headerMenuSubmenuTrigger}
+                  role="menuitem"
+                  onClick={() => {
+                    if (id === "advanced") setAdvancedExpanded((e) => !e);
+                    else setActiveSubMenu(id);
+                  }}
+                  aria-label={
+                    SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
+                  }
+                  title={getSubmenuDescription(id)}
+                >
                     {SUB_MENU_LABELS[id]}
                     <ChevronRight
                       size={16}

@@ -1,9 +1,10 @@
 /**
- * CompletionOverlay – puzzle complete: message, image, New Puzzle, Share. X or Esc to close.
+ * CompletionOverlay – puzzle complete: message, image, Share Result, Menu. X or Esc to close.
  */
 import React, { useEffect, useCallback, useState } from "react";
-import { X, Plus, Share2, Copy, Check, Download, Menu, Image } from "lucide-react";
+import { X, Share2, Download, Menu, Image } from "lucide-react";
 import { Button } from "@/components/Button/Button";
+import { Modal } from "@/components/Modal/Modal";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
 import { setBestTime } from "../timeMode";
@@ -19,6 +20,7 @@ import { getPercentileRank } from "@/services/leaderboardService";
 import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
 import type { Piece } from "@/puzzle/types";
 import { useShareCardImage } from "../hooks/useShareCardImage";
+import { DailyReactions } from "@/components/DailyReactions";
 
 type PieceCutType = "classic" | "irregular" | "hard";
 type VisualModifier = "none" | "fog" | "night" | "sepia";
@@ -41,7 +43,6 @@ interface CompletionOverlayProps {
   onCopyResults: () => void;
   onNativeShare: () => void;
   onDownloadImage: () => void;
-  onNewPuzzle: () => void;
   onMenu: () => void;
   onClose: () => void;
 }
@@ -64,7 +65,6 @@ export function CompletionOverlay({
   onCopyResults,
   onNativeShare,
   onDownloadImage,
-  onNewPuzzle,
   onMenu,
   onClose,
 }: CompletionOverlayProps) {
@@ -83,6 +83,7 @@ export function CompletionOverlay({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [handleClose]);
 
+  const [sharePopupOpen, setSharePopupOpen] = useState(false);
   const [streak, setStreak] = useState<number>(0);
   const [masteryStreak, setMasteryStreak] = useState<number>(0);
   const [percentile, setPercentile] = useState<{
@@ -235,26 +236,35 @@ export function CompletionOverlay({
 
         <div className={styles.completeActions}>
           <div className={styles.completeActionsPrimary}>
-            <Button variant="primary" onClick={onNewPuzzle}>
-              <Plus size={18} />
-              New Puzzle
+            <Button
+              variant="primary"
+              onClick={() => setSharePopupOpen(true)}
+              className={styles.completeSharePrimary}
+            >
+              <Share2 size={18} />
+              Share Result
             </Button>
-            {canNativeShare ? (
-              <Button variant="secondary" onClick={onNativeShare}>
-                <Share2 size={18} />
-                Share Result
-              </Button>
-            ) : (
-              <Button variant="secondary" onClick={onCopyResults}>
-                {copied ? <Check size={18} /> : <Copy size={18} />}
-                {copied ? "Copied!" : "Share Result"}
-              </Button>
-            )}
-            <Button variant="secondary" onClick={handleShareCard} disabled={isGenerating}>
-              <Image size={18} />
-              {isGenerating ? "Generating..." : "Share Card PNG"}
+          </div>
+          <div className={styles.completeActionsSecondary}>
+            <Button size="sm" variant="secondary" onClick={onMenu}>
+              <Menu size={16} />
+              Menu
             </Button>
-            <label className={styles.shareCardToggle}>
+          </div>
+        </div>
+
+        {isDaily && (
+          <DailyReactions puzzleDate={getTodayDateString()} />
+        )}
+
+        <Modal
+          isOpen={sharePopupOpen}
+          onClose={() => setSharePopupOpen(false)}
+          title="Share Result"
+          showCloseButton
+        >
+          <div className={styles.shareResultPopup}>
+            <label className={styles.shareResultPopupToggle}>
               <input
                 type="checkbox"
                 checked={useSeasonalFrame}
@@ -262,18 +272,28 @@ export function CompletionOverlay({
               />
               Seasonal frame
             </label>
-          </div>
-          <div className={styles.completeActionsSecondary}>
-            <Button size="sm" variant="secondary" onClick={onDownloadImage}>
-              <Download size={16} />
+            <Button
+              variant="secondary"
+              onClick={handleShareCard}
+              disabled={isGenerating}
+              className={styles.shareResultPopupBtn}
+            >
+              <Image size={18} />
+              {isGenerating ? "Generating..." : "Share Card PNG"}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                onDownloadImage();
+                setSharePopupOpen(false);
+              }}
+              className={styles.shareResultPopupBtn}
+            >
+              <Download size={18} />
               Download
             </Button>
-            <Button size="sm" variant="secondary" onClick={onMenu}>
-              <Menu size={16} />
-              Menu
-            </Button>
           </div>
-        </div>
+        </Modal>
       </div>
     </div>
   );
