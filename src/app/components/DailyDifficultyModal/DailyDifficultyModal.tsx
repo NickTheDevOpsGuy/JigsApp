@@ -8,6 +8,7 @@ import { Modal } from "@/components/Modal/Modal";
 import {
   GRID_OPTIONS,
   dismissFreezeOfferToday,
+  getDailyPreferredModifier,
   getStreakFreezeCount,
   getYesterdayDateString,
   useStreakFreeze,
@@ -32,13 +33,6 @@ const DIFFICULTY_COLORS = [
 
 const PRIMARY_COUNT = 3; // Easy, Medium, Hard
 const RECOMMENDED_INDEX = 1; // Medium
-const MODIFIER_OPTIONS = [
-  { value: "none", label: "None" },
-  { value: "fog", label: "Fog – Reduced contrast until placed" },
-  { value: "night", label: "Night – Dark palette + vignette" },
-  { value: "sepia", label: "Sepia – Vintage tone" },
-] as const;
-type VisualModifier = (typeof MODIFIER_OPTIONS)[number]["value"];
 
 type Props = {
   isOpen: boolean;
@@ -56,7 +50,6 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const [rememberChoice, setRememberChoice] = useState(preferredIdx !== null);
   const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(preferredIdx ?? RECOMMENDED_INDEX);
-  const [modifier, setModifier] = useState<VisualModifier>("none");
 
   const showFreezeOffer =
     wasYesterdayMissed() &&
@@ -104,6 +97,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const handleStart = () => {
     clearPuzzleState();
     const grid = GRID_OPTIONS[selectedIndex] ?? GRID_OPTIONS[RECOMMENDED_INDEX];
+    const modifier = getDailyPreferredModifier();
     const result = dailyModule.startDailyPuzzle(
       {
         rows: grid.rows,
@@ -214,37 +208,6 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
             })}
           </div>
         )}
-      </div>
-
-      <div className={styles.challengeModeSection}>
-        <p className={styles.challengeModeLabel}>Challenge Mode</p>
-        <p className={styles.challengeModeHint}>
-          Leaderboard bracket — only one active at a time.
-        </p>
-        <div
-          className={styles.challengeModeRadioList}
-          role="radiogroup"
-          aria-label="Challenge mode"
-        >
-          {MODIFIER_OPTIONS.map((opt) => (
-            <label
-              key={opt.value}
-              className={`${styles.challengeModeOption} ${
-                modifier === opt.value ? styles.challengeModeOptionSelected : ""
-              }`}
-            >
-              <input
-                type="radio"
-                name="challenge-mode"
-                value={opt.value}
-                checked={modifier === opt.value}
-                onChange={() => setModifier(opt.value)}
-                className={styles.challengeModeRadio}
-              />
-              <span className={styles.challengeModeOptionText}>{opt.label}</span>
-            </label>
-          ))}
-        </div>
       </div>
 
       <label className={styles.rememberLabel}>

@@ -10,7 +10,6 @@ type HelpChoiceModalProps = {
   onHowToPlay: () => void;
   onKeyboardShortcuts: () => void;
   onShowAbout?: () => void;
-  onOpenSettings?: () => void;
   onOpenTheme?: () => void;
 };
 
@@ -20,7 +19,6 @@ export function HelpChoiceModal({
   onHowToPlay,
   onKeyboardShortcuts,
   onShowAbout,
-  onOpenSettings,
   onOpenTheme,
 }: HelpChoiceModalProps) {
   return (
@@ -59,19 +57,6 @@ export function HelpChoiceModal({
             aria-label="About"
           >
             ℹ️ About
-          </button>
-        )}
-        {onOpenSettings && (
-          <button
-            type="button"
-            className={styles.helpChoiceBtn}
-            onClick={() => {
-              onClose();
-              onOpenSettings();
-            }}
-            aria-label="Settings"
-          >
-            ⚙️ Settings
           </button>
         )}
         {onOpenTheme && (

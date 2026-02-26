@@ -4,6 +4,7 @@
  */
 import type { TimeMode } from "../timeMode";
 import type { Theme } from "@/hooks/useTheme";
+import type { DailyVisualModifier } from "@/daily/dailyPuzzleCore";
 
 export type DebugFlags = {
   showGrid: boolean;
@@ -38,6 +39,11 @@ export type HeaderMenuProps = {
   canShowDebug: boolean;
   debug: DebugFlags;
   onNewPuzzle: () => void;
+  canUndo?: boolean;
+  onUndo?: () => void;
+  canRedo?: boolean;
+  onRedo?: () => void;
+  onResetView?: () => void;
   onTogglePreview: () => void;
   onToggleSound: () => void;
   onToggleMusic?: () => void;
@@ -70,6 +76,8 @@ export type HeaderMenuProps = {
   theme?: Theme;
   setTheme?: (t: Theme) => void;
   onOpenThemeModal?: () => void;
+  dailyPreferredModifier?: DailyVisualModifier;
+  onDailyPreferredModifierChange?: (m: DailyVisualModifier) => void;
   onResetStats?: () => void;
   onClearCache?: () => void;
   snapToleranceOverride: number;
@@ -84,8 +92,11 @@ export type SubMenuId =
   | "contribute"
   | "controls"
   | "display"
+  | "effects"
   | "gameplay"
   | "help"
+  | "manualControls"
+  | "modes"
   | "navigation"
   | "pieceShape"
   | "share"
@@ -109,6 +120,8 @@ export type MenuItemConfig = {
   ariaLabel?: string;
   /** Tooltip when disabled */
   disabledTitle?: string;
+  /** Hover/popup tooltip description */
+  title?: string;
   /** Render as toggle switch instead of button */
   isToggle?: boolean;
   /** Checked state for toggle (on = true) */
@@ -141,6 +154,7 @@ export function buildMenuItems(
       visible: true,
       label: "Home",
       sortKey: "Home",
+      title: "Return to main menu",
       onClick: c(() => navigate("/")),
       subMenu: "navigation",
     },
@@ -150,21 +164,78 @@ export function buildMenuItems(
       visible: true,
       label: "New puzzle",
       sortKey: "New puzzle",
+      title: "Start a fresh puzzle",
       onClick: c(props.onNewPuzzle),
       subMenu: "navigation",
     },
-    // ─── Gameplay ───
+    // ─── Controls (manual: undo, redo, reset, zoom) ───
+    {
+      id: "undo",
+      section: "settings",
+      visible: !!props.onUndo,
+      label: "Undo",
+      sortKey: "0 Undo",
+      title: "Revert last piece placement",
+      onClick: c(props.onUndo ?? (() => {})),
+      subMenu: "manualControls",
+      disabled: !props.canUndo,
+      disabledTitle: !props.canUndo ? "No moves to undo" : undefined,
+    },
+    {
+      id: "redo",
+      section: "settings",
+      visible: !!props.onRedo,
+      label: "Redo",
+      sortKey: "1 Redo",
+      title: "Reapply last undone move",
+      onClick: c(props.onRedo ?? (() => {})),
+      subMenu: "manualControls",
+      disabled: !props.canRedo,
+      disabledTitle: !props.canRedo ? "No moves to redo" : undefined,
+    },
+    {
+      id: "resetView",
+      section: "settings",
+      visible: !!props.onResetView,
+      label: "Reset View",
+      sortKey: "2 Reset View",
+      title: "Reset zoom and pan to center the board",
+      onClick: c(props.onResetView ?? (() => {})),
+      subMenu: "manualControls",
+    },
+    {
+      id: "zoomIn",
+      section: "settings",
+      visible: true,
+      label: "Zoom In",
+      sortKey: "3 Zoom In",
+      title: "Zoom in on the board",
+      onClick: c(props.onZoomIn ?? (() => {})),
+      subMenu: "manualControls",
+    },
+    {
+      id: "zoomOut",
+      section: "settings",
+      visible: true,
+      label: "Zoom Out",
+      sortKey: "4 Zoom Out",
+      title: "Zoom out to see more of the board",
+      onClick: c(props.onZoomOut ?? (() => {})),
+      subMenu: "manualControls",
+    },
+    // ─── Modes (behavior rules) ───
     {
       id: "deliberateDetach",
       section: "settings",
       visible: !!props.onToggleDeliberateDetach,
       label: "Deliberate Detach",
-      sortKey: "Deliberate Detach",
+      sortKey: "0 Deliberate Detach",
+      title: "Require hold or shake to detach placed pieces",
       ariaLabel: props.deliberateDetachEnabled
         ? "Deliberate detach on"
         : "Deliberate detach off",
       onClick: c(props.onToggleDeliberateDetach ?? (() => {})),
-      subMenu: "controls",
+      subMenu: "modes",
       isToggle: true,
       checked: !!props.deliberateDetachEnabled,
     },
@@ -173,9 +244,10 @@ export function buildMenuItems(
       section: "settings",
       visible: true,
       label: "Tap to Rotate",
-      sortKey: "Tap to Rotate",
+      sortKey: "1 Tap to Rotate",
+      title: "Tap a piece in the tray to rotate it",
       onClick: c(props.onTogglePieceLocking),
-      subMenu: "controls",
+      subMenu: "modes",
       isToggle: true,
       checked: props.pieceLockingEnabled,
     },
@@ -184,10 +256,11 @@ export function buildMenuItems(
       section: "settings",
       visible: !!props.onToggleRelaxedMode,
       label: "Relaxed Mode",
-      sortKey: "Relaxed Mode",
+      sortKey: "2 Relaxed Mode",
+      title: "Hide timer and take your time",
       ariaLabel: props.relaxedModeEnabled ? "Relaxed Mode on" : "Relaxed Mode off",
       onClick: c(props.onToggleRelaxedMode ?? (() => {})),
-      subMenu: "controls",
+      subMenu: "modes",
       isToggle: true,
       checked: !!props.relaxedModeEnabled,
     },
@@ -196,10 +269,11 @@ export function buildMenuItems(
       section: "settings",
       visible: !!props.onToggleDriftMode,
       label: "Drift Mode",
-      sortKey: "Drift Mode",
+      sortKey: "3 Drift Mode",
+      title: "Pieces drift slightly for organic feel",
       ariaLabel: props.driftModeEnabled ? "Drift Mode on" : "Drift Mode off",
       onClick: c(props.onToggleDriftMode ?? (() => {})),
-      subMenu: "controls",
+      subMenu: "modes",
       isToggle: true,
       checked: !!props.driftModeEnabled,
     },
@@ -208,9 +282,10 @@ export function buildMenuItems(
       section: "settings",
       visible: true,
       label: "Show Timer",
-      sortKey: "Show Timer",
+      sortKey: "4 Show Timer",
+      title: "Show or hide elapsed time",
       onClick: c(() => props.setTimeMode(showTimer ? "relaxed" : "elapsed")),
-      subMenu: "controls",
+      subMenu: "modes",
       isToggle: true,
       checked: showTimer,
     },
@@ -221,10 +296,63 @@ export function buildMenuItems(
       visible: true,
       label: "Preview",
       sortKey: "0 Preview",
+      title: "Show reference image while solving",
       onClick: c(props.onTogglePreview),
       subMenu: "display",
       isToggle: true,
       checked: props.showPreview,
+    },
+    {
+      id: "modifierNone",
+      section: "settings",
+      visible: !!props.onDailyPreferredModifierChange,
+      label: "None",
+      sortKey: "0 None",
+      title: "No visual modifier",
+      onClick: c(() => props.onDailyPreferredModifierChange?.("none")),
+      subMenu: "effects",
+      isToggle: true,
+      checked: (props.dailyPreferredModifier ?? "none") === "none",
+      ariaLabel: "None – no visual modifier",
+    },
+    {
+      id: "modifierFog",
+      section: "settings",
+      visible: !!props.onDailyPreferredModifierChange,
+      label: "Fog",
+      sortKey: "1 Fog",
+      title: "Reduced contrast until piece is placed",
+      onClick: c(() => props.onDailyPreferredModifierChange?.("fog")),
+      subMenu: "effects",
+      isToggle: true,
+      checked: props.dailyPreferredModifier === "fog",
+      ariaLabel: "Fog – reduced contrast until placed",
+    },
+    {
+      id: "modifierNight",
+      section: "settings",
+      visible: !!props.onDailyPreferredModifierChange,
+      label: "Night",
+      sortKey: "2 Night",
+      title: "Dark palette with vignette",
+      onClick: c(() => props.onDailyPreferredModifierChange?.("night")),
+      subMenu: "effects",
+      isToggle: true,
+      checked: props.dailyPreferredModifier === "night",
+      ariaLabel: "Night – dark palette and vignette",
+    },
+    {
+      id: "modifierSepia",
+      section: "settings",
+      visible: !!props.onDailyPreferredModifierChange,
+      label: "Sepia",
+      sortKey: "3 Sepia",
+      title: "Vintage sepia tone",
+      onClick: c(() => props.onDailyPreferredModifierChange?.("sepia")),
+      subMenu: "effects",
+      isToggle: true,
+      checked: props.dailyPreferredModifier === "sepia",
+      ariaLabel: "Sepia – vintage tone",
     },
     {
       id: "alignmentGrid",
@@ -232,6 +360,7 @@ export function buildMenuItems(
       visible: true,
       label: "Alignment Grid",
       sortKey: "Alignment Grid",
+      title: "Show grid lines to help align pieces",
       onClick: c(props.onToggleAlignmentGrid),
       subMenu: "assistance",
       isToggle: true,
@@ -243,6 +372,7 @@ export function buildMenuItems(
       visible: true,
       label: "Edge Highlight",
       sortKey: "Edge Highlight",
+      title: "Highlight edge pieces in the tray",
       onClick: c(props.onToggleEdgeHighlight),
       subMenu: "assistance",
       isToggle: true,
@@ -254,6 +384,7 @@ export function buildMenuItems(
       visible: !!props.onToggleClusterOutline,
       label: "Cluster Outlines",
       sortKey: "Cluster Outlines",
+      title: "Show outlines around completed clusters",
       ariaLabel: props.showClusterOutline
         ? "Cluster outlines on"
         : "Cluster outlines off",
@@ -268,6 +399,7 @@ export function buildMenuItems(
       visible: true,
       label: "Ghost Hint",
       sortKey: "Ghost Hint",
+      title: "Show ghost placement when dragging a piece",
       onClick: c(props.onToggleGhostHint),
       subMenu: "assistance",
       isToggle: true,
@@ -279,6 +411,7 @@ export function buildMenuItems(
       visible: true,
       label: "Ghost When Idle",
       sortKey: "Ghost When Idle",
+      title: "Show ghost after a moment of idleness",
       onClick: c(props.onToggleGhostWhenIdle),
       subMenu: "assistance",
       isToggle: true,
@@ -290,6 +423,7 @@ export function buildMenuItems(
       visible: true,
       label: "Immersive Mode",
       sortKey: "Immersive Mode",
+      title: "Hide UI until you hover or tap the edge",
       onClick: c(props.onToggleImmersiveMode),
       subMenu: "display",
       isToggle: true,
@@ -301,6 +435,7 @@ export function buildMenuItems(
       visible: true,
       label: "Progressive Reveal",
       sortKey: "Progressive Reveal",
+      title: "Reveal reference image as you place pieces",
       onClick: c(props.onToggleProgressiveReveal ?? (() => {})),
       subMenu: "assistance",
       isToggle: true,
@@ -312,6 +447,7 @@ export function buildMenuItems(
       visible: !!props.onPieceCutTypeChange,
       label: "Classic",
       sortKey: "0 Piece shape Classic",
+      title: "Classic jigsaw cuts – applies to next puzzle",
       onClick: c(() => props.onPieceCutTypeChange?.("classic")),
       subMenu: "pieceShape",
       radioSelected: (props.pieceCutType ?? "classic") === "classic",
@@ -323,6 +459,7 @@ export function buildMenuItems(
       visible: !!props.onPieceCutTypeChange,
       label: "Irregular",
       sortKey: "1 Piece shape Irregular",
+      title: "Irregular wavy cuts – applies to next puzzle",
       onClick: c(() => props.onPieceCutTypeChange?.("irregular")),
       subMenu: "pieceShape",
       radioSelected: (props.pieceCutType ?? "classic") === "irregular",
@@ -334,6 +471,7 @@ export function buildMenuItems(
       visible: !!props.onPieceCutTypeChange,
       label: "Hard",
       sortKey: "2 Piece shape Hard",
+      title: "Hard uniform cuts – applies to next puzzle",
       onClick: c(() => props.onPieceCutTypeChange?.("hard")),
       subMenu: "pieceShape",
       radioSelected: (props.pieceCutType ?? "classic") === "hard",
@@ -346,6 +484,7 @@ export function buildMenuItems(
       visible: props.canShowHaptics,
       label: "Haptics",
       sortKey: "Haptics",
+      title: "Vibration feedback on snap and actions",
       onClick: c(props.onToggleHaptics),
       subMenu: "audio",
       isToggle: true,
@@ -357,6 +496,7 @@ export function buildMenuItems(
       visible: true,
       label: "Sound Effects",
       sortKey: "Sound Effects",
+      title: "Play sounds when placing and snapping pieces",
       onClick: c(props.onToggleSound),
       subMenu: "audio",
       isToggle: true,
@@ -368,6 +508,7 @@ export function buildMenuItems(
       visible: !!props.onToggleMusic,
       label: "Background Music",
       sortKey: "Background Music",
+      title: "Theme-based ambient music",
       ariaLabel: props.musicEnabled ? "Background music on" : "Background music off",
       onClick: c(props.onToggleMusic ?? (() => {})),
       subMenu: "audio",
@@ -381,6 +522,7 @@ export function buildMenuItems(
       visible: !!props.onClearCache,
       label: "Clear Cache",
       sortKey: "Clear Cache",
+      title: "Clear cached puzzle images and data",
       onClick: c(props.onClearCache ?? (() => {})),
       subMenu: "advanced",
     },
@@ -390,6 +532,7 @@ export function buildMenuItems(
       visible: props.canShowDebug,
       label: "Performance Overlay",
       sortKey: "Performance Overlay",
+      title: "Show FPS and draw call stats",
       onClick: c(props.onTogglePerfOverlay),
       subMenu: "advanced",
       isToggle: true,
@@ -401,6 +544,7 @@ export function buildMenuItems(
       visible: !!props.onResetStats,
       label: "Reset Local Stats",
       sortKey: "Reset Local Stats",
+      title: "Clear all local best times – cannot be undone",
       onClick: c(props.onResetStats ?? (() => {})),
       subMenu: "advanced",
     },
@@ -411,6 +555,7 @@ export function buildMenuItems(
       visible: true,
       label: "Leaderboards",
       sortKey: "Leaderboards",
+      title: "View daily and best-time leaderboards",
       onClick: c(() => navigate("/stats")),
       subMenu: "stats",
     },
@@ -420,6 +565,7 @@ export function buildMenuItems(
       visible: !!props.onSharePuzzle,
       label: "Play with friend",
       sortKey: "Play with friend",
+      title: "Start a co-op session to solve together",
       disabled: props.shareDisabled,
       disabledTitle: props.shareDisabled ? "Creating session…" : undefined,
       onClick: c(props.onSharePuzzle ?? (() => {})),
@@ -432,6 +578,7 @@ export function buildMenuItems(
       visible: true,
       label: "Get Involved",
       sortKey: "Get Involved",
+      title: "Contribute on GitHub",
       onClick: c(() => window.open(GITHUB_REPO_URL, "_blank", "noopener,noreferrer")),
       subMenu: "contribute",
     },
@@ -441,6 +588,7 @@ export function buildMenuItems(
       visible: true,
       label: "Meet the Team",
       sortKey: "Meet the Team",
+      title: "View contributors",
       onClick: c(() =>
         window.open(GITHUB_CONTRIBUTORS_URL, "_blank", "noopener,noreferrer"),
       ),
@@ -452,6 +600,7 @@ export function buildMenuItems(
       visible: true,
       label: "How to Play",
       sortKey: "How to Play",
+      title: "Learn the basics",
       onClick: c(props.onShowHowToPlay),
       subMenu: "help",
     },
@@ -461,6 +610,7 @@ export function buildMenuItems(
       visible: true,
       label: "Keyboard & Controls",
       sortKey: "Keyboard & Controls",
+      title: "View keyboard shortcuts",
       onClick: c(props.onShowShortcuts),
       subMenu: "help",
     },

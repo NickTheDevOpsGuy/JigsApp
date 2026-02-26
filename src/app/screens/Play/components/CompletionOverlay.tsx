@@ -38,10 +38,10 @@ interface CompletionOverlayProps {
   isNewBest?: boolean;
   isDaily?: boolean;
   cutType?: PieceCutType;
-  copied: boolean;
-  canNativeShare: boolean;
-  onCopyResults: () => void;
-  onNativeShare: () => void;
+  copied?: boolean;
+  canNativeShare?: boolean;
+  onCopyResults?: () => void;
+  onNativeShare?: () => void;
   onDownloadImage: () => void;
   onMenu: () => void;
   onClose: () => void;
@@ -60,10 +60,10 @@ export function CompletionOverlay({
   isNewBest = false,
   isDaily = false,
   cutType = "classic",
-  copied,
-  canNativeShare,
-  onCopyResults,
-  onNativeShare,
+  copied: _copied,
+  canNativeShare: _canNativeShare,
+  onCopyResults: _onCopyResults,
+  onNativeShare: _onNativeShare,
   onDownloadImage,
   onMenu,
   onClose,
@@ -91,8 +91,10 @@ export function CompletionOverlay({
     totalPlayers: number;
   } | null>(null);
   const [useSeasonalFrame, setUseSeasonalFrame] = useState(true);
+
   const { shareCard, isGenerating } = useShareCardImage();
   const completionMessage = getCompletionMessage(elapsedSeconds);
+
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const badge = getCompletionBadge(elapsedSeconds, undoCount, pieceCount);
   const isMasteryDaily = isDaily && !usedHint && undoCount === 0;
@@ -104,24 +106,28 @@ export function CompletionOverlay({
   }, [isNewBest, grid, elapsedSeconds]);
 
   useEffect(() => {
-    if (isDaily) {
-      const newStreak = recordDailyCompletion(elapsedSeconds);
-      setStreak(newStreak);
-      try {
-        const today = new Date(`${getTodayDateString()}T00:00:00.000Z`);
-        const day = today.getUTCDay();
-        const diffToMonday = day === 0 ? 6 : day - 1;
-        today.setUTCDate(today.getUTCDate() - diffToMonday);
-        const weekKey = today.toISOString().slice(0, 10);
-        localStorage.setItem(`phuzzle:weeklyAlbumNudge:${weekKey}`, "true");
-      } catch {
-        // ignore
-      }
-      try {
-        localStorage.removeItem(DAILY_DATE_KEY);
-      } catch {
-        // ignore
-      }
+    if (!isDaily) return;
+
+    const newStreak = recordDailyCompletion(elapsedSeconds);
+    setStreak(newStreak);
+
+    // Weekly album nudge flag (for future weekly collectible page)
+    try {
+      const today = new Date(`${getTodayDateString()}T00:00:00.000Z`);
+      const day = today.getUTCDay();
+      const diffToMonday = day === 0 ? 6 : day - 1;
+      today.setUTCDate(today.getUTCDate() - diffToMonday);
+      const weekKey = today.toISOString().slice(0, 10);
+      localStorage.setItem(`phuzzle:weeklyAlbumNudge:${weekKey}`, "true");
+    } catch {
+      // ignore
+    }
+
+    // Reset daily seed key so the next run pulls fresh daily state if needed
+    try {
+      localStorage.removeItem(DAILY_DATE_KEY);
+    } catch {
+      // ignore
     }
   }, [isDaily, elapsedSeconds]);
 
@@ -134,8 +140,10 @@ export function CompletionOverlay({
 
   useEffect(() => {
     if (!grid) return;
+
     const run = async () => {
       const dailyStreak = isDaily ? getCurrentStreak() : 0;
+
       const stats = await recordCompletion({
         elapsedSeconds,
         grid,
@@ -146,8 +154,10 @@ export function CompletionOverlay({
         cutType,
         visualModifier,
       });
+
       if (stats) {
         setMasteryStreak(stats.masteryStreak ?? 0);
+
         await checkAndUnlockAchievements({
           puzzlesCompleted: stats.puzzlesCompleted,
           dailyStreak: stats.dailyStreak,
@@ -156,11 +166,13 @@ export function CompletionOverlay({
         });
       }
     };
-    run();
+
+    void run();
   }, [elapsedSeconds, grid, isDaily, cutType, undoCount, usedHint, visualModifier]);
 
   const puzzleSizeText =
     grid != null ? `${grid.rows}×${grid.cols} · ${grid.rows * grid.cols} pieces` : null;
+
   const handleShareCard = useCallback(async () => {
     await shareCard({
       imageUrl,
@@ -190,14 +202,18 @@ export function CompletionOverlay({
       >
         <X size={24} />
       </button>
+
       <div className={styles.completeContent}>
         <h2>🎉 {completionMessage}</h2>
+
         {badge && (
           <p className={styles.puzzleSize} aria-hidden="true">
             {badge}
           </p>
         )}
+
         {puzzleSizeText != null && <p className={styles.puzzleSize}>{puzzleSizeText}</p>}
+
         <p>
           Finished in {formatTime(elapsedSeconds)}
           {percentile && percentile.totalPlayers >= 5 && (
@@ -213,6 +229,7 @@ export function CompletionOverlay({
             </span>
           )}
         </p>
+
         {isMasteryDaily && (
           <p className={styles.dailyBadge}>
             🏅 Mastery clear — no hints, no undo!
@@ -224,6 +241,7 @@ export function CompletionOverlay({
             )}
           </p>
         )}
+
         {imageUrl && (
           <div className={styles.completePreviewWrapper}>
             <img
@@ -270,6 +288,7 @@ export function CompletionOverlay({
               />
               Seasonal frame
             </label>
+
             <Button
               variant="secondary"
               onClick={handleShareCard}
@@ -279,6 +298,7 @@ export function CompletionOverlay({
               <Image size={18} />
               {isGenerating ? "Generating..." : "Share Card PNG"}
             </Button>
+
             <Button
               variant="secondary"
               onClick={() => {

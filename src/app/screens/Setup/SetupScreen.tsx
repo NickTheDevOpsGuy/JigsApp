@@ -372,21 +372,19 @@ export function SetupScreen() {
             </>
           )}
 
-          <p className={styles.difficultySummary}>
-            {effectiveRows * effectiveCols} pieces
-            {isCustom ? " · Custom" : ` · ${GRID_OPTIONS[gridIndex].label.split(" ")[0]}`}
-          </p>
-          {suggestedGrid &&
-            gridIndex !== suggestedGrid.gridIndex &&
-            suggestedGrid.gridIndex < GRID_OPTIONS.length - 1 && (
-              <button
-                type="button"
-                className={styles.difficultySuggestion}
-                onClick={() => setGridIndex(suggestedGrid.gridIndex)}
-              >
-                {suggestedGrid.hint}
-              </button>
-            )}
+          <div className={styles.difficultySuggestionSlot}>
+            {suggestedGrid &&
+              gridIndex !== suggestedGrid.gridIndex &&
+              suggestedGrid.gridIndex < GRID_OPTIONS.length - 1 && (
+                <button
+                  type="button"
+                  className={styles.difficultySuggestion}
+                  onClick={() => setGridIndex(suggestedGrid.gridIndex)}
+                >
+                  {suggestedGrid.hint}
+                </button>
+              )}
+          </div>
           <div className={styles.configGrid}>
             <Dropdown
               label="Difficulty"

@@ -33,7 +33,11 @@ import {
 } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
 import { getBestTime, BEST_TIME_PREFIX, getQuadrantPb, setQuadrantPb } from "./timeMode";
-import { isDailyPuzzleSession, getDailyVisualModifier } from "@/daily/dailyPuzzleCore";
+import {
+  isDailyPuzzleSession,
+  getDailyVisualModifier,
+  getDailyPreferredModifier,
+} from "@/daily/dailyPuzzleCore";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
@@ -49,7 +53,6 @@ import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
 import { useBatterySaver } from "../../hooks/useBatterySaver";
-import { Crosshair } from "lucide-react";
 import {
   CoopDebugPanel,
   CoopStatusIndicator,
@@ -184,6 +187,8 @@ export function PlayScreen() {
     setProgressiveRevealMode,
     snapToleranceOverride,
     setSnapToleranceOverride,
+    dailyPreferredModifier,
+    setDailyPreferredModifier,
   } = ui;
 
   const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
@@ -606,6 +611,13 @@ export function PlayScreen() {
     audioManager.setPaused(isPaused);
   }, [isPaused]);
 
+  useEffect(() => {
+    audioManager.tryStartAmbientIfEnabled();
+    return () => {
+      audioManager.leavePlayScreen();
+    };
+  }, []);
+
   // ─── Persistence (auto-save every N placements + debounce, co-op sync, tab hide flush) ───
   const SAVE_DEBOUNCE_MS = 500;
   const SAVE_EVERY_N_MOVES = 3;
@@ -943,7 +955,9 @@ export function PlayScreen() {
   const piecesOnBoard = state?.pieces.filter((p) => !p.inTray).length ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
-  const dailyVisualModifier = isDailyPuzzleSession() ? getDailyVisualModifier() : "none";
+  const dailyVisualModifier = isDailyPuzzleSession()
+    ? getDailyVisualModifier()
+    : (dailyPreferredModifier ?? getDailyPreferredModifier());
   const fogStrength =
     dailyVisualModifier === "fog" && total > 0 ? (1 - placed / total) * 0.45 : 0;
   const showImmersiveUi = !immersiveMode || immersiveReveal;
@@ -960,6 +974,19 @@ export function PlayScreen() {
     },
     [],
   );
+
+  const handleToggleImmersiveMode = React.useCallback(() => {
+    const willEnable = !immersiveMode;
+    toggleImmersiveMode();
+    if (willEnable) {
+      setImmersiveReveal(true);
+      if (immersiveHideTimerRef.current) clearTimeout(immersiveHideTimerRef.current);
+      immersiveHideTimerRef.current = setTimeout(() => {
+        setImmersiveReveal(false);
+      }, 1800);
+    }
+  }, [immersiveMode, toggleImmersiveMode]);
+
   const handleImmersiveReveal = React.useCallback(() => {
     if (!immersiveMode) return;
     setImmersiveReveal(true);
@@ -1096,6 +1123,39 @@ export function PlayScreen() {
               canShowDebug={SHOW_DEBUG}
               debug={debug}
               onNewPuzzle={() => setShowNewGameModal(true)}
+              canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
+              onUndo={createUndoRedoHandler(
+                manager ?? null,
+                "undo",
+                setState,
+                () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
+                soundManager.play.bind(soundManager),
+                () => {
+                  undoCountRef.current += 1;
+                },
+                (fromPositions) => {
+                  undoSnapBackRef.current = {
+                    fromPositions,
+                    startMs: performance.now(),
+                  };
+                },
+              )}
+              canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
+              onRedo={createUndoRedoHandler(
+                manager ?? null,
+                "redo",
+                setState,
+                () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
+                soundManager.play.bind(soundManager),
+                undefined,
+                (fromPositions) => {
+                  undoSnapBackRef.current = {
+                    fromPositions,
+                    startMs: performance.now(),
+                  };
+                },
+              )}
+              onResetView={() => viewport.reset()}
               onTogglePreview={() => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 setShowPreview((p) => !p);
@@ -1143,7 +1203,7 @@ export function PlayScreen() {
               immersiveMode={immersiveMode}
               onToggleImmersiveMode={() => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                toggleImmersiveMode();
+                handleToggleImmersiveMode();
               }}
               progressiveRevealMode={progressiveRevealMode}
               onToggleProgressiveReveal={() => {
@@ -1161,54 +1221,16 @@ export function PlayScreen() {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
                 setShowThemeModal(true);
               }}
+              dailyPreferredModifier={dailyPreferredModifier}
+              onDailyPreferredModifierChange={(m) => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                setDailyPreferredModifier(m);
+              }}
               onResetStats={() => setShowResetStatsConfirm(true)}
               onClearCache={() => setShowClearCacheConfirm(true)}
               snapToleranceOverride={snapToleranceOverride}
               onSnapToleranceOverrideChange={(value) => setSnapToleranceOverride(value)}
             />
-            <UndoRedoButtons
-              canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
-              onUndo={createUndoRedoHandler(
-                manager ?? null,
-                "undo",
-                setState,
-                () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
-                soundManager.play.bind(soundManager),
-                () => {
-                  undoCountRef.current += 1;
-                },
-                (fromPositions) => {
-                  undoSnapBackRef.current = {
-                    fromPositions,
-                    startMs: performance.now(),
-                  };
-                },
-              )}
-              canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
-              onRedo={createUndoRedoHandler(
-                manager ?? null,
-                "redo",
-                setState,
-                () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
-                soundManager.play.bind(soundManager),
-                undefined,
-                (fromPositions) => {
-                  undoSnapBackRef.current = {
-                    fromPositions,
-                    startMs: performance.now(),
-                  };
-                },
-              )}
-            />
-            <button
-              type="button"
-              className={styles.iconBtn}
-              onClick={() => viewport.reset()}
-              aria-label="Reset view"
-              title="Reset zoom and pan to center"
-            >
-              <Crosshair size={16} />
-            </button>
           </div>
           <div className={styles.topBarCenter}>
             {sessionId && (
@@ -1473,19 +1495,61 @@ export function PlayScreen() {
           </div>
         </div>
         <div
-          className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
+          className={`${styles.trayArea} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
           onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
         >
-          <PieceTray
-            ref={trayRef}
-            pieces={trayPieces}
-            image={imgRef.current}
-            grid={state?.grid ?? grid}
-            onPieceClick={handleTrayPieceClick}
-            highlightedPieceIds={
-              highlightedPieceIds.size > 0 ? highlightedPieceIds : undefined
-            }
-          />
+          {!isComplete && !isPaused && (
+            <div className={styles.undoRedoPillsWrap}>
+              <UndoRedoButtons
+                canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
+                onUndo={createUndoRedoHandler(
+                  manager ?? null,
+                  "undo",
+                  setState,
+                  () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
+                  soundManager.play.bind(soundManager),
+                  () => {
+                    undoCountRef.current += 1;
+                  },
+                  (fromPositions) => {
+                    undoSnapBackRef.current = {
+                      fromPositions,
+                      startMs: performance.now(),
+                    };
+                  },
+                )}
+                canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
+                onRedo={createUndoRedoHandler(
+                  manager ?? null,
+                  "redo",
+                  setState,
+                  () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
+                  soundManager.play.bind(soundManager),
+                  undefined,
+                  (fromPositions) => {
+                    undoSnapBackRef.current = {
+                      fromPositions,
+                      startMs: performance.now(),
+                    };
+                  },
+                )}
+              />
+            </div>
+          )}
+          <div
+            className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""}`}
+          >
+            <PieceTray
+              ref={trayRef}
+              pieces={trayPieces}
+              image={imgRef.current}
+              grid={state?.grid ?? grid}
+              onPieceClick={handleTrayPieceClick}
+              highlightedPieceIds={
+                highlightedPieceIds.size > 0 ? highlightedPieceIds : undefined
+              }
+            />
+          </div>
         </div>
       </div>
 

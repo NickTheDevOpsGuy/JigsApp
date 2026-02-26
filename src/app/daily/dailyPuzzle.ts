@@ -17,6 +17,8 @@ export {
   GRID_OPTIONS,
   DAILY_DATE_KEY,
   DAILY_MODIFIER_KEY,
+  getDailyPreferredModifier,
+  setDailyPreferredModifier,
   getTodayDateString,
   getYesterdayDateString,
   getDailyPreferredDifficultyIndex,

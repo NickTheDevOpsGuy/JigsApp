@@ -6,6 +6,11 @@ import { soundManager } from "@/audio/sounds";
 import { audioManager } from "@/audio/audioManager";
 import type { PieceCutType } from "@/puzzle/types";
 import {
+  getDailyPreferredModifier,
+  setDailyPreferredModifier as persistDailyPreferredModifier,
+} from "@/daily/dailyPuzzleCore";
+import type { DailyVisualModifier } from "@/daily/dailyPuzzleCore";
+import {
   PIECE_LOCKING_KEY,
   CUT_TYPE_KEY,
   PROGRESSIVE_REVEAL_KEY,
@@ -122,6 +127,9 @@ export function usePlayScreenUI() {
       return false;
     }
   });
+
+  const [dailyPreferredModifier, setDailyPreferredModifierState] =
+    useState<DailyVisualModifier>(getDailyPreferredModifier);
 
   const [debug, setDebug] = useState<DebugFlags>({
     showGrid: false,
@@ -343,6 +351,11 @@ export function usePlayScreenUI() {
   const toggleRelaxedMode = useCallback(() => setRelaxedModeEnabled((v) => !v), []);
   const toggleDriftMode = useCallback(() => setDriftModeEnabled((v) => !v), []);
 
+  const setDailyPreferredModifier = useCallback((modifier: DailyVisualModifier) => {
+    setDailyPreferredModifierState(modifier);
+    persistDailyPreferredModifier(modifier);
+  }, []);
+
   return {
     pieceLockingEnabled,
     setPieceLockingEnabled,
@@ -399,6 +412,8 @@ export function usePlayScreenUI() {
     setShowNewGameModal,
     showThemeModal,
     setShowThemeModal,
+    dailyPreferredModifier,
+    setDailyPreferredModifier,
     selectedPieceId,
     setSelectedPieceId,
     pageRef,

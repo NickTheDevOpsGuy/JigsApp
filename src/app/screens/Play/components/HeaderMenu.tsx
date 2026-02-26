@@ -23,8 +23,11 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   contribute: "About",
   controls: "Gameplay",
   display: "Appearance",
+  effects: "Effects",
   gameplay: "Gameplay",
   help: "Help",
+  manualControls: "Controls",
+  modes: "Modes",
   navigation: "Navigate",
   pieceShape: "Piece Shape",
   share: "Share",
@@ -34,7 +37,10 @@ const SUB_MENU_LABELS: Record<SubMenuId, string> = {
 
 const SUBMENU_PARENT: Partial<Record<SubMenuId, SubMenuId>> = {
   contribute: "about",
+  effects: "display",
   help: "about",
+  manualControls: "controls",
+  modes: "controls",
   pieceShape: "controls",
 };
 
@@ -44,15 +50,18 @@ const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
   assistance: "Visual hints: alignment grid, edge highlight, ghost hints",
   audio: "Sound effects and haptic feedback",
   contribute: "About Phuzzle and how to get involved",
-  controls: "Tap to rotate, timer, piece shape, snap assist",
-  display: "Preview, immersive mode, and theme",
-  gameplay: "Tap to rotate, timer, piece shape, snap assist",
+  controls: "Piece shape, modes, and manual controls",
+  display: "Preview, effects, immersive mode, and theme",
+  gameplay: "Piece shape, modes, and manual controls",
   help: "How to play and keyboard shortcuts",
+  manualControls: "Undo, redo, reset view, zoom",
+  modes: "Drift, relaxed, deliberate detach, timer",
   navigation: "Home and new puzzle",
   pieceShape: "Applies to next puzzle",
   share: "Play with a friend (co-op)",
   stats: "View leaderboards",
   theme: "Change color theme",
+  effects: "Fog, night, or sepia visual effects",
 };
 
 function getSubmenuDescription(id: SubMenuId): string {
@@ -204,7 +213,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
           title={
             item.disabled && item.disabledTitle
               ? item.disabledTitle
-              : `Toggle ${item.label}`
+              : (item.title ?? `Toggle ${item.label}`)
           }
           onClick={item.onClick}
         >
@@ -230,7 +239,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         title={
           item.disabled && item.disabledTitle
             ? item.disabledTitle
-            : (item.ariaLabel ?? item.sortKey ?? item.label)
+            : (item.title ?? item.ariaLabel ?? item.sortKey ?? item.label)
         }
       >
         <span className={styles.headerMenuToggleLabel}>{item.label}</span>
@@ -281,6 +290,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
               role="menuitem"
               onClick={() => setActiveSubMenu("contribute")}
               aria-label="About"
+              title="Get involved and meet contributors"
             >
               {SUB_MENU_LABELS.contribute}
               <ChevronRight size={16} className={styles.headerMenuChevron} />
@@ -301,25 +311,60 @@ export function HeaderMenu(props: HeaderMenuProps) {
           )}
         </>
       )}
-      {activeSubMenu === "controls" && hasSubMenuItems("pieceShape") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("pieceShape")}
-          aria-label="Piece Shape"
-          title="Applies to next puzzle"
-        >
-          {SUB_MENU_LABELS.pieceShape}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
-      {subMenuItems.map((item) => (
-        <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
-      ))}
       {activeSubMenu === "controls" && (
+        <>
+          {hasSubMenuItems("pieceShape") && (
+            <button
+              type="button"
+              className={styles.headerMenuSubmenuTrigger}
+              role="menuitem"
+              onClick={() => setActiveSubMenu("pieceShape")}
+              aria-label="Piece Shape"
+              title="Applies to next puzzle"
+            >
+              {SUB_MENU_LABELS.pieceShape}
+              <ChevronRight size={16} className={styles.headerMenuChevron} />
+            </button>
+          )}
+          {hasSubMenuItems("modes") && (
+            <button
+              type="button"
+              className={styles.headerMenuSubmenuTrigger}
+              role="menuitem"
+              onClick={() => setActiveSubMenu("modes")}
+              aria-label="Modes"
+              title={SUBMENU_DESCRIPTIONS.modes}
+            >
+              {SUB_MENU_LABELS.modes}
+              <ChevronRight size={16} className={styles.headerMenuChevron} />
+            </button>
+          )}
+          {hasSubMenuItems("manualControls") && (
+            <button
+              type="button"
+              className={styles.headerMenuSubmenuTrigger}
+              role="menuitem"
+              onClick={() => setActiveSubMenu("manualControls")}
+              aria-label="Controls"
+              title={SUBMENU_DESCRIPTIONS.manualControls}
+            >
+              {SUB_MENU_LABELS.manualControls}
+              <ChevronRight size={16} className={styles.headerMenuChevron} />
+            </button>
+          )}
+        </>
+      )}
+      {activeSubMenu !== "controls" &&
+        subMenuItems.map((item) => (
+          <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
+        ))}
+      {activeSubMenu === "modes" && (
         <div className={styles.headerMenuRangeWrap}>
-          <label htmlFor="snap-tolerance-range" className={styles.headerMenuRangeLabel}>
+          <label
+            htmlFor="snap-tolerance-range"
+            className={styles.headerMenuRangeLabel}
+            title="Adjust how forgiving piece snapping is"
+          >
             Snap Assist: {Math.round(props.snapToleranceOverride * 100)}%
           </label>
           <input
@@ -340,22 +385,39 @@ export function HeaderMenu(props: HeaderMenuProps) {
           </p>
         </div>
       )}
-      {activeSubMenu === "display" && props.onOpenThemeModal && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => {
-            setOpen(false);
-            props.onOpenThemeModal!();
-          }}
-          aria-label="Theme"
-          title="Change color theme"
-          data-testid="open-theme-modal"
-        >
-          {SUB_MENU_LABELS.theme}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
+      {activeSubMenu === "display" && (
+        <>
+          {hasSubMenuItems("effects") && (
+            <button
+              type="button"
+              className={styles.headerMenuSubmenuTrigger}
+              role="menuitem"
+              onClick={() => setActiveSubMenu("effects")}
+              aria-label="Effects"
+              title={SUBMENU_DESCRIPTIONS.effects}
+            >
+              {SUB_MENU_LABELS.effects}
+              <ChevronRight size={16} className={styles.headerMenuChevron} />
+            </button>
+          )}
+          {props.onOpenThemeModal && (
+            <button
+              type="button"
+              className={styles.headerMenuSubmenuTrigger}
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                props.onOpenThemeModal!();
+              }}
+              aria-label="Theme"
+              title="Change color theme"
+              data-testid="open-theme-modal"
+            >
+              {SUB_MENU_LABELS.theme}
+              <ChevronRight size={16} className={styles.headerMenuChevron} />
+            </button>
+          )}
+        </>
       )}
     </>
   );

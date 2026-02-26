@@ -132,10 +132,12 @@
   .overlay {
     padding: 12px;
     align-items: flex-start;
+    overflow-x: hidden;
   }
 
   .modal {
-    max-height: min(95dvh, calc(100dvh - 12px));
+    max-width: min(420px, calc(100vw - 24px));
+    max-height: min(95dvh, calc(100dvh - 24px));
     margin: 0;
     overflow: hidden;
     display: flex;
@@ -157,6 +159,7 @@
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     min-height: 0;
+    min-width: 0;
   }
 }
 

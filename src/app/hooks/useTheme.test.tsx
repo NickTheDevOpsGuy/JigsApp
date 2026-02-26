@@ -7,6 +7,10 @@ import { renderHook, act } from "@testing-library/react";
 import React from "react";
 import { ThemeProvider, useTheme } from "./useTheme";
 
+vi.mock("@/audio/audioManager", () => ({
+  audioManager: { onThemeChange: vi.fn() },
+}));
+
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider>{children}</ThemeProvider>
 );

@@ -15,6 +15,7 @@ export const GRID_OPTIONS = [
 
 export const DAILY_DATE_KEY = "phuzzle:dailyDate";
 export const DAILY_MODIFIER_KEY = "phuzzle:dailyModifier";
+export const DAILY_PREFERRED_MODIFIER_KEY = "phuzzle:dailyPreferredModifier";
 const DAILY_PREFERRED_GRID_KEY = "phuzzle:dailyPreferredGrid";
 const DAILY_PREFIX = "phuzzle:daily:";
 const STREAK_FREEZE_KEY = "phuzzle:streakFreeze";
@@ -31,6 +32,25 @@ export function getDailyVisualModifier(): DailyVisualModifier {
     return raw === "fog" || raw === "night" || raw === "sepia" ? raw : "none";
   } catch {
     return "none";
+  }
+}
+
+/** Read preferred visual modifier for next daily puzzle (Appearance setting). */
+export function getDailyPreferredModifier(): DailyVisualModifier {
+  try {
+    const raw = localStorage.getItem(DAILY_PREFERRED_MODIFIER_KEY);
+    return raw === "fog" || raw === "night" || raw === "sepia" ? raw : "none";
+  } catch {
+    return "none";
+  }
+}
+
+/** Save preferred visual modifier for next daily puzzle. */
+export function setDailyPreferredModifier(modifier: DailyVisualModifier): void {
+  try {
+    localStorage.setItem(DAILY_PREFERRED_MODIFIER_KEY, modifier);
+  } catch {
+    /* ignore */
   }
 }
 

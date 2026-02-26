@@ -85,6 +85,11 @@
   flex-shrink: 0;
 }
 
+.difficultySuggestionSlot {
+  min-height: 36px;
+  margin-bottom: 4px;
+}
+
 .difficultySuggestion {
   display: block;
   width: 100%;
