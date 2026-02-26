@@ -232,7 +232,7 @@ export function usePointerHandlers(args: {
         pickY >= -2 &&
         pickX <= assembledW + 2 &&
         pickY <= assembledH + 2;
-      let pieceId = inBounds ? pickPieceId(ctx2d, boardPieces, pickX, pickY) : null;
+      const pieceId = inBounds ? pickPieceId(ctx2d, boardPieces, pickX, pickY) : null;
       if (!pieceId) {
         selectedIdRef.current = null;
         setSelectedPieceId(null);
