@@ -7,7 +7,8 @@ export type TimeMode =
   | "active" // Only count while moving pieces
   | "relaxed" // Same as elapsed but timer hidden
   | "best" // Track personal best per grid size
-  | "speedrun"; // Quadrant timers + PB comparison
+  | "speedrun" // Quadrant timers + PB comparison
+  | "timeattack"; // 3 lives, wrong snap costs life, leaderboard by time + lives
 
 export const TIME_MODE_KEY = "phuzzle:timeMode";
 export const COUNTDOWN_MINUTES_KEY = "phuzzle:countdownMinutes";

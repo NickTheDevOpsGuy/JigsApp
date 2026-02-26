@@ -1,0 +1,20 @@
+.wrap {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 50;
+}
+
+.canvas {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.canvas:hover {
+  border-color: var(--color-border-strong);
+}

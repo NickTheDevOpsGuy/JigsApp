@@ -9,6 +9,7 @@ import {
   useState,
   ReactNode,
 } from "react";
+import { audioManager } from "@/audio/audioManager";
 
 export type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
 
@@ -82,6 +83,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch {
       // localStorage might not be available
     }
+  }, [theme]);
+
+  useEffect(() => {
+    audioManager.onThemeChange();
   }, [theme]);
 
   const setTheme = (t: Theme) => setThemeState(t);

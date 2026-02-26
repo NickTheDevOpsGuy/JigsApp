@@ -20,12 +20,16 @@ export type HeaderMenuProps = {
   setCountdownMinutes: (n: number | ((prev: number) => number)) => void;
   showPreview: boolean;
   soundEnabled: boolean;
+  musicEnabled?: boolean;
   hapticsEnabled: boolean;
+  deliberateDetachEnabled?: boolean;
+  onToggleDeliberateDetach?: () => void;
   pieceLockingEnabled: boolean;
   relaxedModeEnabled?: boolean;
   showGhostHint: boolean;
   showGhostWhenIdle: boolean;
   showEdgeHighlight: boolean;
+  showClusterOutline?: boolean;
   showAlignmentGrid: boolean;
   isFullscreen: boolean;
   canShowHaptics: boolean;
@@ -36,6 +40,7 @@ export type HeaderMenuProps = {
   onNewPuzzle: () => void;
   onTogglePreview: () => void;
   onToggleSound: () => void;
+  onToggleMusic?: () => void;
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
   onToggleRelaxedMode?: () => void;
@@ -44,6 +49,7 @@ export type HeaderMenuProps = {
   onToggleGhostHint: () => void;
   onToggleGhostWhenIdle: () => void;
   onToggleEdgeHighlight: () => void;
+  onToggleClusterOutline?: () => void;
   onToggleAlignmentGrid: () => void;
   onToggleFullscreen: () => void;
   onZoomIn: () => void;
@@ -149,6 +155,18 @@ export function buildMenuItems(
     },
     // ─── Gameplay ───
     {
+      id: "deliberateDetach",
+      section: "settings",
+      visible: !!props.onToggleDeliberateDetach,
+      label: "Deliberate Detach",
+      sortKey: "Deliberate Detach",
+      ariaLabel: props.deliberateDetachEnabled ? "Deliberate detach on" : "Deliberate detach off",
+      onClick: c(props.onToggleDeliberateDetach ?? (() => {})),
+      subMenu: "controls",
+      isToggle: true,
+      checked: !!props.deliberateDetachEnabled,
+    },
+    {
       id: "lock",
       section: "settings",
       visible: true,
@@ -227,6 +245,18 @@ export function buildMenuItems(
       subMenu: "assistance",
       isToggle: true,
       checked: props.showEdgeHighlight,
+    },
+    {
+      id: "clusterOutline",
+      section: "settings",
+      visible: !!props.onToggleClusterOutline,
+      label: "Cluster Outlines",
+      sortKey: "Cluster Outlines",
+      ariaLabel: props.showClusterOutline ? "Cluster outlines on" : "Cluster outlines off",
+      onClick: c(props.onToggleClusterOutline ?? (() => {})),
+      subMenu: "assistance",
+      isToggle: true,
+      checked: !!props.showClusterOutline,
     },
     {
       id: "ghostHint",
@@ -327,6 +357,18 @@ export function buildMenuItems(
       subMenu: "audio",
       isToggle: true,
       checked: props.soundEnabled,
+    },
+    {
+      id: "music",
+      section: "settings",
+      visible: !!props.onToggleMusic,
+      label: "Background Music",
+      sortKey: "Background Music",
+      ariaLabel: props.musicEnabled ? "Background music on" : "Background music off",
+      onClick: c(props.onToggleMusic ?? (() => {})),
+      subMenu: "audio",
+      isToggle: true,
+      checked: !!props.musicEnabled,
     },
     // ─── Advanced ───
     {

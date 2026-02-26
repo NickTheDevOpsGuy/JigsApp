@@ -3,6 +3,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { soundManager } from "@/audio/sounds";
+import { audioManager } from "@/audio/audioManager";
 import type { PieceCutType } from "@/puzzle/types";
 import {
   PIECE_LOCKING_KEY,
@@ -13,6 +14,8 @@ import {
   ALIGNMENT_GRID_KEY,
   GHOST_WHEN_IDLE_KEY,
   EDGE_HIGHLIGHT_KEY,
+  CLUSTER_OUTLINE_KEY,
+  DELIBERATE_DETACH_KEY,
   RELAXED_MODE_KEY,
   DRIFT_MODE_KEY,
   SNAP_TOLERANCE_OVERRIDE_KEY,
@@ -55,6 +58,22 @@ export function usePlayScreenUI() {
   const [showEdgeHighlight, setShowEdgeHighlight] = useState(() => {
     try {
       return localStorage.getItem(EDGE_HIGHLIGHT_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const [showClusterOutline, setShowClusterOutline] = useState(() => {
+    try {
+      return localStorage.getItem(CLUSTER_OUTLINE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const [deliberateDetachEnabled, setDeliberateDetachEnabled] = useState(() => {
+    try {
+      return localStorage.getItem(DELIBERATE_DETACH_KEY) === "true";
     } catch {
       return false;
     }
@@ -120,6 +139,9 @@ export function usePlayScreenUI() {
   });
   const [soundEnabled, setSoundEnabled] = useState(() =>
     typeof window !== "undefined" ? soundManager.isEnabled() : true,
+  );
+  const [musicEnabled, setMusicEnabled] = useState(() =>
+    typeof window !== "undefined" ? audioManager.isMusicEnabled() : false,
   );
   const [hapticsEnabled, setHapticsEnabled] = useState(() =>
     typeof window !== "undefined" ? soundManager.isHapticsEnabled() : false,
@@ -198,6 +220,22 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
+      localStorage.setItem(CLUSTER_OUTLINE_KEY, showClusterOutline ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [showClusterOutline]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(DELIBERATE_DETACH_KEY, deliberateDetachEnabled ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, [deliberateDetachEnabled]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(RELAXED_MODE_KEY, relaxedModeEnabled ? "true" : "false");
     } catch {
       // ignore
@@ -249,6 +287,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     setSoundEnabled(soundManager.isEnabled());
+    setMusicEnabled(audioManager.isMusicEnabled());
     setHapticsEnabled(soundManager.isHapticsEnabled());
   }, []);
 
@@ -256,6 +295,12 @@ export function usePlayScreenUI() {
     const v = !soundManager.isEnabled();
     soundManager.setEnabled(v);
     setSoundEnabled(v);
+  }, []);
+
+  const toggleMusic = useCallback(() => {
+    const v = !audioManager.isMusicEnabled();
+    audioManager.setMusicEnabled(v);
+    setMusicEnabled(v);
   }, []);
 
   const toggleHaptics = useCallback(() => {
@@ -284,6 +329,11 @@ export function usePlayScreenUI() {
 
   const toggleShowGhostWhenIdle = useCallback(() => setShowGhostWhenIdle((v) => !v), []);
   const toggleShowEdgeHighlight = useCallback(() => setShowEdgeHighlight((v) => !v), []);
+  const toggleShowClusterOutline = useCallback(() => setShowClusterOutline((v) => !v), []);
+  const toggleDeliberateDetach = useCallback(
+    () => setDeliberateDetachEnabled((v) => !v),
+    [],
+  );
   const toggleRelaxedMode = useCallback(() => setRelaxedModeEnabled((v) => !v), []);
   const toggleDriftMode = useCallback(() => setDriftModeEnabled((v) => !v), []);
 
@@ -300,6 +350,11 @@ export function usePlayScreenUI() {
     showEdgeHighlight,
     setShowEdgeHighlight,
     toggleShowEdgeHighlight,
+    showClusterOutline,
+    setShowClusterOutline,
+    toggleShowClusterOutline,
+    deliberateDetachEnabled,
+    toggleDeliberateDetach,
     relaxedModeEnabled,
     setRelaxedModeEnabled,
     toggleRelaxedMode,
@@ -320,6 +375,9 @@ export function usePlayScreenUI() {
     setImmersiveMode,
     soundEnabled,
     setSoundEnabled,
+    musicEnabled,
+    setMusicEnabled,
+    toggleMusic,
     hapticsEnabled,
     setHapticsEnabled,
     isFullscreen,

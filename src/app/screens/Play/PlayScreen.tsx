@@ -20,6 +20,7 @@ import type { Piece, PuzzleState } from "@/puzzle/types";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { consumeCurrentPuzzleId, recordPuzzleCompletion } from "@/data/packCompletion";
 import { soundManager } from "@/audio/sounds";
+import { audioManager } from "@/audio/audioManager";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { ThemeModal } from "@/components/ThemeModal";
 
@@ -53,6 +54,7 @@ import {
   CoopDebugPanel,
   CoopStatusIndicator,
   DragPreview,
+  Minimap,
   PlayHUD,
   CompletionOverlay,
   PauseOverlay,
@@ -139,11 +141,17 @@ export function PlayScreen() {
     toggleShowGhostWhenIdle,
     showEdgeHighlight,
     toggleShowEdgeHighlight,
+    showClusterOutline,
+    toggleShowClusterOutline,
+    deliberateDetachEnabled,
+    toggleDeliberateDetach,
     debug,
     showPreview,
     setShowPreview,
     soundEnabled,
     setSoundEnabled,
+    musicEnabled,
+    toggleMusic,
     hapticsEnabled,
     setHapticsEnabled,
     isPaused,
@@ -197,6 +205,10 @@ export function PlayScreen() {
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
   const [completionDismissed, setCompletionDismissed] = React.useState(false);
+  const [highlightedPieceIds, setHighlightedPieceIds] = React.useState<Set<string>>(new Set());
+  const lastReferenceTapRef = React.useRef(0);
+  const [boardSize, setBoardSize] = React.useState({ w: 800, h: 600 });
+  const [lives, setLives] = React.useState(3);
 
   const viewportKey = grid != null ? `vp:${grid.rows}x${grid.cols}` : null;
   const viewport = useViewport(viewportKey);
@@ -299,12 +311,23 @@ export function PlayScreen() {
   stateRef.current = state;
 
   useEffect(() => {
+    const el = boardRef.current;
+    if (!el) return;
+    const update = () => setBoardSize({ w: el.clientWidth, h: el.clientHeight });
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [state?.pieces?.length]);
+
+  useEffect(() => {
     undoCountRef.current = 0;
     moveCountRef.current = 0;
     abandonCapturedRef.current = false;
     usedHintRef.current = showGhostHint || showGhostWhenIdle;
     setQuadrantTimes({ 0: null, 1: null, 2: null, 3: null });
     setCompletionDismissed(false);
+    setLives(3);
   }, [puzzleKey, showGhostHint, showGhostWhenIdle]);
 
   useEffect(() => {
@@ -577,6 +600,10 @@ export function PlayScreen() {
     lastInteractionRef,
   });
 
+  useEffect(() => {
+    audioManager.setPaused(isPaused);
+  }, [isPaused]);
+
   // ─── Persistence (auto-save every N placements + debounce, co-op sync, tab hide flush) ───
   const SAVE_DEBOUNCE_MS = 500;
   const SAVE_EVERY_N_MOVES = 3;
@@ -781,6 +808,7 @@ export function PlayScreen() {
     showAlignmentGrid,
     showGhostWhenIdle,
     showEdgeHighlight,
+    showClusterOutline,
     lastInteractionRef,
     viewport: viewport.viewport,
     perfStatsRef,
@@ -1042,11 +1070,22 @@ export function PlayScreen() {
               setCountdownMinutes={setCountdownMinutes}
               showPreview={showPreview}
               soundEnabled={soundEnabled}
+              musicEnabled={musicEnabled}
               hapticsEnabled={hapticsEnabled}
               pieceLockingEnabled={pieceLockingEnabled}
               showGhostHint={showGhostHint}
               showGhostWhenIdle={showGhostWhenIdle}
               showEdgeHighlight={showEdgeHighlight}
+              showClusterOutline={showClusterOutline}
+              onToggleClusterOutline={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                toggleShowClusterOutline();
+              }}
+              deliberateDetachEnabled={deliberateDetachEnabled}
+              onToggleDeliberateDetach={() => {
+                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+                toggleDeliberateDetach();
+              }}
               showAlignmentGrid={showAlignmentGrid}
               isFullscreen={ui.isFullscreen}
               canShowHaptics={isCoarsePointer && typeof navigator?.vibrate === "function"}
@@ -1060,6 +1099,7 @@ export function PlayScreen() {
                 setShowPreview((p) => !p);
               }}
               onToggleSound={toggleSound}
+              onToggleMusic={toggleMusic}
               onToggleHaptics={toggleHaptics}
               onTogglePieceLocking={() => {
                 if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
@@ -1197,6 +1237,7 @@ export function PlayScreen() {
                         }
                       : undefined
                   }
+                  lives={timeMode === "timeattack" ? lives : undefined}
                   onTogglePause={() => setIsPaused((p) => !p)}
                 />
               </div>
@@ -1354,6 +1395,19 @@ export function PlayScreen() {
                   onContextMenu={handleContextMenu}
                   onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
                 />
+                {state?.pieces?.[0] && state.grid && (
+                  <Minimap
+                    pieces={state.pieces}
+                    grid={state.grid}
+                    assembledW={state.grid.cols * state.pieces[0].tileW}
+                    assembledH={state.grid.rows * state.pieces[0].tileH}
+                    viewport={viewport.viewport}
+                    containerW={boardSize.w}
+                    containerH={boardSize.h}
+                    setViewport={viewport.setViewport}
+                    visible={!isPaused && !isComplete}
+                  />
+                )}
                 {isPaused && (
                   <PauseOverlay
                     onResume={() => setIsPaused(false)}
@@ -1426,12 +1480,47 @@ export function PlayScreen() {
             image={imgRef.current}
             grid={state?.grid ?? grid}
             onPieceClick={handleTrayPieceClick}
+            highlightedPieceIds={highlightedPieceIds.size > 0 ? highlightedPieceIds : undefined}
           />
         </div>
       </div>
 
-      {(showPreview || progressiveRevealMode) && imgRef.current && (
-        <div className={styles.previewPanel}>
+      {(showPreview || progressiveRevealMode) && imgRef.current && state && (
+        <div
+          className={styles.previewPanel}
+          onClick={(e) => {
+            const COOLDOWN_MS = 3000;
+            if (performance.now() - lastReferenceTapRef.current < COOLDOWN_MS) return;
+            const el = e.currentTarget;
+            const rect = el.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            const { rows, cols } = state.grid;
+            const col = Math.floor(Math.max(0, Math.min(1, x)) * cols);
+            const row = Math.floor(Math.max(0, Math.min(1, y)) * rows);
+            const candidates: Piece[] = [];
+            for (let dr = -1; dr <= 1; dr++) {
+              for (let dc = -1; dc <= 1; dc++) {
+                const r = row + dr;
+                const c = col + dc;
+                if (r >= 0 && r < rows && c >= 0 && c < cols) {
+                  const p = state.pieces.find((x) => x.row === r && x.col === c && x.inTray);
+                  if (p) candidates.push(p);
+                }
+              }
+            }
+            const ids = new Set(candidates.slice(0, 10).map((p) => p.id));
+            if (ids.size > 0) {
+              lastReferenceTapRef.current = performance.now();
+              setHighlightedPieceIds(ids);
+              setTimeout(() => setHighlightedPieceIds(new Set()), 2200);
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          title="Tap to highlight matching pieces in drawer"
+          aria-label="Reference image - tap to highlight matching pieces"
+        >
           {progressiveRevealMode && state?.pieces ? (
             <ProgressivePreviewOverlay
               image={imgRef.current}
@@ -1513,8 +1602,17 @@ export function PlayScreen() {
           onboardingOverlayTray: styles.onboardingOverlayTray,
         }}
       />
-      {(import.meta.env.DEV || SHOW_DEBUG) && (
-        <ProfilerOverlay statsRef={perfStatsRef} visible={debug.showPerfOverlay} />
+      {((import.meta.env.DEV || SHOW_DEBUG) ||
+        searchParams.has("debug") ||
+        searchParams.has("perf")) && (
+        <ProfilerOverlay
+          statsRef={perfStatsRef}
+          visible={
+            debug.showPerfOverlay ||
+            searchParams.has("debug") ||
+            searchParams.has("perf")
+          }
+        />
       )}
       {sessionId && (
         <CoopDebugPanel

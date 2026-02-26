@@ -29,6 +29,8 @@ type Props = {
   image: HTMLImageElement | null;
   grid: { rows: number; cols: number };
   onPieceClick: (pieceId: string) => void;
+  /** Piece IDs to briefly pulse (from reference tap-to-highlight) */
+  highlightedPieceIds?: Set<string>;
 };
 
 function isCorner(p: Piece, grid: { rows: number; cols: number }) {
@@ -50,7 +52,7 @@ function isEdge(p: Piece, grid: { rows: number; cols: number }) {
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
-  { pieces, image, grid, onPieceClick },
+  { pieces, image, grid, onPieceClick, highlightedPieceIds },
   ref,
 ) {
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -110,11 +112,29 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const displayed = useMemo(() => {
     const corners = pieces.filter((p) => isCorner(p, grid));
     const edges = pieces.filter((p) => isEdge(p, grid));
+    const interior = pieces.filter((p) => !isCorner(p, grid) && !isEdge(p, grid));
     const allByGrid = [...pieces].sort(byGrid);
     const allByHue = image ? [...pieces].sort(byHue) : allByGrid;
 
     let result: Piece[];
     switch (filter) {
+      case "arranged": {
+        // Edges first, then interiors clustered by dominant color (3–6 clusters)
+        const edgesSorted = [...edges].sort(byGrid);
+        if (!image || interior.length === 0) {
+          result = edgesSorted;
+        } else {
+          const interiorByHue = [...interior].sort(byHue);
+          const clusterCount = Math.min(6, Math.max(3, Math.ceil(interior.length / 8)));
+          const segmentSize = Math.ceil(interiorByHue.length / clusterCount);
+          const clusters: Piece[][] = [];
+          for (let i = 0; i < interiorByHue.length; i += segmentSize) {
+            clusters.push(interiorByHue.slice(i, i + segmentSize).sort(byGrid));
+          }
+          result = [...edgesSorted, ...clusters.flat()];
+        }
+        break;
+      }
       case "corners":
         result = [...corners].sort(byGrid);
         break;
@@ -387,7 +407,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                   <button
                     key={p.id}
                     type="button"
-                    className={styles.pieceButton}
+                    className={`${styles.pieceButton} ${highlightedPieceIds?.has(p.id) ? styles.pieceButtonPulse : ""}`}
                     onClick={() => onPieceClick(p.id)}
                     aria-label={`Place piece ${p.id}`}
                   >

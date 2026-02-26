@@ -88,8 +88,9 @@ export function usePointerHandlers(args: {
       const piece = st.pieces.find((p) => p.id === pid);
       if (!piece) return false;
       if (piece.isPlaced || piece.locked || piece.inTray) return false;
-      const groupSize = st.pieces.filter((p) => p.groupId === piece.groupId).length;
-      return groupSize === 1;
+      const groupPieces = st.pieces.filter((p) => p.groupId === piece.groupId);
+      if (groupPieces.some((p) => p.locked)) return false;
+      return groupPieces.length === 1;
     },
     [manager],
   );

@@ -11,3 +11,4 @@ export { ProfilerOverlay } from "./ProfilerOverlay";
 export { TopBarButtons } from "./TopBarButtons";
 export { UndoRedoButtons } from "./UndoRedoButtons";
 export { TrayFilterButton } from "./TrayFilterButton";
+export { Minimap } from "./Minimap";

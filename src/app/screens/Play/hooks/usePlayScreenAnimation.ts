@@ -28,6 +28,7 @@ export function usePlayScreenAnimation(args: {
   showAlignmentGrid: boolean;
   showGhostWhenIdle?: boolean;
   showEdgeHighlight?: boolean;
+  showClusterOutline?: boolean;
   lastInteractionRef?: React.RefObject<number>;
   viewport: ViewportState;
   perfStatsRef?: React.RefObject<PerfStats | null>;
@@ -62,6 +63,7 @@ export function usePlayScreenAnimation(args: {
     showAlignmentGrid,
     showGhostWhenIdle,
     showEdgeHighlight,
+    showClusterOutline,
     lastInteractionRef,
     viewport,
     perfStatsRef,
@@ -279,6 +281,7 @@ export function usePlayScreenAnimation(args: {
           showGhostHint: effectiveShowGhost,
           ghostAlpha,
           showEdgeHighlight,
+          showClusterOutline,
           showAlignmentGrid,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
           dragDisplayOverrides: isDragging ? dragDisplayOverrides : undefined,
@@ -320,6 +323,7 @@ export function usePlayScreenAnimation(args: {
     showGhostHint,
     showGhostWhenIdle,
     showEdgeHighlight,
+    showClusterOutline,
     showAlignmentGrid,
     lastInteractionRef,
     setState,

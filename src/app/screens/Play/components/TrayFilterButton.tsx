@@ -7,13 +7,14 @@ import { Check, Filter } from "lucide-react";
 import styles from "./TrayFilterButton.module.css";
 
 // Keep filter values stable so users don't "lose" options between sessions/updates.
-export type TrayFilter = "all" | "corners" | "edges" | "colors";
+export type TrayFilter = "all" | "corners" | "edges" | "colors" | "arranged";
 
 const LABELS: Record<TrayFilter, string> = {
   all: "All",
   corners: "Corners",
   edges: "Sides",
   colors: "Color",
+  arranged: "Arrange",
 };
 
 interface TrayFilterButtonProps {
@@ -94,7 +95,7 @@ export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButton
               minWidth: menuRect.minWidth,
             }}
           >
-            {(["all", "corners", "edges", "colors"] as const).map((opt) => (
+            {(["all", "arranged", "corners", "edges", "colors"] as const).map((opt) => (
               <button
                 key={opt}
                 type="button"

@@ -3,7 +3,7 @@
  * Speedrun: quadrant timers (TL, TR, BL, BR) with PB comparison.
  */
 import React, { useEffect, useState } from "react";
-import { Clock, Pause, Puzzle } from "lucide-react";
+import { Clock, Heart, Pause, Puzzle } from "lucide-react";
 import styles from "../PlayScreen.module.css";
 import { formatTime } from "../playUtils";
 import type { TimeMode } from "../timeMode";
@@ -19,6 +19,7 @@ interface PlayHUDProps {
   bestTimeSeconds?: number | null;
   quadrantTimes?: Record<0 | 1 | 2 | 3, number | null>;
   quadrantPbs?: Record<0 | 1 | 2 | 3, number | null>;
+  lives?: number;
   onTogglePause: () => void;
 }
 
@@ -42,12 +43,14 @@ export function PlayHUD({
   bestTimeSeconds,
   quadrantTimes,
   quadrantPbs,
+  lives,
   onTogglePause,
 }: PlayHUDProps) {
   const pauseTitle = isPaused ? "Resume the timer" : "Pause the timer";
   const showTimer = timeMode !== "relaxed";
   const isCountdown = timeMode === "countdown";
   const isSpeedrun = timeMode === "speedrun";
+  const isTimeAttack = timeMode === "timeattack";
   const countdownTotal = countdownMinutes * 60;
   const isLowTime = isCountdown && elapsedSeconds > 0 && elapsedSeconds <= 60;
   const [bounce, setBounce] = useState(false);
@@ -78,7 +81,20 @@ export function PlayHUD({
           })}
         </div>
       )}
-      {showTimer && !isSpeedrun && (
+      {isTimeAttack && lives != null && (
+        <div className={styles.hudPillTimer} title="Lives remaining">
+          {[1, 2, 3].map((i) => (
+            <Heart
+              key={i}
+              size={16}
+              fill={i <= lives ? "currentColor" : "none"}
+              strokeWidth={2}
+              className={i > lives ? styles.lifeLost : ""}
+            />
+          ))}
+        </div>
+      )}
+      {showTimer && !isSpeedrun && !isTimeAttack && (
         <div
           className={`${styles.hudPillTimer} ${isLowTime ? styles.timerLow : ""}`}
           title={
@@ -97,7 +113,7 @@ export function PlayHUD({
           )}
         </div>
       )}
-      {showTimer && isSpeedrun && (
+      {showTimer && (isSpeedrun || isTimeAttack) && (
         <div className={styles.hudPillTimer} title="Elapsed time (speedrun)">
           <Clock size={14} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>

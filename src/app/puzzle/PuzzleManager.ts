@@ -441,6 +441,8 @@ export class PuzzleManager {
   public rotatePiece(pieceId: string) {
     const piece = this.findPiece(pieceId);
     if (!piece || piece.isPlaced || piece.locked) return;
+    const groupPieces = this.getGroupPieces(piece.groupId);
+    if (groupPieces.some((p) => p.locked)) return;
 
     this.pushUndoState();
 

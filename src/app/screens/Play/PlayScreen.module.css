@@ -302,6 +302,10 @@
   border-color: var(--color-error, #c53030);
 }
 
+.lifeLost {
+  opacity: 0.35;
+}
+
 .quadrantTimers {
   display: flex;
   flex-wrap: wrap;

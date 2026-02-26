@@ -40,6 +40,8 @@ export type AnimationState = {
   ghostAlpha?: number;
   /** When true, show faint border on edge pieces (row 0, rows-1, col 0, cols-1) */
   showEdgeHighlight?: boolean;
+  /** When true, show faint outline only around placed/locked clusters */
+  showClusterOutline?: boolean;
   /** When set, this piece is drawn in a DOM overlay instead of on canvas (for drag-to-tray) */
   dragPreviewPieceId?: string | null;
   /** Interpolated display positions for dragged group (smoother drag, no touch/pointer changes) */
@@ -408,6 +410,7 @@ function drawPiece(
       shake.y,
       showWrongRotationHint,
       shakeElapsedMs,
+      animState?.showClusterOutline,
     );
     return;
   }
@@ -466,6 +469,7 @@ function drawPiece(
       shake.y,
       showWrongRotationHint,
       shakeElapsedMs,
+      animState?.showClusterOutline,
     );
     return;
   }
@@ -496,7 +500,15 @@ function drawPiece(
   );
   ctx.restore();
   clearPieceShadow(ctx);
-  strokePieceOutline(ctx, path, isDragging, isSelected, p.isPlaced, p.locked);
+  strokePieceOutline(
+    ctx,
+    path,
+    isDragging,
+    isSelected,
+    p.isPlaced,
+    p.locked,
+    animState?.showClusterOutline,
+  );
   if (showLockGlow) {
     drawLockGlow(ctx, path, lockElapsedMs);
   }
@@ -560,6 +572,7 @@ function drawCachedPiece(
   shakeY: number = 0,
   showWrongRotationHint: boolean = false,
   wrongRotationElapsedMs: number = 0,
+  showClusterOutline?: boolean,
 ) {
   ctx.save();
   applyPieceShadow(ctx, isDragging, p.isPlaced);
@@ -582,6 +595,11 @@ function drawCachedPiece(
     ctx.strokeStyle = isDragging ? "rgba(102, 126, 234, 0.6)" : "#667eea";
     ctx.lineWidth = isDragging ? 1.5 : 1.5;
     ctx.stroke(path);
+  } else if ((p.isPlaced || p.locked) && showClusterOutline) {
+    ctx.translate(cacheW / 2, cacheH / 2);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.translate(-p.w / 2, -p.h / 2);
+    strokePieceOutline(ctx, path, false, false, true, p.locked, true);
   }
   if (showLockGlow) {
     ctx.translate(cacheW / 2, cacheH / 2);
@@ -623,16 +641,16 @@ function strokePieceOutline(
   isSelected: boolean,
   isPlaced: boolean,
   locked: boolean,
+  showClusterOutline?: boolean,
 ) {
   if (isDragging) {
     ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
     ctx.lineWidth = 2;
-  } else if (isPlaced) {
-    ctx.strokeStyle = "rgba(0, 160, 80, 0.3)";
+  } else if ((isPlaced || locked) && showClusterOutline) {
+    ctx.strokeStyle = "rgba(0, 160, 80, 0.25)";
     ctx.lineWidth = 1;
-  } else if (locked) {
-    ctx.strokeStyle = "rgba(0, 160, 80, 0.4)";
-    ctx.lineWidth = 1.5;
+  } else if (isPlaced || locked) {
+    return; // No outline when cluster outline toggle is off
   } else {
     ctx.strokeStyle = "rgba(0,0,0,0.25)";
     ctx.lineWidth = 1;
