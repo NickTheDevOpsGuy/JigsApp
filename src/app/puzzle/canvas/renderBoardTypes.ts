@@ -26,6 +26,7 @@ export type AnimationState = {
   showClusterOutline?: boolean;
   dragPreviewPieceId?: string | null;
   dragDisplayOverrides?: Map<string, { x: number; y: number }>;
+  lockLerpOverrides?: Map<string, { x: number; y: number }>;
   undoSnapBackOverrides?: Map<string, { x: number; y: number }>;
   wrongRotationHint?: { groupId: string; pieceIds: string[]; triggeredAt: number };
   snapPreview?: { nearSnap: boolean; inSnapRange: boolean; proximity: number } | null;

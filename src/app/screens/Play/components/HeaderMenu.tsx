@@ -6,7 +6,7 @@
  */
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { Menu, ChevronRight, Check } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 import {
@@ -18,10 +18,10 @@ import {
 import {
   SUB_MENU_LABELS,
   SUBMENU_PARENT,
-  SUBMENU_DESCRIPTIONS,
   SETTINGS_SUBMENU_ORDER,
   getSubmenuDescription,
 } from "./headerMenuConstants";
+import { HeaderMenuSubmenuPanel } from "./HeaderMenuSubmenuPanel";
 
 export type { HeaderMenuProps } from "./headerMenuConfig";
 
@@ -196,178 +196,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
     );
   };
 
-  const handleBack = () => {
-    const parent = activeSubMenu ? SUBMENU_PARENT[activeSubMenu] : null;
-    setActiveSubMenu(parent ?? null);
-  };
-
-  const renderSubMenu = () => (
-    <>
-      <button
-        type="button"
-        className={styles.headerMenuBack}
-        role="menuitem"
-        onClick={handleBack}
-        aria-label="Back"
-        title="Back to main menu"
-      >
-        <ChevronLeft size={16} />
-        Back
-      </button>
-      <div className={styles.headerMenuDivider} />
-      {activeSubMenu && activeSubMenu !== "about" && (
-        <div className={styles.headerMenuSubmenuHeadingWrap}>
-          <h3 className={styles.headerMenuSubmenuHeading}>
-            {SUB_MENU_LABELS[activeSubMenu]}
-          </h3>
-          {activeSubMenu === "pieceShape" && (
-            <p className={styles.headerMenuSubmenuHint}>
-              {SUBMENU_DESCRIPTIONS.pieceShape}
-            </p>
-          )}
-        </div>
-      )}
-      {activeSubMenu === "about" && (
-        <>
-          {hasSubMenuItems("contribute") && (
-            <button
-              type="button"
-              className={styles.headerMenuSubmenuTrigger}
-              role="menuitem"
-              onClick={() => setActiveSubMenu("contribute")}
-              aria-label="About"
-              title="Get involved and meet contributors"
-            >
-              {SUB_MENU_LABELS.contribute}
-              <ChevronRight size={16} className={styles.headerMenuChevron} />
-            </button>
-          )}
-          {hasSubMenuItems("help") && (
-            <button
-              type="button"
-              className={styles.headerMenuSubmenuTrigger}
-              role="menuitem"
-              onClick={() => setActiveSubMenu("help")}
-              aria-label="Help"
-              title="How to play and keyboard shortcuts"
-            >
-              {SUB_MENU_LABELS.help}
-              <ChevronRight size={16} className={styles.headerMenuChevron} />
-            </button>
-          )}
-        </>
-      )}
-      {activeSubMenu === "controls" && (
-        <>
-          {hasSubMenuItems("pieceShape") && (
-            <button
-              type="button"
-              className={styles.headerMenuSubmenuTrigger}
-              role="menuitem"
-              onClick={() => setActiveSubMenu("pieceShape")}
-              aria-label="Piece Shape"
-              title="Applies to next puzzle"
-            >
-              {SUB_MENU_LABELS.pieceShape}
-              <ChevronRight size={16} className={styles.headerMenuChevron} />
-            </button>
-          )}
-          {hasSubMenuItems("modes") && (
-            <button
-              type="button"
-              className={styles.headerMenuSubmenuTrigger}
-              role="menuitem"
-              onClick={() => setActiveSubMenu("modes")}
-              aria-label="Modes"
-              title={SUBMENU_DESCRIPTIONS.modes}
-            >
-              {SUB_MENU_LABELS.modes}
-              <ChevronRight size={16} className={styles.headerMenuChevron} />
-            </button>
-          )}
-          {hasSubMenuItems("manualControls") && (
-            <button
-              type="button"
-              className={styles.headerMenuSubmenuTrigger}
-              role="menuitem"
-              onClick={() => setActiveSubMenu("manualControls")}
-              aria-label="Controls"
-              title={SUBMENU_DESCRIPTIONS.manualControls}
-            >
-              {SUB_MENU_LABELS.manualControls}
-              <ChevronRight size={16} className={styles.headerMenuChevron} />
-            </button>
-          )}
-        </>
-      )}
-      {activeSubMenu !== "controls" &&
-        subMenuItems.map((item) => (
-          <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
-        ))}
-      {activeSubMenu === "modes" && (
-        <div className={styles.headerMenuRangeWrap}>
-          <label
-            htmlFor="snap-tolerance-range"
-            className={styles.headerMenuRangeLabel}
-            title="Adjust how forgiving piece snapping is"
-          >
-            Snap Assist: {Math.round(props.snapToleranceOverride * 100)}%
-          </label>
-          <input
-            id="snap-tolerance-range"
-            type="range"
-            min={60}
-            max={160}
-            step={5}
-            value={Math.round(props.snapToleranceOverride * 100)}
-            onChange={(e) =>
-              props.onSnapToleranceOverrideChange(Number(e.target.value) / 100)
-            }
-            className={styles.headerMenuRange}
-            aria-label="Snap tolerance override"
-          />
-          <p className={styles.headerMenuRangeHint}>
-            Lower = tighter snaps, higher = more forgiving.
-          </p>
-        </div>
-      )}
-      {activeSubMenu === "display" && (
-        <>
-          {hasSubMenuItems("effects") && (
-            <button
-              type="button"
-              className={styles.headerMenuSubmenuTrigger}
-              role="menuitem"
-              onClick={() => setActiveSubMenu("effects")}
-              aria-label="Effects"
-              title={SUBMENU_DESCRIPTIONS.effects}
-            >
-              {SUB_MENU_LABELS.effects}
-              <ChevronRight size={16} className={styles.headerMenuChevron} />
-            </button>
-          )}
-          {props.onOpenThemeModal && (
-            <button
-              type="button"
-              className={styles.headerMenuSubmenuTrigger}
-              role="menuitem"
-              onClick={() => {
-                setOpen(false);
-                props.onOpenThemeModal!();
-              }}
-              aria-label="Theme"
-              title="Change color theme"
-              data-testid="open-theme-modal"
-            >
-              {SUB_MENU_LABELS.theme}
-              <ChevronRight size={16} className={styles.headerMenuChevron} />
-            </button>
-          )}
-        </>
-      )}
-    </>
-  );
-
   const mainMenuSubmenus = SETTINGS_SUBMENU_ORDER.filter((id) => hasSubMenuItems(id));
 
   return (
@@ -388,7 +216,15 @@ export function HeaderMenu(props: HeaderMenuProps) {
       {open && (
         <div className={styles.headerMenuPanel} role="menu">
           {activeSubMenu ? (
-            renderSubMenu()
+            <HeaderMenuSubmenuPanel
+              activeSubMenu={activeSubMenu}
+              setActiveSubMenu={setActiveSubMenu}
+              subMenuItems={subMenuItems}
+              hasSubMenuItems={hasSubMenuItems}
+              renderItem={renderItem}
+              headerMenuProps={props}
+              setOpen={setOpen}
+            />
           ) : (
             <>
               {hasSubMenuItems("about") && (

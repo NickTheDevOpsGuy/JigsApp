@@ -15,15 +15,21 @@ import {
   clamp,
   getEffectiveTolerance as getEffectiveToleranceUtil,
   getUndoLimit,
+  findPlacementFromTray as findPlacementFromTrayUtil,
 } from "./puzzleManagerUtils";
 import type { EffectiveToleranceOptions } from "./puzzleManagerUtils";
 import {
   getGroupBounds as getGroupBoundsUtil,
   wouldOverlapAnyOtherGroup as wouldOverlapUtil,
   getSolvedNeighbors as getSolvedNeighborsUtil,
-  buildRowColMap,
-  getSolvedNeighborsFromMap,
 } from "./groupUtils";
+import {
+  computeBoardSnapResult,
+  computeNeighborSnapResult,
+  computeNearSnapNudge,
+  computeMergedGroupBoardSnapResult,
+  rotateGroupToZeroPieces,
+} from "./puzzleSnap";
 
 export type PuzzleManagerOptions = {
   imageUrl: string;
@@ -240,6 +246,10 @@ export class PuzzleManager {
       ...this.state,
       pieces: this.state.pieces.map((p) => (predicate(p) ? { ...p, ...updater(p) } : p)),
     };
+  }
+
+  private replacePieces(newPieces: Piece[]) {
+    this.state = { ...this.state, pieces: newPieces };
   }
 
   private tilePos(p: Piece) {
@@ -493,65 +503,14 @@ export class PuzzleManager {
 
     this.pushUndoState();
 
-    // Use effective dimensions for rotated pieces (90°/270° swap w and h in screen space)
-    const rot = piece.rotation % 360;
-    const effW = rot === 90 || rot === 270 ? piece.h : piece.w;
-    const effH = rot === 90 || rot === 270 ? piece.w : piece.h;
-
-    // Piece (x,y) is container top-left; rotated bbox is centered at (x+w/2, y+h/2) with size effW×effH
-    // Bbox top-left = (x + piece.w/2 - effW/2, y + piece.h/2 - effH/2)
-    const offsetX = (piece.w - effW) / 2;
-    const offsetY = (piece.h - effH) / 2;
-
-    const pad = 16;
-    const xMin = pad - offsetX;
-    const xMax = Math.max(xMin, this.boardWidth - effW - pad - offsetX);
-    const yMin = pad - offsetY;
-    const yMax = Math.max(yMin, this.boardHeight - effH - pad - offsetY);
-
     const boardPieces = this.state.pieces.filter((p) => !p.inTray);
-    const MOVE_FROM_TRAY_RETRY_MAX = 24;
-
-    let x = this.rand(xMin, xMax);
-    let y = this.rand(yMin, yMax);
-    for (let retry = 0; retry < MOVE_FROM_TRAY_RETRY_MAX; retry++) {
-      x = clamp(
-        this.rand(xMin, xMax),
-        pad - offsetX,
-        Math.max(pad - offsetX, this.boardWidth - effW - pad - offsetX),
-      );
-      y = clamp(
-        this.rand(yMin, yMax),
-        pad - offsetY,
-        Math.max(pad - offsetY, this.boardHeight - effH - pad - offsetY),
-      );
-
-      // Overlap: our bbox is (x+offsetX, y+offsetY, effW, effH)
-      const ourLeft = x + offsetX;
-      const ourTop = y + offsetY;
-      let overlaps = false;
-      for (const p of boardPieces) {
-        const pr = p.rotation % 360;
-        const pw = pr === 90 || pr === 270 ? p.h : p.w;
-        const ph = pr === 90 || pr === 270 ? p.w : p.h;
-        const pOffX = (p.w - pw) / 2;
-        const pOffY = (p.h - ph) / 2;
-        const pLeft = p.x + pOffX;
-        const pTop = p.y + pOffY;
-        if (
-          !(
-            ourLeft + effW <= pLeft ||
-            pLeft + pw <= ourLeft ||
-            ourTop + effH <= pTop ||
-            pTop + ph <= ourTop
-          )
-        ) {
-          overlaps = true;
-          break;
-        }
-      }
-      if (!overlaps) break;
-    }
+    const { x, y } = findPlacementFromTrayUtil(
+      this.boardWidth,
+      this.boardHeight,
+      piece,
+      boardPieces,
+      this.rand.bind(this),
+    );
 
     this.zCounter += 1;
     this.updatePieces(
@@ -819,51 +778,24 @@ export class PuzzleManager {
     const activeId = this.drag.activeId;
     if (!activeId) return false;
 
-    const active = this.findPiece(activeId);
-    if (!active) return false;
+    const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
+    const result = computeBoardSnapResult(this.state.pieces, activeId, tolerance);
 
-    const gid = active.groupId;
-    const groupPieces = this.getGroupPieces(gid);
-
-    if (!groupPieces.every((p) => p.rotation === 0)) {
-      const activeTile = this.tilePos(active);
-      const dx = active.targetX - activeTile.x;
-      const dy = active.targetY - activeTile.y;
-      const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
-      if (
-        Math.hypot(dx, dy) <= tolerance &&
-        !this.wouldOverlapAnyOtherGroup(gid, dx, dy)
-      ) {
-        this.events.onWrongRotationHint?.(
-          gid,
-          groupPieces.map((p) => p.id),
-        );
-      }
+    if (result?.kind === "wrongRotation") {
+      this.events.onWrongRotationHint?.(result.groupId, result.pieceIds);
       return false;
     }
+    if (result?.kind !== "snap") return false;
 
-    const activeTile = this.tilePos(active);
-    const dx = active.targetX - activeTile.x;
-    const dy = active.targetY - activeTile.y;
+    const active = this.findPiece(activeId)!;
+    const groupPieces = this.getGroupPieces(result.groupId);
 
-    const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
-    if (Math.hypot(dx, dy) > tolerance) return false;
-    if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return false;
-
-    // Only allow snap when ALL pieces in the group would land at their targets (prevents locking wrong groups)
-    for (const p of groupPieces) {
-      const t = this.tilePos(p);
-      const offX = Math.abs(p.targetX - t.x - dx);
-      const offY = Math.abs(p.targetY - t.y - dy);
-      if (offX > 2 || offY > 2) return false;
-    }
-
-    this.shiftGroupUnclamped(gid, Math.round(dx), Math.round(dy));
-    this.setGroupToExactTargetPositions(gid);
+    this.shiftGroupUnclamped(result.groupId, result.dx, result.dy);
+    this.setGroupToExactTargetPositions(result.groupId);
 
     const wasLocked = new Set(groupPieces.filter((p) => p.locked).map((p) => p.id));
     this.updatePieces(
-      (p) => p.groupId === gid,
+      (p) => p.groupId === result.groupId,
       (p) => ({
         justSnapped: true,
         locked: this.pieceLockingEnabled || p.locked,
@@ -879,42 +811,6 @@ export class PuzzleManager {
     return true;
   }
 
-  /**
-   * Rotate the group to 0° around its geometric center so neighbor snap can run.
-   * Preserves the group's visual position on the board.
-   */
-  private rotateGroupToZero(groupId: string): void {
-    const groupPieces = this.getGroupPieces(groupId);
-    if (groupPieces.length === 0) return;
-    const rot = groupPieces[0].rotation;
-    if (rot === 0) return;
-
-    const centerX =
-      groupPieces.reduce((s, p) => s + p.x + p.w / 2, 0) / groupPieces.length;
-    const centerY =
-      groupPieces.reduce((s, p) => s + p.y + p.h / 2, 0) / groupPieces.length;
-    const rad = (-rot * Math.PI) / 180;
-    const cos = Math.cos(rad);
-    const sin = Math.sin(rad);
-
-    this.updatePieces(
-      (p) => p.groupId === groupId,
-      (p) => {
-        const cx = p.x + p.w / 2;
-        const cy = p.y + p.h / 2;
-        const dx = cx - centerX;
-        const dy = cy - centerY;
-        const newCx = centerX + dx * cos - dy * sin;
-        const newCy = centerY + dx * sin + dy * cos;
-        return {
-          x: Math.round(newCx - p.w / 2),
-          y: Math.round(newCy - p.h / 2),
-          rotation: 0,
-        };
-      },
-    );
-  }
-
   private trySnapActiveGroupToNeighbor(): boolean {
     this.events.onSnapCheck?.();
     const activeId = this.drag.activeId;
@@ -925,62 +821,26 @@ export class PuzzleManager {
 
     const gid = active.groupId;
     const groupPieces = this.getGroupPieces(gid);
-    // Allow neighbor snap at any angle: rotate group to 0 first if needed, then snap
     if (!groupPieces.every((p) => p.rotation === 0)) {
-      this.rotateGroupToZero(gid);
-      // Refresh after rotation
-      const activeAfter = this.findPiece(activeId);
-      if (!activeAfter) return false;
+      this.replacePieces(rotateGroupToZeroPieces(this.state.pieces, gid));
     }
 
-    const currentGroupPieces = this.getGroupPieces(gid);
-    const groupIdSet = new Set(currentGroupPieces.map((p) => p.id));
-    const rowColMap = buildRowColMap(this.state.pieces);
+    const tolerance = this.getEffectiveTolerance(this.snapToleranceNeighborPx);
+    const result = computeNeighborSnapResult(
+      this.state.pieces,
+      activeId,
+      tolerance,
+      this.tileW,
+      this.tileH,
+    );
 
-    // Only check boundary pieces: those with a neighbor outside this group (possible snap target).
-    // Exclude tray pieces – they use different coordinates and must not be snap targets.
-    const boundaryPieces = currentGroupPieces.filter((gp) => {
-      const neighbors = getSolvedNeighborsFromMap(gp, rowColMap);
-      return neighbors.some(
-        (n) => !n.inTray && !groupIdSet.has(n.id) && n.rotation === 0,
-      );
-    });
+    if (result?.kind !== "snap") return false;
 
-    let best: null | { dx: number; dy: number; dist: number; into: string } = null;
+    this.shiftGroupUnclamped(gid, result.dx, result.dy);
+    this.mergeGroups(gid, result.intoGroupId);
 
-    for (const gp of boundaryPieces) {
-      for (const n of getSolvedNeighborsFromMap(gp, rowColMap)) {
-        if (n.groupId === gid || n.rotation !== 0 || n.inTray) continue;
-
-        const gpTile = this.tilePos(gp);
-        const nTile = this.tilePos(n);
-
-        const expectedDx = (n.col - gp.col) * this.tileW;
-        const expectedDy = (n.row - gp.row) * this.tileH;
-
-        const dx = nTile.x - expectedDx - gpTile.x;
-        const dy = nTile.y - expectedDy - gpTile.y;
-        const d = Math.hypot(dx, dy);
-
-        const neighborTolerance = this.getEffectiveTolerance(
-          this.snapToleranceNeighborPx,
-        );
-        if (d <= neighborTolerance && (!best || d < best.dist)) {
-          best = { dx, dy, dist: d, into: n.groupId };
-        }
-      }
-    }
-
-    if (!best) return false;
-
-    this.shiftGroupUnclamped(gid, Math.round(best.dx), Math.round(best.dy));
-    this.mergeGroups(gid, best.into);
-
-    // Don't lock on neighbor snap - the neighbor group may not be at correct positions.
-    // Locking only happens in trySnapActiveGroupToBoard when snapping to the correct board spot.
-
-    this.trySnapMergedGroupToBoard(best.into);
-    const mergedPieces = this.getGroupPieces(best.into);
+    this.trySnapMergedGroupToBoard(result.intoGroupId);
+    const mergedPieces = this.getGroupPieces(result.intoGroupId);
     const mergedIds = mergedPieces.map((p) => p.id);
     const center =
       mergedPieces.length > 0
@@ -994,48 +854,24 @@ export class PuzzleManager {
     return true;
   }
 
-  /** Gentle nudge when group is very close to board snap but didn't snap (e.g. just outside tolerance). */
   private tryNearSnapNudge(): void {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
-    const active = this.findPiece(activeId);
-    if (!active || active.isPlaced || active.locked) return;
-
-    const gid = active.groupId;
-    if (!this.getGroupPieces(gid).every((p) => p.rotation === 0)) return;
-
-    const activeTile = this.tilePos(active);
-    const dx = active.targetX - activeTile.x;
-    const dy = active.targetY - activeTile.y;
-    const distance = Math.hypot(dx, dy);
     const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
-    const nearThreshold = tolerance * 0.7;
-    const farThreshold = tolerance * 1.15;
+    const result = computeNearSnapNudge(this.state.pieces, activeId, tolerance);
+    if (!result) return;
 
-    if (distance <= nearThreshold || distance > farThreshold) return;
-    if (this.wouldOverlapAnyOtherGroup(gid, dx, dy)) return;
-
-    const nudgeFactor = 0.35;
-    const nudgeDx = dx * nudgeFactor;
-    const nudgeDy = dy * nudgeFactor;
-    this.shiftGroup(gid, nudgeDx, nudgeDy);
+    const active = this.findPiece(activeId)!;
+    this.shiftGroup(active.groupId, result.nudgeDx, result.nudgeDy);
   }
 
   private trySnapMergedGroupToBoard(groupId: string): void {
     this.events.onSnapCheck?.();
-    const groupPieces = this.getGroupPieces(groupId);
-    if (!groupPieces.every((p) => p.rotation === 0)) return;
+    const result = computeMergedGroupBoardSnapResult(this.state.pieces, groupId);
+    if (!result) return;
 
-    const ref = groupPieces[0];
-    const tile = this.tilePos(ref);
-
-    const dx = ref.targetX - tile.x;
-    const dy = ref.targetY - tile.y;
-
-    if (this.wouldOverlapAnyOtherGroup(groupId, dx, dy)) return;
-
-    this.shiftGroupUnclamped(groupId, Math.round(dx), Math.round(dy));
+    this.shiftGroupUnclamped(groupId, result.dx, result.dy);
     this.setGroupToExactTargetPositions(groupId);
   }
 

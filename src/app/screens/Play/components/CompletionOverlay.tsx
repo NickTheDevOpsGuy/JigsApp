@@ -2,21 +2,10 @@
  * CompletionOverlay – puzzle complete: image, stats (Time, Moves, Accuracy, Rank), "Can you beat my run?", Continue.
  */
 import React, { useEffect, useCallback, useState } from "react";
-import {
-  X,
-  Clock,
-  Puzzle,
-  Target,
-  Trophy,
-  Play,
-  Share2,
-  Home,
-  RotateCcw,
-} from "lucide-react";
+import { X, Trophy, Play, Share2, Home, RotateCcw } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { Modal } from "@/components/Modal/Modal";
 import styles from "../PlayScreen.module.css";
-import { formatTime } from "../playUtils";
 import { setBestTime } from "../timeMode";
 import {
   recordDailyCompletion,
@@ -32,8 +21,10 @@ import type { Piece } from "@/puzzle/types";
 import { useShareCardImage } from "../hooks/useShareCardImage";
 import { DailyReactions } from "@/components/DailyReactions";
 import { CompletionSharePopup } from "./CompletionSharePopup";
+import { CompletionStatsBlock } from "./CompletionStatsBlock";
 import { useTheme } from "@/hooks/useTheme";
 import { useBatterySaver } from "@/hooks/useBatterySaver";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 
 type PieceCutType = "classic" | "irregular" | "hard";
@@ -123,6 +114,7 @@ export function CompletionOverlay({
   const { shareCard, isGenerating } = useShareCardImage();
   const { theme } = useTheme();
   const batterySaverMode = useBatterySaver();
+  const isNarrow = useMediaQuery("(max-width: 500px), (max-height: 600px)");
 
   const _isMasteryDaily = isDaily && !usedHint && undoCount === 0;
 
@@ -336,34 +328,13 @@ export function CompletionOverlay({
           </div>
         )}
 
-        <div className={styles.completeStats}>
-          <div className={styles.completeStatRow}>
-            <Clock size={18} className={styles.completeStatIcon} aria-hidden />
-            <span className={styles.completeStatLabel}>Time:</span>
-            <span className={styles.completeStatValue}>{formatTime(elapsedSeconds)}</span>
-          </div>
-          <div className={styles.completeStatRow}>
-            <Puzzle size={18} className={styles.completeStatIcon} aria-hidden />
-            <span className={styles.completeStatLabel}>Moves:</span>
-            <span className={styles.completeStatValue}>{moveCount}</span>
-          </div>
-          <div className={styles.completeStatRow}>
-            <Target size={18} className={styles.completeStatIcon} aria-hidden />
-            <span className={styles.completeStatLabel}>Accuracy:</span>
-            <span className={styles.completeStatValue}>
-              {Math.round(Math.max(0, Math.min(100, accuracyPercent)))}%
-            </span>
-          </div>
-          {percentile && percentile.totalPlayers >= 1 && rankPosition != null && (
-            <div className={styles.completeStatRow}>
-              <Trophy size={18} className={styles.completeStatIcon} aria-hidden />
-              <span className={styles.completeStatLabel}>Rank</span>
-              <span className={styles.completeStatValueRank}>
-                #{rankPosition} / {percentile.totalPlayers} (Top {percentile.topPercent}%)
-              </span>
-            </div>
-          )}
-        </div>
+        <CompletionStatsBlock
+          elapsedSeconds={elapsedSeconds}
+          moveCount={moveCount}
+          accuracyPercent={accuracyPercent}
+          percentile={percentile}
+          rankPosition={rankPosition}
+        />
 
         <p className={styles.completeChallenge}>Can you beat my run?</p>
 
@@ -403,9 +374,10 @@ export function CompletionOverlay({
             type="button"
             className={styles.completeShareLink}
             onClick={() => setSharePopupOpen(true)}
+            aria-label="Share Result"
           >
             <Share2 size={16} />
-            Share Result
+            {isNarrow ? "Share" : "Share Result"}
           </button>
         </div>
 

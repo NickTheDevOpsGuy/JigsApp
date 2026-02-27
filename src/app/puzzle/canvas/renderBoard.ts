@@ -109,7 +109,10 @@ export function renderBoard(
     .filter((p) => p.id !== animState?.dragPreviewPieceId)
     .sort((a, b) => a.z - b.z);
 
-  const overrides = animState?.undoSnapBackOverrides ?? animState?.dragDisplayOverrides;
+  const overrides =
+    animState?.undoSnapBackOverrides ??
+    animState?.lockLerpOverrides ??
+    animState?.dragDisplayOverrides;
   const sortedPieces =
     draggedGroupId != null
       ? [...pieces].sort((a, b) => {

@@ -1,7 +1,8 @@
 /**
- * Pure helpers for PuzzleManager (undo limit, clamping, snap tolerance).
+ * Pure helpers for PuzzleManager (undo limit, clamping, snap tolerance, tray placement).
  */
 import type { MutableRefObject } from "react";
+import type { Piece } from "./types";
 
 export function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(n, max));
@@ -53,4 +54,64 @@ export function getEffectiveTolerance(
   const minMult = options.isMobile ? 0.45 : 0.35;
   const maxMult = options.isMobile ? 3 : 2.5;
   return clamp(effective, basePx * minMult, basePx * maxMult);
+}
+
+const MOVE_FROM_TRAY_PAD = 16;
+const MOVE_FROM_TRAY_RETRY_MAX = 24;
+
+/**
+ * Find a non-overlapping (x, y) for a piece being moved from tray onto the board.
+ * Returns container top-left position; uses effective rotated bbox for overlap check.
+ */
+export function findPlacementFromTray(
+  boardWidth: number,
+  boardHeight: number,
+  piece: Piece,
+  boardPieces: Piece[],
+  rand: (min: number, max: number) => number,
+): { x: number; y: number } {
+  const rot = piece.rotation % 360;
+  const effW = rot === 90 || rot === 270 ? piece.h : piece.w;
+  const effH = rot === 90 || rot === 270 ? piece.w : piece.h;
+  const offsetX = (piece.w - effW) / 2;
+  const offsetY = (piece.h - effH) / 2;
+
+  const pad = MOVE_FROM_TRAY_PAD;
+  const xMin = pad - offsetX;
+  const xMax = Math.max(xMin, boardWidth - effW - pad - offsetX);
+  const yMin = pad - offsetY;
+  const yMax = Math.max(yMin, boardHeight - effH - pad - offsetY);
+
+  let x = rand(xMin, xMax);
+  let y = rand(yMin, yMax);
+  for (let retry = 0; retry < MOVE_FROM_TRAY_RETRY_MAX; retry++) {
+    x = clamp(rand(xMin, xMax), xMin, Math.max(xMin, boardWidth - effW - pad - offsetX));
+    y = clamp(rand(yMin, yMax), yMin, Math.max(yMin, boardHeight - effH - pad - offsetY));
+
+    const ourLeft = x + offsetX;
+    const ourTop = y + offsetY;
+    let overlaps = false;
+    for (const p of boardPieces) {
+      const pr = p.rotation % 360;
+      const pw = pr === 90 || pr === 270 ? p.h : p.w;
+      const ph = pr === 90 || pr === 270 ? p.w : p.h;
+      const pOffX = (p.w - pw) / 2;
+      const pOffY = (p.h - ph) / 2;
+      const pLeft = p.x + pOffX;
+      const pTop = p.y + pOffY;
+      if (
+        !(
+          ourLeft + effW <= pLeft ||
+          pLeft + pw <= ourLeft ||
+          ourTop + effH <= pTop ||
+          pTop + ph <= ourTop
+        )
+      ) {
+        overlaps = true;
+        break;
+      }
+    }
+    if (!overlaps) break;
+  }
+  return { x, y };
 }

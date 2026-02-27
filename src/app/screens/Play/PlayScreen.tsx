@@ -19,9 +19,7 @@ import styles from "./PlayScreen.module.css";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { useShouldShowTutorial } from "@/components/HowToPlay";
 import type { Piece, PuzzleState } from "@/puzzle/types";
-import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
-import { consumeCurrentPuzzleId, recordPuzzleCompletion } from "@/data/packCompletion";
-import { recordCompletion as recordAdaptiveCompletion } from "@/services/adaptiveDifficultyService";
+import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { audioManager } from "@/audio/audioManager";
 import {
@@ -51,6 +49,9 @@ import { useOnboarding } from "@/hooks/useOnboarding";
 import { usePointerHandlers } from "./hooks/usePointerHandlers";
 import { useViewport } from "./hooks/useViewport";
 import { useReferenceTapHighlight } from "./hooks/useReferenceTapHighlight";
+import { usePlayScreenSecondaryEffects } from "./hooks/usePlayScreenSecondaryEffects";
+import { usePlayScreenPersistence } from "./hooks/usePlayScreenPersistence";
+import { usePlayScreenSharePuzzle } from "./hooks/usePlayScreenSharePuzzle";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
@@ -379,78 +380,8 @@ export function PlayScreen() {
     viewport.zoomOutOnComplete();
   }, [state?.isComplete, batterySaverMode, viewport.zoomOutOnComplete]);
 
-  // Record pack puzzle completion and adaptive difficulty when puzzle is finished
   const completionCapturedRef = useRef(false);
-  useEffect(() => {
-    if (!state?.isComplete) return;
-    const puzzleId = consumeCurrentPuzzleId();
-    if (puzzleId) recordPuzzleCompletion(puzzleId);
-    const g = state?.grid;
-    if (g) {
-      recordAdaptiveCompletion(g.rows, g.cols, elapsedSeconds);
-    }
-    if (!completionCapturedRef.current) {
-      completionCapturedRef.current = true;
-      const g = state?.grid;
-      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
-      posthog.capture("puzzle_complete", {
-        grid_size: gridSize,
-        device_type: isCoarsePointer ? "mobile" : "desktop",
-        time_mode: timeMode,
-        elapsed_seconds: elapsedSeconds,
-      });
-      if (sessionId) {
-        posthog.capture("coop_session_completed", {
-          grid_size: gridSize,
-          device_type: isCoarsePointer ? "mobile" : "desktop",
-          elapsed_seconds: elapsedSeconds,
-        });
-      }
-    }
-  }, [
-    state?.isComplete,
-    state?.grid,
-    elapsedSeconds,
-    isCoarsePointer,
-    timeMode,
-    sessionId,
-  ]);
-
-  // Analytics: on_fire_toast_shown when placement streak toast appears
   const onFireCapturedRef = useRef(false);
-  useEffect(() => {
-    if (showStreakToast && !onFireCapturedRef.current) {
-      onFireCapturedRef.current = true;
-      const g = state?.grid;
-      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
-      posthog.capture("on_fire_toast_shown", {
-        grid_size: gridSize,
-        device_type: isCoarsePointer ? "mobile" : "desktop",
-        time_mode: timeMode,
-      });
-    }
-  }, [showStreakToast, state?.grid, isCoarsePointer, timeMode]);
-
-  useEffect(() => {
-    if (!showStreakToast) return;
-    const t = setTimeout(() => setShowStreakToast(false), 2000);
-    return () => clearTimeout(t);
-  }, [showStreakToast]);
-
-  useEffect(() => {
-    if (!shareToast) return;
-    const t = setTimeout(() => setShareToast(null), 3000);
-    return () => clearTimeout(t);
-  }, [shareToast]);
-
-  // Reset analytics refs when starting a new puzzle
-  useEffect(() => {
-    firstSnapCapturedRef.current = false;
-    onFireCapturedRef.current = false;
-    completionCapturedRef.current = false;
-    zoomOnCompleteRunRef.current = false;
-  }, [puzzleKey]);
-
   // Auto-clear piece selection after 1s so the blue border doesn’t stay until another click
   const [selectionExtendTrigger, setSelectionExtendTrigger] = React.useState(0);
   useEffect(() => {
@@ -462,18 +393,6 @@ export function PlayScreen() {
     }, 1000);
     return () => clearTimeout(t);
   }, [selectedPieceId, selectionExtendTrigger, setSelectedPieceId, selectedIdRef, bump]);
-
-  // Drift mode: nudge unplaced pieces every ~10s
-  useEffect(() => {
-    const complete = state?.isComplete ?? false;
-    if (!driftModeEnabled || !manager || complete || isPaused) return;
-    const id = setInterval(() => {
-      if (!manager || stateRef.current?.isComplete) return;
-      manager.driftUnplacedPieces();
-      setState(manager.getState());
-    }, 10000);
-    return () => clearInterval(id);
-  }, [driftModeEnabled, manager, state?.isComplete, isPaused, setState]);
 
   const [showTutorial, dismissTutorial] = useShouldShowTutorial();
 
@@ -560,93 +479,21 @@ export function PlayScreen() {
     };
   }, []);
 
-  // ─── Persistence (auto-save every N placements + debounce, co-op sync, tab hide flush) ───
-  const SAVE_DEBOUNCE_MS = 500;
-  const SAVE_EVERY_N_MOVES = 3;
-  const lastSavedPlacedCountRef = React.useRef(0);
-
-  useEffect(() => {
-    if (!state || state.isComplete) return;
-    const url = safeLocalStorage.getItem(STORAGE_KEY) || "";
-    if (!url) return;
-    const placed = state.placedCount ?? 0;
-
-    // Save immediately every N placements
-    const movesSinceSave = placed - lastSavedPlacedCountRef.current;
-    if (movesSinceSave >= SAVE_EVERY_N_MOVES) {
-      savePuzzleState(url, state.grid, state.pieces, elapsedSeconds);
-      lastSavedPlacedCountRef.current = placed;
-      return;
-    }
-
-    // Otherwise debounce
-    const id = setTimeout(
-      () => savePuzzleState(url, state.grid, state.pieces, elapsedSeconds),
-      SAVE_DEBOUNCE_MS,
-    );
-    return () => clearTimeout(id);
-  }, [state, elapsedSeconds]);
-
-  // Co-op: push state to server when in session
-  useEffect(() => {
-    if (!sessionId || !state || state.isComplete) return;
-    pushState(state.pieces, elapsedSeconds, state.isComplete);
-  }, [sessionId, state, elapsedSeconds, pushState]);
-
-  // Co-op: apply remote state when we receive an update from another participant
-  useEffect(() => {
-    if (!remoteState || !manager) return;
-    try {
-      manager.restoreFromSaved(remoteState.pieces);
-      setState(manager.getState());
-      setElapsedSeconds(remoteState.elapsedSeconds);
-      clearRemoteState();
-    } catch (e) {
-      console.warn("Failed to apply remote state:", e);
-      clearRemoteState();
-    }
-  }, [remoteState, manager, setState, setElapsedSeconds, clearRemoteState]);
-
-  // Save before tab hide / refresh (visibilitychange, pagehide)
-  useEffect(() => {
-    const flush = () => {
-      const s = stateRef.current;
-      if (!s || s.isComplete) return;
-      const url = safeLocalStorage.getItem(STORAGE_KEY) || "";
-      if (!url) return;
-      savePuzzleState(url, s.grid, s.pieces, elapsedSecondsRef.current);
-
-      const placed = s.placedCount ?? 0;
-      const total = s.totalCount ?? 1;
-      const elapsed = elapsedSecondsRef.current;
-      const undos = undoCountRef.current;
-      const pct = total > 0 ? (placed / total) * 100 : 0;
-      const looksAbandoned =
-        placed === 0 ||
-        (elapsed < 45 && pct < 5) ||
-        (undos > 0 && placed > 0 && undos >= placed * 2);
-      if (looksAbandoned && !abandonCapturedRef.current) {
-        abandonCapturedRef.current = true;
-        posthog.capture("puzzle_abandoned", {
-          placed_count: placed,
-          total_count: total,
-          elapsed_seconds: elapsed,
-          undo_count: undos,
-          grid: s.grid ? `${s.grid.rows}x${s.grid.cols}` : "unknown",
-        });
-      }
-    };
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "hidden") flush();
-    };
-    const onPageHide = () => flush();
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("pagehide", onPageHide);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("pagehide", onPageHide);
-    };
-  }, []);
+  usePlayScreenPersistence({
+    state,
+    elapsedSeconds,
+    sessionId,
+    pushState,
+    remoteState,
+    manager,
+    setState,
+    setElapsedSeconds,
+    clearRemoteState,
+    stateRef,
+    elapsedSecondsRef,
+    undoCountRef,
+    abandonCapturedRef,
+  });
 
   // First-snap celebration (lightweight confetti for onboarding)
   useEffect(() => {
@@ -684,6 +531,28 @@ export function PlayScreen() {
       });
     }
   }, [state?.placedCount, state?.grid, elapsedSeconds, isCoarsePointer, timeMode]);
+
+  usePlayScreenSecondaryEffects({
+    state,
+    puzzleKey: puzzleKey != null ? String(puzzleKey) : null,
+    elapsedSeconds,
+    sessionId,
+    isCoarsePointer,
+    timeMode,
+    showStreakToast,
+    setShowStreakToast,
+    shareToast,
+    setShareToast,
+    driftModeEnabled,
+    manager,
+    setState,
+    isPaused,
+    completionCapturedRef,
+    onFireCapturedRef,
+    firstSnapCapturedRef,
+    zoomOnCompleteRunRef,
+    stateRef,
+  });
 
   // Analytics: exit before completion (on unmount)
   useEffect(() => {
@@ -796,89 +665,17 @@ export function PlayScreen() {
   }, [navigate]);
 
   const share = useShareResults({ elapsedSeconds, state });
-  const handleSharePuzzle = useCallback(async () => {
-    if (!isSupabaseConfigured()) return;
-    setShareToast(null);
-    const gridSize = stateRef.current?.grid
-      ? `${stateRef.current.grid.rows}x${stateRef.current.grid.cols}`
-      : "unknown";
-    try {
-      if (sessionId) {
-        posthog.capture("coop_share_clicked", { grid_size: gridSize });
-        let ok = false;
-        let usedNative = false;
-        if (typeof navigator.share === "function") {
-          ok = await nativeShare();
-          usedNative = ok;
-          if (!ok) ok = await copyShareLink();
-        } else {
-          ok = await copyShareLink();
-        }
-        if (ok) setShareToast(usedNative ? "Shared!" : "Link copied!");
-        return;
-      }
-      posthog.capture("coop_share_clicked", { grid_size: gridSize });
-      const s = stateRef.current;
-      const pieces = s?.pieces
-        ? s.pieces.map((p: Piece) => ({
-            id: p.id,
-            row: p.row,
-            col: p.col,
-            x: p.x,
-            y: p.y,
-            z: p.z,
-            rotation: p.rotation,
-            isPlaced: p.isPlaced,
-            locked: p.locked,
-            groupId: p.groupId,
-            inTray: p.inTray,
-          }))
-        : [];
-      const id = await createSession(
-        s?.imageUrl ?? safeLocalStorage.getItem(STORAGE_KEY) ?? "",
-        s?.grid ?? grid,
-        pieces,
-        elapsedSecondsRef.current,
-      );
-      if (!id) {
-        setShareToast("Couldn't create share link. Check your connection.");
-        return;
-      }
-      posthog.capture("coop_session_created", {
-        grid_size: gridSize,
-        device_type: isCoarsePointer ? "mobile" : "desktop",
-      });
-      const shareUrl = `${window.location.origin}/play?${SESSION_ID_PARAM}=${id}`;
-      if (typeof navigator.share === "function") {
-        try {
-          await navigator.share({
-            title: "Join my Phuzzle",
-            text: "Solve this puzzle with me!",
-            url: shareUrl,
-          });
-          setShareToast("Shared!");
-        } catch {
-          try {
-            await navigator.clipboard.writeText(shareUrl);
-            setShareToast("Link copied!");
-          } catch {
-            setShareToast("Share failed. Link is in address bar.");
-          }
-        }
-      } else {
-        try {
-          await navigator.clipboard.writeText(shareUrl);
-          setShareToast("Link copied!");
-        } catch {
-          setShareToast("Couldn't copy. Link is in address bar.");
-        }
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.warn("Share failed:", err);
-      setShareToast(msg || "Share failed. Try again.");
-    }
-  }, [sessionId, nativeShare, copyShareLink, createSession, grid, isCoarsePointer]);
+  const handleSharePuzzle = usePlayScreenSharePuzzle({
+    sessionId,
+    nativeShare,
+    copyShareLink,
+    createSession,
+    grid,
+    isCoarsePointer,
+    stateRef,
+    elapsedSecondsRef,
+    setShareToast,
+  });
   const handleDownloadImage = useDownloadImage({
     canvasRef,
     imgRef,
