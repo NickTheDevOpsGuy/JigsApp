@@ -83,7 +83,7 @@ export function usePlayScreenAnimation(args: {
   const fpsLogIntervalRef = useRef<number>(0);
   /** Interpolated positions for dragged group (smooth drag, no touch/pointer changes) */
   const dragDisplayRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const DRAG_LERP = 0.32;
+  const DRAG_LERP = 0.52;
 
   const perfFrameTimesRef = useRef<number[]>([]);
   const perfDrawCountRef = useRef(0);

@@ -435,7 +435,7 @@
   .playBody .trayWrap {
     width: 100%;
     max-width: min(90vw, 420px);
-    height: 100px;
+    height: 160px;
     flex-shrink: 0;
     padding: 0 0 6px;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
@@ -443,7 +443,7 @@
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 115px;
+    height: 180px;
   }
 }
 
@@ -1073,9 +1073,9 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-border);
-  border-radius: 20px;
-  padding: 20px;
-  max-width: min(420px, 92vw);
+  border-radius: 16px;
+  padding: 16px;
+  max-width: min(360px, 90vw);
   width: 100%;
   box-sizing: border-box;
   text-align: center;
@@ -1087,18 +1087,20 @@
   flex-direction: column;
   align-items: stretch;
   gap: 0;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .completeTitle {
   font-family: "Fredoka", sans-serif;
-  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
   font-weight: 600;
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
   color: var(--color-text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .completeTitleDot {
@@ -1126,35 +1128,35 @@
 
 .completeImageWrap {
   width: 100%;
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
   background: var(--color-bg-secondary);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .completeImage {
   display: block;
   width: 100%;
   height: auto;
-  max-height: min(50vh, 280px);
+  max-height: min(38vh, 200px);
   object-fit: cover;
   object-position: center;
 }
 
 .completeStats {
   background: color-mix(in srgb, var(--color-bg-elevated) 95%, var(--color-bg-card));
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 2px 0;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   border: 1px solid var(--color-border);
 }
 
 .completeStatRow {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  font-size: 14px;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -1190,15 +1192,15 @@
 }
 
 .completeChallenge {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--color-text-secondary);
-  margin: 0 0 14px 0;
+  margin: 0 0 10px 0;
 }
 
 .completeContinueBtn {
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   font-size: 1rem;
   font-weight: 600;
   display: inline-flex;
@@ -1249,21 +1251,22 @@
 
 @media (max-width: 600px) {
   .completePanel {
-    padding: 14px 16px;
-    max-width: 96vw;
+    padding: 12px 14px;
+    max-width: 94vw;
+    max-height: 88vh;
   }
 
   .completeTitle {
-    font-size: 1.25rem;
-    margin-bottom: 10px;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
   }
 
   .completeImageWrap {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .completeImage {
-    max-height: min(40vh, 220px);
+    max-height: min(28vh, 160px);
   }
 
   .completeStats {
@@ -1749,12 +1752,24 @@
 
 .completeActions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  gap: 10px 12px;
   width: 100%;
-  max-width: 320px;
   margin: 0 auto;
+}
+
+.completeActions .completeContinueBtn {
+  width: auto;
+  min-width: 120px;
+  flex: 0 0 auto;
+}
+
+.completeActions .completeShareLink {
+  margin-top: 0;
+  flex: 0 0 auto;
 }
 
 .completeActionsPrimary {

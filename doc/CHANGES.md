@@ -71,7 +71,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ## Code structure (reference)
 
-- **Play screen** – `screens/Play/PlayScreen.tsx` composes `PlayScreenTopBar`, `PlayScreenModals`, `PlayScreenOverlays` (preview, tutorial, shortcuts, toasts, profiler, coop debug), board, tray, and completion overlay. Hooks in `screens/Play/hooks/` (e.g. `usePlayScreenManager`, `usePointerHandlers`, `playScreenManagerEvents.ts`, `pointerHandlers/`). UI initial state from `playScreenUIInitial.ts`.
+- **Play screen** – `screens/Play/PlayScreen.tsx` composes `PlayScreenTopBar`, `PlayScreenModals`, `PlayScreenOverlays` (preview, tutorial, shortcuts, toasts, profiler, coop debug), board, tray, and completion overlay. Hooks in `screens/Play/hooks/` (e.g. `usePlayScreenManager`, `usePointerHandlers`, `useReferenceTapHighlight`, `playScreenManagerEvents.ts`, `pointerHandlers/`). UI initial state from `playScreenUIInitial.ts`.
 - **Puzzle logic** – `puzzle/PuzzleManager.ts` (drag, snap, groups, undo); helpers in `puzzle/puzzleManagerUtils.ts` (clamp, getUndoLimit, getEffectiveTolerance). Board drawing in `puzzle/canvas/`: `renderBoardDraw.ts`, `renderBoardDrawOverlays.ts` (wrong-rotation, lock glow).
 - **Audio** – `audio/sounds.ts` (SoundEngine, prefs, ambient); theme-aware SFX in `soundsSfx.ts`. Ambient music: `soundsAmbient.ts` re-exports theme loops; types in `soundsAmbientTypes.ts`; one file per theme: `soundsAmbientOcean.ts`, `soundsAmbientSunset.ts`, `soundsAmbientSpace.ts`, `soundsAmbientForest.ts`, `soundsAmbientLightDark.ts`.
 - **Setup** – `screens/Setup/SetupScreen.tsx`; image source (gallery/upload/camera) in `components/SetupImageSourcePanel.tsx`.

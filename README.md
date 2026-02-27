@@ -540,6 +540,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── playScreenUIInitial.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
+│   │   │   │   │   ├── useReferenceTapHighlight.ts
 │   │   │   │   │   ├── usePuzzleSession.ts
 │   │   │   │   │   ├── useShareCardImage.ts
 │   │   │   │   ├── useShareResults.ts

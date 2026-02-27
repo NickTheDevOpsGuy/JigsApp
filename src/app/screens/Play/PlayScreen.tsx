@@ -50,6 +50,7 @@ import { useDownloadImage } from "./hooks/useDownloadImage";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { usePointerHandlers } from "./hooks/usePointerHandlers";
 import { useViewport } from "./hooks/useViewport";
+import { useReferenceTapHighlight } from "./hooks/useReferenceTapHighlight";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
@@ -199,10 +200,6 @@ export function PlayScreen() {
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
   const [completionDismissed, setCompletionDismissed] = React.useState(false);
-  const [highlightedPieceIds, setHighlightedPieceIds] = React.useState<Set<string>>(
-    new Set(),
-  );
-  const lastReferenceTapRef = React.useRef(0);
   const [boardSize, setBoardSize] = React.useState({ w: 800, h: 600 });
   const [lives, setLives] = React.useState(3);
 
@@ -305,6 +302,7 @@ export function PlayScreen() {
   } = managerResult;
 
   stateRef.current = state;
+  const { highlightedPieceIds, onPreviewTap } = useReferenceTapHighlight(state ?? null);
 
   useEffect(() => {
     const el = boardRef.current;
@@ -1376,37 +1374,7 @@ export function PlayScreen() {
           progressiveRevealMode={progressiveRevealMode}
           previewImage={imgRef.current}
           state={state}
-          onPreviewTap={(e) => {
-            const COOLDOWN_MS = 3000;
-            if (performance.now() - lastReferenceTapRef.current < COOLDOWN_MS) return;
-            if (!state) return;
-            const el = e.currentTarget;
-            const rect = el.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width;
-            const y = (e.clientY - rect.top) / rect.height;
-            const { rows, cols } = state.grid;
-            const col = Math.floor(Math.max(0, Math.min(1, x)) * cols);
-            const row = Math.floor(Math.max(0, Math.min(1, y)) * rows);
-            const candidates: Piece[] = [];
-            for (let dr = -1; dr <= 1; dr++) {
-              for (let dc = -1; dc <= 1; dc++) {
-                const r = row + dr;
-                const c = col + dc;
-                if (r >= 0 && r < rows && c >= 0 && c < cols) {
-                  const p = state.pieces.find(
-                    (x) => x.row === r && x.col === c && x.inTray,
-                  );
-                  if (p) candidates.push(p);
-                }
-              }
-            }
-            const ids = new Set(candidates.slice(0, 10).map((p) => p.id));
-            if (ids.size > 0) {
-              lastReferenceTapRef.current = performance.now();
-              setHighlightedPieceIds(ids);
-              setTimeout(() => setHighlightedPieceIds(new Set()), 2200);
-            }
-          }}
+          onPreviewTap={onPreviewTap}
           immersiveMode={immersiveMode}
           onImmersiveReveal={handleImmersiveReveal}
           showTutorial={showTutorial}
