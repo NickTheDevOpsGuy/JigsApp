@@ -32,13 +32,14 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 - **Header menu items** — `headerMenuItemsDisplay.ts` (display/effects/assistance/piece shape), `headerMenuItemsRest.ts` (audio/advanced/stats/share/contribute/help); `headerMenuItemsDisplayRest.ts` composes getDisplayAudioAdvancedItems.
 - **Viewport** — `hooks/viewportStorage.ts` (loadViewport, saveViewport, MIN/MAX_SCALE, ViewportState); `useViewport.ts` uses it for persistence.
 - **Pointer handlers** — `PointerHandlerFactoryDeps` moved to `pointerHandlers/types.ts`; factory re-exports it.
-- **Play animation** — `hooks/playScreenAnimationOverrides.ts` (computeFrameOverrides: drag display, lock lerp, undo snap-back); `usePlayScreenAnimation.ts` calls it and stays shorter.
-- **README** — File/folder structure updated with all of the above. **doc/CHANGES.md** — Code structure section updated.
+- **Win screen Share** — Share is a full menu row (Button, same style as Play again / Back to home) so it’s always visible.
+- **Lock animation** — Logic kept in `usePlayScreenAnimation.ts` (120ms lock lerp, ease-out 1-(1-t)^1.6, drag position snapshot when drag ends) for smooth snap.
+- **README** — File/folder structure updated; playScreenAnimationOverrides removed after inlining again. **doc/CHANGES.md** — Code structure section updated.
 
 ### Docs
 
 - **README** — File/folder structure includes refactor adds (Stats hooks, PieceTray hooks, SFX split, Play hooks, Setup gallery scroll, LeaderboardTabLists; menuConfigConstants, headerMenuItemsDisplay/Rest, viewportStorage; playScreenAnimationOverrides).
-- **changelog.ts** — Version 19: Play animation overrides extracted. Version 18: menu config, header items, viewport, pointer types. Version 17: code refactor. Version 16: smooth lock, completion, tray.
+- **changelog.ts** — Version 19: Win screen Share as menu option; lock animation restored in usePlayScreenAnimation. Version 18: menu config, header items, viewport, pointer types. Version 17: code refactor. Version 16: smooth lock, completion, tray.
 
 ---
 

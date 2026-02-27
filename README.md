@@ -556,7 +556,6 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   │   ├── shared.ts
 │   │   │   │   │   │   ├── touchHandlers.ts
 │   │   │   │   │   │   └── types.ts
-│   │   │   │   │   ├── playScreenAnimationOverrides.ts
 │   │   │   │   │   ├── playScreenManagerEvents.ts
 │   │   │   │   │   ├── playScreenUIInitial.ts
 │   │   │   │   │   ├── useCoarsePointer.ts

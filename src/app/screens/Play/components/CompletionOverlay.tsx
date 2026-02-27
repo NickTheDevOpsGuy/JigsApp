@@ -370,15 +370,15 @@ export function CompletionOverlay({
               Back to home
             </Button>
           )}
-          <button
-            type="button"
-            className={styles.completeShareLink}
+          <Button
+            variant="secondary"
             onClick={() => setSharePopupOpen(true)}
+            className={styles.completeContinueBtn}
             aria-label="Share Result"
           >
-            <Share2 size={16} />
+            <Share2 size={20} />
             {isNarrow ? "Share" : "Share Result"}
-          </button>
+          </Button>
         </div>
 
         {isDaily && <DailyReactions puzzleDate={getTodayDateString()} />}

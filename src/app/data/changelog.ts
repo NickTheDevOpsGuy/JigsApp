@@ -8,7 +8,8 @@ export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      "🔧 Code refactor – Play screen animation: drag/lock/undo overrides moved to playScreenAnimationOverrides.ts (see README file structure)",
+      "📱 Win screen – Share is a full menu option (same style as Continue, Play again, Back to home)",
+      "🧩 Lock animation – Smooth snap restored: lock lerp in usePlayScreenAnimation (120ms, ease-out); drag position captured when drag ends",
       "🔧 Code refactor (continued) – Menu config constants, header menu items (display/rest) split, viewport storage and pointer-handler types extracted (see README file structure)",
       "🔧 Code refactor – Stats, Piece Tray, SFX, Play hooks, Setup, Leaderboard, and UI persistence split into smaller modules (see README file structure)",
       "🧩 Smoother lock – Pieces ease into place when they snap (no more jump); works on desktop and mobile",
