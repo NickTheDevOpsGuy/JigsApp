@@ -32,7 +32,9 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - Reference image preview (full or progressive reveal mode)
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Completion confetti (layered bursts) and percentile badges (Top 10% / 25% / 50%); dynamic completion badges (Speed Demon, Chill Mode, etc.)
-- **Completion screen** — Redesigned: puzzle image, stats (Time, Moves, Accuracy, Rank), “Can you beat my run?”, **Continue** (primary) and **Share Result** (link). Confetti on win (theme-colored; respects reduced motion and battery saver). Share Result opens popup (Share Card PNG, Seasonal frame, Download).
+- **Completion screen** — Redesigned: larger puzzle image, stats (Time, Moves, Accuracy, Rank), “Can you beat my run?”, vertical menu (Continue, Play again, Back to home, Share Result). Confetti on win (theme-colored; respects reduced motion and battery saver). Share Result opens popup (Share Card PNG, Seasonal frame, Download).
+- **Smooth lock** — When pieces snap to the board they ease into place over ~100ms (desktop and mobile) instead of jumping.
+- **Mobile tray** — Tray height on small screens reduced (175px / 195px for large puzzles) to give the board more space.
 - Settings: **About** (Help), **Display** (Theme, piece shape, board options, effects), **Gameplay** (Controls, time), **Audio**, **Advanced**
 - Optional piece borders, edge-piece highlight, immersive mode
 - Edge and corner pieces display full image content (no cropping)
