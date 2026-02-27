@@ -16,7 +16,11 @@ export type UsePlayScreenPersistenceParams = {
   state: PuzzleState | null;
   elapsedSeconds: number;
   sessionId: string | null;
-  pushState: (pieces: PuzzleState["pieces"], elapsed: number, isComplete: boolean) => void;
+  pushState: (
+    pieces: PuzzleState["pieces"],
+    elapsed: number,
+    isComplete: boolean,
+  ) => void;
   remoteState: PuzzleSessionState | null;
   manager: {
     restoreFromSaved: (pieces: PuzzleSessionState["pieces"]) => void;
