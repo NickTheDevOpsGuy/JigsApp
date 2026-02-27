@@ -10,20 +10,29 @@ import type { LeaderboardType, WeekSubview, WeeklyAlbumSlot } from "../tabs";
 
 export type { LeaderboardType };
 
-const VALID_TABS: StatsTab[] = ["dashboard", "profile", "leaderboard", "achievements"];
+const VALID_TABS: readonly StatsTab[] = [
+  "dashboard",
+  "profile",
+  "leaderboard",
+  "achievements",
+];
+
+function isStatsTab(s: string | null): s is StatsTab {
+  return s != null && (VALID_TABS as readonly string[]).includes(s);
+}
 
 export function useStatsScreenState() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<StatsTab>(() => {
-    if (tabParam && VALID_TABS.includes(tabParam)) return tabParam as StatsTab;
+    if (isStatsTab(tabParam)) return tabParam;
     return "dashboard";
   });
 
   const tabFromUrl = searchParams.get("tab");
   useEffect(() => {
-    if (tabFromUrl && VALID_TABS.includes(tabFromUrl)) {
-      setActiveTab(tabFromUrl as StatsTab);
+    if (isStatsTab(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
 

@@ -435,7 +435,7 @@
   .playBody .trayWrap {
     width: 100%;
     max-width: min(90vw, 420px);
-    height: 175px;
+    height: 170px;
     flex-shrink: 0;
     padding: 0 0 6px;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
@@ -443,7 +443,7 @@
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 195px;
+    height: 190px;
   }
 }
 
@@ -1755,34 +1755,59 @@
   margin: 0 !important;
 }
 
+/* Win screen: actions as a single menu (Continue, Play again, Back to home, Share) */
 .completeActions {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 8px;
+  gap: 0;
   width: 100%;
   margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-sm);
+}
+
+.completeActions > * {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.completeActions > *:last-child {
+  border-bottom: none;
 }
 
 .completeActions .completeContinueBtn {
   width: 100%;
   min-width: 0;
   justify-content: center;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .completeActions .completeShareLink {
   margin-top: 0;
   width: 100%;
+  min-height: 44px;
   justify-content: center;
+  border-radius: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: transparent;
+}
+
+.completeActions .completeShareLink:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-brand-primary);
 }
 
 @media (max-width: 500px), (max-height: 600px) {
-  .completeActions {
-    gap: 6px;
-  }
   .completeActions .completeContinueBtn,
   .completeActions .completeShareLink {
     padding: 10px 12px;
+    min-height: 44px;
     font-size: 0.9rem;
   }
 }

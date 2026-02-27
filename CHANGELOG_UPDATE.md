@@ -28,12 +28,16 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 - **Play hooks** — `useSnapComboAnnouncer.ts`, `usePlayScreenUIPersistence.ts`; usePlayScreenManager and usePlayScreenUI use them.
 - **Setup** — `screens/Setup/hooks/useSetupScreenGalleryScroll.ts` for gallery scroll state.
 - **Leaderboard** — `screens/Stats/tabs/LeaderboardTabLists.tsx` (renderTimeList, renderCompletionList).
-- **README** — File/folder structure updated with all of the above. **doc/CHANGES.md** — Code structure section updated. **changelog.ts** — Version 17: refactor note + existing v16 items.
+- **Menu config** — `data/menuConfigConstants.ts` (TIME_MODE_LABELS, MenuNode); `menuConfig.ts` re-exports getMenuTree and MenuNode.
+- **Header menu items** — `headerMenuItemsDisplay.ts` (display/effects/assistance/piece shape), `headerMenuItemsRest.ts` (audio/advanced/stats/share/contribute/help); `headerMenuItemsDisplayRest.ts` composes getDisplayAudioAdvancedItems.
+- **Viewport** — `hooks/viewportStorage.ts` (loadViewport, saveViewport, MIN/MAX_SCALE, ViewportState); `useViewport.ts` uses it for persistence.
+- **Pointer handlers** — `PointerHandlerFactoryDeps` moved to `pointerHandlers/types.ts`; factory re-exports it.
+- **README** — File/folder structure updated with all of the above. **doc/CHANGES.md** — Code structure section updated.
 
 ### Docs
 
-- **README** — File/folder structure includes refactor adds (Stats hooks, PieceTray hooks, SFX split, Play hooks, Setup gallery scroll, LeaderboardTabLists).
-- **changelog.ts** — Version 16: smooth lock, completion menu + image, mobile tray. Version 17: code refactor entry.
+- **README** — File/folder structure includes refactor adds (Stats hooks, PieceTray hooks, SFX split, Play hooks, Setup gallery scroll, LeaderboardTabLists; menuConfigConstants, headerMenuItemsDisplay/Rest, viewportStorage).
+- **changelog.ts** — Version 18: menu config constants, header menu items split, viewport storage, pointer-handler types. Version 17: code refactor. Version 16: smooth lock, completion, tray.
 
 ---
 

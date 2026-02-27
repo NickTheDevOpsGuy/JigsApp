@@ -1,13 +1,14 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "17";
+export const CHANGELOG_VERSION = "18";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🔧 Code refactor (continued) – Menu config constants, header menu items (display/rest) split, viewport storage and pointer-handler types extracted (see README file structure)",
       "🔧 Code refactor – Stats, Piece Tray, SFX, Play hooks, Setup, Leaderboard, and UI persistence split into smaller modules (see README file structure)",
       "🧩 Smoother lock – Pieces ease into place when they snap (no more jump); works on desktop and mobile",
       "📱 Completion screen – Larger puzzle image and a clear vertical menu for Continue, Play again, Back to home, Share Result",

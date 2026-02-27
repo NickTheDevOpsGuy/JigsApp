@@ -4,13 +4,7 @@
  */
 import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/pickPiece";
-import type { PieceId } from "@/puzzle/types";
-import type {
-  CanvasWithTouch,
-  DragPreviewState,
-  PointerHandlersContext,
-  ScreenToBoard,
-} from "./types";
+import type { CanvasWithTouch, PointerHandlerFactoryDeps } from "./types";
 import {
   handleTouchDown,
   handleTouchMove,
@@ -19,40 +13,7 @@ import {
 } from "./touchHandlers";
 import { handleMouseDown, handleMouseMove, handleMouseUp } from "./mouseHandlers";
 
-export type PointerHandlerFactoryDeps = {
-  ctx: PointerHandlersContext & {
-    viewport?: {
-      startPan: (x: number, y: number) => void;
-      handlePanMove: (x: number, y: number) => void;
-      endPan: () => void;
-      isPanning: () => boolean;
-      isZoomedOrPanned?: () => boolean;
-      startPinch: (
-        p1: { clientX: number; clientY: number },
-        p2: { clientX: number; clientY: number },
-      ) => void;
-      handlePinchMove: (
-        p1: { clientX: number; clientY: number },
-        p2: { clientX: number; clientY: number },
-        boardRect: DOMRect,
-      ) => void;
-      endPinch: () => void;
-      isPinching: () => boolean;
-    };
-  };
-  canRotatePiece: (pid: PieceId) => boolean;
-  isPointerOverTray: (clientX: number, clientY: number) => boolean;
-  pruneStaleTouchPointers: () => void;
-  activePointersRef: React.MutableRefObject<
-    Map<
-      number,
-      { clientX: number; clientY: number; pointerType: string; updatedAtMs: number }
-    >
-  >;
-  screenToBoard?: ScreenToBoard;
-  onDragPreview?: (state: DragPreviewState) => void;
-  setState: (st: import("@/puzzle/types").PuzzleState) => void;
-};
+export type { PointerHandlerFactoryDeps } from "./types";
 
 export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
   const {

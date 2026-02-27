@@ -1,32 +1,14 @@
 /**
  * menuConfig – hierarchical menu structure.
  * Used by MenuScreen (home) and HeaderMenu (in-play hamburger).
+ * Types and TIME_MODE_LABELS in menuConfigConstants.ts.
  */
 import type { Theme } from "@/hooks/useTheme";
 import { THEME_LABELS } from "@/hooks/useTheme";
 import { GRID_OPTIONS } from "@/screens/Setup/hooks/useGridConfig";
+import { TIME_MODE_LABELS, type MenuNode } from "./menuConfigConstants";
 
-const TIME_MODE_LABELS: Record<string, string> = {
-  elapsed: "Elapsed",
-  countdown: "Countdown",
-  active: "Active only",
-  relaxed: "Relaxed (no timer)",
-  best: "Best time",
-};
-
-export type MenuNode =
-  | {
-      type: "folder";
-      id: string;
-      label: string;
-      children: MenuNode[];
-      collapsible?: boolean;
-    }
-  | { type: "action"; id: string; label: string }
-  | { type: "theme"; id: string }
-  | { type: "toggle"; id: string; label: string; getLabel?: (on: boolean) => string }
-  | { type: "navigate"; id: string; label: string; path: string }
-  | { type: "custom"; id: string; render: "theme" | "divider" };
+export type { MenuNode } from "./menuConfigConstants";
 
 /** Root menu tree. Some leaves are placeholders for future features. */
 export function getMenuTree(): MenuNode[] {

@@ -83,10 +83,10 @@ export function usePlayScreenAnimation(args: {
   const fpsLogIntervalRef = useRef<number>(0);
   /** Interpolated positions for dragged group (smooth drag, no touch/pointer changes) */
   const dragDisplayRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const DRAG_LERP = 0.72;
+  const DRAG_LERP = 0.8;
   /** Previous-frame positions for lock lerp (smooth snap instead of jump) */
   const lastPiecePositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const LOCK_LERP_MS = 120;
+  const LOCK_LERP_MS = 200;
 
   const perfFrameTimesRef = useRef<number[]>([]);
   const perfDrawCountRef = useRef(0);
@@ -225,7 +225,13 @@ export function usePlayScreenAnimation(args: {
           pos.y += (p.y - pos.y) * DRAG_LERP;
         }
       } else {
-        dragDisplayOverrides.clear();
+        // First frame after drag end: snapshot last drag positions for lock lerp (desktop + mobile).
+        if (dragDisplayOverrides.size > 0) {
+          for (const [id, pos] of dragDisplayOverrides) {
+            lastPiecePositionsRef.current.set(id, { x: pos.x, y: pos.y });
+          }
+          dragDisplayOverrides.clear();
+        }
       }
 
       const UNDO_SNAPBACK_MS = 280;
@@ -266,7 +272,7 @@ export function usePlayScreenAnimation(args: {
           const from = lastPos.get(p.id);
           if (from == null) continue;
           const t = Math.min(1, lockElapsedMs / LOCK_LERP_MS);
-          const easeOut = 1 - Math.pow(1 - t, 1.6);
+          const easeOut = 1 - (1 - t) * (1 - t);
           lockLerpOverrides ??= new Map();
           lockLerpOverrides.set(p.id, {
             x: from.x + (p.x - from.x) * easeOut,

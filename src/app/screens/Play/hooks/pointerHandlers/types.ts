@@ -58,3 +58,39 @@ export type PointerHandlersContext = {
   /** Timestamp of last tap-rotate; used to avoid click+touch double fire. */
   lastTapRotateTimeRef?: React.MutableRefObject<number>;
 };
+
+/** Dependencies passed to createPointerHandlers (pointerHandlersFactory). */
+export type PointerHandlerFactoryDeps = {
+  ctx: PointerHandlersContext & {
+    viewport?: {
+      startPan: (x: number, y: number) => void;
+      handlePanMove: (x: number, y: number) => void;
+      endPan: () => void;
+      isPanning: () => boolean;
+      isZoomedOrPanned?: () => boolean;
+      startPinch: (
+        p1: { clientX: number; clientY: number },
+        p2: { clientX: number; clientY: number },
+      ) => void;
+      handlePinchMove: (
+        p1: { clientX: number; clientY: number },
+        p2: { clientX: number; clientY: number },
+        boardRect: DOMRect,
+      ) => void;
+      endPinch: () => void;
+      isPinching: () => boolean;
+    };
+  };
+  canRotatePiece: (pid: PieceId) => boolean;
+  isPointerOverTray: (clientX: number, clientY: number) => boolean;
+  pruneStaleTouchPointers: () => void;
+  activePointersRef: React.MutableRefObject<
+    Map<
+      number,
+      { clientX: number; clientY: number; pointerType: string; updatedAtMs: number }
+    >
+  >;
+  screenToBoard?: ScreenToBoard;
+  onDragPreview?: (state: DragPreviewState) => void;
+  setState: (st: PuzzleState) => void;
+};

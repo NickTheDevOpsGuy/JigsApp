@@ -459,6 +459,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── confettiColors.ts
 │   │   │   ├── loadPacksData.ts
 │   │   │   ├── menuConfig.ts
+│   │   │   ├── menuConfigConstants.ts
 │   │   │   ├── menuTips.ts
 │   │   │   ├── packCompletion.ts
 │   │   │   ├── packMetadata.ts
@@ -523,8 +524,10 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── headerMenuConfig.tsx
 │   │   │   │   │   ├── headerMenuConfigTypes.ts
 │   │   │   │   │   ├── headerMenuConstants.ts
+│   │   │   │   │   ├── headerMenuItemsDisplay.ts
 │   │   │   │   │   ├── headerMenuItemsDisplayRest.ts
 │   │   │   │   │   ├── headerMenuItemsNavModes.ts
+│   │   │   │   │   ├── headerMenuItemsRest.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── Minimap.tsx
 │   │   │   │   │   ├── Minimap.module.css
@@ -572,6 +575,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── usePuzzleSession.ts
+│   │   │   │   │   ├── viewportStorage.ts
 │   │   │   │   │   ├── useReferenceTapHighlight.ts
 │   │   │   │   │   ├── useShareCardImage.ts
 │   │   │   │   │   ├── useShareResults.ts
