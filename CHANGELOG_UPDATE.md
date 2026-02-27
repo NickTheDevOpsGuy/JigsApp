@@ -32,12 +32,13 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 - **Header menu items** — `headerMenuItemsDisplay.ts` (display/effects/assistance/piece shape), `headerMenuItemsRest.ts` (audio/advanced/stats/share/contribute/help); `headerMenuItemsDisplayRest.ts` composes getDisplayAudioAdvancedItems.
 - **Viewport** — `hooks/viewportStorage.ts` (loadViewport, saveViewport, MIN/MAX_SCALE, ViewportState); `useViewport.ts` uses it for persistence.
 - **Pointer handlers** — `PointerHandlerFactoryDeps` moved to `pointerHandlers/types.ts`; factory re-exports it.
+- **Play animation** — `hooks/playScreenAnimationOverrides.ts` (computeFrameOverrides: drag display, lock lerp, undo snap-back); `usePlayScreenAnimation.ts` calls it and stays shorter.
 - **README** — File/folder structure updated with all of the above. **doc/CHANGES.md** — Code structure section updated.
 
 ### Docs
 
-- **README** — File/folder structure includes refactor adds (Stats hooks, PieceTray hooks, SFX split, Play hooks, Setup gallery scroll, LeaderboardTabLists; menuConfigConstants, headerMenuItemsDisplay/Rest, viewportStorage).
-- **changelog.ts** — Version 18: menu config constants, header menu items split, viewport storage, pointer-handler types. Version 17: code refactor. Version 16: smooth lock, completion, tray.
+- **README** — File/folder structure includes refactor adds (Stats hooks, PieceTray hooks, SFX split, Play hooks, Setup gallery scroll, LeaderboardTabLists; menuConfigConstants, headerMenuItemsDisplay/Rest, viewportStorage; playScreenAnimationOverrides).
+- **changelog.ts** — Version 19: Play animation overrides extracted. Version 18: menu config, header items, viewport, pointer types. Version 17: code refactor. Version 16: smooth lock, completion, tray.
 
 ---
 

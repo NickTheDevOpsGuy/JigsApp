@@ -7,10 +7,10 @@ import type { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { renderBoard } from "@/puzzle/canvas/renderBoard";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
-import type { UndoSnapBackFrom } from "../playUtils";
 import { SHOW_DEBUG, type DebugFlags } from "../playScreenUtils";
 import type { ViewportState } from "./useViewport";
 import type { PerfStats } from "../components/ProfilerOverlay";
+import { computeFrameOverrides } from "./playScreenAnimationOverrides";
 
 export function usePlayScreenAnimation(args: {
   manager: PuzzleManager | null;
@@ -210,90 +210,23 @@ export function usePlayScreenAnimation(args: {
         ? (st.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
         : null;
 
-      const dragDisplayOverrides = dragDisplayRef.current;
-      if (isDragging && draggedGroupId) {
-        const groupPieces = st.pieces.filter(
-          (p) => !p.inTray && p.groupId === draggedGroupId,
-        );
-        for (const p of groupPieces) {
-          let pos = dragDisplayOverrides.get(p.id);
-          if (!pos) {
-            pos = { x: p.x, y: p.y };
-            dragDisplayOverrides.set(p.id, pos);
-          }
-          pos.x += (p.x - pos.x) * DRAG_LERP;
-          pos.y += (p.y - pos.y) * DRAG_LERP;
-        }
-      } else {
-        // First frame after drag end: snapshot last drag positions for lock lerp (desktop + mobile).
-        if (dragDisplayOverrides.size > 0) {
-          for (const [id, pos] of dragDisplayOverrides) {
-            lastPiecePositionsRef.current.set(id, { x: pos.x, y: pos.y });
-          }
-          dragDisplayOverrides.clear();
-        }
-      }
-
-      const UNDO_SNAPBACK_MS = 280;
-      const undoSnapBack = undoSnapBackRef?.current;
-      let undoSnapBackOverrides: Map<string, { x: number; y: number }> | undefined;
-      if (undoSnapBack) {
-        const elapsed = now - undoSnapBack.startMs;
-        if (elapsed >= UNDO_SNAPBACK_MS) {
-          onUndoSnapBackComplete?.();
-        } else {
-          const t = elapsed / UNDO_SNAPBACK_MS;
-          const easeOut = 1 - Math.pow(1 - t, 1.5);
-          undoSnapBackOverrides = new Map();
-          for (const p of st.pieces) {
-            if (p.inTray) continue;
-            const from = undoSnapBack.fromPositions.get(p.id);
-            if (!from) continue;
-            undoSnapBackOverrides.set(p.id, {
-              x: from.x + (p.x - from.x) * easeOut,
-              y: from.y + (p.y - from.y) * easeOut,
-            });
-          }
-        }
-      }
-
       const popMap = popMapRef.current ?? new Map<string, number>();
       const lockMap = lockMapRef.current ?? new Map<string, number>();
+      const { lockLerpOverrides, undoSnapBackOverrides } = computeFrameOverrides({
+        st,
+        now,
+        isDragging,
+        draggedGroupId,
+        dragDisplayRef,
+        lastPiecePositionsRef,
+        lockMap,
+        undoSnapBackRef: undoSnapBackRef ?? null,
+        DRAG_LERP,
+        LOCK_LERP_MS,
+        onUndoSnapBackComplete,
+      });
 
-      let lockLerpOverrides: Map<string, { x: number; y: number }> | undefined;
-      if (!isDragging && undoSnapBackOverrides == null) {
-        const lastPos = lastPiecePositionsRef.current;
-        for (const p of st.pieces) {
-          if (p.inTray) continue;
-          const lockAt = lockMap.get(p.id);
-          if (lockAt == null) continue;
-          const lockElapsedMs = now - lockAt;
-          if (lockElapsedMs >= LOCK_LERP_MS) continue;
-          const from = lastPos.get(p.id);
-          if (from == null) continue;
-          const t = Math.min(1, lockElapsedMs / LOCK_LERP_MS);
-          const easeOut = 1 - (1 - t) * (1 - t);
-          lockLerpOverrides ??= new Map();
-          lockLerpOverrides.set(p.id, {
-            x: from.x + (p.x - from.x) * easeOut,
-            y: from.y + (p.y - from.y) * easeOut,
-          });
-        }
-      }
-      for (const p of st.pieces) {
-        if (p.inTray) continue;
-        const lockAt = lockMap.get(p.id);
-        if (lockAt != null && now - lockAt < LOCK_LERP_MS) continue;
-        const pos =
-          isDragging &&
-          draggedGroupId &&
-          p.groupId === draggedGroupId &&
-          dragDisplayOverrides.has(p.id)
-            ? dragDisplayOverrides.get(p.id)!
-            : { x: p.x, y: p.y };
-        lastPiecePositionsRef.current.set(p.id, { x: pos.x, y: pos.y });
-      }
-
+      const dragDisplayOverrides = dragDisplayRef.current;
       const pieceCache = pieceCacheRef.current;
       const snapParticles = snapParticlesRef?.current ?? [];
       const hint = wrongRotationHintRef?.current;
