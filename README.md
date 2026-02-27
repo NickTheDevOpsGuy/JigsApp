@@ -71,9 +71,9 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ## Features
 
-- **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap; group merging; 3×3 to 9×9 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan; undo/redo with snap-back animation (Ctrl/Cmd+Z); drag lift (stronger shadow, scale)
+- **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap (including during fast drags); group merging; 2×2 to 10×10 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan (capped to avoid excessive zoom); undo/redo with snap-back animation (Ctrl/Cmd+Z); drag lift (stronger shadow, scale)
 - **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/streak-freeze.md](doc/streak-freeze.md)
-- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), completion confetti and badges, six themes
+- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), completion confetti (layered bursts) and percentile badges (Top 10% / 25% / 50%), six themes
 - **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image, Share Result popup (Share Card PNG, Download), co-op (Play with Friend via link)
 - **Analytics** — Live completion counter, percentile ranking (Top X%)
 
@@ -92,17 +92,19 @@ Full feature list → [CHANGES.md](doc/CHANGES.md)
 
 ## Mobile layout
 
-- **Board** — 94vw width, max 520px on mobile; 65–70% viewport height.
-- **Piece tray** — 160px height below board; horizontal scroll. No collapse.
+- **Board** — 94vw width, max 520px on mobile; 65–70% viewport height. `touch-action: manipulation` to prevent double-tap zoom. Snap detection runs during drag as well as on release, so fast touch drags still snap when passing through the target.
+- **Piece tray** — Compact height below board; horizontal scroll. No collapse. Undo/redo and tray get extra spacing on very small screens (≤380px).
 - **Piece scaling** — Min 42px on mobile; zoom scales if needed.
 - **Snap** — 120ms pop + glow animation.
-- **Header** — 56px max.
+- **Header** — 48px on mobile.
+- **Screens** — Menu, Setup, Stats, Packs fit in viewport (no page scroll); content scrolls inside cards where needed. Loading spinners on Stats and Packs.
+- **Win screen** — Completion overlay shows image, stats (Time, Moves, Accuracy, Rank), “Can you beat my run?”, and Continue; confetti when enabled.
 
 ---
 
 ## Grid sizes & difficulty
 
-Presets: Easy (3×3) → Medium (4×4) → Hard (5×5) → Expert (6×6) → Master (7×7) → Legend (8×8) → Extreme (9×9). Custom grids up to 12×12. Difficulty dropdowns show piece count (e.g. "🌱 3×3 (9 pieces)"). "Based on your progress" suggests the next preset (including 9×9) when you've completed smaller grids. Custom grids 81+ pieces show a hint that larger puzzles may run slower on some devices.
+Presets: Starter (2×2) → Easy (3×3) → Medium (4×4) → Hard (5×5) → Expert (6×6) → Master (7×7) → Legend (8×8) → Extreme (9×9) → Epic (10×10). Custom grids up to 12×12. Difficulty dropdowns show piece count (e.g. "🌱 3×3 (9 pieces)"). "Based on your progress" suggests the next preset when you've completed smaller grids. Custom grids 81+ pieces show a hint that larger puzzles may run slower on some devices.
 
 **Undo cap** – 50 steps for puzzles ≤64 pieces, 25 for 81+ to reduce memory use on large puzzles.
 
@@ -215,6 +217,7 @@ PostHog UI: https://app.posthog.com/
   - first run: `npx playwright install`
   - ensure port 5173 is free (or stop `npm run dev`), or Playwright will start the app in CI
   - Covers Stats mobile layout, Setup/Daily 9×9 preset, and core flows
+  - Completion overlay: `play-screen.spec.ts` uses `?e2eCompletion=1` on `/play` to assert the win screen UI without solving
 - Performance (Lighthouse CI)
   - `npm run lhci` — builds, then runs Lighthouse (perf, a11y, best-practices)
   - Reports in `./lhci-reports`
@@ -355,7 +358,15 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   └── ui
 │   │   │       └── phuzzle-logo-512.png
 │   │   ├── audio
-│   │   │   └── sounds.ts
+│   │   │   ├── sounds.ts
+│   │   │   ├── soundsSfx.ts
+│   │   │   ├── soundsAmbient.ts
+│   │   │   ├── soundsAmbientTypes.ts
+│   │   │   ├── soundsAmbientOcean.ts
+│   │   │   ├── soundsAmbientSunset.ts
+│   │   │   ├── soundsAmbientSpace.ts
+│   │   │   ├── soundsAmbientForest.ts
+│   │   │   └── soundsAmbientLightDark.ts
 │   │   ├── components
 │   │   │   ├── DailyReactions
 │   │   │   │   ├── DailyReactions.module.css
@@ -404,7 +415,8 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   └── OnboardingTooltip.tsx
 │   │   │   ├── PieceTray
 │   │   │   │   ├── PieceTray.module.css
-│   │   │   │   └── PieceTray.tsx
+│   │   │   │   ├── PieceTray.tsx
+│   │   │   │   └── PieceTrayHeader.tsx
 │   │   │   ├── ShortcutsModal
 │   │   │   │   ├── ShortcutsModal.module.css
 │   │   │   │   └── ShortcutsModal.tsx
@@ -452,7 +464,10 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── canvas
 │   │   │   │   ├── pickPiece.ts
 │   │   │   │   ├── renderBoard.ts
+│   │   │   │   ├── renderBoardDraw.ts
+│   │   │   │   ├── renderBoardDrawOverlays.ts
 │   │   │   │   ├── renderBoardHelpers.ts
+│   │   │   │   ├── renderBoardTypes.ts
 │   │   │   │   ├── renderTrayPiece.ts
 │   │   │   │   └── shape.ts
 │   │   │   ├── factories
@@ -463,6 +478,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── groupUtils.ts
 │   │   │   ├── PuzzleManager.test.ts
 │   │   │   ├── PuzzleManager.ts
+│   │   │   ├── puzzleManagerUtils.ts
 │   │   │   ├── puzzleStorage.ts
 │   │   │   ├── shape.ts
 │   │   │   ├── types.ts
@@ -481,6 +497,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── Play
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── CompletionSharePopup.tsx
 │   │   │   │   │   ├── CoopDebugPanel.tsx
 │   │   │   │   │   ├── CoopStatusIndicator.tsx
 │   │   │   │   │   ├── DragPreview.tsx
@@ -489,6 +506,9 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── PauseOverlay.tsx
 │   │   │   │   │   ├── PlayHUD.tsx
+│   │   │   │   │   ├── PlayScreenTopBar.tsx
+│   │   │   │   │   ├── PlayScreenModals.tsx
+│   │   │   │   │   ├── PlayScreenOverlays.tsx
 │   │   │   │   │   ├── ProgressivePreviewOverlay.tsx
 │   │   │   │   │   ├── PlayToasts.tsx
 │   │   │   │   │   ├── PlayToasts.types.ts
@@ -504,9 +524,11 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── pointerHandlers
 │   │   │   │   │   │   ├── dragLog.ts
 │   │   │   │   │   │   ├── mouseHandlers.ts
+│   │   │   │   │   │   ├── pointerHandlersFactory.ts
 │   │   │   │   │   │   ├── shared.ts
 │   │   │   │   │   │   ├── touchHandlers.ts
 │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── playScreenManagerEvents.ts
 │   │   │   │   │   ├── useCoarsePointer.ts
 │   │   │   │   │   ├── useDownloadImage.ts
 │   │   │   │   │   ├── useHaptics.ts
@@ -516,6 +538,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── usePlayScreenShortcuts.ts
 │   │   │   │   │   ├── usePlayScreenTimer.ts
 │   │   │   │   │   ├── usePlayScreenUI.ts
+│   │   │   │   │   ├── playScreenUIInitial.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
 │   │   │   │   │   ├── usePuzzleSession.ts
 │   │   │   │   │   ├── useShareCardImage.ts
@@ -531,7 +554,9 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── Setup
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CameraCapture.module.css
-│   │   │   │   │   └── CameraCapture.tsx
+│   │   │   │   │   ├── CameraCapture.tsx
+│   │   │   │   │   ├── SetupGalleryThumbnail.tsx
+│   │   │   │   │   └── SetupImageSourcePanel.tsx
 │   │   │   │   ├── hooks
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── useGridConfig.ts
@@ -539,6 +564,16 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   ├── SetupScreen.module.css
 │   │   │   │   └── SetupScreen.tsx
 │   │   │   └── Stats
+│   │   │       ├── components
+│   │   │       │   ├── StatsScreenHeader.tsx
+│   │   │       │   └── StatsTabBar.tsx
+│   │   │       ├── tabs
+│   │   │       │   ├── AchievementsTab.tsx
+│   │   │       │   ├── DashboardTab.tsx
+│   │   │       │   ├── LeaderboardTab.tsx
+│   │   │       │   ├── ProfileTab.tsx
+│   │   │       │   └── index.ts
+│   │   │       ├── statsFormatting.ts
 │   │   │       ├── StatsScreen.module.css
 │   │   │       └── StatsScreen.tsx
 │   │   ├── services

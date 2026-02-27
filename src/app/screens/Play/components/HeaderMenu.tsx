@@ -1,5 +1,8 @@
 /**
  * HeaderMenu – hamburger menu with Theme, Gameplay, Display, Audio, Advanced.
+ *
+ * Sections: 1–120 constants (SUB_MENU_LABELS, buildTree) + MenuTree component;
+ * 121–350 menu tree keyboard nav + open/close; 351–503 HeaderMenu export (trigger button + portal).
  */
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,72 +15,15 @@ import {
   type MenuItemConfig,
   type SubMenuId,
 } from "./headerMenuConfig";
+import {
+  SUB_MENU_LABELS,
+  SUBMENU_PARENT,
+  SUBMENU_DESCRIPTIONS,
+  SETTINGS_SUBMENU_ORDER,
+  getSubmenuDescription,
+} from "./headerMenuConstants";
 
 export type { HeaderMenuProps } from "./headerMenuConfig";
-
-const SUB_MENU_LABELS: Record<SubMenuId, string> = {
-  about: "About",
-  advanced: "System",
-  audio: "Audio",
-  assistance: "Assistance",
-  contribute: "About",
-  controls: "Gameplay",
-  display: "Appearance",
-  effects: "Effects",
-  gameplay: "Gameplay",
-  help: "Help",
-  manualControls: "Controls",
-  modes: "Modes",
-  navigation: "Navigate",
-  pieceShape: "Piece Shape",
-  share: "Share",
-  stats: "Leaderboards",
-  theme: "Theme",
-};
-
-const SUBMENU_PARENT: Partial<Record<SubMenuId, SubMenuId>> = {
-  contribute: "about",
-  effects: "display",
-  help: "about",
-  manualControls: "controls",
-  modes: "controls",
-  pieceShape: "controls",
-};
-
-const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
-  about: "About Phuzzle and how to get involved",
-  advanced: "Cache, performance overlay, reset stats",
-  assistance: "Visual hints: alignment grid, edge highlight, ghost hints",
-  audio: "Sound effects and haptic feedback",
-  contribute: "About Phuzzle and how to get involved",
-  controls: "Piece shape, modes, and manual controls",
-  display: "Preview, effects, immersive mode, and theme",
-  gameplay: "Piece shape, modes, and manual controls",
-  help: "How to play and keyboard shortcuts",
-  manualControls: "Undo, redo, reset view, zoom",
-  modes: "Drift, relaxed, deliberate detach, timer",
-  navigation: "Home and new puzzle",
-  pieceShape: "Applies to next puzzle",
-  share: "Play with a friend (co-op)",
-  stats: "View leaderboards",
-  theme: "Change color theme",
-  effects: "Fog, night, or sepia visual effects",
-};
-
-function getSubmenuDescription(id: SubMenuId): string {
-  return SUBMENU_DESCRIPTIONS[id] ?? SUB_MENU_LABELS[id];
-}
-
-const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
-  "display",
-  "assistance",
-  "controls",
-  "audio",
-  "advanced",
-  "navigation",
-  "share",
-  "stats",
-];
 
 export function HeaderMenu(props: HeaderMenuProps) {
   const navigate = useNavigate();

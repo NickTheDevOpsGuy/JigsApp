@@ -17,10 +17,21 @@ export function PauseOverlay({
   isCountdownExpired,
   onNewPuzzle,
 }: PauseOverlayProps) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isCountdownExpired && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      onResume();
+    }
+  };
+
   return (
     <div
       className={styles.pauseOverlay}
       onClick={isCountdownExpired ? undefined : onResume}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={isCountdownExpired ? "Time's up" : "Resume"}
     >
       <div className={styles.pauseContent}>
         {isCountdownExpired ? (

@@ -122,7 +122,17 @@ export function DailyReactions({ puzzleDate }: DailyReactionsProps) {
             disabled={posting}
           />
           <div className={styles.commentActions}>
-            <span className={styles.charCount}>
+            <span
+              className={
+                commentText.length >= MAX_COMMENT_LENGTH
+                  ? styles.charCountAtLimit
+                  : commentText.length >= MAX_COMMENT_LENGTH - 30
+                    ? styles.charCountNearLimit
+                    : styles.charCount
+              }
+              aria-live="polite"
+              aria-label={`${commentText.length} of ${MAX_COMMENT_LENGTH} characters`}
+            >
               {commentText.length}/{MAX_COMMENT_LENGTH}
             </span>
             <button

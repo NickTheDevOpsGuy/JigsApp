@@ -1,5 +1,8 @@
 /**
  * PieceTray – horizontal scrollable tray of unplaced pieces; filter by section, sort by grid/color.
+ *
+ * Sections: 1–120 Props + isCorner + scroll/thumb logic; 121–280 render piece thumbnails + filter bar;
+ * 281–450 main component (scroll container, arrows, filter, keyboard nav).
  */
 import React, {
   forwardRef,
@@ -12,12 +15,10 @@ import React, {
 import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
-import { ChevronLeft, ChevronRight, Shuffle } from "lucide-react";
-import {
-  TrayFilterButton,
-  type TrayFilter,
-} from "@/screens/Play/components/TrayFilterButton";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { type TrayFilter } from "@/screens/Play/components/TrayFilterButton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { PieceTrayHeader } from "./PieceTrayHeader";
 import styles from "./PieceTray.module.css";
 
 const THUMB_NORMAL = 68;
@@ -344,25 +345,13 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
           <span className={styles.handleLabel}>Piece Drawer ({pieces.length})</span>
         )}
       </div>
-      <div className={styles.header}>
-        <div className={styles.titleRow}>
-          <span className={styles.title}>Piece Drawer ({pieces.length})</span>
-          <div className={styles.headerControls}>
-            <TrayFilterButton value={filter} onChange={setFilter} hasImage={!!image} />
-            <button
-              type="button"
-              className={styles.randomBtn}
-              onClick={() => setShuffleKey((k) => k + 1)}
-              disabled={pieces.length === 0}
-              aria-label="Randomize piece order"
-              title="Randomize order"
-            >
-              <Shuffle size={16} />
-              <span className={styles.randomLabel}>Random</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <PieceTrayHeader
+        pieceCount={pieces.length}
+        filter={filter}
+        setFilter={setFilter}
+        hasImage={!!image}
+        onShuffle={() => setShuffleKey((k) => k + 1)}
+      />
 
       {!effectiveCollapsed && displayed.length > 0 && canScroll && (
         <div

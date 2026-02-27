@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PackListScreen.module.css";
 import { ArrowLeft } from "lucide-react";
+import { Loader } from "@/components/Loader";
 import { PACK_METADATA } from "@/data/packMetadata";
 import { loadPacksData } from "@/data/loadPacksData";
 import { getPackProgress } from "@/data/packCompletion";
@@ -45,48 +46,56 @@ export function PackListScreen() {
           <h1 className={styles.title}>Puzzle Packs</h1>
         </div>
 
-        <p className={styles.subtitle}>
-          Curated themes to explore. Complete puzzles to track your progress.
-        </p>
-
-        {seasonPack && (
-          <p className={styles.seasonNote} aria-live="polite">
-            Season&apos;s pick: {season.charAt(0).toUpperCase() + season.slice(1)}
+        <div className={styles.cardScroll}>
+          <p className={styles.subtitle}>
+            Curated themes to explore. Complete puzzles to track your progress.
           </p>
-        )}
 
-        <div className={styles.packGrid}>
-          {orderedPacks.map((pack) => {
-            const puzzlesData = packsData
-              ? packsData.getPuzzlesForPack(pack as (typeof packsData.PUZZLE_PACKS)[0])
-              : [];
-            const { completed, total } = packsData
-              ? getPackProgress(puzzlesData.map((p) => p.id))
-              : { completed: 0, total: 0 };
+          {seasonPack && (
+            <p className={styles.seasonNote} aria-live="polite">
+              Season&apos;s pick: {season.charAt(0).toUpperCase() + season.slice(1)}
+            </p>
+          )}
 
-            const isSeasonPick = seasonPack?.id === pack.id;
+          {!packsData ? (
+            <Loader label="Loading packs…" />
+          ) : (
+            <div className={styles.packGrid}>
+              {orderedPacks.map((pack) => {
+                const puzzlesData = packsData
+                  ? packsData.getPuzzlesForPack(
+                      pack as (typeof packsData.PUZZLE_PACKS)[0],
+                    )
+                  : [];
+                const { completed, total } = packsData
+                  ? getPackProgress(puzzlesData.map((p) => p.id))
+                  : { completed: 0, total: 0 };
 
-            return (
-              <button
-                key={pack.id}
-                type="button"
-                className={`${styles.packCard} ${isSeasonPick ? styles.packCardSeasonal : ""}`}
-                onClick={() => nav(`/packs/${pack.id}`)}
-              >
-                <div className={styles.packEmoji}>{pack.emoji}</div>
-                <div className={styles.packInfo}>
-                  <span className={styles.packName}>{pack.name}</span>
-                  {isSeasonPick && (
-                    <span className={styles.seasonBadge}>Season&apos;s pick</span>
-                  )}
-                  <span className={styles.packDesc}>{pack.description}</span>
-                  <span className={styles.packProgress}>
-                    {packsData ? `${completed}/${total} completed` : "…"}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+                const isSeasonPick = seasonPack?.id === pack.id;
+
+                return (
+                  <button
+                    key={pack.id}
+                    type="button"
+                    className={`${styles.packCard} ${isSeasonPick ? styles.packCardSeasonal : ""}`}
+                    onClick={() => nav(`/packs/${pack.id}`)}
+                  >
+                    <div className={styles.packEmoji}>{pack.emoji}</div>
+                    <div className={styles.packInfo}>
+                      <span className={styles.packName}>{pack.name}</span>
+                      {isSeasonPick && (
+                        <span className={styles.seasonBadge}>Season&apos;s pick</span>
+                      )}
+                      <span className={styles.packDesc}>{pack.description}</span>
+                      <span className={styles.packProgress}>
+                        {packsData ? `${completed}/${total} completed` : "…"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

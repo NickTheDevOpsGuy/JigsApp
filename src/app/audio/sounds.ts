@@ -1,187 +1,282 @@
 /**
- * sounds – Web Audio API effects (snap, place, rotate, etc.), haptic feedback, theme variants.
+ * sounds.ts – SFX, haptics, and (optionally) alternate ambient music.
+ *
+ * SFX are theme-aware via getTheme(). Alternate ambient loops (ocean/sunset/space/forest/light-dark)
+ * live in soundsAmbient.ts and are invoked from startAmbient() with helpers.
+ *
+ * Uses Web Audio API only (no external assets).
  */
-type SoundType = "snap" | "place" | "rotate" | "complete" | "pickup" | "undo";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { getTheme } from "./audioUtils";
+import {
+  createOceanMusic,
+  createSunsetMusic,
+  createSpaceMusic,
+  createForestMusic,
+  createLightDarkMusic,
+} from "./soundsAmbient";
+import {
+  playPickupSfx,
+  playSnapSfx,
+  playPlaceSfx,
+  playRotateSfx,
+  playUndoSfx,
+  playCompleteSfx,
+} from "./soundsSfx";
 
-type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
-
+export type SoundType = "snap" | "place" | "rotate" | "complete" | "pickup" | "undo";
+export type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
 export type SnapSoundPref = "default" | "classic" | "soft" | "punchy" | "muted";
 
+const SOUND_ENABLED_KEY = "phuzzle:soundEnabled";
+const SOUND_VOLUME_KEY = "phuzzle:soundVolume";
+const HAPTICS_ENABLED_KEY = "phuzzle:hapticsEnabled";
 const SNAP_SOUND_KEY = "phuzzle:snapSound";
 
-function getTheme(): Theme {
-  if (typeof document === "undefined") return "light";
-  const classList = document.documentElement.classList;
-  if (classList.contains("theme-space")) return "space";
-  if (classList.contains("theme-ocean")) return "ocean";
-  if (classList.contains("theme-forest")) return "forest";
-  if (classList.contains("theme-sunset")) return "sunset";
-  if (classList.contains("theme-dark")) return "dark";
-  return "light";
+const MUSIC_ENABLED_KEY = "phuzzle:musicEnabled";
+const MUSIC_VOLUME_KEY = "phuzzle:musicVolume";
+
+function clamp01(n: number) {
+  return Math.max(0, Math.min(1, n));
 }
 
-class SoundManager {
+/**
+ * NOTE: iOS/Safari requires user gesture to start AudioContext.
+ * This helper keeps behavior consistent across browsers.
+ */
+function resumeIfSuspended(ctx: AudioContext) {
+  if (ctx.state === "suspended") {
+    // Fire and forget
+    void ctx.resume().catch(() => {
+      // ignore
+    });
+  }
+}
+
+/** Simple helper to create a short noise burst (good for soft clicks, surf, etc.) */
+function createNoiseBuffer(ctx: AudioContext, durationSec: number) {
+  const length = Math.max(1, Math.floor(durationSec * ctx.sampleRate));
+  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < length; i += 1) {
+    data[i] = (Math.random() * 2 - 1) * 0.8;
+  }
+  return buffer;
+}
+
+/** A tiny reverb-ish impulse (very subtle) */
+function createTinyImpulse(ctx: AudioContext) {
+  const dur = 0.35;
+  const len = Math.floor(dur * ctx.sampleRate);
+  const impulse = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let ch = 0; ch < 2; ch += 1) {
+    const data = impulse.getChannelData(ch);
+    for (let i = 0; i < len; i += 1) {
+      const t = i / len;
+      // quick decay + slight randomness
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 3) * 0.35;
+    }
+  }
+  return impulse;
+}
+
+type StopFn = () => void;
+
+/** GainNode with optional oscillator ref for chord/ambient builders that need to retune. */
+type GainNodeWithOsc = GainNode & { __osc?: OscillatorNode };
+
+class SoundEngine {
   private audioContext: AudioContext | null = null;
-  private enabled: boolean = true;
-  private volume: number = 0.3;
-  private hapticsEnabled: boolean = true;
+
+  // SFX channel prefs
+  private enabled = true;
+  private volume = 0.3;
+  private hapticsEnabled = true;
+  private snapSoundPref: SnapSoundPref = "default";
+
+  // Music channel prefs
+  private musicEnabled = false;
+  private musicVolume = 0.35;
+  private paused = false;
+
+  // Ambient nodes
+  private ambientGain: GainNode | null = null;
+  private ambientStops: StopFn[] = [];
+  private ambientTheme: Theme | null = null;
+
+  // Shared DSP nodes (created lazily)
+  private masterReverb: ConvolverNode | null = null;
 
   private getContext(): AudioContext | null {
-    if (!this.audioContext) {
-      try {
-        this.audioContext = new AudioContext();
-      } catch {
-        console.warn("Web Audio API not supported");
-        return null;
-      }
+    if (this.audioContext) return this.audioContext;
+    try {
+      this.audioContext = new AudioContext();
+      return this.audioContext;
+    } catch {
+      console.warn("Web Audio API not supported");
+      return null;
     }
-    return this.audioContext;
   }
 
-  setEnabled(enabled: boolean) {
-    this.enabled = enabled;
-    // Save preference
-    localStorage.setItem("phuzzle:soundEnabled", enabled ? "true" : "false");
+  /** Call this from a user gesture (first tap) if you want to guarantee audio starts on iOS. */
+  unlockAudioFromGesture() {
+    const ctx = this.getContext();
+    if (!ctx) return;
+    resumeIfSuspended(ctx);
   }
 
-  isEnabled(): boolean {
-    return this.enabled;
-  }
-
-  setHapticsEnabled(enabled: boolean) {
-    this.hapticsEnabled = enabled;
-    localStorage.setItem("phuzzle:hapticsEnabled", enabled ? "true" : "false");
-  }
-
-  isHapticsEnabled(): boolean {
-    return this.hapticsEnabled;
-  }
-
-  setVolume(volume: number) {
-    this.volume = Math.max(0, Math.min(1, volume));
-    localStorage.setItem("phuzzle:soundVolume", this.volume.toString());
-  }
-
-  getVolume(): number {
-    return this.volume;
-  }
-
+  // ---------- Preferences ----------
   loadPreferences() {
-    const enabled = localStorage.getItem("phuzzle:soundEnabled");
-    if (enabled !== null) {
-      this.enabled = enabled === "true";
-    }
-    const volume = localStorage.getItem("phuzzle:soundVolume");
-    if (volume !== null) {
-      this.volume = parseFloat(volume);
-    }
-    const haptics = localStorage.getItem("phuzzle:hapticsEnabled");
-    if (haptics !== null) {
-      this.hapticsEnabled = haptics === "true";
-    }
-    const snap = localStorage.getItem(SNAP_SOUND_KEY);
+    const enabled = safeLocalStorage.getItem(SOUND_ENABLED_KEY);
+    if (enabled !== null) this.enabled = enabled === "true";
+
+    const volume = safeLocalStorage.getItem(SOUND_VOLUME_KEY);
+    if (volume !== null) this.volume = clamp01(parseFloat(volume));
+
+    const haptics = safeLocalStorage.getItem(HAPTICS_ENABLED_KEY);
+    if (haptics !== null) this.hapticsEnabled = haptics === "true";
+
+    const snap = safeLocalStorage.getItem(SNAP_SOUND_KEY);
     if (
       snap !== null &&
       ["default", "classic", "soft", "punchy", "muted"].includes(snap)
     ) {
       this.snapSoundPref = snap as SnapSoundPref;
     }
+
+    const m = safeLocalStorage.getItem(MUSIC_ENABLED_KEY);
+    if (m !== null) this.musicEnabled = m === "true";
+
+    const mv = safeLocalStorage.getItem(MUSIC_VOLUME_KEY);
+    if (mv !== null) this.musicVolume = clamp01(parseFloat(mv) || 0.35);
   }
 
-  private snapSoundPref: SnapSoundPref = "default";
+  // ---------- Public setters/getters ----------
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+    safeLocalStorage.setItem(SOUND_ENABLED_KEY, enabled ? "true" : "false");
+  }
+  isEnabled() {
+    return this.enabled;
+  }
+
+  setVolume(volume: number) {
+    this.volume = clamp01(volume);
+    safeLocalStorage.setItem(SOUND_VOLUME_KEY, this.volume.toString());
+  }
+  getVolume() {
+    return this.volume;
+  }
+
+  setHapticsEnabled(enabled: boolean) {
+    this.hapticsEnabled = enabled;
+    safeLocalStorage.setItem(HAPTICS_ENABLED_KEY, enabled ? "true" : "false");
+  }
+  isHapticsEnabled() {
+    return this.hapticsEnabled;
+  }
 
   setSnapSoundPref(pref: SnapSoundPref) {
     this.snapSoundPref = pref;
-    try {
-      localStorage.setItem(SNAP_SOUND_KEY, pref);
-    } catch {
-      /* ignore */
-    }
+    safeLocalStorage.setItem(SNAP_SOUND_KEY, pref);
   }
-
-  getSnapSoundPref(): SnapSoundPref {
+  getSnapSoundPref() {
     return this.snapSoundPref;
   }
 
-  // Vibrate if supported and enabled
+  setMusicEnabled(enabled: boolean) {
+    this.musicEnabled = enabled;
+    safeLocalStorage.setItem(MUSIC_ENABLED_KEY, enabled ? "true" : "false");
+    if (enabled && !this.paused) {
+      void this.startAmbient();
+    } else {
+      this.stopAmbient();
+    }
+  }
+  isMusicEnabled() {
+    return this.musicEnabled;
+  }
+
+  setMusicVolume(vol: number) {
+    this.musicVolume = clamp01(vol);
+    safeLocalStorage.setItem(MUSIC_VOLUME_KEY, this.musicVolume.toString());
+    this.updateAmbientGain();
+  }
+  getMusicVolume() {
+    return this.musicVolume;
+  }
+
+  setPaused(paused: boolean) {
+    if (this.paused === paused) return;
+    this.paused = paused;
+    if (paused) this.stopAmbient();
+    else if (this.musicEnabled) void this.startAmbient();
+  }
+  isPaused() {
+    return this.paused;
+  }
+
+  onThemeChange() {
+    if (this.musicEnabled && !this.paused) {
+      void this.startAmbient();
+    }
+  }
+
+  tryStartAmbientIfEnabled() {
+    if (this.musicEnabled && !this.paused) {
+      void this.startAmbient();
+    }
+  }
+
+  /** Stop ambient when leaving the play screen (e.g. navigating to menu). */
+  leavePlayScreen() {
+    this.stopAmbient();
+  }
+
+  // ---------- Haptics ----------
   private vibrate(pattern: number | number[]) {
     if (!this.hapticsEnabled) return;
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       try {
         navigator.vibrate(pattern);
       } catch {
-        // Vibration not supported or blocked
+        // ignore
       }
     }
   }
 
-  play(sound: SoundType, opts?: { groupSize?: number }) {
-    // Trigger haptic feedback (works even if sound is muted)
-    this.triggerHaptic(sound, opts?.groupSize);
-
-    if (!this.enabled) return;
-
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    // Resume context if suspended (browser autoplay policy)
-    if (ctx.state === "suspended") {
-      ctx.resume();
-    }
-
-    switch (sound) {
-      case "pickup":
-        this.playPickup(ctx);
-        break;
-      case "snap":
-        if (this.snapSoundPref === "muted") break;
-        this.playSnap(ctx, opts?.groupSize ?? 2);
-        break;
-      case "place":
-        this.playPlace(ctx);
-        break;
-      case "rotate":
-        this.playRotate(ctx);
-        break;
-      case "complete":
-        this.playComplete(ctx);
-        break;
-      case "undo":
-        this.playUndo(ctx);
-        break;
-    }
-  }
-
-  // Trigger haptic feedback based on sound type
   private triggerHaptic(sound: SoundType, groupSize?: number) {
     switch (sound) {
       case "pickup":
-        // Light tap
         this.vibrate(10);
         break;
       case "snap": {
-        // Scale by group size: small = subtle, large = stronger
         const snapStrength = groupSize != null ? Math.min(50, 15 + groupSize * 6) : 25;
         this.vibrate(snapStrength);
         break;
       }
       case "place":
-        // Heavier thunk
-        this.vibrate(40);
+        this.vibrate(30);
         break;
       case "rotate":
-        // Quick buzz
-        this.vibrate(15);
+        this.vibrate(12);
         break;
       case "complete":
-        // Celebration pattern: short-pause-short-pause-long
-        this.vibrate([50, 50, 50, 50, 100]);
+        this.vibrate([40, 45, 40, 45, 90]);
         break;
       case "undo":
-        // Quick reverse buzz
-        this.vibrate(20);
+        this.vibrate(18);
         break;
     }
+  }
+
+  // ---------- Core tone/noise helpers ----------
+  private ensureReverb(ctx: AudioContext) {
+    if (this.masterReverb) return this.masterReverb;
+    const conv = ctx.createConvolver();
+    conv.buffer = createTinyImpulse(ctx);
+    this.masterReverb = conv;
+    return conv;
   }
 
   private playTone(
@@ -193,13 +288,16 @@ class SoundManager {
       duration: number;
       start?: number;
       freqRamp?: { to: number; at: number };
+      pan?: number; // -1..1
+      toReverb?: boolean;
     },
   ) {
     const start = opts.start ?? ctx.currentTime;
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+    const panner = ctx.createStereoPanner();
+
     osc.type = opts.type ?? "sine";
     osc.frequency.setValueAtTime(opts.freq, start);
     if (opts.freqRamp) {
@@ -208,500 +306,313 @@ class SoundManager {
         start + opts.freqRamp.at,
       );
     }
-    gain.gain.setValueAtTime(opts.vol, start);
-    gain.gain.exponentialDecayTo(0.001, start + opts.duration);
+
+    // Smooth attack, fast decay
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, opts.vol), start + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + opts.duration);
+
+    panner.pan.value = clamp01((opts.pan ?? 0) + 1) * 2 - 1;
+
+    osc.connect(gain);
+    gain.connect(panner);
+
+    if (opts.toReverb) {
+      const reverb = this.ensureReverb(ctx);
+      const wet = ctx.createGain();
+      wet.gain.value = 0.25;
+      panner.connect(reverb);
+      reverb.connect(wet);
+      wet.connect(ctx.destination);
+
+      // still send dry
+      const dry = ctx.createGain();
+      dry.gain.value = 0.85;
+      panner.connect(dry);
+      dry.connect(ctx.destination);
+    } else {
+      panner.connect(ctx.destination);
+    }
+
     osc.start(start);
-    osc.stop(start + opts.duration);
+    osc.stop(start + opts.duration + 0.02);
   }
 
-  private playPickup(ctx: AudioContext) {
-    const theme = getTheme();
-    const t = ctx.currentTime;
-    if (theme === "space") {
-      // Sci-fi blip: soft square wave with quick decay
-      this.playTone(ctx, {
-        freq: 480,
-        type: "square",
-        vol: this.volume * 0.08,
-        duration: 0.06,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 720,
-        type: "square",
-        vol: this.volume * 0.06,
-        duration: 0.05,
-        start: t + 0.02,
-      });
-    } else if (theme === "ocean") {
-      // Bubble pop: bright sine that rises
-      this.playTone(ctx, {
-        freq: 600,
-        type: "sine",
-        vol: this.volume * 0.1,
-        duration: 0.08,
-        start: t,
-        freqRamp: { to: 1200, at: 0.04 },
-      });
-    } else if (theme === "forest") {
-      // Leaf rustle: two soft chirps
-      this.playTone(ctx, {
-        freq: 880,
-        type: "sine",
-        vol: this.volume * 0.1,
-        duration: 0.04,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 1100,
-        type: "sine",
-        vol: this.volume * 0.08,
-        duration: 0.035,
-        start: t + 0.03,
-      });
-    } else if (theme === "sunset") {
-      // Sunset: warm glow, soft triangle with gentle sustain
-      this.playTone(ctx, {
-        freq: 520,
-        type: "triangle",
-        vol: this.volume * 0.12,
-        duration: 0.1,
-      });
-    } else {
-      // Light/dark: default
-      this.playTone(ctx, { freq: 800, vol: this.volume * 0.15, duration: 0.05 });
-    }
-  }
-
-  private playSnapByPref(
+  private playNoiseClick(
     ctx: AudioContext,
-    pref: Exclude<SnapSoundPref, "default" | "muted">,
-    groupSize: number,
+    opts: {
+      vol: number;
+      duration: number;
+      start?: number;
+      bandpassHz?: number;
+      toReverb?: boolean;
+    },
   ) {
-    const t = ctx.currentTime;
-    const volScale = Math.max(0.5, Math.min(1, 0.5 + (groupSize - 2) * 0.06));
-    if (pref === "classic") {
-      this.playTone(ctx, {
-        freq: 1200 * volScale,
-        vol: this.volume * 0.35 * volScale,
-        duration: 0.07,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 1800 * volScale,
-        vol: this.volume * 0.2 * volScale,
-        duration: 0.05,
-        start: t + 0.02,
-      });
-    } else if (pref === "soft") {
-      this.playTone(ctx, {
-        freq: 880 * volScale,
-        type: "sine",
-        vol: this.volume * 0.18 * volScale,
-        duration: 0.08,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 1320 * volScale,
-        type: "sine",
-        vol: this.volume * 0.1 * volScale,
-        duration: 0.06,
-        start: t + 0.025,
-      });
-    } else if (pref === "punchy") {
-      this.playTone(ctx, {
-        freq: 200,
-        type: "square",
-        vol: this.volume * 0.2 * volScale,
-        duration: 0.03,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: 1400 * volScale,
-        vol: this.volume * 0.45 * volScale,
-        duration: 0.06,
-        start: t + 0.01,
-      });
+    const start = opts.start ?? ctx.currentTime;
+    const src = ctx.createBufferSource();
+    src.buffer = createNoiseBuffer(ctx, opts.duration);
+
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = opts.bandpassHz ?? 1400;
+    filter.Q.value = 1.2;
+
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, opts.vol), start + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + opts.duration);
+
+    src.connect(filter);
+    filter.connect(gain);
+
+    if (opts.toReverb) {
+      const reverb = this.ensureReverb(ctx);
+      const wet = ctx.createGain();
+      wet.gain.value = 0.22;
+      gain.connect(reverb);
+      reverb.connect(wet);
+      wet.connect(ctx.destination);
+
+      const dry = ctx.createGain();
+      dry.gain.value = 0.9;
+      gain.connect(dry);
+      dry.connect(ctx.destination);
+    } else {
+      gain.connect(ctx.destination);
+    }
+
+    src.start(start);
+    src.stop(start + opts.duration + 0.02);
+  }
+
+  // ---------- SFX ----------
+  play(sound: SoundType, opts?: { groupSize?: number }) {
+    this.triggerHaptic(sound, opts?.groupSize);
+
+    if (!this.enabled) return;
+
+    const ctx = this.getContext();
+    if (!ctx) return;
+    resumeIfSuspended(ctx);
+
+    const sfxHelpers = {
+      volume: this.volume,
+      snapSoundPref: this.snapSoundPref,
+      playTone: this.playTone.bind(this),
+      playNoiseClick: this.playNoiseClick.bind(this),
+    };
+
+    switch (sound) {
+      case "pickup":
+        playPickupSfx(ctx, sfxHelpers);
+        break;
+      case "snap":
+        if (this.snapSoundPref === "muted") break;
+        playSnapSfx(ctx, sfxHelpers, opts?.groupSize ?? 2);
+        break;
+      case "place":
+        playPlaceSfx(ctx, sfxHelpers);
+        break;
+      case "rotate":
+        playRotateSfx(ctx, sfxHelpers);
+        break;
+      case "complete":
+        playCompleteSfx(ctx, sfxHelpers);
+        break;
+      case "undo":
+        playUndoSfx(ctx, sfxHelpers);
+        break;
     }
   }
 
-  private playSnap(ctx: AudioContext, groupSize: number = 2) {
-    const pref = this.snapSoundPref;
-    if (pref === "muted") return;
-    if (pref !== "default") {
-      this.playSnapByPref(ctx, pref, groupSize);
-      return;
+  // ---------- Ambient music ----------
+  private updateAmbientGain() {
+    if (!this.ambientGain) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+    this.ambientGain.gain.setTargetAtTime(this.musicVolume, ctx.currentTime, 0.08);
+  }
+
+  private stopAmbient() {
+    for (const stop of this.ambientStops) {
+      try {
+        stop();
+      } catch {
+        // ignore
+      }
     }
+    this.ambientStops = [];
+
+    if (this.ambientGain) {
+      try {
+        this.ambientGain.disconnect();
+      } catch {
+        // ignore
+      }
+    }
+    this.ambientGain = null;
+    this.ambientTheme = null;
+  }
+
+  private async startAmbient() {
+    this.stopAmbient();
+
+    const ctx = this.getContext();
+    if (!ctx) return;
+    if (!this.musicEnabled || this.paused) return;
+
+    if (ctx.state === "suspended") {
+      try {
+        await ctx.resume();
+      } catch {
+        return;
+      }
+      if (!this.musicEnabled || this.paused) return;
+    }
+
     const theme = getTheme();
-    const t = ctx.currentTime;
-    const clamp = (n: number) => Math.max(0, Math.min(1, n));
-    const volScale = clamp(0.5 + (groupSize - 2) * 0.06);
-    const freqScale = Math.max(0.65, 1 - (groupSize - 1) * 0.05);
-    if (theme === "space") {
-      const baseFreq = 660 * freqScale;
-      this.playTone(ctx, {
-        freq: baseFreq,
-        type: "square",
-        vol: this.volume * 0.25 * volScale,
-        duration: 0.06 + groupSize * 0.008,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: baseFreq * 2,
-        type: "square",
-        vol: this.volume * 0.2 * volScale,
-        duration: 0.08 + groupSize * 0.01,
-        start: t + 0.02,
-      });
-    } else if (theme === "ocean") {
-      const baseFreq = 880 * freqScale;
-      this.playTone(ctx, {
-        freq: baseFreq,
-        type: "sine",
-        vol: this.volume * 0.32 * volScale,
-        duration: 0.05 + groupSize * 0.006,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: baseFreq * 2,
-        type: "sine",
-        vol: this.volume * 0.18 * volScale,
-        duration: 0.05 + groupSize * 0.005,
-        start: t + 0.015,
-      });
-    } else if (theme === "forest") {
-      const baseFreq = 660 * freqScale;
-      this.playTone(ctx, {
-        freq: baseFreq,
-        type: "sine",
-        vol: this.volume * 0.35 * volScale,
-        duration: 0.05 + groupSize * 0.007,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: baseFreq * 1.5,
-        type: "sine",
-        vol: this.volume * 0.22 * volScale,
-        duration: 0.06 + groupSize * 0.01,
-        start: t + 0.02,
-      });
+    this.ambientTheme = theme;
+
+    const gain = ctx.createGain();
+    gain.gain.value = this.musicVolume;
+    gain.connect(ctx.destination);
+    this.ambientGain = gain;
+
+    // Route a little reverb for ambience
+    const reverb = this.ensureReverb(ctx);
+    const wet = ctx.createGain();
+    wet.gain.value = 0.18;
+    reverb.connect(wet);
+    wet.connect(gain);
+
+    const helpers = {
+      playTone: this.playTone.bind(this),
+      playNoiseClick: this.playNoiseClick.bind(this),
+      createPadOsc: this.createPadOsc.bind(this),
+      scheduleChordFades: this.scheduleChordFades.bind(this),
+      createNoiseBuffer,
+    };
+    if (theme === "ocean") {
+      this.ambientStops = createOceanMusic(ctx, gain, reverb, helpers);
     } else if (theme === "sunset") {
-      const baseFreq = 880 * freqScale;
-      this.playTone(ctx, {
-        freq: baseFreq,
-        type: "triangle",
-        vol: this.volume * 0.3 * volScale,
-        duration: 0.07 + groupSize * 0.008,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: baseFreq * 1.5,
-        type: "triangle",
-        vol: this.volume * 0.18 * volScale,
-        duration: 0.06 + groupSize * 0.006,
-        start: t + 0.02,
-      });
-    } else {
-      const baseFreq = 1200 * freqScale;
-      this.playTone(ctx, {
-        freq: baseFreq,
-        vol: this.volume * 0.4 * volScale,
-        duration: 0.08 + groupSize * 0.008,
-        start: t,
-      });
-      this.playTone(ctx, {
-        freq: baseFreq * 1.5,
-        vol: this.volume * 0.2 * volScale,
-        duration: 0.06 + groupSize * 0.006,
-        start: t + 0.02,
-      });
-    }
-  }
-
-  private playPlace(ctx: AudioContext) {
-    const theme = getTheme();
-    const t = ctx.currentTime;
-    const softClickVol = this.volume * 0.15;
-    if (theme === "space") {
-      // Deep thunk: magnetic clamp
-      this.playTone(ctx, {
-        freq: 220,
-        type: "square",
-        vol: this.volume * 0.3,
-        duration: 0.2,
-        freqRamp: { to: 80, at: 0.15 },
-      });
-      this.playTone(ctx, {
-        freq: 1200,
-        type: "sine",
-        vol: softClickVol,
-        duration: 0.04,
-        start: t,
-      });
-    } else if (theme === "ocean") {
-      // Plop: water settling
-      this.playTone(ctx, {
-        freq: 440,
-        type: "sine",
-        vol: this.volume * 0.4,
-        duration: 0.16,
-        freqRamp: { to: 180, at: 0.12 },
-      });
-      this.playTone(ctx, {
-        freq: 1400,
-        type: "sine",
-        vol: softClickVol,
-        duration: 0.035,
-        start: t,
-      });
+      this.ambientStops = createSunsetMusic(ctx, gain, reverb, helpers);
+    } else if (theme === "space") {
+      this.ambientStops = createSpaceMusic(ctx, gain, reverb, helpers);
     } else if (theme === "forest") {
-      // Soft thud: mossy landing
-      this.playTone(ctx, {
-        freq: 280,
-        type: "sine",
-        vol: this.volume * 0.38,
-        duration: 0.18,
-        freqRamp: { to: 140, at: 0.12 },
-      });
-      this.playTone(ctx, {
-        freq: 1100,
-        type: "sine",
-        vol: softClickVol,
-        duration: 0.04,
-        start: t,
-      });
-    } else if (theme === "sunset") {
-      // Sunset: warm settle, cozy drop
-      this.playTone(ctx, {
-        freq: 330,
-        type: "triangle",
-        vol: this.volume * 0.42,
-        duration: 0.17,
-        freqRamp: { to: 165, at: 0.11 },
-      });
-      this.playTone(ctx, {
-        freq: 1300,
-        type: "triangle",
-        vol: softClickVol,
-        duration: 0.035,
-        start: t,
-      });
+      this.ambientStops = createForestMusic(ctx, gain, reverb, helpers);
     } else {
-      // Light/dark: default
-      this.playTone(ctx, {
-        freq: 400,
-        type: "triangle",
-        vol: this.volume * 0.5,
-        duration: 0.15,
-        freqRamp: { to: 200, at: 0.1 },
-      });
-      this.playTone(ctx, {
-        freq: 1000,
-        type: "sine",
-        vol: softClickVol,
-        duration: 0.045,
-        start: t,
-      });
+      this.ambientStops = createLightDarkMusic(ctx, gain, reverb, helpers);
     }
   }
 
-  private playUndo(ctx: AudioContext) {
-    const theme = getTheme();
-    const t = ctx.currentTime;
-    // Subtle "rewind" tone - soft, descending
-    if (
-      theme === "space" ||
-      theme === "ocean" ||
-      theme === "forest" ||
-      theme === "sunset"
-    ) {
-      this.playTone(ctx, {
-        freq: 400,
-        type: "sine",
-        vol: this.volume * 0.12,
-        duration: 0.06,
-        start: t,
-        freqRamp: { to: 200, at: 0.04 },
-      });
+  /**
+   * MUSIC DESIGN NOTES
+   * - These are true loops made from layers:
+   *   1) pad (slow chords)
+   *   2) gentle motion (arp or melody)
+   *   3) texture (noise filtered)
+   * - All scheduled using periodic functions + setInterval for simplicity
+   * - Each stop function cancels intervals and stops sources
+   */
+
+  private createPadOsc(
+    ctx: AudioContext,
+    destination: AudioNode,
+    opts: {
+      freq: number;
+      vol: number;
+      type?: OscillatorType;
+      detune?: number;
+      toReverb?: boolean;
+    },
+  ): { stop: StopFn; gain: GainNode } {
+    const osc = ctx.createOscillator();
+    osc.type = opts.type ?? "sine";
+    osc.frequency.value = opts.freq;
+    if (opts.detune) osc.detune.value = opts.detune;
+
+    const g = ctx.createGain();
+    g.gain.value = 0.0001;
+
+    osc.connect(g);
+
+    if (opts.toReverb) {
+      // Send to reverb by connecting gain to convolver
+      // Caller passes the convolver as destination when needed
+      g.connect(destination);
     } else {
-      this.playTone(ctx, {
-        freq: 350,
-        type: "triangle",
-        vol: this.volume * 0.12,
-        duration: 0.06,
-        start: t,
-        freqRamp: { to: 180, at: 0.04 },
-      });
+      g.connect(destination);
     }
+
+    const now = ctx.currentTime;
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, opts.vol), now + 0.8);
+
+    osc.start();
+    return {
+      gain: g,
+      stop: () => {
+        try {
+          const t = ctx.currentTime;
+          g.gain.cancelScheduledValues(t);
+          g.gain.setTargetAtTime(0.0001, t, 0.12);
+          osc.stop(t + 0.35);
+        } catch {
+          // ignore
+        }
+      },
+    };
   }
 
-  private playRotate(ctx: AudioContext) {
-    const theme = getTheme();
-    if (theme === "space") {
-      // Servo whir: ascending square
-      this.playTone(ctx, {
-        freq: 200,
-        type: "square",
-        vol: this.volume * 0.12,
-        duration: 0.1,
-        freqRamp: { to: 500, at: 0.08 },
-      });
-    } else if (theme === "ocean") {
-      // Swirl: quick sine sweep
-      this.playTone(ctx, {
-        freq: 400,
-        type: "sine",
-        vol: this.volume * 0.15,
-        duration: 0.08,
-        freqRamp: { to: 800, at: 0.06 },
-      });
-    } else if (theme === "forest") {
-      // Branch creak: low-to-mid
-      this.playTone(ctx, {
-        freq: 220,
-        type: "sine",
-        vol: this.volume * 0.16,
-        duration: 0.09,
-        freqRamp: { to: 440, at: 0.07 },
-      });
-    } else if (theme === "sunset") {
-      // Sunset: gentle turn, warm triangle sweep
-      this.playTone(ctx, {
-        freq: 260,
-        type: "triangle",
-        vol: this.volume * 0.18,
-        duration: 0.1,
-        freqRamp: { to: 520, at: 0.08 },
-      });
-    } else {
-      // Light/dark: default
-      this.playTone(ctx, {
-        freq: 300,
-        vol: this.volume * 0.2,
-        duration: 0.1,
-        freqRamp: { to: 600, at: 0.1 },
-      });
-    }
-  }
+  private scheduleChordFades(
+    ctx: AudioContext,
+    padGains: GainNode[],
+    chordSeq: number[][],
+    beatSec: number,
+    chordBeats: number,
+    baseVol: number,
+  ): { stop: StopFn } {
+    let idx = 0;
+    const applyChord = (chord: number[]) => {
+      for (let i = 0; i < padGains.length; i += 1) {
+        const g = padGains[i];
+        const freq = chord[i % chord.length];
+        const osc = (g as GainNodeWithOsc).__osc;
+        if (osc) {
+          osc.frequency.setTargetAtTime(freq, ctx.currentTime, 0.08);
+        }
+      }
+      // gentle swell
+      for (const g of padGains) {
+        const t = ctx.currentTime;
+        g.gain.cancelScheduledValues(t);
+        g.gain.setTargetAtTime(baseVol, t, 0.22);
+      }
+    };
 
-  private playComplete(ctx: AudioContext) {
-    const theme = getTheme();
-    if (theme === "space") {
-      // Sci-fi victory: minor arpeggio, square wave
-      const notes = [349.23, 415.3, 523.25, 698.46]; // F4, G#4, C5, F5
-      const step = 0.2;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "square";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.22, start + 0.02);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.15);
-        osc.start(start);
-        osc.stop(start + step + 0.15);
-      });
-    } else if (theme === "ocean") {
-      // Wave crest: bright major arpeggio
-      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
-      const step = 0.16;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "sine";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.4, start + 0.025);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.12);
-        osc.start(start);
-        osc.stop(start + step + 0.12);
-      });
-    } else if (theme === "forest") {
-      // Birdsong finish: natural major
-      const notes = [392, 523.25, 659.25, 1046.5]; // G4, C5, E5, C6
-      const step = 0.18;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "sine";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.36, start + 0.03);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.14);
-        osc.start(start);
-        osc.stop(start + step + 0.14);
-      });
-    } else if (theme === "sunset") {
-      // Sunset: golden hour, warm triangle chord
-      const notes = [392, 493.88, 587.33, 783.99]; // G4, B4, D5, G5
-      const step = 0.17;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "triangle";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.38, start + 0.025);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.12);
-        osc.start(start);
-        osc.stop(start + step + 0.12);
-      });
-    } else {
-      // Light/dark: default celebration
-      const notes = [523.25, 659.25, 783.99, 1046.5];
-      const step = 0.15;
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * step;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "sine";
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(this.volume * 0.4, start + 0.02);
-        gain.gain.exponentialDecayTo(0.001, start + step + 0.1);
-        osc.start(start);
-        osc.stop(start + step + 0.1);
-      });
-      const chordTime = ctx.currentTime + notes.length * step;
-      [523.25, 659.25, 783.99].forEach((freq) => {
-        this.playTone(ctx, {
-          freq,
-          vol: this.volume * 0.3,
-          duration: 0.5,
-          start: chordTime,
-        });
-      });
-    }
+    // Attach oscillators for convenience
+    // (we set __osc right after creating them in music builders)
+    const interval = window.setInterval(
+      () => {
+        idx = (idx + 1) % chordSeq.length;
+        applyChord(chordSeq[idx]);
+      },
+      Math.floor(beatSec * chordBeats * 1000),
+    );
+
+    // Apply immediately
+    applyChord(chordSeq[0]);
+
+    return {
+      stop: () => {
+        clearInterval(interval);
+      },
+    };
   }
 }
 
-// Polyfill for exponentialDecayTo (not standard)
-declare global {
-  interface AudioParam {
-    exponentialDecayTo(value: number, endTime: number): void;
-  }
-}
+export const soundEngine = new SoundEngine();
+soundEngine.loadPreferences();
 
-AudioParam.prototype.exponentialDecayTo = function (value: number, endTime: number) {
-  this.exponentialRampToValueAtTime(Math.max(value, 0.0001), endTime);
-};
-
-// Singleton instance
-export const soundManager = new SoundManager();
-
-// Initialize preferences on load
-soundManager.loadPreferences();
+/** SFX + haptics. Ambient music is @/audio/audioManager. */
+export const soundManager = soundEngine;

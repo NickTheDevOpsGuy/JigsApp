@@ -1,0 +1,369 @@
+/**
+ * LeaderboardTab – Today / Week / All-time leaderboards, filters, weekly album.
+ */
+import { Filter, ChevronDown } from "lucide-react";
+import type { LeaderboardEntry } from "@/services/leaderboardService";
+import type { PieceCutType, VisualModifierFilter } from "@/services/leaderboardService";
+import { DailyCountdown } from "@/components/DailyCountdown/DailyCountdown";
+import { formatTime, formatGap, PODIUM } from "../statsFormatting";
+import styles from "../StatsScreen.module.css";
+
+export type LeaderboardType = "today" | "week" | "alltime";
+export type WeekSubview = "rankings" | "album";
+
+export interface WeeklyAlbumSlot {
+  date: string;
+  dayLabel: string;
+  imageUrl: string | null;
+  completed: boolean;
+  mastery: boolean;
+  isToday: boolean;
+  isFuture: boolean;
+}
+
+interface LeaderboardTabProps {
+  leaderboardType: LeaderboardType;
+  setLeaderboardType: (t: LeaderboardType) => void;
+  weekSubview: WeekSubview;
+  setWeekSubview: (s: WeekSubview) => void;
+  allTimeGrid: "3x3" | "4x4" | "5x5" | "6x6";
+  setAllTimeGrid: (g: "3x3" | "4x4" | "5x5" | "6x6") => void;
+  filtersOpen: boolean;
+  setFiltersOpen: (f: boolean | ((prev: boolean) => boolean)) => void;
+  cutTypeFilter: PieceCutType;
+  setCutTypeFilter: (c: PieceCutType) => void;
+  modifierFilter: VisualModifierFilter;
+  setModifierFilter: (m: VisualModifierFilter) => void;
+  leaderboard: LeaderboardEntry[];
+  weeklyTotalsLeaderboard: { rank: number; count: number; displayName: string }[];
+  todayCompletionCount: number;
+  weeklyAlbumSlots: WeeklyAlbumSlot[];
+  weeklyAlbumProgress: number;
+  weeklyCompleted: number;
+  weekRangeLabel: string;
+  loadData: () => Promise<void>;
+  rowAnimEpoch: number;
+}
+
+function renderTimeList(
+  entries: LeaderboardEntry[],
+  emptyMsg: string,
+  rowAnimEpoch: number,
+  compact: boolean,
+  showChampionBadge = false,
+) {
+  if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
+  return (
+    <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
+      {entries.map((entry, index) => {
+        const key = `time-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
+        const next = entries[index + 1]?.elapsedSeconds;
+        const gapInfo =
+          index === 0 && typeof next === "number"
+            ? `+${formatGap(next - entry.elapsedSeconds)} ahead of #2`
+            : index === 1 && typeof next === "number"
+              ? `+${formatGap(next - entry.elapsedSeconds)} ahead of #3`
+              : null;
+        return (
+          <li
+            key={key}
+            className={`${styles.leaderboardItem} ${
+              entry.rank <= 3 ? styles.leaderboardPodium : ""
+            } ${styles.leaderboardRowEnter}`}
+            style={{ animationDelay: `${index * 45}ms` }}
+          >
+            <span className={styles.rank}>
+              {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+            </span>
+            <span className={styles.player}>
+              {entry.displayName}
+              {showChampionBadge && entry.rank === 1 && (
+                <span className={styles.championBadge} title="Challenge winner">
+                  {" "}
+                  🏆
+                </span>
+              )}
+            </span>
+            <span className={styles.timeCol}>
+              <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
+              {gapInfo && <span className={styles.gapInfo}>{gapInfo}</span>}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function renderCompletionList(
+  entries: { rank: number; count: number; displayName: string }[],
+  rowAnimEpoch: number,
+  compact: boolean,
+  emptyMsg = "No completions yet. Play puzzles!",
+) {
+  if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
+  return (
+    <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
+      {entries.map((entry) => {
+        const key = `completion-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
+        return (
+          <li
+            key={key}
+            className={`${styles.leaderboardItem} ${
+              entry.rank <= 3 ? styles.leaderboardPodium : ""
+            } ${styles.leaderboardRowEnter}`}
+            style={{ animationDelay: `${(entry.rank - 1) * 45}ms` }}
+          >
+            <span className={styles.rank}>
+              {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+            </span>
+            <span className={styles.player}>{entry.displayName}</span>
+            <span className={styles.time}>{entry.count} puzzles</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+export function LeaderboardTab({
+  leaderboardType,
+  setLeaderboardType,
+  weekSubview,
+  setWeekSubview,
+  allTimeGrid,
+  setAllTimeGrid,
+  filtersOpen,
+  setFiltersOpen,
+  cutTypeFilter,
+  setCutTypeFilter,
+  modifierFilter,
+  setModifierFilter,
+  leaderboard,
+  weeklyTotalsLeaderboard,
+  todayCompletionCount,
+  weeklyAlbumSlots,
+  weeklyAlbumProgress,
+  weeklyCompleted,
+  weekRangeLabel,
+  loadData,
+  rowAnimEpoch,
+}: LeaderboardTabProps) {
+  const compact = true;
+
+  return (
+    <div className={styles.section}>
+      <div className={styles.leaderboardHeader}>
+        <div className={styles.boardModeSwitch} role="tablist" aria-label="Board mode">
+          <button
+            type="button"
+            className={`${styles.boardModeBtn} ${
+              leaderboardType === "today" ? styles.boardModeBtnActive : ""
+            }`}
+            onClick={() => setLeaderboardType("today")}
+          >
+            Today
+          </button>
+          <button
+            type="button"
+            className={`${styles.boardModeBtn} ${
+              leaderboardType === "week" ? styles.boardModeBtnActive : ""
+            }`}
+            onClick={() => setLeaderboardType("week")}
+          >
+            Week
+          </button>
+          <button
+            type="button"
+            className={`${styles.boardModeBtn} ${
+              leaderboardType === "alltime" ? styles.boardModeBtnActive : ""
+            }`}
+            onClick={() => setLeaderboardType("alltime")}
+          >
+            All-time
+          </button>
+        </div>
+        {leaderboardType === "today" && (
+          <div className={styles.countdownWrap}>
+            <DailyCountdown
+              variant="untilReset"
+              onUnlock={() => {
+                if (leaderboardType === "today") loadData();
+              }}
+            />
+          </div>
+        )}
+        <button
+          type="button"
+          className={styles.filtersBar}
+          onClick={() => setFiltersOpen((o) => !o)}
+          aria-expanded={filtersOpen}
+          aria-label="Filters"
+        >
+          <Filter size={18} />
+          <span>Filters</span>
+          <ChevronDown
+            size={18}
+            className={filtersOpen ? styles.filtersChevronOpen : ""}
+          />
+        </button>
+        {filtersOpen && (
+          <div className={styles.controlsRow}>
+            {(leaderboardType === "today" || leaderboardType === "alltime") && (
+              <>
+                <select
+                  id="cut-type-select"
+                  className={styles.inlineFilterSelect}
+                  value={cutTypeFilter}
+                  onChange={(e) => setCutTypeFilter(e.target.value as PieceCutType)}
+                  aria-label="Filter by shape"
+                >
+                  <option value="all">All Shapes</option>
+                  <option value="classic">Classic Shape</option>
+                  <option value="irregular">Irregular Shape</option>
+                  <option value="hard">Hard Shape</option>
+                </select>
+                <select
+                  id="modifier-select"
+                  className={styles.inlineFilterSelect}
+                  value={modifierFilter}
+                  onChange={(e) =>
+                    setModifierFilter(e.target.value as VisualModifierFilter)
+                  }
+                  aria-label="Filter by modifier"
+                >
+                  <option value="all">All Modifiers</option>
+                  <option value="none">No Modifier</option>
+                  <option value="fog">Fog Modifier</option>
+                  <option value="night">Night Modifier</option>
+                  <option value="sepia">Sepia Modifier</option>
+                </select>
+              </>
+            )}
+            {leaderboardType === "alltime" && (
+              <select
+                id="alltime-grid-select"
+                className={styles.inlineFilterSelect}
+                value={allTimeGrid}
+                onChange={(e) =>
+                  setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")
+                }
+                aria-label="Filter all-time by grid size"
+              >
+                <option value="3x3">3x3 Grid</option>
+                <option value="4x4">4x4 Grid</option>
+                <option value="5x5">5x5 Grid</option>
+                <option value="6x6">6x6 Grid</option>
+              </select>
+            )}
+          </div>
+        )}
+        {leaderboardType === "week" && (
+          <div className={styles.weekSubviewSwitch}>
+            <button
+              type="button"
+              className={`${styles.weekSubviewBtn} ${
+                weekSubview === "rankings" ? styles.weekSubviewBtnActive : ""
+              }`}
+              onClick={() => setWeekSubview("rankings")}
+            >
+              Rankings
+            </button>
+            <button
+              type="button"
+              className={`${styles.weekSubviewBtn} ${
+                weekSubview === "album" ? styles.weekSubviewBtnActive : ""
+              }`}
+              onClick={() => setWeekSubview("album")}
+            >
+              Album
+            </button>
+          </div>
+        )}
+      </div>
+      {(leaderboardType === "week" || leaderboardType === "alltime") && (
+        <h2 className={styles.leaderboardSubtitle}>
+          {leaderboardType === "week" &&
+            (weekSubview === "rankings"
+              ? `Weekly Rankings (${weekRangeLabel})`
+              : `Weekly Album (${weekRangeLabel})`)}
+          {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
+        </h2>
+      )}
+      {leaderboardType === "today" && (
+        <p className={styles.todayCompletionCount} aria-live="polite">
+          {todayCompletionCount} completion{todayCompletionCount !== 1 ? "s" : ""} so far
+        </p>
+      )}
+      {leaderboardType === "week" && weekSubview === "rankings" && (
+        <div className={styles.weekProgressStrip}>
+          <span>Weekly Album Progress</span>
+          <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong> days
+        </div>
+      )}
+      {leaderboardType === "today" &&
+        renderTimeList(
+          leaderboard,
+          "No completions yet. Be the first!",
+          rowAnimEpoch,
+          compact,
+        )}
+      {leaderboardType === "week" &&
+        weekSubview === "rankings" &&
+        renderCompletionList(
+          weeklyTotalsLeaderboard,
+          rowAnimEpoch,
+          compact,
+          "No completions in the last 7 days.",
+        )}
+      {leaderboardType === "week" && weekSubview === "album" && (
+        <div className={styles.weekAlbumWrap}>
+          <p className={styles.todayCompletionCount}>
+            Weekly collection: {weeklyAlbumProgress}/7 completed
+          </p>
+          <div className={styles.weekAlbumGrid}>
+            {weeklyAlbumSlots.map((slot) => (
+              <div
+                key={slot.date}
+                className={`${styles.weekAlbumSlot} ${
+                  slot.completed ? styles.weekAlbumSlotDone : ""
+                } ${slot.isToday ? styles.weekAlbumSlotToday : ""}`}
+              >
+                <div className={styles.weekAlbumTop}>
+                  <span>{slot.dayLabel}</span>
+                  {slot.completed && slot.mastery && <span title="Mastery">⚡</span>}
+                </div>
+                {slot.completed && slot.imageUrl ? (
+                  <img
+                    src={slot.imageUrl}
+                    alt={`Daily puzzle for ${slot.dayLabel}`}
+                    className={styles.weekAlbumImage}
+                  />
+                ) : (
+                  <div className={styles.weekAlbumHidden}>
+                    {slot.isFuture ? "Locked" : "?"}
+                  </div>
+                )}
+                <div className={styles.weekAlbumFooter}>
+                  {slot.completed ? "Collected" : slot.isFuture ? "Upcoming" : "Missing"}
+                </div>
+              </div>
+            ))}
+          </div>
+          {weeklyAlbumProgress === 7 && (
+            <div className={styles.weekBonusBadge}>
+              🏅 Full week complete! Bonus badge unlocked.
+            </div>
+          )}
+        </div>
+      )}
+      {leaderboardType === "alltime" &&
+        renderTimeList(
+          leaderboard,
+          "No completions for this grid size yet.",
+          rowAnimEpoch,
+          compact,
+        )}
+    </div>
+  );
+}

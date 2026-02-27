@@ -4,6 +4,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/Button/Button";
 import { Modal } from "@/components/Modal/Modal";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import styles from "./TutorialOverlay.module.css";
 
 const TUTORIAL_SEEN_KEY = "phuzzle:tutorialSeen";
@@ -49,7 +50,7 @@ export function TutorialOverlay({
 
   const handleDismiss = () => {
     if (showSkipLink) {
-      localStorage.setItem(TUTORIAL_SEEN_KEY, "true");
+      safeLocalStorage.setItem(TUTORIAL_SEEN_KEY, "true");
     }
     onComplete();
   };
@@ -236,7 +237,7 @@ export function useShouldShowTutorial(): [boolean, () => void] {
   const [shouldShow, setShouldShow] = useState(false);
 
   const dismiss = () => {
-    localStorage.setItem(TUTORIAL_SEEN_KEY, "true");
+    safeLocalStorage.setItem(TUTORIAL_SEEN_KEY, "true");
     setShouldShow(false);
   };
 
@@ -245,7 +246,7 @@ export function useShouldShowTutorial(): [boolean, () => void] {
 
 // Utility to reset tutorial (for testing)
 export function resetTutorial() {
-  localStorage.removeItem(TUTORIAL_SEEN_KEY);
+  safeLocalStorage.removeItem(TUTORIAL_SEEN_KEY);
 }
 
 export default TutorialOverlay;

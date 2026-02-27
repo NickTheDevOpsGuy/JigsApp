@@ -96,8 +96,20 @@
 }
 
 .charCount {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--color-text-secondary);
+}
+
+.charCountNearLimit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-warning, #d97706);
+}
+
+.charCountAtLimit {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-error, #dc2626);
 }
 
 .postBtn {

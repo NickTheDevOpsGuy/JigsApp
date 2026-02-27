@@ -10,6 +10,7 @@ import {
   ReactNode,
 } from "react";
 import { audioManager } from "@/audio/audioManager";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 export type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
 
@@ -37,13 +38,9 @@ const STORAGE_KEY = "phuzzle-theme";
 
 function getStoredTheme(): Theme {
   if (typeof window === "undefined") return "light";
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && THEMES.includes(stored as Theme)) return stored as Theme;
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
-  } catch {
-    // localStorage might not be available
-  }
+  const stored = safeLocalStorage.getItem(STORAGE_KEY);
+  if (stored && THEMES.includes(stored as Theme)) return stored as Theme;
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
   return "light";
 }
 
@@ -78,11 +75,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, theme);
-    } catch {
-      // localStorage might not be available
-    }
+    safeLocalStorage.setItem(STORAGE_KEY, theme);
   }, [theme]);
 
   useEffect(() => {

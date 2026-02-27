@@ -105,20 +105,23 @@
   width: 100%;
 }
 
-/* Mobile adjustments */
+/* Mobile: larger touch targets (44px min for primary actions), keep tap area comfortable */
 @media (max-width: 600px) {
   .sm {
-    padding: 5px 8px;
-    font-size: 12px;
-  }
-
-  .md {
-    padding: 6px 10px;
+    padding: 8px 12px;
+    min-height: 40px;
     font-size: 13px;
   }
 
+  .md {
+    padding: 10px 14px;
+    min-height: 44px;
+    font-size: 14px;
+  }
+
   .lg {
-    padding: 10px 16px;
-    font-size: 15px;
+    padding: 12px 18px;
+    min-height: 48px;
+    font-size: 16px;
   }
 }

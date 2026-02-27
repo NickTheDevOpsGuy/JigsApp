@@ -4,6 +4,8 @@ Lighthouse runs in CI on every PR (performance, accessibility, best practices). 
 
 This doc also explains the common "GitHub token not set" warning and how tokens map between GitHub Actions and LHCI.
 
+**Accessibility (a11y):** The app includes a **skip link** (“Skip to main content”) that is visually hidden until focused (keyboard Tab from top). It moves focus to `<main id="main">`, which wraps the primary content. This helps keyboard and screen reader users bypass repeated navigation. When auditing with Lighthouse or axe, the landmark and skip link should satisfy common a11y checks for “bypass blocks” and main content region.
+
 ---
 
 ## Token naming (what goes where)

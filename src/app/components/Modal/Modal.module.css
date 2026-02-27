@@ -126,6 +126,7 @@
   padding: 20px 24px;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
 }
 
 @media (max-width: 600px) {
@@ -158,6 +159,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
     min-height: 0;
     min-width: 0;
   }

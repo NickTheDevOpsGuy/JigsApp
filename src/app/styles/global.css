@@ -384,12 +384,30 @@ canvas {
   }
   body {
     font-size: var(--font-body-mobile, 15px);
+    /* Prevent overscroll glow/bounce from chaining to parent (e.g. pull-to-refresh) */
+    overscroll-behavior-y: contain;
   }
   h1 {
     font-size: var(--font-h1-mobile, 22px);
   }
   h2 {
     font-size: var(--font-h2-mobile, 18px);
+  }
+  /* 16px prevents iOS from zooming when focusing inputs (accessibility) */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  /* Subtle tap feedback; avoids default gray flash on touch */
+  button,
+  a,
+  [role="button"],
+  [role="tab"],
+  input[type="submit"],
+  input[type="button"] {
+    -webkit-tap-highlight-color: rgba(11, 99, 184, 0.12);
+    tap-highlight-color: rgba(11, 99, 184, 0.12);
   }
 }
 
@@ -411,7 +429,9 @@ select:focus-visible,
   outline-offset: 2px;
 }
 
-/* Respect user's reduced motion preference - disable animations */
+/* Respect user's reduced motion preference – disable CSS animations/transitions.
+   JS-driven effects (e.g. confetti, completion overlay) also check this preference
+   before running (see CompletionOverlay, usePlayScreenManager). */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

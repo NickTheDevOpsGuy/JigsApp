@@ -3,14 +3,15 @@
  * screenToBoard converts client coords to board space; handleWheel, zoomIn/Out, reset.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 const isPanningRef = { current: false };
 const isPinchingRef = { current: false };
 
 const MIN_SCALE = 0.25;
-const MAX_SCALE = 4;
+const MAX_SCALE = 2.5;
 const ZOOM_SENSITIVITY = 0.001;
-const ZOOM_STEP = 0.25;
+const ZOOM_STEP = 0.2;
 const ZOOM_ANIM_MS = 200;
 const VIEWPORT_STORAGE_PREFIX = "phuzzle:viewport:";
 
@@ -22,7 +23,7 @@ function prefersReducedMotion(): boolean {
 function loadViewport(puzzleKey: string | null): ViewportState | null {
   if (!puzzleKey || typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(`${VIEWPORT_STORAGE_PREFIX}${puzzleKey}`);
+    const raw = safeLocalStorage.getItem(`${VIEWPORT_STORAGE_PREFIX}${puzzleKey}`);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as { scale?: number; panX?: number; panY?: number };
     const scale = typeof parsed?.scale === "number" ? parsed.scale : 1;
@@ -39,14 +40,10 @@ function loadViewport(puzzleKey: string | null): ViewportState | null {
 
 function saveViewport(puzzleKey: string | null, v: ViewportState): void {
   if (!puzzleKey || typeof window === "undefined") return;
-  try {
-    localStorage.setItem(
-      `${VIEWPORT_STORAGE_PREFIX}${puzzleKey}`,
-      JSON.stringify({ scale: v.scale, panX: v.panX, panY: v.panY }),
-    );
-  } catch {
-    /* ignore */
-  }
+  safeLocalStorage.setItem(
+    `${VIEWPORT_STORAGE_PREFIX}${puzzleKey}`,
+    JSON.stringify({ scale: v.scale, panX: v.panX, panY: v.panY }),
+  );
 }
 
 export type ViewportState = {

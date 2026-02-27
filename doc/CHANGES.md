@@ -7,15 +7,15 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 ## Core gameplay
 
 - Drag and drop pieces with rotation (tap to rotate on mobile)
-- Board snap and neighbor snap (with near-snap nudge when pieces are close)
+- Board snap and neighbor snap (including during drag for fast moves); near-snap nudge when pieces are close
 - Group merging so connected pieces move together
-- Multiple grid sizes (3×3 to 9×9 presets; custom up to 12×12)
+- Multiple grid sizes (2×2 to 10×10 presets; custom up to 12×12)
 - Image sources: gallery, file upload, camera capture
 - Puzzle packs – curated sets grouped by theme; folder = category (e.g. `puzzles/animals/` → Cozy Animals). Seasonal packs surface as "Season's pick" (spring, summer, fall, winter).
 - **Tray filters** – All, Edges, Color (Filter dropdown in Piece Drawer; pop-up menu)
-- Zoom and pan (animated, persistent per grid size, soft board clamp)
+- Zoom and pan (animated, persistent per grid size, max 2.5× zoom; soft board clamp)
   - Desktop: scroll to zoom, middle mouse drag to pan
-  - Mobile: two-finger pinch zoom and pan, plus single-finger pan on empty space when zoomed
+  - Mobile: two-finger pinch zoom and pan, plus single-finger pan on empty space when zoomed (touch behavior unchanged)
 
 ## Layout
 
@@ -31,8 +31,8 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Snap proximity glow** – Visual feedback while dragging: glow intensifies as you near the correct snap point
 - Reference image preview (full or progressive reveal mode)
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
-- Completion confetti and dynamic badges (Speed Demon, Chill Mode, etc.)
-- **Completion screen** - Share Result button opens popup (Share Card PNG, Seasonal frame, Download); Menu button; removed New Puzzle
+- Completion confetti (layered bursts) and percentile badges (Top 10% / 25% / 50%); dynamic completion badges (Speed Demon, Chill Mode, etc.)
+- **Completion screen** — Redesigned: puzzle image, stats (Time, Moves, Accuracy, Rank), “Can you beat my run?”, **Continue** (primary) and **Share Result** (link). Confetti on win (theme-colored; respects reduced motion and battery saver). Share Result opens popup (Share Card PNG, Seasonal frame, Download).
 - Settings: **About** (Help), **Display** (Theme, piece shape, board options, effects), **Gameplay** (Controls, time), **Audio**, **Advanced**
 - Optional piece borders, edge-piece highlight, immersive mode
 - Edge and corner pieces display full image content (no cropping)
@@ -44,14 +44,16 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Progressive reveal** – Hide full reference; reveal only regions where pieces are correctly placed
 - Battery-saver detection (reduces confetti when low-power or data-saver)
 - Six themes (Light, Dark, Space, Ocean, Forest, Sunset)
+- **Skip to main content** — Link at top (visible on keyboard focus); Tab from top to jump past nav; activating the link scrolls to and focuses `<main id="main">`. See `doc/LIGHTHOUSE.md` for a11y audit notes.
 - Keyboard navigation in hamburger menu (Arrow keys, Escape)
 - Haptic feedback (tap, snap, place, rotate)
 - Sound effects (toggle in Audio)
-- `prefers-reduced-motion` support
+- `prefers-reduced-motion` support (CSS animations and confetti/tray pulse disabled)
+- Loading spinners on Stats and Packs while data loads
 
 ## Social and progress
 
-- **Daily puzzle comments & reactions** – After completing today's puzzle: emoji reactions (👍 🎉 🔥 ✨ 💪), 280-char comments, report for moderation
+- **Daily puzzle comments & reactions** – After completing today's puzzle: emoji reactions (👍 🎉 🔥 ✨ 💪), 280-char comments with live character counter (near-limit styling), report for moderation
 - Daily puzzle and streak tracking
 - **Daily countdown** – Server-synced timer to next daily unlock on Leaderboard; celebration when ready
 - **Streak freeze (streak shield)** – Earn one per week after a 5-day streak; auto-applied if you miss a day. See [streak-freeze.md](./streak-freeze.md).
@@ -64,5 +66,14 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 ## Analytics
 
 - **Live completion counter** – Real-time count of today's completions (Stats → Leaderboard → Today)
-- **Percentile ranking** – "Top X%" on completion overlay, per grid size
+- **Percentile ranking** – "Top X%" and visual badge (Top 10% / 25% / 50%) on completion overlay, per grid size
 - PostHog integration (optional; events like `puzzle_started`, `puzzle_completed`)
+
+## Code structure (reference)
+
+- **Play screen** – `screens/Play/PlayScreen.tsx` composes `PlayScreenTopBar`, `PlayScreenModals`, `PlayScreenOverlays` (preview, tutorial, shortcuts, toasts, profiler, coop debug), board, tray, and completion overlay. Hooks in `screens/Play/hooks/` (e.g. `usePlayScreenManager`, `usePointerHandlers`, `playScreenManagerEvents.ts`, `pointerHandlers/`). UI initial state from `playScreenUIInitial.ts`.
+- **Puzzle logic** – `puzzle/PuzzleManager.ts` (drag, snap, groups, undo); helpers in `puzzle/puzzleManagerUtils.ts` (clamp, getUndoLimit, getEffectiveTolerance). Board drawing in `puzzle/canvas/`: `renderBoardDraw.ts`, `renderBoardDrawOverlays.ts` (wrong-rotation, lock glow).
+- **Audio** – `audio/sounds.ts` (SoundEngine, prefs, ambient); theme-aware SFX in `soundsSfx.ts`. Ambient music: `soundsAmbient.ts` re-exports theme loops; types in `soundsAmbientTypes.ts`; one file per theme: `soundsAmbientOcean.ts`, `soundsAmbientSunset.ts`, `soundsAmbientSpace.ts`, `soundsAmbientForest.ts`, `soundsAmbientLightDark.ts`.
+- **Setup** – `screens/Setup/SetupScreen.tsx`; image source (gallery/upload/camera) in `components/SetupImageSourcePanel.tsx`.
+- **Stats** – `screens/Stats/StatsScreen.tsx`; header in `components/StatsScreenHeader.tsx`; tabs in `tabs/`.
+- **Completion overlay** – Share popup content in `CompletionSharePopup.tsx`. **Piece tray** – header (filter, randomize) in `PieceTrayHeader.tsx`.

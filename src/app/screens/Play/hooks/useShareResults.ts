@@ -42,7 +42,7 @@ export function useShareResults(args: {
         url: window.location.origin,
       });
     } catch (err) {
-      console.log("Share cancelled or failed:", err);
+      if (import.meta.env.DEV) console.warn("Share cancelled or failed:", err);
     }
   }, [getShareText]);
 

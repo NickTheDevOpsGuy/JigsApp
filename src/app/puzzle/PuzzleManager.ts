@@ -1,5 +1,9 @@
 /**
  * PuzzleManager – core puzzle logic: pieces, snapping, groups, undo.
+ *
+ * Sections: options/types; 80–200 init/restore; 200–400 drag/snap/place;
+ * 400–550 groups/merge; 550–650 undo; 650–773 events/helpers.
+ *
  * Handles drag state, board/neighbor snap tolerances, piece locking, events.
  */
 import type { MutableRefObject } from "react";
@@ -7,6 +11,12 @@ import type { DragState, GridSize, Piece, PieceCutType, PuzzleState } from "./ty
 import { createInitialPieces } from "./factories/createInitialPieces";
 import type { SavedPiece } from "./puzzleStorage";
 import { UndoManager } from "./undoManager";
+import {
+  clamp,
+  getEffectiveTolerance as getEffectiveToleranceUtil,
+  getUndoLimit,
+} from "./puzzleManagerUtils";
+import type { EffectiveToleranceOptions } from "./puzzleManagerUtils";
 import {
   getGroupBounds as getGroupBoundsUtil,
   wouldOverlapAnyOtherGroup as wouldOverlapUtil,
@@ -56,14 +66,6 @@ export type PuzzleManagerEvents = {
   /** Called when a group would snap to board but rotation blocks it (position correct, rotation wrong). */
   onWrongRotationHint?: (groupId: string, pieceIds: string[]) => void;
 };
-function _clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(n, max));
-}
-
-/** Undo limit: 50 for ≤64 pieces, 25 for 81+ to reduce memory on large puzzles. */
-function getUndoLimit(pieceCount: number): number {
-  return pieceCount <= 64 ? 50 : 25;
-}
 
 export class PuzzleManager {
   private state: PuzzleState;
@@ -297,8 +299,8 @@ export class PuzzleManager {
     const maxDy = this.boardHeight + this.pad - b.maxY + overflow;
 
     return {
-      dx: _clamp(dx, minDx, maxDx),
-      dy: _clamp(dy, minDy, maxDy),
+      dx: clamp(dx, minDx, maxDx),
+      dy: clamp(dy, minDy, maxDy),
     };
   }
 
@@ -513,12 +515,12 @@ export class PuzzleManager {
     let x = this.rand(xMin, xMax);
     let y = this.rand(yMin, yMax);
     for (let retry = 0; retry < MOVE_FROM_TRAY_RETRY_MAX; retry++) {
-      x = _clamp(
+      x = clamp(
         this.rand(xMin, xMax),
         pad - offsetX,
         Math.max(pad - offsetX, this.boardWidth - effW - pad - offsetX),
       );
-      y = _clamp(
+      y = clamp(
         this.rand(yMin, yMax),
         pad - offsetY,
         Math.max(pad - offsetY, this.boardHeight - effH - pad - offsetY),
@@ -580,8 +582,8 @@ export class PuzzleManager {
       const dyMin = -this.pad - bounds.minY;
       const dyMax = this.boardHeight + this.pad - bounds.maxY;
 
-      const dx = _clamp(0, dxMin, dxMax);
-      const dy = _clamp(0, dyMin, dyMax);
+      const dx = clamp(0, dxMin, dxMax);
+      const dy = clamp(0, dyMin, dyMax);
 
       if (dx !== 0 || dy !== 0) this.shiftGroup(p.groupId, dx, dy);
     }
@@ -629,18 +631,26 @@ export class PuzzleManager {
     const piece = this.findPiece(activeId);
     if (!piece) return;
 
-    // Calculate new position
     const newX = clientX - boardRect.left - this.drag.offsetX;
     const newY = clientY - boardRect.top - this.drag.offsetY;
-
-    // Calculate delta from current position
     const dx = newX - piece.x;
     const dy = newY - piece.y;
 
-    // Move the group
     this.shiftGroup(piece.groupId, dx, dy);
 
-    // Compute snap preview
+    // Try snap during drag so fast drags still snap when passing through the target
+    const snappedNeighbor = this.trySnapActiveGroupToNeighbor();
+    if (snappedNeighbor) {
+      this.drag = { ...this.drag, preview: this.computeSnapPreview() };
+      return;
+    }
+    const snappedBoard = this.trySnapActiveGroupToBoard();
+    if (snappedBoard) {
+      this.recomputeDerivedState();
+      this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
+      return;
+    }
+
     this.drag = {
       ...this.drag,
       preview: this.computeSnapPreview(),
@@ -682,6 +692,20 @@ export class PuzzleManager {
     const dy = newY - piece.y;
 
     this.shiftGroup(piece.groupId, dx, dy);
+
+    // Try snap during drag so fast drags still snap when passing through the target
+    const snappedNeighbor = this.trySnapActiveGroupToNeighbor();
+    if (snappedNeighbor) {
+      this.drag = { ...this.drag, preview: this.computeSnapPreview() };
+      return;
+    }
+    const snappedBoard = this.trySnapActiveGroupToBoard();
+    if (snappedBoard) {
+      this.recomputeDerivedState();
+      this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
+      return;
+    }
+
     this.drag = {
       ...this.drag,
       preview: this.computeSnapPreview(),
@@ -777,40 +801,17 @@ export class PuzzleManager {
 
   /* ---------------- Snapping ---------------- */
 
-  /**
-   * Zoom-adaptive tolerance:
-   * - Zoomed out (scale < 1): larger tolerance to reduce frustration
-   * - Zoomed in (scale > 1): more precise to avoid accidental long-distance snaps
-   * - Floor when very zoomed in to keep consistent feel across devices
-   * Mobile gets a small bump (~8%) for touch imprecision.
-   */
+  private getToleranceOptions(): EffectiveToleranceOptions {
+    return {
+      snapScaleRef: this.snapScaleRef,
+      relaxedToleranceMultiplierRef: this.relaxedToleranceMultiplierRef,
+      snapToleranceOverrideRef: this.snapToleranceOverrideRef,
+      isMobile: this.isMobile,
+    };
+  }
+
   private getEffectiveTolerance(basePx: number): number {
-    const scale = Math.max(0.25, Math.min(4, this.snapScaleRef?.current ?? 1));
-    const relaxedMult = this.relaxedToleranceMultiplierRef?.current ?? 1;
-    const overrideMult = Math.max(
-      0.6,
-      Math.min(1.6, this.snapToleranceOverrideRef?.current ?? 1),
-    );
-    const mobileBump = this.isMobile ? 1.2 : 1;
-    let effective = basePx * mobileBump;
-
-    if (scale < 1) {
-      const zoomOutBoost = this.isMobile
-        ? 1 + (1 - scale) * 1.25
-        : 1 + (1 - scale) * 0.75;
-      effective *= zoomOutBoost;
-    } else if (scale > 1) {
-      const zoomInTighten = this.isMobile
-        ? 1 / (1 + (scale - 1) * 0.45)
-        : 1 / (1 + (scale - 1) * 0.8);
-      effective *= zoomInTighten;
-    }
-
-    effective *= relaxedMult * overrideMult;
-
-    const minMult = this.isMobile ? 0.45 : 0.35;
-    const maxMult = this.isMobile ? 3 : 2.5;
-    return _clamp(effective, basePx * minMult, basePx * maxMult);
+    return getEffectiveToleranceUtil(basePx, this.getToleranceOptions());
   }
 
   private trySnapActiveGroupToBoard(): boolean {

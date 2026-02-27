@@ -53,9 +53,28 @@ export function ShortcutsModal({
 
   if (!isOpen) return null;
 
+  const handleOverlayKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClose();
+    }
+  };
+
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <div
+      className={styles.overlay}
+      onClick={onClose}
+      onKeyDown={handleOverlayKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label="Close"
+    >
+      <div
+        className={styles.modal}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+        role="presentation"
+      >
         <div className={styles.header}>
           <div className={styles.titleRow}>
             <Keyboard size={22} />
@@ -92,6 +111,12 @@ export function ShortcutsModal({
                     <tbody>
                       {isNav && (
                         <>
+                          <tr>
+                            <td className={styles.keys}>
+                              <kbd className={styles.key}>Tab</kbd> (from top)
+                            </td>
+                            <td className={styles.action}>Skip to main content</td>
+                          </tr>
                           <tr>
                             <td className={styles.keys}>
                               <kbd className={styles.key}>Scroll</kbd>

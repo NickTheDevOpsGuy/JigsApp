@@ -1,13 +1,15 @@
 /**
  * packCompletion – track completed puzzle IDs in localStorage for pack progress.
  */
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+
 const STORAGE_KEY = "phuzzle:completedPuzzles";
 const CURRENT_PUZZLE_KEY = "phuzzle:currentPuzzleId";
 
 /** Get set of completed puzzle IDs */
 export function getCompletedPuzzleIds(): Set<string> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = safeLocalStorage.getItem(STORAGE_KEY);
     if (!raw) return new Set();
     const arr = JSON.parse(raw) as string[];
     return new Set(Array.isArray(arr) ? arr : []);
@@ -21,7 +23,7 @@ export function recordPuzzleCompletion(puzzleId: string): void {
   try {
     const completed = getCompletedPuzzleIds();
     completed.add(puzzleId);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...completed]));
+    safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify([...completed]));
   } catch {
     /* ignore */
   }
@@ -44,24 +46,16 @@ export function isPackComplete(puzzleIds: string[]): boolean {
 
 /** Store the current puzzle ID when starting (for completion tracking) */
 export function setCurrentPuzzleId(puzzleId: string | null): void {
-  try {
-    if (puzzleId) {
-      localStorage.setItem(CURRENT_PUZZLE_KEY, puzzleId);
-    } else {
-      localStorage.removeItem(CURRENT_PUZZLE_KEY);
-    }
-  } catch {
-    /* ignore */
+  if (puzzleId) {
+    safeLocalStorage.setItem(CURRENT_PUZZLE_KEY, puzzleId);
+  } else {
+    safeLocalStorage.removeItem(CURRENT_PUZZLE_KEY);
   }
 }
 
 /** Get and clear the current puzzle ID (call on completion) */
 export function consumeCurrentPuzzleId(): string | null {
-  try {
-    const id = localStorage.getItem(CURRENT_PUZZLE_KEY);
-    localStorage.removeItem(CURRENT_PUZZLE_KEY);
-    return id;
-  } catch {
-    return null;
-  }
+  const id = safeLocalStorage.getItem(CURRENT_PUZZLE_KEY);
+  safeLocalStorage.removeItem(CURRENT_PUZZLE_KEY);
+  return id;
 }

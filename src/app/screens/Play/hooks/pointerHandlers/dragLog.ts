@@ -15,5 +15,5 @@ export function dragLog(
   if (event === "move" && now - lastMoveMs < 80) return;
   if (event === "move") lastMoveMs = now;
 
-  console.debug(`[drag:${event}]`, data);
+  if (import.meta.env.DEV) console.warn(`[drag:${event}]`, data);
 }

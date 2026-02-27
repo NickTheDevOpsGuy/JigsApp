@@ -32,7 +32,16 @@ export function Tray({
         key={piece.id}
         className={styles.trayPiece}
         onClick={() => onPieceClick(piece.id)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onPieceClick(piece.id);
+          }
+        }}
+        role="button"
+        tabIndex={0}
         title={`Piece ${piece.id} - Click to place on board`}
+        aria-label={`Piece ${piece.id}, click to place on board`}
       >
         <svg
           width={piece.w * scale}

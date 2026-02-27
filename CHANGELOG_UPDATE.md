@@ -4,7 +4,39 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 🧩 Latest (undo animation, drag lift, daily comments, win screen)
+## 🏆 Latest (win screen, confetti, mobile, a11y, docs)
+
+### Win screen redesign
+
+- **New completion overlay** — Image at top, stats block (Time, Moves, Accuracy, Rank with icons), “Can you beat my run?”, primary **Continue** button (with play icon), secondary **Share Result** link. Rank shows “#X / Y (Top Z%)” when leaderboard data exists.
+- **Confetti on win** — Burst when the completion overlay appears (theme-colored); respects `prefers-reduced-motion` and battery saver.
+- **CompletionOverlayGate** — New wrapper component in `PlayScreen` to keep completion props in one place.
+
+### Mobile & accessibility
+
+- **Compact layouts** — Menu, Setup, Stats, Packs, Play: no page scroll; content scrolls inside cards where needed. Touch targets ≥44px; 16px inputs on mobile to prevent iOS zoom.
+- **Skip link** — “Skip to main content” (visually hidden, visible on focus); `<main id="main">` wraps app content; clicking/focusing the link moves focus into main for screen readers. Documented in Keyboard & Controls modal.
+- **Loading states** — New `Loader` component (spinner + label); used on Stats and Packs while data loads. Spinner respects reduced motion.
+- **Touch-action** — `touch-action: manipulation` on board wrapper and tray to prevent double-tap zoom; canvas keeps `touch-action: none` for pan/zoom.
+- **Reduced motion** — Tray piece pulse animation disabled when `prefers-reduced-motion: reduce`; confetti and completion animations already gated in JS/CSS.
+
+### PWA & docs
+
+- **Manifest** — `display_override`, `categories: ["games", "entertainment"]`, `theme_color` to brand blue; `includeAssets` adds icons and og-image.
+- **Changelog (in-app)** — Version 14: win screen, confetti, mobile polish, skip link, reduced motion.
+- **README** — Mobile layout section updated (touch-action, tray spacing, win screen, loading spinners).
+- **CHANGELOG_UPDATE.md** — This section added for release notes.
+- **Lighthouse / a11y** — `doc/LIGHTHOUSE.md` documents the skip link and main landmark for audits (bypass blocks, main region).
+- **E2E** — Completion overlay test: `e2e/play-screen.spec.ts` uses `?e2eCompletion=1` to assert “Puzzle Completed!” and “Continue” without solving the puzzle.
+
+### Refactors
+
+- **StatsScreen** — Formatting helpers moved to `statsFormatting.ts` (formatDuration, formatTime, formatGap, getDatesInWeek, formatWeekRangeLabel, PODIUM).
+- **PlayScreen** — Completion overlay block replaced by `CompletionOverlayGate` component.
+
+---
+
+## 🧩 Earlier (undo animation, drag lift, daily comments)
 
 ### Undo snap-back animation
 

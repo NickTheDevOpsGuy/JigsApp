@@ -7,6 +7,7 @@
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import type { SamplePuzzle } from "@/data/samplePuzzles";
 
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import {
   getTodayDateString,
   DAILY_DATE_KEY,
@@ -88,14 +89,10 @@ export function startDailyPuzzle(
 
   const dateStr = getTodayDateString();
 
-  try {
-    localStorage.setItem("phuzzle:imageDataUrl", puzzle.fullImage);
-    localStorage.setItem("phuzzle:gridSize", `${grid.rows}x${grid.cols}`);
-    localStorage.setItem(DAILY_DATE_KEY, dateStr);
-    localStorage.setItem(DAILY_MODIFIER_KEY, modifier);
-  } catch (e) {
-    console.warn("Failed to set daily puzzle:", e);
-  }
+  safeLocalStorage.setItem("phuzzle:imageDataUrl", puzzle.fullImage);
+  safeLocalStorage.setItem("phuzzle:gridSize", `${grid.rows}x${grid.cols}`);
+  safeLocalStorage.setItem(DAILY_DATE_KEY, dateStr);
+  safeLocalStorage.setItem(DAILY_MODIFIER_KEY, modifier);
 
   return { imageUrl: puzzle.fullImage, grid };
 }

@@ -3,22 +3,23 @@ import { useEffect, useRef, useState } from "react";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
-import { soundManager } from "@/audio/sounds";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { STORAGE_KEY, CUT_TYPE_KEY } from "../playScreenUtils";
-import { getQuadrant, type TimeMode } from "../timeMode";
-import type { Theme } from "@/hooks/useTheme";
+import type { TimeMode } from "../timeMode";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
-import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
+import { createPlayScreenManagerEvents } from "./playScreenManagerEvents";
+import type { Theme } from "@/hooks/useTheme";
 
 export type ResumeChoice = "resume" | "fresh" | null;
 
-const PLACEMENT_STREAK_MS = 3000;
-const STREAK_COOLDOWN_MS = 5000;
 const SNAP_COMBO_IDLE_MS = 2500;
-const SNAP_PARTICLE_COUNT = 8;
 
 /**
  * usePlayScreenManager – creates PuzzleManager, wires events, provides board/canvas refs.
+ *
+ * Sections: 1–120 hook args + refs + constants; 121–340 effect (load image, create manager, restore state);
+ * 341–420 event handlers (place, snap, undo, wrong rotation); 421–490 return (refs, state, handlers).
+ *
  * Handles undo, snap particles, wrong-rotation hints, placement streaks.
  */
 export function usePlayScreenManager(
@@ -72,6 +73,7 @@ export function usePlayScreenManager(
   const relaxedToleranceMultiplierRef = useRef<number>(1);
   const snapToleranceOverrideRef = useRef<number>(1);
   const sizingCleanupRef = useRef<(() => void) | null>(null);
+  const managerRef = useRef<PuzzleManager | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
@@ -111,7 +113,7 @@ export function usePlayScreenManager(
       return;
     }
 
-    const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
+    const imageUrl = safeLocalStorage.getItem(STORAGE_KEY) || "";
     if (!imageUrl) {
       setIsLoading(false);
       return;
@@ -188,11 +190,24 @@ export function usePlayScreenManager(
           clearPuzzleState();
         }
 
-        const cutTypeRaw = localStorage.getItem(CUT_TYPE_KEY);
+        const cutTypeRaw = safeLocalStorage.getItem(CUT_TYPE_KEY);
         const cutType =
           cutTypeRaw === "irregular" || cutTypeRaw === "hard" ? cutTypeRaw : "classic";
 
         const opts = optionsRef.current;
+        managerRef.current = null;
+        const events = createPlayScreenManagerEvents({
+          grid,
+          optionsRef,
+          lastInteractionRef,
+          popMapRef,
+          lockMapRef,
+          snapParticlesRef,
+          placementTimesRef,
+          lastStreakAtRef,
+          setSnapCombo,
+          getManager: () => managerRef.current,
+        });
         const next = new PuzzleManager(
           {
             imageUrl,
@@ -207,135 +222,9 @@ export function usePlayScreenManager(
             relaxedToleranceMultiplierRef,
             snapToleranceOverrideRef,
           },
-          {
-            onPiecePlaced: (p) => {
-              const now = performance.now();
-              const opts = optionsRef.current;
-              const startTime = opts?.dragStartTimeRef?.current;
-              if (
-                startTime != null &&
-                typeof opts?.onPieceSnappedAnalytics === "function"
-              ) {
-                opts.onPieceSnappedAnalytics(Math.round(now - startTime));
-              }
-              lastInteractionRef.current = now;
-              const groupPieces = next
-                .getState()
-                .pieces.filter((piece) => piece.groupId === p.groupId);
-              for (const piece of groupPieces) {
-                popMapRef.current.set(piece.id, now);
-              }
-              const cx = p.x + p.w / 2;
-              const cy = p.y + p.h / 2;
-              const particles = snapParticlesRef.current;
-              for (let i = 0; i < SNAP_PARTICLE_COUNT; i++) {
-                const angle = (i / SNAP_PARTICLE_COUNT) * Math.PI * 2 + (now % 1);
-                const r = 3 + (now % 2);
-                particles.push({
-                  x: cx + Math.cos(angle) * r,
-                  y: cy + Math.sin(angle) * r,
-                  t0: now,
-                });
-              }
-              const maxAge = 500;
-              snapParticlesRef.current = particles.filter(
-                (part) => now - part.t0 < maxAge,
-              );
-              soundManager.play("place");
-              opts?.haptic?.("place");
-              const elapsed = opts?.elapsedSecondsRef?.current ?? 0;
-              const q = getQuadrant(p.row, p.col, grid.rows, grid.cols);
-              opts?.onQuadrantPlaced?.(q, elapsed);
-              placementTimesRef.current.push(now);
-              const cutoff = now - PLACEMENT_STREAK_MS;
-              const comboCutoff = now - SNAP_COMBO_IDLE_MS;
-              placementTimesRef.current = placementTimesRef.current.filter(
-                (t) => t > cutoff,
-              );
-              const combo = placementTimesRef.current.filter(
-                (t) => t > comboCutoff,
-              ).length;
-              setSnapCombo(combo);
-              if (
-                placementTimesRef.current.length >= 3 &&
-                (lastStreakAtRef.current == null ||
-                  now - lastStreakAtRef.current > STREAK_COOLDOWN_MS)
-              ) {
-                lastStreakAtRef.current = now;
-                opts?.onPlacementStreak?.();
-              }
-            },
-            onPieceSnapped: (pieceIds, center) => {
-              const now = performance.now();
-              const opts = optionsRef.current;
-              const startTime = opts?.dragStartTimeRef?.current;
-              if (
-                startTime != null &&
-                typeof opts?.onPieceSnappedAnalytics === "function"
-              ) {
-                opts.onPieceSnappedAnalytics(Math.round(now - startTime));
-              }
-              lastInteractionRef.current = now;
-              soundManager.play("snap", { groupSize: pieceIds.length });
-              opts?.haptic?.("snap");
-              for (const id of pieceIds) popMapRef.current.set(id, now);
-              if (center) {
-                const particles = snapParticlesRef.current;
-                for (let i = 0; i < SNAP_PARTICLE_COUNT; i++) {
-                  const angle = (i / SNAP_PARTICLE_COUNT) * Math.PI * 2 + (now % 1);
-                  const r = 4 + (now % 3);
-                  particles.push({
-                    x: center.x + Math.cos(angle) * r,
-                    y: center.y + Math.sin(angle) * r,
-                    t0: now,
-                  });
-                }
-                const maxAge = 500;
-                snapParticlesRef.current = particles.filter((p) => now - p.t0 < maxAge);
-              }
-            },
-            onPieceLocked: (ids) => {
-              const now = performance.now();
-              for (const id of ids) lockMapRef.current.set(id, now);
-            },
-            onSnapCheck: opts?.onSnapCheck,
-            onWrongRotationHint: (groupId, pieceIds) => {
-              const ref = opts?.wrongRotationHintRef;
-              if (!ref) return;
-              const now = performance.now();
-              const cur = ref.current;
-              if (cur && now - cur.triggeredAt < 5000) return;
-              ref.current = { groupId, pieceIds, triggeredAt: now };
-            },
-            onPuzzleComplete: () => {
-              clearPuzzleState();
-              soundManager.play("complete");
-              const opts = optionsRef.current;
-              const prefersReducedMotion =
-                typeof window !== "undefined" &&
-                window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-              const batterySaver = opts?.batterySaverMode ?? false;
-              if (!prefersReducedMotion && !batterySaver) {
-                const pieceCount = grid.rows * grid.cols;
-                const particleCount = Math.min(
-                  280,
-                  Math.max(60, Math.floor(pieceCount * 3.5)),
-                );
-                const spread = pieceCount <= 16 ? 50 : pieceCount <= 36 ? 65 : 80;
-                const theme = optionsRef.current?.themeRef?.current ?? "light";
-                const colors = CONFETTI_COLORS_BY_THEME[theme];
-                import("canvas-confetti").then((confetti) => {
-                  confetti.default({
-                    particleCount,
-                    spread,
-                    origin: { y: 0.6 },
-                    colors,
-                  });
-                });
-              }
-            },
-          },
+          events,
         );
+        managerRef.current = next;
 
         if (hasSavedGame && savedState && resumeChoice === "resume") {
           try {

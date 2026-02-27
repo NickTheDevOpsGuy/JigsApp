@@ -1,11 +1,23 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
-export const CHANGELOG_VERSION = "13";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+
+export const CHANGELOG_VERSION = "15";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🎊 Confetti upgrade – Layered bursts on completion (main + side + lower arc); respects reduced motion & battery saver",
+      "🏅 Percentile badges – Completion overlay shows Top 10%, Top 25%, or Top 50% badge when you rank in those tiers",
+      "🧲 Snap during drag – Pieces snap when dragged quickly through the target (no need to release exactly on the spot)",
+      "🔍 Zoom limits – Max zoom capped at 2.5× to prevent excessive zoom-in; smoother zoom steps",
+      "💬 Daily comment counter – Live character count (280 max) with near-limit and at-limit styling",
+      "🧩 Grid sizes – Starter 2×2 and Epic 10×10 presets; build up from 4 to 100 pieces gradually",
+      "🏆 New win screen – Puzzle completed: image, Time/Moves/Accuracy/Rank, “Can you beat my run?”, Continue + Share",
+      "🎊 Confetti on win – Celebration burst when the completion overlay appears (respects reduced motion & battery saver)",
+      "📱 Mobile polish – Compact layouts (no page scroll), 44px touch targets, skip link, loading spinners for Stats/Packs",
+      "♿ Accessibility – “Skip to main content” link for keyboard users; reduced motion disables tray pulse and confetti",
       "↩️ Undo snap-back – Undo animates pieces back to their prior position (Ctrl/Cmd+Z or button)",
       "🔼 Drag lift – Dragged pieces feel physically lifted (stronger shadow, slight scale)",
       "💬 Daily comments & reactions – React with emoji (👍 🎉 🔥 ✨ 💪) and leave a 280-char comment after completing today's puzzle",
@@ -49,19 +61,11 @@ export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
 ];
 
 export function getLastSeenVersion(): string {
-  try {
-    return localStorage.getItem(STORAGE_KEY) ?? "0";
-  } catch {
-    return "0";
-  }
+  return safeLocalStorage.getItem(STORAGE_KEY) ?? "0";
 }
 
 export function markChangelogSeen(): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, CHANGELOG_VERSION);
-  } catch {
-    // ignore
-  }
+  safeLocalStorage.setItem(STORAGE_KEY, CHANGELOG_VERSION);
 }
 
 export function shouldShowChangelog(): boolean {

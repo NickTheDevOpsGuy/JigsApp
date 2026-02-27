@@ -1,6 +1,8 @@
 /**
  * timeMode – elapsed, countdown, active, relaxed, best; localStorage for best times.
  */
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+
 export type TimeMode =
   | "elapsed" // Count up from 0 (default)
   | "countdown" // Start at limit, game over at 0
@@ -24,20 +26,12 @@ export function getBestTimeKey(rows: number, cols: number): string {
 }
 
 export function getBestTime(rows: number, cols: number): number | null {
-  try {
-    const raw = localStorage.getItem(getBestTimeKey(rows, cols));
-    return raw ? parseInt(raw, 10) : null;
-  } catch {
-    return null;
-  }
+  const raw = safeLocalStorage.getItem(getBestTimeKey(rows, cols));
+  return raw ? parseInt(raw, 10) : null;
 }
 
 export function setBestTime(rows: number, cols: number, seconds: number): void {
-  try {
-    localStorage.setItem(getBestTimeKey(rows, cols), String(seconds));
-  } catch {
-    // ignore
-  }
+  safeLocalStorage.setItem(getBestTimeKey(rows, cols), String(seconds));
 }
 
 /** Quadrant indices: 0=TL, 1=TR, 2=BL, 3=BR */
@@ -64,12 +58,8 @@ export function getQuadrantPb(
   cols: number,
   q: 0 | 1 | 2 | 3,
 ): number | null {
-  try {
-    const raw = localStorage.getItem(getQuadrantPbKey(rows, cols, q));
-    return raw ? parseInt(raw, 10) : null;
-  } catch {
-    return null;
-  }
+  const raw = safeLocalStorage.getItem(getQuadrantPbKey(rows, cols, q));
+  return raw ? parseInt(raw, 10) : null;
 }
 export function setQuadrantPb(
   rows: number,
@@ -77,9 +67,5 @@ export function setQuadrantPb(
   q: 0 | 1 | 2 | 3,
   seconds: number,
 ): void {
-  try {
-    localStorage.setItem(getQuadrantPbKey(rows, cols, q), String(seconds));
-  } catch {
-    // ignore
-  }
+  safeLocalStorage.setItem(getQuadrantPbKey(rows, cols, q), String(seconds));
 }

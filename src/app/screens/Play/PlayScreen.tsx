@@ -1,6 +1,10 @@
 /**
  * PlayScreen – main puzzle play UI.
  *
+ * Sections (approx): 76–140 session/grid init; 141–260 state refs; 261–400 effects
+ * (save, remote, share); 401–600 canvas/pointer/viewport; 601–900 completion/share;
+ * 901–1100 HUD/tray/top bar; 1100–1606 main JSX (board, tray, overlays, modals).
+ *
  * Responsibilities:
  * - Session loading (local or co-op via URL param)
  * - Puzzle state via usePlayScreenManager
@@ -13,17 +17,13 @@ import posthog from "posthog-js";
 import styles from "./PlayScreen.module.css";
 
 import { PieceTray } from "@/components/PieceTray/PieceTray";
-import { ConfirmModal } from "@/components/Modal/Modal";
-import { HelpChoiceModal } from "@/components/HelpChoiceModal";
-import { TutorialOverlay, useShouldShowTutorial } from "@/components/HowToPlay";
+import { useShouldShowTutorial } from "@/components/HowToPlay";
 import type { Piece, PuzzleState } from "@/puzzle/types";
 import { savePuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { consumeCurrentPuzzleId, recordPuzzleCompletion } from "@/data/packCompletion";
+import { recordCompletion as recordAdaptiveCompletion } from "@/services/adaptiveDifficultyService";
 import { soundManager } from "@/audio/sounds";
 import { audioManager } from "@/audio/audioManager";
-import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
-import { ThemeModal } from "@/components/ThemeModal";
-
 import {
   STORAGE_KEY,
   GRID_KEY,
@@ -32,7 +32,7 @@ import {
   parseGrid,
 } from "./playScreenUtils";
 import { createUndoRedoHandler } from "./playUtils";
-import { getBestTime, BEST_TIME_PREFIX, getQuadrantPb, setQuadrantPb } from "./timeMode";
+import { getBestTime, getQuadrantPb, setQuadrantPb } from "./timeMode";
 import {
   isDailyPuzzleSession,
   getDailyVisualModifier,
@@ -43,6 +43,7 @@ import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
 import { usePlayScreenAnimation } from "./hooks/usePlayScreenAnimation";
 import { usePlayScreenTimer } from "./hooks/usePlayScreenTimer";
+import { usePlayScreenMilestones } from "./hooks/usePlayScreenMilestones";
 import { useTimeModeConfig } from "./hooks/useTimeModeConfig";
 import { useShareResults } from "./hooks/useShareResults";
 import { useDownloadImage } from "./hooks/useDownloadImage";
@@ -54,46 +55,36 @@ import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
 import { useBatterySaver } from "../../hooks/useBatterySaver";
 import {
-  CoopDebugPanel,
-  CoopStatusIndicator,
-  DragPreview,
   Minimap,
-  PlayHUD,
-  CompletionOverlay,
+  PlayScreenCoopView,
+  PlayScreenModals,
+  PlayScreenOverlays,
+  PlayScreenTopBar,
+  CompletionOverlayGate,
   PauseOverlay,
-  PlayToasts,
-  TopBarButtons,
-  HeaderMenu,
   UndoRedoButtons,
 } from "./components";
-import { ProgressivePreviewOverlay } from "./components/ProgressivePreviewOverlay";
 import { SnapComboMeter } from "./components/SnapComboMeter";
-import { ProfilerOverlay } from "./components";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
 import { isSupabaseConfigured } from "@/supabase/client";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 export function PlayScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const sessionIdFromUrl = searchParams.get(SESSION_ID_PARAM);
+  /** E2E only: ?e2eCompletion=1 forces the completion overlay to show for snapshot/assertion. */
+  const showE2ECompletion = searchParams.get("e2eCompletion") === "1";
 
   const localGrid = useMemo(() => {
-    try {
-      const once = localStorage.getItem(GRID_ONCE_KEY);
-      return parseGrid(once ?? localStorage.getItem(GRID_KEY));
-    } catch {
-      return parseGrid(null);
-    }
+    const once = safeLocalStorage.getItem(GRID_ONCE_KEY);
+    return parseGrid(once ?? safeLocalStorage.getItem(GRID_KEY));
   }, []);
-  const localImageUrl = localStorage.getItem(STORAGE_KEY) ?? "";
+  const localImageUrl = safeLocalStorage.getItem(STORAGE_KEY) ?? "";
 
   useEffect(() => {
-    try {
-      localStorage.removeItem(GRID_ONCE_KEY);
-    } catch {
-      // ignore
-    }
+    safeLocalStorage.removeItem(GRID_ONCE_KEY);
   }, []);
 
   const sessionResult = usePuzzleSession(localImageUrl, localGrid);
@@ -121,8 +112,8 @@ export function PlayScreen() {
 
   useLayoutEffect(() => {
     if (session) {
-      localStorage.setItem(STORAGE_KEY, session.imageUrl);
-      localStorage.setItem(GRID_KEY, `${session.grid.rows}x${session.grid.cols}`);
+      safeLocalStorage.setItem(STORAGE_KEY, session.imageUrl);
+      safeLocalStorage.setItem(GRID_KEY, `${session.grid.rows}x${session.grid.cols}`);
       clearPuzzleState();
     }
   }, [session]);
@@ -202,9 +193,7 @@ export function PlayScreen() {
   const haptics = useHaptics();
   const isCoarsePointer = useCoarsePointer();
   const [showStreakToast, setShowStreakToast] = React.useState(false);
-  const [milestoneMessage, setMilestoneMessage] = React.useState<string | null>(null);
   const [shareToast, setShareToast] = React.useState<string | null>(null);
-  const lastMilestoneRef = React.useRef<number>(0);
   const [immersiveReveal, setImmersiveReveal] = React.useState(false);
   const immersiveHideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
@@ -372,55 +361,12 @@ export function PlayScreen() {
 
   elapsedSecondsRef.current = elapsedSeconds;
 
-  // Milestone callouts at 25%, 33%, 50%, 66%, 75%
-  const MILESTONE_THRESHOLDS = [25, 33, 50, 66, 75] as const;
-  const milestoneMessages: Record<number, string> = {
-    25: "🥉 25% Early win.",
-    33: "📈 33% Making progress.",
-    50: "🥈 50% Big motivation spike.",
-    66: "💪 66% Momentum building.",
-    75: "🥇 75% Almost there!",
-  };
-  useEffect(() => {
-    if (!state || state.isComplete) return;
-    const placed = state.placedCount ?? 0;
-    const total = state.totalCount ?? 0;
-    if (total === 0) return;
-    const pct = (placed / total) * 100;
-    const hit = MILESTONE_THRESHOLDS.find(
-      (t) => pct >= t && lastMilestoneRef.current < t,
-    );
-    if (hit) {
-      lastMilestoneRef.current = hit;
-      setMilestoneMessage(milestoneMessages[hit]);
-      const g = state.grid;
-      const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";
-      posthog.capture("milestone_popup_shown", {
-        milestone_percent: hit,
-        grid_size: gridSize,
-        device_type: isCoarsePointer ? "mobile" : "desktop",
-        time_mode: timeMode,
-      });
-    }
-  }, [
-    state?.placedCount,
-    state?.totalCount,
-    state?.isComplete,
-    state?.grid,
+  const milestoneMessage = usePlayScreenMilestones(
+    state,
+    puzzleKey,
     isCoarsePointer,
     timeMode,
-  ]);
-
-  useEffect(() => {
-    if (!milestoneMessage) return;
-    const t = setTimeout(() => setMilestoneMessage(null), 2000);
-    return () => clearTimeout(t);
-  }, [milestoneMessage]);
-
-  useEffect(() => {
-    if (!state) return;
-    if (state.placedCount === 0) lastMilestoneRef.current = 0;
-  }, [state?.placedCount, puzzleKey]);
+  );
 
   // Camera zoom-out on completion (600ms ease-out)
   const zoomOnCompleteRunRef = useRef(false);
@@ -443,9 +389,7 @@ export function PlayScreen() {
     if (puzzleId) recordPuzzleCompletion(puzzleId);
     const g = state?.grid;
     if (g) {
-      import("@/services/adaptiveDifficultyService").then(({ recordCompletion }) => {
-        recordCompletion(g.rows, g.cols, elapsedSeconds);
-      });
+      recordAdaptiveCompletion(g.rows, g.cols, elapsedSeconds);
     }
     if (!completionCapturedRef.current) {
       completionCapturedRef.current = true;
@@ -625,7 +569,7 @@ export function PlayScreen() {
 
   useEffect(() => {
     if (!state || state.isComplete) return;
-    const url = localStorage.getItem(STORAGE_KEY) || "";
+    const url = safeLocalStorage.getItem(STORAGE_KEY) || "";
     if (!url) return;
     const placed = state.placedCount ?? 0;
 
@@ -670,7 +614,7 @@ export function PlayScreen() {
     const flush = () => {
       const s = stateRef.current;
       if (!s || s.isComplete) return;
-      const url = localStorage.getItem(STORAGE_KEY) || "";
+      const url = safeLocalStorage.getItem(STORAGE_KEY) || "";
       if (!url) return;
       savePuzzleState(url, s.grid, s.pieces, elapsedSecondsRef.current);
 
@@ -893,7 +837,7 @@ export function PlayScreen() {
           }))
         : [];
       const id = await createSession(
-        s?.imageUrl ?? localStorage.getItem(STORAGE_KEY) ?? "",
+        s?.imageUrl ?? safeLocalStorage.getItem(STORAGE_KEY) ?? "",
         s?.grid ?? grid,
         pieces,
         elapsedSecondsRef.current,
@@ -997,567 +941,445 @@ export function PlayScreen() {
       ? getBestTime(state.grid.rows, state.grid.cols)
       : null;
 
-  // Early-exit UI for co-op join flow (must be after all hooks to avoid React #300)
-  // Skip for host: they created the session, no need to show loading/error
-  if (!isHost && sessionIdFromUrl && sessionLoading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.loadingOverlay} aria-label="Loading session">
-          <div className={styles.spinner} />
-          <span>Joining puzzle session…</span>
-        </div>
-      </div>
-    );
-  }
-  if (!isHost && sessionIdFromUrl && !session && !sessionLoading) {
-    const debugInfo = `sessionId=${sessionIdFromUrl}\ntime=${new Date().toISOString()}`;
-    const copyDebug = () => navigator.clipboard.writeText(debugInfo).catch(() => {});
-    posthog.capture("coop_join_failed", {
-      session_id: sessionIdFromUrl,
-      error_type: joinError?.message ?? "session_not_found",
-    });
-    return (
-      <div className={styles.page}>
-        <div className={styles.card} style={{ padding: 24, maxWidth: 360 }}>
-          <h2>Couldn't join session</h2>
-          <p>
-            The puzzle session may have expired, the link is invalid, or realtime is
-            blocked (e.g. by a browser extension).
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <button
-              type="button"
-              className={styles.primaryButton}
-              onClick={() => {
-                posthog.capture("coop_join_opened", { retry: true });
-                retryJoin();
-              }}
-            >
-              Try again
-            </button>
-            <button type="button" onClick={() => navigate("/")}>
-              Back to menu
-            </button>
-            <button type="button" className={styles.secondaryButton} onClick={copyDebug}>
-              Copy debug info
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div
-      className={`${styles.page} ${
-        dailyVisualModifier === "fog"
-          ? styles.modifierFog
-          : dailyVisualModifier === "night"
-            ? styles.modifierNight
-            : dailyVisualModifier === "sepia"
-              ? styles.modifierSepia
-              : ""
-      }`}
-      style={
-        dailyVisualModifier === "fog"
-          ? {
-              ["--fog-strength" as string]: String(
-                Math.max(0, Math.min(0.45, fogStrength)),
-              ),
-            }
-          : undefined
-      }
-      ref={pageRef}
+    <PlayScreenCoopView
+      isHost={isHost}
+      sessionIdFromUrl={sessionIdFromUrl}
+      sessionLoading={sessionLoading}
+      session={session}
+      joinError={joinError}
+      retryJoin={retryJoin}
+      navigate={navigate}
     >
-      {immersiveMode && (
-        <div
-          className={styles.immersivePeekTop}
-          onPointerEnter={handleImmersiveReveal}
-          onPointerDown={handleImmersiveReveal}
-          role="button"
-          tabIndex={-1}
-          aria-label="Show menu and controls"
-          title="Show menu and controls"
-        />
-      )}
       <div
-        className={`${styles.topBarWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveTopHidden : ""}`}
-        onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
+        className={`${styles.page} ${
+          dailyVisualModifier === "fog"
+            ? styles.modifierFog
+            : dailyVisualModifier === "night"
+              ? styles.modifierNight
+              : dailyVisualModifier === "sepia"
+                ? styles.modifierSepia
+                : ""
+        }`}
+        style={
+          dailyVisualModifier === "fog"
+            ? {
+                ["--fog-strength" as string]: String(
+                  Math.max(0, Math.min(0.45, fogStrength)),
+                ),
+              }
+            : undefined
+        }
+        ref={pageRef}
       >
-        <div className={styles.topBar}>
-          <div className={styles.topBarLeft}>
-            <HeaderMenu
-              title="Phuzzle"
-              theme={theme}
-              setTheme={setTheme}
-              timeMode={timeMode}
-              setTimeMode={(modeOrFn) => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                setTimeMode(modeOrFn);
-              }}
-              countdownMinutes={countdownMinutes}
-              setCountdownMinutes={setCountdownMinutes}
-              showPreview={showPreview}
-              soundEnabled={soundEnabled}
-              musicEnabled={musicEnabled}
-              hapticsEnabled={hapticsEnabled}
-              pieceLockingEnabled={pieceLockingEnabled}
-              showGhostHint={showGhostHint}
-              showGhostWhenIdle={showGhostWhenIdle}
-              showEdgeHighlight={showEdgeHighlight}
-              showClusterOutline={showClusterOutline}
-              onToggleClusterOutline={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                toggleShowClusterOutline();
-              }}
-              deliberateDetachEnabled={deliberateDetachEnabled}
-              onToggleDeliberateDetach={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                toggleDeliberateDetach();
-              }}
-              showAlignmentGrid={showAlignmentGrid}
-              isFullscreen={ui.isFullscreen}
-              canShowHaptics={isCoarsePointer && typeof navigator?.vibrate === "function"}
-              canShowFullscreen={!!document.fullscreenEnabled}
-              canShowShortcuts={!isCoarsePointer}
-              canShowDebug={SHOW_DEBUG}
-              debug={debug}
-              onNewPuzzle={() => setShowNewGameModal(true)}
-              canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
-              onUndo={createUndoRedoHandler(
-                manager ?? null,
-                "undo",
-                setState,
-                () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
-                soundManager.play.bind(soundManager),
-                () => {
-                  undoCountRef.current += 1;
-                },
-                (fromPositions) => {
-                  undoSnapBackRef.current = {
-                    fromPositions,
-                    startMs: performance.now(),
-                  };
-                },
-              )}
-              canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
-              onRedo={createUndoRedoHandler(
-                manager ?? null,
-                "redo",
-                setState,
-                () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
-                soundManager.play.bind(soundManager),
-                undefined,
-                (fromPositions) => {
-                  undoSnapBackRef.current = {
-                    fromPositions,
-                    startMs: performance.now(),
-                  };
-                },
-              )}
-              onResetView={() => viewport.reset()}
-              onTogglePreview={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                setShowPreview((p) => !p);
-              }}
-              onToggleSound={toggleSound}
-              onToggleMusic={toggleMusic}
-              onToggleHaptics={toggleHaptics}
-              onTogglePieceLocking={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                setPieceLockingEnabled((p) => !p);
-              }}
-              relaxedModeEnabled={relaxedModeEnabled}
-              onToggleRelaxedMode={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                toggleRelaxedMode();
-              }}
-              driftModeEnabled={driftModeEnabled}
-              onToggleDriftMode={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                toggleDriftMode();
-              }}
-              onToggleGhostHint={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                setShowGhostHint((g) => !g);
-              }}
-              onToggleGhostWhenIdle={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                toggleShowGhostWhenIdle();
-              }}
-              onToggleEdgeHighlight={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                toggleShowEdgeHighlight();
-              }}
-              onToggleAlignmentGrid={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                setShowAlignmentGrid((a) => !a);
-              }}
-              onToggleFullscreen={toggleFullscreen}
-              onZoomIn={() => viewport.zoomIn()}
-              onZoomOut={() => viewport.zoomOut()}
-              onShowShortcuts={() => setShowShortcuts(true)}
-              onShowHowToPlay={() => setShowHowToPlay(true)}
-              onToggleDebug={toggleDebug}
-              onTogglePerfOverlay={togglePerfOverlay}
-              immersiveMode={immersiveMode}
-              onToggleImmersiveMode={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                handleToggleImmersiveMode();
-              }}
-              progressiveRevealMode={progressiveRevealMode}
-              onToggleProgressiveReveal={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                setProgressiveRevealMode((v) => !v);
-              }}
-              pieceCutType={pieceCutType}
-              onPieceCutTypeChange={(cut) => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                setPieceCutType(cut);
-              }}
-              onSharePuzzle={isSupabaseConfigured() ? handleSharePuzzle : undefined}
-              shareDisabled={creatingSession}
-              onOpenThemeModal={() => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                setShowThemeModal(true);
-              }}
-              dailyPreferredModifier={dailyPreferredModifier}
-              onDailyPreferredModifierChange={(m) => {
-                if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-                setDailyPreferredModifier(m);
-              }}
-              onResetStats={() => setShowResetStatsConfirm(true)}
-              onClearCache={() => setShowClearCacheConfirm(true)}
-              snapToleranceOverride={snapToleranceOverride}
-              onSnapToleranceOverrideChange={(value) => setSnapToleranceOverride(value)}
-            />
-          </div>
-          <div className={styles.topBarCenter}>
-            {sessionId && (
-              <CoopStatusIndicator
-                status={realtimeStatus}
-                connectedCount={sessionResult.connectedCount}
-              />
-            )}
-            {!isComplete && !isPaused && (
-              <div className={styles.topBarHud} aria-live="polite">
-                <PlayHUD
-                  elapsedSeconds={elapsedSeconds}
-                  piecesLeft={left}
-                  totalPieces={total}
-                  isPaused={isPaused}
-                  isComplete={isComplete}
-                  timeMode={timeMode}
-                  countdownMinutes={countdownMinutes}
-                  bestTimeSeconds={bestTimeSeconds}
-                  quadrantTimes={timeMode === "speedrun" ? quadrantTimes : undefined}
-                  quadrantPbs={
-                    timeMode === "speedrun" && grid
-                      ? {
-                          0: getQuadrantPb(grid.rows, grid.cols, 0),
-                          1: getQuadrantPb(grid.rows, grid.cols, 1),
-                          2: getQuadrantPb(grid.rows, grid.cols, 2),
-                          3: getQuadrantPb(grid.rows, grid.cols, 3),
-                        }
-                      : undefined
-                  }
-                  lives={timeMode === "timeattack" ? lives : undefined}
-                  onTogglePause={() => setIsPaused((p) => !p)}
-                />
-              </div>
-            )}
-          </div>
-          <TopBarButtons
-            showPreview={showPreview}
-            soundEnabled={soundEnabled}
-            isFullscreen={ui.isFullscreen}
-            showDebug={SHOW_DEBUG}
-            isCoarsePointer={isCoarsePointer}
-            onTogglePreview={() => setShowPreview((p) => !p)}
-            onToggleSound={toggleSound}
-            onToggleFullscreen={toggleFullscreen}
-            onShowShortcuts={() => setShowShortcuts(true)}
-            onToggleDebug={toggleDebug}
-            onNewPuzzle={() => setShowNewGameModal(true)}
-          />
-        </div>
-      </div>
-
-      <ConfirmModal
-        isOpen={awaitingResumeChoice && resumeChoice === null}
-        onClose={() => setResumeChoice("fresh")}
-        onConfirm={() => setResumeChoice("resume")}
-        title="Resume Your Puzzle?"
-        message="You have a puzzle in progress. Would you like to continue where you left off?"
-        confirmText="Resume"
-        cancelText="Start Fresh"
-        variant="default"
-        primaryOnlyConfirm
-      />
-
-      <HelpChoiceModal
-        isOpen={showHelpChoice}
-        onClose={() => setShowHelpChoice(false)}
-        onHowToPlay={() => setShowHowToPlay(true)}
-        onKeyboardShortcuts={() => setShowShortcuts(true)}
-      />
-
-      <ThemeModal
-        isOpen={showThemeModal}
-        onClose={() => setShowThemeModal(false)}
-        hapticsEnabled={hapticsEnabled}
-      />
-
-      <ConfirmModal
-        isOpen={showNewGameModal}
-        onClose={() => setShowNewGameModal(false)}
-        onConfirm={handleNewGame}
-        title="Start New Puzzle?"
-        message="Your current progress will be lost. Are you sure you want to start a new puzzle?"
-        confirmText="New Puzzle"
-        cancelText="Keep Playing"
-        variant="danger"
-      />
-
-      <ConfirmModal
-        isOpen={showResetStatsConfirm}
-        onClose={() => setShowResetStatsConfirm(false)}
-        onConfirm={() => {
-          try {
-            const keysToRemove: string[] = [];
-            for (let i = 0; i < localStorage.length; i++) {
-              const k = localStorage.key(i);
-              if (k?.startsWith(BEST_TIME_PREFIX)) keysToRemove.push(k);
-            }
-            keysToRemove.forEach((k) => localStorage.removeItem(k));
-          } catch {
-            /* ignore */
-          }
-          setShowResetStatsConfirm(false);
-        }}
-        title="Reset Local Stats?"
-        message="This will clear all local best times. This cannot be undone."
-        confirmText="Reset"
-        cancelText="Cancel"
-        variant="danger"
-      />
-
-      <ConfirmModal
-        isOpen={showClearCacheConfirm}
-        onClose={() => setShowClearCacheConfirm(false)}
-        onConfirm={() => {
-          clearPuzzleState();
-          try {
-            const keysToRemove: string[] = [];
-            for (let i = 0; i < localStorage.length; i++) {
-              const k = localStorage.key(i);
-              if (
-                k?.startsWith("phuzzle:viewport:") ||
-                k === "phuzzle:puzzleState" ||
-                k === "phuzzle:puzzleStateBackup"
-              )
-                keysToRemove.push(k);
-            }
-            keysToRemove.forEach((k) => localStorage.removeItem(k));
-          } catch {
-            /* ignore */
-          }
-          setShowClearCacheConfirm(false);
-          navigate("/");
-        }}
-        title="Clear Cache?"
-        message="This will clear saved puzzle state and viewport settings. You will return to the menu."
-        confirmText="Clear"
-        cancelText="Cancel"
-        variant="danger"
-      />
-
-      <div className={styles.playBody}>
-        <div className={styles.main} ref={mainRef}>
-          <div className={styles.boardWrapper}>
-            <div
-              className={styles.boardProgressFrame}
-              style={
-                total > 0
-                  ? {
-                      ["--progress" as string]: placed / total,
-                      ["--progress-color" as string]: "var(--color-progress-75, #22c55e)",
-                    }
-                  : undefined
-              }
-            >
-              <div className={styles.board} ref={boardRef}>
-                {isLoading && (
-                  <div className={styles.loadingOverlay} aria-label="Loading puzzle">
-                    <div className={styles.spinner} />
-                    <span>Loading puzzle…</span>
-                  </div>
-                )}
-                {onboarding.needsStartTip && piecesOnBoard === 0 && (
-                  <div className={styles.startHintOverlay} role="status">
-                    <span>Drag a piece to start</span>
-                    <button
-                      type="button"
-                      className={styles.toastDismiss}
-                      onClick={onboarding.dismissStartTip}
-                      aria-label="Dismiss"
-                    >
-                      ×
-                    </button>
-                  </div>
-                )}
-                <SnapComboMeter combo={snapCombo} />
-                <canvas
-                  key={puzzleKey}
-                  className={styles.canvas}
-                  ref={canvasRef}
-                  onPointerDown={handlePointerDown}
-                  onPointerMove={handlePointerMove}
-                  onPointerUp={handlePointerUp}
-                  onPointerCancel={handlePointerCancel}
-                  onLostPointerCapture={handleLostPointerCapture}
-                  onContextMenu={handleContextMenu}
-                  onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
-                />
-                {state?.pieces?.[0] && state.grid && (
-                  <Minimap
-                    pieces={state.pieces}
-                    grid={state.grid}
-                    assembledW={state.grid.cols * state.pieces[0].tileW}
-                    assembledH={state.grid.rows * state.pieces[0].tileH}
-                    viewport={viewport.viewport}
-                    containerW={boardSize.w}
-                    containerH={boardSize.h}
-                    setViewport={viewport.setViewport}
-                    visible={!isPaused && !isComplete}
-                  />
-                )}
-                {isPaused && (
-                  <PauseOverlay
-                    onResume={() => setIsPaused(false)}
-                    isCountdownExpired={
-                      timeMode === "countdown" &&
-                      elapsedSeconds <= 0 &&
-                      !isComplete &&
-                      isPaused
-                    }
-                    onNewPuzzle={
-                      timeMode === "countdown" &&
-                      elapsedSeconds <= 0 &&
-                      !isComplete &&
-                      isPaused
-                        ? handleNewGame
-                        : undefined
-                    }
-                  />
-                )}
-                {isComplete && !completionDismissed && (
-                  <CompletionOverlay
-                    elapsedSeconds={elapsedSeconds}
-                    grid={state?.grid}
-                    pieces={state?.pieces ?? []}
-                    imageUrl={
-                      localStorage.getItem(STORAGE_KEY) ||
-                      imgRef.current?.src ||
-                      undefined
-                    }
-                    undoCount={undoCountRef.current}
-                    moveCount={moveCountRef.current}
-                    accuracyPercent={
-                      state?.totalCount && state.totalCount > 0
-                        ? Math.round(
-                            (state.totalCount /
-                              Math.max(moveCountRef.current, state.totalCount)) *
-                              100,
-                          )
-                        : 100
-                    }
-                    usedHint={usedHintRef.current}
-                    visualModifier={dailyVisualModifier}
-                    isNewBest={
-                      timeMode === "best" &&
-                      state?.grid != null &&
-                      (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
-                    }
-                    isDaily={isDailyPuzzleSession()}
-                    cutType={pieceCutType}
-                    copied={share.copied}
-                    canNativeShare={share.canNativeShare}
-                    onCopyResults={share.handleCopyResults}
-                    onNativeShare={share.handleNativeShare}
-                    onDownloadImage={handleDownloadImage}
-                    onClose={() => setCompletionDismissed(true)}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          className={`${styles.trayArea} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
-          onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
-        >
-          {!isComplete && !isPaused && (
-            <div className={styles.undoRedoPillsWrap}>
-              <UndoRedoButtons
-                canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
-                onUndo={createUndoRedoHandler(
-                  manager ?? null,
-                  "undo",
-                  setState,
-                  () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
-                  soundManager.play.bind(soundManager),
-                  () => {
-                    undoCountRef.current += 1;
-                  },
-                  (fromPositions) => {
-                    undoSnapBackRef.current = {
-                      fromPositions,
-                      startMs: performance.now(),
-                    };
-                  },
-                )}
-                canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
-                onRedo={createUndoRedoHandler(
-                  manager ?? null,
-                  "redo",
-                  setState,
-                  () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
-                  soundManager.play.bind(soundManager),
-                  undefined,
-                  (fromPositions) => {
-                    undoSnapBackRef.current = {
-                      fromPositions,
-                      startMs: performance.now(),
-                    };
-                  },
-                )}
-              />
-            </div>
-          )}
+        {immersiveMode && (
           <div
-            className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""}`}
+            className={styles.immersivePeekTop}
+            onPointerEnter={handleImmersiveReveal}
+            onPointerDown={handleImmersiveReveal}
+            role="button"
+            tabIndex={-1}
+            aria-label="Show menu and controls"
+            title="Show menu and controls"
+          />
+        )}
+        <PlayScreenTopBar
+          headerMenuProps={{
+            title: "Phuzzle",
+            theme,
+            setTheme,
+            timeMode,
+            setTimeMode: (modeOrFn) => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              setTimeMode(modeOrFn);
+            },
+            countdownMinutes,
+            setCountdownMinutes,
+            showPreview,
+            soundEnabled,
+            musicEnabled,
+            hapticsEnabled,
+            pieceLockingEnabled,
+            showGhostHint,
+            showGhostWhenIdle,
+            showEdgeHighlight,
+            showClusterOutline,
+            onToggleClusterOutline: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              toggleShowClusterOutline();
+            },
+            deliberateDetachEnabled,
+            onToggleDeliberateDetach: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              toggleDeliberateDetach();
+            },
+            showAlignmentGrid,
+            isFullscreen: ui.isFullscreen,
+            canShowHaptics: isCoarsePointer && typeof navigator?.vibrate === "function",
+            canShowFullscreen: !!document.fullscreenEnabled,
+            canShowShortcuts: !isCoarsePointer,
+            canShowDebug: SHOW_DEBUG,
+            debug,
+            onNewPuzzle: () => setShowNewGameModal(true),
+            canUndo: !!(manager?.canUndo() && !isPaused && !state?.isComplete),
+            onUndo: createUndoRedoHandler(
+              manager ?? null,
+              "undo",
+              setState,
+              () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
+              soundManager.play.bind(soundManager),
+              () => {
+                undoCountRef.current += 1;
+              },
+              (fromPositions) => {
+                undoSnapBackRef.current = {
+                  fromPositions,
+                  startMs: performance.now(),
+                };
+              },
+            ),
+            canRedo: !!(manager?.canRedo() && !isPaused && !state?.isComplete),
+            onRedo: createUndoRedoHandler(
+              manager ?? null,
+              "redo",
+              setState,
+              () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
+              soundManager.play.bind(soundManager),
+              undefined,
+              (fromPositions) => {
+                undoSnapBackRef.current = {
+                  fromPositions,
+                  startMs: performance.now(),
+                };
+              },
+            ),
+            onResetView: () => viewport.reset(),
+            onTogglePreview: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              setShowPreview((p) => !p);
+            },
+            onToggleSound: toggleSound,
+            onToggleMusic: toggleMusic,
+            onToggleHaptics: toggleHaptics,
+            onTogglePieceLocking: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              setPieceLockingEnabled((p) => !p);
+            },
+            relaxedModeEnabled,
+            onToggleRelaxedMode: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              toggleRelaxedMode();
+            },
+            driftModeEnabled,
+            onToggleDriftMode: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              toggleDriftMode();
+            },
+            onToggleGhostHint: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              setShowGhostHint((g) => !g);
+            },
+            onToggleGhostWhenIdle: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              toggleShowGhostWhenIdle();
+            },
+            onToggleEdgeHighlight: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              toggleShowEdgeHighlight();
+            },
+            onToggleAlignmentGrid: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              setShowAlignmentGrid((a) => !a);
+            },
+            onToggleFullscreen: toggleFullscreen,
+            onZoomIn: () => viewport.zoomIn(),
+            onZoomOut: () => viewport.zoomOut(),
+            onShowShortcuts: () => setShowShortcuts(true),
+            onShowHowToPlay: () => setShowHowToPlay(true),
+            onToggleDebug: toggleDebug,
+            onTogglePerfOverlay: togglePerfOverlay,
+            immersiveMode,
+            onToggleImmersiveMode: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              handleToggleImmersiveMode();
+            },
+            progressiveRevealMode,
+            onToggleProgressiveReveal: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              setProgressiveRevealMode((v) => !v);
+            },
+            pieceCutType,
+            onPieceCutTypeChange: (cut) => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              setPieceCutType(cut);
+            },
+            onSharePuzzle: isSupabaseConfigured() ? handleSharePuzzle : undefined,
+            shareDisabled: creatingSession,
+            onOpenThemeModal: () => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              setShowThemeModal(true);
+            },
+            dailyPreferredModifier,
+            onDailyPreferredModifierChange: (m) => {
+              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
+              setDailyPreferredModifier(m);
+            },
+            onResetStats: () => setShowResetStatsConfirm(true),
+            onClearCache: () => setShowClearCacheConfirm(true),
+            snapToleranceOverride,
+            onSnapToleranceOverrideChange: (value) => setSnapToleranceOverride(value),
+          }}
+          sessionId={sessionId}
+          realtimeStatus={realtimeStatus}
+          connectedCount={sessionResult.connectedCount}
+          showHud={!isComplete && !isPaused}
+          hudProps={{
+            elapsedSeconds,
+            piecesLeft: left,
+            totalPieces: total,
+            isPaused,
+            isComplete,
+            timeMode,
+            countdownMinutes,
+            bestTimeSeconds,
+            quadrantTimes: timeMode === "speedrun" ? quadrantTimes : undefined,
+            quadrantPbs:
+              timeMode === "speedrun" && grid
+                ? {
+                    0: getQuadrantPb(grid.rows, grid.cols, 0),
+                    1: getQuadrantPb(grid.rows, grid.cols, 1),
+                    2: getQuadrantPb(grid.rows, grid.cols, 2),
+                    3: getQuadrantPb(grid.rows, grid.cols, 3),
+                  }
+                : undefined,
+            lives: timeMode === "timeattack" ? lives : undefined,
+            onTogglePause: () => setIsPaused((p) => !p),
+          }}
+          topBarButtonsProps={{
+            showPreview,
+            soundEnabled,
+            isFullscreen: ui.isFullscreen,
+            showDebug: SHOW_DEBUG,
+            isCoarsePointer,
+            onTogglePreview: () => setShowPreview((p) => !p),
+            onToggleSound: toggleSound,
+            onToggleFullscreen: toggleFullscreen,
+            onShowShortcuts: () => setShowShortcuts(true),
+            onToggleDebug: toggleDebug,
+            onNewPuzzle: () => setShowNewGameModal(true),
+          }}
+          immersiveMode={immersiveMode}
+          showImmersiveUi={showImmersiveUi}
+          onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
+        />
+
+        <PlayScreenModals
+          awaitingResumeChoice={awaitingResumeChoice}
+          resumeChoice={resumeChoice}
+          setResumeChoice={setResumeChoice}
+          showHelpChoice={showHelpChoice}
+          setShowHelpChoice={setShowHelpChoice}
+          setShowHowToPlay={setShowHowToPlay}
+          setShowShortcuts={setShowShortcuts}
+          showThemeModal={showThemeModal}
+          setShowThemeModal={setShowThemeModal}
+          hapticsEnabled={hapticsEnabled}
+          showNewGameModal={showNewGameModal}
+          setShowNewGameModal={setShowNewGameModal}
+          onConfirmNewGame={handleNewGame}
+          showResetStatsConfirm={showResetStatsConfirm}
+          setShowResetStatsConfirm={setShowResetStatsConfirm}
+          showClearCacheConfirm={showClearCacheConfirm}
+          setShowClearCacheConfirm={setShowClearCacheConfirm}
+        />
+
+        <div className={styles.playBody}>
+          <div className={styles.main} ref={mainRef}>
+            <div className={styles.boardWrapper}>
+              <div
+                className={styles.boardProgressFrame}
+                style={
+                  total > 0
+                    ? {
+                        ["--progress" as string]: placed / total,
+                        ["--progress-color" as string]:
+                          "var(--color-progress-75, #22c55e)",
+                      }
+                    : undefined
+                }
+              >
+                <div className={styles.board} ref={boardRef} data-testid="play-board">
+                  {isLoading && (
+                    <div className={styles.loadingOverlay} aria-label="Loading puzzle">
+                      <div className={styles.spinner} />
+                      <span>Loading puzzle…</span>
+                    </div>
+                  )}
+                  {onboarding.needsStartTip && piecesOnBoard === 0 && (
+                    <div className={styles.startHintOverlay} role="status">
+                      <span>Drag a piece to start</span>
+                      <button
+                        type="button"
+                        className={styles.toastDismiss}
+                        onClick={onboarding.dismissStartTip}
+                        aria-label="Dismiss"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                  <SnapComboMeter combo={snapCombo} />
+                  <canvas
+                    key={puzzleKey}
+                    className={styles.canvas}
+                    ref={canvasRef}
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerCancel={handlePointerCancel}
+                    onLostPointerCapture={handleLostPointerCapture}
+                    onContextMenu={handleContextMenu}
+                    onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
+                  />
+                  {state?.pieces?.[0] && state.grid && (
+                    <Minimap
+                      pieces={state.pieces}
+                      grid={state.grid}
+                      assembledW={state.grid.cols * state.pieces[0].tileW}
+                      assembledH={state.grid.rows * state.pieces[0].tileH}
+                      viewport={viewport.viewport}
+                      containerW={boardSize.w}
+                      containerH={boardSize.h}
+                      setViewport={viewport.setViewport}
+                      visible={!isPaused && !isComplete}
+                    />
+                  )}
+                  {isPaused && (
+                    <PauseOverlay
+                      onResume={() => setIsPaused(false)}
+                      isCountdownExpired={
+                        timeMode === "countdown" &&
+                        elapsedSeconds <= 0 &&
+                        !isComplete &&
+                        isPaused
+                      }
+                      onNewPuzzle={
+                        timeMode === "countdown" &&
+                        elapsedSeconds <= 0 &&
+                        !isComplete &&
+                        isPaused
+                          ? handleNewGame
+                          : undefined
+                      }
+                    />
+                  )}
+                  {((isComplete && !completionDismissed) ||
+                    (showE2ECompletion && !completionDismissed)) &&
+                    state && (
+                      <CompletionOverlayGate
+                        show
+                        elapsedSeconds={elapsedSeconds}
+                        state={state}
+                        imageUrl={
+                          safeLocalStorage.getItem(STORAGE_KEY) ||
+                          imgRef.current?.src ||
+                          undefined
+                        }
+                        undoCount={undoCountRef.current}
+                        moveCount={moveCountRef.current}
+                        dailyVisualModifier={dailyVisualModifier}
+                        pieceCutType={pieceCutType}
+                        isNewBest={
+                          timeMode === "best" &&
+                          state.grid != null &&
+                          (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
+                        }
+                        share={{
+                          copied: share.copied,
+                          canNativeShare: share.canNativeShare,
+                          handleCopyResults: share.handleCopyResults,
+                          handleNativeShare: share.handleNativeShare,
+                        }}
+                        onDownloadImage={handleDownloadImage}
+                        onClose={() => setCompletionDismissed(true)}
+                        usedHint={usedHintRef.current}
+                        isDaily={isDailyPuzzleSession()}
+                        onGoHome={() => navigate("/")}
+                        onPlayAgain={handleNewGame}
+                      />
+                    )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            className={`${styles.trayArea} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
+            onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
           >
-            <PieceTray
-              ref={trayRef}
-              pieces={trayPieces}
-              image={imgRef.current}
-              grid={state?.grid ?? grid}
-              onPieceClick={handleTrayPieceClick}
-              highlightedPieceIds={
-                highlightedPieceIds.size > 0 ? highlightedPieceIds : undefined
-              }
-            />
+            {!isComplete && !isPaused && (
+              <div className={styles.undoRedoPillsWrap}>
+                <UndoRedoButtons
+                  canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
+                  onUndo={createUndoRedoHandler(
+                    manager ?? null,
+                    "undo",
+                    setState,
+                    () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
+                    soundManager.play.bind(soundManager),
+                    () => {
+                      undoCountRef.current += 1;
+                    },
+                    (fromPositions) => {
+                      undoSnapBackRef.current = {
+                        fromPositions,
+                        startMs: performance.now(),
+                      };
+                    },
+                  )}
+                  canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
+                  onRedo={createUndoRedoHandler(
+                    manager ?? null,
+                    "redo",
+                    setState,
+                    () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
+                    soundManager.play.bind(soundManager),
+                    undefined,
+                    (fromPositions) => {
+                      undoSnapBackRef.current = {
+                        fromPositions,
+                        startMs: performance.now(),
+                      };
+                    },
+                  )}
+                />
+              </div>
+            )}
+            <div
+              className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""}`}
+            >
+              <PieceTray
+                ref={trayRef}
+                pieces={trayPieces}
+                image={imgRef.current}
+                grid={state?.grid ?? grid}
+                onPieceClick={handleTrayPieceClick}
+                highlightedPieceIds={
+                  highlightedPieceIds.size > 0 ? highlightedPieceIds : undefined
+                }
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {(showPreview || progressiveRevealMode) && imgRef.current && state && (
-        <div
-          className={styles.previewPanel}
-          onClick={(e) => {
+        <PlayScreenOverlays
+          showPreview={showPreview}
+          progressiveRevealMode={progressiveRevealMode}
+          previewImage={imgRef.current}
+          state={state}
+          onPreviewTap={(e) => {
             const COOLDOWN_MS = 3000;
             if (performance.now() - lastReferenceTapRef.current < COOLDOWN_MS) return;
+            if (!state) return;
             const el = e.currentTarget;
             const rect = el.getBoundingClientRect();
             const x = (e.clientX - rect.left) / rect.width;
@@ -1585,113 +1407,41 @@ export function PlayScreen() {
               setTimeout(() => setHighlightedPieceIds(new Set()), 2200);
             }
           }}
-          role="button"
-          tabIndex={0}
-          title="Tap to highlight matching pieces in drawer"
-          aria-label="Reference image - tap to highlight matching pieces"
-        >
-          {progressiveRevealMode && state?.pieces ? (
-            <ProgressivePreviewOverlay
-              image={imgRef.current}
-              pieces={state.pieces}
-              grid={state.grid}
-              width={140}
-              height={140}
-            />
-          ) : (
-            <img
-              src={imgRef.current.src}
-              alt="Puzzle preview"
-              className={styles.previewImage}
-            />
-          )}
-        </div>
-      )}
-
-      {immersiveMode && (
-        <div
-          className={styles.immersivePeekBottom}
-          onPointerEnter={handleImmersiveReveal}
-          onPointerDown={handleImmersiveReveal}
-          role="button"
-          tabIndex={-1}
-          aria-label="Show piece drawer"
-          title="Show piece drawer"
-        />
-      )}
-
-      <TutorialOverlay
-        isOpen={showTutorial || showHowToPlay}
-        onComplete={() => {
-          if (showTutorial) dismissTutorial();
-          setShowHowToPlay(false);
-        }}
-        showSkipLink={showTutorial}
-      />
-
-      <ShortcutsModal
-        isOpen={showShortcuts}
-        onClose={() => setShowShortcuts(false)}
-        disabledIds={
-          state && manager
-            ? [
-                ...(!manager.canUndo() || isPaused || state.isComplete
-                  ? (["undo"] as const)
-                  : []),
-                ...(!manager.canRedo() || isPaused || state.isComplete
-                  ? (["redo"] as const)
-                  : []),
-              ]
-            : undefined
-        }
-      />
-
-      {dragPreviewPiece && dragPreview && imgRef.current && (
-        <DragPreview
-          clientX={dragPreview.clientX}
-          clientY={dragPreview.clientY}
-          piece={dragPreviewPiece}
-          image={imgRef.current}
-          grid={state!.grid}
-        />
-      )}
-
-      <PlayToasts
-        onboarding={onboarding}
-        showFirstSnapToast={onboarding.showFirstSnapToast}
-        showStreakToast={showStreakToast}
-        milestoneMessage={milestoneMessage}
-        announcerLine={announcerLine}
-        shareToast={shareToast}
-        classNames={{
-          engagementToast: styles.engagementToast,
-          announcerToast: styles.announcerToast,
-          toastDismiss: styles.toastDismiss,
-          onboardingOverlay: styles.onboardingOverlay,
-          onboardingOverlayTray: styles.onboardingOverlayTray,
-        }}
-      />
-      {(import.meta.env.DEV ||
-        SHOW_DEBUG ||
-        searchParams.has("debug") ||
-        searchParams.has("perf")) && (
-        <ProfilerOverlay
-          statsRef={perfStatsRef}
-          visible={
+          immersiveMode={immersiveMode}
+          onImmersiveReveal={handleImmersiveReveal}
+          showTutorial={showTutorial}
+          showHowToPlay={showHowToPlay}
+          dismissTutorial={dismissTutorial}
+          setShowHowToPlay={setShowHowToPlay}
+          showShortcuts={showShortcuts}
+          setShowShortcuts={setShowShortcuts}
+          manager={manager}
+          isPaused={isPaused}
+          dragPreviewPiece={dragPreviewPiece ?? null}
+          dragPreview={dragPreview}
+          onboarding={onboarding}
+          showStreakToast={showStreakToast}
+          milestoneMessage={milestoneMessage}
+          announcerLine={announcerLine}
+          shareToast={shareToast}
+          showProfiler={
+            import.meta.env.DEV ||
+            SHOW_DEBUG ||
+            searchParams.has("debug") ||
+            searchParams.has("perf")
+          }
+          perfStatsRef={perfStatsRef}
+          profilerVisible={
             debug.showPerfOverlay || searchParams.has("debug") || searchParams.has("perf")
           }
-        />
-      )}
-      {sessionId && (
-        <CoopDebugPanel
           sessionId={sessionId}
           connectedCount={sessionResult.connectedCount}
           lastEventTimestamp={lastEventTimestamp}
           lastDbWriteMs={lastDbWriteMs}
           channelName={channelName}
         />
-      )}
-    </div>
+      </div>
+    </PlayScreenCoopView>
   );
 }
 

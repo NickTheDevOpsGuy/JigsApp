@@ -17,6 +17,9 @@ const PATTERN_MS: Record<HapticKind, number | number[]> = {
 /**
  * Best-effort haptics.
  *
+ * Place and snap feedback are triggered from usePlayScreenManager when pieces
+ * are placed or snap into position (when haptics are enabled in settings).
+ *
  * Notes:
  * - On iOS Safari, `navigator.vibrate` is often unavailable or ignored.
  * - We only call vibrate in direct response to user actions/events.

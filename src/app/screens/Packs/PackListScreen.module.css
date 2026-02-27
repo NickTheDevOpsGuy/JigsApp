@@ -16,8 +16,12 @@
   margin: 0 auto;
   background: var(--color-bg-card);
   border-radius: 16px;
-  padding: 20px;
+  padding: 16px 20px;
   box-shadow: var(--shadow-md);
+}
+
+.cardScroll {
+  min-height: 0;
 }
 
 .header {
@@ -53,15 +57,15 @@
 }
 
 .subtitle {
-  margin: 0 0 12px;
-  font-size: 14px;
+  margin: 0 0 8px;
+  font-size: 13px;
   color: var(--color-text-secondary);
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .seasonNote {
-  margin: 0 0 12px;
-  font-size: 13px;
+  margin: 0 0 8px;
+  font-size: 12px;
   color: var(--color-text-secondary);
   font-style: italic;
 }
@@ -69,7 +73,7 @@
 .packGrid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .packCard {
@@ -147,40 +151,80 @@
 
 @media (max-width: 600px) {
   .page {
+    height: 100dvh;
     min-height: 100dvh;
-    padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
-      max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
     box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .card {
-    padding: 14px 12px;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
     margin-bottom: 0;
   }
 
+  .header {
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+
+  .backBtn {
+    width: 36px;
+    height: 36px;
+  }
+
   .title {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
+  }
+
+  .cardScroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
 
   .subtitle {
-    font-size: 13px;
-    margin-bottom: 12px;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .seasonNote {
+    font-size: 11px;
+    margin-bottom: 6px;
   }
 
   .packGrid {
-    gap: 10px;
+    gap: 6px;
   }
 
   .packCard {
-    padding: 12px;
-    gap: 12px;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .packEmoji {
+    font-size: 1.5rem;
   }
 
   .packName {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .packDesc {
-    font-size: 12px;
+    font-size: 11px;
+  }
+
+  .packProgress {
+    font-size: 11px;
   }
 }

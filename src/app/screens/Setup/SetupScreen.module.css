@@ -36,36 +36,36 @@
 .cardBody {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   min-width: 0;
   overflow-x: hidden;
 }
 
-/* Desktop: wider card, more spacing, larger preview */
+/* Desktop: wider card, compact spacing */
 @media (min-width: 768px) {
   .page {
-    padding: 28px;
+    padding: 24px;
   }
 
   .card {
-    max-width: 720px;
-    padding: 28px 36px;
+    max-width: 640px;
+    padding: 20px 28px;
   }
 
   .cardBody {
-    gap: 20px;
+    gap: 12px;
   }
 
   .preview {
-    width: min(480px, 50vh);
-    height: min(480px, 50vh);
-    min-height: 280px;
-    margin: 8px 0;
+    width: min(320px, 40vh);
+    height: min(320px, 40vh);
+    min-height: 200px;
+    margin: 6px 0;
   }
 }
 
 .title {
-  margin: 0 0 8px 0;
+  margin: 0 0 4px 0;
   font-size: 17px;
   color: var(--color-brand-primary);
   flex-shrink: 0;
@@ -86,8 +86,8 @@
 }
 
 .difficultySuggestionSlot {
-  min-height: 36px;
-  margin-bottom: 4px;
+  min-height: 28px;
+  margin-bottom: 2px;
 }
 
 .difficultySuggestion {
@@ -114,10 +114,10 @@
 .configGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
   padding: 0;
-  margin: 4px 0;
+  margin: 2px 0;
 }
 
 .configGrid > *:nth-child(n + 3) {
@@ -134,10 +134,10 @@
 }
 
 .preview {
-  min-height: 180px;
-  height: min(50vw, 55vh, 320px);
+  min-height: 160px;
+  height: min(48vw, 50vh, 280px);
   min-width: 0;
-  width: min(50vw, 55vh, 320px);
+  width: min(48vw, 50vh, 280px);
   aspect-ratio: 1 / 1;
   align-self: center;
   border-radius: 12px;
@@ -148,7 +148,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin: 12px 0;
+  margin: 8px 0;
 }
 
 .previewEmpty {
@@ -172,9 +172,9 @@
   flex-shrink: 0;
   display: grid;
   grid-template-columns: 1fr 1fr 1.35fr;
-  gap: 10px;
-  margin-top: 8px;
-  padding-top: 16px;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 12px;
   border-top: 1px solid var(--color-border);
 }
 
@@ -314,16 +314,18 @@
 .rememberLabel {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 13px;
   color: var(--color-text-primary);
   cursor: pointer;
+  margin: 0;
 }
 
 .rememberCheckbox {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   accent-color: var(--color-brand-primary);
+  flex-shrink: 0;
 }
 
 /* Tabs for Gallery/Upload */
@@ -364,7 +366,7 @@
 .imageSourcePanel {
   flex-shrink: 0;
   min-width: 0; /* allows shrinking in flex chain, prevents overflow */
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
 /* Category filter */
@@ -553,17 +555,19 @@
 /* Mobile – full-height flex, anchor Start at bottom */
 @media (max-width: 520px) {
   .page {
-    min-height: 100dvh;
     height: 100dvh;
-    padding: 14px;
-    padding-top: max(10px, env(safe-area-inset-top));
-    padding-bottom: max(10px, env(safe-area-inset-bottom));
-    padding-left: max(10px, env(safe-area-inset-left));
-    padding-right: max(10px, env(safe-area-inset-right));
+    min-height: 100dvh;
+    padding: 8px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: stretch;
+    overflow: hidden;
+    overflow-y: hidden;
   }
 
   .card {
@@ -572,8 +576,8 @@
     flex-direction: column;
     min-height: 0;
     width: 100%;
-    padding: 18px 20px;
-    padding-bottom: max(18px, env(safe-area-inset-bottom));
+    padding: 12px 14px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
     max-width: 100%;
   }
 
@@ -583,20 +587,18 @@
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
     display: flex;
     flex-direction: column;
-  }
-
-  .cardBody {
-    gap: 12px;
+    gap: 8px;
   }
 
   .actionRow {
     flex-shrink: 0;
     margin-top: auto;
-    padding-top: 16px;
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
-    gap: 10px;
+    padding-top: 10px;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+    gap: 8px;
     grid-template-columns: 1fr 1fr;
     border-top: 1px solid var(--color-border);
   }
@@ -625,13 +627,13 @@
   }
 
   .preview {
-    width: min(72vw, 36vh, 200px);
-    height: min(72vw, 36vh, 200px);
+    width: min(64vw, 30vh, 180px);
+    height: min(64vw, 30vh, 180px);
     aspect-ratio: 1 / 1;
-    min-height: 140px;
+    min-height: 120px;
     align-self: center;
     flex-shrink: 1;
-    margin: 10px 0;
+    margin: 6px 0;
   }
 
   .previewImg {
@@ -741,7 +743,8 @@
   }
 
   .configGrid {
-    gap: 8px;
+    gap: 6px;
+    margin: 0;
   }
 
   .previewImg {

@@ -3,6 +3,8 @@
  * Use when you only need completion/streak/date logic.
  * For puzzle selection, dynamically import dailyPuzzle.
  */
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+
 export const GRID_OPTIONS = [
   { rows: 3, cols: 3, label: "Easy 3×3 - 9 pieces", pieces: 9 },
   { rows: 4, cols: 4, label: "Medium 4×4 - 16 pieces (Recommended)", pieces: 16 },
@@ -28,7 +30,7 @@ export type DailyVisualModifier = "none" | "fog" | "night" | "sepia";
 /** Read selected daily visual modifier for current run. */
 export function getDailyVisualModifier(): DailyVisualModifier {
   try {
-    const raw = localStorage.getItem(DAILY_MODIFIER_KEY);
+    const raw = safeLocalStorage.getItem(DAILY_MODIFIER_KEY);
     return raw === "fog" || raw === "night" || raw === "sepia" ? raw : "none";
   } catch {
     return "none";
@@ -38,7 +40,7 @@ export function getDailyVisualModifier(): DailyVisualModifier {
 /** Read preferred visual modifier for next daily puzzle (Appearance setting). */
 export function getDailyPreferredModifier(): DailyVisualModifier {
   try {
-    const raw = localStorage.getItem(DAILY_PREFERRED_MODIFIER_KEY);
+    const raw = safeLocalStorage.getItem(DAILY_PREFERRED_MODIFIER_KEY);
     return raw === "fog" || raw === "night" || raw === "sepia" ? raw : "none";
   } catch {
     return "none";
@@ -48,7 +50,7 @@ export function getDailyPreferredModifier(): DailyVisualModifier {
 /** Save preferred visual modifier for next daily puzzle. */
 export function setDailyPreferredModifier(modifier: DailyVisualModifier): void {
   try {
-    localStorage.setItem(DAILY_PREFERRED_MODIFIER_KEY, modifier);
+    safeLocalStorage.setItem(DAILY_PREFERRED_MODIFIER_KEY, modifier);
   } catch {
     /* ignore */
   }
@@ -63,7 +65,7 @@ export function getTodayDateString(): string {
 /** Get user's preferred daily difficulty index (0–6), or null if not set */
 export function getDailyPreferredDifficultyIndex(): number | null {
   try {
-    const raw = localStorage.getItem(DAILY_PREFERRED_GRID_KEY);
+    const raw = safeLocalStorage.getItem(DAILY_PREFERRED_GRID_KEY);
     if (raw === null) return null;
     const idx = parseInt(raw, 10);
     if (Number.isNaN(idx) || idx < 0 || idx >= GRID_OPTIONS.length) return null;
@@ -76,7 +78,7 @@ export function getDailyPreferredDifficultyIndex(): number | null {
 /** Save user's preferred daily difficulty index for future sessions */
 export function setDailyPreferredDifficultyIndex(index: number): void {
   try {
-    localStorage.setItem(DAILY_PREFERRED_GRID_KEY, String(index));
+    safeLocalStorage.setItem(DAILY_PREFERRED_GRID_KEY, String(index));
   } catch {
     /* ignore */
   }
@@ -85,7 +87,7 @@ export function setDailyPreferredDifficultyIndex(index: number): void {
 /** Clear saved daily difficulty preference */
 export function clearDailyPreferredDifficulty(): void {
   try {
-    localStorage.removeItem(DAILY_PREFERRED_GRID_KEY);
+    safeLocalStorage.removeItem(DAILY_PREFERRED_GRID_KEY);
   } catch {
     /* ignore */
   }
@@ -102,8 +104,9 @@ export function getYesterdayDateString(): string {
 export function wasFreezeOfferDismissedToday(): boolean {
   try {
     return (
-      localStorage.getItem(`${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`) ===
-      "true"
+      safeLocalStorage.getItem(
+        `${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`,
+      ) === "true"
     );
   } catch {
     return false;
@@ -113,7 +116,7 @@ export function wasFreezeOfferDismissedToday(): boolean {
 /** Mark the streak freeze offer as dismissed for today */
 export function dismissFreezeOfferToday(): void {
   try {
-    localStorage.setItem(
+    safeLocalStorage.setItem(
       `${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`,
       "true",
     );
@@ -127,9 +130,9 @@ export function wasYesterdayMissed(): boolean {
   try {
     const yesterday = getYesterdayDateString();
     const completed =
-      localStorage.getItem(`${DAILY_PREFIX}${yesterday}:completed`) === "true";
+      safeLocalStorage.getItem(`${DAILY_PREFIX}${yesterday}:completed`) === "true";
     const freezeUsed =
-      localStorage.getItem(`${STREAK_FREEZE_KEY}:used:${yesterday}`) === "true";
+      safeLocalStorage.getItem(`${STREAK_FREEZE_KEY}:used:${yesterday}`) === "true";
     return !completed && !freezeUsed;
   } catch {
     return false;
@@ -139,7 +142,7 @@ export function wasYesterdayMissed(): boolean {
 /** Check if current play session is a daily puzzle */
 export function isDailyPuzzleSession(): boolean {
   try {
-    const stored = localStorage.getItem(DAILY_DATE_KEY);
+    const stored = safeLocalStorage.getItem(DAILY_DATE_KEY);
     return stored === getTodayDateString();
   } catch {
     return false;
@@ -150,7 +153,8 @@ export function isDailyPuzzleSession(): boolean {
 export function isTodayDailyCompleted(): boolean {
   try {
     return (
-      localStorage.getItem(`${DAILY_PREFIX}${getTodayDateString()}:completed`) === "true"
+      safeLocalStorage.getItem(`${DAILY_PREFIX}${getTodayDateString()}:completed`) ===
+      "true"
     );
   } catch {
     return false;
@@ -161,8 +165,8 @@ export function isTodayDailyCompleted(): boolean {
 export function recordDailyCompletion(elapsedSeconds: number): number {
   const dateStr = getTodayDateString();
   try {
-    localStorage.setItem(`${DAILY_PREFIX}${dateStr}:completed`, "true");
-    localStorage.setItem(`${DAILY_PREFIX}${dateStr}:time`, String(elapsedSeconds));
+    safeLocalStorage.setItem(`${DAILY_PREFIX}${dateStr}:completed`, "true");
+    safeLocalStorage.setItem(`${DAILY_PREFIX}${dateStr}:time`, String(elapsedSeconds));
     const streak = getCurrentStreak();
     tryEarnStreakFreeze(streak);
     return streak;
@@ -175,7 +179,7 @@ export function recordDailyCompletion(elapsedSeconds: number): number {
 /** Get today's completion time in seconds, or null if not completed */
 export function getTodayDailyTime(): number | null {
   try {
-    const raw = localStorage.getItem(`${DAILY_PREFIX}${getTodayDateString()}:time`);
+    const raw = safeLocalStorage.getItem(`${DAILY_PREFIX}${getTodayDateString()}:time`);
     return raw ? parseInt(raw, 10) : null;
   } catch {
     return null;
@@ -185,7 +189,7 @@ export function getTodayDailyTime(): number | null {
 /** Get count of available streak freeze tokens (1 per week, max 1). Earned after 5-day streak. */
 export function getStreakFreezeCount(): number {
   try {
-    const raw = localStorage.getItem(STREAK_FREEZE_KEY);
+    const raw = safeLocalStorage.getItem(STREAK_FREEZE_KEY);
     if (raw === null) return 0;
     const count = parseInt(raw, 10);
     return Number.isNaN(count) ? 0 : Math.min(1, Math.max(0, count));
@@ -207,12 +211,12 @@ export function tryEarnStreakFreeze(currentStreak: number): number {
   try {
     if (currentStreak < 5) return getStreakFreezeCount();
     const weekKey = getWeekKey();
-    const earnedWeek = localStorage.getItem(STREAK_FREEZE_EARNED_WEEK_KEY);
+    const earnedWeek = safeLocalStorage.getItem(STREAK_FREEZE_EARNED_WEEK_KEY);
     if (earnedWeek === weekKey) return getStreakFreezeCount();
     const count = getStreakFreezeCount();
     const newCount = Math.min(1, count + 1);
-    localStorage.setItem(STREAK_FREEZE_KEY, String(newCount));
-    localStorage.setItem(STREAK_FREEZE_EARNED_WEEK_KEY, weekKey);
+    safeLocalStorage.setItem(STREAK_FREEZE_KEY, String(newCount));
+    safeLocalStorage.setItem(STREAK_FREEZE_EARNED_WEEK_KEY, weekKey);
     return newCount;
   } catch {
     return getStreakFreezeCount();
@@ -223,9 +227,9 @@ export function tryEarnStreakFreeze(currentStreak: number): number {
 export function refreshStreakFreeze(): number {
   try {
     const weekKey = getWeekKey();
-    const storedWeek = localStorage.getItem(STREAK_FREEZE_WEEK_KEY);
+    const storedWeek = safeLocalStorage.getItem(STREAK_FREEZE_WEEK_KEY);
     if (storedWeek !== weekKey) {
-      localStorage.setItem(STREAK_FREEZE_WEEK_KEY, weekKey);
+      safeLocalStorage.setItem(STREAK_FREEZE_WEEK_KEY, weekKey);
     }
     return getStreakFreezeCount();
   } catch {
@@ -237,7 +241,7 @@ export function refreshStreakFreeze(): number {
 export function tryAutoApplyStreakFreeze(): boolean {
   try {
     // E2E/QA: set phuzzle:testDisableAutoStreakFreeze=true to skip auto-apply and test manual offer
-    if (localStorage.getItem("phuzzle:testDisableAutoStreakFreeze") === "true")
+    if (safeLocalStorage.getItem("phuzzle:testDisableAutoStreakFreeze") === "true")
       return false;
   } catch {
     /* ignore */
@@ -251,8 +255,8 @@ export function useStreakFreeze(forDate: string): boolean {
   const count = getStreakFreezeCount();
   if (count <= 0) return false;
   try {
-    localStorage.setItem(STREAK_FREEZE_KEY, String(count - 1));
-    localStorage.setItem(`${STREAK_FREEZE_KEY}:used:${forDate}`, "true");
+    safeLocalStorage.setItem(STREAK_FREEZE_KEY, String(count - 1));
+    safeLocalStorage.setItem(`${STREAK_FREEZE_KEY}:used:${forDate}`, "true");
     return true;
   } catch {
     return false;
@@ -262,7 +266,7 @@ export function useStreakFreeze(forDate: string): boolean {
 /** Check if a streak freeze was used for a given date. */
 function wasFreezeUsedFor(dateStr: string): boolean {
   try {
-    return localStorage.getItem(`${STREAK_FREEZE_KEY}:used:${dateStr}`) === "true";
+    return safeLocalStorage.getItem(`${STREAK_FREEZE_KEY}:used:${dateStr}`) === "true";
   } catch {
     return false;
   }
@@ -277,7 +281,7 @@ export function getCurrentStreak(): number {
   for (let i = 0; i < 365; i++) {
     const dateStr = d.toISOString().slice(0, 10);
     const completed =
-      localStorage.getItem(`${DAILY_PREFIX}${dateStr}:completed`) === "true" ||
+      safeLocalStorage.getItem(`${DAILY_PREFIX}${dateStr}:completed`) === "true" ||
       wasFreezeUsedFor(dateStr);
     if (completed) {
       streak++;

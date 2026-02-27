@@ -14,12 +14,14 @@
   overflow-x: hidden;
 }
 
-/* Mobile: full viewport, card fills and content scrolls */
+/* Mobile: full viewport, no page scroll, card fills and content scrolls inside */
 @media (max-width: 600px) {
   .page {
     height: 100dvh;
-    padding: 10px 12px;
-    padding-top: max(12px, env(safe-area-inset-top));
+    min-height: 100dvh;
+    padding: 8px 10px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    overflow: hidden;
   }
 
   .card {
@@ -36,6 +38,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
 }
 
@@ -898,27 +901,27 @@
 /* Mobile: Stats / Leaderboard – compact layout */
 @media (max-width: 600px) {
   .card {
-    padding: 16px 12px;
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
-    border-radius: 16px;
+    padding: 12px 10px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+    border-radius: 14px;
   }
 
   .header {
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   .title {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .titleProgress {
-    font-size: 12px;
+    font-size: 11px;
     padding: 2px 6px;
   }
 
   .tabs {
-    gap: 6px;
-    margin-bottom: 18px;
+    gap: 4px;
+    margin-bottom: 10px;
   }
 
   .tabs button {
@@ -949,19 +952,19 @@
   }
 
   .tabs button {
-    padding: 12px 8px;
-    font-size: 13px;
-    min-width: 72px;
+    padding: 8px 6px;
+    font-size: 12px;
+    min-width: 64px;
   }
 
   .section h2 {
-    font-size: 16px;
-    margin-bottom: 12px;
+    font-size: 15px;
+    margin-bottom: 8px;
   }
 
   .leaderboardHeader {
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
   .controlsRow {

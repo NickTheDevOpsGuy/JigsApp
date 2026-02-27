@@ -1,8 +1,18 @@
 /**
- * CompletionOverlay – puzzle complete: message, image, Share Result. X or Esc to close.
+ * CompletionOverlay – puzzle complete: image, stats (Time, Moves, Accuracy, Rank), "Can you beat my run?", Continue.
  */
 import React, { useEffect, useCallback, useState } from "react";
-import { X, Share2, Download, Image } from "lucide-react";
+import {
+  X,
+  Clock,
+  Puzzle,
+  Target,
+  Trophy,
+  Play,
+  Share2,
+  Home,
+  RotateCcw,
+} from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { Modal } from "@/components/Modal/Modal";
 import styles from "../PlayScreen.module.css";
@@ -14,13 +24,17 @@ import {
   getCurrentStreak,
   getTodayDateString,
 } from "@/daily/dailyPuzzleCore";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { recordCompletion } from "@/services/statsService";
 import { checkAndUnlockAchievements } from "@/services/achievementsService";
 import { getPercentileRank } from "@/services/leaderboardService";
-import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
 import type { Piece } from "@/puzzle/types";
 import { useShareCardImage } from "../hooks/useShareCardImage";
 import { DailyReactions } from "@/components/DailyReactions";
+import { CompletionSharePopup } from "./CompletionSharePopup";
+import { useTheme } from "@/hooks/useTheme";
+import { useBatterySaver } from "@/hooks/useBatterySaver";
+import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 
 type PieceCutType = "classic" | "irregular" | "hard";
 type VisualModifier = "none" | "fog" | "night" | "sepia";
@@ -44,6 +58,10 @@ interface CompletionOverlayProps {
   onNativeShare?: () => void;
   onDownloadImage: () => void;
   onClose: () => void;
+  /** Called after onClose when user chooses "Back to home". */
+  onGoHome?: () => void;
+  /** Called after onClose when user chooses "Play again". */
+  onPlayAgain?: () => void;
 }
 
 export function CompletionOverlay({
@@ -65,10 +83,22 @@ export function CompletionOverlay({
   onNativeShare: _onNativeShare,
   onDownloadImage,
   onClose,
+  onGoHome,
+  onPlayAgain,
 }: CompletionOverlayProps) {
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
+
+  const handleGoHome = useCallback(() => {
+    onClose();
+    onGoHome?.();
+  }, [onClose, onGoHome]);
+
+  const handlePlayAgain = useCallback(() => {
+    onClose();
+    onPlayAgain?.();
+  }, [onClose, onPlayAgain]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -82,8 +112,8 @@ export function CompletionOverlay({
   }, [handleClose]);
 
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
-  const [streak, setStreak] = useState<number>(0);
-  const [masteryStreak, setMasteryStreak] = useState<number>(0);
+  const [_streak, setStreak] = useState<number>(0);
+  const [_masteryStreak, setMasteryStreak] = useState<number>(0);
   const [percentile, setPercentile] = useState<{
     topPercent: number;
     totalPlayers: number;
@@ -91,11 +121,73 @@ export function CompletionOverlay({
   const [useSeasonalFrame, setUseSeasonalFrame] = useState(true);
 
   const { shareCard, isGenerating } = useShareCardImage();
-  const completionMessage = getCompletionMessage(elapsedSeconds);
+  const { theme } = useTheme();
+  const batterySaverMode = useBatterySaver();
 
-  const pieceCount = grid ? grid.rows * grid.cols : 0;
-  const badge = getCompletionBadge(elapsedSeconds, undoCount, pieceCount);
-  const isMasteryDaily = isDaily && !usedHint && undoCount === 0;
+  const _isMasteryDaily = isDaily && !usedHint && undoCount === 0;
+
+  // Confetti when the win screen appears – layered bursts for a fuller celebration
+  useEffect(() => {
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion || batterySaverMode) return;
+
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const colors = CONFETTI_COLORS_BY_THEME[theme ?? "light"];
+    import("canvas-confetti").then((confetti) => {
+      const fn = confetti.default;
+      // Main burst from top center – more particles, longer fall
+      fn({
+        particleCount: 180,
+        spread: 75,
+        origin: { x: 0.5, y: 0.15 },
+        colors,
+        startVelocity: 28,
+        decay: 0.94,
+        ticks: 220,
+        gravity: 0.8,
+      });
+      // Side bursts with slight stagger
+      timeouts.push(
+        setTimeout(() => {
+          fn({
+            particleCount: 65,
+            angle: 60,
+            spread: 60,
+            origin: { x: 0, y: 0.55 },
+            colors,
+            startVelocity: 24,
+            scalar: 1.1,
+          });
+          fn({
+            particleCount: 65,
+            angle: 120,
+            spread: 60,
+            origin: { x: 1, y: 0.55 },
+            colors,
+            startVelocity: 24,
+            scalar: 1.1,
+          });
+        }, 120),
+      );
+      // Third wave: lower arc for depth
+      timeouts.push(
+        setTimeout(() => {
+          fn({
+            particleCount: 80,
+            spread: 100,
+            origin: { x: 0.5, y: 0.7 },
+            colors,
+            angle: 90,
+            startVelocity: 18,
+            decay: 0.92,
+          });
+        }, 350),
+      );
+    });
+    return () => timeouts.forEach((id) => clearTimeout(id));
+  }, [theme, batterySaverMode]);
 
   useEffect(() => {
     if (isNewBest && grid) {
@@ -110,23 +202,15 @@ export function CompletionOverlay({
     setStreak(newStreak);
 
     // Weekly album nudge flag (for future weekly collectible page)
-    try {
-      const today = new Date(`${getTodayDateString()}T00:00:00.000Z`);
-      const day = today.getUTCDay();
-      const diffToMonday = day === 0 ? 6 : day - 1;
-      today.setUTCDate(today.getUTCDate() - diffToMonday);
-      const weekKey = today.toISOString().slice(0, 10);
-      localStorage.setItem(`phuzzle:weeklyAlbumNudge:${weekKey}`, "true");
-    } catch {
-      // ignore
-    }
+    const today = new Date(`${getTodayDateString()}T00:00:00.000Z`);
+    const day = today.getUTCDay();
+    const diffToMonday = day === 0 ? 6 : day - 1;
+    today.setUTCDate(today.getUTCDate() - diffToMonday);
+    const weekKey = today.toISOString().slice(0, 10);
+    safeLocalStorage.setItem(`phuzzle:weeklyAlbumNudge:${weekKey}`, "true");
 
     // Reset daily seed key so the next run pulls fresh daily state if needed
-    try {
-      localStorage.removeItem(DAILY_DATE_KEY);
-    } catch {
-      // ignore
-    }
+    safeLocalStorage.removeItem(DAILY_DATE_KEY);
   }, [isDaily, elapsedSeconds]);
 
   useEffect(() => {
@@ -168,8 +252,31 @@ export function CompletionOverlay({
     void run();
   }, [elapsedSeconds, grid, isDaily, cutType, undoCount, usedHint, visualModifier]);
 
-  const puzzleSizeText =
-    grid != null ? `${grid.rows}×${grid.cols} · ${grid.rows * grid.cols} pieces` : null;
+  /** Rank position from percentile (1-based) */
+  const rankPosition =
+    percentile && percentile.totalPlayers >= 1
+      ? Math.max(
+          1,
+          Math.min(
+            percentile.totalPlayers,
+            percentile.totalPlayers -
+              Math.round((percentile.topPercent / 100) * percentile.totalPlayers) +
+              1,
+          ),
+        )
+      : null;
+
+  /** Visual badge tier for percentile (Top 10%, Top 25%, Top 50%, or null for no badge) */
+  const percentileBadgeTier =
+    percentile && percentile.totalPlayers >= 1
+      ? percentile.topPercent <= 10
+        ? "Top 10%"
+        : percentile.topPercent <= 25
+          ? "Top 25%"
+          : percentile.topPercent <= 50
+            ? "Top 50%"
+            : null
+      : null;
 
   const handleShareCard = useCallback(async () => {
     await shareCard({
@@ -201,110 +308,127 @@ export function CompletionOverlay({
         <X size={24} />
       </button>
 
-      <div className={styles.completeContent}>
-        <h2>🎉 {completionMessage}</h2>
+      <div className={styles.completePanel}>
+        <h2 className={styles.completeTitle}>
+          <span className={styles.completeTitleDot} aria-hidden="true">
+            •
+          </span>
+          Puzzle Completed!
+          <span className={styles.completeTitleDot} aria-hidden="true">
+            •
+          </span>
+        </h2>
 
-        {badge && (
-          <p className={styles.puzzleSize} aria-hidden="true">
-            {badge}
-          </p>
-        )}
-
-        {puzzleSizeText != null && <p className={styles.puzzleSize}>{puzzleSizeText}</p>}
-
-        <p>
-          Finished in {formatTime(elapsedSeconds)}
-          {percentile && percentile.totalPlayers >= 5 && (
-            <span className={styles.percentileRank}> · Top {percentile.topPercent}%</span>
-          )}
-          {isNewBest && <span className={styles.newBest}> — New best!</span>}
-          {isDaily && (
-            <span className={styles.dailyBadge}>
-              — Daily completed!
-              {streak > 0 && (
-                <span className={styles.streak}> {streak} day streak 🔥</span>
-              )}
-            </span>
-          )}
-        </p>
-
-        {isMasteryDaily && (
-          <p className={styles.dailyBadge}>
-            🏅 Mastery clear — no hints, no undo!
-            {masteryStreak > 0 && (
-              <span className={styles.streak}>
-                {" "}
-                {masteryStreak} day mastery streak ⚡
-              </span>
-            )}
-          </p>
+        {percentileBadgeTier && (
+          <div
+            className={styles.completePercentileBadge}
+            role="status"
+            aria-label={`Ranking: ${percentileBadgeTier}`}
+          >
+            <Trophy size={18} aria-hidden />
+            <span>{percentileBadgeTier}</span>
+          </div>
         )}
 
         {imageUrl && (
-          <div className={styles.completePreviewWrapper}>
-            <img
-              src={imageUrl}
-              alt="Completed puzzle"
-              className={styles.completePreviewImage}
-            />
+          <div className={styles.completeImageWrap}>
+            <img src={imageUrl} alt="Completed puzzle" className={styles.completeImage} />
           </div>
         )}
 
-        <div className={styles.completeActions}>
-          <div className={styles.completeActionsPrimary}>
-            <Button
-              variant="primary"
-              onClick={() => setSharePopupOpen(true)}
-              className={styles.completeSharePrimary}
-            >
-              <Share2 size={18} />
-              Share Result
-            </Button>
+        <div className={styles.completeStats}>
+          <div className={styles.completeStatRow}>
+            <Clock size={18} className={styles.completeStatIcon} aria-hidden />
+            <span className={styles.completeStatLabel}>Time:</span>
+            <span className={styles.completeStatValue}>{formatTime(elapsedSeconds)}</span>
           </div>
+          <div className={styles.completeStatRow}>
+            <Puzzle size={18} className={styles.completeStatIcon} aria-hidden />
+            <span className={styles.completeStatLabel}>Moves:</span>
+            <span className={styles.completeStatValue}>{moveCount}</span>
+          </div>
+          <div className={styles.completeStatRow}>
+            <Target size={18} className={styles.completeStatIcon} aria-hidden />
+            <span className={styles.completeStatLabel}>Accuracy:</span>
+            <span className={styles.completeStatValue}>
+              {Math.round(Math.max(0, Math.min(100, accuracyPercent)))}%
+            </span>
+          </div>
+          {percentile && percentile.totalPlayers >= 1 && rankPosition != null && (
+            <div className={styles.completeStatRow}>
+              <Trophy size={18} className={styles.completeStatIcon} aria-hidden />
+              <span className={styles.completeStatLabel}>Rank</span>
+              <span className={styles.completeStatValueRank}>
+                #{rankPosition} / {percentile.totalPlayers} (Top {percentile.topPercent}%)
+              </span>
+            </div>
+          )}
+        </div>
+
+        <p className={styles.completeChallenge}>Can you beat my run?</p>
+
+        <div className={styles.completeActions}>
+          <Button
+            variant="primary"
+            onClick={handleClose}
+            className={styles.completeContinueBtn}
+            aria-label="Continue"
+          >
+            <Play size={20} />
+            Continue
+          </Button>
+          {onPlayAgain != null && (
+            <Button
+              variant="secondary"
+              onClick={handlePlayAgain}
+              className={styles.completeContinueBtn}
+              aria-label="Play again"
+            >
+              <RotateCcw size={20} />
+              Play again
+            </Button>
+          )}
+          {onGoHome != null && (
+            <Button
+              variant="secondary"
+              onClick={handleGoHome}
+              className={styles.completeContinueBtn}
+              aria-label="Back to home"
+            >
+              <Home size={20} />
+              Back to home
+            </Button>
+          )}
+          <button
+            type="button"
+            className={styles.completeShareLink}
+            onClick={() => setSharePopupOpen(true)}
+          >
+            <Share2 size={16} />
+            Share Result
+          </button>
         </div>
 
         {isDaily && <DailyReactions puzzleDate={getTodayDateString()} />}
-
-        <Modal
-          isOpen={sharePopupOpen}
-          onClose={() => setSharePopupOpen(false)}
-          title="Share Result"
-          showCloseButton
-        >
-          <div className={styles.shareResultPopup}>
-            <label className={styles.shareResultPopupToggle}>
-              <input
-                type="checkbox"
-                checked={useSeasonalFrame}
-                onChange={(e) => setUseSeasonalFrame(e.target.checked)}
-              />
-              Seasonal frame
-            </label>
-
-            <Button
-              variant="secondary"
-              onClick={handleShareCard}
-              disabled={isGenerating}
-              className={styles.shareResultPopupBtn}
-            >
-              <Image size={18} />
-              {isGenerating ? "Generating..." : "Share Card PNG"}
-            </Button>
-
-            <Button
-              variant="secondary"
-              onClick={() => {
-                onDownloadImage();
-                setSharePopupOpen(false);
-              }}
-              className={styles.shareResultPopupBtn}
-            >
-              <Download size={18} />
-              Download
-            </Button>
-          </div>
-        </Modal>
       </div>
+
+      <Modal
+        isOpen={sharePopupOpen}
+        onClose={() => setSharePopupOpen(false)}
+        title="Share Result"
+        showCloseButton
+      >
+        <CompletionSharePopup
+          useSeasonalFrame={useSeasonalFrame}
+          setUseSeasonalFrame={setUseSeasonalFrame}
+          onShareCard={handleShareCard}
+          isGenerating={isGenerating}
+          onDownload={() => {
+            onDownloadImage();
+            setSharePopupOpen(false);
+          }}
+        />
+      </Modal>
     </div>
   );
 }

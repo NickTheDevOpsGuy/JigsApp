@@ -1,0 +1,449 @@
+/**
+ * Piece and overlay drawing helpers used by renderBoard.
+ * Keeps renderBoard.ts focused on the main pipeline.
+ */
+import type { Piece } from "@/puzzle/types";
+import type {
+  PopMap,
+  LockMap,
+  DebugFlags,
+  AnimationState,
+  PieceCache,
+} from "./renderBoardTypes";
+import {
+  snapPopScale,
+  snapGlowAlpha,
+  drawSnapGlow,
+  applyPieceShadow,
+  clearPieceShadow,
+  computeImageSourceRect,
+  DRAG_LIFT_PX,
+  DRAG_SCALE,
+} from "./renderBoardHelpers";
+import {
+  WRONG_ROTATION_SHAKE_MS,
+  wrongRotationShakeOffset,
+  drawWrongRotationIcon,
+  drawLockGlow,
+} from "./renderBoardDrawOverlays";
+
+function strokePieceOutline(
+  ctx: CanvasRenderingContext2D,
+  path: Path2D,
+  isDragging: boolean,
+  isSelected: boolean,
+  isPlaced: boolean,
+  locked: boolean,
+  showClusterOutline?: boolean,
+) {
+  if (isDragging) {
+    ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
+    ctx.lineWidth = 2;
+  } else if ((isPlaced || locked) && showClusterOutline) {
+    ctx.strokeStyle = "rgba(0, 160, 80, 0.25)";
+    ctx.lineWidth = 1;
+  } else if (isPlaced || locked) {
+    return;
+  } else {
+    ctx.strokeStyle = "rgba(0,0,0,0.25)";
+    ctx.lineWidth = 1;
+  }
+  ctx.stroke(path);
+}
+
+function drawCachedPiece(
+  ctx: CanvasRenderingContext2D,
+  p: Piece,
+  cacheCanvas: HTMLCanvasElement,
+  cacheW: number,
+  cacheH: number,
+  cachePxW: number,
+  cachePxH: number,
+  scale: number,
+  isDragging: boolean,
+  isSelected: boolean,
+  showLockGlow: boolean,
+  lockElapsedMs: number,
+  path: Path2D,
+  dpr: number,
+  shakeX: number = 0,
+  shakeY: number = 0,
+  showWrongRotationHint: boolean = false,
+  wrongRotationElapsedMs: number = 0,
+  showClusterOutline?: boolean,
+) {
+  ctx.save();
+  applyPieceShadow(ctx, isDragging, p.isPlaced);
+  let cx = p.x + p.w / 2 + shakeX;
+  let cy = p.y + p.h / 2 + shakeY;
+  if (isDragging) {
+    cx = Math.round(cx * dpr) / dpr;
+    cy = Math.round(cy * dpr) / dpr;
+    cy -= DRAG_LIFT_PX;
+  }
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+  ctx.translate(-cacheW / 2, -cacheH / 2);
+  ctx.drawImage(cacheCanvas, 0, 0, cachePxW, cachePxH, 0, 0, cacheW, cacheH);
+  clearPieceShadow(ctx);
+  if (isDragging || isSelected) {
+    ctx.translate(cacheW / 2, cacheH / 2);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.translate(-p.w / 2, -p.h / 2);
+    ctx.strokeStyle = isDragging ? "rgba(102, 126, 234, 0.6)" : "#667eea";
+    ctx.lineWidth = 1.5;
+    ctx.stroke(path);
+  } else if ((p.isPlaced || p.locked) && showClusterOutline) {
+    ctx.translate(cacheW / 2, cacheH / 2);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.translate(-p.w / 2, -p.h / 2);
+    strokePieceOutline(ctx, path, false, false, true, p.locked, true);
+  }
+  if (showLockGlow) {
+    ctx.translate(cacheW / 2, cacheH / 2);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.translate(-p.w / 2, -p.h / 2);
+    drawLockGlow(ctx, path, lockElapsedMs);
+  }
+  if (showWrongRotationHint) {
+    const iconX = cacheW / 2 - 14;
+    const iconY = -cacheH / 2 + 14;
+    drawWrongRotationIcon(ctx, iconX, iconY, Math.min(p.w, p.h), wrongRotationElapsedMs);
+  }
+  ctx.restore();
+}
+
+/** Draw semi-transparent ghosts at correct positions for misplaced pieces. */
+export function drawGhostHints(
+  ctx: CanvasRenderingContext2D,
+  pieces: Piece[],
+  img: HTMLImageElement,
+  cols: number,
+  rows: number,
+  alpha = 0.35,
+) {
+  const popMap = new Map<string, number>();
+  const nowMs = performance.now();
+  const debug: DebugFlags = { showGrid: false, showBounds: false, showIds: false };
+
+  for (const p of pieces) {
+    if (p.isPlaced) continue;
+
+    const tileX = p.x + p.pad;
+    const tileY = p.y + p.pad;
+    const atTarget =
+      Math.round(tileX) === p.targetX &&
+      Math.round(tileY) === p.targetY &&
+      p.rotation === p.targetRotation;
+
+    if (atTarget) continue;
+
+    const ghostPiece: Piece = {
+      ...p,
+      x: p.targetX - p.pad,
+      y: p.targetY - p.pad,
+      rotation: p.targetRotation,
+    };
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    const ghostDpr = ctx.getTransform().a || 1;
+    drawPiece(
+      ctx,
+      ghostPiece,
+      img,
+      cols,
+      rows,
+      popMap,
+      new Map(),
+      nowMs,
+      debug,
+      false,
+      false,
+      0,
+      undefined,
+      undefined,
+      ghostDpr,
+    );
+    ctx.restore();
+  }
+}
+
+export function drawPiece(
+  ctx: CanvasRenderingContext2D,
+  p: Piece,
+  img: HTMLImageElement,
+  cols: number,
+  rows: number,
+  popMap: PopMap,
+  lockMap: LockMap,
+  nowMs: number,
+  debug: DebugFlags,
+  isDragging: boolean,
+  showLockGlow: boolean,
+  lockElapsedMs: number,
+  animState?: AnimationState,
+  pieceCache?: PieceCache,
+  dpr: number = 1,
+) {
+  const isSelected = animState?.selectedPieceId === p.id && !p.isPlaced;
+
+  const hint = animState?.wrongRotationHint;
+  const showWrongRotationHint =
+    hint &&
+    hint.pieceIds.includes(p.id) &&
+    nowMs - hint.triggeredAt < WRONG_ROTATION_SHAKE_MS;
+  const shakeElapsedMs = hint ? nowMs - hint.triggeredAt : 0;
+  const shake = showWrongRotationHint
+    ? wrongRotationShakeOffset(shakeElapsedMs)
+    : { x: 0, y: 0 };
+
+  const start = popMap.get(p.id);
+  const popElapsedMs = start != null ? nowMs - start : 0;
+  const popScale = start != null ? snapPopScale(popElapsedMs) : 1;
+  const scale = popScale * (isDragging ? DRAG_SCALE : 1);
+
+  if (start != null && popElapsedMs < 320) {
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const radius = Math.max(p.w, p.h) * 0.55;
+    drawSnapGlow(ctx, cx, cy, radius, snapGlowAlpha(popElapsedMs));
+  }
+
+  const preview = animState?.snapPreview;
+  if (isDragging && preview && (preview.nearSnap || preview.inSnapRange)) {
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const radius = Math.max(p.w, p.h) * 0.58;
+    const baseAlpha = preview.inSnapRange ? 0.14 : 0.06;
+    const alpha = baseAlpha * (0.4 + 0.6 * preview.proximity);
+    drawSnapGlow(ctx, cx, cy, radius, alpha);
+  }
+
+  let path: Path2D | null = null;
+  try {
+    if (p.shapePath && p.shapePath.length > 0) {
+      path = new Path2D(p.shapePath);
+    }
+  } catch {
+    path = null;
+  }
+
+  if (!path) {
+    ctx.save();
+    ctx.fillStyle = "rgba(0, 120, 255, 0.10)";
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.35)";
+    ctx.lineWidth = 2;
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+    ctx.strokeRect(p.x, p.y, p.w, p.h);
+    ctx.restore();
+    return;
+  }
+
+  const cacheKey = `${p.id}_r${p.rotation}_d${dpr}`;
+  const rot90 = p.rotation === 90 || p.rotation === 270;
+  const cacheW = rot90 ? Math.ceil(p.h) : Math.ceil(p.w);
+  const cacheH = rot90 ? Math.ceil(p.w) : Math.ceil(p.h);
+  const cachePxW = Math.ceil(cacheW * dpr);
+  const cachePxH = Math.ceil(cacheH * dpr);
+  const cached = pieceCache?.get(cacheKey);
+  if (cached && cached.width === cachePxW && cached.height === cachePxH) {
+    drawCachedPiece(
+      ctx,
+      p,
+      cached,
+      cacheW,
+      cacheH,
+      cachePxW,
+      cachePxH,
+      scale,
+      isDragging,
+      isSelected,
+      showLockGlow,
+      lockElapsedMs,
+      path,
+      dpr,
+      shake.x,
+      shake.y,
+      showWrongRotationHint,
+      shakeElapsedMs,
+      animState?.showClusterOutline,
+    );
+    return;
+  }
+
+  let cacheCanvas: HTMLCanvasElement | null = cached ?? null;
+  if (!cacheCanvas && pieceCache) {
+    const off = document.createElement("canvas");
+    off.width = cachePxW;
+    off.height = cachePxH;
+    const offCtx = off.getContext("2d");
+    if (offCtx) {
+      const rect = computeImageSourceRect(p, img, cols, rows);
+      offCtx.imageSmoothingEnabled = true;
+      offCtx.imageSmoothingQuality = "high";
+      offCtx.scale(dpr, dpr);
+      offCtx.translate(cacheW / 2, cacheH / 2);
+      offCtx.rotate((p.rotation * Math.PI) / 180);
+      offCtx.translate(-p.w / 2, -p.h / 2);
+      offCtx.save();
+      offCtx.clip(path);
+      offCtx.drawImage(
+        img,
+        rect.srcX,
+        rect.srcY,
+        rect.srcW,
+        rect.srcH,
+        rect.destX,
+        rect.destY,
+        rect.destW,
+        rect.destH,
+      );
+      offCtx.restore();
+      pieceCache.set(cacheKey, off);
+      cacheCanvas = off;
+    }
+  }
+
+  if (cacheCanvas) {
+    drawCachedPiece(
+      ctx,
+      p,
+      cacheCanvas,
+      cacheW,
+      cacheH,
+      cachePxW,
+      cachePxH,
+      scale,
+      isDragging,
+      isSelected,
+      showLockGlow,
+      lockElapsedMs,
+      path,
+      dpr,
+      shake.x,
+      shake.y,
+      showWrongRotationHint,
+      shakeElapsedMs,
+      animState?.showClusterOutline,
+    );
+    return;
+  }
+
+  const rect = computeImageSourceRect(p, img, cols, rows);
+  ctx.save();
+  applyPieceShadow(ctx, isDragging, p.isPlaced);
+  const liftY = isDragging ? -DRAG_LIFT_PX : 0;
+  ctx.translate(p.x + p.w / 2 + shake.x, p.y + p.h / 2 + shake.y + liftY);
+  ctx.rotate((p.rotation * Math.PI) / 180);
+  ctx.scale(scale, scale);
+  ctx.translate(-p.w / 2, -p.h / 2);
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.clip(path);
+  ctx.drawImage(
+    img,
+    rect.srcX,
+    rect.srcY,
+    rect.srcW,
+    rect.srcH,
+    rect.destX,
+    rect.destY,
+    rect.destW,
+    rect.destH,
+  );
+  ctx.restore();
+  clearPieceShadow(ctx);
+  strokePieceOutline(
+    ctx,
+    path,
+    isDragging,
+    isSelected,
+    p.isPlaced,
+    p.locked,
+    animState?.showClusterOutline,
+  );
+  if (showLockGlow) {
+    drawLockGlow(ctx, path, lockElapsedMs);
+  }
+  if (debug.showBounds) {
+    ctx.strokeStyle = "rgba(255,0,0,0.35)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, p.w, p.h);
+  }
+  if (debug.showIds) {
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
+    ctx.font = "12px system-ui";
+    ctx.fillText(p.id, 8, 16);
+  }
+  if (showWrongRotationHint) {
+    drawWrongRotationIcon(
+      ctx,
+      p.w / 2 - 14,
+      -p.h / 2 + 14,
+      Math.min(p.w, p.h),
+      shakeElapsedMs,
+    );
+  }
+  if (isSelected) {
+    ctx.strokeStyle = "#667eea";
+    ctx.lineWidth = 1.5;
+    ctx.stroke(path);
+    ctx.strokeStyle = "rgba(102, 126, 234, 0.35)";
+    ctx.lineWidth = 3;
+    ctx.stroke(path);
+  }
+  ctx.restore();
+}
+
+export function drawEdgePieceHighlight(ctx: CanvasRenderingContext2D, p: Piece) {
+  let path: Path2D | null = null;
+  try {
+    if (p.shapePath && p.shapePath.length > 0) path = new Path2D(p.shapePath);
+  } catch {
+    path = null;
+  }
+  if (!path) return;
+  ctx.save();
+  ctx.globalAlpha = 0.35;
+  ctx.strokeStyle = "rgba(102, 126, 234, 0.5)";
+  ctx.lineWidth = 1.5;
+  ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
+  ctx.rotate((p.rotation * Math.PI) / 180);
+  ctx.translate(-p.w / 2, -p.h / 2);
+  ctx.stroke(path);
+  ctx.restore();
+}
+
+export function drawCompletionGlow(
+  ctx: CanvasRenderingContext2D,
+  cssW: number,
+  cssH: number,
+  elapsedMs: number,
+) {
+  if (elapsedMs > 3000) return;
+
+  const fadeOut = Math.max(0, 1 - elapsedMs / 3000);
+  const pulse = 0.5 + 0.5 * Math.sin(elapsedMs / 200);
+  const flourish = elapsedMs < 300 ? 0.2 * (1 - elapsedMs / 300) : 0;
+  const alpha = Math.min(0.35, flourish + 0.08 * fadeOut * pulse);
+
+  ctx.save();
+
+  const gradient = ctx.createRadialGradient(
+    cssW / 2,
+    cssH / 2,
+    0,
+    cssW / 2,
+    cssH / 2,
+    Math.max(cssW, cssH) / 2,
+  );
+  gradient.addColorStop(0, `rgba(255, 215, 0, ${alpha})`);
+  gradient.addColorStop(1, `rgba(255, 215, 0, 0)`);
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, cssW, cssH);
+
+  ctx.restore();
+}

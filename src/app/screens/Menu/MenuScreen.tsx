@@ -43,6 +43,7 @@ export function MenuScreen() {
             className={styles.cornerBtn}
             onClick={() => nav("/stats")}
             aria-label="Leaderboard"
+            data-testid="menu-stats"
           >
             <Trophy size={24} />
           </button>
@@ -51,6 +52,7 @@ export function MenuScreen() {
             className={styles.cornerBtn}
             onClick={() => setShowHelpChoice(true)}
             aria-label="Help"
+            data-testid="menu-help"
           >
             ?
           </button>

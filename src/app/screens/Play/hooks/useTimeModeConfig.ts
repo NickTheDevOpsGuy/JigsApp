@@ -2,6 +2,7 @@
  * useTimeModeConfig – time mode + countdown minutes, persisted in localStorage.
  */
 import { useCallback, useEffect, useState } from "react";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import {
   TIME_MODE_KEY,
   COUNTDOWN_MINUTES_KEY,
@@ -12,37 +13,21 @@ import {
 
 export function useTimeModeConfig() {
   const [timeMode, setTimeModeState] = useState<TimeMode>(() => {
-    try {
-      const v = localStorage.getItem(TIME_MODE_KEY);
-      return (v as TimeMode) || DEFAULT_TIME_MODE;
-    } catch {
-      return DEFAULT_TIME_MODE;
-    }
+    const v = safeLocalStorage.getItem(TIME_MODE_KEY);
+    return (v as TimeMode) || DEFAULT_TIME_MODE;
   });
 
   const [countdownMinutes, setCountdownMinutesState] = useState(() => {
-    try {
-      const v = localStorage.getItem(COUNTDOWN_MINUTES_KEY);
-      return v ? parseInt(v, 10) : DEFAULT_COUNTDOWN_MINUTES;
-    } catch {
-      return DEFAULT_COUNTDOWN_MINUTES;
-    }
+    const v = safeLocalStorage.getItem(COUNTDOWN_MINUTES_KEY);
+    return v ? parseInt(v, 10) : DEFAULT_COUNTDOWN_MINUTES;
   });
 
   useEffect(() => {
-    try {
-      localStorage.setItem(TIME_MODE_KEY, timeMode);
-    } catch {
-      // ignore
-    }
+    safeLocalStorage.setItem(TIME_MODE_KEY, timeMode);
   }, [timeMode]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(COUNTDOWN_MINUTES_KEY, String(countdownMinutes));
-    } catch {
-      // ignore
-    }
+    safeLocalStorage.setItem(COUNTDOWN_MINUTES_KEY, String(countdownMinutes));
   }, [countdownMinutes]);
 
   const setTimeMode = useCallback((mode: TimeMode | ((m: TimeMode) => TimeMode)) => {

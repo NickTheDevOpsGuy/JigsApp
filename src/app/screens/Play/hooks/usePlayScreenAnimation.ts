@@ -167,9 +167,11 @@ export function usePlayScreenAnimation(args: {
           fpsLogIntervalRef.current = 0;
           const avg = times.length ? times.reduce((a, t) => a + t, 0) / times.length : 0;
           const fps = avg > 0 ? Math.round(1000 / avg) : 0;
-          console.debug(
-            `[Phuzzle] FPS: ~${fps} (drag: ${isDragging ? "yes" : "no"}, pieces: ${pieceCount})`,
-          );
+          if (import.meta.env.DEV) {
+            console.warn(
+              `[Phuzzle] FPS: ~${fps} (drag: ${isDragging ? "yes" : "no"}, pieces: ${pieceCount})`,
+            );
+          }
         }
       }
 

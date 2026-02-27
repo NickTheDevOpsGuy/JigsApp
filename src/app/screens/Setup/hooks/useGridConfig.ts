@@ -2,6 +2,7 @@
  * useGridConfig – grid presets + custom; persisted in localStorage.
  */
 import { useState, useEffect } from "react";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 export const GRID_KEY = "phuzzle:gridSize";
 const MIN_GRID = 2;
@@ -14,6 +15,7 @@ export type GridOption = {
 };
 
 export const GRID_OPTIONS: GridOption[] = [
+  { label: "Starter 2×2 - 4 pieces", rows: 2, cols: 2 },
   { label: "Easy 3×3 - 9 pieces", rows: 3, cols: 3 },
   { label: "Medium 4×4 - 16 pieces", rows: 4, cols: 4 },
   { label: "Hard 5×5 - 25 pieces", rows: 5, cols: 5 },
@@ -21,16 +23,17 @@ export const GRID_OPTIONS: GridOption[] = [
   { label: "Master 7×7 - 49 pieces", rows: 7, cols: 7 },
   { label: "Legend 8×8 - 64 pieces", rows: 8, cols: 8 },
   { label: "Extreme 9×9 - 81 pieces", rows: 9, cols: 9 },
+  { label: "Epic 10×10 - 100 pieces", rows: 10, cols: 10 },
   { label: "Custom", rows: 0, cols: 0 },
 ];
 
 export function useGridConfig() {
-  const [gridIndex, setGridIndex] = useState(1); // Default to Medium
+  const [gridIndex, setGridIndex] = useState(2); // Default to Medium 4×4
   const [customRows, setCustomRows] = useState(5);
   const [customCols, setCustomCols] = useState(5);
 
   useEffect(() => {
-    const existingGrid = localStorage.getItem(GRID_KEY);
+    const existingGrid = safeLocalStorage.getItem(GRID_KEY);
     if (existingGrid) {
       const normalized = existingGrid.replace("×", "x").replace(/\s+/g, "");
       const idx = GRID_OPTIONS.findIndex(
@@ -56,11 +59,11 @@ export function useGridConfig() {
   const effectiveCols = isCustom ? customCols : GRID_OPTIONS[gridIndex].cols;
 
   const saveGrid = () => {
-    localStorage.setItem(GRID_KEY, `${effectiveRows}x${effectiveCols}`);
+    safeLocalStorage.setItem(GRID_KEY, `${effectiveRows}x${effectiveCols}`);
   };
 
   const clearGrid = () => {
-    localStorage.removeItem(GRID_KEY);
+    safeLocalStorage.removeItem(GRID_KEY);
   };
 
   return {

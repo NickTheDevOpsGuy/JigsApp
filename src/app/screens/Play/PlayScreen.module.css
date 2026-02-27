@@ -113,6 +113,8 @@
   transition:
     max-height 0.25s ease,
     opacity 0.2s ease;
+  /* Prevent double-tap zoom on mobile while keeping touch scroll */
+  touch-action: manipulation;
 }
 
 .topBarLeft {
@@ -433,15 +435,15 @@
   .playBody .trayWrap {
     width: 100%;
     max-width: min(90vw, 420px);
-    height: 115px;
+    height: 100px;
     flex-shrink: 0;
-    padding: 0 0 8px;
-    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+    padding: 0 0 6px;
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
     align-self: center;
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 130px;
+    height: 115px;
   }
 }
 
@@ -559,6 +561,8 @@
   align-items: center;
   gap: 6px;
   position: relative;
+  /* Prevent double-tap zoom on mobile; pan/zoom handled by canvas touch-action: none */
+  touch-action: manipulation;
 }
 
 .boardProgressFrame {
@@ -763,18 +767,18 @@
     min-height: 100dvh;
     overflow: hidden;
     overflow-x: hidden;
-    padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
   }
 
   .playBody {
-    gap: 10px;
+    gap: 6px;
     min-height: 0;
     min-width: 0;
     overflow: hidden;
     overflow-x: hidden;
-    padding: 0 12px;
-    padding-left: max(12px, env(safe-area-inset-left, 0));
-    padding-right: max(12px, env(safe-area-inset-right, 0));
+    padding: 0 8px;
+    padding-left: max(8px, env(safe-area-inset-left, 0));
+    padding-right: max(8px, env(safe-area-inset-right, 0));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -783,8 +787,8 @@
   .main {
     width: 100%;
     max-width: min(90vw, 420px);
-    padding: 10px 0;
-    gap: 6px;
+    padding: 6px 0;
+    gap: 4px;
     align-items: center;
     justify-content: center;
     min-height: 0;
@@ -828,10 +832,10 @@
   }
 
   .topBar {
-    height: 52px;
-    padding: 0 12px;
+    height: 48px;
+    padding: 0 8px;
     padding-top: env(safe-area-inset-top, 0);
-    gap: 8px;
+    gap: 6px;
   }
   .title {
     display: none;
@@ -1060,6 +1064,233 @@
     padding-bottom: max(32px, env(safe-area-inset-bottom, 0) + 24px);
     padding-left: max(16px, env(safe-area-inset-left, 0));
     padding-right: max(16px, env(safe-area-inset-right, 0));
+  }
+}
+
+/* Win panel: card-style layout (image, stats, "Can you beat my run?", Continue) */
+.completePanel {
+  background: color-mix(in srgb, var(--color-bg-card) 92%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 20px;
+  max-width: min(420px, 92vw);
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  color: var(--color-text-primary);
+  user-select: none;
+  animation: completeFlourish 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) 0.1s both;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+.completeTitle {
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.completeTitleDot {
+  font-size: 0.5em;
+  opacity: 0.6;
+}
+
+.completePercentileBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-bg-primary, #0f172a);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+}
+
+.completePercentileBadge span {
+  letter-spacing: 0.02em;
+}
+
+.completeImageWrap {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  margin-bottom: 14px;
+}
+
+.completeImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(50vh, 280px);
+  object-fit: cover;
+  object-position: center;
+}
+
+.completeStats {
+  background: color-mix(in srgb, var(--color-bg-elevated) 95%, var(--color-bg-card));
+  border-radius: 12px;
+  padding: 2px 0;
+  margin-bottom: 14px;
+  border: 1px solid var(--color-border);
+}
+
+.completeStatRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.completeStatRow:last-child {
+  border-bottom: none;
+}
+
+.completeStatIcon {
+  flex-shrink: 0;
+  color: var(--color-brand-primary);
+  opacity: 0.9;
+}
+
+.completeStatLabel {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  min-width: 72px;
+  text-align: left;
+}
+
+.completeStatValue {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.completeStatValueRank {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--color-brand-primary);
+  font-size: 13px;
+}
+
+.completeChallenge {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0 0 14px 0;
+}
+
+.completeContinueBtn {
+  width: 100%;
+  min-height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(
+    180deg,
+    var(--color-brand-primary),
+    color-mix(in srgb, var(--color-brand-primary) 85%, black)
+  );
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+}
+
+.completeContinueBtn:hover {
+  background: linear-gradient(
+    180deg,
+    var(--color-brand-hover),
+    color-mix(in srgb, var(--color-brand-hover) 85%, black)
+  );
+}
+
+.completeShareLink {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+  border-radius: 8px;
+}
+
+.completeShareLink:hover {
+  color: var(--color-brand-primary);
+  background: var(--color-bg-elevated);
+}
+
+@media (max-width: 600px) {
+  .completePanel {
+    padding: 14px 16px;
+    max-width: 96vw;
+  }
+
+  .completeTitle {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+
+  .completeImageWrap {
+    margin-bottom: 10px;
+  }
+
+  .completeImage {
+    max-height: min(40vh, 220px);
+  }
+
+  .completeStats {
+    margin-bottom: 10px;
+  }
+
+  .completeStatRow {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .completeStatLabel {
+    min-width: 68px;
+  }
+
+  .completeStatValueRank {
+    font-size: 12px;
+  }
+
+  .completeChallenge {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+
+  .completeContinueBtn {
+    min-height: 46px;
+    font-size: 0.95rem;
   }
 }
 
@@ -1376,6 +1607,7 @@
 }
 
 /* Very small phones – compact top bar and completion */
+/* Very small phones: extra spacing for undo/redo and tray so controls aren't cramped */
 @media (max-width: 380px) {
   .topBar {
     gap: 6px;
@@ -1383,6 +1615,24 @@
   }
   .topBarLeft {
     gap: 6px;
+  }
+  .undoRedoPillsWrap {
+    padding: 0 10px 10px;
+  }
+  .undoRedoPills {
+    gap: 8px;
+    padding: 6px 8px;
+  }
+  .undoRedoPill {
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+  .playBody {
+    gap: 8px;
+    padding: 0 6px;
+  }
+  .playBody .trayWrap {
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
   }
   .undoRedoBtn {
     padding: 6px 8px;

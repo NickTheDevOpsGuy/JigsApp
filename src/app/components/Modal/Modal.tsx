@@ -85,15 +85,27 @@ export function Modal({
 
   const labelledById = title ? titleId : undefined;
 
+  const handleOverlayKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClose();
+    }
+  };
+
   return createPortal(
     <div
       className={`${styles.overlay} ${variant === "tutorial" ? styles.overlayTutorial : ""}`.trim()}
       onClick={onClose}
+      onKeyDown={handleOverlayKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label="Close"
     >
       <div
         ref={modalRef}
         className={`${styles.modal} ${variant === "tutorial" ? styles.modalTutorial : ""}`.trim()}
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledById}

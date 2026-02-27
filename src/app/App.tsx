@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { initStreakFreeze } from "@/daily/dailyPuzzleCore";
 import { ensureSignedIn } from "@/supabase/auth";
 import { OfflineIndicator } from "@/components/OfflineIndicator/OfflineIndicator";
+import { ErrorBoundary } from "@/components/ErrorBoundary/ErrorBoundary";
+import styles from "./App.module.css";
 
 // Route-level code splitting: load screens on demand to keep initial chunk smaller
 const MenuScreen = lazy(() =>
@@ -60,20 +62,73 @@ export function App() {
     initStreakFreeze();
   }, []);
 
+  const focusMain = () => {
+    requestAnimationFrame(() => {
+      document.getElementById("main")?.focus();
+    });
+  };
+
   return (
     <BrowserRouter>
+      <a href="#main" className={styles.skipLink} onClick={focusMain}>
+        Skip to main content
+      </a>
       <OfflineIndicator />
-      <Suspense fallback={<PageFallback />}>
-        <Routes>
-          <Route path="/" element={<MenuScreen />} />
-          <Route path="/new" element={<NewGameScreen />} />
-          <Route path="/play" element={<PlayScreen />} />
-          <Route path="/stats" element={<StatsScreen />} />
-          <Route path="/packs" element={<PackListScreen />} />
-          <Route path="/packs/:packId" element={<PackDetailScreen />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
+      <main id="main" className={styles.main} tabIndex={-1}>
+        <Suspense fallback={<PageFallback />}>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ErrorBoundary>
+                  <MenuScreen />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/new"
+              element={
+                <ErrorBoundary>
+                  <NewGameScreen />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/play"
+              element={
+                <ErrorBoundary>
+                  <PlayScreen />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/stats"
+              element={
+                <ErrorBoundary>
+                  <StatsScreen />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/packs"
+              element={
+                <ErrorBoundary>
+                  <PackListScreen />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/packs/:packId"
+              element={
+                <ErrorBoundary>
+                  <PackDetailScreen />
+                </ErrorBoundary>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </main>
     </BrowserRouter>
   );
 }

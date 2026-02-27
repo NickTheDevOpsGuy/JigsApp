@@ -2,6 +2,7 @@
  * useOnboarding – step-based tips: start (drag piece), tray, zoom. Persisted in localStorage.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 const STORAGE_KEY = "phuzzle:onboarding";
 
@@ -13,23 +14,15 @@ export type OnboardingStep =
 
 function getStoredStep(): OnboardingStep {
   if (typeof window === "undefined") return "done";
-  try {
-    const v = localStorage.getItem(STORAGE_KEY);
-    if (v === "start" || v === "firstSnapDone" || v === "trayTipSeen" || v === "done") {
-      return v;
-    }
-    return "start";
-  } catch {
-    return "start";
+  const v = safeLocalStorage.getItem(STORAGE_KEY);
+  if (v === "start" || v === "firstSnapDone" || v === "trayTipSeen" || v === "done") {
+    return v;
   }
+  return "start";
 }
 
 function setStoredStep(step: OnboardingStep): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, step);
-  } catch {
-    /* ignore */
-  }
+  safeLocalStorage.setItem(STORAGE_KEY, step);
 }
 
 export function useOnboarding(placedCount: number, pieceCount: number) {

@@ -11,6 +11,7 @@ import {
   EDGE_HIGHLIGHT_KEY,
   IMMERSIVE_MODE_KEY,
 } from "@/screens/Play/playScreenUtils";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 const TOGGLE_KEYS: Record<string, string> = {
   pieceLocking: PIECE_LOCKING_KEY,
@@ -31,11 +32,7 @@ export function useMenuSettings() {
     if (id === "haptics") return soundManager.isHapticsEnabled();
     const key = TOGGLE_KEYS[id];
     if (!key) return false;
-    try {
-      return localStorage.getItem(key) === "true";
-    } catch {
-      return false;
-    }
+    return safeLocalStorage.getItem(key) === "true";
   }, []);
 
   const setToggleState = useCallback((id: string, value: boolean) => {
@@ -46,13 +43,7 @@ export function useMenuSettings() {
       if (value && navigator.vibrate) navigator.vibrate(25);
     } else {
       const key = TOGGLE_KEYS[id];
-      if (key) {
-        try {
-          localStorage.setItem(key, value ? "true" : "false");
-        } catch {
-          /* ignore */
-        }
-      }
+      if (key) safeLocalStorage.setItem(key, value ? "true" : "false");
     }
     forceUpdate((n) => n + 1);
   }, []);

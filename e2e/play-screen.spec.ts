@@ -7,7 +7,7 @@ test.describe("Play screen", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(
       async ({ img, grid }) => {
-        localStorage.setItem("phuzzle:lastSeenChangelog", "12");
+        localStorage.setItem("phuzzle:lastSeenChangelog", "14");
         localStorage.setItem("phuzzle:imageDataUrl", img);
         localStorage.setItem("phuzzle:gridSize", grid);
       },
@@ -34,7 +34,7 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("list")).toBeVisible({ timeout: 15000 });
   });
 
-  test("tray visible on mobile (sidebar layout)", async ({ page }) => {
+  test("tray visible on mobile (board on top, tray below)", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/play");
 
@@ -43,7 +43,18 @@ test.describe("Play screen", () => {
     ).toBeVisible({
       timeout: 15000,
     });
-    // Unified layout: tray in left sidebar, always visible (no collapse handle)
+    // Layout: board on top, tray below; tray always visible
     await expect(page.getByRole("list")).toBeVisible({ timeout: 5000 });
+  });
+
+  test("completion overlay shows expected UI when visible", async ({ page }) => {
+    await page.goto("/play?e2eCompletion=1");
+
+    await expect(page.getByRole("heading", { name: /puzzle completed/i })).toBeVisible({
+      timeout: 15000,
+    });
+    await expect(page.getByRole("button", { name: /continue/i })).toBeVisible({
+      timeout: 5000,
+    });
   });
 });

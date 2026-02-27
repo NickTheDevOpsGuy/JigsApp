@@ -2,6 +2,8 @@
  * adaptiveDifficultyService – track completion times, suggest grid/cut based on performance.
  * Increases complexity when fast, softens when struggling.
  */
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+
 const STORAGE_KEY = "phuzzle:completionHistory";
 const MAX_ENTRIES = 30;
 const FAST_SEC_PER_PIECE = 25;
@@ -16,7 +18,7 @@ export type CompletionEntry = {
 
 function loadHistory(): CompletionEntry[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = safeLocalStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
@@ -33,11 +35,7 @@ function loadHistory(): CompletionEntry[] {
 }
 
 function saveHistory(entries: CompletionEntry[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(-MAX_ENTRIES)));
-  } catch {
-    // ignore
-  }
+  safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(-MAX_ENTRIES)));
 }
 
 /** Record a puzzle completion for adaptive suggestions. */

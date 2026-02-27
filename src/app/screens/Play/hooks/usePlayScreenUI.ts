@@ -1,5 +1,8 @@
 /**
  * usePlayScreenUI – UI state (ghost hint, alignment grid, debug, etc.) with localStorage.
+ *
+ * Sections: 1–190 state (all toggles/options) + load from safeLocalStorage;
+ * 191–350 setters + persistence; 351–430 return object + optional sync effect.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { soundManager } from "@/audio/sounds";
@@ -26,125 +29,53 @@ import {
   SNAP_TOLERANCE_OVERRIDE_KEY,
   type DebugFlags,
 } from "../playScreenUtils";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { getPlayScreenUIStorageInitial, DEBUG_INITIAL } from "./playScreenUIInitial";
 
 export function usePlayScreenUI() {
-  const [pieceLockingEnabled, setPieceLockingEnabled] = useState(() => {
-    try {
-      return localStorage.getItem(PIECE_LOCKING_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
+  const storageInitial = getPlayScreenUIStorageInitial();
 
-  const [showGhostHint, setShowGhostHint] = useState(() => {
-    try {
-      return localStorage.getItem(GHOST_HINT_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const [showAlignmentGrid, setShowAlignmentGrid] = useState(() => {
-    try {
-      return localStorage.getItem(ALIGNMENT_GRID_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const [showGhostWhenIdle, setShowGhostWhenIdle] = useState(() => {
-    try {
-      return localStorage.getItem(GHOST_WHEN_IDLE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const [showEdgeHighlight, setShowEdgeHighlight] = useState(() => {
-    try {
-      return localStorage.getItem(EDGE_HIGHLIGHT_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const [showClusterOutline, setShowClusterOutline] = useState(() => {
-    try {
-      return localStorage.getItem(CLUSTER_OUTLINE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const [deliberateDetachEnabled, setDeliberateDetachEnabled] = useState(() => {
-    try {
-      return localStorage.getItem(DELIBERATE_DETACH_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const [relaxedModeEnabled, setRelaxedModeEnabled] = useState(() => {
-    try {
-      return localStorage.getItem(RELAXED_MODE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const [driftModeEnabled, setDriftModeEnabled] = useState(() => {
-    try {
-      return localStorage.getItem(DRIFT_MODE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const [snapToleranceOverride, setSnapToleranceOverride] = useState<number>(() => {
-    try {
-      const raw = localStorage.getItem(SNAP_TOLERANCE_OVERRIDE_KEY);
-      const parsed = raw != null ? Number(raw) : 1;
-      if (!Number.isFinite(parsed)) return 1;
-      return Math.min(1.6, Math.max(0.6, parsed));
-    } catch {
-      return 1;
-    }
-  });
-
-  const [pieceCutType, setPieceCutType] = useState<PieceCutType>(() => {
-    try {
-      const raw = localStorage.getItem(CUT_TYPE_KEY);
-      return raw === "irregular" || raw === "hard" ? raw : "classic";
-    } catch {
-      return "classic";
-    }
-  });
-
-  const [progressiveRevealMode, setProgressiveRevealMode] = useState(() => {
-    try {
-      return localStorage.getItem(PROGRESSIVE_REVEAL_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
+  const [pieceLockingEnabled, setPieceLockingEnabled] = useState(
+    storageInitial.pieceLockingEnabled,
+  );
+  const [showGhostHint, setShowGhostHint] = useState(storageInitial.showGhostHint);
+  const [showAlignmentGrid, setShowAlignmentGrid] = useState(
+    storageInitial.showAlignmentGrid,
+  );
+  const [showGhostWhenIdle, setShowGhostWhenIdle] = useState(
+    storageInitial.showGhostWhenIdle,
+  );
+  const [showEdgeHighlight, setShowEdgeHighlight] = useState(
+    storageInitial.showEdgeHighlight,
+  );
+  const [showClusterOutline, setShowClusterOutline] = useState(
+    storageInitial.showClusterOutline,
+  );
+  const [deliberateDetachEnabled, setDeliberateDetachEnabled] = useState(
+    storageInitial.deliberateDetachEnabled,
+  );
+  const [relaxedModeEnabled, setRelaxedModeEnabled] = useState(
+    storageInitial.relaxedModeEnabled,
+  );
+  const [driftModeEnabled, setDriftModeEnabled] = useState(
+    storageInitial.driftModeEnabled,
+  );
+  const [snapToleranceOverride, setSnapToleranceOverride] = useState<number>(
+    storageInitial.snapToleranceOverride,
+  );
+  const [pieceCutType, setPieceCutType] = useState<PieceCutType>(
+    storageInitial.pieceCutType,
+  );
+  const [progressiveRevealMode, setProgressiveRevealMode] = useState(
+    storageInitial.progressiveRevealMode,
+  );
 
   const [dailyPreferredModifier, setDailyPreferredModifierState] =
     useState<DailyVisualModifier>(getDailyPreferredModifier);
 
-  const [debug, setDebug] = useState<DebugFlags>({
-    showGrid: false,
-    showBounds: false,
-    showIds: false,
-    showPerfOverlay: false,
-  });
+  const [debug, setDebug] = useState<DebugFlags>(DEBUG_INITIAL);
   const [showPreview, setShowPreview] = useState(false);
-  const [immersiveMode, setImmersiveMode] = useState(() => {
-    try {
-      return localStorage.getItem(IMMERSIVE_MODE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
+  const [immersiveMode, setImmersiveMode] = useState(storageInitial.immersiveMode);
   const [soundEnabled, setSoundEnabled] = useState(() =>
     typeof window !== "undefined" ? soundManager.isEnabled() : true,
   );
@@ -188,7 +119,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(PIECE_LOCKING_KEY, pieceLockingEnabled ? "true" : "false");
+      safeLocalStorage.setItem(PIECE_LOCKING_KEY, pieceLockingEnabled ? "true" : "false");
     } catch {
       // ignore
     }
@@ -196,7 +127,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(GHOST_HINT_KEY, showGhostHint ? "true" : "false");
+      safeLocalStorage.setItem(GHOST_HINT_KEY, showGhostHint ? "true" : "false");
     } catch {
       // ignore
     }
@@ -204,7 +135,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(ALIGNMENT_GRID_KEY, showAlignmentGrid ? "true" : "false");
+      safeLocalStorage.setItem(ALIGNMENT_GRID_KEY, showAlignmentGrid ? "true" : "false");
     } catch {
       // ignore
     }
@@ -212,7 +143,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(GHOST_WHEN_IDLE_KEY, showGhostWhenIdle ? "true" : "false");
+      safeLocalStorage.setItem(GHOST_WHEN_IDLE_KEY, showGhostWhenIdle ? "true" : "false");
     } catch {
       // ignore
     }
@@ -220,7 +151,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(EDGE_HIGHLIGHT_KEY, showEdgeHighlight ? "true" : "false");
+      safeLocalStorage.setItem(EDGE_HIGHLIGHT_KEY, showEdgeHighlight ? "true" : "false");
     } catch {
       // ignore
     }
@@ -228,7 +159,10 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(CLUSTER_OUTLINE_KEY, showClusterOutline ? "true" : "false");
+      safeLocalStorage.setItem(
+        CLUSTER_OUTLINE_KEY,
+        showClusterOutline ? "true" : "false",
+      );
     } catch {
       // ignore
     }
@@ -236,7 +170,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(
+      safeLocalStorage.setItem(
         DELIBERATE_DETACH_KEY,
         deliberateDetachEnabled ? "true" : "false",
       );
@@ -247,7 +181,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(RELAXED_MODE_KEY, relaxedModeEnabled ? "true" : "false");
+      safeLocalStorage.setItem(RELAXED_MODE_KEY, relaxedModeEnabled ? "true" : "false");
     } catch {
       // ignore
     }
@@ -255,7 +189,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(DRIFT_MODE_KEY, driftModeEnabled ? "true" : "false");
+      safeLocalStorage.setItem(DRIFT_MODE_KEY, driftModeEnabled ? "true" : "false");
     } catch {
       // ignore
     }
@@ -263,7 +197,10 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(SNAP_TOLERANCE_OVERRIDE_KEY, String(snapToleranceOverride));
+      safeLocalStorage.setItem(
+        SNAP_TOLERANCE_OVERRIDE_KEY,
+        String(snapToleranceOverride),
+      );
     } catch {
       // ignore
     }
@@ -271,7 +208,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(CUT_TYPE_KEY, pieceCutType);
+      safeLocalStorage.setItem(CUT_TYPE_KEY, pieceCutType);
     } catch {
       // ignore
     }
@@ -279,7 +216,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(
+      safeLocalStorage.setItem(
         PROGRESSIVE_REVEAL_KEY,
         progressiveRevealMode ? "true" : "false",
       );
@@ -290,7 +227,7 @@ export function usePlayScreenUI() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(IMMERSIVE_MODE_KEY, immersiveMode ? "true" : "false");
+      safeLocalStorage.setItem(IMMERSIVE_MODE_KEY, immersiveMode ? "true" : "false");
     } catch {
       // ignore
     }

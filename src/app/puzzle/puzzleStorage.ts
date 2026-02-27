@@ -1,6 +1,7 @@
 /**
  * puzzleStorage – save/load puzzle state to localStorage; restore from SavedPiece[].
  */
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import type { Piece, GridSize } from "./types";
 
 const PUZZLE_STATE_KEY = "phuzzle:puzzleState";
@@ -136,7 +137,7 @@ function validateState(raw: unknown): LoadResult {
 
 function tryLoadFromStorage(key: string): LoadResult {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = safeLocalStorage.getItem(key);
     if (!raw) return { ok: false, reason: "corrupted", cleared: false };
     const parsed = JSON.parse(raw) as unknown;
     return validateState(parsed);
@@ -147,8 +148,8 @@ function tryLoadFromStorage(key: string): LoadResult {
 
 function clearBoth(): void {
   try {
-    localStorage.removeItem(PUZZLE_STATE_KEY);
-    localStorage.removeItem(PUZZLE_BACKUP_KEY);
+    safeLocalStorage.removeItem(PUZZLE_STATE_KEY);
+    safeLocalStorage.removeItem(PUZZLE_BACKUP_KEY);
   } catch (e) {
     console.warn("Failed to clear puzzle state:", e);
   }
@@ -190,11 +191,11 @@ export function savePuzzleState(
 
   try {
     // Rotate: copy current main to backup before overwriting (fallback if new save gets corrupted)
-    const existing = localStorage.getItem(PUZZLE_STATE_KEY);
+    const existing = safeLocalStorage.getItem(PUZZLE_STATE_KEY);
     if (existing) {
-      localStorage.setItem(PUZZLE_BACKUP_KEY, existing);
+      safeLocalStorage.setItem(PUZZLE_BACKUP_KEY, existing);
     }
-    localStorage.setItem(PUZZLE_STATE_KEY, JSON.stringify(state));
+    safeLocalStorage.setItem(PUZZLE_STATE_KEY, JSON.stringify(state));
   } catch (e) {
     console.warn("Failed to save puzzle state:", e);
   }
@@ -217,7 +218,7 @@ export function loadPuzzleState(): SavedPuzzleState | null {
     if (Date.now() - state.savedAt < BACKUP_MAX_AGE_MS) {
       try {
         // Restore backup to main so next load is fast
-        localStorage.setItem(PUZZLE_STATE_KEY, JSON.stringify(state));
+        safeLocalStorage.setItem(PUZZLE_STATE_KEY, JSON.stringify(state));
       } catch {
         // Ignore
       }

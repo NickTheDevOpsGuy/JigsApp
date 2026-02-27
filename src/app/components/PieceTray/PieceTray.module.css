@@ -129,6 +129,12 @@
   animation: piecePulse 0.6s ease-in-out 3;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .pieceButtonPulse {
+    animation: none;
+  }
+}
+
 .randomBtn {
   appearance: none;
   border: 1px solid var(--color-border);

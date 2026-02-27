@@ -12,16 +12,20 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: "autoUpdate",
-        includeAssets: ["favicon.svg"],
+        includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.png"],
         manifest: {
           name: "Phuzzle",
           short_name: "Phuzzle",
           description:
-            "A cozy jigsaw puzzle game. Upload an image, break it into pieces, and snap them together.",
-          theme_color: "#f3f7ff",
+            "Solve beautiful jigsaw puzzles in your browser. Relax, race the clock, or play with a friend.",
+          theme_color: "#0b63b8",
           background_color: "#f3f7ff",
           display: "standalone",
+          display_override: ["standalone", "minimal-ui", "browser"],
           start_url: "/",
+          scope: "/",
+          id: "/",
+          categories: ["games", "entertainment"],
           icons: [
             { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
             {
@@ -59,10 +63,15 @@ export default defineConfig(({ mode }) => {
             // Screen chunks: use short names to avoid CSS preload failures.
             // Vite/Rollup can truncate or misderive chunk names from long module paths
             // (e.g. "NewGameScreen" → "NewGameScree"), causing "Unable to preload CSS" errors.
-            if (id.includes("screens/NewGame") || id.includes("screens/Setup"))
-              return "setup";
+            // Play + Setup + NewGame in one chunk to avoid circular chunk (play→menuConfig→setup→play).
+            if (
+              id.includes("screens/Play") ||
+              id.includes("screens/Setup") ||
+              id.includes("screens/NewGame")
+            ) {
+              return "play-setup";
+            }
             if (id.includes("screens/Menu")) return "menu";
-            if (id.includes("screens/Play")) return "play";
             if (id.includes("screens/Stats")) return "stats";
             if (id.includes("screens/Packs/PackListScreen")) return "pack-list";
             if (id.includes("screens/Packs/PackDetailScreen")) return "pack-detail";
