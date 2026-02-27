@@ -12,7 +12,13 @@ import { setCurrentPuzzleId } from "@/data/packCompletion";
 import { Button } from "@/components/Button/Button";
 import { Dropdown } from "@/components/DropDown/Dropdown";
 import { ArrowLeft, Trash2, Play } from "lucide-react";
-import { useImagePicker, useGridConfig, GRID_OPTIONS, GRID_KEY } from "./hooks";
+import {
+  useImagePicker,
+  useGridConfig,
+  useSetupScreenGalleryScroll,
+  GRID_OPTIONS,
+  GRID_KEY,
+} from "./hooks";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
 import { COUNTDOWN_OPTIONS, getBestTime, type TimeMode } from "../Play/timeMode";
@@ -78,30 +84,10 @@ export function SetupScreen() {
       ? SAMPLE_PUZZLES
       : SAMPLE_PUZZLES.filter((p) => p.category === selectedCategory);
   const previewRef = useRef<HTMLDivElement>(null);
-  const galleryRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
-  useEffect(() => {
-    const el = galleryRef.current;
-    if (!el) return;
-    const update = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = el;
-      const maxScroll = scrollWidth - clientWidth;
-      const hasOverflow = maxScroll > 8;
-      setCanScrollLeft(hasOverflow && scrollLeft > 4);
-      setCanScrollRight(hasOverflow && scrollLeft < maxScroll - 4);
-    };
-    update();
-    el.addEventListener("scroll", update);
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    setTimeout(update, 100);
-    return () => {
-      el.removeEventListener("scroll", update);
-      ro.disconnect();
-    };
-  }, [filteredPuzzles.length, selectedCategory]);
+  const { galleryRef, canScrollLeft, canScrollRight } = useSetupScreenGalleryScroll([
+    filteredPuzzles.length,
+    selectedCategory,
+  ]);
 
   // Scroll preview into view when image is selected
   useEffect(() => {

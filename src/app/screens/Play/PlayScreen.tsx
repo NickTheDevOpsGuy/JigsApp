@@ -18,7 +18,7 @@ import styles from "./PlayScreen.module.css";
 
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { useShouldShowTutorial } from "@/components/HowToPlay";
-import type { Piece, PuzzleState } from "@/puzzle/types";
+import type { PuzzleState } from "@/puzzle/types";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { audioManager } from "@/audio/audioManager";

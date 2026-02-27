@@ -13,24 +13,9 @@ import {
   setDailyPreferredModifier as persistDailyPreferredModifier,
 } from "@/daily/dailyPuzzleCore";
 import type { DailyVisualModifier } from "@/daily/dailyPuzzleCore";
-import {
-  PIECE_LOCKING_KEY,
-  CUT_TYPE_KEY,
-  PROGRESSIVE_REVEAL_KEY,
-  GHOST_HINT_KEY,
-  IMMERSIVE_MODE_KEY,
-  ALIGNMENT_GRID_KEY,
-  GHOST_WHEN_IDLE_KEY,
-  EDGE_HIGHLIGHT_KEY,
-  CLUSTER_OUTLINE_KEY,
-  DELIBERATE_DETACH_KEY,
-  RELAXED_MODE_KEY,
-  DRIFT_MODE_KEY,
-  SNAP_TOLERANCE_OVERRIDE_KEY,
-  type DebugFlags,
-} from "../playScreenUtils";
-import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { type DebugFlags } from "../playScreenUtils";
 import { getPlayScreenUIStorageInitial, DEBUG_INITIAL } from "./playScreenUIInitial";
+import { usePlayScreenUIPersistence } from "./usePlayScreenUIPersistence";
 
 export function usePlayScreenUI() {
   const storageInitial = getPlayScreenUIStorageInitial();
@@ -103,6 +88,22 @@ export function usePlayScreenUI() {
     selectedIdRef.current = selectedPieceId;
   }, [selectedPieceId]);
 
+  usePlayScreenUIPersistence({
+    pieceLockingEnabled,
+    showGhostHint,
+    showAlignmentGrid,
+    showGhostWhenIdle,
+    showEdgeHighlight,
+    showClusterOutline,
+    deliberateDetachEnabled,
+    relaxedModeEnabled,
+    driftModeEnabled,
+    snapToleranceOverride,
+    pieceCutType,
+    progressiveRevealMode,
+    immersiveMode,
+  });
+
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
       pageRef.current?.requestFullscreen?.().catch(() => {});
@@ -116,122 +117,6 @@ export function usePlayScreenUI() {
     document.addEventListener("fullscreenchange", handler);
     return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(PIECE_LOCKING_KEY, pieceLockingEnabled ? "true" : "false");
-    } catch {
-      // ignore
-    }
-  }, [pieceLockingEnabled]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(GHOST_HINT_KEY, showGhostHint ? "true" : "false");
-    } catch {
-      // ignore
-    }
-  }, [showGhostHint]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(ALIGNMENT_GRID_KEY, showAlignmentGrid ? "true" : "false");
-    } catch {
-      // ignore
-    }
-  }, [showAlignmentGrid]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(GHOST_WHEN_IDLE_KEY, showGhostWhenIdle ? "true" : "false");
-    } catch {
-      // ignore
-    }
-  }, [showGhostWhenIdle]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(EDGE_HIGHLIGHT_KEY, showEdgeHighlight ? "true" : "false");
-    } catch {
-      // ignore
-    }
-  }, [showEdgeHighlight]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(
-        CLUSTER_OUTLINE_KEY,
-        showClusterOutline ? "true" : "false",
-      );
-    } catch {
-      // ignore
-    }
-  }, [showClusterOutline]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(
-        DELIBERATE_DETACH_KEY,
-        deliberateDetachEnabled ? "true" : "false",
-      );
-    } catch {
-      // ignore
-    }
-  }, [deliberateDetachEnabled]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(RELAXED_MODE_KEY, relaxedModeEnabled ? "true" : "false");
-    } catch {
-      // ignore
-    }
-  }, [relaxedModeEnabled]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(DRIFT_MODE_KEY, driftModeEnabled ? "true" : "false");
-    } catch {
-      // ignore
-    }
-  }, [driftModeEnabled]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(
-        SNAP_TOLERANCE_OVERRIDE_KEY,
-        String(snapToleranceOverride),
-      );
-    } catch {
-      // ignore
-    }
-  }, [snapToleranceOverride]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(CUT_TYPE_KEY, pieceCutType);
-    } catch {
-      // ignore
-    }
-  }, [pieceCutType]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(
-        PROGRESSIVE_REVEAL_KEY,
-        progressiveRevealMode ? "true" : "false",
-      );
-    } catch {
-      // ignore
-    }
-  }, [progressiveRevealMode]);
-
-  useEffect(() => {
-    try {
-      safeLocalStorage.setItem(IMMERSIVE_MODE_KEY, immersiveMode ? "true" : "false");
-    } catch {
-      // ignore
-    }
-  }, [immersiveMode]);
 
   useEffect(() => {
     setSoundEnabled(soundManager.isEnabled());

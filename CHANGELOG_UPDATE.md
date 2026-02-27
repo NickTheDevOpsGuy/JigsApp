@@ -17,13 +17,23 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ### Lock animation
 
-- **Smooth snap** — When pieces lock to the board, they now lerp from their pre-snap position to the exact target over ~100ms (ease-out) instead of jumping in one frame. Applied on both desktop and mobile.
-- **Implementation** — `lockLerpOverrides` in animation state; `lastPiecePositionsRef` in `usePlayScreenAnimation`; `renderBoard` uses `undoSnapBackOverrides ?? lockLerpOverrides ?? dragDisplayOverrides` for draw order.
+- **Smooth snap** — When pieces lock to the board, they lerp from the last **display** position (interpolated drag position) to the exact target over 120ms (ease-out) instead of jumping. Applied on both desktop and mobile.
+- **Implementation** — `lockLerpOverrides` in animation state; `lastPiecePositionsRef` updated from `dragDisplayOverrides` during drag so the lerp starts from where the piece was drawn; `renderBoard` uses `undoSnapBackOverrides ?? lockLerpOverrides ?? dragDisplayOverrides` for draw order.
+
+### Refactors (code structure)
+
+- **Stats** — `screens/Stats/hooks/useStatsScreenState.ts`, `useStatsScreenData.ts`, `hooks/index.ts`; StatsScreen composes them.
+- **Piece Tray** — `components/PieceTray/usePieceTrayDisplay.ts`, `usePieceTrayScroll.ts`, `usePieceTrayThumbs.ts`; PieceTray uses them for filter/scroll/thumbs.
+- **SFX** — `audio/soundsSfxTypes.ts`, `soundsSfxSnap.ts`, `soundsSfxMisc.ts`, `soundsSfxComplete.ts`; `soundsSfx.ts` re-exports.
+- **Play hooks** — `useSnapComboAnnouncer.ts`, `usePlayScreenUIPersistence.ts`; usePlayScreenManager and usePlayScreenUI use them.
+- **Setup** — `screens/Setup/hooks/useSetupScreenGalleryScroll.ts` for gallery scroll state.
+- **Leaderboard** — `screens/Stats/tabs/LeaderboardTabLists.tsx` (renderTimeList, renderCompletionList).
+- **README** — File/folder structure updated with all of the above. **doc/CHANGES.md** — Code structure section updated. **changelog.ts** — Version 17: refactor note + existing v16 items.
 
 ### Docs
 
-- **README** — File/folder structure updated: `renderBoardDrawPiece.ts`, `CompletionStatsBlock`, `HeaderMenuSubmenuPanel`, `usePlayScreenPersistence`, `usePlayScreenSharePuzzle`, `puzzleSnap.ts`, expanded `services/` and `audio/`, corrected Play `components/` and `hooks/`.
-- **changelog.ts** — Version 16: smooth lock, completion menu + image, mobile tray.
+- **README** — File/folder structure includes refactor adds (Stats hooks, PieceTray hooks, SFX split, Play hooks, Setup gallery scroll, LeaderboardTabLists).
+- **changelog.ts** — Version 16: smooth lock, completion menu + image, mobile tray. Version 17: code refactor entry.
 
 ---
 

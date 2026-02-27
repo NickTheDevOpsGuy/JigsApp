@@ -8,7 +8,6 @@ import {
   SUB_MENU_LABELS,
   SUBMENU_PARENT,
   SUBMENU_DESCRIPTIONS,
-  getSubmenuDescription,
 } from "./headerMenuConstants";
 import type { MenuItemConfig, SubMenuId } from "./headerMenuConfig";
 import type { HeaderMenuProps } from "./headerMenuConfig";

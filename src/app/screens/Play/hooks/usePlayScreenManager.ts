@@ -8,11 +8,10 @@ import { STORAGE_KEY, CUT_TYPE_KEY } from "../playScreenUtils";
 import type { TimeMode } from "../timeMode";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
 import { createPlayScreenManagerEvents } from "./playScreenManagerEvents";
+import { useSnapComboAnnouncer } from "./useSnapComboAnnouncer";
 import type { Theme } from "@/hooks/useTheme";
 
 export type ResumeChoice = "resume" | "fresh" | null;
-
-const SNAP_COMBO_IDLE_MS = 2500;
 
 /**
  * usePlayScreenManager – creates PuzzleManager, wires events, provides board/canvas refs.
@@ -98,7 +97,7 @@ export function usePlayScreenManager(
   const [state, setState] = useState<PuzzleState | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [snapCombo, setSnapCombo] = useState(0);
-  const [announcerLine, setAnnouncerLine] = useState<string | null>(null);
+  const announcerLine = useSnapComboAnnouncer(placementTimesRef, snapCombo, setSnapCombo);
   const [awaitingResumeChoice, setAwaitingResumeChoice] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [puzzleKey, setPuzzleKey] = useState(0);
@@ -294,38 +293,6 @@ export function usePlayScreenManager(
   useEffect(() => {
     manager?.setPieceLockingEnabled(pieceLockingEnabled);
   }, [manager, pieceLockingEnabled]);
-
-  // Decay combo when idle (recompute from placement times)
-  useEffect(() => {
-    const id = setInterval(() => {
-      const now = performance.now();
-      const comboCutoff = now - SNAP_COMBO_IDLE_MS;
-      const recent = placementTimesRef.current.filter((t) => t > comboCutoff);
-      setSnapCombo((prev) => {
-        const next = recent.length;
-        return next !== prev ? next : prev;
-      });
-    }, 400);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    const line =
-      snapCombo >= 6
-        ? "Unstoppable!"
-        : snapCombo >= 4
-          ? "Combo!"
-          : snapCombo >= 2
-            ? "Nice!"
-            : null;
-    setAnnouncerLine(line);
-  }, [snapCombo]);
-
-  useEffect(() => {
-    if (!announcerLine) return;
-    const t = setTimeout(() => setAnnouncerLine(null), 1500);
-    return () => clearTimeout(t);
-  }, [announcerLine]);
 
   // Resize observer: keep manager board size in sync with DOM (no min clamp so coordinate system matches canvas)
   useEffect(() => {

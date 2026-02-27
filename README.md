@@ -360,6 +360,10 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   ├── audio
 │   │   │   ├── sounds.ts
 │   │   │   ├── soundsSfx.ts
+│   │   │   ├── soundsSfxTypes.ts
+│   │   │   ├── soundsSfxSnap.ts
+│   │   │   ├── soundsSfxMisc.ts
+│   │   │   ├── soundsSfxComplete.ts
 │   │   │   ├── soundsAmbient.ts
 │   │   │   ├── soundsAmbientTypes.ts
 │   │   │   ├── soundEngineAmbient.ts
@@ -421,7 +425,10 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── PieceTray
 │   │   │   │   ├── PieceTray.module.css
 │   │   │   │   ├── PieceTray.tsx
-│   │   │   │   └── PieceTrayHeader.tsx
+│   │   │   │   ├── PieceTrayHeader.tsx
+│   │   │   │   ├── usePieceTrayDisplay.ts
+│   │   │   │   ├── usePieceTrayScroll.ts
+│   │   │   │   └── usePieceTrayThumbs.ts
 │   │   │   ├── ShortcutsModal
 │   │   │   │   ├── ShortcutsModal.module.css
 │   │   │   │   └── ShortcutsModal.tsx
@@ -556,6 +563,8 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── usePlayScreenManager.ts
 │   │   │   │   │   ├── usePlayScreenMilestones.ts
 │   │   │   │   │   ├── usePlayScreenPersistence.ts
+│   │   │   │   │   ├── usePlayScreenUIPersistence.ts
+│   │   │   │   │   ├── useSnapComboAnnouncer.ts
 │   │   │   │   │   ├── usePlayScreenSecondaryEffects.ts
 │   │   │   │   │   ├── usePlayScreenSharePuzzle.ts
 │   │   │   │   │   ├── usePlayScreenShortcuts.ts
@@ -584,17 +593,23 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   ├── hooks
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── useGridConfig.ts
-│   │   │   │   │   └── useImagePicker.ts
+│   │   │   │   │   ├── useImagePicker.ts
+│   │   │   │   │   └── useSetupScreenGalleryScroll.ts
 │   │   │   │   ├── SetupScreen.module.css
 │   │   │   │   └── SetupScreen.tsx
 │   │   │   └── Stats
 │   │   │       ├── components
 │   │   │       │   ├── StatsScreenHeader.tsx
 │   │   │       │   └── StatsTabBar.tsx
+│   │   │       ├── hooks
+│   │   │       │   ├── index.ts
+│   │   │       │   ├── useStatsScreenState.ts
+│   │   │       │   └── useStatsScreenData.ts
 │   │   │       ├── tabs
 │   │   │       │   ├── AchievementsTab.tsx
 │   │   │       │   ├── DashboardTab.tsx
 │   │   │       │   ├── LeaderboardTab.tsx
+│   │   │       │   ├── LeaderboardTabLists.tsx
 │   │   │       │   ├── ProfileTab.tsx
 │   │   │       │   └── index.ts
 │   │   │       ├── statsFormatting.ts

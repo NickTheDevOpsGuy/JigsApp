@@ -5,7 +5,7 @@ import { Filter, ChevronDown } from "lucide-react";
 import type { LeaderboardEntry } from "@/services/leaderboardService";
 import type { PieceCutType, VisualModifierFilter } from "@/services/leaderboardService";
 import { DailyCountdown } from "@/components/DailyCountdown/DailyCountdown";
-import { formatTime, formatGap, PODIUM } from "../statsFormatting";
+import { renderTimeList, renderCompletionList } from "./LeaderboardTabLists";
 import styles from "../StatsScreen.module.css";
 
 export type LeaderboardType = "today" | "week" | "alltime";
@@ -43,87 +43,6 @@ interface LeaderboardTabProps {
   weekRangeLabel: string;
   loadData: () => Promise<void>;
   rowAnimEpoch: number;
-}
-
-function renderTimeList(
-  entries: LeaderboardEntry[],
-  emptyMsg: string,
-  rowAnimEpoch: number,
-  compact: boolean,
-  showChampionBadge = false,
-) {
-  if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
-  return (
-    <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
-      {entries.map((entry, index) => {
-        const key = `time-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
-        const next = entries[index + 1]?.elapsedSeconds;
-        const gapInfo =
-          index === 0 && typeof next === "number"
-            ? `+${formatGap(next - entry.elapsedSeconds)} ahead of #2`
-            : index === 1 && typeof next === "number"
-              ? `+${formatGap(next - entry.elapsedSeconds)} ahead of #3`
-              : null;
-        return (
-          <li
-            key={key}
-            className={`${styles.leaderboardItem} ${
-              entry.rank <= 3 ? styles.leaderboardPodium : ""
-            } ${styles.leaderboardRowEnter}`}
-            style={{ animationDelay: `${index * 45}ms` }}
-          >
-            <span className={styles.rank}>
-              {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-            </span>
-            <span className={styles.player}>
-              {entry.displayName}
-              {showChampionBadge && entry.rank === 1 && (
-                <span className={styles.championBadge} title="Challenge winner">
-                  {" "}
-                  🏆
-                </span>
-              )}
-            </span>
-            <span className={styles.timeCol}>
-              <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
-              {gapInfo && <span className={styles.gapInfo}>{gapInfo}</span>}
-            </span>
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
-
-function renderCompletionList(
-  entries: { rank: number; count: number; displayName: string }[],
-  rowAnimEpoch: number,
-  compact: boolean,
-  emptyMsg = "No completions yet. Play puzzles!",
-) {
-  if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
-  return (
-    <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
-      {entries.map((entry) => {
-        const key = `completion-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
-        return (
-          <li
-            key={key}
-            className={`${styles.leaderboardItem} ${
-              entry.rank <= 3 ? styles.leaderboardPodium : ""
-            } ${styles.leaderboardRowEnter}`}
-            style={{ animationDelay: `${(entry.rank - 1) * 45}ms` }}
-          >
-            <span className={styles.rank}>
-              {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-            </span>
-            <span className={styles.player}>{entry.displayName}</span>
-            <span className={styles.time}>{entry.count} puzzles</span>
-          </li>
-        );
-      })}
-    </ol>
-  );
 }
 
 export function LeaderboardTab({

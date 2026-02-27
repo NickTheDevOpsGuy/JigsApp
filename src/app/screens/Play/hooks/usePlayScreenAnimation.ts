@@ -86,7 +86,7 @@ export function usePlayScreenAnimation(args: {
   const DRAG_LERP = 0.72;
   /** Previous-frame positions for lock lerp (smooth snap instead of jump) */
   const lastPiecePositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const LOCK_LERP_MS = 100;
+  const LOCK_LERP_MS = 120;
 
   const perfFrameTimesRef = useRef<number[]>([]);
   const perfDrawCountRef = useRef(0);
@@ -265,8 +265,8 @@ export function usePlayScreenAnimation(args: {
           if (lockElapsedMs >= LOCK_LERP_MS) continue;
           const from = lastPos.get(p.id);
           if (from == null) continue;
-          const t = lockElapsedMs / LOCK_LERP_MS;
-          const easeOut = 1 - Math.pow(1 - t, 1.4);
+          const t = Math.min(1, lockElapsedMs / LOCK_LERP_MS);
+          const easeOut = 1 - Math.pow(1 - t, 1.6);
           lockLerpOverrides ??= new Map();
           lockLerpOverrides.set(p.id, {
             x: from.x + (p.x - from.x) * easeOut,
@@ -278,7 +278,14 @@ export function usePlayScreenAnimation(args: {
         if (p.inTray) continue;
         const lockAt = lockMap.get(p.id);
         if (lockAt != null && now - lockAt < LOCK_LERP_MS) continue;
-        lastPiecePositionsRef.current.set(p.id, { x: p.x, y: p.y });
+        const pos =
+          isDragging &&
+          draggedGroupId &&
+          p.groupId === draggedGroupId &&
+          dragDisplayOverrides.has(p.id)
+            ? dragDisplayOverrides.get(p.id)!
+            : { x: p.x, y: p.y };
+        lastPiecePositionsRef.current.set(p.id, { x: pos.x, y: pos.y });
       }
 
       const pieceCache = pieceCacheRef.current;

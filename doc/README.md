@@ -24,5 +24,5 @@ This folder contains developer docs for Phuzzle.
 
 ## Quick links
 
-- Main README: [README.md](doc/README.md)
+- Main README: [../README.md](../README.md) — overview, getting started, **file/folder structure** (expandable tree)
 - Supabase migrations: `supabase/migrations/`
