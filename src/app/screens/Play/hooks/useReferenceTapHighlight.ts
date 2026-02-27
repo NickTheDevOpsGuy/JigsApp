@@ -24,13 +24,13 @@ export function useReferenceTapHighlight(state: PuzzleState | null) {
       const clientX =
         "clientX" in e
           ? e.clientX
-          : (e as React.TouchEvent).changedTouches?.[0]?.clientX ??
-            (e as React.TouchEvent).touches?.[0]?.clientX;
+          : ((e as React.TouchEvent).changedTouches?.[0]?.clientX ??
+            (e as React.TouchEvent).touches?.[0]?.clientX);
       const clientY =
         "clientY" in e
           ? e.clientY
-          : (e as React.TouchEvent).changedTouches?.[0]?.clientY ??
-            (e as React.TouchEvent).touches?.[0]?.clientY;
+          : ((e as React.TouchEvent).changedTouches?.[0]?.clientY ??
+            (e as React.TouchEvent).touches?.[0]?.clientY);
       if (clientX == null || clientY == null) return;
 
       const x = (clientX - rect.left) / rect.width;
@@ -45,9 +45,7 @@ export function useReferenceTapHighlight(state: PuzzleState | null) {
           const r = row + dr;
           const c = col + dc;
           if (r >= 0 && r < rows && c >= 0 && c < cols) {
-            const p = state.pieces.find(
-              (x) => x.row === r && x.col === c && x.inTray,
-            );
+            const p = state.pieces.find((x) => x.row === r && x.col === c && x.inTray);
             if (p) candidates.push(p);
           }
         }
