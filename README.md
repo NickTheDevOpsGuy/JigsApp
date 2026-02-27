@@ -362,11 +362,16 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── soundsSfx.ts
 │   │   │   ├── soundsAmbient.ts
 │   │   │   ├── soundsAmbientTypes.ts
+│   │   │   ├── soundEngineAmbient.ts
+│   │   │   ├── soundsDsp.ts
 │   │   │   ├── soundsAmbientOcean.ts
 │   │   │   ├── soundsAmbientSunset.ts
 │   │   │   ├── soundsAmbientSpace.ts
 │   │   │   ├── soundsAmbientForest.ts
-│   │   │   └── soundsAmbientLightDark.ts
+│   │   │   ├── soundsAmbientLightDark.ts
+│   │   │   ├── audioManager.ts
+│   │   │   ├── audioManagerThemes.ts
+│   │   │   └── audioManagerTheme*.ts
 │   │   ├── components
 │   │   │   ├── DailyReactions
 │   │   │   │   ├── DailyReactions.module.css
@@ -465,6 +470,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   ├── pickPiece.ts
 │   │   │   │   ├── renderBoard.ts
 │   │   │   │   ├── renderBoardDraw.ts
+│   │   │   │   ├── renderBoardDrawPiece.ts
 │   │   │   │   ├── renderBoardDrawOverlays.ts
 │   │   │   │   ├── renderBoardHelpers.ts
 │   │   │   │   ├── renderBoardTypes.ts
@@ -479,7 +485,9 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── PuzzleManager.test.ts
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleManagerUtils.ts
+│   │   │   ├── puzzleSnap.ts
 │   │   │   ├── puzzleStorage.ts
+│   │   │   ├── puzzleStorage.test.ts
 │   │   │   ├── shape.ts
 │   │   │   ├── types.ts
 │   │   │   └── undoManager.ts
@@ -497,29 +505,39 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── Play
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── CompletionOverlayGate.tsx
 │   │   │   │   │   ├── CompletionSharePopup.tsx
+│   │   │   │   │   ├── CompletionStatsBlock.tsx
 │   │   │   │   │   ├── CoopDebugPanel.tsx
 │   │   │   │   │   ├── CoopStatusIndicator.tsx
 │   │   │   │   │   ├── DragPreview.tsx
 │   │   │   │   │   ├── HeaderMenu.tsx
+│   │   │   │   │   ├── HeaderMenuSubmenuPanel.tsx
 │   │   │   │   │   ├── headerMenuConfig.tsx
+│   │   │   │   │   ├── headerMenuConfigTypes.ts
+│   │   │   │   │   ├── headerMenuConstants.ts
+│   │   │   │   │   ├── headerMenuItemsDisplayRest.ts
+│   │   │   │   │   ├── headerMenuItemsNavModes.ts
 │   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── Minimap.tsx
+│   │   │   │   │   ├── Minimap.module.css
 │   │   │   │   │   ├── PauseOverlay.tsx
 │   │   │   │   │   ├── PlayHUD.tsx
-│   │   │   │   │   ├── PlayScreenTopBar.tsx
 │   │   │   │   │   ├── PlayScreenModals.tsx
 │   │   │   │   │   ├── PlayScreenOverlays.tsx
-│   │   │   │   │   ├── ProgressivePreviewOverlay.tsx
+│   │   │   │   │   ├── PlayScreenTopBar.tsx
 │   │   │   │   │   ├── PlayToasts.tsx
 │   │   │   │   │   ├── PlayToasts.types.ts
-│   │   │   │   │   ├── ProfilerOverlay.module.css
+│   │   │   │   │   ├── PlayConfirmModals.tsx
 │   │   │   │   │   ├── ProfilerOverlay.tsx
-│   │   │   │   │   ├── UndoRedoButtons.tsx
-│   │   │   │   ├── SnapComboMeter.tsx
+│   │   │   │   │   ├── ProfilerOverlay.module.css
+│   │   │   │   │   ├── ProgressivePreviewOverlay.tsx
+│   │   │   │   │   ├── SnapComboMeter.tsx
 │   │   │   │   │   ├── SnapComboMeter.module.css
 │   │   │   │   │   ├── TopBarButtons.tsx
 │   │   │   │   │   ├── TrayFilterButton.tsx
 │   │   │   │   │   ├── TrayFilterButton.module.css
+│   │   │   │   │   └── UndoRedoButtons.tsx
 │   │   │   │   ├── hooks
 │   │   │   │   │   ├── pointerHandlers
 │   │   │   │   │   │   ├── dragLog.ts
@@ -529,29 +547,34 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   │   ├── touchHandlers.ts
 │   │   │   │   │   │   └── types.ts
 │   │   │   │   │   ├── playScreenManagerEvents.ts
+│   │   │   │   │   ├── playScreenUIInitial.ts
 │   │   │   │   │   ├── useCoarsePointer.ts
 │   │   │   │   │   ├── useDownloadImage.ts
 │   │   │   │   │   ├── useHaptics.ts
 │   │   │   │   │   ├── useInputHints.ts
 │   │   │   │   │   ├── usePlayScreenAnimation.ts
 │   │   │   │   │   ├── usePlayScreenManager.ts
+│   │   │   │   │   ├── usePlayScreenMilestones.ts
+│   │   │   │   │   ├── usePlayScreenPersistence.ts
+│   │   │   │   │   ├── usePlayScreenSecondaryEffects.ts
+│   │   │   │   │   ├── usePlayScreenSharePuzzle.ts
 │   │   │   │   │   ├── usePlayScreenShortcuts.ts
 │   │   │   │   │   ├── usePlayScreenTimer.ts
 │   │   │   │   │   ├── usePlayScreenUI.ts
-│   │   │   │   │   ├── playScreenUIInitial.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
-│   │   │   │   │   ├── useReferenceTapHighlight.ts
 │   │   │   │   │   ├── usePuzzleSession.ts
+│   │   │   │   │   ├── useReferenceTapHighlight.ts
 │   │   │   │   │   ├── useShareCardImage.ts
-│   │   │   │   ├── useShareResults.ts
+│   │   │   │   │   ├── useShareResults.ts
 │   │   │   │   │   ├── useTimeModeConfig.ts
 │   │   │   │   │   └── useViewport.ts
 │   │   │   │   ├── PlayScreen.module.css
 │   │   │   │   ├── PlayScreen.tsx
-│   │   │   │   ├── playScreenUtils.test.ts
 │   │   │   │   ├── playScreenUtils.ts
+│   │   │   │   ├── playScreenUtils.test.ts
 │   │   │   │   ├── playUtils.ts
-│   │   │   │   └── timeMode.ts
+│   │   │   │   ├── timeMode.ts
+│   │   │   │   └── timeMode.test.ts
 │   │   │   ├── Setup
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CameraCapture.module.css
@@ -578,12 +601,22 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │       ├── StatsScreen.module.css
 │   │   │       └── StatsScreen.tsx
 │   │   ├── services
-│   │   │   ├── dailyCommentsService.ts
 │   │   │   ├── achievementsService.ts
+│   │   │   ├── adaptiveDifficultyService.ts
+│   │   │   ├── dailyCommentsService.ts
 │   │   │   ├── leaderboardService.ts
-│   │   │   ├── serverTimeService.ts
+│   │   │   ├── leaderboardFetchers.ts
+│   │   │   ├── leaderboardFetchersAllTime.ts
+│   │   │   ├── leaderboardFetchersDaily.ts
+│   │   │   ├── leaderboardFetchersPeriod.ts
+│   │   │   ├── leaderboardFetchersPersonal.ts
+│   │   │   ├── leaderboardFetchersShared.ts
+│   │   │   ├── leaderboardFetchersStreaks.ts
+│   │   │   ├── leaderboardTypes.ts
+│   │   │   ├── prestigeService.ts
 │   │   │   ├── profileService.ts
 │   │   │   ├── puzzleSessionService.ts
+│   │   │   ├── serverTimeService.ts
 │   │   │   └── statsService.ts
 │   │   ├── styles
 │   │   │   └── global.css
@@ -592,12 +625,13 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── client.ts
 │   │   │   └── types.ts
 │   │   ├── utils
-│   │   │   ├── seasons.test.ts
-│   │   │   └── seasons.ts
+│   │   │   ├── safeLocalStorage.ts
+│   │   │   ├── seasons.ts
+│   │   │   └── seasons.test.ts
 │   │   ├── App.tsx
+│   │   ├── App.module.css
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
-│   ├── hooks
 │   ├── test
 │   │   └── setup.ts
 │   └── types

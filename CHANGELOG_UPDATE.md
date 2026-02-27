@@ -4,7 +4,30 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 🏆 Latest (win screen, confetti, mobile, a11y, docs)
+## 🧩 Latest (completion layout, tray, lock smoothness)
+
+### Completion screen
+
+- **Larger image** — Puzzle image on the win overlay is more prominent (e.g. `min(52vh, 280px)` desktop, `min(42vh, 220px)` mobile).
+- **Vertical menu** — Action buttons (Continue, Play again, Back to home, Share Result) are in a single column, full-width menu instead of a 2×2 grid.
+
+### Mobile tray
+
+- **Shorter tray** — On viewports ≤600px, tray height reduced from 200px to 175px (195px for large puzzles) to free vertical space for the board.
+
+### Lock animation
+
+- **Smooth snap** — When pieces lock to the board, they now lerp from their pre-snap position to the exact target over ~100ms (ease-out) instead of jumping in one frame. Applied on both desktop and mobile.
+- **Implementation** — `lockLerpOverrides` in animation state; `lastPiecePositionsRef` in `usePlayScreenAnimation`; `renderBoard` uses `undoSnapBackOverrides ?? lockLerpOverrides ?? dragDisplayOverrides` for draw order.
+
+### Docs
+
+- **README** — File/folder structure updated: `renderBoardDrawPiece.ts`, `CompletionStatsBlock`, `HeaderMenuSubmenuPanel`, `usePlayScreenPersistence`, `usePlayScreenSharePuzzle`, `puzzleSnap.ts`, expanded `services/` and `audio/`, corrected Play `components/` and `hooks/`.
+- **changelog.ts** — Version 16: smooth lock, completion menu + image, mobile tray.
+
+---
+
+## 🏆 Earlier (win screen, confetti, mobile, a11y, docs)
 
 ### Win screen redesign
 

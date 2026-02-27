@@ -1,13 +1,16 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "15";
+export const CHANGELOG_VERSION = "16";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🧩 Smoother lock – Pieces ease into place when they snap (no more jump); works on desktop and mobile",
+      "📱 Completion screen – Larger puzzle image and a clear vertical menu for Continue, Play again, Back to home, Share Result",
+      "📐 Mobile tray – Slightly shorter tray on small screens so the board has more room",
       "🎊 Confetti upgrade – Layered bursts on completion (main + side + lower arc); respects reduced motion & battery saver",
       "🏅 Percentile badges – Completion overlay shows Top 10%, Top 25%, or Top 50% badge when you rank in those tiers",
       "🧲 Snap during drag – Pieces snap when dragged quickly through the target (no need to release exactly on the spot)",
