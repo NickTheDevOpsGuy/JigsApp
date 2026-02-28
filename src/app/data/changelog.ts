@@ -1,13 +1,14 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "19";
+export const CHANGELOG_VERSION = "20";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🧩 Snap on release – Pieces snap when you release; no mid-drag snap for a smoother lock animation",
       "📱 Win screen – Share is a full menu option (same style as Continue, Play again, Back to home)",
       "🧩 Lock animation – Smooth snap restored: lock lerp in usePlayScreenAnimation (120ms, ease-out); drag position captured when drag ends",
       "🔧 Code refactor (continued) – Menu config constants, header menu items (display/rest) split, viewport storage and pointer-handler types extracted (see README file structure)",
