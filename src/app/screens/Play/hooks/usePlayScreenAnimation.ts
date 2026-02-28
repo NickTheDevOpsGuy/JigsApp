@@ -83,11 +83,7 @@ export function usePlayScreenAnimation(args: {
   const fpsLogIntervalRef = useRef<number>(0);
   /** Interpolated positions for dragged group (smooth drag, no touch/pointer changes) */
   const dragDisplayRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const DRAG_LERP = 0.72;
-  /** Previous-frame positions for lock lerp (smooth snap instead of jump) */
-  const lastPiecePositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const LOCK_LERP_MS = 120;
-  const UNDO_SNAPBACK_MS = 280;
+  const DRAG_LERP = 0.32;
 
   const perfFrameTimesRef = useRef<number[]>([]);
   const perfDrawCountRef = useRef(0);
@@ -226,72 +222,11 @@ export function usePlayScreenAnimation(args: {
           pos.y += (p.y - pos.y) * DRAG_LERP;
         }
       } else {
-        if (dragDisplayOverrides.size > 0) {
-          for (const [id, pos] of dragDisplayOverrides) {
-            lastPiecePositionsRef.current.set(id, { x: pos.x, y: pos.y });
-          }
-          dragDisplayOverrides.clear();
-        }
-      }
-
-      const undoSnapBack = undoSnapBackRef?.current ?? null;
-      let undoSnapBackOverrides: Map<string, { x: number; y: number }> | undefined;
-      if (undoSnapBack) {
-        const elapsed = now - undoSnapBack.startMs;
-        if (elapsed >= UNDO_SNAPBACK_MS) {
-          onUndoSnapBackComplete?.();
-        } else {
-          const t = elapsed / UNDO_SNAPBACK_MS;
-          const easeOut = 1 - Math.pow(1 - t, 1.5);
-          undoSnapBackOverrides = new Map();
-          for (const p of st.pieces) {
-            if (p.inTray) continue;
-            const from = undoSnapBack.fromPositions.get(p.id);
-            if (!from) continue;
-            undoSnapBackOverrides.set(p.id, {
-              x: from.x + (p.x - from.x) * easeOut,
-              y: from.y + (p.y - from.y) * easeOut,
-            });
-          }
-        }
+        dragDisplayOverrides.clear();
       }
 
       const popMap = popMapRef.current ?? new Map<string, number>();
       const lockMap = lockMapRef.current ?? new Map<string, number>();
-      let lockLerpOverrides: Map<string, { x: number; y: number }> | undefined;
-      if (!isDragging && undoSnapBackOverrides == null) {
-        const lastPos = lastPiecePositionsRef.current;
-        for (const p of st.pieces) {
-          if (p.inTray) continue;
-          const lockAt = lockMap.get(p.id);
-          if (lockAt == null) continue;
-          const lockElapsedMs = now - lockAt;
-          if (lockElapsedMs >= LOCK_LERP_MS) continue;
-          const from = lastPos.get(p.id);
-          if (from == null) continue;
-          const t = Math.min(1, lockElapsedMs / LOCK_LERP_MS);
-          const easeOut = 1 - Math.pow(1 - t, 1.6);
-          lockLerpOverrides ??= new Map();
-          lockLerpOverrides.set(p.id, {
-            x: from.x + (p.x - from.x) * easeOut,
-            y: from.y + (p.y - from.y) * easeOut,
-          });
-        }
-      }
-      for (const p of st.pieces) {
-        if (p.inTray) continue;
-        const lockAt = lockMap.get(p.id);
-        if (lockAt != null && now - lockAt < LOCK_LERP_MS) continue;
-        const pos =
-          isDragging &&
-          draggedGroupId &&
-          p.groupId === draggedGroupId &&
-          dragDisplayOverrides.has(p.id)
-            ? dragDisplayOverrides.get(p.id)!
-            : { x: p.x, y: p.y };
-        lastPiecePositionsRef.current.set(p.id, { x: pos.x, y: pos.y });
-      }
-
       const pieceCache = pieceCacheRef.current;
       const snapParticles = snapParticlesRef?.current ?? [];
       const hint = wrongRotationHintRef?.current;
@@ -329,8 +264,6 @@ export function usePlayScreenAnimation(args: {
           showAlignmentGrid,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
           dragDisplayOverrides: isDragging ? dragDisplayOverrides : undefined,
-          lockLerpOverrides,
-          undoSnapBackOverrides,
           wrongRotationHint,
           snapPreview,
         },
