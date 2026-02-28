@@ -435,7 +435,7 @@
   .playBody .trayWrap {
     width: 100%;
     max-width: min(90vw, 420px);
-    height: 170px;
+    height: 140px;
     flex-shrink: 0;
     padding: 0 0 6px;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
@@ -443,7 +443,11 @@
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 190px;
+    height: 165px;
+  }
+
+  .tray {
+    height: 140px;
   }
 }
 
@@ -688,7 +692,7 @@
   }
   .tray {
     width: auto;
-    height: 180px;
+    height: 160px;
   }
 }
 
@@ -1755,43 +1759,106 @@
   margin: 0 !important;
 }
 
-/* Win screen: actions as a single menu (Continue, Play again, Back to home, Share) */
+/* Win screen: dropdown (Continue / Play again / Back to home) + Share left-to-right */
 .completeActions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: stretch;
-  gap: 0;
+  gap: 12px;
   width: 100%;
   margin: 0 auto;
+}
+
+.completeActionsDropdownWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.completeActionsTrigger {
+  width: 100%;
+  min-height: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-elevated);
   box-shadow: var(--shadow-sm);
 }
 
-.completeActions > * {
-  border-bottom: 1px solid var(--color-border);
+.completeActionsChevron {
+  margin-left: 4px;
+  opacity: 0.9;
 }
 
-.completeActions > *:last-child {
-  border-bottom: none;
+.completeActionsDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  min-width: 160px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  z-index: 10;
+  animation: completeDropdownIn 0.15s ease;
 }
 
-.completeActions .completeContinueBtn {
+@keyframes completeDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.completeActionsDropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.completeActionsDropdownItem:hover {
+  background: var(--color-bg-card);
+}
+
+.completeActionsShareBtn {
+  flex: 1;
   min-width: 0;
+  min-height: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  border-radius: 0;
-  box-shadow: none;
+  gap: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 .completeActions .completeShareLink {
   margin-top: 0;
-  width: 100%;
   min-height: 44px;
   justify-content: center;
-  border-radius: 0;
+  border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--color-text-primary);
@@ -1804,8 +1871,11 @@
 }
 
 @media (max-width: 500px), (max-height: 600px) {
-  .completeActions .completeContinueBtn,
-  .completeActions .completeShareLink {
+  .completeActions {
+    gap: 8px;
+  }
+  .completeActionsTrigger,
+  .completeActionsShareBtn {
     padding: 10px 12px;
     min-height: 44px;
     font-size: 0.9rem;
