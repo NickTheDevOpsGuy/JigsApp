@@ -1,27 +1,25 @@
 /**
  * PuzzleManager – core puzzle logic: pieces, snapping, groups, undo.
- *
- * Sections: options/types; 80–200 init/restore; 200–400 drag/snap/place;
- * 400–550 groups/merge; 550–650 undo; 650–773 events/helpers.
- *
  * Handles drag state, board/neighbor snap tolerances, piece locking, events.
+ *
+ * Snapping runs on pointerUp only (not during drag) to avoid jerky lock behavior.
  */
 import type { MutableRefObject } from "react";
 import type { DragState, GridSize, Piece, PieceCutType, PuzzleState } from "./types";
 import { createInitialPieces } from "./factories/createInitialPieces";
 import type { SavedPiece } from "./puzzleStorage";
+import { applySavedPieces, assertGroupConsistency } from "./puzzleManagerRestore";
 import { UndoManager } from "./undoManager";
 import {
   clamp,
-  getEffectiveTolerance as getEffectiveToleranceUtil,
   getUndoLimit,
-  findPlacementFromTray as findPlacementFromTrayUtil,
+  getEffectiveTolerance,
+  findPlacementFromTray,
+  type EffectiveToleranceOptions,
 } from "./puzzleManagerUtils";
-import type { EffectiveToleranceOptions } from "./puzzleManagerUtils";
 import {
   getGroupBounds as getGroupBoundsUtil,
   wouldOverlapAnyOtherGroup as wouldOverlapUtil,
-  getSolvedNeighbors as getSolvedNeighborsUtil,
 } from "./groupUtils";
 import {
   computeBoardSnapResult,
@@ -252,6 +250,15 @@ export class PuzzleManager {
     this.state = { ...this.state, pieces: newPieces };
   }
 
+  private getToleranceOptions(): EffectiveToleranceOptions {
+    return {
+      snapScaleRef: this.snapScaleRef,
+      relaxedToleranceMultiplierRef: this.relaxedToleranceMultiplierRef,
+      snapToleranceOverrideRef: this.snapToleranceOverrideRef,
+      isMobile: this.isMobile,
+    };
+  }
+
   private tilePos(p: Piece) {
     return { x: p.x + p.pad, y: p.y + p.pad };
   }
@@ -322,10 +329,6 @@ export class PuzzleManager {
     return wouldOverlapUtil(this.state.pieces, groupId, dx, dy);
   }
 
-  private getSolvedNeighbors(piece: Piece): Piece[] {
-    return getSolvedNeighborsUtil(this.state.pieces, piece);
-  }
-
   /**
    * Merge two groups atomically. All pieces in `from` get `groupId: into`.
    * Undo/redo: we push once at pointerDown; pointerUp runs merge without pushing.
@@ -367,7 +370,10 @@ export class PuzzleManager {
     const dx = active.targetX - activeTile.x;
     const dy = active.targetY - activeTile.y;
     const distance = Math.hypot(dx, dy);
-    const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
+    const tolerance = getEffectiveTolerance(
+      this.snapToleranceBoardPx,
+      this.getToleranceOptions(),
+    );
     const nearThreshold = tolerance * 1.5;
     const wouldOverlap = this.wouldOverlapAnyOtherGroup(gid, dx, dy);
 
@@ -504,7 +510,7 @@ export class PuzzleManager {
     this.pushUndoState();
 
     const boardPieces = this.state.pieces.filter((p) => !p.inTray);
-    const { x, y } = findPlacementFromTrayUtil(
+    const { x, y } = findPlacementFromTray(
       this.boardWidth,
       this.boardHeight,
       piece,
@@ -590,26 +596,18 @@ export class PuzzleManager {
     const piece = this.findPiece(activeId);
     if (!piece) return;
 
+    // Calculate new position
     const newX = clientX - boardRect.left - this.drag.offsetX;
     const newY = clientY - boardRect.top - this.drag.offsetY;
+
+    // Calculate delta from current position
     const dx = newX - piece.x;
     const dy = newY - piece.y;
 
+    // Move the group (no snap during drag – snap only on pointerUp to avoid jerky lock)
     this.shiftGroup(piece.groupId, dx, dy);
 
-    // Try snap during drag so fast drags still snap when passing through the target
-    const snappedNeighbor = this.trySnapActiveGroupToNeighbor();
-    if (snappedNeighbor) {
-      this.drag = { ...this.drag, preview: this.computeSnapPreview() };
-      return;
-    }
-    const snappedBoard = this.trySnapActiveGroupToBoard();
-    if (snappedBoard) {
-      this.recomputeDerivedState();
-      this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
-      return;
-    }
-
+    // Compute snap preview
     this.drag = {
       ...this.drag,
       preview: this.computeSnapPreview(),
@@ -651,20 +649,6 @@ export class PuzzleManager {
     const dy = newY - piece.y;
 
     this.shiftGroup(piece.groupId, dx, dy);
-
-    // Try snap during drag so fast drags still snap when passing through the target
-    const snappedNeighbor = this.trySnapActiveGroupToNeighbor();
-    if (snappedNeighbor) {
-      this.drag = { ...this.drag, preview: this.computeSnapPreview() };
-      return;
-    }
-    const snappedBoard = this.trySnapActiveGroupToBoard();
-    if (snappedBoard) {
-      this.recomputeDerivedState();
-      this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
-      return;
-    }
-
     this.drag = {
       ...this.drag,
       preview: this.computeSnapPreview(),
@@ -708,77 +692,26 @@ export class PuzzleManager {
    * Every piece gets its saved groupId, so groups are consistent after restore.
    */
   public restoreFromSaved(savedPieces: SavedPiece[]) {
-    const currentPieces = this.state.pieces;
-    if (savedPieces.length !== currentPieces.length) {
-      throw new Error(
-        `Saved piece count (${savedPieces.length}) does not match grid (${currentPieces.length})`,
-      );
-    }
-    const pieceMap = new Map(savedPieces.map((p) => [p.id, p]));
-    const currentIds = new Set(currentPieces.map((p) => p.id));
-    for (const sp of savedPieces) {
-      if (!currentIds.has(sp.id)) {
-        throw new Error(`Saved piece id ${sp.id} not found in current puzzle`);
-      }
-    }
-
-    this.state = {
-      ...this.state,
-      pieces: currentPieces.map((p) => {
-        const saved = pieceMap.get(p.id);
-        if (saved) {
-          return {
-            ...p,
-            x: saved.x,
-            y: saved.y,
-            z: saved.z,
-            rotation: saved.rotation,
-            groupId: saved.groupId,
-            isPlaced: saved.isPlaced,
-            locked: saved.locked ?? false,
-            inTray: saved.inTray,
-            dragCount: saved.dragCount ?? p.dragCount ?? 0,
-          };
-        }
-        return p;
-      }),
-    };
-
-    this.assertGroupConsistency();
+    const pieces = applySavedPieces(this.state.pieces, savedPieces);
+    this.state = { ...this.state, pieces };
+    assertGroupConsistency(pieces);
     this.recomputeDerivedState();
   }
 
-  /** Dev-only: ensure no piece has empty groupId after restore (would indicate corruption). */
-  private assertGroupConsistency(): void {
-    if (import.meta.env?.DEV !== true) return;
-    for (const p of this.state.pieces) {
-      if (!p.groupId || typeof p.groupId !== "string") {
-        console.warn("[PuzzleManager] Piece has invalid groupId after restore:", p.id);
-      }
-    }
-  }
-
   /* ---------------- Snapping ---------------- */
-
-  private getToleranceOptions(): EffectiveToleranceOptions {
-    return {
-      snapScaleRef: this.snapScaleRef,
-      relaxedToleranceMultiplierRef: this.relaxedToleranceMultiplierRef,
-      snapToleranceOverrideRef: this.snapToleranceOverrideRef,
-      isMobile: this.isMobile,
-    };
-  }
-
-  private getEffectiveTolerance(basePx: number): number {
-    return getEffectiveToleranceUtil(basePx, this.getToleranceOptions());
-  }
 
   private trySnapActiveGroupToBoard(): boolean {
     this.events.onSnapCheck?.();
     const activeId = this.drag.activeId;
     if (!activeId) return false;
 
-    const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
+    const active = this.findPiece(activeId);
+    if (!active) return false;
+
+    const tolerance = getEffectiveTolerance(
+      this.snapToleranceBoardPx,
+      this.getToleranceOptions(),
+    );
     const result = computeBoardSnapResult(this.state.pieces, activeId, tolerance);
 
     if (result?.kind === "wrongRotation") {
@@ -787,15 +720,16 @@ export class PuzzleManager {
     }
     if (result?.kind !== "snap") return false;
 
-    const active = this.findPiece(activeId)!;
-    const groupPieces = this.getGroupPieces(result.groupId);
+    const gid = result.groupId;
+    const groupPieces = this.getGroupPieces(gid);
 
-    this.shiftGroupUnclamped(result.groupId, result.dx, result.dy);
-    this.setGroupToExactTargetPositions(result.groupId);
+    // Set directly to exact target positions (no intermediate shift) so the lock lerp
+    // animates smoothly from drag-end to final position without a visible half-step.
+    this.setGroupToExactTargetPositions(gid);
 
     const wasLocked = new Set(groupPieces.filter((p) => p.locked).map((p) => p.id));
     this.updatePieces(
-      (p) => p.groupId === result.groupId,
+      (p) => p.groupId === gid,
       (p) => ({
         justSnapped: true,
         locked: this.pieceLockingEnabled || p.locked,
@@ -823,9 +757,13 @@ export class PuzzleManager {
     const groupPieces = this.getGroupPieces(gid);
     if (!groupPieces.every((p) => p.rotation === 0)) {
       this.replacePieces(rotateGroupToZeroPieces(this.state.pieces, gid));
+      if (!this.findPiece(activeId)) return false;
     }
 
-    const tolerance = this.getEffectiveTolerance(this.snapToleranceNeighborPx);
+    const tolerance = getEffectiveTolerance(
+      this.snapToleranceNeighborPx,
+      this.getToleranceOptions(),
+    );
     const result = computeNeighborSnapResult(
       this.state.pieces,
       activeId,
@@ -833,8 +771,7 @@ export class PuzzleManager {
       this.tileW,
       this.tileH,
     );
-
-    if (result?.kind !== "snap") return false;
+    if (!result) return false;
 
     this.shiftGroupUnclamped(gid, result.dx, result.dy);
     this.mergeGroups(gid, result.intoGroupId);
@@ -858,11 +795,15 @@ export class PuzzleManager {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
-    const tolerance = this.getEffectiveTolerance(this.snapToleranceBoardPx);
+    const tolerance = getEffectiveTolerance(
+      this.snapToleranceBoardPx,
+      this.getToleranceOptions(),
+    );
     const result = computeNearSnapNudge(this.state.pieces, activeId, tolerance);
     if (!result) return;
 
-    const active = this.findPiece(activeId)!;
+    const active = this.findPiece(activeId);
+    if (!active) return;
     this.shiftGroup(active.groupId, result.nudgeDx, result.nudgeDy);
   }
 
@@ -871,7 +812,7 @@ export class PuzzleManager {
     const result = computeMergedGroupBoardSnapResult(this.state.pieces, groupId);
     if (!result) return;
 
-    this.shiftGroupUnclamped(groupId, result.dx, result.dy);
+    // Set directly to exact target so lock/place animation doesn't show a half-step.
     this.setGroupToExactTargetPositions(groupId);
   }
 

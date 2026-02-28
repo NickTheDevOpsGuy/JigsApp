@@ -6,13 +6,17 @@
  *
  * Uses Web Audio API only (no external assets).
  */
-import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import {
   clamp01,
   resumeIfSuspended,
   createNoiseBuffer,
   createTinyImpulse,
 } from "./soundsDsp";
+import {
+  loadSoundPreferencesFromStorage,
+  saveSoundPreference,
+  type SnapSoundPref as SnapSoundPrefType,
+} from "./soundsPreferences";
 import { startAmbientFromTheme, getAmbientTheme } from "./soundEngineAmbient";
 import {
   playPickupSfx,
@@ -25,15 +29,7 @@ import {
 
 export type SoundType = "snap" | "place" | "rotate" | "complete" | "pickup" | "undo";
 export type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";
-export type SnapSoundPref = "default" | "classic" | "soft" | "punchy" | "muted";
-
-const SOUND_ENABLED_KEY = "phuzzle:soundEnabled";
-const SOUND_VOLUME_KEY = "phuzzle:soundVolume";
-const HAPTICS_ENABLED_KEY = "phuzzle:hapticsEnabled";
-const SNAP_SOUND_KEY = "phuzzle:snapSound";
-
-const MUSIC_ENABLED_KEY = "phuzzle:musicEnabled";
-const MUSIC_VOLUME_KEY = "phuzzle:musicVolume";
+export type SnapSoundPref = SnapSoundPrefType;
 
 type StopFn = () => void;
 
@@ -79,34 +75,19 @@ class SoundEngine {
 
   // ---------- Preferences ----------
   loadPreferences() {
-    const enabled = safeLocalStorage.getItem(SOUND_ENABLED_KEY);
-    if (enabled !== null) this.enabled = enabled === "true";
-
-    const volume = safeLocalStorage.getItem(SOUND_VOLUME_KEY);
-    if (volume !== null) this.volume = clamp01(parseFloat(volume));
-
-    const haptics = safeLocalStorage.getItem(HAPTICS_ENABLED_KEY);
-    if (haptics !== null) this.hapticsEnabled = haptics === "true";
-
-    const snap = safeLocalStorage.getItem(SNAP_SOUND_KEY);
-    if (
-      snap !== null &&
-      ["default", "classic", "soft", "punchy", "muted"].includes(snap)
-    ) {
-      this.snapSoundPref = snap as SnapSoundPref;
-    }
-
-    const m = safeLocalStorage.getItem(MUSIC_ENABLED_KEY);
-    if (m !== null) this.musicEnabled = m === "true";
-
-    const mv = safeLocalStorage.getItem(MUSIC_VOLUME_KEY);
-    if (mv !== null) this.musicVolume = clamp01(parseFloat(mv) || 0.35);
+    const prefs = loadSoundPreferencesFromStorage();
+    this.enabled = prefs.enabled;
+    this.volume = prefs.volume;
+    this.hapticsEnabled = prefs.hapticsEnabled;
+    this.snapSoundPref = prefs.snapSoundPref;
+    this.musicEnabled = prefs.musicEnabled;
+    this.musicVolume = prefs.musicVolume;
   }
 
   // ---------- Public setters/getters ----------
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
-    safeLocalStorage.setItem(SOUND_ENABLED_KEY, enabled ? "true" : "false");
+    saveSoundPreference("enabled", enabled);
   }
   isEnabled() {
     return this.enabled;
@@ -114,7 +95,7 @@ class SoundEngine {
 
   setVolume(volume: number) {
     this.volume = clamp01(volume);
-    safeLocalStorage.setItem(SOUND_VOLUME_KEY, this.volume.toString());
+    saveSoundPreference("volume", this.volume);
   }
   getVolume() {
     return this.volume;
@@ -122,7 +103,7 @@ class SoundEngine {
 
   setHapticsEnabled(enabled: boolean) {
     this.hapticsEnabled = enabled;
-    safeLocalStorage.setItem(HAPTICS_ENABLED_KEY, enabled ? "true" : "false");
+    saveSoundPreference("hapticsEnabled", enabled);
   }
   isHapticsEnabled() {
     return this.hapticsEnabled;
@@ -130,7 +111,7 @@ class SoundEngine {
 
   setSnapSoundPref(pref: SnapSoundPref) {
     this.snapSoundPref = pref;
-    safeLocalStorage.setItem(SNAP_SOUND_KEY, pref);
+    saveSoundPreference("snapSoundPref", pref);
   }
   getSnapSoundPref() {
     return this.snapSoundPref;
@@ -138,7 +119,7 @@ class SoundEngine {
 
   setMusicEnabled(enabled: boolean) {
     this.musicEnabled = enabled;
-    safeLocalStorage.setItem(MUSIC_ENABLED_KEY, enabled ? "true" : "false");
+    saveSoundPreference("musicEnabled", enabled);
     if (enabled && !this.paused) {
       void this.startAmbient();
     } else {
@@ -151,7 +132,7 @@ class SoundEngine {
 
   setMusicVolume(vol: number) {
     this.musicVolume = clamp01(vol);
-    safeLocalStorage.setItem(MUSIC_VOLUME_KEY, this.musicVolume.toString());
+    saveSoundPreference("musicVolume", this.musicVolume);
     this.updateAmbientGain();
   }
   getMusicVolume() {

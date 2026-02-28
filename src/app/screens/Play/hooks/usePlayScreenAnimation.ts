@@ -11,6 +11,13 @@ import type { UndoSnapBackFrom } from "../playUtils";
 import { SHOW_DEBUG, type DebugFlags } from "../playScreenUtils";
 import type { ViewportState } from "./useViewport";
 import type { PerfStats } from "../components/ProfilerOverlay";
+import {
+  DRAG_LERP,
+  LOCK_LERP_MS,
+  IDLE_MIN_INTERVAL_MS,
+  getHighPieceCountThreshold,
+  IDLE_GHOST_MS,
+} from "./usePlayScreenAnimationConstants";
 
 export function usePlayScreenAnimation(args: {
   manager: PuzzleManager | null;
@@ -83,19 +90,14 @@ export function usePlayScreenAnimation(args: {
   const fpsLogIntervalRef = useRef<number>(0);
   /** Interpolated positions for dragged group (smooth drag, no touch/pointer changes) */
   const dragDisplayRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const DRAG_LERP = 0.32;
   /** When drag ends: snapshot last drawn position here so lock lerp starts from there (no jerk). */
   const lastPiecePositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const LOCK_LERP_MS = 140;
 
   const perfFrameTimesRef = useRef<number[]>([]);
   const perfDrawCountRef = useRef(0);
   const perfLastSecRef = useRef(0);
 
-  /** For 50+ piece puzzles: throttle redraw to 30fps when idle to reduce CPU/GPU load. */
-  const IDLE_TARGET_FPS = 30;
-  const IDLE_MIN_INTERVAL_MS = 1000 / IDLE_TARGET_FPS;
-  const HIGH_PIECE_COUNT_THRESHOLD = batterySaverMode ? 25 : 50;
+  const HIGH_PIECE_COUNT_THRESHOLD = getHighPieceCountThreshold(batterySaverMode);
 
   useEffect(() => {
     if (!manager) return;
@@ -278,7 +280,6 @@ export function usePlayScreenAnimation(args: {
         dragState.activeId && manager ? manager.getSnapPreviewState() : null;
       const idleMs =
         lastInteractionRef?.current != null ? now - lastInteractionRef.current : 0;
-      const IDLE_GHOST_MS = 4000;
       const effectiveShowGhost =
         showGhostHint ||
         (!!showGhostWhenIdle && idleMs >= IDLE_GHOST_MS && !st.isComplete);

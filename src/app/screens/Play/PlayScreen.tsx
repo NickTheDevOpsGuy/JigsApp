@@ -48,6 +48,7 @@ import { useDownloadImage } from "./hooks/useDownloadImage";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { usePointerHandlers } from "./hooks/usePointerHandlers";
 import { useViewport } from "./hooks/useViewport";
+import { usePlayScreenTopBarProps } from "./hooks/usePlayScreenTopBarProps";
 import { useReferenceTapHighlight } from "./hooks/useReferenceTapHighlight";
 import { usePlayScreenSecondaryEffects } from "./hooks/usePlayScreenSecondaryEffects";
 import { usePlayScreenPersistence } from "./hooks/usePlayScreenPersistence";
@@ -69,7 +70,6 @@ import {
 import { SnapComboMeter } from "./components/SnapComboMeter";
 import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
-import { isSupabaseConfigured } from "@/supabase/client";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 export function PlayScreen() {
@@ -736,6 +736,88 @@ export function PlayScreen() {
       ? getBestTime(state.grid.rows, state.grid.cols)
       : null;
 
+  const topBarProps = usePlayScreenTopBarProps({
+    theme,
+    setTheme,
+    timeMode,
+    setTimeMode,
+    countdownMinutes,
+    setCountdownMinutes,
+    showPreview,
+    setShowPreview,
+    soundEnabled,
+    musicEnabled,
+    hapticsEnabled,
+    pieceLockingEnabled,
+    setPieceLockingEnabled,
+    showGhostHint,
+    setShowGhostHint,
+    showGhostWhenIdle,
+    showEdgeHighlight,
+    showClusterOutline,
+    deliberateDetachEnabled,
+    showAlignmentGrid,
+    setShowAlignmentGrid,
+    toggleRelaxedMode,
+    toggleDriftMode,
+    toggleShowClusterOutline,
+    toggleDeliberateDetach,
+    toggleShowGhostWhenIdle,
+    toggleShowEdgeHighlight,
+    toggleSound,
+    toggleMusic,
+    toggleHaptics,
+    toggleFullscreen,
+    toggleDebug,
+    togglePerfOverlay,
+    isFullscreen: ui.isFullscreen,
+    isCoarsePointer,
+    showDebug: SHOW_DEBUG,
+    debug,
+    setShowNewGameModal,
+    setShowShortcuts,
+    setShowHowToPlay,
+    setShowThemeModal,
+    setShowResetStatsConfirm,
+    setShowClearCacheConfirm,
+    manager,
+    state,
+    setState,
+    isPaused,
+    setIsPaused,
+    playUndo: soundManager.play.bind(soundManager),
+    undoCountRef,
+    undoSnapBackRef,
+    viewport,
+    relaxedModeEnabled,
+    driftModeEnabled,
+    immersiveMode,
+    handleToggleImmersiveMode,
+    progressiveRevealMode,
+    setProgressiveRevealMode,
+    pieceCutType,
+    setPieceCutType,
+    handleSharePuzzle,
+    creatingSession,
+    dailyPreferredModifier,
+    setDailyPreferredModifier,
+    snapToleranceOverride,
+    setSnapToleranceOverride,
+    elapsedSeconds,
+    piecesLeft: left,
+    totalPieces: total,
+    isComplete,
+    grid,
+    quadrantTimes,
+    bestTimeSeconds,
+    lives,
+    sessionId,
+    realtimeStatus,
+    connectedCount: sessionResult.connectedCount,
+    showImmersiveUi,
+    scheduleImmersiveHide,
+  });
+
   return (
     <PlayScreenCoopView
       isHost={isHost}
@@ -779,193 +861,16 @@ export function PlayScreen() {
           />
         )}
         <PlayScreenTopBar
-          headerMenuProps={{
-            title: "Phuzzle",
-            theme,
-            setTheme,
-            timeMode,
-            setTimeMode: (modeOrFn) => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              setTimeMode(modeOrFn);
-            },
-            countdownMinutes,
-            setCountdownMinutes,
-            showPreview,
-            soundEnabled,
-            musicEnabled,
-            hapticsEnabled,
-            pieceLockingEnabled,
-            showGhostHint,
-            showGhostWhenIdle,
-            showEdgeHighlight,
-            showClusterOutline,
-            onToggleClusterOutline: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              toggleShowClusterOutline();
-            },
-            deliberateDetachEnabled,
-            onToggleDeliberateDetach: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              toggleDeliberateDetach();
-            },
-            showAlignmentGrid,
-            isFullscreen: ui.isFullscreen,
-            canShowHaptics: isCoarsePointer && typeof navigator?.vibrate === "function",
-            canShowFullscreen: !!document.fullscreenEnabled,
-            canShowShortcuts: !isCoarsePointer,
-            canShowDebug: SHOW_DEBUG,
-            debug,
-            onNewPuzzle: () => setShowNewGameModal(true),
-            canUndo: !!(manager?.canUndo() && !isPaused && !state?.isComplete),
-            onUndo: createUndoRedoHandler(
-              manager ?? null,
-              "undo",
-              setState,
-              () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
-              soundManager.play.bind(soundManager),
-              () => {
-                undoCountRef.current += 1;
-              },
-              (fromPositions) => {
-                undoSnapBackRef.current = {
-                  fromPositions,
-                  startMs: performance.now(),
-                };
-              },
-            ),
-            canRedo: !!(manager?.canRedo() && !isPaused && !state?.isComplete),
-            onRedo: createUndoRedoHandler(
-              manager ?? null,
-              "redo",
-              setState,
-              () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
-              soundManager.play.bind(soundManager),
-              undefined,
-              (fromPositions) => {
-                undoSnapBackRef.current = {
-                  fromPositions,
-                  startMs: performance.now(),
-                };
-              },
-            ),
-            onResetView: () => viewport.reset(),
-            onTogglePreview: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              setShowPreview((p) => !p);
-            },
-            onToggleSound: toggleSound,
-            onToggleMusic: toggleMusic,
-            onToggleHaptics: toggleHaptics,
-            onTogglePieceLocking: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              setPieceLockingEnabled((p) => !p);
-            },
-            relaxedModeEnabled,
-            onToggleRelaxedMode: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              toggleRelaxedMode();
-            },
-            driftModeEnabled,
-            onToggleDriftMode: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              toggleDriftMode();
-            },
-            onToggleGhostHint: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              setShowGhostHint((g) => !g);
-            },
-            onToggleGhostWhenIdle: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              toggleShowGhostWhenIdle();
-            },
-            onToggleEdgeHighlight: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              toggleShowEdgeHighlight();
-            },
-            onToggleAlignmentGrid: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              setShowAlignmentGrid((a) => !a);
-            },
-            onToggleFullscreen: toggleFullscreen,
-            onZoomIn: () => viewport.zoomIn(),
-            onZoomOut: () => viewport.zoomOut(),
-            onShowShortcuts: () => setShowShortcuts(true),
-            onShowHowToPlay: () => setShowHowToPlay(true),
-            onToggleDebug: toggleDebug,
-            onTogglePerfOverlay: togglePerfOverlay,
-            immersiveMode,
-            onToggleImmersiveMode: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              handleToggleImmersiveMode();
-            },
-            progressiveRevealMode,
-            onToggleProgressiveReveal: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              setProgressiveRevealMode((v) => !v);
-            },
-            pieceCutType,
-            onPieceCutTypeChange: (cut) => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              setPieceCutType(cut);
-            },
-            onSharePuzzle: isSupabaseConfigured() ? handleSharePuzzle : undefined,
-            shareDisabled: creatingSession,
-            onOpenThemeModal: () => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              setShowThemeModal(true);
-            },
-            dailyPreferredModifier,
-            onDailyPreferredModifierChange: (m) => {
-              if (hapticsEnabled && navigator.vibrate) navigator.vibrate(10);
-              setDailyPreferredModifier(m);
-            },
-            onResetStats: () => setShowResetStatsConfirm(true),
-            onClearCache: () => setShowClearCacheConfirm(true),
-            snapToleranceOverride,
-            onSnapToleranceOverrideChange: (value) => setSnapToleranceOverride(value),
-          }}
-          sessionId={sessionId}
-          realtimeStatus={realtimeStatus}
-          connectedCount={sessionResult.connectedCount}
-          showHud={!isComplete && !isPaused}
-          hudProps={{
-            elapsedSeconds,
-            piecesLeft: left,
-            totalPieces: total,
-            isPaused,
-            isComplete,
-            timeMode,
-            countdownMinutes,
-            bestTimeSeconds,
-            quadrantTimes: timeMode === "speedrun" ? quadrantTimes : undefined,
-            quadrantPbs:
-              timeMode === "speedrun" && grid
-                ? {
-                    0: getQuadrantPb(grid.rows, grid.cols, 0),
-                    1: getQuadrantPb(grid.rows, grid.cols, 1),
-                    2: getQuadrantPb(grid.rows, grid.cols, 2),
-                    3: getQuadrantPb(grid.rows, grid.cols, 3),
-                  }
-                : undefined,
-            lives: timeMode === "timeattack" ? lives : undefined,
-            onTogglePause: () => setIsPaused((p) => !p),
-          }}
-          topBarButtonsProps={{
-            showPreview,
-            soundEnabled,
-            isFullscreen: ui.isFullscreen,
-            showDebug: SHOW_DEBUG,
-            isCoarsePointer,
-            onTogglePreview: () => setShowPreview((p) => !p),
-            onToggleSound: toggleSound,
-            onToggleFullscreen: toggleFullscreen,
-            onShowShortcuts: () => setShowShortcuts(true),
-            onToggleDebug: toggleDebug,
-            onNewPuzzle: () => setShowNewGameModal(true),
-          }}
-          immersiveMode={immersiveMode}
-          showImmersiveUi={showImmersiveUi}
-          onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
+          headerMenuProps={topBarProps.headerMenuProps}
+          sessionId={topBarProps.sessionId}
+          realtimeStatus={topBarProps.realtimeStatus}
+          connectedCount={topBarProps.connectedCount}
+          showHud={topBarProps.showHud}
+          hudProps={topBarProps.hudProps}
+          topBarButtonsProps={topBarProps.topBarButtonsProps}
+          immersiveMode={topBarProps.immersiveMode}
+          showImmersiveUi={topBarProps.showImmersiveUi}
+          onPointerLeave={topBarProps.onPointerLeave}
         />
 
         <PlayScreenModals

@@ -359,6 +359,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │       └── phuzzle-logo-512.png
 │   │   ├── audio
 │   │   │   ├── sounds.ts
+│   │   │   ├── soundsPreferences.ts
 │   │   │   ├── soundsSfx.ts
 │   │   │   ├── soundsSfxTypes.ts
 │   │   │   ├── soundsSfxSnap.ts
@@ -459,7 +460,10 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── confettiColors.ts
 │   │   │   ├── loadPacksData.ts
 │   │   │   ├── menuConfig.ts
+│   │   │   ├── menuConfigAppearance.ts
 │   │   │   ├── menuConfigConstants.ts
+│   │   │   ├── menuConfigPlay.ts
+│   │   │   ├── menuConfigRest.ts
 │   │   │   ├── menuTips.ts
 │   │   │   ├── packCompletion.ts
 │   │   │   ├── packMetadata.ts
@@ -479,6 +483,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   ├── renderBoard.ts
 │   │   │   │   ├── renderBoardDraw.ts
 │   │   │   │   ├── renderBoardDrawPiece.ts
+│   │   │   │   ├── renderBoardDrawPieceHelpers.ts
 │   │   │   │   ├── renderBoardDrawOverlays.ts
 │   │   │   │   ├── renderBoardHelpers.ts
 │   │   │   │   ├── renderBoardTypes.ts
@@ -493,6 +498,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── PuzzleManager.test.ts
 │   │   │   ├── PuzzleManager.ts
 │   │   │   ├── puzzleManagerUtils.ts
+│   │   │   ├── puzzleManagerRestore.ts
 │   │   │   ├── puzzleSnap.ts
 │   │   │   ├── puzzleStorage.ts
 │   │   │   ├── puzzleStorage.test.ts
@@ -513,6 +519,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── Play
 │   │   │   │   ├── components
 │   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── CompletionOverlayActions.tsx
 │   │   │   │   │   ├── CompletionOverlayGate.tsx
 │   │   │   │   │   ├── CompletionSharePopup.tsx
 │   │   │   │   │   ├── CompletionStatsBlock.tsx
@@ -529,6 +536,8 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── headerMenuItemsNavModes.ts
 │   │   │   │   │   ├── headerMenuItemsRest.ts
 │   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── useCompletionConfetti.ts
+│   │   │   │   │   ├── useCompletionOverlayData.ts
 │   │   │   │   │   ├── Minimap.tsx
 │   │   │   │   │   ├── Minimap.module.css
 │   │   │   │   │   ├── PauseOverlay.tsx
@@ -563,6 +572,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── useHaptics.ts
 │   │   │   │   │   ├── useInputHints.ts
 │   │   │   │   │   ├── usePlayScreenAnimation.ts
+│   │   │   │   │   ├── usePlayScreenAnimationConstants.ts
 │   │   │   │   │   ├── usePlayScreenManager.ts
 │   │   │   │   │   ├── usePlayScreenMilestones.ts
 │   │   │   │   │   ├── usePlayScreenPersistence.ts
@@ -571,6 +581,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── usePlayScreenSecondaryEffects.ts
 │   │   │   │   │   ├── usePlayScreenSharePuzzle.ts
 │   │   │   │   │   ├── usePlayScreenShortcuts.ts
+│   │   │   │   │   ├── usePlayScreenTopBarProps.ts
 │   │   │   │   │   ├── usePlayScreenTimer.ts
 │   │   │   │   │   ├── usePlayScreenUI.ts
 │   │   │   │   │   ├── usePointerHandlers.ts
@@ -593,6 +604,7 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   │   │   ├── CameraCapture.module.css
 │   │   │   │   │   ├── CameraCapture.tsx
 │   │   │   │   │   ├── SetupGalleryThumbnail.tsx
+│   │   │   │   │   ├── SetupConfigSection.tsx
 │   │   │   │   │   └── SetupImageSourcePanel.tsx
 │   │   │   │   ├── hooks
 │   │   │   │   │   ├── index.ts

@@ -51,9 +51,8 @@ export function getEffectiveTolerance(
 
   effective *= relaxedMult * overrideMult;
 
-  // Cap so snap only triggers when pieces are reasonably close (desktop + mobile).
-  const minMult = options.isMobile ? 0.5 : 0.4;
-  const maxMult = options.isMobile ? 2.2 : 1.9;
+  const minMult = options.isMobile ? 0.45 : 0.35;
+  const maxMult = options.isMobile ? 3 : 2.5;
   return clamp(effective, basePx * minMult, basePx * maxMult);
 }
 

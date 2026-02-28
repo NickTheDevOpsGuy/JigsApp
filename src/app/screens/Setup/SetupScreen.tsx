@@ -10,22 +10,21 @@ import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { setCurrentPuzzleId } from "@/data/packCompletion";
 import { Button } from "@/components/Button/Button";
-import { Dropdown } from "@/components/DropDown/Dropdown";
 import { ArrowLeft, Trash2, Play } from "lucide-react";
 import {
   useImagePicker,
   useGridConfig,
   useSetupScreenGalleryScroll,
-  GRID_OPTIONS,
   GRID_KEY,
 } from "./hooks";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
-import { COUNTDOWN_OPTIONS, getBestTime, type TimeMode } from "../Play/timeMode";
+import { getBestTime } from "../Play/timeMode";
 import { getAdaptiveSuggestion } from "@/services/adaptiveDifficultyService";
 import { GRID_ONCE_KEY } from "../Play/playScreenUtils";
-import { TIME_MODE_LABELS, STORAGE_KEY, type ImageSource } from "./setupScreenConstants";
+import { STORAGE_KEY, type ImageSource } from "./setupScreenConstants";
 import { SetupImageSourcePanel } from "./components/SetupImageSourcePanel";
+import { SetupConfigSection } from "./components/SetupConfigSection";
 
 export function SetupScreen() {
   const nav = useNavigate();
@@ -197,123 +196,25 @@ export function SetupScreen() {
             />
           )}
 
-          <div className={styles.difficultySuggestionSlot}>
-            {suggestedGrid &&
-              gridIndex !== suggestedGrid.gridIndex &&
-              suggestedGrid.gridIndex < GRID_OPTIONS.length - 1 && (
-                <button
-                  type="button"
-                  className={styles.difficultySuggestion}
-                  onClick={() => setGridIndex(suggestedGrid.gridIndex)}
-                >
-                  {suggestedGrid.hint}
-                </button>
-              )}
-          </div>
-          <div className={styles.configGrid}>
-            <Dropdown
-              label="Difficulty"
-              compact
-              value={gridIndex}
-              onChange={(val: string) => setGridIndex(Number(val))}
-              options={GRID_OPTIONS.map((opt, i) => ({
-                value: i,
-                label:
-                  opt.rows > 0
-                    ? opt.label
-                    : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
-              }))}
-              fullWidth
-            />
-
-            <Dropdown
-              label="Time"
-              compact
-              value={timeMode}
-              onChange={(val: string) => setTimeMode(val as TimeMode)}
-              options={(
-                [
-                  "elapsed",
-                  "countdown",
-                  "active",
-                  "relaxed",
-                  "best",
-                  "speedrun",
-                  "timeattack",
-                ] as TimeMode[]
-              ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
-              fullWidth
-            />
-
-            {timeMode === "countdown" && (
-              <Dropdown
-                label="Countdown"
-                compact
-                value={countdownMinutes}
-                onChange={(val: string) => setCountdownMinutes(Number(val))}
-                options={COUNTDOWN_OPTIONS.map((m) => ({
-                  value: m,
-                  label: `${m} min`,
-                }))}
-                fullWidth
-              />
-            )}
-          </div>
-
-          {isCustom && (
-            <div>
-              <div className={styles.customGrid}>
-                <label className={styles.customGridLabel}>
-                  Rows
-                  <input
-                    type="number"
-                    min={minGrid}
-                    max={maxGrid}
-                    value={customRows}
-                    onChange={(e) => {
-                      const v = parseInt(e.target.value, 10);
-                      setCustomRows(
-                        isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
-                      );
-                    }}
-                    className={styles.customGridInput}
-                  />
-                </label>
-                <span className={styles.customGridTimes}>×</span>
-                <label className={styles.customGridLabel}>
-                  Cols
-                  <input
-                    type="number"
-                    min={minGrid}
-                    max={maxGrid}
-                    value={customCols}
-                    onChange={(e) => {
-                      const v = parseInt(e.target.value, 10);
-                      setCustomCols(
-                        isNaN(v) ? minGrid : Math.min(maxGrid, Math.max(minGrid, v)),
-                      );
-                    }}
-                    className={styles.customGridInput}
-                  />
-                </label>
-              </div>
-              {customRows * customCols >= 81 && (
-                <p className={styles.customGridHint}>
-                  Larger puzzles may run slower on some devices.
-                </p>
-              )}
-            </div>
-          )}
-
-          <label className={styles.rememberLabel}>
-            <input
-              type="checkbox"
-              checked={rememberChoice}
-              onChange={(e) => setRememberChoice(e.target.checked)}
-              className={styles.rememberCheckbox}
-            />
-            <span>Remember my choice</span>
-          </label>
+          <SetupConfigSection
+            suggestedGrid={suggestedGrid}
+            gridIndex={gridIndex}
+            setGridIndex={setGridIndex}
+            customRows={customRows}
+            setCustomRows={setCustomRows}
+            customCols={customCols}
+            setCustomCols={setCustomCols}
+            isCustom={isCustom}
+            minGrid={minGrid}
+            maxGrid={maxGrid}
+            timeMode={timeMode}
+            setTimeMode={setTimeMode}
+            countdownMinutes={countdownMinutes}
+            setCountdownMinutes={setCountdownMinutes}
+            rememberChoice={rememberChoice}
+            setRememberChoice={setRememberChoice}
+            styles={styles}
+          />
 
           <div className={styles.preview} ref={previewRef}>
             {isLoading ? (
