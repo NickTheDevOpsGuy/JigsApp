@@ -18,6 +18,8 @@ type Props = {
     toastDismiss: string;
     onboardingOverlay: string;
     onboardingOverlayTray: string;
+    streakToast?: string;
+    streakFlame?: string;
   };
 };
 
@@ -43,8 +45,11 @@ export function PlayToasts({
         </div>
       )}
       {showStreakToast && (
-        <div className={s.engagementToast} role="status">
-          🔥 On fire!
+        <div className={`${s.engagementToast} ${s.streakToast ?? ""}`} role="status">
+          <span className={s.streakFlame ?? ""} aria-hidden>
+            🔥
+          </span>
+          On fire!
         </div>
       )}
       {milestoneMessage && (

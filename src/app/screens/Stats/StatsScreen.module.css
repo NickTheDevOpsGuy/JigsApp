@@ -741,10 +741,23 @@
   gap: 12px;
 }
 
+.weekAlbumTitle {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
 .weekAlbumGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+}
+
+@media (min-width: 720px) {
+  .weekAlbumGrid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
 }
 
 .weekAlbumSlot {
@@ -773,24 +786,45 @@
   color: var(--color-text-secondary);
 }
 
-.weekAlbumImage,
-.weekAlbumHidden {
+.weekAlbumThumbWrap {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
   border-radius: 8px;
   border: 1px solid var(--color-border);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-bg-secondary) 55%, var(--color-bg-elevated));
 }
 
-.weekAlbumImage {
+.weekAlbumImage,
+.weekAlbumHidden {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .weekAlbumHidden {
   display: grid;
   place-items: center;
   color: var(--color-text-secondary);
-  background: color-mix(in srgb, var(--color-bg-secondary) 55%, var(--color-bg-elevated));
   font-size: 13px;
+  min-height: 100%;
+}
+
+.weekAlbumOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.weekAlbumSlotThumb .weekAlbumThumbWrap {
+  border-color: var(--color-border);
 }
 
 .weekAlbumFooter {

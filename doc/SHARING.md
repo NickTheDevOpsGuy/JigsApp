@@ -14,18 +14,21 @@ This works **without Supabase**.
 - Supports copy-to-clipboard
 - Uses the Web Share API on supported mobile browsers
 - Can export a PNG of the completed puzzle with a time overlay
+- **Share Result popup** (from completion overlay): shows puzzle URL (phuzzle.vercel.app) with copy button, “Challenge a friend” CTA, Share Card PNG (seasonal frame, branded footer), and Download
 
 **Key files**
 
 - `src/app/screens/Play/hooks/useShareResults.ts`
-  - Creates the share text and per-platform URLs
+  - Creates the share text and per-platform URLs (includes phuzzle.vercel.app)
   - Handles copy + `navigator.share` when available
 - `src/app/screens/Play/hooks/useDownloadImage.ts`
   - Exports the puzzle canvas as PNG
   - Adds a footer like: `🧩 Phuzzle - {pieces} pieces in {time}`
-- `src/app/screens/Play/components/CompletionOverlay.tsx`
-  - UI: buttons/links shown after completion
-  - Wires the overlay to `useShareResults` + `useDownloadImage`
+- `src/app/screens/Play/hooks/useShareCardImage.ts`
+  - Share Card PNG with seasonal frame and branded footer (phuzzle.vercel.app)
+- `src/app/screens/Play/components/CompletionOverlay.tsx`, `CompletionSharePopup.tsx`
+  - UI: Share Result modal with URL, copy, Share Card PNG, Download; “Challenge a friend” CTA
+  - Wires the overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
 
 **How it's triggered**
 

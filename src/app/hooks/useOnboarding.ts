@@ -1,10 +1,12 @@
 /**
  * useOnboarding – step-based tips: start (drag piece), tray, zoom. Persisted in localStorage.
+ * All hint screens auto-dismiss after 10 seconds.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 const STORAGE_KEY = "phuzzle:onboarding";
+const HINT_AUTO_DISMISS_MS = 10_000;
 
 export type OnboardingStep =
   | "start" // show "Drag a piece"
@@ -40,7 +42,7 @@ export function useOnboarding(placedCount: number, pieceCount: number) {
     if (prevPlacedRef.current === 0 && placedCount === 1 && step === "start") {
       setStep("firstSnapDone");
       setShowFirstSnapToast(true);
-      const t = setTimeout(() => setShowFirstSnapToast(false), 2500);
+      const t = setTimeout(() => setShowFirstSnapToast(false), HINT_AUTO_DISMISS_MS);
       return () => clearTimeout(t);
     }
     prevPlacedRef.current = placedCount;
@@ -67,6 +69,24 @@ export function useOnboarding(placedCount: number, pieceCount: number) {
   }, [step]);
   const needsTrayTip = step === "firstSnapDone" && trayTipVisible;
   const needsZoomTip = step === "trayTipSeen" && pieceCount >= 16;
+
+  // Auto-dismiss all hint screens after 10 seconds
+  useEffect(() => {
+    if (step === "start") {
+      const t = setTimeout(() => setStep("done"), HINT_AUTO_DISMISS_MS);
+      return () => clearTimeout(t);
+    }
+  }, [step, setStep]);
+  useEffect(() => {
+    if (!needsTrayTip) return;
+    const t = setTimeout(() => dismissTrayTip(), HINT_AUTO_DISMISS_MS);
+    return () => clearTimeout(t);
+  }, [needsTrayTip, dismissTrayTip]);
+  useEffect(() => {
+    if (!needsZoomTip) return;
+    const t = setTimeout(() => dismissZoomTip(), HINT_AUTO_DISMISS_MS);
+    return () => clearTimeout(t);
+  }, [needsZoomTip, dismissZoomTip]);
 
   return {
     step,

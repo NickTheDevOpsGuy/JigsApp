@@ -58,6 +58,13 @@
   border-color: var(--color-brand-primary);
 }
 
+.menuDate {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0 0 6px 0;
+}
+
 .header {
   display: flex;
   flex-direction: column;
@@ -66,10 +73,30 @@
   flex-shrink: 0;
 }
 
+.dailyTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--color-text-primary);
+}
+
 .logo {
   max-width: 100%;
   max-height: 22vh;
   height: auto;
+}
+
+.brandName {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 4px 0 0 0;
+}
+
+.streakLine {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 4px 0 0 0;
 }
 
 .actionsGrid {
@@ -109,9 +136,11 @@
   background: var(--color-action-hover);
 }
 
-/* Today's Puzzle – featured daily CTA */
+/* Start Today's Puzzle – featured daily CTA */
 .actionCardFeatured {
   position: relative;
+  flex-direction: row;
+  gap: 10px;
   box-shadow: 0 4px 16px rgba(11, 99, 184, 0.25);
   border: 2px solid rgba(255, 255, 255, 0.4);
 }
@@ -120,9 +149,26 @@
   box-shadow: 0 6px 20px rgba(11, 99, 184, 0.35);
 }
 
-.dailyEmoji {
-  font-size: 26px;
+.starIcon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.starFallback {
+  font-size: 20px;
   line-height: 1;
+  color: currentColor;
+}
+
+.homeCountdownWrap {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .actionLabel {

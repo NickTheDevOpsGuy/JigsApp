@@ -112,6 +112,11 @@ export function useShareCardImage() {
           ctx.fillText(line, canvas.width / 2, 1100 + i * 56);
         });
 
+        // Branded footer
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.font = "500 28px system-ui, sans-serif";
+        ctx.fillText("phuzzle.vercel.app", canvas.width / 2, 1320);
+
         const blob = await new Promise<Blob | null>((resolve) =>
           canvas.toBlob(resolve, "image/png"),
         );

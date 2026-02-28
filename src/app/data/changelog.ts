@@ -1,13 +1,19 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "20";
+export const CHANGELOG_VERSION = "21";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📅 Weekly album – Stats → Leaderboard → Week → Album: 7-slot page with daily puzzle thumbnails; mastery (⚡) when completed with no hints or undo",
+      "🌫️ Fog modifier – Pieces gradually gain clarity when placed; unplaced stay foggy (daily modifier)",
+      "🔥 Streak flame – Subtle flame animation when placement streak pops (“On fire!”)",
+      "⏱️ Hint screens – All hint and onboarding toasts auto-dismiss after 10 seconds",
+      "🔗 Share Result – Puzzle URL (phuzzle.vercel.app) and “Challenge a friend” in completion share popup; branded footer on share card image",
+      "🏅 Mastery tracking – Daily completions without hints or undo tracked for weekly album and mastery streak",
       "🧩 Snap on release – Pieces snap when you release; no mid-drag snap for a smoother lock animation",
       "📱 Win screen – Share is a full menu option (same style as Continue, Play again, Back to home)",
       "🧩 Lock animation – Smooth snap restored: lock lerp in usePlayScreenAnimation (120ms, ease-out); drag position captured when drag ends",

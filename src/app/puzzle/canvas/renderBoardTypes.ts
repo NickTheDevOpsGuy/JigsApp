@@ -31,6 +31,8 @@ export type AnimationState = {
   wrongRotationHint?: { groupId: string; pieceIds: string[]; triggeredAt: number };
   snapPreview?: { nearSnap: boolean; inSnapRange: boolean; proximity: number } | null;
   showAlignmentGrid?: boolean;
+  /** Fog modifier: alpha for unplaced pieces (0 = clear, 0.5 = foggy). Placed pieces stay clear. */
+  fogAlphaForUnplaced?: number;
 };
 
 export type PieceCache = Map<string, HTMLCanvasElement>;

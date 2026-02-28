@@ -68,7 +68,6 @@ import {
   UndoRedoButtons,
 } from "./components";
 import { SnapComboMeter } from "./components/SnapComboMeter";
-import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
@@ -303,7 +302,10 @@ export function PlayScreen() {
   } = managerResult;
 
   stateRef.current = state;
-  const { highlightedPieceIds, onPreviewTap } = useReferenceTapHighlight(state ?? null);
+  const { highlightedPieceIds, onPreviewTap } = useReferenceTapHighlight(
+    state ?? null,
+    lastInteractionRef,
+  );
 
   useEffect(() => {
     const el = boardRef.current;
@@ -495,24 +497,11 @@ export function PlayScreen() {
     abandonCapturedRef,
   });
 
-  // First-snap celebration (lightweight confetti for onboarding)
+  // First-snap: glow pulse + toast only (no confetti – premium, restrained feel)
   useEffect(() => {
     if (!onboarding.showFirstSnapToast) return;
-    const prefersReducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!prefersReducedMotion && !batterySaverMode) {
-      import("canvas-confetti").then((confetti) => {
-        const colors = CONFETTI_COLORS_BY_THEME[themeRef.current ?? "light"];
-        confetti.default({
-          particleCount: 60,
-          spread: 50,
-          origin: { y: 0.6 },
-          colors,
-        });
-      });
-    }
-  }, [onboarding.showFirstSnapToast, batterySaverMode]);
+    // Rely on existing snap glow + toast; no first-piece confetti per polish plan.
+  }, [onboarding.showFirstSnapToast]);
 
   // Analytics: first piece placed
   const firstSnapCapturedRef = useRef(false);
@@ -643,6 +632,9 @@ export function PlayScreen() {
     onUndoSnapBackComplete: () => {
       undoSnapBackRef.current = null;
     },
+    dailyVisualModifier: isDailyPuzzleSession()
+      ? getDailyVisualModifier()
+      : (dailyPreferredModifier ?? getDailyPreferredModifier()),
   });
 
   const handleTrayPieceClick = useCallback(

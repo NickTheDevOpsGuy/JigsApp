@@ -61,6 +61,16 @@
 - **Season's pick** – Matching pack is shown first in the pack list with highlighted styling and "Season's pick" badge
 - **Files**: `utils/seasons.ts`, `utils/seasons.test.ts`, `packMetadata.ts`, `puzzlePacks.ts`, `PackListScreen.tsx`
 
+## 10. Weekly Album, Fog Clarity, Streak Flame, Hints & Share (Feb 2025) ✓
+
+- **Weekly album** – Stats → Leaderboard → Week → Album: 7-slot page with daily puzzle thumbnails; each slot shows the day’s image (or placeholder); completed/missing/locked overlay; mastery (⚡) when completed with no hints or undo.
+- **Fog modifier** – Per-piece fog on board: unplaced pieces get a fog overlay; placed pieces stay clear; fog strength scales with progress. Preview/tray keep global fog.
+- **Streak flame** – “On fire!” toast has subtle flame flicker animation and glow.
+- **Hint screens** – All hint and onboarding toasts auto-dismiss after 10 seconds (configurable in useOnboarding, usePlayScreenSecondaryEffects, usePlayScreenMilestones, useSnapComboAnnouncer).
+- **Share Result** – Completion share popup includes puzzle URL (phuzzle.vercel.app), copy button, “Challenge a friend” CTA; share card image has branded footer.
+- **Mastery tracking** – Daily completions without hints or undo recorded as `is_mastery` in completions; mastery_streak in player_stats; weekly album shows ⚡ per day.
+- **Files**: `LeaderboardTab.tsx`, `StatsScreen.module.css`, `renderBoard.ts`, `renderBoardTypes.ts`, `usePlayScreenAnimation.ts`, `PlayToasts.tsx`, `PlayScreen.module.css`, `CompletionSharePopup.tsx`, `useShareCardImage.ts`, `useOnboarding.ts`, `useReferenceTapHighlight.ts`, `statsService.ts`, `leaderboardFetchersShared.ts`
+
 ## Migration Required
 
 Run `supabase/migrations/002_cut_type_xp_prestige_challenge.sql` to add:

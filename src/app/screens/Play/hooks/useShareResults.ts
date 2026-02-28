@@ -19,7 +19,7 @@ export function useShareResults(args: {
   }, [elapsedSeconds, state?.totalCount]);
 
   const handleCopyResults = useCallback(async () => {
-    const text = getShareText() + " #Phuzzle";
+    const text = getShareText() + " #Phuzzle\nhttps://phuzzle.vercel.app/";
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -39,7 +39,7 @@ export function useShareResults(args: {
       await navigator.share({
         title: "Phuzzle",
         text,
-        url: window.location.origin,
+        url: "https://phuzzle.vercel.app/",
       });
     } catch (err) {
       if (import.meta.env.DEV) console.warn("Share cancelled or failed:", err);

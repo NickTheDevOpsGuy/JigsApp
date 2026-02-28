@@ -4,7 +4,6 @@
 import { Filter, ChevronDown } from "lucide-react";
 import type { LeaderboardEntry } from "@/services/leaderboardService";
 import type { PieceCutType, VisualModifierFilter } from "@/services/leaderboardService";
-import { DailyCountdown } from "@/components/DailyCountdown/DailyCountdown";
 import { renderTimeList, renderCompletionList } from "./LeaderboardTabLists";
 import styles from "../StatsScreen.module.css";
 
@@ -65,7 +64,7 @@ export function LeaderboardTab({
   weeklyAlbumProgress,
   weeklyCompleted,
   weekRangeLabel,
-  loadData,
+  loadData: _loadData,
   rowAnimEpoch,
 }: LeaderboardTabProps) {
   const compact = true;
@@ -102,16 +101,6 @@ export function LeaderboardTab({
             All-time
           </button>
         </div>
-        {leaderboardType === "today" && (
-          <div className={styles.countdownWrap}>
-            <DailyCountdown
-              variant="untilReset"
-              onUnlock={() => {
-                if (leaderboardType === "today") loadData();
-              }}
-            />
-          </div>
-        )}
         <button
           type="button"
           className={styles.filtersBar}
@@ -236,33 +225,49 @@ export function LeaderboardTab({
           "No completions in the last 7 days.",
         )}
       {leaderboardType === "week" && weekSubview === "album" && (
-        <div className={styles.weekAlbumWrap}>
-          <p className={styles.todayCompletionCount}>
-            Weekly collection: {weeklyAlbumProgress}/7 completed
-          </p>
+        <div
+          className={styles.weekAlbumWrap}
+          role="region"
+          aria-label="Weekly album: 7 daily puzzle thumbnails"
+        >
+          <h3 className={styles.weekAlbumTitle}>Weekly Album</h3>
+          <p className={styles.todayCompletionCount}>{weeklyAlbumProgress}/7 completed</p>
           <div className={styles.weekAlbumGrid}>
             {weeklyAlbumSlots.map((slot) => (
               <div
                 key={slot.date}
                 className={`${styles.weekAlbumSlot} ${
                   slot.completed ? styles.weekAlbumSlotDone : ""
-                } ${slot.isToday ? styles.weekAlbumSlotToday : ""}`}
+                } ${slot.isToday ? styles.weekAlbumSlotToday : ""} ${
+                  !slot.completed && slot.imageUrl ? styles.weekAlbumSlotThumb : ""
+                }`}
               >
                 <div className={styles.weekAlbumTop}>
                   <span>{slot.dayLabel}</span>
-                  {slot.completed && slot.mastery && <span title="Mastery">⚡</span>}
+                  {slot.completed && slot.mastery && (
+                    <span title="Mastery (no hints, no undo)">⚡</span>
+                  )}
                 </div>
-                {slot.completed && slot.imageUrl ? (
-                  <img
-                    src={slot.imageUrl}
-                    alt={`Daily puzzle for ${slot.dayLabel}`}
-                    className={styles.weekAlbumImage}
-                  />
-                ) : (
-                  <div className={styles.weekAlbumHidden}>
-                    {slot.isFuture ? "Locked" : "?"}
-                  </div>
-                )}
+                <div className={styles.weekAlbumThumbWrap}>
+                  {slot.imageUrl ? (
+                    <img
+                      src={slot.imageUrl}
+                      alt={
+                        slot.completed
+                          ? `Daily puzzle for ${slot.dayLabel} – completed`
+                          : `Daily puzzle for ${slot.dayLabel}`
+                      }
+                      className={styles.weekAlbumImage}
+                    />
+                  ) : (
+                    <div className={styles.weekAlbumHidden}>?</div>
+                  )}
+                  {!slot.completed && (
+                    <div className={styles.weekAlbumOverlay} aria-hidden>
+                      {slot.isFuture ? "Locked" : "Missing"}
+                    </div>
+                  )}
+                </div>
                 <div className={styles.weekAlbumFooter}>
                   {slot.completed ? "Collected" : slot.isFuture ? "Upcoming" : "Missing"}
                 </div>

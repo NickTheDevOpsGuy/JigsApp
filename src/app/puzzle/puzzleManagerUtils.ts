@@ -24,9 +24,13 @@ export type EffectiveToleranceOptions = {
  * Zoom-adaptive snap tolerance (board or neighbor).
  * Used by PuzzleManager for getEffectiveTolerance logic.
  */
+/**
+ * @param firstSnapMultiplier - Slightly > 1 for first placement only (early competence feel).
+ */
 export function getEffectiveTolerance(
   basePx: number,
   options: EffectiveToleranceOptions,
+  firstSnapMultiplier = 1,
 ): number {
   const scale = Math.max(0.25, Math.min(4, options.snapScaleRef?.current ?? 1));
   const relaxedMult = options.relaxedToleranceMultiplierRef?.current ?? 1;
@@ -49,7 +53,7 @@ export function getEffectiveTolerance(
     effective *= zoomInTighten;
   }
 
-  effective *= relaxedMult * overrideMult;
+  effective *= relaxedMult * overrideMult * firstSnapMultiplier;
 
   const minMult = options.isMobile ? 0.45 : 0.35;
   const maxMult = options.isMobile ? 3 : 2.5;

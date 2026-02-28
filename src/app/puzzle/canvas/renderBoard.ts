@@ -149,6 +149,22 @@ export function renderBoard(
       dpr,
     );
     if (
+      animState?.fogAlphaForUnplaced != null &&
+      animState.fogAlphaForUnplaced > 0 &&
+      !p.isPlaced
+    ) {
+      ctx.save();
+      ctx.translate(
+        drawPieceData.x + drawPieceData.w / 2,
+        drawPieceData.y + drawPieceData.h / 2,
+      );
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.translate(-drawPieceData.w / 2, -drawPieceData.h / 2);
+      ctx.fillStyle = `rgba(255,255,255,${animState.fogAlphaForUnplaced})`;
+      ctx.fillRect(0, 0, drawPieceData.w, drawPieceData.h);
+      ctx.restore();
+    }
+    if (
       animState?.showEdgeHighlight &&
       !p.isPlaced &&
       (p.row === 0 || p.row === rows - 1 || p.col === 0 || p.col === cols - 1)

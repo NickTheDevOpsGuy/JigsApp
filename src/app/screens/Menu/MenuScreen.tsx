@@ -1,5 +1,5 @@
 /**
- * MenuScreen – home: New Puzzle, Daily, Packs, Stats, Help, About.
+ * MenuScreen – home: Daily Phuzzle, Packs, Custom, Stats, Help, About.
  */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,19 +8,32 @@ import styles from "./MenuScreen.module.css";
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
+import { DailyCountdown } from "@/components/DailyCountdown/DailyCountdown";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { AboutModal } from "@/components/AboutModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
 import { Image, Camera, Package, Trophy } from "lucide-react";
-import { isTodayDailyCompleted } from "@/daily/dailyPuzzleCore";
+import { isTodayDailyCompleted, getCurrentStreak } from "@/daily/dailyPuzzleCore";
 import { shouldShowChangelog } from "@/data/changelog";
-import { getMenuTagline } from "@/data/menuTips";
+
+/** Star icon for Start Today's Puzzle. Use public/assets/star.png or fallback to character. */
+const STAR_ICON = "/assets/star.png";
+
+function getMenuDate(): string {
+  return new Date().toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+}
 
 export function MenuScreen() {
   const nav = useNavigate();
-  const [tagline] = useState(() => getMenuTagline());
+  const [menuDate] = useState(() => getMenuDate());
+  const [streak] = useState(() => getCurrentStreak());
+  const [starImgFailed, setStarImgFailed] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
   const [showHelpChoice, setShowHelpChoice] = useState(false);
@@ -58,9 +71,16 @@ export function MenuScreen() {
           </button>
         </div>
 
+        <p className={styles.menuDate} aria-live="polite">
+          {menuDate}
+        </p>
         <div className={styles.header}>
+          <h1 className={styles.dailyTitle}>Daily Phuzzle</h1>
           <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
-          <p className={styles.menuTip}>{tagline}</p>
+          <p className={styles.brandName}>phuzzle</p>
+          {streak > 0 && (
+            <p className={styles.streakLine}>Welcome back. Day {streak} streak 🔥</p>
+          )}
         </div>
 
         <div className={styles.actionsGrid}>
@@ -69,11 +89,24 @@ export function MenuScreen() {
             onClick={() => setShowDailyModal(true)}
             disabled={!hasDaily}
             className={`${styles.actionCard} ${styles.actionCardFeatured}`}
-            aria-label={todayCompleted ? "Today's Puzzle (completed)" : "Today's Puzzle"}
+            aria-label={
+              todayCompleted ? "Start Today's Puzzle (completed)" : "Start Today's Puzzle"
+            }
           >
-            <span className={styles.dailyEmoji}>🧩</span>
+            {starImgFailed ? (
+              <span className={styles.starFallback} aria-hidden>
+                ★
+              </span>
+            ) : (
+              <img
+                src={STAR_ICON}
+                alt=""
+                className={styles.starIcon}
+                onError={() => setStarImgFailed(true)}
+              />
+            )}
             <span className={styles.actionLabel}>
-              {todayCompleted ? "Today's Puzzle ✓" : "Today's Puzzle"}
+              {todayCompleted ? "Start Today's Puzzle ✓" : "Start Today's Puzzle"}
             </span>
           </Button>
 
@@ -104,6 +137,10 @@ export function MenuScreen() {
             <Camera size={22} />
             <span className={styles.actionLabel}>Snap a Picture</span>
           </Button>
+        </div>
+
+        <div className={styles.homeCountdownWrap}>
+          <DailyCountdown variant="default" prominent />
         </div>
       </div>
 

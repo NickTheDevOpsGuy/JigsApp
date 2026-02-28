@@ -370,9 +370,11 @@ export class PuzzleManager {
     const dx = active.targetX - activeTile.x;
     const dy = active.targetY - activeTile.y;
     const distance = Math.hypot(dx, dy);
+    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.15 : 1;
     const tolerance = getEffectiveTolerance(
       this.snapToleranceBoardPx,
       this.getToleranceOptions(),
+      firstSnapMult,
     );
     const nearThreshold = tolerance * 1.5;
     const wouldOverlap = this.wouldOverlapAnyOtherGroup(gid, dx, dy);
@@ -708,9 +710,11 @@ export class PuzzleManager {
     const active = this.findPiece(activeId);
     if (!active) return false;
 
+    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.15 : 1;
     const tolerance = getEffectiveTolerance(
       this.snapToleranceBoardPx,
       this.getToleranceOptions(),
+      firstSnapMult,
     );
     const result = computeBoardSnapResult(this.state.pieces, activeId, tolerance);
 
@@ -760,9 +764,11 @@ export class PuzzleManager {
       if (!this.findPiece(activeId)) return false;
     }
 
+    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.15 : 1;
     const tolerance = getEffectiveTolerance(
       this.snapToleranceNeighborPx,
       this.getToleranceOptions(),
+      firstSnapMult,
     );
     const result = computeNeighborSnapResult(
       this.state.pieces,
@@ -795,9 +801,11 @@ export class PuzzleManager {
     const activeId = this.drag.activeId;
     if (!activeId) return;
 
+    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.15 : 1;
     const tolerance = getEffectiveTolerance(
       this.snapToleranceBoardPx,
       this.getToleranceOptions(),
+      firstSnapMult,
     );
     const result = computeNearSnapNudge(this.state.pieces, activeId, tolerance);
     if (!result) return;

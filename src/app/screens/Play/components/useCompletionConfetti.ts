@@ -16,54 +16,48 @@ export function useCompletionConfetti(): void {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion || batterySaverMode) return;
 
+    // Brief freeze then restrained light burst (premium, not screen-filling)
+    const FREEZE_MS = 280;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const colors = CONFETTI_COLORS_BY_THEME[theme ?? "light"];
     import("canvas-confetti").then((confetti) => {
       const fn = confetti.default;
-      fn({
-        particleCount: 180,
-        spread: 75,
-        origin: { x: 0.5, y: 0.15 },
-        colors,
-        startVelocity: 28,
-        decay: 0.94,
-        ticks: 220,
-        gravity: 0.8,
-      });
       timeouts.push(
         setTimeout(() => {
           fn({
-            particleCount: 65,
-            angle: 60,
-            spread: 60,
-            origin: { x: 0, y: 0.55 },
+            particleCount: 55,
+            spread: 70,
+            origin: { x: 0.5, y: 0.2 },
             colors,
-            startVelocity: 24,
-            scalar: 1.1,
+            startVelocity: 18,
+            decay: 0.92,
+            ticks: 140,
+            gravity: 0.6,
+            scalar: 0.95,
           });
-          fn({
-            particleCount: 65,
-            angle: 120,
-            spread: 60,
-            origin: { x: 1, y: 0.55 },
-            colors,
-            startVelocity: 24,
-            scalar: 1.1,
-          });
-        }, 120),
+        }, FREEZE_MS),
       );
       timeouts.push(
         setTimeout(() => {
           fn({
-            particleCount: 80,
-            spread: 100,
-            origin: { x: 0.5, y: 0.7 },
+            particleCount: 35,
+            angle: 60,
+            spread: 50,
+            origin: { x: 0.15, y: 0.5 },
             colors,
-            angle: 90,
-            startVelocity: 18,
-            decay: 0.92,
+            startVelocity: 14,
+            scalar: 0.9,
           });
-        }, 350),
+          fn({
+            particleCount: 35,
+            angle: 120,
+            spread: 50,
+            origin: { x: 0.85, y: 0.5 },
+            colors,
+            startVelocity: 14,
+            scalar: 0.9,
+          });
+        }, FREEZE_MS + 100),
       );
     });
     return () => timeouts.forEach((id) => clearTimeout(id));

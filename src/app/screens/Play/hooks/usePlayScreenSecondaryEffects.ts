@@ -102,17 +102,17 @@ export function usePlayScreenSecondaryEffects({
     }
   }, [showStreakToast, state?.grid, isCoarsePointer, timeMode, onFireCapturedRef]);
 
-  // Streak toast auto-dismiss
+  // Hint/toast screens auto-dismiss after 10 seconds
+  const HINT_DISMISS_MS = 10_000;
   useEffect(() => {
     if (!showStreakToast) return;
-    const t = setTimeout(() => setShowStreakToast(false), 2000);
+    const t = setTimeout(() => setShowStreakToast(false), HINT_DISMISS_MS);
     return () => clearTimeout(t);
   }, [showStreakToast, setShowStreakToast]);
 
-  // Share toast auto-dismiss
   useEffect(() => {
     if (!shareToast) return;
-    const t = setTimeout(() => setShareToast(null), 3000);
+    const t = setTimeout(() => setShareToast(null), HINT_DISMISS_MS);
     return () => clearTimeout(t);
   }, [shareToast, setShareToast]);
 

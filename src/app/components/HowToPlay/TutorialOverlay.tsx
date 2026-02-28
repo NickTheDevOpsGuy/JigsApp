@@ -209,6 +209,10 @@ export function TutorialOverlay({
               <li>Use the Preview button to see the full image</li>
               <li>Pieces snap together when correctly aligned</li>
               <li>Turn on Ghost hint when stuck</li>
+              <li>
+                Stats → Leaderboard → Week → Album shows your 7-day collection with daily
+                thumbnails
+              </li>
             </ul>
           </section>
         </div>

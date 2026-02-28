@@ -1,10 +1,13 @@
 /**
  * Completion overlay actions: dropdown (Continue, Play again, Back to home) + Share side-by-side.
+ * Share button is delayed for pacing (reveal stats first).
  */
 import { useState, useRef, useEffect } from "react";
 import { Play, Share2, Home, RotateCcw, ChevronDown } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
+
+const SHARE_BUTTON_DELAY_MS = 900;
 
 interface CompletionOverlayActionsProps {
   onClose: () => void;
@@ -37,7 +40,13 @@ export function CompletionOverlayActions({
   isNarrow,
 }: CompletionOverlayActionsProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [shareRevealed, setShareRevealed] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShareRevealed(true), SHARE_BUTTON_DELAY_MS);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -109,6 +118,11 @@ export function CompletionOverlayActions({
         onClick={onShareClick}
         className={styles.completeActionsShareBtn}
         aria-label="Share Result"
+        style={{
+          opacity: shareRevealed ? 1 : 0,
+          pointerEvents: shareRevealed ? "auto" : "none",
+          transition: "opacity 0.25s ease-out",
+        }}
       >
         <Share2 size={20} />
         {isNarrow ? "Share" : "Share Result"}

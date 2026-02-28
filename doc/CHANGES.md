@@ -42,6 +42,9 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - Ghost hint and ghost when idle
 - Optional piece locking
 - **Snap combo meter** – Appears when 2+ placements within 2.5s; breaks on idle
+- **Fog modifier** – Daily visual modifier “Fog”: unplaced pieces are foggy; placed pieces gain full clarity (per-piece fog on board). Preview and tray keep global fog.
+- **Streak flame** – When placement streak triggers (“On fire!”), subtle flame animation (flicker + glow).
+- **Hint screens** – All hint and onboarding toasts (first piece, tray tip, zoom tip, streak, share, milestone, combo) auto-dismiss after 10 seconds (user can still dismiss earlier).
 - **Alternate piece shapes** – Classic, Irregular, Hard (Settings → Gameplay → Piece Shape submenu; "Applies to next puzzle")
 - **Progressive reveal** – Hide full reference; reveal only regions where pieces are correctly placed
 - Battery-saver detection (reduces confetti when low-power or data-saver)
@@ -55,6 +58,9 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ## Social and progress
 
+- **Weekly album** – Stats → Leaderboard → Week → Album: 7-slot page with daily puzzle thumbnails (one per day). Completed days show the puzzle image; missing/locked show overlay. Mastery (⚡) badge when the day was completed with no hints and no undo.
+- **Mastery tracking** – Daily completions without hints or undo are recorded as mastery; shown in weekly album and in mastery streak (Profile / Dashboard).
+- **Share Result** – Completion share popup includes puzzle URL (phuzzle.vercel.app), copy button, “Challenge a friend” CTA, Share Card PNG (with branded footer), and Download.
 - **Daily puzzle comments & reactions** – After completing today's puzzle: emoji reactions (👍 🎉 🔥 ✨ 💪), 280-char comments with live character counter (near-limit styling), report for moderation
 - Daily puzzle and streak tracking
 - **Daily countdown** – Server-synced timer to next daily unlock on Leaderboard; celebration when ready
@@ -79,4 +85,5 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Setup** – `screens/Setup/SetupScreen.tsx`; hooks in `hooks/` (`useGridConfig`, `useImagePicker`, `useSetupScreenGalleryScroll`); `SetupConfigSection.tsx` (difficulty, time, custom grid, remember); image source (gallery/upload/camera) in `components/SetupImageSourcePanel.tsx`.
 - **Data / menu** – `data/menuConfig.ts` (getMenuTree); sections in `menuConfigPlay.ts`, `menuConfigAppearance.ts`, `menuConfigRest.ts`; constants and types in `menuConfigConstants.ts` (TIME_MODE_LABELS, MenuNode).
 - **Stats** – `screens/Stats/StatsScreen.tsx`; state and data in `hooks/useStatsScreenState.ts`, `hooks/useStatsScreenData.ts`; header in `components/StatsScreenHeader.tsx`; tabs in `tabs/`; list rendering in `LeaderboardTabLists.tsx`.
-- **Completion overlay** – `CompletionOverlayActions.tsx` (action buttons); `useCompletionConfetti.ts`, `useCompletionOverlayData.ts` (confetti, percentile, recordCompletion, share); share popup in `CompletionSharePopup.tsx`; stats block in `CompletionStatsBlock.tsx`. **Piece tray** – `PieceTrayHeader.tsx`; display/scroll/thumbs in `usePieceTrayDisplay.ts`, `usePieceTrayScroll.ts`, `usePieceTrayThumbs.ts`.
+- **Completion overlay** – `CompletionOverlayActions.tsx` (action buttons); `useCompletionConfetti.ts`, `useCompletionOverlayData.ts` (confetti, percentile, recordCompletion, share); share popup in `CompletionSharePopup.tsx` (URL, Challenge a friend, Share Card); stats block in `CompletionStatsBlock.tsx`. **Piece tray** – `PieceTrayHeader.tsx`; display/scroll/thumbs in `usePieceTrayDisplay.ts`, `usePieceTrayScroll.ts`, `usePieceTrayThumbs.ts`.
+- **Weekly album** – `LeaderboardTab.tsx` (Week → Album: 7-slot grid); `useStatsScreenData.ts` (`loadWeeklyAlbum`, `getMyWeeklyAlbumCompletions`); `leaderboardFetchersShared.ts` (`getMyWeeklyAlbumCompletions`). **Fog modifier** – `usePlayScreenAnimation.ts` (`fogAlphaForUnplaced`); `renderBoard.ts` (fog overlay per unplaced piece); `renderBoardTypes.ts` (`AnimationState.fogAlphaForUnplaced`).

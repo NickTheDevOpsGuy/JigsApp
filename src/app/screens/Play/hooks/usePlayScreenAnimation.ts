@@ -53,6 +53,8 @@ export function usePlayScreenAnimation(args: {
   } | null>;
   /** Called when undo snap-back animation completes (so parent can clear ref) */
   onUndoSnapBackComplete?: () => void;
+  /** When "fog", unplaced pieces get a fog overlay (placed stay clear). */
+  dailyVisualModifier?: "none" | "fog" | "night" | "sepia";
 }) {
   const {
     manager,
@@ -78,6 +80,7 @@ export function usePlayScreenAnimation(args: {
     batterySaverMode = false,
     undoSnapBackRef,
     onUndoSnapBackComplete: _onUndoSnapBackComplete,
+    dailyVisualModifier = "none",
   } = args;
 
   const rafRef = useRef<number | null>(null);
@@ -284,6 +287,12 @@ export function usePlayScreenAnimation(args: {
         showGhostHint ||
         (!!showGhostWhenIdle && idleMs >= IDLE_GHOST_MS && !st.isComplete);
       const ghostAlpha = showGhostHint ? 0.35 : 0.2;
+      const totalPieces = st.pieces.filter((p) => !p.inTray).length;
+      const placedCount = st.pieces.filter((p) => !p.inTray && p.isPlaced).length;
+      const fogAlphaForUnplaced =
+        dailyVisualModifier === "fog" && totalPieces > 0
+          ? Math.max(0.15, 0.6 * (1 - placedCount / totalPieces))
+          : 0;
       renderBoard(
         ctx,
         st,
@@ -311,6 +320,7 @@ export function usePlayScreenAnimation(args: {
           lockLerpOverrides,
           wrongRotationHint,
           snapPreview,
+          fogAlphaForUnplaced: fogAlphaForUnplaced > 0 ? fogAlphaForUnplaced : undefined,
         },
         pieceCache,
         viewport,
@@ -322,13 +332,13 @@ export function usePlayScreenAnimation(args: {
         performance.measure("render-frame", "render-frame-start", "render-frame-end");
       }
 
-      const placedCount = st.pieces.filter((p) => p.isPlaced).length;
+      const currentPlacedCount = st.pieces.filter((p) => p.isPlaced).length;
       if (
         st.isComplete !== lastCompleteRef.current ||
-        placedCount !== lastPieceCountRef.current
+        currentPlacedCount !== lastPieceCountRef.current
       ) {
         lastCompleteRef.current = st.isComplete;
-        lastPieceCountRef.current = placedCount;
+        lastPieceCountRef.current = currentPlacedCount;
         setState(st);
       }
 
@@ -355,5 +365,6 @@ export function usePlayScreenAnimation(args: {
     perfStatsRef,
     wrongRotationHintRef,
     batterySaverMode,
+    dailyVisualModifier,
   ]);
 }

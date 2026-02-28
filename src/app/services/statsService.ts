@@ -86,6 +86,7 @@ export async function recordCompletion(args: {
   const yesterdayStr = yesterday.toISOString().slice(0, 10);
   const cutType = args.cutType ?? "classic";
   const visualModifier = args.visualModifier ?? "none";
+  /** Daily completions without hints or undo are tracked as mastery (weekly album ⚡, mastery_streak). */
   const isMasteryCompletion = args.isDaily && !args.usedUndo && !args.usedHint;
 
   await supabase!.from("completions").insert({

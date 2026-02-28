@@ -73,9 +73,9 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 - **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap (including during fast drags); group merging; 2×2 to 10×10 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan (capped to avoid excessive zoom); undo/redo with snap-back animation (Ctrl/Cmd+Z); drag lift (stronger shadow, scale)
 - **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/streak-freeze.md](doc/streak-freeze.md)
-- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), completion confetti (layered bursts) and percentile badges (Top 10% / 25% / 50%), six themes
-- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image, Share Result popup (Share Card PNG, Download), co-op (Play with Friend via link)
-- **Analytics** — Live completion counter, percentile ranking (Top X%)
+- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), completion confetti (layered bursts) and percentile badges (Top 10% / 25% / 50%), six themes; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 10 seconds
+- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image, **Share Result** popup (Share Card PNG, Download, **puzzle URL** and “Challenge a friend” CTA), co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
+- **Analytics** — Live completion counter, percentile ranking (Top X%); **mastery** completions (daily with no hints and no undo) tracked for weekly album and mastery streak
 
 Full feature list → [CHANGES.md](doc/CHANGES.md)
 
@@ -97,8 +97,8 @@ Full feature list → [CHANGES.md](doc/CHANGES.md)
 - **Piece scaling** — Min 42px on mobile; zoom scales if needed.
 - **Snap** — 120ms pop + glow animation.
 - **Header** — 48px on mobile.
-- **Screens** — Menu, Setup, Stats, Packs fit in viewport (no page scroll); content scrolls inside cards where needed. Loading spinners on Stats and Packs.
-- **Win screen** — Completion overlay shows image, stats (Time, Moves, Accuracy, Rank), “Can you beat my run?”, and Continue; confetti when enabled.
+- **Screens** — Menu, Setup, Stats, Packs fit in viewport (no page scroll); content scrolls inside cards where needed. Loading spinners on Stats and Packs. Stats → Leaderboard → Week → Album shows the 7-slot weekly album with daily thumbnails.
+- **Win screen** — Completion overlay shows image, stats (Time, Moves, Accuracy, Rank), “Can you beat my run?”, and Continue; Share Result (with puzzle URL and Challenge a friend); confetti when enabled.
 
 ---
 

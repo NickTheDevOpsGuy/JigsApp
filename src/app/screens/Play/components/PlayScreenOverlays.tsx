@@ -113,6 +113,7 @@ export function PlayScreenOverlays({
               src={previewImage.src}
               alt="Puzzle preview"
               className={styles.previewImage}
+              draggable={false}
             />
           )}
         </div>
@@ -179,6 +180,8 @@ export function PlayScreenOverlays({
           toastDismiss: styles.toastDismiss,
           onboardingOverlay: styles.onboardingOverlay,
           onboardingOverlayTray: styles.onboardingOverlayTray,
+          streakToast: styles.streakToast,
+          streakFlame: styles.streakFlame,
         }}
       />
 
