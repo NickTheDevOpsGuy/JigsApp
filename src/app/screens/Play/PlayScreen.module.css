@@ -1930,36 +1930,13 @@
   flex-wrap: wrap;
 }
 
-/* Share section on win overlay: actions row + URL line */
+/* Share section on win overlay: actions row */
 .completeShareSection {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 10px;
   width: 100%;
-}
-
-.completeShareUrl {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  font-size: 13px;
-}
-
-.completeShareUrlLink {
-  color: var(--color-link);
-  text-decoration: none;
-  word-break: break-all;
-}
-
-.completeShareUrlLink:hover {
-  text-decoration: underline;
-}
-
-.completeShareUrlCopy {
-  flex-shrink: 0;
-  min-width: 36px;
 }
 
 .shareCardToggle {

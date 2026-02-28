@@ -1,15 +1,16 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "22";
+export const CHANGELOG_VERSION = "23";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      "🏠 Start page – Date above card; bar shows Trophy, “Daily Phuzzle” (center), Help (?); “Next puzzle in Xh Ym” at bottom; “X players solved today’s puzzle” when Supabase is configured",
-      "📱 Win screen – Continue/Play again/Back to home menu opens upward (drop-up) so it stays visible; puzzle URL (phuzzle.vercel.app) and copy button in the share section on the overlay (not only in the Share Result modal)",
+      "🏠 Start page – Today’s Puzzle button matches others (star on top, “Today’s Puzzle” below); starry background; under logo: streak and either “X players solved” (when Supabase has data) or teaser taglines when Supabase is blank",
+      "📱 Win screen – No URL on overlay; puzzle link lives on the share card image (Share Result → Share Card PNG); Continue menu opens upward",
+      "🏠 Start page – Date above card; bar shows Trophy, “Daily Phuzzle” (center), Help (?); “Next puzzle in Xh Ym” at bottom",
       "📅 Weekly album – Stats → Leaderboard → Week → Album: 7-slot page with daily puzzle thumbnails; mastery (⚡) when completed with no hints or undo",
       "🌫️ Fog modifier – Pieces gradually gain clarity when placed; unplaced stay foggy (daily modifier)",
       "🔥 Streak flame – Subtle flame animation when placement streak pops (“On fire!”)",

@@ -73,9 +73,9 @@
 
 ## 11. Start page and win screen updates (Feb 2025) ✓
 
-- **Start page** – Date above card; top bar: Trophy, “Daily Phuzzle” (center), Help (?); “Next puzzle in Xh Ym” at bottom (`DailyCountdown` variant `home`); “X players solved today’s puzzle” when Supabase returns count (MenuScreen fetches `getTodayCompletionCount`).
-- **Win screen** – Continue/Play again/Back to home dropdown opens upward (drop-up) so it stays visible; puzzle URL and copy button in the share section on the overlay (`CompleteShareUrl.tsx`); URL removed from inside Share Result modal.
-- **Files**: `MenuScreen.tsx`, `MenuScreen.module.css`, `DailyCountdown.tsx`, `DailyCountdown.module.css`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompleteShareUrl.tsx` (new), `CompletionSharePopup.tsx`, `PlayScreen.module.css`
+- **Start page** – Date above card; top bar: Trophy, “Daily Phuzzle” (center), Help (?). Logo; under logo: streak and either “X players solved today’s puzzle” (when Supabase has count) or teaser taglines from `menuTips` when Supabase data is blank. Today’s Puzzle button matches other buttons (star on top, “Today’s Puzzle” below). Starry background behind card. “Next puzzle in Xh Ym” at bottom (`DailyCountdown` variant `home`).
+- **Win screen** – Continue/Play again/Back to home dropdown opens upward (drop-up). No URL on overlay; puzzle URL (phuzzle.vercel.app) is on the **share card image** only (Share Result → Share Card PNG).
+- **Files**: `MenuScreen.tsx`, `MenuScreen.module.css`, `DailyCountdown.tsx`, `DailyCountdown.module.css`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompletionSharePopup.tsx`, `PlayScreen.module.css`, `useShareCardImage.ts`, `data/menuTips.ts`
 
 ## Migration Required
 

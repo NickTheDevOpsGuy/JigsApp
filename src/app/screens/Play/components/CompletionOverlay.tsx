@@ -11,7 +11,6 @@ import { DailyReactions } from "@/components/DailyReactions";
 import { CompletionSharePopup } from "./CompletionSharePopup";
 import { CompletionStatsBlock } from "./CompletionStatsBlock";
 import { CompletionOverlayActions } from "./CompletionOverlayActions";
-import { CompleteShareUrl } from "./CompleteShareUrl";
 import { useCompletionConfetti } from "./useCompletionConfetti";
 import { useCompletionOverlayData } from "./useCompletionOverlayData";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -167,7 +166,6 @@ export function CompletionOverlay({
             onShareClick={() => setSharePopupOpen(true)}
             isNarrow={isNarrow}
           />
-          <CompleteShareUrl />
         </div>
 
         {isDaily && <DailyReactions puzzleDate={getTodayDateString()} />}

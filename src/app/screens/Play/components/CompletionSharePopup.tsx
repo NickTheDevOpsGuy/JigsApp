@@ -1,6 +1,6 @@
 /**
  * Share Result modal content: seasonal frame toggle, Share Card PNG, Download.
- * Puzzle URL is shown on the completion overlay share section, not here.
+ * The share card image includes the puzzle URL (phuzzle.vercel.app) on the card itself.
  */
 import { Image, Download } from "lucide-react";
 import { Button } from "@/components/Button/Button";
@@ -24,8 +24,8 @@ export function CompletionSharePopup({
   return (
     <div className={styles.shareResultPopup}>
       <p className={styles.shareResultPopupCta}>
-        Challenge a friend – share the link on the win screen or send your completion
-        card.
+        Challenge a friend – share your completion card (it includes the game link
+        phuzzle.vercel.app) or download the image.
       </p>
       <label className={styles.shareResultPopupToggle}>
         <input

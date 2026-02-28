@@ -1,3 +1,4 @@
+/* Starry/cosmic background behind the card */
 .page {
   min-height: 100vh;
   min-height: 100dvh;
@@ -12,6 +13,34 @@
   padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
   overflow: hidden;
   overflow-x: hidden;
+  position: relative;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Repeating starfield (small dots) */
+  background-image:
+    radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 30% 25%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 50% 5%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 70% 20%, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 90% 12%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 15% 50%, rgba(255, 255, 255, 0.28), transparent),
+    radial-gradient(1px 1px at 45% 45%, rgba(255, 255, 255, 0.22), transparent),
+    radial-gradient(1px 1px at 85% 55%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 8% 78%, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 65% 88%, rgba(255, 255, 255, 0.2), transparent),
+    radial-gradient(1px 1px at 92% 92%, rgba(255, 255, 255, 0.35), transparent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page > .card {
+  z-index: 1;
 }
 
 .card {
@@ -103,17 +132,33 @@
   height: auto;
 }
 
-.brandName {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  margin: 4px 0 0 0;
+/* Area under logo for streak and/or players-solved (replaces the old "phuzzle" text spot) */
+.headerBlurb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+  width: 100%;
 }
 
 .streakLine {
   font-size: 13px;
   color: var(--color-text-secondary);
-  margin: 4px 0 0 0;
+  margin: 0;
+}
+
+.headerBlurb .playersSolved {
+  margin: 0;
+}
+
+.teaserLine {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+  max-width: 100%;
 }
 
 .actionsGrid {
@@ -151,19 +196,6 @@
 
 .actionCard:hover:not(:disabled) {
   background: var(--color-action-hover);
-}
-
-/* Start Today's Puzzle – featured daily CTA */
-.actionCardFeatured {
-  position: relative;
-  flex-direction: row;
-  gap: 10px;
-  box-shadow: 0 4px 16px rgba(11, 99, 184, 0.25);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-}
-
-.actionCardFeatured:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(11, 99, 184, 0.35);
 }
 
 .starIcon {

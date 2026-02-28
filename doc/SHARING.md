@@ -14,7 +14,7 @@ This works **without Supabase**.
 - Supports copy-to-clipboard
 - Uses the Web Share API on supported mobile browsers
 - Can export a PNG of the completed puzzle with a time overlay
-- **Win overlay share section**: puzzle URL (phuzzle.vercel.app) and copy button (always visible on the overlay). **Share Result** button opens a popup with “Challenge a friend” CTA, Share Card PNG (seasonal frame, branded footer), and Download
+- **Win overlay share section**: **Share Result** button only (no URL on the overlay). The puzzle URL (phuzzle.vercel.app) is on the **share card image** (Share Result → Share Card PNG). Popup offers “Challenge a friend” CTA, Share Card PNG (seasonal frame, branded footer with game link), and Download
 
 **Key files**
 
@@ -26,9 +26,9 @@ This works **without Supabase**.
   - Adds a footer like: `🧩 Phuzzle - {pieces} pieces in {time}`
 - `src/app/screens/Play/hooks/useShareCardImage.ts`
   - Share Card PNG with seasonal frame and branded footer (phuzzle.vercel.app)
-- `src/app/screens/Play/components/CompletionOverlay.tsx`, `CompleteShareUrl.tsx`, `CompletionSharePopup.tsx`
-  - UI: Win overlay share section has puzzle URL + copy (`CompleteShareUrl.tsx`); Share Result opens modal with Share Card PNG, Download, “Challenge a friend” CTA
-  - Wires the overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
+- `src/app/screens/Play/components/CompletionOverlay.tsx`, `CompletionSharePopup.tsx`
+  - UI: Win overlay share section has Share Result button only; Share Result opens modal with Share Card PNG (image includes phuzzle.vercel.app in footer), Download, “Challenge a friend” CTA
+  - Share card image built in `useShareCardImage.ts` (includes game link on card). Wires the overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
 
 **How it's triggered**
 
