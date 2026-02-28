@@ -19,7 +19,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ## Layout
 
-- **Home** - Corner buttons: Stats (trophy) left, Help (?) right. Main actions: Today's Puzzle, Packs, Choose Photo, Snap a Picture.
+- **Home** – Date above the card. Top bar: Stats (trophy) left, “Daily Phuzzle” centered, Help (?) right. Logo, “phuzzle”, streak line; main actions (Today’s Puzzle, Packs, Choose Photo, Snap a Picture). “X players solved today’s puzzle” when Supabase returns a count. “Next puzzle in Xh Ym” countdown at bottom (plain text; no clock-style display).
 - **Stats** - Dashboard, Profile, Leaderboard (dropdown for views), Achievements. Anonymous mode with raccoon names.
 - **Play layout** - Board on top, tray below (150px desktop, 160px mobile). HUD (timer, pieces) in top bar.
 - **Piece tray** - Fixed height below board. Compact mode for 25+ pieces; horizontal scroll.
@@ -32,7 +32,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - Reference image preview (full or progressive reveal mode)
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Completion confetti (layered bursts) and percentile badges (Top 10% / 25% / 50%); dynamic completion badges (Speed Demon, Chill Mode, etc.)
-- **Completion screen** — Redesigned: larger puzzle image, stats (Time, Moves, Accuracy, Rank), “Can you beat my run?”, vertical menu (Continue, Play again, Back to home, Share Result). Confetti on win (theme-colored; respects reduced motion and battery saver). Share Result opens popup (Share Card PNG, Seasonal frame, Download).
+- **Completion screen** — Redesigned: larger puzzle image, stats (Time, Moves, Accuracy, Rank), “Can you beat my run?”, share section (Continue dropdown opens upward so menu is visible; Share Result button; puzzle URL and copy on the overlay). Confetti on win (theme-colored; respects reduced motion and battery saver). Share Result opens popup (Share Card PNG, Seasonal frame, Download). Puzzle URL (phuzzle.vercel.app) is shown on the win overlay share section via `CompleteShareUrl.tsx`, not only in the modal.
 - **Smooth lock** — When pieces snap to the board they ease into place over ~100ms (desktop and mobile) instead of jumping.
 - **Mobile tray** — Tray height on small screens reduced (175px / 195px for large puzzles) to give the board more space.
 - Settings: **About** (Help), **Display** (Theme, piece shape, board options, effects), **Gameplay** (Controls, time), **Audio**, **Advanced**
@@ -60,7 +60,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 - **Weekly album** – Stats → Leaderboard → Week → Album: 7-slot page with daily puzzle thumbnails (one per day). Completed days show the puzzle image; missing/locked show overlay. Mastery (⚡) badge when the day was completed with no hints and no undo.
 - **Mastery tracking** – Daily completions without hints or undo are recorded as mastery; shown in weekly album and in mastery streak (Profile / Dashboard).
-- **Share Result** – Completion share popup includes puzzle URL (phuzzle.vercel.app), copy button, “Challenge a friend” CTA, Share Card PNG (with branded footer), and Download.
+- **Share Result** – Win overlay share section shows puzzle URL (phuzzle.vercel.app) and copy button (`CompleteShareUrl.tsx`); Share Result opens popup with Share Card PNG (branded footer), Seasonal frame, and Download. “Challenge a friend” CTA in popup.
 - **Daily puzzle comments & reactions** – After completing today's puzzle: emoji reactions (👍 🎉 🔥 ✨ 💪), 280-char comments with live character counter (near-limit styling), report for moderation
 - Daily puzzle and streak tracking
 - **Daily countdown** – Server-synced timer to next daily unlock on Leaderboard; celebration when ready
@@ -85,5 +85,5 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Setup** – `screens/Setup/SetupScreen.tsx`; hooks in `hooks/` (`useGridConfig`, `useImagePicker`, `useSetupScreenGalleryScroll`); `SetupConfigSection.tsx` (difficulty, time, custom grid, remember); image source (gallery/upload/camera) in `components/SetupImageSourcePanel.tsx`.
 - **Data / menu** – `data/menuConfig.ts` (getMenuTree); sections in `menuConfigPlay.ts`, `menuConfigAppearance.ts`, `menuConfigRest.ts`; constants and types in `menuConfigConstants.ts` (TIME_MODE_LABELS, MenuNode).
 - **Stats** – `screens/Stats/StatsScreen.tsx`; state and data in `hooks/useStatsScreenState.ts`, `hooks/useStatsScreenData.ts`; header in `components/StatsScreenHeader.tsx`; tabs in `tabs/`; list rendering in `LeaderboardTabLists.tsx`.
-- **Completion overlay** – `CompletionOverlayActions.tsx` (action buttons); `useCompletionConfetti.ts`, `useCompletionOverlayData.ts` (confetti, percentile, recordCompletion, share); share popup in `CompletionSharePopup.tsx` (URL, Challenge a friend, Share Card); stats block in `CompletionStatsBlock.tsx`. **Piece tray** – `PieceTrayHeader.tsx`; display/scroll/thumbs in `usePieceTrayDisplay.ts`, `usePieceTrayScroll.ts`, `usePieceTrayThumbs.ts`.
+- **Completion overlay** – `CompletionOverlay.tsx` (wraps share section with `CompleteShareUrl.tsx`); `CompletionOverlayActions.tsx` (Continue dropdown opens upward, Share Result button); `useCompletionConfetti.ts`, `useCompletionOverlayData.ts` (confetti, percentile, recordCompletion, share); share popup in `CompletionSharePopup.tsx` (Share Card, Seasonal frame, Download; puzzle URL is on the overlay via `CompleteShareUrl.tsx`); stats block in `CompletionStatsBlock.tsx`. **Piece tray** – `PieceTrayHeader.tsx`; display/scroll/thumbs in `usePieceTrayDisplay.ts`, `usePieceTrayScroll.ts`, `usePieceTrayThumbs.ts`.
 - **Weekly album** – `LeaderboardTab.tsx` (Week → Album: 7-slot grid); `useStatsScreenData.ts` (`loadWeeklyAlbum`, `getMyWeeklyAlbumCompletions`); `leaderboardFetchersShared.ts` (`getMyWeeklyAlbumCompletions`). **Fog modifier** – `usePlayScreenAnimation.ts` (`fogAlphaForUnplaced`); `renderBoard.ts` (fog overlay per unplaced piece); `renderBoardTypes.ts` (`AnimationState.fogAlphaForUnplaced`).

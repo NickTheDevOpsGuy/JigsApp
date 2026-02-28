@@ -71,6 +71,12 @@
 - **Mastery tracking** – Daily completions without hints or undo recorded as `is_mastery` in completions; mastery_streak in player_stats; weekly album shows ⚡ per day.
 - **Files**: `LeaderboardTab.tsx`, `StatsScreen.module.css`, `renderBoard.ts`, `renderBoardTypes.ts`, `usePlayScreenAnimation.ts`, `PlayToasts.tsx`, `PlayScreen.module.css`, `CompletionSharePopup.tsx`, `useShareCardImage.ts`, `useOnboarding.ts`, `useReferenceTapHighlight.ts`, `statsService.ts`, `leaderboardFetchersShared.ts`
 
+## 11. Start page and win screen updates (Feb 2025) ✓
+
+- **Start page** – Date above card; top bar: Trophy, “Daily Phuzzle” (center), Help (?); “Next puzzle in Xh Ym” at bottom (`DailyCountdown` variant `home`); “X players solved today’s puzzle” when Supabase returns count (MenuScreen fetches `getTodayCompletionCount`).
+- **Win screen** – Continue/Play again/Back to home dropdown opens upward (drop-up) so it stays visible; puzzle URL and copy button in the share section on the overlay (`CompleteShareUrl.tsx`); URL removed from inside Share Result modal.
+- **Files**: `MenuScreen.tsx`, `MenuScreen.module.css`, `DailyCountdown.tsx`, `DailyCountdown.module.css`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompleteShareUrl.tsx` (new), `CompletionSharePopup.tsx`, `PlayScreen.module.css`
+
 ## Migration Required
 
 Run `supabase/migrations/002_cut_type_xp_prestige_challenge.sql` to add:

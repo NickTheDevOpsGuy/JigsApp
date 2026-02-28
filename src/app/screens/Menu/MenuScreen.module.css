@@ -29,11 +29,21 @@
 }
 
 .homeBar {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
   align-items: center;
+  justify-items: center;
+  gap: 8px;
   margin-bottom: 8px;
   flex-shrink: 0;
+}
+
+.dailyTitleInBar {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-primary);
+  text-align: center;
 }
 
 .cornerBtn {
@@ -78,6 +88,13 @@
   font-weight: 700;
   margin: 0 0 6px 0;
   color: var(--color-text-primary);
+}
+
+.playersSolved {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-align: center;
 }
 
 .logo {
@@ -202,6 +219,11 @@
 
   .homeBar {
     margin-bottom: 6px;
+    grid-template-columns: 36px 1fr 36px;
+  }
+
+  .dailyTitleInBar {
+    font-size: 1rem;
   }
 
   .cornerBtn {

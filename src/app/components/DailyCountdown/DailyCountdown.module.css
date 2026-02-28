@@ -64,6 +64,28 @@
   opacity: 0.9;
 }
 
+/* Start page: plain "Next puzzle in Xh Ym" */
+.home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.home .label {
+  font-weight: 400;
+}
+
+.home .time {
+  font-weight: 600;
+}
+
 .anticipation {
   display: flex;
   flex-direction: column;

@@ -1817,9 +1817,11 @@
   opacity: 0.9;
 }
 
+/* Opens upward (pop up) so it stays visible above the trigger */
 .completeActionsDropdown {
   position: absolute;
-  top: calc(100% + 6px);
+  bottom: calc(100% + 6px);
+  top: auto;
   left: 0;
   right: 0;
   min-width: 160px;
@@ -1829,13 +1831,13 @@
   box-shadow: var(--shadow-lg);
   padding: 6px;
   z-index: 10;
-  animation: completeDropdownIn 0.15s ease;
+  animation: completeDropdownUpIn 0.15s ease;
 }
 
-@keyframes completeDropdownIn {
+@keyframes completeDropdownUpIn {
   from {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -1926,6 +1928,38 @@
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+/* Share section on win overlay: actions row + URL line */
+.completeShareSection {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+}
+
+.completeShareUrl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.completeShareUrlLink {
+  color: var(--color-link);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.completeShareUrlLink:hover {
+  text-decoration: underline;
+}
+
+.completeShareUrlCopy {
+  flex-shrink: 0;
+  min-width: 36px;
 }
 
 .shareCardToggle {

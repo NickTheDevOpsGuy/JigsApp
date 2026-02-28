@@ -15,7 +15,12 @@ import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { AboutModal } from "@/components/AboutModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
 import { Image, Camera, Package, Trophy } from "lucide-react";
-import { isTodayDailyCompleted, getCurrentStreak } from "@/daily/dailyPuzzleCore";
+import {
+  isTodayDailyCompleted,
+  getCurrentStreak,
+  getTodayDateString,
+} from "@/daily/dailyPuzzleCore";
+import { getTodayCompletionCount } from "@/services/leaderboardService";
 import { shouldShowChangelog } from "@/data/changelog";
 
 /** Star icon for Start Today's Puzzle. Use public/assets/star.png or fallback to character. */
@@ -40,6 +45,7 @@ export function MenuScreen() {
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [todayPlayersSolved, setTodayPlayersSolved] = useState<number | null>(null);
   const todayCompleted = isTodayDailyCompleted();
   const hasDaily = true;
 
@@ -47,9 +53,18 @@ export function MenuScreen() {
     if (shouldShowChangelog()) setShowWhatsNew(true);
   }, []);
 
+  useEffect(() => {
+    getTodayCompletionCount(getTodayDateString()).then((count: number) => {
+      setTodayPlayersSolved(count);
+    });
+  }, []);
+
   return (
     <div className={styles.page}>
       <div className={styles.card}>
+        <p className={styles.menuDate} aria-live="polite">
+          {menuDate}
+        </p>
         <div className={styles.homeBar}>
           <button
             type="button"
@@ -60,6 +75,7 @@ export function MenuScreen() {
           >
             <Trophy size={24} />
           </button>
+          <h1 className={styles.dailyTitleInBar}>Daily Phuzzle</h1>
           <button
             type="button"
             className={styles.cornerBtn}
@@ -70,12 +86,7 @@ export function MenuScreen() {
             ?
           </button>
         </div>
-
-        <p className={styles.menuDate} aria-live="polite">
-          {menuDate}
-        </p>
         <div className={styles.header}>
-          <h1 className={styles.dailyTitle}>Daily Phuzzle</h1>
           <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
           <p className={styles.brandName}>phuzzle</p>
           {streak > 0 && (
@@ -139,8 +150,13 @@ export function MenuScreen() {
           </Button>
         </div>
 
+        {todayPlayersSolved != null && todayPlayersSolved > 0 && (
+          <p className={styles.playersSolved} aria-live="polite">
+            {todayPlayersSolved.toLocaleString()} players solved today&apos;s puzzle
+          </p>
+        )}
         <div className={styles.homeCountdownWrap}>
-          <DailyCountdown variant="default" prominent />
+          <DailyCountdown variant="home" />
         </div>
       </div>
 

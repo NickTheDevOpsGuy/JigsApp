@@ -29,8 +29,8 @@ function formatCompactCountdown(seconds: number): string {
 interface DailyCountdownProps {
   /** When true, use larger/prominent styling */
   prominent?: boolean;
-  /** Visual style variant for leaderboard anticipation mode. */
-  variant?: "default" | "anticipation" | "untilReset";
+  /** Visual style variant. "home" = plain "Next puzzle in Xh Ym" for start page. */
+  variant?: "default" | "anticipation" | "untilReset" | "home";
   /** Callback when countdown hits 0 */
   onUnlock?: () => void;
 }
@@ -76,8 +76,9 @@ export function DailyCountdown({
   if (secondsLeft == null) return null;
 
   const justUnlocked = secondsLeft <= 0;
+  const isHome = variant === "home";
   const display =
-    variant === "anticipation"
+    variant === "anticipation" || isHome
       ? justUnlocked
         ? "0m"
         : formatCompactCountdown(secondsLeft)
@@ -87,13 +88,17 @@ export function DailyCountdown({
   const label =
     variant === "untilReset"
       ? "until reset"
-      : variant === "anticipation"
+      : isHome
         ? justUnlocked
-          ? "New puzzle live"
-          : "Next puzzle drops in"
-        : justUnlocked
-          ? "New daily ready!"
-          : "Next daily in";
+          ? "New puzzle ready"
+          : "Next puzzle in"
+        : variant === "anticipation"
+          ? justUnlocked
+            ? "New puzzle live"
+            : "Next puzzle drops in"
+          : justUnlocked
+            ? "New daily ready!"
+            : "Next daily in";
 
   const isUntilReset = variant === "untilReset";
 
@@ -101,16 +106,21 @@ export function DailyCountdown({
     <div
       className={`${styles.countdown} ${prominent ? styles.prominent : ""} ${
         variant === "anticipation" ? styles.anticipation : ""
-      } ${isUntilReset ? styles.untilReset : ""} ${celebrating ? styles.celebrating : ""}`}
+      } ${isHome ? styles.home : ""} ${isUntilReset ? styles.untilReset : ""} ${celebrating ? styles.celebrating : ""}`}
       role="timer"
       aria-live="polite"
-      aria-label={justUnlocked ? "New daily puzzle is ready" : `${display} ${label}`}
+      aria-label={justUnlocked ? "New daily puzzle is ready" : `${label} ${display}`}
     >
       {isUntilReset ? (
         <>
           <Clock size={16} className={styles.icon} />
           <span className={styles.time}>{display}</span>
           <span className={styles.label}>{label}</span>
+        </>
+      ) : isHome ? (
+        <>
+          <span className={styles.label}>{label}</span>
+          <span className={styles.time}>{display}</span>
         </>
       ) : variant === "anticipation" ? (
         <>

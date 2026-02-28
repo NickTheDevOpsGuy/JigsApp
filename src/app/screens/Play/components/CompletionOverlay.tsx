@@ -11,6 +11,7 @@ import { DailyReactions } from "@/components/DailyReactions";
 import { CompletionSharePopup } from "./CompletionSharePopup";
 import { CompletionStatsBlock } from "./CompletionStatsBlock";
 import { CompletionOverlayActions } from "./CompletionOverlayActions";
+import { CompleteShareUrl } from "./CompleteShareUrl";
 import { useCompletionConfetti } from "./useCompletionConfetti";
 import { useCompletionOverlayData } from "./useCompletionOverlayData";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -158,13 +159,16 @@ export function CompletionOverlay({
 
         <p className={styles.completeChallenge}>Can you beat my run?</p>
 
-        <CompletionOverlayActions
-          onClose={handleClose}
-          onPlayAgain={onPlayAgain != null ? handlePlayAgain : undefined}
-          onGoHome={onGoHome != null ? handleGoHome : undefined}
-          onShareClick={() => setSharePopupOpen(true)}
-          isNarrow={isNarrow}
-        />
+        <div className={styles.completeShareSection}>
+          <CompletionOverlayActions
+            onClose={handleClose}
+            onPlayAgain={onPlayAgain != null ? handlePlayAgain : undefined}
+            onGoHome={onGoHome != null ? handleGoHome : undefined}
+            onShareClick={() => setSharePopupOpen(true)}
+            isNarrow={isNarrow}
+          />
+          <CompleteShareUrl />
+        </div>
 
         {isDaily && <DailyReactions puzzleDate={getTodayDateString()} />}
       </div>
