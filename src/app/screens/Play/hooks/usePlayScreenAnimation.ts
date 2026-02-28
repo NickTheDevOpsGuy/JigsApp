@@ -70,7 +70,7 @@ export function usePlayScreenAnimation(args: {
     wrongRotationHintRef,
     batterySaverMode = false,
     undoSnapBackRef,
-    onUndoSnapBackComplete,
+    onUndoSnapBackComplete: _onUndoSnapBackComplete,
   } = args;
 
   const rafRef = useRef<number | null>(null);
@@ -84,6 +84,9 @@ export function usePlayScreenAnimation(args: {
   /** Interpolated positions for dragged group (smooth drag, no touch/pointer changes) */
   const dragDisplayRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const DRAG_LERP = 0.32;
+  /** When drag ends: snapshot last drawn position here so lock lerp starts from there (no jerk). */
+  const lastPiecePositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
+  const LOCK_LERP_MS = 140;
 
   const perfFrameTimesRef = useRef<number[]>([]);
   const perfDrawCountRef = useRef(0);
@@ -222,11 +225,51 @@ export function usePlayScreenAnimation(args: {
           pos.y += (p.y - pos.y) * DRAG_LERP;
         }
       } else {
-        dragDisplayOverrides.clear();
+        if (dragDisplayOverrides.size > 0) {
+          for (const [id, pos] of dragDisplayOverrides) {
+            lastPiecePositionsRef.current.set(id, { x: pos.x, y: pos.y });
+          }
+          dragDisplayOverrides.clear();
+        }
       }
 
       const popMap = popMapRef.current ?? new Map<string, number>();
       const lockMap = lockMapRef.current ?? new Map<string, number>();
+
+      let lockLerpOverrides: Map<string, { x: number; y: number }> | undefined;
+      if (!isDragging) {
+        const lastPos = lastPiecePositionsRef.current;
+        for (const p of st.pieces) {
+          if (p.inTray) continue;
+          const lockAt = lockMap.get(p.id);
+          if (lockAt == null) continue;
+          const elapsed = now - lockAt;
+          if (elapsed >= LOCK_LERP_MS) continue;
+          const from = lastPos.get(p.id);
+          if (from == null) continue;
+          const t = Math.min(1, elapsed / LOCK_LERP_MS);
+          const ease = 1 - (1 - t) * (1 - t);
+          lockLerpOverrides ??= new Map();
+          lockLerpOverrides.set(p.id, {
+            x: from.x + (p.x - from.x) * ease,
+            y: from.y + (p.y - from.y) * ease,
+          });
+        }
+      }
+      for (const p of st.pieces) {
+        if (p.inTray) continue;
+        const lockAt = lockMap.get(p.id);
+        if (lockAt != null && now - lockAt < LOCK_LERP_MS) continue;
+        const pos =
+          isDragging &&
+          draggedGroupId &&
+          p.groupId === draggedGroupId &&
+          dragDisplayOverrides.has(p.id)
+            ? dragDisplayOverrides.get(p.id)!
+            : { x: p.x, y: p.y };
+        lastPiecePositionsRef.current.set(p.id, { x: pos.x, y: pos.y });
+      }
+
       const pieceCache = pieceCacheRef.current;
       const snapParticles = snapParticlesRef?.current ?? [];
       const hint = wrongRotationHintRef?.current;
@@ -264,6 +307,7 @@ export function usePlayScreenAnimation(args: {
           showAlignmentGrid,
           dragPreviewPieceId: dragPreviewPieceIdRef.current,
           dragDisplayOverrides: isDragging ? dragDisplayOverrides : undefined,
+          lockLerpOverrides,
           wrongRotationHint,
           snapPreview,
         },
