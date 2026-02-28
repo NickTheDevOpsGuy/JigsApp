@@ -1,13 +1,14 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "23";
+export const CHANGELOG_VERSION = "24";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📤 Share screen – Completion overlay and share card show "Can you beat my run of X:XX seconds?" (your actual time). Share text and card include a link to the exact puzzle: phuzzle.vercel.app/daily or phuzzle.vercel.app/play?session=… so friends can play the same puzzle.",
       "🏠 Start page – Today’s Puzzle button matches others (star on top, “Today’s Puzzle” below); starry background; under logo: streak and either “X players solved” (when Supabase has data) or teaser taglines when Supabase is blank",
       "📱 Win screen – No URL on overlay; puzzle link lives on the share card image (Share Result → Share Card PNG); Continue menu opens upward",
       "🏠 Start page – Date above card; bar shows Trophy, “Daily Phuzzle” (center), Help (?); “Next puzzle in Xh Ym” at bottom",

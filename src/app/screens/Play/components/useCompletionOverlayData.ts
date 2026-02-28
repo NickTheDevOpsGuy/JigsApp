@@ -31,6 +31,7 @@ export type UseCompletionOverlayDataParams = {
   isDaily: boolean;
   cutType: PieceCutType;
   undoCount: number;
+  puzzleShareUrl?: string;
 };
 
 export function useCompletionOverlayData(params: UseCompletionOverlayDataParams) {
@@ -46,6 +47,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     isDaily,
     cutType,
     undoCount,
+    puzzleShareUrl = "/",
   } = params;
 
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
@@ -144,6 +146,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       accuracyPercent,
       percentile,
       useSeasonalFrame,
+      puzzleShareUrl,
     });
   }, [
     shareCard,
@@ -153,6 +156,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     accuracyPercent,
     percentile,
     useSeasonalFrame,
+    puzzleShareUrl,
   ]);
 
   return {

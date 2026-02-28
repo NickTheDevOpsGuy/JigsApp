@@ -4,6 +4,14 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
+## Recent: Share screen (completion card + exact puzzle link)
+
+- **Nag message with time** — Completion overlay and share card show "Can you beat my run of X:XX seconds?" using your actual completion time.
+- **Exact puzzle link** — Share text and card include a link to the same puzzle: `https://phuzzle.vercel.app/daily` for daily, or `https://phuzzle.vercel.app/play?session=…` for co-op. Copy, native share, and Share Card PNG all use this URL.
+- **Share modal** — Share Result modal shows the nag message and a clickable "Play at {url}" link, plus Share Card PNG and Download. Card image includes the nag line and full play URL. See [SHARING.md](./SHARING.md).
+
+---
+
 ## Core gameplay
 
 - Drag and drop pieces with rotation (tap to rotate on mobile)

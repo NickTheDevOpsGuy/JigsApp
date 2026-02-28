@@ -656,7 +656,17 @@ export function PlayScreen() {
     navigate("/new");
   }, [navigate]);
 
-  const share = useShareResults({ elapsedSeconds, state });
+  const puzzleShareUrl = useMemo(() => {
+    if (isDailyPuzzleSession()) return "/daily";
+    if (sessionId) return `/play?${SESSION_ID_PARAM}=${sessionId}`;
+    return "/";
+  }, [sessionId]);
+
+  const share = useShareResults({
+    elapsedSeconds,
+    state,
+    puzzleShareUrl,
+  });
   const handleSharePuzzle = usePlayScreenSharePuzzle({
     sessionId,
     nativeShare,
@@ -986,6 +996,7 @@ export function PlayScreen() {
                           state.grid != null &&
                           (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
                         }
+                        puzzleShareUrl={puzzleShareUrl}
                         share={{
                           copied: share.copied,
                           canNativeShare: share.canNativeShare,

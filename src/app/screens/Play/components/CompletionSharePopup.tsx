@@ -1,12 +1,17 @@
 /**
- * Share Result modal content: seasonal frame toggle, Share Card PNG, Download.
- * The share card image includes the puzzle URL (phuzzle.vercel.app) on the card itself.
+ * Share Result modal content: card-style message, seasonal frame toggle, Share Card PNG, Download.
+ * Shows the completion card message (nag + play link) and actions to share or download.
  */
 import { Image, Download } from "lucide-react";
 import { Button } from "@/components/Button/Button";
+import { formatTime } from "../playUtils";
 import styles from "../PlayScreen.module.css";
 
+const PLAY_BASE = "https://phuzzle.vercel.app";
+
 interface CompletionSharePopupProps {
+  elapsedSeconds: number;
+  puzzleShareUrl: string;
   useSeasonalFrame: boolean;
   setUseSeasonalFrame: (v: boolean) => void;
   onShareCard: () => void;
@@ -15,17 +20,33 @@ interface CompletionSharePopupProps {
 }
 
 export function CompletionSharePopup({
+  elapsedSeconds,
+  puzzleShareUrl,
   useSeasonalFrame,
   setUseSeasonalFrame,
   onShareCard,
   isGenerating,
   onDownload,
 }: CompletionSharePopupProps) {
+  const playUrl = puzzleShareUrl.startsWith("http")
+    ? puzzleShareUrl
+    : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
+  const nagMessage = `Can you beat my run of ${formatTime(elapsedSeconds)} seconds?`;
+
   return (
     <div className={styles.shareResultPopup}>
+      <p className={styles.shareResultPopupCta} role="status">
+        {nagMessage} Share the card below or download it — it includes the play link.
+      </p>
       <p className={styles.shareResultPopupCta}>
-        Challenge a friend – share your completion card (it includes the game link
-        phuzzle.vercel.app) or download the image.
+        <a
+          href={playUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.shareResultPopupUrlLink}
+        >
+          Play at {playUrl}
+        </a>
       </p>
       <label className={styles.shareResultPopupToggle}>
         <input

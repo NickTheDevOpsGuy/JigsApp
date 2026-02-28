@@ -1,25 +1,32 @@
 /**
- * useShareResults – copy, native share.
+ * useShareResults – copy, native share. Includes nag message with time and link to play (exact puzzle when available).
  */
 import { useCallback, useState } from "react";
 import type { PuzzleState } from "@/puzzle/types";
 import { formatTime } from "../playUtils";
 
+const PLAY_BASE_URL = "https://phuzzle.vercel.app";
+
 export function useShareResults(args: {
   elapsedSeconds: number;
   state: PuzzleState | null;
+  /** Link to this exact puzzle (e.g. /daily or /play?session=xxx). Omit for home. */
+  puzzleShareUrl?: string | null;
 }) {
-  const { elapsedSeconds, state } = args;
+  const { elapsedSeconds, state, puzzleShareUrl } = args;
   const [copied, setCopied] = useState(false);
+
+  const playUrl = puzzleShareUrl
+    ? `${PLAY_BASE_URL}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`
+    : `${PLAY_BASE_URL}/`;
 
   const getShareText = useCallback(() => {
     const timeStr = formatTime(elapsedSeconds);
-    const pieceCount = state?.totalCount ?? 0;
-    return `🧩 I completed a ${pieceCount}-piece Phuzzle in ${timeStr}! Can you beat my time?`;
-  }, [elapsedSeconds, state?.totalCount]);
+    return `Can you beat my run of ${timeStr} seconds? Play here: ${playUrl}`;
+  }, [elapsedSeconds, playUrl]);
 
   const handleCopyResults = useCallback(async () => {
-    const text = getShareText() + " #Phuzzle\nhttps://phuzzle.vercel.app/";
+    const text = getShareText() + " #Phuzzle";
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -39,12 +46,12 @@ export function useShareResults(args: {
       await navigator.share({
         title: "Phuzzle",
         text,
-        url: "https://phuzzle.vercel.app/",
+        url: playUrl,
       });
     } catch (err) {
       if (import.meta.env.DEV) console.warn("Share cancelled or failed:", err);
     }
-  }, [getShareText]);
+  }, [getShareText, playUrl]);
 
   return {
     copied,

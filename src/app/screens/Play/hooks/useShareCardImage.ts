@@ -43,6 +43,8 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
 export function useShareCardImage() {
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const PLAY_BASE = "https://phuzzle.vercel.app";
+
   const shareCard = useCallback(
     async (args: {
       imageUrl?: string;
@@ -51,10 +53,17 @@ export function useShareCardImage() {
       accuracyPercent: number;
       percentile: Percentile;
       useSeasonalFrame: boolean;
+      puzzleShareUrl?: string;
     }) => {
       if (!args.imageUrl || isGenerating) return;
       setIsGenerating(true);
       try {
+        const playPath = args.puzzleShareUrl ?? "/";
+        const playUrl = playPath.startsWith("http")
+          ? playPath
+          : `${PLAY_BASE}${playPath.startsWith("/") ? playPath : `/${playPath}`}`;
+        const nagText = `Can you beat my run of ${formatTime(args.elapsedSeconds)} seconds?`;
+
         const img = await loadImage(args.imageUrl);
         const canvas = document.createElement("canvas");
         canvas.width = 1080;
@@ -112,10 +121,13 @@ export function useShareCardImage() {
           ctx.fillText(line, canvas.width / 2, 1100 + i * 56);
         });
 
-        // Branded footer
+        // Nag message and play link on card
+        ctx.fillStyle = "rgba(255,255,255,0.9)";
+        ctx.font = "600 32px system-ui, sans-serif";
+        ctx.fillText(nagText, canvas.width / 2, 1240);
         ctx.fillStyle = "rgba(255,255,255,0.5)";
         ctx.font = "500 28px system-ui, sans-serif";
-        ctx.fillText("phuzzle.vercel.app", canvas.width / 2, 1320);
+        ctx.fillText(playUrl, canvas.width / 2, 1320);
 
         const blob = await new Promise<Blob | null>((resolve) =>
           canvas.toBlob(resolve, "image/png"),
@@ -125,10 +137,11 @@ export function useShareCardImage() {
           type: "image/png",
         });
 
+        const shareText = `${nagText} Play here: ${playUrl}`;
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({
             title: "My Phuzzle completion",
-            text: "Can you beat my run?",
+            text: shareText,
             files: [file],
           });
           return;

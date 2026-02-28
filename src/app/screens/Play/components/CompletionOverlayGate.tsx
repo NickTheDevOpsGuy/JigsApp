@@ -18,6 +18,8 @@ interface CompletionOverlayGateProps {
   dailyVisualModifier: VisualModifier;
   pieceCutType: PieceCutType;
   isNewBest: boolean;
+  /** Path to this puzzle for share link (e.g. /daily or /play?session=xxx). */
+  puzzleShareUrl: string;
   share: {
     copied: boolean;
     canNativeShare: boolean;
@@ -42,6 +44,7 @@ export function CompletionOverlayGate({
   dailyVisualModifier,
   pieceCutType,
   isNewBest,
+  puzzleShareUrl,
   share,
   onDownloadImage,
   onClose,
@@ -71,6 +74,7 @@ export function CompletionOverlayGate({
       isNewBest={isNewBest}
       isDaily={isDaily}
       cutType={pieceCutType}
+      puzzleShareUrl={puzzleShareUrl}
       copied={share.copied}
       canNativeShare={share.canNativeShare}
       onCopyResults={share.handleCopyResults}

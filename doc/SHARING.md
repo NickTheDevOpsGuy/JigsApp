@@ -14,21 +14,22 @@ This works **without Supabase**.
 - Supports copy-to-clipboard
 - Uses the Web Share API on supported mobile browsers
 - Can export a PNG of the completed puzzle with a time overlay
+- **Share text** includes a nag line with your actual time: "Can you beat my run of X:XX seconds?" and a **link to the exact puzzle** (phuzzle.vercel.app/daily for daily, or phuzzle.vercel.app/play?session=… for a session) so friends can play the same puzzle
 - **Win overlay share section**: **Share Result** button only (no URL on the overlay). The puzzle URL (phuzzle.vercel.app) is on the **share card image** (Share Result → Share Card PNG). Popup offers “Challenge a friend” CTA, Share Card PNG (seasonal frame, branded footer with game link), and Download
 
 **Key files**
 
 - `src/app/screens/Play/hooks/useShareResults.ts`
-  - Creates the share text and per-platform URLs (includes phuzzle.vercel.app)
+  - Creates the share text (nag "Can you beat my run of X:XX seconds?" + play URL) and per-platform URLs; play URL is the exact puzzle (daily or session)
   - Handles copy + `navigator.share` when available
 - `src/app/screens/Play/hooks/useDownloadImage.ts`
   - Exports the puzzle canvas as PNG
   - Adds a footer like: `🧩 Phuzzle - {pieces} pieces in {time}`
 - `src/app/screens/Play/hooks/useShareCardImage.ts`
-  - Share Card PNG with seasonal frame and branded footer (phuzzle.vercel.app)
+  - Share Card PNG with seasonal frame, nag line + full play URL on card, and branded footer (phuzzle.vercel.app)
 - `src/app/screens/Play/components/CompletionOverlay.tsx`, `CompletionSharePopup.tsx`
-  - UI: Win overlay share section has Share Result button only; Share Result opens modal with Share Card PNG (image includes phuzzle.vercel.app in footer), Download, “Challenge a friend” CTA
-  - Share card image built in `useShareCardImage.ts` (includes game link on card). Wires the overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
+  - UI: Win overlay shows nag "Can you beat my run of X:XX seconds?"; Share Result opens modal with completion card preview, nag, "Play at {url}" link, Share Card PNG, Download, “Challenge a friend” CTA
+  - Share card image built in `useShareCardImage.ts` (nag + exact puzzle URL on card). Wires the overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
 
 **How it's triggered**
 

@@ -1,8 +1,9 @@
 /**
- * CompletionOverlay – puzzle complete: image, stats, "Can you beat my run?", actions.
+ * CompletionOverlay – puzzle complete: image, stats, nag message with time, actions.
  */
 import React, { useEffect, useCallback } from "react";
 import { X, Trophy } from "lucide-react";
+import { formatTime } from "../playUtils";
 import { Modal } from "@/components/Modal/Modal";
 import styles from "../PlayScreen.module.css";
 import type { Piece } from "@/puzzle/types";
@@ -31,6 +32,8 @@ interface CompletionOverlayProps {
   isNewBest?: boolean;
   isDaily?: boolean;
   cutType?: PieceCutType;
+  /** Path for share link (e.g. /daily or /play?session=xxx). */
+  puzzleShareUrl?: string;
   copied?: boolean;
   canNativeShare?: boolean;
   onCopyResults?: () => void;
@@ -53,6 +56,7 @@ export function CompletionOverlay({
   isNewBest = false,
   isDaily = false,
   cutType = "classic",
+  puzzleShareUrl = "/",
   onDownloadImage,
   onClose,
   onGoHome,
@@ -82,6 +86,7 @@ export function CompletionOverlay({
     isDaily,
     cutType,
     undoCount,
+    puzzleShareUrl,
   });
 
   const {
@@ -156,7 +161,9 @@ export function CompletionOverlay({
           rankPosition={rankPosition}
         />
 
-        <p className={styles.completeChallenge}>Can you beat my run?</p>
+        <p className={styles.completeChallenge}>
+          Can you beat my run of {formatTime(elapsedSeconds)} seconds?
+        </p>
 
         <div className={styles.completeShareSection}>
           <CompletionOverlayActions
@@ -178,6 +185,8 @@ export function CompletionOverlay({
         showCloseButton
       >
         <CompletionSharePopup
+          elapsedSeconds={elapsedSeconds}
+          puzzleShareUrl={puzzleShareUrl ?? "/"}
           useSeasonalFrame={useSeasonalFrame}
           setUseSeasonalFrame={setUseSeasonalFrame}
           onShareCard={handleShareCard}
