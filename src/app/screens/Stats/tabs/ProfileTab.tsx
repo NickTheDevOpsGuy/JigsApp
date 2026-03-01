@@ -124,7 +124,11 @@ export function ProfileTab({
                   aria-hidden
                 >
                   {filled && slot?.imageUrl ? (
-                    <img src={slot.imageUrl} alt="" className={styles.profilePuzzleThumb} />
+                    <img
+                      src={slot.imageUrl}
+                      alt=""
+                      className={styles.profilePuzzleThumb}
+                    />
                   ) : null}
                 </div>
               );
