@@ -1988,6 +1988,13 @@
   justify-content: center;
 }
 
+.shareResultPopupHint {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin: -4px 0 0;
+  opacity: 0.9;
+}
+
 .shareResultPopupToggle {
   display: flex;
   align-items: center;

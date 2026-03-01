@@ -31,11 +31,6 @@ export function CompletionSharePopup({
 
   return (
     <div className={styles.shareResultPopup}>
-      <p className={styles.shareResultPopupCta} role="status">
-        The share message will say something like: &ldquo;I beat this in X minutes! How
-        well can you do? Play the game here&rdquo; followed by a clickable link. The link
-        is only in the message, not on the card image.
-      </p>
       <p className={styles.shareResultPopupCta}>
         <a
           href={playUrl}
@@ -60,10 +55,14 @@ export function CompletionSharePopup({
         onClick={onShareCard}
         disabled={isGenerating}
         className={styles.shareResultPopupBtn}
+        title="Share the puzzle image and message together"
       >
         <Image size={18} />
         {isGenerating ? "Generating..." : "Share Card PNG"}
       </Button>
+      <p className={styles.shareResultPopupHint}>
+        Share Card sends the image and link together to apps that support it.
+      </p>
 
       <Button
         variant="secondary"

@@ -144,6 +144,7 @@ export function useShareCardImage() {
           await navigator.share({
             title: "My Phuzzle completion",
             text: shareText,
+            url: playUrl,
             files: [file],
           });
           return;

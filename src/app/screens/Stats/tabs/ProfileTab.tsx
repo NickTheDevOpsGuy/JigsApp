@@ -109,36 +109,38 @@ export function ProfileTab({
         </div>
       </section>
 
-      {/* Finished Puzzles */}
-      <section className={styles.profileBlock}>
-        <h2 className={styles.profileBlockTitle}>Finished Puzzles</h2>
-        <div className={styles.profilePuzzleGrid}>
-          {Array.from({ length: 8 }, (_, i) => {
-            const slot = weeklyAlbumSlots[i];
-            const filled = slot?.completed ?? false;
-            return (
-              <div
-                key={slot?.date ?? i}
-                className={`${styles.profilePuzzleSlot} ${filled ? styles.profilePuzzleSlotFilled : ""}`}
-                aria-hidden
-              >
-                {filled && slot?.imageUrl ? (
-                  <img src={slot.imageUrl} alt="" className={styles.profilePuzzleThumb} />
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-        {onNavigateToBoard && (
-          <button
-            type="button"
-            className={styles.profileViewAll}
-            onClick={onNavigateToBoard}
-          >
-            View All →
-          </button>
-        )}
-      </section>
+      {/* Finished Puzzles – only show when user has at least one completion */}
+      {puzzles > 0 && (
+        <section className={styles.profileBlock}>
+          <h2 className={styles.profileBlockTitle}>Finished Puzzles</h2>
+          <div className={styles.profilePuzzleGrid}>
+            {Array.from({ length: 8 }, (_, i) => {
+              const slot = weeklyAlbumSlots[i];
+              const filled = slot?.completed ?? false;
+              return (
+                <div
+                  key={slot?.date ?? i}
+                  className={`${styles.profilePuzzleSlot} ${filled ? styles.profilePuzzleSlotFilled : ""}`}
+                  aria-hidden
+                >
+                  {filled && slot?.imageUrl ? (
+                    <img src={slot.imageUrl} alt="" className={styles.profilePuzzleThumb} />
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+          {onNavigateToBoard && (
+            <button
+              type="button"
+              className={styles.profileViewAll}
+              onClick={onNavigateToBoard}
+            >
+              View All →
+            </button>
+          )}
+        </section>
+      )}
 
       {/* Daily Mastery */}
       <section className={styles.profileBlock}>
