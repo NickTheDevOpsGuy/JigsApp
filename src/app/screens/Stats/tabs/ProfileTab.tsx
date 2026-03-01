@@ -145,7 +145,7 @@ export function ProfileTab({
       )}
 
       {/* Daily Mastery */}
-      <section className={styles.profileBlock}>
+      <section className={`${styles.profileBlock} ${styles.profileBlockMastery}`}>
         <h2 className={styles.profileBlockTitle}>Daily Mastery {masteryCount} / 7</h2>
         <div
           className={styles.profileMasteryBar}

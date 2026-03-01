@@ -633,6 +633,11 @@
   transition: width 0.2s ease;
 }
 
+/* No divider line between Daily Mastery and Settings */
+.profileBlockMastery {
+  border-bottom: none;
+}
+
 .profileSettingsToggle {
   display: flex;
   align-items: center;

@@ -111,40 +111,46 @@ export function DailyReactions({ puzzleDate }: DailyReactionsProps) {
       </div>
       <div className={styles.comments}>
         <h4 className={styles.commentsTitle}>Comments</h4>
-        <div className={styles.commentInput}>
-          <textarea
-            placeholder="Share a thought… (280 chars)"
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value.slice(0, MAX_COMMENT_LENGTH))}
-            maxLength={MAX_COMMENT_LENGTH}
-            rows={2}
-            className={styles.textarea}
-            disabled={posting}
-          />
-          <div className={styles.commentActions}>
-            <span
-              className={
-                commentText.length >= MAX_COMMENT_LENGTH
-                  ? styles.charCountAtLimit
-                  : commentText.length >= MAX_COMMENT_LENGTH - 30
-                    ? styles.charCountNearLimit
-                    : styles.charCount
-              }
-              aria-live="polite"
-              aria-label={`${commentText.length} of ${MAX_COMMENT_LENGTH} characters`}
-            >
-              {commentText.length}/{MAX_COMMENT_LENGTH}
-            </span>
-            <button
-              type="button"
-              className={styles.postBtn}
-              onClick={handlePostComment}
-              disabled={!commentText.trim() || posting}
-            >
-              Post
-            </button>
+        {!canComment ? (
+          <p className={styles.profileRequired}>
+            Fill out your profile (Stats → Profile) to join the conversation.
+          </p>
+        ) : (
+          <div className={styles.commentInput}>
+            <textarea
+              placeholder="Share a thought… (280 chars)"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value.slice(0, MAX_COMMENT_LENGTH))}
+              maxLength={MAX_COMMENT_LENGTH}
+              rows={2}
+              className={styles.textarea}
+              disabled={posting}
+            />
+            <div className={styles.commentActions}>
+              <span
+                className={
+                  commentText.length >= MAX_COMMENT_LENGTH
+                    ? styles.charCountAtLimit
+                    : commentText.length >= MAX_COMMENT_LENGTH - 30
+                      ? styles.charCountNearLimit
+                      : styles.charCount
+                }
+                aria-live="polite"
+                aria-label={`${commentText.length} of ${MAX_COMMENT_LENGTH} characters`}
+              >
+                {commentText.length}/{MAX_COMMENT_LENGTH}
+              </span>
+              <button
+                type="button"
+                className={styles.postBtn}
+                onClick={handlePostComment}
+                disabled={!commentText.trim() || posting}
+              >
+                Post
+              </button>
+            </div>
           </div>
-        </div>
+        )}
         <ul className={styles.commentList}>
           {comments.map((c) => (
             <li key={c.id} className={styles.commentItem}>
