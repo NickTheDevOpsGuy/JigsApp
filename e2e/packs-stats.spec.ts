@@ -36,9 +36,7 @@ test.describe("Packs and Stats", () => {
     await expect(page.getByTestId("stats-card-content")).toBeVisible({ timeout: 5000 });
     // With Supabase: tabs (Profile, Board, Badges). Without: Connect Supabase message.
     await expect(
-      page
-        .getByRole("tab", { name: /profile/i })
-        .or(page.getByText(/connect supabase/i)),
+      page.getByRole("tab", { name: /profile/i }).or(page.getByText(/connect supabase/i)),
     ).toBeVisible({ timeout: 5000 });
   });
 });

@@ -41,7 +41,12 @@ interface ProfileTabProps {
     masteryStreak?: number;
     [key: string]: unknown;
   } | null;
-  weeklyAlbumSlots: { date: string; dayLabel: string; imageUrl: string | null; completed: boolean }[];
+  weeklyAlbumSlots: {
+    date: string;
+    dayLabel: string;
+    imageUrl: string | null;
+    completed: boolean;
+  }[];
   weeklyAlbumProgress: number;
   onSave: () => Promise<void>;
   profileSaving: boolean;
@@ -64,7 +69,11 @@ export function ProfileTab({
   onNavigateToBoard,
 }: ProfileTabProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const displayName = (displayNameInput.trim() || profile?.displayName || "Puzzler").slice(0, 32);
+  const displayName = (
+    displayNameInput.trim() ||
+    profile?.displayName ||
+    "Puzzler"
+  ).slice(0, 32);
   const identityName = raccoonName ?? displayName;
   const streak = stats?.dailyStreak ?? 0;
   const level = stats?.level ?? 1;
@@ -133,10 +142,14 @@ export function ProfileTab({
 
       {/* Daily Mastery */}
       <section className={styles.profileBlock}>
-        <h2 className={styles.profileBlockTitle}>
-          Daily Mastery {masteryCount} / 7
-        </h2>
-        <div className={styles.profileMasteryBar} role="progressbar" aria-valuenow={masteryCount} aria-valuemin={0} aria-valuemax={7}>
+        <h2 className={styles.profileBlockTitle}>Daily Mastery {masteryCount} / 7</h2>
+        <div
+          className={styles.profileMasteryBar}
+          role="progressbar"
+          aria-valuenow={masteryCount}
+          aria-valuemin={0}
+          aria-valuemax={7}
+        >
           <div
             className={styles.profileMasteryFill}
             style={{ width: `${(masteryCount / 7) * 100}%` }}

@@ -703,7 +703,9 @@ export function PlayScreen() {
 
   const shareAccuracyPercent =
     state?.totalCount && state.totalCount > 0
-      ? Math.round((state.totalCount / Math.max(moveCountRef.current, state.totalCount)) * 100)
+      ? Math.round(
+          (state.totalCount / Math.max(moveCountRef.current, state.totalCount)) * 100,
+        )
       : 100;
   const share = useShareResults({
     elapsedSeconds,

@@ -10,11 +10,7 @@ import type { LeaderboardType, WeekSubview, WeeklyAlbumSlot } from "../tabs";
 
 export type { LeaderboardType };
 
-const VALID_TABS: readonly StatsTab[] = [
-  "profile",
-  "leaderboard",
-  "achievements",
-];
+const VALID_TABS: readonly StatsTab[] = ["profile", "leaderboard", "achievements"];
 
 function isStatsTab(s: string | null): s is StatsTab {
   return s != null && (VALID_TABS as readonly string[]).includes(s);
