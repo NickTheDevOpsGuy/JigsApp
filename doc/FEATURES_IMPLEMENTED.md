@@ -66,7 +66,7 @@
 - **Weekly album** – Stats → Leaderboard → Week → Album: 7-slot page with daily puzzle thumbnails; each slot shows the day’s image (or placeholder); completed/missing/locked overlay; mastery (⚡) when completed with no hints or undo.
 - **Fog modifier** – Per-piece fog on board: unplaced pieces get a fog overlay; placed pieces stay clear; fog strength scales with progress. Preview/tray keep global fog.
 - **Streak flame** – “On fire!” toast has subtle flame flicker animation and glow.
-- **Hint screens** – All hint and onboarding toasts auto-dismiss after 10 seconds (configurable in useOnboarding, usePlayScreenSecondaryEffects, usePlayScreenMilestones, useSnapComboAnnouncer).
+- **Hint screens** – All hint and onboarding toasts auto-dismiss after 4 seconds (configurable in useOnboarding, usePlayScreenSecondaryEffects, usePlayScreenMilestones, useSnapComboAnnouncer).
 - **Share Result** – Completion share popup includes puzzle URL (phuzzle.vercel.app), copy button, “Challenge a friend” CTA; share card image has branded footer.
 - **Mastery tracking** – Daily completions without hints or undo recorded as `is_mastery` in completions; mastery_streak in player_stats; weekly album shows ⚡ per day.
 - **Files**: `LeaderboardTab.tsx`, `StatsScreen.module.css`, `renderBoard.ts`, `renderBoardTypes.ts`, `usePlayScreenAnimation.ts`, `PlayToasts.tsx`, `PlayScreen.module.css`, `CompletionSharePopup.tsx`, `useShareCardImage.ts`, `useOnboarding.ts`, `useReferenceTapHighlight.ts`, `statsService.ts`, `leaderboardFetchersShared.ts`
@@ -74,8 +74,8 @@
 ## 11. Start page and win screen updates (Feb 2025) ✓
 
 - **Start page** – Date above card; top bar: Trophy, “Daily Phuzzle” (center), Help (?). Logo; under logo: streak and either “X players solved today’s puzzle” (when Supabase has count) or teaser taglines from `menuTips` when Supabase data is blank. Today’s Puzzle button matches other buttons (star on top, “Today’s Puzzle” below). Starry background behind card. “Next puzzle in Xh Ym” at bottom (`DailyCountdown` variant `home`).
-- **Win screen** – Continue/Play again/Back to home dropdown opens upward (drop-up). No URL on overlay; puzzle URL (phuzzle.vercel.app) is on the **share card image** only (Share Result → Share Card PNG).
-- **Files**: `MenuScreen.tsx`, `MenuScreen.module.css`, `DailyCountdown.tsx`, `DailyCountdown.module.css`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompletionSharePopup.tsx`, `PlayScreen.module.css`, `useShareCardImage.ts`, `data/menuTips.ts`
+- **Win screen** – Continue/Play again/Back to home dropdown opens upward (drop-up). No URL on overlay; puzzle URL (phuzzle.vercel.app) is on the **share card image** only (Share Result → Share Card PNG). Below “Puzzle Completed!” a **cycling positive message** (from `completionMessages.ts`: “You did it!”, “Nailed it!”, etc.); when you beat your best time, “New best time!” is shown; otherwise a performance badge (Speed Demon, Precision Pro, Chill Mode, etc.) may appear.
+- **Files**: `MenuScreen.tsx`, `MenuScreen.module.css`, `DailyCountdown.tsx`, `DailyCountdown.module.css`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompletionSharePopup.tsx`, `PlayScreen.module.css`, `useShareCardImage.ts`, `data/menuTips.ts`, `data/completionMessages.ts`
 
 ## Migration Required
 

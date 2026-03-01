@@ -7,6 +7,10 @@ import { Modal } from "@/components/Modal/Modal";
 import styles from "../PlayScreen.module.css";
 import type { Piece } from "@/puzzle/types";
 import { getTodayDateString } from "@/daily/dailyPuzzleCore";
+import {
+  getCompletionMessage,
+  getCompletionBadge,
+} from "@/data/completionMessages";
 import { DailyReactions } from "@/components/DailyReactions";
 import { CompletionSharePopup } from "./CompletionSharePopup";
 import { CompletionStatsBlock } from "./CompletionStatsBlock";
@@ -134,6 +138,26 @@ export function CompletionOverlay({
             •
           </span>
         </h2>
+        {(() => {
+          const pieceCount = grid ? grid.rows * grid.cols : 0;
+          const seed = elapsedSeconds + pieceCount;
+          const message = getCompletionMessage(seed);
+          const badge =
+            pieceCount > 0
+              ? getCompletionBadge(elapsedSeconds, undoCount ?? 0, pieceCount)
+              : null;
+          return (
+            <p className={styles.completeMessage} role="status">
+              {message}
+              {isNewBest && (
+                <span className={styles.completeMessageExtra}> · New best time!</span>
+              )}
+              {badge && !isNewBest && (
+                <span className={styles.completeMessageExtra}> · {badge}</span>
+              )}
+            </p>
+          );
+        })()}
 
         {percentileBadgeTier && (
           <div

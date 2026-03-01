@@ -1,21 +1,22 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "24";
+export const CHANGELOG_VERSION = "25";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      '📤 Share screen – Completion overlay and share card show "Can you beat my run of X:XX seconds?" (your actual time). Share text and card include a link to the exact puzzle: phuzzle.vercel.app/daily or phuzzle.vercel.app/play?session=… so friends can play the same puzzle.',
+      "🏆 Win screen – Cycling positive message below “Puzzle Completed!” (e.g. You did it!, Nailed it!); “New best time!” when you beat your record; performance badge (Speed Demon, Precision Pro, Chill Mode) when not.",
+      '📤 Share screen – Share text and card include a link to the exact puzzle: phuzzle.vercel.app/daily or phuzzle.vercel.app/play?session=… so friends can play the same puzzle.',
       "🏠 Start page – Today’s Puzzle button matches others (star on top, “Today’s Puzzle” below); starry background; under logo: streak and either “X players solved” (when Supabase has data) or teaser taglines when Supabase is blank",
       "📱 Win screen – No URL on overlay; puzzle link lives on the share card image (Share Result → Share Card PNG); Continue menu opens upward",
       "🏠 Start page – Date above card; bar shows Trophy, “Daily Phuzzle” (center), Help (?); “Next puzzle in Xh Ym” at bottom",
       "📅 Weekly album – Stats → Leaderboard → Week → Album: 7-slot page with daily puzzle thumbnails; mastery (⚡) when completed with no hints or undo",
       "🌫️ Fog modifier – Pieces gradually gain clarity when placed; unplaced stay foggy (daily modifier)",
       "🔥 Streak flame – Subtle flame animation when placement streak pops (“On fire!”)",
-      "⏱️ Hint screens – All hint and onboarding toasts auto-dismiss after 10 seconds",
+      "⏱️ Hint screens – All hint and onboarding toasts auto-dismiss after 4 seconds",
       "🔗 Share Result – Puzzle URL (phuzzle.vercel.app) and “Challenge a friend” in completion share popup; branded footer on share card image",
       "🏅 Mastery tracking – Daily completions without hints or undo tracked for weekly album and mastery streak",
       "🧩 Snap on release – Pieces snap when you release; no mid-drag snap for a smoother lock animation",

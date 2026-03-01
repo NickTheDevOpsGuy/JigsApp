@@ -19,7 +19,7 @@ interface CompletionOverlayActionsProps {
 
 type MenuAction = "goHome" | "playAgain";
 
-function getLabel(action: MenuAction, isNarrow: boolean): string {
+function getLabel(action: MenuAction): string {
   switch (action) {
     case "goHome":
       return "Home";
@@ -31,11 +31,11 @@ function getLabel(action: MenuAction, isNarrow: boolean): string {
 }
 
 export function CompletionOverlayActions({
-  onClose,
+  onClose: _onClose,
   onPlayAgain,
   onGoHome,
   onShareClick,
-  isNarrow,
+  isNarrow: _isNarrow,
 }: CompletionOverlayActionsProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [shareRevealed, setShareRevealed] = useState(false);
@@ -101,10 +101,10 @@ export function CompletionOverlayActions({
                 role="menuitem"
                 className={styles.completeActionsDropdownItem}
                 onClick={() => handleAction(onClick)}
-                aria-label={getLabel(id, isNarrow)}
+                aria-label={getLabel(id)}
               >
                 {icon}
-                {getLabel(id, isNarrow)}
+                {getLabel(id)}
               </button>
             ))}
           </div>

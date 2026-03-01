@@ -1,12 +1,12 @@
 /**
  * useOnboarding – step-based tips: start (drag piece), tray, zoom. Persisted in localStorage.
- * All hint screens auto-dismiss after 10 seconds.
+ * All hint screens auto-dismiss after 4 seconds.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 const STORAGE_KEY = "phuzzle:onboarding";
-const HINT_AUTO_DISMISS_MS = 10_000;
+const HINT_AUTO_DISMISS_MS = 4_000;
 
 export type OnboardingStep =
   | "start" // show "Drag a piece"
@@ -70,7 +70,7 @@ export function useOnboarding(placedCount: number, pieceCount: number) {
   const needsTrayTip = step === "firstSnapDone" && trayTipVisible;
   const needsZoomTip = step === "trayTipSeen" && pieceCount >= 16;
 
-  // Auto-dismiss all hint screens after 10 seconds
+  // Auto-dismiss all hint screens after 4 seconds
   useEffect(() => {
     if (step === "start") {
       const t = setTimeout(() => setStep("done"), HINT_AUTO_DISMISS_MS);

@@ -4,11 +4,11 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
-## Recent: Share screen (completion card + exact puzzle link)
+## Recent: Share screen and win screen
 
-- **Nag message with time** — Completion overlay and share card show "Can you beat my run of X:XX seconds?" using your actual completion time.
+- **Win screen messages** — Below “Puzzle Completed!” a cycling positive message (e.g. “You did it!”, “Nailed it!”, “Puzzle master!”) varies by puzzle and time. When you beat your best time, “New best time!” is shown; otherwise a performance badge (e.g. Speed Demon, Precision Pro, Chill Mode) may appear.
 - **Exact puzzle link** — Share text and card include a link to the same puzzle: `https://phuzzle.vercel.app/daily` for daily, or `https://phuzzle.vercel.app/play?session=…` for co-op. Copy, native share, and Share Card PNG all use this URL.
-- **Share modal** — Share Result modal shows the nag message and a clickable "Play at {url}" link, plus Share Card PNG and Download. Card image includes the nag line and full play URL. See [SHARING.md](./SHARING.md).
+- **Share modal** — Share Result modal shows a clickable “Play here: {url}” link, plus Share Card PNG and Download. Card image shows “Phuzzle” (no URL on image). See [SHARING.md](./SHARING.md).
 
 ---
 
@@ -40,7 +40,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - Reference image preview (full or progressive reveal mode)
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Completion confetti (layered bursts) and percentile badges (Top 10% / 25% / 50%); dynamic completion badges (Speed Demon, Chill Mode, etc.)
-- **Completion screen** — Redesigned: larger puzzle image, stats (Time, Moves, Accuracy, Rank), “Can you beat my run?”, share section (Continue dropdown opens upward; Share Result button only; no URL on the overlay). Puzzle URL (phuzzle.vercel.app) is on the **share card** image (Share Result → Share Card PNG). Confetti on win (theme-colored; respects reduced motion and battery saver). Share Result opens popup (Share Card PNG, Seasonal frame, Download).
+- **Completion screen** — Redesigned: larger puzzle image, stats (Time, Moves, Accuracy, Rank), cycling positive message below title (“You did it!”, “Nailed it!”, etc.); “New best time!” when you beat your record, or a performance badge when not. Share section (Continue dropdown opens upward; Share Result button only; no URL on the overlay). Puzzle URL (phuzzle.vercel.app) is on the **share card** image (Share Result → Share Card PNG). Confetti on win (theme-colored; respects reduced motion and battery saver). Share Result opens popup (Share Card PNG, Seasonal frame, Download).
 - **Smooth lock** — When pieces snap to the board they ease into place over ~100ms (desktop and mobile) instead of jumping.
 - **Mobile tray** — Tray height on small screens reduced (175px / 195px for large puzzles) to give the board more space.
 - Settings: **About** (Help), **Display** (Theme, piece shape, board options, effects), **Gameplay** (Controls, time), **Audio**, **Advanced**
@@ -52,7 +52,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Snap combo meter** – Appears when 2+ placements within 2.5s; breaks on idle
 - **Fog modifier** – Daily visual modifier “Fog”: unplaced pieces are foggy; placed pieces gain full clarity (per-piece fog on board). Preview and tray keep global fog.
 - **Streak flame** – When placement streak triggers (“On fire!”), subtle flame animation (flicker + glow).
-- **Hint screens** – All hint and onboarding toasts (first piece, tray tip, zoom tip, streak, share, milestone, combo) auto-dismiss after 10 seconds (user can still dismiss earlier).
+- **Hint screens** – All hint and onboarding toasts (first piece, tray tip, zoom tip, streak, share, milestone, combo) auto-dismiss after 4 seconds (user can still dismiss earlier).
 - **Alternate piece shapes** – Classic, Irregular, Hard (Settings → Gameplay → Piece Shape submenu; "Applies to next puzzle")
 - **Progressive reveal** – Hide full reference; reveal only regions where pieces are correctly placed
 - Battery-saver detection (reduces confetti when low-power or data-saver)

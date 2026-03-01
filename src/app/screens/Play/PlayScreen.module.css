@@ -1112,6 +1112,18 @@
   opacity: 0.6;
 }
 
+.completeMessage {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+  margin: 0 0 10px 0;
+}
+
+.completeMessageExtra {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
 .completePercentileBadge {
   display: inline-flex;
   align-items: center;
