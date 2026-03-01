@@ -1,7 +1,9 @@
 /**
  * PlayToasts – engagement and onboarding toast overlays.
- * Renders first-snap, streak, milestone, share, and onboarding tooltips.
+ * Renders at most ONE engagement toast at a time (first in priority order) so toasts
+ * don’t stack; tray and zoom onboarding tips are separate overlays.
  */
+import type React from "react";
 import { OnboardingTooltip } from "@/components/OnboardingTooltip";
 import type { OnboardingState } from "./PlayToasts.types";
 
@@ -23,6 +25,22 @@ type Props = {
   };
 };
 
+/** Priority order: only the first truthy toast is shown so they don’t overlap. */
+function getSingleToast(
+  showFirstSnapToast: boolean,
+  announcerLine: string | null,
+  showStreakToast: boolean,
+  milestoneMessage: string | null,
+  shareToast: string | null,
+): { content: React.ReactNode; isStreak: boolean } | null {
+  if (showFirstSnapToast) return { content: "First piece! ✨", isStreak: false };
+  if (announcerLine) return { content: announcerLine, isStreak: false };
+  if (showStreakToast) return { content: null, isStreak: true }; // "On fire!" + flame
+  if (milestoneMessage) return { content: milestoneMessage, isStreak: false };
+  if (shareToast) return { content: shareToast, isStreak: false };
+  return null;
+}
+
 export function PlayToasts({
   onboarding,
   showFirstSnapToast,
@@ -32,34 +50,32 @@ export function PlayToasts({
   shareToast,
   classNames: s,
 }: Props) {
+  const single = getSingleToast(
+    showFirstSnapToast,
+    announcerLine,
+    showStreakToast,
+    milestoneMessage,
+    shareToast,
+  );
+
   return (
     <>
-      {showFirstSnapToast && (
-        <div className={s.engagementToast} role="status">
-          First piece! ✨
-        </div>
-      )}
-      {announcerLine && (
-        <div className={s.announcerToast} role="status">
-          {announcerLine}
-        </div>
-      )}
-      {showStreakToast && (
-        <div className={`${s.engagementToast} ${s.streakToast ?? ""}`} role="status">
-          <span className={s.streakFlame ?? ""} aria-hidden>
-            🔥
-          </span>
-          On fire!
-        </div>
-      )}
-      {milestoneMessage && (
-        <div className={s.engagementToast} role="status">
-          {milestoneMessage}
-        </div>
-      )}
-      {shareToast && (
-        <div className={s.engagementToast} role="status">
-          {shareToast}
+      {single && (
+        <div
+          className={
+            single.isStreak
+              ? `${s.engagementToast} ${s.streakToast ?? ""}`
+              : s.engagementToast
+          }
+          role="status"
+        >
+          {single.isStreak && (
+            <span className={s.streakFlame ?? ""} aria-hidden>
+              🔥
+            </span>
+          )}
+          {single.content}
+          {single.isStreak && " On fire!"}
         </div>
       )}
       {onboarding.needsTrayTip && (

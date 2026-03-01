@@ -917,19 +917,6 @@ export function PlayScreen() {
                       <span>Loading puzzle…</span>
                     </div>
                   )}
-                  {onboarding.needsStartTip && piecesOnBoard === 0 && (
-                    <div className={styles.startHintOverlay} role="status">
-                      <span>Drag a piece to start</span>
-                      <button
-                        type="button"
-                        className={styles.toastDismiss}
-                        onClick={onboarding.dismissStartTip}
-                        aria-label="Dismiss"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
                   <SnapComboMeter combo={snapCombo} />
                   <canvas
                     key={puzzleKey}

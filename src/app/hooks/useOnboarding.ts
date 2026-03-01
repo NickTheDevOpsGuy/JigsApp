@@ -64,7 +64,8 @@ export function useOnboarding(placedCount: number, pieceCount: number) {
   const [trayTipVisible, setTrayTipVisible] = useState(false);
   useEffect(() => {
     if (step !== "firstSnapDone") return;
-    const t = setTimeout(() => setTrayTipVisible(true), 2800);
+    // Show tray tip after first-snap toast has dismissed (4s) so they don’t overlap
+    const t = setTimeout(() => setTrayTipVisible(true), 4500);
     return () => clearTimeout(t);
   }, [step]);
   const needsTrayTip = step === "firstSnapDone" && trayTipVisible;
