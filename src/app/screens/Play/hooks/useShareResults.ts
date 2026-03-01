@@ -1,5 +1,5 @@
 /**
- * useShareResults – copy, native share. Share text: "Can you beat my score? Play here: {url}".
+ * useShareResults – copy, native share. Share text: "Play here: {url}".
  */
 import { useCallback, useState } from "react";
 import type { PuzzleState } from "@/puzzle/types";
@@ -12,7 +12,7 @@ export function useShareResults(args: {
   /** Link to this exact puzzle (e.g. /daily or /play?session=xxx). Omit for home. */
   puzzleShareUrl?: string | null;
 }) {
-  const { elapsedSeconds, state, puzzleShareUrl } = args;
+  const { elapsedSeconds: _elapsedSeconds, state: _state, puzzleShareUrl } = args;
   const [copied, setCopied] = useState(false);
 
   const playUrl = puzzleShareUrl
@@ -20,7 +20,7 @@ export function useShareResults(args: {
     : `${PLAY_BASE_URL}/`;
 
   const getShareText = useCallback(() => {
-    return `Can you beat my score? Play here: ${playUrl}`;
+    return `Play here: ${playUrl}`;
   }, [playUrl]);
 
   const handleCopyResults = useCallback(async () => {

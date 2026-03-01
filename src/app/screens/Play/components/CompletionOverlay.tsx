@@ -3,7 +3,6 @@
  */
 import React, { useEffect, useCallback } from "react";
 import { X, Trophy } from "lucide-react";
-import { formatTime } from "../playUtils";
 import { Modal } from "@/components/Modal/Modal";
 import styles from "../PlayScreen.module.css";
 import type { Piece } from "@/puzzle/types";

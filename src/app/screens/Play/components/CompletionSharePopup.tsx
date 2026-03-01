@@ -1,6 +1,5 @@
 /**
- * Share Result modal content: card-style message, seasonal frame toggle, Share Card PNG, Download.
- * The share card says "Can you beat my score?" and includes the game URL.
+ * Share Result modal content: seasonal frame toggle, Share Card PNG, Download, and clickable play link.
  */
 import { Image, Download } from "lucide-react";
 import { Button } from "@/components/Button/Button";
@@ -33,8 +32,7 @@ export function CompletionSharePopup({
   return (
     <div className={styles.shareResultPopup}>
       <p className={styles.shareResultPopupCta} role="status">
-        Can you beat my score? Share the card below or download it — it includes the play
-        link.
+        When you share, the message will include a clickable link so they can play:
       </p>
       <p className={styles.shareResultPopupCta}>
         <a
@@ -43,7 +41,7 @@ export function CompletionSharePopup({
           rel="noopener noreferrer"
           className={styles.shareResultPopupUrlLink}
         >
-          Play at {playUrl}
+          {playUrl}
         </a>
       </p>
       <label className={styles.shareResultPopupToggle}>

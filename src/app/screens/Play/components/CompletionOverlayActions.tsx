@@ -1,9 +1,9 @@
 /**
- * Completion overlay actions: dropdown (Continue, Play again, Back to home) + Share side-by-side.
+ * Completion overlay actions: dropdown (Home, Play again) + Share side-by-side.
  * Share button is delayed for pacing (reveal stats first).
  */
 import { useState, useRef, useEffect } from "react";
-import { Play, Share2, Home, RotateCcw, ChevronDown } from "lucide-react";
+import { Share2, Home, RotateCcw, ChevronDown } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 
@@ -17,16 +17,14 @@ interface CompletionOverlayActionsProps {
   isNarrow: boolean;
 }
 
-type MenuAction = "continue" | "playAgain" | "goHome";
+type MenuAction = "goHome" | "playAgain";
 
 function getLabel(action: MenuAction, isNarrow: boolean): string {
   switch (action) {
-    case "continue":
-      return "Continue";
+    case "goHome":
+      return "Home";
     case "playAgain":
       return "Play again";
-    case "goHome":
-      return isNarrow ? "Home" : "Back to home";
     default:
       return "";
   }
@@ -60,7 +58,9 @@ export function CompletionOverlayActions({
   }, [dropdownOpen]);
 
   const actions: { id: MenuAction; onClick: () => void; icon: React.ReactNode }[] = [
-    { id: "continue", onClick: onClose, icon: <Play size={18} /> },
+    ...(onGoHome != null
+      ? [{ id: "goHome" as const, onClick: onGoHome, icon: <Home size={18} /> }]
+      : []),
     ...(onPlayAgain != null
       ? [
           {
@@ -69,9 +69,6 @@ export function CompletionOverlayActions({
             icon: <RotateCcw size={18} />,
           },
         ]
-      : []),
-    ...(onGoHome != null
-      ? [{ id: "goHome" as const, onClick: onGoHome, icon: <Home size={18} /> }]
       : []),
   ];
 
@@ -87,12 +84,12 @@ export function CompletionOverlayActions({
           variant="primary"
           onClick={() => setDropdownOpen((o) => !o)}
           className={styles.completeActionsTrigger}
-          aria-label="Continue and more options"
+          aria-label="Home and more options"
           aria-expanded={dropdownOpen}
           aria-haspopup="menu"
         >
-          <Play size={20} />
-          <span>Continue</span>
+          <Home size={20} />
+          <span>Home</span>
           <ChevronDown size={18} className={styles.completeActionsChevron} aria-hidden />
         </Button>
         {dropdownOpen && (

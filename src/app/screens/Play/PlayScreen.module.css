@@ -1071,7 +1071,7 @@
   }
 }
 
-/* Win panel: card-style layout (image, stats, "Can you beat my run?", Continue) */
+/* Win panel: card-style layout (image, stats, Home/Share actions) */
 .completePanel {
   background: color-mix(in srgb, var(--color-bg-card) 92%, transparent);
   backdrop-filter: blur(16px);

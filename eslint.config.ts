@@ -66,7 +66,8 @@ export default [
       "jsx-a11y/anchor-has-content": "warn",
       "jsx-a11y/iframe-has-title": "warn",
       "jsx-a11y/img-redundant-alt": "warn",
-      "jsx-a11y/label-has-associated-control": "warn",
+      // Disabled: rule crashes with current eslint-plugin-jsx-a11y + minimatch (TypeError: _minimatch.default is not a function)
+      "jsx-a11y/label-has-associated-control": "off",
     },
   },
 ];

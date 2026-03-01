@@ -62,7 +62,7 @@ export function useShareCardImage() {
         const playUrl = playPath.startsWith("http")
           ? playPath
           : `${PLAY_BASE}${playPath.startsWith("/") ? playPath : `/${playPath}`}`;
-        const challengeText = "Can you beat my score?";
+        const challengeText = "Phuzzle";
 
         const img = await loadImage(args.imageUrl);
         const canvas = document.createElement("canvas");
@@ -121,13 +121,10 @@ export function useShareCardImage() {
           ctx.fillText(line, canvas.width / 2, 1100 + i * 56);
         });
 
-        // Challenge line and play link on card
-        ctx.fillStyle = "rgba(255,255,255,0.9)";
-        ctx.font = "600 32px system-ui, sans-serif";
+        // Brand line on card (URL is only in the share text so recipients get a clickable link)
+        ctx.fillStyle = "rgba(255,255,255,0.7)";
+        ctx.font = "600 28px system-ui, sans-serif";
         ctx.fillText(challengeText, canvas.width / 2, 1240);
-        ctx.fillStyle = "rgba(255,255,255,0.5)";
-        ctx.font = "500 28px system-ui, sans-serif";
-        ctx.fillText(playUrl, canvas.width / 2, 1320);
 
         const blob = await new Promise<Blob | null>((resolve) =>
           canvas.toBlob(resolve, "image/png"),
@@ -137,7 +134,7 @@ export function useShareCardImage() {
           type: "image/png",
         });
 
-        const shareText = `${challengeText} Play here: ${playUrl}`;
+        const shareText = `Play here: ${playUrl}`;
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({
             title: "My Phuzzle completion",
