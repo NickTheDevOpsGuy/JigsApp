@@ -7,10 +7,7 @@ import { Modal } from "@/components/Modal/Modal";
 import styles from "../PlayScreen.module.css";
 import type { Piece } from "@/puzzle/types";
 import { getTodayDateString } from "@/daily/dailyPuzzleCore";
-import {
-  getCompletionMessage,
-  getCompletionBadge,
-} from "@/data/completionMessages";
+import { getCompletionMessage, getCompletionBadge } from "@/data/completionMessages";
 import { DailyReactions } from "@/components/DailyReactions";
 import { CompletionSharePopup } from "./CompletionSharePopup";
 import { CompletionStatsBlock } from "./CompletionStatsBlock";

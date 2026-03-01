@@ -9,7 +9,7 @@ export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
     title: "What's New",
     items: [
       "🏆 Win screen – Cycling positive message below “Puzzle Completed!” (e.g. You did it!, Nailed it!); “New best time!” when you beat your record; performance badge (Speed Demon, Precision Pro, Chill Mode) when not.",
-      '📤 Share screen – Share text and card include a link to the exact puzzle: phuzzle.vercel.app/daily or phuzzle.vercel.app/play?session=… so friends can play the same puzzle.',
+      "📤 Share screen – Share text and card include a link to the exact puzzle: phuzzle.vercel.app/daily or phuzzle.vercel.app/play?session=… so friends can play the same puzzle.",
       "🏠 Start page – Today’s Puzzle button matches others (star on top, “Today’s Puzzle” below); starry background; under logo: streak and either “X players solved” (when Supabase has data) or teaser taglines when Supabase is blank",
       "📱 Win screen – No URL on overlay; puzzle link lives on the share card image (Share Result → Share Card PNG); Continue menu opens upward",
       "🏠 Start page – Date above card; bar shows Trophy, “Daily Phuzzle” (center), Help (?); “Next puzzle in Xh Ym” at bottom",
