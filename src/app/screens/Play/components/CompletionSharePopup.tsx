@@ -33,7 +33,8 @@ export function CompletionSharePopup({
   return (
     <div className={styles.shareResultPopup}>
       <p className={styles.shareResultPopupCta} role="status">
-        Can you beat my score? Share the card below or download it — it includes the play link.
+        Can you beat my score? Share the card below or download it — it includes the play
+        link.
       </p>
       <p className={styles.shareResultPopupCta}>
         <a

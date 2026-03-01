@@ -94,7 +94,8 @@ export function MenuScreen() {
             )}
             {todayPlayersSolved != null && todayPlayersSolved >= 10 ? (
               <p className={styles.playersSolved} aria-live="polite">
-                {todayPlayersSolved.toLocaleString()} players solved today&apos;s puzzle. Can you?
+                {todayPlayersSolved.toLocaleString()} players solved today&apos;s puzzle.
+                Can you?
               </p>
             ) : (
               <p className={styles.teaserLine}>
