@@ -161,10 +161,6 @@ export function CompletionOverlay({
           rankPosition={rankPosition}
         />
 
-        <p className={styles.completeChallenge}>
-          Can you beat my run of {formatTime(elapsedSeconds)} seconds?
-        </p>
-
         <div className={styles.completeShareSection}>
           <CompletionOverlayActions
             onClose={handleClose}

@@ -1,9 +1,8 @@
 /**
- * useShareResults – copy, native share. Includes nag message with time and link to play (exact puzzle when available).
+ * useShareResults – copy, native share. Share text: "Can you beat my score? Play here: {url}".
  */
 import { useCallback, useState } from "react";
 import type { PuzzleState } from "@/puzzle/types";
-import { formatTime } from "../playUtils";
 
 const PLAY_BASE_URL = "https://phuzzle.vercel.app";
 
@@ -21,9 +20,8 @@ export function useShareResults(args: {
     : `${PLAY_BASE_URL}/`;
 
   const getShareText = useCallback(() => {
-    const timeStr = formatTime(elapsedSeconds);
-    return `Can you beat my run of ${timeStr} seconds? Play here: ${playUrl}`;
-  }, [elapsedSeconds, playUrl]);
+    return `Can you beat my score? Play here: ${playUrl}`;
+  }, [playUrl]);
 
   const handleCopyResults = useCallback(async () => {
     const text = getShareText() + " #Phuzzle";

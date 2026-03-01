@@ -1,10 +1,9 @@
 /**
  * Share Result modal content: card-style message, seasonal frame toggle, Share Card PNG, Download.
- * Shows the completion card message (nag + play link) and actions to share or download.
+ * The share card says "Can you beat my score?" and includes the game URL.
  */
 import { Image, Download } from "lucide-react";
 import { Button } from "@/components/Button/Button";
-import { formatTime } from "../playUtils";
 import styles from "../PlayScreen.module.css";
 
 const PLAY_BASE = "https://phuzzle.vercel.app";
@@ -20,7 +19,6 @@ interface CompletionSharePopupProps {
 }
 
 export function CompletionSharePopup({
-  elapsedSeconds,
   puzzleShareUrl,
   useSeasonalFrame,
   setUseSeasonalFrame,
@@ -31,12 +29,11 @@ export function CompletionSharePopup({
   const playUrl = puzzleShareUrl.startsWith("http")
     ? puzzleShareUrl
     : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
-  const nagMessage = `Can you beat my run of ${formatTime(elapsedSeconds)} seconds?`;
 
   return (
     <div className={styles.shareResultPopup}>
       <p className={styles.shareResultPopupCta} role="status">
-        {nagMessage} Share the card below or download it — it includes the play link.
+        Can you beat my score? Share the card below or download it — it includes the play link.
       </p>
       <p className={styles.shareResultPopupCta}>
         <a

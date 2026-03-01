@@ -556,6 +556,26 @@
   margin-bottom: 4px;
 }
 
+/* Card-style container for leaderboard (Profile/Stats look) */
+.leaderboardCard {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.leaderboardCardTitle {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.leaderboardCard .leaderboardHeader {
+  margin-bottom: 12px;
+}
+
 .leaderboardHeader {
   display: flex;
   flex-direction: column;

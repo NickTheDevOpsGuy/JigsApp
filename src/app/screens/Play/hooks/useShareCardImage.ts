@@ -62,7 +62,7 @@ export function useShareCardImage() {
         const playUrl = playPath.startsWith("http")
           ? playPath
           : `${PLAY_BASE}${playPath.startsWith("/") ? playPath : `/${playPath}`}`;
-        const nagText = `Can you beat my run of ${formatTime(args.elapsedSeconds)} seconds?`;
+        const challengeText = "Can you beat my score?";
 
         const img = await loadImage(args.imageUrl);
         const canvas = document.createElement("canvas");
@@ -121,10 +121,10 @@ export function useShareCardImage() {
           ctx.fillText(line, canvas.width / 2, 1100 + i * 56);
         });
 
-        // Nag message and play link on card
+        // Challenge line and play link on card
         ctx.fillStyle = "rgba(255,255,255,0.9)";
         ctx.font = "600 32px system-ui, sans-serif";
-        ctx.fillText(nagText, canvas.width / 2, 1240);
+        ctx.fillText(challengeText, canvas.width / 2, 1240);
         ctx.fillStyle = "rgba(255,255,255,0.5)";
         ctx.font = "500 28px system-ui, sans-serif";
         ctx.fillText(playUrl, canvas.width / 2, 1320);
@@ -137,7 +137,7 @@ export function useShareCardImage() {
           type: "image/png",
         });
 
-        const shareText = `${nagText} Play here: ${playUrl}`;
+        const shareText = `${challengeText} Play here: ${playUrl}`;
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({
             title: "My Phuzzle completion",

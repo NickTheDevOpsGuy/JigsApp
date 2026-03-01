@@ -36,7 +36,7 @@ export function StatsTabBar({
         <span>Profile</span>
       </button>
       <button
-        className=""
+        className={activeTab === "leaderboard" ? styles.tabActive : ""}
         onClick={() => setActiveTab("leaderboard")}
         aria-label="Leaderboard"
       >

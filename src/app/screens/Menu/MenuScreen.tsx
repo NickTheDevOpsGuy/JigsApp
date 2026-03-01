@@ -22,7 +22,6 @@ import {
 } from "@/daily/dailyPuzzleCore";
 import { getTodayCompletionCount } from "@/services/leaderboardService";
 import { shouldShowChangelog } from "@/data/changelog";
-import { getMenuTagline } from "@/data/menuTips";
 
 /** Star icon for Start Today's Puzzle. Use public/assets/star.png or fallback to character. */
 const STAR_ICON = "/assets/star.png";
@@ -47,7 +46,6 @@ export function MenuScreen() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [todayPlayersSolved, setTodayPlayersSolved] = useState<number | null>(null);
-  const [teaserMessage] = useState(() => getMenuTagline());
   const todayCompleted = isTodayDailyCompleted();
   const hasDaily = true;
 
@@ -94,12 +92,14 @@ export function MenuScreen() {
             {streak > 0 && (
               <p className={styles.streakLine}>Welcome back. Day {streak} streak 🔥</p>
             )}
-            {todayPlayersSolved != null && todayPlayersSolved > 0 ? (
+            {todayPlayersSolved != null && todayPlayersSolved >= 10 ? (
               <p className={styles.playersSolved} aria-live="polite">
-                {todayPlayersSolved.toLocaleString()} players solved today&apos;s puzzle
+                {todayPlayersSolved.toLocaleString()} players solved today&apos;s puzzle. Can you?
               </p>
             ) : (
-              <p className={styles.teaserLine}>{teaserMessage}</p>
+              <p className={styles.teaserLine}>
+                Be one of the first to solve today&apos;s puzzle.
+              </p>
             )}
           </div>
         </div>

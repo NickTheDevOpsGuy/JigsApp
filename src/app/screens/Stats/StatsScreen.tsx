@@ -27,12 +27,18 @@ export function StatsScreen() {
   const masteryPuzzlesRemaining = Math.max(0, 1 - (state.stats?.masteryStreak ?? 0));
   const headerTitle =
     state.activeTab === "leaderboard"
-      ? "Leaderboard"
+      ? isNarrow
+        ? "Board"
+        : "Leaderboard"
       : state.activeTab === "dashboard"
-        ? "Dashboard"
+        ? isNarrow
+          ? "Dash"
+          : "Dashboard"
         : state.activeTab === "profile"
           ? "Profile"
-          : "Achievements";
+          : isNarrow
+            ? "Badges"
+            : "Achievements";
 
   if (!configured) {
     const status = getSupabaseConfigStatus();

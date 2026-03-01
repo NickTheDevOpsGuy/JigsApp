@@ -70,7 +70,8 @@ export function LeaderboardTab({
   const compact = true;
 
   return (
-    <div className={styles.section}>
+    <div className={`${styles.section} ${styles.leaderboardCard}`}>
+      <h2 className={styles.leaderboardCardTitle}>Board</h2>
       <div className={styles.leaderboardHeader}>
         <div className={styles.boardModeSwitch} role="tablist" aria-label="Board mode">
           <button
