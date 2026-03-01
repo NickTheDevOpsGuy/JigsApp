@@ -80,16 +80,19 @@ export function useShareCardImage() {
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "rgba(255,255,255,0.08)";
-        ctx.fillRect(60, 60, canvas.width - 120, canvas.height - 120);
-        ctx.strokeStyle = palette.frame;
-        ctx.lineWidth = 8;
-        ctx.strokeRect(60, 60, canvas.width - 120, canvas.height - 120);
-
-        const imageBox = { x: 110, y: 170, w: 860, h: 860 };
+        // Puzzle image is the hero: large centered area (most of the card)
+        const padding = 40;
+        const imageBox = {
+          x: padding,
+          y: 70,
+          w: canvas.width - padding * 2,
+          h: 1000,
+        };
         ctx.fillStyle = "rgba(255,255,255,0.04)";
         ctx.fillRect(imageBox.x, imageBox.y, imageBox.w, imageBox.h);
-        // Scale image to fit within box, centered (object-fit: contain)
+        ctx.strokeStyle = palette.frame;
+        ctx.lineWidth = 6;
+        ctx.strokeRect(imageBox.x, imageBox.y, imageBox.w, imageBox.h);
         const imgW = img.naturalWidth;
         const imgH = img.naturalHeight;
         const scale = Math.min(imageBox.w / imgW, imageBox.h / imgH);
@@ -99,11 +102,13 @@ export function useShareCardImage() {
         const drawY = imageBox.y + (imageBox.h - drawH) / 2;
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
+        // Small title above image
         ctx.fillStyle = palette.accent;
         ctx.textAlign = "center";
-        ctx.font = "700 46px system-ui, sans-serif";
-        ctx.fillText("Phuzzle Completion Card", canvas.width / 2, 120);
+        ctx.font = "600 32px system-ui, sans-serif";
+        ctx.fillText("Phuzzle", canvas.width / 2, 48);
 
+        // Stats in a compact row at bottom
         const rankLabel = getRankFromPercentile(args.percentile);
         const percentileLabel =
           args.percentile && args.percentile.totalPlayers >= 5
@@ -115,9 +120,11 @@ export function useShareCardImage() {
           `Accuracy ${Math.max(0, Math.min(100, args.accuracyPercent))}%`,
           `Rank ${rankLabel} (${percentileLabel})`,
         ];
-        ctx.font = "600 34px system-ui, sans-serif";
+        ctx.font = "600 28px system-ui, sans-serif";
+        const statsY = 1110;
+        const lineHeight = 38;
         stats.forEach((line, i) => {
-          ctx.fillText(line, canvas.width / 2, 1100 + i * 56);
+          ctx.fillText(line, canvas.width / 2, statsY + i * lineHeight);
         });
 
         // No URL or link text on the image – link is only in the share message so it’s clickable for recipients.
@@ -130,9 +137,12 @@ export function useShareCardImage() {
           type: "image/png",
         });
 
-        const mins = Math.floor(args.elapsedSeconds / 60);
-        const minuteWord = mins === 1 ? "minute" : "minutes";
-        const shareText = `I beat this in ${mins} ${minuteWord}! How well can you do? Play the game here\n\n${playUrl}`;
+        const d = new Date();
+        const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const dateStr = `${monthNames[d.getMonth()]} ${d.getDate()}`;
+        const timeStr = formatTime(args.elapsedSeconds);
+        const acc = Math.max(0, Math.min(100, args.accuracyPercent));
+        const shareText = `🧩 Phuzzle — ${dateStr}\n⏱ ${timeStr}\n🎯 ${acc}% accuracy\n\nCan you beat it?\n\n${playUrl}`;
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({
             title: "My Phuzzle completion",

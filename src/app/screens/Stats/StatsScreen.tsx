@@ -83,19 +83,17 @@ export function StatsScreen() {
           weekSubview={state.weekSubview}
           shareCopied={state.shareCopied}
           albumShareCopied={state.albumShareCopied}
-          onBack={() => nav("/")}
+          onClose={() => nav("/")}
           onShareLeaderboard={handleShareLeaderboard}
           onShareWeeklyAlbum={handleShareWeeklyAlbum}
         />
 
-        {state.activeTab !== "leaderboard" && (
-          <StatsTabBar
-            activeTab={state.activeTab}
-            setActiveTab={state.setActiveTab}
-            isNarrow={isNarrow}
-            weeklyAlbumProgress={state.weeklyAlbumProgress}
-          />
-        )}
+        <StatsTabBar
+          activeTab={state.activeTab}
+          setActiveTab={state.setActiveTab}
+          isNarrow={isNarrow}
+          weeklyAlbumProgress={state.weeklyAlbumProgress}
+        />
 
         <div className={styles.cardContent} data-testid="stats-card-content">
           {state.loading ? (

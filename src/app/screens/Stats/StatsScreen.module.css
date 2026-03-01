@@ -91,21 +91,9 @@
   justify-content: center;
 }
 
-/* Leaderboard: Back | centered title | Filter + Share icons */
-.headerLeaderboard {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 10px;
-  align-items: center;
-}
-
-.headerLeaderboard .title {
-  justify-content: center;
-  text-align: center;
-}
-
+/* Leaderboard: title + Share + X (tabs stay visible below) */
 .headerLeaderboard .titleProgress {
-  display: none;
+  display: inline-flex;
 }
 
 .headerActions {

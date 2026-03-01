@@ -36,6 +36,7 @@ import {
   getDailyVisualModifier,
   getDailyPreferredModifier,
 } from "@/daily/dailyPuzzleCore";
+import { startDailyPuzzle } from "@/daily/dailyPuzzle";
 import { usePlayScreenManager, type ResumeChoice } from "./hooks/usePlayScreenManager";
 import { usePlayScreenShortcuts } from "./hooks/usePlayScreenShortcuts";
 import { usePlayScreenUI } from "./hooks/usePlayScreenUI";
@@ -71,6 +72,9 @@ import { SnapComboMeter } from "./components/SnapComboMeter";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
+const DAILY_PARAM = "daily";
+const GRID_PARAM = "grid";
+
 export function PlayScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -78,11 +82,28 @@ export function PlayScreen() {
   /** E2E only: ?e2eCompletion=1 forces the completion overlay to show for snapshot/assertion. */
   const showE2ECompletion = searchParams.get("e2eCompletion") === "1";
 
+  // Re-read from storage after applying /play?daily=1&grid=RxC so share links load same puzzle + difficulty
+  const [dailyLinkApplied, setDailyLinkApplied] = React.useState(false);
   const localGrid = useMemo(() => {
     const once = safeLocalStorage.getItem(GRID_ONCE_KEY);
     return parseGrid(once ?? safeLocalStorage.getItem(GRID_KEY));
-  }, []);
-  const localImageUrl = safeLocalStorage.getItem(STORAGE_KEY) ?? "";
+  }, [dailyLinkApplied]);
+  const localImageUrl = useMemo(
+    () => safeLocalStorage.getItem(STORAGE_KEY) ?? "",
+    [dailyLinkApplied],
+  );
+
+  useLayoutEffect(() => {
+    if (searchParams.get(DAILY_PARAM) !== "1") return;
+    const gridParam = searchParams.get(GRID_PARAM);
+    const grid = parseGrid(gridParam ?? null);
+    const result = startDailyPuzzle(grid);
+    if (result) {
+      safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
+      setDailyLinkApplied(true);
+      navigate("/play", { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   useEffect(() => {
     safeLocalStorage.removeItem(GRID_ONCE_KEY);
@@ -656,16 +677,46 @@ export function PlayScreen() {
     navigate("/new");
   }, [navigate]);
 
+  // Create a share session when puzzle is complete (non-daily, no co-op) so share link opens /play with same puzzle + difficulty
+  const [shareSessionId, setShareSessionId] = React.useState<string | null>(null);
+  useEffect(() => {
+    if (
+      !state?.isComplete ||
+      sessionId != null ||
+      isDailyPuzzleSession() ||
+      shareSessionId != null ||
+      !grid
+    )
+      return;
+    createSession(
+      safeLocalStorage.getItem(STORAGE_KEY) ?? "",
+      grid,
+      [],
+      0,
+    ).then((id) => {
+      if (id) setShareSessionId(id);
+    });
+  }, [state?.isComplete, sessionId, grid, shareSessionId, createSession]);
+
   const puzzleShareUrl = useMemo(() => {
-    if (isDailyPuzzleSession()) return "/daily";
+    if (shareSessionId) return `/play?${SESSION_ID_PARAM}=${shareSessionId}`;
+    if (isDailyPuzzleSession() && grid)
+      return `/play?${DAILY_PARAM}=1&${GRID_PARAM}=${grid.rows}x${grid.cols}`;
     if (sessionId) return `/play?${SESSION_ID_PARAM}=${sessionId}`;
     return "/";
-  }, [sessionId]);
+  }, [sessionId, shareSessionId, grid]);
 
+  const shareAccuracyPercent =
+    state?.totalCount && state.totalCount > 0
+      ? Math.round(
+          (state.totalCount / Math.max(moveCount, state.totalCount)) * 100,
+        )
+      : 100;
   const share = useShareResults({
     elapsedSeconds,
     state,
     puzzleShareUrl,
+    accuracyPercent: shareAccuracyPercent,
   });
   const handleSharePuzzle = usePlayScreenSharePuzzle({
     sessionId,

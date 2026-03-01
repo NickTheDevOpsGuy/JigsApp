@@ -1,7 +1,7 @@
 /**
- * Stats screen top bar: Back, title, optional share (leaderboard).
+ * Stats screen top bar: title, optional share (leaderboard), close (X) in upper right.
  */
-import { ArrowLeft, Share2 } from "lucide-react";
+import { Share2, X } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../StatsScreen.module.css";
 
@@ -15,7 +15,7 @@ interface StatsScreenHeaderProps {
   weekSubview: string;
   shareCopied: boolean;
   albumShareCopied: boolean;
-  onBack: () => void;
+  onClose: () => void;
   onShareLeaderboard: () => void;
   onShareWeeklyAlbum: () => void;
 }
@@ -28,7 +28,7 @@ export function StatsScreenHeader({
   weekSubview,
   shareCopied,
   albumShareCopied,
-  onBack,
+  onClose,
   onShareLeaderboard,
   onShareWeeklyAlbum,
 }: StatsScreenHeaderProps) {
@@ -54,18 +54,14 @@ export function StatsScreenHeader({
         activeTab === "leaderboard" ? styles.headerLeaderboard : ""
       }`}
     >
-      <Button size="sm" onClick={onBack}>
-        <ArrowLeft size={18} />
-        Back
-      </Button>
       <h1 className={styles.title}>
         {headerTitle}
         {activeTab === "leaderboard" && (
           <span className={styles.titleProgress}>{weeklyAlbumProgress}/7</span>
         )}
       </h1>
-      {activeTab === "leaderboard" ? (
-        <div className={styles.headerActions}>
+      <div className={styles.headerActions}>
+        {activeTab === "leaderboard" && (
           <Button
             size="sm"
             variant="secondary"
@@ -76,8 +72,18 @@ export function StatsScreenHeader({
           >
             <Share2 size={18} />
           </Button>
-        </div>
-      ) : null}
+        )}
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={onClose}
+          className={styles.headerIconBtn}
+          aria-label="Close"
+          title="Close"
+        >
+          <X size={20} />
+        </Button>
+      </div>
     </div>
   );
 }
