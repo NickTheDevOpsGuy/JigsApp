@@ -1,9 +1,29 @@
 /**
- * ProfileTab – display name, show on leaderboard, mastery info, prestige.
+ * ProfileTab – identity, streak, tier, stats, finished puzzles grid, daily mastery, settings.
  */
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/Button/Button";
+import { getBestTime } from "@/screens/Play/timeMode";
+import { formatDuration } from "../statsFormatting";
 import { prestigeReset } from "@/services/prestigeService";
 import styles from "../StatsScreen.module.css";
+
+function formatBestTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+/** Level to tier label e.g. 7 -> "Gold III" */
+function levelToTier(level: number): string {
+  if (level < 1) return "—";
+  const tiers = ["Bronze", "Silver", "Gold", "Platinum"];
+  const tierIndex = Math.min(Math.floor((level - 1) / 3), tiers.length - 1);
+  const rank = ((level - 1) % 3) + 1;
+  const roman = rank === 1 ? "I" : rank === 2 ? "II" : "III";
+  return `${tiers[tierIndex]} ${roman}`;
+}
 
 interface ProfileTabProps {
   profile: { displayName: string; showOnLeaderboard: boolean } | null;
@@ -13,10 +33,20 @@ interface ProfileTabProps {
   displayNameInput: string;
   setDisplayNameInput: (v: string) => void;
   raccoonName: string | null;
-  stats: { level?: number; masteryStreak?: number; [key: string]: unknown } | null;
+  stats: {
+    puzzlesCompleted?: number;
+    totalPlayTimeSeconds?: number;
+    dailyStreak?: number;
+    level?: number;
+    masteryStreak?: number;
+    [key: string]: unknown;
+  } | null;
+  weeklyAlbumSlots: { date: string; dayLabel: string; imageUrl: string | null; completed: boolean }[];
+  weeklyAlbumProgress: number;
   onSave: () => Promise<void>;
   profileSaving: boolean;
   loadData: () => Promise<void>;
+  onNavigateToBoard?: () => void;
 }
 
 export function ProfileTab({
@@ -26,72 +56,155 @@ export function ProfileTab({
   setDisplayNameInput,
   raccoonName,
   stats,
+  weeklyAlbumSlots,
+  weeklyAlbumProgress,
   onSave,
   profileSaving,
   loadData,
+  onNavigateToBoard,
 }: ProfileTabProps) {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const displayName = (displayNameInput.trim() || profile?.displayName || "Puzzler").slice(0, 32);
+  const identityName = raccoonName ?? displayName;
+  const streak = stats?.dailyStreak ?? 0;
+  const level = stats?.level ?? 1;
+  const tier = levelToTier(level);
+  const puzzles = stats?.puzzlesCompleted ?? 0;
+  const bestSeconds = getBestTime(4, 4);
+  const bestStr = bestSeconds != null ? formatBestTime(bestSeconds) : "—";
+  const totalTime = formatDuration(stats?.totalPlayTimeSeconds ?? 0);
+  const masteryCount = Math.min(7, weeklyAlbumProgress);
+
   return (
-    <div className={styles.section}>
-      <h2>Display Name</h2>
-      <p className={styles.hint}>Set your name to appear on leaderboards.</p>
-      <input
-        type="text"
-        className={styles.displayNameInput}
-        value={displayNameInput}
-        onChange={(e) => setDisplayNameInput(e.target.value)}
-        placeholder="Puzzler"
-        maxLength={32}
-        aria-label="Display name"
-      />
-      <div className={styles.profileRow}>
-        <label className={styles.checkboxLabel}>
-          <input
-            type="checkbox"
-            checked={profile?.showOnLeaderboard ?? true}
-            onChange={(e) =>
-              setProfile((p) => ({
-                ...p!,
-                showOnLeaderboard: e.target.checked,
-              }))
-            }
-          />
-          <span>Show my name on leaderboards</span>
-        </label>
-      </div>
-      {raccoonName && (
-        <p className={styles.raccoonPreview}>
-          🦝 Your raccoon name: <strong>{raccoonName}</strong>
+    <div className={styles.profileLayout}>
+      {/* Identity */}
+      <section className={styles.profileBlock}>
+        <p className={styles.profileIdentity}>
+          <span className={styles.profileRaccoon}>🦝</span>{" "}
+          <strong>{identityName}</strong>
         </p>
-      )}
-      <p className={styles.hint}>
-        🏅 Mastery badge: complete the daily puzzle with no hints and no undo. Current
-        mastery streak: <strong>{stats?.masteryStreak ?? 0}</strong>.
-      </p>
-      {stats && (stats.level ?? 1) >= 5 && (
-        <div className={styles.prestigeSection}>
-          <h3>Prestige</h3>
-          <p className={styles.hint}>
-            Reset to Level 1 and earn a rare cosmetic badge. Your puzzles completed and
-            challenge wins are kept.
-          </p>
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={async () => {
-              const result = await prestigeReset();
-              if (result) loadData();
-            }}
-          >
-            Prestige Reset ★
-          </Button>
+        <p className={styles.profileSubtitle}>Puzzler</p>
+        <p className={styles.profileStreak}>🔥 {streak} day streak</p>
+        <p className={styles.profileTier}>{tier}</p>
+      </section>
+
+      {/* Stats */}
+      <section className={styles.profileBlock}>
+        <h2 className={styles.profileBlockTitle}>Stats</h2>
+        <div className={styles.profileStatsRow}>
+          <span>Puzzles: {puzzles}</span>
+          <span>Best: {bestStr}</span>
         </div>
-      )}
-      <p className={styles.hint}>
-        Off = raccoon name on boards. You&apos;re still tracked.
-      </p>
-      <Button onClick={onSave} disabled={profileSaving} className={styles.saveBtn}>
-        {profileSaving ? "Saving…" : "Save"}
-      </Button>
+        <div className={styles.profileStatsRow}>
+          <span>Total Time: {totalTime}</span>
+        </div>
+      </section>
+
+      {/* Finished Puzzles */}
+      <section className={styles.profileBlock}>
+        <h2 className={styles.profileBlockTitle}>Finished Puzzles</h2>
+        <div className={styles.profilePuzzleGrid}>
+          {Array.from({ length: 8 }, (_, i) => {
+            const slot = weeklyAlbumSlots[i];
+            const filled = slot?.completed ?? false;
+            return (
+              <div
+                key={slot?.date ?? i}
+                className={`${styles.profilePuzzleSlot} ${filled ? styles.profilePuzzleSlotFilled : ""}`}
+                aria-hidden
+              >
+                {filled && slot?.imageUrl ? (
+                  <img src={slot.imageUrl} alt="" className={styles.profilePuzzleThumb} />
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+        {onNavigateToBoard && (
+          <button
+            type="button"
+            className={styles.profileViewAll}
+            onClick={onNavigateToBoard}
+          >
+            View All →
+          </button>
+        )}
+      </section>
+
+      {/* Daily Mastery */}
+      <section className={styles.profileBlock}>
+        <h2 className={styles.profileBlockTitle}>
+          Daily Mastery {masteryCount} / 7
+        </h2>
+        <div className={styles.profileMasteryBar} role="progressbar" aria-valuenow={masteryCount} aria-valuemin={0} aria-valuemax={7}>
+          <div
+            className={styles.profileMasteryFill}
+            style={{ width: `${(masteryCount / 7) * 100}%` }}
+          />
+        </div>
+      </section>
+
+      {/* Settings (expandable) */}
+      <section className={styles.profileBlock}>
+        <button
+          type="button"
+          className={styles.profileSettingsToggle}
+          onClick={() => setSettingsOpen((o) => !o)}
+          aria-expanded={settingsOpen}
+        >
+          Settings {settingsOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </button>
+        {settingsOpen && (
+          <div className={styles.profileSettingsContent}>
+            <p className={styles.hint}>Display name (for leaderboards)</p>
+            <input
+              type="text"
+              className={styles.displayNameInput}
+              value={displayNameInput}
+              onChange={(e) => setDisplayNameInput(e.target.value)}
+              placeholder="Puzzler"
+              maxLength={32}
+              aria-label="Display name"
+            />
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={profile?.showOnLeaderboard ?? true}
+                onChange={(e) =>
+                  setProfile((p) => ({
+                    ...p!,
+                    showOnLeaderboard: e.target.checked,
+                  }))
+                }
+              />
+              <span>Show my name on leaderboards</span>
+            </label>
+            <p className={styles.hint}>
+              Off = raccoon name on boards. You&apos;re still tracked.
+            </p>
+            <Button onClick={onSave} disabled={profileSaving} className={styles.saveBtn}>
+              {profileSaving ? "Saving…" : "Save"}
+            </Button>
+            {stats && (stats.level ?? 1) >= 5 && (
+              <>
+                <p className={styles.hint}>
+                  Prestige: reset to Level 1 and earn ★. Completions kept.
+                </p>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={async () => {
+                    const result = await prestigeReset();
+                    if (result) loadData();
+                  }}
+                >
+                  Prestige Reset ★
+                </Button>
+              </>
+            )}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

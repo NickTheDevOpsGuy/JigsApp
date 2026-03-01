@@ -5,7 +5,7 @@ import { Share2, X } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../StatsScreen.module.css";
 
-type StatsTab = "dashboard" | "profile" | "leaderboard" | "achievements";
+type StatsTab = "profile" | "leaderboard" | "achievements";
 
 interface StatsScreenHeaderProps {
   activeTab: StatsTab;

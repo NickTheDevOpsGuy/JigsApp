@@ -9,7 +9,7 @@ import styles from "./StatsScreen.module.css";
 import { isSupabaseConfigured, getSupabaseConfigStatus } from "@/supabase/client";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Loader } from "@/components/Loader";
-import { DashboardTab, ProfileTab, LeaderboardTab, AchievementsTab } from "./tabs";
+import { ProfileTab, LeaderboardTab, AchievementsTab } from "./tabs";
 import { StatsTabBar } from "./components/StatsTabBar";
 import { StatsScreenHeader } from "./components/StatsScreenHeader";
 import { useStatsScreenState, useStatsScreenData } from "./hooks";
@@ -23,22 +23,14 @@ export function StatsScreen() {
     useStatsScreenData(configured, state);
 
   const weeklyCompleted = Math.max(0, Math.min(7, state.weeklyAlbumProgress));
-  const weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
-  const masteryPuzzlesRemaining = Math.max(0, 1 - (state.stats?.masteryStreak ?? 0));
+  const _weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
+  const _masteryPuzzlesRemaining = Math.max(0, 1 - (state.stats?.masteryStreak ?? 0));
   const headerTitle =
     state.activeTab === "leaderboard"
-      ? isNarrow
-        ? "Board"
-        : "Leaderboard"
-      : state.activeTab === "dashboard"
-        ? isNarrow
-          ? "Dash"
-          : "Dashboard"
-        : state.activeTab === "profile"
-          ? "Profile"
-          : isNarrow
-            ? "Badges"
-            : "Achievements";
+      ? "Board"
+      : state.activeTab === "profile"
+        ? "Profile"
+        : "Badges";
 
   if (!configured) {
     const status = getSupabaseConfigStatus();
@@ -100,15 +92,6 @@ export function StatsScreen() {
             <Loader label="Loading stats…" />
           ) : (
             <>
-              {state.activeTab === "dashboard" && (
-                <DashboardTab
-                  stats={state.stats}
-                  weeklyAlbumProgress={state.weeklyAlbumProgress}
-                  weeklyRemaining={weeklyRemaining}
-                  masteryPuzzlesRemaining={masteryPuzzlesRemaining}
-                />
-              )}
-
               {state.activeTab === "profile" && (
                 <ProfileTab
                   profile={state.profile}
@@ -117,9 +100,12 @@ export function StatsScreen() {
                   setDisplayNameInput={state.setDisplayNameInput}
                   raccoonName={state.raccoonName}
                   stats={state.stats}
+                  weeklyAlbumSlots={state.weeklyAlbumSlots}
+                  weeklyAlbumProgress={state.weeklyAlbumProgress}
                   onSave={handleSaveProfile}
                   profileSaving={state.profileSaving}
                   loadData={loadData}
+                  onNavigateToBoard={() => state.setActiveTab("leaderboard")}
                 />
               )}
 

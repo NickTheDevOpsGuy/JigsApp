@@ -1,15 +1,15 @@
 /**
- * Tab bar for Stats screen: Dashboard, Profile, Leaderboard, Achievements.
+ * Tab bar for Stats screen: 3 tabs – Profile, Board, Badges.
  */
-import { BarChart3, Trophy, User, Award } from "lucide-react";
+import { Trophy, User, Award } from "lucide-react";
 import styles from "../StatsScreen.module.css";
 
-export type StatsTab = "dashboard" | "profile" | "leaderboard" | "achievements";
+export type StatsTab = "profile" | "leaderboard" | "achievements";
 
 export function StatsTabBar({
   activeTab,
   setActiveTab,
-  isNarrow,
+  isNarrow: _isNarrow,
   weeklyAlbumProgress,
 }: {
   activeTab: StatsTab;
@@ -19,14 +19,6 @@ export function StatsTabBar({
 }) {
   return (
     <div className={styles.tabs}>
-      <button
-        className={activeTab === "dashboard" ? styles.tabActive : ""}
-        onClick={() => setActiveTab("dashboard")}
-        aria-label="Dashboard"
-      >
-        <BarChart3 size={18} aria-hidden />
-        <span>{isNarrow ? "Dash" : "Dashboard"}</span>
-      </button>
       <button
         className={activeTab === "profile" ? styles.tabActive : ""}
         onClick={() => setActiveTab("profile")}
@@ -38,19 +30,19 @@ export function StatsTabBar({
       <button
         className={activeTab === "leaderboard" ? styles.tabActive : ""}
         onClick={() => setActiveTab("leaderboard")}
-        aria-label="Leaderboard"
+        aria-label="Board"
       >
         <Trophy size={18} aria-hidden />
-        <span>{isNarrow ? "Board" : "Leaderboard"}</span>
+        <span>Board</span>
         <span className={styles.tabMiniProgress}>{weeklyAlbumProgress}/7</span>
       </button>
       <button
         className={activeTab === "achievements" ? styles.tabActive : ""}
         onClick={() => setActiveTab("achievements")}
-        aria-label="Achievements"
+        aria-label="Badges"
       >
         <Award size={18} aria-hidden />
-        <span>{isNarrow ? "Badges" : "Achievements"}</span>
+        <span>Badges</span>
       </button>
     </div>
   );

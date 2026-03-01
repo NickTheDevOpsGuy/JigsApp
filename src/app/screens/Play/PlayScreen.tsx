@@ -703,7 +703,7 @@ export function PlayScreen() {
 
   const shareAccuracyPercent =
     state?.totalCount && state.totalCount > 0
-      ? Math.round((state.totalCount / Math.max(moveCount, state.totalCount)) * 100)
+      ? Math.round((state.totalCount / Math.max(moveCountRef.current, state.totalCount)) * 100)
       : 100;
   const share = useShareResults({
     elapsedSeconds,
@@ -737,7 +737,7 @@ export function PlayScreen() {
     dragPreview && state ? state.pieces.find((p) => p.id === dragPreview.pieceId) : null;
   const placed = state?.placedCount ?? 0;
   const total = state?.totalCount ?? 0;
-  const piecesOnBoard = state?.pieces.filter((p) => !p.inTray).length ?? 0;
+  const _piecesOnBoard = state?.pieces.filter((p) => !p.inTray).length ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
   const dailyVisualModifier = isDailyPuzzleSession()

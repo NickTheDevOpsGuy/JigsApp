@@ -48,7 +48,7 @@ export function useStatsScreenData(
     setAchievements,
     setLoading,
     setLeaderboardType,
-    setWeekSubview,
+    setWeekSubview: _setWeekSubview,
     setRaccoonName,
     setRowAnimEpoch,
     setProfileSaving,
@@ -146,10 +146,9 @@ export function useStatsScreenData(
     const nudgeKey = `phuzzle:weeklyAlbumNudge:${weekStart}`;
     if (safeLocalStorage.getItem(nudgeKey) === "true") {
       setLeaderboardType("week");
-      setWeekSubview("album");
       safeLocalStorage.removeItem(nudgeKey);
     }
-  }, [configured, activeTab, setLeaderboardType, setWeekSubview]);
+  }, [configured, activeTab, setLeaderboardType]);
 
   useEffect(() => {
     if (!configured || activeTab !== "leaderboard" || leaderboardType !== "today") return;

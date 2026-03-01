@@ -11,7 +11,6 @@ import type { LeaderboardType, WeekSubview, WeeklyAlbumSlot } from "../tabs";
 export type { LeaderboardType };
 
 const VALID_TABS: readonly StatsTab[] = [
-  "dashboard",
   "profile",
   "leaderboard",
   "achievements",
@@ -26,7 +25,7 @@ export function useStatsScreenState() {
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<StatsTab>(() => {
     if (isStatsTab(tabParam)) return tabParam;
-    return "dashboard";
+    return "profile";
   });
 
   const tabFromUrl = searchParams.get("tab");

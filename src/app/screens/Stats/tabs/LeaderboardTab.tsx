@@ -47,8 +47,8 @@ interface LeaderboardTabProps {
 export function LeaderboardTab({
   leaderboardType,
   setLeaderboardType,
-  weekSubview,
-  setWeekSubview,
+  weekSubview: _weekSubview,
+  setWeekSubview: _setWeekSubview,
   allTimeGrid,
   setAllTimeGrid,
   filtersOpen,
@@ -60,8 +60,8 @@ export function LeaderboardTab({
   leaderboard,
   weeklyTotalsLeaderboard,
   todayCompletionCount,
-  weeklyAlbumSlots,
-  weeklyAlbumProgress,
+  weeklyAlbumSlots: _weeklyAlbumSlots,
+  weeklyAlbumProgress: _weeklyAlbumProgress,
   weeklyCompleted,
   weekRangeLabel,
   loadData: _loadData,
@@ -167,35 +167,10 @@ export function LeaderboardTab({
             )}
           </div>
         )}
-        {leaderboardType === "week" && (
-          <div className={styles.weekSubviewSwitch}>
-            <button
-              type="button"
-              className={`${styles.weekSubviewBtn} ${
-                weekSubview === "rankings" ? styles.weekSubviewBtnActive : ""
-              }`}
-              onClick={() => setWeekSubview("rankings")}
-            >
-              Rankings
-            </button>
-            <button
-              type="button"
-              className={`${styles.weekSubviewBtn} ${
-                weekSubview === "album" ? styles.weekSubviewBtnActive : ""
-              }`}
-              onClick={() => setWeekSubview("album")}
-            >
-              Album
-            </button>
-          </div>
-        )}
       </div>
       {(leaderboardType === "week" || leaderboardType === "alltime") && (
         <h2 className={styles.leaderboardSubtitle}>
-          {leaderboardType === "week" &&
-            (weekSubview === "rankings"
-              ? `Weekly Rankings (${weekRangeLabel})`
-              : `Weekly Album (${weekRangeLabel})`)}
+          {leaderboardType === "week" && `Weekly Rankings (${weekRangeLabel})`}
           {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
         </h2>
       )}
@@ -204,7 +179,7 @@ export function LeaderboardTab({
           {todayCompletionCount} completion{todayCompletionCount !== 1 ? "s" : ""} so far
         </p>
       )}
-      {leaderboardType === "week" && weekSubview === "rankings" && (
+      {leaderboardType === "week" && (
         <div className={styles.weekProgressStrip}>
           <span>Weekly Album Progress</span>
           <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong> days
@@ -218,70 +193,12 @@ export function LeaderboardTab({
           compact,
         )}
       {leaderboardType === "week" &&
-        weekSubview === "rankings" &&
         renderCompletionList(
           weeklyTotalsLeaderboard,
           rowAnimEpoch,
           compact,
           "No completions in the last 7 days.",
         )}
-      {leaderboardType === "week" && weekSubview === "album" && (
-        <div
-          className={styles.weekAlbumWrap}
-          role="region"
-          aria-label="Weekly album: 7 daily puzzle thumbnails"
-        >
-          <h3 className={styles.weekAlbumTitle}>Weekly Album</h3>
-          <p className={styles.todayCompletionCount}>{weeklyAlbumProgress}/7 completed</p>
-          <div className={styles.weekAlbumGrid}>
-            {weeklyAlbumSlots.map((slot) => (
-              <div
-                key={slot.date}
-                className={`${styles.weekAlbumSlot} ${
-                  slot.completed ? styles.weekAlbumSlotDone : ""
-                } ${slot.isToday ? styles.weekAlbumSlotToday : ""} ${
-                  !slot.completed && slot.imageUrl ? styles.weekAlbumSlotThumb : ""
-                }`}
-              >
-                <div className={styles.weekAlbumTop}>
-                  <span>{slot.dayLabel}</span>
-                  {slot.completed && slot.mastery && (
-                    <span title="Mastery (no hints, no undo)">⚡</span>
-                  )}
-                </div>
-                <div className={styles.weekAlbumThumbWrap}>
-                  {slot.imageUrl ? (
-                    <img
-                      src={slot.imageUrl}
-                      alt={
-                        slot.completed
-                          ? `Daily puzzle for ${slot.dayLabel} – completed`
-                          : `Daily puzzle for ${slot.dayLabel}`
-                      }
-                      className={styles.weekAlbumImage}
-                    />
-                  ) : (
-                    <div className={styles.weekAlbumHidden}>?</div>
-                  )}
-                  {!slot.completed && (
-                    <div className={styles.weekAlbumOverlay} aria-hidden>
-                      {slot.isFuture ? "Locked" : "Missing"}
-                    </div>
-                  )}
-                </div>
-                <div className={styles.weekAlbumFooter}>
-                  {slot.completed ? "Collected" : slot.isFuture ? "Upcoming" : "Missing"}
-                </div>
-              </div>
-            ))}
-          </div>
-          {weeklyAlbumProgress === 7 && (
-            <div className={styles.weekBonusBadge}>
-              🏅 Full week complete! Bonus badge unlocked.
-            </div>
-          )}
-        </div>
-      )}
       {leaderboardType === "alltime" &&
         renderTimeList(
           leaderboard,

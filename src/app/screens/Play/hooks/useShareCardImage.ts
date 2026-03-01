@@ -137,25 +137,9 @@ export function useShareCardImage() {
           type: "image/png",
         });
 
-        const d = new Date();
-        const monthNames = [
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec",
-        ];
-        const dateStr = `${monthNames[d.getMonth()]} ${d.getDate()}`;
+        // Sharer’s time; playUrl = exact puzzle + difficulty (daily?grid= or session=)
         const timeStr = formatTime(args.elapsedSeconds);
-        const acc = Math.max(0, Math.min(100, args.accuracyPercent));
-        const shareText = `🧩 Phuzzle — ${dateStr}\n⏱ ${timeStr}\n🎯 ${acc}% accuracy\n\nCan you beat it?\n\n${playUrl}`;
+        const shareText = `That was ${timeStr} of focus. Can you do better?\n\n${playUrl}`;
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({
             title: "My Phuzzle completion",
