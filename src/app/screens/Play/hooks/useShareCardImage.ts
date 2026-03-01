@@ -138,7 +138,20 @@ export function useShareCardImage() {
         });
 
         const d = new Date();
-        const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const monthNames = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
         const dateStr = `${monthNames[d.getMonth()]} ${d.getDate()}`;
         const timeStr = formatTime(args.elapsedSeconds);
         const acc = Math.max(0, Math.min(100, args.accuracyPercent));

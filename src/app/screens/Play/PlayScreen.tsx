@@ -688,12 +688,7 @@ export function PlayScreen() {
       !grid
     )
       return;
-    createSession(
-      safeLocalStorage.getItem(STORAGE_KEY) ?? "",
-      grid,
-      [],
-      0,
-    ).then((id) => {
+    createSession(safeLocalStorage.getItem(STORAGE_KEY) ?? "", grid, [], 0).then((id) => {
       if (id) setShareSessionId(id);
     });
   }, [state?.isComplete, sessionId, grid, shareSessionId, createSession]);
@@ -708,9 +703,7 @@ export function PlayScreen() {
 
   const shareAccuracyPercent =
     state?.totalCount && state.totalCount > 0
-      ? Math.round(
-          (state.totalCount / Math.max(moveCount, state.totalCount)) * 100,
-        )
+      ? Math.round((state.totalCount / Math.max(moveCount, state.totalCount)) * 100)
       : 100;
   const share = useShareResults({
     elapsedSeconds,
