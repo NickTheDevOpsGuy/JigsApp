@@ -59,7 +59,7 @@ export function ProfileTab({
   setProfile,
   displayNameInput,
   setDisplayNameInput,
-  raccoonName,
+  raccoonName: _raccoonName,
   stats,
   weeklyAlbumSlots,
   weeklyAlbumProgress,
@@ -74,7 +74,6 @@ export function ProfileTab({
     profile?.displayName ||
     "Puzzler"
   ).slice(0, 32);
-  const identityName = raccoonName ?? displayName;
   const streak = stats?.dailyStreak ?? 0;
   const level = stats?.level ?? 1;
   const tier = levelToTier(level);
@@ -89,8 +88,7 @@ export function ProfileTab({
       {/* Identity */}
       <section className={styles.profileBlock}>
         <p className={styles.profileIdentity}>
-          <span className={styles.profileRaccoon}>🦝</span>{" "}
-          <strong>{identityName}</strong>
+          <strong>{displayName}</strong>
         </p>
         <p className={styles.profileSubtitle}>Puzzler</p>
         <p className={styles.profileStreak}>🔥 {streak} day streak</p>
@@ -198,9 +196,6 @@ export function ProfileTab({
               />
               <span>Show my name on leaderboards</span>
             </label>
-            <p className={styles.hint}>
-              Off = raccoon name on boards. You&apos;re still tracked.
-            </p>
             <Button onClick={onSave} disabled={profileSaving} className={styles.saveBtn}>
               {profileSaving ? "Saving…" : "Save"}
             </Button>
