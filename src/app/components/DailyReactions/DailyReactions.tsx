@@ -115,9 +115,7 @@ export function DailyReactions({ puzzleDate }: DailyReactionsProps) {
           <textarea
             placeholder="Share a thought… (280 chars)"
             value={commentText}
-            onChange={(e) =>
-              setCommentText(e.target.value.slice(0, MAX_COMMENT_LENGTH))
-            }
+            onChange={(e) => setCommentText(e.target.value.slice(0, MAX_COMMENT_LENGTH))}
             maxLength={MAX_COMMENT_LENGTH}
             rows={2}
             className={styles.textarea}
