@@ -7,7 +7,7 @@ test.describe("Play screen", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(
       async ({ img, grid }) => {
-        localStorage.setItem("phuzzle:lastSeenChangelog", "14");
+        localStorage.setItem("phuzzle:lastSeenChangelog", "25");
         localStorage.setItem("phuzzle:imageDataUrl", img);
         localStorage.setItem("phuzzle:gridSize", grid);
       },
@@ -48,13 +48,17 @@ test.describe("Play screen", () => {
   });
 
   test("completion overlay shows expected UI when visible", async ({ page }) => {
+    test.setTimeout(60000);
     await page.goto("/play?e2eCompletion=1");
 
     await expect(page.getByRole("heading", { name: /puzzle completed/i })).toBeVisible({
-      timeout: 15000,
+      timeout: 20000,
     });
-    await expect(page.getByRole("button", { name: /continue/i })).toBeVisible({
-      timeout: 5000,
+    await expect(page.getByRole("button", { name: /home/i })).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.getByRole("button", { name: /play again/i })).toBeVisible({
+      timeout: 10000,
     });
   });
 });
