@@ -62,8 +62,6 @@ export function useShareCardImage() {
         const playUrl = playPath.startsWith("http")
           ? playPath
           : `${PLAY_BASE}${playPath.startsWith("/") ? playPath : `/${playPath}`}`;
-        // Card image: brand name only (no URL). URL goes in the share message text so it’s clickable.
-        const brandLabel = "Phuzzle";
 
         const img = await loadImage(args.imageUrl);
         const canvas = document.createElement("canvas");
@@ -122,10 +120,7 @@ export function useShareCardImage() {
           ctx.fillText(line, canvas.width / 2, 1100 + i * 56);
         });
 
-        // Footer on card: brand only (no URL). Link is in the shared message text.
-        ctx.fillStyle = "rgba(255,255,255,0.7)";
-        ctx.font = "600 28px system-ui, sans-serif";
-        ctx.fillText(brandLabel, canvas.width / 2, 1240);
+        // No URL or link text on the image – link is only in the share message so it’s clickable for recipients.
 
         const blob = await new Promise<Blob | null>((resolve) =>
           canvas.toBlob(resolve, "image/png"),
@@ -135,8 +130,9 @@ export function useShareCardImage() {
           type: "image/png",
         });
 
-        const timeStr = formatTime(args.elapsedSeconds);
-        const shareText = `I beat this in ${timeStr}? How well can you do? Play the game here\n\n${playUrl}`;
+        const mins = Math.floor(args.elapsedSeconds / 60);
+        const minuteWord = mins === 1 ? "minute" : "minutes";
+        const shareText = `I beat this in ${mins} ${minuteWord}! How well can you do? Play the game here\n\n${playUrl}`;
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({
             title: "My Phuzzle completion",

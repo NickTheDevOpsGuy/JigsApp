@@ -32,8 +32,7 @@ export function CompletionSharePopup({
   return (
     <div className={styles.shareResultPopup}>
       <p className={styles.shareResultPopupCta} role="status">
-        When you share, the message will say something like “I beat this in 0:29? How well
-        can you do? Play the game here” with a clickable link below.
+        The share message will say something like: &ldquo;I beat this in X minutes! How well can you do? Play the game here&rdquo; followed by a clickable link. The link is only in the message, not on the card image.
       </p>
       <p className={styles.shareResultPopupCta}>
         <a

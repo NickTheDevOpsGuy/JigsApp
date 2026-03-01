@@ -88,12 +88,14 @@ export function StatsScreen() {
           onShareWeeklyAlbum={handleShareWeeklyAlbum}
         />
 
-        <StatsTabBar
-          activeTab={state.activeTab}
-          setActiveTab={state.setActiveTab}
-          isNarrow={isNarrow}
-          weeklyAlbumProgress={state.weeklyAlbumProgress}
-        />
+        {state.activeTab !== "leaderboard" && (
+          <StatsTabBar
+            activeTab={state.activeTab}
+            setActiveTab={state.setActiveTab}
+            isNarrow={isNarrow}
+            weeklyAlbumProgress={state.weeklyAlbumProgress}
+          />
+        )}
 
         <div className={styles.cardContent} data-testid="stats-card-content">
           {state.loading ? (

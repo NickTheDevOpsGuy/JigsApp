@@ -49,7 +49,11 @@ export function StatsScreenHeader({
       : "Share leaderboard";
 
   return (
-    <div className={styles.header}>
+    <div
+      className={`${styles.header} ${
+        activeTab === "leaderboard" ? styles.headerLeaderboard : ""
+      }`}
+    >
       <Button size="sm" onClick={onBack}>
         <ArrowLeft size={18} />
         Back
