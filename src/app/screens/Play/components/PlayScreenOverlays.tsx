@@ -86,7 +86,9 @@ export function PlayScreenOverlays({
   lastDbWriteMs,
   channelName,
 }: PlayScreenOverlaysProps) {
-  const [previewPosition, setPreviewPosition] = useState<{ x: number; y: number } | null>(null);
+  const [previewPosition, setPreviewPosition] = useState<{ x: number; y: number } | null>(
+    null,
+  );
   const dragStartRef = useRef<{
     clientX: number;
     clientY: number;
