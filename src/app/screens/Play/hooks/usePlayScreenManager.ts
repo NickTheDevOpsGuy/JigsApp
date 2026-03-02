@@ -28,6 +28,8 @@ export function usePlayScreenManager(
   countdownMinutes: number,
   lastInteractionRef: MutableRefObject<number>,
   resumeChoice: ResumeChoice,
+  /** When set, runSizing will not tear down the manager if the puzzle is already complete (prevents win bounce-back). */
+  stateRef?: MutableRefObject<PuzzleState | null>,
   options?: {
     initialSessionPieces?: import("@/puzzle/puzzleStorage").SavedPiece[];
     haptic?: (kind: "place" | "snap" | "rotate") => void;
@@ -131,6 +133,8 @@ export function usePlayScreenManager(
 
       const runSizing = () => {
         if (!mainEl || !boardEl) return;
+        // Never tear down when puzzle is complete (prevents win bounce-back when effect re-runs)
+        if (stateRef?.current?.isComplete) return;
         const rect = boardEl.getBoundingClientRect();
         const rectW = Math.floor(rect.width);
         const rectH = Math.floor(rect.height);

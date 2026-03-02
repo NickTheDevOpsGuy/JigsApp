@@ -259,6 +259,7 @@ export function PlayScreen() {
     countdownMinutes,
     lastInteractionRef,
     resumeChoice,
+    stateRef,
     {
       haptic: hapticsEnabled ? haptics.vibrate : undefined,
       themeRef,

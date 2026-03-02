@@ -633,9 +633,12 @@
   transition: width 0.2s ease;
 }
 
-/* No divider line between Daily Mastery and Settings */
-.profileBlockMastery {
+/* No divider line under Daily Mastery (or between it and Settings) */
+.profileBlock.profileBlockMastery {
   border-bottom: none;
+}
+.profileBlockMastery + .profileBlock {
+  border-top: none;
 }
 
 .profileSettingsToggle {
