@@ -80,7 +80,8 @@ export function ProfileTab({
   const tier = levelToTier(level);
   const puzzles = stats?.puzzlesCompleted ?? 0;
   const bestSeconds = getBestTime(4, 4);
-  const bestStr = bestSeconds != null ? formatBestTime(bestSeconds) : "—";
+  const bestStr =
+    bestSeconds != null ? formatBestTime(bestSeconds) : "Awaiting your first finish";
   const totalTime = formatDuration(stats?.totalPlayTimeSeconds ?? 0);
   const masteryCount = Math.min(7, weeklyAlbumProgress);
 
