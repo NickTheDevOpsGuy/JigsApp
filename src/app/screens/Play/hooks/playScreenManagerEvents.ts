@@ -3,6 +3,7 @@
  * Extracted from usePlayScreenManager to keep the hook file smaller.
  */
 import type { MutableRefObject } from "react";
+import type { Theme } from "@/hooks/useTheme";
 import type { Piece } from "@/puzzle/types";
 import type { PuzzleManagerEvents } from "@/puzzle/PuzzleManager";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
