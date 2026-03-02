@@ -691,7 +691,11 @@ export function PlayScreen() {
       return;
     const imgUrl = safeLocalStorage.getItem(STORAGE_KEY) ?? "";
     if (!imgUrl) return;
-    createPuzzleSession(imgUrl, grid, { pieces: [], elapsedSeconds: 0, isComplete: false })
+    createPuzzleSession(imgUrl, grid, {
+      pieces: [],
+      elapsedSeconds: 0,
+      isComplete: false,
+    })
       .then((result) => {
         if (!("error" in result)) setShareSessionId(result.sessionId);
       })

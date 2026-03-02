@@ -129,7 +129,9 @@ export function ProfileTab({
                       loading="lazy"
                     />
                   ) : filled ? (
-                    <span className={styles.profilePuzzlePlaceholder} aria-hidden>✓</span>
+                    <span className={styles.profilePuzzlePlaceholder} aria-hidden>
+                      ✓
+                    </span>
                   ) : null}
                 </div>
               );
