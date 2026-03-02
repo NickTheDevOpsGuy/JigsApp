@@ -237,11 +237,14 @@ export function usePlayScreenManager(
             clearPuzzleState();
             // next already has fresh pieces; no need to recreate
           }
-        } else if (options?.initialSessionPieces?.length) {
-          try {
-            next.restoreFromSaved(options.initialSessionPieces);
-          } catch (e) {
-            console.warn("Failed to restore session state:", e);
+        } else if (options?.initialSessionPieces !== undefined) {
+          /* Join flow: use session state only (empty array = new game). Do not restore from localStorage. */
+          if (options.initialSessionPieces.length > 0) {
+            try {
+              next.restoreFromSaved(options.initialSessionPieces);
+            } catch (e) {
+              console.warn("Failed to restore session state:", e);
+            }
           }
         }
 

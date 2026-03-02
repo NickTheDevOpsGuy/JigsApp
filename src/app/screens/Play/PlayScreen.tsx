@@ -70,6 +70,7 @@ import {
 } from "./components";
 import { SnapComboMeter } from "./components/SnapComboMeter";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
+import { createPuzzleSession } from "@/services/puzzleSessionService";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 const DAILY_PARAM = "daily";
@@ -264,9 +265,8 @@ export function PlayScreen() {
       haptic: hapticsEnabled ? haptics.vibrate : undefined,
       themeRef,
       onPlacementStreak: () => setShowStreakToast(true),
-      initialSessionPieces: session?.state?.pieces?.length
-        ? session.state.pieces
-        : undefined,
+      /* When joining via share link, use session state only (empty = new game). Never use localStorage. */
+      initialSessionPieces: session != null ? session.state.pieces : undefined,
       snapScaleRef,
       onSnapCheck: () => {
         perfStatsRef.current.snapCheckCount++;
@@ -678,7 +678,7 @@ export function PlayScreen() {
     navigate("/new");
   }, [navigate]);
 
-  // Create a share session when puzzle is complete (non-daily, no co-op) so share link opens /play with same puzzle + difficulty
+  // Create a share-only session when puzzle is complete (non-daily, no co-op) so share link opens a new game with same puzzle + difficulty. Do not switch current session.
   const [shareSessionId, setShareSessionId] = React.useState<string | null>(null);
   useEffect(() => {
     if (
@@ -689,10 +689,14 @@ export function PlayScreen() {
       !grid
     )
       return;
-    createSession(safeLocalStorage.getItem(STORAGE_KEY) ?? "", grid, [], 0).then((id) => {
-      if (id) setShareSessionId(id);
-    });
-  }, [state?.isComplete, sessionId, grid, shareSessionId, createSession]);
+    const imgUrl = safeLocalStorage.getItem(STORAGE_KEY) ?? "";
+    if (!imgUrl) return;
+    createPuzzleSession(imgUrl, grid, { pieces: [], elapsedSeconds: 0, isComplete: false })
+      .then((result) => {
+        if (!("error" in result)) setShareSessionId(result.sessionId);
+      })
+      .catch(() => {});
+  }, [state?.isComplete, sessionId, grid, shareSessionId]);
 
   const puzzleShareUrl = useMemo(() => {
     if (shareSessionId) return `/play?${SESSION_ID_PARAM}=${shareSessionId}`;

@@ -56,6 +56,8 @@ export function CompletionOverlay({
   isDaily = false,
   cutType = "classic",
   puzzleShareUrl = "/",
+  copied,
+  onCopyResults,
   onDownloadImage,
   onClose,
   onGoHome,
@@ -113,16 +115,17 @@ export function CompletionOverlay({
 
   return (
     <div className={styles.completeOverlay}>
-      <button
-        type="button"
-        className={styles.completeCloseBtn}
-        onClick={handleClose}
-        aria-label="Close"
-      >
-        <X size={24} />
-      </button>
-
       <div className={styles.completePanel}>
+        {!imageUrl && (
+          <button
+            type="button"
+            className={styles.completeCloseBtn}
+            onClick={handleClose}
+            aria-label="Close"
+          >
+            <X size={24} />
+          </button>
+        )}
         <h2 className={styles.completeTitle}>
           <span className={styles.completeTitleDot} aria-hidden="true">
             •
@@ -167,6 +170,14 @@ export function CompletionOverlay({
         {imageUrl && (
           <div className={styles.completeImageWrap}>
             <img src={imageUrl} alt="Completed puzzle" className={styles.completeImage} />
+            <button
+              type="button"
+              className={styles.completeCloseBtn}
+              onClick={handleClose}
+              aria-label="Close"
+            >
+              <X size={24} />
+            </button>
           </div>
         )}
 
@@ -200,6 +211,8 @@ export function CompletionOverlay({
         <CompletionSharePopup
           elapsedSeconds={elapsedSeconds}
           puzzleShareUrl={puzzleShareUrl ?? "/"}
+          copied={copied}
+          onCopyResults={onCopyResults}
           useSeasonalFrame={useSeasonalFrame}
           setUseSeasonalFrame={setUseSeasonalFrame}
           onShareCard={handleShareCard}

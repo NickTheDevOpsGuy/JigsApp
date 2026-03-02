@@ -47,32 +47,35 @@
   margin-top: 1.25rem;
 }
 
-/* Mobile: tighter layout, touch-friendly scroll */
+/* Mobile: compact layout, no scrollbar – fit within viewport */
 @media (max-width: 600px) {
   .content {
-    max-height: min(55vh, 400px);
-    padding-bottom: 1rem;
-    -webkit-overflow-scrolling: touch;
+    max-height: none;
+    overflow: visible;
+    padding-bottom: 0.25rem;
+    font-size: 0.9rem;
   }
 
   .section {
-    margin-bottom: 1rem;
+    margin-bottom: 0.6rem;
   }
 
   .sectionTitle {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
   }
 
   .list {
-    padding-left: 1.25rem;
+    padding-left: 1.1rem;
   }
 
   .item {
-    font-size: 0.9rem;
-    line-height: 1.55;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin-bottom: 0.35rem;
   }
 
   .actions {
-    margin-top: 1rem;
+    margin-top: 0.75rem;
   }
 }

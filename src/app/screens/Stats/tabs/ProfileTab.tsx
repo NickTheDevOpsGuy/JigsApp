@@ -112,7 +112,7 @@ export function ProfileTab({
         <section className={styles.profileBlock}>
           <h2 className={styles.profileBlockTitle}>Finished Puzzles</h2>
           <div className={styles.profilePuzzleGrid}>
-            {Array.from({ length: 8 }, (_, i) => {
+            {Array.from({ length: 7 }, (_, i) => {
               const slot = weeklyAlbumSlots[i];
               const filled = slot?.completed ?? false;
               return (
@@ -126,7 +126,10 @@ export function ProfileTab({
                       src={slot.imageUrl}
                       alt=""
                       className={styles.profilePuzzleThumb}
+                      loading="lazy"
                     />
+                  ) : filled ? (
+                    <span className={styles.profilePuzzlePlaceholder} aria-hidden>✓</span>
                   ) : null}
                 </div>
               );

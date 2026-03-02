@@ -76,7 +76,7 @@ export function useStatsScreenData(
       return {
         date,
         dayLabel: d.toLocaleDateString(undefined, { weekday: "short" }),
-        imageUrl: puzzle?.fullImage ?? null,
+        imageUrl: puzzle ? (puzzle.fullImage || puzzle.thumbnail || null) : null,
         completed: !!flags?.completed,
         mastery: !!flags?.mastery,
         isToday: date === today,

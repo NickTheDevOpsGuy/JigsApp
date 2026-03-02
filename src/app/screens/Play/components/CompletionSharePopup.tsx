@@ -1,8 +1,9 @@
 /**
- * Share Result modal content: seasonal frame toggle, Share Card PNG, Download, and clickable play link.
+ * Share Result modal content: share text + Copy (old layout), seasonal frame, Share Card PNG, Download.
  */
-import { Image, Download } from "lucide-react";
+import { Copy, Image, Download } from "lucide-react";
 import { Button } from "@/components/Button/Button";
+import { formatTime } from "../playUtils";
 import styles from "../PlayScreen.module.css";
 
 const PLAY_BASE = "https://phuzzle.vercel.app";
@@ -10,6 +11,8 @@ const PLAY_BASE = "https://phuzzle.vercel.app";
 interface CompletionSharePopupProps {
   elapsedSeconds: number;
   puzzleShareUrl: string;
+  copied?: boolean;
+  onCopyResults?: () => void;
   useSeasonalFrame: boolean;
   setUseSeasonalFrame: (v: boolean) => void;
   onShareCard: () => void;
@@ -18,7 +21,10 @@ interface CompletionSharePopupProps {
 }
 
 export function CompletionSharePopup({
+  elapsedSeconds,
   puzzleShareUrl,
+  copied = false,
+  onCopyResults,
   useSeasonalFrame,
   setUseSeasonalFrame,
   onShareCard,
@@ -28,19 +34,29 @@ export function CompletionSharePopup({
   const playUrl = puzzleShareUrl.startsWith("http")
     ? puzzleShareUrl
     : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
+  const shareText = `That was ${formatTime(elapsedSeconds)} of focus. Can you do better?\n\n${playUrl}`;
 
   return (
     <div className={styles.shareResultPopup}>
-      <p className={styles.shareResultPopupCta}>
-        <a
-          href={playUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.shareResultPopupUrlLink}
-        >
-          {playUrl}
-        </a>
-      </p>
+      <div className={styles.shareResultPopupTextBlock}>
+        <textarea
+          readOnly
+          value={shareText}
+          className={styles.shareResultPopupTextarea}
+          aria-label="Share message"
+          rows={4}
+        />
+        {onCopyResults && (
+          <Button
+            variant="primary"
+            onClick={onCopyResults}
+            className={styles.shareResultPopupBtn}
+          >
+            <Copy size={18} />
+            {copied ? "Copied!" : "Copy"}
+          </Button>
+        )}
+      </div>
       <label className={styles.shareResultPopupToggle}>
         <input
           type="checkbox"

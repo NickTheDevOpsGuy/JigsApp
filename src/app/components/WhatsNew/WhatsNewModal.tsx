@@ -7,7 +7,7 @@ import { Button } from "@/components/Button/Button";
 import { CHANGELOG_ENTRIES, markChangelogSeen } from "@/data/changelog";
 import styles from "./WhatsNewModal.module.css";
 
-const MAX_FEATURES = 4;
+const MAX_FEATURES = 2;
 
 type WhatsNewModalProps = {
   isOpen: boolean;

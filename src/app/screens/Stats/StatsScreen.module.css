@@ -605,6 +605,17 @@
   display: block;
 }
 
+.profilePuzzlePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 1.5rem;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-card);
+}
+
 .profileViewAll {
   background: none;
   border: none;
