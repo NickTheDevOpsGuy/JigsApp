@@ -158,7 +158,10 @@ export function ProfileTab({
             <p className={styles.profileGalleryEmptyText}>
               Solve one to build your personal gallery.
             </p>
-            <Link to="/play" className={styles.profileGalleryEmptyBtn}>
+            <Link
+              to="/play?daily=1&grid=4x4"
+              className={styles.profileGalleryEmptyBtn}
+            >
               Start Today's Puzzle
             </Link>
           </div>
@@ -168,18 +171,6 @@ export function ProfileTab({
       {/* Daily Mastery */}
       <section className={`${styles.profileBlock} ${styles.profileBlockMastery}`}>
         <h2 className={styles.profileBlockTitle}>Daily Mastery {masteryCount} / 7</h2>
-        <div
-          className={styles.profileMasteryBar}
-          role="progressbar"
-          aria-valuenow={masteryCount}
-          aria-valuemin={0}
-          aria-valuemax={7}
-        >
-          <div
-            className={styles.profileMasteryFill}
-            style={{ width: `${(masteryCount / 7) * 100}%` }}
-          />
-        </div>
       </section>
 
       {/* Settings (expandable) */}
