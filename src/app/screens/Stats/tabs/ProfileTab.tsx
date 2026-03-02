@@ -158,10 +158,7 @@ export function ProfileTab({
             <p className={styles.profileGalleryEmptyText}>
               Solve one to build your personal gallery.
             </p>
-            <Link
-              to="/play?daily=1&grid=4x4"
-              className={styles.profileGalleryEmptyBtn}
-            >
+            <Link to="/play?daily=1&grid=4x4" className={styles.profileGalleryEmptyBtn}>
               Start Today's Puzzle
             </Link>
           </div>
