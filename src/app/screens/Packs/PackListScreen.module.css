@@ -18,6 +18,8 @@
   border-radius: 16px;
   padding: 16px 20px;
   box-shadow: var(--shadow-md);
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .cardScroll {

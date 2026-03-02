@@ -2,7 +2,7 @@
  * PlayScreenOverlays – preview panel, immersive peek, tutorial, shortcuts modal,
  * drag preview, toasts, profiler, coop debug. Keeps PlayScreen.tsx smaller.
  */
-import React from "react";
+import React, { useCallback, useRef, useState } from "react";
 import type { Piece, PuzzleState } from "@/puzzle/types";
 import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
@@ -86,6 +86,58 @@ export function PlayScreenOverlays({
   lastDbWriteMs,
   channelName,
 }: PlayScreenOverlaysProps) {
+  const [previewPosition, setPreviewPosition] = useState<{ x: number; y: number } | null>(null);
+  const dragStartRef = useRef<{
+    clientX: number;
+    clientY: number;
+    originX: number;
+    originY: number;
+  } | null>(null);
+  const didDragRef = useRef(false);
+
+  const onPreviewPointerDown = useCallback((e: React.PointerEvent) => {
+    if (e.button !== 0) return;
+    const el = e.currentTarget as HTMLElement;
+    const rect = el.getBoundingClientRect();
+    setPreviewPosition((prev) => prev ?? { x: rect.left, y: rect.top });
+    dragStartRef.current = {
+      clientX: e.clientX,
+      clientY: e.clientY,
+      originX: rect.left,
+      originY: rect.top,
+    };
+    didDragRef.current = false;
+    el.setPointerCapture?.(e.pointerId);
+  }, []);
+
+  const onPreviewPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!dragStartRef.current) return;
+    const { clientX, clientY, originX, originY } = dragStartRef.current;
+    didDragRef.current = true;
+    setPreviewPosition({
+      x: originX + (e.clientX - clientX),
+      y: originY + (e.clientY - clientY),
+    });
+  }, []);
+
+  const onPreviewPointerUp = useCallback((e: React.PointerEvent) => {
+    const el = e.currentTarget as HTMLElement;
+    try {
+      el.releasePointerCapture?.(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    dragStartRef.current = null;
+  }, []);
+
+  const onPreviewClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!didDragRef.current) onPreviewTap(e);
+      didDragRef.current = false;
+    },
+    [onPreviewTap],
+  );
+
   return (
     <>
       {(showPreview || progressiveRevealMode) && previewImage && state && (
@@ -93,12 +145,25 @@ export function PlayScreenOverlays({
           className={styles.previewPanel}
           role="button"
           tabIndex={0}
-          aria-label="Reference image, tap to reveal region"
+          aria-label="Reference image, tap to reveal region. Drag to move."
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") e.preventDefault();
           }}
-          onClick={onPreviewTap}
-          title="Tap to highlight matching pieces in drawer"
+          onClick={onPreviewClick}
+          onPointerDown={onPreviewPointerDown}
+          onPointerMove={onPreviewPointerMove}
+          onPointerUp={onPreviewPointerUp}
+          onPointerCancel={onPreviewPointerUp}
+          style={
+            previewPosition
+              ? {
+                  left: previewPosition.x,
+                  top: previewPosition.y,
+                  right: "auto",
+                }
+              : undefined
+          }
+          title="Tap to highlight matching pieces. Drag to move."
         >
           {progressiveRevealMode && state?.pieces ? (
             <ProgressivePreviewOverlay

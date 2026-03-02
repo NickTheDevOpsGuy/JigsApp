@@ -27,6 +27,7 @@
   gap: 10px;
   padding: 0 12px;
   padding-top: env(safe-area-inset-top, 0);
+  min-width: 0;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -38,7 +39,8 @@
 
 .topBarWrap {
   flex-shrink: 0;
-  overflow: visible;
+  overflow-x: hidden;
+  overflow-y: visible;
   max-height: 56px;
   transition: max-height 0.25s ease;
   position: relative;
@@ -322,6 +324,7 @@
   justify-content: center;
   min-width: 0;
   overflow: hidden;
+  flex-wrap: nowrap;
 }
 
 .hudPill {
@@ -662,6 +665,8 @@
   align-items: center;
   justify-content: center;
   z-index: 100;
+  touch-action: none;
+  cursor: move;
 }
 
 .previewImage {
@@ -886,6 +891,15 @@
   }
   .hudPillTimer .timerSuffix {
     display: none;
+  }
+  .hudPill {
+    min-width: 0;
+  }
+  .hudPill span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 4.5em;
   }
   .board {
     border-width: 2px;

@@ -141,6 +141,12 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
       return;
     }
 
+    /* Bring piece to front on tap so it never appears trapped under others */
+    if (piece && !piece.isPlaced) {
+      manager.raiseGroupToFront(pieceId);
+      setState(manager.getState());
+    }
+
     selectedIdRef.current = pieceId;
     setSelectedPieceId(pieceId);
     bump();

@@ -18,3 +18,10 @@
 .canvas:hover {
   border-color: var(--color-border-strong);
 }
+
+/* Hide minimap on mobile to avoid grey box over puzzle and trapped pieces */
+@media (max-width: 600px) {
+  .wrap {
+    display: none;
+  }
+}

@@ -295,6 +295,13 @@ export class PuzzleManager {
     );
   }
 
+  /** Raise this piece's group to front on tap so it never appears trapped under others. */
+  public raiseGroupToFront(pieceId: string): void {
+    const p = this.findPiece(pieceId);
+    if (!p || p.isPlaced) return;
+    this.bumpGroupZ(p.groupId);
+  }
+
   private getGroupBounds(groupId: string) {
     return getGroupBoundsUtil(this.state.pieces, groupId);
   }

@@ -80,8 +80,8 @@ export function ProfileTab({
   const tier = levelToTier(level);
   const puzzles = stats?.puzzlesCompleted ?? 0;
   const bestSeconds = getBestTime(4, 4);
-  const bestStr =
-    bestSeconds != null ? formatBestTime(bestSeconds) : "Awaiting your first finish";
+  const hasBest = bestSeconds != null;
+  const bestStr = hasBest ? formatBestTime(bestSeconds) : "—";
   const totalTime = formatDuration(stats?.totalPlayTimeSeconds ?? 0);
   const masteryCount = Math.min(7, weeklyAlbumProgress);
 
@@ -97,12 +97,17 @@ export function ProfileTab({
         <p className={styles.profileTier}>{tier}</p>
       </section>
 
-      {/* Stats */}
+      {/* Stats: Puzzles + Best (4×4) on one line, Total Time below */}
       <section className={styles.profileBlock}>
         <h2 className={styles.profileBlockTitle}>Stats</h2>
         <div className={styles.profileStatsRow}>
           <span>Puzzles: {puzzles}</span>
-          <span>Best: {bestStr}</span>
+          <span>
+            Best (4×4):{" "}
+            <span className={!hasBest ? styles.profileStatMuted : undefined}>
+              {bestStr}
+            </span>
+          </span>
         </div>
         <div className={styles.profileStatsRow}>
           <span>Total Time: {totalTime}</span>
