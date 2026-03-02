@@ -2,6 +2,7 @@
  * ProfileTab – identity, streak, tier, stats, finished puzzles grid, daily mastery, settings.
  */
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { getBestTime } from "@/screens/Play/timeMode";
@@ -107,47 +108,62 @@ export function ProfileTab({
         </div>
       </section>
 
-      {/* Finished Puzzles – only show when user has at least one completion */}
-      {puzzles > 0 && (
-        <section className={styles.profileBlock}>
-          <h2 className={styles.profileBlockTitle}>Finished Puzzles</h2>
-          <div className={styles.profilePuzzleGrid}>
-            {Array.from({ length: 7 }, (_, i) => {
-              const slot = weeklyAlbumSlots[i];
-              const filled = slot?.completed ?? false;
-              return (
-                <div
-                  key={slot?.date ?? i}
-                  className={`${styles.profilePuzzleSlot} ${filled ? styles.profilePuzzleSlotFilled : ""}`}
-                  aria-hidden
-                >
-                  {filled && slot?.imageUrl ? (
-                    <img
-                      src={slot.imageUrl}
-                      alt=""
-                      className={styles.profilePuzzleThumb}
-                      loading="lazy"
-                    />
-                  ) : filled ? (
-                    <span className={styles.profilePuzzlePlaceholder} aria-hidden>
-                      ✓
-                    </span>
-                  ) : null}
-                </div>
-              );
-            })}
+      {/* Finished Puzzles – gallery when any completed, empty state otherwise */}
+      <section className={styles.profileBlock}>
+        <h2 className={styles.profileBlockTitle}>Finished Puzzles</h2>
+        {puzzles > 0 ? (
+          <>
+            <div className={styles.profilePuzzleGrid}>
+              {Array.from({ length: 7 }, (_, i) => {
+                const slot = weeklyAlbumSlots[i];
+                const filled = slot?.completed ?? false;
+                return (
+                  <div
+                    key={slot?.date ?? i}
+                    className={`${styles.profilePuzzleSlot} ${filled ? styles.profilePuzzleSlotFilled : ""}`}
+                    aria-hidden
+                  >
+                    {filled && slot?.imageUrl ? (
+                      <img
+                        src={slot.imageUrl}
+                        alt=""
+                        className={styles.profilePuzzleThumb}
+                        loading="lazy"
+                      />
+                    ) : filled ? (
+                      <span className={styles.profilePuzzlePlaceholder} aria-hidden>
+                        ✓
+                      </span>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+            {onNavigateToBoard && (
+              <button
+                type="button"
+                className={styles.profileViewAll}
+                onClick={onNavigateToBoard}
+              >
+                View All →
+              </button>
+            )}
+          </>
+        ) : (
+          <div className={styles.profileGalleryEmpty}>
+            <span className={styles.profileGalleryEmptyIcon} aria-hidden>
+              🧩
+            </span>
+            <p className={styles.profileGalleryEmptyTitle}>No finished puzzles yet</p>
+            <p className={styles.profileGalleryEmptyText}>
+              Solve one to build your personal gallery.
+            </p>
+            <Link to="/play" className={styles.profileGalleryEmptyBtn}>
+              Start Today's Puzzle
+            </Link>
           </div>
-          {onNavigateToBoard && (
-            <button
-              type="button"
-              className={styles.profileViewAll}
-              onClick={onNavigateToBoard}
-            >
-              View All →
-            </button>
-          )}
-        </section>
-      )}
+        )}
+      </section>
 
       {/* Daily Mastery */}
       <section className={`${styles.profileBlock} ${styles.profileBlockMastery}`}>

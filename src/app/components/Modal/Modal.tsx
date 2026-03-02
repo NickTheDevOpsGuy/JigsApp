@@ -18,8 +18,8 @@ type ModalProps = {
   title?: string;
   children: React.ReactNode;
   showCloseButton?: boolean;
-  /** "tutorial" for wider modal, softer shadow, stronger blur */
-  variant?: "default" | "tutorial";
+  /** "tutorial" for wider modal, softer shadow, stronger blur. "compact" for small content, no scroll on mobile. */
+  variant?: "default" | "tutorial" | "compact";
 };
 
 export function Modal({
@@ -103,7 +103,7 @@ export function Modal({
     >
       <div
         ref={modalRef}
-        className={`${styles.modal} ${variant === "tutorial" ? styles.modalTutorial : ""}`.trim()}
+        className={`${styles.modal} ${variant === "tutorial" ? styles.modalTutorial : ""} ${variant === "compact" ? styles.modalCompact : ""}`.trim()}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
         role="dialog"
@@ -130,7 +130,7 @@ export function Modal({
           </div>
         )}
         <div
-          className={`${styles.content} ${variant === "tutorial" ? styles.contentTutorial : ""}`.trim()}
+          className={`${styles.content} ${variant === "tutorial" ? styles.contentTutorial : ""} ${variant === "compact" ? styles.contentCompact : ""}`.trim()}
         >
           {children}
         </div>

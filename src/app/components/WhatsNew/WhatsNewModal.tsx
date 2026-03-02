@@ -26,6 +26,7 @@ export function WhatsNewModal({ isOpen, onClose }: WhatsNewModalProps) {
       onClose={handleClose}
       title="What's New"
       showCloseButton={true}
+      variant="compact"
     >
       <div
         className={styles.content}

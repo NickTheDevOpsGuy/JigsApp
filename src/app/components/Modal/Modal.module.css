@@ -130,6 +130,10 @@
   overscroll-behavior-y: contain;
 }
 
+.contentCompact {
+  /* Base: same as default */
+}
+
 @media (max-width: 600px) {
   .overlay {
     padding: 12px;
@@ -163,6 +167,16 @@
     overscroll-behavior-y: contain;
     min-height: 0;
     min-width: 0;
+  }
+
+  .modalCompact {
+    max-height: none;
+  }
+
+  .contentCompact {
+    overflow: visible;
+    padding: 12px 16px;
+    min-height: 0;
   }
 }
 
