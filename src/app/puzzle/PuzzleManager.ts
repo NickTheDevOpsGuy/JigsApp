@@ -289,7 +289,10 @@ export class PuzzleManager {
   /** Bump the group's z so it draws on top of other pieces (never pops behind connected). */
   private bumpGroupZ(groupId: string): void {
     this.zCounter += 1;
-    this.updatePieces((p) => p.groupId === groupId, () => ({ z: this.zCounter }));
+    this.updatePieces(
+      (p) => p.groupId === groupId,
+      () => ({ z: this.zCounter }),
+    );
   }
 
   private getGroupBounds(groupId: string) {
