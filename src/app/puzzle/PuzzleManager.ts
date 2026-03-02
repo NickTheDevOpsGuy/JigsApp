@@ -286,6 +286,12 @@ export class PuzzleManager {
     );
   }
 
+  /** Bump the group's z so it draws on top of other pieces (never pops behind connected). */
+  private bumpGroupZ(groupId: string): void {
+    this.zCounter += 1;
+    this.updatePieces((p) => p.groupId === groupId, () => ({ z: this.zCounter }));
+  }
+
   private getGroupBounds(groupId: string) {
     return getGroupBoundsUtil(this.state.pieces, groupId);
   }
@@ -730,6 +736,7 @@ export class PuzzleManager {
     // Set directly to exact target positions (no intermediate shift) so the lock lerp
     // animates smoothly from drag-end to final position without a visible half-step.
     this.setGroupToExactTargetPositions(gid);
+    this.bumpGroupZ(gid);
 
     const wasLocked = new Set(groupPieces.filter((p) => p.locked).map((p) => p.id));
     this.updatePieces(
@@ -781,6 +788,9 @@ export class PuzzleManager {
 
     this.shiftGroupUnclamped(gid, result.dx, result.dy);
     this.mergeGroups(gid, result.intoGroupId);
+    // Align merged group to exact grid so pieces line up (no fractional drift at seams)
+    this.setGroupToExactTargetPositions(result.intoGroupId);
+    this.bumpGroupZ(result.intoGroupId);
 
     this.trySnapMergedGroupToBoard(result.intoGroupId);
     const mergedPieces = this.getGroupPieces(result.intoGroupId);
@@ -822,6 +832,7 @@ export class PuzzleManager {
 
     // Set directly to exact target so lock/place animation doesn't show a half-step.
     this.setGroupToExactTargetPositions(groupId);
+    this.bumpGroupZ(groupId);
   }
 
   private rand(min: number, max: number) {

@@ -40,7 +40,7 @@ export function useSnapComboAnnouncer(
 
   useEffect(() => {
     if (!announcerLine) return;
-    const t = setTimeout(() => setAnnouncerLine(null), 4_000);
+    const t = setTimeout(() => setAnnouncerLine(null), 3_000);
     return () => clearTimeout(t);
   }, [announcerLine]);
 

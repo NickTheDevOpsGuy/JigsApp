@@ -137,13 +137,6 @@ export function DailyCountdown({
           <span className={styles.time}>{display}</span>
         </>
       )}
-      {celebrating && (
-        <div className={styles.confetti} aria-hidden>
-          {[...Array(12)].map((_, i) => (
-            <span key={i} className={styles.confettiPiece} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

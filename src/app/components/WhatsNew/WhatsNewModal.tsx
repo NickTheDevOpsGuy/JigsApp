@@ -1,10 +1,13 @@
 /**
  * WhatsNewModal – changelog/release notes, marks as seen on close.
+ * Shows at most MAX_FEATURES items to keep the screen short.
  */
 import { Modal } from "@/components/Modal/Modal";
 import { Button } from "@/components/Button/Button";
 import { CHANGELOG_ENTRIES, markChangelogSeen } from "@/data/changelog";
 import styles from "./WhatsNewModal.module.css";
+
+const MAX_FEATURES = 4;
 
 type WhatsNewModalProps = {
   isOpen: boolean;
@@ -34,7 +37,7 @@ export function WhatsNewModal({ isOpen, onClose }: WhatsNewModalProps) {
           <div key={i} className={styles.section}>
             <h3 className={styles.sectionTitle}>{section.title}</h3>
             <ul className={styles.list}>
-              {section.items.map((item, j) => (
+              {section.items.slice(0, MAX_FEATURES).map((item, j) => (
                 <li key={j} className={styles.item}>
                   {item}
                 </li>

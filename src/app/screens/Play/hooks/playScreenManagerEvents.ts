@@ -7,10 +7,7 @@ import type { Piece } from "@/puzzle/types";
 import type { PuzzleManagerEvents } from "@/puzzle/PuzzleManager";
 import type { SnapParticle } from "@/puzzle/canvas/renderBoardHelpers";
 import { soundManager } from "@/audio/sounds";
-import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { getQuadrant } from "../timeMode";
-import type { Theme } from "@/hooks/useTheme";
-import { CONFETTI_COLORS_BY_THEME } from "@/data/confettiColors";
 
 const PLACEMENT_STREAK_MS = 3000;
 const STREAK_COOLDOWN_MS = 5000;
@@ -154,28 +151,7 @@ export function createPlayScreenManagerEvents(
       ref.current = { groupId, pieceIds, triggeredAt: now };
     },
     onPuzzleComplete: () => {
-      clearPuzzleState();
       soundManager.play("complete");
-      const opts = optionsRef.current;
-      const prefersReducedMotion =
-        typeof window !== "undefined" &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const batterySaver = opts?.batterySaverMode ?? false;
-      if (!prefersReducedMotion && !batterySaver) {
-        const pieceCount = grid.rows * grid.cols;
-        const particleCount = Math.min(280, Math.max(60, Math.floor(pieceCount * 3.5)));
-        const spread = pieceCount <= 16 ? 50 : pieceCount <= 36 ? 65 : 80;
-        const theme = optionsRef.current?.themeRef?.current ?? "light";
-        const colors = CONFETTI_COLORS_BY_THEME[theme];
-        import("canvas-confetti").then((confetti) => {
-          confetti.default({
-            particleCount,
-            spread,
-            origin: { y: 0.6 },
-            colors,
-          });
-        });
-      }
     },
   };
 }

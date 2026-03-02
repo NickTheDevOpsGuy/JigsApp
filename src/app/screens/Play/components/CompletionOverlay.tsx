@@ -12,7 +12,6 @@ import { DailyReactions } from "@/components/DailyReactions";
 import { CompletionSharePopup } from "./CompletionSharePopup";
 import { CompletionStatsBlock } from "./CompletionStatsBlock";
 import { CompletionOverlayActions } from "./CompletionOverlayActions";
-import { useCompletionConfetti } from "./useCompletionConfetti";
 import { useCompletionOverlayData } from "./useCompletionOverlayData";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -71,8 +70,6 @@ export function CompletionOverlay({
     onClose();
     onPlayAgain?.();
   }, [onClose, onPlayAgain]);
-
-  useCompletionConfetti();
 
   const data = useCompletionOverlayData({
     elapsedSeconds,

@@ -56,7 +56,7 @@ export function usePlayScreenMilestones(
 
   useEffect(() => {
     if (!milestoneMessage) return;
-    const t = setTimeout(() => setMilestoneMessage(null), 4_000);
+    const t = setTimeout(() => setMilestoneMessage(null), 3_000);
     return () => clearTimeout(t);
   }, [milestoneMessage]);
 

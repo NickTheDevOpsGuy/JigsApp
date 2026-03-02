@@ -4,6 +4,15 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
+## Recent: UX polish (hints, win screen, What's New)
+
+- **Hint toasts** – All hint and onboarding toasts (including combo and milestone) auto-dismiss after 3 seconds.
+- **Win screen** – No confetti; completion overlay shows image, stats, share section, and cycling message/badge only.
+- **Piece draw order** – Newly snapped/placed pieces always draw on top of connected pieces (no pop-behind).
+- **What's New** – Modal shows at most 4 items to keep the screen short.
+
+---
+
 ## Recent: Share screen and win screen
 
 - **Win screen messages** — Below “Puzzle Completed!” a cycling positive message (e.g. “You did it!”, “Nailed it!”, “Puzzle master!”) varies by puzzle and time. When you beat your best time, “New best time!” is shown; otherwise a performance badge (e.g. Speed Demon, Precision Pro, Chill Mode) may appear.
@@ -39,8 +48,8 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Snap proximity glow** – Visual feedback while dragging: glow intensifies as you near the correct snap point
 - Reference image preview (full or progressive reveal mode)
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
-- Completion confetti (layered bursts) and percentile badges (Top 10% / 25% / 50%); dynamic completion badges (Speed Demon, Chill Mode, etc.)
-- **Completion screen** — Redesigned: larger puzzle image, stats (Time, Moves, Accuracy, Rank), cycling positive message below title (“You did it!”, “Nailed it!”, etc.); “New best time!” when you beat your record, or a performance badge when not. Share section (Continue dropdown opens upward; Share Result button only; no URL on the overlay). Puzzle URL (phuzzle.vercel.app) is on the **share card** image (Share Result → Share Card PNG). Confetti on win (theme-colored; respects reduced motion and battery saver). Share Result opens popup (Share Card PNG, Seasonal frame, Download).
+- Percentile badges (Top 10% / 25% / 50%); dynamic completion badges (Speed Demon, Chill Mode, etc.)
+- **Completion screen** — Redesigned: larger puzzle image, stats (Time, Moves, Accuracy, Rank), cycling positive message below title (“You did it!”, “Nailed it!”, etc.); “New best time!” when you beat your record, or a performance badge when not. Share section (Continue dropdown opens upward; Share Result button only; no URL on the overlay). Puzzle URL (phuzzle.vercel.app) is on the **share card** image (Share Result → Share Card PNG). Share Result opens popup (Share Card PNG, Seasonal frame, Download).
 - **Smooth lock** — When pieces snap to the board they ease into place over ~100ms (desktop and mobile) instead of jumping.
 - **Mobile tray** — Tray height on small screens reduced (175px / 195px for large puzzles) to give the board more space.
 - Settings: **About** (Help), **Display** (Theme, piece shape, board options, effects), **Gameplay** (Controls, time), **Audio**, **Advanced**
@@ -52,16 +61,16 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Snap combo meter** – Appears when 2+ placements within 2.5s; breaks on idle
 - **Fog modifier** – Daily visual modifier “Fog”: unplaced pieces are foggy; placed pieces gain full clarity (per-piece fog on board). Preview and tray keep global fog.
 - **Streak flame** – When placement streak triggers (“On fire!”), subtle flame animation (flicker + glow).
-- **Hint screens** – All hint and onboarding toasts (first piece, tray tip, zoom tip, streak, share, milestone, combo) auto-dismiss after 4 seconds (user can still dismiss earlier).
+- **Hint screens** – All hint and onboarding toasts (first piece, tray tip, zoom tip, streak, share, milestone, combo) auto-dismiss after 3 seconds (user can still dismiss earlier).
 - **Alternate piece shapes** – Classic, Irregular, Hard (Settings → Gameplay → Piece Shape submenu; "Applies to next puzzle")
 - **Progressive reveal** – Hide full reference; reveal only regions where pieces are correctly placed
-- Battery-saver detection (reduces confetti when low-power or data-saver)
+- Battery-saver detection (reduces heavy animations when low-power or data-saver)
 - Six themes (Light, Dark, Space, Ocean, Forest, Sunset)
 - **Skip to main content** — Link at top (visible on keyboard focus); Tab from top to jump past nav; activating the link scrolls to and focuses `<main id="main">`. See `doc/LIGHTHOUSE.md` for a11y audit notes.
 - Keyboard navigation in hamburger menu (Arrow keys, Escape)
 - Haptic feedback (tap, snap, place, rotate)
 - Sound effects (toggle in Audio)
-- `prefers-reduced-motion` support (CSS animations and confetti/tray pulse disabled)
+- `prefers-reduced-motion` support (CSS animations and tray pulse disabled)
 - Loading spinners on Stats and Packs while data loads
 
 ## Social and progress

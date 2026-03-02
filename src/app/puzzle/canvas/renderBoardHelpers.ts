@@ -217,6 +217,11 @@ export function computeImageSourceRect(
   let srcY = p.row * srcTileH - topPad;
   let srcW = srcTileW + leftPad + rightPad;
   let srcH = srcTileH + topPad + bottomPad;
+  // Round to integer pixels so drawImage samples cleanly and adjacent pieces align at seams
+  srcX = Math.round(srcX);
+  srcY = Math.round(srcY);
+  srcW = Math.round(srcW);
+  srcH = Math.round(srcH);
   let destX = 0;
   let destY = 0;
   let destW = p.w;

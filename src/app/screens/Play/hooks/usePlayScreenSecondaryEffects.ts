@@ -102,8 +102,8 @@ export function usePlayScreenSecondaryEffects({
     }
   }, [showStreakToast, state?.grid, isCoarsePointer, timeMode, onFireCapturedRef]);
 
-  // Hint/toast screens auto-dismiss after 4 seconds
-  const HINT_DISMISS_MS = 4_000;
+  // Hint/toast screens auto-dismiss after 3 seconds
+  const HINT_DISMISS_MS = 3_000;
   useEffect(() => {
     if (!showStreakToast) return;
     const t = setTimeout(() => setShowStreakToast(false), HINT_DISMISS_MS);
