@@ -244,6 +244,7 @@ export function usePlayScreenAnimation(args: {
       let lockLerpOverrides: Map<string, { x: number; y: number }> | undefined;
       if (!isDragging) {
         const lastPos = lastPiecePositionsRef.current;
+        const maxTravel = Math.max(assembledW, assembledH) * 1.5;
         for (const p of st.pieces) {
           if (p.inTray) continue;
           const lockAt = lockMap.get(p.id);
@@ -252,12 +253,17 @@ export function usePlayScreenAnimation(args: {
           if (elapsed >= LOCK_LERP_MS) continue;
           const from = lastPos.get(p.id);
           if (from == null) continue;
+          const dx = p.x - from.x;
+          const dy = p.y - from.y;
+          if (Math.hypot(dx, dy) > maxTravel) continue;
           const t = Math.min(1, elapsed / LOCK_LERP_MS);
-          const ease = 1 - (1 - t) * (1 - t);
+          const ease = 1 - (1 - t) ** 3;
+          const lerpX = from.x + dx * ease;
+          const lerpY = from.y + dy * ease;
           lockLerpOverrides ??= new Map();
           lockLerpOverrides.set(p.id, {
-            x: from.x + (p.x - from.x) * ease,
-            y: from.y + (p.y - from.y) * ease,
+            x: Math.min(Math.max(lerpX, Math.min(from.x, p.x)), Math.max(from.x, p.x)),
+            y: Math.min(Math.max(lerpY, Math.min(from.y, p.y)), Math.max(from.y, p.y)),
           });
         }
       }

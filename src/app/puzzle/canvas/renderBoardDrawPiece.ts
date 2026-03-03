@@ -47,8 +47,8 @@ export function drawGhostHints(
     const tileX = p.x + p.pad;
     const tileY = p.y + p.pad;
     const atTarget =
-      Math.round(tileX) === p.targetX &&
-      Math.round(tileY) === p.targetY &&
+      Math.abs(tileX - p.targetX) <= 1 &&
+      Math.abs(tileY - p.targetY) <= 1 &&
       p.rotation === p.targetRotation;
 
     if (atTarget) continue;

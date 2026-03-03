@@ -88,6 +88,19 @@
   transition: max-height 0.25s ease;
   position: relative;
   z-index: 200;
+  scrollbar-width: none;
+}
+
+.topBarWrap::-webkit-scrollbar {
+  display: none;
+}
+
+.topBar {
+  scrollbar-width: none;
+}
+
+.topBar::-webkit-scrollbar {
+  display: none;
 }
 
 .topBarWrap.immersiveTopHidden {
@@ -650,6 +663,7 @@
   max-width: 100%;
   max-height: 100%;
   position: relative;
+  isolation: isolate;
   background: var(--color-bg-elevated);
   border-radius: var(--radius-board, 20px);
   border: 2px solid var(--color-border);
@@ -1378,6 +1392,308 @@
   background: var(--color-bg-elevated);
 }
 
+/* New success screen layout + animation */
+.completePanelNew {
+  max-width: min(420px, 92vw);
+  padding: 24px 20px 20px;
+  gap: 16px;
+  animation: completePanelEnter 0.4s ease-out both;
+}
+
+.completePanelNew .completeCloseBtn {
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1;
+  padding: 0;
+}
+
+.completePanelNew .completeCloseBtn:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+
+.completePanelNew .completeCloseBtn:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.completeTitleNew {
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(1.25rem, 4vw, 1.6rem);
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+}
+
+.completeTimeBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
+}
+
+.completeTimeBlock.completeTimeVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.completeTimeValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-brand-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.completeTimeValue svg {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.completeTimeLabel {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.completeImageWrapNew {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0.96);
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
+    box-shadow 0.5s ease-out;
+}
+
+.completeImageWrapNew.completeImageScaled {
+  transform: scale(1);
+}
+
+.completeImageWrapNew.completeImageGlow {
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    0 0 24px rgba(34, 197, 94, 0.25),
+    0 0 48px rgba(34, 197, 94, 0.12);
+}
+
+.completeImageNew {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(50vh, 260px);
+  object-fit: cover;
+  object-position: center;
+}
+
+.completeStatsNew {
+  margin: 0;
+  padding: 0;
+}
+
+.completeStatsLine {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.completePrimaryActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.completePrimaryActions .completePrimaryBtn:only-child {
+  grid-column: 1 / -1;
+}
+
+.completePrimaryBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 12px;
+  min-height: 64px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.15s;
+}
+
+.completePrimaryBtn:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-strong);
+}
+
+.completePrimaryBtn:first-child {
+  background: var(--color-progress-75, #22c55e);
+  color: #fff;
+  border-color: transparent;
+}
+
+.completePrimaryBtn:first-child:hover {
+  background: var(--color-progress-90, #16a34a);
+  color: #fff;
+}
+
+.completePrimaryBtnSecondary {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.completePrimaryBtnSecondary:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-strong);
+}
+
+.completePrimaryBtnTitle {
+  font-size: 1rem;
+}
+
+.completePrimaryBtnSub {
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.completeSecondaryActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.completeSecondaryLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+
+.completeSecondaryLink:hover {
+  color: var(--color-brand-primary);
+  background: var(--color-bg-elevated);
+}
+
+.completePlayTomorrowBtn {
+  width: 100%;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.completePlayTomorrowBtn:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-strong);
+}
+
+.completeHomeBtn {
+  width: 100%;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.completeHomeBtn:hover {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+}
+
+@keyframes completePanelEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 500px), (max-height: 600px) {
+  .completePanelNew {
+    padding: 18px 14px 16px;
+    gap: 12px;
+  }
+  .completePrimaryActions {
+    gap: 8px;
+  }
+  .completePrimaryBtn {
+    min-height: 56px;
+    padding: 10px 8px;
+  }
+  .completePrimaryBtnTitle {
+    font-size: 0.9rem;
+  }
+  .completePrimaryBtnSub {
+    font-size: 0.75rem;
+  }
+}
+
 @media (max-width: 600px) {
   .completePanel {
     padding: 12px 14px;
@@ -1999,6 +2315,14 @@
   gap: 8px;
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
+  background: var(--color-progress-75, #22c55e) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.completeActionsShareBtn:hover:not(:disabled) {
+  background: var(--color-progress-90, #16a34a) !important;
+  color: #fff !important;
 }
 
 .completeActions .completeShareLink {
@@ -2077,13 +2401,106 @@
   height: 14px;
 }
 
-/* Share Result popup (inside completion overlay modal) */
+/* Share panel inline on completion overlay (no modal) */
+.shareResultInline {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  padding: 8px 0 0;
+}
+
+.shareResultInlineBack {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  align-self: flex-start;
+}
+
+.shareResultInlineBack:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.shareResultInlineHint {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.35;
+}
+
+/* Share popup: Home + two share buttons side by side; readable contrast */
 .shareResultPopup {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 12px;
-  padding: 4px 0;
+  gap: 14px;
+  padding: 8px 0;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  border-radius: 12px;
+  min-width: 280px;
+}
+
+.shareResultPopupHomeBtn {
+  width: 100%;
+  min-height: 48px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  justify-content: center;
+}
+
+.shareResultPopupRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.shareResultPopupSideBtn {
+  min-height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.shareResultPopupDownloadLink {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.shareResultPopupDownloadLink:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
 }
 
 .shareResultPopupTextBlock {
@@ -2284,6 +2701,7 @@
   overflow-y: auto;
   overflow-x: visible;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -2293,6 +2711,10 @@
   padding: 8px 0;
   z-index: 1100;
   animation: menuFadeIn 0.15s ease;
+}
+
+.headerMenuPanel::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes menuFadeIn {

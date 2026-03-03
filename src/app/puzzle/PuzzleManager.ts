@@ -59,6 +59,9 @@ export type PuzzleManagerOptions = {
   isMobile?: boolean;
   /** Piece cut style (classic, irregular, hard). */
   cutType?: PieceCutType;
+  /** Top-left of assembled puzzle in board space (for centering). Default 0,0. */
+  targetStartX?: number;
+  targetStartY?: number;
 };
 
 export type PuzzleManagerEvents = {
@@ -108,8 +111,8 @@ export class PuzzleManager {
   private tileW: number;
   private tileH: number;
 
-  private readonly targetStartX: number = 0;
-  private readonly targetStartY: number = 0;
+  private readonly targetStartX: number;
+  private readonly targetStartY: number;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {
@@ -119,10 +122,12 @@ export class PuzzleManager {
       grid,
       pieceWidth,
       pieceHeight,
+      targetStartX = 0,
+      targetStartY = 0,
       scatterPadding = 16,
       pad = 18,
-      snapToleranceBoardPx = 34,
-      snapToleranceNeighborPx = 48,
+      snapToleranceBoardPx = 46,
+      snapToleranceNeighborPx = 60,
       snapScaleRef,
       relaxedToleranceMultiplierRef,
       snapToleranceOverrideRef,
@@ -150,6 +155,8 @@ export class PuzzleManager {
     this.pad = Math.max(pad, minPad);
     this.tileW = pieceWidth;
     this.tileH = pieceHeight;
+    this.targetStartX = targetStartX;
+    this.targetStartY = targetStartY;
 
     this.drag = { activeId: null, offsetX: 0, offsetY: 0, preview: null };
     this.zCounter = 10;
@@ -307,13 +314,13 @@ export class PuzzleManager {
     );
   }
 
-  /** Set every piece in the group to its exact target position on the canvas (no rounding drift). */
+  /** Set every piece in the group to its exact target position (no rounding, so pieces line up 100%). */
   private setGroupToExactTargetPositions(groupId: string): void {
     this.updatePieces(
       (p) => !p.inTray && p.groupId === groupId,
       (p) => ({
-        x: Math.round(p.targetX - p.pad),
-        y: Math.round(p.targetY - p.pad),
+        x: p.targetX - p.pad,
+        y: p.targetY - p.pad,
       }),
     );
   }

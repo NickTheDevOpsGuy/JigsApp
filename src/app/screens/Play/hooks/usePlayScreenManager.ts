@@ -148,11 +148,13 @@ export function usePlayScreenManager(
         const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
         const isMobile = viewportW < 600;
 
-        // Canvas drives piece size: piece dimensions from container rect
+        // Integer tile size so pieces align with no gaps (fixes 2x2 and small grids)
         const boardW = rectW;
         const boardH = rectH;
-        const pieceWidth = boardW / grid.cols;
-        const pieceHeight = boardH / grid.rows;
+        const pieceWidth = Math.max(1, Math.floor(boardW / grid.cols));
+        const pieceHeight = Math.max(1, Math.floor(boardH / grid.rows));
+        const targetStartX = (boardW - grid.cols * pieceWidth) / 2;
+        const targetStartY = (boardH - grid.rows * pieceHeight) / 2;
 
         const savedState = loadPuzzleState();
         const hasSavedGame =
@@ -182,6 +184,8 @@ export function usePlayScreenManager(
         popMapRef.current.clear();
         lockMapRef.current.clear();
         snapParticlesRef.current = [];
+        placementTimesRef.current = [];
+        setSnapCombo(0);
         const canvas = canvasRef.current;
         if (canvas) {
           const ctx = canvas.getContext("2d");
@@ -224,6 +228,8 @@ export function usePlayScreenManager(
             grid,
             pieceWidth,
             pieceHeight,
+            targetStartX,
+            targetStartY,
             isMobile,
             cutType,
             snapScaleRef: opts?.snapScaleRef,

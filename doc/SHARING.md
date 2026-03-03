@@ -15,7 +15,7 @@ This works **without Supabase**.
 - Uses the Web Share API on supported mobile browsers
 - Can export a PNG of the completed puzzle with a time overlay
 - **Share text** includes a nag line with your actual time: "Can you beat my run of X:XX seconds?" and a **link to the exact puzzle** (phuzzle.vercel.app/daily for daily, or phuzzle.vercel.app/play?session=… for a session) so friends can play the same puzzle
-- **Win overlay share section**: **Share Result** button only (no URL on the overlay). The puzzle URL (phuzzle.vercel.app) is on the **share card image** (Share Result → Share Card PNG). Popup offers “Challenge a friend” CTA, Share Card PNG (seasonal frame, branded footer with game link), and Download
+- **Win overlay share section**: **Share Result** opens the same share panel as Challenge: Copy link, **Share Card** (a capture of your result — image to share with others), and Download. **Challenge Friend** uses native share or copy with the challenge link. The puzzle URL is on the share card image.
 
 **Key files**
 
@@ -27,9 +27,8 @@ This works **without Supabase**.
   - Adds a footer like: `🧩 Phuzzle - {pieces} pieces in {time}`
 - `src/app/screens/Play/hooks/useShareCardImage.ts`
   - Share Card PNG with seasonal frame, nag line + full play URL on card, and branded footer (phuzzle.vercel.app)
-- `src/app/screens/Play/components/CompletionOverlay.tsx`, `CompletionSharePopup.tsx`
-  - UI: Win overlay shows nag "Can you beat my run of X:XX seconds?"; Share Result opens modal with completion card preview, nag, "Play at {url}" link, Share Card PNG, Download, “Challenge a friend” CTA
-  - Share card image built in `useShareCardImage.ts` (nag + exact puzzle URL on card). Wires the overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
+- `src/app/screens/Play/components/CompletionOverlay.tsx`
+  - UI: Win overlay; Share Result opens inline panel (no modal) with Copy link, Share Card (capture of your result to share), Download. Challenge Friend triggers native share/copy with challenge link. Share card image built in `useShareCardImage.ts`. Wires overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
 
 **How it's triggered**
 

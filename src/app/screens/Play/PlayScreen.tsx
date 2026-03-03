@@ -392,7 +392,7 @@ export function PlayScreen() {
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [state?.pieces?.length]);
+  }, [state?.pieces?.length, completionDismissed]);
 
   useEffect(() => {
     undoCountRef.current = 0;
@@ -651,6 +651,41 @@ export function PlayScreen() {
     startMs: number;
   } | null>(null);
 
+  const screenToBoard = React.useCallback(
+    (clientX: number, clientY: number, boardRect: DOMRect) => {
+      const cssX = clientX - boardRect.left;
+      const cssY = clientY - boardRect.top;
+      const cssW = boardRect.width;
+      const cssH = boardRect.height;
+      const first = state?.pieces?.[0];
+      const assembledW = first && state?.grid ? state.grid.cols * first.tileW : 0;
+      const assembledH = first && state?.grid ? state.grid.rows * first.tileH : 0;
+      const piece00 = state?.pieces?.find((p) => p.row === 0 && p.col === 0);
+      const boardOffsetX = piece00 ? piece00.pad - piece00.targetX : 0;
+      const boardOffsetY = piece00 ? piece00.pad - piece00.targetY : 0;
+      const fitScale =
+        assembledW > 0 && assembledH > 0
+          ? Math.min(1, cssW / assembledW, cssH / assembledH)
+          : 1;
+      let vx = (cssX - cssW / 2) / fitScale + assembledW / 2;
+      let vy = (cssY - cssH / 2) / fitScale + assembledH / 2;
+      vx = (vx - viewport.viewport.panX) / viewport.viewport.scale;
+      vy = (vy - viewport.viewport.panY) / viewport.viewport.scale;
+      return {
+        x: vx - boardOffsetX,
+        y: vy - boardOffsetY,
+      };
+    },
+    [
+      state?.pieces,
+      state?.grid,
+      viewport.viewport.panX,
+      viewport.viewport.panY,
+      viewport.viewport.scale,
+      viewport.screenToBoard,
+    ],
+  );
+
   const {
     handlePointerDown,
     handlePointerMove,
@@ -689,7 +724,7 @@ export function PlayScreen() {
     onDragEnded: () => {
       dragStartTimeRef.current = null;
     },
-    screenToBoard: viewport.screenToBoard,
+    screenToBoard,
     viewport,
   });
 
@@ -1063,7 +1098,7 @@ export function PlayScreen() {
                       <span>Loading puzzle…</span>
                     </div>
                   )}
-                  <SnapComboMeter combo={snapCombo} />
+                  {!state?.isComplete && <SnapComboMeter combo={snapCombo} />}
                   <canvas
                     key={puzzleKey}
                     className={styles.canvas}

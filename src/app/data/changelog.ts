@@ -1,13 +1,15 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "26";
+export const CHANGELOG_VERSION = "27";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📐 Puzzle in canvas – The complete puzzle is always centered and scaled to fit the board so it never clips.",
+      "📤 Share Result – Same share panel as Challenge: Copy link, Share Card (a capture of your result to share), and Download; Challenge Friend uses native share/copy with the challenge link.",
       "🧘 Zen Ambient – Toggle in Settings → Modes: no timer or rankings, subtle animated background, softer transitions for a pressure-free play.",
       "🕵️ Mystery Mode – Hide the full reference image; sections reveal only after you place pieces correctly (Settings → Modes).",
       "🎯 Precision Mode – Snap distance is scored; completion overlay shows average precision (px) and bonus points for tight snaps (Settings → Modes).",

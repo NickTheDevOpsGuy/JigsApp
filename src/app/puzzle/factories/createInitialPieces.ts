@@ -244,8 +244,9 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     const col = i % grid.cols;
     const row = Math.floor(i / grid.cols);
 
-    const targetX = Math.round(targetStartX + col * tileW);
-    const targetY = Math.round(targetStartY + row * tileH);
+    // Exact positions so tiles abut with no gaps (fixes 2x2 and small grids)
+    const targetX = targetStartX + col * tileW;
+    const targetY = targetStartY + row * tileH;
 
     const startInTray = trayIndices.has(i);
     const rawPos = positions[i];

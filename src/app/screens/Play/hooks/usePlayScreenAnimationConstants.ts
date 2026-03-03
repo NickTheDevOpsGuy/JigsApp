@@ -5,8 +5,8 @@
 /** Lerp factor for smooth drag position (0–1; higher = snappier). */
 export const DRAG_LERP = 0.32;
 
-/** Duration of lock-place ease animation (ms). */
-export const LOCK_LERP_MS = 140;
+/** Duration of lock-place ease animation (ms). Longer + smooth easing so lock feels good in any direction. */
+export const LOCK_LERP_MS = 240;
 
 /** When idle: throttle redraw to this FPS for 50+ piece puzzles. */
 export const IDLE_TARGET_FPS = 30;

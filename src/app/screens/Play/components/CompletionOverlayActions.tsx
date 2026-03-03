@@ -1,9 +1,8 @@
 /**
- * Completion overlay actions: Home and Restart as visible buttons, plus Share.
- * No dropdown, no Continue – so Home and Restart are always visible under the menu.
+ * Completion overlay actions: Home and Share (Share is primary green).
  */
 import { useState, useEffect } from "react";
-import { Share2, Home, RotateCcw } from "lucide-react";
+import { Share2, Home } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../PlayScreen.module.css";
 
@@ -18,10 +17,9 @@ interface CompletionOverlayActionsProps {
 }
 
 export function CompletionOverlayActions({
-  onPlayAgain,
   onGoHome,
   onShareClick,
-  isNarrow,
+  isNarrow: _isNarrow,
 }: CompletionOverlayActionsProps) {
   const [shareRevealed, setShareRevealed] = useState(false);
 
@@ -34,7 +32,7 @@ export function CompletionOverlayActions({
     <div className={styles.completeActions}>
       {onGoHome != null && (
         <Button
-          variant="primary"
+          variant="secondary"
           onClick={onGoHome}
           className={styles.completeActionsTrigger}
           aria-label="Home"
@@ -43,22 +41,11 @@ export function CompletionOverlayActions({
           <span>Home</span>
         </Button>
       )}
-      {onPlayAgain != null && (
-        <Button
-          variant="primary"
-          onClick={onPlayAgain}
-          className={styles.completeActionsTrigger}
-          aria-label="Play again"
-        >
-          <RotateCcw size={20} />
-          <span>Play again</span>
-        </Button>
-      )}
       <Button
-        variant="secondary"
+        variant="primary"
         onClick={onShareClick}
         className={styles.completeActionsShareBtn}
-        aria-label="Share Result"
+        aria-label="Share"
         style={{
           opacity: shareRevealed ? 1 : 0,
           pointerEvents: shareRevealed ? "auto" : "none",
@@ -66,7 +53,7 @@ export function CompletionOverlayActions({
         }}
       >
         <Share2 size={20} />
-        {isNarrow ? "Share" : "Share Result"}
+        Share
       </Button>
     </div>
   );

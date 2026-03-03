@@ -25,7 +25,7 @@
   min-height: 0;
   background: var(--color-bg-card);
   border-radius: 16px;
-  padding: 16px 20px;
+  padding: 14px 20px 10px;
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
@@ -36,7 +36,7 @@
 .cardBody {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
   overflow-x: hidden;
 }
@@ -49,18 +49,18 @@
 
   .card {
     max-width: 640px;
-    padding: 20px 28px;
+    padding: 18px 28px 14px;
   }
 
   .cardBody {
-    gap: 12px;
+    gap: 8px;
   }
 
   .preview {
-    width: min(320px, 38vh);
-    height: min(320px, 38vh);
-    min-height: 200px;
-    margin: 4px 0;
+    width: min(420px, 54vw, 48vh);
+    height: min(420px, 54vw, 48vh);
+    min-height: 240px;
+    margin: 2px 0;
   }
 }
 
@@ -134,10 +134,10 @@
 }
 
 .preview {
-  min-height: 100px;
-  height: min(36vw, 32vh, 200px);
+  min-height: 160px;
+  height: min(62vw, 54vh, 320px);
   min-width: 0;
-  width: min(36vw, 32vh, 200px);
+  width: min(62vw, 54vh, 320px);
   aspect-ratio: 1 / 1;
   align-self: center;
   border-radius: 12px;
@@ -148,7 +148,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin: 4px 0;
+  margin: 2px 0;
 }
 
 .previewEmpty {
@@ -173,8 +173,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1.35fr;
   gap: 8px;
-  margin-top: 4px;
-  padding-top: 12px;
+  margin-top: 0;
+  padding-top: 8px;
   border-top: 1px solid var(--color-border);
 }
 
@@ -627,13 +627,13 @@
   }
 
   .preview {
-    width: min(44vw, 22vh, 140px);
-    height: min(44vw, 22vh, 140px);
+    width: min(58vw, 32vh, 200px);
+    height: min(58vw, 32vh, 200px);
     aspect-ratio: 1 / 1;
-    min-height: 88px;
+    min-height: 120px;
     align-self: center;
     flex-shrink: 1;
-    margin: 4px 0;
+    margin: 2px 0;
   }
 
   .previewImg {
@@ -808,9 +808,9 @@
   }
 
   .preview {
-    width: min(40vw, 20vh, 120px);
-    height: min(40vw, 20vh, 120px);
-    min-height: 80px;
+    width: min(54vw, 28vh, 170px);
+    height: min(54vw, 28vh, 170px);
+    min-height: 100px;
   }
 
   .previewImg {

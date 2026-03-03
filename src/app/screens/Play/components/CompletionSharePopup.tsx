@@ -1,8 +1,9 @@
 /**
- * Share Result modal content: single Share menu with Copy, Share Card, Download.
+ * Share modal: Home button, then two share options side by side (Copy link, Share Card).
+ * Readable contrast; optional Download.
  */
-import React, { useState, useRef, useEffect } from "react";
-import { Copy, Image, Download, ChevronDown } from "lucide-react";
+import React from "react";
+import { Copy, Image, Download, Home } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { formatTime } from "../playUtils";
 import styles from "../PlayScreen.module.css";
@@ -14,11 +15,10 @@ interface CompletionSharePopupProps {
   puzzleShareUrl: string;
   copied?: boolean;
   onCopyResults?: () => void;
-  useSeasonalFrame: boolean;
-  setUseSeasonalFrame: (v: boolean) => void;
   onShareCard: () => void;
   isGenerating: boolean;
   onDownload: () => void;
+  onGoHome?: () => void;
 }
 
 export function CompletionSharePopup({
@@ -29,6 +29,7 @@ export function CompletionSharePopup({
   onShareCard,
   isGenerating,
   onDownload,
+  onGoHome,
 }: CompletionSharePopupProps) {
   const playUrl = puzzleShareUrl.startsWith("http")
     ? puzzleShareUrl
@@ -37,76 +38,48 @@ export function CompletionSharePopup({
   const shareText = `That was ${formatTime(elapsedSeconds)} of focus. Can you do better?\n\n${playUrl}`;
 
   const canCopy = typeof onCopyResults === "function";
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const close = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener("click", close);
-    return () => document.removeEventListener("click", close);
-  }, [menuOpen]);
-
-  const runAndClose = (fn: () => void) => {
-    fn();
-    setMenuOpen(false);
-  };
 
   return (
-    <div className={styles.shareResultPopup} ref={menuRef}>
-      <div className={styles.shareResultPopupMenuWrap}>
+    <div className={styles.shareResultPopup}>
+      {onGoHome != null && (
         <Button
           variant="secondary"
-          onClick={() => setMenuOpen((o) => !o)}
-          className={styles.shareResultPopupBtn}
-          title="Share options"
-          aria-expanded={menuOpen}
-          aria-haspopup="true"
+          onClick={onGoHome}
+          className={styles.shareResultPopupHomeBtn}
+          aria-label="Home"
         >
-          Share
-          <ChevronDown
-            size={18}
-            className={menuOpen ? styles.shareResultPopupChevronOpen : ""}
-          />
+          <Home size={20} />
+          Home
         </Button>
-        {menuOpen && (
-          <div className={styles.shareResultPopupMenu} role="menu">
-            <button
-              type="button"
-              role="menuitem"
-              className={styles.shareResultPopupMenuItem}
-              onClick={() => runAndClose(onCopyResults ?? (() => {}))}
-              disabled={!canCopy}
-            >
-              <Copy size={18} />
-              {copied ? "Copied" : "Copy text + link"}
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              className={styles.shareResultPopupMenuItem}
-              onClick={() => runAndClose(onShareCard)}
-              disabled={isGenerating}
-            >
-              <Image size={18} />
-              {isGenerating ? "Generating..." : "Share Card"}
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              className={styles.shareResultPopupMenuItem}
-              onClick={() => runAndClose(onDownload)}
-            >
-              <Download size={18} />
-              Download
-            </button>
-          </div>
-        )}
+      )}
+      <div className={styles.shareResultPopupRow}>
+        <Button
+          variant="secondary"
+          onClick={onCopyResults ?? (() => {})}
+          disabled={!canCopy}
+          className={styles.shareResultPopupSideBtn}
+        >
+          <Copy size={20} />
+          {copied ? "Copied" : "Copy link"}
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={onShareCard}
+          disabled={isGenerating}
+          className={styles.shareResultPopupSideBtn}
+        >
+          <Image size={20} />
+          {isGenerating ? "…" : "Share Card"}
+        </Button>
       </div>
+      <button
+        type="button"
+        className={styles.shareResultPopupDownloadLink}
+        onClick={onDownload}
+      >
+        <Download size={18} />
+        Download image
+      </button>
 
       <textarea
         readOnly

@@ -16,7 +16,7 @@ export function pickPieceId(
   x: number,
   y: number,
 ): string | null {
-  // topmost first (highest z)
+  // Topmost first: sort by z descending so we hit the visually top piece first.
   const sorted = [...pieces].sort((a, b) => b.z - a.z);
 
   for (const p of sorted) {

@@ -82,6 +82,17 @@ export function renderBoard(
 
   if (debug.showGrid) drawGridOverlay(ctx, cssW, cssH);
 
+  /* Scale to fit and center the puzzle in the canvas so it is never clipped and always centered. */
+  let appliedFit = false;
+  if (assembledW > 0 && assembledH > 0) {
+    const fitScale = Math.min(1, cssW / assembledW, cssH / assembledH);
+    ctx.save();
+    appliedFit = true;
+    ctx.translate(cssW / 2, cssH / 2);
+    ctx.scale(fitScale, fitScale);
+    ctx.translate(-assembledW / 2, -assembledH / 2);
+  }
+
   if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
     ctx.save();
     ctx.translate(viewport.panX, viewport.panY);
@@ -89,6 +100,19 @@ export function renderBoard(
   }
 
   const { cols, rows } = state.grid;
+
+  /* Offset so the puzzle is never clipped: map piece (0,0) container top-left to (0,0). */
+  let appliedOffset = false;
+  let boardOffsetX = 0;
+  let boardOffsetY = 0;
+  const piece00 = state.pieces.find((p) => p.row === 0 && p.col === 0);
+  if (piece00) {
+    boardOffsetX = piece00.pad - piece00.targetX;
+    boardOffsetY = piece00.pad - piece00.targetY;
+    ctx.save();
+    ctx.translate(boardOffsetX, boardOffsetY);
+    appliedOffset = true;
+  }
 
   if (animState?.showAlignmentGrid) {
     const tileW = assembledW / cols;
@@ -108,8 +132,7 @@ export function renderBoard(
     .filter((p) => !p.inTray)
     .filter((p) => p.id !== animState?.dragPreviewPieceId)
     .sort((a, b) => {
-      /* Locked pieces drawn last so they stay on top and never get hidden behind others */
-      if (a.locked !== b.locked) return a.locked ? 1 : -1;
+      /* Draw by z so higher z (e.g. just-placed / bumped) is on top; never pops behind */
       return a.z - b.z;
     });
 
@@ -123,7 +146,6 @@ export function renderBoard(
           const aInGroup = a.groupId === draggedGroupId ? 1 : 0;
           const bInGroup = b.groupId === draggedGroupId ? 1 : 0;
           if (aInGroup !== bInGroup) return aInGroup - bInGroup;
-          if (a.locked !== b.locked) return a.locked ? 1 : -1;
           return a.z - b.z;
         })
       : pieces;
@@ -182,11 +204,27 @@ export function renderBoard(
     drawSnapParticles(ctx, snapParticles, nowMs);
   }
 
+  if (appliedOffset) {
+    ctx.restore();
+  }
+
   if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
     ctx.restore();
   }
 
+  if (appliedFit) {
+    ctx.restore();
+  }
+
   if (animState?.isComplete && animState.completedAtMs) {
-    drawCompletionGlow(ctx, cssW, cssH, nowMs - animState.completedAtMs);
+    drawCompletionGlow(
+      ctx,
+      cssW,
+      cssH,
+      nowMs - animState.completedAtMs,
+      state,
+      boardOffsetX,
+      boardOffsetY,
+    );
   }
 }

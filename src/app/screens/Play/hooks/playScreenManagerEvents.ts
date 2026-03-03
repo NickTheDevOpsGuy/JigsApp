@@ -155,6 +155,8 @@ export function createPlayScreenManagerEvents(
       ref.current = { groupId, pieceIds, triggeredAt: now };
     },
     onPuzzleComplete: () => {
+      placementTimesRef.current = [];
+      setSnapCombo(0);
       soundManager.play("complete");
     },
   };

@@ -75,7 +75,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/streak-freeze.md](doc/streak-freeze.md)
 - **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), percentile badges (Top 10% / 25% / 50%), six themes; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 3 seconds
 - **Play modes** (Settings → Modes) — **Zen Ambient** (no timer/rankings, subtle animated background, soft transitions); **Mystery Mode** (hide full reference, reveal sections only after correct placements); **Precision Mode** (score snap distance; completion shows avg precision and bonus points); **Dynamic Difficulty** (snap tolerance adjusts from completion history — tighter when you’re fast, more forgiving when slower); **Adaptive Personality** (UI tone follows pace: fast play → competitive microcopy/animations, slow play → calm)
-- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share section** (Share Result button; puzzle URL is on the **share card** image only); **Share Result** popup (Share Card PNG with game link, Download, “Challenge a friend” CTA); co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
+- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share section**: **Share Result** (same share panel as Challenge — Copy link, Share Card = capture of your result to share with others, Download); **Challenge Friend** (native share/copy with challenge link); co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
 - **Analytics** — Live completion counter, percentile ranking (Top X%); **mastery** completions (daily with no hints and no undo) tracked for weekly album and mastery streak
 
 Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popup → `src/app/data/changelog.ts`.
@@ -93,13 +93,13 @@ Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popu
 
 ## Mobile layout
 
-- **Board** — 94vw width, max 520px on mobile; 65–70% viewport height. `touch-action: manipulation` to prevent double-tap zoom. Snap detection runs during drag as well as on release, so fast touch drags still snap when passing through the target.
+- **Board** — 94vw width, max 520px on mobile; 65–70% viewport height. The complete puzzle is **centered and scaled to fit** the canvas so it never clips. `touch-action: manipulation` to prevent double-tap zoom. Snap detection runs during drag as well as on release, so fast touch drags still snap when passing through the target.
 - **Piece tray** — Compact height below board; horizontal scroll. No collapse. Undo/redo and tray get extra spacing on very small screens (≤380px).
 - **Piece scaling** — Min 42px on mobile; zoom scales if needed.
 - **Snap** — 120ms pop + glow animation.
 - **Header** — 48px on mobile.
 - **Screens** — Menu, Setup, Stats, Packs fit in viewport (no page scroll); content scrolls inside cards where needed. Loading spinners on Stats and Packs. Stats → Leaderboard → Week → Album shows the 7-slot weekly album with daily thumbnails.
-- **Win screen** — Completion overlay shows image, stats (Time, Moves, Accuracy, Rank), cycling positive message below title (“You did it!”, “Nailed it!”, etc.); “New best time!” when you beat your record, or a performance badge (e.g. Speed Demon, Precision Pro) when not; share section (Continue dropdown opens upward; Share Result; puzzle URL is on the share card image, not on the overlay).
+- **Win screen** — Completion overlay shows image, stats (Time, Moves, Accuracy, Rank), cycling positive message below title (“You did it!”, “Nailed it!”, etc.); “New best time!” when you beat your record, or a performance badge (e.g. Speed Demon, Precision Pro) when not; **Share Result** (inline panel: Copy link, Share Card = capture of your result, Download); **Challenge Friend** (native share/copy with challenge link). Puzzle URL is on the share card image.
 
 ---
 

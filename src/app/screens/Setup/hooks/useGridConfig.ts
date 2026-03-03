@@ -15,7 +15,6 @@ export type GridOption = {
 };
 
 export const GRID_OPTIONS: GridOption[] = [
-  { label: "Starter 2×2 - 4 pieces", rows: 2, cols: 2 },
   { label: "Easy 3×3 - 9 pieces", rows: 3, cols: 3 },
   { label: "Medium 4×4 - 16 pieces", rows: 4, cols: 4 },
   { label: "Hard 5×5 - 25 pieces", rows: 5, cols: 5 },
@@ -28,7 +27,7 @@ export const GRID_OPTIONS: GridOption[] = [
 ];
 
 export function useGridConfig() {
-  const [gridIndex, setGridIndex] = useState(2); // Default to Medium 4×4
+  const [gridIndex, setGridIndex] = useState(1); // Default to Medium 4×4
   const [customRows, setCustomRows] = useState(5);
   const [customCols, setCustomCols] = useState(5);
 
