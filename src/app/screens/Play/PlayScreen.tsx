@@ -1138,63 +1138,67 @@ export function PlayScreen() {
               </div>
             </div>
           </div>
-          <div
-            className={`${styles.trayArea} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
-            onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
-          >
-            {!isComplete && !isPaused && (
-              <div className={styles.undoRedoPillsWrap}>
-                <UndoRedoButtons
-                  canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
-                  onUndo={createUndoRedoHandler(
-                    manager ?? null,
-                    "undo",
-                    setState,
-                    () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
-                    soundManager.play.bind(soundManager),
-                    () => {
-                      undoCountRef.current += 1;
-                    },
-                    (fromPositions) => {
-                      undoSnapBackRef.current = {
-                        fromPositions,
-                        startMs: performance.now(),
-                      };
-                    },
-                  )}
-                  canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
-                  onRedo={createUndoRedoHandler(
-                    manager ?? null,
-                    "redo",
-                    setState,
-                    () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
-                    soundManager.play.bind(soundManager),
-                    undefined,
-                    (fromPositions) => {
-                      undoSnapBackRef.current = {
-                        fromPositions,
-                        startMs: performance.now(),
-                      };
-                    },
-                  )}
+          {!isComplete && (
+            <div
+              className={`${styles.trayArea} ${immersiveMode && !showImmersiveUi ? styles.immersiveHidden : ""}`}
+              onPointerLeave={immersiveMode ? scheduleImmersiveHide : undefined}
+            >
+              {!isPaused && (
+                <div className={styles.undoRedoPillsWrap}>
+                  <UndoRedoButtons
+                    canUndo={!!(manager?.canUndo() && !isPaused && !state?.isComplete)}
+                    onUndo={createUndoRedoHandler(
+                      manager ?? null,
+                      "undo",
+                      setState,
+                      () =>
+                        Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
+                      soundManager.play.bind(soundManager),
+                      () => {
+                        undoCountRef.current += 1;
+                      },
+                      (fromPositions) => {
+                        undoSnapBackRef.current = {
+                          fromPositions,
+                          startMs: performance.now(),
+                        };
+                      },
+                    )}
+                    canRedo={!!(manager?.canRedo() && !isPaused && !state?.isComplete)}
+                    onRedo={createUndoRedoHandler(
+                      manager ?? null,
+                      "redo",
+                      setState,
+                      () =>
+                        Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
+                      soundManager.play.bind(soundManager),
+                      undefined,
+                      (fromPositions) => {
+                        undoSnapBackRef.current = {
+                          fromPositions,
+                          startMs: performance.now(),
+                        };
+                      },
+                    )}
+                  />
+                </div>
+              )}
+              <div
+                className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""}`}
+              >
+                <PieceTray
+                  ref={trayRef}
+                  pieces={trayPieces}
+                  image={imgRef.current}
+                  grid={state?.grid ?? grid}
+                  onPieceClick={handleTrayPieceClick}
+                  highlightedPieceIds={
+                    highlightedPieceIds.size > 0 ? highlightedPieceIds : undefined
+                  }
                 />
               </div>
-            )}
-            <div
-              className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""}`}
-            >
-              <PieceTray
-                ref={trayRef}
-                pieces={trayPieces}
-                image={imgRef.current}
-                grid={state?.grid ?? grid}
-                onPieceClick={handleTrayPieceClick}
-                highlightedPieceIds={
-                  highlightedPieceIds.size > 0 ? highlightedPieceIds : undefined
-                }
-              />
             </div>
-          </div>
+          )}
         </div>
 
         <PlayScreenOverlays

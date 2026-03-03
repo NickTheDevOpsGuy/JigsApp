@@ -1,7 +1,8 @@
 /**
- * Share Result modal content: share text + Copy, seasonal frame, Share Card PNG, Download.
+ * Share Result modal content: single Share menu with Copy, Share Card, Download.
  */
-import { Copy, Image, Download } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { Copy, Image, Download, ChevronDown } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { formatTime } from "../playUtils";
 import styles from "../PlayScreen.module.css";
@@ -25,8 +26,6 @@ export function CompletionSharePopup({
   puzzleShareUrl,
   copied = false,
   onCopyResults,
-  useSeasonalFrame,
-  setUseSeasonalFrame,
   onShareCard,
   isGenerating,
   onDownload,
@@ -38,73 +37,77 @@ export function CompletionSharePopup({
   const shareText = `That was ${formatTime(elapsedSeconds)} of focus. Can you do better?\n\n${playUrl}`;
 
   const canCopy = typeof onCopyResults === "function";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [menuOpen]);
+
+  const runAndClose = (fn: () => void) => {
+    fn();
+    setMenuOpen(false);
+  };
 
   return (
-    <div className={styles.shareResultPopup}>
-      <p className={styles.shareResultPopupCta} role="status">
-        The share message will say something like: &ldquo;I beat this in X minutes! How
-        well can you do? Play the game here&rdquo; followed by a clickable link. The link
-        is only in the message, not on the card image.
-      </p>
-
-      <p className={styles.shareResultPopupCta}>
-        <a
-          href={playUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.shareResultPopupUrlLink}
-        >
-          {playUrl}
-        </a>
-      </p>
-
-      <label className={styles.shareResultPopupToggle}>
-        <input
-          type="checkbox"
-          checked={useSeasonalFrame}
-          onChange={(e) => setUseSeasonalFrame(e.target.checked)}
-        />
-        Seasonal frame
-      </label>
-
-      <div className={styles.shareResultPopupRow}>
+    <div className={styles.shareResultPopup} ref={menuRef}>
+      <div className={styles.shareResultPopupMenuWrap}>
         <Button
           variant="secondary"
-          onClick={onCopyResults}
-          disabled={!canCopy}
+          onClick={() => setMenuOpen((o) => !o)}
           className={styles.shareResultPopupBtn}
-          title={canCopy ? "Copy share text + link" : "Copy not available"}
+          title="Share options"
+          aria-expanded={menuOpen}
+          aria-haspopup="true"
         >
-          <Copy size={18} />
-          {copied ? "Copied" : "Copy text + link"}
+          Share
+          <ChevronDown
+            size={18}
+            className={menuOpen ? styles.shareResultPopupChevronOpen : ""}
+          />
         </Button>
-
-        <Button
-          variant="secondary"
-          onClick={onShareCard}
-          disabled={isGenerating}
-          className={styles.shareResultPopupBtn}
-          title="Share the puzzle image and message together"
-        >
-          <Image size={18} />
-          {isGenerating ? "Generating..." : "Share Card PNG"}
-        </Button>
+        {menuOpen && (
+          <div className={styles.shareResultPopupMenu} role="menu">
+            <button
+              type="button"
+              role="menuitem"
+              className={styles.shareResultPopupMenuItem}
+              onClick={() => runAndClose(onCopyResults ?? (() => {}))}
+              disabled={!canCopy}
+            >
+              <Copy size={18} />
+              {copied ? "Copied" : "Copy text + link"}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className={styles.shareResultPopupMenuItem}
+              onClick={() => runAndClose(onShareCard)}
+              disabled={isGenerating}
+            >
+              <Image size={18} />
+              {isGenerating ? "Generating..." : "Share Card"}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className={styles.shareResultPopupMenuItem}
+              onClick={() => runAndClose(onDownload)}
+            >
+              <Download size={18} />
+              Download
+            </button>
+          </div>
+        )}
       </div>
 
-      <p className={styles.shareResultPopupHint}>
-        Share Card sends the image and link together to apps that support it.
-      </p>
-
-      <Button
-        variant="secondary"
-        onClick={onDownload}
-        className={styles.shareResultPopupBtn}
-      >
-        <Download size={18} />
-        Download
-      </Button>
-
-      {/* Hidden textarea ensures shareText is in DOM for copy implementations that query/select */}
       <textarea
         readOnly
         value={shareText}

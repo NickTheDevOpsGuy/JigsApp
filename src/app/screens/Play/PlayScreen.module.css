@@ -2119,6 +2119,66 @@
   justify-content: center;
 }
 
+.shareResultPopupMenuWrap {
+  position: relative;
+  width: 100%;
+}
+
+.shareResultPopupMenuWrap .shareResultPopupBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shareResultPopupChevronOpen {
+  transform: rotate(180deg);
+}
+
+.shareResultPopupMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.shareResultPopupMenuItem {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.shareResultPopupMenuItem:hover:not(:disabled) {
+  background: var(--color-bg-secondary);
+}
+
+.shareResultPopupMenuItem:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.shareResultPopupMenuItem:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+
 .shareResultPopupHint {
   font-size: 0.8rem;
   color: var(--color-text-secondary);

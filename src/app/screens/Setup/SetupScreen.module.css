@@ -134,10 +134,10 @@
 }
 
 .preview {
-  min-height: 140px;
-  height: min(48vw, 42vh, 260px);
+  min-height: 100px;
+  height: min(36vw, 32vh, 200px);
   min-width: 0;
-  width: min(48vw, 42vh, 260px);
+  width: min(36vw, 32vh, 200px);
   aspect-ratio: 1 / 1;
   align-self: center;
   border-radius: 12px;
@@ -627,10 +627,10 @@
   }
 
   .preview {
-    width: min(56vw, 26vh, 160px);
-    height: min(56vw, 26vh, 160px);
+    width: min(44vw, 22vh, 140px);
+    height: min(44vw, 22vh, 140px);
     aspect-ratio: 1 / 1;
-    min-height: 100px;
+    min-height: 88px;
     align-self: center;
     flex-shrink: 1;
     margin: 4px 0;
@@ -808,9 +808,9 @@
   }
 
   .preview {
-    width: min(52vw, 24vh, 140px);
-    height: min(52vw, 24vh, 140px);
-    min-height: 90px;
+    width: min(40vw, 20vh, 120px);
+    height: min(40vw, 20vh, 120px);
+    min-height: 80px;
   }
 
   .previewImg {
