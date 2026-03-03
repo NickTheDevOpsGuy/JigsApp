@@ -266,10 +266,7 @@ export function usePlayScreenUI() {
     toggleAdaptivePersonality,
     minimapVisible,
     setMinimapVisible,
-    toggleMinimap: useCallback(
-      () => setMinimapVisible((v) => !v),
-      [],
-    ),
+    toggleMinimap: useCallback(() => setMinimapVisible((v) => !v), []),
     minimapPosition,
     setMinimapPosition,
     cycleMinimapPosition: useCallback(

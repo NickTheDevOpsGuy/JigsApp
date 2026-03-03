@@ -1079,7 +1079,7 @@ export function PlayScreen() {
                   {state?.pieces?.[0] &&
                     state.grid &&
                     minimapVisible &&
-                    (state.grid.rows * state.grid.cols >= 25) && (
+                    state.grid.rows * state.grid.cols >= 25 && (
                       <Minimap
                         pieces={state.pieces}
                         grid={state.grid}
