@@ -57,9 +57,7 @@ export function usePlayScreenUI() {
   const [progressiveRevealMode, setProgressiveRevealMode] = useState(
     storageInitial.progressiveRevealMode,
   );
-  const [zenModeEnabled, setZenModeEnabled] = useState(
-    storageInitial.zenModeEnabled,
-  );
+  const [zenModeEnabled, setZenModeEnabled] = useState(storageInitial.zenModeEnabled);
   const [mysteryModeEnabled, setMysteryModeEnabled] = useState(
     storageInitial.mysteryModeEnabled,
   );
@@ -198,10 +196,7 @@ export function usePlayScreenUI() {
   const toggleDriftMode = useCallback(() => setDriftModeEnabled((v) => !v), []);
   const toggleZenMode = useCallback(() => setZenModeEnabled((v) => !v), []);
   const toggleMysteryMode = useCallback(() => setMysteryModeEnabled((v) => !v), []);
-  const togglePrecisionMode = useCallback(
-    () => setPrecisionModeEnabled((v) => !v),
-    [],
-  );
+  const togglePrecisionMode = useCallback(() => setPrecisionModeEnabled((v) => !v), []);
   const toggleDynamicDifficulty = useCallback(
     () => setDynamicDifficultyEnabled((v) => !v),
     [],

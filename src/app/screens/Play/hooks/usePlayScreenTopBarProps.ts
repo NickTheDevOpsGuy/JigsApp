@@ -392,11 +392,12 @@ export function usePlayScreenTopBarProps(
       onToggleAdaptivePersonality: withHaptic(hapticsEnabled, toggleAdaptivePersonality),
     };
 
-    const movesPerMin =
-      (state?.placedCount ?? 0) / Math.max(0.1, elapsedSeconds / 60);
+    const movesPerMin = (state?.placedCount ?? 0) / Math.max(0.1, elapsedSeconds / 60);
     const uiTone =
       adaptivePersonalityEnabled && elapsedSeconds >= 10
-        ? (movesPerMin >= 6 ? ("competitive" as const) : ("calm" as const))
+        ? movesPerMin >= 6
+          ? ("competitive" as const)
+          : ("calm" as const)
         : undefined;
 
     const hudProps = {

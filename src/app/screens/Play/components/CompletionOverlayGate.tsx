@@ -66,7 +66,9 @@ export function CompletionOverlayGate({
   const movesPerMin = moveCount / Math.max(0.1, elapsedSeconds / 60);
   const uiTone =
     adaptivePersonalityEnabled && elapsedSeconds >= 5
-      ? (movesPerMin >= 6 ? ("competitive" as const) : ("calm" as const))
+      ? movesPerMin >= 6
+        ? ("competitive" as const)
+        : ("calm" as const)
       : undefined;
 
   const precisionCount = precisionSnaps.length;

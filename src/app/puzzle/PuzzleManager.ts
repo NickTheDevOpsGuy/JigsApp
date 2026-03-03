@@ -819,7 +819,11 @@ export class PuzzleManager {
     );
     this.events.onPiecePlaced?.(active);
     const precisionPx = Math.hypot(result.dx, result.dy);
-    this.events.onPieceSnapped?.(groupPieces.map((p) => p.id), undefined, precisionPx);
+    this.events.onPieceSnapped?.(
+      groupPieces.map((p) => p.id),
+      undefined,
+      precisionPx,
+    );
     if (this.pieceLockingEnabled) {
       const newlyLocked = groupPieces
         .filter((p) => !wasLocked.has(p.id))

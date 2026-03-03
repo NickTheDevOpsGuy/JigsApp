@@ -60,8 +60,7 @@ export function PlayHUD({
       : isPaused
         ? "Resume the timer"
         : "Pause the timer";
-  const showTimer =
-    !zenModeEnabled && timeMode !== "relaxed";
+  const showTimer = !zenModeEnabled && timeMode !== "relaxed";
   const isCountdown = timeMode === "countdown";
   const isSpeedrun = timeMode === "speedrun";
   const isTimeAttack = timeMode === "timeattack";
