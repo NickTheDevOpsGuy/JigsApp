@@ -14,7 +14,14 @@ export function usePieceTrayScroll(displayedLength: number) {
     const el = scrollerRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
-    const maxScroll = Math.max(0, scrollWidth - clientWidth);
+    const paddingStart = 12;
+    const paddingEnd = 12;
+    const row = el.firstElementChild as HTMLElement | null;
+    const contentWidth =
+      row && row.offsetWidth > 0
+        ? paddingStart + row.offsetWidth + paddingEnd
+        : scrollWidth;
+    const maxScroll = Math.max(0, contentWidth - clientWidth);
     const clamped = Math.max(0, Math.min(maxScroll, scrollLeft));
     if (clamped !== scrollLeft) {
       el.scrollLeft = clamped;
@@ -30,7 +37,14 @@ export function usePieceTrayScroll(displayedLength: number) {
   const scrollBy = useCallback((delta: number) => {
     const el = scrollerRef.current;
     if (!el) return;
-    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+    const paddingStart = 12;
+    const paddingEnd = 12;
+    const row = el.firstElementChild as HTMLElement | null;
+    const contentWidth =
+      row && row.offsetWidth > 0
+        ? paddingStart + row.offsetWidth + paddingEnd
+        : el.scrollWidth;
+    const maxScroll = Math.max(0, contentWidth - el.clientWidth);
     const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + delta));
     el.scrollTo({ left: target, behavior: "smooth" });
   }, []);
@@ -48,10 +62,14 @@ export function usePieceTrayScroll(displayedLength: number) {
     };
     run();
     el.addEventListener("scroll", updateScrollProgress);
+    el.addEventListener("scrollend", run);
+    el.addEventListener("touchend", run);
     const ro = new ResizeObserver(run);
     ro.observe(el);
     return () => {
       el.removeEventListener("scroll", updateScrollProgress);
+      el.removeEventListener("scrollend", run);
+      el.removeEventListener("touchend", run);
       ro.disconnect();
     };
   }, [updateScrollProgress, displayedLength]);

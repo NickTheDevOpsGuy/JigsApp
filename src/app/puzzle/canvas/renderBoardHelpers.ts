@@ -227,9 +227,9 @@ export function computeImageSourceRect(
   const bottomPadR = Math.round(bottomPad);
 
   let srcX = p.col === 0 ? 0 : seamX(p.col) - leftPadR;
-  let srcRight = p.col === cols - 1 ? sourceW : seamX(p.col + 1) + rightPadR;
+  const srcRight = p.col === cols - 1 ? sourceW : seamX(p.col + 1) + rightPadR;
   let srcY = p.row === 0 ? 0 : seamY(p.row) - topPadR;
-  let srcBottom = p.row === rows - 1 ? sourceH : seamY(p.row + 1) + bottomPadR;
+  const srcBottom = p.row === rows - 1 ? sourceH : seamY(p.row + 1) + bottomPadR;
 
   let srcW = srcRight - srcX;
   let srcH = srcBottom - srcY;
