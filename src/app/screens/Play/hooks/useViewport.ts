@@ -2,7 +2,9 @@
  * useViewport – zoom/pan state for the puzzle board.
  * screenToBoard converts client coords to board space; handleWheel, zoomIn/Out, reset.
  * Persistence in viewportStorage.ts.
+ * Optional getBounds clamps pan so the board never shows blank area.
  */
+import type { RefObject } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   loadViewport,
@@ -13,6 +15,13 @@ import {
 } from "./viewportStorage";
 
 export type { ViewportState } from "./viewportStorage";
+
+export type ViewportBounds = {
+  contentW: number;
+  contentH: number;
+  containerW: number;
+  containerH: number;
+};
 
 const isPanningRef = { current: false };
 const isPinchingRef = { current: false };
@@ -26,7 +35,25 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function useViewport(puzzleKey: string | null = null) {
+function clampPan(
+  scale: number,
+  panX: number,
+  panY: number,
+  bounds: ViewportBounds,
+): { panX: number; panY: number } {
+  /* Keep content covering the container: no blank area when panning. */
+  const minPanX = bounds.containerW - bounds.contentW * scale;
+  const minPanY = bounds.containerH - bounds.contentH * scale;
+  return {
+    panX: Math.max(minPanX, Math.min(0, panX)),
+    panY: Math.max(minPanY, Math.min(0, panY)),
+  };
+}
+
+export function useViewport(
+  puzzleKey: string | null = null,
+  getBoundsRef?: RefObject<(() => ViewportBounds | null) | null>,
+) {
   const [viewport, setViewport] = useState<ViewportState>(() => {
     const loaded = loadViewport(puzzleKey);
     return loaded ?? { scale: 1, panX: 0, panY: 0 };
@@ -40,6 +67,17 @@ export function useViewport(puzzleKey: string | null = null) {
       setViewport(loaded ?? { scale: 1, panX: 0, panY: 0 });
     }
   }, [puzzleKey]);
+
+  /* Clamp pan when bounds become available (e.g. after mount) or scale changes. */
+  useEffect(() => {
+    const bounds = getBoundsRef?.current?.();
+    if (!bounds) return;
+    const { scale, panX, panY } = viewport;
+    const { panX: cx, panY: cy } = clampPan(scale, panX, panY, bounds);
+    if (cx !== panX || cy !== panY) {
+      setViewport((prev) => ({ ...prev, panX: cx, panY: cy }));
+    }
+  }, [viewport.scale, viewport.panX, viewport.panY, getBoundsRef]);
 
   useEffect(() => {
     if (!puzzleKey) return;
@@ -99,15 +137,25 @@ export function useViewport(puzzleKey: string | null = null) {
     };
   }, []);
 
-  const handlePanMove = useCallback((clientX: number, clientY: number) => {
-    const start = panStartRef.current;
-    if (!start || !isPanningRef.current) return;
-    setViewport((prev) => ({
-      ...prev,
-      panX: start.panX + (clientX - start.clientX),
-      panY: start.panY + (clientY - start.clientY),
-    }));
-  }, []);
+  const handlePanMove = useCallback(
+    (clientX: number, clientY: number) => {
+      const start = panStartRef.current;
+      if (!start || !isPanningRef.current) return;
+      const nextPanX = start.panX + (clientX - start.clientX);
+      const nextPanY = start.panY + (clientY - start.clientY);
+      setViewport((prev) => {
+        const next = { ...prev, panX: nextPanX, panY: nextPanY };
+        const bounds = getBoundsRef?.current?.() ?? null;
+        if (bounds) {
+          const clamped = clampPan(prev.scale, next.panX, next.panY, bounds);
+          next.panX = clamped.panX;
+          next.panY = clamped.panY;
+        }
+        return next;
+      });
+    },
+    [getBoundsRef],
+  );
 
   const startPinch = useCallback(
     (
@@ -156,12 +204,18 @@ export function useViewport(puzzleKey: string | null = null) {
       const zoomScaleFactor = newScale / v.scale;
       const centerDeltaX = prevCenter ? centerX - prevCenter.x : 0;
       const centerDeltaY = prevCenter ? centerY - prevCenter.y : 0;
-      const newPanX = cssX - (cssX - v.panX) * zoomScaleFactor + centerDeltaX;
-      const newPanY = cssY - (cssY - v.panY) * zoomScaleFactor + centerDeltaY;
+      let newPanX = cssX - (cssX - v.panX) * zoomScaleFactor + centerDeltaX;
+      let newPanY = cssY - (cssY - v.panY) * zoomScaleFactor + centerDeltaY;
+      const bounds = getBoundsRef?.current?.() ?? null;
+      if (bounds) {
+        const clamped = clampPan(newScale, newPanX, newPanY, bounds);
+        newPanX = clamped.panX;
+        newPanY = clamped.panY;
+      }
       pinchPrevCenterRef.current = { x: centerX, y: centerY };
       setViewport({ scale: newScale, panX: newPanX, panY: newPanY });
     },
-    [],
+    [getBoundsRef],
   );
 
   const endPinch = useCallback(() => {
@@ -275,13 +329,19 @@ export function useViewport(puzzleKey: string | null = null) {
 
       // Zoom toward cursor: adjust pan so point under cursor stays fixed
       const scaleFactor = newScale / viewport.scale;
-      const newPanX = cssX - (cssX - viewport.panX) * scaleFactor;
-      const newPanY = cssY - (cssY - viewport.panY) * scaleFactor;
+      let newPanX = cssX - (cssX - viewport.panX) * scaleFactor;
+      let newPanY = cssY - (cssY - viewport.panY) * scaleFactor;
+      const bounds = getBoundsRef?.current?.() ?? null;
+      if (bounds) {
+        const clamped = clampPan(newScale, newPanX, newPanY, bounds);
+        newPanX = clamped.panX;
+        newPanY = clamped.panY;
+      }
 
       setViewport({ scale: newScale, panX: newPanX, panY: newPanY });
       e.preventDefault();
     },
-    [viewport],
+    [viewport, getBoundsRef],
   );
 
   return {

@@ -30,7 +30,8 @@ export function usePieceTrayDisplay(
   grid: { rows: number; cols: number },
 ) {
   const [filter, setFilter] = useState<TrayFilter>("all");
-  const [shuffleKey, setShuffleKey] = useState(0);
+  /* Start with shuffle so tray order is randomized from the beginning */
+  const [shuffleKey, setShuffleKey] = useState(1);
 
   const hueById = useMemo(() => {
     const m = new Map<string, number>();

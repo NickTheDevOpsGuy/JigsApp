@@ -226,7 +226,8 @@ export function PlayScreen() {
   const [lives, setLives] = React.useState(3);
 
   const viewportKey = grid != null ? `vp:${grid.rows}x${grid.cols}` : null;
-  const viewport = useViewport(viewportKey);
+  const viewportBoundsRef = React.useRef<(() => { contentW: number; contentH: number; containerW: number; containerH: number } | null) | null>(null);
+  const viewport = useViewport(viewportKey, viewportBoundsRef);
   const snapScaleRef = React.useRef(1);
   snapScaleRef.current = viewport.viewport.scale;
 
@@ -322,6 +323,20 @@ export function PlayScreen() {
     lockMapRef,
     snapParticlesRef,
   } = managerResult;
+
+  const boardSizeRef = React.useRef(boardSize);
+  boardSizeRef.current = boardSize;
+  viewportBoundsRef.current = () => {
+    if (!boardRef.current) return null;
+    const r = boardRef.current.getBoundingClientRect();
+    const sz = boardSizeRef.current;
+    return {
+      contentW: sz.w,
+      contentH: sz.h,
+      containerW: r.width,
+      containerH: r.height,
+    };
+  };
 
   stateRef.current = state;
   const { highlightedPieceIds, onPreviewTap } = useReferenceTapHighlight(
