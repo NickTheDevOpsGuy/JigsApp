@@ -226,7 +226,15 @@ export function PlayScreen() {
   const [lives, setLives] = React.useState(3);
 
   const viewportKey = grid != null ? `vp:${grid.rows}x${grid.cols}` : null;
-  const viewportBoundsRef = React.useRef<(() => { contentW: number; contentH: number; containerW: number; containerH: number } | null) | null>(null);
+  const viewportBoundsRef = React.useRef<
+    | (() => {
+        contentW: number;
+        contentH: number;
+        containerW: number;
+        containerH: number;
+      } | null)
+    | null
+  >(null);
   const viewport = useViewport(viewportKey, viewportBoundsRef);
   const snapScaleRef = React.useRef(1);
   snapScaleRef.current = viewport.viewport.scale;
