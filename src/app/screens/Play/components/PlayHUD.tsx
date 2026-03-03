@@ -21,6 +21,10 @@ interface PlayHUDProps {
   quadrantPbs?: Record<0 | 1 | 2 | 3, number | null>;
   lives?: number;
   onTogglePause: () => void;
+  /** Zen Ambient: hide timer and rankings for a pressure-free view */
+  zenModeEnabled?: boolean;
+  /** Adaptive Personality: competitive = snappier copy; calm = softer copy */
+  uiTone?: "competitive" | "calm";
 }
 
 const QUAD_LABELS = ["TL", "TR", "BL", "BR"] as const;
@@ -45,9 +49,19 @@ export function PlayHUD({
   quadrantPbs,
   lives,
   onTogglePause,
+  zenModeEnabled,
+  uiTone,
 }: PlayHUDProps) {
-  const pauseTitle = isPaused ? "Resume the timer" : "Pause the timer";
-  const showTimer = timeMode !== "relaxed";
+  const pauseTitle =
+    uiTone === "competitive"
+      ? isPaused
+        ? "Resume"
+        : "Pause"
+      : isPaused
+        ? "Resume the timer"
+        : "Pause the timer";
+  const showTimer =
+    !zenModeEnabled && timeMode !== "relaxed";
   const isCountdown = timeMode === "countdown";
   const isSpeedrun = timeMode === "speedrun";
   const isTimeAttack = timeMode === "timeattack";
@@ -61,8 +75,18 @@ export function PlayHUD({
     return () => clearTimeout(t);
   }, [piecesLeft]);
 
+  const piecesLabel =
+    uiTone === "competitive"
+      ? `${piecesLeft} left`
+      : uiTone === "calm"
+        ? `${piecesLeft} remaining`
+        : `${piecesLeft} / ${totalPieces}`;
+
   return (
-    <div className={styles.hud}>
+    <div
+      className={`${styles.hud} ${uiTone === "competitive" ? styles.hudCompetitive : ""} ${uiTone === "calm" ? styles.hudCalm : ""}`}
+      data-ui-tone={uiTone ?? undefined}
+    >
       {isSpeedrun && quadrantTimes && (
         <div className={styles.quadrantTimers}>
           {([0, 1, 2, 3] as const).map((q) => {
@@ -135,9 +159,7 @@ export function PlayHUD({
         role="status"
       >
         <Puzzle size={14} />
-        <span>
-          {piecesLeft} / {totalPieces}
-        </span>
+        <span>{piecesLabel}</span>
       </div>
     </div>
   );

@@ -16,6 +16,8 @@ export type NeighborSnapResult = {
   dx: number;
   dy: number;
   intoGroupId: string;
+  /** Distance in px at snap (for precision scoring). */
+  dist: number;
 } | null;
 
 export type NearSnapNudgeResult = { nudgeDx: number; nudgeDy: number } | null;
@@ -86,9 +88,10 @@ export function computeBoardSnapResult(
 
 /**
  * Rotate the group to 0° around its geometric center. Returns new pieces array.
+ * Only rotates board pieces (never tray); tray pieces in the group are left unchanged.
  */
 export function rotateGroupToZeroPieces(pieces: Piece[], groupId: string): Piece[] {
-  const groupPieces = getGroupPieces(pieces, groupId);
+  const groupPieces = getGroupPieces(pieces, groupId).filter((p) => !p.inTray);
   if (groupPieces.length === 0) return pieces;
   const rot = groupPieces[0].rotation;
   if (rot === 0) return pieces;
@@ -168,6 +171,7 @@ export function computeNeighborSnapResult(
     dx: Math.round(best.dx),
     dy: Math.round(best.dy),
     intoGroupId: best.into,
+    dist: best.dist,
   };
 }
 

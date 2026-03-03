@@ -48,6 +48,8 @@ export type HeaderMenuProps = {
   onToggleMusic?: () => void;
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
+  autoRotateOnSnap?: boolean;
+  onToggleAutoRotateOnSnap?: () => void;
   onToggleRelaxedMode?: () => void;
   driftModeEnabled?: boolean;
   onToggleDriftMode?: () => void;
@@ -81,6 +83,16 @@ export type HeaderMenuProps = {
   onClearCache?: () => void;
   snapToleranceOverride: number;
   onSnapToleranceOverrideChange: (value: number) => void;
+  zenModeEnabled?: boolean;
+  onToggleZenMode?: () => void;
+  mysteryModeEnabled?: boolean;
+  onToggleMysteryMode?: () => void;
+  precisionModeEnabled?: boolean;
+  onTogglePrecisionMode?: () => void;
+  dynamicDifficultyEnabled?: boolean;
+  onToggleDynamicDifficulty?: () => void;
+  adaptivePersonalityEnabled?: boolean;
+  onToggleAdaptivePersonality?: () => void;
 };
 
 export type SubMenuId =

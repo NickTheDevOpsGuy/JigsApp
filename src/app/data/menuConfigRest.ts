@@ -75,7 +75,7 @@ export function getRestMenuNodes(): MenuNode[] {
         {
           type: "folder",
           id: "leaderboards",
-          label: "Leaderboards",
+          label: "Leaderboard",
           children: [
             { type: "navigate", id: "stats", label: "Overview", path: "/stats" },
           ],
@@ -131,7 +131,7 @@ export function getRestMenuNodes(): MenuNode[] {
     {
       type: "folder",
       id: "stats",
-      label: "Leaderboards",
+      label: "Leaderboard",
       children: [
         { type: "navigate", id: "statsOverview", label: "Overview", path: "/stats" },
         { type: "navigate", id: "statsStreaks", label: "Streaks", path: "/stats" },

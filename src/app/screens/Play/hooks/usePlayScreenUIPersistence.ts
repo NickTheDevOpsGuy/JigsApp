@@ -4,6 +4,7 @@
 import { useEffect } from "react";
 import {
   PIECE_LOCKING_KEY,
+  AUTO_ROTATE_ON_SNAP_KEY,
   CUT_TYPE_KEY,
   PROGRESSIVE_REVEAL_KEY,
   GHOST_HINT_KEY,
@@ -16,11 +17,17 @@ import {
   RELAXED_MODE_KEY,
   DRIFT_MODE_KEY,
   SNAP_TOLERANCE_OVERRIDE_KEY,
+  ZEN_MODE_KEY,
+  MYSTERY_MODE_KEY,
+  PRECISION_MODE_KEY,
+  DYNAMIC_DIFFICULTY_KEY,
+  ADAPTIVE_PERSONALITY_KEY,
 } from "../playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 export function usePlayScreenUIPersistence(state: {
   pieceLockingEnabled: boolean;
+  autoRotateOnSnap: boolean;
   showGhostHint: boolean;
   showAlignmentGrid: boolean;
   showGhostWhenIdle: boolean;
@@ -33,6 +40,11 @@ export function usePlayScreenUIPersistence(state: {
   pieceCutType: string;
   progressiveRevealMode: boolean;
   immersiveMode: boolean;
+  zenModeEnabled: boolean;
+  mysteryModeEnabled: boolean;
+  precisionModeEnabled: boolean;
+  dynamicDifficultyEnabled: boolean;
+  adaptivePersonalityEnabled: boolean;
 }) {
   useEffect(() => {
     try {
@@ -44,6 +56,17 @@ export function usePlayScreenUIPersistence(state: {
       /* ignore */
     }
   }, [state.pieceLockingEnabled]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(
+        AUTO_ROTATE_ON_SNAP_KEY,
+        state.autoRotateOnSnap ? "true" : "false",
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [state.autoRotateOnSnap]);
 
   useEffect(() => {
     try {
@@ -167,4 +190,56 @@ export function usePlayScreenUIPersistence(state: {
       /* ignore */
     }
   }, [state.immersiveMode]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(ZEN_MODE_KEY, state.zenModeEnabled ? "true" : "false");
+    } catch {
+      /* ignore */
+    }
+  }, [state.zenModeEnabled]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(
+        MYSTERY_MODE_KEY,
+        state.mysteryModeEnabled ? "true" : "false",
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [state.mysteryModeEnabled]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(
+        PRECISION_MODE_KEY,
+        state.precisionModeEnabled ? "true" : "false",
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [state.precisionModeEnabled]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(
+        DYNAMIC_DIFFICULTY_KEY,
+        state.dynamicDifficultyEnabled ? "true" : "false",
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [state.dynamicDifficultyEnabled]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(
+        ADAPTIVE_PERSONALITY_KEY,
+        state.adaptivePersonalityEnabled ? "true" : "false",
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [state.adaptivePersonalityEnabled]);
 }

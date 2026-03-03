@@ -30,6 +30,8 @@ export type PlayScreenTopBarProps = {
     quadrantPbs?: Record<0 | 1 | 2 | 3, number | null>;
     lives?: number;
     onTogglePause: () => void;
+    zenModeEnabled?: boolean;
+    uiTone?: "competitive" | "calm";
   };
   topBarButtonsProps: {
     showPreview: boolean;

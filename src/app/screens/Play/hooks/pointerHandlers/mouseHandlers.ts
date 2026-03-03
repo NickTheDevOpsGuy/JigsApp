@@ -20,10 +20,12 @@ export function handleMouseDown(
   const { manager, canvasRef, didDragRef, setState, haptic, onPieceInteraction } = ctx;
   if (!manager) return false;
 
-  // Right click = rotate (desktop)
+  // Right click = rotate (desktop) – only rotate board pieces; never rotate tray from canvas
   if (e.button === 2) {
     e.preventDefault();
     if (!canRotatePiece(pieceId)) return false;
+    const current = manager.getState().pieces.find((p) => p.id === pieceId);
+    if (current?.inTray) return false;
 
     onPieceInteraction?.();
     manager.rotatePiece(pieceId);

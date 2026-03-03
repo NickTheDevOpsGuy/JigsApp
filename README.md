@@ -74,10 +74,11 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap (including during fast drags); group merging; 2×2 to 10×10 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan (capped to avoid excessive zoom); undo/redo with snap-back animation (Ctrl/Cmd+Z); drag lift (stronger shadow, scale)
 - **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/streak-freeze.md](doc/streak-freeze.md)
 - **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), percentile badges (Top 10% / 25% / 50%), six themes; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 3 seconds
+- **Play modes** (Settings → Modes) — **Zen Ambient** (no timer/rankings, subtle animated background, soft transitions); **Mystery Mode** (hide full reference, reveal sections only after correct placements); **Precision Mode** (score snap distance; completion shows avg precision and bonus points); **Dynamic Difficulty** (snap tolerance adjusts from completion history — tighter when you’re fast, more forgiving when slower); **Adaptive Personality** (UI tone follows pace: fast play → competitive microcopy/animations, slow play → calm)
 - **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share section** (Share Result button; puzzle URL is on the **share card** image only); **Share Result** popup (Share Card PNG with game link, Download, “Challenge a friend” CTA); co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
 - **Analytics** — Live completion counter, percentile ranking (Top X%); **mastery** completions (daily with no hints and no undo) tracked for weekly album and mastery streak
 
-Full feature list → [CHANGES.md](doc/CHANGES.md)
+Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popup → `src/app/data/changelog.ts`.
 
 ---
 
@@ -175,6 +176,8 @@ Useful scripts:
 | [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                         |
 | [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                               |
 | [README.md](doc/README.md)                             | Index of docs                                                                                             |
+
+**Play modes (Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)** — State and toggles: `Play/playScreenUtils.ts` (storage keys), `Play/hooks/playScreenUIInitial.ts`, `usePlayScreenUI.ts`, `usePlayScreenUIPersistence.ts`. Menu: `Play/components/headerMenuConfigTypes.ts`, `headerMenuItemsNavModes.ts`. Top bar/HUD: `usePlayScreenTopBarProps.ts`, `PlayScreenTopBar.tsx`, `PlayHUD.tsx`. Zen/Mystery/Precision/Completion: `PlayScreen.tsx`, `PlayScreen.module.css` (`.zenMode`, `.hudCompetitive`, `.hudCalm`), `CompletionOverlayGate.tsx`, `CompletionOverlay.tsx`, `CompletionStatsBlock.tsx`. Snap/precision: `puzzle/puzzleSnap.ts`, `PuzzleManager.ts`, `puzzleManagerUtils.ts`; `Play/hooks/playScreenManagerEvents.ts`. Dynamic difficulty: `services/adaptiveDifficultyService.ts` (`getToleranceMultiplier`). Completion copy by tone: `data/completionMessages.ts`.
 
 ---
 

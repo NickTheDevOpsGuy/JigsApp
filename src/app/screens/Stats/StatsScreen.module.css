@@ -63,10 +63,18 @@
   .cardContent {
     flex: 1;
     min-height: 0;
+    min-width: 0;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
+  }
+
+  /* Prevent leaderboard/achievements from going off screen to the right */
+  .leaderboard,
+  .achievements {
+    min-width: 0;
+    overflow-x: hidden;
   }
 }
 

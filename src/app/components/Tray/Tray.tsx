@@ -1,6 +1,4 @@
-/**
- * Tray – legacy piece tray (corners/edges/center); PieceTray is the primary tray now.
- */
+// src/app/components/Tray/Tray.tsx
 import React from "react";
 import type { Piece } from "@/puzzle/types";
 import styles from "./Tray.module.css";
@@ -31,6 +29,8 @@ export function Tray({
       <div
         key={piece.id}
         className={styles.trayPiece}
+        role="button"
+        tabIndex={0}
         onClick={() => onPieceClick(piece.id)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -38,10 +38,8 @@ export function Tray({
             onPieceClick(piece.id);
           }
         }}
-        role="button"
-        tabIndex={0}
         title={`Piece ${piece.id} - Click to place on board`}
-        aria-label={`Piece ${piece.id}, click to place on board`}
+        aria-label={`Place piece ${piece.id} on board`}
       >
         <svg
           width={piece.w * scale}

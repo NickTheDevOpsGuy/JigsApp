@@ -107,7 +107,11 @@ export function renderBoard(
   const pieces = [...state.pieces]
     .filter((p) => !p.inTray)
     .filter((p) => p.id !== animState?.dragPreviewPieceId)
-    .sort((a, b) => a.z - b.z);
+    .sort((a, b) => {
+      /* Locked pieces drawn last so they stay on top and never get hidden behind others */
+      if (a.locked !== b.locked) return a.locked ? 1 : -1;
+      return a.z - b.z;
+    });
 
   const overrides =
     animState?.undoSnapBackOverrides ??
@@ -119,6 +123,7 @@ export function renderBoard(
           const aInGroup = a.groupId === draggedGroupId ? 1 : 0;
           const bInGroup = b.groupId === draggedGroupId ? 1 : 0;
           if (aInGroup !== bInGroup) return aInGroup - bInGroup;
+          if (a.locked !== b.locked) return a.locked ? 1 : -1;
           return a.z - b.z;
         })
       : pieces;

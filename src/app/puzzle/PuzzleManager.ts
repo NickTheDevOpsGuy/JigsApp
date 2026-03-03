@@ -52,6 +52,8 @@ export type PuzzleManagerOptions = {
   relaxedToleranceMultiplierRef?: MutableRefObject<number>;
   /** Ref to user override multiplier from settings slider. */
   snapToleranceOverrideRef?: MutableRefObject<number>;
+  /** Ref to Dynamic Difficulty multiplier (0.9 = tighter, 1.1 = more forgiving). */
+  dynamicDifficultyMultiplierRef?: MutableRefObject<number>;
   rotationStepDeg?: 90 | 180;
   /** Use tighter scatter pattern for mobile viewports. */
   isMobile?: boolean;
@@ -61,8 +63,12 @@ export type PuzzleManagerOptions = {
 
 export type PuzzleManagerEvents = {
   onPiecePlaced?: (piece: Piece) => void;
-  /** Called when a group snaps to a neighbor (merge). Pass merged group piece IDs and optional center (board space) for particles. */
-  onPieceSnapped?: (pieceIds: string[], center?: { x: number; y: number }) => void;
+  /** Called when a group snaps (board or neighbor). Optional center for particles; precisionPx = distance before magnet (for Precision Mode). */
+  onPieceSnapped?: (
+    pieceIds: string[],
+    center?: { x: number; y: number },
+    precisionPx?: number,
+  ) => void;
   onPieceLocked?: (pieceIds: string[]) => void;
   onPuzzleComplete?: (state: PuzzleState) => void;
   /** Called each time snap logic is evaluated (for perf overlay profiling). */
@@ -87,12 +93,16 @@ export class PuzzleManager {
   private snapScaleRef: MutableRefObject<number> | undefined;
   private relaxedToleranceMultiplierRef: MutableRefObject<number> | undefined;
   private snapToleranceOverrideRef: MutableRefObject<number> | undefined;
+  private dynamicDifficultyMultiplierRef: MutableRefObject<number> | undefined;
   private isMobile: boolean;
   private scatterStartYRatio: number;
   private rotationStepDeg: 90 | 180;
 
   /** When true, pieces that snap to correct position become locked (cannot be moved). */
   private pieceLockingEnabled: boolean = false;
+
+  /** When true, snapping to a neighbor auto-rotates the group to 0°. When false, user must rotate manually to snap. */
+  private autoRotateOnSnap: boolean = true;
 
   private pad: number;
   private tileW: number;
@@ -116,6 +126,7 @@ export class PuzzleManager {
       snapScaleRef,
       relaxedToleranceMultiplierRef,
       snapToleranceOverrideRef,
+      dynamicDifficultyMultiplierRef,
       scatterStartYRatio = 0.3,
       rotationStepDeg = 90,
       isMobile = false,
@@ -130,6 +141,7 @@ export class PuzzleManager {
     this.snapScaleRef = snapScaleRef;
     this.isMobile = isMobile;
     this.snapToleranceOverrideRef = snapToleranceOverrideRef;
+    this.dynamicDifficultyMultiplierRef = dynamicDifficultyMultiplierRef;
     this.scatterStartYRatio = scatterStartYRatio;
     this.rotationStepDeg = rotationStepDeg;
     const cutType = options.cutType ?? "classic";
@@ -250,11 +262,31 @@ export class PuzzleManager {
     this.state = { ...this.state, pieces: newPieces };
   }
 
+  /** Replace pieces but keep tray piece references from current state so tray thumbs don't flicker. */
+  private replacePiecesPreservingTray(newPieces: Piece[]) {
+    const current = this.state.pieces;
+    const currentTrayById = new Map(
+      current.filter((p) => p.inTray).map((p) => [p.id, p] as const),
+    );
+    const pieces =
+      currentTrayById.size === 0
+        ? newPieces
+        : newPieces.map((p) => {
+            if (p.inTray) {
+              const existing = currentTrayById.get(p.id);
+              return existing ?? p;
+            }
+            return p;
+          });
+    this.state = { ...this.state, pieces };
+  }
+
   private getToleranceOptions(): EffectiveToleranceOptions {
     return {
       snapScaleRef: this.snapScaleRef,
       relaxedToleranceMultiplierRef: this.relaxedToleranceMultiplierRef,
       snapToleranceOverrideRef: this.snapToleranceOverrideRef,
+      dynamicDifficultyMultiplierRef: this.dynamicDifficultyMultiplierRef,
       isMobile: this.isMobile,
     };
   }
@@ -270,7 +302,7 @@ export class PuzzleManager {
   private shiftGroupUnclamped(groupId: string, dx: number, dy: number) {
     if (dx === 0 && dy === 0) return;
     this.updatePieces(
-      (p) => p.groupId === groupId,
+      (p) => !p.inTray && p.groupId === groupId,
       (p) => ({ x: p.x + Math.round(dx), y: p.y + Math.round(dy) }),
     );
   }
@@ -278,7 +310,7 @@ export class PuzzleManager {
   /** Set every piece in the group to its exact target position on the canvas (no rounding drift). */
   private setGroupToExactTargetPositions(groupId: string): void {
     this.updatePieces(
-      (p) => p.groupId === groupId,
+      (p) => !p.inTray && p.groupId === groupId,
       (p) => ({
         x: Math.round(p.targetX - p.pad),
         y: Math.round(p.targetY - p.pad),
@@ -290,7 +322,7 @@ export class PuzzleManager {
   private bumpGroupZ(groupId: string): void {
     this.zCounter += 1;
     this.updatePieces(
-      (p) => p.groupId === groupId,
+      (p) => !p.inTray && p.groupId === groupId,
       () => ({ z: this.zCounter }),
     );
   }
@@ -310,7 +342,7 @@ export class PuzzleManager {
     const clamped = this.clampGroupDelta(groupId, dx, dy);
     if (clamped.dx === 0 && clamped.dy === 0) return;
     this.updatePieces(
-      (p) => p.groupId === groupId,
+      (p) => !p.inTray && p.groupId === groupId,
       (p) => ({ x: p.x + clamped.dx, y: p.y + clamped.dy }),
     );
   }
@@ -353,7 +385,7 @@ export class PuzzleManager {
   private mergeGroups(from: string, into: string) {
     if (from === into) return;
     this.updatePieces(
-      (p) => p.groupId === from,
+      (p) => !p.inTray && p.groupId === from,
       () => ({ groupId: into }),
     );
   }
@@ -452,6 +484,14 @@ export class PuzzleManager {
     return this.pieceLockingEnabled;
   }
 
+  setAutoRotateOnSnap(enabled: boolean): void {
+    this.autoRotateOnSnap = enabled;
+  }
+
+  getAutoRotateOnSnap(): boolean {
+    return this.autoRotateOnSnap;
+  }
+
   getDragState(): DragState {
     return this.drag;
   }
@@ -478,17 +518,35 @@ export class PuzzleManager {
     const piece = this.findPiece(pieceId);
     if (!piece || piece.isPlaced || piece.locked) return;
 
-    const groupPieces = this.getGroupPieces(piece.groupId);
-    if (groupPieces.some((p) => p.locked)) return;
-
     this.pushUndoState();
+    const step = this.rotationStepDeg;
 
-    this.updatePieces(
-      piece.inTray
-        ? (p) => p.id === pieceId
-        : (p) => !p.inTray && p.groupId === piece.groupId,
-      (p) => ({ rotation: (p.rotation + this.rotationStepDeg) % 360 }),
+    if (piece.inTray) {
+      // Rotate only this single tray piece; no other piece must change.
+      this.state = {
+        ...this.state,
+        pieces: this.state.pieces.map((p) =>
+          p.id === pieceId ? { ...p, rotation: (p.rotation + step) % 360 } : p,
+        ),
+      };
+      return;
+    }
+
+    // Board piece: rotate only board pieces in the same group. Never modify tray pieces.
+    const boardGroupPieces = this.state.pieces.filter(
+      (p) => p.groupId === piece.groupId && !p.inTray,
     );
+    if (boardGroupPieces.some((p) => p.locked)) return;
+
+    const gid = piece.groupId;
+    this.state = {
+      ...this.state,
+      pieces: this.state.pieces.map((p) => {
+        if (p.inTray) return p; // keep tray pieces unchanged by reference
+        if (p.groupId !== gid) return p;
+        return { ...p, rotation: (p.rotation + step) % 360 };
+      }),
+    };
   }
 
   /** @param skipPush - when true, caller already pushed (e.g. nudgeGroup) */
@@ -753,13 +811,15 @@ export class PuzzleManager {
 
     const wasLocked = new Set(groupPieces.filter((p) => p.locked).map((p) => p.id));
     this.updatePieces(
-      (p) => p.groupId === gid,
+      (p) => !p.inTray && p.groupId === gid,
       (p) => ({
         justSnapped: true,
         locked: this.pieceLockingEnabled || p.locked,
       }),
     );
     this.events.onPiecePlaced?.(active);
+    const precisionPx = Math.hypot(result.dx, result.dy);
+    this.events.onPieceSnapped?.(groupPieces.map((p) => p.id), undefined, precisionPx);
     if (this.pieceLockingEnabled) {
       const newlyLocked = groupPieces
         .filter((p) => !wasLocked.has(p.id))
@@ -778,10 +838,19 @@ export class PuzzleManager {
     if (!active || active.isPlaced) return false;
 
     const gid = active.groupId;
-    const groupPieces = this.getGroupPieces(gid);
-    if (!groupPieces.every((p) => p.rotation === 0)) {
-      this.replacePieces(rotateGroupToZeroPieces(this.state.pieces, gid));
-      if (!this.findPiece(activeId)) return false;
+    const boardGroupPieces = this.state.pieces.filter(
+      (p) => p.groupId === gid && !p.inTray,
+    );
+    const allAtZero =
+      boardGroupPieces.length > 0 && boardGroupPieces.every((p) => p.rotation === 0);
+    if (!allAtZero) {
+      if (this.autoRotateOnSnap) {
+        this.replacePiecesPreservingTray(rotateGroupToZeroPieces(this.state.pieces, gid));
+        if (!this.findPiece(activeId)) return false;
+      } else {
+        /* User must rotate the piece to 0° themselves to snap (no auto-align). */
+        return false;
+      }
     }
 
     const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.15 : 1;
@@ -815,7 +884,7 @@ export class PuzzleManager {
             y: mergedPieces.reduce((s, p) => s + p.y + p.h / 2, 0) / mergedPieces.length,
           }
         : undefined;
-    this.events.onPieceSnapped?.(mergedIds, center);
+    this.events.onPieceSnapped?.(mergedIds, center, result.dist);
 
     return true;
   }

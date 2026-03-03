@@ -1,10 +1,33 @@
 # Phuzzle — Recent Changes Summary
 
-A single post summarizing all recent updates: UX polish, leaderboards, performance, testing, PWA, tap-to-rotate, layout (PDF spec), grid presets, and docs.
+A single post summarizing all recent updates: UX polish, leaderboards, performance, testing, PWA, tap-to-rotate, layout (PDF spec), grid presets, play modes, and docs.
 
 ---
 
-## 🧩 Latest (completion layout, tray, lock smoothness)
+## 🧩 Latest (play modes: Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)
+
+### New modes (Settings → Modes)
+
+- **Zen Ambient** — Toggle hides timer and rankings, adds a subtle animated gradient background and longer transitions for a pressure-free experience. Persisted in localStorage.
+- **Mystery Mode** — Full reference image is hidden; regions reveal only after correct placements (uses progressive reveal).
+- **Precision Mode** — Each snap records distance (px) before magnet; completion overlay shows average precision and bonus points (e.g. +N for tight snaps). Board and neighbor snap both report precision.
+- **Dynamic Difficulty** — Snap tolerance is adjusted from completion history (`adaptiveDifficultyService.getToleranceMultiplier`): 0.9× for fast players, 1.1× for slower, per grid size. Ref is passed into `PuzzleManager` and `getEffectiveTolerance`.
+- **Adaptive Personality** — Pace (moves per minute) is derived from placed count and elapsed time. Fast (≥6 moves/min) → competitive UI: shorter HUD labels (“N left”), snappier pill transitions (0.15s). Slow → calm: “N remaining”, gentler transitions (0.4s). Completion message set (calm vs competitive) and tone passed to completion overlay.
+
+### File / folder changes
+
+- **State & persistence** — `Play/playScreenUtils.ts` (storage keys), `playScreenUIInitial.ts`, `usePlayScreenUI.ts`, `usePlayScreenUIPersistence.ts` for the five toggles.
+- **Menu** — `headerMenuConfigTypes.ts`, `headerMenuItemsNavModes.ts` (Modes submenu items).
+- **Top bar / HUD** — `usePlayScreenTopBarProps.ts` (uiTone from pace, passed in hudProps), `PlayScreenTopBar.tsx`, `PlayHUD.tsx` (uiTone microcopy and `.hudCompetitive` / `.hudCalm` classes).
+- **Play screen** — `PlayScreen.tsx` (zen class, mystery preview/reveal, precision ref, dynamic-difficulty ref, completion gate props), `PlayScreen.module.css` (`.zenMode`, `.hudCompetitive`, `.hudCalm`, `.completeStatBonus`).
+- **Completion** — `CompletionOverlayGate.tsx` (precision stats, uiTone), `CompletionOverlay.tsx`, `CompletionStatsBlock.tsx` (precision row, bonus), `completionMessages.ts` (tone-based message sets).
+- **Puzzle / snap** — `puzzleSnap.ts` (NeighborSnapResult.dist), `PuzzleManager.ts` (onPieceSnapped with precisionPx, dynamicDifficultyMultiplierRef), `puzzleManagerUtils.ts` (EffectiveToleranceOptions.dynamicDifficultyMultiplierRef), `playScreenManagerEvents.ts` (onPrecisionSnap).
+- **Service** — `adaptiveDifficultyService.ts` (`getToleranceMultiplier(rows, cols)`).
+- **In-app changelog** — `src/app/data/changelog.ts` version 26 with the five new mode entries. **README.md** — Features and Documentation updated; key-files note for play modes.
+
+---
+
+## 🧩 Earlier (completion layout, tray, lock smoothness)
 
 ### Completion screen
 

@@ -19,7 +19,7 @@ export const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   navigation: "Navigate",
   pieceShape: "Piece Shape",
   share: "Share",
-  stats: "Leaderboards",
+  stats: "Leaderboard",
   theme: "Theme",
 };
 
@@ -56,13 +56,14 @@ export function getSubmenuDescription(id: SubMenuId): string {
   return SUBMENU_DESCRIPTIONS[id] ?? SUB_MENU_LABELS[id];
 }
 
+/** Settings submenus in alphabetical order by label (Appearance, Assistance, Audio, …). */
 export const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
-  "display",
-  "assistance",
-  "controls",
-  "audio",
-  "advanced",
-  "navigation",
-  "share",
-  "stats",
+  "display", // Appearance
+  "assistance", // Assistance
+  "audio", // Audio
+  "controls", // Gameplay
+  "stats", // Leaderboard
+  "navigation", // Navigate
+  "share", // Share
+  "advanced", // System
 ];

@@ -4,6 +4,16 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
+## Recent: Play modes (Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)
+
+- **Zen Ambient** — Toggle in Settings → Modes. Hides timer and rankings; adds a subtle animated gradient background and softer transitions. Persisted.
+- **Mystery Mode** — Full reference image hidden; sections reveal only after correct placements (progressive reveal).
+- **Precision Mode** — Snap distance (px) is recorded per snap; completion overlay shows average precision and bonus points for tight snaps.
+- **Dynamic Difficulty** — Snap tolerance adjusts from completion history (same grid size): slightly tighter when you complete fast, more forgiving when slower.
+- **Adaptive Personality** — UI tone follows pace: fast play (≥6 moves/min) gets competitive microcopy and snappier HUD transitions; slow play gets calm copy and gentler animations. Completion message set varies by tone.
+
+---
+
 ## Recent: UX polish (hints, win screen, What's New)
 
 - **Hint toasts** – All hint and onboarding toasts (including combo and milestone) auto-dismiss after 3 seconds.

@@ -20,6 +20,10 @@ export function useReferenceTapHighlight(
   );
   const lastTapRef = useRef(0);
 
+  const clearHighlight = useCallback(() => {
+    setHighlightedPieceIds(new Set());
+  }, []);
+
   const onPreviewTap = useCallback(
     (e: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>) => {
       if (performance.now() - lastTapRef.current < COOLDOWN_MS) return;
@@ -74,5 +78,5 @@ export function useReferenceTapHighlight(
     [state, lastPlacementOrInteractionRef],
   );
 
-  return { highlightedPieceIds, onPreviewTap };
+  return { highlightedPieceIds, onPreviewTap, clearHighlight };
 }

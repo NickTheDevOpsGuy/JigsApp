@@ -12,7 +12,36 @@ export const COMPLETION_MESSAGES = [
   "Well done!",
 ] as const;
 
-export function getCompletionMessage(seed: number): string {
+const CALM_MESSAGES = [
+  "Complete!",
+  "Well done.",
+  "All together.",
+  "Peaceful finish.",
+  "Nicely done.",
+  "You did it.",
+] as const;
+
+const COMPETITIVE_MESSAGES = [
+  "Nailed it!",
+  "Speed run!",
+  "Crushed it!",
+  "Lightning finish!",
+  "You did it!",
+  "Puzzle master!",
+] as const;
+
+export function getCompletionMessage(
+  seed: number,
+  uiTone?: "competitive" | "calm",
+): string {
+  if (uiTone === "calm") {
+    const i = Math.abs(seed) % CALM_MESSAGES.length;
+    return CALM_MESSAGES[i];
+  }
+  if (uiTone === "competitive") {
+    const i = Math.abs(seed) % COMPETITIVE_MESSAGES.length;
+    return COMPETITIVE_MESSAGES[i];
+  }
   const i = Math.abs(seed) % COMPLETION_MESSAGES.length;
   return COMPLETION_MESSAGES[i];
 }

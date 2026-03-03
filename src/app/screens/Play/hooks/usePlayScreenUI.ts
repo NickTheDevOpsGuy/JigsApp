@@ -23,6 +23,9 @@ export function usePlayScreenUI() {
   const [pieceLockingEnabled, setPieceLockingEnabled] = useState(
     storageInitial.pieceLockingEnabled,
   );
+  const [autoRotateOnSnap, setAutoRotateOnSnap] = useState(
+    storageInitial.autoRotateOnSnap,
+  );
   const [showGhostHint, setShowGhostHint] = useState(storageInitial.showGhostHint);
   const [showAlignmentGrid, setShowAlignmentGrid] = useState(
     storageInitial.showAlignmentGrid,
@@ -53,6 +56,21 @@ export function usePlayScreenUI() {
   );
   const [progressiveRevealMode, setProgressiveRevealMode] = useState(
     storageInitial.progressiveRevealMode,
+  );
+  const [zenModeEnabled, setZenModeEnabled] = useState(
+    storageInitial.zenModeEnabled,
+  );
+  const [mysteryModeEnabled, setMysteryModeEnabled] = useState(
+    storageInitial.mysteryModeEnabled,
+  );
+  const [precisionModeEnabled, setPrecisionModeEnabled] = useState(
+    storageInitial.precisionModeEnabled,
+  );
+  const [dynamicDifficultyEnabled, setDynamicDifficultyEnabled] = useState(
+    storageInitial.dynamicDifficultyEnabled,
+  );
+  const [adaptivePersonalityEnabled, setAdaptivePersonalityEnabled] = useState(
+    storageInitial.adaptivePersonalityEnabled,
   );
 
   const [dailyPreferredModifier, setDailyPreferredModifierState] =
@@ -90,6 +108,7 @@ export function usePlayScreenUI() {
 
   usePlayScreenUIPersistence({
     pieceLockingEnabled,
+    autoRotateOnSnap,
     showGhostHint,
     showAlignmentGrid,
     showGhostWhenIdle,
@@ -102,6 +121,11 @@ export function usePlayScreenUI() {
     pieceCutType,
     progressiveRevealMode,
     immersiveMode,
+    zenModeEnabled,
+    mysteryModeEnabled,
+    precisionModeEnabled,
+    dynamicDifficultyEnabled,
+    adaptivePersonalityEnabled,
   });
 
   const toggleFullscreen = useCallback(() => {
@@ -172,6 +196,20 @@ export function usePlayScreenUI() {
   );
   const toggleRelaxedMode = useCallback(() => setRelaxedModeEnabled((v) => !v), []);
   const toggleDriftMode = useCallback(() => setDriftModeEnabled((v) => !v), []);
+  const toggleZenMode = useCallback(() => setZenModeEnabled((v) => !v), []);
+  const toggleMysteryMode = useCallback(() => setMysteryModeEnabled((v) => !v), []);
+  const togglePrecisionMode = useCallback(
+    () => setPrecisionModeEnabled((v) => !v),
+    [],
+  );
+  const toggleDynamicDifficulty = useCallback(
+    () => setDynamicDifficultyEnabled((v) => !v),
+    [],
+  );
+  const toggleAdaptivePersonality = useCallback(
+    () => setAdaptivePersonalityEnabled((v) => !v),
+    [],
+  );
 
   const setDailyPreferredModifier = useCallback((modifier: DailyVisualModifier) => {
     setDailyPreferredModifierState(modifier);
@@ -181,6 +219,8 @@ export function usePlayScreenUI() {
   return {
     pieceLockingEnabled,
     setPieceLockingEnabled,
+    autoRotateOnSnap,
+    setAutoRotateOnSnap,
     showGhostHint,
     setShowGhostHint,
     showAlignmentGrid,
@@ -208,6 +248,21 @@ export function usePlayScreenUI() {
     setPieceCutType,
     progressiveRevealMode,
     setProgressiveRevealMode,
+    zenModeEnabled,
+    setZenModeEnabled,
+    toggleZenMode,
+    mysteryModeEnabled,
+    setMysteryModeEnabled,
+    toggleMysteryMode,
+    precisionModeEnabled,
+    setPrecisionModeEnabled,
+    togglePrecisionMode,
+    dynamicDifficultyEnabled,
+    setDynamicDifficultyEnabled,
+    toggleDynamicDifficulty,
+    adaptivePersonalityEnabled,
+    setAdaptivePersonalityEnabled,
+    toggleAdaptivePersonality,
     debug,
     setDebug,
     showPreview,

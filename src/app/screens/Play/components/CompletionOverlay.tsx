@@ -41,6 +41,11 @@ interface CompletionOverlayProps {
   onClose: () => void;
   onGoHome?: () => void;
   onPlayAgain?: () => void;
+  precisionModeEnabled?: boolean;
+  avgPrecisionPx?: number | null;
+  precisionBonusPoints?: number | null;
+  /** Adaptive Personality: "competitive" | "calm" for microcopy */
+  uiTone?: "competitive" | "calm";
 }
 
 export function CompletionOverlay({
@@ -62,6 +67,10 @@ export function CompletionOverlay({
   onClose,
   onGoHome,
   onPlayAgain,
+  precisionModeEnabled,
+  avgPrecisionPx,
+  precisionBonusPoints,
+  uiTone,
 }: CompletionOverlayProps) {
   const handleClose = useCallback(() => onClose(), [onClose]);
   const handleGoHome = useCallback(() => {
@@ -138,7 +147,7 @@ export function CompletionOverlay({
         {(() => {
           const pieceCount = grid ? grid.rows * grid.cols : 0;
           const seed = elapsedSeconds + pieceCount;
-          const message = getCompletionMessage(seed);
+          const message = getCompletionMessage(seed, uiTone);
           const badge =
             pieceCount > 0
               ? getCompletionBadge(elapsedSeconds, undoCount ?? 0, pieceCount)
@@ -187,6 +196,9 @@ export function CompletionOverlay({
           accuracyPercent={accuracyPercent}
           percentile={percentile}
           rankPosition={rankPosition}
+          precisionModeEnabled={precisionModeEnabled}
+          avgPrecisionPx={avgPrecisionPx}
+          precisionBonusPoints={precisionBonusPoints}
         />
 
         <div className={styles.completeShareSection}>

@@ -1,32 +1,45 @@
-/**
- * useShareResults – copy, native share. Share text: "That was M:SS of focus. Can you do better?" + link.
- */
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { PuzzleState } from "@/puzzle/types";
 import { formatTime } from "../playUtils";
 
-const PLAY_BASE_URL = "https://phuzzle.vercel.app";
+export type ShareUrls = {
+  twitter: string;
+  facebook: string;
+  reddit: string;
+  whatsapp: string;
+};
 
 export function useShareResults(args: {
   elapsedSeconds: number;
   state: PuzzleState | null;
-  /** Link to this exact puzzle (e.g. /daily or /play?session=xxx). Omit for home. */
-  puzzleShareUrl?: string | null;
-  /** 0–100, unused in share text but kept for API compatibility. */
+  puzzleShareUrl?: string;
   accuracyPercent?: number;
 }) {
-  const { elapsedSeconds, state: _state, puzzleShareUrl } = args;
+  const { elapsedSeconds, state } = args;
   const [copied, setCopied] = useState(false);
 
-  const playUrl = puzzleShareUrl
-    ? `${PLAY_BASE_URL}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`
-    : `${PLAY_BASE_URL}/`;
-
-  // Message uses the sharer’s completion time; playUrl is the exact puzzle + difficulty (daily?grid= or session=)
   const getShareText = useCallback(() => {
     const timeStr = formatTime(elapsedSeconds);
-    return `That was ${timeStr} of focus. Can you do better?\n\n${playUrl}`;
-  }, [playUrl, elapsedSeconds]);
+    const pieceCount = state?.totalCount ?? 0;
+    return `🧩 I completed a ${pieceCount}-piece Phuzzle in ${timeStr}! Can you beat my time?`;
+  }, [elapsedSeconds, state?.totalCount]);
+
+  const shareUrls: ShareUrls = useMemo(() => {
+    const text = encodeURIComponent(getShareText());
+    const hashtag = encodeURIComponent("#Phuzzle");
+    const url = encodeURIComponent(window.location.origin);
+
+    return {
+      twitter: `https://twitter.com/intent/tweet?text=${text}%20${hashtag}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}%20${hashtag}`,
+      reddit: `https://reddit.com/submit?title=${text}%20${hashtag}`,
+      whatsapp: `https://wa.me/?text=${text}%20${hashtag}%20${url}`,
+    };
+  }, [getShareText]);
+
+  const openShareWindow = useCallback((url: string) => {
+    window.open(url, "_blank", "width=600,height=400,menubar=no,toolbar=no");
+  }, []);
 
   const handleCopyResults = useCallback(async () => {
     const text = getShareText() + " #Phuzzle";
@@ -49,17 +62,19 @@ export function useShareResults(args: {
       await navigator.share({
         title: "Phuzzle",
         text,
-        url: playUrl,
+        url: window.location.origin,
       });
     } catch (err) {
-      if (import.meta.env.DEV) console.warn("Share cancelled or failed:", err);
+      console.warn("Share cancelled or failed:", err);
     }
-  }, [getShareText, playUrl]);
+  }, [getShareText]);
 
   return {
     copied,
     setCopied,
     getShareText,
+    shareUrls,
+    openShareWindow,
     handleCopyResults,
     canNativeShare,
     handleNativeShare,

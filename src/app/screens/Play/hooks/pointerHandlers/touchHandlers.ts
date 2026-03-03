@@ -172,12 +172,15 @@ export function handleTouchUp(
         pid &&
         canRotatePiece(pid)
       ) {
-        if (ctx.lastTapRotateTimeRef) ctx.lastTapRotateTimeRef.current = now;
-        onPieceInteraction?.();
-        manager.rotatePiece(pid);
-        soundManager.play("rotate");
-        haptic?.("rotate");
-        setState(manager.getState());
+        const current = manager.getState().pieces.find((p) => p.id === pid);
+        if (!current?.inTray) {
+          if (ctx.lastTapRotateTimeRef) ctx.lastTapRotateTimeRef.current = now;
+          onPieceInteraction?.();
+          manager.rotatePiece(pid);
+          soundManager.play("rotate");
+          haptic?.("rotate");
+          setState(manager.getState());
+        }
       }
     }
   } else {

@@ -5,6 +5,7 @@ export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
 export const GRID_ONCE_KEY = "phuzzle:gridSizeOnce";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
+export const AUTO_ROTATE_ON_SNAP_KEY = "phuzzle:autoRotateOnSnap";
 export const GHOST_HINT_KEY = "phuzzle:ghostHint";
 export const IMMERSIVE_MODE_KEY = "phuzzle:immersiveMode";
 export const ALIGNMENT_GRID_KEY = "phuzzle:alignmentGrid";
@@ -17,6 +18,11 @@ export const DRIFT_MODE_KEY = "phuzzle:driftMode";
 export const CUT_TYPE_KEY = "phuzzle:cutType";
 export const PROGRESSIVE_REVEAL_KEY = "phuzzle:progressiveReveal";
 export const SNAP_TOLERANCE_OVERRIDE_KEY = "phuzzle:snapToleranceOverride";
+export const ZEN_MODE_KEY = "phuzzle:zenMode";
+export const MYSTERY_MODE_KEY = "phuzzle:mysteryMode";
+export const PRECISION_MODE_KEY = "phuzzle:precisionMode";
+export const DYNAMIC_DIFFICULTY_KEY = "phuzzle:dynamicDifficulty";
+export const ADAPTIVE_PERSONALITY_KEY = "phuzzle:adaptivePersonality";
 
 export const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
 

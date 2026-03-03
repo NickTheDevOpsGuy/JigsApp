@@ -24,6 +24,7 @@ export type ResumeChoice = "resume" | "fresh" | null;
 export function usePlayScreenManager(
   grid: { rows: number; cols: number },
   pieceLockingEnabled: boolean,
+  autoRotateOnSnap: boolean,
   timeMode: TimeMode,
   countdownMinutes: number,
   lastInteractionRef: MutableRefObject<number>,
@@ -59,6 +60,10 @@ export function usePlayScreenManager(
     elapsedSecondsRef?: MutableRefObject<number>;
     /** Called when first piece in a quadrant is placed (speedrun mode). */
     onQuadrantPlaced?: (quadrant: 0 | 1 | 2 | 3, elapsedSeconds: number) => void;
+    /** Precision Mode: called with snap distance in px when a snap occurs. */
+    onPrecisionSnap?: (precisionPx: number) => void;
+    /** Dynamic Difficulty: ref to tolerance multiplier (0.9–1.1). */
+    dynamicDifficultyMultiplierRef?: MutableRefObject<number>;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -224,6 +229,7 @@ export function usePlayScreenManager(
             snapScaleRef: opts?.snapScaleRef,
             relaxedToleranceMultiplierRef,
             snapToleranceOverrideRef,
+            dynamicDifficultyMultiplierRef: opts?.dynamicDifficultyMultiplierRef,
           },
           events,
         );
@@ -249,6 +255,7 @@ export function usePlayScreenManager(
         }
 
         next.setPieceLockingEnabled(pieceLockingEnabled);
+        next.setAutoRotateOnSnap(autoRotateOnSnap);
         setManager(next);
         setState(next.getState());
         setIsLoading(false);
@@ -290,6 +297,7 @@ export function usePlayScreenManager(
   }, [
     grid,
     pieceLockingEnabled,
+    autoRotateOnSnap,
     timeMode,
     countdownMinutes,
     lastInteractionRef,
@@ -300,6 +308,10 @@ export function usePlayScreenManager(
   useEffect(() => {
     manager?.setPieceLockingEnabled(pieceLockingEnabled);
   }, [manager, pieceLockingEnabled]);
+
+  useEffect(() => {
+    manager?.setAutoRotateOnSnap(autoRotateOnSnap);
+  }, [manager, autoRotateOnSnap]);
 
   // Resize observer: keep manager board size in sync with DOM (no min clamp so coordinate system matches canvas)
   useEffect(() => {

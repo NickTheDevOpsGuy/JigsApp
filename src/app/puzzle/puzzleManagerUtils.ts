@@ -17,6 +17,8 @@ export type EffectiveToleranceOptions = {
   snapScaleRef?: MutableRefObject<number> | undefined;
   relaxedToleranceMultiplierRef?: MutableRefObject<number> | undefined;
   snapToleranceOverrideRef?: MutableRefObject<number> | undefined;
+  /** Dynamic Difficulty: 0.9 = tighter (skilled), 1.1 = more forgiving */
+  dynamicDifficultyMultiplierRef?: MutableRefObject<number> | undefined;
   isMobile: boolean;
 };
 
@@ -38,6 +40,7 @@ export function getEffectiveTolerance(
     0.6,
     Math.min(1.6, options.snapToleranceOverrideRef?.current ?? 1),
   );
+  const dynamicMult = options.dynamicDifficultyMultiplierRef?.current ?? 1;
   const mobileBump = options.isMobile ? 1.2 : 1;
   let effective = basePx * mobileBump;
 
@@ -53,7 +56,7 @@ export function getEffectiveTolerance(
     effective *= zoomInTighten;
   }
 
-  effective *= relaxedMult * overrideMult * firstSnapMultiplier;
+  effective *= relaxedMult * overrideMult * dynamicMult * firstSnapMultiplier;
 
   const minMult = options.isMobile ? 0.45 : 0.35;
   const maxMult = options.isMobile ? 3 : 2.5;

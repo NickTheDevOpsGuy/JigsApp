@@ -36,6 +36,8 @@ export type UsePlayScreenTopBarPropsParams = {
   hapticsEnabled: boolean;
   pieceLockingEnabled: boolean;
   setPieceLockingEnabled: (fn: (p: boolean) => boolean) => void;
+  autoRotateOnSnap: boolean;
+  setAutoRotateOnSnap: (fn: (a: boolean) => boolean) => void;
   showGhostHint: boolean;
   setShowGhostHint: (fn: (g: boolean) => boolean) => void;
   showGhostWhenIdle: boolean;
@@ -111,6 +113,16 @@ export type UsePlayScreenTopBarPropsParams = {
   connectedCount: number;
   showImmersiveUi: boolean;
   scheduleImmersiveHide: () => void;
+  zenModeEnabled: boolean;
+  mysteryModeEnabled: boolean;
+  precisionModeEnabled: boolean;
+  dynamicDifficultyEnabled: boolean;
+  adaptivePersonalityEnabled: boolean;
+  toggleZenMode: () => void;
+  toggleMysteryMode: () => void;
+  togglePrecisionMode: () => void;
+  toggleDynamicDifficulty: () => void;
+  toggleAdaptivePersonality: () => void;
 };
 
 export type PlayScreenTopBarPropsResult = {
@@ -128,6 +140,8 @@ export type PlayScreenTopBarPropsResult = {
     quadrantPbs?: Record<0 | 1 | 2 | 3, number | null>;
     lives?: number;
     onTogglePause: () => void;
+    /** Adaptive Personality: "competitive" | "calm" for microcopy/animations */
+    uiTone?: "competitive" | "calm";
   };
   topBarButtonsProps: {
     showPreview: boolean;
@@ -241,7 +255,20 @@ export function usePlayScreenTopBarProps(
     connectedCount,
     showImmersiveUi,
     scheduleImmersiveHide,
+    zenModeEnabled,
+    mysteryModeEnabled,
+    precisionModeEnabled,
+    dynamicDifficultyEnabled,
+    adaptivePersonalityEnabled,
+    toggleZenMode,
+    toggleMysteryMode,
+    togglePrecisionMode,
+    toggleDynamicDifficulty,
+    toggleAdaptivePersonality,
   } = params;
+
+  const autoRotateOnSnap = params.autoRotateOnSnap;
+  const setAutoRotateOnSnap = params.setAutoRotateOnSnap;
 
   return useMemo(() => {
     const headerMenuProps: HeaderMenuProps = {
@@ -309,6 +336,10 @@ export function usePlayScreenTopBarProps(
       onTogglePieceLocking: withHaptic(hapticsEnabled, () =>
         setPieceLockingEnabled((p) => !p),
       ),
+      autoRotateOnSnap,
+      onToggleAutoRotateOnSnap: withHaptic(hapticsEnabled, () =>
+        setAutoRotateOnSnap((a) => !a),
+      ),
       relaxedModeEnabled,
       onToggleRelaxedMode: withHaptic(hapticsEnabled, toggleRelaxedMode),
       driftModeEnabled,
@@ -349,7 +380,24 @@ export function usePlayScreenTopBarProps(
       onClearCache: () => setShowClearCacheConfirm(true),
       snapToleranceOverride,
       onSnapToleranceOverrideChange: setSnapToleranceOverride,
+      zenModeEnabled,
+      onToggleZenMode: withHaptic(hapticsEnabled, toggleZenMode),
+      mysteryModeEnabled,
+      onToggleMysteryMode: withHaptic(hapticsEnabled, toggleMysteryMode),
+      precisionModeEnabled,
+      onTogglePrecisionMode: withHaptic(hapticsEnabled, togglePrecisionMode),
+      dynamicDifficultyEnabled,
+      onToggleDynamicDifficulty: withHaptic(hapticsEnabled, toggleDynamicDifficulty),
+      adaptivePersonalityEnabled,
+      onToggleAdaptivePersonality: withHaptic(hapticsEnabled, toggleAdaptivePersonality),
     };
+
+    const movesPerMin =
+      (state?.placedCount ?? 0) / Math.max(0.1, elapsedSeconds / 60);
+    const uiTone =
+      adaptivePersonalityEnabled && elapsedSeconds >= 10
+        ? (movesPerMin >= 6 ? ("competitive" as const) : ("calm" as const))
+        : undefined;
 
     const hudProps = {
       elapsedSeconds,
@@ -372,6 +420,8 @@ export function usePlayScreenTopBarProps(
           : undefined,
       lives: timeMode === "timeattack" ? lives : undefined,
       onTogglePause: () => setIsPaused((p) => !p),
+      zenModeEnabled,
+      uiTone,
     };
 
     const topBarButtonsProps = {
@@ -480,5 +530,17 @@ export function usePlayScreenTopBarProps(
     connectedCount,
     showImmersiveUi,
     scheduleImmersiveHide,
+    autoRotateOnSnap,
+    setAutoRotateOnSnap,
+    zenModeEnabled,
+    mysteryModeEnabled,
+    precisionModeEnabled,
+    dynamicDifficultyEnabled,
+    adaptivePersonalityEnabled,
+    toggleZenMode,
+    toggleMysteryMode,
+    togglePrecisionMode,
+    toggleDynamicDifficulty,
+    toggleAdaptivePersonality,
   ]);
 }

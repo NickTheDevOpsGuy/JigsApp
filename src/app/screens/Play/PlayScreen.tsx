@@ -18,7 +18,7 @@ import styles from "./PlayScreen.module.css";
 
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import { useShouldShowTutorial } from "@/components/HowToPlay";
-import type { PuzzleState } from "@/puzzle/types";
+import type { Piece, PuzzleState } from "@/puzzle/types";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
 import { audioManager } from "@/audio/audioManager";
@@ -71,6 +71,7 @@ import {
 import { SnapComboMeter } from "./components/SnapComboMeter";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
 import { createPuzzleSession } from "@/services/puzzleSessionService";
+import { getToleranceMultiplier } from "@/services/adaptiveDifficultyService";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 const DAILY_PARAM = "daily";
@@ -146,6 +147,8 @@ export function PlayScreen() {
   const {
     pieceLockingEnabled,
     setPieceLockingEnabled,
+    autoRotateOnSnap,
+    setAutoRotateOnSnap,
     relaxedModeEnabled,
     toggleRelaxedMode,
     driftModeEnabled,
@@ -199,6 +202,16 @@ export function PlayScreen() {
     setPieceCutType,
     progressiveRevealMode,
     setProgressiveRevealMode,
+    zenModeEnabled,
+    mysteryModeEnabled,
+    precisionModeEnabled,
+    dynamicDifficultyEnabled,
+    adaptivePersonalityEnabled,
+    toggleZenMode,
+    toggleMysteryMode,
+    togglePrecisionMode,
+    toggleDynamicDifficulty,
+    toggleAdaptivePersonality,
     snapToleranceOverride,
     setSnapToleranceOverride,
     dailyPreferredModifier,
@@ -253,8 +266,14 @@ export function PlayScreen() {
   } | null>(null);
   const dragStartTimeRef = React.useRef<number | null>(null);
   const stateRef = React.useRef<PuzzleState | null>(null);
+  const trayPiecesKeyRef = React.useRef<{ key: string; pieces: Piece[] }>({
+    key: "",
+    pieces: [],
+  });
   const undoCountRef = React.useRef(0);
   const moveCountRef = React.useRef(0);
+  const precisionSnapsRef = React.useRef<number[]>([]);
+  const dynamicDifficultyMultiplierRef = React.useRef<number>(1);
   const usedHintRef = React.useRef(false);
   const abandonCapturedRef = React.useRef(false);
   const elapsedSecondsRef = React.useRef(0);
@@ -265,6 +284,7 @@ export function PlayScreen() {
   const managerResult = usePlayScreenManager(
     grid,
     pieceLockingEnabled,
+    autoRotateOnSnap,
     timeMode,
     countdownMinutes,
     lastInteractionRef,
@@ -309,6 +329,14 @@ export function PlayScreen() {
           time_to_snap_ms: timeToSnapMs,
         });
       },
+      onPrecisionSnap: precisionModeEnabled
+        ? (precisionPx) => {
+            precisionSnapsRef.current = [...precisionSnapsRef.current, precisionPx];
+          }
+        : undefined,
+      dynamicDifficultyMultiplierRef: dynamicDifficultyEnabled
+        ? dynamicDifficultyMultiplierRef
+        : undefined,
     },
   );
   const {
@@ -347,7 +375,7 @@ export function PlayScreen() {
   };
 
   stateRef.current = state;
-  const { highlightedPieceIds, onPreviewTap } = useReferenceTapHighlight(
+  const { highlightedPieceIds, onPreviewTap, clearHighlight } = useReferenceTapHighlight(
     state ?? null,
     lastInteractionRef,
   );
@@ -365,12 +393,21 @@ export function PlayScreen() {
   useEffect(() => {
     undoCountRef.current = 0;
     moveCountRef.current = 0;
+    precisionSnapsRef.current = [];
     abandonCapturedRef.current = false;
     usedHintRef.current = showGhostHint || showGhostWhenIdle;
     setQuadrantTimes({ 0: null, 1: null, 2: null, 3: null });
     setCompletionDismissed(false);
     setLives(3);
   }, [puzzleKey, showGhostHint, showGhostWhenIdle]);
+
+  useEffect(() => {
+    if (!dynamicDifficultyEnabled || !grid) {
+      dynamicDifficultyMultiplierRef.current = 1;
+      return;
+    }
+    dynamicDifficultyMultiplierRef.current = getToleranceMultiplier(grid.rows, grid.cols);
+  }, [dynamicDifficultyEnabled, grid?.rows, grid?.cols]);
 
   useEffect(() => {
     if (state?.isComplete) return;
@@ -632,6 +669,7 @@ export function PlayScreen() {
     onDragPreview: setDragPreview,
     onPieceInteraction: () => {
       lastInteractionRef.current = performance.now();
+      clearHighlight();
     },
     onDragStarted: () => {
       moveCountRef.current += 1;
@@ -763,10 +801,22 @@ export function PlayScreen() {
     elapsedSeconds,
   });
 
-  const trayPieces = useMemo(
-    () => (state ? state.pieces.filter((p) => p.inTray) : []),
-    [state],
-  );
+  // Stable reference when only board state changed (avoids tray thumbs re-running and "spinning")
+  const trayPieces = useMemo(() => {
+    const next = state ? state.pieces.filter((p) => p.inTray) : [];
+    const key =
+      next.length === 0
+        ? ""
+        : next
+            .map((p) => `${p.id}:${p.rotation}`)
+            .sort()
+            .join(",");
+    const ref = trayPiecesKeyRef.current;
+    if (ref.key === key && ref.pieces.length === next.length) return ref.pieces;
+    ref.key = key;
+    ref.pieces = next;
+    return next;
+  }, [state]);
   const dragPreviewPiece =
     dragPreview && state ? state.pieces.find((p) => p.id === dragPreview.pieceId) : null;
   const placed = state?.placedCount ?? 0;
@@ -830,6 +880,8 @@ export function PlayScreen() {
     hapticsEnabled,
     pieceLockingEnabled,
     setPieceLockingEnabled,
+    autoRotateOnSnap,
+    setAutoRotateOnSnap,
     showGhostHint,
     setShowGhostHint,
     showGhostWhenIdle,
@@ -896,6 +948,16 @@ export function PlayScreen() {
     connectedCount: sessionResult.connectedCount,
     showImmersiveUi,
     scheduleImmersiveHide,
+    zenModeEnabled,
+    mysteryModeEnabled,
+    precisionModeEnabled,
+    dynamicDifficultyEnabled,
+    adaptivePersonalityEnabled,
+    toggleZenMode,
+    toggleMysteryMode,
+    togglePrecisionMode,
+    toggleDynamicDifficulty,
+    toggleAdaptivePersonality,
   });
 
   return (
@@ -909,7 +971,7 @@ export function PlayScreen() {
       navigate={navigate}
     >
       <div
-        className={`${styles.page} ${
+        className={`${styles.page} ${zenModeEnabled ? styles.zenMode : ""} ${
           dailyVisualModifier === "fog"
             ? styles.modifierFog
             : dailyVisualModifier === "night"
@@ -1021,25 +1083,7 @@ export function PlayScreen() {
                       visible={!isPaused && !isComplete}
                     />
                   )}
-                  {isPaused && (
-                    <PauseOverlay
-                      onResume={() => setIsPaused(false)}
-                      isCountdownExpired={
-                        timeMode === "countdown" &&
-                        elapsedSeconds <= 0 &&
-                        !isComplete &&
-                        isPaused
-                      }
-                      onNewPuzzle={
-                        timeMode === "countdown" &&
-                        elapsedSeconds <= 0 &&
-                        !isComplete &&
-                        isPaused
-                          ? handleNewGame
-                          : undefined
-                      }
-                    />
-                  )}
+                  {isPaused && <PauseOverlay onResume={() => setIsPaused(false)} />}
                   {((isComplete && !completionDismissed) ||
                     (showE2ECompletion && !completionDismissed)) &&
                     state && (
@@ -1074,6 +1118,9 @@ export function PlayScreen() {
                         isDaily={isDailyPuzzleSession()}
                         onGoHome={() => navigate("/")}
                         onPlayAgain={handleNewGame}
+                        precisionModeEnabled={precisionModeEnabled}
+                        precisionSnaps={precisionSnapsRef.current}
+                        adaptivePersonalityEnabled={adaptivePersonalityEnabled}
                       />
                     )}
                 </div>
@@ -1140,8 +1187,8 @@ export function PlayScreen() {
         </div>
 
         <PlayScreenOverlays
-          showPreview={showPreview}
-          progressiveRevealMode={progressiveRevealMode}
+          showPreview={showPreview && !mysteryModeEnabled}
+          progressiveRevealMode={progressiveRevealMode || mysteryModeEnabled}
           previewImage={imgRef.current}
           state={state}
           onPreviewTap={onPreviewTap}

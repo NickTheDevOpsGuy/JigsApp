@@ -38,7 +38,7 @@ export function getSolvedNeighborsFromMap(
 }
 
 export function getGroupBounds(pieces: Piece[], groupId: string): GroupBounds | null {
-  const ps = pieces.filter((p) => p.groupId === groupId);
+  const ps = pieces.filter((p) => !p.inTray && p.groupId === groupId);
   if (!ps.length) return null;
 
   let minX = Infinity,
@@ -65,7 +65,7 @@ export function wouldOverlapAnyOtherGroup(
   dx: number,
   dy: number,
 ): boolean {
-  const groupPieces = pieces.filter((p) => p.groupId === groupId);
+  const groupPieces = pieces.filter((p) => !p.inTray && p.groupId === groupId);
   if (groupPieces.length === 0) return false;
 
   const movedBounds = getGroupBounds(

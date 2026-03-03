@@ -2,54 +2,52 @@
  * ShortcutsModal – keyboard shortcuts reference overlay.
  */
 import React, { useState, useMemo } from "react";
-import { X, Keyboard, Gamepad2, Compass, Settings, Mouse } from "lucide-react";
-import { SHORTCUTS, SHORTCUT_GROUPS } from "@/hooks/useKeyboardShortcuts";
-import type { ShortcutId } from "@/hooks/useKeyboardShortcuts";
+import {
+  X,
+  Keyboard,
+  Gamepad2,
+  Compass,
+  Settings,
+  HelpCircle,
+  Mouse,
+} from "lucide-react";
+import { SHORTCUT_GROUPS } from "@/hooks/useKeyboardShortcuts";
 import styles from "./ShortcutsModal.module.css";
 
-const SECTION_ICONS = {
+type GroupId = (typeof SHORTCUT_GROUPS)[number]["id"];
+const SECTION_ICONS: Record<GroupId, typeof Gamepad2> = {
   gameplay: Gamepad2,
-  navigation: Compass,
-  system: Settings,
-} as const;
+  pieceControl: Compass,
+  displayAudio: Settings,
+  help: HelpCircle,
+};
 
 interface ShortcutsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Optional: dim these shortcuts when not available */
-  disabledIds?: ShortcutId[];
+  /** Optional: dim these shortcuts when not available (match by action text) */
+  disabledActions?: string[];
 }
 
 export function ShortcutsModal({
   isOpen,
   onClose,
-  disabledIds = [],
+  disabledActions = [],
 }: ShortcutsModalProps) {
   const [search, setSearch] = useState("");
-  const shortcutsById = useMemo(() => new Map(SHORTCUTS.map((s) => [s.id, s])), []);
 
   const filteredGroups = useMemo(() => {
     if (!search.trim()) return SHORTCUT_GROUPS;
     const q = search.toLowerCase().trim();
-    const navTerms = ["zoom", "pan", "scroll", "pinch", "middle"];
-    return SHORTCUT_GROUPS.map((g) => {
-      const shortcutIds = g.shortcutIds.filter((id) => {
-        const s = shortcutsById.get(id);
-        return (
-          s &&
-          (s.action.toLowerCase().includes(q) ||
-            s.keys.some((k) => formatKey(k).toLowerCase().includes(q)))
-        );
-      });
-      if (g.id === "navigation" && navTerms.some((t) => t.includes(q) || q.includes(t))) {
-        return {
-          ...g,
-          shortcutIds: shortcutIds.length > 0 ? shortcutIds : g.shortcutIds,
-        };
-      }
-      return { ...g, shortcutIds };
-    }).filter((g) => g.shortcutIds.length > 0);
-  }, [search, shortcutsById]);
+    return SHORTCUT_GROUPS.map((g) => ({
+      ...g,
+      shortcuts: g.shortcuts.filter(
+        (s) =>
+          s.action.toLowerCase().includes(q) ||
+          s.keys.some((k) => formatKey(k).toLowerCase().includes(q)),
+      ),
+    })).filter((g) => g.shortcuts.length > 0);
+  }, [search]);
 
   if (!isOpen) return null;
 
@@ -100,7 +98,6 @@ export function ShortcutsModal({
           <div className={styles.grid}>
             {filteredGroups.map((group) => {
               const Icon = SECTION_ICONS[group.id];
-              const isNav = group.id === "navigation";
               return (
                 <section key={group.id} className={styles.section} data-group={group.id}>
                   <h3 className={styles.sectionTitle}>
@@ -109,44 +106,14 @@ export function ShortcutsModal({
                   </h3>
                   <table className={styles.table}>
                     <tbody>
-                      {isNav && (
-                        <>
-                          <tr>
-                            <td className={styles.keys}>
-                              <kbd className={styles.key}>Tab</kbd> (from top)
-                            </td>
-                            <td className={styles.action}>Skip to main content</td>
-                          </tr>
-                          <tr>
-                            <td className={styles.keys}>
-                              <kbd className={styles.key}>Scroll</kbd>
-                            </td>
-                            <td className={styles.action}>Zoom</td>
-                          </tr>
-                          <tr>
-                            <td className={styles.keys}>
-                              <kbd className={styles.key}>Middle</kbd> + Drag
-                            </td>
-                            <td className={styles.action}>Pan</td>
-                          </tr>
-                          <tr>
-                            <td className={styles.keys}>
-                              <kbd className={styles.key}>Pinch</kbd> /{" "}
-                              <kbd className={styles.key}>Two-finger drag</kbd>
-                            </td>
-                            <td className={styles.action}>Zoom & pan (touch)</td>
-                          </tr>
-                        </>
-                      )}
-                      {group.shortcutIds.map((id) => {
-                        const shortcut = shortcutsById.get(id);
-                        if (!shortcut) return null;
-                        const disabled = disabledIds.includes(id);
+                      {group.shortcuts.map((shortcut, i) => {
+                        const disabled = disabledActions.includes(shortcut.action);
+                        const keysLabel = shortcut.keys.map(formatKey).join(" or ");
                         return (
                           <tr
-                            key={id}
+                            key={`${group.id}-${i}`}
                             className={disabled ? styles.rowDisabled : undefined}
-                            aria-label={`${shortcut.ariaAction}: ${shortcut.keys.join(" or ")}`}
+                            aria-label={`${shortcut.action}: ${keysLabel}`}
                           >
                             <td className={styles.keys}>
                               {shortcut.keys.map((key, j) => (
@@ -162,12 +129,6 @@ export function ShortcutsModal({
                       })}
                     </tbody>
                   </table>
-                  {isNav && (
-                    <p className={styles.navNote}>
-                      Board fits your screen. Use the piece tray and arrow keys to nudge
-                      selected pieces.
-                    </p>
-                  )}
                 </section>
               );
             })}

@@ -1,7 +1,7 @@
 /**
- * Completion overlay stats block: Time, Moves, Accuracy, Rank.
+ * Completion overlay stats block: Time, Moves, Accuracy, Rank, Precision (optional).
  */
-import { Clock, Puzzle, Target, Trophy } from "lucide-react";
+import { Clock, Puzzle, Target, Trophy, Crosshair } from "lucide-react";
 import { formatTime } from "../playUtils";
 import styles from "../PlayScreen.module.css";
 
@@ -13,6 +13,9 @@ type Props = {
   accuracyPercent: number;
   percentile: Percentile | null;
   rankPosition: number | null;
+  precisionModeEnabled?: boolean;
+  avgPrecisionPx?: number | null;
+  precisionBonusPoints?: number | null;
 };
 
 export function CompletionStatsBlock({
@@ -21,6 +24,9 @@ export function CompletionStatsBlock({
   accuracyPercent,
   percentile,
   rankPosition,
+  precisionModeEnabled,
+  avgPrecisionPx,
+  precisionBonusPoints,
 }: Props) {
   return (
     <div className={styles.completeStats}>
@@ -41,6 +47,21 @@ export function CompletionStatsBlock({
           {Math.round(Math.max(0, Math.min(100, accuracyPercent)))}%
         </span>
       </div>
+      {precisionModeEnabled && avgPrecisionPx != null && (
+        <div className={styles.completeStatRow}>
+          <Crosshair size={18} className={styles.completeStatIcon} aria-hidden />
+          <span className={styles.completeStatLabel}>Precision:</span>
+          <span className={styles.completeStatValue}>
+            {avgPrecisionPx.toFixed(1)} px avg
+            {precisionBonusPoints != null && precisionBonusPoints > 0 && (
+              <span className={styles.completeStatBonus}>
+                {" "}
+                +{precisionBonusPoints} bonus
+              </span>
+            )}
+          </span>
+        </div>
+      )}
       {percentile && percentile.totalPlayers >= 1 && rankPosition != null && (
         <div className={styles.completeStatRow}>
           <Trophy size={18} className={styles.completeStatIcon} aria-hidden />

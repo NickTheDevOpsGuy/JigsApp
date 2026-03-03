@@ -1,11 +1,21 @@
 /**
  * usePieceTrayThumbs – batched thumbnail generation for tray pieces.
+ * Effect key is stable when only board pieces change (e.g. rotate on canvas)
+ * so tray thumbs don’t flicker or “spin” during canvas rotation.
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import type { Piece } from "@/puzzle/types";
 import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
 
 const BATCH_SIZE = 12;
+
+/** Stable key: only changes when tray piece set or their rotations change. */
+function trayVisualKey(displayed: Piece[]): string {
+  return displayed
+    .map((p) => `${p.id}:${p.rotation}`)
+    .sort()
+    .join(",");
+}
 
 export function usePieceTrayThumbs(
   displayed: Piece[],
@@ -18,6 +28,8 @@ export function usePieceTrayThumbs(
   const [imageLoadCount, setImageLoadCount] = useState(0);
   const displayedRef = useRef(displayed);
   displayedRef.current = displayed;
+
+  const key = useMemo(() => trayVisualKey(displayed), [displayed]);
 
   useEffect(() => {
     if (!image || displayed.length === 0) {
@@ -86,7 +98,7 @@ export function usePieceTrayThumbs(
     return () => {
       cancelled = true;
     };
-  }, [displayed, image, grid, thumbSize, compact, imageLoadCount]);
+  }, [key, image, grid, thumbSize, compact, imageLoadCount]);
 
   return thumbsById;
 }

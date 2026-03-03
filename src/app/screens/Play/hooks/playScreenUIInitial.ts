@@ -5,6 +5,7 @@ import type { PieceCutType } from "@/puzzle/types";
 import type { DebugFlags } from "../playScreenUtils";
 import {
   PIECE_LOCKING_KEY,
+  AUTO_ROTATE_ON_SNAP_KEY,
   CUT_TYPE_KEY,
   PROGRESSIVE_REVEAL_KEY,
   GHOST_HINT_KEY,
@@ -17,6 +18,11 @@ import {
   RELAXED_MODE_KEY,
   DRIFT_MODE_KEY,
   SNAP_TOLERANCE_OVERRIDE_KEY,
+  ZEN_MODE_KEY,
+  MYSTERY_MODE_KEY,
+  PRECISION_MODE_KEY,
+  DYNAMIC_DIFFICULTY_KEY,
+  ADAPTIVE_PERSONALITY_KEY,
 } from "../playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
@@ -31,6 +37,7 @@ function getBool(key: string, defaultValue: boolean): boolean {
 
 export function getPlayScreenUIStorageInitial(): {
   pieceLockingEnabled: boolean;
+  autoRotateOnSnap: boolean;
   showGhostHint: boolean;
   showAlignmentGrid: boolean;
   showGhostWhenIdle: boolean;
@@ -43,6 +50,11 @@ export function getPlayScreenUIStorageInitial(): {
   pieceCutType: PieceCutType;
   progressiveRevealMode: boolean;
   immersiveMode: boolean;
+  zenModeEnabled: boolean;
+  mysteryModeEnabled: boolean;
+  precisionModeEnabled: boolean;
+  dynamicDifficultyEnabled: boolean;
+  adaptivePersonalityEnabled: boolean;
 } {
   let snapToleranceOverride = 1;
   try {
@@ -65,6 +77,7 @@ export function getPlayScreenUIStorageInitial(): {
 
   return {
     pieceLockingEnabled: getBool(PIECE_LOCKING_KEY, false),
+    autoRotateOnSnap: getBool(AUTO_ROTATE_ON_SNAP_KEY, true),
     showGhostHint: getBool(GHOST_HINT_KEY, false),
     showAlignmentGrid: getBool(ALIGNMENT_GRID_KEY, false),
     showGhostWhenIdle: getBool(GHOST_WHEN_IDLE_KEY, false),
@@ -77,6 +90,11 @@ export function getPlayScreenUIStorageInitial(): {
     pieceCutType,
     progressiveRevealMode: getBool(PROGRESSIVE_REVEAL_KEY, false),
     immersiveMode: getBool(IMMERSIVE_MODE_KEY, false),
+    zenModeEnabled: getBool(ZEN_MODE_KEY, false),
+    mysteryModeEnabled: getBool(MYSTERY_MODE_KEY, false),
+    precisionModeEnabled: getBool(PRECISION_MODE_KEY, false),
+    dynamicDifficultyEnabled: getBool(DYNAMIC_DIFFICULTY_KEY, false),
+    adaptivePersonalityEnabled: getBool(ADAPTIVE_PERSONALITY_KEY, false),
   };
 }
 

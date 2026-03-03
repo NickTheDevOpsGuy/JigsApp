@@ -32,6 +32,11 @@ interface CompletionOverlayGateProps {
   isDaily: boolean;
   onGoHome?: () => void;
   onPlayAgain?: () => void;
+  /** Precision Mode: show snap precision and bonus rank points */
+  precisionModeEnabled?: boolean;
+  precisionSnaps?: number[];
+  /** Adaptive Personality: derive UI tone from pace for microcopy */
+  adaptivePersonalityEnabled?: boolean;
 }
 
 export function CompletionOverlayGate({
@@ -52,8 +57,27 @@ export function CompletionOverlayGate({
   isDaily,
   onGoHome,
   onPlayAgain,
+  precisionModeEnabled,
+  precisionSnaps = [],
+  adaptivePersonalityEnabled,
 }: CompletionOverlayGateProps) {
   if (!show || !state) return null;
+
+  const movesPerMin = moveCount / Math.max(0.1, elapsedSeconds / 60);
+  const uiTone =
+    adaptivePersonalityEnabled && elapsedSeconds >= 5
+      ? (movesPerMin >= 6 ? ("competitive" as const) : ("calm" as const))
+      : undefined;
+
+  const precisionCount = precisionSnaps.length;
+  const avgPrecisionPx =
+    precisionCount > 0
+      ? precisionSnaps.reduce((a, b) => a + b, 0) / precisionCount
+      : null;
+  const precisionBonusPoints =
+    precisionModeEnabled && avgPrecisionPx != null
+      ? Math.max(0, Math.round(30 - avgPrecisionPx))
+      : null;
 
   const accuracyPercent =
     state.totalCount && state.totalCount > 0
@@ -83,6 +107,10 @@ export function CompletionOverlayGate({
       onClose={onClose}
       onGoHome={onGoHome}
       onPlayAgain={onPlayAgain}
+      precisionModeEnabled={precisionModeEnabled}
+      avgPrecisionPx={avgPrecisionPx}
+      precisionBonusPoints={precisionBonusPoints}
+      uiTone={uiTone}
     />
   );
 }

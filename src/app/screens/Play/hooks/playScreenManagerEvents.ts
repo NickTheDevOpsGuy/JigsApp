@@ -33,6 +33,8 @@ export type PlayScreenManagerEventsDeps = {
         onQuadrantPlaced?: (quadrant: 0 | 1 | 2 | 3, elapsedSeconds: number) => void;
         batterySaverMode?: boolean;
         themeRef?: MutableRefObject<Theme | undefined>;
+        /** Precision Mode: called with snap distance in px (lower = more precise). */
+        onPrecisionSnap?: (precisionPx: number) => void;
       }
     | undefined
   >;
@@ -112,13 +114,14 @@ export function createPlayScreenManagerEvents(
         opts?.onPlacementStreak?.();
       }
     },
-    onPieceSnapped: (pieceIds, center) => {
+    onPieceSnapped: (pieceIds, center, precisionPx) => {
       const now = performance.now();
       const opts = optionsRef.current;
       const startTime = opts?.dragStartTimeRef?.current;
       if (startTime != null && typeof opts?.onPieceSnappedAnalytics === "function") {
         opts.onPieceSnappedAnalytics(Math.round(now - startTime));
       }
+      if (typeof precisionPx === "number") opts?.onPrecisionSnap?.(precisionPx);
       lastInteractionRef.current = now;
       soundManager.play("snap", { groupSize: pieceIds.length });
       opts?.haptic?.("snap");

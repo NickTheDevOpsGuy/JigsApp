@@ -18,6 +18,41 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Zen Ambient: no pressure, subtle animated background, soft transitions */
+.zenMode {
+  background: linear-gradient(
+    145deg,
+    var(--color-bg-primary) 0%,
+    color-mix(in srgb, var(--color-bg-elevated) 40%, var(--color-bg-primary)) 50%,
+    var(--color-bg-primary) 100%
+  );
+  background-size: 200% 200%;
+  animation: zenAmbient 12s ease-in-out infinite;
+  transition: background 0.6s ease, opacity 0.5s ease;
+}
+
+.zenMode .topBar,
+.zenMode .hud,
+.zenMode .trayWrap {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+@keyframes zenAmbient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zenMode {
+    animation: none;
+  }
+}
+
 .headerMenuTriggerWrap {
   display: inline-flex;
 }
@@ -326,9 +361,17 @@
   gap: 8px;
   flex: 1;
   justify-content: center;
-  min-width: 0;
-  overflow: hidden;
-  flex-wrap: nowrap;
+  transition: opacity 0.25s ease;
+}
+
+/* Adaptive Personality: subtle animation tone */
+.hudCompetitive .hudPill {
+  transition-duration: 0.15s;
+}
+
+.hudCalm .hudPill {
+  transition-duration: 0.4s;
+  transition-timing-function: ease-in-out;
 }
 
 .hudPill {
@@ -773,6 +816,22 @@
   margin: 10px 0;
 }
 
+/* Short viewport (e.g. MacBook Air, small laptop): allow vertical scroll so tray is reachable */
+@media (max-height: 700px) {
+  .page {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .playBody {
+    flex: none;
+    min-height: min(80vh, 600px);
+  }
+}
+
 /* Mobile – no scroll, aligned layout like desktop */
 @media (max-width: 600px) {
   .page {
@@ -781,6 +840,19 @@
     overflow: hidden;
     overflow-x: hidden;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
+  }
+
+  /* On short mobile (e.g. landscape), allow scroll so tray is reachable */
+  @media (max-height: 500px) {
+    .page {
+      height: auto;
+      min-height: 100dvh;
+      overflow-y: auto;
+    }
+    .playBody {
+      flex: none;
+      min-height: min(85vh, 500px);
+    }
   }
 
   .playBody {
@@ -1236,6 +1308,12 @@
   font-weight: 700;
   color: var(--color-brand-primary);
   font-size: 13px;
+}
+
+.completeStatBonus {
+  font-size: 0.9em;
+  color: var(--color-brand-primary);
+  font-weight: 600;
 }
 
 .completeChallenge {
@@ -1938,12 +2016,15 @@
 @media (max-width: 500px), (max-height: 600px) {
   .completeActions {
     gap: 8px;
+    flex-wrap: wrap;
   }
   .completeActionsTrigger,
   .completeActionsShareBtn {
-    padding: 10px 12px;
+    padding: 12px 14px;
     min-height: 44px;
     font-size: 0.9rem;
+    flex: 1 1 0;
+    min-width: 0;
   }
 }
 
@@ -2306,6 +2387,7 @@
 
 .headerMenuChevron {
   flex-shrink: 0;
+  margin-left: 12px;
   opacity: 0.85;
   transition: transform 0.15s ease;
 }

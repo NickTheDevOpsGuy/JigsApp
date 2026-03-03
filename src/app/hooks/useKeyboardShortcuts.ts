@@ -1,6 +1,6 @@
-/**
- * useKeyboardShortcuts – cross-platform shortcuts for play, menu, rotate, tray, undo, etc.
- */
+// src/app/hooks/useKeyboardShortcuts.ts
+// Cross-platform keyboard shortcuts for Phuzzle
+
 import { useEffect, useCallback } from "react";
 
 export type ShortcutAction =
@@ -19,10 +19,10 @@ export type ShortcutAction =
   | "moveDown" // Move piece down
   | "moveLeft" // Move piece left
   | "moveRight" // Move piece right
-  | "sendToTray"
-  | "snap"
   | "undo"
   | "redo"
+  | "sendToTray"
+  | "snap"
   | "showHelp"
   | "escape";
 
@@ -53,6 +53,7 @@ export function useKeyboardShortcuts({
     (e: KeyboardEvent) => {
       if (!enabled) return;
 
+      // Don't trigger shortcuts when typing in inputs
       const target = e.target as HTMLElement;
       if (
         target.tagName === "INPUT" ||
@@ -64,6 +65,7 @@ export function useKeyboardShortcuts({
 
       const { mod, shift } = getModifiers(e);
       const key = e.key.toLowerCase();
+
       let action: ShortcutAction | null = null;
 
       // Escape - close modals, unpause
@@ -129,42 +131,15 @@ export function useKeyboardShortcuts({
       else if (key === "h" && !mod) {
         action = "toggleHaptics";
       }
-      // G - Toggle ghost hint
-      else if (key === "g" && !mod) {
-        action = "toggleGhostHint";
-      }
-      // T - Send selected piece to tray
-      else if (key === "t" && !mod) {
-        e.preventDefault();
-        action = "sendToTray";
-      }
-      // Enter - Snap selected piece
-      else if (e.key === "Enter" && !mod) {
-        e.preventDefault();
-        action = "snap";
-      }
       // ? or F1 - Show help
       else if ((key === "?" || e.key === "F1") && !mod) {
         e.preventDefault();
         action = "showHelp";
       }
-      // Ctrl/Cmd+Z - Undo
-      else if (key === "z" && mod && !shift) {
-        e.preventDefault();
-        action = "undo";
-      }
-      // Ctrl/Cmd+Shift+Z - Redo
-      else if (key === "z" && mod && shift) {
-        e.preventDefault();
-        action = "redo";
-      }
-      // Ctrl/Cmd+Y - Redo (alternative, common on Windows)
-      else if (key === "y" && mod && !shift) {
-        e.preventDefault();
-        action = "redo";
-      }
 
-      if (action) onAction(action);
+      if (action) {
+        onAction(action);
+      }
     },
     [enabled, onAction],
   );
@@ -175,133 +150,58 @@ export function useKeyboardShortcuts({
   }, [handleKeyDown]);
 }
 
-// Shortcut definitions for the help modal (flat list, backward compatible)
+// Shortcut definitions for the help modal
 export const SHORTCUTS = [
-  {
-    keys: ["↑ ↓ ← →"],
-    action: "Move piece",
-    ariaAction: "Move piece",
-    id: "arrows" as const,
-  },
-  {
-    keys: ["R"],
-    action: "Rotate piece",
-    ariaAction: "Rotate piece",
-    id: "rotateCW" as const,
-  },
-  {
-    keys: ["Shift+R"],
-    action: "Rotate counter-clockwise",
-    ariaAction: "Rotate counter-clockwise",
-    id: "rotateCCW" as const,
-  },
-  {
-    keys: ["T"],
-    action: "Store piece in drawer",
-    ariaAction: "Store piece",
-    id: "sendToTray" as const,
-  },
-  {
-    keys: ["G"],
-    action: "Toggle ghost hint",
-    ariaAction: "Toggle ghost hint",
-    id: "ghost" as const,
-  },
-  {
-    keys: ["Space"],
-    action: "Pause / Resume",
-    ariaAction: "Pause or Resume",
-    id: "pause" as const,
-  },
-  {
-    keys: ["Tab"],
-    action: "Select next piece",
-    ariaAction: "Select next piece",
-    id: "nextPiece" as const,
-  },
-  {
-    keys: ["Shift+Tab"],
-    action: "Select previous piece",
-    ariaAction: "Select previous piece",
-    id: "prevPiece" as const,
-  },
-  {
-    keys: ["P"],
-    action: "Toggle preview",
-    ariaAction: "Toggle preview",
-    id: "preview" as const,
-  },
-  {
-    keys: ["F"],
-    action: "Fullscreen",
-    ariaAction: "Fullscreen",
-    id: "fullscreen" as const,
-  },
-  { keys: ["Ctrl+Z", "⌘Z"], action: "Undo", ariaAction: "Undo", id: "undo" as const },
-  {
-    keys: ["Ctrl+Shift+Z", "⌘⇧Z", "Ctrl+Y", "⌘Y"],
-    action: "Redo",
-    ariaAction: "Redo",
-    id: "redo" as const,
-  },
-  {
-    keys: ["M"],
-    action: "Mute / Unmute",
-    ariaAction: "Mute or Unmute",
-    id: "sound" as const,
-  },
-  {
-    keys: ["H"],
-    action: "Toggle haptics",
-    ariaAction: "Toggle haptics",
-    id: "haptics" as const,
-  },
-  { keys: ["N"], action: "New puzzle", ariaAction: "New puzzle", id: "newGame" as const },
-  {
-    keys: ["?", "F1"],
-    action: "Show shortcuts",
-    ariaAction: "Show shortcuts",
-    id: "showHelp" as const,
-  },
-  {
-    keys: ["Esc"],
-    action: "Close / Unpause",
-    ariaAction: "Close or Unpause",
-    id: "escape" as const,
-  },
+  { keys: ["Space"], action: "Pause / Resume" },
+  { keys: ["Tab"], action: "Select next piece" },
+  { keys: ["Shift+Tab"], action: "Select previous piece" },
+  { keys: ["R"], action: "Rotate selected piece" },
+  { keys: ["Shift+R"], action: "Rotate counter-clockwise" },
+  { keys: ["↑ ↓ ← →"], action: "Move selected piece" },
+  { keys: ["P"], action: "Toggle preview" },
+  { keys: ["F"], action: "Fullscreen" },
+  { keys: ["M"], action: "Mute / Unmute sound" },
+  { keys: ["H"], action: "Toggle haptics" },
+  { keys: ["N"], action: "New puzzle" },
+  { keys: ["?", "F1"], action: "Show shortcuts" },
+  { keys: ["Esc"], action: "Close / Unpause" },
 ] as const;
 
-// Grouped by intent per PDF v2: Gameplay, Navigation & View, System, Input Reference
-export type ShortcutId = (typeof SHORTCUTS)[number]["id"];
-export type ShortcutGroupId = "gameplay" | "navigation" | "system";
-
-export const SHORTCUT_GROUPS: {
-  id: ShortcutGroupId;
-  title: string;
-  shortcutIds: ShortcutId[];
-}[] = [
+// Grouped shortcuts for organized help modal display
+export const SHORTCUT_GROUPS = [
   {
     id: "gameplay",
     title: "Gameplay",
-    shortcutIds: [
-      "arrows",
-      "rotateCW",
-      "rotateCCW",
-      "sendToTray",
-      "ghost",
-      "pause",
-      "nextPiece",
-      "prevPiece",
+    shortcuts: [
+      { keys: ["Space"], action: "Pause / Resume" },
+      { keys: ["P"], action: "Toggle preview" },
+      { keys: ["N"], action: "New puzzle" },
+      { keys: ["Esc"], action: "Close / Unpause" },
     ],
   },
   {
-    id: "navigation",
-    title: "Navigation & View",
-    shortcutIds: ["preview", "fullscreen"],
+    id: "pieceControl",
+    title: "Piece Control",
+    shortcuts: [
+      { keys: ["Tab"], action: "Select next piece" },
+      { keys: ["Shift", "Tab"], action: "Select previous piece" },
+      { keys: ["R"], action: "Rotate selected piece" },
+      { keys: ["Shift", "R"], action: "Rotate counter-clockwise" },
+      { keys: ["↑", "↓", "←", "→"], action: "Move selected piece" },
+    ],
   },
   {
-    id: "system",
-    title: "System",
-    shortcutIds: ["undo", "redo", "sound", "haptics", "newGame", "showHelp", "escape"],
+    id: "displayAudio",
+    title: "Display & Audio",
+    shortcuts: [
+      { keys: ["F"], action: "Fullscreen" },
+      { keys: ["M"], action: "Mute / Unmute sound" },
+      { keys: ["H"], action: "Toggle haptics" },
+    ],
   },
-];
+  {
+    id: "help",
+    title: "Help",
+    shortcuts: [{ keys: ["?"], action: "Show shortcuts" }],
+  },
+] as const;

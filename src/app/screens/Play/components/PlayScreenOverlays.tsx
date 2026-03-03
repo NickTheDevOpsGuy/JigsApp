@@ -210,7 +210,7 @@ export function PlayScreenOverlays({
       <ShortcutsModal
         isOpen={showShortcuts}
         onClose={() => setShowShortcuts(false)}
-        disabledIds={
+        disabledActions={
           state && manager
             ? [
                 ...(!manager.canUndo() || isPaused || state.isComplete

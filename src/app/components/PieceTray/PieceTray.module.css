@@ -284,6 +284,8 @@
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
+  /* Prevent scrolling past last piece into blank area */
+  scroll-padding-inline-end: 0;
   padding: 12px 12px 8px 12px;
   padding-inline-end: max(16px, env(safe-area-inset-right, 0));
   display: flex;

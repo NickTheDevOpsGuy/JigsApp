@@ -196,6 +196,10 @@ export type ImageSourceRect = {
   destH: number;
 };
 
+/**
+ * Seam-locked source rect: use shared pixel boundaries at tile edges so adjacent
+ * pieces sample the same pixels at the seam (fixes misaligned eyes/features at borders).
+ */
 export function computeImageSourceRect(
   p: Piece,
   img: HTMLImageElement,
@@ -208,25 +212,33 @@ export function computeImageSourceRect(
   const srcTileH = sourceH / rows;
   const srcPadX = (p.pad / p.tileW) * srcTileW;
   const srcPadY = (p.pad / p.tileH) * srcTileH;
-  // Edge/corner pieces have flat sides—don't extend source past image bounds
   const leftPad = p.col === 0 ? 0 : srcPadX;
   const rightPad = p.col === cols - 1 ? 0 : srcPadX;
   const topPad = p.row === 0 ? 0 : srcPadY;
   const bottomPad = p.row === rows - 1 ? 0 : srcPadY;
-  let srcX = p.col * srcTileW - leftPad;
-  let srcY = p.row * srcTileH - topPad;
-  let srcW = srcTileW + leftPad + rightPad;
-  let srcH = srcTileH + topPad + bottomPad;
-  // Round to integer pixels so drawImage samples cleanly and adjacent pieces align at seams
-  srcX = Math.round(srcX);
-  srcY = Math.round(srcY);
-  srcW = Math.round(srcW);
-  srcH = Math.round(srcH);
+
+  // Shared seam positions (one per tile boundary) so neighbors use the same pixel column/row
+  const seamX = (c: number) => Math.round(c * srcTileW);
+  const seamY = (r: number) => Math.round(r * srcTileH);
+
+  const leftPadR = Math.round(leftPad);
+  const rightPadR = Math.round(rightPad);
+  const topPadR = Math.round(topPad);
+  const bottomPadR = Math.round(bottomPad);
+
+  let srcX = p.col === 0 ? 0 : seamX(p.col) - leftPadR;
+  let srcRight = p.col === cols - 1 ? sourceW : seamX(p.col + 1) + rightPadR;
+  let srcY = p.row === 0 ? 0 : seamY(p.row) - topPadR;
+  let srcBottom = p.row === rows - 1 ? sourceH : seamY(p.row + 1) + bottomPadR;
+
+  let srcW = srcRight - srcX;
+  let srcH = srcBottom - srcY;
   let destX = 0;
   let destY = 0;
   let destW = p.w;
   let destH = p.h;
-  // Clamp to image bounds (safety for any floating point edge cases)
+
+  // Clamp to image bounds
   if (srcX < 0) {
     destX = (-srcX / srcW) * p.w;
     destW = p.w - destX;

@@ -60,6 +60,21 @@ function avgSecPerPiece(entries: CompletionEntry[]): number | null {
   return totalPieces > 0 ? totalSeconds / totalPieces : null;
 }
 
+/**
+ * Multiplier for snap tolerance based on completion history (Dynamic Difficulty).
+ * Fast players get slightly tighter snap (0.9); slower players get more forgiving (1.1).
+ */
+export function getToleranceMultiplier(rows: number, cols: number): number {
+  const history = loadHistory();
+  const recent = history.filter((e) => e.rows === rows && e.cols === cols).slice(-8);
+  if (recent.length < 2) return 1;
+  const avg = avgSecPerPiece(recent);
+  if (avg == null) return 1;
+  if (avg < FAST_SEC_PER_PIECE) return 0.9;
+  if (avg > SLOW_SEC_PER_PIECE) return 1.1;
+  return 1;
+}
+
 const PRESET_SIZES = [
   { rows: 3, cols: 3 },
   { rows: 4, cols: 4 },
