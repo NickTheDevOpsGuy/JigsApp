@@ -477,13 +477,16 @@ export class PuzzleManager {
   public rotatePiece(pieceId: string) {
     const piece = this.findPiece(pieceId);
     if (!piece || piece.isPlaced || piece.locked) return;
+
     const groupPieces = this.getGroupPieces(piece.groupId);
     if (groupPieces.some((p) => p.locked)) return;
 
     this.pushUndoState();
 
     this.updatePieces(
-      (p) => p.groupId === piece.groupId,
+      piece.inTray
+        ? (p) => p.id === pieceId
+        : (p) => !p.inTray && p.groupId === piece.groupId,
       (p) => ({ rotation: (p.rotation + this.rotationStepDeg) % 360 }),
     );
   }

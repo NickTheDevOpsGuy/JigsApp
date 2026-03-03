@@ -1,10 +1,9 @@
 /**
  * HeaderMenu – hamburger menu with Theme, Gameplay, Display, Audio, Advanced.
- *
- * Sections: 1–120 constants (SUB_MENU_LABELS, buildTree) + MenuTree component;
- * 121–350 menu tree keyboard nav + open/close; 351–503 HeaderMenu export (trigger button + portal).
+ * Fix: render menu in a portal (document.body) so it stays above the board/canvas layers.
  */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Menu, ChevronRight, Check } from "lucide-react";
 import { Button } from "@/components/Button/Button";
@@ -30,22 +29,63 @@ export function HeaderMenu(props: HeaderMenuProps) {
   const [open, setOpen] = useState(false);
   const [activeSubMenu, setActiveSubMenu] = useState<SubMenuId | null>(null);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
+
   const rootRef = useRef<HTMLDivElement | null>(null);
+
+  // Button does not forward refs; use wrapper for measuring
+  const triggerWrapRef = useRef<HTMLDivElement | null>(null);
+
+  const [menuRect, setMenuRect] = useState<{
+    top: number;
+    left: number;
+    minWidth: number;
+  } | null>(null);
+
   const items = buildMenuItems(props, setOpen, (path) => navigate(path));
 
   useEffect(() => {
     if (!open) {
       setActiveSubMenu(null);
+      setMenuRect(null);
     }
   }, [open]);
 
+  useLayoutEffect(() => {
+    if (!open || !triggerWrapRef.current) {
+      setMenuRect(null);
+      return;
+    }
+
+    const rect = triggerWrapRef.current.getBoundingClientRect();
+    const gap = 6;
+
+    const maxWidth = Math.min(360, window.innerWidth - 16);
+    const left = Math.min(Math.max(8, rect.left), window.innerWidth - maxWidth - 8);
+
+    setMenuRect({
+      top: rect.bottom + gap,
+      left,
+      minWidth: Math.min(rect.width, maxWidth),
+    });
+  }, [open, activeSubMenu]);
+
   useEffect(() => {
     if (!open) return;
+
     const onPointerDown = (e: PointerEvent) => {
-      const el = rootRef.current;
-      if (!el || (e.target && el.contains(e.target as Node))) return;
+      // clicks inside trigger wrapper: do not close
+      const wrap = rootRef.current;
+      if (wrap && e.target && wrap.contains(e.target as Node)) return;
+
+      // clicks inside portal panel: do not close
+      const panel = document.querySelector(
+        "[data-header-menu-panel='true']",
+      ) as HTMLElement | null;
+      if (panel && e.target && panel.contains(e.target as Node)) return;
+
       setOpen(false);
     };
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         if (activeSubMenu) {
@@ -56,14 +96,19 @@ export function HeaderMenu(props: HeaderMenuProps) {
         }
         return;
       }
+
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        const panel = rootRef.current?.querySelector("[role='menu']");
+        const panel = document.querySelector(
+          "[data-header-menu-panel='true']",
+        ) as HTMLElement | null;
         if (!panel) return;
+
         const focusable = Array.from(
           panel.querySelectorAll<HTMLElement>(
             "button[role='menuitem'], button[role='menuitemcheckbox'], [role='menuitem'], [role='menuitemcheckbox']",
           ),
         ).filter((el) => !(el as HTMLButtonElement).disabled);
+
         const idx = focusable.indexOf(document.activeElement as HTMLElement);
         if (idx === -1) {
           focusable[0]?.focus();
@@ -75,15 +120,22 @@ export function HeaderMenu(props: HeaderMenuProps) {
         e.preventDefault();
       }
     };
+
+    const onScroll = () => setOpen(false);
+
     window.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("scroll", onScroll, true);
+
     return () => {
       window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("scroll", onScroll, true);
     };
   }, [open, activeSubMenu]);
 
   const visibleItems = items.filter((i) => i.visible);
+
   const settingsItems = visibleItems
     .filter((i) => i.section === "settings")
     .sort((a, b) =>
@@ -91,6 +143,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         sensitivity: "base",
       }),
     );
+
   const helpItems = visibleItems
     .filter((i) => i.section === "help")
     .sort((a, b) =>
@@ -98,6 +151,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         sensitivity: "base",
       }),
     );
+
   const aboutItems = visibleItems
     .filter((i) => i.section === "about")
     .sort((a, b) =>
@@ -105,6 +159,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         sensitivity: "base",
       }),
     );
+
   const contributeItems = visibleItems
     .filter((i) => i.section === "contribute")
     .sort((a, b) =>
@@ -143,9 +198,8 @@ export function HeaderMenu(props: HeaderMenuProps) {
   };
 
   const renderItem = (item: MenuItemConfig) => {
-    if (item.isSectionLabel) {
-      return null;
-    }
+    if (item.isSectionLabel) return null;
+
     if (item.isToggle) {
       return (
         <button
@@ -173,6 +227,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         </button>
       );
     }
+
     return (
       <button
         key={item.id}
@@ -200,86 +255,107 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   return (
     <div className={styles.headerMenuWrap} ref={rootRef}>
-      <Button
-        size="sm"
-        className={styles.headerMenuTrigger}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-label={open ? "Close settings" : "Open settings"}
-        title={open ? "Close settings" : "Open settings menu"}
-        onClick={() => setOpen((s) => !s)}
-      >
-        <Menu size={16} />
-        <span className={styles.btnText}>Settings</span>
-      </Button>
+      <div className={styles.headerMenuTriggerWrap} ref={triggerWrapRef}>
+        <Button
+          size="sm"
+          className={styles.headerMenuTrigger}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label={open ? "Close settings" : "Open settings"}
+          title={open ? "Close settings" : "Open settings menu"}
+          onClick={() => setOpen((s) => !s)}
+        >
+          <Menu size={16} />
+          <span className={styles.btnText}>Settings</span>
+        </Button>
+      </div>
 
-      {open && (
-        <div className={styles.headerMenuPanel} role="menu">
-          {activeSubMenu ? (
-            <HeaderMenuSubmenuPanel
-              activeSubMenu={activeSubMenu}
-              setActiveSubMenu={setActiveSubMenu}
-              subMenuItems={subMenuItems}
-              hasSubMenuItems={hasSubMenuItems}
-              renderItem={renderItem}
-              headerMenuProps={props}
-              setOpen={setOpen}
-            />
-          ) : (
-            <>
-              {hasSubMenuItems("about") && (
-                <button
-                  type="button"
-                  className={styles.headerMenuSubmenuTrigger}
-                  role="menuitem"
-                  onClick={() => setActiveSubMenu("about")}
-                  aria-label="About"
-                  title="About Phuzzle, help, and contributors"
-                >
-                  {SUB_MENU_LABELS.about}
-                  <ChevronRight size={16} className={styles.headerMenuChevron} />
-                </button>
-              )}
-              <div className={styles.headerMenuDivider} />
-              {mainMenuSubmenus.map((id) => (
-                <React.Fragment key={id}>
+      {open &&
+        menuRect &&
+        createPortal(
+          <div
+            data-header-menu-panel="true"
+            className={`${styles.headerMenuPanel} ${styles.headerMenuPanelPortal}`}
+            role="menu"
+            style={{
+              top: menuRect.top,
+              left: menuRect.left,
+              minWidth: menuRect.minWidth,
+            }}
+          >
+            {activeSubMenu ? (
+              <HeaderMenuSubmenuPanel
+                activeSubMenu={activeSubMenu}
+                setActiveSubMenu={setActiveSubMenu}
+                subMenuItems={subMenuItems}
+                hasSubMenuItems={hasSubMenuItems}
+                renderItem={renderItem}
+                headerMenuProps={props}
+                setOpen={setOpen}
+              />
+            ) : (
+              <>
+                {hasSubMenuItems("about") && (
                   <button
                     type="button"
                     className={styles.headerMenuSubmenuTrigger}
                     role="menuitem"
-                    onClick={() => {
-                      if (id === "advanced") setAdvancedExpanded((e) => !e);
-                      else setActiveSubMenu(id);
-                    }}
-                    aria-label={
-                      SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
-                    }
-                    title={getSubmenuDescription(id)}
+                    onClick={() => setActiveSubMenu("about")}
+                    aria-label="About"
+                    title="About Phuzzle, help, and contributors"
                   >
-                    {SUB_MENU_LABELS[id]}
-                    <ChevronRight
-                      size={16}
-                      className={`${styles.headerMenuChevron} ${id === "advanced" && advancedExpanded ? styles.headerMenuChevronExpanded : ""}`}
-                    />
+                    {SUB_MENU_LABELS.about}
+                    <ChevronRight size={16} className={styles.headerMenuChevron} />
                   </button>
-                  {id === "advanced" && advancedExpanded && (
-                    <div className={styles.headerMenuNested}>
-                      {settingsItems
-                        .filter((i) => i.subMenu === "advanced")
-                        .sort((a, b) =>
-                          (a.sortKey ?? "").localeCompare(b.sortKey ?? "", undefined, {
-                            sensitivity: "base",
-                          }),
-                        )
-                        .map(renderItem)}
-                    </div>
-                  )}
-                </React.Fragment>
-              ))}
-            </>
-          )}
-        </div>
-      )}
+                )}
+
+                <div className={styles.headerMenuDivider} />
+
+                {mainMenuSubmenus.map((id) => (
+                  <React.Fragment key={id}>
+                    <button
+                      type="button"
+                      className={styles.headerMenuSubmenuTrigger}
+                      role="menuitem"
+                      onClick={() => {
+                        if (id === "advanced") setAdvancedExpanded((e) => !e);
+                        else setActiveSubMenu(id);
+                      }}
+                      aria-label={
+                        SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
+                      }
+                      title={getSubmenuDescription(id)}
+                    >
+                      {SUB_MENU_LABELS[id]}
+                      <ChevronRight
+                        size={16}
+                        className={`${styles.headerMenuChevron} ${
+                          id === "advanced" && advancedExpanded
+                            ? styles.headerMenuChevronExpanded
+                            : ""
+                        }`}
+                      />
+                    </button>
+
+                    {id === "advanced" && advancedExpanded && (
+                      <div className={styles.headerMenuNested}>
+                        {settingsItems
+                          .filter((i) => i.subMenu === "advanced")
+                          .sort((a, b) =>
+                            (a.sortKey ?? "").localeCompare(b.sortKey ?? "", undefined, {
+                              sensitivity: "base",
+                            }),
+                          )
+                          .map(renderItem)}
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+              </>
+            )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

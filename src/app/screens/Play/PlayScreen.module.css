@@ -18,6 +18,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.headerMenuTriggerWrap {
+  display: inline-flex;
+}
+
 .topBar {
   height: 56px;
   flex-shrink: 0;
@@ -2438,4 +2442,19 @@
   object-fit: contain;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
   image-rendering: auto;
+}
+
+.shareResultPopupRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.shareResultPopupHiddenText {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }

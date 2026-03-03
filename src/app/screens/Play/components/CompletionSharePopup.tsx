@@ -1,5 +1,5 @@
 /**
- * Share Result modal content: share text + Copy (old layout), seasonal frame, Share Card PNG, Download.
+ * Share Result modal content: share text + Copy, seasonal frame, Share Card PNG, Download.
  */
 import { Copy, Image, Download } from "lucide-react";
 import { Button } from "@/components/Button/Button";
@@ -34,7 +34,10 @@ export function CompletionSharePopup({
   const playUrl = puzzleShareUrl.startsWith("http")
     ? puzzleShareUrl
     : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
+
   const shareText = `That was ${formatTime(elapsedSeconds)} of focus. Can you do better?\n\n${playUrl}`;
+
+  const canCopy = typeof onCopyResults === "function";
 
   return (
     <div className={styles.shareResultPopup}>
@@ -43,6 +46,7 @@ export function CompletionSharePopup({
         well can you do? Play the game here&rdquo; followed by a clickable link. The link
         is only in the message, not on the card image.
       </p>
+
       <p className={styles.shareResultPopupCta}>
         <a
           href={playUrl}
@@ -53,6 +57,7 @@ export function CompletionSharePopup({
           {playUrl}
         </a>
       </p>
+
       <label className={styles.shareResultPopupToggle}>
         <input
           type="checkbox"
@@ -62,16 +67,30 @@ export function CompletionSharePopup({
         Seasonal frame
       </label>
 
-      <Button
-        variant="secondary"
-        onClick={onShareCard}
-        disabled={isGenerating}
-        className={styles.shareResultPopupBtn}
-        title="Share the puzzle image and message together"
-      >
-        <Image size={18} />
-        {isGenerating ? "Generating..." : "Share Card PNG"}
-      </Button>
+      <div className={styles.shareResultPopupRow}>
+        <Button
+          variant="secondary"
+          onClick={onCopyResults}
+          disabled={!canCopy}
+          className={styles.shareResultPopupBtn}
+          title={canCopy ? "Copy share text + link" : "Copy not available"}
+        >
+          <Copy size={18} />
+          {copied ? "Copied" : "Copy text + link"}
+        </Button>
+
+        <Button
+          variant="secondary"
+          onClick={onShareCard}
+          disabled={isGenerating}
+          className={styles.shareResultPopupBtn}
+          title="Share the puzzle image and message together"
+        >
+          <Image size={18} />
+          {isGenerating ? "Generating..." : "Share Card PNG"}
+        </Button>
+      </div>
+
       <p className={styles.shareResultPopupHint}>
         Share Card sends the image and link together to apps that support it.
       </p>
@@ -84,6 +103,15 @@ export function CompletionSharePopup({
         <Download size={18} />
         Download
       </Button>
+
+      {/* Hidden textarea ensures shareText is in DOM for copy implementations that query/select */}
+      <textarea
+        readOnly
+        value={shareText}
+        className={styles.shareResultPopupHiddenText}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
     </div>
   );
 }
