@@ -23,6 +23,8 @@ import {
   PRECISION_MODE_KEY,
   DYNAMIC_DIFFICULTY_KEY,
   ADAPTIVE_PERSONALITY_KEY,
+  MINIMAP_VISIBLE_KEY,
+  MINIMAP_POSITION_KEY,
 } from "../playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
@@ -55,6 +57,8 @@ export function getPlayScreenUIStorageInitial(): {
   precisionModeEnabled: boolean;
   dynamicDifficultyEnabled: boolean;
   adaptivePersonalityEnabled: boolean;
+  minimapVisible: boolean;
+  minimapPosition: "bottom-left" | "bottom-right" | "top-left" | "top-right";
 } {
   let snapToleranceOverride = 1;
   try {
@@ -95,6 +99,16 @@ export function getPlayScreenUIStorageInitial(): {
     precisionModeEnabled: getBool(PRECISION_MODE_KEY, false),
     dynamicDifficultyEnabled: getBool(DYNAMIC_DIFFICULTY_KEY, false),
     adaptivePersonalityEnabled: getBool(ADAPTIVE_PERSONALITY_KEY, false),
+    minimapVisible: getBool(MINIMAP_VISIBLE_KEY, true),
+    minimapPosition: (() => {
+      try {
+        const v = safeLocalStorage.getItem(MINIMAP_POSITION_KEY);
+        if (v === "bottom-right" || v === "top-left" || v === "top-right") return v;
+      } catch {
+        /* ignore */
+      }
+      return "bottom-left";
+    })(),
   };
 }
 

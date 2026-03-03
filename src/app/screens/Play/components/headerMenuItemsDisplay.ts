@@ -21,6 +21,18 @@ export function getDisplayItems(
       checked: props.showPreview,
     },
     {
+      id: "showMinimap",
+      section: "settings",
+      visible: typeof props.minimapVisible === "boolean",
+      label: "Show minimap",
+      sortKey: "Show minimap",
+      title: "Show board overview (25+ pieces); tap to pan",
+      onClick: c(props.onToggleMinimap ?? (() => {})),
+      subMenu: "display",
+      isToggle: true,
+      checked: props.minimapVisible ?? true,
+    },
+    {
       id: "modifierNone",
       section: "settings",
       visible: !!props.onDailyPreferredModifierChange,

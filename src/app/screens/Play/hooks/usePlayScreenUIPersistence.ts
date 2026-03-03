@@ -22,6 +22,8 @@ import {
   PRECISION_MODE_KEY,
   DYNAMIC_DIFFICULTY_KEY,
   ADAPTIVE_PERSONALITY_KEY,
+  MINIMAP_VISIBLE_KEY,
+  MINIMAP_POSITION_KEY,
 } from "../playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
@@ -45,6 +47,8 @@ export function usePlayScreenUIPersistence(state: {
   precisionModeEnabled: boolean;
   dynamicDifficultyEnabled: boolean;
   adaptivePersonalityEnabled: boolean;
+  minimapVisible: boolean;
+  minimapPosition: string;
 }) {
   useEffect(() => {
     try {
@@ -242,4 +246,23 @@ export function usePlayScreenUIPersistence(state: {
       /* ignore */
     }
   }, [state.adaptivePersonalityEnabled]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(
+        MINIMAP_VISIBLE_KEY,
+        state.minimapVisible ? "true" : "false",
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [state.minimapVisible]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(MINIMAP_POSITION_KEY, state.minimapPosition);
+    } catch {
+      /* ignore */
+    }
+  }, [state.minimapPosition]);
 }

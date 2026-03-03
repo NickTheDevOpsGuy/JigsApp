@@ -70,6 +70,10 @@ export function usePlayScreenUI() {
   const [adaptivePersonalityEnabled, setAdaptivePersonalityEnabled] = useState(
     storageInitial.adaptivePersonalityEnabled,
   );
+  const [minimapVisible, setMinimapVisible] = useState(storageInitial.minimapVisible);
+  const [minimapPosition, setMinimapPosition] = useState<
+    "bottom-left" | "bottom-right" | "top-left" | "top-right"
+  >(storageInitial.minimapPosition);
 
   const [dailyPreferredModifier, setDailyPreferredModifierState] =
     useState<DailyVisualModifier>(getDailyPreferredModifier);
@@ -124,6 +128,8 @@ export function usePlayScreenUI() {
     precisionModeEnabled,
     dynamicDifficultyEnabled,
     adaptivePersonalityEnabled,
+    minimapVisible,
+    minimapPosition,
   });
 
   const toggleFullscreen = useCallback(() => {
@@ -258,6 +264,24 @@ export function usePlayScreenUI() {
     adaptivePersonalityEnabled,
     setAdaptivePersonalityEnabled,
     toggleAdaptivePersonality,
+    minimapVisible,
+    setMinimapVisible,
+    toggleMinimap: useCallback(
+      () => setMinimapVisible((v) => !v),
+      [],
+    ),
+    minimapPosition,
+    setMinimapPosition,
+    cycleMinimapPosition: useCallback(
+      () =>
+        setMinimapPosition((p) => {
+          if (p === "bottom-left") return "bottom-right";
+          if (p === "bottom-right") return "top-right";
+          if (p === "top-right") return "top-left";
+          return "bottom-left";
+        }),
+      [],
+    ),
     debug,
     setDebug,
     showPreview,

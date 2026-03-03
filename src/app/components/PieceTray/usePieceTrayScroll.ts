@@ -16,7 +16,9 @@ export function usePieceTrayScroll(displayedLength: number) {
     const { scrollLeft, scrollWidth, clientWidth } = el;
     const maxScroll = Math.max(0, scrollWidth - clientWidth);
     const clamped = Math.max(0, Math.min(maxScroll, scrollLeft));
-    if (clamped !== scrollLeft) el.scrollLeft = clamped;
+    if (clamped !== scrollLeft) {
+      el.scrollLeft = clamped;
+    }
     const hasOverflow = maxScroll > 8;
     setCanScroll(hasOverflow);
     setCanScrollLeft(hasOverflow && clamped > 4);

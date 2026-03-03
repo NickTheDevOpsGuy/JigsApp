@@ -212,6 +212,10 @@ export function PlayScreen() {
     togglePrecisionMode,
     toggleDynamicDifficulty,
     toggleAdaptivePersonality,
+    minimapVisible,
+    toggleMinimap,
+    minimapPosition,
+    cycleMinimapPosition,
     snapToleranceOverride,
     setSnapToleranceOverride,
     dailyPreferredModifier,
@@ -958,6 +962,8 @@ export function PlayScreen() {
     togglePrecisionMode,
     toggleDynamicDifficulty,
     toggleAdaptivePersonality,
+    minimapVisible,
+    toggleMinimap,
   });
 
   return (
@@ -1070,19 +1076,24 @@ export function PlayScreen() {
                     onContextMenu={handleContextMenu}
                     onWheel={(e) => viewport.handleWheel(e, boardRef.current)}
                   />
-                  {state?.pieces?.[0] && state.grid && (
-                    <Minimap
-                      pieces={state.pieces}
-                      grid={state.grid}
-                      assembledW={state.grid.cols * state.pieces[0].tileW}
-                      assembledH={state.grid.rows * state.pieces[0].tileH}
-                      viewport={viewport.viewport}
-                      containerW={boardSize.w}
-                      containerH={boardSize.h}
-                      setViewport={viewport.setViewport}
-                      visible={!isPaused && !isComplete}
-                    />
-                  )}
+                  {state?.pieces?.[0] &&
+                    state.grid &&
+                    minimapVisible &&
+                    (state.grid.rows * state.grid.cols >= 25) && (
+                      <Minimap
+                        pieces={state.pieces}
+                        grid={state.grid}
+                        assembledW={state.grid.cols * state.pieces[0].tileW}
+                        assembledH={state.grid.rows * state.pieces[0].tileH}
+                        viewport={viewport.viewport}
+                        containerW={boardSize.w}
+                        containerH={boardSize.h}
+                        setViewport={viewport.setViewport}
+                        visible={!isPaused && !isComplete}
+                        position={minimapPosition}
+                        onCyclePosition={cycleMinimapPosition}
+                      />
+                    )}
                   {isPaused && <PauseOverlay onResume={() => setIsPaused(false)} />}
                   {((isComplete && !completionDismissed) ||
                     (showE2ECompletion && !completionDismissed)) &&

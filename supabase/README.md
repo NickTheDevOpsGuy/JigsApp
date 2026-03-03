@@ -37,6 +37,10 @@ In **Authentication > Providers**, enable **Anonymous sign-ins**. This lets user
 
 The `tables.sql` script adds `puzzle_sessions` and `completions` to the Realtime publication. If needed, enable in **Database > Replication** for both tables.
 
+## Play modes (Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)
+
+These modes are **client-only**. No Supabase schema or migration changes are required. Toggles and precision/difficulty state use localStorage or in-session state; `recordCompletion` is unchanged.
+
 ## Tables
 
 - **player_stats** – One row per user: puzzles completed, play time, streaks

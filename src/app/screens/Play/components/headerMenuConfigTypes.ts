@@ -93,6 +93,8 @@ export type HeaderMenuProps = {
   onToggleDynamicDifficulty?: () => void;
   adaptivePersonalityEnabled?: boolean;
   onToggleAdaptivePersonality?: () => void;
+  minimapVisible?: boolean;
+  onToggleMinimap?: () => void;
 };
 
 export type SubMenuId =

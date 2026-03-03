@@ -284,12 +284,11 @@
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
-  /* Prevent scrolling past last piece into blank area */
+  /* Minimal right padding so scroll doesn't show big blank past last piece */
   scroll-padding-inline-end: 0;
   padding: 12px 12px 8px 12px;
-  padding-inline-end: max(16px, env(safe-area-inset-right, 0));
+  padding-inline-end: 12px;
   display: flex;
-  gap: 8px;
   align-items: center;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
@@ -304,14 +303,19 @@
   scroll-snap-type: x mandatory;
   scroll-snap-stop: always;
   scroll-padding-inline-start: 12px;
-  scroll-padding-inline-end: max(16px, env(safe-area-inset-right, 0));
+  scroll-padding-inline-end: 12px;
   scroll-behavior: smooth;
 }
 
+/* Width fits content only so scroll doesn't show blank space past last piece */
 .row {
   display: flex;
   gap: 8px;
   align-items: center;
+  width: max-content;
+  min-width: max-content;
+  flex: 0 0 auto;
+  box-sizing: border-box;
 }
 
 .scrollerSnap .pieceButton {
@@ -411,7 +415,7 @@
 
 .trayCompact .scroller {
   padding: 12px 12px 6px 12px;
-  padding-inline-end: max(16px, env(safe-area-inset-right, 0));
+  padding-inline-end: 12px;
 }
 
 /* Extra-compact for 49+ pieces – larger than before for visibility */
@@ -432,7 +436,7 @@
 
 .trayExtraCompact .scroller {
   padding: 12px 10px 6px 10px;
-  padding-inline-end: max(14px, env(safe-area-inset-right, 0));
+  padding-inline-end: 12px;
 }
 
 /* Tray fills its container (board-above, tray-below layout) */
@@ -502,21 +506,21 @@
 
   .scroller {
     padding: 10px 14px 10px 14px;
-    padding-inline-end: max(56px, calc(env(safe-area-inset-right, 0) + 24px));
+    padding-inline-end: 12px;
     gap: 8px;
   }
 
   .scrollerSnap {
-    scroll-padding-inline-end: max(56px, calc(env(safe-area-inset-right, 0) + 24px));
+    scroll-padding-inline-end: 12px;
   }
 
   .trayCompact .scroller {
     padding: 10px 14px 8px 14px;
-    padding-inline-end: max(56px, calc(env(safe-area-inset-right, 0) + 24px));
+    padding-inline-end: 12px;
   }
 
   .trayExtraCompact .scroller {
     padding: 10px 12px 8px 12px;
-    padding-inline-end: max(48px, calc(env(safe-area-inset-right, 0) + 20px));
+    padding-inline-end: 12px;
   }
 }

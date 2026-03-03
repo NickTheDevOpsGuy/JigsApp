@@ -161,7 +161,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 
       {!effectiveCollapsed && (
         <div className={styles.scrollerWrap}>
-          {likelyOverflows && (
+          {likelyOverflows && canScroll && (
             <button
               type="button"
               className={styles.scrollBtn}
@@ -210,7 +210,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
               </div>
             )}
           </div>
-          {likelyOverflows && (
+          {likelyOverflows && canScroll && (
             <button
               type="button"
               className={styles.scrollBtn}

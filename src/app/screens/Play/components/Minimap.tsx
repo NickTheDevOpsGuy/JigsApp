@@ -1,10 +1,14 @@
 /**
  * Minimap – overview of board for large puzzles; tap to pan, pinch to zoom.
+ * Optional position (4 corners) and cycle button to move.
  */
 import React, { useCallback, useRef } from "react";
+import { Move } from "lucide-react";
 import type { Piece } from "@/puzzle/types";
 import type { ViewportState } from "../hooks/useViewport";
 import styles from "./Minimap.module.css";
+
+export type MinimapPosition = "bottom-left" | "bottom-right" | "top-left" | "top-right";
 
 type Props = {
   pieces: Piece[];
@@ -16,6 +20,8 @@ type Props = {
   containerH: number;
   setViewport: React.Dispatch<React.SetStateAction<ViewportState>>;
   visible?: boolean;
+  position?: MinimapPosition;
+  onCyclePosition?: () => void;
 };
 
 const MINIMAP_SIZE = 100;
@@ -31,6 +37,8 @@ export function Minimap({
   containerH,
   setViewport,
   visible = true,
+  position = "bottom-left",
+  onCyclePosition,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -125,8 +133,17 @@ export function Minimap({
 
   if (!visible || grid.rows * grid.cols < MIN_GRID_SIZE) return null;
 
+  const positionClass =
+    position === "bottom-right"
+      ? styles.positionBottomRight
+      : position === "top-left"
+        ? styles.positionTopLeft
+        : position === "top-right"
+          ? styles.positionTopRight
+          : "";
+
   return (
-    <div className={styles.wrap}>
+    <div className={`${styles.wrap} ${positionClass}`}>
       <canvas
         ref={canvasRef}
         width={MINIMAP_SIZE}
@@ -136,6 +153,21 @@ export function Minimap({
         role="img"
         aria-label="Board minimap - tap to pan"
       />
+      {onCyclePosition && (
+        <button
+          type="button"
+          className={styles.moveBtn}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onCyclePosition();
+          }}
+          aria-label="Move minimap to next corner"
+          title="Move minimap"
+        >
+          <Move size={12} aria-hidden />
+        </button>
+      )}
     </div>
   );
 }

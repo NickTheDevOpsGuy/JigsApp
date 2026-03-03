@@ -23,6 +23,8 @@ export const MYSTERY_MODE_KEY = "phuzzle:mysteryMode";
 export const PRECISION_MODE_KEY = "phuzzle:precisionMode";
 export const DYNAMIC_DIFFICULTY_KEY = "phuzzle:dynamicDifficulty";
 export const ADAPTIVE_PERSONALITY_KEY = "phuzzle:adaptivePersonality";
+export const MINIMAP_VISIBLE_KEY = "phuzzle:minimapVisible";
+export const MINIMAP_POSITION_KEY = "phuzzle:minimapPosition";
 
 export const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
 

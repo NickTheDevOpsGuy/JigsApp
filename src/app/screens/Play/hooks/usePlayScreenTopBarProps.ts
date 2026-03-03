@@ -123,6 +123,8 @@ export type UsePlayScreenTopBarPropsParams = {
   togglePrecisionMode: () => void;
   toggleDynamicDifficulty: () => void;
   toggleAdaptivePersonality: () => void;
+  minimapVisible: boolean;
+  toggleMinimap: () => void;
 };
 
 export type PlayScreenTopBarPropsResult = {
@@ -265,6 +267,8 @@ export function usePlayScreenTopBarProps(
     togglePrecisionMode,
     toggleDynamicDifficulty,
     toggleAdaptivePersonality,
+    minimapVisible,
+    toggleMinimap,
   } = params;
 
   const autoRotateOnSnap = params.autoRotateOnSnap;
@@ -390,6 +394,8 @@ export function usePlayScreenTopBarProps(
       onToggleDynamicDifficulty: withHaptic(hapticsEnabled, toggleDynamicDifficulty),
       adaptivePersonalityEnabled,
       onToggleAdaptivePersonality: withHaptic(hapticsEnabled, toggleAdaptivePersonality),
+      minimapVisible,
+      onToggleMinimap: withHaptic(hapticsEnabled, toggleMinimap),
     };
 
     const movesPerMin = (state?.placedCount ?? 0) / Math.max(0.1, elapsedSeconds / 60);
@@ -543,5 +549,7 @@ export function usePlayScreenTopBarProps(
     togglePrecisionMode,
     toggleDynamicDifficulty,
     toggleAdaptivePersonality,
+    minimapVisible,
+    toggleMinimap,
   ]);
 }
