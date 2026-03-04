@@ -151,6 +151,27 @@
   border-radius: 10px;
 }
 
+/* Close (X) matches modal win-screen style */
+.headerCloseBtn {
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-weight: 300;
+}
+
+.headerCloseBtn:hover,
+.headerCloseBtn:focus-visible {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+
+.headerCloseBtn:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
 .placeholder,
 .hint {
   margin: 0 0 12px;

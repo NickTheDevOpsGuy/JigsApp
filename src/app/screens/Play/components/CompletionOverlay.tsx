@@ -1,11 +1,8 @@
 /**
- * CompletionOverlay – success screen: title, time, image, stats, share/challenge, actions.
- * Two buttons: "Share Result" opens an inline share screen (result only). "Challenge Friend" opens
- * an inline share screen (challenge only). No modals – each is a full-screen-style panel with Back.
+ * CompletionOverlay – success screen with direct share actions.
  */
 import React, { useEffect, useCallback, useState } from "react";
-import { X, Clock, Share2, Send, Copy, Image, Download, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/Button/Button";
+import { X, Clock, Share2, Send, Copy } from "lucide-react";
 import styles from "../PlayScreen.module.css";
 import type { Piece } from "@/puzzle/types";
 import { getTodayDateString } from "@/daily/dailyPuzzleCore";
@@ -31,8 +28,10 @@ interface CompletionOverlayProps {
   cutType?: PieceCutType;
   puzzleShareUrl?: string;
   copied?: boolean;
-  onCopyResults?: () => void;
-  onNativeShare?: () => void;
+  onShareProgress?: () => void;
+  onShareChallenge?: () => void;
+  onCopyProgress?: () => void;
+  onCopyChallenge?: () => void;
   onDownloadImage: () => void;
   onClose: () => void;
   onGoHome?: () => void;
@@ -60,14 +59,16 @@ export function CompletionOverlay({
   isDaily = false,
   cutType = "classic",
   undoCount = 0,
-  onCopyResults,
-  onDownloadImage,
+  onShareProgress,
+  onShareChallenge,
+  onCopyProgress,
+  onCopyChallenge,
+  onDownloadImage: _onDownloadImage,
   onClose,
   onGoHome: _onGoHome,
   onPlayAgain: _onPlayAgain,
   puzzleShareUrl = "/",
   copied,
-  onNativeShare,
 }: CompletionOverlayProps) {
   const [animPhase, setAnimPhase] = useState<"title" | "scale" | "glow" | "time">(
     "title",
@@ -90,11 +91,7 @@ export function CompletionOverlay({
     puzzleShareUrl,
   });
 
-  const { sharePopupOpen, setSharePopupOpen, percentile, isGenerating, handleShareCard } =
-    data;
-  const [shareScreenMode, setShareScreenMode] = useState<"result" | "challenge">(
-    "result",
-  );
+  const { percentile } = data;
 
   useEffect(() => {
     const t1 = setTimeout(() => setAnimPhase("scale"), ANIM_PHASE_SCALE_MS);
@@ -174,117 +171,49 @@ export function CompletionOverlay({
           </div>
         )}
 
-        {!sharePopupOpen ? (
-          <>
-            <div className={styles.completePrimaryActions}>
-              <button
-                type="button"
-                className={styles.completePrimaryBtn}
-                onClick={() => {
-                  setShareScreenMode("result");
-                  setSharePopupOpen(true);
-                }}
-                aria-label="Share Result"
-              >
-                <Share2 size={20} />
-                <span className={styles.completePrimaryBtnTitle}>Share Result</span>
-              </button>
-              <button
-                type="button"
-                className={styles.completePrimaryBtn}
-                onClick={() => {
-                  setShareScreenMode("challenge");
-                  setSharePopupOpen(true);
-                }}
-                aria-label="Challenge Friend"
-              >
-                <Send size={20} />
-                <span className={styles.completePrimaryBtnTitle}>Challenge Friend</span>
-              </button>
-            </div>
+        <div className={styles.completePrimaryActions}>
+          <button
+            type="button"
+            className={styles.completePrimaryBtn}
+            onClick={onShareProgress ?? onCopyProgress ?? (() => {})}
+            aria-label="Share Progress"
+          >
+            <Share2 size={20} />
+            <span className={styles.completePrimaryBtnTitle}>Share Progress</span>
+            <span className={styles.completePrimaryBtnSub}>Show your time + result</span>
+          </button>
+          <button
+            type="button"
+            className={styles.completePrimaryBtn}
+            onClick={onShareChallenge ?? onCopyChallenge ?? (() => {})}
+            aria-label="Send Challenge"
+          >
+            <Send size={20} />
+            <span className={styles.completePrimaryBtnTitle}>Send Challenge</span>
+            <span className={styles.completePrimaryBtnSub}>Same puzzle + difficulty</span>
+          </button>
+        </div>
 
-            {isDaily && <DailyReactions puzzleDate={getTodayDateString()} />}
-          </>
-        ) : (
-          <div className={styles.shareResultInline}>
-            <button
-              type="button"
-              className={styles.shareResultInlineBack}
-              onClick={() => setSharePopupOpen(false)}
-              aria-label="Back"
-            >
-              <ArrowLeft size={20} />
-              Back
-            </button>
+        <div className={styles.shareResultPopupRow}>
+          <button
+            type="button"
+            className={styles.shareResultPopupSideBtn}
+            onClick={onCopyProgress ?? (() => {})}
+          >
+            <Copy size={18} />
+            {copied ? "Copied" : "Copy Progress Link"}
+          </button>
+          <button
+            type="button"
+            className={styles.shareResultPopupSideBtn}
+            onClick={onCopyChallenge ?? (() => {})}
+          >
+            <Copy size={18} />
+            Copy Challenge Link
+          </button>
+        </div>
 
-            {shareScreenMode === "result" ? (
-              <>
-                <h3 className={styles.shareScreenSideTitle}>Share how you did</h3>
-                <p className={styles.shareResultInlineHint}>
-                  Showcase your result: link, card, or image.
-                </p>
-                <div className={styles.shareResultPopupRow}>
-                  <Button
-                    variant="secondary"
-                    onClick={onCopyResults ?? (() => {})}
-                    className={styles.shareResultPopupSideBtn}
-                  >
-                    <Copy size={20} />
-                    {copied ? "Copied" : "Copy link"}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={handleShareCard}
-                    disabled={isGenerating}
-                    className={styles.shareResultPopupSideBtn}
-                  >
-                    <Image size={20} />
-                    {isGenerating ? "…" : "Share Card"}
-                  </Button>
-                </div>
-                <button
-                  type="button"
-                  className={styles.shareResultPopupDownloadLink}
-                  onClick={() => {
-                    onDownloadImage();
-                    setSharePopupOpen(false);
-                  }}
-                >
-                  <Download size={18} />
-                  Download image
-                </button>
-              </>
-            ) : (
-              <>
-                <h3 className={styles.shareScreenSideTitle}>Challenge a friend</h3>
-                <p className={styles.shareResultInlineHint}>
-                  Send them the same puzzle and difficulty to try.
-                </p>
-                <div className={styles.shareResultPopupRow}>
-                  <Button
-                    variant="secondary"
-                    onClick={onCopyResults ?? (() => {})}
-                    className={styles.shareResultPopupSideBtn}
-                  >
-                    <Copy size={20} />
-                    {copied ? "Copied" : "Copy link"}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      if (onNativeShare) onNativeShare();
-                      else onCopyResults?.();
-                    }}
-                    className={styles.shareResultPopupSideBtn}
-                  >
-                    <Send size={20} />
-                    Send challenge
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        )}
+        {isDaily && <DailyReactions puzzleDate={getTodayDateString()} />}
       </div>
     </div>
   );

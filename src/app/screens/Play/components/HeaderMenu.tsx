@@ -28,7 +28,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [activeSubMenu, setActiveSubMenu] = useState<SubMenuId | null>(null);
-  const [advancedExpanded, setAdvancedExpanded] = useState(false);
 
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -312,44 +311,20 @@ export function HeaderMenu(props: HeaderMenuProps) {
                 <div className={styles.headerMenuDivider} />
 
                 {mainMenuSubmenus.map((id) => (
-                  <React.Fragment key={id}>
-                    <button
-                      type="button"
-                      className={styles.headerMenuSubmenuTrigger}
-                      role="menuitem"
-                      onClick={() => {
-                        if (id === "advanced") setAdvancedExpanded((e) => !e);
-                        else setActiveSubMenu(id);
-                      }}
-                      aria-label={
-                        SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
-                      }
-                      title={getSubmenuDescription(id)}
-                    >
-                      {SUB_MENU_LABELS[id]}
-                      <ChevronRight
-                        size={16}
-                        className={`${styles.headerMenuChevron} ${
-                          id === "advanced" && advancedExpanded
-                            ? styles.headerMenuChevronExpanded
-                            : ""
-                        }`}
-                      />
-                    </button>
-
-                    {id === "advanced" && advancedExpanded && (
-                      <div className={styles.headerMenuNested}>
-                        {settingsItems
-                          .filter((i) => i.subMenu === "advanced")
-                          .sort((a, b) =>
-                            (a.sortKey ?? "").localeCompare(b.sortKey ?? "", undefined, {
-                              sensitivity: "base",
-                            }),
-                          )
-                          .map(renderItem)}
-                      </div>
-                    )}
-                  </React.Fragment>
+                  <button
+                    key={id}
+                    type="button"
+                    className={styles.headerMenuSubmenuTrigger}
+                    role="menuitem"
+                    onClick={() => setActiveSubMenu(id)}
+                    aria-label={
+                      SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
+                    }
+                    title={getSubmenuDescription(id)}
+                  >
+                    {SUB_MENU_LABELS[id]}
+                    <ChevronRight size={16} className={styles.headerMenuChevron} />
+                  </button>
                 ))}
               </>
             )}

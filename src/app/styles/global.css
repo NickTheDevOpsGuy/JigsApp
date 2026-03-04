@@ -341,9 +341,23 @@ button {
   font-family: inherit;
 }
 
+/* Prevent long-press callouts/context menus on touch devices across core UI targets */
+button,
+a,
+img,
+canvas,
+[role="button"] {
+  -webkit-touch-callout: none;
+}
+
 img {
   max-width: 100%;
   display: block;
+  -webkit-user-drag: none;
+}
+
+canvas {
+  -webkit-user-drag: none;
 }
 
 /* ============================================

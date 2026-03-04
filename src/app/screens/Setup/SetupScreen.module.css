@@ -18,6 +18,10 @@
   overscroll-behavior-y: contain;
 }
 
+.page::-webkit-scrollbar {
+  display: none;
+}
+
 .card {
   width: 100%;
   max-width: 560px;
@@ -39,6 +43,11 @@
   gap: 6px;
   min-width: 0;
   overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.cardBody::-webkit-scrollbar {
+  display: none;
 }
 
 /* Desktop: wider card, compact spacing */
@@ -168,6 +177,66 @@
   background: var(--color-bg-secondary);
 }
 
+/* Grid preview overlay */
+.previewImageWrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.previewImageWrap .previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gridOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gridLine {
+  position: absolute;
+  background: rgba(255, 80, 80, 0.8);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+.gridToggleBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition:
+    opacity 0.2s,
+    background 0.2s;
+  z-index: 5;
+}
+
+.gridToggleBtn:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.gridToggleBtnActive {
+  background: rgba(255, 80, 80, 0.8);
+}
+
+.gridToggleBtnActive:hover {
+  background: rgba(255, 80, 80, 0.95);
+}
+
 .actionRow {
   flex-shrink: 0;
   display: grid;
@@ -238,21 +307,38 @@
 }
 
 .errorClose {
-  background: none;
-  border: none;
-  color: var(--color-error);
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0 4px;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: 1.25rem;
+  font-weight: 300;
   line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .errorClose:hover,
 .errorClose:focus-visible,
 .errorClose:active {
-  color: var(--color-error-hover);
-  background: var(--color-bg-card);
-  border-radius: 6px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+
+.errorClose:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
 }
 
 .select {
@@ -591,6 +677,11 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    scrollbar-width: none;
+  }
+
+  .cardBody::-webkit-scrollbar {
+    display: none;
   }
 
   .actionRow {
@@ -627,8 +718,8 @@
   }
 
   .preview {
-    width: min(58vw, 32vh, 200px);
-    height: min(58vw, 32vh, 200px);
+    width: min(50vw, 28vh, 170px);
+    height: min(50vw, 28vh, 170px);
     aspect-ratio: 1 / 1;
     min-height: 120px;
     align-self: center;
@@ -776,6 +867,15 @@
     padding: 10px 14px;
     font-size: 14px;
   }
+
+  /* Grid toggle button - smaller on mobile */
+  .gridToggleBtn {
+    width: 28px;
+    height: 28px;
+    top: 6px;
+    right: 6px;
+    border-radius: 6px;
+  }
 }
 
 /* Very short mobile screens: extra compact */
@@ -808,9 +908,9 @@
   }
 
   .preview {
-    width: min(54vw, 28vh, 170px);
-    height: min(54vw, 28vh, 170px);
-    min-height: 100px;
+    width: min(48vw, 24vh, 150px);
+    height: min(48vw, 24vh, 150px);
+    min-height: 92px;
   }
 
   .previewImg {
@@ -853,5 +953,76 @@
   .secondary {
     height: 36px;
     font-size: 12px;
+  }
+}
+
+/* Grid preview overlay */
+.previewImageWrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.previewImageWrap .previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gridOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gridLine {
+  position: absolute;
+  background: rgba(255, 80, 80, 0.8);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+.gridToggleBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition:
+    opacity 0.2s,
+    background 0.2s;
+  z-index: 5;
+}
+
+.gridToggleBtn:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.gridToggleBtnActive {
+  background: rgba(255, 80, 80, 0.8);
+}
+
+.gridToggleBtnActive:hover {
+  background: rgba(255, 80, 80, 0.95);
+}
+
+/* Grid toggle button - smaller on mobile */
+@media (max-width: 520px) {
+  .gridToggleBtn {
+    width: 28px;
+    height: 28px;
+    top: 6px;
+    right: 6px;
+    border-radius: 6px;
   }
 }

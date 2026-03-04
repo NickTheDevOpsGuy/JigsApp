@@ -16,14 +16,16 @@ const CUT_PARAMS: Record<
   PieceCutType,
   { depthPct: number; widthPct: number; curvePct: number }
 > = {
-  classic: { depthPct: 0.22, widthPct: 0.36, curvePct: 0.12 },
-  irregular: { depthPct: 0.26, widthPct: 0.32, curvePct: 0.18 },
-  hard: { depthPct: 0.14, widthPct: 0.28, curvePct: 0.08 },
+  // Slightly softer default cuts so large/low-piece puzzles don't carve through features too aggressively.
+  classic: { depthPct: 0.17, widthPct: 0.31, curvePct: 0.11 },
+  irregular: { depthPct: 0.2, widthPct: 0.29, curvePct: 0.16 },
+  hard: { depthPct: 0.12, widthPct: 0.25, curvePct: 0.08 },
 };
 
 function knobDepth(tileW: number, tileH: number, cutType: PieceCutType) {
   const p = CUT_PARAMS[cutType];
-  return Math.round(Math.min(tileW, tileH) * p.depthPct);
+  const raw = Math.round(Math.min(tileW, tileH) * p.depthPct);
+  return Math.max(10, Math.min(34, raw));
 }
 
 function knobWidth(

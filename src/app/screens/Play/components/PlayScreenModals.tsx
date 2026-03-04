@@ -18,6 +18,7 @@ export type PlayScreenModalsProps = {
   setShowShortcuts: (show: boolean) => void;
   showThemeModal: boolean;
   setShowThemeModal: (show: boolean) => void;
+  onOpenFeedback: () => void;
   hapticsEnabled: boolean;
   showNewGameModal: boolean;
   setShowNewGameModal: (show: boolean) => void;
@@ -38,6 +39,7 @@ export function PlayScreenModals({
   setShowShortcuts,
   showThemeModal,
   setShowThemeModal,
+  onOpenFeedback,
   hapticsEnabled,
   showNewGameModal,
   setShowNewGameModal,
@@ -63,8 +65,19 @@ export function PlayScreenModals({
       <HelpChoiceModal
         isOpen={showHelpChoice}
         onClose={() => setShowHelpChoice(false)}
-        onHowToPlay={() => setShowHowToPlay(true)}
-        onKeyboardShortcuts={() => setShowShortcuts(true)}
+        onHowToPlay={() => {
+          setShowHelpChoice(false);
+          setShowHowToPlay(true);
+        }}
+        onKeyboardShortcuts={() => {
+          setShowHelpChoice(false);
+          setShowShortcuts(true);
+        }}
+        onOpenTheme={() => {
+          setShowHelpChoice(false);
+          setShowThemeModal(true);
+        }}
+        onOpenFeedback={onOpenFeedback}
       />
 
       <ThemeModal

@@ -53,6 +53,11 @@ export function setCurrentPuzzleId(puzzleId: string | null): void {
   }
 }
 
+/** Read the current puzzle ID without consuming it. */
+export function getCurrentPuzzleId(): string | null {
+  return safeLocalStorage.getItem(CURRENT_PUZZLE_KEY);
+}
+
 /** Get and clear the current puzzle ID (call on completion) */
 export function consumeCurrentPuzzleId(): string | null {
   const id = safeLocalStorage.getItem(CURRENT_PUZZLE_KEY);

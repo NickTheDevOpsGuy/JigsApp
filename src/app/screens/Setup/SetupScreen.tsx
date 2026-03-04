@@ -10,12 +10,13 @@ import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { setCurrentPuzzleId } from "@/data/packCompletion";
 import { Button } from "@/components/Button/Button";
-import { ArrowLeft, Trash2, Play } from "lucide-react";
+import { ArrowLeft, Trash2, Play, Grid3X3 } from "lucide-react";
 import {
   useImagePicker,
   useGridConfig,
   useSetupScreenGalleryScroll,
   GRID_KEY,
+  GRID_OPTIONS,
 } from "./hooks";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
@@ -26,15 +27,68 @@ import { STORAGE_KEY, type ImageSource } from "./setupScreenConstants";
 import { SetupImageSourcePanel } from "./components/SetupImageSourcePanel";
 import { SetupConfigSection } from "./components/SetupConfigSection";
 
+/** Grid preview overlay to show where cuts will land */
+function GridPreviewOverlay({
+  rows,
+  cols,
+  visible,
+}: {
+  rows: number;
+  cols: number;
+  visible: boolean;
+}) {
+  if (!visible || rows < 2 || cols < 2) return null;
+
+  const lines = [];
+
+  // Vertical lines (cols - 1 lines)
+  for (let c = 1; c < cols; c++) {
+    const pct = (c / cols) * 100;
+    lines.push(
+      <div
+        key={`v-${c}`}
+        className={styles.gridLine}
+        style={{
+          left: `${pct}%`,
+          top: 0,
+          bottom: 0,
+          width: "2px",
+        }}
+      />,
+    );
+  }
+
+  // Horizontal lines (rows - 1 lines)
+  for (let r = 1; r < rows; r++) {
+    const pct = (r / rows) * 100;
+    lines.push(
+      <div
+        key={`h-${r}`}
+        className={styles.gridLine}
+        style={{
+          top: `${pct}%`,
+          left: 0,
+          right: 0,
+          height: "2px",
+        }}
+      />,
+    );
+  }
+
+  return <div className={styles.gridOverlay}>{lines}</div>;
+}
+
 export function SetupScreen() {
   const nav = useNavigate();
   const [searchParams] = useSearchParams();
   const sourceParam = searchParams.get("source");
   const puzzleIdParam = searchParams.get("puzzle");
+  const gridParam = searchParams.get("grid");
   const [imageSource, setImageSource] = useState<ImageSource>(
     sourceParam === "camera" ? "camera" : sourceParam === "upload" ? "upload" : "gallery",
   );
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showGridPreview, setShowGridPreview] = useState(true);
 
   const {
     gridIndex,
@@ -112,6 +166,26 @@ export function SetupScreen() {
       setCurrentPuzzleId(puzzleIdParam);
     }
   }, [puzzleIdParam, selectGalleryPuzzle]);
+
+  // Apply grid from query (?grid=RxC) so challenge links can prefill exact difficulty.
+  useEffect(() => {
+    if (!gridParam) return;
+    const m = gridParam.toLowerCase().match(/^(\d+)x(\d+)$/);
+    if (!m) return;
+    const rows = Number(m[1]);
+    const cols = Number(m[2]);
+    if (!Number.isFinite(rows) || !Number.isFinite(cols)) return;
+
+    const presetIdx = GRID_OPTIONS.findIndex((g) => g.rows === rows && g.cols === cols);
+    if (presetIdx >= 0) {
+      setGridIndex(presetIdx);
+      return;
+    }
+    const customIdx = GRID_OPTIONS.length - 1;
+    setGridIndex(customIdx);
+    setCustomRows(Math.min(maxGrid, Math.max(minGrid, rows)));
+    setCustomCols(Math.min(maxGrid, Math.max(minGrid, cols)));
+  }, [gridParam, setGridIndex, setCustomRows, setCustomCols, minGrid, maxGrid]);
 
   const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -220,7 +294,23 @@ export function SetupScreen() {
             {isLoading ? (
               <div className={styles.previewEmpty}>Loading...</div>
             ) : imgDataUrl ? (
-              <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
+              <div className={styles.previewImageWrap}>
+                <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
+                <GridPreviewOverlay
+                  rows={effectiveRows}
+                  cols={effectiveCols}
+                  visible={showGridPreview}
+                />
+                <button
+                  type="button"
+                  className={`${styles.gridToggleBtn} ${showGridPreview ? styles.gridToggleBtnActive : ""}`}
+                  onClick={() => setShowGridPreview((v) => !v)}
+                  title={showGridPreview ? "Hide grid preview" : "Show grid preview"}
+                  aria-label={showGridPreview ? "Hide grid preview" : "Show grid preview"}
+                >
+                  <Grid3X3 size={18} />
+                </button>
+              </div>
             ) : (
               <div className={styles.previewEmpty}>Select an image above</div>
             )}

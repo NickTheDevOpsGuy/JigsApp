@@ -9,10 +9,12 @@ This folder contains developer docs for Phuzzle.
 
 ## Reference
 
-- [streak-freeze.md](streak-freeze.md) - Streak freeze (streak shield) behavior and storage keys
+- [BUG_REPORT.md](BUG_REPORT.md) - Bug report flow (About → Report a bug; mailto, screenshots)
+- [STREAK-FREEZE.md](STREAK-FREEZE.md) - Streak freeze (streak shield) behavior and storage keys
 - [SHARING.md](SHARING.md) - Completion share and co-op share flows
 - [CHANGES.md](CHANGES.md) - Full feature list and code structure
 - [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md) - Feature history and migrations
+- [MOBILE_QA.md](MOBILE_QA.md) - Real-device iPhone/Android checklist and release gate
 
 ## Future ideas
 

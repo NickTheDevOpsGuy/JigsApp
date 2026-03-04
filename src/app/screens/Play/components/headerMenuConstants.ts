@@ -5,7 +5,7 @@ import type { SubMenuId } from "./headerMenuConfigTypes";
 
 export const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   about: "About",
-  advanced: "System",
+  advanced: "Advanced",
   audio: "Audio",
   assistance: "Assistance",
   contribute: "About",
@@ -34,7 +34,7 @@ export const SUBMENU_PARENT: Partial<Record<SubMenuId, SubMenuId>> = {
 
 export const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
   about: "About Phuzzle and how to get involved",
-  advanced: "Cache, performance overlay, reset stats",
+  advanced: "Clear cache, performance overlay, reset local stats",
   assistance: "Visual hints: alignment grid, edge highlight, ghost hints",
   audio: "Sound effects and haptic feedback",
   contribute: "About Phuzzle and how to get involved",
@@ -56,8 +56,9 @@ export function getSubmenuDescription(id: SubMenuId): string {
   return SUBMENU_DESCRIPTIONS[id] ?? SUB_MENU_LABELS[id];
 }
 
-/** Settings submenus in alphabetical order by label (Appearance, Assistance, Audio, …). */
+/** Settings submenus in alphabetical order by label (Advanced, Appearance, Assistance, Audio, …). */
 export const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
+  "advanced", // Advanced
   "display", // Appearance
   "assistance", // Assistance
   "audio", // Audio
@@ -65,5 +66,4 @@ export const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
   "stats", // Leaderboard
   "navigation", // Navigate
   "share", // Share
-  "advanced", // System
 ];

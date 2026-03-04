@@ -72,8 +72,8 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 ## Features
 
 - **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap (including during fast drags); group merging; 3×3 to 10×10 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan (capped to avoid excessive zoom); undo/redo with snap-back animation (Ctrl/Cmd+Z); drag lift (stronger shadow, scale)
-- **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/streak-freeze.md](doc/streak-freeze.md)
-- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), percentile badges (Top 10% / 25% / 50%), six themes; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 3 seconds; **piece draw order** (locked/placed pieces draw underneath so movable pieces never get stuck behind); **pixel-aligned seams** (integer target positions so pieces line up 100% at boundaries)
+- **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/STREAK-FREEZE.md](doc/STREAK-FREEZE.md)
+- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), percentile badges (Top 10% / 25% / 50%), six themes; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 3 seconds; **piece draw order** (locked/placed pieces draw underneath so movable pieces never get stuck behind); **pixel-aligned seams** (integer target positions so pieces line up 100% at boundaries). **Bug report** (Settings → About → Feedback → Report a bug, or Help → Feedback on home): form with optional email, description, optional screenshots; opens mailto so user can attach files and send. See [doc/BUG_REPORT.md](doc/BUG_REPORT.md).
 - **Play modes** (Settings → Modes) — **Zen Ambient** (no timer/rankings, subtle animated background, soft transitions); **Mystery Mode** (hide full reference, reveal sections only after correct placements); **Precision Mode** (score snap distance; completion shows avg precision and bonus points); **Dynamic Difficulty** (snap tolerance adjusts from completion history — tighter when you’re fast, more forgiving when slower); **Adaptive Personality** (UI tone follows pace: fast play → competitive microcopy/animations, slow play → calm)
 - **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share screen** (inline, no modal): **Share Result** and **Challenge Friend** both open the same screen with Copy link, Share Card, Download and challenge send; co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
 - **Analytics** — Live completion counter, percentile ranking (Top X%); **mastery** completions (daily with no hints and no undo) tracked for weekly album and mastery streak
@@ -175,6 +175,8 @@ Useful scripts:
 | [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                                      |
 | [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                         |
 | [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                               |
+| [BUG_REPORT.md](doc/BUG_REPORT.md)                     | Bug report flow (About → Report a bug; mailto, screenshots)                                               |
+| [MOBILE_QA.md](doc/MOBILE_QA.md)                       | Real-device mobile validation checklist (iPhone/Android)                                                   |
 | [README.md](doc/README.md)                             | Index of docs                                                                                             |
 
 **Play modes (Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)** — State and toggles: `Play/playScreenUtils.ts` (storage keys), `Play/hooks/playScreenUIInitial.ts`, `usePlayScreenUI.ts`, `usePlayScreenUIPersistence.ts`. Menu: `Play/components/headerMenuConfigTypes.ts`, `headerMenuItemsNavModes.ts`. Top bar/HUD: `usePlayScreenTopBarProps.ts`, `PlayScreenTopBar.tsx`, `PlayHUD.tsx`. Zen/Mystery/Precision/Completion: `PlayScreen.tsx`, `PlayScreen.module.css` (`.zenMode`, `.hudCompetitive`, `.hudCalm`), `CompletionOverlayGate.tsx`, `CompletionOverlay.tsx`, `CompletionStatsBlock.tsx`. Snap/precision: `puzzle/puzzleSnap.ts`, `PuzzleManager.ts`, `puzzleManagerUtils.ts`; `Play/hooks/playScreenManagerEvents.ts`. Dynamic difficulty: `services/adaptiveDifficultyService.ts` (`getToleranceMultiplier`). Completion copy by tone: `data/completionMessages.ts`.
@@ -188,13 +190,15 @@ Copy `.env.example` to `.env.local` (or `.env.development`) and set what you nee
 For Vercel:  
 Project Settings → Environment Variables
 
-| Variable                 | Required | Purpose                                            |
-| ------------------------ | -------- | -------------------------------------------------- |
-| `VITE_SHOW_DEBUG`        | No       | `true` to show debug overlay in play screen        |
-| `VITE_SUPABASE_URL`      | No       | Supabase project URL                               |
-| `VITE_SUPABASE_ANON_KEY` | No       | Supabase anon key                                  |
-| `VITE_POSTHOG_KEY`       | No       | PostHog project key                                |
-| `VITE_POSTHOG_HOST`      | No       | PostHog host (example: `https://us.i.posthog.com`) |
+| Variable                         | Required | Purpose                                                        |
+| -------------------------------- | -------- | -------------------------------------------------------------- |
+| `VITE_SHOW_DEBUG`                | No       | `true` to show debug overlay in play screen                    |
+| `VITE_SUPABASE_URL`              | No       | Supabase project URL                                           |
+| `VITE_SUPABASE_ANON_KEY`         | No       | Supabase anon key                                              |
+| `VITE_POSTHOG_KEY`               | No       | PostHog project key                                            |
+| `VITE_POSTHOG_HOST`              | No       | PostHog host (example: `https://us.i.posthog.com`)             |
+| `VITE_FORMSPREE_BUG_FORM_ID`     | No       | Formspree form URL or ID for bug reports (else mailto)         |
+| `VITE_FORMSPREE_FEATURE_FORM_ID` | No       | Formspree form URL or ID for feature suggestions (else mailto) |
 
 PostHog UI: https://app.posthog.com/
 
@@ -215,6 +219,8 @@ PostHog UI: https://app.posthog.com/
   - `npm run test` single run
   - `npm run test:watch` watch mode
   - `npm run test:ui` UI runner
+- Quality guards
+  - `npm run guard:quality` fails if `test.skip(...)` appears in E2E specs or `console.log(...)` appears in `src/`
 - E2E tests (Playwright)
   - `npm run test:e2e`
   - first run: `npx playwright install`
@@ -390,6 +396,10 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── AboutModal
 │   │   │   │   ├── AboutModal.module.css
 │   │   │   │   ├── AboutModal.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── BugReportModal
+│   │   │   │   ├── BugReportModal.module.css
+│   │   │   │   ├── BugReportModal.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── Button
 │   │   │   │   ├── Button.module.css

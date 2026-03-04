@@ -77,7 +77,7 @@ export function StatsScreenHeader({
           size="sm"
           variant="secondary"
           onClick={onClose}
-          className={styles.headerIconBtn}
+          className={`${styles.headerIconBtn} ${styles.headerCloseBtn}`}
           aria-label="Close"
           title="Close"
         >

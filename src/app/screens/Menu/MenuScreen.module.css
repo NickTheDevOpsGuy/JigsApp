@@ -59,12 +59,18 @@
 
 .homeBar {
   display: grid;
-  grid-template-columns: 40px 1fr 40px;
+  grid-template-columns: 44px 1fr auto;
   align-items: center;
   justify-items: center;
   gap: 8px;
   margin-bottom: 8px;
   flex-shrink: 0;
+}
+
+.cornerBtns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .dailyTitleInBar {
@@ -79,8 +85,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 1px solid var(--color-border-strong);
   border-radius: 10px;
@@ -251,7 +257,7 @@
 
   .homeBar {
     margin-bottom: 6px;
-    grid-template-columns: 36px 1fr 36px;
+    grid-template-columns: 44px 1fr auto;
   }
 
   .dailyTitleInBar {
@@ -259,8 +265,8 @@
   }
 
   .cornerBtn {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     font-size: 16px;
   }
 

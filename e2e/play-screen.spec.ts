@@ -51,13 +51,13 @@ test.describe("Play screen", () => {
     test.setTimeout(60000);
     await page.goto("/play?e2eCompletion=1");
 
-    await expect(page.getByRole("heading", { name: /puzzle completed/i })).toBeVisible({
+    await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
       timeout: 20000,
     });
-    await expect(page.getByRole("button", { name: /home/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /share progress/i })).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByRole("button", { name: /play again/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /send challenge/i })).toBeVisible({
       timeout: 10000,
     });
   });

@@ -13,6 +13,7 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "typecheck": "tsc --noEmit",
+    "guard:quality": "bash ./scripts/guard-no-skip-and-console.sh",
     "precheck": "bash ./scripts/precheck.sh",
     "prepare": "husky",
     "test": "vitest run",

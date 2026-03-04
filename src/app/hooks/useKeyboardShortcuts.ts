@@ -51,7 +51,9 @@ export function useKeyboardShortcuts({
 }: UseKeyboardShortcutsOptions) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!enabled) return;
+      if (!enabled) {
+        return;
+      }
 
       // Don't trigger shortcuts when typing in inputs
       const target = e.target as HTMLElement;

@@ -31,7 +31,7 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
   const isTouch = isTouchDevice();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="How to Play">
+    <Modal isOpen={isOpen} onClose={onClose} title="How to Play" showCloseButton>
       <div className={styles.content}>
         <p className={styles.intro}>
           Drag and drop pieces to assemble the puzzle. Match all pieces to complete the

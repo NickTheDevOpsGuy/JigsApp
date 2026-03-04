@@ -148,19 +148,51 @@ export function usePlayScreenManager(
 
         const viewportW = typeof window !== "undefined" ? window.innerWidth : 1024;
         const isMobile = viewportW < 600;
+        const cutTypeRaw = safeLocalStorage.getItem(CUT_TYPE_KEY);
+        const cutType =
+          cutTypeRaw === "irregular" || cutTypeRaw === "hard" ? cutTypeRaw : "classic";
+        const cutDepthPct =
+          cutType === "irregular" ? 0.2 : cutType === "hard" ? 0.12 : 0.17;
 
-        // Integer tile size so pieces align with no gaps (fixes 2x2 and small grids)
+        // Fit assembled puzzle to board while preserving source aspect ratio.
+        // Reserve extra inset for piece pad/tab overhang so snapped pieces stay fully visible.
         const boardW = rectW;
         const boardH = rectH;
-        const pieceWidth = Math.max(1, Math.floor(boardW / grid.cols));
-        const pieceHeight = Math.max(1, Math.floor(boardH / grid.rows));
-        const innerW = boardW - 2 * BOARD_INSET_PX;
-        const innerH = boardH - 2 * BOARD_INSET_PX;
+        const tileAspect =
+          (img.naturalWidth * grid.rows) / Math.max(1, img.naturalHeight * grid.cols);
+
+        const fitTileSizeAtInset = (inset: number) => {
+          const innerW = Math.max(1, boardW - 2 * inset);
+          const innerH = Math.max(1, boardH - 2 * inset);
+          const maxPieceWByWidth = Math.max(1, Math.floor(innerW / grid.cols));
+          const maxPieceHByHeight = Math.max(1, Math.floor(innerH / grid.rows));
+          let pieceWidth = maxPieceWByWidth;
+          let pieceHeight = Math.max(1, Math.floor(pieceWidth / tileAspect));
+          if (pieceHeight * grid.rows > innerH) {
+            pieceHeight = maxPieceHByHeight;
+            pieceWidth = Math.max(1, Math.floor(pieceHeight * tileAspect));
+          }
+
+          pieceWidth = Math.max(1, Math.min(pieceWidth, maxPieceWByWidth));
+          pieceHeight = Math.max(1, Math.min(pieceHeight, maxPieceHByHeight));
+          return { pieceWidth, pieceHeight, innerW, innerH };
+        };
+
+        let { pieceWidth, pieceHeight } = fitTileSizeAtInset(BOARD_INSET_PX);
+        const padReserve = Math.max(
+          18,
+          Math.min(34, Math.ceil(Math.min(pieceWidth, pieceHeight) * cutDepthPct)),
+        );
+        const effectiveInset = BOARD_INSET_PX + padReserve;
+        ({ pieceWidth, pieceHeight } = fitTileSizeAtInset(effectiveInset));
+
+        const innerW = Math.max(1, boardW - 2 * effectiveInset);
+        const innerH = Math.max(1, boardH - 2 * effectiveInset);
         const targetStartX = Math.round(
-          BOARD_INSET_PX + (innerW - grid.cols * pieceWidth) / 2,
+          effectiveInset + (innerW - grid.cols * pieceWidth) / 2,
         );
         const targetStartY = Math.round(
-          BOARD_INSET_PX + (innerH - grid.rows * pieceHeight) / 2,
+          effectiveInset + (innerH - grid.rows * pieceHeight) / 2,
         );
 
         const savedState = loadPuzzleState();
@@ -208,10 +240,6 @@ export function usePlayScreenManager(
         if (hasSavedGame && resumeChoice === "fresh") {
           clearPuzzleState();
         }
-
-        const cutTypeRaw = safeLocalStorage.getItem(CUT_TYPE_KEY);
-        const cutType =
-          cutTypeRaw === "irregular" || cutTypeRaw === "hard" ? cutTypeRaw : "classic";
 
         const opts = optionsRef.current;
         managerRef.current = null;

@@ -25,6 +25,8 @@ interface CompletionOverlayGateProps {
     canNativeShare: boolean;
     handleCopyResults: () => void;
     handleNativeShare: () => void;
+    handleCopyChallenge: () => void;
+    handleNativeChallengeShare: () => void;
   };
   onDownloadImage: () => void;
   onClose: () => void;
@@ -102,8 +104,10 @@ export function CompletionOverlayGate({
       cutType={pieceCutType}
       puzzleShareUrl={puzzleShareUrl}
       copied={share.copied}
-      onCopyResults={share.handleCopyResults}
-      onNativeShare={share.handleNativeShare}
+      onShareProgress={share.handleNativeShare}
+      onShareChallenge={share.handleNativeChallengeShare}
+      onCopyProgress={share.handleCopyResults}
+      onCopyChallenge={share.handleCopyChallenge}
       onDownloadImage={onDownloadImage}
       onClose={onClose}
       onGoHome={onGoHome}

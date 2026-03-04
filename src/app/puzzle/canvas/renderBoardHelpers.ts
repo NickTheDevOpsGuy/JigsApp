@@ -197,8 +197,9 @@ export type ImageSourceRect = {
 };
 
 /**
- * Seam-locked source rect: use shared pixel boundaries at tile edges so adjacent
- * pieces sample the same pixels at the seam (fixes misaligned eyes/features at borders).
+ * Seam-locked source rect:
+ * Keep shared tile boundaries in source-space with subpixel precision so adjacent
+ * pieces sample continuously across seams (prevents facial-feature wobble at joins).
  */
 export function computeImageSourceRect(
   p: Piece,
@@ -217,37 +218,37 @@ export function computeImageSourceRect(
   const topPad = p.row === 0 ? 0 : srcPadY;
   const bottomPad = p.row === rows - 1 ? 0 : srcPadY;
 
-  // Shared seam positions (one per tile boundary) so neighbors use the same pixel column/row
-  const seamX = (c: number) => Math.round(c * srcTileW);
-  const seamY = (r: number) => Math.round(r * srcTileH);
+  // Shared seam positions (one per tile boundary) so neighbors use identical boundaries.
+  // Do not round here: integer snapping can make per-row/col scaling drift on non-divisible images.
+  const seamX = (c: number) => c * srcTileW;
+  const seamY = (r: number) => r * srcTileH;
 
-  const leftPadR = Math.round(leftPad);
-  const rightPadR = Math.round(rightPad);
-  const topPadR = Math.round(topPad);
-  const bottomPadR = Math.round(bottomPad);
-
-  let srcX = p.col === 0 ? 0 : seamX(p.col) - leftPadR;
-  const srcRight = p.col === cols - 1 ? sourceW : seamX(p.col + 1) + rightPadR;
-  let srcY = p.row === 0 ? 0 : seamY(p.row) - topPadR;
-  const srcBottom = p.row === rows - 1 ? sourceH : seamY(p.row + 1) + bottomPadR;
+  let srcX = p.col === 0 ? 0 : seamX(p.col) - leftPad;
+  const srcRight = p.col === cols - 1 ? sourceW : seamX(p.col + 1) + rightPad;
+  let srcY = p.row === 0 ? 0 : seamY(p.row) - topPad;
+  const srcBottom = p.row === rows - 1 ? sourceH : seamY(p.row + 1) + bottomPad;
 
   let srcW = srcRight - srcX;
   let srcH = srcBottom - srcY;
-  let destX = 0;
-  let destY = 0;
-  let destW = p.w;
-  let destH = p.h;
+  // On outer flat edges, the pad region is not visible (path starts/ends at tile edge).
+  // Exclude that hidden region so visible pixels keep the same scale across all pieces.
+  let destX = p.col === 0 ? p.pad : 0;
+  let destY = p.row === 0 ? p.pad : 0;
+  let destW = p.w - (p.col === 0 ? p.pad : 0) - (p.col === cols - 1 ? p.pad : 0);
+  let destH = p.h - (p.row === 0 ? p.pad : 0) - (p.row === rows - 1 ? p.pad : 0);
 
   // Clamp to image bounds
   if (srcX < 0) {
-    destX = (-srcX / srcW) * p.w;
-    destW = p.w - destX;
+    const k = -srcX / srcW;
+    destX += destW * k;
+    destW *= 1 - k;
     srcW = srcW + srcX;
     srcX = 0;
   }
   if (srcY < 0) {
-    destY = (-srcY / srcH) * p.h;
-    destH = p.h - destY;
+    const k = -srcY / srcH;
+    destY += destH * k;
+    destH *= 1 - k;
     srcH = srcH + srcY;
     srcY = 0;
   }

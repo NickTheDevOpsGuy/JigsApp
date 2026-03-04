@@ -1,6 +1,6 @@
 //
 // src/app/components/Modal/Modal.tsx
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useId } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Modal.module.css";
 import { Button } from "@/components/Button/Button";
@@ -22,6 +22,8 @@ export function Modal({
   showCloseButton = true,
   variant,
 }: ModalProps) {
+  const titleId = useId();
+
   // Close on escape key
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -71,14 +73,25 @@ export function Modal({
         data-variant={variant}
         role="dialog"
         aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        aria-label={title ? undefined : "Dialog"}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleModalKeyDown}
       >
         {(title || showCloseButton) && (
           <div className={styles.header}>
-            {title && <h2 className={styles.title}>{title}</h2>}
+            {title && (
+              <h2 id={titleId} className={styles.title}>
+                {title}
+              </h2>
+            )}
             {showCloseButton && (
-              <button className={styles.closeBtn} onClick={onClose}>
+              <button
+                type="button"
+                className={styles.closeBtn}
+                onClick={onClose}
+                aria-label="Close"
+              >
                 ×
               </button>
             )}
@@ -117,7 +130,7 @@ export function ConfirmModal({
   primaryOnlyConfirm = false,
 }: ConfirmModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} showCloseButton={false}>
+    <Modal isOpen={isOpen} onClose={onClose} title={title} showCloseButton>
       <p className={styles.message}>{message}</p>
       <div className={styles.actions}>
         {!primaryOnlyConfirm && (

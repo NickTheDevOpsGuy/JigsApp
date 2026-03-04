@@ -38,6 +38,9 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci
 
+      - name: 🧱 Quality guards (no test.skip / no console.log in src)
+        run: npm run guard:quality
+
       - name: 🧹 ESLint
         run: npm run lint
 

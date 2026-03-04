@@ -14,34 +14,47 @@ export type ShareUrls = {
 export function useShareResults(args: {
   elapsedSeconds: number;
   state: PuzzleState | null;
-  puzzleShareUrl?: string;
+  progressShareUrl?: string;
+  challengeShareUrl?: string;
   accuracyPercent?: number;
 }) {
-  const { elapsedSeconds, state, puzzleShareUrl = "/" } = args;
+  const { elapsedSeconds, state, progressShareUrl = "/", challengeShareUrl = "/" } = args;
   const [copied, setCopied] = useState(false);
 
-  const fullShareUrl = useMemo(() => {
-    const path = puzzleShareUrl.startsWith("http")
-      ? puzzleShareUrl
-      : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
+  const fullProgressUrl = useMemo(() => {
+    const path = progressShareUrl.startsWith("http")
+      ? progressShareUrl
+      : `${PLAY_BASE}${progressShareUrl.startsWith("/") ? progressShareUrl : `/${progressShareUrl}`}`;
     return path;
-  }, [puzzleShareUrl]);
+  }, [progressShareUrl]);
+
+  const fullChallengeUrl = useMemo(() => {
+    const path = challengeShareUrl.startsWith("http")
+      ? challengeShareUrl
+      : `${PLAY_BASE}${challengeShareUrl.startsWith("/") ? challengeShareUrl : `/${challengeShareUrl}`}`;
+    return path;
+  }, [challengeShareUrl]);
 
   const getShareText = useCallback(() => {
     const timeStr = formatTime(elapsedSeconds);
     const pieceCount = state?.totalCount ?? 0;
-    return `🧩 I completed a ${pieceCount}-piece Phuzzle in ${timeStr}! Can you beat my time?`;
+    return `🧩 I completed a ${pieceCount}-piece Phuzzle in ${timeStr}.`;
   }, [elapsedSeconds, state?.totalCount]);
 
-  /** Challenge message with link, for copy / native share / SMS */
-  const getShareTextWithUrl = useCallback(() => {
-    return `${getShareText()}\n\n${fullShareUrl}`;
-  }, [getShareText, fullShareUrl]);
+  const getProgressShareTextWithUrl = useCallback(() => {
+    return `${getShareText()}\n\n${fullProgressUrl}`;
+  }, [getShareText, fullProgressUrl]);
+
+  const getChallengeShareTextWithUrl = useCallback(() => {
+    const timeStr = formatTime(elapsedSeconds);
+    const pieceCount = state?.totalCount ?? 0;
+    return `Think you're faster than ${timeStr}? Prove it on this ${pieceCount}-piece challenge.\n\n${fullChallengeUrl}`;
+  }, [elapsedSeconds, state?.totalCount, fullChallengeUrl]);
 
   const shareUrls: ShareUrls = useMemo(() => {
     const text = encodeURIComponent(getShareText());
     const hashtag = encodeURIComponent("#Phuzzle");
-    const url = encodeURIComponent(fullShareUrl);
+    const url = encodeURIComponent(fullProgressUrl);
 
     return {
       twitter: `https://twitter.com/intent/tweet?text=${text}%20${hashtag}`,
@@ -49,14 +62,14 @@ export function useShareResults(args: {
       reddit: `https://reddit.com/submit?title=${text}%20${hashtag}`,
       whatsapp: `https://wa.me/?text=${text}%20${hashtag}%20${url}`,
     };
-  }, [getShareText, fullShareUrl]);
+  }, [getShareText, fullProgressUrl]);
 
   const openShareWindow = useCallback((url: string) => {
     window.open(url, "_blank", "width=600,height=400,menubar=no,toolbar=no");
   }, []);
 
   const handleCopyResults = useCallback(async () => {
-    const text = getShareTextWithUrl();
+    const text = getProgressShareTextWithUrl();
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -64,33 +77,67 @@ export function useShareResults(args: {
     } catch (err) {
       console.error("Failed to copy:", err);
     }
-  }, [getShareTextWithUrl]);
+  }, [getProgressShareTextWithUrl]);
+
+  const handleCopyChallenge = useCallback(async () => {
+    const text = getChallengeShareTextWithUrl();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  }, [getChallengeShareTextWithUrl]);
 
   const canNativeShare = typeof navigator !== "undefined" && !!navigator.share;
 
   const handleNativeShare = useCallback(async () => {
-    if (!navigator.share) return;
-    const text = getShareTextWithUrl();
+    if (!navigator.share) {
+      await handleCopyResults();
+      return;
+    }
+    const text = getProgressShareTextWithUrl();
     try {
       await navigator.share({
         title: "Phuzzle",
         text,
-        url: fullShareUrl,
+        url: fullProgressUrl,
       });
     } catch (err) {
       console.warn("Share cancelled or failed:", err);
     }
-  }, [getShareTextWithUrl, fullShareUrl]);
+  }, [getProgressShareTextWithUrl, fullProgressUrl, handleCopyResults]);
+
+  const handleNativeChallengeShare = useCallback(async () => {
+    if (!navigator.share) {
+      await handleCopyChallenge();
+      return;
+    }
+    const text = getChallengeShareTextWithUrl();
+    try {
+      await navigator.share({
+        title: "Phuzzle Challenge",
+        text,
+        url: fullChallengeUrl,
+      });
+    } catch (err) {
+      console.warn("Share cancelled or failed:", err);
+    }
+  }, [getChallengeShareTextWithUrl, fullChallengeUrl, handleCopyChallenge]);
 
   return {
     copied,
     setCopied,
     getShareText,
-    getShareTextWithUrl,
+    getProgressShareTextWithUrl,
+    getChallengeShareTextWithUrl,
     shareUrls,
     openShareWindow,
     handleCopyResults,
+    handleCopyChallenge,
     canNativeShare,
     handleNativeShare,
+    handleNativeChallengeShare,
   };
 }

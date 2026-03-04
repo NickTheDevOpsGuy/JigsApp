@@ -7,6 +7,12 @@
   padding: env(safe-area-inset-top) 16px 24px;
   background: var(--color-bg-primary);
   overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
 }
 
 .card {
@@ -24,6 +30,11 @@
 
 .cardScroll {
   min-height: 0;
+  scrollbar-width: none;
+}
+
+.cardScroll::-webkit-scrollbar {
+  display: none;
 }
 
 .header {
@@ -193,6 +204,11 @@
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
+    scrollbar-width: none;
+  }
+
+  .cardScroll::-webkit-scrollbar {
+    display: none;
   }
 
   .subtitle {

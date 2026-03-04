@@ -58,6 +58,7 @@ import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
 import { useBatterySaver } from "../../hooks/useBatterySaver";
+import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
 import {
   Minimap,
   PlayScreenCoopView,
@@ -73,6 +74,7 @@ import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
 import { createPuzzleSession } from "@/services/puzzleSessionService";
 import { getToleranceMultiplier } from "@/services/adaptiveDifficultyService";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { getCurrentPuzzleId } from "@/data/packCompletion";
 
 const DAILY_PARAM = "daily";
 const GRID_PARAM = "grid";
@@ -182,6 +184,8 @@ export function PlayScreen() {
     setShowHowToPlay,
     showHelpChoice,
     setShowHelpChoice,
+    showFeedbackChoice,
+    setShowFeedbackChoice,
     showNewGameModal,
     setShowNewGameModal,
     showThemeModal,
@@ -657,14 +661,20 @@ export function PlayScreen() {
       const assembledW = first && state?.grid ? state.grid.cols * first.tileW : 0;
       const assembledH = first && state?.grid ? state.grid.rows * first.tileH : 0;
       const piece00 = state?.pieces?.find((p) => p.row === 0 && p.col === 0);
+      const pad = piece00?.pad ?? 18;
       const boardOffsetX = piece00 ? piece00.pad - piece00.targetX : 0;
       const boardOffsetY = piece00 ? piece00.pad - piece00.targetY : 0;
+      const contentW = assembledW + 2 * pad;
+      const contentH = assembledH + 2 * pad;
       const fitScale =
-        assembledW > 0 && assembledH > 0
-          ? Math.min(1, cssW / assembledW, cssH / assembledH)
-          : 1;
-      let vx = (cssX - cssW / 2) / fitScale + assembledW / 2;
-      let vy = (cssY - cssH / 2) / fitScale + assembledH / 2;
+        contentW > 0 && contentH > 0 ? Math.min(1, cssW / contentW, cssH / contentH) : 1;
+      const drawW = contentW * fitScale;
+      const drawH = contentH * fitScale;
+      const hiddenBottomBand = pad * fitScale;
+      const fitOffsetX = (cssW - drawW) / 2;
+      const fitOffsetY = cssH - drawH + hiddenBottomBand;
+      let vx = (cssX - fitOffsetX) / fitScale;
+      let vy = (cssY - fitOffsetY) / fitScale;
       vx = (vx - viewport.viewport.panX) / viewport.viewport.scale;
       vy = (vy - viewport.viewport.panY) / viewport.viewport.scale;
       return {
@@ -806,6 +816,17 @@ export function PlayScreen() {
     return "/";
   }, [sessionId, shareSessionId, grid]);
 
+  const challengeShareUrl = useMemo(() => {
+    if (!grid) return puzzleShareUrl;
+    if (isDailyPuzzleSession())
+      return `/play?${DAILY_PARAM}=1&${GRID_PARAM}=${grid.rows}x${grid.cols}`;
+    const puzzleId = getCurrentPuzzleId();
+    if (puzzleId) {
+      return `/new?source=gallery&puzzle=${encodeURIComponent(puzzleId)}&grid=${grid.rows}x${grid.cols}`;
+    }
+    return puzzleShareUrl;
+  }, [grid, puzzleShareUrl]);
+
   const shareAccuracyPercent =
     state?.totalCount && state.totalCount > 0
       ? Math.round(
@@ -815,7 +836,8 @@ export function PlayScreen() {
   const share = useShareResults({
     elapsedSeconds,
     state,
-    puzzleShareUrl,
+    progressShareUrl: puzzleShareUrl,
+    challengeShareUrl,
     accuracyPercent: shareAccuracyPercent,
   });
   const handleSharePuzzle = usePlayScreenSharePuzzle({
@@ -1062,6 +1084,10 @@ export function PlayScreen() {
           setShowShortcuts={setShowShortcuts}
           showThemeModal={showThemeModal}
           setShowThemeModal={setShowThemeModal}
+          onOpenFeedback={() => {
+            setShowHelpChoice(false);
+            setShowFeedbackChoice(true);
+          }}
           hapticsEnabled={hapticsEnabled}
           showNewGameModal={showNewGameModal}
           setShowNewGameModal={setShowNewGameModal}
@@ -1070,6 +1096,16 @@ export function PlayScreen() {
           setShowResetStatsConfirm={setShowResetStatsConfirm}
           showClearCacheConfirm={showClearCacheConfirm}
           setShowClearCacheConfirm={setShowClearCacheConfirm}
+        />
+
+        <FeedbackChoiceModal
+          isOpen={showFeedbackChoice}
+          onClose={() => setShowFeedbackChoice(false)}
+          environmentSnippet={
+            state?.grid
+              ? `Grid: ${state.grid.rows}x${state.grid.cols}\nSession: ${sessionIdFromUrl ?? "—"}`
+              : undefined
+          }
         />
 
         {((isComplete && !completionDismissed) ||
@@ -1097,6 +1133,8 @@ export function PlayScreen() {
                 canNativeShare: share.canNativeShare,
                 handleCopyResults: share.handleCopyResults,
                 handleNativeShare: share.handleNativeShare,
+                handleCopyChallenge: share.handleCopyChallenge,
+                handleNativeChallengeShare: share.handleNativeChallengeShare,
               }}
               onDownloadImage={handleDownloadImage}
               onClose={() => {

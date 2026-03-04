@@ -62,6 +62,33 @@ export function App() {
     initStreakFreeze();
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isTouchDevice =
+      window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0;
+    if (!isTouchDevice) return;
+
+    const allowContextMenuTarget = (target: EventTarget | null): boolean => {
+      const el = target as HTMLElement | null;
+      if (!el) return false;
+      return Boolean(
+        el.closest(
+          'input, textarea, select, [contenteditable="true"], [data-allow-context-menu="true"]',
+        ),
+      );
+    };
+
+    const handleContextMenu = (event: MouseEvent) => {
+      if (allowContextMenuTarget(event.target)) return;
+      event.preventDefault();
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu, true);
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu, true);
+    };
+  }, []);
+
   const focusMain = () => {
     requestAnimationFrame(() => {
       document.getElementById("main")?.focus();

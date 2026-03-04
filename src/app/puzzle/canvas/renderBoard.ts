@@ -86,17 +86,23 @@ export function renderBoard(
   const piece00 = state.pieces.find((p) => p.row === 0 && p.col === 0);
   const pad = piece00?.pad ?? 18;
 
-  /* Scale to fit and center the full puzzle (tile grid + piece padding) so the bottom row sits on the canvas, not below it. */
+  /* Scale to fit full puzzle (tile grid + piece padding), center horizontally and anchor to bottom. */
   let appliedFit = false;
   if (assembledW > 0 && assembledH > 0) {
     const contentW = assembledW + 2 * pad;
     const contentH = assembledH + 2 * pad;
     const fitScale = Math.min(1, cssW / contentW, cssH / contentH);
+    const drawW = contentW * fitScale;
+    const drawH = contentH * fitScale;
+    // Bottom outer edge is flat, so the bottom pad area is visually empty.
+    // Shift down by that hidden band so the solved image visually touches the bottom.
+    const hiddenBottomBand = pad * fitScale;
+    const offsetX = (cssW - drawW) / 2;
+    const offsetY = cssH - drawH + hiddenBottomBand;
     ctx.save();
     appliedFit = true;
-    ctx.translate(cssW / 2, cssH / 2);
+    ctx.translate(offsetX, offsetY);
     ctx.scale(fitScale, fitScale);
-    ctx.translate(-contentW / 2, -contentH / 2);
   }
 
   if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
@@ -131,34 +137,32 @@ export function renderBoard(
     ? (state.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
     : null;
 
-  const isBottom = (p: { isPlaced: boolean; locked: boolean }) => p.isPlaced || p.locked;
-  const pieces = [...state.pieces]
+  // Filter to board pieces only, excluding drag preview
+  const boardPieces = [...state.pieces]
     .filter((p) => !p.inTray)
-    .filter((p) => p.id !== animState?.dragPreviewPieceId)
-    .sort((a, b) => {
-      /* Locked/placed pieces draw first (bottom); movable pieces draw last (on top) so they can't get stuck behind. */
-      const aBottom = isBottom(a);
-      const bBottom = isBottom(b);
-      if (aBottom !== bBottom) return (aBottom ? 0 : 1) - (bBottom ? 0 : 1);
-      return a.z - b.z;
-    });
+    .filter((p) => p.id !== animState?.dragPreviewPieceId);
+
+  // Sort pieces for drawing order:
+  // 1. Dragged group ALWAYS on top (drawn last)
+  // 2. Then by z-index (lower z drawn first)
+  const sortedPieces = boardPieces.sort((a, b) => {
+    // Dragged group always draws last (on top of everything)
+    if (draggedGroupId != null) {
+      const aInDragGroup = a.groupId === draggedGroupId;
+      const bInDragGroup = b.groupId === draggedGroupId;
+      if (aInDragGroup !== bInDragGroup) {
+        return aInDragGroup ? 1 : -1; // Dragged group sorts to end
+      }
+    }
+
+    // Otherwise sort by z (lower z = drawn first = behind)
+    return a.z - b.z;
+  });
 
   const overrides =
     animState?.undoSnapBackOverrides ??
     animState?.lockLerpOverrides ??
     animState?.dragDisplayOverrides;
-  const sortedPieces =
-    draggedGroupId != null
-      ? [...pieces].sort((a, b) => {
-          const aInGroup = a.groupId === draggedGroupId ? 1 : 0;
-          const bInGroup = b.groupId === draggedGroupId ? 1 : 0;
-          if (aInGroup !== bInGroup) return aInGroup - bInGroup;
-          const aBottom = isBottom(a);
-          const bBottom = isBottom(b);
-          if (aBottom !== bBottom) return (aBottom ? 0 : 1) - (bBottom ? 0 : 1);
-          return a.z - b.z;
-        })
-      : pieces;
 
   for (const p of sortedPieces) {
     const isDragging = draggedGroupId !== null && p.groupId === draggedGroupId;

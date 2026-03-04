@@ -11,6 +11,8 @@ type HelpChoiceModalProps = {
   onKeyboardShortcuts: () => void;
   onShowAbout?: () => void;
   onOpenTheme?: () => void;
+  onOpenFeedback?: () => void;
+  onOpenAdvanced?: () => void;
 };
 
 export function HelpChoiceModal({
@@ -20,6 +22,8 @@ export function HelpChoiceModal({
   onKeyboardShortcuts,
   onShowAbout,
   onOpenTheme,
+  onOpenFeedback,
+  onOpenAdvanced,
 }: HelpChoiceModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Help" showCloseButton={true}>
@@ -57,6 +61,32 @@ export function HelpChoiceModal({
             aria-label="About"
           >
             ℹ️ About
+          </button>
+        )}
+        {onOpenFeedback && (
+          <button
+            type="button"
+            className={styles.helpChoiceBtn}
+            onClick={() => {
+              onClose();
+              onOpenFeedback();
+            }}
+            aria-label="Feedback"
+          >
+            📣 Feedback
+          </button>
+        )}
+        {onOpenAdvanced && (
+          <button
+            type="button"
+            className={styles.helpChoiceBtn}
+            onClick={() => {
+              onClose();
+              onOpenAdvanced();
+            }}
+            aria-label="Advanced"
+          >
+            ⚙️ Advanced
           </button>
         )}
         {onOpenTheme && (

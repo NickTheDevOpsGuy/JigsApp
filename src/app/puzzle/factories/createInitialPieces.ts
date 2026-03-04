@@ -5,9 +5,9 @@ import type { GridSize, Piece, PieceEdges, PieceCutType } from "../types";
 import { buildPiecePath } from "../shape";
 
 const CUT_DEPTH_PCT: Record<PieceCutType, number> = {
-  classic: 0.22,
-  irregular: 0.26,
-  hard: 0.14,
+  classic: 0.17,
+  irregular: 0.2,
+  hard: 0.12,
 };
 
 type CreateInitialPiecesArgs = {
@@ -96,7 +96,8 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const total = grid.cols * grid.rows;
   const edges = buildEdgesForGrid(grid);
   const depthPct = CUT_DEPTH_PCT[cutType];
-  const minPad = Math.ceil(Math.min(tileW, tileH) * depthPct);
+  const rawPad = Math.ceil(Math.min(tileW, tileH) * depthPct);
+  const minPad = Math.max(10, Math.min(34, rawPad));
   const effectivePad = Math.max(pad, minPad);
 
   const w = tileW + effectivePad * 2;

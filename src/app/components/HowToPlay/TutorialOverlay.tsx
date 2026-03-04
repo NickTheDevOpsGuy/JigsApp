@@ -56,7 +56,13 @@ export function TutorialOverlay({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleDismiss} title="How to Play" variant="tutorial">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleDismiss}
+      title="How to Play"
+      variant="tutorial"
+      showCloseButton
+    >
       <div className={styles.wrapper}>
         {/* Row 1: How it Works (2 wide) */}
         <div className={styles.row}>

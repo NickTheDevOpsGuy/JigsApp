@@ -80,8 +80,8 @@ export function computeBoardSnapResult(
 
   return {
     kind: "snap",
-    dx: Math.round(dx),
-    dy: Math.round(dy),
+    dx,
+    dy,
     groupId: gid,
   };
 }
@@ -168,8 +168,8 @@ export function computeNeighborSnapResult(
   if (!best) return null;
   return {
     kind: "snap",
-    dx: Math.round(best.dx),
-    dy: Math.round(best.dy),
+    dx: best.dx,
+    dy: best.dy,
     intoGroupId: best.into,
     dist: best.dist,
   };
@@ -223,5 +223,5 @@ export function computeMergedGroupBoardSnapResult(
   const dy = ref.targetY - tile.y;
 
   if (wouldOverlapAnyOtherGroup(pieces, groupId, dx, dy)) return null;
-  return { dx: Math.round(dx), dy: Math.round(dy) };
+  return { dx, dy };
 }
