@@ -20,6 +20,7 @@ export type PlayScreenOverlaysProps = {
   progressiveRevealMode: boolean;
   previewImage: HTMLImageElement | null;
   state: PuzzleState | null;
+  isComplete?: boolean;
   onPreviewTap: (e: React.MouseEvent<HTMLDivElement>) => void;
   immersiveMode: boolean;
   onImmersiveReveal: () => void;
@@ -59,6 +60,7 @@ export function PlayScreenOverlays({
   progressiveRevealMode,
   previewImage,
   state,
+  isComplete = false,
   onPreviewTap,
   immersiveMode,
   onImmersiveReveal,
@@ -235,6 +237,7 @@ export function PlayScreenOverlays({
       )}
 
       <PlayToasts
+        isComplete={isComplete}
         onboarding={onboarding}
         showFirstSnapToast={onboarding.showFirstSnapToast}
         showStreakToast={showStreakToast}

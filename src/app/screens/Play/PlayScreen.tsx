@@ -448,6 +448,14 @@ export function PlayScreen() {
 
   elapsedSecondsRef.current = elapsedSeconds;
 
+  // When game is complete, clear any toast state so no toasts show
+  useEffect(() => {
+    if (state?.isComplete) {
+      setShowStreakToast(false);
+      setShareToast(null);
+    }
+  }, [state?.isComplete]);
+
   const milestoneMessage = usePlayScreenMilestones(
     state,
     puzzleKey,
@@ -455,19 +463,7 @@ export function PlayScreen() {
     timeMode,
   );
 
-  // Camera zoom-out on completion (600ms ease-out)
   const zoomOnCompleteRunRef = useRef(false);
-  useEffect(() => {
-    if (!state?.isComplete || zoomOnCompleteRunRef.current || batterySaverMode) return;
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
-      return;
-    zoomOnCompleteRunRef.current = true;
-    viewport.zoomOutOnComplete();
-  }, [state?.isComplete, batterySaverMode, viewport.zoomOutOnComplete]);
-
   const completionCapturedRef = useRef(false);
   const onFireCapturedRef = useRef(false);
   // Auto-clear piece selection after 1s so the blue border doesn’t stay until another click
@@ -1076,6 +1072,47 @@ export function PlayScreen() {
           setShowClearCacheConfirm={setShowClearCacheConfirm}
         />
 
+        {((isComplete && !completionDismissed) ||
+          (showE2ECompletion && !completionDismissed)) &&
+          state && (
+            <CompletionOverlayGate
+              show
+              elapsedSeconds={elapsedSeconds}
+              state={state}
+              imageUrl={
+                safeLocalStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
+              }
+              undoCount={undoCountRef.current}
+              moveCount={moveCountRef.current}
+              dailyVisualModifier={dailyVisualModifier}
+              pieceCutType={pieceCutType}
+              isNewBest={
+                timeMode === "best" &&
+                state.grid != null &&
+                (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
+              }
+              puzzleShareUrl={puzzleShareUrl}
+              share={{
+                copied: share.copied,
+                canNativeShare: share.canNativeShare,
+                handleCopyResults: share.handleCopyResults,
+                handleNativeShare: share.handleNativeShare,
+              }}
+              onDownloadImage={handleDownloadImage}
+              onClose={() => {
+                setCompletionDismissed(true);
+                viewport.reset();
+              }}
+              usedHint={usedHintRef.current}
+              isDaily={isDailyPuzzleSession()}
+              onGoHome={() => navigate("/")}
+              onPlayAgain={handleNewGame}
+              precisionModeEnabled={precisionModeEnabled}
+              precisionSnaps={precisionSnapsRef.current}
+              adaptivePersonalityEnabled={adaptivePersonalityEnabled}
+            />
+          )}
+
         <div className={styles.playBody}>
           <div className={styles.main} ref={mainRef}>
             <div className={styles.boardWrapper}>
@@ -1130,45 +1167,6 @@ export function PlayScreen() {
                       />
                     )}
                   {isPaused && <PauseOverlay onResume={() => setIsPaused(false)} />}
-                  {((isComplete && !completionDismissed) ||
-                    (showE2ECompletion && !completionDismissed)) &&
-                    state && (
-                      <CompletionOverlayGate
-                        show
-                        elapsedSeconds={elapsedSeconds}
-                        state={state}
-                        imageUrl={
-                          safeLocalStorage.getItem(STORAGE_KEY) ||
-                          imgRef.current?.src ||
-                          undefined
-                        }
-                        undoCount={undoCountRef.current}
-                        moveCount={moveCountRef.current}
-                        dailyVisualModifier={dailyVisualModifier}
-                        pieceCutType={pieceCutType}
-                        isNewBest={
-                          timeMode === "best" &&
-                          state.grid != null &&
-                          (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds)
-                        }
-                        puzzleShareUrl={puzzleShareUrl}
-                        share={{
-                          copied: share.copied,
-                          canNativeShare: share.canNativeShare,
-                          handleCopyResults: share.handleCopyResults,
-                          handleNativeShare: share.handleNativeShare,
-                        }}
-                        onDownloadImage={handleDownloadImage}
-                        onClose={() => setCompletionDismissed(true)}
-                        usedHint={usedHintRef.current}
-                        isDaily={isDailyPuzzleSession()}
-                        onGoHome={() => navigate("/")}
-                        onPlayAgain={handleNewGame}
-                        precisionModeEnabled={precisionModeEnabled}
-                        precisionSnaps={precisionSnapsRef.current}
-                        adaptivePersonalityEnabled={adaptivePersonalityEnabled}
-                      />
-                    )}
                 </div>
               </div>
             </div>
@@ -1241,6 +1239,7 @@ export function PlayScreen() {
           progressiveRevealMode={progressiveRevealMode || mysteryModeEnabled}
           previewImage={imgRef.current}
           state={state}
+          isComplete={isComplete}
           onPreviewTap={onPreviewTap}
           immersiveMode={immersiveMode}
           onImmersiveReveal={handleImmersiveReveal}

@@ -82,15 +82,21 @@ export function renderBoard(
 
   if (debug.showGrid) drawGridOverlay(ctx, cssW, cssH);
 
-  /* Scale to fit and center the puzzle in the canvas so it is never clipped and always centered. */
+  const { cols, rows } = state.grid;
+  const piece00 = state.pieces.find((p) => p.row === 0 && p.col === 0);
+  const pad = piece00?.pad ?? 18;
+
+  /* Scale to fit and center the full puzzle (tile grid + piece padding) so the bottom row sits on the canvas, not below it. */
   let appliedFit = false;
   if (assembledW > 0 && assembledH > 0) {
-    const fitScale = Math.min(1, cssW / assembledW, cssH / assembledH);
+    const contentW = assembledW + 2 * pad;
+    const contentH = assembledH + 2 * pad;
+    const fitScale = Math.min(1, cssW / contentW, cssH / contentH);
     ctx.save();
     appliedFit = true;
     ctx.translate(cssW / 2, cssH / 2);
     ctx.scale(fitScale, fitScale);
-    ctx.translate(-assembledW / 2, -assembledH / 2);
+    ctx.translate(-contentW / 2, -contentH / 2);
   }
 
   if (viewport && (viewport.scale !== 1 || viewport.panX !== 0 || viewport.panY !== 0)) {
@@ -99,13 +105,10 @@ export function renderBoard(
     ctx.scale(viewport.scale, viewport.scale);
   }
 
-  const { cols, rows } = state.grid;
-
   /* Offset so the puzzle is never clipped: map piece (0,0) container top-left to (0,0). */
   let appliedOffset = false;
   let boardOffsetX = 0;
   let boardOffsetY = 0;
-  const piece00 = state.pieces.find((p) => p.row === 0 && p.col === 0);
   if (piece00) {
     boardOffsetX = piece00.pad - piece00.targetX;
     boardOffsetY = piece00.pad - piece00.targetY;
@@ -128,11 +131,15 @@ export function renderBoard(
     ? (state.pieces.find((p) => p.id === dragState.activeId)?.groupId ?? null)
     : null;
 
+  const isBottom = (p: { isPlaced: boolean; locked: boolean }) => p.isPlaced || p.locked;
   const pieces = [...state.pieces]
     .filter((p) => !p.inTray)
     .filter((p) => p.id !== animState?.dragPreviewPieceId)
     .sort((a, b) => {
-      /* Draw by z so higher z (e.g. just-placed / bumped) is on top; never pops behind */
+      /* Locked/placed pieces draw first (bottom); movable pieces draw last (on top) so they can't get stuck behind. */
+      const aBottom = isBottom(a);
+      const bBottom = isBottom(b);
+      if (aBottom !== bBottom) return (aBottom ? 0 : 1) - (bBottom ? 0 : 1);
       return a.z - b.z;
     });
 
@@ -146,6 +153,9 @@ export function renderBoard(
           const aInGroup = a.groupId === draggedGroupId ? 1 : 0;
           const bInGroup = b.groupId === draggedGroupId ? 1 : 0;
           if (aInGroup !== bInGroup) return aInGroup - bInGroup;
+          const aBottom = isBottom(a);
+          const bBottom = isBottom(b);
+          if (aBottom !== bBottom) return (aBottom ? 0 : 1) - (bBottom ? 0 : 1);
           return a.z - b.z;
         })
       : pieces;

@@ -57,10 +57,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   } = usePieceTrayScroll(displayed.length);
   const thumbsById = usePieceTrayThumbs(displayed, image, grid, thumbSize, compact);
 
-  const emptyText =
-    pieces.length === 0
-      ? "All pieces on board! Drag pieces here to store them."
-      : "Drag pieces here to store them";
+  const emptyText = "Drag pieces here to store them";
 
   const handleSwipeStart = useCallback((clientY: number) => {
     swipeStartY.current = clientY;

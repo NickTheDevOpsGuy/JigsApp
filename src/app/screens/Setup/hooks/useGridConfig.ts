@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 export const GRID_KEY = "phuzzle:gridSize";
-const MIN_GRID = 2;
+const MIN_GRID = 3;
 const MAX_GRID = 12;
 
 export type GridOption = {

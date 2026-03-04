@@ -4,7 +4,42 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 🧩 Latest (play modes: Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)
+## 🧩 Latest (share screen, draw order, seams, unwinnable fix, grid minimum)
+
+### Share screen (no modal)
+
+- **Share Result** and **Challenge Friend** both open the same inline share screen: one panel with “Share how you did” (Copy link, Share Card, Download) and “Challenge a friend” (Copy link, Send challenge). Back returns to completion view; no modal.
+- **Files** — `CompletionOverlay.tsx` (single share screen, both sections + divider; removed `shareScreenMode`), `PlayScreen.module.css` (`.shareResultInlineDivider`).
+
+### Piece draw order
+
+- **Locked/placed** pieces draw first (bottom); **movable** pieces draw last (on top) and are hit-tested first, so pieces never appear or get stuck behind locked sections.
+- **Files** — `puzzle/canvas/renderBoard.ts` (`isBottom = isPlaced || locked`; sort by bottom then z), `puzzle/canvas/pickPiece.ts` (same order for hit test).
+
+### Unwinnable state fix
+
+- **Overlap-based clamp** — Drag delta is clamped so the group’s bounds keep **overlapping** the playable area (not full containment). A group partly off the bottom can always be dragged up; groups taller than the playable height no longer get an empty allowed range.
+- **Files** — `PuzzleManager.ts` (`clampGroupDelta`: `minDx = minX - b.maxX`, `maxDx = maxX - b.minX`, same for Y; removed soft overflow).
+
+### Seam alignment (pixel-perfect)
+
+- **Integer target grid** — Board origin `targetStartX` / `targetStartY` rounded in play screen manager; `setGroupToExactTargetPositions` rounds `x`/`y` when snapping so piece positions are integer and seams line up 100%.
+- **Files** — `usePlayScreenManager.ts` (`Math.round` on targetStartX/Y), `PuzzleManager.ts` (`Math.round(p.targetX - p.pad)` in setGroupToExactTargetPositions), `createInitialPieces.ts` (comment only).
+
+### Grid minimum 3×3
+
+- **2×2 removed** — Smallest grid is 3×3. Presets and custom/parseGrid clamp to minimum 3 rows/cols.
+- **Files** — `useGridConfig.ts` (MIN_GRID 3), `playScreenUtils.ts` (MIN_GRID_SIZE 3, parseGrid clamp), `playScreenUtils.test.ts` (parseGrid "2x2" → 3×3).
+
+### Docs
+
+- **README.md** — Features: 3×3 to 10×10 grids; share screen (inline, no modal); win screen share copy; grid presets Starter (3×3); Polish: piece draw order, pixel-aligned seams.
+- **doc/CHANGES.md** — New “Recent” section for share screen, draw order, seams, unwinnable fix, grid minimum; grid sizes 3×3 to 10×10.
+- **src/app/data/changelog.ts** — Version 28: share screen, piece order, seam alignment, unwinnable fix, grid 3×3.
+
+---
+
+## 🧩 Earlier (play modes: Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)
 
 ### New modes (Settings → Modes)
 

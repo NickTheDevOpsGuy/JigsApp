@@ -1,6 +1,7 @@
 /**
  * CompletionOverlay – success screen: title, time, image, stats, share/challenge, actions.
- * Share Result shows share panel inline (no modal). Challenge Friend triggers native share (text/SMS).
+ * Two buttons: "Share Result" opens an inline share screen (result only). "Challenge Friend" opens
+ * an inline share screen (challenge only). No modals – each is a full-screen-style panel with Back.
  */
 import React, { useEffect, useCallback, useState } from "react";
 import { X, Clock, Share2, Send, Copy, Image, Download, ArrowLeft } from "lucide-react";
@@ -91,6 +92,9 @@ export function CompletionOverlay({
 
   const { sharePopupOpen, setSharePopupOpen, percentile, isGenerating, handleShareCard } =
     data;
+  const [shareScreenMode, setShareScreenMode] = useState<"result" | "challenge">(
+    "result",
+  );
 
   useEffect(() => {
     const t1 = setTimeout(() => setAnimPhase("scale"), ANIM_PHASE_SCALE_MS);
@@ -125,16 +129,14 @@ export function CompletionOverlay({
         className={`${styles.completePanel} ${styles.completePanelNew}`}
         data-anim-phase={animPhase}
       >
-        {imageUrl && (
-          <button
-            type="button"
-            className={styles.completeCloseBtn}
-            onClick={handleClose}
-            aria-label="Close"
-          >
-            <X size={24} />
-          </button>
-        )}
+        <button
+          type="button"
+          className={styles.completeCloseBtn}
+          onClick={handleClose}
+          aria-label="Close"
+        >
+          <X size={24} />
+        </button>
 
         <h2 className={styles.completeTitleNew} aria-hidden="false">
           🎉 PUZZLE COMPLETE! 🎉
@@ -178,7 +180,10 @@ export function CompletionOverlay({
               <button
                 type="button"
                 className={styles.completePrimaryBtn}
-                onClick={() => setSharePopupOpen(true)}
+                onClick={() => {
+                  setShareScreenMode("result");
+                  setSharePopupOpen(true);
+                }}
                 aria-label="Share Result"
               >
                 <Share2 size={20} />
@@ -188,8 +193,8 @@ export function CompletionOverlay({
                 type="button"
                 className={styles.completePrimaryBtn}
                 onClick={() => {
-                  if (onNativeShare) onNativeShare();
-                  else onCopyResults?.();
+                  setShareScreenMode("challenge");
+                  setSharePopupOpen(true);
                 }}
                 aria-label="Challenge Friend"
               >
@@ -211,39 +216,73 @@ export function CompletionOverlay({
               <ArrowLeft size={20} />
               Back
             </button>
-            <p className={styles.shareResultInlineHint}>
-              Share a capture of your result (image) or the challenge link.
-            </p>
-            <div className={styles.shareResultPopupRow}>
-              <Button
-                variant="secondary"
-                onClick={onCopyResults ?? (() => {})}
-                className={styles.shareResultPopupSideBtn}
-              >
-                <Copy size={20} />
-                {copied ? "Copied" : "Copy link"}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={handleShareCard}
-                disabled={isGenerating}
-                className={styles.shareResultPopupSideBtn}
-              >
-                <Image size={20} />
-                {isGenerating ? "…" : "Share Card"}
-              </Button>
-            </div>
-            <button
-              type="button"
-              className={styles.shareResultPopupDownloadLink}
-              onClick={() => {
-                onDownloadImage();
-                setSharePopupOpen(false);
-              }}
-            >
-              <Download size={18} />
-              Download image
-            </button>
+
+            {shareScreenMode === "result" ? (
+              <>
+                <h3 className={styles.shareScreenSideTitle}>Share how you did</h3>
+                <p className={styles.shareResultInlineHint}>
+                  Showcase your result: link, card, or image.
+                </p>
+                <div className={styles.shareResultPopupRow}>
+                  <Button
+                    variant="secondary"
+                    onClick={onCopyResults ?? (() => {})}
+                    className={styles.shareResultPopupSideBtn}
+                  >
+                    <Copy size={20} />
+                    {copied ? "Copied" : "Copy link"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleShareCard}
+                    disabled={isGenerating}
+                    className={styles.shareResultPopupSideBtn}
+                  >
+                    <Image size={20} />
+                    {isGenerating ? "…" : "Share Card"}
+                  </Button>
+                </div>
+                <button
+                  type="button"
+                  className={styles.shareResultPopupDownloadLink}
+                  onClick={() => {
+                    onDownloadImage();
+                    setSharePopupOpen(false);
+                  }}
+                >
+                  <Download size={18} />
+                  Download image
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className={styles.shareScreenSideTitle}>Challenge a friend</h3>
+                <p className={styles.shareResultInlineHint}>
+                  Send them the same puzzle and difficulty to try.
+                </p>
+                <div className={styles.shareResultPopupRow}>
+                  <Button
+                    variant="secondary"
+                    onClick={onCopyResults ?? (() => {})}
+                    className={styles.shareResultPopupSideBtn}
+                  >
+                    <Copy size={20} />
+                    {copied ? "Copied" : "Copy link"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      if (onNativeShare) onNativeShare();
+                      else onCopyResults?.();
+                    }}
+                    className={styles.shareResultPopupSideBtn}
+                  >
+                    <Send size={20} />
+                    Send challenge
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

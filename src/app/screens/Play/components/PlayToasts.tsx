@@ -8,6 +8,7 @@ import { OnboardingTooltip } from "@/components/OnboardingTooltip";
 import type { OnboardingState } from "./PlayToasts.types";
 
 type Props = {
+  isComplete?: boolean;
   onboarding: OnboardingState;
   showFirstSnapToast: boolean;
   showStreakToast: boolean;
@@ -42,6 +43,7 @@ function getSingleToast(
 }
 
 export function PlayToasts({
+  isComplete = false,
   onboarding,
   showFirstSnapToast,
   showStreakToast,
@@ -50,13 +52,15 @@ export function PlayToasts({
   shareToast,
   classNames: s,
 }: Props) {
-  const single = getSingleToast(
-    showFirstSnapToast,
-    announcerLine,
-    showStreakToast,
-    milestoneMessage,
-    shareToast,
-  );
+  const single = isComplete
+    ? null
+    : getSingleToast(
+        showFirstSnapToast,
+        announcerLine,
+        showStreakToast,
+        milestoneMessage,
+        shareToast,
+      );
 
   return (
     <>
@@ -78,7 +82,7 @@ export function PlayToasts({
           {single.isStreak && " On fire!"}
         </div>
       )}
-      {onboarding.needsTrayTip && (
+      {!isComplete && onboarding.needsTrayTip && (
         <div className={s.onboardingOverlayTray}>
           <OnboardingTooltip
             message="Use the tray below to store or recall pieces"
@@ -87,7 +91,7 @@ export function PlayToasts({
           />
         </div>
       )}
-      {onboarding.needsZoomTip && (
+      {!isComplete && onboarding.needsZoomTip && (
         <div className={s.onboardingOverlay}>
           <OnboardingTooltip
             message="Pinch or scroll to zoom on larger puzzles"

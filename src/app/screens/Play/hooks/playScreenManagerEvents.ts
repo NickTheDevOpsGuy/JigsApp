@@ -99,7 +99,11 @@ export function createPlayScreenManagerEvents(
       const elapsed = opts?.elapsedSecondsRef?.current ?? 0;
       const q = getQuadrant(p.row, p.col, grid.rows, grid.cols);
       opts?.onQuadrantPlaced?.(q, elapsed);
-      placementTimesRef.current.push(now);
+      /* Combo only counts single-piece placements (one piece snapped to its correct spot).
+       * Snapping a merged group to the board or nudges do not count – avoids combo from "just dragging around". */
+      if (groupPieces.length === 1) {
+        placementTimesRef.current.push(now);
+      }
       const cutoff = now - PLACEMENT_STREAK_MS;
       const comboCutoff = now - SNAP_COMBO_IDLE_MS;
       placementTimesRef.current = placementTimesRef.current.filter((t) => t > cutoff);

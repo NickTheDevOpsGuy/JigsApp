@@ -1,7 +1,8 @@
 /**
  * usePlayScreenTimer – elapsed/countdown/active ticks; auto-pause on countdown expiry.
+ * Timer stops when puzzle is complete (no further ticks).
  */
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ACTIVE_IDLE_MS } from "../timeMode";
 import type { TimeMode } from "../timeMode";
 import type { PuzzleState } from "@/puzzle/types";
@@ -24,6 +25,9 @@ export function usePlayScreenTimer(args: {
     lastInteractionRef,
   } = args;
 
+  const isCompleteRef = useRef(false);
+  isCompleteRef.current = state?.isComplete ?? false;
+
   useEffect(() => {
     if (
       timeMode === "countdown" &&
@@ -41,6 +45,7 @@ export function usePlayScreenTimer(args: {
     const isActive = timeMode === "active";
 
     const id = setInterval(() => {
+      if (isCompleteRef.current) return;
       setElapsedSeconds((s) => {
         if (isCountdown) {
           if (s <= 0) return 0;

@@ -74,6 +74,8 @@ export function getSuggestedGrid(
   }
 }
 
+const MIN_GRID_SIZE = 3;
+
 export function parseGrid(stored: string | null): { rows: number; cols: number } {
   if (!stored) return { rows: 4, cols: 4 };
   const match = stored.match(/^\s*(\d+)\s*[x×]\s*(\d+)\s*$/i);
@@ -81,7 +83,10 @@ export function parseGrid(stored: string | null): { rows: number; cols: number }
   const r = Number(match[1]);
   const c = Number(match[2]);
   if (Number.isFinite(r) && Number.isFinite(c) && r > 0 && c > 0) {
-    return { rows: r, cols: c };
+    return {
+      rows: Math.max(MIN_GRID_SIZE, r),
+      cols: Math.max(MIN_GRID_SIZE, c),
+    };
   }
   return { rows: 4, cols: 4 };
 }

@@ -1,13 +1,18 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "27";
+export const CHANGELOG_VERSION = "28";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📤 Share screen – Share Result and Challenge Friend both open the same inline share screen (no modal): one panel with result options (Copy link, Share Card, Download) and challenge options (Copy link, Send challenge).",
+      "🧩 Piece order – Locked/placed pieces draw underneath; movable pieces always on top so they never get stuck behind completed sections.",
+      "✨ Seam alignment – Pieces snap to integer positions so seams (e.g. eyes at piece boundaries) line up 100%.",
+      "🔧 Unwinnable fix – You can always drag a group back into view; overlap-based clamp prevents getting stuck off the board.",
+      "📐 Grid sizes – Smallest grid is now 3×3 (Starter); 2×2 removed.",
       "📐 Puzzle in canvas – The complete puzzle is always centered and scaled to fit the board so it never clips.",
       "📤 Share Result – Same share panel as Challenge: Copy link, Share Card (a capture of your result to share), and Download; Challenge Friend uses native share/copy with the challenge link.",
       "🧘 Zen Ambient – Toggle in Settings → Modes: no timer or rankings, subtle animated background, softer transitions for a pressure-free play.",

@@ -129,9 +129,9 @@ export function drawPiece(
   if (isDragging && preview && (preview.nearSnap || preview.inSnapRange)) {
     const cx = p.x + p.w / 2;
     const cy = p.y + p.h / 2;
-    const radius = Math.max(p.w, p.h) * 0.58;
-    const baseAlpha = preview.inSnapRange ? 0.14 : 0.06;
-    const alpha = baseAlpha * (0.4 + 0.6 * preview.proximity);
+    const radius = Math.max(p.w, p.h) * 0.72;
+    const baseAlpha = preview.inSnapRange ? 0.28 : 0.12;
+    const alpha = baseAlpha * (0.5 + 0.5 * preview.proximity);
     drawSnapGlow(ctx, cx, cy, radius, alpha);
   }
 
@@ -279,6 +279,20 @@ export function drawPiece(
     p.locked,
     animState?.showClusterOutline,
   );
+  if (
+    isDragging &&
+    preview &&
+    (preview.nearSnap || preview.inSnapRange) &&
+    preview.proximity > 0.2
+  ) {
+    ctx.save();
+    ctx.strokeStyle = `rgba(255, 220, 130, ${0.15 + 0.4 * preview.proximity})`;
+    ctx.lineWidth = 5;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.stroke(path);
+    ctx.restore();
+  }
   if (showLockGlow) {
     drawLockGlow(ctx, path, lockElapsedMs);
   }

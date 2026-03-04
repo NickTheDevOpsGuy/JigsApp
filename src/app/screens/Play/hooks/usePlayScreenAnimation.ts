@@ -257,7 +257,7 @@ export function usePlayScreenAnimation(args: {
           const dy = p.y - from.y;
           if (Math.hypot(dx, dy) > maxTravel) continue;
           const t = Math.min(1, elapsed / LOCK_LERP_MS);
-          const ease = 1 - (1 - t) ** 3;
+          const ease = 1 - (1 - t) ** 4;
           const lerpX = from.x + dx * ease;
           const lerpY = from.y + dy * ease;
           lockLerpOverrides ??= new Map();

@@ -2,6 +2,7 @@ import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
+import { BOARD_INSET_PX } from "@/puzzle/puzzleManagerUtils";
 import { loadPuzzleState, clearPuzzleState } from "@/puzzle/puzzleStorage";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { STORAGE_KEY, CUT_TYPE_KEY } from "../playScreenUtils";
@@ -153,8 +154,14 @@ export function usePlayScreenManager(
         const boardH = rectH;
         const pieceWidth = Math.max(1, Math.floor(boardW / grid.cols));
         const pieceHeight = Math.max(1, Math.floor(boardH / grid.rows));
-        const targetStartX = (boardW - grid.cols * pieceWidth) / 2;
-        const targetStartY = (boardH - grid.rows * pieceHeight) / 2;
+        const innerW = boardW - 2 * BOARD_INSET_PX;
+        const innerH = boardH - 2 * BOARD_INSET_PX;
+        const targetStartX = Math.round(
+          BOARD_INSET_PX + (innerW - grid.cols * pieceWidth) / 2,
+        );
+        const targetStartY = Math.round(
+          BOARD_INSET_PX + (innerH - grid.rows * pieceHeight) / 2,
+        );
 
         const savedState = loadPuzzleState();
         const hasSavedGame =
@@ -230,6 +237,7 @@ export function usePlayScreenManager(
             pieceHeight,
             targetStartX,
             targetStartY,
+            boardInset: BOARD_INSET_PX,
             isMobile,
             cutType,
             snapScaleRef: opts?.snapScaleRef,

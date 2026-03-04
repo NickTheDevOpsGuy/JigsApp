@@ -16,8 +16,14 @@ export function pickPieceId(
   x: number,
   y: number,
 ): string | null {
-  // Topmost first: sort by z descending so we hit the visually top piece first.
-  const sorted = [...pieces].sort((a, b) => b.z - a.z);
+  // Topmost first: movable (not locked/placed) pieces are on top, then by z descending.
+  const isBottom = (p: { isPlaced: boolean; locked: boolean }) => p.isPlaced || p.locked;
+  const sorted = [...pieces].sort((a, b) => {
+    const aBottom = isBottom(a);
+    const bBottom = isBottom(b);
+    if (aBottom !== bBottom) return (aBottom ? 1 : 0) - (bBottom ? 1 : 0);
+    return b.z - a.z;
+  });
 
   for (const p of sorted) {
     // Skip pieces in tray

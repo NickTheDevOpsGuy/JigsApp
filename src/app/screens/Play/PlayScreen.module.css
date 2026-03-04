@@ -624,9 +624,12 @@
 
 .boardWrapper {
   width: min(90vw, 700px);
+  max-width: 100%;
   aspect-ratio: 1 / 1;
+  max-height: 100%;
   margin: 0 auto;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -634,6 +637,16 @@
   position: relative;
   /* Prevent double-tap zoom on mobile; pan/zoom handled by canvas touch-action: none */
   touch-action: manipulation;
+}
+
+.boardWrapper > .boardProgressFrame {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .boardProgressFrame {
@@ -1112,7 +1125,7 @@
   margin: 0;
 }
 
-/* Completion overlay – full viewport, centered content */
+/* Completion overlay – full viewport, above top bar and menus (rendered at page level) */
 .completeOverlay {
   position: fixed;
   inset: 0;
@@ -1122,7 +1135,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 300;
+  z-index: 2000;
   animation: fadeIn 0.5s ease-out;
   padding: 20px;
   padding-top: max(20px, env(safe-area-inset-top, 0));
@@ -1177,12 +1190,15 @@
   .completeOverlay {
     position: fixed;
     inset: 0;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: center;
     padding: 16px;
     padding-top: max(24px, env(safe-area-inset-top, 0));
     padding-bottom: max(32px, env(safe-area-inset-bottom, 0) + 24px);
     padding-left: max(16px, env(safe-area-inset-left, 0));
     padding-right: max(16px, env(safe-area-inset-right, 0));
+    min-height: 100dvh;
+    min-height: 100vh;
   }
 }
 
@@ -1678,6 +1694,9 @@
   .completePanelNew {
     padding: 18px 14px 16px;
     gap: 12px;
+    max-height: min(90vh, 85dvh);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .completePrimaryActions {
     gap: 8px;
@@ -2401,13 +2420,40 @@
   height: 14px;
 }
 
-/* Share panel inline on completion overlay (no modal) */
+/* Share panel inline on completion overlay (no modal): left = how you did, right = challenge friend */
 .shareResultInline {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 14px;
   padding: 8px 0 0;
+}
+
+.shareScreenTwoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.shareScreenSide {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.shareScreenSideTitle {
+  margin: 0 0 2px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 380px) {
+  .shareScreenTwoCol {
+    grid-template-columns: 1fr;
+  }
 }
 
 .shareResultInlineBack {
@@ -2440,6 +2486,13 @@
   font-size: 0.85rem;
   color: var(--color-text-secondary);
   line-height: 1.35;
+}
+
+.shareResultInlineDivider {
+  margin: 6px 0 2px;
+  border: none;
+  border-top: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.1));
+  width: 100%;
 }
 
 /* Share popup: Home + two share buttons side by side; readable contrast */

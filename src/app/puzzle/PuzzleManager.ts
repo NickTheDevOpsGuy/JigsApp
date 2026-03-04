@@ -15,6 +15,7 @@ import {
   getUndoLimit,
   getEffectiveTolerance,
   findPlacementFromTray,
+  BOARD_INSET_PX,
   type EffectiveToleranceOptions,
 } from "./puzzleManagerUtils";
 import {
@@ -62,6 +63,8 @@ export type PuzzleManagerOptions = {
   /** Top-left of assembled puzzle in board space (for centering). Default 0,0. */
   targetStartX?: number;
   targetStartY?: number;
+  /** Inset (px) from board edge so playable area stays inside frame/border. Default BOARD_INSET_PX. */
+  boardInset?: number;
 };
 
 export type PuzzleManagerEvents = {
@@ -113,6 +116,7 @@ export class PuzzleManager {
 
   private readonly targetStartX: number;
   private readonly targetStartY: number;
+  private readonly boardInset: number;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {
@@ -124,6 +128,7 @@ export class PuzzleManager {
       pieceHeight,
       targetStartX = 0,
       targetStartY = 0,
+      boardInset = BOARD_INSET_PX,
       scatterPadding = 16,
       pad = 18,
       snapToleranceBoardPx = 46,
@@ -141,6 +146,7 @@ export class PuzzleManager {
     this.events = events;
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
+    this.boardInset = boardInset;
     this.snapToleranceBoardPx = snapToleranceBoardPx;
     this.snapToleranceNeighborPx = snapToleranceNeighborPx;
     this.snapScaleRef = snapScaleRef;
@@ -173,6 +179,7 @@ export class PuzzleManager {
       rotationStepDeg,
       targetStartX: this.targetStartX,
       targetStartY: this.targetStartY,
+      boardInset: this.boardInset,
       isMobile,
       cutType,
     });
@@ -314,13 +321,13 @@ export class PuzzleManager {
     );
   }
 
-  /** Set every piece in the group to its exact target position (no rounding, so pieces line up 100%). */
+  /** Set every piece in the group to its exact target position. Round to integer pixels so seams line up 100% (e.g. eyes at piece boundaries). */
   private setGroupToExactTargetPositions(groupId: string): void {
     this.updatePieces(
       (p) => !p.inTray && p.groupId === groupId,
       (p) => ({
-        x: p.targetX - p.pad,
-        y: p.targetY - p.pad,
+        x: Math.round(p.targetX - p.pad),
+        y: Math.round(p.targetY - p.pad),
       }),
     );
   }
@@ -355,20 +362,24 @@ export class PuzzleManager {
   }
 
   /**
-   * Soft overflow (px) beyond board edge before hard clamping.
-   * Keep this small so pieces remain reachable on touch devices.
+   * Clamp drag delta so the group's bounds keep overlapping the playable area.
+   * We require overlap (not full containment) so:
+   * - A group partly off the bottom can always be dragged up.
+   * - Groups taller than the playable height never get an empty allowed range and get stuck.
    */
-  private static readonly SOFT_CLAMP_OVERFLOW = 24;
-
   private clampGroupDelta(groupId: string, dx: number, dy: number) {
     const b = this.getGroupBounds(groupId);
     if (!b) return { dx: 0, dy: 0 };
 
-    const overflow = PuzzleManager.SOFT_CLAMP_OVERFLOW;
-    const minDx = -this.pad - b.minX - overflow;
-    const maxDx = this.boardWidth + this.pad - b.maxX + overflow;
-    const minDy = -this.pad - b.minY - overflow;
-    const maxDy = this.boardHeight + this.pad - b.maxY + overflow;
+    const minX = this.boardInset;
+    const maxX = this.boardWidth - this.boardInset;
+    const minY = this.boardInset;
+    const maxY = this.boardHeight - this.boardInset;
+    // Allow any (dx, dy) such that the group still overlaps [minX,maxX] x [minY,maxY].
+    const minDx = minX - b.maxX;
+    const maxDx = maxX - b.minX;
+    const minDy = minY - b.maxY;
+    const maxDy = maxY - b.minY;
 
     return {
       dx: clamp(dx, minDx, maxDx),
@@ -602,6 +613,7 @@ export class PuzzleManager {
       piece,
       boardPieces,
       this.rand.bind(this),
+      this.boardInset,
     );
 
     this.zCounter += 1;
@@ -620,6 +632,11 @@ export class PuzzleManager {
     this.boardWidth = boardWidth;
     this.boardHeight = boardHeight;
 
+    const minX = this.boardInset;
+    const maxX = this.boardWidth - this.boardInset;
+    const minY = this.boardInset;
+    const maxY = this.boardHeight - this.boardInset;
+
     const seen = new Set<string>();
     for (const p of this.state.pieces) {
       if (seen.has(p.groupId)) continue;
@@ -628,10 +645,10 @@ export class PuzzleManager {
       const bounds = this.getGroupBounds(p.groupId);
       if (!bounds) continue;
 
-      const dxMin = -this.pad - bounds.minX;
-      const dxMax = this.boardWidth + this.pad - bounds.maxX;
-      const dyMin = -this.pad - bounds.minY;
-      const dyMax = this.boardHeight + this.pad - bounds.maxY;
+      const dxMin = minX - bounds.minX;
+      const dxMax = maxX - bounds.maxX;
+      const dyMin = minY - bounds.minY;
+      const dyMax = maxY - bounds.maxY;
 
       const dx = clamp(0, dxMin, dxMax);
       const dy = clamp(0, dyMin, dyMax);

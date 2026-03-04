@@ -58,7 +58,6 @@ export function PlayScreenModals({
         confirmText="Resume"
         cancelText="Start Fresh"
         variant="default"
-        primaryOnlyConfirm
       />
 
       <HelpChoiceModal

@@ -4,6 +4,9 @@
 import type { MutableRefObject } from "react";
 import type { Piece } from "./types";
 
+/** Inset (px) from board edge so pieces stay inside the visible play area (inside frame/border). */
+export const BOARD_INSET_PX = 16;
+
 export function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(n, max));
 }
@@ -69,6 +72,7 @@ const MOVE_FROM_TRAY_RETRY_MAX = 24;
 /**
  * Find a non-overlapping (x, y) for a piece being moved from tray onto the board.
  * Returns container top-left position; uses effective rotated bbox for overlap check.
+ * Uses boardInset so the piece spawns inside the inner playable area (not under the frame).
  */
 export function findPlacementFromTray(
   boardWidth: number,
@@ -76,6 +80,7 @@ export function findPlacementFromTray(
   piece: Piece,
   boardPieces: Piece[],
   rand: (min: number, max: number) => number,
+  boardInset: number = 0,
 ): { x: number; y: number } {
   const rot = piece.rotation % 360;
   const effW = rot === 90 || rot === 270 ? piece.h : piece.w;
@@ -84,16 +89,24 @@ export function findPlacementFromTray(
   const offsetY = (piece.h - effH) / 2;
 
   const pad = MOVE_FROM_TRAY_PAD;
-  const xMin = pad - offsetX;
-  const xMax = Math.max(xMin, boardWidth - effW - pad - offsetX);
-  const yMin = pad - offsetY;
-  const yMax = Math.max(yMin, boardHeight - effH - pad - offsetY);
+  const xMin = boardInset + pad - offsetX;
+  const xMax = Math.max(xMin, boardWidth - boardInset - effW - pad - offsetX);
+  const yMin = boardInset + pad - offsetY;
+  const yMax = Math.max(yMin, boardHeight - boardInset - effH - pad - offsetY);
 
   let x = rand(xMin, xMax);
   let y = rand(yMin, yMax);
   for (let retry = 0; retry < MOVE_FROM_TRAY_RETRY_MAX; retry++) {
-    x = clamp(rand(xMin, xMax), xMin, Math.max(xMin, boardWidth - effW - pad - offsetX));
-    y = clamp(rand(yMin, yMax), yMin, Math.max(yMin, boardHeight - effH - pad - offsetY));
+    x = clamp(
+      rand(xMin, xMax),
+      xMin,
+      Math.max(xMin, boardWidth - boardInset - effW - pad - offsetX),
+    );
+    y = clamp(
+      rand(yMin, yMax),
+      yMin,
+      Math.max(yMin, boardHeight - boardInset - effH - pad - offsetY),
+    );
 
     const ourLeft = x + offsetX;
     const ourTop = y + offsetY;

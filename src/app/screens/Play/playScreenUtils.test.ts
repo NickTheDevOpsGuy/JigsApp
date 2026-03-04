@@ -18,6 +18,10 @@ describe("parseGrid", () => {
     expect(parseGrid("6x6")).toEqual({ rows: 6, cols: 6 });
   });
 
+  it("clamps 2x2 to 3x3 (minimum grid size)", () => {
+    expect(parseGrid("2x2")).toEqual({ rows: 3, cols: 3 });
+  });
+
   it("returns default for invalid format", () => {
     expect(parseGrid("invalid")).toEqual({ rows: 4, cols: 4 });
     expect(parseGrid("5")).toEqual({ rows: 4, cols: 4 });

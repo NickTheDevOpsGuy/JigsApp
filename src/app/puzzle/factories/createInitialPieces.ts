@@ -22,6 +22,8 @@ type CreateInitialPiecesArgs = {
   rotationStepDeg: 90 | 180;
   targetStartX: number;
   targetStartY: number;
+  /** Inset from board edge so scatter zone and targets stay inside play area. Default 0. */
+  boardInset?: number;
   /** When true, use tighter scatter for mobile (fewer columns, more rows). */
   isMobile?: boolean;
   /** Piece cut style (default: classic) */
@@ -86,6 +88,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     rotationStepDeg,
     targetStartX,
     targetStartY,
+    boardInset = 0,
     isMobile = false,
     cutType = "classic",
   } = args;
@@ -100,14 +103,17 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const h = tileH + effectivePad * 2;
 
   const scatterStartY = Math.max(
-    scatterPadding,
+    boardInset + scatterPadding,
     Math.floor(boardHeight * scatterStartYRatio),
   );
   const scatterZone = {
-    minX: scatterPadding,
-    maxX: Math.max(scatterPadding, boardWidth - scatterPadding - w),
+    minX: boardInset + scatterPadding,
+    maxX: Math.max(
+      boardInset + scatterPadding,
+      boardWidth - boardInset - scatterPadding - w,
+    ),
     minY: scatterStartY,
-    maxY: Math.max(scatterStartY, boardHeight - scatterPadding - h),
+    maxY: Math.max(scatterStartY, boardHeight - boardInset - scatterPadding - h),
   };
   const zoneWidth = Math.max(w, scatterZone.maxX - scatterZone.minX);
   const zoneHeight = Math.max(h, scatterZone.maxY - scatterZone.minY);
@@ -244,7 +250,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     const col = i % grid.cols;
     const row = Math.floor(i / grid.cols);
 
-    // Exact positions so tiles abut with no gaps (fixes 2x2 and small grids)
+    // Integer target positions (targetStart + integer tile size) so tiles align to the pixel grid and seams line up 100%.
     const targetX = targetStartX + col * tileW;
     const targetY = targetStartY + row * tileH;
 

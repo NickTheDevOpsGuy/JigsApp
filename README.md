@@ -71,11 +71,11 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 ## Features
 
-- **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap (including during fast drags); group merging; 2×2 to 10×10 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan (capped to avoid excessive zoom); undo/redo with snap-back animation (Ctrl/Cmd+Z); drag lift (stronger shadow, scale)
+- **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap (including during fast drags); group merging; 3×3 to 10×10 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan (capped to avoid excessive zoom); undo/redo with snap-back animation (Ctrl/Cmd+Z); drag lift (stronger shadow, scale)
 - **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/streak-freeze.md](doc/streak-freeze.md)
-- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), percentile badges (Top 10% / 25% / 50%), six themes; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 3 seconds
+- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), percentile badges (Top 10% / 25% / 50%), six themes; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 3 seconds; **piece draw order** (locked/placed pieces draw underneath so movable pieces never get stuck behind); **pixel-aligned seams** (integer target positions so pieces line up 100% at boundaries)
 - **Play modes** (Settings → Modes) — **Zen Ambient** (no timer/rankings, subtle animated background, soft transitions); **Mystery Mode** (hide full reference, reveal sections only after correct placements); **Precision Mode** (score snap distance; completion shows avg precision and bonus points); **Dynamic Difficulty** (snap tolerance adjusts from completion history — tighter when you’re fast, more forgiving when slower); **Adaptive Personality** (UI tone follows pace: fast play → competitive microcopy/animations, slow play → calm)
-- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share section**: **Share Result** (same share panel as Challenge — Copy link, Share Card = capture of your result to share with others, Download); **Challenge Friend** (native share/copy with challenge link); co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
+- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share screen** (inline, no modal): **Share Result** and **Challenge Friend** both open the same screen with Copy link, Share Card, Download and challenge send; co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
 - **Analytics** — Live completion counter, percentile ranking (Top X%); **mastery** completions (daily with no hints and no undo) tracked for weekly album and mastery streak
 
 Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popup → `src/app/data/changelog.ts`.
@@ -99,13 +99,13 @@ Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popu
 - **Snap** — 120ms pop + glow animation.
 - **Header** — 48px on mobile.
 - **Screens** — Menu, Setup, Stats, Packs fit in viewport (no page scroll); content scrolls inside cards where needed. Loading spinners on Stats and Packs. Stats → Leaderboard → Week → Album shows the 7-slot weekly album with daily thumbnails.
-- **Win screen** — Completion overlay shows image, stats (Time, Moves, Accuracy, Rank), cycling positive message below title (“You did it!”, “Nailed it!”, etc.); “New best time!” when you beat your record, or a performance badge (e.g. Speed Demon, Precision Pro) when not; **Share Result** (inline panel: Copy link, Share Card = capture of your result, Download); **Challenge Friend** (native share/copy with challenge link). Puzzle URL is on the share card image.
+- **Win screen** — Completion overlay shows image, stats (Time, Moves, Accuracy, Rank), cycling positive message below title (“You did it!”, “Nailed it!”, etc.); “New best time!” when you beat your record, or a performance badge (e.g. Speed Demon, Precision Pro) when not; **Share Result** and **Challenge Friend** both open the same inline share screen (no modal) with result + challenge options. Puzzle URL is on the share card image.
 
 ---
 
 ## Grid sizes & difficulty
 
-Presets: Starter (2×2) → Easy (3×3) → Medium (4×4) → Hard (5×5) → Expert (6×6) → Master (7×7) → Legend (8×8) → Extreme (9×9) → Epic (10×10). Custom grids up to 12×12. Difficulty dropdowns show piece count (e.g. "🌱 3×3 (9 pieces)"). "Based on your progress" suggests the next preset when you've completed smaller grids. Custom grids 81+ pieces show a hint that larger puzzles may run slower on some devices.
+Presets: Starter (3×3) → Easy (3×3) → Medium (4×4) → Hard (5×5) → Expert (6×6) → Master (7×7) → Legend (8×8) → Extreme (9×9) → Epic (10×10). Custom grids 3×3 to 12×12. Difficulty dropdowns show piece count (e.g. "🌱 3×3 (9 pieces)"). "Based on your progress" suggests the next preset when you've completed smaller grids. Custom grids 81+ pieces show a hint that larger puzzles may run slower on some devices.
 
 **Undo cap** – 50 steps for puzzles ≤64 pieces, 25 for 81+ to reduce memory use on large puzzles.
 

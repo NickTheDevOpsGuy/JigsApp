@@ -4,6 +4,16 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
+## Recent: Share screen, draw order, seams, unwinnable fix, grid minimum
+
+- **Share screen (no modal)** — Share Result and Challenge Friend both open the same inline share screen: one panel with “Share how you did” (Copy link, Share Card, Download) and “Challenge a friend” (Copy link, Send challenge). No modal; Back returns to completion view.
+- **Piece draw order** — Locked or placed pieces draw first (bottom); movable pieces always draw on top and are hit-tested first, so pieces never get stuck behind locked sections.
+- **Unwinnable state fixed** — Drag clamp uses overlap with the playable area (not full containment), so a group partly off the bottom can always be dragged back up; tall groups no longer get an empty allowed range.
+- **Seam alignment** — Target positions use an integer pixel grid (rounded board origin; snapped positions rounded). Piece boundaries line up 100% at seams (e.g. eyes at piece edges).
+- **Grid minimum** — Smallest grid is 3×3 (2×2 removed). Presets start at Starter (3×3); custom and share links clamp to minimum 3 rows/cols.
+
+---
+
 ## Recent: Play modes (Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)
 
 - **Zen Ambient** — Toggle in Settings → Modes. Hides timer and rankings; adds a subtle animated gradient background and softer transitions. Persisted.
@@ -36,7 +46,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - Drag and drop pieces with rotation (tap to rotate on mobile)
 - Board snap and neighbor snap (including during drag for fast moves); near-snap nudge when pieces are close
 - Group merging so connected pieces move together
-- Multiple grid sizes (2×2 to 10×10 presets; custom up to 12×12)
+- Multiple grid sizes (3×3 to 10×10 presets; custom 3×3 up to 12×12)
 - Image sources: gallery, file upload, camera capture
 - Puzzle packs – curated sets grouped by theme; folder = category (e.g. `puzzles/animals/` → Cozy Animals). Seasonal packs surface as "Season's pick" (spring, summer, fall, winter).
 - **Tray filters** – All, Edges, Color (Filter dropdown in Piece Drawer; pop-up menu)
