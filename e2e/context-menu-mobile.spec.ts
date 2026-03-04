@@ -42,7 +42,8 @@ test.describe("Mobile context menu guard", () => {
       }
 
       const probe = await page.evaluate(() => {
-        const target = (document.querySelector("main") as HTMLElement | null) ?? document.body;
+        const target =
+          (document.querySelector("main") as HTMLElement | null) ?? document.body;
         const event = new MouseEvent("contextmenu", {
           bubbles: true,
           cancelable: true,
