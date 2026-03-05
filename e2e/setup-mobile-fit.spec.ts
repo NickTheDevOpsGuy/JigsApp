@@ -69,9 +69,9 @@ test.describe("Setup mobile viewport fit", () => {
           };
         });
 
-        expect(metricsBefore.scrollHeight - metricsBefore.clientHeight).toBeLessThanOrEqual(
-          2,
-        );
+        expect(
+          metricsBefore.scrollHeight - metricsBefore.clientHeight,
+        ).toBeLessThanOrEqual(2);
         expect(metricsAfter.scrollY).toBe(0);
       }
     });

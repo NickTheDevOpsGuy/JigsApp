@@ -18,7 +18,7 @@ This works **without Supabase**.
 - **Win overlay share section** uses two clear actions:
   - **Share Result** for your completion summary (time, moves, accuracy)
   - **Share with People** to share the same puzzle + difficulty quickly
-  Both use native share/copy where available and support Share Card + Download.
+    Both use native share/copy where available and support Share Card + Download.
 
 **Key files**
 
