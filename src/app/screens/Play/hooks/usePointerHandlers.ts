@@ -17,6 +17,17 @@ import type {
 import { resetTouchState } from "./pointerHandlers/touchHandlers";
 import { createPointerHandlers } from "./pointerHandlers/pointerHandlersFactory";
 
+export function canRotateBoardPieceInState(st: PuzzleState, pid: PieceId): boolean {
+  const piece = st.pieces.find((p) => p.id === pid);
+  if (!piece) return false;
+  if (piece.isPlaced || piece.locked || piece.inTray) return false;
+  const boardGroupPieces = st.pieces.filter(
+    (p) => p.groupId === piece.groupId && !p.inTray,
+  );
+  if (boardGroupPieces.length === 0) return false;
+  return !boardGroupPieces.some((p) => p.locked);
+}
+
 export function usePointerHandlers(args: {
   manager: PuzzleManager | null;
   boardRef: React.RefObject<HTMLDivElement | null>;
@@ -77,12 +88,7 @@ export function usePointerHandlers(args: {
     (pid: PieceId) => {
       if (!manager) return false;
       const st = manager.getState();
-      const piece = st.pieces.find((p) => p.id === pid);
-      if (!piece) return false;
-      if (piece.isPlaced || piece.locked || piece.inTray) return false;
-      const groupPieces = st.pieces.filter((p) => p.groupId === piece.groupId);
-      if (groupPieces.some((p) => p.locked)) return false;
-      return groupPieces.length === 1;
+      return canRotateBoardPieceInState(st, pid);
     },
     [manager],
   );

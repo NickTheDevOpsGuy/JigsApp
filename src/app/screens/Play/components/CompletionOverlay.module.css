@@ -1,0 +1,423 @@
+.completeOverlay {
+  --color-completion-accent: var(--color-progress-75, #22c55e);
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay-strong);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: completionFadeIn 0.5s ease-out;
+  padding: 20px;
+  padding-top: max(20px, env(safe-area-inset-top, 0));
+  padding-bottom: max(28px, env(safe-area-inset-bottom, 0) + 20px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.completePanel {
+  background: color-mix(in srgb, var(--color-bg-card) 92%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 16px;
+  max-width: min(360px, 90vw);
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.completePanelNew {
+  max-width: min(460px, 94vw);
+  padding: 24px 20px 20px;
+  gap: 14px;
+  border-color: rgba(67, 160, 71, 0.58);
+  box-shadow:
+    0 0 0 1px rgba(67, 160, 71, 0.22),
+    var(--shadow-lg);
+  animation: completePanelEnter 0.4s ease-out both;
+}
+
+.completeCloseBtn {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top, 0));
+  right: max(16px, env(safe-area-inset-right, 0));
+  appearance: none;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  z-index: 10;
+}
+
+.completePanelNew .completeCloseBtn {
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1;
+  padding: 0;
+}
+
+.completePanelNew .completeCloseBtn:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+
+.completePanelNew .completeCloseBtn:focus-visible {
+  outline: 2px solid var(--color-completion-accent);
+  outline-offset: 2px;
+}
+
+.completeTitleNew {
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(1.25rem, 4vw, 1.6rem);
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+}
+
+.completeSubtitleNew {
+  margin: -2px 0 2px;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.completeTimeBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
+}
+
+.completeTimeBlock.completeTimeVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.completeTimeValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-completion-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.completeTimeValue svg {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.completeTimeLabel {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.completeImageWrapNew {
+  position: relative;
+  width: 100%;
+  border: 1px solid rgba(67, 160, 71, 0.5);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0.96);
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
+    box-shadow 0.5s ease-out;
+}
+
+.completeImageWrapNew.completeImageScaled {
+  transform: scale(1);
+}
+
+.completeImageWrapNew.completeImageGlow {
+  box-shadow:
+    0 0 0 1px rgba(67, 160, 71, 0.86),
+    0 0 0 6px rgba(67, 160, 71, 0.18),
+    0 10px 30px rgba(15, 23, 42, 0.35);
+}
+
+.completeImageNew {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(50vh, 260px);
+  object-fit: cover;
+  object-position: center;
+}
+
+.completeStats {
+  background: color-mix(in srgb, var(--color-bg-elevated) 95%, var(--color-bg-card));
+  border-radius: 10px;
+  padding: 2px 0;
+  margin-bottom: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.completeStatRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.completeStatRow:last-child {
+  border-bottom: none;
+}
+
+.completeStatIcon {
+  flex-shrink: 0;
+  color: var(--color-brand-primary);
+  opacity: 0.9;
+}
+
+.completeStatLabel {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  min-width: 72px;
+  text-align: left;
+}
+
+.completeStatValue {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.completeStatValueRank {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--color-brand-primary);
+  font-size: 13px;
+}
+
+.completeStatBonus {
+  font-size: 0.9em;
+  color: var(--color-brand-primary);
+  font-weight: 600;
+}
+
+.completeStatsNew {
+  margin: 0;
+  padding: 0;
+}
+
+.completeStatsLine {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.completePrimaryActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.completePrimaryActions .completePrimaryBtn:only-child {
+  grid-column: 1 / -1;
+}
+
+.completePrimaryBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 12px;
+  min-height: 64px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.15s;
+}
+
+.completePrimaryBtn:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-strong);
+}
+
+.completePrimaryBtnTitle {
+  font-size: 1rem;
+}
+
+.completePrimaryBtnSub {
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.completeActions {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.completeActionsTrigger {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.completeActionsShareBtn {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  background: var(--color-progress-75, #22c55e) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.completeActionsShareBtn:hover:not(:disabled) {
+  background: var(--color-progress-90, #16a34a) !important;
+  color: #fff !important;
+}
+
+@keyframes completionFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes completePanelEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .completeOverlay {
+    position: fixed;
+    inset: 0;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 16px;
+    padding-top: max(24px, env(safe-area-inset-top, 0));
+    padding-bottom: max(32px, env(safe-area-inset-bottom, 0) + 24px);
+    padding-left: max(16px, env(safe-area-inset-left, 0));
+    padding-right: max(16px, env(safe-area-inset-right, 0));
+    min-height: 100dvh;
+    min-height: 100vh;
+  }
+}
+
+@media (max-width: 500px), (max-height: 600px) {
+  .completePanelNew {
+    padding: 18px 14px 16px;
+    gap: 12px;
+    max-height: min(90vh, 85dvh);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .completePrimaryActions {
+    gap: 8px;
+  }
+
+  .completePrimaryBtn {
+    min-height: 56px;
+    padding: 10px 8px;
+  }
+
+  .completePrimaryBtnTitle {
+    font-size: 0.9rem;
+  }
+
+  .completePrimaryBtnSub {
+    font-size: 0.75rem;
+  }
+
+  .completeActions {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .completeActionsTrigger,
+  .completeActionsShareBtn {
+    padding: 12px 14px;
+    min-height: 44px;
+    font-size: 0.9rem;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}

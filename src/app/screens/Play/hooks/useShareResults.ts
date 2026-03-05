@@ -131,7 +131,7 @@ export function useShareResults(args: {
     const text = getChallengeShareTextWithUrl();
     try {
       await navigator.share({
-        title: "Phuzzle Challenge",
+        title: "Phuzzle Puzzle Share",
         text,
         url: fullChallengeUrl,
       });

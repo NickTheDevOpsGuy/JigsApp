@@ -3,7 +3,7 @@
  */
 import { Clock, Puzzle, Target, Trophy, Crosshair } from "lucide-react";
 import { formatTime } from "../playUtils";
-import styles from "../PlayScreen.module.css";
+import styles from "./CompletionOverlay.module.css";
 
 type Percentile = { topPercent: number; totalPlayers: number };
 

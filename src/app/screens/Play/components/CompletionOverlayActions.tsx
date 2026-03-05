@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { Share2, Home } from "lucide-react";
 import { Button } from "@/components/Button/Button";
-import styles from "../PlayScreen.module.css";
+import styles from "./CompletionOverlay.module.css";
 
 const SHARE_BUTTON_DELAY_MS = 900;
 

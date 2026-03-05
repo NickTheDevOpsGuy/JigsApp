@@ -29,24 +29,24 @@ function getPiecesLine(pieceCount: number): string {
 export function buildProgressShareMessage(args: ShareMessageArgs): string {
   const accuracy = clampPercent(args.accuracyPercent ?? 100);
   return [
-    "Here's how I did:",
+    "I just finished this puzzle on Phuzzle.",
     "",
     "🧩 PHUZZLE RESULT",
-    `My Time: ${formatTime(args.elapsedSeconds)}`,
+    `Time: ${formatTime(args.elapsedSeconds)}`,
     getPiecesLine(args.pieceCount),
     `Accuracy: ${accuracy}%`,
     "",
-    "Think you can beat me?",
+    "Play this puzzle:",
     args.playUrl,
   ].join("\n");
 }
 
 export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   return [
-    "Think you can beat me?",
+    "I just finished this puzzle and wanted to share it.",
     "",
-    "🧩 PUZZLE CHALLENGE",
-    `My Time: ${formatTime(args.elapsedSeconds)}`,
+    "🧩 PHUZZLE PUZZLE SHARE",
+    `Time: ${formatTime(args.elapsedSeconds)}`,
     getPiecesLine(args.pieceCount),
     "",
     "Try the same puzzle:",

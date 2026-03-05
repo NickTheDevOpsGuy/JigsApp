@@ -1159,9 +1159,7 @@ export function PlayScreen() {
                     ? {
                         ["--progress" as string]: placed / total,
                         ["--progress-color" as string]:
-                          placed >= total
-                            ? "var(--color-hud-done-border, #22c55e)"
-                            : "var(--color-brand-primary, #3b82f6)",
+                          "var(--color-progress-75, #22c55e)",
                       }
                     : undefined
                 }

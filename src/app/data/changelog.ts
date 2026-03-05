@@ -1,13 +1,16 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "29";
+export const CHANGELOG_VERSION = "30";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📤 Share polish – Completion share copy is now neutral (no taunts), and challenge action is renamed to “Share with People”.",
+      "🖼️ Share Card refresh – New cleaner, message-style card layout with large puzzle preview and result chips for mobile sharing.",
+      "✅ Win screen tone – Replaced competitive “beat X%” line with calm completion/share messaging.",
       "↔️ Setup gallery now has left/right arrow buttons for horizontal scrolling.",
       "↔️ Pack puzzle lists now use the same left/right arrow scroll controls as setup.",
       "🧭 Horizontal scrollbars are visible again on setup and pack rows.",

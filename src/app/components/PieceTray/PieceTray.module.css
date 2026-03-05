@@ -1,6 +1,9 @@
 /* src/app/components/PieceTray/PieceTray.module.css */
 
 .tray {
+  height: 28vh;
+  min-height: 100px;
+  transition: height 0.25s ease;
   flex-shrink: 0;
   min-width: 0;
   max-width: 100%;
@@ -17,15 +20,33 @@
   font-size: 13px;
   line-height: 1.35;
   color: var(--color-text-secondary);
-  overflow: visible;
+  overflow: hidden;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
+/* 32vh for large grids (25+ pieces) per PDF */
+.trayLarge:not(.trayCollapsed) {
+  height: 32vh;
+}
+
 .handle {
-  display: none;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.handle:hover {
+  background: var(--color-bg-elevated);
 }
 
 .handleBar {
@@ -42,6 +63,13 @@
   color: var(--color-text-secondary);
 }
 
+/* Collapsed: 8vh desktop, 6vh mobile; hide header content and scroller (PDF) */
+.trayCollapsed,
+.trayLarge.trayCollapsed {
+  height: 8vh;
+  min-height: 48px;
+}
+
 .trayCollapsed .header {
   display: none;
 }
@@ -52,16 +80,23 @@
 }
 
 .header {
-  padding: 4px 10px 6px 10px;
+  padding: 6px 12px 12px 12px;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-bg-card);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
   min-width: 0;
+  /* Sticky filter row: stays visible when scrolling piece thumbnails */
+  box-shadow: 0 1px 0 var(--color-border);
 }
 
 .titleRow {
@@ -105,14 +140,14 @@
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-primary);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   transition: all 0.15s ease;
   touch-action: manipulation;
 }
@@ -138,20 +173,19 @@
 .title {
   font-weight: 600;
   flex-shrink: 0;
-  font-size: 12px;
 }
 
 .controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
   min-width: 0;
 }
 
 .segment {
   display: flex;
-  gap: 3px;
+  gap: 4px;
 }
 
 .segment button {
@@ -159,9 +193,9 @@
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-primary);
-  border-radius: 5px;
-  padding: 4px 8px;
-  font-size: 11px;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
@@ -185,8 +219,14 @@
   cursor: not-allowed;
 }
 
+/* Visual "you are here" scroll position indicator */
 .scrollIndicator {
-  display: none;
+  flex-shrink: 0;
+  height: 6px;
+  background: var(--color-bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 12px 6px;
 }
 
 .scrollIndicatorFill {
@@ -197,45 +237,102 @@
 }
 
 .scrollerWrap {
+  flex: 1;
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  align-items: center;
+  gap: 6px;
   min-width: 0;
-  padding: 6px 8px 8px 8px;
+  overflow: hidden;
+  padding: 0 4px;
 }
 
 .scrollBtn {
-  display: none;
-}
-
-/* KEY FIX: No scroll, just wrap the pieces */
-.scroller {
-  width: 100%;
-  overflow: visible;
+  flex-shrink: 0;
+  appearance: none;
+  border: none;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  padding: 8px 6px;
+  min-width: 36px;
+  min-height: 36px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  border-radius: 4px;
 }
 
-/* KEY FIX: Flex-wrap grid that shows ALL pieces */
+.scrollBtn:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-brand-primary);
+}
+
+.scrollBtn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.scrollBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.scroller {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  /* Minimal right padding so scroll doesn't show big blank past last piece */
+  scroll-padding-inline-end: 0;
+  padding: 8px 12px;
+  padding-inline-end: 12px;
+  display: flex;
+  align-items: center;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.scroller::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+
+.scrollerSnap {
+  scroll-snap-type: x mandatory;
+  scroll-snap-stop: always;
+  scroll-padding-inline-start: 12px;
+  scroll-padding-inline-end: 12px;
+  scroll-behavior: smooth;
+}
+
+/* Width fits content only so scroll doesn't show blank space past last piece */
 .row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  gap: 8px;
   align-items: center;
-  justify-content: center;
-  width: 100%;
+  width: max-content;
+  min-width: max-content;
+  flex: 0 0 auto;
   box-sizing: border-box;
+}
+
+.scrollerSnap .pieceButton {
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
 }
 
 .pieceButton {
   appearance: none;
   border: none;
   background: transparent;
-  padding: 1px;
+  padding: 2px 4px;
+  min-width: 56px;
+  min-height: 56px;
   cursor: pointer;
-  border-radius: 4px;
-  transition: transform 0.15s ease;
+  border-radius: 6px;
+  transition: all 0.15s ease;
   flex-shrink: 0;
   touch-action: manipulation;
   display: flex;
@@ -243,25 +340,45 @@
   justify-content: center;
 }
 
+.blankSlot {
+  padding: 2px 4px;
+  min-width: 56px;
+  min-height: 56px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
 .pieceButton:hover {
-  transform: scale(1.1);
+  background: transparent;
+  transform: scale(1.08);
 }
 
 .pieceButton:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
 .thumbWrap {
-  width: var(--thumb-size, 52px);
-  height: var(--thumb-size, 52px);
+  width: var(--thumb-size, 68px);
+  height: var(--thumb-size, 68px);
+
+  /* IMPORTANT:
+     Do NOT clip the thumbnail, otherwise jigsaw tabs/slots get cut off. */
   border-radius: 4px;
   overflow: visible;
   background: transparent;
+
+  /* helps center an <img> thumbnail cleanly */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* Old class used by background-image thumbs (keep for compatibility) */
 .thumb {
   width: 100%;
   height: 100%;
@@ -275,6 +392,13 @@
   border-radius: 4px;
 }
 
+.thumbBlank {
+  border: 1px dashed var(--color-border);
+  background: color-mix(in srgb, var(--color-bg-secondary) 70%, transparent);
+  box-sizing: border-box;
+}
+
+/* New class for <img> thumbnails (jigsaw-shaped renders) */
 .thumbImg {
   width: 100%;
   height: 100%;
@@ -289,81 +413,148 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 16px;
+  height: 100%;
   color: var(--color-text-secondary);
   font-style: italic;
   font-size: 13px;
 }
 
-/* Compact: smaller thumbs for more pieces */
+/* Compact mode: 25–48 piece puzzles */
 .trayCompact .thumbWrap {
-  width: 44px;
-  height: 44px;
+  width: 54px;
+  height: 54px;
+}
+
+.trayCompact .pieceButton {
+  min-width: 58px;
+  min-height: 58px;
+  padding: 2px;
+}
+
+.trayCompact .blankSlot {
+  min-width: 58px;
+  min-height: 58px;
+  padding: 2px;
 }
 
 .trayCompact .row {
-  gap: 3px;
+  gap: 8px;
 }
 
-/* Extra compact for 49+ */
+.trayCompact .scroller {
+  padding: 8px 12px;
+  padding-inline-end: 12px;
+}
+
+/* Extra-compact for 49+ pieces – larger than before for visibility */
 .trayExtraCompact .thumbWrap {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
+}
+
+.trayExtraCompact .pieceButton {
+  min-width: 52px;
+  min-height: 52px;
+  padding: 2px;
+}
+
+.trayExtraCompact .blankSlot {
+  min-width: 52px;
+  min-height: 52px;
+  padding: 2px;
 }
 
 .trayExtraCompact .row {
-  gap: 2px;
+  gap: 6px;
 }
 
-/* Mobile */
+.trayExtraCompact .scroller {
+  padding: 8px 10px;
+  padding-inline-end: 12px;
+}
+
+/* Tray fills its container (board-above, tray-below layout) */
+.tray,
+.trayLarge,
+.trayCollapsed,
+.trayLarge.trayCollapsed {
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+}
+
+/* Handle hidden – tray always visible below board */
+.handle {
+  display: none;
+}
+
+/* Mobile: padding around buttons, match desktop feel */
 @media (max-width: 600px) {
-  .tray {
-    margin: 0;
-    margin-bottom: max(4px, env(safe-area-inset-bottom, 0));
-    border-radius: 10px;
+  .tray,
+  .trayLarge,
+  .trayCollapsed,
+  .trayLarge.trayCollapsed {
+    height: 100%;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .handle {
+    display: none;
   }
 
   .header {
-    padding: 3px 8px 4px 8px;
+    padding: 6px 10px 8px 10px;
+    gap: 4px;
   }
 
-  .title {
-    font-size: 11px;
+  .titleRow {
+    min-height: 28px;
+  }
+
+  .randomBtn {
+    padding: 6px 8px;
   }
 
   .randomLabel {
     display: none;
   }
 
+  .title {
+    font-size: 13px;
+  }
+
+  .tray {
+    margin: 0;
+    margin-bottom: max(4px, env(safe-area-inset-bottom, 0));
+    border-radius: 12px;
+    padding: 0;
+    width: 100%;
+  }
+
   .segment button {
-    padding: 3px 6px;
-    font-size: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 8px;
   }
 
-  .scrollerWrap {
-    padding: 4px 6px 6px 6px;
+  .scroller {
+    padding: 8px 14px;
+    padding-inline-end: 12px;
+    gap: 8px;
   }
 
-  .row {
-    gap: 3px;
+  .scrollerSnap {
+    scroll-padding-inline-end: 12px;
   }
 
-  .thumbWrap {
-    width: var(--thumb-size, 46px);
-    height: var(--thumb-size, 46px);
+  .trayCompact .scroller {
+    padding: 8px 14px;
+    padding-inline-end: 12px;
   }
 
-  .trayCompact .thumbWrap {
-    width: 40px;
-    height: 40px;
-  }
-
-  .trayExtraCompact .thumbWrap {
-    width: 32px;
-    height: 32px;
-  }
-
-  .trayExtraCompact .row {
-    gap: 2px;
+  .trayExtraCompact .scroller {
+    padding: 8px 12px;
+    padding-inline-end: 12px;
   }
 }

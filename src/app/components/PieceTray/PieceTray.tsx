@@ -1,11 +1,13 @@
 /**
- * PieceTray – displays all tray pieces in a wrapping grid layout (no scroll needed).
+ * PieceTray – horizontal scrollable tray with arrow controls and fixed slot capacity.
  */
 import React, { forwardRef } from "react";
 import type { Piece } from "@/puzzle/types";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { PieceTrayHeader } from "./PieceTrayHeader";
 import { usePieceTrayDisplay } from "./usePieceTrayDisplay";
+import { usePieceTrayScroll } from "./usePieceTrayScroll";
 import { usePieceTrayThumbs } from "./usePieceTrayThumbs";
 import styles from "./PieceTray.module.css";
 
@@ -36,23 +38,48 @@ type Props = {
   highlightedPieceIds?: Set<string>;
 };
 
+type TraySlot = { kind: "piece"; piece: Piece } | { kind: "blank"; id: string };
+
+export function buildTraySlots(displayed: Piece[], totalSlots: number): TraySlot[] {
+  const slotCount = Math.max(0, Math.trunc(totalSlots));
+  const capped = displayed.slice(0, slotCount);
+  if (capped.length === 0) {
+    return [];
+  }
+  const out: TraySlot[] = capped.map((piece) => ({ kind: "piece", piece }));
+  for (let i = capped.length; i < slotCount; i += 1) {
+    out.push({ kind: "blank", id: `blank-${i}` });
+  }
+  return out;
+}
+
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   { pieces, image, grid, onPieceClick, highlightedPieceIds },
   ref,
 ) {
   const isMobile = useMediaQuery("(max-width: 600px)");
 
-  const pieceCount = grid.rows * grid.cols;
-  const compact = pieceCount >= 25;
-  const extraCompact = pieceCount >= 49;
-  const thumbSize = getThumbSize(pieceCount, isMobile);
+  const totalSlots = grid.rows * grid.cols;
+  const compact = totalSlots >= 25;
+  const extraCompact = totalSlots >= 49;
+  const thumbSize = getThumbSize(totalSlots, isMobile);
 
   const { filter, setFilter, displayed, onShuffle } = usePieceTrayDisplay(
     pieces,
     image,
     grid,
   );
+  const traySlots = buildTraySlots(displayed, totalSlots);
+  const {
+    scrollerRef,
+    scrollProgress,
+    canScroll,
+    canScrollLeft,
+    canScrollRight,
+    scrollBy,
+  } = usePieceTrayScroll(traySlots.length);
   const thumbsById = usePieceTrayThumbs(displayed, image, grid, thumbSize, compact);
+  const likelyOverflows = traySlots.length >= 8;
 
   const emptyText = "Drag pieces here to store them";
 
@@ -69,40 +96,95 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         onShuffle={onShuffle}
       />
 
+      {traySlots.length > 0 && canScroll && (
+        <div
+          className={styles.scrollIndicator}
+          role="progressbar"
+          aria-valuenow={Math.round(scrollProgress * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Scroll position"
+        >
+          <div
+            className={styles.scrollIndicatorFill}
+            style={{ width: `${scrollProgress * 100}%` }}
+          />
+        </div>
+      )}
+
       <div className={styles.scrollerWrap}>
-        <div className={styles.scroller}>
-          {displayed.length === 0 ? (
+        {likelyOverflows && canScroll && (
+          <button
+            type="button"
+            className={styles.scrollBtn}
+            onClick={() => scrollBy(-180)}
+            disabled={!canScrollLeft}
+            aria-label="Scroll left"
+            title="Scroll left"
+          >
+            <ChevronLeft size={20} />
+          </button>
+        )}
+        <div
+          className={`${styles.scroller} ${traySlots.length > 0 && traySlots.length < 25 ? styles.scrollerSnap : ""}`}
+          ref={scrollerRef}
+          role="list"
+        >
+          {traySlots.length === 0 ? (
             <div className={styles.empty}>{emptyText}</div>
           ) : (
             <div className={styles.row}>
-              {displayed.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`${styles.pieceButton} ${highlightedPieceIds?.has(p.id) ? styles.pieceButtonPulse : ""}`}
-                  onClick={() => onPieceClick(p.id)}
-                  aria-label={`Place piece ${p.id}`}
-                >
-                  <div
-                    className={styles.thumbWrap}
-                    style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+              {traySlots.map((slot) =>
+                slot.kind === "piece" ? (
+                  <button
+                    key={slot.piece.id}
+                    type="button"
+                    className={`${styles.pieceButton} ${highlightedPieceIds?.has(slot.piece.id) ? styles.pieceButtonPulse : ""}`}
+                    onClick={() => onPieceClick(slot.piece.id)}
+                    aria-label={`Place piece ${slot.piece.id}`}
                   >
-                    {image && thumbsById.has(p.id) ? (
-                      <img
-                        className={styles.thumbImg}
-                        src={thumbsById.get(p.id)}
-                        alt=""
-                        draggable={false}
-                      />
-                    ) : (
-                      <div className={styles.thumbFallback} />
-                    )}
+                    <div
+                      className={styles.thumbWrap}
+                      style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+                    >
+                      {image && thumbsById.has(slot.piece.id) ? (
+                        <img
+                          className={styles.thumbImg}
+                          src={thumbsById.get(slot.piece.id)}
+                          alt=""
+                          draggable={false}
+                        />
+                      ) : (
+                        <div className={styles.thumbFallback} />
+                      )}
+                    </div>
+                  </button>
+                ) : (
+                  <div key={slot.id} className={styles.blankSlot} aria-hidden="true">
+                    <div
+                      className={styles.thumbWrap}
+                      style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
+                    >
+                      <div className={`${styles.thumbFallback} ${styles.thumbBlank}`} />
+                    </div>
                   </div>
-                </button>
-              ))}
+                ),
+              )}
             </div>
           )}
         </div>
+        {likelyOverflows && canScroll && (
+          <button
+            type="button"
+            className={styles.scrollBtn}
+            onClick={() => scrollBy(180)}
+            disabled={!canScrollRight}
+            aria-label="Scroll right"
+            title="Scroll right"
+          >
+            <ChevronRight size={20} />
+          </button>
+        )}
       </div>
     </div>
   );

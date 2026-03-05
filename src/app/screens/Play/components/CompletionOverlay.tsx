@@ -3,7 +3,7 @@
  */
 import React, { useEffect, useCallback, useState } from "react";
 import { X, Clock, Share2, Send } from "lucide-react";
-import styles from "../PlayScreen.module.css";
+import styles from "./CompletionOverlay.module.css";
 import type { Piece } from "@/puzzle/types";
 import { useCompletionOverlayData } from "./useCompletionOverlayData";
 import { formatTime } from "../playUtils";
@@ -124,10 +124,6 @@ export function CompletionOverlay({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [handleClose]);
 
-  const beatPercent =
-    percentile && percentile.totalPlayers >= 1
-      ? Math.round(100 - percentile.topPercent)
-      : null;
   const pieceCount = grid ? grid.rows * grid.cols : (pieces?.length ?? 0);
   const metaParts: string[] = [];
   if (pieceCount > 0) {
@@ -136,6 +132,9 @@ export function CompletionOverlay({
   }
   if (grid) metaParts.push(`${grid.cols} x ${grid.rows}`);
   const puzzleMeta = metaParts.join(" • ");
+  const completionNote = isDaily
+    ? "Nice solve. Share it if you want to compare times."
+    : "Nice solve. Share this puzzle with people.";
 
   return (
     <div className={styles.completeOverlay}>
@@ -191,20 +190,16 @@ export function CompletionOverlay({
           precisionBonusPoints={precisionBonusPoints}
         />
 
-        {beatPercent != null && (
-          <div className={styles.completeStatsNew} role="status">
-            <p className={styles.completeStatsLine}>
-              You beat {beatPercent}% of players today
-            </p>
-          </div>
-        )}
+        <div className={styles.completeStatsNew} role="status">
+          <p className={styles.completeStatsLine}>{completionNote}</p>
+        </div>
 
         <div className={styles.completePrimaryActions}>
           <button
             type="button"
             className={styles.completePrimaryBtn}
             onClick={onShareProgress ?? onCopyProgress ?? (() => {})}
-            aria-label="Share Progress"
+            aria-label="Share Result"
           >
             <Share2 size={20} />
             <span className={styles.completePrimaryBtnTitle}>Share Result</span>
@@ -216,11 +211,13 @@ export function CompletionOverlay({
             type="button"
             className={styles.completePrimaryBtn}
             onClick={onShareChallenge ?? onCopyChallenge ?? (() => {})}
-            aria-label="Send Challenge"
+            aria-label="Share with People"
           >
             <Send size={20} />
-            <span className={styles.completePrimaryBtnTitle}>Send Challenge</span>
-            <span className={styles.completePrimaryBtnSub}>Same puzzle + difficulty</span>
+            <span className={styles.completePrimaryBtnTitle}>Share with People</span>
+            <span className={styles.completePrimaryBtnSub}>
+              Same puzzle and difficulty
+            </span>
           </button>
         </div>
       </div>

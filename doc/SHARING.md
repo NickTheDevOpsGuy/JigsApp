@@ -13,22 +13,25 @@ This works **without Supabase**.
 - Builds social share URLs (X/Twitter, Facebook, Reddit, WhatsApp, etc.)
 - Supports copy-to-clipboard
 - Uses the Web Share API on supported mobile browsers
-- Can export a PNG of the completed puzzle with a time overlay
-- **Share text** includes a nag line with your actual time: "Can you beat my run of X:XX seconds?" and a **link to the exact puzzle** (phuzzle.vercel.app/daily for daily, or phuzzle.vercel.app/play?session=… for a session) so friends can play the same puzzle
-- **Win overlay share section**: **Share Result** opens the same share panel as Challenge: Copy link, **Share Card** (a capture of your result — image to share with others), and Download. **Challenge Friend** uses native share or copy with the challenge link. The puzzle URL is on the share card image.
+- Can export a PNG share card of the completed puzzle (clean layout, no taunt text)
+- **Share text** is neutral and includes your result plus a **link to the exact puzzle** (phuzzle.vercel.app/daily for daily, or phuzzle.vercel.app/play?session=… for a session) so others can play the same puzzle
+- **Win overlay share section** uses two clear actions:
+  - **Share Result** for your completion summary (time, moves, accuracy)
+  - **Share with People** to share the same puzzle + difficulty quickly
+  Both use native share/copy where available and support Share Card + Download.
 
 **Key files**
 
 - `src/app/screens/Play/hooks/useShareResults.ts`
-  - Creates the share text (nag "Can you beat my run of X:XX seconds?" + play URL) and per-platform URLs; play URL is the exact puzzle (daily or session)
+  - Creates neutral share text + per-platform URLs; play URL is the exact puzzle (daily or session)
   - Handles copy + `navigator.share` when available
 - `src/app/screens/Play/hooks/useDownloadImage.ts`
   - Exports the puzzle canvas as PNG
   - Adds a footer like: `🧩 Phuzzle - {pieces} pieces in {time}`
 - `src/app/screens/Play/hooks/useShareCardImage.ts`
-  - Share Card PNG with seasonal frame, nag line + full play URL on card, and branded footer (phuzzle.vercel.app)
+  - Share Card PNG with seasonal frame, large puzzle image, neutral copy, and stats chips
 - `src/app/screens/Play/components/CompletionOverlay.tsx`
-  - UI: Win overlay; Share Result opens inline panel (no modal) with Copy link, Share Card (capture of your result to share), Download. Challenge Friend triggers native share/copy with challenge link. Share card image built in `useShareCardImage.ts`. Wires overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
+  - UI: Win overlay with **Share Result** and **Share with People** actions. Share card image built in `useShareCardImage.ts`. Wires overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
 
 **How it's triggered**
 
