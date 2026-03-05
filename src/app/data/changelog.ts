@@ -1,13 +1,17 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "28";
+export const CHANGELOG_VERSION = "29";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "↔️ Setup gallery now has left/right arrow buttons for horizontal scrolling.",
+      "↔️ Pack puzzle lists now use the same left/right arrow scroll controls as setup.",
+      "🧭 Horizontal scrollbars are visible again on setup and pack rows.",
+      "📱 Mobile sizing is tighter with smaller scroll arrows and compact row spacing.",
       "📤 Share screen – Share Result and Challenge Friend both open the same inline share screen (no modal): one panel with result options (Copy link, Share Card, Download) and challenge options (Copy link, Send challenge).",
       "🧩 Piece order – Locked/placed pieces draw underneath; movable pieces always on top so they never get stuck behind completed sections.",
       "✨ Seam alignment – Pieces snap to integer positions so seams (e.g. eyes at piece boundaries) line up 100%.",
