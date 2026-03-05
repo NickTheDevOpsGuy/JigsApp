@@ -201,6 +201,7 @@ export class PuzzleManager {
     };
 
     this.undoManager = new UndoManager(getUndoLimit(pieces.length));
+    this.syncZCounterFromPieces();
 
     this.recomputeDerivedState();
   }
@@ -281,6 +282,12 @@ export class PuzzleManager {
 
   private replacePieces(newPieces: Piece[]) {
     this.state = { ...this.state, pieces: newPieces };
+  }
+
+  /** Keep zCounter above all current piece z values (important after restore/resume). */
+  private syncZCounterFromPieces() {
+    const maxPieceZ = this.state.pieces.reduce((max, p) => Math.max(max, p.z), 0);
+    this.zCounter = Math.max(this.zCounter, maxPieceZ);
   }
 
   private getToleranceOptions(): EffectiveToleranceOptions {
@@ -773,6 +780,7 @@ export class PuzzleManager {
   public restoreFromSaved(savedPieces: SavedPiece[]) {
     const pieces = applySavedPieces(this.state.pieces, savedPieces);
     this.state = { ...this.state, pieces };
+    this.syncZCounterFromPieces();
     assertGroupConsistency(pieces);
     this.recomputeDerivedState();
   }

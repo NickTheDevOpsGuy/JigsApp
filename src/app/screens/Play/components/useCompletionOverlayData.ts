@@ -147,6 +147,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       percentile,
       useSeasonalFrame,
       puzzleShareUrl,
+      pieceCount: grid ? grid.rows * grid.cols : 0,
     });
   }, [
     shareCard,
@@ -157,6 +158,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     percentile,
     useSeasonalFrame,
     puzzleShareUrl,
+    grid,
   ]);
 
   return {

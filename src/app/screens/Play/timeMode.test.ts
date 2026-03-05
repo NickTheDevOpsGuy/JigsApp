@@ -1,5 +1,12 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import { getQuadrant, getQuadrantPb, setQuadrantPb, getQuadrantPbKey } from "./timeMode";
+import {
+  DEFAULT_TIME_MODE,
+  getQuadrant,
+  getQuadrantPb,
+  getQuadrantPbKey,
+  normalizeTimeMode,
+  setQuadrantPb,
+} from "./timeMode";
 
 let store: Record<string, string> = {};
 const localStorageMock = {
@@ -92,5 +99,23 @@ describe("quadrant Pb", () => {
   it("uses correct key per grid and quadrant", () => {
     expect(getQuadrantPbKey(4, 4, 0)).toBe("phuzzle:quadrantPb_4x4_q0");
     expect(getQuadrantPbKey(6, 6, 3)).toBe("phuzzle:quadrantPb_6x6_q3");
+  });
+});
+
+describe("normalizeTimeMode", () => {
+  it("maps legacy elapsed mode to default mode", () => {
+    expect(normalizeTimeMode("elapsed")).toBe(DEFAULT_TIME_MODE);
+  });
+
+  it("keeps selectable modes", () => {
+    expect(normalizeTimeMode("countdown")).toBe("countdown");
+    expect(normalizeTimeMode("active")).toBe("active");
+  });
+
+  it("falls back for invalid or empty values", () => {
+    expect(normalizeTimeMode("unknown")).toBe(DEFAULT_TIME_MODE);
+    expect(normalizeTimeMode(null)).toBe(DEFAULT_TIME_MODE);
+    expect(normalizeTimeMode(undefined)).toBe(DEFAULT_TIME_MODE);
+    expect(normalizeTimeMode("")).toBe(DEFAULT_TIME_MODE);
   });
 });

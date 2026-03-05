@@ -1,10 +1,10 @@
 /**
- * timeMode – elapsed, countdown, active, relaxed, best; localStorage for best times.
+ * timeMode values + helpers for persisted mode handling.
  */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 export type TimeMode =
-  | "elapsed" // Count up from 0 (default)
+  | "elapsed" // Legacy mode (kept for backward compatibility in stored values)
   | "countdown" // Start at limit, game over at 0
   | "active" // Only count while moving pieces
   | "relaxed" // Same as elapsed but timer hidden
@@ -12,14 +12,33 @@ export type TimeMode =
   | "speedrun" // Quadrant timers + PB comparison
   | "timeattack"; // 3 lives, wrong snap costs life, leaderboard by time + lives
 
+export type SelectableTimeMode = Exclude<TimeMode, "elapsed">;
+
 export const TIME_MODE_KEY = "phuzzle:timeMode";
 export const COUNTDOWN_MINUTES_KEY = "phuzzle:countdownMinutes";
 export const BEST_TIME_PREFIX = "phuzzle:bestTime_";
 
-export const DEFAULT_TIME_MODE: TimeMode = "elapsed";
+export const DEFAULT_TIME_MODE: SelectableTimeMode = "active";
 export const DEFAULT_COUNTDOWN_MINUTES = 10;
 export const COUNTDOWN_OPTIONS = [5, 10, 15, 20, 30] as const;
 export const ACTIVE_IDLE_MS = 2500; // Stop counting after 2.5s idle
+
+export const SELECTABLE_TIME_MODES: readonly SelectableTimeMode[] = [
+  "countdown",
+  "active",
+  "relaxed",
+  "best",
+  "speedrun",
+  "timeattack",
+];
+
+export function normalizeTimeMode(value: string | null | undefined): SelectableTimeMode {
+  if (!value || value === "elapsed") return DEFAULT_TIME_MODE;
+  if ((SELECTABLE_TIME_MODES as readonly string[]).includes(value)) {
+    return value as SelectableTimeMode;
+  }
+  return DEFAULT_TIME_MODE;
+}
 
 export function getBestTimeKey(rows: number, cols: number): string {
   return `${BEST_TIME_PREFIX}${rows}x${cols}`;

@@ -16,18 +16,20 @@ export function renderTrayPiece(
   assembledH: number,
   scale: number = 0.5,
 ): HTMLCanvasElement {
-  const BLEED_PX = 2;
-  // Canvas must fit rotated piece: 90°/270° swaps w/h
-  const baseSize = Math.max(piece.w, piece.h);
+  // Extra padding in CANVAS pixels (after scaling) to prevent clipping
+  const CANVAS_PAD = 6;
+  
+  const maxDim = Math.max(piece.w, piece.h);
+  // Calculate scaled piece size, then add padding in canvas pixels
+  const scaledSize = Math.ceil(maxDim * scale);
+  const canvasSize = scaledSize + CANVAS_PAD * 2;
+  
   const canvas = document.createElement("canvas");
-  canvas.width = Math.ceil(baseSize * scale) + BLEED_PX * 2;
-  canvas.height = Math.ceil(baseSize * scale) + BLEED_PX * 2;
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
-
-  ctx.scale(scale, scale);
-  ctx.translate(BLEED_PX / scale, BLEED_PX / scale);
 
   // Build clip path
   let path: Path2D | null = null;
@@ -40,16 +42,22 @@ export function renderTrayPiece(
   }
 
   if (!path) {
-    // Fallback rectangle
     ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
-    ctx.fillRect(0, 0, piece.w, piece.h);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     return canvas;
   }
 
-  // Apply rotation around piece center (same as renderBoard)
-  const cx = baseSize / 2;
-  const cy = baseSize / 2;
-  ctx.translate(cx, cy);
+  // Transform order:
+  // 1. Move to canvas center (in canvas pixels)
+  // 2. Scale
+  // 3. Rotate
+  // 4. Offset to center the piece
+  
+  const canvasCenterX = canvasSize / 2;
+  const canvasCenterY = canvasSize / 2;
+  
+  ctx.translate(canvasCenterX, canvasCenterY);
+  ctx.scale(scale, scale);
   ctx.rotate((piece.rotation * Math.PI) / 180);
   ctx.translate(-piece.w / 2, -piece.h / 2);
 
@@ -74,7 +82,7 @@ export function renderTrayPiece(
 
   // Draw outline
   ctx.strokeStyle = "rgba(0,0,0,0.3)";
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 1 / scale;
   ctx.stroke(path);
 
   return canvas;

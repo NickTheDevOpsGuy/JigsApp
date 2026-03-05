@@ -21,6 +21,7 @@ import {
   drawEdgePieceHighlight,
   drawCompletionGlow,
 } from "./renderBoardDraw";
+import { sortPiecesForDraw } from "./pieceDrawOrder";
 import type {
   PopMap,
   LockMap,
@@ -142,22 +143,7 @@ export function renderBoard(
     .filter((p) => !p.inTray)
     .filter((p) => p.id !== animState?.dragPreviewPieceId);
 
-  // Sort pieces for drawing order:
-  // 1. Dragged group ALWAYS on top (drawn last)
-  // 2. Then by z-index (lower z drawn first)
-  const sortedPieces = boardPieces.sort((a, b) => {
-    // Dragged group always draws last (on top of everything)
-    if (draggedGroupId != null) {
-      const aInDragGroup = a.groupId === draggedGroupId;
-      const bInDragGroup = b.groupId === draggedGroupId;
-      if (aInDragGroup !== bInDragGroup) {
-        return aInDragGroup ? 1 : -1; // Dragged group sorts to end
-      }
-    }
-
-    // Otherwise sort by z (lower z = drawn first = behind)
-    return a.z - b.z;
-  });
+  const sortedPieces = sortPiecesForDraw(boardPieces, draggedGroupId);
 
   const overrides =
     animState?.undoSnapBackOverrides ??

@@ -269,16 +269,6 @@
   margin-right: 24px;
 }
 
-.rememberLabel {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  font-size: 14px;
-  color: var(--color-text-primary);
-  cursor: pointer;
-}
-
 .challengeModeSection {
   margin: 16px 0 14px;
   min-width: 0;
@@ -384,12 +374,6 @@
   box-shadow: 0 0 0 1px var(--color-brand-primary);
 }
 
-.rememberCheckbox {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--color-brand-primary);
-}
-
 .startBtn {
   appearance: none;
   border: none;
@@ -460,10 +444,6 @@
     border-radius: 8px;
   }
 
-  .rememberLabel {
-    margin-bottom: 12px;
-    font-size: 13px;
-  }
 }
 
 @media (max-width: 400px) {

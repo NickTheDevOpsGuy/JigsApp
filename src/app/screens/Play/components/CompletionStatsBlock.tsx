@@ -13,6 +13,7 @@ type Props = {
   accuracyPercent: number;
   percentile: Percentile | null;
   rankPosition: number | null;
+  hideTime?: boolean;
   precisionModeEnabled?: boolean;
   avgPrecisionPx?: number | null;
   precisionBonusPoints?: number | null;
@@ -24,17 +25,20 @@ export function CompletionStatsBlock({
   accuracyPercent,
   percentile,
   rankPosition,
+  hideTime = false,
   precisionModeEnabled,
   avgPrecisionPx,
   precisionBonusPoints,
 }: Props) {
   return (
     <div className={styles.completeStats}>
-      <div className={styles.completeStatRow}>
-        <Clock size={18} className={styles.completeStatIcon} aria-hidden />
-        <span className={styles.completeStatLabel}>Time:</span>
-        <span className={styles.completeStatValue}>{formatTime(elapsedSeconds)}</span>
-      </div>
+      {!hideTime && (
+        <div className={styles.completeStatRow}>
+          <Clock size={18} className={styles.completeStatIcon} aria-hidden />
+          <span className={styles.completeStatLabel}>Time:</span>
+          <span className={styles.completeStatValue}>{formatTime(elapsedSeconds)}</span>
+        </div>
+      )}
       <div className={styles.completeStatRow}>
         <Puzzle size={18} className={styles.completeStatIcon} aria-hidden />
         <span className={styles.completeStatLabel}>Moves:</span>

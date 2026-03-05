@@ -1,7 +1,7 @@
 /**
  * usePieceTrayThumbs – batched thumbnail generation for tray pieces.
  * Effect key is stable when only board pieces change (e.g. rotate on canvas)
- * so tray thumbs don’t flicker or “spin” during canvas rotation.
+ * so tray thumbs don't flicker or "spin" during canvas rotation.
  */
 import { useState, useEffect, useMemo, useRef } from "react";
 import type { Piece } from "@/puzzle/types";
@@ -41,8 +41,10 @@ export function usePieceTrayThumbs(
       image.addEventListener("load", onLoad);
       return () => image.removeEventListener("load", onLoad);
     }
-    // Keep a consistent inset so jigsaw tabs/slots don't hug tray edges.
-    const inset = compact ? 4 : 5;
+    
+    // Increase inset to give more room for jigsaw tabs
+    // The piece.w/h includes padding for tabs, but we need extra margin in the thumb container
+    const inset = compact ? 8 : 10;
     const maxW = Math.max(24, thumbSize - inset * 2);
     const maxH = Math.max(24, thumbSize - inset * 2);
     const assembledW = grid.cols * (displayed[0]?.tileW ?? 1);
@@ -51,7 +53,9 @@ export function usePieceTrayThumbs(
     const renderOne = (p: Piece): string | null => {
       try {
         if (!p.w || !p.h || p.w <= 0 || p.h <= 0) return null;
-        const scale = Math.min(maxW / p.w, maxH / p.h);
+        // Use the larger dimension to ensure square canvas fits rotated piece
+        const maxPieceDim = Math.max(p.w, p.h);
+        const scale = Math.min(maxW / maxPieceDim, maxH / maxPieceDim);
         if (!Number.isFinite(scale) || scale <= 0) return null;
         const c = renderTrayPiece(p, image, assembledW, assembledH, scale);
         return c.toDataURL("image/png");

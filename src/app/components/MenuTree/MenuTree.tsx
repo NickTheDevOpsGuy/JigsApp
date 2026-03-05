@@ -17,7 +17,6 @@ const PLAY_ONLY_IDS = new Set([
   "ghostHint",
   "ghostWhenIdle",
   "timeModeQuick",
-  "time-elapsed",
   "time-countdown",
   "time-active",
   "time-relaxed",

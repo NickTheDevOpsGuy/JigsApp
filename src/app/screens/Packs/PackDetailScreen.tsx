@@ -1,10 +1,10 @@
 /**
  * PackDetailScreen – pack puzzle list with completion checkmarks; launch to Play.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PackDetailScreen.module.css";
-import { ArrowLeft, Check, Play } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { PACK_METADATA } from "@/data/packMetadata";
 import { loadPacksData } from "@/data/loadPacksData";
@@ -15,6 +15,9 @@ export function PackDetailScreen() {
   const nav = useNavigate();
   const { packId } = useParams<{ packId: string }>();
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
+  const puzzleGridRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const [packsData, setPacksData] = useState<Awaited<
     ReturnType<typeof loadPacksData>
   > | null>(null);
@@ -28,6 +31,28 @@ export function PackDetailScreen() {
   const puzzles: SamplePuzzle[] =
     pack && packsData ? packsData.getPuzzlesForPack(pack) : [];
   const completed = getCompletedPuzzleIds();
+
+  useEffect(() => {
+    const el = puzzleGridRef.current;
+    if (!el) return;
+    const update = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      const maxScroll = scrollWidth - clientWidth;
+      const hasOverflow = maxScroll > 8;
+      setCanScrollLeft(hasOverflow && scrollLeft > 4);
+      setCanScrollRight(hasOverflow && scrollLeft < maxScroll - 4);
+    };
+    update();
+    el.addEventListener("scroll", update);
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    const t = setTimeout(update, 100);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+      clearTimeout(t);
+    };
+  }, [puzzles.length, packId]);
 
   const handlePlay = (puzzle: SamplePuzzle) => {
     setCurrentPuzzleId(puzzle.id);
@@ -68,7 +93,6 @@ export function PackDetailScreen() {
             <ArrowLeft size={20} />
           </button>
           <div className={styles.packHeader}>
-            <span className={styles.packEmoji}>{packMeta.emoji}</span>
             <div>
               <h1 className={styles.title}>{packMeta.name}</h1>
               <p className={styles.desc}>{packMeta.description}</p>
@@ -76,41 +100,67 @@ export function PackDetailScreen() {
           </div>
         </div>
 
-        <div className={styles.puzzleGrid}>
-          {puzzles.map((puzzle) => {
-            const isCompleted = completed.has(puzzle.id);
-            return (
-              <button
-                key={puzzle.id}
-                type="button"
-                className={styles.puzzleCard}
-                onClick={() => handlePlay(puzzle)}
-              >
-                <div className={styles.puzzleThumb}>
-                  {imgError[puzzle.id] ? (
-                    <div className={styles.placeholder}>?</div>
-                  ) : (
-                    <img
-                      src={puzzle.thumbnail}
-                      alt={puzzle.name}
-                      onError={() =>
-                        setImgError((prev) => ({ ...prev, [puzzle.id]: true }))
-                      }
-                    />
-                  )}
-                  {isCompleted && (
-                    <div className={styles.completedBadge}>
-                      <Check size={16} />
-                    </div>
-                  )}
-                </div>
-                <span className={styles.puzzleName}>{puzzle.name}</span>
-                <span className={styles.playHint}>
-                  <Play size={12} /> Play
-                </span>
-              </button>
-            );
-          })}
+        <div className={styles.puzzleGridWrap}>
+          <button
+            type="button"
+            className={styles.puzzleScrollBtn}
+            aria-label="Scroll puzzles left"
+            disabled={!canScrollLeft}
+            onClick={() =>
+              puzzleGridRef.current?.scrollBy({ left: -220, behavior: "smooth" })
+            }
+          >
+            <ChevronLeft size={18} />
+          </button>
+
+          <div className={styles.puzzleGrid} ref={puzzleGridRef}>
+            {puzzles.map((puzzle) => {
+              const isCompleted = completed.has(puzzle.id);
+              return (
+                <button
+                  key={puzzle.id}
+                  type="button"
+                  className={styles.puzzleCard}
+                  onClick={() => handlePlay(puzzle)}
+                >
+                  <div className={styles.puzzleThumb}>
+                    {imgError[puzzle.id] ? (
+                      <div className={styles.placeholder}>?</div>
+                    ) : (
+                      <img
+                        src={puzzle.thumbnail}
+                        alt={puzzle.name}
+                        onError={() =>
+                          setImgError((prev) => ({ ...prev, [puzzle.id]: true }))
+                        }
+                      />
+                    )}
+                    {isCompleted && (
+                      <div className={styles.completedBadge}>
+                        <Check size={16} />
+                      </div>
+                    )}
+                  </div>
+                  <span className={styles.puzzleName}>{puzzle.name}</span>
+                  <span className={styles.playHint}>
+                    <Play size={12} /> Play
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="button"
+            className={styles.puzzleScrollBtn}
+            aria-label="Scroll puzzles right"
+            disabled={!canScrollRight}
+            onClick={() =>
+              puzzleGridRef.current?.scrollBy({ left: 220, behavior: "smooth" })
+            }
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
       </div>
     </div>

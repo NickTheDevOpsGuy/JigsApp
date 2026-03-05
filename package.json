@@ -22,7 +22,13 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "check:bundle": "bash ./scripts/check-bundle-size.sh",
-    "lhci": "npm run build && npx lhci autorun"
+    "lhci": "npm run build && npx lhci autorun",
+    "supabase:push:uat": "test -n \"$SUPABASE_UAT_PROJECT_REF\" && npx supabase@latest link --project-ref \"$SUPABASE_UAT_PROJECT_REF\" && npx supabase@latest db push --linked --yes",
+    "supabase:push:prod": "test -n \"$SUPABASE_PROD_PROJECT_REF\" && npx supabase@latest link --project-ref \"$SUPABASE_PROD_PROJECT_REF\" && npx supabase@latest db push --linked --yes",
+    "supabase:push:uat:seed": "test -n \"$SUPABASE_UAT_PROJECT_REF\" && npx supabase@latest link --project-ref \"$SUPABASE_UAT_PROJECT_REF\" && npx supabase@latest db push --linked --include-seed --yes",
+    "supabase:push:prod:seed": "test -n \"$SUPABASE_PROD_PROJECT_REF\" && npx supabase@latest link --project-ref \"$SUPABASE_PROD_PROJECT_REF\" && npx supabase@latest db push --linked --include-seed --yes",
+    "supabase:push:local": "npx supabase@latest db push --local --yes",
+    "supabase:push:local:seed": "npx supabase@latest db push --local --include-seed --yes"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.0",

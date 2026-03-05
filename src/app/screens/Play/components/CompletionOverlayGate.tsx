@@ -32,8 +32,6 @@ interface CompletionOverlayGateProps {
   onClose: () => void;
   usedHint: boolean;
   isDaily: boolean;
-  onGoHome?: () => void;
-  onPlayAgain?: () => void;
   /** Precision Mode: show snap precision and bonus rank points */
   precisionModeEnabled?: boolean;
   precisionSnaps?: number[];
@@ -57,8 +55,6 @@ export function CompletionOverlayGate({
   onClose,
   usedHint,
   isDaily,
-  onGoHome,
-  onPlayAgain,
   precisionModeEnabled,
   precisionSnaps = [],
   adaptivePersonalityEnabled,
@@ -110,8 +106,6 @@ export function CompletionOverlayGate({
       onCopyChallenge={share.handleCopyChallenge}
       onDownloadImage={onDownloadImage}
       onClose={onClose}
-      onGoHome={onGoHome}
-      onPlayAgain={onPlayAgain}
       precisionModeEnabled={precisionModeEnabled}
       avgPrecisionPx={avgPrecisionPx}
       precisionBonusPoints={precisionBonusPoints}

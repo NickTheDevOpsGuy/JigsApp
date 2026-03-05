@@ -2,7 +2,7 @@
  * SetupScreen – image picker (gallery/upload/camera), grid config, time mode, launch to Play.
  *
  * Sections: 1–220 GalleryThumbnail + state + useImagePicker/useGridConfig + effects;
- * 221–350 handleStart/handleClear + scroll/gallery logic; 351–531 main JSX (card, gallery, preview, buttons).
+ * 221–350 handleStart + scroll/gallery logic; 351–531 main JSX (card, gallery, preview, buttons).
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -10,16 +10,14 @@ import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { setCurrentPuzzleId } from "@/data/packCompletion";
 import { Button } from "@/components/Button/Button";
-import { ArrowLeft, Trash2, Play, Grid3X3 } from "lucide-react";
+import { ArrowLeft, Grid3X3, Play, Puzzle, Sparkles, X } from "lucide-react";
 import {
   useImagePicker,
   useGridConfig,
-  useSetupScreenGalleryScroll,
-  GRID_KEY,
   GRID_OPTIONS,
+  useSetupScreenGalleryScroll,
 } from "./hooks";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import { useTimeModeConfig } from "../Play/hooks/useTimeModeConfig";
 import { getBestTime } from "../Play/timeMode";
 import { getAdaptiveSuggestion } from "@/services/adaptiveDifficultyService";
 import { GRID_ONCE_KEY } from "../Play/playScreenUtils";
@@ -101,14 +99,9 @@ export function SetupScreen() {
     effectiveRows,
     effectiveCols,
     saveGrid,
-    clearGrid,
     minGrid,
     maxGrid,
   } = useGridConfig();
-
-  const [rememberChoice, setRememberChoice] = useState(
-    () => !!safeLocalStorage.getItem(GRID_KEY),
-  );
 
   const {
     imgDataUrl,
@@ -121,15 +114,11 @@ export function SetupScreen() {
     selectGalleryPuzzle,
     pickFile,
     setFromBlob,
-    clearImage,
     validateBeforeStart,
   } = useImagePicker({
     gridRows: effectiveRows,
     gridCols: effectiveCols,
   });
-
-  const { timeMode, setTimeMode, countdownMinutes, setCountdownMinutes } =
-    useTimeModeConfig();
 
   const suggestedGrid = useMemo(() => getAdaptiveSuggestion(getBestTime), []);
   const filteredPuzzles =
@@ -204,11 +193,7 @@ export function SetupScreen() {
       safeLocalStorage.setItem(STORAGE_KEY, imgDataUrl);
       // Always pin the selected grid for the very next run.
       safeLocalStorage.setItem(GRID_ONCE_KEY, `${effectiveRows}x${effectiveCols}`);
-      if (rememberChoice) {
-        saveGrid();
-      } else {
-        clearGrid();
-      }
+      saveGrid();
       safeLocalStorage.removeItem("phuzzle:dailyDate");
       if (selectedPuzzle) setCurrentPuzzleId(selectedPuzzle.id);
       else setCurrentPuzzleId(null);
@@ -220,21 +205,53 @@ export function SetupScreen() {
     }
   };
 
-  const handleClear = () => {
-    safeLocalStorage.removeItem(STORAGE_KEY);
-    setCurrentPuzzleId(null);
-    clearImage();
-  };
-
   const isPackFlow = !!puzzleIdParam;
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
+    <div className={`${styles.page} ${isPackFlow ? styles.pagePackFlow : ""}`}>
+      <div className={`${styles.card} ${isPackFlow ? styles.cardPackFlow : ""}`}>
         <div className={styles.cardBody}>
-          <h1 className={styles.title}>
-            {isPackFlow && selectedPuzzle ? selectedPuzzle.name : "🧩 New Puzzle"}
-          </h1>
+          <div className={styles.headerRow}>
+            <h1 className={`${styles.title} ${isPackFlow ? styles.titlePackFlow : ""}`}>
+              {!isPackFlow && (
+                <span className={styles.titleIcon} aria-hidden>
+                  <Puzzle size={28} />
+                </span>
+              )}
+              <span>{isPackFlow && selectedPuzzle ? selectedPuzzle.name : "New Puzzle"}</span>
+            </h1>
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={() => nav(isPackFlow ? "/packs" : "/")}
+              aria-label={isPackFlow ? "Close puzzle setup" : "Close new puzzle"}
+            >
+              <X size={26} />
+            </button>
+          </div>
+
+          {isPackFlow &&
+            suggestedGrid &&
+            gridIndex !== suggestedGrid.gridIndex &&
+            suggestedGrid.gridIndex < GRID_OPTIONS.length - 1 && (
+              <div className={styles.recommendCard}>
+                <div className={styles.recommendBody}>
+                  <p className={styles.recommendTitle}>
+                    <Sparkles size={16} />
+                    Next Recommended Difficulty -{" "}
+                    {GRID_OPTIONS[suggestedGrid.gridIndex].label.split(" - ")[0]}
+                  </p>
+                  <p className={styles.recommendSubtitle}>Based on your progress</p>
+                </div>
+                <button
+                  type="button"
+                  className={styles.recommendButton}
+                  onClick={() => setGridIndex(suggestedGrid.gridIndex)}
+                >
+                  Play {GRID_OPTIONS[suggestedGrid.gridIndex].label.split(" - ")[0]}
+                </button>
+              </div>
+            )}
 
           {error && (
             <div className={styles.error} role="alert">
@@ -266,12 +283,13 @@ export function SetupScreen() {
               isLoading={isLoading}
               onPickFile={handlePickFile}
               setFromBlob={setFromBlob}
+              selectedPieceCount={effectiveRows * effectiveCols}
               styles={styles}
             />
           )}
 
           <SetupConfigSection
-            suggestedGrid={suggestedGrid}
+            suggestedGrid={isPackFlow ? null : suggestedGrid}
             gridIndex={gridIndex}
             setGridIndex={setGridIndex}
             customRows={customRows}
@@ -281,16 +299,13 @@ export function SetupScreen() {
             isCustom={isCustom}
             minGrid={minGrid}
             maxGrid={maxGrid}
-            timeMode={timeMode}
-            setTimeMode={setTimeMode}
-            countdownMinutes={countdownMinutes}
-            setCountdownMinutes={setCountdownMinutes}
-            rememberChoice={rememberChoice}
-            setRememberChoice={setRememberChoice}
             styles={styles}
           />
 
-          <div className={styles.preview} ref={previewRef}>
+          <div
+            className={`${styles.preview} ${isPackFlow ? styles.previewPackFlow : ""}`}
+            ref={previewRef}
+          >
             {isLoading ? (
               <div className={styles.previewEmpty}>Loading...</div>
             ) : imgDataUrl ? (
@@ -317,15 +332,16 @@ export function SetupScreen() {
           </div>
         </div>
 
-        <div className={styles.actionRow}>
-          <Button onClick={() => nav("/")} aria-label="Back to menu">
+        <div
+          className={`${styles.actionRow} ${isPackFlow ? styles.actionRowPackFlow : ""}`}
+        >
+          <Button
+            className={styles.backActionBtn}
+            onClick={() => nav(isPackFlow ? "/packs" : "/")}
+            aria-label="Back to menu"
+          >
             <ArrowLeft size={18} />
             Back
-          </Button>
-
-          <Button onClick={handleClear} disabled={isLoading} aria-label="Clear image">
-            <Trash2 size={18} />
-            Clear
           </Button>
 
           <Button

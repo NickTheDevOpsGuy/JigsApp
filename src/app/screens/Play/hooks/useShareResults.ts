@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import type { PuzzleState } from "@/puzzle/types";
 import { formatTime } from "../playUtils";
+import { buildChallengeShareMessage, buildProgressShareMessage } from "../shareMessages";
 
 const PLAY_BASE = "https://phuzzle.vercel.app";
 
@@ -18,7 +19,13 @@ export function useShareResults(args: {
   challengeShareUrl?: string;
   accuracyPercent?: number;
 }) {
-  const { elapsedSeconds, state, progressShareUrl = "/", challengeShareUrl = "/" } = args;
+  const {
+    elapsedSeconds,
+    state,
+    progressShareUrl = "/",
+    challengeShareUrl = "/",
+    accuracyPercent = 100,
+  } = args;
   const [copied, setCopied] = useState(false);
 
   const fullProgressUrl = useMemo(() => {
@@ -42,13 +49,20 @@ export function useShareResults(args: {
   }, [elapsedSeconds, state?.totalCount]);
 
   const getProgressShareTextWithUrl = useCallback(() => {
-    return `${getShareText()}\n\n${fullProgressUrl}`;
-  }, [getShareText, fullProgressUrl]);
+    return buildProgressShareMessage({
+      elapsedSeconds,
+      pieceCount: state?.totalCount ?? 0,
+      accuracyPercent,
+      playUrl: fullProgressUrl,
+    });
+  }, [elapsedSeconds, state?.totalCount, accuracyPercent, fullProgressUrl]);
 
   const getChallengeShareTextWithUrl = useCallback(() => {
-    const timeStr = formatTime(elapsedSeconds);
-    const pieceCount = state?.totalCount ?? 0;
-    return `Think you're faster than ${timeStr}? Prove it on this ${pieceCount}-piece challenge.\n\n${fullChallengeUrl}`;
+    return buildChallengeShareMessage({
+      elapsedSeconds,
+      pieceCount: state?.totalCount ?? 0,
+      playUrl: fullChallengeUrl,
+    });
   }, [elapsedSeconds, state?.totalCount, fullChallengeUrl]);
 
   const shareUrls: ShareUrls = useMemo(() => {

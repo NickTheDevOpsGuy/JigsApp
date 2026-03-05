@@ -72,4 +72,32 @@ describe("PuzzleManager", () => {
     const moved = after.some((p, i) => p.x !== before[i].x || p.y !== before[i].y);
     expect(moved).toBe(true);
   });
+
+  it("keeps dragged piece z above restored saved z values", () => {
+    const manager = createManager({ rows: 2, cols: 2 });
+    const initial = manager.getState();
+    const saved = initial.pieces.map((p, i) => ({
+      id: p.id,
+      row: p.row,
+      col: p.col,
+      x: p.x,
+      y: p.y,
+      z: 100 + i,
+      rotation: p.rotation,
+      isPlaced: p.isPlaced,
+      locked: p.locked,
+      groupId: p.groupId,
+      inTray: p.inTray,
+      dragCount: p.dragCount ?? 0,
+    }));
+    manager.restoreFromSaved(saved);
+
+    const beforeDragMaxZ = Math.max(...manager.getState().pieces.map((p) => p.z));
+    const pieceId = manager.getState().pieces[0].id;
+
+    manager.pointerDownBoardSpace(pieceId, 10, 10);
+    const draggedPiece = manager.getState().pieces.find((p) => p.id === pieceId);
+    expect(draggedPiece).toBeTruthy();
+    expect(draggedPiece!.z).toBeGreaterThan(beforeDragMaxZ);
+  });
 });

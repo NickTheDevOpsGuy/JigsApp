@@ -13,6 +13,7 @@ interface SetupImageSourcePanelProps {
   setImageSource: (s: ImageSource) => void;
   selectedCategory: string;
   setSelectedCategory: (c: string) => void;
+  selectedPieceCount: number;
   filteredPuzzles: SamplePuzzle[];
   galleryRef: React.RefObject<HTMLDivElement>;
   canScrollLeft: boolean;
@@ -30,6 +31,7 @@ export function SetupImageSourcePanel({
   setImageSource,
   selectedCategory,
   setSelectedCategory,
+  selectedPieceCount,
   filteredPuzzles,
   galleryRef,
   canScrollLeft,
@@ -92,27 +94,19 @@ export function SetupImageSourcePanel({
             </div>
 
             <div className={styles.galleryWrap}>
-              {filteredPuzzles.length > 4 && (
-                <button
-                  type="button"
-                  className={styles.galleryScrollBtn}
-                  onClick={() =>
-                    galleryRef.current?.scrollBy({
-                      left: -200,
-                      behavior: "smooth",
-                    })
-                  }
-                  disabled={!canScrollLeft}
-                  aria-label="Scroll left"
-                >
-                  <ChevronLeft size={24} />
-                </button>
-              )}
-              <div
-                className={`${styles.gallery} ${filteredPuzzles.length > 4 ? styles.galleryWithButtons : ""}`}
-                ref={galleryRef}
-                role="list"
+              <button
+                type="button"
+                className={styles.galleryScrollBtn}
+                aria-label="Scroll gallery left"
+                disabled={!canScrollLeft}
+                onClick={() =>
+                  galleryRef.current?.scrollBy({ left: -220, behavior: "smooth" })
+                }
               >
+                <ChevronLeft size={18} />
+              </button>
+
+              <div ref={galleryRef} className={`${styles.gallery} ${styles.galleryWithButtons}`} role="list">
                 {filteredPuzzles.length === 0 ? (
                   <div className={styles.galleryEmpty}>
                     No puzzles in this category yet
@@ -122,6 +116,7 @@ export function SetupImageSourcePanel({
                     <SetupGalleryThumbnail
                       key={puzzle.id}
                       puzzle={puzzle}
+                      pieceCount={selectedPieceCount}
                       isSelected={selectedPuzzle?.id === puzzle.id}
                       isLoading={isLoading}
                       onSelect={() => selectGalleryPuzzle(puzzle)}
@@ -129,22 +124,18 @@ export function SetupImageSourcePanel({
                   ))
                 )}
               </div>
-              {filteredPuzzles.length > 4 && (
-                <button
-                  type="button"
-                  className={styles.galleryScrollBtn}
-                  onClick={() =>
-                    galleryRef.current?.scrollBy({
-                      left: 200,
-                      behavior: "smooth",
-                    })
-                  }
-                  disabled={!canScrollRight}
-                  aria-label="Scroll right"
-                >
-                  <ChevronRight size={24} />
-                </button>
-              )}
+
+              <button
+                type="button"
+                className={styles.galleryScrollBtn}
+                aria-label="Scroll gallery right"
+                disabled={!canScrollRight}
+                onClick={() =>
+                  galleryRef.current?.scrollBy({ left: 220, behavior: "smooth" })
+                }
+              >
+                <ChevronRight size={18} />
+              </button>
             </div>
           </>
         ) : imageSource === "upload" ? (

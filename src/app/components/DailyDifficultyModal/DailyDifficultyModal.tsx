@@ -16,7 +16,6 @@ import {
   wasYesterdayMissed,
   getDailyPreferredDifficultyIndex,
   setDailyPreferredDifficultyIndex,
-  clearDailyPreferredDifficulty,
 } from "@/daily/dailyPuzzleCore";
 import { clearPuzzleState } from "@/puzzle/puzzleStorage";
 import styles from "./DailyDifficultyModal.module.css";
@@ -47,7 +46,6 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   const [freezeUsed, setFreezeUsed] = useState(false);
   const preferredIdx = getDailyPreferredDifficultyIndex();
   const [showMore, setShowMore] = useState(false);
-  const [rememberChoice, setRememberChoice] = useState(preferredIdx !== null);
   const useFreezeBtnRef = useRef<HTMLButtonElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(preferredIdx ?? RECOMMENDED_INDEX);
 
@@ -106,11 +104,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       modifier,
     );
     if (result) {
-      if (rememberChoice) {
-        setDailyPreferredDifficultyIndex(selectedIndex);
-      } else {
-        clearDailyPreferredDifficulty();
-      }
+      setDailyPreferredDifficultyIndex(selectedIndex);
       onClose();
       navigate("/play");
     }
@@ -209,16 +203,6 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
           </div>
         )}
       </div>
-
-      <label className={styles.rememberLabel}>
-        <input
-          type="checkbox"
-          checked={rememberChoice}
-          onChange={(e) => setRememberChoice(e.target.checked)}
-          className={styles.rememberCheckbox}
-        />
-        <span>Remember my choice</span>
-      </label>
 
       <button type="button" className={styles.startBtn} onClick={handleStart}>
         Start Puzzle

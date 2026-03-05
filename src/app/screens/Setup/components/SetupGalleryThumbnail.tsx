@@ -2,18 +2,21 @@
  * Gallery thumbnail for sample puzzle in SetupScreen.
  */
 import { useState } from "react";
+import { Puzzle } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import styles from "../SetupScreen.module.css";
 
-type Puzzle = (typeof SAMPLE_PUZZLES)[0];
+type GalleryPuzzle = (typeof SAMPLE_PUZZLES)[0];
 
 export function SetupGalleryThumbnail({
   puzzle,
+  pieceCount,
   isSelected,
   isLoading,
   onSelect,
 }: {
-  puzzle: Puzzle;
+  puzzle: GalleryPuzzle;
+  pieceCount: number;
   isSelected: boolean;
   isLoading: boolean;
   onSelect: () => void;
@@ -33,7 +36,13 @@ export function SetupGalleryThumbnail({
       ) : (
         <img src={puzzle.thumbnail} alt={puzzle.name} onError={() => setImgError(true)} />
       )}
-      <span className={styles.galleryItemName}>{puzzle.name}</span>
+      <span className={styles.galleryItemMeta}>
+        <span className={styles.galleryItemName}>{puzzle.name}</span>
+        <span className={styles.galleryItemPieces}>
+          <Puzzle size={12} />
+          {pieceCount} pieces
+        </span>
+      </span>
     </button>
   );
 }

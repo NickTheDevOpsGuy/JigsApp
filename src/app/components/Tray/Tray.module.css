@@ -8,6 +8,8 @@
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   overflow-x: auto;
   overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 12px;
   height: 100%;
   align-items: flex-start;
 }
@@ -17,6 +19,7 @@
   flex-direction: column;
   gap: 8px;
   min-width: 0;
+  scroll-snap-align: start;
 }
 
 .trayLabel {

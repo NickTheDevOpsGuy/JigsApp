@@ -4,6 +4,7 @@
 import { useCallback, useState } from "react";
 import { getCurrentSeason } from "@/utils/seasons";
 import { formatTime } from "../playUtils";
+import { buildProgressShareMessage } from "../shareMessages";
 
 type Percentile = { topPercent: number; totalPlayers: number } | null;
 
@@ -54,6 +55,7 @@ export function useShareCardImage() {
       percentile: Percentile;
       useSeasonalFrame: boolean;
       puzzleShareUrl?: string;
+      pieceCount: number;
     }) => {
       if (!args.imageUrl || isGenerating) return;
       setIsGenerating(true);
@@ -138,8 +140,12 @@ export function useShareCardImage() {
         });
 
         // Sharer’s time; playUrl = exact puzzle + difficulty (daily?grid= or session=)
-        const timeStr = formatTime(args.elapsedSeconds);
-        const shareText = `That was ${timeStr} of focus. Can you do better?\n\n${playUrl}`;
+        const shareText = buildProgressShareMessage({
+          elapsedSeconds: args.elapsedSeconds,
+          pieceCount: args.pieceCount,
+          accuracyPercent: args.accuracyPercent,
+          playUrl,
+        });
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({
             title: "My Phuzzle completion",

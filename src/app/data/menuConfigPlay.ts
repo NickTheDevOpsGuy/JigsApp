@@ -57,11 +57,6 @@ export function getPlayMenuNodes(): MenuNode[] {
               children: [
                 {
                   type: "action",
-                  id: "time-elapsed",
-                  label: TIME_MODE_LABELS["elapsed"],
-                },
-                {
-                  type: "action",
                   id: "time-countdown",
                   label: TIME_MODE_LABELS["countdown"],
                 },

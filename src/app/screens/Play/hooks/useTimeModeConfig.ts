@@ -6,15 +6,15 @@ import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import {
   TIME_MODE_KEY,
   COUNTDOWN_MINUTES_KEY,
-  DEFAULT_TIME_MODE,
   DEFAULT_COUNTDOWN_MINUTES,
+  normalizeTimeMode,
   type TimeMode,
 } from "../timeMode";
 
 export function useTimeModeConfig() {
   const [timeMode, setTimeModeState] = useState<TimeMode>(() => {
     const v = safeLocalStorage.getItem(TIME_MODE_KEY);
-    return (v as TimeMode) || DEFAULT_TIME_MODE;
+    return normalizeTimeMode(v);
   });
 
   const [countdownMinutes, setCountdownMinutesState] = useState(() => {
@@ -31,7 +31,9 @@ export function useTimeModeConfig() {
   }, [countdownMinutes]);
 
   const setTimeMode = useCallback((mode: TimeMode | ((m: TimeMode) => TimeMode)) => {
-    setTimeModeState((prev) => (typeof mode === "function" ? mode(prev) : mode));
+    setTimeModeState((prev) =>
+      normalizeTimeMode(typeof mode === "function" ? mode(prev) : mode),
+    );
   }, []);
 
   const setCountdownMinutes = useCallback((mins: number | ((m: number) => number)) => {

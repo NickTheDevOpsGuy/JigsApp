@@ -2,13 +2,12 @@
  * CompletionOverlay – success screen with direct share actions.
  */
 import React, { useEffect, useCallback, useState } from "react";
-import { X, Clock, Share2, Send, Copy } from "lucide-react";
+import { X, Clock, Share2, Send } from "lucide-react";
 import styles from "../PlayScreen.module.css";
 import type { Piece } from "@/puzzle/types";
-import { getTodayDateString } from "@/daily/dailyPuzzleCore";
-import { DailyReactions } from "@/components/DailyReactions";
 import { useCompletionOverlayData } from "./useCompletionOverlayData";
 import { formatTime } from "../playUtils";
+import { CompletionStatsBlock } from "./CompletionStatsBlock";
 
 type PieceCutType = "classic" | "irregular" | "hard";
 type VisualModifier = "none" | "fog" | "night" | "sepia";
@@ -34,8 +33,6 @@ interface CompletionOverlayProps {
   onCopyChallenge?: () => void;
   onDownloadImage: () => void;
   onClose: () => void;
-  onGoHome?: () => void;
-  onPlayAgain?: () => void;
   precisionModeEnabled?: boolean;
   avgPrecisionPx?: number | null;
   precisionBonusPoints?: number | null;
@@ -47,10 +44,21 @@ const ANIM_PHASE_SCALE_MS = 400;
 const ANIM_PHASE_GLOW_MS = 700;
 const ANIM_PHASE_TIME_MS = 1000;
 
+function getDifficultyLabel(pieceCount: number): string {
+  if (pieceCount <= 9) return "Easy";
+  if (pieceCount <= 16) return "Medium";
+  if (pieceCount <= 25) return "Hard";
+  if (pieceCount <= 36) return "Expert";
+  if (pieceCount <= 49) return "Master";
+  if (pieceCount <= 64) return "Legend";
+  return "Extreme";
+}
+
 export function CompletionOverlay({
   elapsedSeconds,
   grid,
   imageUrl,
+  pieces,
   moveCount = 0,
   accuracyPercent = 100,
   usedHint = false,
@@ -65,10 +73,11 @@ export function CompletionOverlay({
   onCopyChallenge,
   onDownloadImage: _onDownloadImage,
   onClose,
-  onGoHome: _onGoHome,
-  onPlayAgain: _onPlayAgain,
+  precisionModeEnabled,
+  avgPrecisionPx,
+  precisionBonusPoints,
+  uiTone: _uiTone,
   puzzleShareUrl = "/",
-  copied,
 }: CompletionOverlayProps) {
   const [animPhase, setAnimPhase] = useState<"title" | "scale" | "glow" | "time">(
     "title",
@@ -91,7 +100,7 @@ export function CompletionOverlay({
     puzzleShareUrl,
   });
 
-  const { percentile } = data;
+  const { percentile, rankPosition } = data;
 
   useEffect(() => {
     const t1 = setTimeout(() => setAnimPhase("scale"), ANIM_PHASE_SCALE_MS);
@@ -119,6 +128,14 @@ export function CompletionOverlay({
     percentile && percentile.totalPlayers >= 1
       ? Math.round(100 - percentile.topPercent)
       : null;
+  const pieceCount = grid ? grid.rows * grid.cols : (pieces?.length ?? 0);
+  const metaParts: string[] = [];
+  if (pieceCount > 0) {
+    metaParts.push(`${pieceCount} pieces`);
+    metaParts.push(getDifficultyLabel(pieceCount));
+  }
+  if (grid) metaParts.push(`${grid.cols} x ${grid.rows}`);
+  const puzzleMeta = metaParts.join(" • ");
 
   return (
     <div className={styles.completeOverlay}>
@@ -135,9 +152,8 @@ export function CompletionOverlay({
           <X size={24} />
         </button>
 
-        <h2 className={styles.completeTitleNew} aria-hidden="false">
-          🎉 PUZZLE COMPLETE! 🎉
-        </h2>
+        <h2 className={styles.completeTitleNew}>Puzzle Complete</h2>
+        {puzzleMeta && <p className={styles.completeSubtitleNew}>{puzzleMeta}</p>}
 
         <div
           className={`${styles.completeTimeBlock} ${animPhase === "time" ? styles.completeTimeVisible : ""}`}
@@ -148,7 +164,7 @@ export function CompletionOverlay({
             <Clock size={22} aria-hidden />
             {formatTime(elapsedSeconds)}
           </span>
-          <span className={styles.completeTimeLabel}>Your Solve Time</span>
+          <span className={styles.completeTimeLabel}>Solved in</span>
         </div>
 
         {imageUrl && (
@@ -163,11 +179,21 @@ export function CompletionOverlay({
           </div>
         )}
 
+        <CompletionStatsBlock
+          elapsedSeconds={elapsedSeconds}
+          moveCount={moveCount}
+          accuracyPercent={accuracyPercent}
+          percentile={percentile}
+          rankPosition={rankPosition}
+          hideTime
+          precisionModeEnabled={precisionModeEnabled}
+          avgPrecisionPx={avgPrecisionPx}
+          precisionBonusPoints={precisionBonusPoints}
+        />
+
         {beatPercent != null && (
           <div className={styles.completeStatsNew} role="status">
-            <p className={styles.completeStatsLine}>
-              🔥 You beat {beatPercent}% of players today
-            </p>
+            <p className={styles.completeStatsLine}>You beat {beatPercent}% of players today</p>
           </div>
         )}
 
@@ -179,8 +205,8 @@ export function CompletionOverlay({
             aria-label="Share Progress"
           >
             <Share2 size={20} />
-            <span className={styles.completePrimaryBtnTitle}>Share Progress</span>
-            <span className={styles.completePrimaryBtnSub}>Show your time + result</span>
+            <span className={styles.completePrimaryBtnTitle}>Share Result</span>
+            <span className={styles.completePrimaryBtnSub}>Time, moves, and accuracy</span>
           </button>
           <button
             type="button"
@@ -193,27 +219,6 @@ export function CompletionOverlay({
             <span className={styles.completePrimaryBtnSub}>Same puzzle + difficulty</span>
           </button>
         </div>
-
-        <div className={styles.shareResultPopupRow}>
-          <button
-            type="button"
-            className={styles.shareResultPopupSideBtn}
-            onClick={onCopyProgress ?? (() => {})}
-          >
-            <Copy size={18} />
-            {copied ? "Copied" : "Copy Progress Link"}
-          </button>
-          <button
-            type="button"
-            className={styles.shareResultPopupSideBtn}
-            onClick={onCopyChallenge ?? (() => {})}
-          >
-            <Copy size={18} />
-            Copy Challenge Link
-          </button>
-        </div>
-
-        {isDaily && <DailyReactions puzzleDate={getTodayDateString()} />}
       </div>
     </div>
   );

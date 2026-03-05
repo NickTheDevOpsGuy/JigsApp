@@ -5,7 +5,7 @@
 import React from "react";
 import { Copy, Image, Download, Home } from "lucide-react";
 import { Button } from "@/components/Button/Button";
-import { formatTime } from "../playUtils";
+import { buildProgressShareMessage } from "../shareMessages";
 import styles from "../PlayScreen.module.css";
 
 const PLAY_BASE = "https://phuzzle.vercel.app";
@@ -13,6 +13,8 @@ const PLAY_BASE = "https://phuzzle.vercel.app";
 interface CompletionSharePopupProps {
   elapsedSeconds: number;
   puzzleShareUrl: string;
+  pieceCount?: number;
+  accuracyPercent?: number;
   copied?: boolean;
   onCopyResults?: () => void;
   onShareCard: () => void;
@@ -24,6 +26,8 @@ interface CompletionSharePopupProps {
 export function CompletionSharePopup({
   elapsedSeconds,
   puzzleShareUrl,
+  pieceCount = 0,
+  accuracyPercent = 100,
   copied = false,
   onCopyResults,
   onShareCard,
@@ -35,7 +39,12 @@ export function CompletionSharePopup({
     ? puzzleShareUrl
     : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
 
-  const shareText = `That was ${formatTime(elapsedSeconds)} of focus. Can you do better?\n\n${playUrl}`;
+  const shareText = buildProgressShareMessage({
+    elapsedSeconds,
+    pieceCount,
+    accuracyPercent,
+    playUrl,
+  });
 
   const canCopy = typeof onCopyResults === "function";
 

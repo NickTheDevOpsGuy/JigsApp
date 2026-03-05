@@ -1143,8 +1143,6 @@ export function PlayScreen() {
               }}
               usedHint={usedHintRef.current}
               isDaily={isDailyPuzzleSession()}
-              onGoHome={() => navigate("/")}
-              onPlayAgain={handleNewGame}
               precisionModeEnabled={precisionModeEnabled}
               precisionSnaps={precisionSnapsRef.current}
               adaptivePersonalityEnabled={adaptivePersonalityEnabled}
@@ -1161,7 +1159,9 @@ export function PlayScreen() {
                     ? {
                         ["--progress" as string]: placed / total,
                         ["--progress-color" as string]:
-                          "var(--color-progress-75, #22c55e)",
+                          placed >= total
+                            ? "var(--color-hud-done-border, #22c55e)"
+                            : "var(--color-brand-primary, #3b82f6)",
                       }
                     : undefined
                 }

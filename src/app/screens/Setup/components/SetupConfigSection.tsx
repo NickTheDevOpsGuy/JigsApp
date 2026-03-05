@@ -1,10 +1,8 @@
 /**
- * Setup screen: difficulty suggestion, Difficulty/Time/Countdown dropdowns, custom grid, remember choice.
+ * Setup screen config: difficulty suggestion/cards and custom grid inputs.
  */
-import { Dropdown } from "@/components/DropDown/Dropdown";
+import { Puzzle } from "lucide-react";
 import { GRID_OPTIONS } from "../hooks";
-import { COUNTDOWN_OPTIONS, type TimeMode } from "../../Play/timeMode";
-import { TIME_MODE_LABELS } from "../setupScreenConstants";
 
 export type SetupConfigSectionProps = {
   suggestedGrid: { gridIndex: number; hint: string } | null;
@@ -17,12 +15,6 @@ export type SetupConfigSectionProps = {
   isCustom: boolean;
   minGrid: number;
   maxGrid: number;
-  timeMode: TimeMode;
-  setTimeMode: (m: TimeMode) => void;
-  countdownMinutes: number;
-  setCountdownMinutes: (n: number) => void;
-  rememberChoice: boolean;
-  setRememberChoice: (v: boolean) => void;
   styles: Record<string, string>;
 };
 
@@ -37,14 +29,16 @@ export function SetupConfigSection({
   isCustom,
   minGrid,
   maxGrid,
-  timeMode,
-  setTimeMode,
-  countdownMinutes,
-  setCountdownMinutes,
-  rememberChoice,
-  setRememberChoice,
   styles,
 }: SetupConfigSectionProps) {
+  const primaryDifficulties = GRID_OPTIONS.slice(0, 4).map((opt, index) => ({
+    index,
+    title: ["Easy", "Medium", "Hard", "Expert"][index],
+    pieces: opt.rows * opt.cols,
+  }));
+  const isAdvancedSelection = gridIndex >= primaryDifficulties.length;
+  const selectedAdvanced = GRID_OPTIONS[gridIndex];
+
   return (
     <>
       <div className={styles.difficultySuggestionSlot}>
@@ -60,55 +54,46 @@ export function SetupConfigSection({
             </button>
           )}
       </div>
-      <div className={styles.configGrid}>
-        <Dropdown
-          label="Difficulty"
-          compact
-          value={gridIndex}
-          onChange={(val: string) => setGridIndex(Number(val))}
-          options={GRID_OPTIONS.map((opt, i) => ({
-            value: i,
-            label:
-              opt.rows > 0
-                ? opt.label
-                : `Custom (${customRows}×${customCols} – ${customRows * customCols} pieces)`,
-          }))}
-          fullWidth
-        />
-
-        <Dropdown
-          label="Time"
-          compact
-          value={timeMode}
-          onChange={(val: string) => setTimeMode(val as TimeMode)}
-          options={(
-            [
-              "elapsed",
-              "countdown",
-              "active",
-              "relaxed",
-              "best",
-              "speedrun",
-              "timeattack",
-            ] as TimeMode[]
-          ).map((m) => ({ value: m, label: TIME_MODE_LABELS[m] }))}
-          fullWidth
-        />
-
-        {timeMode === "countdown" && (
-          <Dropdown
-            label="Countdown"
-            compact
-            value={countdownMinutes}
-            onChange={(val: string) => setCountdownMinutes(Number(val))}
-            options={COUNTDOWN_OPTIONS.map((m) => ({
-              value: m,
-              label: `${m} min`,
-            }))}
-            fullWidth
-          />
-        )}
-      </div>
+      <section className={styles.difficultySection} aria-label="Difficulty">
+        <p className={styles.configSectionLabel}>Difficulty</p>
+        <div className={styles.difficultyGrid}>
+          {primaryDifficulties.map((difficulty) => (
+            <button
+              key={difficulty.index}
+              type="button"
+              className={`${styles.difficultyCard} ${gridIndex === difficulty.index ? styles.difficultyCardActive : ""}`}
+              onClick={() => setGridIndex(difficulty.index)}
+              aria-pressed={gridIndex === difficulty.index}
+            >
+              <span className={styles.difficultyCardTitle}>
+                <Puzzle size={16} />
+                {difficulty.title}
+              </span>
+              <span className={styles.difficultyCardPieces}>{difficulty.pieces} pieces</span>
+            </button>
+          ))}
+          {isAdvancedSelection && (
+            <button
+              type="button"
+              className={`${styles.difficultyCard} ${styles.difficultyCardActive}`}
+              onClick={() => setGridIndex(gridIndex)}
+              aria-pressed
+            >
+              <span className={styles.difficultyCardTitle}>
+                <Puzzle size={16} />
+                {selectedAdvanced.rows > 0
+                  ? selectedAdvanced.label.split(" ")[0]
+                  : "Custom"}
+              </span>
+              <span className={styles.difficultyCardPieces}>
+                {selectedAdvanced.rows > 0
+                  ? `${selectedAdvanced.rows * selectedAdvanced.cols} pieces`
+                  : `${customRows * customCols} pieces`}
+              </span>
+            </button>
+          )}
+        </div>
+      </section>
 
       {isCustom && (
         <div>
@@ -154,16 +139,6 @@ export function SetupConfigSection({
           )}
         </div>
       )}
-
-      <label className={styles.rememberLabel}>
-        <input
-          type="checkbox"
-          checked={rememberChoice}
-          onChange={(e) => setRememberChoice(e.target.checked)}
-          className={styles.rememberCheckbox}
-        />
-        <span>Remember my choice</span>
-      </label>
     </>
   );
 }
