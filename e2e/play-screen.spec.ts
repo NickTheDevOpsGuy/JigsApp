@@ -54,11 +54,47 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
       timeout: 20000,
     });
-    await expect(page.getByRole("button", { name: /share progress/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /share result/i })).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByRole("button", { name: /send challenge/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /share with people/i })).toBeVisible({
       timeout: 10000,
     });
+  });
+
+  test("completion overlay fits on mobile without body scroll", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
+      timeout: 20000,
+    });
+    await expect(page.getByRole("button", { name: /share result/i })).toBeVisible({
+      timeout: 10000,
+    });
+
+    const before = await page.evaluate(() => {
+      const scroller = document.scrollingElement ?? document.documentElement;
+      return {
+        clientHeight: scroller.clientHeight,
+        scrollHeight: scroller.scrollHeight,
+        scrollY: window.scrollY,
+      };
+    });
+
+    await page.evaluate(() => window.scrollTo(0, 9999));
+
+    const after = await page.evaluate(() => {
+      const scroller = document.scrollingElement ?? document.documentElement;
+      return {
+        clientHeight: scroller.clientHeight,
+        scrollHeight: scroller.scrollHeight,
+        scrollY: window.scrollY,
+      };
+    });
+
+    expect(before.scrollHeight - before.clientHeight).toBeLessThanOrEqual(2);
+    expect(after.scrollY).toBe(0);
   });
 });

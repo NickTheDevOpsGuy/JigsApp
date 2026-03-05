@@ -285,431 +285,94 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 
 ---
 
-<details>  
-<summary>📁 Click to expand file structure</summary>
+<details>
+<summary>Click to expand current project structure (high-level)</summary>
 
 ```plaintext
 .
-├── .github
-│   ├── ISSUE_TEMPLATE
-│   │   ├── bug.yml
-│   │   ├── config.yml
-│   │   ├── documentation.yml
-│   │   ├── enhancement_refactor.yml
-│   │   ├── feature_request.yml
-│   │   └── question_discussion.yml
-│   ├── workflows
-│   │   ├── CODEOWNERS
-│   │   ├── Phuzzle.yml
-│   │   └── vercel-production.yml
-│   └── pull_request_template.md
-├── .husky
-│   ├── pre-commit
-│   └── pre-push
-├── doc
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   └── workflows/
+├── .husky/
+├── doc/
+│   ├── BUG_REPORT.md
 │   ├── CHANGES.md
 │   ├── FEATURES_IMPLEMENTED.md
 │   ├── FUTURE.md
 │   ├── LIGHTHOUSE.md
+│   ├── MOBILE_QA.md
 │   ├── README.md
 │   ├── SESSION_SUMMARY.md
 │   ├── SHARING.md
-│   ├── streak-freeze.md
+│   ├── STREAK-FREEZE.md
 │   └── SUPABASE_SETUP.md
-├── e2e
+├── e2e/
+│   ├── context-menu-mobile.spec.ts
 │   ├── daily-modal.spec.ts
 │   ├── home.spec.ts
 │   ├── packs-stats.spec.ts
 │   ├── play-screen.spec.ts
+│   ├── setup-mobile-fit.spec.ts
 │   ├── setup-play.spec.ts
 │   ├── streak-freeze.spec.ts
 │   └── theme.spec.ts
-├── public
-│   ├── assets
-│   │   └── star.png
-│   ├── favicon.svg
-│   ├── icon-192.png
-│   └── icon-512.png
-├── scripts
+├── public/
+├── scripts/
 │   ├── check-bundle-size.sh
+│   ├── guard-no-skip-and-console.sh
 │   └── precheck.sh
-├── src
-│   ├── app
-│   │   ├── assets
-│   │   │   ├── puzzles
-│   │   │   │   ├── animals
-│   │   │   │   │   ├── bear.png
-│   │   │   │   │   ├── cat.png
-│   │   │   │   │   ├── fox.png
-│   │   │   │   │   ├── rabbit.png
-│   │   │   │   │   └── racoon-8bit.png
-│   │   │   │   ├── flowers
-│   │   │   │   │   ├── daisy.png
-│   │   │   │   │   ├── flower_bed.png
-│   │   │   │   │   ├── lavender.png
-│   │   │   │   │   └── sunflower.png
-│   │   │   │   ├── food
-│   │   │   │   │   ├── charcuterie_board.png
-│   │   │   │   │   ├── curries_and_rice.png
-│   │   │   │   │   ├── fruit_platter.png
-│   │   │   │   │   ├── pasta_dishes.png
-│   │   │   │   │   ├── strawbery_shortcake.png
-│   │   │   │   │   ├── tacos.png
-│   │   │   │   │   └── warmcoco.png
-│   │   │   │   ├── space
-│   │   │   │   │   ├── nebual.png
-│   │   │   │   │   ├── outterspace.png
-│   │   │   │   │   ├── outterspace2.png
-│   │   │   │   │   └── saturn.png
-│   │   │   │   └── tech
-│   │   │   │       ├── 404.png
-│   │   │   │       ├── computer-404.png
-│   │   │   │       ├── racoon-computer.png
-│   │   │   │       └── racoon-matrix.png
-│   │   │   └── ui
-│   │   │       └── phuzzle-logo-512.png
-│   │   ├── audio
-│   │   │   ├── sounds.ts
-│   │   │   ├── soundsPreferences.ts
-│   │   │   ├── soundsSfx.ts
-│   │   │   ├── soundsSfxTypes.ts
-│   │   │   ├── soundsSfxSnap.ts
-│   │   │   ├── soundsSfxMisc.ts
-│   │   │   ├── soundsSfxComplete.ts
-│   │   │   ├── soundsAmbient.ts
-│   │   │   ├── soundsAmbientTypes.ts
-│   │   │   ├── soundEngineAmbient.ts
-│   │   │   ├── soundsDsp.ts
-│   │   │   ├── soundsAmbientOcean.ts
-│   │   │   ├── soundsAmbientSunset.ts
-│   │   │   ├── soundsAmbientSpace.ts
-│   │   │   ├── soundsAmbientForest.ts
-│   │   │   ├── soundsAmbientLightDark.ts
-│   │   │   ├── audioManager.ts
-│   │   │   ├── audioManagerThemes.ts
-│   │   │   └── audioManagerTheme*.ts
-│   │   ├── components
-│   │   │   ├── DailyReactions
-│   │   │   │   ├── DailyReactions.module.css
-│   │   │   │   ├── DailyReactions.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── AboutModal
-│   │   │   │   ├── AboutModal.module.css
-│   │   │   │   ├── AboutModal.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── BugReportModal
-│   │   │   │   ├── BugReportModal.module.css
-│   │   │   │   ├── BugReportModal.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── Button
-│   │   │   │   ├── Button.module.css
-│   │   │   │   └── Button.tsx
-│   │   │   ├── DailyCountdown
-│   │   │   │   ├── DailyCountdown.module.css
-│   │   │   │   └── DailyCountdown.tsx
-│   │   │   ├── DailyDifficultyModal
-│   │   │   │   ├── DailyDifficultyModal.module.css
-│   │   │   │   ├── DailyDifficultyModal.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── DropDown
-│   │   │   │   ├── Dropdown.module.css
-│   │   │   │   └── Dropdown.tsx
-│   │   │   ├── ErrorBoundary
-│   │   │   │   ├── ErrorBoundary.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── HelpChoiceModal
-│   │   │   │   ├── HelpChoiceModal.module.css
-│   │   │   │   ├── HelpChoiceModal.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── HowToPlay
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── TutorialOverlay.module.css
-│   │   │   │   └── TutorialOverlay.tsx
-│   │   │   ├── MenuTree
-│   │   │   │   ├── MenuTree.module.css
-│   │   │   │   └── MenuTree.tsx
-│   │   │   ├── Modal
-│   │   │   │   ├── Modal.module.css
-│   │   │   │   └── Modal.tsx
-│   │   │   ├── OfflineIndicator
-│   │   │   │   ├── OfflineIndicator.module.css
-│   │   │   │   └── OfflineIndicator.tsx
-│   │   │   ├── OnboardingTooltip
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── OnboardingTooltip.module.css
-│   │   │   │   └── OnboardingTooltip.tsx
-│   │   │   ├── PieceTray
-│   │   │   │   ├── PieceTray.module.css
-│   │   │   │   ├── PieceTray.tsx
-│   │   │   │   ├── PieceTrayHeader.tsx
-│   │   │   │   ├── usePieceTrayDisplay.ts
-│   │   │   │   ├── usePieceTrayScroll.ts
-│   │   │   │   └── usePieceTrayThumbs.ts
-│   │   │   ├── ShortcutsModal
-│   │   │   │   ├── ShortcutsModal.module.css
-│   │   │   │   └── ShortcutsModal.tsx
-│   │   │   ├── ThemeModal
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── ThemeModal.module.css
-│   │   │   │   └── ThemeModal.tsx
-│   │   │   ├── ThemeToggle
-│   │   │   │   ├── ThemeToggle.module.css
-│   │   │   │   └── ThemeToggle.tsx
-│   │   │   ├── Tray
-│   │   │   │   ├── Tray.module.css
-│   │   │   │   └── Tray.tsx
-│   │   │   └── WhatsNew
-│   │   │       ├── index.ts
-│   │   │       ├── WhatsNewModal.module.css
-│   │   │       └── WhatsNewModal.tsx
-│   │   ├── daily
-│   │   │   ├── dailyPuzzle.ts
-│   │   │   ├── dailyPuzzleCore.test.ts
-│   │   │   └── dailyPuzzleCore.ts
-│   │   ├── data
-│   │   │   ├── achievements.ts
-│   │   │   ├── anonymousNames.ts
-│   │   │   ├── changelog.ts
-│   │   │   ├── completionMessages.test.ts
-│   │   │   ├── completionMessages.ts
-│   │   │   ├── confettiColors.ts
-│   │   │   ├── loadPacksData.ts
-│   │   │   ├── menuConfig.ts
-│   │   │   ├── menuConfigAppearance.ts
-│   │   │   ├── menuConfigConstants.ts
-│   │   │   ├── menuConfigPlay.ts
-│   │   │   ├── menuConfigRest.ts
-│   │   │   ├── menuTips.ts
-│   │   │   ├── packCompletion.ts
-│   │   │   ├── packMetadata.ts
-│   │   │   ├── puzzlePacks.ts
-│   │   │   └── samplePuzzles.ts
-│   │   ├── hooks
-│   │   │   ├── useBatterySaver.ts
-│   │   │   ├── useKeyboardShortcuts.ts
-│   │   │   ├── useMediaQuery.ts
-│   │   │   ├── useMenuSettings.ts
-│   │   │   ├── useOnboarding.ts
-│   │   │   ├── useTheme.test.tsx
-│   │   │   └── useTheme.tsx
-│   │   ├── puzzle
-│   │   │   ├── canvas
-│   │   │   │   ├── pickPiece.ts
-│   │   │   │   ├── renderBoard.ts
-│   │   │   │   ├── renderBoardDraw.ts
-│   │   │   │   ├── renderBoardDrawPiece.ts
-│   │   │   │   ├── renderBoardDrawPieceHelpers.ts
-│   │   │   │   ├── renderBoardDrawOverlays.ts
-│   │   │   │   ├── renderBoardHelpers.ts
-│   │   │   │   ├── renderBoardTypes.ts
-│   │   │   │   ├── renderTrayPiece.ts
-│   │   │   │   └── shape.ts
-│   │   │   ├── factories
-│   │   │   │   └── createInitialPieces.ts
-│   │   │   ├── colorUtils.ts
-│   │   │   ├── config.ts
-│   │   │   ├── groupUtils.test.ts
-│   │   │   ├── groupUtils.ts
-│   │   │   ├── PuzzleManager.test.ts
-│   │   │   ├── PuzzleManager.ts
-│   │   │   ├── puzzleManagerUtils.ts
-│   │   │   ├── puzzleManagerRestore.ts
-│   │   │   ├── puzzleSnap.ts
-│   │   │   ├── puzzleStorage.ts
-│   │   │   ├── puzzleStorage.test.ts
-│   │   │   ├── shape.ts
-│   │   │   ├── types.ts
-│   │   │   └── undoManager.ts
-│   │   ├── screens
-│   │   │   ├── Menu
-│   │   │   │   ├── MenuScreen.module.css
-│   │   │   │   └── MenuScreen.tsx
-│   │   │   ├── NewGame
-│   │   │   │   └── NewGameScreen.tsx
-│   │   │   ├── Packs
-│   │   │   │   ├── PackDetailScreen.module.css
-│   │   │   │   ├── PackDetailScreen.tsx
-│   │   │   │   ├── PackListScreen.module.css
-│   │   │   │   └── PackListScreen.tsx
-│   │   │   ├── Play
-│   │   │   │   ├── components
-│   │   │   │   │   ├── CompletionOverlay.tsx
-│   │   │   │   │   ├── CompletionOverlayActions.tsx
-│   │   │   │   │   ├── CompletionOverlayGate.tsx
-│   │   │   │   │   ├── CompletionSharePopup.tsx
-│   │   │   │   │   ├── CompletionStatsBlock.tsx
-│   │   │   │   │   ├── CoopDebugPanel.tsx
-│   │   │   │   │   ├── CoopStatusIndicator.tsx
-│   │   │   │   │   ├── DragPreview.tsx
-│   │   │   │   │   ├── HeaderMenu.tsx
-│   │   │   │   │   ├── HeaderMenuSubmenuPanel.tsx
-│   │   │   │   │   ├── headerMenuConfig.tsx
-│   │   │   │   │   ├── headerMenuConfigTypes.ts
-│   │   │   │   │   ├── headerMenuConstants.ts
-│   │   │   │   │   ├── headerMenuItemsDisplay.ts
-│   │   │   │   │   ├── headerMenuItemsDisplayRest.ts
-│   │   │   │   │   ├── headerMenuItemsNavModes.ts
-│   │   │   │   │   ├── headerMenuItemsRest.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── useCompletionConfetti.ts
-│   │   │   │   │   ├── useCompletionOverlayData.ts
-│   │   │   │   │   ├── Minimap.tsx
-│   │   │   │   │   ├── Minimap.module.css
-│   │   │   │   │   ├── PauseOverlay.tsx
-│   │   │   │   │   ├── PlayHUD.tsx
-│   │   │   │   │   ├── PlayScreenModals.tsx
-│   │   │   │   │   ├── PlayScreenOverlays.tsx
-│   │   │   │   │   ├── PlayScreenTopBar.tsx
-│   │   │   │   │   ├── PlayToasts.tsx
-│   │   │   │   │   ├── PlayToasts.types.ts
-│   │   │   │   │   ├── PlayConfirmModals.tsx
-│   │   │   │   │   ├── ProfilerOverlay.tsx
-│   │   │   │   │   ├── ProfilerOverlay.module.css
-│   │   │   │   │   ├── ProgressivePreviewOverlay.tsx
-│   │   │   │   │   ├── SnapComboMeter.tsx
-│   │   │   │   │   ├── SnapComboMeter.module.css
-│   │   │   │   │   ├── TopBarButtons.tsx
-│   │   │   │   │   ├── TrayFilterButton.tsx
-│   │   │   │   │   ├── TrayFilterButton.module.css
-│   │   │   │   │   └── UndoRedoButtons.tsx
-│   │   │   │   ├── hooks
-│   │   │   │   │   ├── pointerHandlers
-│   │   │   │   │   │   ├── dragLog.ts
-│   │   │   │   │   │   ├── mouseHandlers.ts
-│   │   │   │   │   │   ├── pointerHandlersFactory.ts
-│   │   │   │   │   │   ├── shared.ts
-│   │   │   │   │   │   ├── touchHandlers.ts
-│   │   │   │   │   │   └── types.ts
-│   │   │   │   │   ├── playScreenManagerEvents.ts
-│   │   │   │   │   ├── playScreenUIInitial.ts
-│   │   │   │   │   ├── useCoarsePointer.ts
-│   │   │   │   │   ├── useDownloadImage.ts
-│   │   │   │   │   ├── useHaptics.ts
-│   │   │   │   │   ├── useInputHints.ts
-│   │   │   │   │   ├── usePlayScreenAnimation.ts
-│   │   │   │   │   ├── usePlayScreenAnimationConstants.ts
-│   │   │   │   │   ├── usePlayScreenManager.ts
-│   │   │   │   │   ├── usePlayScreenMilestones.ts
-│   │   │   │   │   ├── usePlayScreenPersistence.ts
-│   │   │   │   │   ├── usePlayScreenUIPersistence.ts
-│   │   │   │   │   ├── useSnapComboAnnouncer.ts
-│   │   │   │   │   ├── usePlayScreenSecondaryEffects.ts
-│   │   │   │   │   ├── usePlayScreenSharePuzzle.ts
-│   │   │   │   │   ├── usePlayScreenShortcuts.ts
-│   │   │   │   │   ├── usePlayScreenTopBarProps.ts
-│   │   │   │   │   ├── usePlayScreenTimer.ts
-│   │   │   │   │   ├── usePlayScreenUI.ts
-│   │   │   │   │   ├── usePointerHandlers.ts
-│   │   │   │   │   ├── usePuzzleSession.ts
-│   │   │   │   │   ├── viewportStorage.ts
-│   │   │   │   │   ├── useReferenceTapHighlight.ts
-│   │   │   │   │   ├── useShareCardImage.ts
-│   │   │   │   │   ├── useShareResults.ts
-│   │   │   │   │   ├── useTimeModeConfig.ts
-│   │   │   │   │   └── useViewport.ts
-│   │   │   │   ├── PlayScreen.module.css
+├── src/
+│   ├── app/
+│   │   ├── assets/
+│   │   │   └── puzzles/
+│   │   ├── audio/
+│   │   ├── components/
+│   │   │   └── PieceTray/
+│   │   │       ├── PieceTray.tsx
+│   │   │       ├── PieceTray.module.css
+│   │   │       ├── PieceTray.test.ts
+│   │   │       └── usePieceTray*.ts
+│   │   ├── daily/
+│   │   ├── data/
+│   │   ├── hooks/
+│   │   ├── puzzle/
+│   │   │   └── canvas/
+│   │   ├── screens/
+│   │   │   ├── Menu/
+│   │   │   ├── NewGame/
+│   │   │   ├── Packs/
+│   │   │   ├── Play/
 │   │   │   │   ├── PlayScreen.tsx
-│   │   │   │   ├── playScreenUtils.ts
-│   │   │   │   ├── playScreenUtils.test.ts
-│   │   │   │   ├── playUtils.ts
-│   │   │   │   ├── timeMode.ts
-│   │   │   │   └── timeMode.test.ts
-│   │   │   ├── Setup
-│   │   │   │   ├── components
-│   │   │   │   │   ├── CameraCapture.module.css
-│   │   │   │   │   ├── CameraCapture.tsx
-│   │   │   │   │   ├── SetupGalleryThumbnail.tsx
-│   │   │   │   │   ├── SetupConfigSection.tsx
-│   │   │   │   │   └── SetupImageSourcePanel.tsx
-│   │   │   │   ├── hooks
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── useGridConfig.ts
-│   │   │   │   │   ├── useImagePicker.ts
-│   │   │   │   │   └── useSetupScreenGalleryScroll.ts
-│   │   │   │   ├── SetupScreen.module.css
-│   │   │   │   └── SetupScreen.tsx
-│   │   │   └── Stats
-│   │   │       ├── components
-│   │   │       │   ├── StatsScreenHeader.tsx
-│   │   │       │   └── StatsTabBar.tsx
-│   │   │       ├── hooks
-│   │   │       │   ├── index.ts
-│   │   │       │   ├── useStatsScreenState.ts
-│   │   │       │   └── useStatsScreenData.ts
-│   │   │       ├── tabs
-│   │   │       │   ├── AchievementsTab.tsx
-│   │   │       │   ├── DashboardTab.tsx
-│   │   │       │   ├── LeaderboardTab.tsx
-│   │   │       │   ├── LeaderboardTabLists.tsx
-│   │   │       │   ├── ProfileTab.tsx
-│   │   │       │   └── index.ts
-│   │   │       ├── statsFormatting.ts
-│   │   │       ├── StatsScreen.module.css
-│   │   │       └── StatsScreen.tsx
-│   │   ├── services
-│   │   │   ├── achievementsService.ts
-│   │   │   ├── adaptiveDifficultyService.ts
-│   │   │   ├── dailyCommentsService.ts
-│   │   │   ├── leaderboardService.ts
-│   │   │   ├── leaderboardFetchers.ts
-│   │   │   ├── leaderboardFetchersAllTime.ts
-│   │   │   ├── leaderboardFetchersDaily.ts
-│   │   │   ├── leaderboardFetchersPeriod.ts
-│   │   │   ├── leaderboardFetchersPersonal.ts
-│   │   │   ├── leaderboardFetchersShared.ts
-│   │   │   ├── leaderboardFetchersStreaks.ts
-│   │   │   ├── leaderboardTypes.ts
-│   │   │   ├── prestigeService.ts
-│   │   │   ├── profileService.ts
-│   │   │   ├── puzzleSessionService.ts
-│   │   │   ├── serverTimeService.ts
-│   │   │   └── statsService.ts
-│   │   ├── styles
-│   │   │   └── global.css
-│   │   ├── supabase
-│   │   │   ├── auth.ts
-│   │   │   ├── client.ts
-│   │   │   └── types.ts
-│   │   ├── utils
-│   │   │   ├── safeLocalStorage.ts
-│   │   │   ├── seasons.ts
-│   │   │   └── seasons.test.ts
+│   │   │   │   ├── PlayScreen.module.css
+│   │   │   │   ├── shareMessages.ts
+│   │   │   │   ├── shareMessages.test.ts
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── CompletionOverlay.tsx
+│   │   │   │   │   ├── CompletionOverlay.module.css
+│   │   │   │   │   ├── CompletionStatsBlock.tsx
+│   │   │   │   │   └── headerMenu*.ts*
+│   │   │   │   └── hooks/
+│   │   │   │       ├── usePointerHandlers.ts
+│   │   │   │       ├── usePointerHandlers.test.ts
+│   │   │   │       ├── useShareCardImage.ts
+│   │   │   │       ├── useShareResults.ts
+│   │   │   │       └── pointerHandlers/
+│   │   │   ├── Setup/
+│   │   │   └── Stats/
+│   │   ├── services/
+│   │   ├── styles/
+│   │   ├── supabase/
+│   │   ├── utils/
 │   │   ├── App.tsx
-│   │   ├── App.module.css
-│   │   ├── main.tsx
-│   │   └── vite-env.d.ts
-│   ├── test
-│   │   └── setup.ts
-│   └── types
-│       ├── canvas-confetti.d.ts
-│       └── vite-env.d.ts
-├── supabase
-│   ├── migrations
-│   │   ├── 20260225120000_tables.sql
-│   │   └── 20260225120001_rls.sql
+│   │   └── main.tsx
+│   ├── test/
+│   └── types/
+├── supabase/
+│   ├── migrations/
 │   └── README.md
-├── .env.example
-├── .eslintcache
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── CHANGELOG_UPDATE.md
-├── CONTRIBUTORS.md
-├── eslint.config.ts
-├── index.html
-├── LICENSE.md
-├── lighthouserc.cjs
-├── package-lock.json
 ├── package.json
-├── playwright.config.ts
 ├── README.md
-├── tsconfig.app.json
-├── tsconfig.app.tsbuildinfo
-├── tsconfig.json
-├── tsconfig.node.json
-├── vercel.json
 └── vite.config.ts
-
 ```
 
 </details>

@@ -9,6 +9,13 @@ const MOBILE_VIEWPORTS = [
 
 const IMAGE_SOURCE_TABS = [/gallery/i, /upload/i, /camera/i] as const;
 
+async function gotoSetup(page: import("@playwright/test").Page) {
+  await page.goto("/new", { waitUntil: "domcontentloaded", timeout: 45000 });
+  await expect(page.getByRole("tab", { name: /gallery/i })).toBeVisible({
+    timeout: 15000,
+  });
+}
+
 test.describe("Setup mobile viewport fit", () => {
   test.use({ hasTouch: true });
 
@@ -16,12 +23,13 @@ test.describe("Setup mobile viewport fit", () => {
     test(`all setup tabs fit without vertical page scroll (${viewport.width}x${viewport.height})`, async ({
       page,
     }) => {
+      test.setTimeout(60000);
       await page.setViewportSize(viewport);
       await page.addInitScript(async () => {
         localStorage.setItem("phuzzle:lastSeenChangelog", "999");
       });
 
-      await page.goto("/new");
+      await gotoSetup(page);
       await dismissWhatsNewModalIfOpen(page);
 
       for (const tab of IMAGE_SOURCE_TABS) {
@@ -68,4 +76,39 @@ test.describe("Setup mobile viewport fit", () => {
       }
     });
   }
+
+  test("setup page stays fixed without body scroll on iPhone SE", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.addInitScript(async () => {
+      localStorage.setItem("phuzzle:lastSeenChangelog", "999");
+    });
+
+    await gotoSetup(page);
+    await dismissWhatsNewModalIfOpen(page);
+    await expect(page.getByRole("tab", { name: /gallery/i })).toBeVisible();
+
+    const before = await page.evaluate(() => {
+      const scroller = document.scrollingElement ?? document.documentElement;
+      return {
+        clientHeight: scroller.clientHeight,
+        scrollHeight: scroller.scrollHeight,
+        scrollY: window.scrollY,
+      };
+    });
+
+    await page.evaluate(() => window.scrollTo(0, 9999));
+
+    const after = await page.evaluate(() => {
+      const scroller = document.scrollingElement ?? document.documentElement;
+      return {
+        clientHeight: scroller.clientHeight,
+        scrollHeight: scroller.scrollHeight,
+        scrollY: window.scrollY,
+      };
+    });
+
+    expect(before.scrollHeight - before.clientHeight).toBeLessThanOrEqual(2);
+    expect(after.scrollY).toBe(0);
+  });
 });

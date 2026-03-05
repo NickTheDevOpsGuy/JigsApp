@@ -4,9 +4,9 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
-## Recent: Share screen, draw order, seams, unwinnable fix, grid minimum
+## Recent: Share flow, draw order, seams, unwinnable fix, grid minimum
 
-- **Share screen (no modal)** — Share Result and Challenge Friend both open the same inline share screen: one panel with “Share how you did” (Copy link, Share Card, Download) and “Challenge a friend” (Copy link, Send challenge). No modal; Back returns to completion view.
+- **Completion share actions** — Win overlay now uses direct actions: **Share Result** and **Share with People**. Copy/native share text is neutral (no taunts), and share card generation uses a cleaner message-style layout for mobile sharing.
 - **Piece draw order** — Locked or placed pieces draw first (bottom); movable pieces always draw on top and are hit-tested first, so pieces never get stuck behind locked sections.
 - **Unwinnable state fixed** — Drag clamp uses overlap with the playable area (not full containment), so a group partly off the bottom can always be dragged back up; tall groups no longer get an empty allowed range.
 - **Seam alignment** — Target positions use an integer pixel grid (rounded board origin; snapped positions rounded). Piece boundaries line up 100% at seams (e.g. eyes at piece edges).
@@ -36,8 +36,8 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 ## Recent: Share screen and win screen
 
 - **Win screen messages** — Below “Puzzle Completed!” a cycling positive message (e.g. “You did it!”, “Nailed it!”, “Puzzle master!”) varies by puzzle and time. When you beat your best time, “New best time!” is shown; otherwise a performance badge (e.g. Speed Demon, Precision Pro, Chill Mode) may appear.
-- **Exact puzzle link** — Share text and card include a link to the same puzzle: `https://phuzzle.vercel.app/daily` for daily, or `https://phuzzle.vercel.app/play?session=…` for co-op. Copy, native share, and Share Card PNG all use this URL.
-- **Share modal** — Share Result modal shows a clickable “Play here: {url}” link, plus Share Card PNG and Download. Card image shows “Phuzzle” (no URL on image). See [SHARING.md](./SHARING.md).
+- **Exact puzzle link** — Share text includes a link to the same puzzle: `https://phuzzle.vercel.app/daily` for daily, or `https://phuzzle.vercel.app/play?session=…` for session play.
+- **Share card** — Share Card PNG uses a large puzzle preview, clean stat chips, and neutral copy. URL stays in message text so recipients get a clickable link. See [SHARING.md](./SHARING.md).
 
 ---
 
@@ -69,7 +69,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - Reference image preview (full or progressive reveal mode)
 - Progress and timer modes (elapsed, countdown, active-only, relaxed, best time)
 - Percentile badges (Top 10% / 25% / 50%); dynamic completion badges (Speed Demon, Chill Mode, etc.)
-- **Completion screen** — Redesigned: larger puzzle image, stats (Time, Moves, Accuracy, Rank), cycling positive message below title (“You did it!”, “Nailed it!”, etc.); “New best time!” when you beat your record, or a performance badge when not. Share section (Continue dropdown opens upward; Share Result button only; no URL on the overlay). Puzzle URL (phuzzle.vercel.app) is on the **share card** image (Share Result → Share Card PNG). Share Result opens popup (Share Card PNG, Seasonal frame, Download).
+- **Completion screen** — Redesigned: larger puzzle image, stats (Time, Moves, Accuracy, Rank), cycling positive message below title (“You did it!”, “Nailed it!”, etc.); “New best time!” when you beat your record, or a performance badge when not. Share section is now direct actions (**Share Result**, **Share with People**) with neutral copy and no competitive taunts.
 - **Smooth lock** — When pieces snap to the board they ease into place over ~100ms (desktop and mobile) instead of jumping.
 - **Mobile tray** — Tray height on small screens reduced (175px / 195px for large puzzles) to give the board more space.
 - Settings: **About** (Help), **Display** (Theme, piece shape, board options, effects), **Gameplay** (Controls, time), **Audio**, **Advanced**
@@ -97,7 +97,7 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 - **Weekly album** – Stats → Leaderboard → Week → Album: 7-slot page with daily puzzle thumbnails (one per day). Completed days show the puzzle image; missing/locked show overlay. Mastery (⚡) badge when the day was completed with no hints and no undo.
 - **Mastery tracking** – Daily completions without hints or undo are recorded as mastery; shown in weekly album and in mastery streak (Profile / Dashboard).
-- **Share Result** – Win overlay has Share Result button only; puzzle URL is on the share card image (phuzzle.vercel.app in footer). Share Result opens popup with Share Card PNG (branded footer with game link), Seasonal frame, and Download. “Challenge a friend” CTA in popup.
+- **Share Result / Share with People** – Win overlay provides both actions directly; share text includes the puzzle URL, and Share Card PNG is generated from the current solved image with a clean mobile-friendly layout.
 - **Daily puzzle comments & reactions** – After completing today's puzzle: emoji reactions (👍 🎉 🔥 ✨ 💪), 280-char comments with live character counter (near-limit styling), report for moderation
 - Daily puzzle and streak tracking
 - **Daily countdown** – Server-synced timer to next daily unlock on Leaderboard; celebration when ready

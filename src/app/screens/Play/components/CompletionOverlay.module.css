@@ -421,3 +421,94 @@
     min-width: 0;
   }
 }
+
+@media (max-height: 700px) {
+  .completeOverlay {
+    justify-content: center;
+    padding-top: max(10px, env(safe-area-inset-top, 0));
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0) + 8px);
+    overflow-y: hidden;
+  }
+
+  .completePanel {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .completePanelNew {
+    max-width: min(420px, 96vw);
+    padding: 14px 12px 12px;
+    gap: 8px;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .completePanelNew .completeCloseBtn {
+    width: 36px;
+    height: 36px;
+    top: 6px;
+    right: 6px;
+  }
+
+  .completeTitleNew {
+    font-size: 1.08rem;
+  }
+
+  .completeSubtitleNew {
+    margin: 0;
+    font-size: 0.82rem;
+  }
+
+  .completeTimeValue {
+    font-size: 1.3rem;
+  }
+
+  .completeTimeLabel {
+    font-size: 0.75rem;
+  }
+
+  .completeImageNew {
+    max-height: min(24vh, 150px);
+  }
+
+  .completeStatRow {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .completeStatIcon {
+    width: 15px;
+    height: 15px;
+  }
+
+  .completeStatLabel {
+    min-width: 58px;
+    font-size: 0.74rem;
+  }
+
+  .completeStatValue,
+  .completeStatValueRank {
+    font-size: 0.74rem;
+  }
+
+  .completeStatsLine {
+    font-size: 0.78rem;
+  }
+
+  .completePrimaryActions {
+    gap: 6px;
+  }
+
+  .completePrimaryBtn {
+    min-height: 48px;
+    padding: 8px 6px;
+  }
+
+  .completePrimaryBtnTitle {
+    font-size: 0.82rem;
+  }
+
+  .completePrimaryBtnSub {
+    font-size: 0.68rem;
+  }
+}

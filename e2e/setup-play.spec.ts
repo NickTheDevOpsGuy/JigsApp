@@ -44,13 +44,11 @@ test.describe("Setup → Play flow", () => {
     ).toBeVisible();
   });
 
-  test("Setup difficulty dropdown includes 9×9 Extreme preset", async ({ page }) => {
-    await page.goto("/new");
+  test("Setup supports 9×9 (81 pieces) via grid query", async ({ page }) => {
+    await page.goto("/new?grid=9x9");
     await page.getByRole("tab", { name: /gallery/i }).click();
-    await page.getByTestId("gallery-item").first().click();
-
-    const difficultySelect = page.getByLabel(/difficulty/i);
-    await expect(difficultySelect).toBeVisible();
-    await expect(page.locator("option", { hasText: /9×9.*81 pieces/ })).toHaveCount(1);
+    const firstPuzzle = page.getByTestId("gallery-item").first();
+    await expect(firstPuzzle).toBeVisible();
+    await expect(firstPuzzle).toContainText(/81 pieces/i);
   });
 });
