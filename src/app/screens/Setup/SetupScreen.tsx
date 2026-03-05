@@ -218,7 +218,9 @@ export function SetupScreen() {
                   <Puzzle size={28} />
                 </span>
               )}
-              <span>{isPackFlow && selectedPuzzle ? selectedPuzzle.name : "New Puzzle"}</span>
+              <span>
+                {isPackFlow && selectedPuzzle ? selectedPuzzle.name : "New Puzzle"}
+              </span>
             </h1>
             <button
               type="button"

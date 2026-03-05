@@ -41,7 +41,7 @@ export function usePieceTrayThumbs(
       image.addEventListener("load", onLoad);
       return () => image.removeEventListener("load", onLoad);
     }
-    
+
     // Increase inset to give more room for jigsaw tabs
     // The piece.w/h includes padding for tabs, but we need extra margin in the thumb container
     const inset = compact ? 8 : 10;

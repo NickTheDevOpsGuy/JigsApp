@@ -106,7 +106,11 @@ export function SetupImageSourcePanel({
                 <ChevronLeft size={18} />
               </button>
 
-              <div ref={galleryRef} className={`${styles.gallery} ${styles.galleryWithButtons}`} role="list">
+              <div
+                ref={galleryRef}
+                className={`${styles.gallery} ${styles.galleryWithButtons}`}
+                role="list"
+              >
                 {filteredPuzzles.length === 0 ? (
                   <div className={styles.galleryEmpty}>
                     No puzzles in this category yet

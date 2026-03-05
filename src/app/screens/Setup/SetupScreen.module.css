@@ -14,7 +14,11 @@
   overflow-y: auto;
   overflow-x: hidden;
   background:
-    radial-gradient(1200px 680px at 50% -18%, rgba(40, 84, 168, 0.44) 0%, transparent 62%),
+    radial-gradient(
+      1200px 680px at 50% -18%,
+      rgba(40, 84, 168, 0.44) 0%,
+      transparent 62%
+    ),
     radial-gradient(900px 540px at 50% 86%, rgba(232, 144, 72, 0.18) 0%, transparent 58%),
     linear-gradient(180deg, #070b1f 0%, #050a1a 100%);
   scrollbar-width: none;
@@ -33,8 +37,10 @@
   max-width: 620px;
   border-radius: 16px;
   background:
-    linear-gradient(180deg, rgba(17, 29, 52, 0.95) 0%, rgba(13, 24, 44, 0.96) 100%) padding-box,
-    linear-gradient(180deg, rgba(147, 181, 240, 0.35), rgba(255, 178, 103, 0.22)) border-box;
+    linear-gradient(180deg, rgba(17, 29, 52, 0.95) 0%, rgba(13, 24, 44, 0.96) 100%)
+      padding-box,
+    linear-gradient(180deg, rgba(147, 181, 240, 0.35), rgba(255, 178, 103, 0.22))
+      border-box;
   border: 1px solid transparent;
   box-shadow:
     0 24px 54px rgba(0, 0, 0, 0.48),

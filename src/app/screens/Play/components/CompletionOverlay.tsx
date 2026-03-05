@@ -193,7 +193,9 @@ export function CompletionOverlay({
 
         {beatPercent != null && (
           <div className={styles.completeStatsNew} role="status">
-            <p className={styles.completeStatsLine}>You beat {beatPercent}% of players today</p>
+            <p className={styles.completeStatsLine}>
+              You beat {beatPercent}% of players today
+            </p>
           </div>
         )}
 
@@ -206,7 +208,9 @@ export function CompletionOverlay({
           >
             <Share2 size={20} />
             <span className={styles.completePrimaryBtnTitle}>Share Result</span>
-            <span className={styles.completePrimaryBtnSub}>Time, moves, and accuracy</span>
+            <span className={styles.completePrimaryBtnSub}>
+              Time, moves, and accuracy
+            </span>
           </button>
           <button
             type="button"

@@ -18,12 +18,12 @@ export function renderTrayPiece(
 ): HTMLCanvasElement {
   // Extra padding in CANVAS pixels (after scaling) to prevent clipping
   const CANVAS_PAD = 6;
-  
+
   const maxDim = Math.max(piece.w, piece.h);
   // Calculate scaled piece size, then add padding in canvas pixels
   const scaledSize = Math.ceil(maxDim * scale);
   const canvasSize = scaledSize + CANVAS_PAD * 2;
-  
+
   const canvas = document.createElement("canvas");
   canvas.width = canvasSize;
   canvas.height = canvasSize;
@@ -52,10 +52,10 @@ export function renderTrayPiece(
   // 2. Scale
   // 3. Rotate
   // 4. Offset to center the piece
-  
+
   const canvasCenterX = canvasSize / 2;
   const canvasCenterY = canvasSize / 2;
-  
+
   ctx.translate(canvasCenterX, canvasCenterY);
   ctx.scale(scale, scale);
   ctx.rotate((piece.rotation * Math.PI) / 180);

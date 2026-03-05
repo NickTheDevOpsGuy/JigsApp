@@ -69,7 +69,9 @@ export function SetupConfigSection({
                 <Puzzle size={16} />
                 {difficulty.title}
               </span>
-              <span className={styles.difficultyCardPieces}>{difficulty.pieces} pieces</span>
+              <span className={styles.difficultyCardPieces}>
+                {difficulty.pieces} pieces
+              </span>
             </button>
           ))}
           {isAdvancedSelection && (
