@@ -16,16 +16,18 @@ export function renderTrayPiece(
   assembledH: number,
   scale: number = 0.5,
 ): HTMLCanvasElement {
+  const BLEED_PX = 2;
   // Canvas must fit rotated piece: 90°/270° swaps w/h
   const baseSize = Math.max(piece.w, piece.h);
   const canvas = document.createElement("canvas");
-  canvas.width = Math.ceil(baseSize * scale);
-  canvas.height = Math.ceil(baseSize * scale);
+  canvas.width = Math.ceil(baseSize * scale) + BLEED_PX * 2;
+  canvas.height = Math.ceil(baseSize * scale) + BLEED_PX * 2;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
 
   ctx.scale(scale, scale);
+  ctx.translate(BLEED_PX / scale, BLEED_PX / scale);
 
   // Build clip path
   let path: Path2D | null = null;

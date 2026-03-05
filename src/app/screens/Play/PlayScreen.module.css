@@ -480,21 +480,21 @@
 
 .playBody .trayWrap {
   flex-shrink: 0;
-  height: 170px;
+  height: 186px;
 }
 
 /* More tray height for large puzzles (49+ pieces) – prevents cramped layout */
 .playBody .trayWrap.trayWrapLarge {
-  height: 210px;
+  height: 224px;
 }
 
 @media (max-width: 900px) {
   .playBody .trayWrap {
-    height: 170px;
+    height: 178px;
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 195px;
+    height: 206px;
   }
 }
 
@@ -502,7 +502,7 @@
   .playBody .trayWrap {
     width: 100%;
     max-width: min(90vw, 420px);
-    height: 140px;
+    height: 156px;
     flex-shrink: 0;
     padding: 0 0 6px;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
@@ -510,11 +510,11 @@
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 165px;
+    height: 178px;
   }
 
   .tray {
-    height: 140px;
+    height: 156px;
   }
 }
 

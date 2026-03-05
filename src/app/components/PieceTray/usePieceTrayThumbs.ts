@@ -41,9 +41,10 @@ export function usePieceTrayThumbs(
       image.addEventListener("load", onLoad);
       return () => image.removeEventListener("load", onLoad);
     }
-    const padding = compact ? 4 : 6;
-    const maxW = thumbSize - padding;
-    const maxH = thumbSize - padding;
+    // Keep a consistent inset so jigsaw tabs/slots don't hug tray edges.
+    const inset = compact ? 4 : 5;
+    const maxW = Math.max(24, thumbSize - inset * 2);
+    const maxH = Math.max(24, thumbSize - inset * 2);
     const assembledW = grid.cols * (displayed[0]?.tileW ?? 1);
     const assembledH = grid.rows * (displayed[0]?.tileH ?? 1);
 

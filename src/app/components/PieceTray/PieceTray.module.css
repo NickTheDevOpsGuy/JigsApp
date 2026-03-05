@@ -286,7 +286,7 @@
   overscroll-behavior-x: contain;
   /* Minimal right padding so scroll doesn't show big blank past last piece */
   scroll-padding-inline-end: 0;
-  padding: 12px 12px 8px 12px;
+  padding: 8px 12px;
   padding-inline-end: 12px;
   display: flex;
   align-items: center;
@@ -327,7 +327,7 @@
   appearance: none;
   border: none;
   background: transparent;
-  padding: 4px;
+  padding: 2px 4px;
   min-width: 56px;
   min-height: 56px;
   cursor: pointer;
@@ -335,6 +335,9 @@
   transition: all 0.15s ease;
   flex-shrink: 0;
   touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pieceButton:hover {
@@ -414,7 +417,7 @@
 }
 
 .trayCompact .scroller {
-  padding: 12px 12px 6px 12px;
+  padding: 8px 12px;
   padding-inline-end: 12px;
 }
 
@@ -435,7 +438,7 @@
 }
 
 .trayExtraCompact .scroller {
-  padding: 12px 10px 6px 10px;
+  padding: 8px 10px;
   padding-inline-end: 12px;
 }
 
@@ -505,7 +508,7 @@
   }
 
   .scroller {
-    padding: 10px 14px 10px 14px;
+    padding: 8px 14px;
     padding-inline-end: 12px;
     gap: 8px;
   }
@@ -515,12 +518,12 @@
   }
 
   .trayCompact .scroller {
-    padding: 10px 14px 8px 14px;
+    padding: 8px 14px;
     padding-inline-end: 12px;
   }
 
   .trayExtraCompact .scroller {
-    padding: 10px 12px 8px 12px;
+    padding: 8px 12px;
     padding-inline-end: 12px;
   }
 }
