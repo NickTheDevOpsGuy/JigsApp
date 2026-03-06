@@ -40,6 +40,18 @@ export function pickPieceId(
     ctx.rotate((p.rotation * Math.PI) / 180);
     ctx.translate(-p.w / 2, -p.h / 2);
 
+    // Transform screen point into piece-local coordinates once so we can
+    // fall back to rect hit testing when a complex path misses on some devices.
+    const localX = x - (p.x + p.w / 2);
+    const localY = y - (p.y + p.h / 2);
+    const angle = -(p.rotation * Math.PI) / 180;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    const rotX = localX * cos - localY * sin;
+    const rotY = localX * sin + localY * cos;
+    const pieceLocalX = rotX + p.w / 2;
+    const pieceLocalY = rotY + p.h / 2;
+
     let hit = false;
 
     if (path) {
@@ -48,23 +60,17 @@ export function pickPieceId(
       // tests against the path in the current transform.
       // We need to transform the point INTO the local space.
       hit = ctx.isPointInPath(path, x, y);
+      if (!hit) {
+        // Tolerate tiny path precision misses on mobile browsers.
+        const tolerance = 2;
+        hit =
+          pieceLocalX >= -tolerance &&
+          pieceLocalX <= p.w + tolerance &&
+          pieceLocalY >= -tolerance &&
+          pieceLocalY <= p.h + tolerance;
+      }
     } else {
       // Fallback to rect hit test
-      // Transform the click point into piece-local coordinates
-      const localX = x - (p.x + p.w / 2);
-      const localY = y - (p.y + p.h / 2);
-
-      // Apply inverse rotation
-      const angle = -(p.rotation * Math.PI) / 180;
-      const cos = Math.cos(angle);
-      const sin = Math.sin(angle);
-      const rotX = localX * cos - localY * sin;
-      const rotY = localX * sin + localY * cos;
-
-      // Translate back to piece-local origin
-      const pieceLocalX = rotX + p.w / 2;
-      const pieceLocalY = rotY + p.h / 2;
-
       hit =
         pieceLocalX >= 0 && pieceLocalX <= p.w && pieceLocalY >= 0 && pieceLocalY <= p.h;
     }

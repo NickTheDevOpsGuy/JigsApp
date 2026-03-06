@@ -22,6 +22,9 @@
   --font-h1-mobile: 22px;
   --font-h2-mobile: 18px;
   --font-body-mobile: 15px;
+  /* Mobile viewport vars; App.tsx updates these from visualViewport when available. */
+  --app-vh-dynamic: 100dvh;
+  --app-vh-stable: 100svh;
 
   /* Light theme colors */
   --color-bg-primary: #f3f7ff;
@@ -60,6 +63,18 @@
   --color-error-hover: #991b1b;
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
+}
+
+@supports not (height: 100dvh) {
+  :root {
+    --app-vh-dynamic: 100vh;
+  }
+}
+
+@supports not (height: 100svh) {
+  :root {
+    --app-vh-stable: 100vh;
+  }
 }
 
 html.theme-light {
@@ -393,8 +408,8 @@ canvas {
   html,
   body,
   #root {
-    min-height: 100dvh;
-    height: 100%;
+    min-height: var(--app-vh-stable, 100dvh);
+    height: var(--app-vh-stable, 100dvh);
   }
   body {
     font-size: var(--font-body-mobile, 15px);

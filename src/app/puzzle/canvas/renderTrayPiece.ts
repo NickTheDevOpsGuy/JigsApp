@@ -17,7 +17,7 @@ export function renderTrayPiece(
   scale: number = 0.5,
 ): HTMLCanvasElement {
   // Extra padding in CANVAS pixels (after scaling) to prevent clipping
-  const CANVAS_PAD = 6;
+  const CANVAS_PAD = 4;
 
   const maxDim = Math.max(piece.w, piece.h);
   // Calculate scaled piece size, then add padding in canvas pixels
@@ -80,9 +80,9 @@ export function renderTrayPiece(
   );
   ctx.restore();
 
-  // Draw outline
-  ctx.strokeStyle = "rgba(0,0,0,0.3)";
-  ctx.lineWidth = 1 / scale;
+  // Keep outline nearly invisible to avoid noticeable edge lines.
+  ctx.strokeStyle = "rgba(0,0,0,0.10)";
+  ctx.lineWidth = 0.8 / scale;
   ctx.stroke(path);
 
   return canvas;

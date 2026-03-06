@@ -237,6 +237,30 @@ export function computeImageSourceRect(
   let destW = p.w - (p.col === 0 ? p.pad : 0) - (p.col === cols - 1 ? p.pad : 0);
   let destH = p.h - (p.row === 0 ? p.pad : 0) - (p.row === rows - 1 ? p.pad : 0);
 
+  // Small bleed prevents occasional hairline seams on some DPR/rotation combos.
+  const srcBleed = 0.7;
+  const destBleed = 0.6;
+  if (p.col > 0) {
+    srcX -= srcBleed;
+    srcW += srcBleed;
+    destX -= destBleed;
+    destW += destBleed;
+  }
+  if (p.col < cols - 1) {
+    srcW += srcBleed;
+    destW += destBleed;
+  }
+  if (p.row > 0) {
+    srcY -= srcBleed;
+    srcH += srcBleed;
+    destY -= destBleed;
+    destH += destBleed;
+  }
+  if (p.row < rows - 1) {
+    srcH += srcBleed;
+    destH += destBleed;
+  }
+
   // Clamp to image bounds
   if (srcX < 0) {
     const k = -srcX / srcW;

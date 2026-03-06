@@ -42,9 +42,8 @@ export function usePieceTrayThumbs(
       return () => image.removeEventListener("load", onLoad);
     }
 
-    // Increase inset to give more room for jigsaw tabs
-    // The piece.w/h includes padding for tabs, but we need extra margin in the thumb container
-    const inset = compact ? 8 : 10;
+    // Keep only a small inset so the rendered piece remains visually large in tray slots.
+    const inset = compact ? 4 : 3;
     const maxW = Math.max(24, thumbSize - inset * 2);
     const maxH = Math.max(24, thumbSize - inset * 2);
     const assembledW = grid.cols * (displayed[0]?.tileW ?? 1);
@@ -55,7 +54,14 @@ export function usePieceTrayThumbs(
         if (!p.w || !p.h || p.w <= 0 || p.h <= 0) return null;
         // Use the larger dimension to ensure square canvas fits rotated piece
         const maxPieceDim = Math.max(p.w, p.h);
-        const scale = Math.min(maxW / maxPieceDim, maxH / maxPieceDim);
+        const baseScale = Math.min(maxW / maxPieceDim, maxH / maxPieceDim);
+        // Slightly over-scale so tray pieces are easier to see/tap on mobile.
+        const boostedScale = baseScale * (compact ? 1.16 : 1.12);
+        const scale = Math.min(
+          boostedScale,
+          (maxW + 10) / maxPieceDim,
+          (maxH + 10) / maxPieceDim,
+        );
         if (!Number.isFinite(scale) || scale <= 0) return null;
         const c = renderTrayPiece(p, image, assembledW, assembledH, scale);
         return c.toDataURL("image/png");

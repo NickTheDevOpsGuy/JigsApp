@@ -378,6 +378,48 @@ export class PuzzleManager {
     };
   }
 
+  private clampGroupInsideBoardInterior(groupId: string) {
+    const bounds = this.getGroupBounds(groupId);
+    if (!bounds) return;
+
+    const innerMinX = this.boardInset;
+    const innerMaxX = this.boardWidth - this.boardInset;
+    const innerMinY = this.boardInset;
+    const innerMaxY = this.boardHeight - this.boardInset;
+    const boundsW = bounds.maxX - bounds.minX;
+    const boundsH = bounds.maxY - bounds.minY;
+
+    let dx = 0;
+    let dy = 0;
+
+    if (boundsW >= innerMaxX - innerMinX) {
+      const boundsCx = (bounds.minX + bounds.maxX) / 2;
+      const innerCx = (innerMinX + innerMaxX) / 2;
+      dx = innerCx - boundsCx;
+    } else if (bounds.minX < innerMinX) {
+      dx = innerMinX - bounds.minX;
+    } else if (bounds.maxX > innerMaxX) {
+      dx = innerMaxX - bounds.maxX;
+    }
+
+    if (boundsH >= innerMaxY - innerMinY) {
+      const boundsCy = (bounds.minY + bounds.maxY) / 2;
+      const innerCy = (innerMinY + innerMaxY) / 2;
+      dy = innerCy - boundsCy;
+    } else if (bounds.minY < innerMinY) {
+      dy = innerMinY - bounds.minY;
+    } else if (bounds.maxY > innerMaxY) {
+      dy = innerMaxY - bounds.maxY;
+    }
+
+    if (dx !== 0 || dy !== 0) {
+      this.updatePieces(
+        (p) => p.groupId === groupId,
+        (p) => ({ x: p.x + dx, y: p.y + dy }),
+      );
+    }
+  }
+
   private findPiece(id: string) {
     return this.state.pieces.find((p) => p.id === id) ?? null;
   }
@@ -602,6 +644,7 @@ export class PuzzleManager {
       piece,
       boardPieces,
       this.rand.bind(this),
+      this.boardInset,
     );
 
     this.zCounter += 1;
@@ -614,6 +657,7 @@ export class PuzzleManager {
         z: this.zCounter,
       }),
     );
+    this.clampGroupInsideBoardInterior(piece.groupId);
   }
 
   setBoardSize(boardWidth: number, boardHeight: number) {

@@ -14,12 +14,12 @@ import styles from "./PieceTray.module.css";
 // Thumb sizes - smaller for more pieces so they all fit
 function getThumbSize(pieceCount: number, isMobile: boolean): number {
   if (isMobile) {
-    if (pieceCount >= 64) return 32;
-    if (pieceCount >= 49) return 36;
-    if (pieceCount >= 36) return 40;
-    if (pieceCount >= 25) return 44;
-    if (pieceCount >= 16) return 48;
-    return 52;
+    if (pieceCount >= 64) return 36;
+    if (pieceCount >= 49) return 40;
+    if (pieceCount >= 36) return 44;
+    if (pieceCount >= 25) return 48;
+    if (pieceCount >= 16) return 54;
+    return 62;
   }
   // Desktop
   if (pieceCount >= 64) return 40;
@@ -38,19 +38,12 @@ type Props = {
   highlightedPieceIds?: Set<string>;
 };
 
-type TraySlot = { kind: "piece"; piece: Piece } | { kind: "blank"; id: string };
+type TraySlot = { kind: "piece"; piece: Piece };
 
 export function buildTraySlots(displayed: Piece[], totalSlots: number): TraySlot[] {
   const slotCount = Math.max(0, Math.trunc(totalSlots));
   const capped = displayed.slice(0, slotCount);
-  if (capped.length === 0) {
-    return [];
-  }
-  const out: TraySlot[] = capped.map((piece) => ({ kind: "piece", piece }));
-  for (let i = capped.length; i < slotCount; i += 1) {
-    out.push({ kind: "blank", id: `blank-${i}` });
-  }
-  return out;
+  return capped.map((piece) => ({ kind: "piece", piece }));
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
@@ -134,42 +127,31 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
             <div className={styles.empty}>{emptyText}</div>
           ) : (
             <div className={styles.row}>
-              {traySlots.map((slot) =>
-                slot.kind === "piece" ? (
-                  <button
-                    key={slot.piece.id}
-                    type="button"
-                    className={`${styles.pieceButton} ${highlightedPieceIds?.has(slot.piece.id) ? styles.pieceButtonPulse : ""}`}
-                    onClick={() => onPieceClick(slot.piece.id)}
-                    aria-label={`Place piece ${slot.piece.id}`}
+              {traySlots.map((slot) => (
+                <button
+                  key={slot.piece.id}
+                  type="button"
+                  className={`${styles.pieceButton} ${highlightedPieceIds?.has(slot.piece.id) ? styles.pieceButtonPulse : ""}`}
+                  onClick={() => onPieceClick(slot.piece.id)}
+                  aria-label={`Place piece ${slot.piece.id}`}
+                >
+                  <div
+                    className={styles.thumbWrap}
+                    style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
                   >
-                    <div
-                      className={styles.thumbWrap}
-                      style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
-                    >
-                      {image && thumbsById.has(slot.piece.id) ? (
-                        <img
-                          className={styles.thumbImg}
-                          src={thumbsById.get(slot.piece.id)}
-                          alt=""
-                          draggable={false}
-                        />
-                      ) : (
-                        <div className={styles.thumbFallback} />
-                      )}
-                    </div>
-                  </button>
-                ) : (
-                  <div key={slot.id} className={styles.blankSlot} aria-hidden="true">
-                    <div
-                      className={styles.thumbWrap}
-                      style={{ "--thumb-size": `${thumbSize}px` } as React.CSSProperties}
-                    >
-                      <div className={`${styles.thumbFallback} ${styles.thumbBlank}`} />
-                    </div>
+                    {image && thumbsById.has(slot.piece.id) ? (
+                      <img
+                        className={styles.thumbImg}
+                        src={thumbsById.get(slot.piece.id)}
+                        alt=""
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className={styles.thumbFallback} />
+                    )}
                   </div>
-                ),
-              )}
+                </button>
+              ))}
             </div>
           )}
         </div>

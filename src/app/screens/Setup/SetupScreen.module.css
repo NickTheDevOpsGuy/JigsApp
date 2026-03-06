@@ -1,6 +1,5 @@
 .page {
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: var(--app-vh-stable, 100dvh);
   width: 100%;
   box-sizing: border-box;
   padding: 8px;
@@ -708,10 +707,8 @@
 
 @media (max-width: 720px) {
   .page {
-    height: 100vh;
-    height: 100dvh;
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: var(--app-vh-stable, 100dvh);
+    min-height: var(--app-vh-stable, 100dvh);
     padding: 6px;
     padding-top: max(6px, env(safe-area-inset-top, 0));
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
@@ -733,6 +730,10 @@
     gap: 5px;
     flex: 1 1 auto;
     min-height: 0;
+  }
+
+  .cardPackFlow .cardBody {
+    flex: 0 1 auto;
   }
 
   .headerRow {
@@ -881,10 +882,16 @@
 
   .preview,
   .previewPackFlow {
-    width: min(41vw, 19vh, 130px);
-    height: min(41vw, 19vh, 130px);
-    min-height: 92px;
+    width: clamp(156px, 49vw, 204px);
+    height: clamp(156px, 49vw, 204px);
+    min-height: 156px;
     border-radius: 12px;
+  }
+
+  .previewPackFlow {
+    width: clamp(182px, 56vw, 236px);
+    height: clamp(182px, 56vw, 236px);
+    min-height: 182px;
   }
 
   .gridToggleBtn {
@@ -897,6 +904,10 @@
     gap: 6px;
     padding-top: 6px;
     margin-top: auto;
+  }
+
+  .actionRowPackFlow {
+    margin-top: 8px;
   }
 
   .backActionBtn,
@@ -961,9 +972,15 @@
 
   .preview,
   .previewPackFlow {
-    width: min(36vw, 16vh, 112px);
-    height: min(36vw, 16vh, 112px);
-    min-height: 80px;
+    width: clamp(138px, 42vw, 182px);
+    height: clamp(138px, 42vw, 182px);
+    min-height: 138px;
+  }
+
+  .previewPackFlow {
+    width: clamp(154px, 47vw, 198px);
+    height: clamp(154px, 47vw, 198px);
+    min-height: 154px;
   }
 
   .backActionBtn,

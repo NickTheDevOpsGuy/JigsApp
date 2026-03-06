@@ -47,11 +47,11 @@ describe("buildTraySlots", () => {
     expect(slots.every((s) => s.kind === "piece")).toBe(true);
   });
 
-  it("fills missing capacity with blank slots", () => {
+  it("does not create blank slots for missing capacity", () => {
     const pieces = [makePiece("p1"), makePiece("p2")];
     const slots = buildTraySlots(pieces, 5);
-    expect(slots).toHaveLength(5);
-    expect(slots.filter((s) => s.kind === "piece")).toHaveLength(2);
-    expect(slots.filter((s) => s.kind === "blank")).toHaveLength(3);
+    expect(slots).toHaveLength(2);
+    expect(slots.every((s) => s.kind === "piece")).toBe(true);
+    expect(slots.map((s) => s.piece.id)).toEqual(["p1", "p2"]);
   });
 });

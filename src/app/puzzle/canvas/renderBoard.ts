@@ -87,7 +87,7 @@ export function renderBoard(
   const piece00 = state.pieces.find((p) => p.row === 0 && p.col === 0);
   const pad = piece00?.pad ?? 18;
 
-  /* Scale to fit full puzzle (tile grid + piece padding), center horizontally and anchor to bottom. */
+  /* Scale to fit full puzzle (tile grid + piece padding), centered in the board. */
   let appliedFit = false;
   if (assembledW > 0 && assembledH > 0) {
     const contentW = assembledW + 2 * pad;
@@ -95,11 +95,8 @@ export function renderBoard(
     const fitScale = Math.min(1, cssW / contentW, cssH / contentH);
     const drawW = contentW * fitScale;
     const drawH = contentH * fitScale;
-    // Bottom outer edge is flat, so the bottom pad area is visually empty.
-    // Shift down by that hidden band so the solved image visually touches the bottom.
-    const hiddenBottomBand = pad * fitScale;
     const offsetX = (cssW - drawW) / 2;
-    const offsetY = cssH - drawH + hiddenBottomBand;
+    const offsetY = (cssH - drawH) / 2;
     ctx.save();
     appliedFit = true;
     ctx.translate(offsetX, offsetY);

@@ -88,24 +88,38 @@ export function findPlacementFromTray(
   const offsetX = (piece.w - effW) / 2;
   const offsetY = (piece.h - effH) / 2;
 
-  const pad = MOVE_FROM_TRAY_PAD;
-  const xMin = boardInset + pad - offsetX;
-  const xMax = Math.max(xMin, boardWidth - boardInset - effW - pad - offsetX);
-  const yMin = boardInset + pad - offsetY;
-  const yMax = Math.max(yMin, boardHeight - boardInset - effH - pad - offsetY);
+  const pad = MOVE_FROM_TRAY_PAD + Math.max(6, Math.round((piece.pad ?? 0) * 0.35));
+  const safeInset = Math.max(0, boardInset) + Math.max(6, Math.round((piece.pad ?? 0) * 0.2));
+  const xMin = safeInset + pad - offsetX;
+  const xMax = Math.max(xMin, boardWidth - safeInset - effW - pad - offsetX);
+  const yMin = safeInset + pad - offsetY;
+  const yMax = Math.max(yMin, boardHeight - safeInset - effH - pad - offsetY);
 
-  let x = rand(xMin, xMax);
-  let y = rand(yMin, yMax);
+  const centerBiasX = Math.min(
+    72,
+    Math.max(24, Math.round(Math.min(boardWidth, boardHeight) * 0.08)),
+  );
+  const centerBiasY = Math.min(
+    72,
+    Math.max(24, Math.round(Math.min(boardWidth, boardHeight) * 0.08)),
+  );
+  const xCenterMin = Math.min(xMax, xMin + centerBiasX);
+  const xCenterMax = Math.max(xCenterMin, xMax - centerBiasX);
+  const yCenterMin = Math.min(yMax, yMin + centerBiasY);
+  const yCenterMax = Math.max(yCenterMin, yMax - centerBiasY);
+
+  let x = clamp(rand(xCenterMin, xCenterMax), xMin, xMax);
+  let y = clamp(rand(yCenterMin, yCenterMax), yMin, yMax);
   for (let retry = 0; retry < MOVE_FROM_TRAY_RETRY_MAX; retry++) {
     x = clamp(
       rand(xMin, xMax),
       xMin,
-      Math.max(xMin, boardWidth - boardInset - effW - pad - offsetX),
+      Math.max(xMin, boardWidth - safeInset - effW - pad - offsetX),
     );
     y = clamp(
       rand(yMin, yMax),
       yMin,
-      Math.max(yMin, boardHeight - boardInset - effH - pad - offsetY),
+      Math.max(yMin, boardHeight - safeInset - effH - pad - offsetY),
     );
 
     const ourLeft = x + offsetX;

@@ -194,6 +194,7 @@ export function usePlayScreenManager(
         const targetStartY = Math.round(
           effectiveInset + (innerH - grid.rows * pieceHeight) / 2,
         );
+        const managerBoardInset = Math.max(BOARD_INSET_PX, Math.round(effectiveInset));
 
         const savedState = loadPuzzleState();
         const hasSavedGame =
@@ -265,7 +266,7 @@ export function usePlayScreenManager(
             pieceHeight,
             targetStartX,
             targetStartY,
-            boardInset: BOARD_INSET_PX,
+            boardInset: managerBoardInset,
             isMobile,
             cutType,
             snapScaleRef: opts?.snapScaleRef,

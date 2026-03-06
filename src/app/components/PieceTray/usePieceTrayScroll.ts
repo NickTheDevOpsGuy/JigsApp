@@ -3,6 +3,17 @@
  */
 import { useRef, useState, useCallback, useEffect } from "react";
 
+function getHorizontalScrollMetrics(el: HTMLDivElement) {
+  const paddingStart = 12;
+  const paddingEnd = 12;
+  const row = el.firstElementChild as HTMLElement | null;
+  const contentWidth =
+    row && row.offsetWidth > 0 ? paddingStart + row.offsetWidth + paddingEnd : el.scrollWidth;
+  const maxScroll = Math.max(0, contentWidth - el.clientWidth);
+  const clamped = Math.max(0, Math.min(maxScroll, el.scrollLeft));
+  return { maxScroll, clamped };
+}
+
 export function usePieceTrayScroll(displayedLength: number) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -13,16 +24,8 @@ export function usePieceTrayScroll(displayedLength: number) {
   const updateScrollProgress = useCallback(() => {
     const el = scrollerRef.current;
     if (!el) return;
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    const paddingStart = 12;
-    const paddingEnd = 12;
-    const row = el.firstElementChild as HTMLElement | null;
-    const contentWidth =
-      row && row.offsetWidth > 0
-        ? paddingStart + row.offsetWidth + paddingEnd
-        : scrollWidth;
-    const maxScroll = Math.max(0, contentWidth - clientWidth);
-    const clamped = Math.max(0, Math.min(maxScroll, scrollLeft));
+    const { maxScroll, clamped } = getHorizontalScrollMetrics(el);
+    const scrollLeft = el.scrollLeft;
     if (clamped !== scrollLeft) {
       el.scrollLeft = clamped;
     }
@@ -37,14 +40,7 @@ export function usePieceTrayScroll(displayedLength: number) {
   const scrollBy = useCallback((delta: number) => {
     const el = scrollerRef.current;
     if (!el) return;
-    const paddingStart = 12;
-    const paddingEnd = 12;
-    const row = el.firstElementChild as HTMLElement | null;
-    const contentWidth =
-      row && row.offsetWidth > 0
-        ? paddingStart + row.offsetWidth + paddingEnd
-        : el.scrollWidth;
-    const maxScroll = Math.max(0, contentWidth - el.clientWidth);
+    const { maxScroll } = getHorizontalScrollMetrics(el);
     const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + delta));
     el.scrollTo({ left: target, behavior: "smooth" });
   }, []);
@@ -52,6 +48,33 @@ export function usePieceTrayScroll(displayedLength: number) {
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
+
+    let touchLastX: number | null = null;
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length === 1) {
+        touchLastX = event.touches[0].clientX;
+      }
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      if (event.touches.length !== 1 || touchLastX == null) return;
+      const x = event.touches[0].clientX;
+      const dx = x - touchLastX;
+      touchLastX = x;
+
+      const { maxScroll, clamped } = getHorizontalScrollMetrics(el);
+      const atLeft = clamped <= 1;
+      const atRight = clamped >= maxScroll - 1;
+      if ((atLeft && dx > 0) || (atRight && dx < 0)) {
+        // Prevent iOS rubber-band from revealing blank space outside the tray content.
+        event.preventDefault();
+        el.scrollLeft = atLeft ? 0 : maxScroll;
+      }
+    };
+    const onTouchDone = () => {
+      touchLastX = null;
+      run();
+    };
+
     const run = () => {
       updateScrollProgress();
       if (displayedLength > 20) {
@@ -63,13 +86,19 @@ export function usePieceTrayScroll(displayedLength: number) {
     run();
     el.addEventListener("scroll", updateScrollProgress);
     el.addEventListener("scrollend", run);
-    el.addEventListener("touchend", run);
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchDone, { passive: true });
+    el.addEventListener("touchcancel", onTouchDone, { passive: true });
     const ro = new ResizeObserver(run);
     ro.observe(el);
     return () => {
       el.removeEventListener("scroll", updateScrollProgress);
       el.removeEventListener("scrollend", run);
-      el.removeEventListener("touchend", run);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchDone);
+      el.removeEventListener("touchcancel", onTouchDone);
       ro.disconnect();
     };
   }, [updateScrollProgress, displayedLength]);

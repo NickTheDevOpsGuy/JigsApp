@@ -670,9 +670,8 @@ export function PlayScreen() {
         contentW > 0 && contentH > 0 ? Math.min(1, cssW / contentW, cssH / contentH) : 1;
       const drawW = contentW * fitScale;
       const drawH = contentH * fitScale;
-      const hiddenBottomBand = pad * fitScale;
       const fitOffsetX = (cssW - drawW) / 2;
-      const fitOffsetY = cssH - drawH + hiddenBottomBand;
+      const fitOffsetY = (cssH - drawH) / 2;
       let vx = (cssX - fitOffsetX) / fitScale;
       let vy = (cssY - fitOffsetY) / fitScale;
       vx = (vx - viewport.viewport.panX) / viewport.viewport.scale;
@@ -771,6 +770,8 @@ export function PlayScreen() {
       lastInteractionRef.current = performance.now();
       moveCountRef.current += 1;
       manager.movePieceFromTray(pieceId);
+      // Subtle spawn pop so tray→board placement feels intentional on mobile.
+      popMapRef.current.set(pieceId, performance.now());
       setState(manager.getState());
       selectedIdRef.current = pieceId;
       setSelectedPieceId(pieceId);

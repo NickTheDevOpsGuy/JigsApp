@@ -17,6 +17,7 @@
   gap: 6px;
   transition: all 0.15s ease;
   touch-action: manipulation;
+  min-height: 40px;
 }
 
 .trigger:hover {
@@ -85,4 +86,11 @@
 .menuItem:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .trigger {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

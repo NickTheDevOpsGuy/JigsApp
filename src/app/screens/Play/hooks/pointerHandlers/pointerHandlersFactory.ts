@@ -104,17 +104,9 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
     ctx2d.setTransform(1, 0, 0, 1, 0, 0);
     const st = manager.getState();
     const boardPieces = st.pieces.filter((p) => !p.inTray);
-    const first = st.pieces[0];
-    const assembledW = first ? st.grid.cols * first.tileW : 0;
-    const assembledH = first ? st.grid.rows * first.tileH : 0;
-    const inBounds =
-      assembledW > 0 &&
-      assembledH > 0 &&
-      pickX >= -2 &&
-      pickY >= -2 &&
-      pickX <= assembledW + 2 &&
-      pickY <= assembledH + 2;
-    const pieceId = inBounds ? pickPieceId(ctx2d, boardPieces, pickX, pickY) : null;
+    // Always hit-test board pieces; restricting to assembled bounds can miss pieces
+    // moved near board edges and make rotate/drag feel randomly broken.
+    const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY);
     if (!pieceId) {
       selectedIdRef.current = null;
       setSelectedPieceId(null);

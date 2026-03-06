@@ -45,7 +45,7 @@ function PageFallback() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: "100dvh",
+        minHeight: "var(--app-vh-stable, 100dvh)",
         paddingTop: "env(safe-area-inset-top)",
         paddingBottom: "env(safe-area-inset-bottom)",
         fontFamily: "system-ui, sans-serif",
@@ -60,6 +60,60 @@ export function App() {
   useEffect(() => {
     ensureSignedIn();
     initStreakFreeze();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const root = document.documentElement;
+    let minViewportHeight = Number.POSITIVE_INFINITY;
+    let rafId = 0;
+    let resetOnNextApply = false;
+
+    const applyViewportHeightVars = (forceReset = false) => {
+      const vvHeight = window.visualViewport?.height ?? window.innerHeight;
+      const dynamicPx = Math.max(1, Math.round(vvHeight));
+      const stableCandidate = Math.max(1, Math.round(Math.min(window.innerHeight, vvHeight)));
+
+      if (forceReset || !Number.isFinite(minViewportHeight)) {
+        minViewportHeight = stableCandidate;
+      } else {
+        minViewportHeight = Math.min(minViewportHeight, stableCandidate);
+      }
+
+      root.style.setProperty("--app-vh-dynamic", `${dynamicPx}px`);
+      root.style.setProperty("--app-vh-stable", `${minViewportHeight}px`);
+    };
+
+    const scheduleApply = (forceReset = false) => {
+      if (forceReset) resetOnNextApply = true;
+      if (rafId !== 0) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        const shouldReset = resetOnNextApply;
+        resetOnNextApply = false;
+        applyViewportHeightVars(shouldReset);
+      });
+    };
+
+    applyViewportHeightVars(true);
+
+    const onResize = () => scheduleApply(false);
+    const onOrientationChange = () => scheduleApply(true);
+    const vv = window.visualViewport ?? null;
+
+    window.addEventListener("resize", onResize, { passive: true });
+    window.addEventListener("orientationchange", onOrientationChange, { passive: true });
+    vv?.addEventListener("resize", onResize, { passive: true });
+    vv?.addEventListener("scroll", onResize, { passive: true });
+
+    return () => {
+      if (rafId !== 0) window.cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onOrientationChange);
+      vv?.removeEventListener("resize", onResize);
+      vv?.removeEventListener("scroll", onResize);
+    };
   }, []);
 
   useEffect(() => {

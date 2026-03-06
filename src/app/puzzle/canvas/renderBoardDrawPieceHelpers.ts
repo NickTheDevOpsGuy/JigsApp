@@ -24,8 +24,8 @@ export function strokePieceOutline(
   } else if (isPlaced || locked) {
     return;
   } else {
-    ctx.strokeStyle = "rgba(0,0,0,0.25)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(0,0,0,0.14)";
+    ctx.lineWidth = 0.85;
   }
   ctx.stroke(path);
 }

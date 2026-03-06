@@ -150,6 +150,7 @@
   gap: 6px;
   transition: all 0.15s ease;
   touch-action: manipulation;
+  min-height: 40px;
 }
 
 .randomBtn:hover:not(:disabled) {
@@ -253,8 +254,8 @@
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
   padding: 8px 6px;
-  min-width: 36px;
-  min-height: 36px;
+  min-width: 40px;
+  min-height: 40px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -283,7 +284,9 @@
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  overscroll-behavior-x: contain;
+  /* Hard-stop horizontal edges; no blank rubber-band runout beyond first/last piece. */
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: contain;
   /* Minimal right padding so scroll doesn't show big blank past last piece */
   scroll-padding-inline-end: 0;
   padding: 8px 12px;
@@ -319,7 +322,8 @@
 }
 
 .scrollerSnap .pieceButton {
-  scroll-snap-align: center;
+  /* Start alignment avoids centering the edge items with large blank side gutters. */
+  scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 
@@ -514,6 +518,8 @@
 
   .randomBtn {
     padding: 6px 8px;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .randomLabel {
@@ -542,6 +548,11 @@
     padding: 8px 14px;
     padding-inline-end: 12px;
     gap: 8px;
+  }
+
+  .scrollBtn {
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .scrollerSnap {
