@@ -75,7 +75,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/STREAK-FREEZE.md](doc/STREAK-FREEZE.md)
 - **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), percentile badges (Top 10% / 25% / 50%), six themes; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 3 seconds; **piece draw order** (locked/placed pieces draw underneath so movable pieces never get stuck behind); **pixel-aligned seams** (integer target positions so pieces line up 100% at boundaries). **Bug report** (Settings → About → Feedback → Report a bug, or Help → Feedback on home): form with optional email, description, optional screenshots; opens mailto so user can attach files and send. See [doc/BUG_REPORT.md](doc/BUG_REPORT.md).
 - **Play modes** (Settings → Modes) — **Zen Ambient** (no timer/rankings, subtle animated background, soft transitions); **Mystery Mode** (hide full reference, reveal sections only after correct placements); **Precision Mode** (score snap distance; completion shows avg precision and bonus points); **Dynamic Difficulty** (snap tolerance adjusts from completion history — tighter when you’re fast, more forgiving when slower); **Adaptive Personality** (UI tone follows pace: fast play → competitive microcopy/animations, slow play → calm)
-- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share screen** (inline, no modal): **Share Result** and **Share with People** with native share/copy plus Share Card + Download options; co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
+- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share screen** (inline, no modal): **Share Result** and **Share with People** with native share/copy plus **Share Card** + Download options; **Share Card** PNG matches iMessage-style layout (starry background, header, puzzle image, gold line, centered time/pieces/accuracy, Play Phuzzle CTA); co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
 - **Analytics** — Live completion counter, percentile ranking (Top X%); **mastery** completions (daily with no hints and no undo) tracked for weekly album and mastery streak
 
 Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popup → `src/app/data/changelog.ts`.
@@ -94,12 +94,12 @@ Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popu
 ## Mobile layout
 
 - **Board** — 94vw width, max 520px on mobile; 65–70% viewport height. The complete puzzle is **centered and scaled to fit** the canvas so it never clips. `touch-action: manipulation` to prevent double-tap zoom. Snap detection runs during drag as well as on release, so fast touch drags still snap when passing through the target.
-- **Piece tray** — Compact height below board; horizontal scroll. No collapse. Undo/redo and tray get extra spacing on very small screens (≤380px).
+- **Piece tray** — Compact height below board; horizontal scroll (scrollbar hidden; tray still scrolls). No collapse. Undo/redo and tray get extra spacing on very small screens (≤380px).
 - **Piece scaling** — Min 42px on mobile; zoom scales if needed.
 - **Snap** — 120ms pop + glow animation.
 - **Header** — 48px on mobile.
 - **Screens** — Menu, Setup, Stats, Packs fit in viewport (no page scroll); content scrolls inside cards where needed. Loading spinners on Stats and Packs. Stats → Leaderboard → Week → Album shows the 7-slot weekly album with daily thumbnails.
-- **Win screen** — Completion overlay shows image and stats (Time, Moves, Accuracy, Rank), plus neutral completion/share copy; “New best time!” when you beat your record, or a performance badge (e.g. Speed Demon, Precision Pro) when not; **Share Result** and **Share with People** open share actions directly. Puzzle URL is included in the share message text.
+- **Win screen** — Completion overlay shows puzzle image (no overlay text) and stats (Time, Moves, Accuracy, Rank), plus neutral completion/share copy; “New best time!” when you beat your record, or a performance badge (e.g. Speed Demon, Precision Pro) when not; **Share Result** and **Share with People** open share actions directly. When the overlay is dismissed, the board shows a share-card-style banner at the top with "Solved in X:XX!" and move count. Progress ring (green) only fills when pieces actually snap (locked), not when merely nudged. Piece tray horizontal scrollbar is hidden (tray still scrolls). Puzzle URL is included in the share message text.
 
 ---
 
@@ -351,18 +351,40 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 │   │   │   ├── Play/
 │   │   │   │   ├── PlayScreen.tsx
 │   │   │   │   ├── PlayScreen.module.css
+│   │   │   │   ├── playUtils.ts
+│   │   │   │   ├── playScreenUtils.ts
+│   │   │   │   ├── playScreenUtils.test.ts
 │   │   │   │   ├── shareMessages.ts
 │   │   │   │   ├── shareMessages.test.ts
+│   │   │   │   ├── timeMode.ts
+│   │   │   │   ├── timeMode.test.ts
 │   │   │   │   ├── components/
 │   │   │   │   │   ├── CompletionOverlay.tsx
 │   │   │   │   │   ├── CompletionOverlay.module.css
+│   │   │   │   │   ├── CompletionOverlayGate.tsx
+│   │   │   │   │   ├── CompletionSharePopup.tsx
 │   │   │   │   │   ├── CompletionStatsBlock.tsx
-│   │   │   │   │   └── headerMenu*.ts*
+│   │   │   │   │   ├── useCompletionOverlayData.ts
+│   │   │   │   │   ├── HeaderMenu.tsx
+│   │   │   │   │   ├── headerMenuConfig.tsx
+│   │   │   │   │   ├── headerMenu*.ts*
+│   │   │   │   │   ├── Minimap.tsx
+│   │   │   │   │   ├── PlayHUD.tsx
+│   │   │   │   │   ├── PlayScreenOverlays.tsx
+│   │   │   │   │   ├── PlayScreenTopBar.tsx
+│   │   │   │   │   ├── SnapComboMeter.tsx
+│   │   │   │   │   ├── TrayFilterButton.tsx
+│   │   │   │   │   └── ...
 │   │   │   │   └── hooks/
 │   │   │   │       ├── usePointerHandlers.ts
 │   │   │   │       ├── usePointerHandlers.test.ts
 │   │   │   │       ├── useShareCardImage.ts
 │   │   │   │       ├── useShareResults.ts
+│   │   │   │       ├── useDownloadImage.ts
+│   │   │   │       ├── usePlayScreenManager.ts
+│   │   │   │       ├── usePlayScreenAnimation.ts
+│   │   │   │       ├── usePlayScreenTimer.ts
+│   │   │   │       ├── usePuzzleSession.ts
 │   │   │   │       └── pointerHandlers/
 │   │   │   ├── Setup/
 │   │   │   └── Stats/

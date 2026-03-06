@@ -29,9 +29,11 @@ This works **without Supabase**.
   - Exports the puzzle canvas as PNG
   - Adds a footer like: `🧩 Phuzzle - {pieces} pieces in {time}`
 - `src/app/screens/Play/hooks/useShareCardImage.ts`
-  - Share Card PNG with seasonal frame, large puzzle image, neutral copy, and stats chips
+  - Share Card PNG (iMessage-style layout): dark gradient + subtle starry background, thin white border; header "PUZZLE CHALLENGE -" or "PHUZZLE RESULT" with puzzle icon; gold horizontal line; centered puzzle image with gold border; gold line; centered time ("My Time" / "Time"), piece count and difficulty, accuracy (result mode); footer with "Play Phuzzle" CTA and phuzzle.vercel.app. Single URL in share text (no duplicate). Challenge and result modes supported.
 - `src/app/screens/Play/components/CompletionOverlay.tsx`
-  - UI: Win overlay with **Share Result** and **Share with People** actions. Share card image built in `useShareCardImage.ts`. Wires overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`
+  - UI: Win overlay with **Share Result** and **Share with People** actions. Puzzle image shown without text overlay; time/stats in block above image. Share card image built in `useShareCardImage.ts`. Wires overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`. Panel centered (margin: auto).
+- **Board when complete** (after dismissing overlay): Share-card-style banner at top of board with "Solved in X:XX!" and move count (`PlayScreen.tsx` + `PlayScreen.module.css` `.boardCompleteMessage` / `.boardCompleteBanner`).
+- **Piece tray**: Horizontal scrollbar is hidden (tray still scrolls); see `PlayScreen.module.css` `.trayScroll`.
 
 **How it's triggered**
 

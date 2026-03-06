@@ -35,44 +35,54 @@ export function CompletionStatsBlock({
       {!hideTime && (
         <div className={styles.completeStatRow}>
           <Clock size={18} className={styles.completeStatIcon} aria-hidden />
-          <span className={styles.completeStatLabel}>Time:</span>
-          <span className={styles.completeStatValue}>{formatTime(elapsedSeconds)}</span>
+          <div className={styles.completeStatLabelValue}>
+            <span className={styles.completeStatLabel}>Time:</span>
+            <span className={styles.completeStatValue}>{formatTime(elapsedSeconds)}</span>
+          </div>
         </div>
       )}
       <div className={styles.completeStatRow}>
         <Puzzle size={18} className={styles.completeStatIcon} aria-hidden />
-        <span className={styles.completeStatLabel}>Moves:</span>
-        <span className={styles.completeStatValue}>{moveCount}</span>
+        <div className={styles.completeStatLabelValue}>
+          <span className={styles.completeStatLabel}>Moves:</span>
+          <span className={styles.completeStatValue}>{moveCount}</span>
+        </div>
       </div>
       <div className={styles.completeStatRow}>
         <Target size={18} className={styles.completeStatIcon} aria-hidden />
-        <span className={styles.completeStatLabel}>Accuracy:</span>
-        <span className={styles.completeStatValue}>
-          {Math.round(Math.max(0, Math.min(100, accuracyPercent)))}%
-        </span>
+        <div className={styles.completeStatLabelValue}>
+          <span className={styles.completeStatLabel}>Accuracy:</span>
+          <span className={styles.completeStatValue}>
+            {Math.round(Math.max(0, Math.min(100, accuracyPercent)))}%
+          </span>
+        </div>
       </div>
       {precisionModeEnabled && avgPrecisionPx != null && (
         <div className={styles.completeStatRow}>
           <Crosshair size={18} className={styles.completeStatIcon} aria-hidden />
-          <span className={styles.completeStatLabel}>Precision:</span>
-          <span className={styles.completeStatValue}>
-            {avgPrecisionPx.toFixed(1)} px avg
-            {precisionBonusPoints != null && precisionBonusPoints > 0 && (
-              <span className={styles.completeStatBonus}>
-                {" "}
-                +{precisionBonusPoints} bonus
-              </span>
-            )}
-          </span>
+          <div className={styles.completeStatLabelValue}>
+            <span className={styles.completeStatLabel}>Precision:</span>
+            <span className={styles.completeStatValue}>
+              {avgPrecisionPx.toFixed(1)} px avg
+              {precisionBonusPoints != null && precisionBonusPoints > 0 && (
+                <span className={styles.completeStatBonus}>
+                  {" "}
+                  +{precisionBonusPoints} bonus
+                </span>
+              )}
+            </span>
+          </div>
         </div>
       )}
       {percentile && percentile.totalPlayers >= 1 && rankPosition != null && (
         <div className={styles.completeStatRow}>
           <Trophy size={18} className={styles.completeStatIcon} aria-hidden />
-          <span className={styles.completeStatLabel}>Rank</span>
-          <span className={styles.completeStatValueRank}>
-            #{rankPosition} / {percentile.totalPlayers} (Top {percentile.topPercent}%)
-          </span>
+          <div className={styles.completeStatLabelValue}>
+            <span className={styles.completeStatLabel}>Rank</span>
+            <span className={styles.completeStatValueRank}>
+              #{rankPosition} / {percentile.totalPlayers} (Top {percentile.topPercent}%)
+            </span>
+          </div>
         </div>
       )}
     </div>
