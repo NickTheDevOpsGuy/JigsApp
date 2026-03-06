@@ -8,7 +8,9 @@ function getHorizontalScrollMetrics(el: HTMLDivElement) {
   const paddingEnd = 12;
   const row = el.firstElementChild as HTMLElement | null;
   const contentWidth =
-    row && row.offsetWidth > 0 ? paddingStart + row.offsetWidth + paddingEnd : el.scrollWidth;
+    row && row.offsetWidth > 0
+      ? paddingStart + row.offsetWidth + paddingEnd
+      : el.scrollWidth;
   const maxScroll = Math.max(0, contentWidth - el.clientWidth);
   const clamped = Math.max(0, Math.min(maxScroll, el.scrollLeft));
   return { maxScroll, clamped };

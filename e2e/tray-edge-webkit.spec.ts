@@ -18,8 +18,6 @@ test.describe("Tray edge clamp (WebKit)", () => {
   });
 
   test("tray hard-stops at both edges without runout", async ({ page, browserName }) => {
-    test.skip(browserName !== "webkit", "WebKit-specific overscroll guard");
-
     await page.goto("/play");
     const scroller = page.getByRole("list");
 
@@ -32,7 +30,9 @@ test.describe("Tray edge clamp (WebKit)", () => {
       const paddingEnd = 12;
       const row = el.firstElementChild as HTMLElement | null;
       const contentWidth =
-        row && row.offsetWidth > 0 ? paddingStart + row.offsetWidth + paddingEnd : el.scrollWidth;
+        row && row.offsetWidth > 0
+          ? paddingStart + row.offsetWidth + paddingEnd
+          : el.scrollWidth;
       const max = Math.max(0, contentWidth - el.clientWidth);
       el.scrollLeft = max;
       el.scrollBy({ left: 2000 });
@@ -44,7 +44,9 @@ test.describe("Tray edge clamp (WebKit)", () => {
     });
 
     expect(right.max).toBeGreaterThan(0);
-    expect(right.overscrollX).toBe("none");
+    if (browserName === "webkit") {
+      expect(right.overscrollX).toBe("none");
+    }
     expect(right.after).toBeLessThanOrEqual(right.max + 1);
 
     const left = await scroller.evaluate((node) => {

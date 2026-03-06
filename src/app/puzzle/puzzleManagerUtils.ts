@@ -89,7 +89,8 @@ export function findPlacementFromTray(
   const offsetY = (piece.h - effH) / 2;
 
   const pad = MOVE_FROM_TRAY_PAD + Math.max(6, Math.round((piece.pad ?? 0) * 0.35));
-  const safeInset = Math.max(0, boardInset) + Math.max(6, Math.round((piece.pad ?? 0) * 0.2));
+  const safeInset =
+    Math.max(0, boardInset) + Math.max(6, Math.round((piece.pad ?? 0) * 0.2));
   const xMin = safeInset + pad - offsetX;
   const xMax = Math.max(xMin, boardWidth - safeInset - effW - pad - offsetX);
   const yMin = safeInset + pad - offsetY;

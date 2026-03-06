@@ -73,7 +73,10 @@ export function App() {
     const applyViewportHeightVars = (forceReset = false) => {
       const vvHeight = window.visualViewport?.height ?? window.innerHeight;
       const dynamicPx = Math.max(1, Math.round(vvHeight));
-      const stableCandidate = Math.max(1, Math.round(Math.min(window.innerHeight, vvHeight)));
+      const stableCandidate = Math.max(
+        1,
+        Math.round(Math.min(window.innerHeight, vvHeight)),
+      );
 
       if (forceReset || !Number.isFinite(minViewportHeight)) {
         minViewportHeight = stableCandidate;

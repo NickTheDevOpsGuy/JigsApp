@@ -42,10 +42,12 @@ test.describe("Mobile rotation reliability", () => {
     ).toBeVisible({ timeout: 15000 });
 
     const trayButtons = page.locator('button[aria-label^="Place piece "]');
-    await expect.poll(async () => await trayButtons.count(), {
-      timeout: 15000,
-      intervals: [200, 300, 500],
-    }).toBeGreaterThan(0);
+    await expect
+      .poll(async () => await trayButtons.count(), {
+        timeout: 15000,
+        intervals: [200, 300, 500],
+      })
+      .toBeGreaterThan(0);
     const initialCount = await trayButtons.count();
     expect(initialCount).toBeGreaterThan(0);
 
@@ -55,7 +57,9 @@ test.describe("Mobile rotation reliability", () => {
       const btn = trayButtons.first();
       const label = await btn.getAttribute("aria-label");
       expect(label).toBeTruthy();
-      const pieceId = String(label).replace(/^Place piece\s+/, "").trim();
+      const pieceId = String(label)
+        .replace(/^Place piece\s+/, "")
+        .trim();
 
       await btn.click();
 
