@@ -296,8 +296,7 @@ export function useShareCardImage() {
         ctx.textBaseline = "middle";
         ctx.fillStyle = white;
         ctx.font = "700 28px system-ui, sans-serif";
-        const headerText =
-          mode === "challenge" ? "PUZZLE CHALLENGE -" : "PHUZZLE RESULT";
+        const headerText = mode === "challenge" ? "PUZZLE CHALLENGE -" : "PHUZZLE RESULT";
         ctx.fillText(headerText, panel.x + 32 + iconSize + headerGap, headerY);
 
         /* Puzzle image directly under header (like reference) */
