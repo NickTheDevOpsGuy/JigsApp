@@ -16,7 +16,7 @@ export type CanvasWithTouch = HTMLCanvasElement & {
 };
 
 /** Max movement (px) before touch is treated as drag instead of tap. */
-export const TAP_DRAG_THRESHOLD_PX = 8;
+export const TAP_DRAG_THRESHOLD_PX = 6;
 
 /** Max duration (ms) for touch down→up to count as a tap (avoids slow-tap/hesitation). */
 export const TAP_MAX_MS = 350;

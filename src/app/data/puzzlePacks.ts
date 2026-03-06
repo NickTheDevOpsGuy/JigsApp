@@ -58,6 +58,41 @@ export const PUZZLE_PACKS: PuzzlePack[] = [
     category: "flowers",
     season: "spring",
   },
+  {
+    id: "house-pets",
+    name: "House Pets",
+    description: "Cats, kittens, and rabbits",
+    emoji: "🐾",
+    category: "pets",
+  },
+  {
+    id: "woodland-friends",
+    name: "Woodland Friends",
+    description: "Forest critters and cozy wildlife",
+    emoji: "🦊",
+    category: "woodland",
+  },
+  {
+    id: "garden-blooms-plus",
+    name: "Garden Blooms+",
+    description: "Fresh flower scenes",
+    emoji: "🌼",
+    category: "garden",
+  },
+  {
+    id: "cozy-food-delights",
+    name: "Cozy Food Delights",
+    description: "Comfort foods and warm table scenes",
+    emoji: "🍲",
+    category: "cozy-food",
+  },
+  {
+    id: "glitch-lab",
+    name: "Glitch Lab",
+    description: "Retro terminals and hacker vibes",
+    emoji: "🧪",
+    category: "retro",
+  },
 ];
 
 /** Get puzzles belonging to a pack */

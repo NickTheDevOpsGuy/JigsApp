@@ -16,7 +16,9 @@ export function pickPieceId(
   pieces: Piece[],
   x: number,
   y: number,
+  options?: { hitSlopPx?: number },
 ): string | null {
+  const hitSlopPx = Math.max(0, options?.hitSlopPx ?? 2);
   // Topmost first in the exact inverse of draw order.
   const sorted = sortPiecesForHitTest(pieces);
 
@@ -62,7 +64,7 @@ export function pickPieceId(
       hit = ctx.isPointInPath(path, x, y);
       if (!hit) {
         // Tolerate tiny path precision misses on mobile browsers.
-        const tolerance = 2;
+        const tolerance = hitSlopPx;
         hit =
           pieceLocalX >= -tolerance &&
           pieceLocalX <= p.w + tolerance &&
@@ -72,7 +74,10 @@ export function pickPieceId(
     } else {
       // Fallback to rect hit test
       hit =
-        pieceLocalX >= 0 && pieceLocalX <= p.w && pieceLocalY >= 0 && pieceLocalY <= p.h;
+        pieceLocalX >= -hitSlopPx &&
+        pieceLocalX <= p.w + hitSlopPx &&
+        pieceLocalY >= -hitSlopPx &&
+        pieceLocalY <= p.h + hitSlopPx;
     }
 
     ctx.restore();

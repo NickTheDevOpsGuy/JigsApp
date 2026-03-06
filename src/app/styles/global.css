@@ -365,6 +365,21 @@ canvas,
   -webkit-touch-callout: none;
 }
 
+@media (pointer: coarse) {
+  body {
+    -webkit-touch-callout: none;
+  }
+
+  input,
+  textarea,
+  select,
+  [contenteditable],
+  [contenteditable="true"],
+  [data-allow-context-menu="true"] {
+    -webkit-touch-callout: default;
+  }
+}
+
 img {
   max-width: 100%;
   display: block;

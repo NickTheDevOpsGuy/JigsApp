@@ -106,7 +106,10 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
     const boardPieces = st.pieces.filter((p) => !p.inTray);
     // Always hit-test board pieces; restricting to assembled bounds can miss pieces
     // moved near board edges and make rotate/drag feel randomly broken.
-    const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY);
+    const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY, {
+      // Mobile taps benefit from a larger hit target around irregular piece edges.
+      hitSlopPx: e.pointerType === "touch" ? 8 : 2,
+    });
     if (!pieceId) {
       selectedIdRef.current = null;
       setSelectedPieceId(null);

@@ -2,7 +2,9 @@ import { describe, it, expect } from "vitest";
 import { PuzzleManager } from "./PuzzleManager";
 
 describe("PuzzleManager", () => {
-  function createManager(overrides?: Partial<{ rows: number; cols: number }>) {
+  function createManager(
+    overrides?: Partial<{ rows: number; cols: number; isMobile: boolean }>,
+  ) {
     return new PuzzleManager(
       {
         imageUrl: "data:image/png;base64,iVBORw0KGgo=",
@@ -11,6 +13,7 @@ describe("PuzzleManager", () => {
         grid: { rows: overrides?.rows ?? 2, cols: overrides?.cols ?? 2 },
         pieceWidth: 80,
         pieceHeight: 80,
+        isMobile: overrides?.isMobile ?? false,
       },
       {},
     );
@@ -99,5 +102,48 @@ describe("PuzzleManager", () => {
     const draggedPiece = manager.getState().pieces.find((p) => p.id === pieceId);
     expect(draggedPiece).toBeTruthy();
     expect(draggedPiece!.z).toBeGreaterThan(beforeDragMaxZ);
+  });
+
+  it("keeps mobile board pieces reachable when dragged to the edge", () => {
+    const manager = createManager({ rows: 3, cols: 3, isMobile: true });
+    const pieceId = manager.getState().pieces[0].id;
+    manager.movePieceFromTray(pieceId);
+    const piece = manager.getState().pieces.find((p) => p.id === pieceId)!;
+
+    manager.pointerDownBoardSpace(pieceId, piece.x + 10, piece.y + 10);
+    manager.pointerMoveBoardSpace(-1000, -1000);
+    manager.pointerUp();
+
+    const moved = manager.getState().pieces.find((p) => p.id === pieceId)!;
+    expect(moved.x).toBeGreaterThanOrEqual(-moved.pad);
+    expect(moved.y).toBeGreaterThanOrEqual(-moved.pad);
+  });
+
+  it("clamps legacy offscreen board pieces when restoring on mobile", () => {
+    const manager = createManager({ rows: 3, cols: 3, isMobile: true });
+    const pieceId = manager.getState().pieces[0].id;
+    manager.movePieceFromTray(pieceId);
+    const state = manager.getState();
+
+    const saved = state.pieces.map((p) => ({
+      id: p.id,
+      row: p.row,
+      col: p.col,
+      x: p.id === pieceId ? -999 : p.x,
+      y: p.id === pieceId ? -999 : p.y,
+      z: p.z,
+      rotation: p.rotation,
+      isPlaced: p.isPlaced,
+      locked: p.locked,
+      groupId: p.groupId,
+      inTray: p.inTray,
+      dragCount: p.dragCount ?? 0,
+    }));
+
+    manager.restoreFromSaved(saved);
+
+    const restored = manager.getState().pieces.find((p) => p.id === pieceId)!;
+    expect(restored.x).toBeGreaterThanOrEqual(-restored.pad);
+    expect(restored.y).toBeGreaterThanOrEqual(-restored.pad);
   });
 });

@@ -140,9 +140,23 @@ export function App() {
       event.preventDefault();
     };
 
+    const handleDragStart = (event: DragEvent) => {
+      if (allowContextMenuTarget(event.target)) return;
+      event.preventDefault();
+    };
+
+    const handleSelectStart = (event: Event) => {
+      if (allowContextMenuTarget(event.target)) return;
+      event.preventDefault();
+    };
+
     document.addEventListener("contextmenu", handleContextMenu, true);
+    document.addEventListener("dragstart", handleDragStart, true);
+    document.addEventListener("selectstart", handleSelectStart, true);
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu, true);
+      document.removeEventListener("dragstart", handleDragStart, true);
+      document.removeEventListener("selectstart", handleSelectStart, true);
     };
   }, []);
 

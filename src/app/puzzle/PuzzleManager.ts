@@ -357,16 +357,20 @@ export class PuzzleManager {
   }
 
   /**
-   * Soft overflow (px) beyond board edge before hard clamping.
-   * Keep this small so pieces remain reachable on touch devices.
+   * Keep pieces fully inside board bounds (no overflow past outer edge).
+   * This prevents clipped/hidden pieces that become hard to recover on touch.
    */
-  private static readonly SOFT_CLAMP_OVERFLOW = 24;
+  private static readonly SOFT_CLAMP_OVERFLOW = 0;
+
+  private getSoftClampOverflow(): number {
+    return PuzzleManager.SOFT_CLAMP_OVERFLOW;
+  }
 
   private clampGroupDelta(groupId: string, dx: number, dy: number) {
     const b = this.getGroupBounds(groupId);
     if (!b) return { dx: 0, dy: 0 };
 
-    const overflow = PuzzleManager.SOFT_CLAMP_OVERFLOW;
+    const overflow = this.getSoftClampOverflow();
     const minDx = -this.pad - b.minX - overflow;
     const maxDx = this.boardWidth + this.pad - b.maxX + overflow;
     const minDy = -this.pad - b.minY - overflow;
@@ -417,6 +421,49 @@ export class PuzzleManager {
         (p) => p.groupId === groupId,
         (p) => ({ x: p.x + dx, y: p.y + dy }),
       );
+    }
+  }
+
+  /** Keep board groups inside drag bounds (used to recover legacy offscreen saves). */
+  private clampGroupInsideDragBounds(groupId: string): void {
+    const bounds = this.getGroupBounds(groupId);
+    if (!bounds) return;
+
+    const overflow = this.getSoftClampOverflow();
+    const minX = -this.pad - overflow;
+    const maxX = this.boardWidth + this.pad + overflow;
+    const minY = -this.pad - overflow;
+    const maxY = this.boardHeight + this.pad + overflow;
+
+    let dx = 0;
+    let dy = 0;
+
+    if (bounds.minX < minX) {
+      dx = minX - bounds.minX;
+    } else if (bounds.maxX > maxX) {
+      dx = maxX - bounds.maxX;
+    }
+
+    if (bounds.minY < minY) {
+      dy = minY - bounds.minY;
+    } else if (bounds.maxY > maxY) {
+      dy = maxY - bounds.maxY;
+    }
+
+    if (dx !== 0 || dy !== 0) {
+      this.updatePieces(
+        (p) => p.groupId === groupId,
+        (p) => ({ x: p.x + dx, y: p.y + dy }),
+      );
+    }
+  }
+
+  private clampAllBoardGroupsInsideDragBounds(): void {
+    const boardGroupIds = new Set(
+      this.state.pieces.filter((p) => !p.inTray).map((p) => p.groupId),
+    );
+    for (const groupId of boardGroupIds) {
+      this.clampGroupInsideDragBounds(groupId);
     }
   }
 
@@ -813,6 +860,8 @@ export class PuzzleManager {
       preview: null,
     };
 
+    // Safety net: recover any off-edge groups (including legacy states) during active play.
+    this.clampAllBoardGroupsInsideDragBounds();
     this.recomputeDerivedState();
   }
 
@@ -824,8 +873,10 @@ export class PuzzleManager {
   public restoreFromSaved(savedPieces: SavedPiece[]) {
     const pieces = applySavedPieces(this.state.pieces, savedPieces);
     this.state = { ...this.state, pieces };
+    // Recovery for legacy states created before stricter mobile clamping.
+    this.clampAllBoardGroupsInsideDragBounds();
     this.syncZCounterFromPieces();
-    assertGroupConsistency(pieces);
+    assertGroupConsistency(this.state.pieces);
     this.recomputeDerivedState();
   }
 
