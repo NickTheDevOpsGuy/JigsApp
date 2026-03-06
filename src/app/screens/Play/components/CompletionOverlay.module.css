@@ -48,11 +48,10 @@
   max-width: min(460px, 94vw);
   padding: 24px 20px 20px;
   gap: 14px;
-  border-color: rgba(67, 160, 71, 0.58);
-  box-shadow:
-    0 0 0 1px rgba(67, 160, 71, 0.22),
-    var(--shadow-lg);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-lg);
   animation: completePanelEnter 0.4s ease-out both;
+  margin: auto;
 }
 
 .completeCloseBtn {
@@ -156,7 +155,7 @@
 .completeImageWrapNew {
   position: relative;
   width: 100%;
-  border: 1px solid rgba(67, 160, 71, 0.5);
+  border: 1px solid var(--color-border-strong);
   border-radius: 12px;
   overflow: hidden;
   background: var(--color-bg-secondary);
@@ -175,8 +174,8 @@
 
 .completeImageWrapNew.completeImageGlow {
   box-shadow:
-    0 0 0 1px rgba(67, 160, 71, 0.86),
-    0 0 0 6px rgba(67, 160, 71, 0.18),
+    0 0 0 1px var(--color-border-strong),
+    0 0 0 6px rgba(0, 0, 0, 0.08),
     0 10px 30px rgba(15, 23, 42, 0.35);
 }
 

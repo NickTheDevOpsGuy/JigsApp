@@ -1011,6 +1011,13 @@ export class PuzzleManager {
     // Set directly to exact target so lock/place animation doesn't show a half-step.
     this.setGroupToExactTargetPositions(groupId);
     this.bumpGroupZ(groupId);
+    // Count merged group as "snapped" for progress ring (same as board snap).
+    if (this.pieceLockingEnabled) {
+      this.updatePieces(
+        (p) => p.groupId === groupId,
+        (_p) => ({ locked: true }),
+      );
+    }
   }
 
   private rand(min: number, max: number) {

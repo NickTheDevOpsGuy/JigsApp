@@ -43,10 +43,10 @@ export function buildProgressShareMessage(args: ShareMessageArgs): string {
 
 export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   return [
-    "I just finished this puzzle and wanted to share it.",
+    "Think you can beat me?",
     "",
-    "🧩 PHUZZLE PUZZLE SHARE",
-    `Time: ${formatTime(args.elapsedSeconds)}`,
+    "🧩 PUZZLE CHALLENGE",
+    `My Time: ${formatTime(args.elapsedSeconds)}`,
     getPiecesLine(args.pieceCount),
     "",
     "Try the same puzzle:",

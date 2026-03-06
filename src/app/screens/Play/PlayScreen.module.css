@@ -501,19 +501,16 @@
   .playBody .trayWrap {
     width: 100%;
     max-width: min(90vw, 420px);
-    height: 156px;
+    /* Match desktop heights so tray is not cut off; same as tablet breakpoint */
+    height: 186px;
     flex-shrink: 0;
-    padding: 0 0 6px;
-    padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
+    padding: 0 0 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
     align-self: center;
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 178px;
-  }
-
-  .tray {
-    height: 156px;
+    height: 224px;
   }
 }
 
@@ -634,6 +631,8 @@
   align-items: center;
   gap: 6px;
   position: relative;
+  /* Above fixed preview panel so pieces never render behind it */
+  z-index: 105;
   /* Prevent double-tap zoom on mobile; pan/zoom handled by canvas touch-action: none */
   touch-action: manipulation;
 }
@@ -666,6 +665,11 @@
 .boardProgressFrame:not([style]) {
   padding: 8px;
   border-radius: calc(var(--radius-board, 20px) + 8px);
+  background: var(--color-border);
+}
+
+/* When complete: neutral border only (no green ring) */
+.boardProgressFrame[data-complete="true"] {
   background: var(--color-border);
 }
 
@@ -712,6 +716,45 @@
 .modifierSepia .previewPanel,
 .modifierSepia .trayWrap {
   filter: sepia(0.78) saturate(0.75) contrast(1.05);
+}
+
+/* Share-card style banner at top of board when complete */
+.boardCompleteMessage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.boardCompleteBanner {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.62) 0%,
+    rgba(0, 0, 0, 0.35) 70%,
+    transparent 100%
+  );
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.boardCompleteBannerLine {
+  font-family: "Fredoka", system-ui, sans-serif;
+  font-size: clamp(1.05rem, 3.5vw, 1.4rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.98);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.02em;
+}
+
+.boardCompleteBannerSub {
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .canvas {
@@ -802,6 +845,12 @@
   scroll-snap-type: x proximity;
   scroll-padding-inline: 12px;
   padding: 8px 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.trayScroll::-webkit-scrollbar {
+  display: none;
 }
 
 .trayPieces {

@@ -19,18 +19,18 @@ describe("shareMessages", () => {
     expect(text).not.toContain("Think you can beat me?");
   });
 
-  it("buildChallengeShareMessage is invite-style and has no taunt copy", () => {
+  it("buildChallengeShareMessage is challenge-style with taunt copy", () => {
     const text = buildChallengeShareMessage({
       elapsedSeconds: 102,
       pieceCount: 16,
       playUrl: "https://phuzzle.vercel.app/new?puzzle=xyz",
     });
 
-    expect(text).toContain("🧩 PHUZZLE PUZZLE SHARE");
-    expect(text).toContain("Time: 1:42");
+    expect(text).toContain("Think you can beat me?");
+    expect(text).toContain("🧩 PUZZLE CHALLENGE");
+    expect(text).toContain("My Time: 1:42");
     expect(text).toContain("16 Pieces • Medium");
     expect(text).toContain("Try the same puzzle:");
     expect(text).toContain("https://phuzzle.vercel.app/new?puzzle=xyz");
-    expect(text).not.toContain("Think you can beat me?");
   });
 });

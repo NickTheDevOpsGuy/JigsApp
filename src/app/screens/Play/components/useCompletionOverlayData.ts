@@ -148,6 +148,55 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       useSeasonalFrame,
       puzzleShareUrl,
       pieceCount: grid ? grid.rows * grid.cols : 0,
+      mode: "result",
+    });
+  }, [
+    shareCard,
+    imageUrl,
+    elapsedSeconds,
+    moveCount,
+    accuracyPercent,
+    percentile,
+    useSeasonalFrame,
+    puzzleShareUrl,
+    grid,
+  ]);
+
+  const handleShareResultCard = useCallback(async () => {
+    await shareCard({
+      imageUrl,
+      elapsedSeconds,
+      moveCount,
+      accuracyPercent,
+      percentile,
+      useSeasonalFrame,
+      puzzleShareUrl,
+      pieceCount: grid ? grid.rows * grid.cols : 0,
+      mode: "result",
+    });
+  }, [
+    shareCard,
+    imageUrl,
+    elapsedSeconds,
+    moveCount,
+    accuracyPercent,
+    percentile,
+    useSeasonalFrame,
+    puzzleShareUrl,
+    grid,
+  ]);
+
+  const handleShareChallengeCard = useCallback(async () => {
+    await shareCard({
+      imageUrl,
+      elapsedSeconds,
+      moveCount,
+      accuracyPercent,
+      percentile,
+      useSeasonalFrame,
+      puzzleShareUrl,
+      pieceCount: grid ? grid.rows * grid.cols : 0,
+      mode: "challenge",
     });
   }, [
     shareCard,
@@ -172,5 +221,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     shareCard,
     isGenerating,
     handleShareCard,
+    handleShareResultCard,
+    handleShareChallengeCard,
   };
 }

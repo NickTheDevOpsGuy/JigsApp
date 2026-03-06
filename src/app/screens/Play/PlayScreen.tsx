@@ -29,7 +29,7 @@ import {
   SHOW_DEBUG,
   parseGrid,
 } from "./playScreenUtils";
-import { createUndoRedoHandler } from "./playUtils";
+import { createUndoRedoHandler, formatTime } from "./playUtils";
 import { getBestTime, getQuadrantPb, setQuadrantPb } from "./timeMode";
 import {
   isDailyPuzzleSession,
@@ -243,6 +243,9 @@ export function PlayScreen() {
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
   const [completionDismissed, setCompletionDismissed] = React.useState(false);
+  const [completionImageUrl, setCompletionImageUrl] = React.useState<string | undefined>(
+    undefined,
+  );
   const [boardSize, setBoardSize] = React.useState({ w: 800, h: 600 });
   const [lives, setLives] = React.useState(3);
 
@@ -406,6 +409,7 @@ export function PlayScreen() {
     usedHintRef.current = showGhostHint || showGhostWhenIdle;
     setQuadrantTimes({ 0: null, 1: null, 2: null, 3: null });
     setCompletionDismissed(false);
+    setCompletionImageUrl(undefined);
     setLives(3);
   }, [puzzleKey, showGhostHint, showGhostWhenIdle]);
 
@@ -628,6 +632,22 @@ export function PlayScreen() {
     zoomOnCompleteRunRef,
     stateRef,
   });
+
+  // Capture completed puzzle from canvas for overlay (avoids broken blob/data URLs)
+  useEffect(() => {
+    if (!state?.isComplete || completionDismissed || !state) return;
+    const id = requestAnimationFrame(() => {
+      const canvas = canvasRef.current;
+      if (!canvas || canvas.width <= 0 || canvas.height <= 0) return;
+      try {
+        const dataUrl = canvas.toDataURL("image/png");
+        setCompletionImageUrl(dataUrl);
+      } catch {
+        // toDataURL can fail (e.g. tainted); leave completionImageUrl undefined to use fallback
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [state?.isComplete, completionDismissed, state]);
 
   // Analytics: exit before completion (on unmount)
   useEffect(() => {
@@ -879,6 +899,11 @@ export function PlayScreen() {
     dragPreview && state ? state.pieces.find((p) => p.id === dragPreview.pieceId) : null;
   const placed = state?.placedCount ?? 0;
   const total = state?.totalCount ?? 0;
+  /** Progress ring: only fill when pieces have actually snapped (locked), not when merely dragged into place or nudged. */
+  const progressCount =
+    pieceLockingEnabled && state?.pieces
+      ? state.pieces.filter((p) => p.locked).length
+      : placed;
   const _piecesOnBoard = state?.pieces.filter((p) => !p.inTray).length ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
@@ -1117,7 +1142,10 @@ export function PlayScreen() {
               elapsedSeconds={elapsedSeconds}
               state={state}
               imageUrl={
-                safeLocalStorage.getItem(STORAGE_KEY) || imgRef.current?.src || undefined
+                completionImageUrl ??
+                safeLocalStorage.getItem(STORAGE_KEY) ??
+                imgRef.current?.src ??
+                undefined
               }
               undoCount={undoCountRef.current}
               moveCount={moveCountRef.current}
@@ -1140,6 +1168,7 @@ export function PlayScreen() {
               onDownloadImage={handleDownloadImage}
               onClose={() => {
                 setCompletionDismissed(true);
+                setCompletionImageUrl(undefined);
                 viewport.reset();
               }}
               usedHint={usedHintRef.current}
@@ -1155,10 +1184,11 @@ export function PlayScreen() {
             <div className={styles.boardWrapper}>
               <div
                 className={styles.boardProgressFrame}
+                data-complete={isComplete ? "true" : undefined}
                 style={
-                  total > 0
+                  total > 0 && !isComplete
                     ? {
-                        ["--progress" as string]: placed / total,
+                        ["--progress" as string]: progressCount / total,
                         ["--progress-color" as string]:
                           "var(--color-progress-75, #22c55e)",
                       }
@@ -1166,6 +1196,24 @@ export function PlayScreen() {
                 }
               >
                 <div className={styles.board} ref={boardRef} data-testid="play-board">
+                  {isComplete && (
+                    <div
+                      className={styles.boardCompleteMessage}
+                      role="status"
+                      aria-live="polite"
+                    >
+                      <div className={styles.boardCompleteBanner}>
+                        <span className={styles.boardCompleteBannerLine}>
+                          Solved in {formatTime(elapsedSeconds)}!
+                        </span>
+                        <span className={styles.boardCompleteBannerSub}>
+                          {moveCountRef.current === 1
+                            ? "1 move"
+                            : `${moveCountRef.current} moves`}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                   {isLoading && (
                     <div className={styles.loadingOverlay} aria-label="Loading puzzle">
                       <div className={styles.spinner} />

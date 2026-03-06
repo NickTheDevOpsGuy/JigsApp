@@ -82,6 +82,7 @@ export function CompletionOverlay({
   const [animPhase, setAnimPhase] = useState<"title" | "scale" | "glow" | "time">(
     "title",
   );
+  const [imageError, setImageError] = useState(false);
 
   const handleClose = useCallback(() => onClose(), [onClose]);
 
@@ -100,7 +101,12 @@ export function CompletionOverlay({
     puzzleShareUrl,
   });
 
-  const { percentile, rankPosition } = data;
+  const { percentile, rankPosition, handleShareResultCard, handleShareChallengeCard } =
+    data;
+
+  useEffect(() => {
+    setImageError(false);
+  }, [imageUrl]);
 
   useEffect(() => {
     const t1 = setTimeout(() => setAnimPhase("scale"), ANIM_PHASE_SCALE_MS);
@@ -166,7 +172,7 @@ export function CompletionOverlay({
           <span className={styles.completeTimeLabel}>Solved in</span>
         </div>
 
-        {imageUrl && (
+        {imageUrl && !imageError && (
           <div
             className={`${styles.completeImageWrapNew} ${animPhase !== "title" ? styles.completeImageScaled : ""} ${animPhase === "glow" || animPhase === "time" ? styles.completeImageGlow : ""}`}
           >
@@ -174,6 +180,7 @@ export function CompletionOverlay({
               src={imageUrl}
               alt="Completed puzzle"
               className={styles.completeImageNew}
+              onError={() => setImageError(true)}
             />
           </div>
         )}
@@ -198,7 +205,9 @@ export function CompletionOverlay({
           <button
             type="button"
             className={styles.completePrimaryBtn}
-            onClick={onShareProgress ?? onCopyProgress ?? (() => {})}
+            onClick={
+              handleShareResultCard ?? onShareProgress ?? onCopyProgress ?? (() => {})
+            }
             aria-label="Share Result"
           >
             <Share2 size={20} />
@@ -210,7 +219,12 @@ export function CompletionOverlay({
           <button
             type="button"
             className={styles.completePrimaryBtn}
-            onClick={onShareChallenge ?? onCopyChallenge ?? (() => {})}
+            onClick={
+              handleShareChallengeCard ??
+              onShareChallenge ??
+              onCopyChallenge ??
+              (() => {})
+            }
             aria-label="Share with People"
           >
             <Send size={20} />

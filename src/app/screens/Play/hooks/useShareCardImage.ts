@@ -4,7 +4,7 @@
 import { useCallback, useState } from "react";
 import { getCurrentSeason } from "@/utils/seasons";
 import { formatTime } from "../playUtils";
-import { buildProgressShareMessage } from "../shareMessages";
+import { buildProgressShareMessage, buildChallengeShareMessage } from "../shareMessages";
 
 type Percentile = { topPercent: number; totalPlayers: number } | null;
 type Rect = { x: number; y: number; w: number; h: number };
@@ -23,12 +23,12 @@ function getDifficultyLabel(pieceCount: number): string {
   return "Extreme";
 }
 
-function getPiecesLine(pieceCount: number): string {
+function _getPiecesLine(pieceCount: number): string {
   if (pieceCount <= 0) return "Custom Puzzle";
   return `${pieceCount} Pieces • ${getDifficultyLabel(pieceCount)}`;
 }
 
-function getSeasonPalette() {
+function _getSeasonPalette() {
   const season = getCurrentSeason();
   if (season === "spring") {
     return {
@@ -144,7 +144,75 @@ function drawCoverImage(
   ctx.restore();
 }
 
-function drawChipRow(
+/** Seeded scatter for star positions (no grid/diagonal lines). */
+function scatter(seed: number, index: number): number {
+  const t = (index * 2654435761 + seed) >>> 0;
+  return (t % 10007) / 10007;
+}
+
+/** Dark card background like reference: gradient + subtle white speckles (starry). */
+function drawCardBackground(ctx: CanvasRenderingContext2D, rect: Rect, radius: number) {
+  const bg1 = "#0a0e1a";
+  const bg2 = "#1a1f35";
+  const g = ctx.createLinearGradient(rect.x, rect.y, rect.x, rect.y + rect.h);
+  g.addColorStop(0, bg1);
+  g.addColorStop(1, bg2);
+  ctx.fillStyle = g;
+  roundedRectPath(ctx, rect, radius);
+  ctx.fill();
+  const pad = 16;
+  const innerW = Math.max(0, rect.w - pad * 2);
+  const innerH = Math.max(0, rect.h - pad * 2);
+  const count = Math.floor((innerW / 48) * (innerH / 48));
+  ctx.fillStyle = "rgba(255,255,255,0.55)";
+  for (let i = 0; i < count; i++) {
+    const x = rect.x + pad + scatter(1, i) * innerW;
+    const y = rect.y + pad + scatter(2, i) * innerH;
+    ctx.beginPath();
+    ctx.arc(x, y, 0.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+/** Draw a simple puzzle-piece icon (multi-color segments). */
+function drawPuzzleIcon(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+) {
+  const w = size;
+  const h = size * 1.05;
+  const r = size * 0.18;
+  ctx.save();
+  ctx.translate(x, y);
+  const colors = ["#facc15", "#3b82f6", "#22c55e", "#f97316"];
+  fillRoundedRect(ctx, { x: 0, y: 0, w, h }, r, colors[0]);
+  strokeRoundedRect(ctx, { x: 0, y: 0, w, h }, r, "rgba(255,255,255,0.35)", 1);
+  const tabW = w * 0.3;
+  const tabH = h * 0.2;
+  fillRoundedRect(
+    ctx,
+    { x: w * 0.35, y: -tabH * 0.2, w: tabW, h: tabH * 1.2 },
+    r * 0.5,
+    colors[1],
+  );
+  fillRoundedRect(
+    ctx,
+    { x: w - tabW * 0.85, y: h * 0.38, w: tabW * 1.05, h: tabH },
+    r * 0.5,
+    colors[2],
+  );
+  fillRoundedRect(
+    ctx,
+    { x: w * 0.34, y: h - tabH * 0.6, w: tabW, h: tabH * 1.05 },
+    r * 0.5,
+    colors[3],
+  );
+  ctx.restore();
+}
+
+function _drawChipRow(
   ctx: CanvasRenderingContext2D,
   rowBounds: Rect,
   labels: string[],
@@ -187,9 +255,12 @@ export function useShareCardImage() {
       useSeasonalFrame: boolean;
       puzzleShareUrl?: string;
       pieceCount: number;
+      /** Challenge = taunt copy ("Think you're faster?", "Try the same puzzle:"). Result = informational only. */
+      mode?: "challenge" | "result";
     }) => {
       if (!args.imageUrl || isGenerating) return;
       setIsGenerating(true);
+      const mode = args.mode ?? "result";
       try {
         const playPath = args.puzzleShareUrl ?? "/";
         const playUrl = playPath.startsWith("http")
@@ -199,138 +270,132 @@ export function useShareCardImage() {
         const img = await loadImage(args.imageUrl);
         const canvas = document.createElement("canvas");
         canvas.width = 1080;
-        canvas.height = 1920;
+        canvas.height = 1520;
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        const palette = args.useSeasonalFrame
-          ? getSeasonPalette()
-          : {
-              bg1: "#141723",
-              bg2: "#2a2f45",
-              frame: "#8f9bc7",
-              accent: "#f3f5ff",
-              panel: "rgba(12, 16, 28, 0.76)",
-              chip: "rgba(143, 155, 199, 0.2)",
-            };
-
-        const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        bgGradient.addColorStop(0, palette.bg1);
-        bgGradient.addColorStop(1, palette.bg2);
-        ctx.fillStyle = bgGradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const glow = ctx.createRadialGradient(
-          canvas.width * 0.22,
-          canvas.height * 0.12,
-          0,
-          canvas.width * 0.22,
-          canvas.height * 0.12,
-          1300,
-        );
-        glow.addColorStop(0, "rgba(255,255,255,0.22)");
-        glow.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.fillStyle = glow;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const panel: Rect = { x: 56, y: 72, w: 968, h: 1776 };
-        fillRoundedRect(ctx, panel, 48, palette.panel);
-        strokeRoundedRect(ctx, panel, 48, "rgba(255,255,255,0.14)", 2);
-        strokeRoundedRect(ctx, panel, 48, palette.frame, 3);
-
-        ctx.save();
-        roundedRectPath(ctx, panel, 48);
-        ctx.clip();
-        const panelShine = ctx.createLinearGradient(0, panel.y, 0, panel.y + 420);
-        panelShine.addColorStop(0, "rgba(255,255,255,0.14)");
-        panelShine.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.fillStyle = panelShine;
-        ctx.fillRect(panel.x, panel.y, panel.w, 420);
-        ctx.restore();
-
+        const gold = "#D4AF37";
+        const white = "#ffffff";
+        const blueBtn = "#2563eb";
+        const cardRadius = 24;
+        const margin = 48;
+        const cardW = canvas.width - margin * 2;
+        const cardH = canvas.height - margin * 2;
+        const panel: Rect = { x: margin, y: margin, w: cardW, h: cardH };
         const centerX = panel.x + panel.w / 2;
+
+        drawCardBackground(ctx, panel, cardRadius);
+        strokeRoundedRect(ctx, panel, cardRadius, "rgba(255,255,255,0.12)", 1);
+
+        /* Header like reference: icon + "PUZZLE CHALLENGE -" / "PHUZZLE RESULT" */
+        const headerY = panel.y + 44;
+        const iconSize = 44;
+        const headerGap = 14;
+        drawPuzzleIcon(ctx, panel.x + 32, headerY - iconSize / 2, iconSize);
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = white;
+        ctx.font = "700 28px system-ui, sans-serif";
+        const headerText =
+          mode === "challenge" ? "PUZZLE CHALLENGE -" : "PHUZZLE RESULT";
+        ctx.fillText(headerText, panel.x + 32 + iconSize + headerGap, headerY);
+
+        /* Puzzle image directly under header (like reference) */
+        const line1Y = headerY + 28;
+        ctx.strokeStyle = gold;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(panel.x + 32, line1Y);
+        ctx.lineTo(panel.x + panel.w - 32, line1Y);
+        ctx.stroke();
+
+        const imgSize = Math.min(panel.w - 64, 560);
+        const imgX = panel.x + (panel.w - imgSize) / 2;
+        const imgY = line1Y + 24;
+        const imageRect: Rect = { x: imgX, y: imgY, w: imgSize, h: imgSize };
+        fillRoundedRect(ctx, imageRect, 12, "#0f172a");
+        drawCoverImage(ctx, img, imageRect, 12);
+        strokeRoundedRect(ctx, imageRect, 12, gold, 2);
+
+        /* Gold line then centered stats below image (like reference) */
+        const line2Y = imgY + imgSize + 20;
+        ctx.strokeStyle = gold;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(panel.x + 32, line2Y);
+        ctx.lineTo(panel.x + panel.w - 32, line2Y);
+        ctx.stroke();
+
+        const pieceLineShort =
+          args.pieceCount <= 0
+            ? "Custom Puzzle"
+            : `${args.pieceCount} Pieces • ${getDifficultyLabel(args.pieceCount)}`;
         ctx.textAlign = "center";
         ctx.textBaseline = "alphabetic";
-        ctx.fillStyle = palette.accent;
-        ctx.font = "700 62px system-ui, sans-serif";
-        ctx.fillText("PUZZLE SHARE", centerX, panel.y + 124);
-        ctx.font = "500 34px system-ui, sans-serif";
-        ctx.fillStyle = "rgba(241,245,255,0.9)";
-        ctx.fillText("Same puzzle • same settings", centerX, panel.y + 176);
-
-        const heroFrame: Rect = { x: panel.x + 62, y: panel.y + 236, w: 844, h: 980 };
-        fillRoundedRect(ctx, heroFrame, 34, "rgba(9,12,21,0.84)");
-        strokeRoundedRect(ctx, heroFrame, 34, palette.frame, 3);
-
-        const heroImage: Rect = {
-          x: heroFrame.x + 20,
-          y: heroFrame.y + 20,
-          w: heroFrame.w - 40,
-          h: heroFrame.h - 40,
-        };
-        drawCoverImage(ctx, img, heroImage, 24);
-
-        ctx.save();
-        roundedRectPath(ctx, heroImage, 24);
-        ctx.clip();
-        const heroShade = ctx.createLinearGradient(
-          0,
-          heroImage.y + heroImage.h - 220,
-          0,
-          heroImage.y + heroImage.h,
+        ctx.fillStyle = white;
+        ctx.font = "700 38px system-ui, sans-serif";
+        const timeLabel = mode === "challenge" ? "My Time" : "Time";
+        ctx.fillText(
+          `${timeLabel}: ${formatTime(args.elapsedSeconds)}`,
+          centerX,
+          line2Y + 48,
         );
-        heroShade.addColorStop(0, "rgba(0,0,0,0)");
-        heroShade.addColorStop(1, "rgba(0,0,0,0.32)");
-        ctx.fillStyle = heroShade;
-        ctx.fillRect(heroImage.x, heroImage.y, heroImage.w, heroImage.h);
-        ctx.restore();
+        ctx.font = "600 26px system-ui, sans-serif";
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.fillText(pieceLineShort, centerX, line2Y + 88);
+        if (mode === "result") {
+          const accuracy = clampPercent(args.accuracyPercent);
+          ctx.font = "500 22px system-ui, sans-serif";
+          ctx.fillStyle = "rgba(255,255,255,0.88)";
+          ctx.fillText(`Accuracy: ${accuracy}%`, centerX, line2Y + 126);
+        }
 
-        const accuracy = clampPercent(args.accuracyPercent);
-        const pieceLine = getPiecesLine(args.pieceCount);
-        const playersLine =
-          args.percentile && args.percentile.totalPlayers >= 5
-            ? `${args.percentile.totalPlayers.toLocaleString()} players solved this size today`
-            : "Share and compare times";
-
-        const statsTop = heroFrame.y + heroFrame.h + 96;
-        ctx.fillStyle = palette.accent;
-        ctx.font = "700 68px system-ui, sans-serif";
-        ctx.fillText(`Time ${formatTime(args.elapsedSeconds)}`, centerX, statsTop);
-        ctx.font = "600 40px system-ui, sans-serif";
-        ctx.fillStyle = "rgba(246,249,255,0.95)";
-        ctx.fillText(pieceLine, centerX, statsTop + 66);
-        ctx.font = "500 31px system-ui, sans-serif";
-        ctx.fillStyle = "rgba(227,233,248,0.9)";
-        ctx.fillText(playersLine, centerX, statsTop + 116);
-
-        ctx.font = "600 30px system-ui, sans-serif";
-        drawChipRow(
-          ctx,
-          { x: panel.x + 42, y: statsTop + 140, w: panel.w - 84, h: 82 },
-          [
-            `Accuracy ${accuracy}%`,
-            `Moves ${Math.max(0, args.moveCount)}`,
-            args.pieceCount > 0 ? `${args.pieceCount} pieces` : "Custom puzzle",
-          ],
-          palette.chip,
-          "rgba(245,249,255,0.95)",
+        const sectionY = line2Y + (mode === "result" ? 158 : 120);
+        const icon2Size = 36;
+        const footerGap = 12;
+        drawPuzzleIcon(ctx, panel.x + 32, sectionY - icon2Size / 2 + 10, icon2Size);
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = white;
+        ctx.font = "700 22px system-ui, sans-serif";
+        ctx.fillText(
+          mode === "challenge" ? "PUZZLE CHALLENGE" : "PHUZZLE",
+          panel.x + 32 + icon2Size + footerGap,
+          sectionY,
         );
 
-        const footerCard: Rect = {
-          x: panel.x + 116,
-          y: panel.y + panel.h - 148,
-          w: panel.w - 232,
-          h: 96,
-        };
-        fillRoundedRect(ctx, footerCard, 24, palette.chip);
-        strokeRoundedRect(ctx, footerCard, 24, "rgba(255,255,255,0.16)");
+        const ctaY = sectionY + 44;
+        if (mode === "challenge") {
+          ctx.textAlign = "center";
+          ctx.fillStyle = white;
+          ctx.font = "600 26px system-ui, sans-serif";
+          ctx.fillText("Think you're faster?", centerX, ctaY);
+          ctx.font = "500 22px system-ui, sans-serif";
+          ctx.fillStyle = "rgba(255,255,255,0.9)";
+          ctx.fillText("Try the same puzzle:", centerX, ctaY + 36);
+        } else {
+          ctx.textAlign = "center";
+          ctx.fillStyle = "rgba(255,255,255,0.9)";
+          ctx.font = "500 22px system-ui, sans-serif";
+          ctx.fillText("Play this puzzle:", centerX, ctaY + 18);
+        }
+
+        const btnY = mode === "challenge" ? ctaY + 78 : ctaY + 52;
+        const btnW = 320;
+        const btnH = 56;
+        const btnRect: Rect = { x: centerX - btnW / 2, y: btnY, w: btnW, h: btnH };
+        fillRoundedRect(ctx, btnRect, 14, blueBtn);
+        ctx.fillStyle = white;
+        ctx.font = "600 22px system-ui, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillStyle = palette.accent;
-        ctx.font = "600 36px system-ui, sans-serif";
-        ctx.fillText("Open in Phuzzle", centerX, footerCard.y + 43);
-        ctx.font = "500 24px system-ui, sans-serif";
-        ctx.fillStyle = "rgba(233,238,251,0.9)";
-        ctx.fillText("Link is included with your message", centerX, footerCard.y + 74);
+        ctx.textBaseline = "middle";
+        drawPuzzleIcon(ctx, centerX - 92, btnY + (btnH - 28) / 2, 28);
+        ctx.fillText("Play Phuzzle", centerX, btnY + btnH / 2);
+
+        const urlY = btnY + btnH + 24;
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.font = "500 20px system-ui, sans-serif";
+        ctx.fillText("phuzzle.vercel.app", centerX, urlY);
 
         const blob = await new Promise<Blob | null>((resolve) =>
           canvas.toBlob(resolve, "image/png"),
@@ -340,18 +405,23 @@ export function useShareCardImage() {
           type: "image/png",
         });
 
-        // Sharer’s time; playUrl = exact puzzle + difficulty (daily?grid= or session=)
-        const shareText = buildProgressShareMessage({
-          elapsedSeconds: args.elapsedSeconds,
-          pieceCount: args.pieceCount,
-          accuracyPercent: args.accuracyPercent,
-          playUrl,
-        });
+        const shareText =
+          mode === "challenge"
+            ? buildChallengeShareMessage({
+                elapsedSeconds: args.elapsedSeconds,
+                pieceCount: args.pieceCount,
+                playUrl,
+              })
+            : buildProgressShareMessage({
+                elapsedSeconds: args.elapsedSeconds,
+                pieceCount: args.pieceCount,
+                accuracyPercent: args.accuracyPercent,
+                playUrl,
+              });
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({
-            title: "Phuzzle Puzzle Share",
+            title: mode === "challenge" ? "Puzzle Challenge" : "Phuzzle Result",
             text: shareText,
-            url: playUrl,
             files: [file],
           });
           return;
