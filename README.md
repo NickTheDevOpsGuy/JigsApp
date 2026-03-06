@@ -251,20 +251,20 @@ Drop images into `src/app/assets/puzzles/`. Subfolders are supported. Images are
 
 **Folder name = category.** Packs filter puzzles by category:
 
-| Pack              | Category  | Folder             |
-| ----------------- | --------- | ------------------ |
-| Cozy Animals      | `animals` | `puzzles/animals/` |
-| Floral            | `flowers` | `puzzles/flowers/` |
-| Food Photography  | `food`    | `puzzles/food/`    |
-| Space Exploration | `space`   | `puzzles/space/`   |
-| Retro Tech        | `tech`    | `puzzles/tech/`    |
-| Landscape Escapes | `landscapes` | `puzzles/landscapes/` |
-| Fantasy Realms    | `fantasy` | `puzzles/fantasy/` |
-| Pet Portraits     | `pets`    | `puzzles/pets/`    |
-| City Lights       | `cityscapes` | `puzzles/cityscapes/` |
-| Underwater Odyssey | `underwater` | `puzzles/underwater/` |
-| Cozy Interiors    | `cozy-interiors` | `puzzles/cozy-interiors/` |
-| Adventure Trails  | `adventure` | `puzzles/adventure/` |
+| Pack               | Category         | Folder                    |
+| ------------------ | ---------------- | ------------------------- |
+| Cozy Animals       | `animals`        | `puzzles/animals/`        |
+| Floral             | `flowers`        | `puzzles/flowers/`        |
+| Food Photography   | `food`           | `puzzles/food/`           |
+| Space Exploration  | `space`          | `puzzles/space/`          |
+| Retro Tech         | `tech`           | `puzzles/tech/`           |
+| Landscape Escapes  | `landscapes`     | `puzzles/landscapes/`     |
+| Fantasy Realms     | `fantasy`        | `puzzles/fantasy/`        |
+| Pet Portraits      | `pets`           | `puzzles/pets/`           |
+| City Lights        | `cityscapes`     | `puzzles/cityscapes/`     |
+| Underwater Odyssey | `underwater`     | `puzzles/underwater/`     |
+| Cozy Interiors     | `cozy-interiors` | `puzzles/cozy-interiors/` |
+| Adventure Trails   | `adventure`      | `puzzles/adventure/`      |
 
 Example:
 
