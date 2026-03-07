@@ -345,14 +345,13 @@ export function usePlayScreenManager(
       const RETRY_MS = 400;
       const MAX_WAIT_MS = 2800;
       const retryIdRef = { current: null as ReturnType<typeof setInterval> | null };
-      let fallbackId: ReturnType<typeof setTimeout>;
       const ro = new ResizeObserver(() => {
         if (didRunRef.current) return;
         requestAnimationFrame(() => {
           requestAnimationFrame(tryRun);
         });
       });
-      fallbackId = setTimeout(() => {
+      const fallbackId = setTimeout(() => {
         if (didRunRef.current) return;
         runSizing();
         if (didRunRef.current) return;
