@@ -112,10 +112,13 @@ export function usePlayScreenManager(
   const [isLoading, setIsLoading] = useState(true);
   const [puzzleKey, setPuzzleKey] = useState(0);
   const [refsReady, setRefsReady] = useState(0);
+  const refsReadyFiredRef = useRef(false);
 
-  // After layout, refs are attached; bump refsReady so manager effect can run (fixes upload→Play board not sizing).
+  // After layout, refs are attached; bump refsReady once so manager effect can run (fixes upload→Play board not sizing).
+  // Only fire once to avoid infinite setState loop (React error #185) when resize/drag triggers repeated layout.
   useLayoutEffect(() => {
-    if (mainRef.current && boardRef.current) {
+    if (mainRef.current && boardRef.current && !refsReadyFiredRef.current) {
+      refsReadyFiredRef.current = true;
       setRefsReady((r) => r + 1);
     }
   });

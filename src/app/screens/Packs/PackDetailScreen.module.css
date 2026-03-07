@@ -1,12 +1,15 @@
 .page {
-  min-height: 100vh;
+  height: 100dvh;
   min-height: 100dvh;
-  padding: max(6px, env(safe-area-inset-top)) 10px 10px;
+  max-height: 100dvh;
+  padding: max(6px, env(safe-area-inset-top)) 8px 8px;
   background:
     radial-gradient(1080px 620px at 50% -18%, #173155 0%, transparent 62%),
     linear-gradient(180deg, #020b18 0%, #010715 100%);
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
+  overscroll-behavior: none;
+  display: flex;
+  flex-direction: column;
   scrollbar-width: none;
 }
 
@@ -19,18 +22,22 @@
   width: 100%;
   min-width: 0;
   margin: 0 auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(
     180deg,
     rgba(15, 25, 43, 0.96) 0%,
     rgba(12, 20, 35, 0.96) 100%
   );
   border: 1px solid rgba(90, 145, 220, 0.25);
-  border-radius: 14px;
-  padding: 10px 12px;
+  border-radius: 12px;
+  padding: 8px 10px;
   box-shadow:
     0 14px 34px rgba(0, 0, 0, 0.45),
     inset 0 0 0 1px rgba(31, 61, 102, 0.38);
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .header {
@@ -65,19 +72,21 @@
 
 .title {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: 0;
   color: #edf5ff;
 }
 
 .desc {
-  margin: 4px 0 0;
-  font-size: 14px;
+  margin: 2px 0 0;
+  font-size: 13px;
   color: #d7e4fa;
 }
 
 .puzzleGridWrap {
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   gap: 6px;
