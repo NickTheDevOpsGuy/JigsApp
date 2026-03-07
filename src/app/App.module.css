@@ -23,3 +23,13 @@
   min-height: 100%;
   outline: none;
 }
+
+@media (max-width: 600px) {
+  .main {
+    height: 100%;
+    min-height: var(--app-vh-stable, 100dvh);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+}

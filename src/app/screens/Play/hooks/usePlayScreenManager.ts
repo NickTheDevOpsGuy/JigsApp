@@ -155,8 +155,9 @@ export function usePlayScreenManager(
     img.onload = () => {
       imgRef.current = img;
 
+      const didRunRef = { current: false };
       const runSizing = () => {
-        if (!mainEl || !boardEl) return;
+        if (didRunRef.current || !mainEl || !boardEl) return;
         // Never tear down when puzzle is complete (prevents win bounce-back when effect re-runs)
         if (stateRef?.current?.isComplete) return;
         const rect = boardEl.getBoundingClientRect();
@@ -317,25 +318,25 @@ export function usePlayScreenManager(
 
         next.setPieceLockingEnabled(pieceLockingEnabled);
         next.setAutoRotateOnSnap(autoRotateOnSnap);
+        didRunRef.current = true;
+        ro.disconnect();
+        clearTimeout(fallbackId);
         setManager(next);
         setState(next.getState());
         setIsLoading(false);
       };
 
       // ResizeObserver: measure board when CSS layout is stable (board sized by aspect-ratio).
-      // If board has size now, run immediately; otherwise wait for resize (e.g. after upload→Play).
-      let didRun = false;
+      // Only mark "did run" and disconnect after we actually create the manager (so on mobile,
+      // if board is 0x0 at fallback time, ResizeObserver can still fire when layout completes).
       const tryRun = () => {
-        if (didRun || !mainEl || !boardEl) return;
+        if (didRunRef.current || !mainEl || !boardEl) return;
         const r = boardEl.getBoundingClientRect();
         if (r.width <= 0 || r.height <= 0) return;
-        didRun = true;
-        ro.disconnect();
-        clearTimeout(fallbackId);
         runSizing();
       };
       const ro = new ResizeObserver(() => {
-        if (didRun) return;
+        if (didRunRef.current) return;
         requestAnimationFrame(() => {
           requestAnimationFrame(tryRun);
         });
@@ -343,12 +344,8 @@ export function usePlayScreenManager(
       ro.observe(boardEl);
       tryRun();
       const fallbackId = setTimeout(() => {
-        if (!didRun) {
-          didRun = true;
-          ro.disconnect();
-          runSizing();
-        }
-      }, 400);
+        if (!didRunRef.current) runSizing();
+      }, 500);
       sizingCleanupRef.current = () => {
         ro.disconnect();
         clearTimeout(fallbackId);

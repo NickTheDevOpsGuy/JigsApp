@@ -328,12 +328,16 @@ body,
 
 html {
   overflow-x: hidden;
+  overflow-y: hidden;
+  overscroll-behavior: none;
 }
 
 body {
   margin: 0;
   background: var(--color-bg-primary);
   overflow-x: hidden;
+  overflow-y: hidden;
+  overscroll-behavior: none;
   font-family:
     "Nunito",
     system-ui,
@@ -350,6 +354,7 @@ body {
 
 #root {
   min-height: 100%;
+  overflow: hidden;
 }
 
 button {
@@ -418,18 +423,39 @@ canvas {
   transition: none !important;
 }
 
-/* Mobile: fill viewport, avoid white bars when address bar shows/hides */
+/* Mobile (Android & iPhone): lock viewport, no document scroll – only in-app scroll areas scroll */
 @media (max-width: 600px) {
-  html,
-  body,
-  #root {
+  html {
     min-height: var(--app-vh-stable, 100dvh);
     height: var(--app-vh-stable, 100dvh);
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
   }
+
   body {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: var(--app-vh-stable, 100dvh);
+    max-height: var(--app-vh-stable, 100dvh);
+    overflow: hidden;
+    overscroll-behavior: none;
     font-size: var(--font-body-mobile, 15px);
-    /* Prevent overscroll glow/bounce from chaining to parent (e.g. pull-to-refresh) */
-    overscroll-behavior-y: contain;
+    /* Prevent iOS rubber-band and Android overscroll from moving the document */
+    -webkit-overflow-scrolling: auto;
+  }
+
+  #root {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: var(--app-vh-stable, 100dvh);
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: auto;
   }
   h1 {
     font-size: var(--font-h1-mobile, 22px);

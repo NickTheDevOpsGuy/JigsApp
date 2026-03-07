@@ -138,11 +138,8 @@ export function SetupScreen() {
     }
   }, [imgDataUrl]);
 
-  // Load existing image on mount
-  useEffect(() => {
-    const existingImg = safeLocalStorage.getItem(STORAGE_KEY);
-    if (existingImg) setImgDataUrl(existingImg);
-  }, [setImgDataUrl]);
+  // Do not restore image from localStorage here – preview stays empty until user picks
+  // (avoids showing a broken/stale image; Play screen reads from storage when starting.)
 
   // Pre-select puzzle when navigating from pack (?puzzle=id)
   useEffect(() => {

@@ -1,6 +1,6 @@
 .page {
-  height: 100dvh;
-  min-height: 100dvh;
+  height: var(--app-vh-stable, 100dvh);
+  min-height: var(--app-vh-stable, 100dvh);
   max-height: 100dvh;
   padding: max(6px, env(safe-area-inset-top)) 8px 8px;
   background:
