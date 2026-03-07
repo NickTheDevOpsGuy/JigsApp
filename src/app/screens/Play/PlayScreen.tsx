@@ -958,6 +958,11 @@ export function PlayScreen() {
     [],
   );
 
+  // Reset tray piece cache when puzzle changes (e.g. own image) so tray never shows stale pieces.
+  React.useEffect(() => {
+    trayPiecesKeyRef.current = { key: "", pieces: [] };
+  }, [puzzleKey]);
+
   const handleToggleImmersiveMode = React.useCallback(() => {
     const willEnable = !immersiveMode;
     toggleImmersiveMode();
@@ -1357,6 +1362,7 @@ export function PlayScreen() {
                 className={`${styles.trayWrap} ${(state?.grid?.rows ?? 0) * (state?.grid?.cols ?? 0) >= 49 ? styles.trayWrapLarge : ""}`}
               >
                 <PieceTray
+                  key={puzzleKey}
                   ref={trayRef}
                   pieces={trayPieces}
                   image={imgRef.current}

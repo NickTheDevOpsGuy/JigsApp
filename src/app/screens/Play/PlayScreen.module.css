@@ -277,12 +277,21 @@
   cursor: default;
 }
 
-/* Undo/Redo pills – above drawer, right-aligned */
+/* Undo/Redo pills – above drawer, right-aligned to outer edge of tray */
 .undoRedoPillsWrap {
   display: flex;
   justify-content: flex-end;
   padding: 0 12px 6px;
   flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .trayArea .undoRedoPillsWrap {
+    width: 100%;
+    max-width: min(90vw, 420px);
+    align-self: center;
+    box-sizing: border-box;
+  }
 }
 
 .undoRedoPills {

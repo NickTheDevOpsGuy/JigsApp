@@ -237,22 +237,25 @@
 
 @media (max-width: 600px) {
   .page {
-    height: 100dvh;
-    min-height: 100dvh;
-    padding: 8px 10px;
+    height: var(--app-vh-stable, 100dvh);
+    min-height: var(--app-vh-stable, 100dvh);
+    max-height: var(--app-vh-stable, 100dvh);
+    padding: 8px 10px 4px;
     padding-top: max(8px, env(safe-area-inset-top));
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
     padding-left: max(10px, env(safe-area-inset-left));
     padding-right: max(10px, env(safe-area-inset-right));
     align-items: center;
+    overscroll-behavior: none;
   }
 
   .card {
-    padding: 12px 14px;
+    padding: 12px 14px 10px;
     width: 100%;
     max-width: 100%;
     max-height: 100%;
     box-sizing: border-box;
+    min-height: 0;
   }
 
   .homeBar {

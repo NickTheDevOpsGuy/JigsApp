@@ -45,11 +45,14 @@
 /* Mobile: full viewport, no page scroll, card fills and content scrolls inside */
 @media (max-width: 600px) {
   .page {
-    height: 100dvh;
-    min-height: 100dvh;
-    padding: 8px 10px;
+    height: var(--app-vh-stable, 100dvh);
+    min-height: var(--app-vh-stable, 100dvh);
+    max-height: var(--app-vh-stable, 100dvh);
+    padding: 8px 10px 4px;
     padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
     overflow: hidden;
+    overscroll-behavior: none;
   }
 
   .card {

@@ -7,16 +7,15 @@
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-primary);
-  padding: 6px 10px;
+  padding: 8px;
   border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   transition: all 0.15s ease;
   touch-action: manipulation;
+  min-width: 40px;
   min-height: 40px;
 }
 
@@ -27,10 +26,6 @@
 
 .trigger:active {
   transform: scale(0.98);
-}
-
-.label {
-  white-space: nowrap;
 }
 
 .menuUp,
@@ -90,7 +85,8 @@
 
 @media (max-width: 600px) {
   .trigger {
-    min-height: 44px;
     min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
   }
 }

@@ -128,6 +128,9 @@ export function usePlayScreenManager(
       return;
     }
 
+    // Clear image ref so tray never shows a previous puzzle's image while the new one loads (fixes own-image tray glitch).
+    imgRef.current = null;
+
     // Show loading when user chose resume/fresh (async manager creation)
     if (resumeChoice === "fresh" || resumeChoice === "resume") {
       setIsLoading(true);

@@ -26,7 +26,7 @@ export function snapGlowAlpha(elapsedMs: number): number {
   return 0.14 * (1 - elapsedMs / SNAP_GLOW_MS);
 }
 
-/** Draw a subtle radial glow at (cx, cy). Used for snap/placement feedback. */
+/** Draw a radial glow at (cx, cy). Used for snap/placement feedback; intensity increases as piece nears correct placement. */
 export function drawSnapGlow(
   ctx: CanvasRenderingContext2D,
   cx: number,
@@ -37,9 +37,10 @@ export function drawSnapGlow(
   if (alpha <= 0) return;
   ctx.save();
   const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-  gradient.addColorStop(0, `rgba(255, 220, 130, ${alpha})`);
-  gradient.addColorStop(0.5, `rgba(255, 200, 100, ${alpha * 0.4})`);
-  gradient.addColorStop(1, "rgba(255, 200, 100, 0)");
+  gradient.addColorStop(0, `rgba(255, 225, 140, ${alpha})`);
+  gradient.addColorStop(0.35, `rgba(255, 210, 120, ${alpha * 0.55})`);
+  gradient.addColorStop(0.65, `rgba(255, 195, 100, ${alpha * 0.2})`);
+  gradient.addColorStop(1, "rgba(255, 180, 90, 0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
   ctx.restore();

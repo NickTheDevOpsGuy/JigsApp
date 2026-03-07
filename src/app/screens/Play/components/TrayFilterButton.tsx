@@ -79,8 +79,7 @@ export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButton
         aria-label={`Filter pieces: ${LABELS[value]}`}
         title={`Filter pieces: ${LABELS[value]}`}
       >
-        <Filter size={16} />
-        <span className={styles.label}>Filter</span>
+        <Filter size={18} aria-hidden />
       </button>
       {open &&
         menuRect &&

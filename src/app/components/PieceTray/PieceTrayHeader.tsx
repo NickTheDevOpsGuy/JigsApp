@@ -37,8 +37,7 @@ export function PieceTrayHeader({
             aria-label="Randomize piece order"
             title="Randomize order"
           >
-            <Shuffle size={16} />
-            <span className={styles.randomLabel}>Random</span>
+            <Shuffle size={18} aria-hidden />
           </button>
         </div>
       </div>

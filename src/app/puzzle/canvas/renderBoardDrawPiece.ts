@@ -129,9 +129,12 @@ export function drawPiece(
   if (isDragging && preview && (preview.nearSnap || preview.inSnapRange)) {
     const cx = p.x + p.w / 2;
     const cy = p.y + p.h / 2;
-    const radius = Math.max(p.w, p.h) * 0.72;
-    const baseAlpha = preview.inSnapRange ? 0.28 : 0.12;
-    const alpha = baseAlpha * (0.5 + 0.5 * preview.proximity);
+    // Ease-out: intensity ramps up more as you get closer (satisfying on mobile and desktop)
+    const proximityEased = 1 - (1 - preview.proximity) ** 2;
+    const size = Math.max(p.w, p.h);
+    const radius = size * (preview.inSnapRange ? 0.85 : 0.72);
+    const baseAlpha = preview.inSnapRange ? 0.36 : 0.14;
+    const alpha = baseAlpha * (0.2 + 0.8 * proximityEased);
     drawSnapGlow(ctx, cx, cy, radius, alpha);
   }
 
@@ -286,7 +289,8 @@ export function drawPiece(
     preview.proximity > 0.2
   ) {
     ctx.save();
-    ctx.strokeStyle = `rgba(255, 220, 130, ${0.15 + 0.4 * preview.proximity})`;
+    const proximityEased = 1 - (1 - preview.proximity) ** 2;
+    ctx.strokeStyle = `rgba(255, 220, 130, ${0.12 + 0.5 * proximityEased})`;
     ctx.lineWidth = 5;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
