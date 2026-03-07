@@ -1,5 +1,5 @@
 import type { MutableRefObject } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PuzzleManager } from "@/puzzle/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/types";
 import { BOARD_INSET_PX } from "@/puzzle/puzzleManagerUtils";
@@ -111,6 +111,14 @@ export function usePlayScreenManager(
   const [awaitingResumeChoice, setAwaitingResumeChoice] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [puzzleKey, setPuzzleKey] = useState(0);
+  const [refsReady, setRefsReady] = useState(0);
+
+  // After layout, refs are attached; bump refsReady so manager effect can run (fixes upload→Play board not sizing).
+  useLayoutEffect(() => {
+    if (mainRef.current && boardRef.current) {
+      setRefsReady((r) => r + 1);
+    }
+  });
 
   // Initial setup: create manager with square tiles
   useEffect(() => {
@@ -118,7 +126,6 @@ export function usePlayScreenManager(
     const mainEl = mainRef.current;
     const boardEl = boardRef.current;
     if (!mainEl || !boardEl) {
-      setIsLoading(false);
       return;
     }
 
@@ -138,6 +145,9 @@ export function usePlayScreenManager(
 
     // Load image
     const img = new Image();
+    img.onerror = () => {
+      setIsLoading(false);
+    };
     img.src = imageUrl;
     img.onload = () => {
       imgRef.current = img;
@@ -310,29 +320,32 @@ export function usePlayScreenManager(
       };
 
       // ResizeObserver: measure board when CSS layout is stable (board sized by aspect-ratio).
+      // If board has size now, run immediately; otherwise wait for resize (e.g. after upload→Play).
       let didRun = false;
+      const tryRun = () => {
+        if (didRun || !mainEl || !boardEl) return;
+        const r = boardEl.getBoundingClientRect();
+        if (r.width <= 0 || r.height <= 0) return;
+        didRun = true;
+        ro.disconnect();
+        clearTimeout(fallbackId);
+        runSizing();
+      };
       const ro = new ResizeObserver(() => {
         if (didRun) return;
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            if (didRun || !mainEl || !boardEl) return;
-            const r = boardEl.getBoundingClientRect();
-            if (r.width <= 0 || r.height <= 0) return;
-            didRun = true;
-            ro.disconnect();
-            clearTimeout(fallbackId);
-            runSizing();
-          });
+          requestAnimationFrame(tryRun);
         });
       });
       ro.observe(boardEl);
+      tryRun();
       const fallbackId = setTimeout(() => {
         if (!didRun) {
           didRun = true;
           ro.disconnect();
           runSizing();
         }
-      }, 200);
+      }, 400);
       sizingCleanupRef.current = () => {
         ro.disconnect();
         clearTimeout(fallbackId);
@@ -343,6 +356,7 @@ export function usePlayScreenManager(
       sizingCleanupRef.current = null;
     };
   }, [
+    refsReady,
     grid,
     pieceLockingEnabled,
     autoRotateOnSnap,

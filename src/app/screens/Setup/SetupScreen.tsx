@@ -10,7 +10,7 @@ import styles from "./SetupScreen.module.css";
 import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
 import { setCurrentPuzzleId } from "@/data/packCompletion";
 import { Button } from "@/components/Button/Button";
-import { ArrowLeft, Grid3X3, Play, Puzzle, Sparkles, X } from "lucide-react";
+import { ArrowLeft, Grid3X3, Play, Puzzle, X } from "lucide-react";
 import {
   useImagePicker,
   useGridConfig,
@@ -231,29 +231,6 @@ export function SetupScreen() {
               <X size={26} />
             </button>
           </div>
-
-          {isPackFlow &&
-            suggestedGrid &&
-            gridIndex !== suggestedGrid.gridIndex &&
-            suggestedGrid.gridIndex < GRID_OPTIONS.length - 1 && (
-              <div className={styles.recommendCard}>
-                <div className={styles.recommendBody}>
-                  <p className={styles.recommendTitle}>
-                    <Sparkles size={16} />
-                    Next Recommended Difficulty -{" "}
-                    {GRID_OPTIONS[suggestedGrid.gridIndex].label.split(" - ")[0]}
-                  </p>
-                  <p className={styles.recommendSubtitle}>Based on your progress</p>
-                </div>
-                <button
-                  type="button"
-                  className={styles.recommendButton}
-                  onClick={() => setGridIndex(suggestedGrid.gridIndex)}
-                >
-                  Play {GRID_OPTIONS[suggestedGrid.gridIndex].label.split(" - ")[0]}
-                </button>
-              </div>
-            )}
 
           {error && (
             <div className={styles.error} role="alert">
