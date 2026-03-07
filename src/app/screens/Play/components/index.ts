@@ -18,3 +18,4 @@ export { UndoRedoButtons } from "./UndoRedoButtons";
 export { TrayFilterButton } from "./TrayFilterButton";
 export { Minimap } from "./Minimap";
 export { PlayConfirmModals } from "./PlayConfirmModals";
+export { ReplayBar } from "./ReplayBar";

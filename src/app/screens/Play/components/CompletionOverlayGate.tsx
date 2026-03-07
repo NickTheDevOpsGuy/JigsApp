@@ -37,6 +37,11 @@ interface CompletionOverlayGateProps {
   precisionSnaps?: number[];
   /** Adaptive Personality: derive UI tone from pace for microcopy */
   adaptivePersonalityEnabled?: boolean;
+  /** Replay: show Replay button; on click dismiss overlay and start playback. */
+  canReplay?: boolean;
+  onReplayClick?: () => void;
+  /** Next Puzzle: primary CTA to start a new puzzle. */
+  onNextPuzzle?: () => void;
 }
 
 export function CompletionOverlayGate({
@@ -58,6 +63,9 @@ export function CompletionOverlayGate({
   precisionModeEnabled,
   precisionSnaps = [],
   adaptivePersonalityEnabled,
+  canReplay = false,
+  onReplayClick,
+  onNextPuzzle,
 }: CompletionOverlayGateProps) {
   if (!show || !state) return null;
 
@@ -110,6 +118,9 @@ export function CompletionOverlayGate({
       avgPrecisionPx={avgPrecisionPx}
       precisionBonusPoints={precisionBonusPoints}
       uiTone={uiTone}
+      canReplay={canReplay}
+      onReplayClick={onReplayClick}
+      onNextPuzzle={onNextPuzzle}
     />
   );
 }

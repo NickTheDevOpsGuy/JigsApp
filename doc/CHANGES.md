@@ -4,6 +4,14 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
+## Recent: Win screen refresh, replay, share cards
+
+- **Win screen** — Redesigned: starry celebratory background, “PUZZLE COMPLETE!” banner (golden-orange with puzzle icon), completed puzzle image, two stat cards (Time | Moves), **Watch Replay** (when available), and **Next Puzzle** as primary CTA. On mobile the completion panel is aligned to the top.
+- **Replay** — After completing a puzzle you can **Watch Replay** from the win screen; progress is recorded as snapshots and played back at 1×–10× speed (play/pause, progress bar, close). Playback uses requestAnimationFrame for smooth updates on desktop and mobile.
+- **Share cards** — Challenge card (“PUZZLE CHALLENGE”) and result card (“PHUZZLE RESULT”) have distinct layouts; result card is informational (Time, Accuracy, no taunt copy). Full puzzle image on cards (no missing-piece cutout).
+
+---
+
 ## Recent: Share flow, draw order, seams, unwinnable fix, grid minimum
 
 - **Completion share actions** — Win overlay now uses direct actions: **Share Result** and **Share with People**. Copy/native share text is neutral (no taunts), and share card generation uses a cleaner message-style layout for mobile sharing.

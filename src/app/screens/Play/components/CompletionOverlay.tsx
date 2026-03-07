@@ -2,12 +2,11 @@
  * CompletionOverlay – success screen with direct share actions.
  */
 import React, { useEffect, useCallback, useState } from "react";
-import { X, Clock, Share2, Send } from "lucide-react";
+import { X, Clock, Trophy, Puzzle, Play } from "lucide-react";
 import styles from "./CompletionOverlay.module.css";
 import type { Piece } from "@/puzzle/types";
 import { useCompletionOverlayData } from "./useCompletionOverlayData";
 import { formatTime } from "../playUtils";
-import { CompletionStatsBlock } from "./CompletionStatsBlock";
 
 type PieceCutType = "classic" | "irregular" | "hard";
 type VisualModifier = "none" | "fog" | "night" | "sepia";
@@ -37,6 +36,11 @@ interface CompletionOverlayProps {
   avgPrecisionPx?: number | null;
   precisionBonusPoints?: number | null;
   uiTone?: "competitive" | "calm";
+  /** Replay: show Replay button and call when clicked (dismiss overlay and start playback). */
+  canReplay?: boolean;
+  onReplayClick?: () => void;
+  /** Next Puzzle: primary CTA to start a new puzzle (e.g. navigate to /new). */
+  onNextPuzzle?: () => void;
 }
 
 const _ANIM_PHASE_TITLE_MS = 0;
@@ -44,21 +48,11 @@ const ANIM_PHASE_SCALE_MS = 400;
 const ANIM_PHASE_GLOW_MS = 700;
 const ANIM_PHASE_TIME_MS = 1000;
 
-function getDifficultyLabel(pieceCount: number): string {
-  if (pieceCount <= 9) return "Easy";
-  if (pieceCount <= 16) return "Medium";
-  if (pieceCount <= 25) return "Hard";
-  if (pieceCount <= 36) return "Expert";
-  if (pieceCount <= 49) return "Master";
-  if (pieceCount <= 64) return "Legend";
-  return "Extreme";
-}
-
 export function CompletionOverlay({
   elapsedSeconds,
   grid,
   imageUrl,
-  pieces,
+  pieces: _pieces,
   moveCount = 0,
   accuracyPercent = 100,
   usedHint = false,
@@ -67,17 +61,20 @@ export function CompletionOverlay({
   isDaily = false,
   cutType = "classic",
   undoCount = 0,
-  onShareProgress,
-  onShareChallenge,
-  onCopyProgress,
-  onCopyChallenge,
+  onShareProgress: _onShareProgress,
+  onShareChallenge: _onShareChallenge,
+  onCopyProgress: _onCopyProgress,
+  onCopyChallenge: _onCopyChallenge,
   onDownloadImage: _onDownloadImage,
   onClose,
-  precisionModeEnabled,
-  avgPrecisionPx,
-  precisionBonusPoints,
+  precisionModeEnabled: _precisionModeEnabled,
+  avgPrecisionPx: _avgPrecisionPx,
+  precisionBonusPoints: _precisionBonusPoints,
   uiTone: _uiTone,
   puzzleShareUrl = "/",
+  canReplay = false,
+  onReplayClick,
+  onNextPuzzle,
 }: CompletionOverlayProps) {
   const [animPhase, setAnimPhase] = useState<"title" | "scale" | "glow" | "time">(
     "title",
@@ -86,7 +83,7 @@ export function CompletionOverlay({
 
   const handleClose = useCallback(() => onClose(), [onClose]);
 
-  const data = useCompletionOverlayData({
+  useCompletionOverlayData({
     elapsedSeconds,
     grid,
     imageUrl,
@@ -100,9 +97,6 @@ export function CompletionOverlay({
     undoCount,
     puzzleShareUrl,
   });
-
-  const { percentile, rankPosition, handleShareResultCard, handleShareChallengeCard } =
-    data;
 
   useEffect(() => {
     setImageError(false);
@@ -130,18 +124,6 @@ export function CompletionOverlay({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [handleClose]);
 
-  const pieceCount = grid ? grid.rows * grid.cols : (pieces?.length ?? 0);
-  const metaParts: string[] = [];
-  if (pieceCount > 0) {
-    metaParts.push(`${pieceCount} pieces`);
-    metaParts.push(getDifficultyLabel(pieceCount));
-  }
-  if (grid) metaParts.push(`${grid.cols} x ${grid.rows}`);
-  const puzzleMeta = metaParts.join(" • ");
-  const completionNote = isDaily
-    ? "Nice solve. Share it if you want to compare times."
-    : "Nice solve. Share this puzzle with people.";
-
   return (
     <div className={styles.completeOverlay}>
       <div
@@ -157,19 +139,11 @@ export function CompletionOverlay({
           <X size={24} />
         </button>
 
-        <h2 className={styles.completeTitleNew}>Puzzle Complete</h2>
-        {puzzleMeta && <p className={styles.completeSubtitleNew}>{puzzleMeta}</p>}
-
-        <div
-          className={`${styles.completeTimeBlock} ${animPhase === "time" ? styles.completeTimeVisible : ""}`}
-          role="status"
-          aria-live="polite"
-        >
-          <span className={styles.completeTimeValue}>
-            <Clock size={22} aria-hidden />
-            {formatTime(elapsedSeconds)}
+        <div className={styles.completeBanner} role="banner">
+          <span className={styles.completeBannerIcon} aria-hidden>
+            <Puzzle size={28} strokeWidth={2} />
           </span>
-          <span className={styles.completeTimeLabel}>Solved in</span>
+          <h2 className={styles.completeBannerTitle}>PUZZLE COMPLETE!</h2>
         </div>
 
         {imageUrl && !imageError && (
@@ -185,55 +159,44 @@ export function CompletionOverlay({
           </div>
         )}
 
-        <CompletionStatsBlock
-          elapsedSeconds={elapsedSeconds}
-          moveCount={moveCount}
-          accuracyPercent={accuracyPercent}
-          percentile={percentile}
-          rankPosition={rankPosition}
-          hideTime
-          precisionModeEnabled={precisionModeEnabled}
-          avgPrecisionPx={avgPrecisionPx}
-          precisionBonusPoints={precisionBonusPoints}
-        />
-
-        <div className={styles.completeStatsNew} role="status">
-          <p className={styles.completeStatsLine}>{completionNote}</p>
+        <div className={styles.completeStatCards} role="status" aria-live="polite">
+          <div className={styles.completeStatCard}>
+            <Clock size={24} className={styles.completeStatCardIcon} aria-hidden />
+            <span className={styles.completeStatCardLabel}>Time</span>
+            <span className={styles.completeStatCardValue}>
+              {formatTime(elapsedSeconds)}
+            </span>
+          </div>
+          <div className={styles.completeStatCard}>
+            <Puzzle size={24} className={styles.completeStatCardIcon} aria-hidden />
+            <span className={styles.completeStatCardLabel}>Moves</span>
+            <span className={styles.completeStatCardValue}>{moveCount}</span>
+          </div>
         </div>
 
-        <div className={styles.completePrimaryActions}>
+        {canReplay && onReplayClick && (
           <button
             type="button"
-            className={styles.completePrimaryBtn}
-            onClick={
-              handleShareResultCard ?? onShareProgress ?? onCopyProgress ?? (() => {})
-            }
-            aria-label="Share Result"
+            className={styles.completeReplayBtn}
+            onClick={onReplayClick}
+            aria-label="Watch replay"
           >
-            <Share2 size={20} />
-            <span className={styles.completePrimaryBtnTitle}>Share Result</span>
-            <span className={styles.completePrimaryBtnSub}>
-              Time, moves, and accuracy
-            </span>
+            <Play size={18} aria-hidden />
+            <span>Watch Replay</span>
           </button>
+        )}
+
+        {onNextPuzzle && (
           <button
             type="button"
-            className={styles.completePrimaryBtn}
-            onClick={
-              handleShareChallengeCard ??
-              onShareChallenge ??
-              onCopyChallenge ??
-              (() => {})
-            }
-            aria-label="Share with People"
+            className={styles.completeNextPuzzleBtn}
+            onClick={onNextPuzzle}
+            aria-label="Next Puzzle"
           >
-            <Send size={20} />
-            <span className={styles.completePrimaryBtnTitle}>Share with People</span>
-            <span className={styles.completePrimaryBtnSub}>
-              Same puzzle and difficulty
-            </span>
+            <Trophy size={22} className={styles.completeNextPuzzleIcon} aria-hidden />
+            <span className={styles.completeNextPuzzleTitle}>Next Puzzle</span>
           </button>
-        </div>
+        )}
       </div>
     </div>
   );

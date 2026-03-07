@@ -1,13 +1,15 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "30";
+export const CHANGELOG_VERSION = "31";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🏆 Win screen refresh – Starry background, “PUZZLE COMPLETE!” banner, completed image, Time and Moves stat cards, Watch Replay, and a prominent Next Puzzle button.",
+      "▶️ Replay – Watch your solve back from the win screen; playback at 1×–10× speed with play/pause and progress bar (desktop and mobile).",
       "📤 Share polish – Completion share copy is now neutral (no taunts), and challenge action is renamed to “Share with People”.",
       "🖼️ Share Card refresh – New cleaner, message-style card layout with large puzzle preview and result chips for mobile sharing.",
       "✅ Win screen tone – Replaced competitive “beat X%” line with calm completion/share messaging.",

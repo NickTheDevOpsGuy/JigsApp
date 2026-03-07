@@ -2,8 +2,7 @@
   --color-completion-accent: var(--color-progress-75, #22c55e);
   position: fixed;
   inset: 0;
-  background: var(--color-overlay-strong);
-  backdrop-filter: blur(4px);
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,6 +20,50 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Starry celebratory background */
+.completeOverlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 15%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(2px 2px at 80% 18%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 1px at 40% 25%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 60% 22%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1.5px 1.5px at 30% 80%, rgba(255, 220, 150, 0.6), transparent),
+    radial-gradient(1.5px 1.5px at 70% 75%, rgba(255, 220, 150, 0.6), transparent);
+  background-size: 200% 200%;
+  background-position:
+    0 0,
+    100% 0,
+    50% 30%,
+    50% 20%,
+    20% 100%,
+    80% 100%;
+  pointer-events: none;
+}
+
+.completeOverlay::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background:
+    radial-gradient(
+      ellipse 120% 80% at 15% 10%,
+      rgba(251, 191, 36, 0.25) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 120% 80% at 85% 10%,
+      rgba(251, 191, 36, 0.25) 0%,
+      transparent 55%
+    );
+  pointer-events: none;
 }
 
 .completePanel {
@@ -47,11 +90,16 @@
 .completePanelNew {
   max-width: min(460px, 94vw);
   padding: 24px 20px 20px;
-  gap: 14px;
-  border-color: var(--color-border-strong);
+  gap: 18px;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   box-shadow: var(--shadow-lg);
   animation: completePanelEnter 0.4s ease-out both;
   margin: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .completeCloseBtn {
@@ -98,20 +146,38 @@
   outline-offset: 2px;
 }
 
-.completeTitleNew {
-  font-family: "Fredoka", sans-serif;
-  font-size: clamp(1.25rem, 4vw, 1.6rem);
-  font-weight: 700;
-  margin: 0;
-  color: var(--color-text-primary);
-  letter-spacing: 0.02em;
+/* PUZZLE COMPLETE! banner – golden-orange, curved, white text + puzzle icon */
+.completeBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: linear-gradient(180deg, #ea580c 0%, #c2410c 40%, #b45309 100%);
+  border-radius: 16px 16px 20px 20px;
+  box-shadow:
+    0 4px 12px rgba(194, 65, 12, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  margin: 0 auto;
+  width: fit-content;
+  max-width: 100%;
 }
 
-.completeSubtitleNew {
-  margin: -2px 0 2px;
-  color: var(--color-text-secondary);
-  font-size: 0.95rem;
-  font-weight: 500;
+.completeBannerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.completeBannerTitle {
+  margin: 0;
+  font-size: clamp(1.15rem, 3.5vw, 1.5rem);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .completeTimeBlock {
@@ -186,6 +252,48 @@
   max-height: min(50vh, 260px);
   object-fit: cover;
   object-position: center;
+}
+
+/* Two stat cards: Time | Moves – dark translucent, white border, icon + label + value */
+.completeStatCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+}
+
+.completeStatCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.completeStatCardIcon {
+  color: #fff;
+  opacity: 0.95;
+  flex-shrink: 0;
+}
+
+.completeStatCardLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.completeStatCardValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .completeStats {
@@ -303,6 +411,94 @@
   opacity: 0.85;
 }
 
+/* Next Puzzle – primary CTA: blue gradient, beveled/3D, trophy icon (reference win screen) */
+.completeNextPuzzleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 20px;
+  margin-top: 8px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  position: relative;
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.2),
+    0 6px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  background: linear-gradient(
+    180deg,
+    #1d4ed8 0%,
+    #2563eb 35%,
+    #3b82f6 50%,
+    #2563eb 65%,
+    #1e40af 100%
+  );
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.completeNextPuzzleBtn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 0 rgba(0, 0, 0, 0.2),
+    0 8px 16px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.completeNextPuzzleBtn:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.25),
+    0 3px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.completeNextPuzzleIcon {
+  flex-shrink: 0;
+  color: #fbbf24;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.completeNextPuzzleTitle {
+  letter-spacing: 0.02em;
+}
+
+.completeReplayBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin: 0 auto;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-brand-primary, #2563eb);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.completeReplayBtn:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-brand-primary, #2563eb);
+}
+
 .completeActions {
   display: flex;
   flex-direction: row;
@@ -381,6 +577,16 @@
     padding-right: max(16px, env(safe-area-inset-right, 0));
     min-height: 100dvh;
     min-height: 100vh;
+  }
+
+  /* Keep completion panel at top on mobile; no vertical centering */
+  .completeOverlay .completePanelNew {
+    margin: 0;
+    margin-top: 0;
+    align-self: flex-start;
+    max-height: min(85vh, 85dvh);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

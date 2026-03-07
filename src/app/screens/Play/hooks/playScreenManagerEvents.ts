@@ -35,6 +35,8 @@ export type PlayScreenManagerEventsDeps = {
         themeRef?: MutableRefObject<Theme | undefined>;
         /** Precision Mode: called with snap distance in px (lower = more precise). */
         onPrecisionSnap?: (precisionPx: number) => void;
+        /** Replay: record a progress snapshot (called after place/snap). */
+        onRecordReplaySnapshot?: () => void;
       }
     | undefined
   >;
@@ -115,6 +117,7 @@ export function createPlayScreenManagerEvents(
         lastStreakAtRef.current = now;
         opts?.onPlacementStreak?.();
       }
+      opts?.onRecordReplaySnapshot?.();
     },
     onPieceSnapped: (pieceIds, center, precisionPx) => {
       const now = performance.now();
@@ -142,6 +145,7 @@ export function createPlayScreenManagerEvents(
         const maxAge = 500;
         snapParticlesRef.current = particles.filter((p) => now - p.t0 < maxAge);
       }
+      opts?.onRecordReplaySnapshot?.();
     },
     onPieceLocked: (ids) => {
       const now = performance.now();

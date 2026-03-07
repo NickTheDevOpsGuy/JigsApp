@@ -54,6 +54,7 @@ import { useReferenceTapHighlight } from "./hooks/useReferenceTapHighlight";
 import { usePlayScreenSecondaryEffects } from "./hooks/usePlayScreenSecondaryEffects";
 import { usePlayScreenPersistence } from "./hooks/usePlayScreenPersistence";
 import { usePlayScreenSharePuzzle } from "./hooks/usePlayScreenSharePuzzle";
+import { useReplay, type ReplayStateRef } from "./hooks/useReplay";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
@@ -68,6 +69,7 @@ import {
   CompletionOverlayGate,
   PauseOverlay,
   UndoRedoButtons,
+  ReplayBar,
 } from "./components";
 import { SnapComboMeter } from "./components/SnapComboMeter";
 import { usePuzzleSession, SESSION_ID_PARAM } from "./hooks/usePuzzleSession";
@@ -288,6 +290,9 @@ export function PlayScreen() {
   const usedHintRef = React.useRef(false);
   const abandonCapturedRef = React.useRef(false);
   const elapsedSecondsRef = React.useRef(0);
+  const replayStateRef = React.useRef<ReplayStateRef | null>(null);
+  const recordSnapshotRef = React.useRef<() => void>(() => {});
+  const initialSnapshotRecordedRef = React.useRef(false);
   const [quadrantTimes, setQuadrantTimes] = React.useState<
     Record<0 | 1 | 2 | 3, number | null>
   >({ 0: null, 1: null, 2: null, 3: null });
@@ -348,6 +353,7 @@ export function PlayScreen() {
       dynamicDifficultyMultiplierRef: dynamicDifficultyEnabled
         ? dynamicDifficultyMultiplierRef
         : undefined,
+      onRecordReplaySnapshot: () => recordSnapshotRef.current?.(),
     },
   );
   const {
@@ -386,6 +392,28 @@ export function PlayScreen() {
   };
 
   stateRef.current = state;
+  replayStateRef.current = {
+    getState: () => manager?.getState() ?? null,
+    elapsedSeconds,
+    moveCount: moveCountRef.current,
+  };
+  const replay = useReplay(manager, setState, replayStateRef, state?.isComplete ?? false);
+  React.useEffect(() => {
+    recordSnapshotRef.current = replay.recordSnapshot;
+  }, [replay.recordSnapshot]);
+  React.useEffect(() => {
+    if (
+      state?.placedCount === 0 &&
+      (state?.pieces?.length ?? 0) > 0 &&
+      !initialSnapshotRecordedRef.current
+    ) {
+      initialSnapshotRecordedRef.current = true;
+      replay.recordSnapshot();
+    }
+  }, [state?.placedCount, state?.pieces?.length, replay.recordSnapshot]);
+  React.useEffect(() => {
+    if (puzzleKey != null) initialSnapshotRecordedRef.current = false;
+  }, [puzzleKey]);
   const { highlightedPieceIds, onPreviewTap, clearHighlight } = useReferenceTapHighlight(
     state ?? null,
     lastInteractionRef,
@@ -907,6 +935,9 @@ export function PlayScreen() {
   const _piecesOnBoard = state?.pieces.filter((p) => !p.inTray).length ?? 0;
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
+  const displayElapsedSeconds = replay.isReplaying
+    ? replay.replayElapsedSeconds
+    : elapsedSeconds;
   const dailyVisualModifier = isDailyPuzzleSession()
     ? getDailyVisualModifier()
     : (dailyPreferredModifier ?? getDailyPreferredModifier());
@@ -1018,7 +1049,7 @@ export function PlayScreen() {
     setDailyPreferredModifier,
     snapToleranceOverride,
     setSnapToleranceOverride,
-    elapsedSeconds,
+    elapsedSeconds: displayElapsedSeconds,
     piecesLeft: left,
     totalPieces: total,
     isComplete,
@@ -1139,7 +1170,7 @@ export function PlayScreen() {
           state && (
             <CompletionOverlayGate
               show
-              elapsedSeconds={elapsedSeconds}
+              elapsedSeconds={displayElapsedSeconds}
               state={state}
               imageUrl={
                 completionImageUrl ??
@@ -1176,8 +1207,29 @@ export function PlayScreen() {
               precisionModeEnabled={precisionModeEnabled}
               precisionSnaps={precisionSnapsRef.current}
               adaptivePersonalityEnabled={adaptivePersonalityEnabled}
+              canReplay={replay.canReplay}
+              onReplayClick={() => {
+                replay.startReplay();
+                setCompletionDismissed(true);
+                setCompletionImageUrl(undefined);
+              }}
+              onNextPuzzle={handleNewGame}
             />
           )}
+
+        {replay.isReplaying && (
+          <ReplayBar
+            isPaused={replay.isReplayPaused}
+            onPlay={replay.resumeReplay}
+            onPause={replay.pauseReplay}
+            speed={replay.replaySpeed}
+            onSpeedChange={replay.setReplaySpeed}
+            currentIndex={replay.replayIndex}
+            totalSnapshots={replay.snapshots.length}
+            elapsedSeconds={replay.replayElapsedSeconds}
+            onClose={replay.stopReplay}
+          />
+        )}
 
         <div className={styles.playBody}>
           <div className={styles.main} ref={mainRef}>

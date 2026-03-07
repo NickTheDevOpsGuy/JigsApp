@@ -1,0 +1,107 @@
+.replayBar {
+  position: fixed;
+  bottom: max(16px, env(safe-area-inset-bottom, 0));
+  left: max(12px, env(safe-area-inset-left, 0));
+  right: max(12px, env(safe-area-inset-right, 0));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 96%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.replayBarLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.replayBarBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.2s;
+  touch-action: manipulation;
+}
+
+.replayBarBtn:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.replayBarBtn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.replayBarTime {
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 3.5em;
+}
+
+.replayBarSpeeds {
+  display: flex;
+  gap: 4px;
+}
+
+.replaySpeedBtn {
+  padding: 8px 12px;
+  min-height: 44px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+  touch-action: manipulation;
+}
+
+.replaySpeedBtn:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.replaySpeedBtnActive {
+  background: var(--color-accent, #22c55e);
+  border-color: var(--color-accent, #22c55e);
+  color: var(--color-bg-primary, #fff);
+}
+
+.replayBarProgressWrap {
+  flex: 1;
+  min-width: 0;
+  height: 8px;
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.replayBarProgressFill {
+  height: 100%;
+  background: var(--color-accent, #22c55e);
+  border-radius: 4px;
+  transition: width 0.15s ease-out;
+}

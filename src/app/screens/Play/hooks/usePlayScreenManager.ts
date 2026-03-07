@@ -65,6 +65,8 @@ export function usePlayScreenManager(
     onPrecisionSnap?: (precisionPx: number) => void;
     /** Dynamic Difficulty: ref to tolerance multiplier (0.9–1.1). */
     dynamicDifficultyMultiplierRef?: MutableRefObject<number>;
+    /** Replay: record a progress snapshot after place/snap. */
+    onRecordReplaySnapshot?: () => void;
   },
 ) {
   const boardRef = useRef<HTMLDivElement | null>(null);
