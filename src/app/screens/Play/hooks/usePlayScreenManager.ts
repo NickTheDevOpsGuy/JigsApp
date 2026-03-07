@@ -114,13 +114,25 @@ export function usePlayScreenManager(
   const [refsReady, setRefsReady] = useState(0);
   const refsReadyFiredRef = useRef(false);
 
-  // After layout, refs are attached; bump refsReady once so manager effect can run (fixes upload→Play board not sizing).
-  // Only fire once to avoid infinite setState loop (React error #185) when resize/drag triggers repeated layout.
+  // Bump refsReady once when board/main refs are available so manager effect can run.
+  // Run after every commit (no deps) so we eventually see refs on desktop and mobile; only set state once to avoid loop.
   useLayoutEffect(() => {
-    if (mainRef.current && boardRef.current && !refsReadyFiredRef.current) {
+    if (refsReadyFiredRef.current) return;
+    if (mainRef.current && boardRef.current) {
       refsReadyFiredRef.current = true;
       setRefsReady((r) => r + 1);
+      return;
     }
+    const rafId = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (refsReadyFiredRef.current) return;
+        if (mainRef.current && boardRef.current) {
+          refsReadyFiredRef.current = true;
+          setRefsReady((r) => r + 1);
+        }
+      });
+    });
+    return () => cancelAnimationFrame(rafId);
   });
 
   // Initial setup: create manager with square tiles
@@ -343,12 +355,40 @@ export function usePlayScreenManager(
       });
       ro.observe(boardEl);
       tryRun();
+      const RETRY_MS = 400;
+      const MAX_WAIT_MS = 2800;
+      const retryIdRef = { current: null as ReturnType<typeof setInterval> | null };
       const fallbackId = setTimeout(() => {
-        if (!didRunRef.current) runSizing();
+        if (didRunRef.current) return;
+        runSizing();
+        if (didRunRef.current) return;
+        let elapsed = 500;
+        retryIdRef.current = setInterval(() => {
+          elapsed += RETRY_MS;
+          if (didRunRef.current || elapsed > MAX_WAIT_MS) {
+            if (retryIdRef.current) {
+              clearInterval(retryIdRef.current);
+              retryIdRef.current = null;
+            }
+            return;
+          }
+          runSizing();
+        }, RETRY_MS);
+        sizingCleanupRef.current = () => {
+          ro.disconnect();
+          clearTimeout(fallbackId);
+          if (retryIdRef.current) {
+            clearInterval(retryIdRef.current);
+            retryIdRef.current = null;
+          }
+        };
       }, 500);
       sizingCleanupRef.current = () => {
         ro.disconnect();
         clearTimeout(fallbackId);
+        if (retryIdRef.current) {
+          clearInterval(retryIdRef.current);
+        }
       };
     };
     return () => {
