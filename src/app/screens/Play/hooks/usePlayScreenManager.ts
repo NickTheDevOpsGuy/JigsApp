@@ -341,24 +341,18 @@ export function usePlayScreenManager(
       // ResizeObserver: measure board when CSS layout is stable (board sized by aspect-ratio).
       // Only mark "did run" and disconnect after we actually create the manager (so on mobile,
       // if board is 0x0 at fallback time, ResizeObserver can still fire when layout completes).
-      const tryRun = () => {
-        if (didRunRef.current || !mainEl || !boardEl) return;
-        const r = boardEl.getBoundingClientRect();
-        if (r.width <= 0 || r.height <= 0) return;
-        runSizing();
-      };
+      // Declare ro, fallbackId, retryIdRef before tryRun so runSizing() can safely reference them (avoids TDZ).
+      const RETRY_MS = 400;
+      const MAX_WAIT_MS = 2800;
+      const retryIdRef = { current: null as ReturnType<typeof setInterval> | null };
+      let fallbackId: ReturnType<typeof setTimeout>;
       const ro = new ResizeObserver(() => {
         if (didRunRef.current) return;
         requestAnimationFrame(() => {
           requestAnimationFrame(tryRun);
         });
       });
-      ro.observe(boardEl);
-      tryRun();
-      const RETRY_MS = 400;
-      const MAX_WAIT_MS = 2800;
-      const retryIdRef = { current: null as ReturnType<typeof setInterval> | null };
-      const fallbackId = setTimeout(() => {
+      fallbackId = setTimeout(() => {
         if (didRunRef.current) return;
         runSizing();
         if (didRunRef.current) return;
@@ -383,6 +377,14 @@ export function usePlayScreenManager(
           }
         };
       }, 500);
+      const tryRun = () => {
+        if (didRunRef.current || !mainEl || !boardEl) return;
+        const r = boardEl.getBoundingClientRect();
+        if (r.width <= 0 || r.height <= 0) return;
+        runSizing();
+      };
+      ro.observe(boardEl);
+      tryRun();
       sizingCleanupRef.current = () => {
         ro.disconnect();
         clearTimeout(fallbackId);
