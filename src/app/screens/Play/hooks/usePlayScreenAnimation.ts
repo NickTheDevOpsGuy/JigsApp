@@ -223,8 +223,7 @@ export function usePlayScreenAnimation(args: {
         const groupPieces = st.pieces.filter(
           (p) => !p.inTray && p.groupId === draggedGroupId,
         );
-        const snapPreview =
-          manager?.getSnapPreviewState() ?? null;
+        const snapPreview = manager?.getSnapPreviewState() ?? null;
         let groupDeltaX = 0;
         let groupDeltaY = 0;
         let magneticProximity = 0;
@@ -233,14 +232,10 @@ export function usePlayScreenAnimation(args: {
           (snapPreview.inSnapRange || snapPreview.nearSnap) &&
           snapPreview.proximity > 0
         ) {
-          const activePiece = groupPieces.find(
-            (p) => p.id === dragState.activeId,
-          );
+          const activePiece = groupPieces.find((p) => p.id === dragState.activeId);
           if (activePiece) {
-            groupDeltaX =
-              activePiece.targetX - activePiece.pad - activePiece.x;
-            groupDeltaY =
-              activePiece.targetY - activePiece.pad - activePiece.y;
+            groupDeltaX = activePiece.targetX - activePiece.pad - activePiece.x;
+            groupDeltaY = activePiece.targetY - activePiece.pad - activePiece.y;
             magneticProximity = snapPreview.proximity;
           }
         }

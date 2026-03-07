@@ -116,7 +116,9 @@ export function usePieceTrayDisplay(
     let result: Piece[];
     switch (filter) {
       case "clusters": {
-        result = image ? clusterPiecesByDominantColor(pieces, hueById, byGrid) : allByGrid;
+        result = image
+          ? clusterPiecesByDominantColor(pieces, hueById, byGrid)
+          : allByGrid;
         break;
       }
       case "arranged": {
@@ -124,7 +126,11 @@ export function usePieceTrayDisplay(
         if (!image || interior.length === 0) {
           result = edgesSorted;
         } else {
-          const interiorClustered = clusterPiecesByDominantColor(interior, hueById, byGrid);
+          const interiorClustered = clusterPiecesByDominantColor(
+            interior,
+            hueById,
+            byGrid,
+          );
           result = [...edgesSorted, ...interiorClustered];
         }
         break;

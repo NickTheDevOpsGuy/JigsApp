@@ -95,27 +95,29 @@ export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButton
               minWidth: menuRect.minWidth,
             }}
           >
-            {(["all", "clusters", "arranged", "corners", "edges", "colors"] as const).map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                role="option"
-                aria-selected={value === opt}
-                className={value === opt ? styles.menuItemActive : styles.menuItem}
-                onClick={() => {
-                  onChange(opt);
-                  setOpen(false);
-                }}
-                disabled={(opt === "colors" || opt === "clusters") && !hasImage}
-              >
-                <span className={styles.checkSlot}>
-                  {value === opt && (
-                    <Check size={14} className={styles.checkIcon} aria-hidden />
-                  )}
-                </span>
-                {LABELS[opt]}
-              </button>
-            ))}
+            {(["all", "clusters", "arranged", "corners", "edges", "colors"] as const).map(
+              (opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  role="option"
+                  aria-selected={value === opt}
+                  className={value === opt ? styles.menuItemActive : styles.menuItem}
+                  onClick={() => {
+                    onChange(opt);
+                    setOpen(false);
+                  }}
+                  disabled={(opt === "colors" || opt === "clusters") && !hasImage}
+                >
+                  <span className={styles.checkSlot}>
+                    {value === opt && (
+                      <Check size={14} className={styles.checkIcon} aria-hidden />
+                    )}
+                  </span>
+                  {LABELS[opt]}
+                </button>
+              ),
+            )}
           </div>,
           document.body,
         )}
