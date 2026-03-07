@@ -108,6 +108,7 @@ export function CompletionOverlayGate({
       cutType={pieceCutType}
       puzzleShareUrl={puzzleShareUrl}
       copied={share.copied}
+      canNativeShare={share.canNativeShare}
       onShareProgress={share.handleNativeShare}
       onShareChallenge={share.handleNativeChallengeShare}
       onCopyProgress={share.handleCopyResults}

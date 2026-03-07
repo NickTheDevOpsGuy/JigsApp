@@ -2,7 +2,7 @@
  * CompletionOverlay – success screen with direct share actions.
  */
 import React, { useEffect, useCallback, useState } from "react";
-import { X, Clock, Trophy, Puzzle, Play } from "lucide-react";
+import { X, Clock, Trophy, Puzzle, Play, Share2, Swords } from "lucide-react";
 import styles from "./CompletionOverlay.module.css";
 import type { Piece } from "@/puzzle/types";
 import { useCompletionOverlayData } from "./useCompletionOverlayData";
@@ -26,6 +26,7 @@ interface CompletionOverlayProps {
   cutType?: PieceCutType;
   puzzleShareUrl?: string;
   copied?: boolean;
+  canNativeShare?: boolean;
   onShareProgress?: () => void;
   onShareChallenge?: () => void;
   onCopyProgress?: () => void;
@@ -61,10 +62,12 @@ export function CompletionOverlay({
   isDaily = false,
   cutType = "classic",
   undoCount = 0,
-  onShareProgress: _onShareProgress,
-  onShareChallenge: _onShareChallenge,
-  onCopyProgress: _onCopyProgress,
-  onCopyChallenge: _onCopyChallenge,
+  copied = false,
+  canNativeShare = false,
+  onShareProgress,
+  onShareChallenge,
+  onCopyProgress,
+  onCopyChallenge,
   onDownloadImage: _onDownloadImage,
   onClose,
   precisionModeEnabled: _precisionModeEnabled,
@@ -173,6 +176,36 @@ export function CompletionOverlay({
             <span className={styles.completeStatCardValue}>{moveCount}</span>
           </div>
         </div>
+
+        {(onShareProgress || onCopyProgress || onShareChallenge || onCopyChallenge) && (
+          <div className={styles.completeShareSection}>
+            <span className={styles.completeShareLabel}>Share</span>
+            <div className={styles.completeShareOptions}>
+              {(onShareProgress || onCopyProgress) && (
+                <button
+                  type="button"
+                  className={styles.completeShareOptionBtn}
+                  onClick={canNativeShare ? onShareProgress : onCopyProgress}
+                  aria-label={canNativeShare ? "Share result" : "Copy result link"}
+                >
+                  <Share2 size={18} aria-hidden />
+                  <span>{copied ? "Copied!" : canNativeShare ? "Share result" : "Copy result link"}</span>
+                </button>
+              )}
+              {(onShareChallenge || onCopyChallenge) && (
+                <button
+                  type="button"
+                  className={styles.completeShareOptionBtn}
+                  onClick={canNativeShare ? onShareChallenge : onCopyChallenge}
+                  aria-label={canNativeShare ? "Challenge a friend" : "Copy challenge link"}
+                >
+                  <Swords size={18} aria-hidden />
+                  <span>{copied ? "Copied!" : canNativeShare ? "Challenge a friend" : "Copy challenge link"}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {canReplay && onReplayClick && (
           <button

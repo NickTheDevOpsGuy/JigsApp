@@ -156,6 +156,34 @@ export function useReplay(
     setReplayIndex(0);
   }, []);
 
+  const goToStart = useCallback(() => {
+    const list = snapshotsRef.current;
+    if (!manager || list.length === 0) return;
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    setReplayIndex(0);
+    manager.restoreFromSaved(list[0].savedPieces);
+    setState(manager.getState());
+    setIsReplayPaused(true);
+  }, [manager, setState]);
+
+  const goToEnd = useCallback(() => {
+    const list = snapshotsRef.current;
+    if (!manager || list.length === 0) return;
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    const lastIdx = list.length - 1;
+    setReplayIndex(lastIdx);
+    manager.restoreFromSaved(list[lastIdx].savedPieces);
+    setState(manager.getState());
+    setIsReplaying(false);
+    setIsReplayPaused(true);
+  }, [manager, setState]);
+
   return {
     snapshots,
     recordSnapshot,
@@ -168,6 +196,8 @@ export function useReplay(
     setReplaySpeed,
     startReplay,
     stopReplay,
+    goToStart,
+    goToEnd,
     clearSnapshots,
     replayElapsedSeconds,
     replayMoveCount,

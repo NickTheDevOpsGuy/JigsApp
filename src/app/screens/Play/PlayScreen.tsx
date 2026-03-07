@@ -246,6 +246,7 @@ export function PlayScreen() {
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
   const [completionDismissed, setCompletionDismissed] = React.useState(false);
+  const [replayBarOpen, setReplayBarOpen] = React.useState(false);
   const [completionImageUrl, setCompletionImageUrl] = React.useState<string | undefined>(
     undefined,
   );
@@ -1214,23 +1215,31 @@ export function PlayScreen() {
               onReplayClick={() => {
                 replay.startReplay();
                 setCompletionDismissed(true);
+                setReplayBarOpen(true);
                 setCompletionImageUrl(undefined);
               }}
               onNextPuzzle={handleNewGame}
             />
           )}
 
-        {replay.isReplaying && (
+        {replayBarOpen && (
           <ReplayBar
             isPaused={replay.isReplayPaused}
             onPlay={replay.resumeReplay}
             onPause={replay.pauseReplay}
+            onRewind={replay.goToStart}
+            onFastForward={replay.goToEnd}
+            onStop={replay.stopReplay}
             speed={replay.replaySpeed}
             onSpeedChange={replay.setReplaySpeed}
             currentIndex={replay.replayIndex}
             totalSnapshots={replay.snapshots.length}
             elapsedSeconds={replay.replayElapsedSeconds}
-            onClose={replay.stopReplay}
+            onClose={() => {
+              replay.stopReplay();
+              setReplayBarOpen(false);
+              setCompletionDismissed(false);
+            }}
           />
         )}
 

@@ -105,3 +105,32 @@
   border-radius: 4px;
   transition: width 0.15s ease-out;
 }
+
+.replayBarCloseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  touch-action: manipulation;
+  flex-shrink: 0;
+}
+
+.replayBarCloseBtn:hover {
+  background: var(--color-danger-bg, rgba(239, 68, 68, 0.2));
+  color: var(--color-danger, #ef4444);
+}
+
+.replayBarCloseBtn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

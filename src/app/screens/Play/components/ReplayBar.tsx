@@ -1,8 +1,8 @@
 /**
- * ReplayBar – playback controls when replaying the solve (play/pause, speed, progress, close).
+ * ReplayBar – playback controls when replaying the solve (rewind, play/pause, fast forward, stop, close).
  */
 import React from "react";
-import { Play, Pause, X } from "lucide-react";
+import { Play, Pause, X, RotateCcw, RotateCw, Square } from "lucide-react";
 import { formatTime } from "../playUtils";
 import styles from "./ReplayBar.module.css";
 
@@ -12,6 +12,9 @@ interface ReplayBarProps {
   isPaused: boolean;
   onPlay: () => void;
   onPause: () => void;
+  onRewind: () => void;
+  onFastForward: () => void;
+  onStop: () => void;
   speed: number;
   onSpeedChange: (speed: number) => void;
   currentIndex: number;
@@ -24,6 +27,9 @@ export function ReplayBar({
   isPaused,
   onPlay,
   onPause,
+  onRewind,
+  onFastForward,
+  onStop,
   speed,
   onSpeedChange,
   currentIndex,
@@ -39,10 +45,34 @@ export function ReplayBar({
         <button
           type="button"
           className={styles.replayBarBtn}
+          onClick={onRewind}
+          aria-label="Rewind to start"
+        >
+          <RotateCcw size={20} aria-hidden />
+        </button>
+        <button
+          type="button"
+          className={styles.replayBarBtn}
           onClick={isPaused ? onPlay : onPause}
           aria-label={isPaused ? "Resume replay" : "Pause replay"}
         >
           {isPaused ? <Play size={22} aria-hidden /> : <Pause size={22} aria-hidden />}
+        </button>
+        <button
+          type="button"
+          className={styles.replayBarBtn}
+          onClick={onFastForward}
+          aria-label="Fast forward to end"
+        >
+          <RotateCw size={20} aria-hidden />
+        </button>
+        <button
+          type="button"
+          className={styles.replayBarBtn}
+          onClick={onStop}
+          aria-label="Stop replay"
+        >
+          <Square size={18} aria-hidden />
         </button>
         <span className={styles.replayBarTime} aria-live="polite">
           {formatTime(elapsedSeconds)}
@@ -75,11 +105,11 @@ export function ReplayBar({
       </div>
       <button
         type="button"
-        className={styles.replayBarBtn}
+        className={styles.replayBarCloseBtn}
         onClick={onClose}
-        aria-label="Close replay"
+        aria-label="Close replay and return to win screen"
       >
-        <X size={22} aria-hidden />
+        <X size={24} aria-hidden />
       </button>
     </div>
   );
