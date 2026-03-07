@@ -189,7 +189,13 @@ export function CompletionOverlay({
                   aria-label={canNativeShare ? "Share result" : "Copy result link"}
                 >
                   <Share2 size={18} aria-hidden />
-                  <span>{copied ? "Copied!" : canNativeShare ? "Share result" : "Copy result link"}</span>
+                  <span>
+                    {copied
+                      ? "Copied!"
+                      : canNativeShare
+                        ? "Share result"
+                        : "Copy result link"}
+                  </span>
                 </button>
               )}
               {(onShareChallenge || onCopyChallenge) && (
@@ -197,10 +203,18 @@ export function CompletionOverlay({
                   type="button"
                   className={styles.completeShareOptionBtn}
                   onClick={canNativeShare ? onShareChallenge : onCopyChallenge}
-                  aria-label={canNativeShare ? "Challenge a friend" : "Copy challenge link"}
+                  aria-label={
+                    canNativeShare ? "Challenge a friend" : "Copy challenge link"
+                  }
                 >
                   <Swords size={18} aria-hidden />
-                  <span>{copied ? "Copied!" : canNativeShare ? "Challenge a friend" : "Copy challenge link"}</span>
+                  <span>
+                    {copied
+                      ? "Copied!"
+                      : canNativeShare
+                        ? "Challenge a friend"
+                        : "Copy challenge link"}
+                  </span>
                 </button>
               )}
             </div>
