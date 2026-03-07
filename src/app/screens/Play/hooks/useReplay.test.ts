@@ -52,9 +52,7 @@ describe("useReplay", () => {
   it("returns canReplay false when manager is null", () => {
     const setState = vi.fn();
     const replayStateRef = { current: null as ReplayStateRef | null };
-    const { result } = renderHook(() =>
-      useReplay(null, setState, replayStateRef, false),
-    );
+    const { result } = renderHook(() => useReplay(null, setState, replayStateRef, false));
     expect(result.current.canReplay).toBe(false);
     expect(result.current.snapshots).toEqual([]);
   });
@@ -62,9 +60,7 @@ describe("useReplay", () => {
   it("clearSnapshots does not throw and leaves snapshots empty", () => {
     const setState = vi.fn();
     const replayStateRef = { current: null as ReplayStateRef | null };
-    const { result } = renderHook(() =>
-      useReplay(null, setState, replayStateRef, false),
-    );
+    const { result } = renderHook(() => useReplay(null, setState, replayStateRef, false));
     act(() => {
       result.current.clearSnapshots();
     });
@@ -74,9 +70,7 @@ describe("useReplay", () => {
   it("startReplay and stopReplay do not throw when manager is null", () => {
     const setState = vi.fn();
     const replayStateRef = { current: null as ReplayStateRef | null };
-    const { result } = renderHook(() =>
-      useReplay(null, setState, replayStateRef, false),
-    );
+    const { result } = renderHook(() => useReplay(null, setState, replayStateRef, false));
     act(() => {
       result.current.startReplay();
     });
