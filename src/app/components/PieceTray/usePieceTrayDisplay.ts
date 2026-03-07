@@ -1,10 +1,41 @@
 /**
  * usePieceTrayDisplay – filter state, shuffle, and sorted/filtered piece list for the tray.
+ * Supports dominant-color clustering for visual grouping on mobile and desktop.
  */
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import type { Piece } from "@/puzzle/types";
 import { getAverageColor } from "@/puzzle/colorUtils";
 import type { TrayFilter } from "@/screens/Play/components/TrayFilterButton";
+
+const NUM_HUE_BUCKETS = 6;
+const HUE_BUCKET_DEG = 360 / NUM_HUE_BUCKETS;
+/** Hue offset so red (0/360) sits in one bucket; bucket = ((hue + offset) % 360) / HUE_BUCKET_DEG */
+const HUE_BUCKET_OFFSET = HUE_BUCKET_DEG / 2;
+
+function getHueBucket(hue: number): number {
+  return Math.min(
+    NUM_HUE_BUCKETS - 1,
+    Math.floor(((hue + HUE_BUCKET_OFFSET) % 360) / HUE_BUCKET_DEG),
+  );
+}
+
+/** Group pieces by dominant color (hue buckets with wraparound), then sort by grid within each cluster. */
+function clusterPiecesByDominantColor(
+  pieceList: Piece[],
+  hueById: Map<string, number>,
+  byGrid: (a: Piece, b: Piece) => number,
+): Piece[] {
+  if (pieceList.length === 0) return [];
+  const withBucket = pieceList.map((p) => ({
+    piece: p,
+    bucket: hueById.has(p.id) ? getHueBucket(hueById.get(p.id)!) : NUM_HUE_BUCKETS,
+  }));
+  withBucket.sort((a, b) => {
+    if (a.bucket !== b.bucket) return a.bucket - b.bucket;
+    return byGrid(a.piece, b.piece);
+  });
+  return withBucket.map((x) => x.piece);
+}
 
 export function isCorner(p: Piece, grid: { rows: number; cols: number }) {
   const lastRow = grid.rows - 1;
@@ -30,8 +61,15 @@ export function usePieceTrayDisplay(
   grid: { rows: number; cols: number },
 ) {
   const [filter, setFilter] = useState<TrayFilter>("all");
+  const hasAutoSelectedClustersRef = useRef(false);
   /* Start with shuffle so tray order is randomized from the beginning */
   const [shuffleKey, setShuffleKey] = useState(1);
+
+  useEffect(() => {
+    if (!image || hasAutoSelectedClustersRef.current) return;
+    hasAutoSelectedClustersRef.current = true;
+    setFilter("clusters");
+  }, [image]);
 
   const hueById = useMemo(() => {
     const m = new Map<string, number>();
@@ -77,19 +115,17 @@ export function usePieceTrayDisplay(
 
     let result: Piece[];
     switch (filter) {
+      case "clusters": {
+        result = image ? clusterPiecesByDominantColor(pieces, hueById, byGrid) : allByGrid;
+        break;
+      }
       case "arranged": {
         const edgesSorted = [...edges].sort(byGrid);
         if (!image || interior.length === 0) {
           result = edgesSorted;
         } else {
-          const interiorByHue = [...interior].sort(byHue);
-          const clusterCount = Math.min(6, Math.max(3, Math.ceil(interior.length / 8)));
-          const segmentSize = Math.ceil(interiorByHue.length / clusterCount);
-          const clusters: Piece[][] = [];
-          for (let i = 0; i < interiorByHue.length; i += segmentSize) {
-            clusters.push(interiorByHue.slice(i, i + segmentSize).sort(byGrid));
-          }
-          result = [...edgesSorted, ...clusters.flat()];
+          const interiorClustered = clusterPiecesByDominantColor(interior, hueById, byGrid);
+          result = [...edgesSorted, ...interiorClustered];
         }
         break;
       }

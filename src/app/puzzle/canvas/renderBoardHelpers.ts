@@ -86,6 +86,13 @@ export function easeOutBounce(t: number): number {
   return 1 - 2 * (1 - t) * (1 - t);
 }
 
+/** Ease for gravity-style drop: moves quickly at first (drop), then soft settle at the end. */
+export function easeGravityDrop(t: number): number {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  return 1 - Math.pow(1 - t, 2.2);
+}
+
 export function drawDebugBackdrop(
   ctx: CanvasRenderingContext2D,
   cssW: number,

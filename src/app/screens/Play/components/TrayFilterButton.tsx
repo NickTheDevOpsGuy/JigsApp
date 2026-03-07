@@ -7,10 +7,11 @@ import { Check, Filter } from "lucide-react";
 import styles from "./TrayFilterButton.module.css";
 
 // Keep filter values stable so users don't "lose" options between sessions/updates.
-export type TrayFilter = "all" | "corners" | "edges" | "colors" | "arranged";
+export type TrayFilter = "all" | "clusters" | "corners" | "edges" | "colors" | "arranged";
 
 const LABELS: Record<TrayFilter, string> = {
   all: "All",
+  clusters: "Clusters",
   corners: "Corners",
   edges: "Sides",
   colors: "Color",
@@ -94,7 +95,7 @@ export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButton
               minWidth: menuRect.minWidth,
             }}
           >
-            {(["all", "arranged", "corners", "edges", "colors"] as const).map((opt) => (
+            {(["all", "clusters", "arranged", "corners", "edges", "colors"] as const).map((opt) => (
               <button
                 key={opt}
                 type="button"
@@ -105,7 +106,7 @@ export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButton
                   onChange(opt);
                   setOpen(false);
                 }}
-                disabled={opt === "colors" && !hasImage}
+                disabled={(opt === "colors" || opt === "clusters") && !hasImage}
               >
                 <span className={styles.checkSlot}>
                   {value === opt && (

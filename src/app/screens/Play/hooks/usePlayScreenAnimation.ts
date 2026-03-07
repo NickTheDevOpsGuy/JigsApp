@@ -14,10 +14,13 @@ import type { PerfStats } from "../components/ProfilerOverlay";
 import {
   DRAG_LERP,
   LOCK_LERP_MS,
+  LOCK_LIFT_MAX_PX,
+  MAGNETIC_PULL_STRENGTH,
   IDLE_MIN_INTERVAL_MS,
   getHighPieceCountThreshold,
   IDLE_GHOST_MS,
 } from "./usePlayScreenAnimationConstants";
+import { easeGravityDrop } from "@/puzzle/canvas/renderBoardHelpers";
 
 export function usePlayScreenAnimation(args: {
   manager: PuzzleManager | null;
@@ -220,6 +223,27 @@ export function usePlayScreenAnimation(args: {
         const groupPieces = st.pieces.filter(
           (p) => !p.inTray && p.groupId === draggedGroupId,
         );
+        const snapPreview =
+          manager?.getSnapPreviewState() ?? null;
+        let groupDeltaX = 0;
+        let groupDeltaY = 0;
+        let magneticProximity = 0;
+        if (
+          snapPreview &&
+          (snapPreview.inSnapRange || snapPreview.nearSnap) &&
+          snapPreview.proximity > 0
+        ) {
+          const activePiece = groupPieces.find(
+            (p) => p.id === dragState.activeId,
+          );
+          if (activePiece) {
+            groupDeltaX =
+              activePiece.targetX - activePiece.pad - activePiece.x;
+            groupDeltaY =
+              activePiece.targetY - activePiece.pad - activePiece.y;
+            magneticProximity = snapPreview.proximity;
+          }
+        }
         for (const p of groupPieces) {
           let pos = dragDisplayOverrides.get(p.id);
           if (!pos) {
@@ -228,6 +252,10 @@ export function usePlayScreenAnimation(args: {
           }
           pos.x += (p.x - pos.x) * DRAG_LERP;
           pos.y += (p.y - pos.y) * DRAG_LERP;
+          if (magneticProximity > 0) {
+            pos.x += groupDeltaX * MAGNETIC_PULL_STRENGTH * magneticProximity;
+            pos.y += groupDeltaY * MAGNETIC_PULL_STRENGTH * magneticProximity;
+          }
         }
       } else {
         if (dragDisplayOverrides.size > 0) {
@@ -257,13 +285,18 @@ export function usePlayScreenAnimation(args: {
           const dy = p.y - from.y;
           if (Math.hypot(dx, dy) > maxTravel) continue;
           const t = Math.min(1, elapsed / LOCK_LERP_MS);
-          const ease = 1 - (1 - t) ** 4;
-          const lerpX = from.x + dx * ease;
-          const lerpY = from.y + dy * ease;
+          const easeX = 1 - (1 - t) ** 4;
+          const easeY = easeGravityDrop(t);
+          const liftPx = Math.min(LOCK_LIFT_MAX_PX, Math.max(4, p.h * 0.08));
+          const liftOffset = liftPx * (1 - t) ** 2;
+          const lerpX = from.x + dx * easeX;
+          const lerpY = from.y + dy * easeY - liftOffset;
+          const minY = Math.min(from.y, p.y) - liftPx;
+          const maxY = Math.max(from.y, p.y);
           lockLerpOverrides ??= new Map();
           lockLerpOverrides.set(p.id, {
             x: Math.min(Math.max(lerpX, Math.min(from.x, p.x)), Math.max(from.x, p.x)),
-            y: Math.min(Math.max(lerpY, Math.min(from.y, p.y)), Math.max(from.y, p.y)),
+            y: Math.min(Math.max(lerpY, minY), maxY),
           });
         }
       }

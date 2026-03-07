@@ -55,6 +55,7 @@ import { usePlayScreenSecondaryEffects } from "./hooks/usePlayScreenSecondaryEff
 import { usePlayScreenPersistence } from "./hooks/usePlayScreenPersistence";
 import { usePlayScreenSharePuzzle } from "./hooks/usePlayScreenSharePuzzle";
 import { useReplay, type ReplayStateRef } from "./hooks/useReplay";
+import { useFirstPieceCelebration } from "./hooks/useFirstPieceCelebration";
 import { useHaptics } from "./hooks/useHaptics";
 import { useCoarsePointer } from "./hooks/useCoarsePointer";
 import { useTheme } from "@/hooks/useTheme";
@@ -615,11 +616,8 @@ export function PlayScreen() {
     abandonCapturedRef,
   });
 
-  // First-snap: glow pulse + toast only (no confetti – premium, restrained feel)
-  useEffect(() => {
-    if (!onboarding.showFirstSnapToast) return;
-    // Rely on existing snap glow + toast; no first-piece confetti per polish plan.
-  }, [onboarding.showFirstSnapToast]);
+  // First correctly placed piece: brief visual celebration (restrained confetti) once per puzzle
+  useFirstPieceCelebration(state?.placedCount ?? 0, puzzleKey);
 
   // Analytics: first piece placed
   const firstSnapCapturedRef = useRef(false);
