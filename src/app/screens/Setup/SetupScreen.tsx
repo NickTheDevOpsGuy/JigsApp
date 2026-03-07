@@ -105,7 +105,6 @@ export function SetupScreen() {
 
   const {
     imgDataUrl,
-    setImgDataUrl,
     error,
     setError,
     isLoading,
