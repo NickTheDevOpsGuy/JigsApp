@@ -2,6 +2,7 @@
  * puzzleStorage – save/load puzzle state to localStorage; restore from SavedPiece[].
  */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { logger } from "@/utils/logger";
 import type { Piece, GridSize } from "./types";
 
 const PUZZLE_STATE_KEY = "phuzzle:puzzleState";
@@ -151,7 +152,7 @@ function clearBoth(): void {
     safeLocalStorage.removeItem(PUZZLE_STATE_KEY);
     safeLocalStorage.removeItem(PUZZLE_BACKUP_KEY);
   } catch (e) {
-    console.warn("Failed to clear puzzle state:", e);
+    logger.warn("Failed to clear puzzle state:", e);
   }
 }
 
@@ -197,7 +198,7 @@ export function savePuzzleState(
     }
     safeLocalStorage.setItem(PUZZLE_STATE_KEY, JSON.stringify(state));
   } catch (e) {
-    console.warn("Failed to save puzzle state:", e);
+    logger.warn("Failed to save puzzle state:", e);
   }
 }
 

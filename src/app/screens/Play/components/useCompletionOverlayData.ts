@@ -34,6 +34,8 @@ export type UseCompletionOverlayDataParams = {
   puzzleShareUrl?: string;
 };
 
+export type UseCompletionOverlayDataResult = ReturnType<typeof useCompletionOverlayData>;
+
 export function useCompletionOverlayData(params: UseCompletionOverlayDataParams) {
   const {
     elapsedSeconds,

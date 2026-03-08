@@ -1,0 +1,195 @@
+/* src/app/screens/Play/PlayScreen.module.css - Dark Mode Support */
+
+.page {
+  box-sizing: border-box;
+  min-height: var(--app-vh-stable, 100dvh);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-primary);
+  overscroll-behavior: none;
+  overflow: hidden;
+  padding-left: max(0px, env(safe-area-inset-left, 0));
+  padding-right: max(0px, env(safe-area-inset-right, 0));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
+  /* PZ-045: Prevent text selection and Safari callouts on touch */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Zen Ambient: no pressure, subtle animated background, soft transitions */
+.zenMode {
+  background: linear-gradient(
+    145deg,
+    var(--color-bg-primary) 0%,
+    color-mix(in srgb, var(--color-bg-elevated) 40%, var(--color-bg-primary)) 50%,
+    var(--color-bg-primary) 100%
+  );
+  background-size: 200% 200%;
+  animation: zenAmbient 12s ease-in-out infinite;
+  transition:
+    background 0.6s ease,
+    opacity 0.5s ease;
+}
+
+.zenMode .topBar,
+.zenMode .hud,
+.zenMode .trayWrap {
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+
+@keyframes zenAmbient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zenMode {
+    animation: none;
+  }
+}
+
+.headerMenuTriggerWrap {
+  display: inline-flex;
+}
+
+.headerMenuTrigger {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.topBar {
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 12px;
+  padding-top: env(safe-area-inset-top, 0);
+  min-width: 0;
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  transition:
+    transform 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.topBarWrap {
+  flex-shrink: 0;
+  overflow-x: hidden;
+  overflow-y: visible;
+  max-height: 56px;
+  transition: max-height 0.25s ease;
+  position: relative;
+  z-index: 200;
+  scrollbar-width: none;
+  touch-action: pan-y;
+}
+
+.topBarWrap::-webkit-scrollbar {
+  display: none;
+}
+
+.topBar {
+  scrollbar-width: none;
+}
+
+.topBar::-webkit-scrollbar {
+  display: none;
+}
+
+.topBarWrap.immersiveTopHidden {
+  max-height: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.immersivePeekTop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  z-index: 50;
+  cursor: pointer;
+  padding-top: env(safe-area-inset-top, 0);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08), transparent);
+}
+
+.immersivePeekBottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  z-index: 50;
+  cursor: pointer;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.08), transparent);
+}
+
+[data-theme="dark"] .immersivePeekTop,
+[data-theme="ocean"] .immersivePeekTop,
+[data-theme="forest"] .immersivePeekTop {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.06), transparent);
+}
+
+[data-theme="dark"] .immersivePeekBottom,
+[data-theme="ocean"] .immersivePeekBottom,
+[data-theme="forest"] .immersivePeekBottom {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.06), transparent);
+}
+
+.trayArea {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  transition:
+    max-height 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.trayArea.immersiveHidden {
+  max-height: 0;
+  min-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.trayWrap {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 320px;
+  transition:
+    max-height 0.25s ease,
+    opacity 0.2s ease;
+  /* Prevent double-tap zoom on mobile while keeping touch scroll */
+  touch-action: pan-y manipulation;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topBar,
+  .topBarWrap,
+  .trayArea,
+  .trayWrap,
+  .immersivePeekTop,
+  .immersivePeekBottom {
+    transition: none !important;
+    animation: none !important;
+  }
+}

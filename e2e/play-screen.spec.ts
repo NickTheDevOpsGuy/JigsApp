@@ -54,10 +54,15 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
       timeout: 20000,
     });
-    await expect(page.getByRole("button", { name: /share result/i })).toBeVisible({
+    const shareTrigger = page.getByRole("button", { name: /share options/i });
+    await expect(shareTrigger).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByRole("button", { name: /share with people/i })).toBeVisible({
+    await shareTrigger.click();
+    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.getByRole("menuitem", { name: /challenge a friend/i })).toBeVisible({
       timeout: 10000,
     });
   });
@@ -70,7 +75,12 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
       timeout: 20000,
     });
-    await expect(page.getByRole("button", { name: /share result/i })).toBeVisible({
+    const shareTrigger = page.getByRole("button", { name: /share options/i });
+    await expect(shareTrigger).toBeVisible({
+      timeout: 10000,
+    });
+    await shareTrigger.click();
+    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
       timeout: 10000,
     });
 

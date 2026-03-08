@@ -1,60 +1,107 @@
-/**
- * Completion overlay actions: Home and Share (Share is primary green).
- */
-import { useState, useEffect } from "react";
-import { Share2, Home } from "lucide-react";
-import { Button } from "@/components/Button/Button";
+import React from "react";
 import styles from "./CompletionOverlay.module.css";
+import type { UseCompletionOverlayDataResult } from "./useCompletionOverlayData";
+import { CompletionOverlayShareMenu } from "./CompletionOverlayShareMenu";
+import { CompletionOverlayReplayNextMenu } from "./CompletionOverlayReplayNextMenu";
 
-const SHARE_BUTTON_DELAY_MS = 900;
+export function CompletionOverlayActions(args: {
+  hasShare: boolean;
+  hasReplayNext: boolean;
+  shareMenuOpen: boolean;
+  setShareMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  shareRef: React.RefObject<HTMLDivElement>;
+  shareTriggerRef: React.RefObject<HTMLButtonElement>;
+  dropdownPosition: { top: number; left: number; minWidth: number } | null;
+  replayNextMenuOpen: boolean;
+  setReplayNextMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  replayNextRef: React.RefObject<HTMLDivElement>;
+  replayNextTriggerRef: React.RefObject<HTMLButtonElement>;
+  replayNextDropdownPosition: { top: number; left: number; minWidth: number } | null;
+  grid?: { rows: number; cols: number };
+  puzzleShareUrl: string;
+  elapsedSeconds: number;
+  accuracyPercent: number;
+  copied: boolean;
+  canNativeShare: boolean;
+  onShareProgress?: () => void;
+  onCopyProgress?: () => void;
+  onShareChallenge?: () => void;
+  onCopyChallenge?: () => void;
+  completionData: UseCompletionOverlayDataResult;
+  canReplay: boolean;
+  onReplayClick?: () => void;
+  onNextPuzzle?: () => void;
+}) {
+  const {
+    hasShare,
+    hasReplayNext,
+    shareMenuOpen,
+    setShareMenuOpen,
+    shareRef,
+    shareTriggerRef,
+    dropdownPosition,
+    replayNextMenuOpen,
+    setReplayNextMenuOpen,
+    replayNextRef,
+    replayNextTriggerRef,
+    replayNextDropdownPosition,
+    grid,
+    puzzleShareUrl,
+    elapsedSeconds,
+    accuracyPercent,
+    copied,
+    canNativeShare,
+    onShareProgress,
+    onCopyProgress,
+    onShareChallenge,
+    onCopyChallenge,
+    completionData,
+    canReplay,
+    onReplayClick,
+    onNextPuzzle,
+  } = args;
 
-interface CompletionOverlayActionsProps {
-  onClose: () => void;
-  onPlayAgain?: () => void;
-  onGoHome?: () => void;
-  onShareClick: () => void;
-  isNarrow: boolean;
-}
-
-export function CompletionOverlayActions({
-  onGoHome,
-  onShareClick,
-  isNarrow: _isNarrow,
-}: CompletionOverlayActionsProps) {
-  const [shareRevealed, setShareRevealed] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setShareRevealed(true), SHARE_BUTTON_DELAY_MS);
-    return () => clearTimeout(t);
-  }, []);
+  if (!hasShare && !hasReplayNext) return null;
 
   return (
-    <div className={styles.completeActions}>
-      {onGoHome != null && (
-        <Button
-          variant="secondary"
-          onClick={onGoHome}
-          className={styles.completeActionsTrigger}
-          aria-label="Home"
-        >
-          <Home size={20} />
-          <span>Home</span>
-        </Button>
-      )}
-      <Button
-        variant="primary"
-        onClick={onShareClick}
-        className={styles.completeActionsShareBtn}
-        aria-label="Share"
-        style={{
-          opacity: shareRevealed ? 1 : 0,
-          pointerEvents: shareRevealed ? "auto" : "none",
-          transition: "opacity 0.25s ease-out",
-        }}
-      >
-        <Share2 size={20} />
-        Share
-      </Button>
-    </div>
+    <section className={styles.completeShareSection} aria-label="Actions">
+      <div className={styles.completeShareDivider} aria-hidden>
+        Actions
+      </div>
+      <div className={styles.completeActionsRow}>
+        {hasShare && (
+          <CompletionOverlayShareMenu
+            shareMenuOpen={shareMenuOpen}
+            setShareMenuOpen={setShareMenuOpen}
+            shareRef={shareRef}
+            shareTriggerRef={shareTriggerRef}
+            dropdownPosition={dropdownPosition}
+            grid={grid}
+            puzzleShareUrl={puzzleShareUrl}
+            elapsedSeconds={elapsedSeconds}
+            accuracyPercent={accuracyPercent}
+            copied={copied}
+            canNativeShare={canNativeShare}
+            onShareProgress={onShareProgress}
+            onCopyProgress={onCopyProgress}
+            onShareChallenge={onShareChallenge}
+            onCopyChallenge={onCopyChallenge}
+            completionData={completionData}
+          />
+        )}
+        {hasReplayNext && (
+          <CompletionOverlayReplayNextMenu
+            replayNextMenuOpen={replayNextMenuOpen}
+            setReplayNextMenuOpen={setReplayNextMenuOpen}
+            replayNextRef={replayNextRef}
+            replayNextTriggerRef={replayNextTriggerRef}
+            replayNextDropdownPosition={replayNextDropdownPosition}
+            canReplay={canReplay}
+            onReplayClick={onReplayClick}
+            onNextPuzzle={onNextPuzzle}
+          />
+        )}
+      </div>
+    </section>
   );
 }

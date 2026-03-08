@@ -51,7 +51,8 @@ export function drawLockGlow(
   const alpha = Math.max(0, 0.5 * (1 - elapsedMs / LOCK_GLOW_MS));
   if (alpha <= 0) return;
   ctx.save();
-  ctx.strokeStyle = `rgba(0, 200, 100, ${alpha})`;
+  /* Neutral glow on snap – no green; snapping only */
+  ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.4})`;
   ctx.lineWidth = 4;
   ctx.stroke(path);
   ctx.restore();

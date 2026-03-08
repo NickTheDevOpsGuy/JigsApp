@@ -1,0 +1,124 @@
+.page {
+  height: var(--app-vh-stable, 100dvh);
+  min-height: var(--app-vh-stable, 100dvh);
+  max-height: var(--app-vh-stable, 100dvh);
+  width: 100%;
+  box-sizing: border-box;
+  padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right))
+    max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background:
+    radial-gradient(
+      1200px 680px at 50% -18%,
+      rgba(40, 84, 168, 0.44) 0%,
+      transparent 62%
+    ),
+    radial-gradient(900px 540px at 50% 86%, rgba(232, 144, 72, 0.18) 0%, transparent 58%),
+    linear-gradient(180deg, #070b1f 0%, #050a1a 100%);
+  scrollbar-width: none;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
+}
+
+.pagePackFlow {
+  align-items: flex-start;
+}
+
+.card {
+  width: 100%;
+  max-width: 620px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(17, 29, 52, 0.95) 0%, rgba(13, 24, 44, 0.96) 100%)
+      padding-box,
+    linear-gradient(180deg, rgba(147, 181, 240, 0.35), rgba(255, 178, 103, 0.22))
+      border-box;
+  border: 1px solid transparent;
+  box-shadow:
+    0 24px 54px rgba(0, 0, 0, 0.48),
+    inset 0 0 0 1px rgba(77, 119, 186, 0.3);
+  padding: 8px 10px 6px;
+  overflow: hidden;
+}
+
+.cardPackFlow {
+  max-width: 620px;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.cardBody::-webkit-scrollbar {
+  display: none;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(98, 131, 185, 0.35);
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(1.1rem, 2.3vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: #9bc4ff;
+}
+
+.titlePackFlow {
+  color: #a9caff;
+}
+
+.titleIcon {
+  color: #74d96a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeBtn {
+  appearance: none;
+  border: 1px solid rgba(180, 150, 122, 0.5);
+  background: rgba(30, 31, 44, 0.74);
+  color: #f3e0c0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+

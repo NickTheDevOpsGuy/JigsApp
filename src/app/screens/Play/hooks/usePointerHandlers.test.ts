@@ -68,6 +68,13 @@ describe("canRotateBoardPieceInState", () => {
     expect(canRotateBoardPieceInState(state, "p1")).toBe(false);
   });
 
+  it("blocks rotation when any piece in the group is locked, including tray members", () => {
+    const p1 = makePiece("p1", { groupId: "g1" });
+    const p2 = makePiece("p2", { groupId: "g1", locked: true, inTray: true });
+    const state = makeState([p1, p2]);
+    expect(canRotateBoardPieceInState(state, "p1")).toBe(false);
+  });
+
   it("blocks rotation for tray pieces", () => {
     const piece = makePiece("p1", { inTray: true });
     const state = makeState([piece]);

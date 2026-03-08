@@ -1,0 +1,135 @@
+
+/* Row: Share + (Watch Replay | Next Puzzle) module */
+.completeActionsRow {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Replay/Next dropdown module – same pattern as Share */
+.completeReplayNextWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.completeShareWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.completeShareTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.completeShareTrigger:hover {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border-strong);
+}
+
+.completeShareTrigger:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.completeShareChevronOpen {
+  transform: rotate(180deg);
+}
+
+.completeShareDropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Share/taunt message preview – chat-bubble style like reference image */
+.completeShareMessagePreview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.completeShareBubble {
+  background: rgba(71, 85, 105, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.completeShareBubbleResult {
+  background: rgba(71, 85, 105, 0.42);
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+.completeShareBubbleChallenge {
+  background: linear-gradient(
+    180deg,
+    rgba(186, 230, 170, 0.94),
+    rgba(134, 239, 172, 0.9)
+  );
+  border-color: rgba(74, 222, 128, 0.55);
+}
+
+.completeShareBubbleIntro {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  color: rgba(226, 232, 240, 0.95);
+  line-height: 1.4;
+}
+
+.completeShareBubbleChallenge .completeShareBubbleIntro,
+.completeShareBubbleChallenge .completeShareBubbleTitle,
+.completeShareBubbleChallenge .completeShareBubbleLine,
+.completeShareBubbleChallenge .completeShareBubbleCta {
+  color: rgba(17, 24, 39, 0.96);
+}
+
+.completeShareBubbleChallenge .completeShareBubbleUrl {
+  color: rgba(21, 128, 61, 1);
+}
+
+.completeShareBubbleTitle {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(226, 232, 240, 0.98);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.completeShareBubbleIcon {
+  font-size: 1rem;
+}
+
+.completeShareBubbleLine {
+  margin: 0 0 4px;
+  font-size: 0.88rem;
+  color: rgba(203, 213, 225, 0.95);
+  line-height: 1.35;
+}

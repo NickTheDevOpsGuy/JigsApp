@@ -2,6 +2,8 @@
 
 Summary of all changes on `bugfix/layout` and related work. Includes piece drawer, touch/input, layout polish, leaderboards, co-op, packs, onboarding, testing, PWA, and docs.
 
+Latest pass also includes deep file splitting (Play screen flow, puzzle manager ops/core/runtime, CSS base/layout/responsive modules), mobile touch hardening, and updated QA/docs coverage for lock + orientation regressions.
+
 ---
 
 ## Layout Revert (Latest)

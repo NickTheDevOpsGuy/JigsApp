@@ -30,6 +30,7 @@ export type AnimationState = {
   undoSnapBackOverrides?: Map<string, { x: number; y: number }>;
   wrongRotationHint?: { groupId: string; pieceIds: string[]; triggeredAt: number };
   snapPreview?: { nearSnap: boolean; inSnapRange: boolean; proximity: number } | null;
+  snapGlowEnabled?: boolean;
   showAlignmentGrid?: boolean;
   /** Fog modifier: alpha for unplaced pieces (0 = clear, 0.5 = foggy). Placed pieces stay clear. */
   fogAlphaForUnplaced?: number;

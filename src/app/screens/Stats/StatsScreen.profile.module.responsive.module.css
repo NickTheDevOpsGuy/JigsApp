@@ -1,0 +1,193 @@
+.weekSubviewBtn {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.weekSubviewBtnActive {
+  border-color: var(--color-brand-primary);
+  background: color-mix(in srgb, var(--color-brand-primary) 14%, transparent);
+}
+
+.leaderboardSelect {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.leaderboardSelect:focus {
+  outline: none;
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.inlineFilterSelect {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 12px;
+}
+
+.weekProgressStrip {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 40%, var(--color-border));
+  background: color-mix(in srgb, var(--color-brand-primary) 10%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.weekProgressStrip strong {
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.championBadge {
+  font-size: 1em;
+  vertical-align: middle;
+}
+
+.prestigeBadge {
+  color: var(--color-brand-primary);
+  font-size: 0.9em;
+}
+
+.prestigeSection {
+  margin: 16px 0;
+  padding: 12px;
+  background: var(--color-bg-elevated);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+}
+
+.prestigeSection h3 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+}
+
+.weekAlbumWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.weekAlbumTitle {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.weekAlbumGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 720px) {
+  .weekAlbumGrid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+}
+
+.weekAlbumSlot {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.weekAlbumSlotDone {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 45%, var(--color-border));
+}
+
+.weekAlbumSlotToday {
+  box-shadow: inset 0 0 0 1px var(--color-brand-primary);
+}
+
+.weekAlbumTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.weekAlbumThumbWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-bg-secondary) 55%, var(--color-bg-elevated));
+}
+
+.weekAlbumImage,
+.weekAlbumHidden {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.weekAlbumHidden {
+  display: grid;
+  place-items: center;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  min-height: 100%;
+}
+
+.weekAlbumOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.weekAlbumSlotThumb .weekAlbumThumbWrap {
+  border-color: var(--color-border);
+}
+
+.weekAlbumFooter {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}

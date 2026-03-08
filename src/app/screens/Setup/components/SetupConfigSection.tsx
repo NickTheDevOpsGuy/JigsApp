@@ -49,6 +49,7 @@ export function SetupConfigSection({
               type="button"
               className={styles.difficultySuggestion}
               onClick={() => setGridIndex(suggestedGrid.gridIndex)}
+              title={suggestedGrid.hint}
             >
               {suggestedGrid.hint}
             </button>
@@ -64,6 +65,7 @@ export function SetupConfigSection({
               className={`${styles.difficultyCard} ${gridIndex === difficulty.index ? styles.difficultyCardActive : ""}`}
               onClick={() => setGridIndex(difficulty.index)}
               aria-pressed={gridIndex === difficulty.index}
+              title={`${difficulty.title}: ${difficulty.pieces} pieces`}
             >
               <span className={styles.difficultyCardTitle}>
                 <Puzzle size={16} />
@@ -80,6 +82,11 @@ export function SetupConfigSection({
               className={`${styles.difficultyCard} ${styles.difficultyCardActive}`}
               onClick={() => setGridIndex(gridIndex)}
               aria-pressed
+              title={
+                selectedAdvanced.rows > 0
+                  ? `${selectedAdvanced.rows * selectedAdvanced.cols} pieces`
+                  : `Custom: ${customRows * customCols} pieces`
+              }
             >
               <span className={styles.difficultyCardTitle}>
                 <Puzzle size={16} />
@@ -114,6 +121,8 @@ export function SetupConfigSection({
                   );
                 }}
                 className={styles.customGridInput}
+                title={`Rows (${minGrid}–${maxGrid})`}
+                aria-label={`Rows, ${minGrid} to ${maxGrid}`}
               />
             </label>
             <span className={styles.customGridTimes}>×</span>
@@ -131,6 +140,8 @@ export function SetupConfigSection({
                   );
                 }}
                 className={styles.customGridInput}
+                title={`Columns (${minGrid}–${maxGrid})`}
+                aria-label={`Columns, ${minGrid} to ${maxGrid}`}
               />
             </label>
           </div>

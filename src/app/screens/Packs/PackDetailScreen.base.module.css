@@ -1,0 +1,118 @@
+.page {
+  min-height: var(--app-vh-stable, 100dvh);
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+    max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  background:
+    radial-gradient(1080px 620px at 50% -18%, #173155 0%, transparent 62%),
+    linear-gradient(180deg, #020b18 0%, #010715 100%);
+  overflow-y: auto;
+  overscroll-behavior: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  scrollbar-width: none;
+  box-sizing: border-box;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  max-width: min(640px, 98vw);
+  width: 100%;
+  min-width: 0;
+  margin: 0 auto;
+  flex: 0 1 auto;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 25, 43, 0.96) 0%,
+    rgba(12, 20, 35, 0.96) 100%
+  );
+  border: 1px solid rgba(90, 145, 220, 0.25);
+  border-radius: 12px;
+  padding: 10px 12px 8px;
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(31, 61, 102, 0.38);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.header {
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin-bottom: 12px;
+  background: rgba(23, 37, 62, 0.9);
+  border: 1px solid rgba(118, 154, 214, 0.35);
+  border-radius: 10px;
+  color: #e8f3ff;
+  cursor: pointer;
+}
+
+.backBtn:hover {
+  background: rgba(29, 45, 76, 0.95);
+  border-color: rgba(130, 188, 255, 0.58);
+}
+
+.packHeader {
+  display: flex;
+  align-items: flex-start;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: #edf5ff;
+}
+
+.desc {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #d7e4fa;
+}
+
+.puzzleGridWrap {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  padding-top: 6px;
+  padding-bottom: 0;
+}
+
+.puzzleScrollBtn {
+  flex-shrink: 0;
+  appearance: none;
+  border: none;
+  background: rgba(19, 31, 53, 0.92);
+  color: #c6dbfb;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}

@@ -116,6 +116,8 @@ type ConfirmModalProps = {
   variant?: "danger" | "default";
   /** When true, only show the primary (confirm) button; no cancel. */
   primaryOnlyConfirm?: boolean;
+  /** When false, do not auto-call onClose after confirm. */
+  closeOnConfirm?: boolean;
 };
 
 export function ConfirmModal({
@@ -128,6 +130,7 @@ export function ConfirmModal({
   cancelText = "Cancel",
   variant = "default",
   primaryOnlyConfirm = false,
+  closeOnConfirm = true,
 }: ConfirmModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} showCloseButton>
@@ -142,7 +145,7 @@ export function ConfirmModal({
           variant={variant === "danger" ? "primary" : "primary"}
           onClick={() => {
             onConfirm();
-            onClose();
+            if (closeOnConfirm) onClose();
           }}
           className={variant === "danger" ? styles.dangerBtn : ""}
         >

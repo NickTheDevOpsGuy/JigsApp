@@ -5,7 +5,10 @@ import type { PieceCutType } from "@/puzzle/types";
 import type { DebugFlags } from "../playScreenUtils";
 import {
   PIECE_LOCKING_KEY,
+  PIECE_LOCKING_EXPLICIT_KEY,
   AUTO_ROTATE_ON_SNAP_KEY,
+  MAGNETIC_SNAP_KEY,
+  SNAP_GLOW_KEY,
   CUT_TYPE_KEY,
   PROGRESSIVE_REVEAL_KEY,
   GHOST_HINT_KEY,
@@ -31,15 +34,39 @@ import { safeLocalStorage } from "@/utils/safeLocalStorage";
 function getBool(key: string, defaultValue: boolean): boolean {
   try {
     const v = safeLocalStorage.getItem(key);
-    return v === "true";
+    if (v == null) return defaultValue;
+    if (v === "true") return true;
+    if (v === "false") return false;
+    return defaultValue;
   } catch {
     return defaultValue;
+  }
+}
+
+function getPieceLockingInitial(): boolean {
+  try {
+    const explicit = safeLocalStorage.getItem(PIECE_LOCKING_EXPLICIT_KEY);
+    const raw = safeLocalStorage.getItem(PIECE_LOCKING_KEY);
+
+    // Migration guard:
+    // If preference was never explicitly set by user, default lock-on-snap to true
+    // even if a stale "false" value exists from older buggy/default behavior.
+    if (explicit == null || explicit === "false" || explicit === "0") {
+      return true;
+    }
+    if (raw === "true") return true;
+    if (raw === "false") return false;
+    return true;
+  } catch {
+    return true;
   }
 }
 
 export function getPlayScreenUIStorageInitial(): {
   pieceLockingEnabled: boolean;
   autoRotateOnSnap: boolean;
+  magneticSnapEnabled: boolean;
+  snapGlowEnabled: boolean;
   showGhostHint: boolean;
   showAlignmentGrid: boolean;
   showGhostWhenIdle: boolean;
@@ -80,8 +107,10 @@ export function getPlayScreenUIStorageInitial(): {
   }
 
   return {
-    pieceLockingEnabled: getBool(PIECE_LOCKING_KEY, false),
+    pieceLockingEnabled: getPieceLockingInitial(),
     autoRotateOnSnap: getBool(AUTO_ROTATE_ON_SNAP_KEY, true),
+    magneticSnapEnabled: getBool(MAGNETIC_SNAP_KEY, true),
+    snapGlowEnabled: getBool(SNAP_GLOW_KEY, true),
     showGhostHint: getBool(GHOST_HINT_KEY, false),
     showAlignmentGrid: getBool(ALIGNMENT_GRID_KEY, false),
     showGhostWhenIdle: getBool(GHOST_WHEN_IDLE_KEY, false),

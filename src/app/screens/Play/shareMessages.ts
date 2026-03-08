@@ -11,7 +11,7 @@ function clampPercent(value: number): number {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
-function getDifficultyLabel(pieceCount: number): string {
+export function getDifficultyLabel(pieceCount: number): string {
   if (pieceCount <= 9) return "Easy";
   if (pieceCount <= 16) return "Medium";
   if (pieceCount <= 25) return "Hard";
@@ -21,7 +21,7 @@ function getDifficultyLabel(pieceCount: number): string {
   return "Extreme";
 }
 
-function getPiecesLine(pieceCount: number): string {
+export function getPiecesLine(pieceCount: number): string {
   if (pieceCount <= 0) return "Custom Puzzle";
   return `${pieceCount} Pieces • ${getDifficultyLabel(pieceCount)}`;
 }
@@ -29,14 +29,14 @@ function getPiecesLine(pieceCount: number): string {
 export function buildProgressShareMessage(args: ShareMessageArgs): string {
   const accuracy = clampPercent(args.accuracyPercent ?? 100);
   return [
-    "I just finished this puzzle on Phuzzle.",
+    "🧩 Puzzle complete!",
     "",
-    "🧩 PHUZZLE RESULT",
+    "PHUZZLE RESULT",
     `Time: ${formatTime(args.elapsedSeconds)}`,
     getPiecesLine(args.pieceCount),
     `Accuracy: ${accuracy}%`,
     "",
-    "Play this puzzle:",
+    "Try this same puzzle:",
     args.playUrl,
   ].join("\n");
 }

@@ -4,6 +4,7 @@
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import type { GridSize } from "@/puzzle/types";
 import type { SavedPiece } from "@/puzzle/puzzleStorage";
+import { logger } from "@/utils/logger";
 
 export type PuzzleSessionState = {
   pieces: SavedPiece[];
@@ -52,7 +53,7 @@ export async function createPuzzleSession(
     .single();
 
   if (error) {
-    console.warn("Failed to create puzzle session:", error);
+    logger.warn("Failed to create puzzle session:", error);
     return { error: error.message };
   }
   if (!data?.id) return { error: "No session ID returned" };
@@ -120,7 +121,7 @@ export async function updatePuzzleSession(
     .eq("id", sessionId);
 
   if (error) {
-    console.warn("Failed to update puzzle session:", error);
+    logger.warn("Failed to update puzzle session:", error);
     return false;
   }
   return true;

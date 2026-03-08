@@ -2,6 +2,7 @@
  * auth – ensureSignedIn (anonymous), getUserId.
  */
 import { supabase } from "./client";
+import { logger } from "@/utils/logger";
 
 /** Ensure user is signed in (anonymous). Call on app init if using Supabase. */
 export async function ensureSignedIn(): Promise<string | null> {
@@ -14,7 +15,7 @@ export async function ensureSignedIn(): Promise<string | null> {
 
   const { data, error } = await supabase.auth.signInAnonymously();
   if (error) {
-    console.warn("Supabase anonymous sign-in failed:", error.message);
+    logger.warn("Supabase anonymous sign-in failed:", error.message);
     return null;
   }
   return data.user?.id ?? null;

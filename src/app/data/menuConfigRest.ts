@@ -12,14 +12,6 @@ export function getRestMenuNodes(): MenuNode[] {
       children: [
         {
           type: "folder",
-          id: "interaction",
-          label: "Interaction",
-          children: [
-            { type: "toggle", id: "pieceLocking", label: "Lock Pieces (Tap to Rotate)" },
-          ],
-        },
-        {
-          type: "folder",
           id: "timeDisplay",
           label: "Time Display",
           children: [
@@ -62,6 +54,13 @@ export function getRestMenuNodes(): MenuNode[] {
               id: "ghostHint",
               label: "Ghost Hint (wrong rotation)",
               getLabel: (on) => (on ? "Ghost hint: on" : "Ghost hint: off"),
+            },
+            {
+              type: "toggle",
+              id: "pieceLocking",
+              label: "Unlock Pieces (Alpha)",
+              getLabel: (on) =>
+                on ? "Unlock pieces (alpha): off" : "Unlock pieces (alpha): on",
             },
           ],
         },

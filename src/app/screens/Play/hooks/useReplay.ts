@@ -8,7 +8,7 @@ import type { SavedPiece } from "@/puzzle/puzzleStorage";
 import { piecesToSaved } from "@/puzzle/undoManager";
 
 const MAX_SNAPSHOTS = 400;
-const DEFAULT_SPEED = 4; // 4x
+const DEFAULT_SPEED = 1; // 1x – no speed shown as "on" until user picks
 const TICK_MS = 80;
 
 function getIntervalMs(speed: number): number {
@@ -39,10 +39,12 @@ export function useReplay(
   const [isReplayPaused, setIsReplayPaused] = useState(false);
   const [replayIndex, setReplayIndex] = useState(0);
   const [replaySpeed, setReplaySpeed] = useState(DEFAULT_SPEED);
+  const [speedExplicitlyChosen, setSpeedExplicitlyChosen] = useState(false);
   const rafRef = useRef<number | null>(null);
   const lastTickRef = useRef<number>(0);
   const lastSnapshotCountRef = useRef(0);
   const isReplayingRef = useRef(false);
+  const hasAdvancedThisResumeRef = useRef(false);
   isReplayingRef.current = isReplaying;
 
   const recordSnapshot = useCallback(() => {
@@ -82,7 +84,7 @@ export function useReplay(
     manager.restoreFromSaved(list[0].savedPieces);
     setState(manager.getState());
     setIsReplaying(true);
-    setIsReplayPaused(false);
+    setIsReplayPaused(true); // Start paused so user presses Play to start
   }, [manager, setState]);
 
   const pauseReplay = useCallback(() => {
@@ -94,6 +96,7 @@ export function useReplay(
   }, []);
 
   const resumeReplay = useCallback(() => {
+    hasAdvancedThisResumeRef.current = false;
     setIsReplayPaused(false);
   }, []);
 
@@ -107,7 +110,10 @@ export function useReplay(
 
     const tick = (now: number) => {
       const elapsed = now - lastTickRef.current;
-      if (elapsed >= intervalMs) {
+      const shouldAdvance =
+        elapsed >= intervalMs || (!hasAdvancedThisResumeRef.current && list.length > 1);
+      if (shouldAdvance) {
+        hasAdvancedThisResumeRef.current = true;
         lastTickRef.current = now;
         setReplayIndex((i) => {
           const next = i + 1;
@@ -184,6 +190,28 @@ export function useReplay(
     setIsReplayPaused(true);
   }, [manager, setState]);
 
+  const seekToIndex = useCallback(
+    (index: number) => {
+      const list = snapshotsRef.current;
+      if (!manager || list.length === 0) return;
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      const clamped = Math.max(0, Math.min(list.length - 1, index));
+      setReplayIndex(clamped);
+      manager.restoreFromSaved(list[clamped].savedPieces);
+      setState(manager.getState());
+      setIsReplayPaused(true);
+    },
+    [manager, setState],
+  );
+
+  const setReplaySpeedWithChoice = useCallback((speed: number) => {
+    setSpeedExplicitlyChosen(true);
+    setReplaySpeed(speed);
+  }, []);
+
   return {
     snapshots,
     recordSnapshot,
@@ -193,11 +221,13 @@ export function useReplay(
     resumeReplay,
     replayIndex,
     replaySpeed,
-    setReplaySpeed,
+    setReplaySpeed: setReplaySpeedWithChoice,
+    speedExplicitlyChosen,
     startReplay,
     stopReplay,
     goToStart,
     goToEnd,
+    seekToIndex,
     clearSnapshots,
     replayElapsedSeconds,
     replayMoveCount,

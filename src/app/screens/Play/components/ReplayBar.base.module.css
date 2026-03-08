@@ -1,0 +1,89 @@
+/* Aligns with board outer border when boardRect is provided */
+.replayBar {
+  position: fixed;
+  bottom: max(16px, env(safe-area-inset-bottom, 0));
+  left: max(12px, env(safe-area-inset-left, 0));
+  right: max(12px, env(safe-area-inset-right, 0));
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 12px 12px 14px;
+  background: rgba(30, 41, 59, 0.97);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  z-index: 2100;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+.replayBar[style*="left"] {
+  right: auto;
+  margin: 0;
+}
+
+.replayBarCloseBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(203, 213, 225, 0.9);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  flex-shrink: 0;
+}
+
+.replayBarCloseBtn:hover {
+  background: rgba(71, 85, 105, 0.5);
+  color: #fff;
+}
+
+.replayBarCloseBtn:focus-visible {
+  outline: 2px solid rgba(148, 163, 184, 0.6);
+  outline-offset: 2px;
+}
+
+.replayBarContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 28px;
+}
+
+.replayBarRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (pointer: coarse) {
+  .replayBarCloseBtn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Grouped sections with rectangular outline */
+.replayBarGroup,
+.replayBarTimeGroup,
+.replayBarSpeedGroup {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.4);
+}

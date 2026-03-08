@@ -7,6 +7,7 @@ import {
   clearPuzzleState,
 } from "@/puzzle/puzzleStorage";
 import { soundManager } from "@/audio/sounds";
+import { logger } from "@/utils/logger";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";
@@ -147,7 +148,7 @@ export function usePuzzleLifecycle({
       setState(next.getState());
     };
     img.onerror = () => {
-      console.error("Failed to load puzzle image");
+      logger.error("Failed to load puzzle image");
     };
     img.src = imageUrl;
 

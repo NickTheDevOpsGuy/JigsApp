@@ -1,0 +1,180 @@
+.playersSolved {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-align: center;
+}
+
+.logo {
+  max-width: 100%;
+  max-height: 22vh;
+  height: auto;
+}
+
+/* Area under logo for streak and/or players-solved (replaces the old "phuzzle" text spot) */
+.headerBlurb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.streakLine {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.headerBlurb .playersSolved {
+  margin: 0;
+}
+
+.teaserLine {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+  max-width: 100%;
+}
+
+.actionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.actionCardFullWidth,
+.whatsNewCard {
+  grid-column: 1 / -1;
+}
+
+.whatsNewCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 16px;
+}
+
+.actionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 64px;
+  padding: 10px;
+  transition: background-color 0.15s ease;
+}
+
+.actionCard:hover:not(:disabled) {
+  background: var(--color-action-hover);
+}
+
+.starIcon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.starFallback {
+  font-size: 20px;
+  line-height: 1;
+  color: currentColor;
+}
+
+.homeCountdownWrap {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.actionLabel {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.actionCard svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .page {
+    height: var(--app-vh-stable, 100dvh);
+    min-height: var(--app-vh-stable, 100dvh);
+    max-height: var(--app-vh-stable, 100dvh);
+    padding: 8px 10px 4px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+    align-items: center;
+    overscroll-behavior: none;
+  }
+
+  .card {
+    padding: 12px 14px 10px;
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
+    min-height: 0;
+  }
+
+  .homeBar {
+    margin-bottom: 6px;
+    grid-template-columns: 44px 1fr auto;
+  }
+
+  .dailyTitleInBar {
+    font-size: 1rem;
+  }
+
+  .cornerBtn {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .header {
+    margin-bottom: 8px;
+  }
+
+  .logo {
+    max-height: 18vh;
+  }
+
+  .actionCard {
+    min-height: 52px;
+    padding: 8px;
+    gap: 2px;
+  }
+
+  .actionLabel {
+    font-size: 12px;
+  }
+
+  .dailyEmoji {
+    font-size: 20px;
+  }
+
+  .actionsGrid {
+    gap: 6px;
+  }
+
+  .menuTip {
+    margin: 4px 0 0;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+}

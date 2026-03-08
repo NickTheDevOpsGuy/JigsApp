@@ -1,0 +1,172 @@
+#root {
+  min-height: 100%;
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Prevent long-press callouts/context menus on touch devices across core UI targets */
+button,
+a,
+img,
+canvas,
+[role="button"] {
+  -webkit-touch-callout: none;
+}
+
+@media (pointer: coarse) {
+  body {
+    -webkit-touch-callout: none;
+  }
+
+  input,
+  textarea,
+  select,
+  [contenteditable],
+  [contenteditable="true"],
+  [data-allow-context-menu="true"] {
+    -webkit-touch-callout: default;
+  }
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  -webkit-user-drag: none;
+}
+
+canvas {
+  -webkit-user-drag: none;
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* Playful/logo font */
+.font-display {
+  font-family: "Fredoka", system-ui, sans-serif;
+}
+
+/* Monospace for timer */
+.font-mono {
+  font-family: "SF Mono", "Roboto Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Theme transition */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: ease;
+  transition-duration: 0.2s;
+}
+
+/* Disable transitions for images and canvas */
+img,
+canvas {
+  transition: none !important;
+}
+
+/* Mobile (Android & iPhone): lock viewport, no document scroll – only in-app scroll areas scroll */
+@media (max-width: 600px) {
+  html {
+    min-height: var(--app-vh-stable, 100dvh);
+    height: var(--app-vh-stable, 100dvh);
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: var(--app-vh-stable, 100dvh);
+    max-height: var(--app-vh-stable, 100dvh);
+    overflow: hidden;
+    overscroll-behavior: none;
+    font-size: var(--font-body-mobile, 15px);
+    /* Prevent iOS rubber-band and Android overscroll from moving the document */
+    -webkit-overflow-scrolling: auto;
+  }
+
+  #root {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: var(--app-vh-stable, 100dvh);
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: auto;
+  }
+  h1 {
+    font-size: var(--font-h1-mobile, 22px);
+  }
+  h2 {
+    font-size: var(--font-h2-mobile, 18px);
+  }
+  /* 16px prevents iOS from zooming when focusing inputs (accessibility) */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  /* Subtle tap feedback; avoids default gray flash on touch */
+  button,
+  a,
+  [role="button"],
+  [role="tab"],
+  input[type="submit"],
+  input[type="button"] {
+    -webkit-tap-highlight-color: rgba(11, 99, 184, 0.12);
+    tap-highlight-color: rgba(11, 99, 184, 0.12);
+  }
+
+  /* Global touch-target floor for mobile ergonomics. */
+  button,
+  [role="button"],
+  [role="menuitem"],
+  [role="tab"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}
+
+/* Focus rings for keyboard users - visible only when focusing via keyboard */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[role="menuitem"]:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Respect user's reduced motion preference – disable CSS animations/transitions.
+   JS-driven effects (e.g. confetti, completion overlay) also check this preference
+   before running (see CompletionOverlay, usePlayScreenManager). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -52,6 +52,7 @@ export function SetupImageSourcePanel({
           aria-controls="image-source-panel"
           className={`${styles.tab} ${imageSource === "gallery" ? styles.tabActive : ""}`}
           onClick={() => setImageSource("gallery")}
+          title="Choose from gallery"
         >
           <Image size={16} />
           Gallery
@@ -62,6 +63,7 @@ export function SetupImageSourcePanel({
           aria-controls="image-source-panel"
           className={`${styles.tab} ${imageSource === "upload" ? styles.tabActive : ""}`}
           onClick={() => setImageSource("upload")}
+          title="Upload your own image"
         >
           <Upload size={16} />
           Upload
@@ -72,6 +74,7 @@ export function SetupImageSourcePanel({
           aria-controls="image-source-panel"
           className={`${styles.tab} ${imageSource === "camera" ? styles.tabActive : ""}`}
           onClick={() => setImageSource("camera")}
+          title="Take a photo"
         >
           <Camera size={16} />
           Camera
@@ -87,6 +90,7 @@ export function SetupImageSourcePanel({
                   key={cat.id}
                   className={`${styles.categoryBtn} ${selectedCategory === cat.id ? styles.categoryBtnActive : ""}`}
                   onClick={() => setSelectedCategory(cat.id)}
+                  title={`Filter by ${cat.label}`}
                 >
                   {cat.label}
                 </button>
@@ -98,6 +102,7 @@ export function SetupImageSourcePanel({
                 type="button"
                 className={styles.galleryScrollBtn}
                 aria-label="Scroll gallery left"
+                title="Scroll gallery left"
                 disabled={!canScrollLeft}
                 onClick={() =>
                   galleryRef.current?.scrollBy({ left: -220, behavior: "smooth" })
@@ -133,6 +138,7 @@ export function SetupImageSourcePanel({
                 type="button"
                 className={styles.galleryScrollBtn}
                 aria-label="Scroll gallery right"
+                title="Scroll gallery right"
                 disabled={!canScrollRight}
                 onClick={() =>
                   galleryRef.current?.scrollBy({ left: 220, behavior: "smooth" })
@@ -147,6 +153,7 @@ export function SetupImageSourcePanel({
             Choose photo (PNG, JPG, WebP)
             <input
               aria-label="Choose a photo (PNG, JPG, or WebP)"
+              title="Choose a photo file (PNG, JPG, or WebP)"
               className={styles.file}
               type="file"
               accept="image/png,image/jpeg,image/webp"

@@ -6,6 +6,7 @@ import posthog from "posthog-js";
 import type { PuzzleState } from "@/puzzle/types";
 import { savePuzzleState } from "@/puzzle/puzzleStorage";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { logger } from "@/utils/logger";
 import { STORAGE_KEY } from "../playScreenUtils";
 import type { PuzzleSessionState } from "@/services/puzzleSessionService";
 
@@ -83,7 +84,7 @@ export function usePlayScreenPersistence({
       setElapsedSeconds(remoteState.elapsedSeconds);
       clearRemoteState();
     } catch (e) {
-      console.warn("Failed to apply remote state:", e);
+      logger.warn("Failed to apply remote state:", e);
       clearRemoteState();
     }
   }, [remoteState, manager, setState, setElapsedSeconds, clearRemoteState]);

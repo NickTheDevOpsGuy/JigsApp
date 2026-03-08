@@ -5,7 +5,7 @@ import type React from "react";
 import { soundManager } from "@/audio/sounds";
 import type { CanvasWithTouch, ScreenToBoard } from "./types";
 import type { PointerHandlersContext } from "./types";
-import { finishDragWithTrayCheck } from "./shared";
+import { autoScrollTrayAtPointer, finishDragWithTrayCheck } from "./shared";
 import { dragLog } from "./dragLog";
 
 export function handleMouseDown(
@@ -29,6 +29,7 @@ export function handleMouseDown(
 
     onPieceInteraction?.();
     manager.rotatePiece(pieceId);
+    ctx.onRotate?.();
     soundManager.play("rotate");
     haptic?.("rotate");
     setState(manager.getState());
@@ -81,6 +82,7 @@ export function handleMouseMove(
 
   didDragRef.current = true;
   onPieceInteraction?.();
+  autoScrollTrayAtPointer(ctx.trayRef, e.clientX, e.clientY);
   const boardRect = boardRef.current.getBoundingClientRect();
   if (screenToBoard) {
     const { x: boardX, y: boardY } = screenToBoard(e.clientX, e.clientY, boardRect);

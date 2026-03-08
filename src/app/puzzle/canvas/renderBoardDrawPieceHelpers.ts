@@ -13,15 +13,13 @@ export function strokePieceOutline(
   isSelected: boolean,
   isPlaced: boolean,
   locked: boolean,
-  showClusterOutline?: boolean,
+  _showClusterOutline?: boolean,
 ) {
   if (isDragging) {
     ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
     ctx.lineWidth = 2;
-  } else if ((isPlaced || locked) && showClusterOutline) {
-    ctx.strokeStyle = "rgba(0, 160, 80, 0.25)";
-    ctx.lineWidth = 1;
   } else if (isPlaced || locked) {
+    /* No outline for placed/snapped pieces – snapping only, no green fill */
     return;
   } else {
     ctx.strokeStyle = "rgba(0,0,0,0.14)";

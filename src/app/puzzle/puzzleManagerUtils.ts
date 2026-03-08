@@ -44,7 +44,7 @@ export function getEffectiveTolerance(
     Math.min(1.6, options.snapToleranceOverrideRef?.current ?? 1),
   );
   const dynamicMult = options.dynamicDifficultyMultiplierRef?.current ?? 1;
-  const mobileBump = options.isMobile ? 1.2 : 1;
+  const mobileBump = options.isMobile ? 1.28 : 1;
   let effective = basePx * mobileBump;
 
   if (scale < 1) {

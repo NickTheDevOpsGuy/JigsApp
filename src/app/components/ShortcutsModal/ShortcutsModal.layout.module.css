@@ -1,0 +1,127 @@
+.searchInput {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-brand-primary);
+}
+
+.content {
+  padding: 16px 20px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Single column to avoid zig-zag scanning */
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.section {
+  padding: 16px 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  min-width: 0;
+}
+
+.section:last-of-type {
+  border-bottom: none;
+}
+
+/* Soft tinted backgrounds per section */
+.section[data-group="gameplay"] {
+  background: color-mix(in srgb, var(--color-brand-light) 12%, transparent);
+}
+
+.section[data-group="navigation"] {
+  background: color-mix(in srgb, var(--color-brand-light) 8%, transparent);
+}
+
+.section[data-group="system"] {
+  background: color-mix(in srgb, var(--color-bg-card) 40%, transparent);
+}
+
+.sectionInputRef {
+  background: color-mix(in srgb, var(--color-text-secondary) 4%, transparent);
+}
+
+.sectionTitle {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectionTitleInput {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sectionIcon {
+  color: var(--color-brand-primary);
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table tr {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+}
+
+.table tr:last-child {
+  border-bottom: none;
+}
+
+.table td {
+  padding: 6px 0;
+  vertical-align: middle;
+}
+
+.keys {
+  white-space: nowrap;
+  width: 52%;
+  vertical-align: top;
+  padding-right: 16px;
+}
+
+.action {
+  width: 48%;
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  padding-left: 8px;
+  vertical-align: top;
+}

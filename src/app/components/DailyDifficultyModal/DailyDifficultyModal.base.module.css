@@ -1,0 +1,151 @@
+/* DailyDifficultyModal – Today's Puzzle mockup design */
+
+.headerCustom {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+
+.headerIcon {
+  color: var(--color-brand-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+.headerCustom .subtitle {
+  margin-top: 2px;
+}
+
+.freezeOffer {
+  flex-shrink: 0;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-text-primary);
+}
+
+.freezeOffer > span {
+  display: block;
+}
+
+.freezeOffer > span:first-child {
+  margin-bottom: 6px;
+}
+
+.freezeHint {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.freezeActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.freezeBtn {
+  appearance: none;
+  border: none;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.freezeBtn:hover {
+  opacity: 0.95;
+}
+
+.freezeSkip {
+  appearance: none;
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-secondary);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.freezeSkip:hover {
+  background: var(--color-bg-secondary);
+}
+
+.difficultySection {
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.difficultyRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.difficultyStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.difficultyCard {
+  position: relative;
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  text-align: left;
+  min-height: 0;
+  min-width: 0;
+}
+
+.difficultyCard:hover {
+  background: var(--color-bg-card);
+  border-color: var(--color-brand-primary);
+  transform: none;
+  box-shadow: none;
+}
+
+.difficultyCardSelected {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 60%, var(--color-border));
+  background: color-mix(in srgb, var(--color-brand-light) 50%, var(--color-bg-elevated));
+  box-shadow: none;
+}

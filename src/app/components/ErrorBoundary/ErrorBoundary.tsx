@@ -2,6 +2,7 @@
  * ErrorBoundary – catches React errors, shows fallback + reload. Non-blocking for events.
  */
 import React from "react";
+import { logger } from "@/utils/logger";
 
 type ErrorBoundaryProps = {
   children: React.ReactNode;
@@ -31,7 +32,7 @@ export class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("ErrorBoundary caught:", error, errorInfo);
+    logger.error("ErrorBoundary caught:", error, errorInfo);
   }
 
   render() {

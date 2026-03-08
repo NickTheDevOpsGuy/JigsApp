@@ -7,6 +7,7 @@ import { CoopStatusIndicator } from "./CoopStatusIndicator";
 import { PlayHUD } from "./PlayHUD";
 import { TopBarButtons } from "./TopBarButtons";
 import { HeaderMenu } from "./HeaderMenu";
+import { TopBarKeyboardHints } from "./TopBarKeyboardHints";
 import type { RealtimeStatus } from "../hooks/usePuzzleSession";
 import type { TimeMode } from "../timeMode";
 import styles from "../PlayScreen.module.css";
@@ -49,6 +50,8 @@ export type PlayScreenTopBarProps = {
   immersiveMode: boolean;
   showImmersiveUi: boolean;
   onPointerLeave?: () => void;
+  /** When true (e.g. replay mode), hide menu and right-side buttons so they can't be opened. */
+  hideMenuAndButtons?: boolean;
 };
 
 export function PlayScreenTopBar({
@@ -62,6 +65,7 @@ export function PlayScreenTopBar({
   immersiveMode,
   showImmersiveUi,
   onPointerLeave,
+  hideMenuAndButtons = false,
 }: PlayScreenTopBarProps) {
   return (
     <div
@@ -70,7 +74,7 @@ export function PlayScreenTopBar({
     >
       <div className={styles.topBar}>
         <div className={styles.topBarLeft}>
-          <HeaderMenu {...headerMenuProps} />
+          {!hideMenuAndButtons && <HeaderMenu {...headerMenuProps} />}
         </div>
         <div className={styles.topBarCenter}>
           {sessionId && (
@@ -84,8 +88,9 @@ export function PlayScreenTopBar({
               <PlayHUD {...hudProps} />
             </div>
           )}
+          <TopBarKeyboardHints hidden={topBarButtonsProps.isCoarsePointer || hideMenuAndButtons} />
         </div>
-        <TopBarButtons {...topBarButtonsProps} />
+        {!hideMenuAndButtons && <TopBarButtons {...topBarButtonsProps} />}
       </div>
     </div>
   );

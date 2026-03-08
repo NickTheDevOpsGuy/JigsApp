@@ -1,0 +1,72 @@
+@media (max-width: 420px) {
+  .title {
+    font-size: 0.95rem;
+  }
+
+  .tab {
+    font-size: 0.75rem;
+  }
+
+  .difficultyCardTitle {
+    font-size: 0.72rem;
+  }
+
+  .difficultyCardPieces {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 720px) and (max-height: 760px) {
+  .card {
+    padding: 6px 9px 4px;
+  }
+
+  .cardBody {
+    gap: 4px;
+  }
+
+  .headerRow {
+    padding-bottom: 4px;
+  }
+
+  .title {
+    font-size: 0.94rem;
+  }
+
+  .tab {
+    min-height: 32px;
+    font-size: 0.74rem;
+  }
+
+  .difficultyCard {
+    min-height: 42px;
+    flex-basis: min(84px, 23vw);
+  }
+
+  .difficultyCardTitle {
+    font-size: 0.66rem;
+  }
+
+  .difficultyCardPieces {
+    font-size: 0.58rem;
+  }
+
+  .preview,
+  .previewPackFlow {
+    width: clamp(138px, 42vw, 182px);
+    height: clamp(138px, 42vw, 182px);
+    min-height: 138px;
+  }
+
+  .previewPackFlow {
+    width: clamp(154px, 47vw, 198px);
+    height: clamp(154px, 47vw, 198px);
+    min-height: 154px;
+  }
+
+  .backActionBtn,
+  .startBtn {
+    min-height: 34px;
+    font-size: 0.76rem;
+  }
+}

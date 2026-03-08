@@ -1,0 +1,193 @@
+.profileSettingsToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.profileSettingsContent {
+  margin-top: 12px;
+  padding-top: 12px;
+  min-width: 0;
+}
+
+.profileSettingsContent .displayNameInput,
+.profileSettingsContent .checkboxLabel,
+.profileSettingsContent .hint,
+.profileSettingsContent .saveBtn {
+  margin-bottom: 10px;
+}
+
+/* Profile (legacy / settings) */
+.displayNameInput {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  margin-bottom: 16px;
+}
+
+.displayNameInput:focus {
+  outline: none;
+  border-color: var(--color-brand-primary);
+}
+
+.raccoonPreview {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  background: var(--color-bg-elevated);
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.raccoonPreview strong {
+  color: var(--color-brand-primary);
+}
+
+.profileRow {
+  margin-bottom: 12px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  width: 18px;
+  height: 18px;
+}
+
+.saveBtn {
+  margin-top: 8px;
+}
+
+/* Leaderboard header – segment, countdown, filters */
+.countdownWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+/* Card-style container for leaderboard (Profile/Stats look) */
+.leaderboardCard {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.leaderboardCardTitle {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.leaderboardCard .leaderboardHeader {
+  margin-bottom: 12px;
+}
+
+.leaderboardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 14px;
+}
+
+/* Single segmented bar: Today | Week | All-time */
+.boardModeSwitch {
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+.boardModeBtn {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.boardModeBtn:not(:last-child) {
+  border-right: 1px solid var(--color-border);
+}
+
+.boardModeBtnActive {
+  background: var(--color-brand-primary);
+  color: #fff;
+  border-color: var(--color-brand-primary);
+}
+
+.boardModeBtnActive + .boardModeBtn {
+  border-left-color: var(--color-brand-primary);
+}
+
+/* Filters bar: icon + "Filters" + chevron */
+.filtersBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+}
+
+.filtersBar:hover {
+  background: var(--color-bg-card);
+}
+
+.filtersChevronOpen {
+  transform: rotate(180deg);
+  margin-left: auto;
+}
+
+.leaderboardSubtitle {
+  font-size: 16px;
+  margin: 0 0 10px 0;
+  color: var(--color-text-secondary);
+}
+
+.weekSubviewSwitch {
+  display: flex;
+  gap: 8px;
+}

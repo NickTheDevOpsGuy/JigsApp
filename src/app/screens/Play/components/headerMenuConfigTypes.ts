@@ -25,6 +25,8 @@ export type HeaderMenuProps = {
   deliberateDetachEnabled?: boolean;
   onToggleDeliberateDetach?: () => void;
   pieceLockingEnabled: boolean;
+  magneticSnapEnabled?: boolean;
+  snapGlowEnabled?: boolean;
   relaxedModeEnabled?: boolean;
   showGhostHint: boolean;
   showGhostWhenIdle: boolean;
@@ -48,6 +50,8 @@ export type HeaderMenuProps = {
   onToggleMusic?: () => void;
   onToggleHaptics: () => void;
   onTogglePieceLocking: () => void;
+  onToggleMagneticSnap?: () => void;
+  onToggleSnapGlow?: () => void;
   autoRotateOnSnap?: boolean;
   onToggleAutoRotateOnSnap?: () => void;
   onToggleRelaxedMode?: () => void;

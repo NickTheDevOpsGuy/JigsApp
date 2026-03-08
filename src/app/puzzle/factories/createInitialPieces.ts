@@ -166,7 +166,9 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     gridRows = Math.min(maxRows, Math.ceil(total / gridCols));
   }
 
-  const SPAWN_RETRY_MAX = 12;
+  const SPAWN_RETRY_MAX = 80;
+  const rangeX = Math.max(0, scatterZone.maxX - scatterZone.minX - w);
+  const rangeY = Math.max(0, scatterZone.maxY - scatterZone.minY - h);
 
   function wouldOverlap(
     placed: Array<{ x: number; y: number }>,
@@ -181,65 +183,52 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
     return false;
   }
 
+  /** Random position in scatter zone (inclusive of padding so pieces don't touch edges). */
+  function randomPosition(): { x: number; y: number } {
+    const x =
+      rangeX <= 0
+        ? scatterZone.minX
+        : scatterZone.minX + Math.floor(Math.random() * (rangeX + 1));
+    const y =
+      rangeY <= 0
+        ? scatterZone.minY
+        : scatterZone.minY + Math.floor(Math.random() * (rangeY + 1));
+    return { x, y };
+  }
+
   const positions: Array<{ x: number; y: number }> = [];
-  const jitterSpace = Math.max(
-    0,
-    Math.min(
-      effectiveCellW - w - 4,
-      effectiveCellH - h - 4,
-      Math.floor(minSpacing * 0.5),
-    ),
-  );
-
-  const capacity = gridCols * gridRows;
   for (let i = 0; i < total; i++) {
-    let row: number;
-    let col: number;
-    if (i < capacity) {
-      row = Math.floor(i / gridCols);
-      col = i % gridCols;
-    } else {
-      const overflow = i - capacity;
-      row = gridRows + Math.floor(overflow / gridCols);
-      col = overflow % gridCols;
-    }
-    const baseX = scatterZone.minX + col * effectiveCellW;
-    const baseY = scatterZone.minY + row * effectiveCellH;
-
     let x: number;
     let y: number;
     let retries = 0;
     do {
-      const jitterX = jitterSpace > 0 ? randInt(-jitterSpace, jitterSpace) : 0;
-      const jitterY = jitterSpace > 0 ? randInt(-jitterSpace, jitterSpace) : 0;
-      x = Math.max(scatterZone.minX, Math.min(scatterZone.maxX - w, baseX + jitterX));
-      y = Math.max(scatterZone.minY, Math.min(scatterZone.maxY - h, baseY + jitterY));
+      const pos = randomPosition();
+      x = pos.x;
+      y = pos.y;
       retries++;
-      if (retries > SPAWN_RETRY_MAX) break;
+      if (retries > SPAWN_RETRY_MAX) {
+        // Fallback: grid position so we always place all pieces
+        const row = Math.floor(i / gridCols);
+        const col = i % gridCols;
+        x =
+          scatterZone.minX +
+          col * effectiveCellW +
+          randInt(0, Math.max(0, effectiveCellW - w - 2));
+        y =
+          scatterZone.minY +
+          row * effectiveCellH +
+          randInt(0, Math.max(0, effectiveCellH - h - 2));
+        break;
+      }
     } while (wouldOverlap(positions, x, y));
 
     positions.push({ x, y });
   }
 
-  // Shuffle so piece assignment is random
+  // Shuffle so piece assignment to positions is random (which piece gets which spot)
   for (let i = positions.length - 1; i > 0; i--) {
     const j = randInt(0, i);
     [positions[i], positions[j]] = [positions[j], positions[i]];
-  }
-
-  // Add more positions in rows below if we have more pieces than grid cells
-  let rowOffset = 0;
-  while (positions.length < total) {
-    rowOffset++;
-    const baseY = scatterZone.minY + gridRows * cellH + (rowOffset - 1) * cellH;
-    for (let col = 0; col < gridCols && positions.length < total; col++) {
-      const jitterX = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
-      const jitterY = jitterSpace > 0 ? randInt(0, jitterSpace) : 0;
-      positions.push({
-        x: scatterZone.minX + col * cellW + jitterX,
-        y: baseY + jitterY,
-      });
-    }
   }
 
   // All pieces start in tray; board starts empty (build intentionally)
@@ -278,7 +267,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
       dragCount: 0,
       x: pos.x,
       y: pos.y,
-      z: 1,
+      z: i + 1,
       w,
       h,
       tileW,
@@ -296,6 +285,12 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
       edges: edges[i],
       inTray: startInTray,
     });
+  }
+
+  // Randomize tray order at start (Fisher–Yates shuffle)
+  for (let i = pieces.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pieces[i], pieces[j]] = [pieces[j], pieces[i]];
   }
 
   return pieces;

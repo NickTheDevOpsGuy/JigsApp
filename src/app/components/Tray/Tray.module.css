@@ -8,8 +8,9 @@
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-snap-type: x proximity;
-  scroll-padding-inline: 12px;
+  scroll-snap-type: x mandatory;
+  scroll-snap-stop: always;
+  scroll-padding-inline: calc(50% - 60px); /* center first/last section without partial */
   height: 100%;
   align-items: flex-start;
 }
@@ -19,7 +20,7 @@
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  scroll-snap-align: start;
+  scroll-snap-align: center;
 }
 
 .trayLabel {

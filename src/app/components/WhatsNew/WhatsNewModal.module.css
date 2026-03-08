@@ -1,6 +1,6 @@
 .content {
-  max-height: 65vh;
-  overflow-y: auto;
+  max-height: none;
+  overflow: hidden;
   font-size: 1rem;
   padding-bottom: 0.5rem;
 }
@@ -51,7 +51,7 @@
 @media (max-width: 600px) {
   .content {
     max-height: none;
-    overflow: visible;
+    overflow: hidden;
     padding-bottom: 0.25rem;
     font-size: 0.9rem;
   }

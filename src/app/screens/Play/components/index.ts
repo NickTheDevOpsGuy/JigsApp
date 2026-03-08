@@ -9,6 +9,7 @@ export { CompletionOverlay } from "./CompletionOverlay";
 export { CompletionOverlayGate } from "./CompletionOverlayGate";
 export { PauseOverlay } from "./PauseOverlay";
 export { PlayScreenCoopView } from "./PlayScreenCoopView";
+export { PlayScreenLayout } from "./PlayScreenLayout";
 export { PlayScreenModals } from "./PlayScreenModals";
 export { PlayScreenOverlays } from "./PlayScreenOverlays";
 export { PlayScreenTopBar } from "./PlayScreenTopBar";

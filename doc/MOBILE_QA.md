@@ -35,8 +35,11 @@ Quick manual pass for real devices before release.
 - Board remains within viewport on first load.
 - Tray remains visible and usable on small screens.
 - Drag/snap feels smooth (no stuck pieces, no hidden-behind bug).
+- Piece locking remains reliable across all piece groups (no side-specific lock failure).
+- Fast touch drags still snap correctly (during drag and on release).
 - Long-press on board/pieces does **not** open browser context menu.
 - Inputs/modals (where text is entered) still allow normal interaction.
+- While dragging on touch devices, minimap does not block interaction.
 
 ### Win/Share flow
 
@@ -49,12 +52,18 @@ Quick manual pass for real devices before release.
 - Bottom controls do not overlap iOS home indicator.
 - Top controls do not overlap notch/dynamic island.
 - Rotation to landscape does not hide critical actions.
+- After rotate, board recenters and remains draggable/snappable without reloading.
 
 ## Accessibility smoke
 
 - Tap targets for primary actions are >= 44px.
 - Focus indicators visible when using external keyboard (if available).
 - Text remains readable at OS text-size + one step.
+
+## Debug/log noise checks
+
+- No repeated lock debug flood while idle drag loops.
+- Console has no persistent `overlap-block` spam during normal play.
 
 ## Regression gate
 

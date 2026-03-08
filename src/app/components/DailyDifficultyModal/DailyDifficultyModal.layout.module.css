@@ -1,0 +1,157 @@
+.recommendedBadge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.difficultyCardIcon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.difficultyCardIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.difficultyCardLabel {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+}
+
+.difficultyCardMeta {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.difficultyCardLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  flex: 1;
+}
+
+.recommendedInline {
+  font-size: 11px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+}
+
+.difficultyCardCheck {
+  position: static;
+  margin-left: auto;
+  color: var(--color-text-on-brand);
+  background: var(--color-brand-primary);
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  padding: 2px;
+  box-sizing: content-box;
+}
+
+.moreOptionsBtn {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.moreOptionsBtn:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-brand-primary);
+}
+
+.moreOptionsIcon {
+  flex-shrink: 0;
+}
+
+.moreOptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.moreOptionsList .difficultyCard {
+  min-height: 0;
+  padding: 9px 12px;
+}
+
+.moreOptionsList .difficultyCardIcon {
+  margin-right: 12px;
+}
+
+.moreOptionsList .difficultyCardLabel {
+  flex: 1;
+}
+
+.moreOptionsList .difficultyCardMeta {
+  margin-right: 24px;
+}
+
+.challengeModeSection {
+  margin: 16px 0 14px;
+  min-width: 0;
+}
+
+.challengeModeLabel {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.challengeModeHint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  overflow-wrap: break-word;
+}
+
+.challengeModeRadioList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.challengeModeOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  min-width: 0;
+}

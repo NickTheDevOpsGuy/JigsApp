@@ -10,6 +10,16 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Replay** — After completing a puzzle you can **Watch Replay** from the win screen; progress is recorded as snapshots and played back at 1×–10× speed (play/pause, progress bar, close). Playback uses requestAnimationFrame for smooth updates on desktop and mobile.
 - **Share cards** — Challenge card (“PUZZLE CHALLENGE”) and result card (“PHUZZLE RESULT”) have distinct layouts; result card is informational (Time, Accuracy, no taunt copy). Full puzzle image on cards (no missing-piece cutout).
 
+## Recent: Mobile/touch hardening + architecture split
+
+- **Touch drag hardening** — Dynamic tap-vs-drag threshold for coarse/high-DPI devices; touch move throttle tuned by device class to reduce jitter without changing behavior.
+- **Drag UI safety** — Minimap suppression while active drag on coarse pointers; safe-area guardrails for top/bottom controls; 44px minimum touch targets for key actions.
+- **Orientation recovery** — Rotation triggers board re-measure + viewport reset/recenter flow to avoid off-screen board issues.
+- **Piece lock diagnostics** — Lock-debug paths are isolated (`puzzleLockDebug.ts`) with tests and overlap tracing to validate lock behavior regressions safely.
+- **Play screen split** — `PlayScreen.tsx` delegates through `PlayScreenController.tsx`, `PlayScreenMain.tsx`, and scene/layout modules with focused hooks (`usePlayScreenLifecycleEffects.ts`, `usePlayScreenBoardInteractions.ts`, `usePlayScreenSceneState.ts`, `usePlayScreenTrayPieces.ts`).
+- **Puzzle manager split** — Core logic split into operation modules (`puzzleManagerPointerOps.ts`, `puzzleManagerSnapOps.ts`, `puzzleManagerActionsOps.ts`, `puzzleManagerNeighborSnapOps.ts`, `puzzleManagerBoardOps.ts`) plus engine/runtime/core files.
+- **CSS split** — Large CSS files split into base/layout/responsive modules across play/setup/stats/menu/components for safer mobile iteration.
+
 ---
 
 ## Recent: Share flow, draw order, seams, unwinnable fix, grid minimum
@@ -38,6 +48,12 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Win screen** – No confetti; completion overlay shows image, stats, share section, and cycling message/badge only.
 - **Piece draw order** – Newly snapped/placed pieces always draw on top of connected pieces (no pop-behind).
 - **What's New** – Modal shows at most 4 items to keep the screen short.
+
+## Recent: Controls engagement toggles
+
+- **Magnetic Snap** (Settings → Modes) — New toggle to enable/disable gentle magnetic pull when a dragged piece is near valid snap.
+- **Snap Glow** (Settings → Modes) — New toggle to enable/disable proximity glow and snap pulse visuals.
+- **Persistence** — Both toggles are saved to local storage and restored on next launch.
 
 ---
 
@@ -124,8 +140,10 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ## Code structure (reference)
 
-- **Play screen** – `screens/Play/PlayScreen.tsx` composes `PlayScreenTopBar`, `PlayScreenModals`, `PlayScreenOverlays` (preview, tutorial, shortcuts, toasts, profiler, coop debug), board, tray, and completion overlay. Hooks in `screens/Play/hooks/` (e.g. `usePlayScreenManager`, `usePlayScreenTopBarProps`, `useSnapComboAnnouncer`, `usePlayScreenUIPersistence`, `usePointerHandlers`, `useViewport`, `viewportStorage.ts`, `useReferenceTapHighlight`, `playScreenManagerEvents.ts`, `pointerHandlers/` with types in `types.ts`). Header menu items: `headerMenuItemsDisplay.ts`, `headerMenuItemsRest.ts`, `headerMenuItemsDisplayRest.ts`. UI initial state from `playScreenUIInitial.ts`.
-- **Puzzle logic** – `puzzle/PuzzleManager.ts` (drag, snap, groups, undo). Snapping runs on pointerUp only (no mid-drag snap) to avoid jerky lock; lock uses a single `setGroupToExactTargetPositions` update. Helpers: `puzzleManagerUtils.ts` (clamp, getUndoLimit, getEffectiveTolerance, findPlacementFromTray), `puzzleManagerRestore.ts` (applySavedPieces for undo/redo), `puzzleSnap.ts` (computeBoardSnapResult, computeNeighborSnapResult, computeNearSnapNudge, computeMergedGroupBoardSnapResult, rotateGroupToZeroPieces). Board drawing in `puzzle/canvas/`: `renderBoardDraw.ts`, `renderBoardDrawPiece.ts`, `renderBoardDrawPieceHelpers.ts` (stroke, cached piece), `renderBoardDrawOverlays.ts` (wrong-rotation, lock glow).
+- **Play screen** – Entry split: `screens/Play/PlayScreen.tsx` → `PlayScreenController.tsx` → `PlayScreenMain.tsx` → `PlayScreenScene.tsx` / `PlayScreenSceneImpl.tsx` with `components/PlayScreenLayout.tsx`. Hooks are split by concern in `screens/Play/hooks/` (scene state, lifecycle, board interactions, UI persistence, share session, top bar builders, pointer handling, viewport, replay).
+- **Pointer handling** – `screens/Play/hooks/pointerHandlers/` split into `pointerHandlersFactoryCore.ts`, `touchHandlers.ts`, `mouseHandlers.ts`, and shared helpers/types.
+- **Puzzle logic** – `puzzle/PuzzleManager.ts` delegates to split modules (`PuzzleManagerCore.ts`, `PuzzleManagerEngine.ts`, `PuzzleManagerRuntime.ts`, `puzzleManager*Ops.ts`, `puzzleManager*Helpers.ts`) while `puzzleSnap.ts`, `puzzleManagerRestore.ts`, and `puzzleManagerUtils.ts` keep reusable pure logic.
+- **Canvas draw** – Drawing helpers are split into core modules (`renderBoardDrawPieceCore.ts`, `renderBoardHelpersCore.ts`) plus existing higher-level draw files.
 - **Audio** – `audio/sounds.ts` (SoundEngine, ambient); `soundsPreferences.ts` (load/save prefs from localStorage); theme-aware SFX in `soundsSfx.ts` (barrel); implementations in `soundsSfxTypes.ts`, `soundsSfxSnap.ts`, `soundsSfxMisc.ts`, `soundsSfxComplete.ts`. Ambient music: `soundsAmbient.ts` re-exports theme loops; types in `soundsAmbientTypes.ts`; one file per theme.
 - **Setup** – `screens/Setup/SetupScreen.tsx`; hooks in `hooks/` (`useGridConfig`, `useImagePicker`, `useSetupScreenGalleryScroll`); `SetupConfigSection.tsx` (difficulty, time, custom grid, remember); image source (gallery/upload/camera) in `components/SetupImageSourcePanel.tsx`.
 - **Data / menu** – `data/menuConfig.ts` (getMenuTree); sections in `menuConfigPlay.ts`, `menuConfigAppearance.ts`, `menuConfigRest.ts`; constants and types in `menuConfigConstants.ts` (TIME_MODE_LABELS, MenuNode).

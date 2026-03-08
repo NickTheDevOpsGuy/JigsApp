@@ -1,13 +1,15 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "31";
+export const CHANGELOG_VERSION = "32";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "✨ New controls and polish – Magnetic Snap and Snap Glow toggles are now in Assistance, drag stays frame-synced for smoother motion, and a touch rotate guard reduces accidental post-drop spins.",
+      "🧱 Internal split cleanup – Play scene and puzzle engine internals were further split into focused modules; README structure docs updated.",
       "🏆 Win screen refresh – Starry background, “PUZZLE COMPLETE!” banner, completed image, Time and Moves stat cards, Watch Replay, and a prominent Next Puzzle button.",
       "▶️ Replay – Watch your solve back from the win screen; playback at 1×–10× speed with play/pause and progress bar (desktop and mobile).",
       "📤 Share polish – Completion share copy is now neutral (no taunts), and challenge action is renamed to “Share with People”.",

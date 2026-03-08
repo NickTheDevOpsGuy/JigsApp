@@ -1,0 +1,208 @@
+.segment button:hover:not(:disabled) {
+  background: var(--color-bg-secondary);
+}
+
+.segment button.active {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+}
+
+.segment button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.segment button {
+  min-height: 36px;
+}
+
+/* Visual "you are here" scroll position indicator */
+.scrollIndicator {
+  flex-shrink: 0;
+  height: 6px;
+  background: var(--color-bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 12px 6px;
+}
+
+.scrollIndicatorFill {
+  height: 100%;
+  background: var(--color-brand-primary);
+  border-radius: 3px;
+  transition: width 0.1s ease-out;
+}
+
+.scrollerWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 4px;
+}
+
+.scrollBtn {
+  flex-shrink: 0;
+  appearance: none;
+  border: none;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  padding: 8px 6px;
+  min-width: 44px;
+  min-height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  border-radius: 4px;
+}
+
+.scrollBtn:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-brand-primary);
+}
+
+.scrollBtn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.scrollBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.scroller {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Hard-stop horizontal edges; no blank rubber-band runout beyond first/last piece. */
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: contain;
+  /* Minimal right padding so scroll doesn't show big blank past last piece */
+  scroll-padding-inline-end: 0;
+  padding: 8px 12px;
+  padding-inline-end: 12px;
+  display: flex;
+  align-items: center;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.scroller::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+
+.scrollerSnap {
+  scroll-snap-type: x mandatory;
+  scroll-snap-stop: always;
+  scroll-padding-inline: calc(
+    50% - 28px
+  ); /* half of 56px piece so first/last center without partial */
+  scroll-behavior: smooth;
+}
+
+/* Width fits content only so scroll doesn't show blank space past last piece */
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: max-content;
+  min-width: max-content;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+}
+
+.scrollerSnap .pieceButton {
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.pieceButton {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 2px 4px;
+  min-width: 56px;
+  min-height: 56px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blankSlot {
+  padding: 2px 4px;
+  min-width: 56px;
+  min-height: 56px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.pieceButton:hover {
+  background: transparent;
+  transform: scale(1.08);
+}
+
+.pieceButton:active {
+  transform: scale(0.98);
+}
+
+@media (pointer: coarse) {
+  .segment button,
+  .scrollBtn,
+  .pieceButton {
+    min-height: 44px;
+  }
+}
+
+.thumbWrap {
+  width: var(--thumb-size, 68px);
+  height: var(--thumb-size, 68px);
+
+  /* IMPORTANT:
+     Do NOT clip the thumbnail, otherwise jigsaw tabs/slots get cut off. */
+  border-radius: 4px;
+  overflow: visible;
+  background: transparent;
+
+  /* helps center an <img> thumbnail cleanly */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Old class used by background-image thumbs (keep for compatibility) */
+.thumb {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+}
+
+.thumbFallback {
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg-secondary);
+  border-radius: 4px;
+}
+
+.thumbBlank {
+  border: 1px dashed var(--color-border);
+  background: color-mix(in srgb, var(--color-bg-secondary) 70%, transparent);
+  box-sizing: border-box;
+}

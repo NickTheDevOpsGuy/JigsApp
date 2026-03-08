@@ -2,8 +2,13 @@
  * groupUtils – group bounds, row/col map, neighbor lookups for snap logic.
  */
 import type { Piece } from "./types";
-
-export type GroupBounds = { minX: number; minY: number; maxX: number; maxY: number };
+import { lockDebug } from "./puzzleLockDebug";
+import {
+  getCollisionBounds,
+  shouldIgnoreNeighborJitterOverlap,
+  type GroupBounds,
+} from "./groupCollision";
+export type { GroupBounds } from "./groupCollision";
 
 /** Key for (row, col) lookup. Use for O(1) neighbor checks in snap logic. */
 export function rowColKey(row: number, col: number): string {
@@ -64,14 +69,24 @@ export function wouldOverlapAnyOtherGroup(
   groupId: string,
   dx: number,
   dy: number,
+  overlapEpsilonPx: number = 0,
+  ignoreGroupIds: ReadonlySet<string> = new Set<string>(),
 ): boolean {
+  // Sub-pixel canvas math and fractional DPR often produce ~0.1-0.9px phantom overlaps.
+  // Treat tiny overlaps as non-blocking so edge-adjacent groups can still snap/lock.
+  const effectiveOverlapEpsilonPx = Math.max(1, overlapEpsilonPx);
   const groupPieces = pieces.filter((p) => !p.inTray && p.groupId === groupId);
   if (groupPieces.length === 0) return false;
 
-  const movedBounds = getGroupBounds(
-    groupPieces.map((p) => ({ ...p, x: p.x + dx, y: p.y + dy })),
-    groupId,
-  );
+  const movedTileBounds = groupPieces.map((p) => getCollisionBounds(p, dx, dy));
+  const movedBounds: GroupBounds | null = movedTileBounds.length
+    ? {
+        minX: Math.min(...movedTileBounds.map((b) => b.minX)),
+        minY: Math.min(...movedTileBounds.map((b) => b.minY)),
+        maxX: Math.max(...movedTileBounds.map((b) => b.maxX)),
+        maxY: Math.max(...movedTileBounds.map((b) => b.maxY)),
+      }
+    : null;
   if (!movedBounds) return false;
 
   const otherGroupIds = new Set<string>();
@@ -80,19 +95,43 @@ export function wouldOverlapAnyOtherGroup(
   }
 
   for (const otherGid of otherGroupIds) {
-    const otherBounds = getGroupBounds(pieces, otherGid);
+    if (ignoreGroupIds.has(otherGid)) continue;
+    const otherPieces = pieces.filter((p) => p.groupId === otherGid && !p.inTray);
+    const otherTileBounds = otherPieces.map((p) => getCollisionBounds(p));
+    const otherBounds: GroupBounds | null = otherTileBounds.length
+      ? {
+          minX: Math.min(...otherTileBounds.map((b) => b.minX)),
+          minY: Math.min(...otherTileBounds.map((b) => b.minY)),
+          maxX: Math.max(...otherTileBounds.map((b) => b.maxX)),
+          maxY: Math.max(...otherTileBounds.map((b) => b.maxY)),
+        }
+      : null;
     if (!otherBounds || !boundsIntersect(movedBounds, otherBounds)) continue;
-
-    const otherPieces = pieces.filter((p) => p.groupId === otherGid);
     for (const gp of groupPieces) {
-      const gpX = gp.x + dx;
-      const gpY = gp.y + dy;
-      const gpRight = gpX + gp.w;
-      const gpBottom = gpY + gp.h;
+      const gpBounds = getCollisionBounds(gp, dx, dy);
       for (const op of otherPieces) {
-        const opRight = op.x + op.w;
-        const opBottom = op.y + op.h;
-        if (!(gpRight <= op.x || gpX >= opRight || gpBottom <= op.y || gpY >= opBottom)) {
+        const opBounds = getCollisionBounds(op);
+        if (
+          !(
+            gpBounds.maxX <= opBounds.minX + effectiveOverlapEpsilonPx ||
+            gpBounds.minX >= opBounds.maxX - effectiveOverlapEpsilonPx ||
+            gpBounds.maxY <= opBounds.minY + effectiveOverlapEpsilonPx ||
+            gpBounds.minY >= opBounds.maxY - effectiveOverlapEpsilonPx
+          )
+        ) {
+          if (shouldIgnoreNeighborJitterOverlap(gp, op, dx, dy)) {
+            continue;
+          }
+          lockDebug("overlap-block", {
+            movingGroupId: groupId,
+            blockingGroupId: otherGid,
+            movingPieceId: gp.id,
+            blockingPieceId: op.id,
+            dx,
+            dy,
+            movingBounds: gpBounds,
+            blockingBounds: opBounds,
+          });
           return true;
         }
       }

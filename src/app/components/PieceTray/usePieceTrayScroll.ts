@@ -50,6 +50,8 @@ export function usePieceTrayScroll(displayedLength: number) {
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
+    const isIOS =
+      typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     let touchLastX: number | null = null;
     const onTouchStart = (event: TouchEvent) => {
@@ -74,6 +76,18 @@ export function usePieceTrayScroll(displayedLength: number) {
     };
     const onTouchDone = () => {
       touchLastX = null;
+      if (isIOS && displayedLength > 0) {
+        // Nudge to a slot-aligned resting point to reduce half-cut pieces after momentum.
+        const STEP_PX = 64;
+        const { maxScroll } = getHorizontalScrollMetrics(el);
+        const aligned = Math.max(
+          0,
+          Math.min(maxScroll, Math.round(el.scrollLeft / STEP_PX) * STEP_PX),
+        );
+        requestAnimationFrame(() => {
+          el.scrollTo({ left: aligned, behavior: "smooth" });
+        });
+      }
       run();
     };
 

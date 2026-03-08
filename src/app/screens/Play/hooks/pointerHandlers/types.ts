@@ -16,10 +16,26 @@ export type CanvasWithTouch = HTMLCanvasElement & {
 };
 
 /** Max movement (px) before touch is treated as drag instead of tap. */
-export const TAP_DRAG_THRESHOLD_PX = 6;
+export const TAP_DRAG_THRESHOLD_PX = 8;
+
+/**
+ * Dynamic tap/drag threshold for touch devices.
+ * Slightly higher threshold on high-DPI/coarse pointers to reduce accidental drags.
+ */
+export function getTapDragThresholdPx(): number {
+  if (typeof window === "undefined") return TAP_DRAG_THRESHOLD_PX;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const isCoarse = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+  let threshold = TAP_DRAG_THRESHOLD_PX;
+  if (isCoarse) threshold += 2;
+  if (dpr >= 2.5) threshold += 1;
+  return threshold;
+}
 
 /** Max duration (ms) for touch down→up to count as a tap (avoids slow-tap/hesitation). */
 export const TAP_MAX_MS = 350;
+/** Guard window after a touch drag ends; suppress tap-rotate to avoid accidental rotates. */
+export const TOUCH_ROTATE_AFTER_DRAG_GUARD_MS = 180;
 
 export type DragPreviewState = {
   clientX: number;
@@ -53,10 +69,14 @@ export type PointerHandlersContext = {
   onDragStarted?: () => void;
   /** Called when drag ends (pointer up). */
   onDragEnded?: () => void;
+  /** Called when user rotates a piece (for completion stats). */
+  onRotate?: () => void;
   /** When set, use board-space API for zoom/pan viewport */
   screenToBoard?: ScreenToBoard;
   /** Timestamp of last tap-rotate; used to avoid click+touch double fire. */
   lastTapRotateTimeRef?: React.MutableRefObject<number>;
+  /** Timestamp of last completed touch drag; used to suppress immediate accidental tap-rotate. */
+  lastTouchDragEndTimeRef?: React.MutableRefObject<number>;
 };
 
 /** Dependencies passed to createPointerHandlers (pointerHandlersFactory). */

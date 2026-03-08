@@ -7,6 +7,12 @@ This folder contains developer docs for Phuzzle.
 - `SUPABASE_SETUP.md` - Supabase setup for leaderboards, stats, achievements, and co-op
 - `LIGHTHOUSE.md` - Lighthouse CI setup and token troubleshooting
 
+## Architecture and mobile
+
+- Main architecture and file/folder split notes live in [../README.md](../README.md) under **Internal structure (recent split)**.
+- Mobile/touch release checks live in [MOBILE_QA.md](MOBILE_QA.md).
+- Markdown lint config for docs lives at `/.markdownlint-cli2.jsonc`.
+
 ## Reference
 
 - [BUG_REPORT.md](BUG_REPORT.md) - Bug report flow (About → Report a bug; mailto, screenshots)

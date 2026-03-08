@@ -115,8 +115,8 @@ describe("PuzzleManager", () => {
     manager.pointerUp();
 
     const moved = manager.getState().pieces.find((p) => p.id === pieceId)!;
-    expect(moved.x).toBeGreaterThanOrEqual(-moved.pad);
-    expect(moved.y).toBeGreaterThanOrEqual(-moved.pad);
+    expect(moved.x).toBeGreaterThanOrEqual(0);
+    expect(moved.y).toBeGreaterThanOrEqual(0);
   });
 
   it("clamps legacy offscreen board pieces when restoring on mobile", () => {
@@ -143,7 +143,71 @@ describe("PuzzleManager", () => {
     manager.restoreFromSaved(saved);
 
     const restored = manager.getState().pieces.find((p) => p.id === pieceId)!;
-    expect(restored.x).toBeGreaterThanOrEqual(-restored.pad);
-    expect(restored.y).toBeGreaterThanOrEqual(-restored.pad);
+    expect(restored.x).toBeGreaterThanOrEqual(0);
+    expect(restored.y).toBeGreaterThanOrEqual(0);
+  });
+
+  it("unlocks restored non-complete pieces when piece locking is disabled", () => {
+    const manager = createManager({ rows: 2, cols: 2 });
+    const state = manager.getState();
+    const targetId = state.pieces[0].id;
+
+    const saved = state.pieces.map((p) => ({
+      id: p.id,
+      row: p.row,
+      col: p.col,
+      x: p.x,
+      y: p.y,
+      z: p.z,
+      rotation: p.rotation,
+      isPlaced: false,
+      locked: true,
+      groupId: p.groupId,
+      inTray: p.inTray,
+      dragCount: p.dragCount ?? 0,
+    }));
+    manager.restoreFromSaved(saved);
+    manager.setPieceLockingEnabled(false);
+
+    const unlocked = manager.getState().pieces.find((p) => p.id === targetId)!;
+    expect(unlocked.locked).toBe(false);
+
+    manager.pointerDownBoardSpace(targetId, unlocked.x + 5, unlocked.y + 5);
+    expect(manager.getDragState().activeId).toBe(targetId);
+  });
+
+  it("keeps unlocked members movable when restoring mixed locked groups", () => {
+    const manager = createManager({ rows: 2, cols: 2 });
+    const state = manager.getState();
+    const [anchor, other] = state.pieces;
+    const sharedGroupId = anchor.groupId;
+
+    const saved = state.pieces.map((p, index) => {
+      return {
+        id: p.id,
+        row: p.row,
+        col: p.col,
+        x: p.x,
+        y: p.y,
+        z: p.z,
+        rotation: p.rotation,
+        isPlaced: false,
+        locked: index === 0,
+        groupId: index <= 1 ? sharedGroupId : p.groupId,
+        inTray: index <= 1 ? false : p.inTray,
+        dragCount: p.dragCount ?? 0,
+      };
+    });
+
+    manager.restoreFromSaved(saved);
+    const movableCandidate = manager.getState().pieces.find((p) => p.id === other.id)!;
+    expect(movableCandidate.locked).toBe(false);
+
+    manager.pointerDownBoardSpace(
+      movableCandidate.id,
+      movableCandidate.x + 4,
+      movableCandidate.y + 4,
+    );
+    expect(manager.getDragState().activeId).toBe(movableCandidate.id);
   });
 });

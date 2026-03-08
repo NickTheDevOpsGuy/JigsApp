@@ -1,0 +1,136 @@
+/* Starry/cosmic background behind the card. No page scroll – card scrolls when needed. */
+.page {
+  height: var(--app-vh-stable, 100dvh);
+  min-height: var(--app-vh-stable, 100dvh);
+  max-height: 100dvh;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: var(--color-bg-secondary);
+  padding: 12px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+  overflow: hidden;
+  overscroll-behavior: none;
+  position: relative;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Repeating starfield (small dots) */
+  background-image:
+    radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 30% 25%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 50% 5%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 70% 20%, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 90% 12%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 15% 50%, rgba(255, 255, 255, 0.28), transparent),
+    radial-gradient(1px 1px at 45% 45%, rgba(255, 255, 255, 0.22), transparent),
+    radial-gradient(1px 1px at 85% 55%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 8% 78%, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 65% 88%, rgba(255, 255, 255, 0.2), transparent),
+    radial-gradient(1px 1px at 92% 92%, rgba(255, 255, 255, 0.35), transparent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page > .card {
+  z-index: 1;
+}
+
+.card {
+  width: min(480px, 100%);
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  background: var(--color-bg-card);
+  border-radius: 18px;
+  padding: 14px 18px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+
+.card::-webkit-scrollbar {
+  display: none;
+}
+
+.homeBar {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  justify-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.cornerBtns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dailyTitleInBar {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.cornerBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-brand-primary);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cornerBtn:hover {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand-primary);
+}
+
+.menuDate {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0 0 6px 0;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.dailyTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--color-text-primary);
+}

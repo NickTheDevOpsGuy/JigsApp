@@ -1,0 +1,174 @@
+.shareResultPopupTextarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  resize: none;
+}
+
+.shareResultPopupCta {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.shareResultPopupBtn {
+  width: 100%;
+  min-height: 44px;
+  justify-content: center;
+}
+
+.shareResultPopupMenuWrap {
+  position: relative;
+  width: 100%;
+}
+
+.shareResultPopupMenuWrap .shareResultPopupBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shareResultPopupChevronOpen {
+  transform: rotate(180deg);
+}
+
+.shareResultPopupMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.shareResultPopupMenuItem {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.shareResultPopupMenuItem:hover:not(:disabled) {
+  background: var(--color-bg-secondary);
+}
+
+.shareResultPopupMenuItem:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.shareResultPopupMenuItem:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.shareResultPopupHint {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin: -4px 0 0;
+  opacity: 0.9;
+}
+
+.shareResultPopupToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  user-select: none;
+  padding: 4px 0;
+}
+
+.shareResultPopupToggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.shareResultPopupUrl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.shareResultPopupUrlLabel {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.shareResultPopupUrlLink {
+  font-size: 0.9rem;
+  color: var(--color-link);
+  text-decoration: none;
+  word-break: break-all;
+  flex: 1;
+  min-width: 0;
+}
+
+.shareResultPopupUrlLink:hover {
+  text-decoration: underline;
+}
+
+.shareResultPopupUrlCopy {
+  flex-shrink: 0;
+  min-width: 36px;
+  padding: 6px;
+}
+
+/* Help choice modal */
+.helpChoice {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.helpChoiceBtn {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 14px 20px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.helpChoiceBtn:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-brand-primary);
+}
+
+/* Hamburger menu */

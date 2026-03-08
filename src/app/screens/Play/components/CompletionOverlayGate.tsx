@@ -15,6 +15,8 @@ interface CompletionOverlayGateProps {
   imageUrl: string | undefined;
   undoCount: number;
   moveCount: number;
+  rotationCount?: number;
+  maxGroupSize?: number;
   dailyVisualModifier: VisualModifier;
   pieceCutType: PieceCutType;
   isNewBest: boolean;
@@ -51,6 +53,8 @@ export function CompletionOverlayGate({
   imageUrl,
   undoCount,
   moveCount,
+  rotationCount = 0,
+  maxGroupSize = 0,
   dailyVisualModifier,
   pieceCutType,
   isNewBest,
@@ -100,6 +104,9 @@ export function CompletionOverlayGate({
       imageUrl={imageUrl}
       undoCount={undoCount}
       moveCount={moveCount}
+      piecesPerMin={movesPerMin}
+      rotationCount={rotationCount}
+      maxGroupSize={maxGroupSize}
       accuracyPercent={accuracyPercent}
       usedHint={usedHint}
       visualModifier={dailyVisualModifier}

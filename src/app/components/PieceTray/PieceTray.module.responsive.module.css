@@ -1,0 +1,192 @@
+/* New class for <img> thumbnails (jigsaw-shaped renders) */
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  font-size: 13px;
+}
+
+/* Compact mode: 25–48 piece puzzles */
+.trayCompact .thumbWrap {
+  width: 54px;
+  height: 54px;
+}
+
+.trayCompact .pieceButton {
+  min-width: 58px;
+  min-height: 58px;
+  padding: 2px;
+}
+
+.trayCompact .blankSlot {
+  min-width: 58px;
+  min-height: 58px;
+  padding: 2px;
+}
+
+@media (max-width: 600px) {
+  .trayCompact .thumbWrap {
+    width: 60px;
+    height: 60px;
+  }
+
+  .trayCompact .pieceButton,
+  .trayCompact .blankSlot {
+    min-width: 64px;
+    min-height: 64px;
+  }
+}
+
+.trayCompact .row {
+  gap: 8px;
+}
+
+.trayCompact .scroller {
+  padding: 8px 12px;
+  padding-inline-end: 12px;
+}
+
+/* Extra-compact for 49+ pieces – larger than before for visibility */
+.trayExtraCompact .thumbWrap {
+  width: 48px;
+  height: 48px;
+}
+
+.trayExtraCompact .pieceButton {
+  min-width: 52px;
+  min-height: 52px;
+  padding: 2px;
+}
+
+.trayExtraCompact .blankSlot {
+  min-width: 52px;
+  min-height: 52px;
+  padding: 2px;
+}
+
+@media (max-width: 600px) {
+  .trayExtraCompact .thumbWrap {
+    width: 56px;
+    height: 56px;
+  }
+
+  .trayExtraCompact .pieceButton,
+  .trayExtraCompact .blankSlot {
+    min-width: 60px;
+    min-height: 60px;
+  }
+}
+
+.trayExtraCompact .row {
+  gap: 6px;
+}
+
+.trayExtraCompact .scroller {
+  padding: 8px 10px;
+  padding-inline-end: 12px;
+}
+
+/* Tray fills its container (board-above, tray-below layout) */
+.tray,
+.trayLarge,
+.trayCollapsed,
+.trayLarge.trayCollapsed {
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+}
+
+/* Handle hidden – tray always visible below board */
+.handle {
+  display: none;
+}
+
+/* Mobile: padding around buttons, match desktop feel */
+@media (max-width: 600px) {
+  .tray,
+  .trayLarge,
+  .trayCollapsed,
+  .trayLarge.trayCollapsed {
+    height: 100%;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .handle {
+    display: none;
+  }
+
+  .header {
+    padding: 6px 10px 8px 10px;
+    gap: 4px;
+  }
+
+  .titleRow {
+    min-height: 28px;
+  }
+
+  .randomBtn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 13px;
+  }
+
+  .tray {
+    /* Match desktop: side and bottom margins so tray is not cut off and looks like desktop */
+    margin: 0 12px 16px 12px;
+    margin-bottom: max(16px, env(safe-area-inset-bottom, 0));
+    border-radius: 16px;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .segment button {
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 8px;
+    min-height: 44px;
+  }
+
+  .scroller {
+    padding: 8px 14px;
+    padding-inline-end: 12px;
+    gap: 8px;
+  }
+
+  .scrollBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .scrollerSnap {
+    scroll-padding-inline-end: 12px;
+  }
+
+  .trayCompact .scroller {
+    padding: 8px 14px;
+    padding-inline-end: 12px;
+  }
+
+  .trayExtraCompact .scroller {
+    padding: 8px 12px;
+    padding-inline-end: 12px;
+  }
+}

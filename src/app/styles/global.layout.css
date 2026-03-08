@@ -1,0 +1,159 @@
+/* Ocean theme - deep blue, sea feel */
+html.theme-ocean {
+  --color-bg-primary: #0a1628;
+  --color-bg-secondary: #0f1f38;
+  --color-bg-card: #132a4a;
+  --color-bg-elevated: #1a3560;
+  --color-text-primary: #e8f4fc;
+  --color-text-secondary: #b8d9f5;
+  --color-text-muted: #98c9f0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-hover: #60a5fa;
+  --color-brand-light: #1e3a5f;
+  --color-action-hover: rgba(59, 130, 246, 0.25);
+  --color-border: rgba(59, 130, 246, 0.3);
+  --color-border-strong: rgba(59, 130, 246, 0.45);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.6);
+  --color-tray-bg: rgba(19, 42, 74, 0.95);
+  --color-piece-shadow: rgba(0, 0, 0, 0.5);
+  --color-overlay: rgba(10, 22, 40, 0.9);
+  --color-overlay-strong: rgba(10, 22, 40, 0.95);
+  --color-overlay-hint: rgba(10, 22, 40, 0.9);
+  --color-overlay-content: rgba(59, 130, 246, 0.15);
+  --color-overlay-content-hover: rgba(59, 130, 246, 0.25);
+  --color-overlay-content-active: rgba(59, 130, 246, 0.35);
+  --color-complete-gradient-start: #2563eb;
+  --color-complete-gradient-end: #93c5fd;
+  --color-complete-text-shadow: rgba(37, 99, 235, 0.5);
+  --color-hud-live-bg: rgba(59, 130, 246, 0.2);
+  --color-hud-live-border: rgba(59, 130, 246, 0.4);
+  --color-hud-done-bg: rgba(34, 197, 94, 0.2);
+  --color-hud-done-border: rgba(34, 197, 94, 0.4);
+  --color-focus-ring: rgba(59, 130, 246, 0.4);
+  --color-error: #ef4444;
+  --color-error-hover: #f87171;
+  --color-error-bg: rgba(239, 68, 68, 0.15);
+  --color-error-border: rgba(239, 68, 68, 0.35);
+}
+
+/* Forest theme - greens, earthy */
+html.theme-forest {
+  --color-bg-primary: #0d1612;
+  --color-bg-secondary: #132118;
+  --color-bg-card: #182d22;
+  --color-bg-elevated: #1f3d2e;
+  --color-text-primary: #e8f5e9;
+  --color-text-secondary: #c8e6c9;
+  --color-text-muted: #9ed99f;
+  --color-brand-primary: #66bb6a;
+  --color-brand-hover: #81c784;
+  --color-brand-light: #1a2e22;
+  --color-action-hover: rgba(102, 187, 106, 0.22);
+  --color-border: rgba(102, 187, 106, 0.25);
+  --color-border-strong: rgba(102, 187, 106, 0.4);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.6);
+  --color-tray-bg: rgba(24, 45, 34, 0.95);
+  --color-piece-shadow: rgba(0, 0, 0, 0.5);
+  --color-overlay: rgba(13, 22, 18, 0.9);
+  --color-overlay-strong: rgba(13, 22, 18, 0.95);
+  --color-overlay-hint: rgba(13, 22, 18, 0.9);
+  --color-overlay-content: rgba(102, 187, 106, 0.12);
+  --color-overlay-content-hover: rgba(102, 187, 106, 0.22);
+  --color-overlay-content-active: rgba(102, 187, 106, 0.32);
+  --color-complete-gradient-start: #43a047;
+  --color-complete-gradient-end: #a5d6a7;
+  --color-complete-text-shadow: rgba(67, 160, 71, 0.5);
+  --color-hud-live-bg: rgba(102, 187, 106, 0.2);
+  --color-hud-live-border: rgba(102, 187, 106, 0.4);
+  --color-hud-done-bg: rgba(76, 175, 80, 0.25);
+  --color-hud-done-border: rgba(76, 175, 80, 0.45);
+  --color-focus-ring: rgba(102, 187, 106, 0.4);
+  --color-error: #e57373;
+  --color-error-hover: #ef9a9a;
+  --color-error-bg: rgba(229, 115, 115, 0.15);
+  --color-error-border: rgba(229, 115, 115, 0.35);
+}
+
+/* Sunset theme - warm oranges, amber, golden hour */
+html.theme-sunset {
+  --color-bg-primary: #1f1208;
+  --color-bg-secondary: #2d1a0c;
+  --color-bg-card: #3d2412;
+  --color-bg-elevated: #4d2e14;
+  --color-text-primary: #fff4e6;
+  --color-text-secondary: #ffe4c4;
+  --color-text-muted: #f0c9a0;
+  --color-brand-primary: #ff8c42;
+  --color-brand-hover: #ffa366;
+  --color-brand-light: #4d2e14;
+  --color-action-hover: rgba(255, 140, 66, 0.28);
+  --color-border: rgba(255, 140, 66, 0.35);
+  --color-border-strong: rgba(255, 140, 66, 0.5);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.6);
+  --color-tray-bg: rgba(61, 36, 18, 0.95);
+  --color-piece-shadow: rgba(0, 0, 0, 0.5);
+  --color-overlay: rgba(31, 18, 8, 0.9);
+  --color-overlay-strong: rgba(31, 18, 8, 0.95);
+  --color-overlay-hint: rgba(31, 18, 8, 0.9);
+  --color-overlay-content: rgba(255, 140, 66, 0.18);
+  --color-overlay-content-hover: rgba(255, 140, 66, 0.28);
+  --color-overlay-content-active: rgba(255, 140, 66, 0.38);
+  --color-complete-gradient-start: #ff9f43;
+  --color-complete-gradient-end: #ffd89b;
+  --color-complete-text-shadow: rgba(255, 159, 67, 0.5);
+  --color-hud-live-bg: rgba(255, 140, 66, 0.22);
+  --color-hud-live-border: rgba(255, 140, 66, 0.45);
+  --color-hud-done-bg: rgba(76, 175, 80, 0.2);
+  --color-hud-done-border: rgba(76, 175, 80, 0.4);
+  --color-focus-ring: rgba(255, 140, 66, 0.45);
+  --color-error: #e57373;
+  --color-error-hover: #ef9a9a;
+  --color-error-bg: rgba(229, 115, 115, 0.15);
+  --color-error-border: rgba(229, 115, 115, 0.35);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+html {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg-primary);
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overscroll-behavior: none;
+  font-family:
+    "Nunito",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  color: var(--color-text-primary);
+  line-height: var(--line-height-body, 1.45);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}

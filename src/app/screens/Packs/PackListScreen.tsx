@@ -6,10 +6,10 @@ import { useNavigate } from "react-router-dom";
 import styles from "./PackListScreen.module.css";
 import { ArrowLeft } from "lucide-react";
 import { Loader } from "@/components/Loader";
-import { PACK_METADATA } from "@/data/packMetadata";
 import { loadPacksData } from "@/data/loadPacksData";
 import { getPackProgress } from "@/data/packCompletion";
 import { getCurrentSeason } from "@/utils/seasons";
+import type { PuzzlePack } from "@/data/puzzlePacks";
 
 export function PackListScreen() {
   const nav = useNavigate();
@@ -18,14 +18,15 @@ export function PackListScreen() {
   > | null>(null);
 
   const season = useMemo(() => getCurrentSeason(), []);
-  const seasonPack = useMemo(
-    () => PACK_METADATA.find((p) => p.season === season),
-    [season],
-  );
-  const orderedPacks = useMemo(() => {
-    if (!seasonPack) return PACK_METADATA;
-    return [seasonPack, ...PACK_METADATA.filter((p) => p.id !== seasonPack.id)];
-  }, [seasonPack]);
+
+  /** Order packs: season's pick first, then the rest. Use loaded PUZZLE_PACKS so we pass real PuzzlePack to getPuzzlesForPack. */
+  const orderedPacks = useMemo((): PuzzlePack[] => {
+    if (!packsData) return [];
+    const { PUZZLE_PACKS } = packsData;
+    const seasonPack = PUZZLE_PACKS.find((p) => p.season === season);
+    if (!seasonPack) return [...PUZZLE_PACKS];
+    return [seasonPack, ...PUZZLE_PACKS.filter((p) => p.id !== seasonPack.id)];
+  }, [packsData, season]);
 
   useEffect(() => {
     loadPacksData().then(setPacksData);
@@ -40,6 +41,7 @@ export function PackListScreen() {
             className={styles.backBtn}
             onClick={() => nav("/")}
             aria-label="Back to menu"
+            title="Back to menu"
           >
             <ArrowLeft size={20} />
           </button>
@@ -51,7 +53,7 @@ export function PackListScreen() {
             Curated themes to explore. Complete puzzles to track your progress.
           </p>
 
-          {seasonPack && (
+          {season && (
             <p className={styles.seasonNote} aria-live="polite">
               Season&apos;s pick: {season.charAt(0).toUpperCase() + season.slice(1)}
             </p>
@@ -62,16 +64,11 @@ export function PackListScreen() {
           ) : (
             <div className={styles.packGrid}>
               {orderedPacks.map((pack) => {
-                const puzzlesData = packsData
-                  ? packsData.getPuzzlesForPack(
-                      pack as (typeof packsData.PUZZLE_PACKS)[0],
-                    )
-                  : [];
-                const { completed, total } = packsData
-                  ? getPackProgress(puzzlesData.map((p) => p.id))
-                  : { completed: 0, total: 0 };
-
-                const isSeasonPick = seasonPack?.id === pack.id;
+                const puzzlesData = packsData.getPuzzlesForPack(pack);
+                const { completed, total } = getPackProgress(
+                  puzzlesData.map((p) => p.id),
+                );
+                const isSeasonPick = pack.season === season;
 
                 return (
                   <button
@@ -79,6 +76,8 @@ export function PackListScreen() {
                     type="button"
                     className={`${styles.packCard} ${isSeasonPick ? styles.packCardSeasonal : ""}`}
                     onClick={() => nav(`/packs/${pack.id}`)}
+                    title={`Open ${pack.name}`}
+                    aria-label={`Open ${pack.name}: ${pack.description}`}
                   >
                     <div className={styles.packEmoji}>{pack.emoji}</div>
                     <div className={styles.packInfo}>
@@ -88,7 +87,7 @@ export function PackListScreen() {
                       )}
                       <span className={styles.packDesc}>{pack.description}</span>
                       <span className={styles.packProgress}>
-                        {packsData ? `${completed}/${total} completed` : "…"}
+                        {total > 0 ? `${completed}/${total} completed` : "0 puzzles"}
                       </span>
                     </div>
                   </button>

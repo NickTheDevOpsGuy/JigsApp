@@ -1,0 +1,90 @@
+.seasonNote {
+  margin: 0 0 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.packGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.packCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.packCard:hover {
+  background: var(--color-bg-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.packCardSeasonal {
+  border-color: var(--color-brand-primary);
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 12%,
+    var(--color-bg-elevated)
+  );
+}
+
+.packCardSeasonal:hover {
+  background: color-mix(in srgb, var(--color-brand-primary) 18%, var(--color-bg-primary));
+}
+
+.seasonBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-brand-primary);
+  margin-top: 2px;
+}
+
+.packEmoji {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.packInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.packName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.packDesc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.packProgress {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}

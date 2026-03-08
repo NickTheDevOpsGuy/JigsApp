@@ -24,10 +24,13 @@ export function SetupGalleryThumbnail({
   const [imgError, setImgError] = useState(false);
   return (
     <button
+      type="button"
       className={`${styles.galleryItem} ${isSelected ? styles.galleryItemSelected : ""}`}
       onClick={onSelect}
       disabled={isLoading}
       data-testid="gallery-item"
+      title={`Select ${puzzle.name}`}
+      aria-label={`Select ${puzzle.name}, ${pieceCount} pieces`}
     >
       {imgError ? (
         <div className={styles.galleryItemPlaceholder} title="Image unavailable">

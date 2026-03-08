@@ -1,0 +1,188 @@
+.headerCloseBtn:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.placeholder,
+.hint {
+  margin: 0 0 12px;
+  color: var(--color-text-secondary);
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  opacity: 0.95;
+}
+
+.debug {
+  font-size: 13px;
+  font-family: monospace;
+  padding: 8px 12px;
+  background: var(--color-bg-elevated);
+  border-radius: 8px;
+  margin: 12px 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  flex-shrink: 0;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs button {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.tabMiniProgress {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
+}
+
+.tabs .tabActive .tabMiniProgress {
+  background: color-mix(in srgb, #ffffff 25%, transparent);
+  color: #fff;
+}
+
+.tabs button:hover {
+  background: var(--color-bg-primary);
+}
+
+.tabs .tabActive {
+  background: var(--color-brand-primary);
+  color: white;
+  border-color: var(--color-brand-primary);
+}
+
+.section h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: var(--color-text-primary);
+}
+
+.loading,
+.todayCompletionCount {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.todayCompletionCount {
+  font-weight: 500;
+}
+
+.empty {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.statCard {
+  padding: 14px 16px;
+  background: var(--color-bg-elevated);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-brand-primary);
+}
+
+.statLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.retentionHero {
+  text-align: center;
+  padding: 8px 4px 2px;
+}
+
+.retentionHeading {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.retentionDivider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 12px 0;
+}
+
+.retentionBig {
+  margin: 10px 0 4px;
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: var(--color-brand-primary);
+}
+
+.retentionSub {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.overallBlock {
+  padding: 2px 0;
+}
+
+.overallRows {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.overallRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.overallRow strong {
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}

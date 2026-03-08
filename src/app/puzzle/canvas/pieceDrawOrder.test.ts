@@ -38,16 +38,16 @@ function makePiece(
 }
 
 describe("pieceDrawOrder", () => {
-  it("keeps locked/placed pieces behind movable ones even when z is higher", () => {
-    const lockedTopZ = makePiece({ id: "locked", locked: true, z: 99 });
-    const movableLowZ = makePiece({ id: "movable-low", z: 2 });
-    const movableHighZ = makePiece({ id: "movable-high", z: 10 });
+  it("orders by z (higher z on top) so newly snapped pieces stay visible", () => {
+    const lowZ = makePiece({ id: "low", z: 2 });
+    const midZ = makePiece({ id: "mid", z: 10 });
+    const highZ = makePiece({ id: "high", z: 99 });
 
-    const drawn = sortPiecesForDraw([movableLowZ, lockedTopZ, movableHighZ], null);
-    expect(drawn.map((p) => p.id)).toEqual(["locked", "movable-low", "movable-high"]);
+    const drawn = sortPiecesForDraw([midZ, highZ, lowZ], null);
+    expect(drawn.map((p) => p.id)).toEqual(["low", "mid", "high"]);
 
-    const hitTest = sortPiecesForHitTest([movableLowZ, lockedTopZ, movableHighZ]);
-    expect(hitTest.map((p) => p.id)).toEqual(["movable-high", "movable-low", "locked"]);
+    const hitTest = sortPiecesForHitTest([midZ, highZ, lowZ]);
+    expect(hitTest.map((p) => p.id)).toEqual(["high", "mid", "low"]);
   });
 
   it("always renders the dragged group on top", () => {
@@ -56,5 +56,52 @@ describe("pieceDrawOrder", () => {
 
     const drawn = sortPiecesForDraw([otherTop, dragged], "g1");
     expect(drawn[drawn.length - 1]?.id).toBe("dragged");
+  });
+
+  it("keeps movable pieces above locked/placed even if z would put locked on top", () => {
+    const movableLowZ = makePiece({ id: "movable", z: 1, isPlaced: false });
+    const lockedHighZ = makePiece({ id: "locked", z: 999, isPlaced: true, locked: true });
+
+    const drawn = sortPiecesForDraw([lockedHighZ, movableLowZ], null);
+    expect(drawn[0]?.id).toBe("locked");
+    expect(drawn[1]?.id).toBe("movable");
+  });
+
+  it("still respects z within the same layer bucket", () => {
+    const unplacedHighZ = makePiece({ id: "unplaced", z: 99, isPlaced: false });
+    const lockedLowZ = makePiece({ id: "locked", z: 1, isPlaced: true, locked: true });
+
+    const drawn = sortPiecesForDraw([unplacedHighZ, lockedLowZ], null);
+    expect(drawn[0]?.id).toBe("locked");
+    expect(drawn[1]?.id).toBe("unplaced");
+  });
+
+  it("keeps movable pieces above all locked/placed pieces even in mixed groups", () => {
+    const mixedLocked = makePiece({
+      id: "mixed-locked",
+      groupId: "g-mixed",
+      z: 2,
+      locked: true,
+      isPlaced: true,
+    });
+    const mixedMovable = makePiece({
+      id: "mixed-movable",
+      groupId: "g-mixed",
+      z: 3,
+      locked: false,
+      isPlaced: false,
+    });
+    const placedGroupPiece = makePiece({
+      id: "placed",
+      groupId: "g-placed",
+      z: 500,
+      locked: true,
+      isPlaced: true,
+    });
+
+    const drawn = sortPiecesForDraw([placedGroupPiece, mixedLocked, mixedMovable], null);
+
+    expect(drawn[2]?.id).toBe("mixed-movable");
+    expect(drawn[0]?.id).not.toBe("mixed-movable");
   });
 });

@@ -146,7 +146,12 @@ export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
           Requires HTTPS (or localhost) and camera permission.
         </p>
         <div className={styles.idleActions}>
-          <Button variant="primary" onClick={handleStart} disabled={disabled}>
+          <Button
+            variant="primary"
+            onClick={handleStart}
+            disabled={disabled}
+            title="Start camera"
+          >
             <Camera size={18} />
             Start Camera
           </Button>
@@ -158,11 +163,13 @@ export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
             onChange={handleFileCapture}
             className={styles.fileInput}
             aria-label="Take photo with camera app"
+            title="Take photo with camera app"
           />
           <Button
             variant="secondary"
             onClick={() => fileInputRef.current?.click()}
             disabled={disabled}
+            title="Open device camera app"
           >
             Open Camera App
           </Button>
@@ -198,11 +205,13 @@ export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
           onChange={handleFileCapture}
           className={styles.fileInput}
           aria-label="Take photo with camera"
+          title="Take photo with camera"
         />
         <Button
           variant="primary"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled}
+          title="Open camera app"
         >
           <Camera size={18} />
           Open Camera App

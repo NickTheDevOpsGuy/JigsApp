@@ -172,6 +172,21 @@ export function getDisplayItems(
       checked: !!props.progressiveRevealMode,
     },
     {
+      id: "unlockPiecesAlpha",
+      section: "settings",
+      visible: true,
+      label: "Unlock Pieces (Alpha)",
+      sortKey: "Unlock Pieces (Alpha)",
+      title: "Allow moving snapped pieces again (experimental)",
+      onClick: c(props.onTogglePieceLocking),
+      subMenu: "assistance",
+      isToggle: true,
+      checked: !props.pieceLockingEnabled,
+      ariaLabel: props.pieceLockingEnabled
+        ? "Unlock pieces alpha off"
+        : "Unlock pieces alpha on",
+    },
+    {
       id: "pieceCutClassic",
       section: "settings",
       visible: !!props.onPieceCutTypeChange,

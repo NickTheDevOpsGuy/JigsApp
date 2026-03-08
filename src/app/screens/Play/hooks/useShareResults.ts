@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import type { PuzzleState } from "@/puzzle/types";
+import { logger } from "@/utils/logger";
 import { formatTime } from "../playUtils";
 import { buildChallengeShareMessage, buildProgressShareMessage } from "../shareMessages";
 
@@ -89,7 +90,7 @@ export function useShareResults(args: {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      logger.error("Failed to copy:", err);
     }
   }, [getProgressShareTextWithUrl]);
 
@@ -100,7 +101,7 @@ export function useShareResults(args: {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      logger.error("Failed to copy:", err);
     }
   }, [getChallengeShareTextWithUrl]);
 
@@ -119,7 +120,7 @@ export function useShareResults(args: {
         url: fullProgressUrl,
       });
     } catch (err) {
-      console.warn("Share cancelled or failed:", err);
+      logger.warn("Share cancelled or failed:", err);
     }
   }, [getProgressShareTextWithUrl, fullProgressUrl, handleCopyResults]);
 
@@ -136,7 +137,7 @@ export function useShareResults(args: {
         url: fullChallengeUrl,
       });
     } catch (err) {
-      console.warn("Share cancelled or failed:", err);
+      logger.warn("Share cancelled or failed:", err);
     }
   }, [getChallengeShareTextWithUrl, fullChallengeUrl, handleCopyChallenge]);
 

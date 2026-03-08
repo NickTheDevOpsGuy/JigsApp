@@ -40,6 +40,7 @@ export function computeBoardSnapResult(
   pieces: Piece[],
   activeId: string,
   toleranceBoardPx: number,
+  overlapEpsilonPx: number = 0,
 ): BoardSnapResult {
   const active = pieces.find((p) => p.id === activeId);
   if (!active) return null;
@@ -53,7 +54,7 @@ export function computeBoardSnapResult(
     const dy = active.targetY - activeTile.y;
     if (
       Math.hypot(dx, dy) <= toleranceBoardPx &&
-      !wouldOverlapAnyOtherGroup(pieces, gid, dx, dy)
+      !wouldOverlapAnyOtherGroup(pieces, gid, dx, dy, overlapEpsilonPx)
     ) {
       return {
         kind: "wrongRotation",
@@ -69,13 +70,15 @@ export function computeBoardSnapResult(
   const dy = active.targetY - activeTile.y;
 
   if (Math.hypot(dx, dy) > toleranceBoardPx) return null;
-  if (wouldOverlapAnyOtherGroup(pieces, gid, dx, dy)) return null;
+  if (wouldOverlapAnyOtherGroup(pieces, gid, dx, dy, overlapEpsilonPx)) return null;
 
+  /** Allow small per-piece drift (e.g. from rounding) so whole group can snap and lock. */
+  const perPieceEpsilonPx = 3;
   for (const p of groupPieces) {
     const t = getTilePos(p);
     const offX = Math.abs(p.targetX - t.x - dx);
     const offY = Math.abs(p.targetY - t.y - dy);
-    if (offX > 2 || offY > 2) return null;
+    if (offX > perPieceEpsilonPx || offY > perPieceEpsilonPx) return null;
   }
 
   return {
@@ -129,6 +132,7 @@ export function computeNeighborSnapResult(
   toleranceNeighborPx: number,
   tileW: number,
   tileH: number,
+  overlapEpsilonPx: number = 0,
 ): NeighborSnapResult {
   const active = pieces.find((p) => p.id === activeId);
   if (!active || active.isPlaced) return null;
@@ -166,6 +170,21 @@ export function computeNeighborSnapResult(
   }
 
   if (!best) return null;
+  // Prevent "far-side" jumps: if the closest geometric snap would collide,
+  // do not fall back to a farther candidate in a different direction.
+  if (
+    wouldOverlapAnyOtherGroup(
+      pieces,
+      gid,
+      best.dx,
+      best.dy,
+      overlapEpsilonPx,
+      new Set([best.into]),
+    )
+  ) {
+    return null;
+  }
+
   return {
     kind: "snap",
     dx: best.dx,
@@ -183,6 +202,7 @@ export function computeNearSnapNudge(
   activeId: string,
   toleranceBoardPx: number,
   nudgeFactor: number = 0.35,
+  overlapEpsilonPx: number = 0,
 ): NearSnapNudgeResult {
   const active = pieces.find((p) => p.id === activeId);
   if (!active || active.isPlaced || active.locked) return null;
@@ -199,7 +219,7 @@ export function computeNearSnapNudge(
   const farThreshold = toleranceBoardPx * 1.15;
 
   if (distance <= nearThreshold || distance > farThreshold) return null;
-  if (wouldOverlapAnyOtherGroup(pieces, gid, dx, dy)) return null;
+  if (wouldOverlapAnyOtherGroup(pieces, gid, dx, dy, overlapEpsilonPx)) return null;
 
   return {
     nudgeDx: dx * nudgeFactor,
@@ -213,6 +233,7 @@ export function computeNearSnapNudge(
 export function computeMergedGroupBoardSnapResult(
   pieces: Piece[],
   groupId: string,
+  overlapEpsilonPx: number = 0,
 ): MergedGroupBoardSnapResult {
   const groupPieces = getGroupPieces(pieces, groupId);
   if (!groupPieces.every((p) => p.rotation === 0)) return null;
@@ -222,6 +243,6 @@ export function computeMergedGroupBoardSnapResult(
   const dx = ref.targetX - tile.x;
   const dy = ref.targetY - tile.y;
 
-  if (wouldOverlapAnyOtherGroup(pieces, groupId, dx, dy)) return null;
+  if (wouldOverlapAnyOtherGroup(pieces, groupId, dx, dy, overlapEpsilonPx)) return null;
   return { dx, dy };
 }

@@ -27,6 +27,8 @@ export type PlayScreenModalsProps = {
   setShowResetStatsConfirm: (show: boolean) => void;
   showClearCacheConfirm: boolean;
   setShowClearCacheConfirm: (show: boolean) => void;
+  /** When true (replay mode), do not show resume or new-game modals. */
+  replayBarOpen?: boolean;
 };
 
 export function PlayScreenModals({
@@ -48,17 +50,21 @@ export function PlayScreenModals({
   setShowResetStatsConfirm,
   showClearCacheConfirm,
   setShowClearCacheConfirm,
+  replayBarOpen = false,
 }: PlayScreenModalsProps) {
+  const blockReplayModals = replayBarOpen;
+
   return (
     <>
       <ConfirmModal
-        isOpen={awaitingResumeChoice && resumeChoice === null}
-        onClose={() => setResumeChoice("fresh")}
-        onConfirm={() => setResumeChoice("resume")}
+        isOpen={!blockReplayModals && awaitingResumeChoice && resumeChoice === null}
+        onClose={() => setResumeChoice("resume")}
+        onConfirm={() => setResumeChoice("fresh")}
+        closeOnConfirm={false}
         title="Resume Your Puzzle?"
         message="You have a puzzle in progress. Would you like to continue where you left off?"
-        confirmText="Resume"
-        cancelText="Start Fresh"
+        confirmText="Start Fresh"
+        cancelText="Resume"
         variant="default"
       />
 
@@ -87,7 +93,7 @@ export function PlayScreenModals({
       />
 
       <ConfirmModal
-        isOpen={showNewGameModal}
+        isOpen={!blockReplayModals && showNewGameModal}
         onClose={() => setShowNewGameModal(false)}
         onConfirm={onConfirmNewGame}
         title="Start New Puzzle?"

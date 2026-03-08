@@ -1,0 +1,110 @@
+.headerMenuToggleRow:hover {
+  background: var(--color-bg-card);
+}
+
+.headerMenuToggleLabel {
+  flex: 1;
+}
+
+.headerMenuSwitch {
+  flex-shrink: 0;
+  width: 44px;
+  height: 24px;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--color-border);
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.headerMenuSwitchOn {
+  background: var(--color-brand-primary);
+}
+
+.headerMenuSwitchThumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.headerMenuSwitch .headerMenuSwitchThumb {
+  transform: translateX(0);
+}
+
+.headerMenuSwitchOn .headerMenuSwitchThumb {
+  transform: translateX(20px);
+}
+
+.headerMenuToggle {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: default;
+}
+
+.headerMenuHelpTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.headerMenuHelpTrigger:hover {
+  background: var(--color-bg-card);
+}
+
+.headerMenuChevron {
+  flex-shrink: 0;
+  margin-left: 12px;
+  opacity: 0.85;
+  transition: transform 0.15s ease;
+}
+
+.headerMenuChevronExpanded {
+  transform: rotate(90deg);
+}
+
+.headerMenuCheck {
+  flex-shrink: 0;
+  color: var(--color-brand-primary);
+}
+
+.headerMenuNested {
+  padding-left: 12px;
+  padding-bottom: 4px;
+  border-left: 2px solid var(--color-border);
+  margin-left: 12px;
+}
+
+.headerMenuRangeWrap {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg-card) 70%, transparent);
+}
+
+.headerMenuRangeLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.headerMenuRange {
+  width: 100%;
+  accent-color: var(--color-brand-primary);
+}

@@ -5,9 +5,13 @@
 import type React from "react";
 import { soundManager } from "@/audio/sounds";
 import type { CanvasWithTouch, ScreenToBoard } from "./types";
-import { TAP_DRAG_THRESHOLD_PX, TAP_MAX_MS } from "./types";
+import {
+  getTapDragThresholdPx,
+  TAP_MAX_MS,
+  TOUCH_ROTATE_AFTER_DRAG_GUARD_MS,
+} from "./types";
 import type { PointerHandlersContext } from "./types";
-import { finishDragWithTrayCheck } from "./shared";
+import { autoScrollTrayAtPointer, finishDragWithTrayCheck } from "./shared";
 import { dragLog } from "./dragLog";
 
 export function resetTouchState(canvas: CanvasWithTouch): void {
@@ -79,8 +83,9 @@ export function handleTouchMove(
   if (!useBoardSpace && !pendingRect) return false;
 
   const dist = Math.hypot(e.clientX - sx, e.clientY - sy);
+  const dragThresholdPx = getTapDragThresholdPx();
 
-  if (!canvas.touchDragStarted && dist >= TAP_DRAG_THRESHOLD_PX) {
+  if (!canvas.touchDragStarted && dist >= dragThresholdPx) {
     canvas.touchDragStarted = true;
     didDragRef.current = true;
     ctx.onPieceInteraction?.();
@@ -104,6 +109,7 @@ export function handleTouchMove(
     } else {
       manager.pointerMove(e.clientX, e.clientY, boardRect);
     }
+    autoScrollTrayAtPointer(ctx.trayRef, e.clientX, e.clientY);
     dragLog("move", {
       x: e.clientX,
       y: e.clientY,
@@ -159,7 +165,10 @@ export function handleTouchUp(
     const doubleFireWindow = 300;
     const recentlyRotated =
       (ctx.lastTapRotateTimeRef?.current ?? 0) > now - doubleFireWindow;
-    if (!recentlyRotated) {
+    const recentlyDragged =
+      (ctx.lastTouchDragEndTimeRef?.current ?? 0) >
+      now - TOUCH_ROTATE_AFTER_DRAG_GUARD_MS;
+    if (!recentlyRotated && !recentlyDragged) {
       const sx = canvas.touchStartX ?? 0;
       const sy = canvas.touchStartY ?? 0;
       const dist = Math.hypot(e.clientX - sx, e.clientY - sy);
@@ -167,7 +176,7 @@ export function handleTouchUp(
         (canvas.touchStartTime ?? 0) > 0 ? now - canvas.touchStartTime! : Infinity;
       const pid = canvas.pendingPieceId;
       if (
-        dist < TAP_DRAG_THRESHOLD_PX &&
+        dist < getTapDragThresholdPx() &&
         elapsed < TAP_MAX_MS &&
         pid &&
         canRotatePiece(pid)
@@ -177,6 +186,7 @@ export function handleTouchUp(
           if (ctx.lastTapRotateTimeRef) ctx.lastTapRotateTimeRef.current = now;
           onPieceInteraction?.();
           manager.rotatePiece(pid);
+          ctx.onRotate?.();
           soundManager.play("rotate");
           haptic?.("rotate");
           setState(manager.getState());
@@ -194,6 +204,9 @@ export function handleTouchUp(
       selectCycle,
     );
     setState(manager.getState());
+    if (ctx.lastTouchDragEndTimeRef) {
+      ctx.lastTouchDragEndTimeRef.current = Date.now();
+    }
     ctx.onDragEnded?.();
   }
 

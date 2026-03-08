@@ -1,4 +1,5 @@
 import { SHOW_DEBUG } from "../../playScreenUtils";
+import { logger } from "@/utils/logger";
 
 let lastMoveMs = 0;
 
@@ -15,5 +16,5 @@ export function dragLog(
   if (event === "move" && now - lastMoveMs < 80) return;
   if (event === "move") lastMoveMs = now;
 
-  if (import.meta.env.DEV) console.warn(`[drag:${event}]`, data);
+  if (import.meta.env.DEV) logger.warn(`[drag:${event}]`, data);
 }

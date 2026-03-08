@@ -18,6 +18,7 @@ export function PackDetailScreen() {
   const puzzleGridRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [hasScrollablePuzzles, setHasScrollablePuzzles] = useState(false);
   const [packsData, setPacksData] = useState<Awaited<
     ReturnType<typeof loadPacksData>
   > | null>(null);
@@ -39,6 +40,7 @@ export function PackDetailScreen() {
       const { scrollLeft, scrollWidth, clientWidth } = el;
       const maxScroll = scrollWidth - clientWidth;
       const hasOverflow = maxScroll > 8;
+      setHasScrollablePuzzles(hasOverflow);
       setCanScrollLeft(hasOverflow && scrollLeft > 4);
       setCanScrollRight(hasOverflow && scrollLeft < maxScroll - 4);
     };
@@ -89,6 +91,7 @@ export function PackDetailScreen() {
             className={styles.backBtn}
             onClick={() => nav("/packs")}
             aria-label="Back to packs"
+            title="Back to packs"
           >
             <ArrowLeft size={20} />
           </button>
@@ -101,17 +104,20 @@ export function PackDetailScreen() {
         </div>
 
         <div className={styles.puzzleGridWrap}>
-          <button
-            type="button"
-            className={styles.puzzleScrollBtn}
-            aria-label="Scroll puzzles left"
-            disabled={!canScrollLeft}
-            onClick={() =>
-              puzzleGridRef.current?.scrollBy({ left: -220, behavior: "smooth" })
-            }
-          >
-            <ChevronLeft size={18} />
-          </button>
+          {hasScrollablePuzzles && (
+            <button
+              type="button"
+              className={styles.puzzleScrollBtn}
+              aria-label="Scroll puzzles left"
+              title="Scroll puzzles left"
+              disabled={!canScrollLeft}
+              onClick={() =>
+                puzzleGridRef.current?.scrollBy({ left: -220, behavior: "smooth" })
+              }
+            >
+              <ChevronLeft size={18} />
+            </button>
+          )}
 
           <div className={styles.puzzleGrid} ref={puzzleGridRef}>
             {puzzles.map((puzzle) => {
@@ -122,6 +128,8 @@ export function PackDetailScreen() {
                   type="button"
                   className={styles.puzzleCard}
                   onClick={() => handlePlay(puzzle)}
+                  title={`Play ${puzzle.name}`}
+                  aria-label={`Play ${puzzle.name}`}
                 >
                   <div className={styles.puzzleThumb}>
                     {imgError[puzzle.id] ? (
@@ -150,17 +158,20 @@ export function PackDetailScreen() {
             })}
           </div>
 
-          <button
-            type="button"
-            className={styles.puzzleScrollBtn}
-            aria-label="Scroll puzzles right"
-            disabled={!canScrollRight}
-            onClick={() =>
-              puzzleGridRef.current?.scrollBy({ left: 220, behavior: "smooth" })
-            }
-          >
-            <ChevronRight size={18} />
-          </button>
+          {hasScrollablePuzzles && (
+            <button
+              type="button"
+              className={styles.puzzleScrollBtn}
+              aria-label="Scroll puzzles right"
+              title="Scroll puzzles right"
+              disabled={!canScrollRight}
+              onClick={() =>
+                puzzleGridRef.current?.scrollBy({ left: 220, behavior: "smooth" })
+              }
+            >
+              <ChevronRight size={18} />
+            </button>
+          )}
         </div>
       </div>
     </div>

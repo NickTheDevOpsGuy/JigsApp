@@ -35,6 +35,8 @@ type UsePlayScreenShortcutsArgs = {
   onExtendSelection?: () => void;
   /** Trigger snap-back animation after undo/redo (Ctrl/Cmd+Z) */
   onSnapBackAnimate?: (fromPositions: import("../playUtils").UndoSnapBackFrom) => void;
+  /** Called when user rotates a piece (for completion stats). */
+  onRotate?: () => void;
 };
 
 export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
@@ -63,6 +65,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
     onUndoSuccess,
     onExtendSelection,
     onSnapBackAnimate,
+    onRotate,
   } = args;
 
   const handleShortcut = useCallback(
@@ -115,6 +118,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
             }
             if (piece) {
               manager.rotatePiece(piece.id);
+              onRotate?.();
               soundManager.play("rotate");
               setState(manager.getState());
               onExtendSelection?.();

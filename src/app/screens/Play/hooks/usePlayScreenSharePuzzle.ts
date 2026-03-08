@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import posthog from "posthog-js";
 import type { Piece, PuzzleState, GridSize } from "@/puzzle/types";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { logger } from "@/utils/logger";
 import { isSupabaseConfigured } from "@/supabase/client";
 import { STORAGE_KEY } from "../playScreenUtils";
 import { SESSION_ID_PARAM } from "./usePuzzleSession";
@@ -128,7 +129,7 @@ export function usePlayScreenSharePuzzle({
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn("Share failed:", err);
+      logger.warn("Share failed:", err);
       setShareToast(msg || "Share failed. Try again.");
     }
   }, [

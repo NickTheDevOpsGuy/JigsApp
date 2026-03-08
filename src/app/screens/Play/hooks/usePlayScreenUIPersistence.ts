@@ -4,7 +4,10 @@
 import { useEffect } from "react";
 import {
   PIECE_LOCKING_KEY,
+  PIECE_LOCKING_EXPLICIT_KEY,
   AUTO_ROTATE_ON_SNAP_KEY,
+  MAGNETIC_SNAP_KEY,
+  SNAP_GLOW_KEY,
   CUT_TYPE_KEY,
   PROGRESSIVE_REVEAL_KEY,
   GHOST_HINT_KEY,
@@ -30,6 +33,8 @@ import { safeLocalStorage } from "@/utils/safeLocalStorage";
 export function usePlayScreenUIPersistence(state: {
   pieceLockingEnabled: boolean;
   autoRotateOnSnap: boolean;
+  magneticSnapEnabled: boolean;
+  snapGlowEnabled: boolean;
   showGhostHint: boolean;
   showAlignmentGrid: boolean;
   showGhostWhenIdle: boolean;
@@ -56,6 +61,7 @@ export function usePlayScreenUIPersistence(state: {
         PIECE_LOCKING_KEY,
         state.pieceLockingEnabled ? "true" : "false",
       );
+      safeLocalStorage.setItem(PIECE_LOCKING_EXPLICIT_KEY, "true");
     } catch {
       /* ignore */
     }
@@ -71,6 +77,25 @@ export function usePlayScreenUIPersistence(state: {
       /* ignore */
     }
   }, [state.autoRotateOnSnap]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(
+        MAGNETIC_SNAP_KEY,
+        state.magneticSnapEnabled ? "true" : "false",
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [state.magneticSnapEnabled]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(SNAP_GLOW_KEY, state.snapGlowEnabled ? "true" : "false");
+    } catch {
+      /* ignore */
+    }
+  }, [state.snapGlowEnabled]);
 
   useEffect(() => {
     try {

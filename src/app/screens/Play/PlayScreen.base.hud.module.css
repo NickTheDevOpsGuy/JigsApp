@@ -1,0 +1,91 @@
+.hud {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  transition: opacity 0.25s ease;
+}
+
+/* Adaptive Personality: subtle animation tone */
+.hudCompetitive .hudPill {
+  transition-duration: 0.15s;
+}
+
+.hudCalm .hudPill {
+  transition-duration: 0.4s;
+  transition-timing-function: ease-in-out;
+}
+
+.hudPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.hudPillBounce {
+  animation: hudPillBounce 0.3s ease-out;
+}
+
+@keyframes hudPillBounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.hudPillTimer {
+  composes: hudPill;
+  flex-shrink: 0; /* Prevent timer from being squeezed off on mobile */
+}
+
+.hudPillTimer.timerLow {
+  color: var(--color-error, #c53030);
+  border-color: var(--color-error, #c53030);
+}
+
+.lifeLost {
+  opacity: 0.35;
+}
+
+.quadrantTimers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+  font-size: 11px;
+}
+
+.quadrantTimer {
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+.timerSuffix {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-left: 4px;
+}
+
+.hudPillLive {
+  composes: hudPill;
+  background: var(--color-hud-live-bg);
+  border-color: var(--color-hud-live-border);
+  color: var(--color-text-primary);
+}
+
+.hudPillDone {
+  composes: hudPill;
+  background: var(--color-hud-done-bg);
+  border-color: var(--color-hud-done-border);
+  color: var(--color-text-primary);
+}
