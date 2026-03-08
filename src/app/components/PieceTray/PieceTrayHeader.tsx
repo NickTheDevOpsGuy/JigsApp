@@ -5,7 +5,7 @@ import { Shuffle } from "lucide-react";
 import {
   TrayFilterButton,
   type TrayFilter,
-} from "@/screens/Play/components/TrayFilterButton";
+} from "@/screens/Play/components/hud/TrayFilterButton";
 import styles from "./PieceTray.module.css";
 
 interface PieceTrayHeaderProps {

@@ -3,8 +3,8 @@
     height: var(--app-vh-stable, 100dvh);
     min-height: var(--app-vh-stable, 100dvh);
     max-height: var(--app-vh-stable, 100dvh);
-    padding: max(4px, env(safe-area-inset-top)) max(4px, env(safe-area-inset-right))
-      max(4px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left));
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
     box-sizing: border-box;
     overflow: hidden;
     overscroll-behavior: none;
@@ -18,14 +18,14 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    padding: 8px 10px 10px;
+    padding: 8px 10px 12px;
     margin-bottom: 0;
-    overflow-y: auto;
+    overflow: hidden;
     overflow-x: hidden;
   }
 
   .header {
-    margin-bottom: 2px;
+    margin-bottom: 8px;
     flex-shrink: 0;
   }
 
@@ -39,9 +39,9 @@
   }
 
   .cardScroll {
-    flex: 0 1 auto;
+    flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
@@ -59,7 +59,7 @@
 
   .subtitle {
     font-size: 12px;
-    margin-bottom: 2px;
+    margin-bottom: 8px;
   }
 
   .seasonNote {
@@ -74,6 +74,7 @@
   .packCard {
     padding: 10px 12px;
     gap: 8px;
+    min-height: 64px;
   }
 
   .packEmoji {

@@ -1,0 +1,122 @@
+.page {
+  height: var(--app-vh-stable, 100dvh);
+  min-height: var(--app-vh-stable, 100dvh);
+  max-height: var(--app-vh-stable, 100dvh);
+  width: 100%;
+  box-sizing: border-box;
+  padding: max(var(--space-2), env(safe-area-inset-top))
+    max(var(--space-2), env(safe-area-inset-right))
+    max(var(--space-2), env(safe-area-inset-bottom))
+    max(var(--space-2), env(safe-area-inset-left));
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--color-bg-primary);
+  scrollbar-width: none;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
+}
+
+.pagePackFlow {
+  align-items: flex-start;
+}
+
+.card {
+  width: 100%;
+  max-width: 620px;
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-card);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-2) var(--space-3);
+  overflow: hidden;
+}
+
+.cardPackFlow {
+  max-width: 620px;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow-y: visible;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.cardBody::-webkit-scrollbar {
+  display: none;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: clamp(1.1rem, 2.3vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--color-text-primary);
+}
+
+.titlePackFlow {
+  color: var(--color-text-primary);
+}
+
+.titleIcon {
+  color: var(--color-brand-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeBtn {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.closeBtn:hover,
+.closeBtn:focus-visible {
+  background: var(--color-bg-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.closeBtn svg {
+  width: 22px;
+  height: 22px;
+}

@@ -1,4 +1,4 @@
-import { SHOW_DEBUG } from "../../playScreenUtils";
+import { SHOW_DEBUG } from "@/screens/Play/core/utils/playScreenUtils";
 import { logger } from "@/utils/logger";
 
 let lastMoveMs = 0;

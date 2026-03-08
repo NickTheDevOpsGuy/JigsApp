@@ -1,11 +1,13 @@
 .page {
+  height: var(--app-vh-stable, 100dvh);
   min-height: var(--app-vh-stable, 100dvh);
-  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
-    max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
-  background:
-    radial-gradient(1080px 620px at 50% -18%, #173155 0%, transparent 62%),
-    linear-gradient(180deg, #020b18 0%, #010715 100%);
-  overflow-y: auto;
+  max-height: var(--app-vh-stable, 100dvh);
+  padding: max(var(--space-2), env(safe-area-inset-top))
+    max(var(--space-2), env(safe-area-inset-right))
+    max(var(--space-2), env(safe-area-inset-bottom))
+    max(var(--space-2), env(safe-area-inset-left));
+  background: var(--color-bg-primary);
+  overflow: hidden;
   overscroll-behavior: none;
   display: flex;
   flex-direction: column;
@@ -25,26 +27,21 @@
   min-width: 0;
   margin: 0 auto;
   flex: 0 1 auto;
+  max-height: 100%;
   align-self: center;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(
-    180deg,
-    rgba(15, 25, 43, 0.96) 0%,
-    rgba(12, 20, 35, 0.96) 100%
-  );
-  border: 1px solid rgba(90, 145, 220, 0.25);
-  border-radius: 12px;
-  padding: 10px 12px 8px;
-  box-shadow:
-    0 14px 34px rgba(0, 0, 0, 0.45),
-    inset 0 0 0 1px rgba(31, 61, 102, 0.38);
-  overflow-y: auto;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-lg);
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 
 .header {
-  margin-bottom: 4px;
+  margin-bottom: var(--space-2);
   flex-shrink: 0;
 }
 
@@ -55,17 +52,17 @@
   width: 40px;
   height: 40px;
   padding: 0;
-  margin-bottom: 12px;
-  background: rgba(23, 37, 62, 0.9);
-  border: 1px solid rgba(118, 154, 214, 0.35);
-  border-radius: 10px;
-  color: #e8f3ff;
+  margin-bottom: var(--space-3);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  color: var(--color-text-primary);
   cursor: pointer;
 }
 
 .backBtn:hover {
-  background: rgba(29, 45, 76, 0.95);
-  border-color: rgba(130, 188, 255, 0.58);
+  background: var(--color-bg-primary);
+  border-color: var(--color-brand-primary);
 }
 
 .packHeader {
@@ -78,41 +75,24 @@
   font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: 0;
-  color: #edf5ff;
+  color: var(--color-text-primary);
 }
 
 .desc {
   margin: 2px 0 0;
   font-size: 13px;
-  color: #d7e4fa;
+  color: var(--color-text-secondary);
 }
 
 .puzzleGridWrap {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
-  overflow: hidden;
-  padding-top: 6px;
+  overflow: visible;
+  padding-top: 10px;
+  padding-left: 2px;
+  padding-right: 2px;
   padding-bottom: 0;
-}
-
-.puzzleScrollBtn {
-  flex-shrink: 0;
-  appearance: none;
-  border: none;
-  background: rgba(19, 31, 53, 0.92);
-  color: #c6dbfb;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease,
-    opacity 0.15s ease;
 }

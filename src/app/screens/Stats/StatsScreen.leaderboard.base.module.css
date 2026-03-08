@@ -8,6 +8,13 @@
   font-weight: 600;
 }
 
+/* Moves / undos under time (when stored) */
+.leaderboardItem .timeCol .movesInfo {
+  font-size: 11px;
+  opacity: 0.85;
+  color: var(--color-text-secondary);
+}
+
 /* PZ-071: Mobile leaderboard – card layout with expandable details */
 @media (max-width: 600px) {
   .leaderboard {

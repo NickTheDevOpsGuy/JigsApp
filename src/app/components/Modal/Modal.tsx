@@ -2,6 +2,7 @@
 // src/app/components/Modal/Modal.tsx
 import React, { useEffect, useCallback, useId } from "react";
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 import styles from "./Modal.module.css";
 import { Button } from "@/components/Button/Button";
 
@@ -62,6 +63,7 @@ export function Modal({
   return createPortal(
     <div
       className={styles.overlay}
+      data-variant={variant}
       onClick={onClose}
       onKeyDown={handleOverlayKeyDown}
       role="button"
@@ -92,7 +94,7 @@ export function Modal({
                 onClick={onClose}
                 aria-label="Close"
               >
-                ×
+                <X size={20} aria-hidden />
               </button>
             )}
           </div>

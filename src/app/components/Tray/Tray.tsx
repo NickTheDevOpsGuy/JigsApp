@@ -1,6 +1,6 @@
 // src/app/components/Tray/Tray.tsx
 import React from "react";
-import type { Piece } from "@/puzzle/types";
+import type { Piece } from "@/puzzle/core/types";
 import styles from "./Tray.module.css";
 
 type TrayProps = {

@@ -1,8 +1,8 @@
 /**
  * createInitialPieces – builds scrambled pieces with jigsaw edges, scatter positions, targets.
  */
-import type { GridSize, Piece, PieceEdges, PieceCutType } from "../types";
-import { buildPiecePath } from "../shape";
+import type { GridSize, Piece, PieceEdges, PieceCutType } from "@/puzzle/core/types";
+import { buildPiecePath } from "@/puzzle/core/shape";
 
 const CUT_DEPTH_PCT: Record<PieceCutType, number> = {
   classic: 0.17,

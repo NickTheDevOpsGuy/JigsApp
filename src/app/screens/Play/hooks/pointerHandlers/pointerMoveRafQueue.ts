@@ -1,4 +1,6 @@
-export function createPointerMoveRafQueue(onFlush: (clientX: number, clientY: number) => void) {
+export function createPointerMoveRafQueue(
+  onFlush: (clientX: number, clientY: number) => void,
+) {
   let queuedClientX = 0;
   let queuedClientY = 0;
   let rafId: number | null = null;

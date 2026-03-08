@@ -56,10 +56,11 @@
 
 ## 9. Seasonal Puzzle Packs ✓
 
+- **10 packs** – Curated themes with emojis (Nature, Animals, Food, Cozy, Space, Retro, Art, Gaming, Seasonal, Cute). Category labels and pack names show emoji; folder aliases in `samplePuzzles.ts` map e.g. `flowers/` → nature, `tech/` → gaming.
 - **Season detection** – `getCurrentSeason()` maps current date to spring, summer, fall, or winter (Northern Hemisphere)
 - **Pack metadata** – Packs can have optional `season` field in `packMetadata.ts` and `puzzlePacks.ts`
 - **Season's pick** – Matching pack is shown first in the pack list with highlighted styling and "Season's pick" badge
-- **Files**: `utils/seasons.ts`, `utils/seasons.test.ts`, `packMetadata.ts`, `puzzlePacks.ts`, `PackListScreen.tsx`
+- **Files**: `utils/seasons.ts`, `utils/seasons.test.ts`, `packMetadata.ts`, `puzzlePacks.ts`, `samplePuzzles.ts`, `PackListScreen.tsx`
 
 ## 10. Weekly Album, Fog Clarity, Streak Flame, Hints & Share (Feb 2025) ✓
 

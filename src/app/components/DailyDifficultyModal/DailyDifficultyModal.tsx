@@ -17,7 +17,7 @@ import {
   getDailyPreferredDifficultyIndex,
   setDailyPreferredDifficultyIndex,
 } from "@/daily/dailyPuzzleCore";
-import { clearPuzzleState } from "@/puzzle/puzzleStorage";
+import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import styles from "./DailyDifficultyModal.module.css";
 
 const DIFFICULTY_COLORS = [

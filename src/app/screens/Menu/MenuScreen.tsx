@@ -17,17 +17,17 @@ import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
 import { AboutModal } from "@/components/AboutModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
 import { ConfirmModal } from "@/components/Modal/Modal";
-import { clearPuzzleState } from "@/puzzle/puzzleStorage";
+import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import { BEST_TIME_PREFIX } from "@/screens/Play/timeMode";
+import { BEST_TIME_PREFIX } from "@/screens/Play/core/time/timeMode";
 import { Image, Camera, Package, Trophy, Megaphone } from "lucide-react";
 import {
   isTodayDailyCompleted,
   getCurrentStreak,
   getTodayDateString,
 } from "@/daily/dailyPuzzleCore";
-import { getTodayCompletionCount } from "@/services/leaderboardService";
-import { shouldShowChangelog } from "@/data/changelog";
+import { getTodayCompletionCount } from "@/services/leaderboard/leaderboardService";
+import { shouldShowChangelog } from "@/data/content/changelog";
 
 /** Star icon for Start Today's Puzzle. Use public/assets/star.png or fallback to character. */
 const STAR_ICON = "/assets/star.png";

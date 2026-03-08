@@ -19,12 +19,12 @@ export function SetupScreenShell(props: {
   setImageSource: React.Dispatch<React.SetStateAction<ImageSource>>;
   selectedCategory: string;
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
-  filteredPuzzles: import("@/data/samplePuzzles").SamplePuzzle[];
+  filteredPuzzles: import("@/data/packs/samplePuzzles").SamplePuzzle[];
   galleryRef: React.RefObject<HTMLDivElement>;
   canScrollLeft: boolean;
   canScrollRight: boolean;
-  selectGalleryPuzzle: (p: import("@/data/samplePuzzles").SamplePuzzle) => void;
-  selectedPuzzle: import("@/data/samplePuzzles").SamplePuzzle | null;
+  selectGalleryPuzzle: (p: import("@/data/packs/samplePuzzles").SamplePuzzle) => void;
+  selectedPuzzle: import("@/data/packs/samplePuzzles").SamplePuzzle | null;
   isLoading: boolean;
   onPickFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setFromBlob: (blob: Blob) => Promise<boolean>;
@@ -114,25 +114,23 @@ export function SetupScreenShell(props: {
             </div>
           )}
 
-          {!isPackFlow && (
-            <SetupImageSourcePanel
-              imageSource={imageSource}
-              setImageSource={setImageSource}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              filteredPuzzles={filteredPuzzles}
-              galleryRef={galleryRef}
-              canScrollLeft={canScrollLeft}
-              canScrollRight={canScrollRight}
-              selectGalleryPuzzle={selectGalleryPuzzle}
-              selectedPuzzle={selectedPuzzle}
-              isLoading={isLoading}
-              onPickFile={onPickFile}
-              setFromBlob={setFromBlob}
-              selectedPieceCount={selectedPieceCount}
-              styles={styles}
-            />
-          )}
+          <SetupImageSourcePanel
+            imageSource={imageSource}
+            setImageSource={setImageSource}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            filteredPuzzles={filteredPuzzles}
+            galleryRef={galleryRef}
+            canScrollLeft={canScrollLeft}
+            canScrollRight={canScrollRight}
+            selectGalleryPuzzle={selectGalleryPuzzle}
+            selectedPuzzle={selectedPuzzle}
+            isLoading={isLoading}
+            onPickFile={onPickFile}
+            setFromBlob={setFromBlob}
+            selectedPieceCount={selectedPieceCount}
+            styles={styles}
+          />
 
           <SetupConfigSection
             suggestedGrid={isPackFlow ? null : suggestedGrid}
@@ -161,7 +159,9 @@ export function SetupScreenShell(props: {
           />
         </div>
 
-        <div className={`${styles.actionRow} ${isPackFlow ? styles.actionRowPackFlow : ""}`}>
+        <div
+          className={`${styles.actionRow} ${isPackFlow ? styles.actionRowPackFlow : ""}`}
+        >
           <Button
             className={styles.backActionBtn}
             onClick={onBack}

@@ -2,7 +2,7 @@
  * PieceTray – horizontal scrollable tray with arrow controls and fixed slot capacity.
  */
 import React, { forwardRef } from "react";
-import type { Piece } from "@/puzzle/types";
+import type { Piece } from "@/puzzle/core/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { PieceTrayHeader } from "./PieceTrayHeader";

@@ -62,9 +62,11 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByRole("menuitem", { name: /challenge a friend/i })).toBeVisible({
-      timeout: 10000,
-    });
+    await expect(page.getByRole("menuitem", { name: /challenge a friend/i })).toBeVisible(
+      {
+        timeout: 10000,
+      },
+    );
   });
 
   test("completion overlay fits on mobile without body scroll", async ({ page }) => {

@@ -1,0 +1,152 @@
+/* Control row: dark grey square << Play >>, longer empty area (thin white border), Speed 1x */
+.controlRow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
+/* Dark grey square buttons, rounded corners, white icons */
+.controlBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(80, 90, 110, 0.5);
+  border-radius: 10px;
+  background: #2d3340;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
+}
+
+.controlBtn:hover {
+  border-color: rgba(120, 130, 150, 0.6);
+  background: #363d4a;
+  color: #fff;
+}
+
+.controlBtn:focus-visible {
+  outline: 2px solid rgba(117, 180, 255, 0.88);
+  outline-offset: 1px;
+}
+
+/* Play when active: slightly lighter background */
+.controlBtnActive {
+  background: #3a4150;
+  border-color: rgba(100, 110, 130, 0.55);
+}
+
+/* Longer empty dark rectangular input-like area, thin white border */
+.emptySlot {
+  flex: 1;
+  min-width: 100px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  background: rgba(18, 22, 32, 0.6);
+}
+
+.speedTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(80, 90, 110, 0.5);
+  border-radius: 10px;
+  background: #2d3340;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.speedTrigger:hover {
+  border-color: rgba(130, 180, 255, 0.5);
+}
+
+.speedTrigger:focus-visible {
+  outline: 2px solid rgba(117, 180, 255, 0.88);
+  outline-offset: 1px;
+}
+
+.speedChevron {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+/* Nav: Back to Results (dark grey, arrow + text) | Next Puzzle (vibrant blue, text + triangle) */
+.navRow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 20px;
+}
+
+.navBtnSecondary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid rgba(90, 100, 120, 0.5);
+  border-radius: 12px;
+  background: #2d3340;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.navBtnSecondary:hover {
+  border-color: rgba(120, 130, 150, 0.6);
+  background: #363d4a;
+}
+
+.navBtnPrimary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4);
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+
+.navBtnPrimary:hover {
+  background: #3b82f6;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.5);
+}
+
+.navBtnPrimary:focus-visible,
+.navBtnSecondary:focus-visible {
+  outline: 2px solid rgba(117, 180, 255, 0.9);
+  outline-offset: 2px;
+}

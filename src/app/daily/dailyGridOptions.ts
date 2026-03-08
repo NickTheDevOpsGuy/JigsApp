@@ -7,4 +7,3 @@ export const GRID_OPTIONS = [
   { rows: 8, cols: 8, label: "Legend 8×8 - 64 pieces", pieces: 64 },
   { rows: 9, cols: 9, label: "Extreme 9×9 - 81 pieces", pieces: 81 },
 ] as const;
-

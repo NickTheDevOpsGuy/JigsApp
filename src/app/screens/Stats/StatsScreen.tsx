@@ -123,6 +123,8 @@ export function StatsScreen() {
                   setCutTypeFilter={state.setCutTypeFilter}
                   modifierFilter={state.modifierFilter}
                   setModifierFilter={state.setModifierFilter}
+                  sourceFilter={state.sourceFilter}
+                  setSourceFilter={state.setSourceFilter}
                   leaderboard={state.leaderboard}
                   weeklyTotalsLeaderboard={state.weeklyTotalsLeaderboard}
                   todayCompletionCount={state.todayCompletionCount}

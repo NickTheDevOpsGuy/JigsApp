@@ -2,11 +2,11 @@
  * Image source tabs (Gallery / Upload / Camera) and panel content for SetupScreen.
  */
 import { Camera, ChevronLeft, ChevronRight, Image, Upload } from "lucide-react";
-import { CATEGORIES } from "@/data/samplePuzzles";
+import { CATEGORIES } from "@/data/packs/samplePuzzles";
 import { CameraCapture } from "./CameraCapture";
 import { SetupGalleryThumbnail } from "./SetupGalleryThumbnail";
 import type { ImageSource } from "../setupScreenConstants";
-import type { SamplePuzzle } from "@/data/samplePuzzles";
+import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 
 interface SetupImageSourcePanelProps {
   imageSource: ImageSource;
@@ -43,6 +43,21 @@ export function SetupImageSourcePanel({
   setFromBlob,
   styles,
 }: SetupImageSourcePanelProps) {
+  const scrollGalleryByCards = (direction: -1 | 1) => {
+    const gallery = galleryRef.current;
+    if (!gallery) return;
+    const firstCard = gallery.querySelector<HTMLElement>("button");
+    const cardWidth = firstCard?.offsetWidth ?? 96;
+    const gap = Number.parseFloat(getComputedStyle(gallery).columnGap || "8") || 8;
+    const pitch = Math.max(1, Math.round(cardWidth + gap));
+    const step = pitch * 2;
+    const maxScroll = Math.max(0, gallery.scrollWidth - gallery.clientWidth);
+    const rawTarget = gallery.scrollLeft + direction * step;
+    const snappedTarget = Math.round(rawTarget / pitch) * pitch;
+    const clamped = Math.max(0, Math.min(maxScroll, snappedTarget));
+    gallery.scrollTo({ left: clamped, behavior: "smooth" });
+  };
+
   return (
     <>
       <div className={styles.tabs} role="tablist" aria-label="Image source">
@@ -104,9 +119,7 @@ export function SetupImageSourcePanel({
                 aria-label="Scroll gallery left"
                 title="Scroll gallery left"
                 disabled={!canScrollLeft}
-                onClick={() =>
-                  galleryRef.current?.scrollBy({ left: -220, behavior: "smooth" })
-                }
+                onClick={() => scrollGalleryByCards(-1)}
               >
                 <ChevronLeft size={18} />
               </button>
@@ -140,9 +153,7 @@ export function SetupImageSourcePanel({
                 aria-label="Scroll gallery right"
                 title="Scroll gallery right"
                 disabled={!canScrollRight}
-                onClick={() =>
-                  galleryRef.current?.scrollBy({ left: 220, behavior: "smooth" })
-                }
+                onClick={() => scrollGalleryByCards(1)}
               >
                 <ChevronRight size={18} />
               </button>

@@ -1,0 +1,203 @@
+.completeShareBubbleCta {
+  margin: 10px 0 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.completeShareBubbleUrl {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-primary);
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.completeShareDropdownActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.completeShareDropdownItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.completeShareDropdownItem:hover {
+  background: var(--color-bg-secondary);
+}
+
+.completeShareDropdownItem:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.completeActions {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.completeActionsTrigger {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.completeActionsShareBtn {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  background: var(--color-progress-75, #22c55e) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.completeActionsShareBtn:hover:not(:disabled) {
+  background: var(--color-progress-90, #16a34a) !important;
+  color: #fff !important;
+}
+
+@keyframes completionFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes completePanelEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .completeOverlay {
+    position: fixed;
+    inset: 0;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 16px;
+    padding-top: max(24px, env(safe-area-inset-top, 0));
+    padding-bottom: max(32px, env(safe-area-inset-bottom, 0) + 24px);
+    padding-left: max(16px, env(safe-area-inset-left, 0));
+    padding-right: max(16px, env(safe-area-inset-right, 0));
+    min-height: 100dvh;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Keep completion panel fully visible on mobile with no vertical scrolling. */
+  .completeOverlay .completePanelNew {
+    margin: 0;
+    margin-top: 0;
+    align-self: flex-start;
+    width: min(100%, 430px);
+    max-width: min(94vw, 430px);
+    padding: 12px 10px;
+    gap: 8px;
+    max-height: calc(
+      100dvh - max(24px, env(safe-area-inset-top, 0)) -
+        max(32px, env(safe-area-inset-bottom, 0) + 24px)
+    );
+    overflow: hidden;
+  }
+
+  .completePanelNew .completeCloseBtn {
+    width: 40px;
+    height: 40px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .completeTitleText {
+    font-size: clamp(1.45rem, 6.2vw, 1.9rem);
+  }
+
+  .completeTitlePhrase {
+    font-size: clamp(1.25rem, 5.1vw, 1.6rem);
+    margin-top: 0.25em;
+  }
+
+  .completeImageWrapNew {
+    border-radius: 18px;
+    max-height: min(26vh, 220px);
+    aspect-ratio: 4 / 3;
+  }
+
+  .completeImageNew {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .completeStatCard {
+    padding: 10px 8px 9px;
+  }
+
+  .completeStatCardLabel {
+    font-size: 0.76rem;
+  }
+
+  .completeStatCardValue {
+    font-size: clamp(0.98rem, 3.9vw, 1.2rem);
+  }
+
+  .completeShareSection {
+    gap: 8px;
+  }
+
+  .completeActionsRow {
+    gap: 8px;
+  }
+
+  .completeShareTrigger {
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 0.88rem;
+    border-radius: 10px;
+  }
+}

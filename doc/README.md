@@ -28,6 +28,7 @@ This folder contains developer docs for Phuzzle.
 
 ## Session notes
 
+- [SESSION_2025-03-06.md](SESSION_2025-03-06.md) - Replay modal, Back to Results, focus return, target glow, completion snapshot, pause vs win screen
 - [SESSION_SUMMARY.md](SESSION_SUMMARY.md) - Development session summary (long form)
 
 ## Quick links

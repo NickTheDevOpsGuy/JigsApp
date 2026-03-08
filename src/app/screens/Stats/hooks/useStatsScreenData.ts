@@ -6,19 +6,19 @@ import { getTodayDateString } from "@/daily/dailyPuzzleCore";
 import {
   getCalendarWeekRange,
   getMyWeeklyAlbumCompletions,
-} from "@/services/leaderboardService";
+} from "@/services/leaderboard/leaderboardService";
 import {
   getDailyLeaderboard,
   getTodayCompletionCount,
   subscribeTodayCompletionCount,
   getWeeklyTotalsLeaderboard,
   getAllTimeBestLeaderboard,
-} from "@/services/leaderboardService";
-import { getMyAchievements } from "@/services/achievementsService";
-import { getMyStats } from "@/services/statsService";
-import { getMyProfile, updateMyProfile } from "@/services/profileService";
+} from "@/services/leaderboard/leaderboardService";
+import { getMyAchievements } from "@/services/player/achievementsService";
+import { getMyStats } from "@/services/player/statsService";
+import { getMyProfile, updateMyProfile } from "@/services/player/profileService";
 import { getUserId } from "@/supabase/auth";
-import { getAnonymousDisplayName } from "@/data/anonymousNames";
+import { getAnonymousDisplayName } from "@/data/content/anonymousNames";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { getDatesInWeek, formatWeekRangeLabel } from "../statsFormatting";
 import type { WeeklyAlbumSlot } from "../tabs";
@@ -33,6 +33,7 @@ export function useStatsScreenData(
     leaderboardType,
     cutTypeFilter,
     modifierFilter,
+    sourceFilter,
     allTimeGrid,
     profile,
     displayNameInput,
@@ -164,7 +165,13 @@ export function useStatsScreenData(
       const cutType = cutTypeFilter === "all" ? "all" : cutTypeFilter;
       const visualModifier = modifierFilter;
       if (leaderboardType === "today") {
-        const lb = await getDailyLeaderboard(today, 10, cutType, visualModifier);
+        const lb = await getDailyLeaderboard(
+          today,
+          10,
+          cutType,
+          visualModifier,
+          sourceFilter,
+        );
         setLeaderboard(lb);
         setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "week") {
@@ -176,7 +183,14 @@ export function useStatsScreenData(
         setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "alltime") {
         const [r, c] = allTimeGrid.split("x").map(Number);
-        const lb = await getAllTimeBestLeaderboard(r, c, 10, cutType, visualModifier);
+        const lb = await getAllTimeBestLeaderboard(
+          r,
+          c,
+          10,
+          cutType,
+          visualModifier,
+          sourceFilter,
+        );
         setLeaderboard(lb);
         setRowAnimEpoch((n) => n + 1);
       }
@@ -189,6 +203,7 @@ export function useStatsScreenData(
     allTimeGrid,
     cutTypeFilter,
     modifierFilter,
+    sourceFilter,
     loadWeeklyAlbum,
     setLeaderboard,
     setWeeklyTotalsLeaderboard,

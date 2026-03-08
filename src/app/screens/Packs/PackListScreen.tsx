@@ -6,10 +6,10 @@ import { useNavigate } from "react-router-dom";
 import styles from "./PackListScreen.module.css";
 import { ArrowLeft } from "lucide-react";
 import { Loader } from "@/components/Loader";
-import { loadPacksData } from "@/data/loadPacksData";
-import { getPackProgress } from "@/data/packCompletion";
+import { loadPacksData } from "@/data/packs/loadPacksData";
+import { getPackProgress } from "@/data/packs/packCompletion";
 import { getCurrentSeason } from "@/utils/seasons";
-import type { PuzzlePack } from "@/data/puzzlePacks";
+import type { PuzzlePack } from "@/data/packs/puzzlePacks";
 
 export function PackListScreen() {
   const nav = useNavigate();

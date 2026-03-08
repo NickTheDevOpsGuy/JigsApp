@@ -27,7 +27,7 @@
   width: 100%;
   padding: 14px 16px;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   background: var(--color-bg-card);
   text-align: left;
   font-size: 16px;
@@ -59,4 +59,37 @@
 .checkIcon {
   margin-left: auto;
   color: var(--color-brand-primary);
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.sliderLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--color-brand-primary);
+}
+
+.optionTextBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.optionHint {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
 }

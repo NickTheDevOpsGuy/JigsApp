@@ -3,9 +3,9 @@
  * Supports dominant-color clustering for visual grouping on mobile and desktop.
  */
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import type { Piece } from "@/puzzle/types";
-import { getAverageColor } from "@/puzzle/colorUtils";
-import type { TrayFilter } from "@/screens/Play/components/TrayFilterButton";
+import type { Piece } from "@/puzzle/core/types";
+import { getAverageColor } from "@/puzzle/core/colorUtils";
+import type { TrayFilter } from "@/screens/Play/components/hud/TrayFilterButton";
 
 const NUM_HUE_BUCKETS = 6;
 const HUE_BUCKET_DEG = 360 / NUM_HUE_BUCKETS;

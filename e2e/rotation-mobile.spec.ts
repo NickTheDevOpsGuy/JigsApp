@@ -18,7 +18,9 @@ test.describe("Mobile rotation reliability", () => {
     );
   });
 
-  test("tray pieces can be moved to board repeatedly without input deadlock", async ({ page }) => {
+  test("tray pieces can be moved to board repeatedly without input deadlock", async ({
+    page,
+  }) => {
     await page.goto("/play");
 
     await expect(

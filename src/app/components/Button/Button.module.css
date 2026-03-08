@@ -3,7 +3,7 @@
 .button {
   appearance: none;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-btn);
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -22,7 +22,7 @@
 /* Variants */
 .primary {
   background: var(--color-brand-primary);
-  color: white;
+  color: var(--color-text-on-brand);
   border: 1px solid var(--color-brand-primary);
 }
 
@@ -85,19 +85,19 @@
 .sm {
   padding: 6px 10px;
   font-size: 13px;
-  border-radius: 8px;
+  border-radius: var(--radius-btn);
 }
 
 .md {
   padding: 8px 14px;
   font-size: 14px;
-  border-radius: 10px;
+  border-radius: var(--radius-btn);
 }
 
 .lg {
   padding: 12px 20px;
   font-size: 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
 }
 
 /* Full width */

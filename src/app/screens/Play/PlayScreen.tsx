@@ -1,1 +1,1 @@
-export { PlayScreen, default } from "./PlayScreenView";
+export { PlayScreen, default } from "@/screens/Play/core/scene/PlayScreenView";

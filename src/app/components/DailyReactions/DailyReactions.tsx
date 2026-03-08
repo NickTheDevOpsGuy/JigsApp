@@ -13,7 +13,7 @@ import {
   getReactionEmojis,
   type DailyComment,
   type DailyReactionCount,
-} from "@/services/dailyCommentsService";
+} from "@/services/player/dailyCommentsService";
 import { isSupabaseConfigured } from "@/supabase/client";
 import styles from "./DailyReactions.module.css";
 

@@ -14,7 +14,7 @@
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   border: 1px solid var(--color-border);
   margin: 0 12px 16px 12px;
   font-size: 13px;
@@ -98,4 +98,3 @@
   /* Sticky filter row: stays visible when scrolling piece thumbnails */
   box-shadow: 0 1px 0 var(--color-border);
 }
-

@@ -1,0 +1,114 @@
+/* Aligns with board outer border when boardRect is provided */
+.replayBar {
+  position: fixed;
+  bottom: max(var(--space-4), env(safe-area-inset-bottom, 0));
+  left: max(var(--space-3), env(safe-area-inset-left, 0));
+  right: max(var(--space-3), env(safe-area-inset-right, 0));
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 14px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lg);
+  z-index: 2100;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+.replayBar[style*="left"] {
+  right: auto;
+  margin: 0;
+  max-width: none;
+}
+
+.replayBarCloseBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  flex-shrink: 0;
+}
+
+.replayBarCloseBtn:hover {
+  background: var(--color-bg-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.replayBarCloseBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.replayBarContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-right: 0;
+}
+
+.replayBarHeading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 2px 2px 0;
+}
+
+.replayBarTitle {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 0.01em;
+}
+
+.replayBarSubtitle {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.replayBarRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+@media (pointer: coarse) {
+  .replayBarCloseBtn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.replayBarGroup,
+.replayBarTimeGroup,
+.replayBarSpeedModule {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  background: var(--color-bg-elevated);
+}

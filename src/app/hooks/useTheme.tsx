@@ -9,7 +9,7 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { audioManager } from "@/audio/audioManager";
+import { audioManager } from "@/audio/manager/audioManager";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 export type Theme = "light" | "dark" | "space" | "ocean" | "forest" | "sunset";

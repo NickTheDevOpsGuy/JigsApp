@@ -1,8 +1,12 @@
 /**
  * LeaderboardTab – Today / Week / All-time leaderboards, filters, weekly album.
  */
-import type { LeaderboardEntry } from "@/services/leaderboardService";
-import type { PieceCutType, VisualModifierFilter } from "@/services/leaderboardService";
+import type { LeaderboardEntry } from "@/services/leaderboard/leaderboardService";
+import type {
+  PieceCutType,
+  VisualModifierFilter,
+  CompletionSourceFilter,
+} from "@/services/leaderboard/leaderboardService";
 import { renderTimeList, renderCompletionList } from "./LeaderboardTabLists";
 import { LeaderboardTabHeader } from "./LeaderboardTabHeader";
 import styles from "../StatsScreen.module.css";
@@ -33,6 +37,8 @@ interface LeaderboardTabProps {
   setCutTypeFilter: (c: PieceCutType) => void;
   modifierFilter: VisualModifierFilter;
   setModifierFilter: (m: VisualModifierFilter) => void;
+  sourceFilter: CompletionSourceFilter;
+  setSourceFilter: (s: CompletionSourceFilter) => void;
   leaderboard: LeaderboardEntry[];
   weeklyTotalsLeaderboard: { rank: number; count: number; displayName: string }[];
   todayCompletionCount: number;
@@ -57,6 +63,8 @@ export function LeaderboardTab({
   setCutTypeFilter,
   modifierFilter,
   setModifierFilter,
+  sourceFilter,
+  setSourceFilter,
   leaderboard,
   weeklyTotalsLeaderboard,
   todayCompletionCount,
@@ -81,6 +89,8 @@ export function LeaderboardTab({
         setCutTypeFilter={setCutTypeFilter}
         modifierFilter={modifierFilter}
         setModifierFilter={setModifierFilter}
+        sourceFilter={sourceFilter}
+        setSourceFilter={setSourceFilter}
         allTimeGrid={allTimeGrid}
         setAllTimeGrid={setAllTimeGrid}
       />

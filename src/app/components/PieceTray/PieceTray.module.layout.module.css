@@ -102,9 +102,7 @@
 .scrollerSnap {
   scroll-snap-type: x mandatory;
   scroll-snap-stop: always;
-  scroll-padding-inline: calc(
-    50% - 28px
-  ); /* half of 56px piece so first/last center without partial */
+  scroll-padding-inline: 0;
   scroll-behavior: smooth;
 }
 
@@ -120,7 +118,7 @@
 }
 
 .scrollerSnap .pieceButton {
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 

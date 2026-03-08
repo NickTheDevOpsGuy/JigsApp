@@ -3,8 +3,8 @@
  */
 import { useState } from "react";
 import { ChevronRight, ChevronDown } from "lucide-react";
-import type { MenuNode } from "@/data/menuConfig";
-import { getMenuTree } from "@/data/menuConfig";
+import type { MenuNode } from "@/data/menu/menuConfig";
+import { getMenuTree } from "@/data/menu/menuConfig";
 import styles from "./MenuTree.module.css";
 
 export type MenuActionHandler = (node: MenuNode, path: string[]) => void | Promise<void>;

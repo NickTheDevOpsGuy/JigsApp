@@ -1,0 +1,222 @@
+.page:fullscreen,
+.page:-webkit-full-screen {
+  background: var(--color-bg-primary);
+}
+
+.page:fullscreen .topBar,
+.page:-webkit-full-screen .topBar {
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Pause overlay */
+.pauseOverlay {
+  position: absolute;
+  inset: 0;
+  background: var(--color-overlay-strong);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  cursor: pointer;
+  animation: fadeIn 0.2s ease-out;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.pauseContent {
+  text-align: center;
+  color: white;
+  user-select: none;
+}
+
+.pauseContent svg {
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.pauseContent h2 {
+  font-family: "Fredoka", sans-serif;
+  font-size: 2.5rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.pauseContent p {
+  font-size: 1rem;
+  opacity: 0.7;
+  margin: 0;
+}
+
+/* Replay close button pinned to board frame top-right */
+.replayCanvasCloseBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 35;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(112, 143, 206, 0.55);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(22, 38, 68, 0.9), rgba(16, 28, 51, 0.9));
+  color: #b9ccec;
+  box-shadow: inset 0 0 0 1px rgba(81, 120, 191, 0.2);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.replayCanvasCloseBtn:hover {
+  background: linear-gradient(180deg, rgba(31, 56, 96, 0.94), rgba(22, 42, 74, 0.94));
+  color: #e7f2ff;
+  border-color: rgba(140, 184, 255, 0.78);
+}
+
+.replayCanvasCloseBtn:focus-visible {
+  outline: 2px solid rgba(117, 180, 255, 0.92);
+  outline-offset: 2px;
+}
+
+/* Onboarding tooltips */
+.onboardingOverlay {
+  position: fixed;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 85;
+  animation: engagementToastIn 0.3s ease-out;
+}
+
+.onboardingOverlayTray {
+  position: fixed;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 85;
+  animation: engagementToastIn 0.3s ease-out;
+}
+
+/* HUD (timer, pause, pieces): top center of canvas */
+.hudOverlay {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.hudOverlay .hud {
+  flex: none;
+  pointer-events: auto;
+}
+
+.hudPillPause {
+  composes: hudPill;
+  cursor: pointer;
+  border: none;
+  font: inherit;
+  color: inherit;
+  background: var(--color-bg-card);
+  padding: 6px 10px;
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hudPillPause:hover {
+  background: var(--color-bg-secondary);
+}
+
+/* Start hint: top center of canvas (inside board) */
+.startHintOverlay {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: var(--color-overlay-content);
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  animation: engagementToastIn 0.3s ease-out;
+}
+
+/* Announcer: Nice! Combo! Unstoppable! - punchy, centered */
+.announcerToast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  padding: 16px 28px;
+  border-radius: 16px;
+  background: var(--color-overlay-content);
+  color: var(--color-brand-primary);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: var(--shadow-lg);
+  z-index: 95;
+  animation: announcerPop 0.25s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes announcerPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Engagement toasts: streak, milestones - top center of viewport */
+.engagementToast {
+  position: fixed;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: var(--color-overlay-content);
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  z-index: 90;
+  animation: engagementToastIn 0.3s ease-out;
+}

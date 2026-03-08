@@ -3,8 +3,7 @@
  * Shows at most MAX_FEATURES items to keep the screen short.
  */
 import { Modal } from "@/components/Modal/Modal";
-import { Button } from "@/components/Button/Button";
-import { CHANGELOG_ENTRIES, markChangelogSeen } from "@/data/changelog";
+import { CHANGELOG_ENTRIES, markChangelogSeen } from "@/data/content/changelog";
 import styles from "./WhatsNewModal.module.css";
 
 const MAX_FEATURES = 2;
@@ -46,11 +45,6 @@ export function WhatsNewModal({ isOpen, onClose }: WhatsNewModalProps) {
             </ul>
           </div>
         ))}
-        <div className={styles.actions}>
-          <Button variant="primary" onClick={handleClose} fullWidth>
-            Got it!
-          </Button>
-        </div>
       </div>
     </Modal>
   );

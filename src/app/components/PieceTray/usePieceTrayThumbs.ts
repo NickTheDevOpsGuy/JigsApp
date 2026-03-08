@@ -4,8 +4,8 @@
  * so tray thumbs don't flicker or "spin" during canvas rotation.
  */
 import { useState, useEffect, useMemo, useRef } from "react";
-import type { Piece } from "@/puzzle/types";
-import { renderTrayPiece } from "@/puzzle/canvas/renderTrayPiece";
+import type { Piece } from "@/puzzle/core/types";
+import { renderTrayPiece } from "@/puzzle/canvas/render/renderTrayPiece";
 
 const BATCH_SIZE = 12;
 

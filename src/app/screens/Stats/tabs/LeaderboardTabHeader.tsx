@@ -2,7 +2,8 @@ import { ChevronDown, Filter } from "lucide-react";
 import type {
   PieceCutType,
   VisualModifierFilter,
-} from "@/services/leaderboardService";
+  CompletionSourceFilter,
+} from "@/services/leaderboard/leaderboardService";
 import styles from "../StatsScreen.module.css";
 import type { LeaderboardType } from "./LeaderboardTab";
 
@@ -15,6 +16,8 @@ interface LeaderboardTabHeaderProps {
   setCutTypeFilter: (c: PieceCutType) => void;
   modifierFilter: VisualModifierFilter;
   setModifierFilter: (m: VisualModifierFilter) => void;
+  sourceFilter: CompletionSourceFilter;
+  setSourceFilter: (s: CompletionSourceFilter) => void;
   allTimeGrid: "3x3" | "4x4" | "5x5" | "6x6";
   setAllTimeGrid: (g: "3x3" | "4x4" | "5x5" | "6x6") => void;
 }
@@ -28,6 +31,8 @@ export function LeaderboardTabHeader({
   setCutTypeFilter,
   modifierFilter,
   setModifierFilter,
+  sourceFilter,
+  setSourceFilter,
   allTimeGrid,
   setAllTimeGrid,
 }: LeaderboardTabHeaderProps) {
@@ -87,7 +92,9 @@ export function LeaderboardTabHeader({
                 id="modifier-select"
                 className={styles.inlineFilterSelect}
                 value={modifierFilter}
-                onChange={(e) => setModifierFilter(e.target.value as VisualModifierFilter)}
+                onChange={(e) =>
+                  setModifierFilter(e.target.value as VisualModifierFilter)
+                }
                 aria-label="Filter by modifier"
               >
                 <option value="all">All Modifiers</option>
@@ -96,6 +103,20 @@ export function LeaderboardTabHeader({
                 <option value="night">Night Modifier</option>
                 <option value="sepia">Sepia Modifier</option>
               </select>
+              <select
+                id="source-select"
+                className={styles.inlineFilterSelect}
+                value={sourceFilter}
+                onChange={(e) =>
+                  setSourceFilter(e.target.value as CompletionSourceFilter)
+                }
+                aria-label="Filter by source"
+              >
+                <option value="all">All Sources</option>
+                <option value="daily">Daily</option>
+                <option value="pack">Pack</option>
+                <option value="custom">Custom</option>
+              </select>
             </>
           )}
           {leaderboardType === "alltime" && (
@@ -103,7 +124,9 @@ export function LeaderboardTabHeader({
               id="alltime-grid-select"
               className={styles.inlineFilterSelect}
               value={allTimeGrid}
-              onChange={(e) => setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")}
+              onChange={(e) =>
+                setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")
+              }
               aria-label="Filter all-time by grid size"
             >
               <option value="3x3">3x3 Grid</option>
@@ -117,4 +140,3 @@ export function LeaderboardTabHeader({
     </div>
   );
 }
-

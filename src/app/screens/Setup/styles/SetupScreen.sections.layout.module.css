@@ -1,0 +1,117 @@
+.file {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(90, 121, 175, 0.62);
+  background: rgba(18, 31, 56, 0.82);
+  color: #d7e9ff;
+  padding: 10px 12px;
+}
+
+.difficultySuggestionSlot {
+  min-height: 0;
+}
+
+.difficultySuggestion {
+  width: 100%;
+  min-height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(112, 169, 243, 0.7);
+  background: linear-gradient(180deg, rgba(44, 82, 140, 0.76), rgba(36, 66, 117, 0.82));
+  color: #e8f2ff;
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.difficultySection,
+.timerSection {
+  display: grid;
+  gap: 8px;
+}
+
+.difficultySection {
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+.configSectionLabel {
+  margin: 0;
+  color: #efdcc0;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.difficultyGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.difficultyCard {
+  appearance: none;
+  border: 1px solid rgba(89, 118, 168, 0.62);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(20, 33, 57, 0.94), rgba(14, 25, 43, 0.94));
+  min-height: 56px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  color: #dfecff;
+}
+
+.difficultyCard:hover {
+  border-color: rgba(116, 166, 243, 0.84);
+}
+
+.difficultyCardActive {
+  border-color: rgba(110, 190, 255, 0.92);
+  background: linear-gradient(180deg, rgba(45, 86, 151, 0.9), rgba(34, 72, 129, 0.9));
+  box-shadow: 0 0 0 1px rgba(110, 190, 255, 0.4);
+}
+
+.difficultyCardTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.difficultyCardPieces {
+  font-size: 0.72rem;
+  color: #c9dcf8;
+  font-weight: 600;
+}
+
+.timerDropdown :global(label) {
+  color: #a8c6ef;
+}
+
+.timerDropdown :global(select) {
+  min-height: 40px;
+  border-radius: 10px;
+  border-color: rgba(94, 123, 175, 0.65);
+  background: rgba(17, 30, 54, 0.84);
+  color: #ecf5ff;
+}
+
+.customGrid {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.customGridLabel {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+  color: #b2ccf1;
+  font-size: 0.82rem;
+  font-weight: 600;
+}

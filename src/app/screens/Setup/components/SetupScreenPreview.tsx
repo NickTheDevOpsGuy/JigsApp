@@ -26,13 +26,20 @@ export function SetupScreenPreview(props: {
   } = props;
 
   return (
-    <div className={`${styles.preview} ${isPackFlow ? styles.previewPackFlow : ""}`} ref={previewRef}>
+    <div
+      className={`${styles.preview} ${isPackFlow ? styles.previewPackFlow : ""}`}
+      ref={previewRef}
+    >
       {isLoading ? (
         <div className={styles.previewEmpty}>Loading...</div>
       ) : imgDataUrl ? (
         <div className={styles.previewImageWrap}>
           <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
-          <GridPreviewOverlay rows={effectiveRows} cols={effectiveCols} visible={showGridPreview} />
+          <GridPreviewOverlay
+            rows={effectiveRows}
+            cols={effectiveCols}
+            visible={showGridPreview}
+          />
           <button
             type="button"
             className={`${styles.gridToggleBtn} ${showGridPreview ? styles.gridToggleBtnActive : ""}`}

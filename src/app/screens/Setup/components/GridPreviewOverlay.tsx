@@ -1,4 +1,4 @@
-import styles from "../SetupScreen.module.css";
+import styles from "@/screens/Setup/styles/SetupScreen.module.css";
 
 /** Grid preview overlay to show where cuts will land */
 export function GridPreviewOverlay({

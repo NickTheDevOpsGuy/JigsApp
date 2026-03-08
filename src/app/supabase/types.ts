@@ -74,6 +74,9 @@ export interface Database {
           cut_type?: string;
           is_mastery?: boolean;
           visual_modifier?: string;
+          move_count?: number | null;
+          undo_count?: number | null;
+          completion_source?: string;
         };
         Insert: {
           id?: string;
@@ -87,6 +90,9 @@ export interface Database {
           cut_type?: string;
           is_mastery?: boolean;
           visual_modifier?: string;
+          move_count?: number | null;
+          undo_count?: number | null;
+          completion_source?: string;
         };
         Update: Partial<{
           id: string;
@@ -99,6 +105,9 @@ export interface Database {
           created_at: string;
           is_mastery: boolean;
           visual_modifier: string;
+          move_count: number | null;
+          undo_count: number | null;
+          completion_source: string;
         }>;
       };
       user_achievements: {

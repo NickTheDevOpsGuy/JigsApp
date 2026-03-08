@@ -16,7 +16,9 @@ export function SetupScreenHeader(props: {
             <Puzzle size={28} />
           </span>
         )}
-        <span>{isPackFlow && selectedPuzzleName ? selectedPuzzleName : "New Puzzle"}</span>
+        <span>
+          {isPackFlow && selectedPuzzleName ? selectedPuzzleName : "New Puzzle"}
+        </span>
       </h1>
       <button
         type="button"
@@ -25,7 +27,7 @@ export function SetupScreenHeader(props: {
         aria-label={isPackFlow ? "Close puzzle setup" : "Close new puzzle"}
         title={isPackFlow ? "Close and return to pack" : "Close and return to menu"}
       >
-        <X size={26} />
+        <X size={22} />
       </button>
     </div>
   );

@@ -16,6 +16,18 @@ function getHorizontalScrollMetrics(el: HTMLDivElement) {
   return { maxScroll, clamped };
 }
 
+function getTraySnapPitchPx(el: HTMLDivElement): number {
+  const row = el.firstElementChild as HTMLElement | null;
+  const first = row?.querySelector<HTMLElement>("button");
+  if (!first) return 64;
+  const second = first.nextElementSibling as HTMLElement | null;
+  if (second) {
+    const delta = second.offsetLeft - first.offsetLeft;
+    if (delta > 0) return delta;
+  }
+  return first.offsetWidth || 64;
+}
+
 export function usePieceTrayScroll(displayedLength: number) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -77,12 +89,12 @@ export function usePieceTrayScroll(displayedLength: number) {
     const onTouchDone = () => {
       touchLastX = null;
       if (isIOS && displayedLength > 0) {
-        // Nudge to a slot-aligned resting point to reduce half-cut pieces after momentum.
-        const STEP_PX = 64;
+        // Nudge to nearest slot pitch so pieces rest fully visible.
+        const stepPx = getTraySnapPitchPx(el);
         const { maxScroll } = getHorizontalScrollMetrics(el);
         const aligned = Math.max(
           0,
-          Math.min(maxScroll, Math.round(el.scrollLeft / STEP_PX) * STEP_PX),
+          Math.min(maxScroll, Math.round(el.scrollLeft / stepPx) * stepPx),
         );
         requestAnimationFrame(() => {
           el.scrollTo({ left: aligned, behavior: "smooth" });

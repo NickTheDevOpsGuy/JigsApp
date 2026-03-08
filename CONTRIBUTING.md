@@ -17,9 +17,9 @@ npm install
 
 Copy [.env.example](.env.example) to `.env` and fill in any required keys (e.g. Supabase, PostHog). See [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) for backend setup.
 
-## Before submitting a PR
+## Before committing / submitting a PR
 
-Run these locally; CI will run them as well.
+Run these locally before you commit; CI will run them on the PR as well.
 
 | Command             | Description                    |
 | ------------------- | ------------------------------ |
@@ -30,8 +30,10 @@ Run these locally; CI will run them as well.
 
 Optional:
 
-- `npm run test:e2e` — Playwright E2E tests (requires build and env if needed).
+- `npm run test:e2e` — Playwright E2E tests (run `npx playwright install` once; ensure port 5173 is free or app is not already running).
 - `npm run format:check` — Prettier; use `npm run format` to fix.
+
+Running the same commands before each commit helps catch issues early.
 
 ## Workflow
 

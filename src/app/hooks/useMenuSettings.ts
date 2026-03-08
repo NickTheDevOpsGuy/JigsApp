@@ -2,7 +2,7 @@
  * useMenuSettings – read persisted settings from localStorage for use in MenuTree (home context).
  */
 import { useCallback, useState } from "react";
-import { soundManager } from "@/audio/sounds";
+import { soundManager } from "@/audio/core/sounds";
 import {
   PIECE_LOCKING_KEY,
   GHOST_HINT_KEY,
@@ -10,7 +10,7 @@ import {
   GHOST_WHEN_IDLE_KEY,
   EDGE_HIGHLIGHT_KEY,
   IMMERSIVE_MODE_KEY,
-} from "@/screens/Play/playScreenUtils";
+} from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 const TOGGLE_KEYS: Record<string, string> = {

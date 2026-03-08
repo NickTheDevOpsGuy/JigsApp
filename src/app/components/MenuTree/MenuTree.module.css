@@ -14,7 +14,7 @@
   background: transparent;
   color: var(--color-text-primary);
   padding: 10px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -112,7 +112,7 @@
     padding: 12px 14px;
     font-size: 15px;
     min-height: 48px;
-    border-radius: 10px;
+    border-radius: var(--radius-btn);
   }
 
   .children {

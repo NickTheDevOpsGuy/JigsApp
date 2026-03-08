@@ -1,7 +1,7 @@
 /**
  * Shared pointer logic: finishDragWithTrayCheck, screen-to-board conversion.
  */
-import type { PuzzleManager } from "@/puzzle/PuzzleManager";
+import type { PuzzleManager } from "@/puzzle/manager/PuzzleManager";
 import type React from "react";
 
 const TRAY_EDGE_SCROLL_ZONE_PX = 56;
@@ -32,7 +32,11 @@ export function autoScrollTrayAtPointer(
   }
 
   if (scrollDelta !== 0) {
-    scroller.scrollLeft += scrollDelta;
+    const maxScroll = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+    const next = Math.max(0, Math.min(maxScroll, scroller.scrollLeft + scrollDelta));
+    if (next !== scroller.scrollLeft) {
+      scroller.scrollLeft = next;
+    }
   }
 }
 

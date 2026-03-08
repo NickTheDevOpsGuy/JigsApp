@@ -3,8 +3,8 @@
  */
 import { useState } from "react";
 import { Puzzle } from "lucide-react";
-import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
-import styles from "../SetupScreen.module.css";
+import { SAMPLE_PUZZLES } from "@/data/packs/samplePuzzles";
+import styles from "@/screens/Setup/styles/SetupScreen.module.css";
 
 type GalleryPuzzle = (typeof SAMPLE_PUZZLES)[0];
 

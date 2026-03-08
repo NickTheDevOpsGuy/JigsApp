@@ -1,7 +1,7 @@
 /**
  * LeaderboardTabLists – render time-based and completion-count leaderboard lists.
  */
-import type { LeaderboardEntry } from "@/services/leaderboardService";
+import type { LeaderboardEntry } from "@/services/leaderboard/leaderboardService";
 import { formatTime, formatGap, PODIUM } from "../statsFormatting";
 import styles from "../StatsScreen.module.css";
 
@@ -47,6 +47,13 @@ export function renderTimeList(
             <span className={styles.timeCol}>
               <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
               {gapInfo && <span className={styles.gapInfo}>{gapInfo}</span>}
+              {(entry.moveCount != null || entry.undoCount != null) && (
+                <span className={styles.movesInfo} aria-label="Moves and undos">
+                  {entry.moveCount != null && `${entry.moveCount} moves`}
+                  {entry.moveCount != null && entry.undoCount != null && " · "}
+                  {entry.undoCount != null && `${entry.undoCount} undos`}
+                </span>
+              )}
             </span>
           </li>
         );

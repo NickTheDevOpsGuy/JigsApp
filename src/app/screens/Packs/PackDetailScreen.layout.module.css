@@ -1,76 +1,37 @@
-.puzzleScrollBtn:hover:not(:disabled) {
-  background: rgba(39, 69, 118, 0.96);
-  color: #f0f7ff;
-}
-
-.puzzleScrollBtn:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
 .puzzleGrid {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  gap: 6px;
-  padding: 2px 0;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 10px;
+  padding: 10px 2px 0;
   min-width: 0;
   align-items: stretch;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(96, 145, 219, 0.86) rgba(11, 20, 36, 0.82);
-  scrollbar-gutter: stable;
-  scroll-snap-type: x mandatory;
-  scroll-snap-stop: always;
-  scroll-padding-inline: calc(50% - 54px);
-}
-
-.puzzleGrid::-webkit-scrollbar {
-  height: 8px;
-}
-
-.puzzleGrid::-webkit-scrollbar-track {
-  background: rgba(11, 20, 36, 0.82);
-  border-radius: 999px;
-}
-
-.puzzleGrid::-webkit-scrollbar-thumb {
-  background: rgba(96, 145, 219, 0.86);
-  border-radius: 999px;
-  border: 1px solid rgba(13, 26, 46, 0.9);
-}
-
-.puzzleGrid::-webkit-scrollbar-thumb:hover {
-  background: rgba(123, 175, 248, 0.92);
+  overflow: visible;
 }
 
 .puzzleCard {
-  flex: 0 0 108px;
-  width: 108px;
-  min-width: 108px;
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  padding: 6px;
-  background: linear-gradient(180deg, rgba(28, 42, 67, 0.97), rgba(22, 35, 56, 0.97));
-  border: 1px solid rgba(84, 128, 196, 0.52);
-  border-radius: 10px;
+  gap: 6px;
+  padding: 10px 9px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
   cursor: pointer;
   text-align: center;
   transition:
     border-color 0.15s,
     background 0.15s,
     transform 0.15s;
-  scroll-snap-align: center;
+  min-height: 0;
 }
 
 .puzzleCard:hover:not(:disabled) {
-  background: linear-gradient(180deg, rgba(39, 57, 88, 0.96), rgba(25, 39, 65, 0.96));
-  border-color: #55a8ff;
+  background: var(--color-bg-primary);
+  border-color: var(--color-brand-primary);
   transform: translateY(-1px);
 }
 
@@ -88,16 +49,17 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: var(--radius-btn);
   overflow: hidden;
-  background: #111f36;
-  border: 1px solid rgba(116, 163, 223, 0.35);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
 .puzzleThumb img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .placeholder {
@@ -120,7 +82,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #3ecf8e, #22aa74);
+  background: var(--color-complete-gradient-start);
   color: white;
   border-radius: 50%;
 }

@@ -5,7 +5,7 @@
   width: 100%;
   max-width: 100vw;
   box-sizing: border-box;
-  padding: max(4px, env(safe-area-inset-top)) 6px 6px;
+  padding: max(8px, env(safe-area-inset-top)) 8px 8px;
   background: var(--color-bg-primary);
   overflow: hidden;
   overscroll-behavior: none;
@@ -29,23 +29,24 @@
   display: flex;
   flex-direction: column;
   background: var(--color-bg-card);
-  border-radius: 12px;
-  padding: 8px 10px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
   box-shadow: var(--shadow-md);
-  overflow-y: auto;
+  overflow: hidden;
   overflow-x: hidden;
   box-sizing: border-box;
 }
 
 .cardScroll {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   scrollbar-width: none;
-  padding: 8px 0 12px;
+  padding: 12px 0 16px;
   scroll-snap-type: y mandatory;
   scroll-snap-stop: always;
   scroll-padding-block: calc(50% - 40px); /* center first/last card without partial */
@@ -58,8 +59,8 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 2px;
+  gap: 12px;
+  margin-bottom: 8px;
   flex-shrink: 0;
 }
 
@@ -72,7 +73,7 @@
   padding: 0;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-btn);
   color: var(--color-text-primary);
   cursor: pointer;
 }
@@ -89,7 +90,7 @@
 }
 
 .subtitle {
-  margin: 0 0 4px;
+  margin: 0 0 8px;
   font-size: 13px;
   color: var(--color-text-secondary);
   line-height: 1.4;

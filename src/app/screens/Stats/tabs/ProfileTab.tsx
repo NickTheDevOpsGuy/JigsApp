@@ -5,9 +5,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/Button/Button";
-import { getBestTime } from "@/screens/Play/timeMode";
+import { getBestTime } from "@/screens/Play/core/time/timeMode";
 import { formatDuration } from "../statsFormatting";
-import { prestigeReset } from "@/services/prestigeService";
+import { prestigeReset } from "@/services/player/prestigeService";
 import styles from "../StatsScreen.module.css";
 
 function formatBestTime(seconds: number): string {

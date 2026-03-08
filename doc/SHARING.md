@@ -29,7 +29,7 @@ This works **without Supabase**.
   - Exports the puzzle canvas as PNG
   - Adds a footer like: `🧩 Phuzzle - {pieces} pieces in {time}`
 - `src/app/screens/Play/hooks/useShareCardImage.ts`
-  - Share Card PNG (iMessage-style layout): dark gradient + subtle starry background, thin white border; header "PUZZLE CHALLENGE -" or "PHUZZLE RESULT" with puzzle icon; gold horizontal line; centered puzzle image with gold border; gold line; centered time ("My Time" / "Time"), piece count and difficulty, accuracy (result mode); footer with "Play Phuzzle" CTA and phuzzle.vercel.app. Single URL in share text (no duplicate). Challenge and result modes supported.
+  - Share Card PNG: **Challenge** mode is image-only (dark gradient background, centered puzzle image with gold border; no text on the card). **Result** mode: header, time, piece count and difficulty, accuracy, footer with play URL. Share text uses a random taunt phrase (e.g. "BOOM! I just crushed that puzzle! 😎") plus time/moves and same-puzzle URL. Share title "Phuzzle" to avoid duplicate "Phuzzle Challenge" in shared text.
 - `src/app/screens/Play/components/CompletionOverlay.tsx`
   - UI: Win overlay with **Share Result** and **Share with People** actions. Puzzle image shown without text overlay; time/stats in block above image. Share card image built in `useShareCardImage.ts`. Wires overlay to `useShareResults` + `useDownloadImage` + `useShareCardImage`. Panel centered (margin: auto).
 - **Board when complete** (after dismissing overlay): Share-card-style banner at top of board with "Solved in X:XX!" and move count (`PlayScreen.tsx` + `PlayScreen.module.css` `.boardCompleteMessage` / `.boardCompleteBanner`).

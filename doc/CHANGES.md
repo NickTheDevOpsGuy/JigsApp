@@ -4,6 +4,73 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
+## Recent: Share card, puzzle folders, Start over
+
+- **Share card** — Challenge card is **image-only** (gradient background + centered puzzle image with gold border; no text on the image). Result card: time, moves, pieces, accuracy, full URL. Share **message** (copy/native share): "🧩 Phuzzle Challenge" plus a **random taunt phrase** (e.g. "BOOM! I just crushed that puzzle! 😎", "Another one in the books! 💪", "Puzzle demolished. Your turn. 🧩") plus "I did it in [time] and [N] moves.", largest merge, "Think you can beat me? Let me know if you need lessons! 😉", then "Same puzzle, same difficulty" + full URL. Share title is "Phuzzle" (not "Phuzzle Challenge") to avoid duplicate heading. Files: `src/app/screens/Play/core/share/shareMessages.ts`, `src/app/screens/Play/hooks/share/useShareCardImageCore.ts`, `shareCardImageShare.ts`, `shareCardImageHelpers.ts`.
+
+- **Puzzle folder reorg** — One folder per pack; no aliases. Folders under `src/app/assets/puzzles/`: `nature/`, `animals/`, `food/`, `cozy/`, `space/`, `retro/`, `art/`, `gaming/`, `seasonal/`, `cute/`. Previous `flowers/` → `nature/`, `cozy-food/` → `food/`, `tech/` → `gaming/`. Config: `src/app/data/packs/samplePuzzles.ts`, `packMetadata.ts`, `puzzlePacks.ts`. See README "Adding Sample Puzzles".
+- **Start over** — Menu → Navigation → **Start over** restarts the current puzzle from scratch (same image and grid). Files: `usePlayScreenSceneState.ts`, `usePlayScreenManagerCore.ts`, `headerMenuItemsNavModes.ts`, top bar props and layout.
+
+---
+
+## Recent: Replay polish, Back to Results, win screen (6 Mar 2025)
+
+- **Replay controls width** — Playback controls (seek bar, control row, nav) in the Replay Solve modal are now only as wide as the outer board/canvas and aligned under it; min/max width (280px / viewport−32) with centering when clamped.
+- **Back to Results** — "Back to Results" now fully stops replay, closes the modal, shows the completion overlay, and restores focus to the completion close button; button calls `onBackToResults` when provided (else `onClose`).
+- **Focus return** — When leaving replay, focus moves to the completion overlay close button (`completionFocusRef` wired through scene, completion props, and overlay components).
+- **Target slot glow** — Snap-target indicator is now a soft radial glow only (circle stroke removed) so it reads as a glow on the piece.
+- **Replay final frame** — One extra snapshot is recorded when the puzzle becomes complete so the last replay frame always shows the fully assembled puzzle.
+- **Pause vs win screen** — Pause overlay is hidden when the puzzle is complete so "Back to Results" shows the win screen instead of the pause overlay (`!board.isComplete` in PauseOverlay condition in `PlayScreenLayout.tsx`).
+- **Tests** — `ReplaySolveModal.test.tsx`: Back to Results calls `onBackToResults` when provided, and calls `onClose` when not.
+
+---
+
+## Recent: Replay modal, snap feedback, tests
+
+- **Replay Solve modal** — **Watch Replay** opens a full-screen modal with a **board cutout**: the live puzzle canvas stays visible in the center so playback is visible. Header (Replay Solve, close), seek bar with time, play/pause, rewind/fast-forward, 1×–3× speed (tap to cycle), Back to Results / Next Puzzle. When no board rect is available the modal falls back to a centered box with completion image. See `src/app/screens/Play/components/replay/ReplaySolveModal.tsx`, `ReplaySolveModal.module.css`.
+- **Snap/magnet feedback** — Stronger “magnet” feel on desktop and mobile: **target-slot glow** (subtle glow at the snap destination when in range), **proximity glow** (stronger radial glow and outline when dragging near snap; gentle pulse), **post-snap** (slightly stronger/longer glow and pop), **lock glow** (warmer, longer stroke), **snap particles** (slightly larger/longer burst). **No near-snap nudge** — only real snaps move pieces; dragging near the target no longer auto-nudges on release. See `src/app/puzzle/canvas/render/renderBoardDrawPieceCore.ts`, `src/app/puzzle/canvas/utils/renderBoardHelpersCore.ts`, `src/app/puzzle/manager/ops/puzzleManagerPointerOps.ts`.
+- **Tests** — Unit tests added: `ReplaySolveModal.test.tsx` (heading, play/pause, close, seek, time), `renderBoardHelpersCore.test.ts` (snapGlowAlpha, snapPopScale). Lint: unused vars in pointer ops prefixed with `_`.
+
+---
+
+## Recent: 10 puzzle packs with emojis
+
+- **Packs capped at 10** — Curated set: 🌿 Nature, 🐶 Animals, 🍔 Food, 🏠 Cozy, 🌌 Space, 🧠 Retro, 🖼 Art, 🎮 Gaming, 🌸 Seasonal, 🧁 Cute. Each pack has an emoji, name, description, and optional `season` (spring/summer/fall/winter) for "Season's pick".
+- **One folder per pack** — Folder name = category id (no aliases). See “Recent: Share card, puzzle folders, Start over” for current folder list and reorg from flowers/cozy-food/tech.
+- **Emoji in labels** — Category picker and pack list show emoji + name (e.g. "🌿 Nature"). `CATEGORY_LABELS` and pack `emoji` in `packMetadata.ts` / `puzzlePacks.ts`. README "Adding Sample Puzzles" updated with the 10-pack table.
+
+---
+
+## Recent: remove empty categories and packs
+
+- **Categories/packs trimmed to existing assets** — Removed pack entries and category config for categories that have no puzzle images: Pets (`pets`), Illustrations (`illustrations`), Space (`space`), Food (`food`). Only categories with assets under `puzzles/` remained; later reorganized into the current 10 emoji packs (see above).
+
+## Recent: dialog consistency pass
+
+- **Unified dialog shell** — Completion/setup dialogs now share the same close-button treatment, frame radius, border glow, and panel spacing so transitions across screens feel cohesive.
+- **Win screen layout refresh** — Completion now uses a fixed heading/subtitle, full solved-image preview frame, 4-column stat row, and stacked action rows with one clear primary CTA.
+- **Action pattern standardization** — Primary and secondary dialog actions now follow one row style (icon + label + chevron) with consistent hover/focus states across desktop and mobile.
+- **Docs + lint discipline** — README structure paths and UX notes were updated to match current folders, and lint remains `--max-warnings=0` to keep refactors clean.
+
+- **Image authenticity cleanup** — Removed generated/derivative variant files (renamed/inverted style assets) from the catalog.
+- **Balanced catalog target** — Active categories target **~10 unique images each** with hash-level duplicate prevention.
+- **Folder cleanup** — Removed deprecated `puzzles/garden/` source folder; flowers now come only from `puzzles/flowers/`.
+
+- **Picker/category cleanup** — Consolidated duplicate category buckets into a cleaner 9-category set: Animals, Pets, Illustrations, Food, Cozy Food, Flowers, Space, Tech, Retro. Pets = real pets; Illustrations = drawings (including drawn pets).
+- **Folder normalization** — Puzzle folders map to curated picker categories; `pets/drawings` can alias to Illustrations in `samplePuzzles.ts`.
+- **Pack alignment** — Pack metadata and runtime pack config now match available image categories (removed stale/empty pack categories).
+
+---
+
+## Recent: layout consistency + restore safety
+
+- **Pack screens** — Removed extra whitespace and reduced nested scrolling behavior so image-preview sections stay tighter on desktop and mobile.
+- **Win image fit** — Completion overlay puzzle preview now favors full-image fit behavior (`contain`) to avoid visual cut-off.
+- **Restore lock normalization** — Restored snapshots now invalidate impossible lock states (`locked` while `isPlaced` is false), preventing false completion/locking states after resume.
+- **Docs alignment** — README architecture paths now match current folders (`Play/core`, `Play/components/*`, `Play/hooks/*`, manager `engine/ops/state` split).
+
+---
+
 ## Recent: Win screen refresh, replay, share cards
 
 - **Win screen** — Redesigned: starry celebratory background, “PUZZLE COMPLETE!” banner (golden-orange with puzzle icon), completed puzzle image, two stat cards (Time | Moves), **Watch Replay** (when available), and **Next Puzzle** as primary CTA. On mobile the completion panel is aligned to the top.
@@ -68,11 +135,11 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 ## Core gameplay
 
 - Drag and drop pieces with rotation (tap to rotate on mobile)
-- Board snap and neighbor snap (including during drag for fast moves); near-snap nudge when pieces are close
+- Board snap and neighbor snap (including during drag for fast moves); only real snaps place pieces (no auto-nudge on release)
 - Group merging so connected pieces move together
 - Multiple grid sizes (3×3 to 10×10 presets; custom 3×3 up to 12×12)
 - Image sources: gallery, file upload, camera capture
-- Puzzle packs – curated sets grouped by theme; folder = category (e.g. `puzzles/animals/` → Cozy Animals). Seasonal packs surface as "Season's pick" (spring, summer, fall, winter).
+- Puzzle packs – up to 10 curated packs with emojis (Nature, Animals, Food, Cozy, Space, Retro, Art, Gaming, Seasonal, Cute). Folder = category, with optional aliases in `samplePuzzles.ts` (e.g. `flowers/` → nature, `tech/` → gaming). Seasonal packs surface as "Season's pick" (spring, summer, fall, winter).
 - **Tray filters** – All, Edges, Color (Filter dropdown in Piece Drawer; pop-up menu)
 - Zoom and pan (animated, persistent per grid size, max 2.5× zoom; soft board clamp)
   - Desktop: scroll to zoom, middle mouse drag to pan
@@ -148,5 +215,5 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 - **Setup** – `screens/Setup/SetupScreen.tsx`; hooks in `hooks/` (`useGridConfig`, `useImagePicker`, `useSetupScreenGalleryScroll`); `SetupConfigSection.tsx` (difficulty, time, custom grid, remember); image source (gallery/upload/camera) in `components/SetupImageSourcePanel.tsx`.
 - **Data / menu** – `data/menuConfig.ts` (getMenuTree); sections in `menuConfigPlay.ts`, `menuConfigAppearance.ts`, `menuConfigRest.ts`; constants and types in `menuConfigConstants.ts` (TIME_MODE_LABELS, MenuNode).
 - **Stats** – `screens/Stats/StatsScreen.tsx`; state and data in `hooks/useStatsScreenState.ts`, `hooks/useStatsScreenData.ts`; header in `components/StatsScreenHeader.tsx`; tabs in `tabs/`; list rendering in `LeaderboardTabLists.tsx`.
-- **Completion overlay** – `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx` (Continue dropdown opens upward, Share Result button); `useCompletionConfetti.ts`, `useCompletionOverlayData.ts` (confetti, percentile, recordCompletion, share); share popup in `CompletionSharePopup.tsx` (Share Card PNG with game link in image footer, Seasonal frame, Download); stats block in `CompletionStatsBlock.tsx`. Share card image built in `useShareCardImage.ts` (includes phuzzle.vercel.app on card). **Piece tray** – `PieceTrayHeader.tsx`; display/scroll/thumbs in `usePieceTrayDisplay.ts`, `usePieceTrayScroll.ts`, `usePieceTrayThumbs.ts`.
+- **Completion overlay** – `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx` (Continue dropdown opens upward, Share Result button); `useCompletionConfetti.ts`, `useCompletionOverlayData.ts` (confetti, percentile, recordCompletion, share); share popup in `CompletionSharePopup.tsx` (Share Card PNG with game link in image footer, Seasonal frame, Download); stats block in `CompletionStatsBlock.tsx`. Share card image built in `useShareCardImage.ts` (includes phuzzle.vercel.app on card). **Replay modal** – `components/replay/ReplaySolveModal.tsx` (board cutout so live canvas visible, play/pause, seek, 1×–3× speed); replay state in `hooks/gameplay/useReplay.ts`. **Piece tray** – `PieceTrayHeader.tsx`; display/scroll/thumbs in `usePieceTrayDisplay.ts`, `usePieceTrayScroll.ts`, `usePieceTrayThumbs.ts`.
 - **Weekly album** – `LeaderboardTab.tsx` (Week → Album: 7-slot grid); `useStatsScreenData.ts` (`loadWeeklyAlbum`, `getMyWeeklyAlbumCompletions`); `leaderboardFetchersShared.ts` (`getMyWeeklyAlbumCompletions`). **Fog modifier** – `usePlayScreenAnimation.ts` (`fogAlphaForUnplaced`); `renderBoard.ts` (fog overlay per unplaced piece); `renderBoardTypes.ts` (`AnimationState.fogAlphaForUnplaced`).

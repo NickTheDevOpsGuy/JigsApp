@@ -2,7 +2,7 @@
  * useImagePicker – file input, paste, camera; validates dimensions per grid size.
  */
 import { useState } from "react";
-import type { SamplePuzzle } from "@/data/samplePuzzles";
+import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB – high-res phone/camera/DSLR
 const VALID_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];

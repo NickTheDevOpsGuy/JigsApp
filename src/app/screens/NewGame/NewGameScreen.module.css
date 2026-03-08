@@ -2,65 +2,66 @@
   min-height: 100vh;
   display: grid;
   place-items: center;
-  background: #dff1ff;
-  padding: 24px;
+  background: var(--color-bg-primary);
+  padding: var(--space-6);
 }
 
 .card {
   width: min(520px, 100%);
-  background: #eef8ff;
-  border-radius: 18px;
-  padding: 28px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-lg);
   display: grid;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .title {
-  margin: 0 0 6px;
+  margin: 0 0 var(--space-2);
   font-size: 20px;
-  color: #0b63b8;
+  color: var(--color-text-primary);
 }
 
 .label {
   display: grid;
-  gap: 8px;
-  color: #0b63b8;
+  gap: var(--space-2);
+  color: var(--color-text-primary);
   font-weight: 600;
 }
 
 .select {
   height: 48px;
-  border-radius: 12px;
-  border: 1px solid rgba(11, 99, 184, 0.35);
-  padding: 0 12px;
-  background: white;
-  color: #0b2e52;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--color-border);
+  padding: 0 var(--space-3);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
 }
 
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 6px;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
 }
 
 .primary,
 .secondary {
   height: 52px;
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   font-weight: 600;
   cursor: pointer;
 }
 
 .primary {
-  background: #0b63b8;
-  color: white;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
   border: none;
 }
 
 .secondary {
-  background: white;
-  color: #0b63b8;
-  border: 1px solid rgba(11, 99, 184, 0.35);
+  background: var(--color-bg-elevated);
+  color: var(--color-brand-primary);
+  border: 1px solid var(--color-border);
 }

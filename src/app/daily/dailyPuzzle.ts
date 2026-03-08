@@ -4,8 +4,8 @@
  * Load via dynamic import when user opens daily modal to avoid pulling samplePuzzles
  * into initial bundle.
  */
-import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
-import type { SamplePuzzle } from "@/data/samplePuzzles";
+import { SAMPLE_PUZZLES } from "@/data/packs/samplePuzzles";
+import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import {

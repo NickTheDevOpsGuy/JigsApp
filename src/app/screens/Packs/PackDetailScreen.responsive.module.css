@@ -1,16 +1,27 @@
 .puzzleName {
   font-size: 13px;
   font-weight: 500;
-  color: #eef6ff;
+  color: var(--color-text-primary);
   line-height: 1.2;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 0;
+  height: 1.2em;
+  flex-shrink: 0;
 }
 
 .playHint {
   font-size: 11px;
-  color: #d4def0;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .loading {
@@ -32,17 +43,19 @@
   .card {
     flex: 0 1 auto;
     align-self: center;
-    padding: 8px 10px 6px;
+    padding: 8px;
   }
 
   .header {
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     flex-shrink: 0;
   }
 
   .puzzleGridWrap {
     flex: 0 1 auto;
-    padding-top: 4px;
+    padding-top: 10px;
+    padding-left: 2px;
+    padding-right: 2px;
     padding-bottom: 0;
   }
 
@@ -67,40 +80,26 @@
   }
 
   .puzzleGrid {
-    gap: 4px;
+    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+    gap: 10px;
+    padding-top: 10px;
     padding-bottom: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: thin;
-    scroll-snap-type: x mandatory;
-    scroll-snap-stop: always;
-    scroll-padding-inline: calc(50% - 43px);
-  }
-
-  .puzzleGrid::-webkit-scrollbar {
-    height: 6px;
   }
 
   .puzzleGridWrap {
-    gap: 4px;
-  }
-
-  .puzzleScrollBtn {
-    width: 32px;
-    height: 32px;
+    gap: 10px;
   }
 
   .puzzleCard {
-    flex: 0 0 86px;
-    width: 86px;
-    min-width: 86px;
-    padding: 3px 4px;
-    gap: 2px;
-    scroll-snap-align: center;
+    width: 100%;
+    min-width: 0;
+    padding: 9px 7px;
+    gap: 4px;
   }
 
   .puzzleName {
     font-size: 10px;
+    height: 1.2em;
   }
 
   .playHint {

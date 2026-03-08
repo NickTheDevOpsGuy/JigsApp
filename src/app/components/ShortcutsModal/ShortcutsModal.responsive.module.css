@@ -66,8 +66,8 @@
 @media (max-width: 640px) {
   .modal {
     max-width: 95%;
-    max-height: min(92dvh, 520px);
-    border-radius: 12px;
+    max-height: min(90dvh, 500px);
+    border-radius: var(--radius-card);
   }
 
   .header {
@@ -120,5 +120,19 @@
 
   .hint {
     font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 760px) {
+  .modal {
+    max-height: min(86dvh, calc(100dvh - 16px));
+  }
+
+  .header {
+    padding: 10px 14px;
+  }
+
+  .content {
+    padding: 10px 14px;
   }
 }

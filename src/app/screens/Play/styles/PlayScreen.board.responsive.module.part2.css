@@ -1,0 +1,23 @@
+/* Touch hint */
+.touchHint {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-overlay-hint);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 20;
+  white-space: nowrap;
+}
+
+.touchHintVisible {
+  opacity: 1;
+}
+
+/* Fullscreen */

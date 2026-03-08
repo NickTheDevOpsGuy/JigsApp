@@ -51,4 +51,3 @@ export const SHORTCUT_GROUPS = [
     shortcuts: [{ keys: ["?"], action: "Show shortcuts" }],
   },
 ] as const;
-

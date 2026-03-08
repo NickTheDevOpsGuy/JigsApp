@@ -20,6 +20,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* When opened from completion overlay (variant=compact), show above completion (2000) */
+.overlay[data-variant="compact"] {
+  z-index: 2500;
+}
+
 .overlayTutorial {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -35,15 +40,15 @@
 }
 
 .modal {
-  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  background: color-mix(in srgb, var(--color-bg-card) 96%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-lg);
   max-width: 420px;
   width: 100%;
   max-height: 90vh;
-  overflow: auto;
+  overflow: hidden;
   animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   border: 1px solid var(--color-border);
   display: flex;
@@ -57,10 +62,8 @@
 
 .modalTutorial {
   max-width: 680px;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04);
-  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-lg);
+  background: var(--color-bg-card);
 }
 
 @keyframes slideUp {

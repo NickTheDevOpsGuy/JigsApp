@@ -8,7 +8,7 @@ import {
   syncServerTime,
   getSyncedNow,
   getSecondsUntilNextUtcMidnight,
-} from "@/services/serverTimeService";
+} from "@/services/player/serverTimeService";
 import { isSupabaseConfigured } from "@/supabase/client";
 import styles from "./DailyCountdown.module.css";
 

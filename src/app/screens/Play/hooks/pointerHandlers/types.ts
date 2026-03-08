@@ -2,9 +2,9 @@
  * Pointer handler types: CanvasWithTouch, ScreenToBoard, thresholds.
  */
 import type React from "react";
-import type { PuzzleManager } from "@/puzzle/PuzzleManager";
-import type { PieceId, PuzzleState } from "@/puzzle/types";
-import type { HapticKind } from "../useHaptics";
+import type { PuzzleManager } from "@/puzzle/manager/PuzzleManager";
+import type { PieceId, PuzzleState } from "@/puzzle/core/types";
+import type { HapticKind } from "@/screens/Play/hooks/system/useHaptics";
 
 export type CanvasWithTouch = HTMLCanvasElement & {
   touchStartX?: number;

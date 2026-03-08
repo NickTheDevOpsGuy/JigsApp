@@ -3,9 +3,9 @@
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import styles from "./SetupScreen.module.css";
-import { SAMPLE_PUZZLES } from "@/data/samplePuzzles";
-import { setCurrentPuzzleId } from "@/data/packCompletion";
+import styles from "@/screens/Setup/styles/SetupScreen.module.css";
+import { SAMPLE_PUZZLES } from "@/data/packs/samplePuzzles";
+import { setCurrentPuzzleId } from "@/data/packs/packCompletion";
 import {
   useImagePicker,
   useGridConfig,
@@ -13,9 +13,9 @@ import {
   useSetupScreenGalleryScroll,
 } from "./hooks";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import { getBestTime } from "../Play/timeMode";
-import { getAdaptiveSuggestion } from "@/services/adaptiveDifficultyService";
-import { GRID_ONCE_KEY } from "../Play/playScreenUtils";
+import { getBestTime } from "@/screens/Play/core/time/timeMode";
+import { getAdaptiveSuggestion } from "@/services/player/adaptiveDifficultyService";
+import { GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { STORAGE_KEY, type ImageSource } from "./setupScreenConstants";
 import { logger } from "@/utils/logger";
 import { SetupScreenShell } from "./components/SetupScreenShell";

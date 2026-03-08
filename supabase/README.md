@@ -24,10 +24,11 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 npx supabase db push
 ```
 
-**Option B – SQL Editor:** Run in order: `migrations/20260225120000_tables.sql` then `migrations/20260225120001_rls.sql`
+**Option B – SQL Editor:** Run in order: `migrations/20260225120000_tables.sql`, `migrations/20260225120001_rls.sql`, then `migrations/20260308120000_completions_move_undo_source.sql`
 
 - **20260225120000_tables.sql** – Tables, indexes, replica identity, realtime, `get_server_utc_now()`
 - **20260225120001_rls.sql** – RLS enable + policies
+- **20260308120000_completions_move_undo_source.sql** – `completions`: move_count, undo_count, completion_source
 
 ## 4. Enable anonymous auth
 
@@ -44,7 +45,7 @@ These modes are **client-only**. No Supabase schema or migration changes are req
 ## Tables
 
 - **player_stats** – One row per user: puzzles completed, play time, streaks
-- **completions** – Each puzzle completion (leaderboards)
+- **completions** – Each puzzle completion (leaderboards); includes move_count, undo_count, completion_source (daily | pack | custom)
 - **player_profiles** – Display name and `show_on_leaderboard`
 - **user_achievements** – Unlocked achievements per user
 - **puzzle_sessions** – Session state for co-op puzzles

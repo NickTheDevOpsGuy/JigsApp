@@ -3,8 +3,12 @@
  */
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import type { LeaderboardEntry } from "@/services/leaderboardService";
-import type { PieceCutType, VisualModifierFilter } from "@/services/leaderboardService";
+import type { LeaderboardEntry } from "@/services/leaderboard/leaderboardService";
+import type {
+  PieceCutType,
+  VisualModifierFilter,
+  CompletionSourceFilter,
+} from "@/services/leaderboard/leaderboardService";
 import type { StatsTab } from "../components/StatsTabBar";
 import type { LeaderboardType, WeekSubview, WeeklyAlbumSlot } from "../tabs";
 
@@ -36,6 +40,7 @@ export function useStatsScreenState() {
   const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
   const [cutTypeFilter, setCutTypeFilter] = useState<PieceCutType>("all");
   const [modifierFilter, setModifierFilter] = useState<VisualModifierFilter>("all");
+  const [sourceFilter, setSourceFilter] = useState<CompletionSourceFilter>("all");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [stats, setStats] = useState<{
@@ -95,6 +100,8 @@ export function useStatsScreenState() {
     setCutTypeFilter,
     modifierFilter,
     setModifierFilter,
+    sourceFilter,
+    setSourceFilter,
     filtersOpen,
     setFiltersOpen,
     stats,

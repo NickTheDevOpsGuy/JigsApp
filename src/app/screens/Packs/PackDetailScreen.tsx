@@ -1,24 +1,20 @@
 /**
  * PackDetailScreen – pack puzzle list with completion checkmarks; launch to Play.
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PackDetailScreen.module.css";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ArrowLeft, Check, Play } from "lucide-react";
 import { Button } from "@/components/Button/Button";
-import { PACK_METADATA } from "@/data/packMetadata";
-import { loadPacksData } from "@/data/loadPacksData";
-import type { SamplePuzzle } from "@/data/samplePuzzles";
-import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packCompletion";
+import { PACK_METADATA } from "@/data/packs/packMetadata";
+import { loadPacksData } from "@/data/packs/loadPacksData";
+import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
+import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packs/packCompletion";
 
 export function PackDetailScreen() {
   const nav = useNavigate();
   const { packId } = useParams<{ packId: string }>();
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
-  const puzzleGridRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const [hasScrollablePuzzles, setHasScrollablePuzzles] = useState(false);
   const [packsData, setPacksData] = useState<Awaited<
     ReturnType<typeof loadPacksData>
   > | null>(null);
@@ -32,29 +28,6 @@ export function PackDetailScreen() {
   const puzzles: SamplePuzzle[] =
     pack && packsData ? packsData.getPuzzlesForPack(pack) : [];
   const completed = getCompletedPuzzleIds();
-
-  useEffect(() => {
-    const el = puzzleGridRef.current;
-    if (!el) return;
-    const update = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = el;
-      const maxScroll = scrollWidth - clientWidth;
-      const hasOverflow = maxScroll > 8;
-      setHasScrollablePuzzles(hasOverflow);
-      setCanScrollLeft(hasOverflow && scrollLeft > 4);
-      setCanScrollRight(hasOverflow && scrollLeft < maxScroll - 4);
-    };
-    update();
-    el.addEventListener("scroll", update);
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    const t = setTimeout(update, 100);
-    return () => {
-      el.removeEventListener("scroll", update);
-      ro.disconnect();
-      clearTimeout(t);
-    };
-  }, [puzzles.length, packId]);
 
   const handlePlay = (puzzle: SamplePuzzle) => {
     setCurrentPuzzleId(puzzle.id);
@@ -104,22 +77,7 @@ export function PackDetailScreen() {
         </div>
 
         <div className={styles.puzzleGridWrap}>
-          {hasScrollablePuzzles && (
-            <button
-              type="button"
-              className={styles.puzzleScrollBtn}
-              aria-label="Scroll puzzles left"
-              title="Scroll puzzles left"
-              disabled={!canScrollLeft}
-              onClick={() =>
-                puzzleGridRef.current?.scrollBy({ left: -220, behavior: "smooth" })
-              }
-            >
-              <ChevronLeft size={18} />
-            </button>
-          )}
-
-          <div className={styles.puzzleGrid} ref={puzzleGridRef}>
+          <div className={styles.puzzleGrid}>
             {puzzles.map((puzzle) => {
               const isCompleted = completed.has(puzzle.id);
               return (
@@ -157,21 +115,6 @@ export function PackDetailScreen() {
               );
             })}
           </div>
-
-          {hasScrollablePuzzles && (
-            <button
-              type="button"
-              className={styles.puzzleScrollBtn}
-              aria-label="Scroll puzzles right"
-              title="Scroll puzzles right"
-              disabled={!canScrollRight}
-              onClick={() =>
-                puzzleGridRef.current?.scrollBy({ left: 220, behavior: "smooth" })
-              }
-            >
-              <ChevronRight size={18} />
-            </button>
-          )}
         </div>
       </div>
     </div>

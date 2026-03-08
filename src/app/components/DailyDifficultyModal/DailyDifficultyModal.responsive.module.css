@@ -50,7 +50,7 @@
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-primary);
-  border-radius: 10px;
+  border-radius: var(--radius-btn);
   min-height: 40px;
   padding: 8px 10px;
   font-size: 13px;
@@ -70,7 +70,7 @@
   background: var(--color-brand-primary);
   color: var(--color-text-on-brand, #ffffff);
   padding: 14px 24px;
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   font-size: 16px;
   font-weight: 700;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -131,7 +131,7 @@
   .modifierBtn {
     min-height: 36px;
     font-size: 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-btn);
   }
 }
 

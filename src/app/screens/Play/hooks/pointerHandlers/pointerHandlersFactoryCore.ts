@@ -3,13 +3,9 @@
  * Used by usePointerHandlers to keep the hook file smaller.
  */
 import type React from "react";
-import { pickPieceId } from "@/puzzle/canvas/pickPiece";
+import { pickPieceId } from "@/puzzle/canvas/utils/pickPiece";
 import type { CanvasWithTouch, PointerHandlerFactoryDeps } from "./types";
-import {
-  handleTouchDown,
-  handleTouchMove,
-  resetTouchState,
-} from "./touchHandlers";
+import { handleTouchDown, handleTouchMove, resetTouchState } from "./touchHandlers";
 import { handleMouseDown, handleMouseMove } from "./mouseHandlers";
 import { createPointerEndHandlers } from "./pointerHandlersEnd";
 import { createPointerMoveRafQueue } from "./pointerMoveRafQueue";
@@ -205,7 +201,8 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
       const canvas = canvasRef.current as CanvasWithTouch | null;
       const hasActivePieceDrag =
         ctx.activePointerIdRef.current != null &&
-        ((canvas?.pendingPieceId ?? null) != null || manager?.getDragState().activeId != null);
+        ((canvas?.pendingPieceId ?? null) != null ||
+          manager?.getDragState().activeId != null);
 
       if (touchPointers.length >= 2 && hasActivePieceDrag && canvas) {
         ctx.activePointerIdRef.current = null;

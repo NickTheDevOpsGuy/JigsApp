@@ -73,12 +73,12 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 
 - **Gameplay** — Drag, drop, rotate pieces; board and neighbor snap (including during fast drags); group merging; 3×3 to 10×10 grids; gallery, upload, camera; puzzle packs; tray filters (All, Edges, Color); zoom and pan (capped to avoid excessive zoom); undo/redo with snap-back animation (Ctrl/Cmd+Z); drag lift (stronger shadow, scale)
 - **Daily** — Today's puzzle, streak tracking, countdown to next unlock, streak shield (earn after 5-day streak); comments and emoji reactions after completion (280 chars, report support). See [doc/STREAK-FREEZE.md](doc/STREAK-FREEZE.md)
-- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), percentile badges (Top 10% / 25% / 50%), six themes; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 3 seconds; **piece draw order** (locked/placed pieces draw underneath so movable pieces never get stuck behind); **pixel-aligned seams** (integer target positions so pieces line up 100% at boundaries). **Bug report** (Settings → About → Feedback → Report a bug, or Help → Feedback on home): form with optional email, description, optional screenshots; opens mailto so user can attach files and send. See [doc/BUG_REPORT.md](doc/BUG_REPORT.md).
+- **Polish** — Snap proximity glow, reference preview (full or progressive reveal), snap combo meter, alternate piece shapes (Classic/Irregular/Hard via submenu), percentile badges (Top 10% / 25% / 50%), six themes; **Start over** (menu → Navigation) restarts the current puzzle from scratch so you can escape an unwinnable state after resume; **fog modifier** (pieces gradually gain clarity when placed); **streak flame** animation when placement streak increases; hint and onboarding toasts auto-dismiss after 3 seconds; **piece draw order** (locked/placed pieces draw underneath so movable pieces never get stuck behind); **pixel-aligned seams** (integer target positions so pieces line up 100% at boundaries). **Bug report** (Settings → About → Feedback → Report a bug, or Help → Feedback on home): form with optional email, description, optional screenshots; opens mailto so user can attach files and send. See [doc/BUG_REPORT.md](doc/BUG_REPORT.md).
 - **Play modes** (Settings → Modes) — **Zen Ambient** (no timer/rankings, subtle animated background, soft transitions); **Mystery Mode** (hide full reference, reveal sections only after correct placements); **Precision Mode** (score snap distance; completion shows avg precision and bonus points); **Dynamic Difficulty** (snap tolerance adjusts from completion history — tighter when you’re fast, more forgiving when slower); **Adaptive Personality** (UI tone follows pace: fast play → competitive microcopy/animations, slow play → calm); **Magnetic Snap** toggle (gentle near-snap pull when dragging); **Snap Glow** toggle (proximity/lock glow feedback)
-- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share screen** (inline, no modal): **Share Result** and **Share with People** with native share/copy plus **Share Card** + Download options; **Share Card** PNG matches iMessage-style layout (starry background, header, puzzle image, gold line, centered time/pieces/accuracy, Play Phuzzle CTA); **Replay** — after completing a puzzle you can **Watch Replay** from the win screen; progress is recorded as snapshots and played back at 1×–10× speed (play/pause, progress bar, close); co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
+- **Social** — Stats, leaderboards, profile, anonymous mode (raccoon names), share puzzle image; win overlay **share screen** (inline, no modal): **Share Result** and **Share with People** with native share/copy plus **Share Card** + Download options; **Share Card** PNG: challenge card is **image-only** (gradient + puzzle image with gold border); result card has time, moves, pieces, accuracy, full URL; share message uses **random taunt phrases** (e.g. “BOOM! I just crushed that puzzle!”, “Another one in the books!”, “Puzzle demolished. Your turn.”) plus time/moves and “Same puzzle, same difficulty” with full URL; **Replay** — after completing a puzzle you can **Watch Replay** from the win screen; **Replay Solve** modal shows the live puzzle (board cutout) with play/pause, seek bar, and 1×–3× speed; co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
 - **Analytics** — Live completion counter, percentile ranking (Top X%); **mastery** completions (daily with no hints and no undo) tracked for weekly album and mastery streak
 
-Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popup → `src/app/data/changelog.ts`.
+Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popup → `src/app/data/content/changelog.ts`.
 
 ---
 
@@ -103,7 +103,7 @@ Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popu
 - **Snap** — 120ms pop + glow animation.
 - **Header** — 48px on mobile.
 - **Screens** — Menu, Setup, Stats, Packs fit in viewport (no page scroll); content scrolls inside cards where needed. Loading spinners on Stats and Packs. Stats → Leaderboard → Week → Album shows the 7-slot weekly album with daily thumbnails.
-- **Win screen** — Completion overlay: starry celebratory background, **PUZZLE COMPLETE!** banner (golden-orange with puzzle icon), completed puzzle image, two stat cards (**Time** and **Moves**), **Watch Replay** (accelerated playback of your solve when available), and **Next Puzzle** (primary CTA). On mobile the overlay panel is aligned to the top of the screen. Progress ring (green) only fills when pieces actually snap (locked), not when merely nudged. Piece tray horizontal scrollbar is hidden (tray still scrolls). Puzzle URL is included in the share message text.
+- **Win screen** — Completion overlay: starry celebratory background, **Puzzle complete!** header, solved image preview, 4 stat columns (Time, Moves, Pieces/min, Largest Merge), stacked action rows, and a primary **Next Puzzle** CTA. On mobile the overlay panel is aligned to the top of the screen. Progress ring (green) only fills when pieces actually snap (locked), not when merely nudged. Piece tray horizontal scrollbar is hidden (tray still scrolls). Puzzle URL is included in the share message text.
 
 ---
 
@@ -172,30 +172,43 @@ Useful scripts:
 
 ## Documentation
 
-| Doc                                                    | Description                                                                                               |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| [SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share, daily comments; migrations (tables + RLS) |
-| [SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                             |
-| [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                                      |
-| [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                         |
-| [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                               |
-| [BUG_REPORT.md](doc/BUG_REPORT.md)                     | Bug report flow (About → Report a bug; mailto, screenshots)                                               |
-| [MOBILE_QA.md](doc/MOBILE_QA.md)                       | Real-device mobile validation checklist (iPhone/Android)                                                  |
-| [README.md](doc/README.md)                             | Index of docs                                                                                             |
+| Doc                                                    | Description                                                                                                           |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| [SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share, daily comments; migrations (tables + RLS)             |
+| [SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                                         |
+| [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                                                  |
+| [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                                     |
+| [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                                           |
+| [BUG_REPORT.md](doc/BUG_REPORT.md)                     | Bug report flow (About → Report a bug; mailto, screenshots)                                                           |
+| [MOBILE_QA.md](doc/MOBILE_QA.md)                       | Real-device mobile validation checklist (iPhone/Android)                                                              |
+| [README.md](doc/README.md)                             | Index of docs                                                                                                         |
+| [SESSION_2025-03-06.md](doc/SESSION_2025-03-06.md)     | Session summary: replay controls width, Back to Results, focus return, target glow, completion snapshot, pause vs win |
 
-**Play modes (Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)** — State and toggles: `Play/playScreenUtils.ts` (storage keys), `Play/hooks/playScreenUIInitial.ts`, `usePlayScreenUI.ts`, `usePlayScreenUIPersistence.ts`. Menu: `Play/components/headerMenuConfigTypes.ts`, `headerMenuItemsNavModes.ts`. Top bar/HUD: `usePlayScreenTopBarProps.ts`, `PlayScreenTopBar.tsx`, `PlayHUD.tsx`. Zen/Mystery/Precision/Completion: `PlayScreen.tsx`, `PlayScreen.module.css` (`.zenMode`, `.hudCompetitive`, `.hudCalm`), `CompletionOverlayGate.tsx`, `CompletionOverlay.tsx`, `CompletionStatsBlock.tsx`. Snap/precision: `puzzle/puzzleSnap.ts`, `PuzzleManager.ts`, `puzzleManagerUtils.ts`; `Play/hooks/playScreenManagerEvents.ts`. Dynamic difficulty: `services/adaptiveDifficultyService.ts` (`getToleranceMultiplier`). Completion copy by tone: `data/completionMessages.ts`.
+**Play modes (Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)** — State and toggles: `src/app/screens/Play/hooks/state/` (`playScreenUIInitial.ts`, `usePlayScreenUI.ts`, `usePlayScreenUIPersistence.ts`) plus `src/app/screens/Play/core/utils/playScreenUtils.ts` (storage keys). Menu config: `src/app/screens/Play/components/headerMenu/`. Top bar/HUD: `src/app/screens/Play/hooks/topBar/` and `src/app/screens/Play/components/hud/`. Completion/win flow: `src/app/screens/Play/components/completion/` (overlay, stats, replay/share menus). Snap/precision and manager events: `src/app/puzzle/snap/`, `src/app/puzzle/manager/`, `src/app/screens/Play/hooks/manager/playScreenManagerEvents.ts`. Dynamic difficulty: `src/app/services/player/adaptiveDifficultyService.ts`.
 
 ### Internal structure (recent split)
 
-- Play flow entry is split by responsibility: `PlayScreen.tsx` → `PlayScreenController.tsx` → `PlayScreenMain.tsx` → `PlayScreenScene.tsx` / `PlayScreenSceneImpl.tsx` with `PlayScreenLayout.tsx`.
-- Scene implementation is now split into focused modules: `playScreenScenePrimarySetup.ts`, `playScreenSceneBehavior.ts`, `playScreenSceneInteractions.ts`, and `playScreenSceneLayout.ts` (with `playScreenSceneOverlays.ts` + `playScreenLayoutPropsBuilder.ts`).
-- Scene orchestration now delegates to focused hooks such as `usePlayScreenLifecycleEffects.ts`, `usePlayScreenBoardInteractions.ts`, `usePlayScreenShareSession.ts`, `usePlayScreenImmersiveControls.ts`, `usePlayScreenTrayPieces.ts`, and `useAutoClearSelection.ts`.
-- Puzzle manager internals are split into layered engine files (`PuzzleManagerEngineState.ts`, `PuzzleManagerEngineActions.ts`, `PuzzleManagerEngineInteractions.ts`) plus operation modules (`puzzleManagerPointerOps.ts`, `puzzleManagerSnapOps.ts`, `puzzleManagerActionsOps.ts`, `puzzleManagerNeighborSnapOps.ts`, `puzzleManagerBoardOps.ts`), with `PuzzleManagerEngineCore.ts` as the public export surface.
-- Pointer internals are split under `Play/hooks/pointerHandlers/` with `pointerHandlersFactoryCore.ts`, `pointerMoveRafQueue.ts`, `touchHandlers.ts`, `mouseHandlers.ts`, and shared helpers.
-- Core rendering and state paths are also split into focused modules (`PuzzleManagerCore.ts`, `PuzzleManagerEngine.ts`, `PuzzleManagerRuntime.ts`, `renderBoardDrawPieceCore.ts`, `renderBoardHelpersCore.ts`) to keep per-file complexity lower.
-- Animation smoothing/perf utilities are split into focused modules (`usePlayScreenAnimationCore.ts`, `usePlayScreenAnimationHelpers.ts`, `usePlayScreenAnimationRefs.ts`, `useDevFrameSampler.ts`).
-- CSS is split into base/layout/responsive modules across screens and components (for example `PlayScreen.base.module.css`, `PlayScreen.board.*`, `ReplayBar.*`, `Modal.*`, `DailyCountdown.*`) to make mobile changes isolated and safer.
+- Play screen internals now live under `src/app/screens/Play/core/scene/` for scene setup, behavior, interactions, layout, and overlay wiring.
+- Play hooks are grouped by role: `animation/`, `gameplay/`, `input/`, `lifecycle/`, `manager/`, `share/`, `state/`, `system/`, `topBar/`, and `viewport/`.
+- Play components are grouped by role: `completion/`, `coop/`, `headerMenu/`, `hud/`, `layout/`, `overlay/`, and `replay/`.
+- Puzzle manager internals are split into `engine/`, `ops/`, and `state/` modules under `src/app/puzzle/manager/`.
+- Render helpers are grouped under `src/app/puzzle/canvas/render/` and `src/app/puzzle/canvas/utils/`.
+- Audio modules are grouped under `src/app/audio/ambient/`, `core/`, `manager/`, `sfx/`, and `themes/`.
+- Data/services are grouped by domain: `src/app/data/content|menu|packs/` and `src/app/services/leaderboard|player|session/`.
 - Markdown linting is scoped to repo docs via `.markdownlint-cli2.jsonc` (excludes `node_modules`, `dist`, `coverage`).
+
+### UI consistency notes
+
+- **Design tokens** — Screens, cards, and modals use shared CSS variables so the app stays uniform and theme-aware. Use these when adding or changing UI:
+  - **Radii:** `--radius-card` (16px) for main panels/cards; `--radius-btn` (10px) for buttons and inner cards.
+  - **Spacing:** `--space-1` (4px) through `--space-12` (48px) for padding and gaps.
+  - **Surfaces:** `--color-bg-primary`, `--color-bg-card`, `--color-bg-elevated`; `--color-border` for borders.
+  - **Text:** `--color-text-primary`, `--color-text-secondary`; `--color-brand-primary` for accents.
+  - **Shadows:** `--shadow-md`, `--shadow-lg`. Defined in `src/app/styles/global.base.css` and theme overrides.
+- Dialog panels share one visual language: starry backdrop (where used), theme backgrounds, and the same close-button treatment.
+- Action areas use consistent stacked rows with left icon + label + right chevron, with one primary CTA at the bottom.
+- Stat rows use the same divider/column rhythm so completion and setup flows feel related on desktop and mobile.
+- Linting remains strict (`npm run lint` uses `--max-warnings=0`) so no-console and unused-variable drift is caught during UI refactors.
 
 ---
 
@@ -263,46 +276,40 @@ Phuzzle is a Progressive Web App. You can install it from the browser.
 
 ## Adding Sample Puzzles
 
-Drop images into `src/app/assets/puzzles/`. Subfolders are supported. Images are auto-discovered at build time (no config needed).
+Drop images into `src/app/assets/puzzles/`. Images are auto-discovered at build time (no import config needed).
 
-**Folder name = category.** Packs filter puzzles by category:
+**File/folder layout** — One folder per pack; folder name = category id. Existing folders: `nature/`, `animals/`, `food/`, `cozy/`, `space/`, `retro/`, `art/`, `gaming/`, `seasonal/`, `cute/`. Config: `src/app/data/packs/samplePuzzles.ts` (categories), `src/app/data/packs/packMetadata.ts`, `src/app/data/packs/puzzlePacks.ts` (pack list). Share: `src/app/screens/Play/core/share/shareMessages.ts` (share text), `src/app/screens/Play/hooks/share/useShareCardImageCore.ts` (card PNG), `shareCardImageShare.ts`, `shareCardImageHelpers.ts`.
 
-| Pack               | Category         | Folder                    |
-| ------------------ | ---------------- | ------------------------- |
-| Cozy Animals       | `animals`        | `puzzles/animals/`        |
-| Floral             | `flowers`        | `puzzles/flowers/`        |
-| Food Photography   | `food`           | `puzzles/food/`           |
-| Space Exploration  | `space`          | `puzzles/space/`          |
-| Retro Tech         | `tech`           | `puzzles/tech/`           |
-| Landscape Escapes  | `landscapes`     | `puzzles/landscapes/`     |
-| Fantasy Realms     | `fantasy`        | `puzzles/fantasy/`        |
-| Pet Portraits      | `pets`           | `puzzles/pets/`           |
-| City Lights        | `cityscapes`     | `puzzles/cityscapes/`     |
-| Underwater Odyssey | `underwater`     | `puzzles/underwater/`     |
-| Cozy Interiors     | `cozy-interiors` | `puzzles/cozy-interiors/` |
-| Adventure Trails   | `adventure`      | `puzzles/adventure/`      |
+Current catalog rules:
+
+- **10 packs max**, each with an emoji and category. Categories with puzzle images under `puzzles/` appear in the pack list; empty packs are hidden from the main flow but remain in config.
+- **Target ~10 images per category**; unique assets only (no renamed/inverted/filtered duplicates).
+- **One folder per pack** – Folder name = category id. Put images in the matching folder (e.g. `puzzles/nature/`, `puzzles/food/`).
+
+| Pack (emoji) | Category ID | Folder              |
+| ------------ | ----------- | ------------------- |
+| 🌿 Nature    | `nature`    | `puzzles/nature/`   |
+| 🐶 Animals   | `animals`   | `puzzles/animals/`  |
+| 🍔 Food      | `food`      | `puzzles/food/`     |
+| 🏠 Cozy      | `cozy`      | `puzzles/cozy/`     |
+| 🌌 Space     | `space`     | `puzzles/space/`    |
+| 🧠 Retro     | `retro`     | `puzzles/retro/`    |
+| 🖼 Art       | `art`       | `puzzles/art/`      |
+| 🎮 Gaming    | `gaming`    | `puzzles/gaming/`   |
+| 🌸 Seasonal  | `seasonal`  | `puzzles/seasonal/` |
+| 🧁 Cute      | `cute`      | `puzzles/cute/`     |
 
 Example:
 
 ```
 src/app/assets/puzzles/
-  animals/
-    bear.png
-    fox.png
-    cute/
-      kitten.png
-  flowers/
-    daisy.png
-    sunflower.png
-  nature/
-    mountain.jpg
+  nature/    animals/   food/   cozy/   space/
+  retro/     art/       gaming/ seasonal/  cute/
 ```
 
-- **Category** = path under `puzzles/` (e.g. `animals`, `animals/cute`, `flowers`)
+- **Category** = folder name under `puzzles/`. Category labels include emojis (e.g. "🌿 Nature"). When adding a new category, update `CATEGORY_ALIAS`, `CATEGORY_LABELS`, `CATEGORY_ORDER` in `samplePuzzles.ts` and add the pack in `packMetadata.ts` and `puzzlePacks.ts` (keep to 10 packs or adjust the cap).
 - **Puzzle name** = filename (kebab-case → Title Case)
 - **Formats** = jpg, jpeg, png, webp
-
-Add images to an existing folder and they appear in that pack. Add a new folder and create a pack with `category: "folder-name"` in `packMetadata.ts` and `puzzlePacks.ts`.
 
 **Seasonal packs** – Packs can have a `season` (spring, summer, fall, winter). The matching pack is shown as "Season's pick" at the top of the pack list.
 
@@ -313,115 +320,37 @@ Add images to an existing folder and they appear in that pack. Add a new folder 
 
 ```plaintext
 .
-├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   └── workflows/
-├── .husky/
 ├── doc/
-│   ├── BUG_REPORT.md
-│   ├── CHANGES.md
-│   ├── FEATURES_IMPLEMENTED.md
-│   ├── FUTURE.md
-│   ├── LIGHTHOUSE.md
-│   ├── MOBILE_QA.md
-│   ├── README.md
-│   ├── SESSION_SUMMARY.md
-│   ├── SHARING.md
-│   ├── STREAK-FREEZE.md
-│   └── SUPABASE_SETUP.md
 ├── e2e/
-│   ├── context-menu-mobile.spec.ts
-│   ├── daily-modal.spec.ts
-│   ├── home.spec.ts
-│   ├── packs-stats.spec.ts
-│   ├── play-screen.spec.ts
-│   ├── setup-mobile-fit.spec.ts
-│   ├── setup-play.spec.ts
-│   ├── streak-freeze.spec.ts
-│   └── theme.spec.ts
 ├── public/
 ├── scripts/
-│   ├── check-bundle-size.sh
-│   ├── guard-no-skip-and-console.sh
-│   └── precheck.sh
 ├── src/
 │   ├── app/
-│   │   ├── assets/
-│   │   │   └── puzzles/
-│   │   ├── audio/
+│   │   ├── assets/puzzles/   (one folder per pack: nature, animals, food, cozy, space, retro, art, gaming, seasonal, cute)
+│   │   ├── audio/{ambient,core,manager,sfx,themes}/
 │   │   ├── components/
-│   │   │   └── PieceTray/
-│   │   │       ├── PieceTray.tsx
-│   │   │       ├── PieceTray.module.css
-│   │   │       ├── PieceTray.test.ts
-│   │   │       └── usePieceTray*.ts
-│   │   ├── daily/
-│   │   ├── data/
-│   │   ├── hooks/
+│   │   ├── data/{content,menu,packs}/
 │   │   ├── puzzle/
-│   │   │   └── canvas/
+│   │   │   ├── canvas/{render,utils}/
+│   │   │   ├── manager/{engine,ops,state}/
+│   │   │   └── {core,groups,snap,storage}/
 │   │   ├── screens/
 │   │   │   ├── Menu/
-│   │   │   ├── NewGame/
 │   │   │   ├── Packs/
 │   │   │   ├── Play/
-│   │   │   │   ├── PlayScreen.tsx
-│   │   │   │   ├── PlayScreen.module.css
-│   │   │   │   ├── playUtils.ts
-│   │   │   │   ├── playScreenUtils.ts
-│   │   │   │   ├── playScreenUtils.test.ts
-│   │   │   │   ├── shareMessages.ts
-│   │   │   │   ├── shareMessages.test.ts
-│   │   │   │   ├── timeMode.ts
-│   │   │   │   ├── timeMode.test.ts
-│   │   │   │   ├── components/
-│   │   │   │   │   ├── CompletionOverlay.tsx
-│   │   │   │   │   ├── CompletionOverlay.module.css
-│   │   │   │   │   ├── CompletionOverlayGate.tsx
-│   │   │   │   │   ├── CompletionSharePopup.tsx
-│   │   │   │   │   ├── CompletionStatsBlock.tsx
-│   │   │   │   │   ├── ReplayBar.tsx
-│   │   │   │   │   ├── ReplayBar.module.css
-│   │   │   │   │   ├── useCompletionOverlayData.ts
-│   │   │   │   │   ├── HeaderMenu.tsx
-│   │   │   │   │   ├── headerMenuConfig.tsx
-│   │   │   │   │   ├── headerMenu*.ts*
-│   │   │   │   │   ├── Minimap.tsx
-│   │   │   │   │   ├── PlayHUD.tsx
-│   │   │   │   │   ├── PlayScreenOverlays.tsx
-│   │   │   │   │   ├── PlayScreenTopBar.tsx
-│   │   │   │   │   ├── SnapComboMeter.tsx
-│   │   │   │   │   ├── TrayFilterButton.tsx
-│   │   │   │   │   └── ...
-│   │   │   │   └── hooks/
-│   │   │   │       ├── usePointerHandlers.ts
-│   │   │   │       ├── usePointerHandlers.test.ts
-│   │   │   │       ├── useReplay.ts
-│   │   │   │       ├── useReplay.test.ts
-│   │   │   │       ├── useShareCardImage.ts
-│   │   │   │       ├── useShareResults.ts
-│   │   │   │       ├── useDownloadImage.ts
-│   │   │   │       ├── usePlayScreenManager.ts
-│   │   │   │       ├── usePlayScreenAnimation.ts
-│   │   │   │       ├── usePlayScreenTimer.ts
-│   │   │   │       ├── usePuzzleSession.ts
-│   │   │   │       └── pointerHandlers/
-│   │   │   ├── Setup/
+│   │   │   │   ├── core/{scene,share,time,utils}/
+│   │   │   │   ├── components/{completion,coop,headerMenu,hud,layout,overlay,replay}/
+│   │   │   │   ├── hooks/{animation,gameplay,input,lifecycle,manager,pointerHandlers,share,state,system,topBar,viewport}/
+│   │   │   │   └── styles/
+│   │   │   ├── Setup/{components,hooks,styles}/
 │   │   │   └── Stats/
-│   │   ├── services/
-│   │   ├── styles/
-│   │   ├── supabase/
-│   │   ├── utils/
-│   │   ├── App.tsx
-│   │   └── main.tsx
+│   │   ├── services/{leaderboard,player,session}/
+│   │   └── styles/
 │   ├── test/
 │   └── types/
 ├── supabase/
-│   ├── migrations/
-│   └── README.md
-├── package.json
 ├── README.md
-└── vite.config.ts
+└── package.json
 ```
 
 </details>

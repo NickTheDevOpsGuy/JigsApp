@@ -12,7 +12,7 @@
   padding: 14px 20px;
   border: 1px solid var(--color-border);
   background: var(--color-bg-card);
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   font-size: 16px;
   font-weight: 500;
   color: var(--color-text-primary);
