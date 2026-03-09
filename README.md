@@ -172,17 +172,17 @@ Useful scripts:
 
 ## Documentation
 
-| Doc                                                    | Description                                                                                                           |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| Doc                                                    | Description                                                                                                                                                    |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share, daily comments. Schema: two migrations — `20260225120000_tables.sql`, `20260225120001_rls.sql` |
-| [SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                                         |
-| [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                                                  |
-| [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                                     |
-| [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                                           |
-| [BUG_REPORT.md](doc/BUG_REPORT.md)                     | Bug report flow (About → Report a bug; mailto, screenshots)                                                           |
-| [MOBILE_QA.md](doc/MOBILE_QA.md)                       | Real-device mobile validation checklist (iPhone/Android)                                                              |
-| [README.md](doc/README.md)                             | Index of docs                                                                                                         |
-| [SESSION_2025-03-06.md](doc/SESSION_2025-03-06.md)     | Session summary: replay controls width, Back to Results, focus return, target glow, completion snapshot, pause vs win |
+| [SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                                                                                  |
+| [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                                                                                           |
+| [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                                                                              |
+| [FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | New features (countdown, streak shield, piece shapes, etc.)                                                                                                    |
+| [BUG_REPORT.md](doc/BUG_REPORT.md)                     | Bug report flow (About → Report a bug; mailto, screenshots)                                                                                                    |
+| [MOBILE_QA.md](doc/MOBILE_QA.md)                       | Real-device mobile validation checklist (iPhone/Android)                                                                                                       |
+| [README.md](doc/README.md)                             | Index of docs                                                                                                                                                  |
+| [SESSION_2025-03-06.md](doc/SESSION_2025-03-06.md)     | Session summary: replay controls width, Back to Results, focus return, target glow, completion snapshot, pause vs win                                          |
 
 **Play modes (Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality)** — State and toggles: `src/app/screens/Play/hooks/state/` (`playScreenUIInitial.ts`, `usePlayScreenUI.ts`, `usePlayScreenUIPersistence.ts`) plus `src/app/screens/Play/core/utils/playScreenUtils.ts` (storage keys). Menu config: `src/app/screens/Play/components/headerMenu/`. Top bar/HUD: `src/app/screens/Play/hooks/topBar/` and `src/app/screens/Play/components/hud/`. Completion/win flow: `src/app/screens/Play/components/completion/` (overlay, stats, replay/share menus). Snap/precision and manager events: `src/app/puzzle/snap/`, `src/app/puzzle/manager/`, `src/app/screens/Play/hooks/manager/playScreenManagerEvents.ts`. Dynamic difficulty: `src/app/services/player/adaptiveDifficultyService.ts`.
 

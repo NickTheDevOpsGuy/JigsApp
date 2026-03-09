@@ -71,10 +71,10 @@ Anonymous auth lets users track stats and appear on leaderboards without signing
 
 Supabase schema is **two files**: one for tables, one for RLS. Both are idempotent (safe to run multiple times).
 
-| File | Contents |
-|------|----------|
+| File                                            | Contents                                                                                                                   |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `supabase/migrations/20260225120000_tables.sql` | All tables, indexes, realtime, server-time RPC. Includes `completions` columns: move_count, undo_count, completion_source. |
-| `supabase/migrations/20260225120001_rls.sql` | RLS enable + policies. |
+| `supabase/migrations/20260225120001_rls.sql`    | RLS enable + policies.                                                                                                     |
 
 Run in order: tables first, then RLS.
 

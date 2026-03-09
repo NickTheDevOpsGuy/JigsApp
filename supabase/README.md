@@ -20,10 +20,10 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 Supabase schema is split into **two files**: one for tables, one for RLS.
 
-| File | Contents |
-|------|----------|
+| File                                   | Contents                                                                                                                                                        |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `migrations/20260225120000_tables.sql` | All tables, indexes, replica identity, realtime publication, `get_server_utc_now()`. Includes `completions` columns: move_count, undo_count, completion_source. |
-| `migrations/20260225120001_rls.sql` | RLS enable + policies for all tables. |
+| `migrations/20260225120001_rls.sql`    | RLS enable + policies for all tables.                                                                                                                           |
 
 **Option A – Supabase CLI:**
 

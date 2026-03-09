@@ -230,7 +230,7 @@ Latest pass also includes deep file splitting (Play screen flow, puzzle manager 
 | Layout revert  | `PlayScreen.tsx`, `PlayScreen.module.css`, `PieceTray.tsx`, `PieceTray.module.css`, `global.css`                                                 |
 | Help/Modals    | `Modal.module.css`, `TutorialOverlay.tsx`, `ShortcutsModal.module.css`, `HelpChoiceModal.tsx`                                                    |
 | Packs          | `PackListScreen.tsx`, `PackDetailScreen.tsx`, `packCompletion.ts`, `puzzlePacks.ts`                                                              |
-| Sessions/Co-op | `usePuzzleSession.ts`, `puzzleSessionService.ts`, `supabase/migrations/20260225120000_tables.sql`, `supabase/migrations/20260225120001_rls.sql`   |
+| Sessions/Co-op | `usePuzzleSession.ts`, `puzzleSessionService.ts`, `supabase/migrations/20260225120000_tables.sql`, `supabase/migrations/20260225120001_rls.sql`  |
 | Onboarding     | `useOnboarding.ts`, `OnboardingTooltip.tsx`                                                                                                      |
 | Stats          | `StatsScreen.tsx`, `StatsScreen.module.css`                                                                                                      |
 | Time           | `timeMode.ts`, `useTimeModeConfig.ts`, `usePlayScreenTimer.ts`, `PlayHUD.tsx`                                                                    |
