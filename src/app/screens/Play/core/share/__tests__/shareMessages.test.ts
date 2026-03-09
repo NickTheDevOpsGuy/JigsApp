@@ -30,8 +30,7 @@ describe("shareMessages", () => {
       moveCount: 42,
     });
 
-    expect(text).toContain("BOOM!");
-    expect(text).toContain("I just crushed that puzzle!");
+    expect(text).toContain("Phuzzle Challenge");
     expect(text).toContain("I did it in 1:42 and 42 moves");
     expect(text).toContain("Think you can beat me?");
     expect(text).toContain("Let me know if you need lessons!");
