@@ -38,7 +38,7 @@
 
 ## 6. Separate Stats per Cut Type ✓
 
-- **Cut type filter** – Leaderboard views (Today, Challenge, Best week/month, All-time) can filter by Classic, Irregular, or Hard
+- **Cut type filter** – Leaderboard views (Today, Week, All-time) can filter by shape (Classic/Irregular/Hard), modifier (None/Fog/Night/Sepia), and source (Daily/Pack/Custom). Week uses the same filters as Today; All-time also has a grid-size filter (3×3–6×6). No share button in the Stats/leaderboard header.
 - **Stored with completions** – `cut_type` column in completions table (migration 002)
 - **Files**: `002_cut_type_xp_prestige_challenge.sql`, `leaderboardService.ts`, `statsService.ts`, `StatsScreen.tsx`
 
@@ -74,7 +74,7 @@
 
 ## 11. Start page and win screen updates (Feb 2025) ✓
 
-- **Start page** – Date above card; top bar: Trophy, “Daily Phuzzle” (center), Help (?). Logo; under logo: streak and either “X players solved today’s puzzle” (when Supabase has count) or teaser taglines from `menuTips` when Supabase data is blank. Today’s Puzzle button matches other buttons (star on top, “Today’s Puzzle” below). Starry background behind card. “Next puzzle in Xh Ym” at bottom (`DailyCountdown` variant `home`).
+- **Start page** – Date above card; top bar: Trophy, “Phuzzle” (center), Feedback (megaphone), Help (?). Logo; under logo: streak and either “X players solved today’s puzzle” (when Supabase has count) or teaser taglines from `menuTips` when Supabase data is blank. Today’s Puzzle button matches other buttons (star on top, “Today’s Puzzle” below). Starry background behind card. “Next puzzle in Xh Ym” at bottom (`DailyCountdown` variant `home`).
 - **Win screen** – Continue/Play again/Back to home dropdown opens upward (drop-up). No URL on overlay; puzzle URL (phuzzle.vercel.app) is on the **share card image** only (Share Result → Share Card PNG). Below “Puzzle Completed!” a **cycling positive message** (from `completionMessages.ts`: “You did it!”, “Nailed it!”, etc.); when you beat your best time, “New best time!” is shown; otherwise a performance badge (Speed Demon, Precision Pro, Chill Mode, etc.) may appear.
 - **Files**: `MenuScreen.tsx`, `MenuScreen.module.css`, `DailyCountdown.tsx`, `DailyCountdown.module.css`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompletionSharePopup.tsx`, `PlayScreen.module.css`, `useShareCardImage.ts`, `data/menuTips.ts`, `data/completionMessages.ts`
 

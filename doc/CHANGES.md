@@ -4,6 +4,11 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
+## Recent: Home bar, leaderboard filters, docs
+
+- **Home bar** — Top bar now shows "Phuzzle" (center) with date above the card; Feedback (megaphone) and Help (?) in the bar. No "Daily Phuzzle" label in the bar.
+- **Leaderboard** — Week view has the same filters as Today (shape, modifier, source); All-time also has grid size. Share button removed from Stats/leaderboard header. See Layout and FEATURES_IMPLEMENTED.
+
 ## Recent: Share card, puzzle folders, Start over
 
 - **Share card** — Challenge card is **image-only** (gradient background + centered puzzle image with gold border; no text on the image). Result card: time, moves, pieces, accuracy, full URL. Share **message** (copy/native share): "🧩 Phuzzle Challenge" plus a **random taunt phrase** (e.g. "BOOM! I just crushed that puzzle! 😎", "Another one in the books! 💪", "Puzzle demolished. Your turn. 🧩") plus "I did it in [time] and [N] moves.", largest merge, "Think you can beat me? Let me know if you need lessons! 😉", then "Same puzzle, same difficulty" + full URL. Share title is "Phuzzle" (not "Phuzzle Challenge") to avoid duplicate heading. Files: `src/app/screens/Play/core/share/shareMessages.ts`, `src/app/screens/Play/hooks/share/useShareCardImageCore.ts`, `shareCardImageShare.ts`, `shareCardImageHelpers.ts`.
@@ -147,8 +152,8 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ## Layout
 
-- **Home** – Date above the card. Top bar: Stats (trophy) left, “Daily Phuzzle” centered, Help (?) right. Logo; under logo: streak (when present) and either “X players solved today’s puzzle” (when Supabase returns a count) or a teaser tagline from `menuTips` when Supabase data is blank. Starry background behind the card. Main actions: Today’s Puzzle (star on top, label below, same style as other buttons), Packs, Choose Photo, Snap a Picture. “Next puzzle in Xh Ym” countdown at bottom (plain text).
-- **Stats** - Dashboard, Profile, Leaderboard (dropdown for views), Achievements. Anonymous mode with raccoon names.
+- **Home** – Date above the card. Top bar: Stats (trophy) left, “Phuzzle” centered, Feedback (megaphone), Help (?) right. Logo; under logo: streak (when present) and either “X players solved today’s puzzle” (when Supabase returns a count) or a teaser tagline from `menuTips` when Supabase data is blank. Starry background behind the card. Main actions: Today’s Puzzle (star on top, label below, same style as other buttons), Packs, Choose Photo, Snap a Picture. “Next puzzle in Xh Ym” countdown at bottom (plain text).
+- **Stats** – Dashboard, Profile, Leaderboard (Today / Week / All-time with filters: shape, modifier, source; All-time also has grid size). No share button in the leaderboard header. Achievements. Anonymous mode with raccoon names.
 - **Play layout** - Board on top, tray below (150px desktop, 160px mobile). HUD (timer, pieces) in top bar.
 - **Piece tray** - Fixed height below board. Compact mode for 25+ pieces; horizontal scroll.
 

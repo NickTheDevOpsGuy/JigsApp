@@ -1,5 +1,5 @@
 /**
- * MenuScreen – home: Daily Phuzzle, Packs, Custom, Stats, Help, About.
+ * MenuScreen – home: date above card, Phuzzle in bar, Packs, Custom, Stats, Help, About.
  */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -72,9 +72,6 @@ export function MenuScreen() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <p className={styles.menuDate} aria-live="polite">
-          {menuDate}
-        </p>
         <div className={styles.homeBar}>
           <button
             type="button"
@@ -85,7 +82,9 @@ export function MenuScreen() {
           >
             <Trophy size={24} />
           </button>
-          <h1 className={styles.dailyTitleInBar}>Phuzzle</h1>
+          <p className={styles.dailyTitleInBar} aria-live="polite">
+            {menuDate}
+          </p>
           <div className={styles.cornerBtns}>
             <button
               type="button"

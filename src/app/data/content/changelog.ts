@@ -1,13 +1,14 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "41";
+export const CHANGELOG_VERSION = "42";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🏆 Leaderboard – Week view now has the same filters as Today (shape, modifier, source); share button removed from Stats/leaderboard header.",
       "📤 Challenge share – Share card image is now image-only (just the puzzle with a gold border); share message picks a random taunt (e.g. “BOOM! I just crushed that puzzle!”, “Another one in the books!”, “Puzzle demolished. Your turn.”) so each challenge feels a bit different.",
       "🔄 Start over – Menu → Navigation → Start over restarts the current puzzle from the beginning (same image and difficulty) so you can escape an unwinnable state after resuming.",
       "📤 Share card – Challenge card is image-only (puzzle + gold border); result card has message and full URL. Share message includes time and moves.",
@@ -59,7 +60,7 @@ export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
       "📤 Share screen – Share text and card include a link to the exact puzzle: phuzzle.vercel.app/daily or phuzzle.vercel.app/play?session=… so friends can play the same puzzle.",
       "🏠 Start page – Today’s Puzzle button matches others (star on top, “Today’s Puzzle” below); starry background; under logo: streak and either “X players solved” (when Supabase has data) or teaser taglines when Supabase is blank",
       "📱 Win screen – No URL on overlay; puzzle link lives on the share card image (Share Result → Share Card PNG); Continue menu opens upward",
-      "🏠 Start page – Date above card; bar shows Trophy, “Daily Phuzzle” (center), Help (?); “Next puzzle in Xh Ym” at bottom",
+      "🏠 Start page – Date above card; bar shows Trophy, Phuzzle (center), Feedback, Help (?); “Next puzzle in Xh Ym” at bottom",
       "📅 Weekly album – Stats → Leaderboard → Week → Album: 7-slot page with daily puzzle thumbnails; mastery (⚡) when completed with no hints or undo",
       "🌫️ Fog modifier – Pieces gradually gain clarity when placed; unplaced stay foggy (daily modifier)",
       "🔥 Streak flame – Subtle flame animation when placement streak pops (“On fire!”)",

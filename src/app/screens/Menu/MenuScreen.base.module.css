@@ -85,8 +85,8 @@
 }
 
 .dailyTitleInBar {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 600;
   margin: 0;
   color: var(--color-text-primary);
   text-align: center;
@@ -116,9 +116,10 @@
 
 .menuDate {
   text-align: center;
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  margin: 0 0 6px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 8px 0;
 }
 
 .header {
