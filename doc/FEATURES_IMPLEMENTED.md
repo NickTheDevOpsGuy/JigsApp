@@ -5,7 +5,7 @@
 - **Server-synced timer** via Supabase RPC `get_server_utc_now()` (fallback to client time if Supabase unavailable)
 - **Prominent on leaderboard** – DailyCountdown component shown at top of Stats/Leaderboard tab
 - **Celebration at unlock** – Confetti animation when countdown hits zero
-- **Files**: `serverTimeService.ts`, `DailyCountdown/`, `StatsScreen.tsx`, `001_full_schema.sql` (includes `get_server_utc_now()` RPC)
+- **Files**: `serverTimeService.ts`, `DailyCountdown/`, `StatsScreen.tsx`, `supabase/migrations/20260225120000_tables.sql` (includes `get_server_utc_now()` RPC)
 
 ## 2. Streak Shield ✓
 

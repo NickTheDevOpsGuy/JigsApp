@@ -69,12 +69,14 @@ Anonymous auth lets users track stats and appear on leaderboards without signing
 
 ## 4. Run database migration
 
-Two migration files create tables and RLS. Both are idempotent (safe to run multiple times).
+Supabase schema is **two files**: one for tables, one for RLS. Both are idempotent (safe to run multiple times).
 
-Migration files (run in order):
+| File | Contents |
+|------|----------|
+| `supabase/migrations/20260225120000_tables.sql` | All tables, indexes, realtime, server-time RPC. Includes `completions` columns: move_count, undo_count, completion_source. |
+| `supabase/migrations/20260225120001_rls.sql` | RLS enable + policies. |
 
-- `supabase/migrations/20260225120000_tables.sql` — tables, indexes, realtime, server-time RPC
-- `supabase/migrations/20260225120001_rls.sql` — RLS enable + policies
+Run in order: tables first, then RLS.
 
 ### Option A: Supabase CLI
 
@@ -207,5 +209,6 @@ Completion share (after finishing a puzzle) works without Supabase.
 
 - `src/app/supabase/client.ts` - Supabase client and config
 - `src/app/supabase/auth.ts` - Anonymous auth helpers
-- `supabase/migrations/001_full_schema.sql` - Migration (idempotent)
+- `supabase/migrations/20260225120000_tables.sql` - Tables migration (idempotent)
+- `supabase/migrations/20260225120001_rls.sql` - RLS migration (idempotent)
 - `supabase/README.md` - Short reference

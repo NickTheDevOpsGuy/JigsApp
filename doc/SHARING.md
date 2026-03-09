@@ -92,7 +92,7 @@ For **co-op**:
 
 1. **Supabase project** – Create a project at [supabase.com](https://supabase.com).
 2. **Environment variables** – Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (see [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)).
-3. **Database migrations** – Run `supabase/migrations/001_full_schema.sql` (includes `puzzle_sessions`).
+3. **Database migrations** – Run `supabase/migrations/20260225120000_tables.sql` then `supabase/migrations/20260225120001_rls.sql` (tables include `puzzle_sessions`).
 4. **Anonymous auth** – Enable Anonymous sign-ins in Supabase Auth.
 5. **Realtime** – The migration adds `puzzle_sessions` and `completions`. If needed: Database → Replication → toggle both ON, or run the ALTER PUBLICATION commands from [SUPABASE_SETUP.md § Enable Realtime](./SUPABASE_SETUP.md#5-enable-realtime).
 

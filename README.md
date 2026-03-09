@@ -174,7 +174,7 @@ Useful scripts:
 
 | Doc                                                    | Description                                                                                                           |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| [SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share, daily comments; migrations (tables + RLS)             |
+| [SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase setup: leaderboards, stats, achievements, co-op share, daily comments. Schema: two migrations — `20260225120000_tables.sql`, `20260225120001_rls.sql` |
 | [SHARING.md](doc/SHARING.md)                           | Completion share (image, social) and co-op (Play with Friend)                                                         |
 | [STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze: earn after 5-day streak, auto-applied when day missed                                                  |
 | [CHANGES.md](doc/CHANGES.md)                           | Full feature list                                                                                                     |
@@ -349,6 +349,9 @@ src/app/assets/puzzles/
 │   ├── test/
 │   └── types/
 ├── supabase/
+│   └── migrations/
+│       ├── 20260225120000_tables.sql   # tables, indexes, realtime, get_server_utc_now
+│       └── 20260225120001_rls.sql     # RLS enable + policies
 ├── README.md
 └── package.json
 ```

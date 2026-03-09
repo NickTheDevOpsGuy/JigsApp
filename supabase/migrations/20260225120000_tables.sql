@@ -51,6 +51,9 @@ BEGIN
     ALTER TABLE completions ADD COLUMN IF NOT EXISTS cut_type TEXT NOT NULL DEFAULT 'classic';
     ALTER TABLE completions ADD COLUMN IF NOT EXISTS is_mastery BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE completions ADD COLUMN IF NOT EXISTS visual_modifier TEXT NOT NULL DEFAULT 'none';
+    ALTER TABLE completions ADD COLUMN IF NOT EXISTS move_count INTEGER;
+    ALTER TABLE completions ADD COLUMN IF NOT EXISTS undo_count INTEGER;
+    ALTER TABLE completions ADD COLUMN IF NOT EXISTS completion_source TEXT NOT NULL DEFAULT 'custom';
   END IF;
 END $$;
 
@@ -67,6 +70,9 @@ BEGIN
   END IF;
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'completions' AND column_name = 'visual_modifier') THEN
     CREATE INDEX IF NOT EXISTS idx_completions_visual_modifier ON completions(visual_modifier);
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'completions' AND column_name = 'completion_source') THEN
+    CREATE INDEX IF NOT EXISTS idx_completions_completion_source ON completions(completion_source);
   END IF;
 END $$;
 

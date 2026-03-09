@@ -18,17 +18,23 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ## 3. Run the migrations (idempotent – safe to re-run)
 
+Supabase schema is split into **two files**: one for tables, one for RLS.
+
+| File | Contents |
+|------|----------|
+| `migrations/20260225120000_tables.sql` | All tables, indexes, replica identity, realtime publication, `get_server_utc_now()`. Includes `completions` columns: move_count, undo_count, completion_source. |
+| `migrations/20260225120001_rls.sql` | RLS enable + policies for all tables. |
+
 **Option A – Supabase CLI:**
 
 ```bash
 npx supabase db push
 ```
 
-**Option B – SQL Editor:** Run in order: `migrations/20260225120000_tables.sql`, `migrations/20260225120001_rls.sql`, then `migrations/20260308120000_completions_move_undo_source.sql`
+**Option B – SQL Editor:** Run in order:
 
-- **20260225120000_tables.sql** – Tables, indexes, replica identity, realtime, `get_server_utc_now()`
-- **20260225120001_rls.sql** – RLS enable + policies
-- **20260308120000_completions_move_undo_source.sql** – `completions`: move_count, undo_count, completion_source
+1. `migrations/20260225120000_tables.sql`
+2. `migrations/20260225120001_rls.sql`
 
 ## 4. Enable anonymous auth
 

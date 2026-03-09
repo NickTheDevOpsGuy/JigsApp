@@ -176,7 +176,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 - **Leaderboard** – Real-time count of players who completed today's daily puzzle
 - **Supabase Realtime** – Subscribes to INSERTs on `completions` for today; updates without refresh
-- **Files** – `leaderboardService.ts` (`getTodayCompletionCount`, `subscribeTodayCompletionCount`), `StatsScreen.tsx`, `001_full_schema.sql`
+- **Files** – `leaderboardService.ts` (`getTodayCompletionCount`, `subscribeTodayCompletionCount`), `StatsScreen.tsx`, `supabase/migrations/20260225120000_tables.sql`, `supabase/migrations/20260225120001_rls.sql`
 
 ### Percentile ranking
 
@@ -192,7 +192,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ### Supabase changes
 
-- **Single migration** – `001_full_schema.sql` consolidates all tables, RLS, policies, Realtime. Idempotent (safe to re-run). Run `supabase db push` or SQL Editor.
+- **Migrations** – Two files: `20260225120000_tables.sql` (tables, indexes, Realtime) and `20260225120001_rls.sql` (RLS, policies). Idempotent (safe to re-run). Run `supabase db push` or SQL Editor.
 
 ---
 
