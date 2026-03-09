@@ -74,7 +74,9 @@ export function LeaderboardTabHeader({
       </button>
       {filtersOpen && (
         <div className={styles.controlsRow}>
-          {(leaderboardType === "today" || leaderboardType === "alltime") && (
+          {(leaderboardType === "today" ||
+            leaderboardType === "week" ||
+            leaderboardType === "alltime") && (
             <>
               <select
                 id="cut-type-select"

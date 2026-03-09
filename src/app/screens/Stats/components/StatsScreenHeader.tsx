@@ -1,7 +1,7 @@
 /**
- * Stats screen top bar: title, optional share (leaderboard), close (X) in upper right.
+ * Stats screen top bar: title, close (X) in upper right.
  */
-import { Share2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "../StatsScreen.module.css";
 
@@ -11,43 +11,15 @@ interface StatsScreenHeaderProps {
   activeTab: StatsTab;
   headerTitle: string;
   weeklyAlbumProgress: number;
-  leaderboardType: string;
-  weekSubview: string;
-  shareCopied: boolean;
-  albumShareCopied: boolean;
   onClose: () => void;
-  onShareLeaderboard: () => void;
-  onShareWeeklyAlbum: () => void;
 }
 
 export function StatsScreenHeader({
   activeTab,
   headerTitle,
   weeklyAlbumProgress,
-  leaderboardType,
-  weekSubview,
-  shareCopied,
-  albumShareCopied,
   onClose,
-  onShareLeaderboard,
-  onShareWeeklyAlbum,
 }: StatsScreenHeaderProps) {
-  const isAlbumShare = leaderboardType === "week" && weekSubview === "album";
-  const shareLabel = isAlbumShare
-    ? albumShareCopied
-      ? "Copied weekly album share text"
-      : "Share weekly album"
-    : shareCopied
-      ? "Copied leaderboard share text"
-      : "Share leaderboard";
-  const shareTitle = isAlbumShare
-    ? albumShareCopied
-      ? "Copied!"
-      : "Share album"
-    : shareCopied
-      ? "Copied!"
-      : "Share leaderboard";
-
   return (
     <div
       className={`${styles.header} ${
@@ -61,18 +33,6 @@ export function StatsScreenHeader({
         )}
       </h1>
       <div className={styles.headerActions}>
-        {activeTab === "leaderboard" && (
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={isAlbumShare ? onShareWeeklyAlbum : onShareLeaderboard}
-            className={styles.headerIconBtn}
-            aria-label={shareLabel}
-            title={shareTitle}
-          >
-            <Share2 size={18} />
-          </Button>
-        )}
         <Button
           size="sm"
           variant="secondary"

@@ -6,6 +6,8 @@ import type {
   LeaderboardEntry,
   CompletionCountEntry,
   PieceCutType,
+  VisualModifierFilter,
+  CompletionSourceFilter,
 } from "./leaderboardTypes";
 import { resolveDisplayNames } from "./leaderboardFetchersShared";
 
@@ -75,16 +77,24 @@ export async function getPeriodLeaderboard(
 
 export async function getWeeklyTotalsLeaderboard(
   limit = 10,
+  cutType: PieceCutType = "all",
+  visualModifier: VisualModifierFilter = "all",
+  completionSource: CompletionSourceFilter = "all",
 ): Promise<CompletionCountEntry[]> {
   if (!isSupabaseConfigured()) return [];
 
   const { start, end } = getDateRange("week");
 
-  const { data, error } = await supabase!
+  let query = supabase!
     .from("completions")
     .select("user_id")
     .gte("puzzle_date", start)
     .lte("puzzle_date", end);
+  if (cutType !== "all") query = query.eq("cut_type", cutType);
+  if (visualModifier !== "all") query = query.eq("visual_modifier", visualModifier);
+  if (completionSource !== "all") query = query.eq("completion_source", completionSource);
+
+  const { data, error } = await query;
 
   if (error) return [];
 

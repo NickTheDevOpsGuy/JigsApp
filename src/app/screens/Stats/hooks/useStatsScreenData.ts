@@ -53,10 +53,6 @@ export function useStatsScreenData(
     setRaccoonName,
     setRowAnimEpoch,
     setProfileSaving,
-    setShareCopied,
-    setAlbumShareCopied,
-    weeklyAlbumSlots,
-    weeklyAlbumProgress,
   } = state;
 
   const loadWeeklyAlbum = useCallback(async () => {
@@ -101,9 +97,9 @@ export function useStatsScreenData(
     setAchievements(a ?? []);
     const today = getTodayDateString();
     const [lb, todayCount, wklb] = await Promise.all([
-      getDailyLeaderboard(today, 10, "all", "all"),
+      getDailyLeaderboard(today, 10, cutTypeFilter, modifierFilter, sourceFilter),
       getTodayCompletionCount(today),
-      getWeeklyTotalsLeaderboard(),
+      getWeeklyTotalsLeaderboard(10, cutTypeFilter, modifierFilter, sourceFilter),
     ]);
     setLeaderboard(lb);
     setRowAnimEpoch((n) => n + 1);
@@ -113,6 +109,9 @@ export function useStatsScreenData(
     setLoading(false);
   }, [
     configured,
+    cutTypeFilter,
+    modifierFilter,
+    sourceFilter,
     loadWeeklyAlbum,
     setStats,
     setProfile,
@@ -176,7 +175,7 @@ export function useStatsScreenData(
         setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "week") {
         const [wklb] = await Promise.all([
-          getWeeklyTotalsLeaderboard(),
+          getWeeklyTotalsLeaderboard(10, cutType, visualModifier, sourceFilter),
           loadWeeklyAlbum(),
         ]);
         setWeeklyTotalsLeaderboard(wklb);
@@ -229,64 +228,9 @@ export function useStatsScreenData(
     loadData,
   ]);
 
-  const handleShareLeaderboard = useCallback(() => {
-    const text =
-      leaderboardType === "today"
-        ? `Today's Daily Puzzle leaderboard - Phuzzle`
-        : leaderboardType === "week"
-          ? "Weekly leaderboard - Phuzzle"
-          : "All-time leaderboard - Phuzzle";
-    const url = window.location.origin;
-    const shareText = `${text}\n${url}`;
-    if (navigator.share) {
-      navigator.share({
-        title: "Phuzzle Leaderboard",
-        text: shareText,
-        url,
-      });
-    } else {
-      navigator.clipboard?.writeText(shareText).then(() => {
-        setShareCopied(true);
-        setTimeout(() => setShareCopied(false), 2000);
-      });
-    }
-  }, [leaderboardType, setShareCopied]);
-
-  const handleShareWeeklyAlbum = useCallback(async () => {
-    const marks = weeklyAlbumSlots.map((slot) => (slot.completed ? "🟩" : "⬜")).join("");
-    const masteryMarks = weeklyAlbumSlots
-      .map((slot) => (slot.mastery ? "⚡" : "·"))
-      .join("");
-    const shareText = [
-      "🧩 Phuzzle Weekly Collection Album",
-      `${weeklyAlbumProgress}/7 daily puzzles completed`,
-      marks,
-      `Mastery: ${masteryMarks}`,
-      weeklyAlbumProgress === 7 ? "🏅 Perfect Week Badge unlocked!" : "",
-      window.location.origin,
-    ]
-      .filter(Boolean)
-      .join("\n");
-
-    if (navigator.share) {
-      await navigator.share({
-        title: "Phuzzle Weekly Album",
-        text: shareText,
-        url: window.location.origin,
-      });
-      return;
-    }
-
-    await navigator.clipboard?.writeText(shareText);
-    setAlbumShareCopied(true);
-    setTimeout(() => setAlbumShareCopied(false), 2000);
-  }, [weeklyAlbumSlots, weeklyAlbumProgress, setAlbumShareCopied]);
-
   return {
     loadData,
     loadWeeklyAlbum,
     handleSaveProfile,
-    handleShareLeaderboard,
-    handleShareWeeklyAlbum,
   };
 }

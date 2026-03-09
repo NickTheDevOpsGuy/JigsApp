@@ -85,7 +85,7 @@ export function MenuScreen() {
           >
             <Trophy size={24} />
           </button>
-          <h1 className={styles.dailyTitleInBar}>Daily Phuzzle</h1>
+          <h1 className={styles.dailyTitleInBar}>Phuzzle</h1>
           <div className={styles.cornerBtns}>
             <button
               type="button"

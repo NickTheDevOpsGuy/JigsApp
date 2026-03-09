@@ -19,8 +19,7 @@ export function StatsScreen() {
   const configured = isSupabaseConfigured();
   const isNarrow = useMediaQuery("(max-width: 520px)");
   const state = useStatsScreenState();
-  const { loadData, handleSaveProfile, handleShareLeaderboard, handleShareWeeklyAlbum } =
-    useStatsScreenData(configured, state);
+  const { loadData, handleSaveProfile } = useStatsScreenData(configured, state);
 
   const weeklyCompleted = Math.max(0, Math.min(7, state.weeklyAlbumProgress));
   const _weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
@@ -71,13 +70,7 @@ export function StatsScreen() {
           activeTab={state.activeTab}
           headerTitle={headerTitle}
           weeklyAlbumProgress={state.weeklyAlbumProgress}
-          leaderboardType={state.leaderboardType}
-          weekSubview={state.weekSubview}
-          shareCopied={state.shareCopied}
-          albumShareCopied={state.albumShareCopied}
           onClose={() => nav("/")}
-          onShareLeaderboard={handleShareLeaderboard}
-          onShareWeeklyAlbum={handleShareWeeklyAlbum}
         />
 
         <StatsTabBar
