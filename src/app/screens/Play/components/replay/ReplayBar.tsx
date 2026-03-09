@@ -1,9 +1,9 @@
 /**
- * ReplayBar – playback controls (<< >> rewind/ff, play/pause, time, progress, 1x 2x 3x, close).
+ * ReplayBar – playback controls (<< 5s back, 5s forward >> rewind/ff, play/pause, time, progress, 1x 2x 3x, close).
  * Width and position match the board outer border when boardRect is provided.
  */
 import React from "react";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import styles from "@/screens/Play/components/replay/ReplayBar.module.css";
 import { ReplayBarSpeedControls } from "@/screens/Play/components/replay/ReplayBarSpeedControls";
@@ -15,6 +15,8 @@ interface ReplayBarProps {
   onPause: () => void;
   onRewind: () => void;
   onFastForward: () => void;
+  onSkipBack15: () => void;
+  onSkipForward15: () => void;
   speed: number;
   onSpeedChange: (speed: number) => void;
   /** When false, no speed pill is shown as selected (user has not picked yet). */
@@ -35,6 +37,8 @@ export function ReplayBar({
   onPause,
   onRewind,
   onFastForward,
+  onSkipBack15,
+  onSkipForward15,
   speed,
   onSpeedChange,
   speedExplicitlyChosen = false,
@@ -94,6 +98,16 @@ export function ReplayBar({
             <button
               type="button"
               className={styles.replayBarBtn}
+              onClick={onSkipBack15}
+              onPointerDown={stopProp}
+              aria-label="Back 5 seconds"
+              title="Back 5 seconds"
+            >
+              <SkipBack size={20} aria-hidden />
+            </button>
+            <button
+              type="button"
+              className={styles.replayBarBtn}
               onPointerDown={(e) => {
                 stopProp(e);
                 e.preventDefault();
@@ -107,6 +121,16 @@ export function ReplayBar({
               ) : (
                 <Pause size={22} aria-hidden />
               )}
+            </button>
+            <button
+              type="button"
+              className={styles.replayBarBtn}
+              onClick={onSkipForward15}
+              onPointerDown={stopProp}
+              aria-label="Forward 5 seconds"
+              title="Forward 5 seconds"
+            >
+              <SkipForward size={20} aria-hidden />
             </button>
             <button
               type="button"

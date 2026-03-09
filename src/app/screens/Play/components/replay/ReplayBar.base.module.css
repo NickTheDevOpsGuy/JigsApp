@@ -26,6 +26,10 @@
   max-width: none;
 }
 
+.replayBar[style*="left"] .replayBarContent {
+  min-width: 0;
+}
+
 .replayBarCloseBtn {
   position: absolute;
   top: 10px;

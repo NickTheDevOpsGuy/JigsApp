@@ -36,6 +36,12 @@ html.theme-ocean {
   --color-error-hover: #f87171;
   --color-error-bg: rgba(239, 68, 68, 0.15);
   --color-error-border: rgba(239, 68, 68, 0.35);
+  --replay-backdrop-top: #050c18;
+  --replay-backdrop-mid: #0a1628;
+  --replay-backdrop-bottom: #080f1c;
+  --replay-backdrop-glow-a: rgba(59, 130, 246, 0.16);
+  --replay-backdrop-glow-b: rgba(30, 58, 95, 0.1);
+  --replay-star: rgba(220, 235, 255, 0.88);
 }
 
 /* Forest theme - greens, earthy */
@@ -76,6 +82,12 @@ html.theme-forest {
   --color-error-hover: #ef9a9a;
   --color-error-bg: rgba(229, 115, 115, 0.15);
   --color-error-border: rgba(229, 115, 115, 0.35);
+  --replay-backdrop-top: #061008;
+  --replay-backdrop-mid: #0d1612;
+  --replay-backdrop-bottom: #080e0a;
+  --replay-backdrop-glow-a: rgba(102, 187, 106, 0.14);
+  --replay-backdrop-glow-b: rgba(40, 80, 50, 0.08);
+  --replay-star: rgba(220, 245, 220, 0.82);
 }
 
 /* Sunset theme - warm oranges, amber, golden hour */
@@ -116,6 +128,12 @@ html.theme-sunset {
   --color-error-hover: #ef9a9a;
   --color-error-bg: rgba(229, 115, 115, 0.15);
   --color-error-border: rgba(229, 115, 115, 0.35);
+  --replay-backdrop-top: #1a0f06;
+  --replay-backdrop-mid: #2d1a0c;
+  --replay-backdrop-bottom: #1f1208;
+  --replay-backdrop-glow-a: rgba(255, 140, 66, 0.14);
+  --replay-backdrop-glow-b: rgba(120, 60, 20, 0.08);
+  --replay-star: rgba(255, 244, 230, 0.85);
 }
 
 /* ============================================

@@ -2,7 +2,14 @@
  * Seek bar, play/pause/speed controls, and nav (Back to Results | Next Puzzle) for ReplaySolveModal.
  */
 import React from "react";
-import { Play, Pause, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Play,
+  Pause,
+  ChevronDown,
+  ChevronLeft,
+  SkipBack,
+  SkipForward,
+} from "lucide-react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
@@ -15,6 +22,8 @@ export interface ReplaySolveModalControlsProps {
   onPause: () => void;
   onRewind: () => void;
   onFastForward: () => void;
+  onSkipBack15?: () => void;
+  onSkipForward15?: () => void;
   effectiveSpeed: number;
   onSpeedChange: (speed: number) => void;
   currentIndex: number;
@@ -40,6 +49,8 @@ export function ReplaySolveModalControls({
   onPause,
   onRewind,
   onFastForward,
+  onSkipBack15,
+  onSkipForward15,
   effectiveSpeed,
   onSpeedChange,
   currentIndex,
@@ -96,10 +107,6 @@ export function ReplaySolveModalControls({
   return (
     <>
       <div className={styles.seekRow}>
-        <div className={styles.seekIconsLeft} aria-hidden>
-          <ChevronLeft size={18} />
-          <ChevronLeft size={18} style={{ marginLeft: -10 }} />
-        </div>
         <div className={styles.seekBarWrap}>
           <div
             className={styles.seekBar}
@@ -120,10 +127,6 @@ export function ReplaySolveModalControls({
             {formatTime(elapsedSeconds)} / {formatTime(totalSeconds)}
           </span>
         </div>
-        <div className={styles.seekIconsRight} aria-hidden>
-          <ChevronRight size={18} />
-          <ChevronRight size={18} style={{ marginLeft: -10 }} />
-        </div>
       </div>
 
       <div className={styles.controlRow}>
@@ -137,6 +140,18 @@ export function ReplaySolveModalControls({
         >
           &lt;&lt;
         </button>
+        {onSkipBack15 && (
+          <button
+            type="button"
+            className={styles.controlBtn}
+            onClick={onSkipBack15}
+            onPointerDown={stopProp}
+            aria-label="Back 5 seconds"
+            title="Back 5 seconds"
+          >
+            <SkipBack size={20} aria-hidden />
+          </button>
+        )}
         <button
           type="button"
           className={`${styles.controlBtn} ${!isPaused ? styles.controlBtnActive : ""}`}
@@ -151,6 +166,18 @@ export function ReplaySolveModalControls({
             <Pause size={22} aria-hidden />
           )}
         </button>
+        {onSkipForward15 && (
+          <button
+            type="button"
+            className={styles.controlBtn}
+            onClick={onSkipForward15}
+            onPointerDown={stopProp}
+            aria-label="Forward 5 seconds"
+            title="Forward 5 seconds"
+          >
+            <SkipForward size={20} aria-hidden />
+          </button>
+        )}
         <button
           type="button"
           className={styles.controlBtn}
@@ -161,7 +188,6 @@ export function ReplaySolveModalControls({
         >
           &gt;&gt;
         </button>
-        <div className={styles.emptySlot} aria-hidden />
         <button
           type="button"
           className={styles.speedTrigger}

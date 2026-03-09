@@ -1,4 +1,4 @@
-/* Control row: dark grey square << Play >>, longer empty area (thin white border), Speed 1x */
+/* Control row: << 5s Play 5s >>, Speed 1x */
 .controlRow {
   flex-shrink: 0;
   display: flex;
@@ -43,16 +43,6 @@
 .controlBtnActive {
   background: #3a4150;
   border-color: rgba(100, 110, 130, 0.55);
-}
-
-/* Longer empty dark rectangular input-like area, thin white border */
-.emptySlot {
-  flex: 1;
-  min-width: 100px;
-  height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 10px;
-  background: rgba(18, 22, 32, 0.6);
 }
 
 .speedTrigger {

@@ -216,6 +216,27 @@ export function useReplay(
     [manager, setState],
   );
 
+  /** Seek to the snapshot whose elapsedSeconds is closest to current + deltaSeconds (e.g. ±15s). */
+  const seekBySeconds = useCallback(
+    (deltaSeconds: number) => {
+      const list = snapshotsRef.current;
+      if (!manager || list.length === 0) return;
+      const current = list[replayIndex]?.elapsedSeconds ?? 0;
+      const targetSeconds = Math.max(0, current + deltaSeconds);
+      let bestIdx = 0;
+      let bestDiff = Math.abs((list[0]?.elapsedSeconds ?? 0) - targetSeconds);
+      for (let i = 1; i < list.length; i++) {
+        const diff = Math.abs(list[i].elapsedSeconds - targetSeconds);
+        if (diff < bestDiff) {
+          bestDiff = diff;
+          bestIdx = i;
+        }
+      }
+      seekToIndex(bestIdx);
+    },
+    [manager, replayIndex, seekToIndex],
+  );
+
   const setReplaySpeedWithChoice = useCallback((speed: number) => {
     setSpeedExplicitlyChosen(true);
     setReplaySpeed(speed);
@@ -237,6 +258,7 @@ export function useReplay(
     goToStart,
     goToEnd,
     seekToIndex,
+    seekBySeconds,
     clearSnapshots,
     replayElapsedSeconds,
     replayMoveCount,

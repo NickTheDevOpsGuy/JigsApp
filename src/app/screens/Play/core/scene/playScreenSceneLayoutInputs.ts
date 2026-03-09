@@ -139,6 +139,8 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     onPause: behavior.replay.pauseReplay,
     onRewind: behavior.replay.goToStart,
     onFastForward: behavior.replay.goToEnd,
+    onSkipBack15: () => behavior.replay.seekBySeconds(-5),
+    onSkipForward15: () => behavior.replay.seekBySeconds(5),
     speed: behavior.replay.replaySpeed,
     onSpeedChange: behavior.replay.setReplaySpeed,
     currentIndex: behavior.replay.replayIndex,

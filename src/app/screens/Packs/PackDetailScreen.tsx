@@ -1,15 +1,17 @@
 /**
  * PackDetailScreen – pack puzzle list with completion checkmarks; launch to Play.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PackDetailScreen.module.css";
-import { ArrowLeft, Check, Play } from "lucide-react";
+import { ArrowLeft, Check, Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { PACK_METADATA } from "@/data/packs/packMetadata";
 import { loadPacksData } from "@/data/packs/loadPacksData";
 import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packs/packCompletion";
+
+const SCROLL_STEP = 220;
 
 export function PackDetailScreen() {
   const nav = useNavigate();
@@ -18,9 +20,19 @@ export function PackDetailScreen() {
   const [packsData, setPacksData] = useState<Awaited<
     ReturnType<typeof loadPacksData>
   > | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadPacksData().then(setPacksData);
+  }, []);
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
   }, []);
 
   const packMeta = PACK_METADATA.find((p) => p.id === packId);
@@ -33,6 +45,24 @@ export function PackDetailScreen() {
     setCurrentPuzzleId(puzzle.id);
     nav(`/new?puzzle=${encodeURIComponent(puzzle.id)}`);
   };
+
+  const scrollBy = (delta: number) => {
+    scrollRef.current?.scrollBy({ left: delta, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const raf = requestAnimationFrame(() => updateScrollState());
+    el.addEventListener("scroll", updateScrollState);
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("scroll", updateScrollState);
+      ro.disconnect();
+    };
+  }, [packId, packsData, updateScrollState]);
 
   if (!packMeta) {
     return (
@@ -77,44 +107,71 @@ export function PackDetailScreen() {
         </div>
 
         <div className={styles.puzzleGridWrap}>
-          <div className={styles.puzzleGrid}>
-            {puzzles.map((puzzle) => {
-              const isCompleted = completed.has(puzzle.id);
-              return (
-                <button
-                  key={puzzle.id}
-                  type="button"
-                  className={styles.puzzleCard}
-                  onClick={() => handlePlay(puzzle)}
-                  title={`Play ${puzzle.name}`}
-                  aria-label={`Play ${puzzle.name}`}
-                >
-                  <div className={styles.puzzleThumb}>
-                    {imgError[puzzle.id] ? (
-                      <div className={styles.placeholder}>?</div>
-                    ) : (
-                      <img
-                        src={puzzle.thumbnail}
-                        alt={puzzle.name}
-                        onError={() =>
-                          setImgError((prev) => ({ ...prev, [puzzle.id]: true }))
-                        }
-                      />
-                    )}
-                    {isCompleted && (
-                      <div className={styles.completedBadge}>
-                        <Check size={16} />
-                      </div>
-                    )}
-                  </div>
-                  <span className={styles.puzzleName}>{puzzle.name}</span>
-                  <span className={styles.playHint}>
-                    <Play size={12} /> Play
-                  </span>
-                </button>
-              );
-            })}
+          <button
+            type="button"
+            className={styles.scrollBtn}
+            onClick={() => scrollBy(-SCROLL_STEP)}
+            disabled={!canScrollLeft}
+            aria-label="Scroll left"
+            title="Scroll left"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <div
+            ref={scrollRef}
+            className={styles.scrollViewport}
+            role="list"
+            aria-label="Puzzle list"
+          >
+            <div className={styles.puzzleGrid}>
+              {puzzles.map((puzzle) => {
+                const isCompleted = completed.has(puzzle.id);
+                return (
+                  <button
+                    key={puzzle.id}
+                    type="button"
+                    className={styles.puzzleCard}
+                    onClick={() => handlePlay(puzzle)}
+                    title={`Play ${puzzle.name}`}
+                    aria-label={`Play ${puzzle.name}`}
+                  >
+                    <div className={styles.puzzleThumb}>
+                      {imgError[puzzle.id] ? (
+                        <div className={styles.placeholder}>?</div>
+                      ) : (
+                        <img
+                          src={puzzle.thumbnail}
+                          alt={puzzle.name}
+                          onError={() =>
+                            setImgError((prev) => ({ ...prev, [puzzle.id]: true }))
+                          }
+                        />
+                      )}
+                      {isCompleted && (
+                        <div className={styles.completedBadge}>
+                          <Check size={16} />
+                        </div>
+                      )}
+                    </div>
+                    <span className={styles.puzzleName}>{puzzle.name}</span>
+                    <span className={styles.playHint}>
+                      <Play size={12} /> Play
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+          <button
+            type="button"
+            className={styles.scrollBtn}
+            onClick={() => scrollBy(SCROLL_STEP)}
+            disabled={!canScrollRight}
+            aria-label="Scroll right"
+            title="Scroll right"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
       </div>
     </div>

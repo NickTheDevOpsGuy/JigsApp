@@ -103,11 +103,11 @@
   grid-template-columns: 1fr 1.2fr;
   gap: 8px;
   border-top: 1px solid rgba(102, 130, 178, 0.44);
-  margin-top: 10px;
-  padding-top: 8px;
+  margin-top: 4px;
+  padding-top: var(--space-2);
   flex-shrink: 0;
 }
 
 .actionRowPackFlow {
-  margin-top: 4px;
+  margin-top: 2px;
 }

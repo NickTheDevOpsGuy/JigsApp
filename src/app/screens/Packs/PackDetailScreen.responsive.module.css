@@ -43,26 +43,35 @@
   .card {
     flex: 0 1 auto;
     align-self: center;
-    padding: 8px;
+    padding: var(--space-2);
   }
 
   .header {
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     flex-shrink: 0;
   }
 
   .puzzleGridWrap {
     flex: 0 1 auto;
-    padding-top: 10px;
-    padding-left: 2px;
-    padding-right: 2px;
-    padding-bottom: 0;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .scrollViewport {
+    padding: var(--space-2) 0;
+  }
+
+  .scrollBtn {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
   }
 
   .backBtn {
     width: 36px;
     height: 36px;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2);
   }
 
   .packHeader {
@@ -80,29 +89,28 @@
   }
 
   .puzzleGrid {
-    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
-    gap: 10px;
-    padding-top: 10px;
-    padding-bottom: 0;
-  }
-
-  .puzzleGridWrap {
-    gap: 10px;
+    gap: var(--space-3);
+    padding: 0 var(--space-2);
   }
 
   .puzzleCard {
-    width: 100%;
-    min-width: 0;
-    padding: 9px 7px;
+    width: clamp(130px, 38vw, 160px);
+    padding: 9px 8px;
     gap: 4px;
   }
 
   .puzzleName {
-    font-size: 10px;
+    font-size: 11px;
     height: 1.2em;
   }
 
   .playHint {
     font-size: 9px;
+  }
+}
+
+@media (min-width: 601px) {
+  .puzzleCard {
+    width: clamp(160px, 18vw, 200px);
   }
 }

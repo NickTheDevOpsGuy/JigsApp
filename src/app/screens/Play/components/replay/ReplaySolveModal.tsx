@@ -1,7 +1,7 @@
 /**
  * Replay Solve modal – full-screen overlay matching the "Replay Solve" design:
  * dark cosmic backdrop, modal with header (clapperboard, title, close), subtitle,
- * puzzle area, seek bar with time, control row (<< Play >> empty Speed 1x), nav (Back to Results | Next Puzzle).
+ * puzzle area, seek bar with time, control row (<< 5s Play 5s >> Speed 1x), nav (Back to Results | Next Puzzle).
  */
 import React, { useEffect, useRef, useState } from "react";
 import { Clapperboard, X } from "lucide-react";
@@ -17,6 +17,8 @@ export interface ReplaySolveModalProps {
   onPause: () => void;
   onRewind: () => void;
   onFastForward: () => void;
+  onSkipBack15?: () => void;
+  onSkipForward15?: () => void;
   speed: number;
   onSpeedChange: (speed: number) => void;
   speedExplicitlyChosen?: boolean;
@@ -40,6 +42,8 @@ export function ReplaySolveModal({
   onPause,
   onRewind,
   onFastForward,
+  onSkipBack15,
+  onSkipForward15,
   speed,
   onSpeedChange,
   speedExplicitlyChosen = false,
@@ -114,6 +118,8 @@ export function ReplaySolveModal({
       onPause={onPause}
       onRewind={onRewind}
       onFastForward={onFastForward}
+      onSkipBack15={onSkipBack15}
+      onSkipForward15={onSkipForward15}
       effectiveSpeed={effectiveSpeed}
       onSpeedChange={onSpeedChange}
       currentIndex={currentIndex}

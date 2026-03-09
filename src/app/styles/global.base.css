@@ -62,6 +62,12 @@
   --color-error-hover: #991b1b;
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
+  --replay-backdrop-top: #1a2235;
+  --replay-backdrop-mid: #252f45;
+  --replay-backdrop-bottom: #1e2838;
+  --replay-backdrop-glow-a: rgba(11, 99, 184, 0.12);
+  --replay-backdrop-glow-b: rgba(80, 100, 160, 0.06);
+  --replay-star: rgba(11, 99, 184, 0.5);
 }
 
 @supports not (height: 100dvh) {
@@ -115,6 +121,12 @@ html.theme-light {
   --color-error-hover: #991b1b;
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
+  --replay-backdrop-top: #1a2235;
+  --replay-backdrop-mid: #252f45;
+  --replay-backdrop-bottom: #1e2838;
+  --replay-backdrop-glow-a: rgba(11, 99, 184, 0.12);
+  --replay-backdrop-glow-b: rgba(80, 100, 160, 0.06);
+  --replay-star: rgba(11, 99, 184, 0.5);
 }
 
 html.theme-dark {
@@ -155,6 +167,12 @@ html.theme-dark {
   --color-error-hover: #fca5a5;
   --color-error-bg: rgba(248, 113, 113, 0.15);
   --color-error-border: rgba(248, 113, 113, 0.35);
+  --replay-backdrop-top: #060a12;
+  --replay-backdrop-mid: #0a0f1a;
+  --replay-backdrop-bottom: #080d18;
+  --replay-backdrop-glow-a: rgba(74, 159, 245, 0.14);
+  --replay-backdrop-glow-b: rgba(60, 90, 140, 0.08);
+  --replay-star: rgba(230, 240, 255, 0.88);
 }
 
 /* Space theme - deep cosmos, purple/blue accents */
@@ -195,4 +213,10 @@ html.theme-space {
   --color-error-hover: #f9a8d4;
   --color-error-bg: rgba(244, 114, 182, 0.15);
   --color-error-border: rgba(244, 114, 182, 0.35);
+  --replay-backdrop-top: #0a0814;
+  --replay-backdrop-mid: #0d0b1a;
+  --replay-backdrop-bottom: #080618;
+  --replay-backdrop-glow-a: rgba(167, 139, 250, 0.18);
+  --replay-backdrop-glow-b: rgba(80, 60, 120, 0.1);
+  --replay-star: rgba(232, 228, 255, 0.9);
 }

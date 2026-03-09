@@ -1,4 +1,4 @@
-/* Backdrop: deep dark blue, subtle sparkling orange-red particles toward bottom, starry/cosmic */
+/* Backdrop: theme-driven (--replay-backdrop-* and --replay-star from theme) */
 .backdrop {
   position: fixed;
   inset: 0;
@@ -10,16 +10,21 @@
   box-sizing: border-box;
   background:
     radial-gradient(
-      ellipse 140% 100% at 50% 110%,
-      rgba(180, 80, 50, 0.12) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      ellipse 100% 70% at 50% 100%,
-      rgba(140, 50, 35, 0.08) 0%,
+      ellipse 120% 80% at 50% 20%,
+      var(--replay-backdrop-glow-a) 0%,
       transparent 50%
     ),
-    #0a0f1c;
+    radial-gradient(
+      ellipse 100% 100% at 80% 80%,
+      var(--replay-backdrop-glow-b) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      var(--replay-backdrop-top) 0%,
+      var(--replay-backdrop-mid) 40%,
+      var(--replay-backdrop-bottom) 100%
+    );
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -39,16 +44,52 @@
   pointer-events: auto;
   background:
     radial-gradient(
-      ellipse 140% 100% at 50% 110%,
-      rgba(180, 80, 50, 0.12) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      ellipse 100% 70% at 50% 100%,
-      rgba(140, 50, 35, 0.08) 0%,
+      ellipse 120% 80% at 50% 20%,
+      var(--replay-backdrop-glow-a) 0%,
       transparent 50%
     ),
-    #0a0f1c;
+    radial-gradient(
+      ellipse 100% 100% at 80% 80%,
+      var(--replay-backdrop-glow-b) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      var(--replay-backdrop-top) 0%,
+      var(--replay-backdrop-mid) 40%,
+      var(--replay-backdrop-bottom) 100%
+    );
+}
+
+.backdropCutout > [data-cutout-panel]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 8% 12%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 18% 28%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 25% 8%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 42% 22%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 55% 15%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 68% 30%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 82% 18%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 92% 25%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 12% 45%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 35% 52%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 58% 48%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 78% 55%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 5% 68%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 22% 72%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 48% 75%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 72% 68%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 88% 78%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 15% 88%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 38% 92%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 62% 88%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 85% 92%, var(--replay-star), transparent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
 }
 .backdropCutoutContent {
   position: fixed;
@@ -65,17 +106,17 @@
 .cutoutTopBar {
   flex-shrink: 0;
   width: 100%;
-  background: #132035;
-  border-bottom: 1px solid rgba(90, 130, 190, 0.18);
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
   padding: 14px 16px 14px 18px;
 }
 .cutoutBottomBar {
   flex-shrink: 0;
   width: 100%;
-  background: linear-gradient(180deg, #1e2a42 0%, #161e32 100%);
-  border-top: 1px solid rgba(90, 140, 200, 0.28);
+  background: var(--color-bg-card);
+  border-top: 1px solid var(--color-border);
   padding: 14px 16px 20px;
-  box-shadow: 0 -4px 24px rgba(0, 4, 16, 0.4);
+  box-shadow: var(--shadow-lg);
 }
 
 .cutoutBottomBarInner {
@@ -83,54 +124,67 @@
   min-width: 0;
 }
 
-/* Sparkle particles: concentrated toward bottom, fading into dark blue at top */
+/* Sharp starfield: theme-driven star color (--replay-star) */
 .backdrop::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(1.5px 1.5px at 20% 85%, rgba(220, 120, 80, 0.4), transparent),
-    radial-gradient(1px 1px at 40% 92%, rgba(200, 90, 60, 0.35), transparent),
-    radial-gradient(1.5px 1.5px at 60% 88%, rgba(230, 100, 70, 0.3), transparent),
-    radial-gradient(1px 1px at 80% 95%, rgba(210, 80, 50, 0.35), transparent),
-    radial-gradient(1px 1px at 30% 90%, rgba(240, 110, 70, 0.25), transparent),
-    radial-gradient(1.5px 1.5px at 70% 85%, rgba(200, 70, 45, 0.3), transparent);
+    radial-gradient(1px 1px at 8% 12%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 18% 28%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 25% 8%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 42% 22%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 55% 15%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 68% 30%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 82% 18%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 92% 25%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 12% 45%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 35% 52%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 58% 48%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 78% 55%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 5% 68%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 22% 72%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 48% 75%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 72% 68%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 88% 78%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 15% 88%, var(--replay-star), transparent),
+    radial-gradient(1.5px 1.5px at 38% 92%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 62% 88%, var(--replay-star), transparent),
+    radial-gradient(1px 1px at 85% 92%, var(--replay-star), transparent);
   background-size: 100% 100%;
+  background-repeat: no-repeat;
   pointer-events: none;
 }
 
-/* Modal box: dark blue-grey, softly rounded, subtle light blue glow top edge and borders */
+/* Modal box: theme-driven */
 .modal {
   width: 100%;
   max-width: 520px;
   max-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #1e2a42 0%, #161e32 100%);
-  border: 1px solid rgba(90, 140, 200, 0.28);
-  border-radius: 16px;
-  box-shadow:
-    0 0 0 1px rgba(100, 150, 220, 0.1),
-    0 -1px 16px rgba(110, 160, 240, 0.12),
-    0 20px 44px rgba(0, 4, 16, 0.5);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
 
-/* Header: solid dark blue, slightly more pronounced rounded corners on top */
+/* Header: theme-driven */
 .header {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 14px 16px 14px 18px;
-  background: #132035;
-  border-bottom: 1px solid rgba(90, 130, 190, 0.18);
-  border-radius: 18px 18px 0 0;
+  background: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 
 .headerIcon {
   flex-shrink: 0;
-  color: #fff;
+  color: var(--color-text-primary);
   opacity: 0.95;
 }
 
@@ -139,7 +193,7 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text-primary);
   letter-spacing: 0.02em;
 }
 
@@ -155,21 +209,21 @@
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: #fff;
+  color: var(--color-text-primary);
   cursor: pointer;
   transition:
     background 0.15s,
     box-shadow 0.15s;
-  box-shadow: 0 0 10px rgba(100, 160, 255, 0.3);
+  box-shadow: 0 0 10px var(--color-border);
 }
 
 .closeBtn:hover {
-  background: rgba(100, 160, 255, 0.2);
-  box-shadow: 0 0 12px rgba(100, 160, 255, 0.35);
+  background: var(--color-action-hover);
+  box-shadow: 0 0 12px var(--color-border-strong);
 }
 
 .closeBtn:focus-visible {
-  outline: 2px solid rgba(120, 180, 255, 0.9);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -180,7 +234,7 @@
   padding: 5px 18px 14px;
   font-size: 0.78rem;
   font-weight: 500;
-  color: rgba(190, 205, 230, 0.88);
+  color: var(--color-text-secondary);
   line-height: 1.35;
 }
 
@@ -189,9 +243,9 @@
   flex: 1;
   min-height: 200px;
   margin: 0 14px 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   overflow: hidden;
-  background: #0c111a;
+  background: var(--color-bg-primary);
   position: relative;
   display: flex;
   align-items: center;
@@ -217,21 +271,13 @@
   font-size: 0.9rem;
 }
 
-/* Seek row: far left << <<, progress bar, time to right of bar, far right >> >> */
+/* Seek row: progress bar and time */
 .seekRow {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 0 16px 14px;
-}
-
-.seekIconsLeft,
-.seekIconsRight {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  color: rgba(100, 160, 255, 0.92);
 }
 
 .seekBarWrap {
