@@ -12,7 +12,9 @@
 }
 
 .celebrating {
-  animation: pulse 0.6s ease-out, celebratingGlow 1.2s ease-out;
+  animation:
+    pulse 0.6s ease-out,
+    celebratingGlow 1.2s ease-out;
   box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand-primary) 40%, transparent);
 }
 
@@ -33,7 +35,8 @@
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
   }
   40% {
-    box-shadow: 0 0 20px 4px color-mix(in srgb, var(--color-brand-primary) 35%, transparent);
+    box-shadow: 0 0 20px 4px
+      color-mix(in srgb, var(--color-brand-primary) 35%, transparent);
   }
   100% {
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand-primary) 0%, transparent);

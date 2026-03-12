@@ -134,9 +134,7 @@ export function MenuScreen() {
                 Can you?
               </p>
             ) : (
-              <p className={styles.teaserLine}>
-                {getMenuTagline()}
-              </p>
+              <p className={styles.teaserLine}>{getMenuTagline()}</p>
             )}
           </div>
         </div>

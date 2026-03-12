@@ -64,36 +64,36 @@ export function PackListScreen() {
           ) : (
             <div className={styles.packScrollViewport}>
               <div className={styles.packGrid}>
-              {orderedPacks.map((pack) => {
-                const puzzlesData = packsData.getPuzzlesForPack(pack);
-                const { completed, total } = getPackProgress(
-                  puzzlesData.map((p) => p.id),
-                );
-                const isSeasonPick = pack.season === season;
+                {orderedPacks.map((pack) => {
+                  const puzzlesData = packsData.getPuzzlesForPack(pack);
+                  const { completed, total } = getPackProgress(
+                    puzzlesData.map((p) => p.id),
+                  );
+                  const isSeasonPick = pack.season === season;
 
-                return (
-                  <button
-                    key={pack.id}
-                    type="button"
-                    className={`${styles.packCard} ${isSeasonPick ? styles.packCardSeasonal : ""}`}
-                    onClick={() => nav(`/packs/${pack.id}`)}
-                    title={`Open ${pack.name}`}
-                    aria-label={`Open ${pack.name}: ${pack.description}`}
-                  >
-                    <div className={styles.packEmoji}>{pack.emoji}</div>
-                    <div className={styles.packInfo}>
-                      <span className={styles.packName}>{pack.name}</span>
-                      {isSeasonPick && (
-                        <span className={styles.seasonBadge}>Season&apos;s pick</span>
-                      )}
-                      <span className={styles.packDesc}>{pack.description}</span>
-                      <span className={styles.packProgress}>
-                        {total > 0 ? `${completed}/${total} completed` : "0 puzzles"}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={pack.id}
+                      type="button"
+                      className={`${styles.packCard} ${isSeasonPick ? styles.packCardSeasonal : ""}`}
+                      onClick={() => nav(`/packs/${pack.id}`)}
+                      title={`Open ${pack.name}`}
+                      aria-label={`Open ${pack.name}: ${pack.description}`}
+                    >
+                      <div className={styles.packEmoji}>{pack.emoji}</div>
+                      <div className={styles.packInfo}>
+                        <span className={styles.packName}>{pack.name}</span>
+                        {isSeasonPick && (
+                          <span className={styles.seasonBadge}>Season&apos;s pick</span>
+                        )}
+                        <span className={styles.packDesc}>{pack.description}</span>
+                        <span className={styles.packProgress}>
+                          {total > 0 ? `${completed}/${total} completed` : "0 puzzles"}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

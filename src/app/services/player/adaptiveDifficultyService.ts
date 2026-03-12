@@ -95,15 +95,7 @@ export type AdaptiveSuggestion = {
   hint: string;
 };
 
-const PRESET_LABELS = [
-  "Easy",
-  "Medium",
-  "Hard",
-  "Expert",
-  "Master",
-  "Legend",
-  "Extreme",
-];
+const PRESET_LABELS = ["Easy", "Medium", "Hard", "Expert", "Master", "Legend", "Extreme"];
 
 /**
  * Get grid suggestion considering completion times.

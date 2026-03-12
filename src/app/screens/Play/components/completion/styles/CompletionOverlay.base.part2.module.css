@@ -73,7 +73,11 @@
   font-size: clamp(0.85rem, 2vw, 1rem);
   font-weight: 600;
   color: var(--color-text-primary);
-  background: color-mix(in srgb, var(--color-complete-gradient-start) 25%, var(--color-bg-card));
+  background: color-mix(
+    in srgb,
+    var(--color-complete-gradient-start) 25%,
+    var(--color-bg-card)
+  );
   border-radius: var(--radius-btn);
   text-align: center;
   display: inline-block;

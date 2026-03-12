@@ -41,15 +41,7 @@ const PRESET_SIZES = [
   { rows: 9, cols: 9 },
 ];
 
-const PRESET_LABELS = [
-  "Easy",
-  "Medium",
-  "Hard",
-  "Expert",
-  "Master",
-  "Legend",
-  "Extreme",
-];
+const PRESET_LABELS = ["Easy", "Medium", "Hard", "Expert", "Master", "Legend", "Extreme"];
 
 /** Suggest next grid size based on best times. Returns gridIndex (0–6), rows, cols, and label, or null. */
 export function getSuggestedGrid(
