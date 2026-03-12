@@ -5,7 +5,6 @@ import { Puzzle } from "lucide-react";
 import { GRID_OPTIONS } from "../hooks";
 
 export type SetupConfigSectionProps = {
-  suggestedGrid: { gridIndex: number; hint: string } | null;
   gridIndex: number;
   setGridIndex: (i: number) => void;
   customRows: number;
@@ -19,7 +18,6 @@ export type SetupConfigSectionProps = {
 };
 
 export function SetupConfigSection({
-  suggestedGrid,
   gridIndex,
   setGridIndex,
   customRows,
@@ -41,20 +39,6 @@ export function SetupConfigSection({
 
   return (
     <>
-      <div className={styles.difficultySuggestionSlot}>
-        {suggestedGrid &&
-          gridIndex !== suggestedGrid.gridIndex &&
-          suggestedGrid.gridIndex < GRID_OPTIONS.length - 1 && (
-            <button
-              type="button"
-              className={styles.difficultySuggestion}
-              onClick={() => setGridIndex(suggestedGrid.gridIndex)}
-              title={suggestedGrid.hint}
-            >
-              {suggestedGrid.hint}
-            </button>
-          )}
-      </div>
       <section className={styles.difficultySection} aria-label="Difficulty">
         <p className={styles.configSectionLabel}>Difficulty</p>
         <div className={styles.difficultyGrid}>

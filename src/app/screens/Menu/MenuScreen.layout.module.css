@@ -161,7 +161,7 @@
   }
 
   .actionLabel {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .dailyEmoji {
@@ -174,7 +174,8 @@
 
   .menuTip {
     margin: 4px 0 0;
-    padding: 6px 8px;
-    font-size: 11px;
+    padding: 6px 10px;
+    font-size: 12px;
+    line-height: 1.4;
   }
 }

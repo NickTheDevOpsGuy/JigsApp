@@ -6,6 +6,8 @@ import { X } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { useCompletionOverlayData } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { useCompletionConfetti } from "@/screens/Play/components/completion/useCompletionConfetti";
+import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
+import { ACHIEVEMENT_DEFS } from "@/data/content/achievements";
 import { CompletionOverlayActions } from "@/screens/Play/components/completion/CompletionOverlayActions";
 import { CompletionOverlayStats } from "@/screens/Play/components/completion/CompletionOverlayStats";
 import { useCompletionOverlayMenus } from "@/screens/Play/components/completion/useCompletionOverlayMenus";
@@ -142,7 +144,27 @@ export function CompletionOverlay({
 
         <div className={styles.completeTitleBlock} role="banner">
           <h2 className={styles.completeTitleText}>🧩 Puzzle complete!</h2>
-          <p className={styles.completeTitlePhrase}>Nice solve!⭐</p>
+          {isNewBest && (
+            <p className={styles.completeTitlePhraseHighlight}>New personal best! 🏆</p>
+          )}
+          {isDaily && completionData.newlyUnlocked?.length === 0 && !isNewBest && (
+            <p className={styles.completeTitlePhraseSub}>Daily streak +1 🔥</p>
+          )}
+          <p className={styles.completeTitlePhrase}>
+            {pickCompletionPhrase(elapsedSeconds, moveCount, undoCount)}
+          </p>
+          {completionData.newlyUnlocked?.length > 0 && (() => {
+            const firstId = completionData.newlyUnlocked[0];
+            const achievement = ACHIEVEMENT_DEFS.find((a) => a.id === firstId);
+            const text = achievement
+              ? `${achievement.icon} Achievement unlocked: ${achievement.name}`
+              : "Achievement unlocked! 🏆";
+            return (
+              <p className={styles.completeAchievementUnlock} role="status">
+                {text}
+              </p>
+            );
+          })()}
         </div>
 
         {imageUrl && !imageError && (

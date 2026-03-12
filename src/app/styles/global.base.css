@@ -58,6 +58,11 @@
   --color-hud-done-bg: rgba(0, 200, 100, 0.15);
   --color-hud-done-border: rgba(0, 200, 100, 0.3);
   --color-focus-ring: rgba(11, 99, 184, 0.3);
+  /* Scrollbars – same on all screens and viewports (parity) */
+  --scrollbar-track: rgba(11, 20, 36, 0.82);
+  --scrollbar-thumb: rgba(96, 145, 219, 0.86);
+  --scrollbar-thumb-hover: rgba(123, 175, 248, 0.92);
+  --scrollbar-border: rgba(13, 26, 46, 0.9);
   --color-error: #dc2626;
   --color-error-hover: #991b1b;
   --color-error-bg: #fef2f2;
@@ -127,6 +132,10 @@ html.theme-light {
   --replay-backdrop-glow-a: rgba(11, 99, 184, 0.12);
   --replay-backdrop-glow-b: rgba(80, 100, 160, 0.06);
   --replay-star: rgba(11, 99, 184, 0.5);
+  --scrollbar-track: rgba(11, 20, 36, 0.82);
+  --scrollbar-thumb: rgba(96, 145, 219, 0.86);
+  --scrollbar-thumb-hover: rgba(123, 175, 248, 0.92);
+  --scrollbar-border: rgba(13, 26, 46, 0.9);
 }
 
 html.theme-dark {

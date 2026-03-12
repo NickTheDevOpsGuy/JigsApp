@@ -94,7 +94,7 @@
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: rgba(96, 145, 219, 0.86) rgba(11, 20, 36, 0.82);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   scrollbar-gutter: stable;
   scroll-snap-type: x mandatory;
 }

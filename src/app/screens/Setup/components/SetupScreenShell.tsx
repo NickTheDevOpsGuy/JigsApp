@@ -29,7 +29,6 @@ export function SetupScreenShell(props: {
   onPickFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setFromBlob: (blob: Blob) => Promise<boolean>;
   selectedPieceCount: number;
-  suggestedGrid: { gridIndex: number; hint: string } | null;
   gridIndex: number;
   setGridIndex: React.Dispatch<React.SetStateAction<number>>;
   customRows: number;
@@ -69,7 +68,6 @@ export function SetupScreenShell(props: {
     onPickFile,
     setFromBlob,
     selectedPieceCount,
-    suggestedGrid,
     gridIndex,
     setGridIndex,
     customRows,
@@ -133,7 +131,6 @@ export function SetupScreenShell(props: {
           />
 
           <SetupConfigSection
-            suggestedGrid={isPackFlow ? null : suggestedGrid}
             gridIndex={gridIndex}
             setGridIndex={setGridIndex}
             customRows={customRows}

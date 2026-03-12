@@ -40,6 +40,22 @@ function getMenuDate(): string {
   });
 }
 
+/** Rotating taglines for delight — one per day of week so it's consistent. */
+const MENU_TAGLINES = [
+  "Be one of the first to solve today's puzzle.",
+  "One puzzle a day. You've got this. ✨",
+  "Today's puzzle is waiting for you. 🧩",
+  "Ready when you are.",
+  "One puzzle. One win. 🌟",
+  "Your daily dose of satisfaction.",
+  "Time to piece it together. 💪",
+];
+
+function getMenuTagline(): string {
+  const day = new Date().getDay();
+  return MENU_TAGLINES[day] ?? MENU_TAGLINES[0];
+}
+
 export function MenuScreen() {
   const nav = useNavigate();
   const [menuDate] = useState(() => getMenuDate());
@@ -119,7 +135,7 @@ export function MenuScreen() {
               </p>
             ) : (
               <p className={styles.teaserLine}>
-                Be one of the first to solve today&apos;s puzzle.
+                {getMenuTagline()}
               </p>
             )}
           </div>

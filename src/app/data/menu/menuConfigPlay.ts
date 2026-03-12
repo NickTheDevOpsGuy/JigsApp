@@ -75,10 +75,10 @@ export function getPlayMenuNodes(): MenuNode[] {
           id: "dailyPuzzle",
           label: "Daily Puzzle",
           children: [
-            { type: "action", id: "daily-easy", label: "Easy 🌱" },
-            { type: "action", id: "daily-medium", label: "Medium ⚡" },
-            { type: "action", id: "daily-hard", label: "Hard 🔥" },
-            { type: "action", id: "daily-expert", label: "Expert 👑" },
+            { type: "action", id: "daily-easy", label: "Easy" },
+            { type: "action", id: "daily-medium", label: "Medium" },
+            { type: "action", id: "daily-hard", label: "Hard" },
+            { type: "action", id: "daily-expert", label: "Expert" },
           ],
         },
         {

@@ -17,6 +17,7 @@ export async function checkAndUnlockAchievements(args: {
   dailyStreak: number;
   bestDailyStreak: number;
   lastCompletion?: { elapsedSeconds: number; grid: { rows: number; cols: number } };
+  undoCount?: number;
 }): Promise<string[]> {
   if (!isSupabaseConfigured()) return [];
 
@@ -32,20 +33,39 @@ export async function checkAndUnlockAchievements(args: {
   const newlyUnlocked: string[] = [];
 
   const last = args.lastCompletion;
-  const speedDemon =
-    last && last.grid.rows === 3 && last.grid.cols === 3 && last.elapsedSeconds < 60;
-  const expertGrid = last && last.grid.rows === 6 && last.grid.cols === 6;
+  const r = last?.grid.rows ?? 0;
+  const c = last?.grid.cols ?? 0;
+  const time = last?.elapsedSeconds ?? 0;
+
+  const speedDemon = r === 3 && c === 3 && time < 60;
+  const lightning = r === 3 && c === 3 && time < 45;
+  const expertGrid = r === 6 && c === 6;
+  const quick4x4 = r === 4 && c === 4 && time < 120;
+  const flawless = args.undoCount === 0;
 
   const toCheck: { id: string; condition: boolean }[] = [
     { id: "first_puzzle", condition: args.puzzlesCompleted >= 1 },
     { id: "five_puzzles", condition: args.puzzlesCompleted >= 5 },
     { id: "twenty_puzzles", condition: args.puzzlesCompleted >= 20 },
     { id: "fifty_puzzles", condition: args.puzzlesCompleted >= 50 },
+    { id: "hundred_puzzles", condition: args.puzzlesCompleted >= 100 },
+    { id: "two_fifty_puzzles", condition: args.puzzlesCompleted >= 250 },
+    { id: "five_hundred_puzzles", condition: args.puzzlesCompleted >= 500 },
+    { id: "first_daily", condition: args.bestDailyStreak >= 1 },
     { id: "daily_streak_3", condition: args.bestDailyStreak >= 3 },
     { id: "daily_streak_7", condition: args.bestDailyStreak >= 7 },
+    { id: "daily_streak_14", condition: args.bestDailyStreak >= 14 },
     { id: "daily_streak_30", condition: args.bestDailyStreak >= 30 },
-    { id: "speed_demon", condition: !!speedDemon },
-    { id: "expert_grid", condition: !!expertGrid },
+    { id: "speed_demon", condition: speedDemon },
+    { id: "lightning_3x3", condition: lightning },
+    { id: "expert_grid", condition: expertGrid },
+    { id: "quick_4x4", condition: quick4x4 },
+    { id: "grid_4x4", condition: r === 4 && c === 4 },
+    { id: "grid_5x5", condition: r === 5 && c === 5 },
+    { id: "grid_7x7", condition: r === 7 && c === 7 },
+    { id: "grid_8x8", condition: r === 8 && c === 8 },
+    { id: "grid_9x9", condition: r === 9 && c === 9 },
+    { id: "flawless", condition: flawless },
   ];
 
   for (const { id, condition } of toCheck) {

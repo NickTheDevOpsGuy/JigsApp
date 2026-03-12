@@ -41,19 +41,45 @@
 .cardScroll {
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   padding: 12px 0 16px;
-  scroll-snap-type: y mandatory;
-  scroll-snap-stop: always;
-  scroll-padding-block: calc(50% - 40px); /* center first/last card without partial */
 }
 
-.cardScroll::-webkit-scrollbar {
-  display: none;
+/* Horizontal scroll (left–right) for parity with pack detail and other screens */
+.packScrollViewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  padding: 8px 0;
+  margin: 0 -4px;
+}
+
+.packScrollViewport::-webkit-scrollbar {
+  height: 8px;
+}
+
+.packScrollViewport::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+.packScrollViewport::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 1px solid var(--scrollbar-border);
+}
+
+.packScrollViewport::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
 
 .header {

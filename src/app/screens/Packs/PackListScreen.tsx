@@ -62,7 +62,8 @@ export function PackListScreen() {
           {!packsData ? (
             <Loader label="Loading packs…" />
           ) : (
-            <div className={styles.packGrid}>
+            <div className={styles.packScrollViewport}>
+              <div className={styles.packGrid}>
               {orderedPacks.map((pack) => {
                 const puzzlesData = packsData.getPuzzlesForPack(pack);
                 const { completed, total } = getPackProgress(
@@ -93,6 +94,7 @@ export function PackListScreen() {
                   </button>
                 );
               })}
+              </div>
             </div>
           )}
         </div>

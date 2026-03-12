@@ -97,6 +97,11 @@
 }
 
 @media (max-width: 520px) {
+  .difficultyCardLabel {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
   .difficultyRow {
     grid-template-columns: 1fr;
   }
@@ -136,6 +141,10 @@
 }
 
 @media (max-width: 400px) {
+  .difficultyCardLabel {
+    font-size: 11px;
+  }
+
   .freezeActions {
     flex-direction: column;
   }

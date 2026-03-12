@@ -42,13 +42,13 @@ const PRESET_SIZES = [
 ];
 
 const PRESET_LABELS = [
-  "Easy 🌱",
-  "Medium ⚡",
-  "Hard 🔥",
-  "Expert 👑",
-  "Master 🧠",
-  "Legend 🔮",
-  "Extreme 💀",
+  "Easy",
+  "Medium",
+  "Hard",
+  "Expert",
+  "Master",
+  "Legend",
+  "Extreme",
 ];
 
 /** Suggest next grid size based on best times. Returns gridIndex (0–6), rows, cols, and label, or null. */

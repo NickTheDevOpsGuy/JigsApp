@@ -39,31 +39,20 @@
   }
 
   .cardScroll {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-    scrollbar-width: none;
-    scroll-snap-type: y mandatory;
-    scroll-snap-stop: always;
-    scroll-padding-block: calc(
-      50% - 36px
-    ); /* mobile: smaller cards, center without partial */
+    padding: 8px 0 12px;
   }
 
-  .cardScroll::-webkit-scrollbar {
-    display: none;
+  .packScrollViewport {
+    padding: 6px 0;
   }
 
   .subtitle {
-    font-size: 12px;
+    font-size: 13px;
     margin-bottom: 8px;
   }
 
   .seasonNote {
-    font-size: 11px;
+    font-size: 12px;
     margin-bottom: 2px;
   }
 
@@ -75,6 +64,8 @@
     padding: 10px 12px;
     gap: 8px;
     min-height: 64px;
+    min-width: 220px;
+    max-width: 280px;
   }
 
   .packEmoji {
@@ -86,10 +77,10 @@
   }
 
   .packDesc {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .packProgress {
-    font-size: 11px;
+    font-size: 12px;
   }
 }

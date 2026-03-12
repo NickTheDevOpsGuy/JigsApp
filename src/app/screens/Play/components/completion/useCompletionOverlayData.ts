@@ -63,6 +63,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
   const [_streak, setStreak] = useState<number>(0);
   const [_masteryStreak, setMasteryStreak] = useState<number>(0);
+  const [newlyUnlocked, setNewlyUnlocked] = useState<string[]>([]);
   const [percentile, setPercentile] = useState<{
     topPercent: number;
     totalPlayers: number;
@@ -117,12 +118,14 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       if (stats) {
         setMasteryStreak(stats.masteryStreak ?? 0);
         onCompletionRecorded?.(stats);
-        await checkAndUnlockAchievements({
+        const unlocked = await checkAndUnlockAchievements({
           puzzlesCompleted: stats.puzzlesCompleted,
           dailyStreak: stats.dailyStreak,
           bestDailyStreak: stats.bestDailyStreak,
           lastCompletion: { elapsedSeconds, grid },
+          undoCount,
         });
+        if (unlocked.length > 0) setNewlyUnlocked(unlocked);
       }
     };
     void run();
@@ -253,6 +256,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     percentile,
     rankPosition,
     percentileBadgeTier,
+    newlyUnlocked,
     shareCard,
     isGenerating,
     handleShareCard,

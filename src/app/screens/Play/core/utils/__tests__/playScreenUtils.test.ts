@@ -36,7 +36,7 @@ describe("getSuggestedGrid", () => {
       gridIndex: 0,
       rows: 3,
       cols: 3,
-      label: "Easy 🌱 (3×3)",
+      label: "Easy (3×3)",
     });
   });
 
@@ -47,7 +47,7 @@ describe("getSuggestedGrid", () => {
       gridIndex: 1,
       rows: 4,
       cols: 4,
-      label: "Medium ⚡ (4×4)",
+      label: "Medium (4×4)",
     });
   });
 
@@ -58,7 +58,7 @@ describe("getSuggestedGrid", () => {
       gridIndex: 3,
       rows: 6,
       cols: 6,
-      label: "Expert 👑 (6×6)",
+      label: "Expert (6×6)",
     });
   });
 
@@ -69,7 +69,7 @@ describe("getSuggestedGrid", () => {
       gridIndex: 6,
       rows: 9,
       cols: 9,
-      label: "Extreme 💀 (9×9)",
+      label: "Extreme (9×9)",
     });
   });
 

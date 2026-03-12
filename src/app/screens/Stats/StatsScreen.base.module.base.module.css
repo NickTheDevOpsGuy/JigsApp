@@ -68,16 +68,6 @@
     overflow-x: hidden;
   }
 
-  .cardContent {
-    flex: 0 1 auto;
-    min-height: 0;
-    min-width: 0;
-    overflow-x: hidden;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-  }
-
   /* Prevent leaderboard/achievements from going off screen to the right */
   .leaderboard,
   .achievements {
@@ -106,13 +96,34 @@
 }
 
 .cardContent {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
   overflow-x: hidden;
-  overflow-y: visible;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.cardContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cardContent::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+.cardContent::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 1px solid var(--scrollbar-border);
+}
+
+.cardContent::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
 
 .header {

@@ -14,31 +14,29 @@
     height: var(--app-vh-stable, 100dvh);
     min-height: var(--app-vh-stable, 100dvh);
     max-height: var(--app-vh-stable, 100dvh);
-    padding: 6px 6px 2px;
-    padding-top: max(6px, env(safe-area-inset-top, 0));
+    padding: 4px 4px 2px;
+    padding-top: max(4px, env(safe-area-inset-top, 0));
     padding-bottom: max(2px, env(safe-area-inset-bottom, 0));
-    padding-left: max(6px, env(safe-area-inset-left, 0));
-    padding-right: max(6px, env(safe-area-inset-right, 0));
-    align-items: flex-start;
+    padding-left: max(4px, env(safe-area-inset-left, 0));
+    padding-right: max(4px, env(safe-area-inset-right, 0));
+    align-items: stretch;
     overflow: hidden;
     overscroll-behavior: none;
     touch-action: pan-y;
   }
 
   .card {
-    border-radius: 12px;
-    padding: 8px 10px 6px;
+    border-radius: 10px;
+    padding: 6px 8px 6px;
     max-height: 100%;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    min-height: 0;
+    overflow: hidden;
   }
 
   .cardBody {
-    gap: var(--space-3);
-    flex: 0 1 auto;
-    overflow-y: visible;
-    overflow-x: hidden;
+    gap: 6px;
   }
 
   .cardPackFlow .cardBody {
@@ -46,7 +44,8 @@
   }
 
   .headerRow {
-    padding-bottom: 5px;
+    padding-bottom: 4px;
+    flex-shrink: 0;
   }
 
   .title {
@@ -75,8 +74,8 @@
   }
 
   .tab {
-    min-height: 34px;
-    font-size: 0.78rem;
+    min-height: 36px;
+    font-size: 0.8rem;
     gap: 5px;
   }
 
@@ -94,20 +93,20 @@
   .categoryBtn {
     flex: 1 1 0;
     min-width: 0;
-    font-size: clamp(0.6rem, 2.2vw, 0.72rem);
-    padding: 4px 6px;
+    font-size: clamp(0.7rem, 2.4vw, 0.8rem);
+    padding: 5px 6px;
   }
 
   .galleryWrap {
-    gap: 6px;
-    margin: 4px 0 20px;
+    gap: 4px;
+    margin: 2px 0 8px;
   }
 
   .gallery {
     min-height: 0;
-    padding: 6px;
-    gap: 6px;
-    max-height: 82px;
+    padding: 4px;
+    gap: 4px;
+    max-height: 64px;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
@@ -115,23 +114,38 @@
   }
 
   .gallery::-webkit-scrollbar {
-    height: 7px;
+    height: 8px;
+  }
+
+  .gallery::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 999px;
+  }
+
+  .gallery::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 999px;
+    border: 1px solid var(--scrollbar-border);
+  }
+
+  .gallery::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
   }
 
   .galleryItem {
-    flex: 0 0 68px;
-    width: 68px;
-    min-width: 68px;
-    height: 68px;
+    flex: 0 0 56px;
+    width: 56px;
+    min-width: 56px;
+    height: 56px;
     aspect-ratio: auto;
   }
 
   .galleryItemName {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
   }
 
   .galleryItemPieces {
-    font-size: 0.66rem;
+    font-size: 0.68rem;
   }
 
   .label {
@@ -146,7 +160,9 @@
 
   .difficultySection,
   .timerSection {
-    gap: 4px;
+    gap: 2px;
+    margin-top: 2px;
+    margin-bottom: 4px;
   }
 
   .configSectionLabel {
@@ -161,7 +177,7 @@
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
-    scrollbar-color: rgba(96, 145, 219, 0.86) rgba(11, 20, 36, 0.82);
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
     padding-bottom: 2px;
   }
 
@@ -170,18 +186,18 @@
   }
 
   .difficultyGrid::-webkit-scrollbar-track {
-    background: rgba(11, 20, 36, 0.82);
+    background: var(--scrollbar-track);
     border-radius: 999px;
   }
 
   .difficultyGrid::-webkit-scrollbar-thumb {
-    background: rgba(96, 145, 219, 0.86);
+    background: var(--scrollbar-thumb);
     border-radius: 999px;
-    border: 1px solid rgba(13, 26, 46, 0.9);
+    border: 1px solid var(--scrollbar-border);
   }
 
   .difficultyGrid::-webkit-scrollbar-thumb:hover {
-    background: rgba(123, 175, 248, 0.92);
+    background: var(--scrollbar-thumb-hover);
   }
 
   .difficultyCard {
@@ -193,7 +209,7 @@
   }
 
   .difficultyCardTitle {
-    font-size: 0.69rem;
+    font-size: 0.72rem;
     gap: 4px;
   }
 
@@ -203,21 +219,21 @@
   }
 
   .difficultyCardPieces {
-    font-size: 0.62rem;
+    font-size: 0.68rem;
   }
 
   .preview,
   .previewPackFlow {
-    width: clamp(156px, 49vw, 204px);
-    height: clamp(156px, 49vw, 204px);
-    min-height: 156px;
-    border-radius: 12px;
+    width: clamp(120px, 38vw, 160px);
+    height: clamp(120px, 38vw, 160px);
+    min-height: 120px;
+    border-radius: 10px;
   }
 
   .previewPackFlow {
-    width: clamp(182px, 56vw, 236px);
-    height: clamp(182px, 56vw, 236px);
-    min-height: 182px;
+    width: clamp(140px, 42vw, 180px);
+    height: clamp(140px, 42vw, 180px);
+    min-height: 140px;
   }
 
   .gridToggleBtn {
@@ -240,7 +256,7 @@
 
   .backActionBtn,
   .startBtn {
-    min-height: 36px;
-    font-size: 0.8rem;
+    min-height: 44px;
+    font-size: 0.85rem;
   }
 }

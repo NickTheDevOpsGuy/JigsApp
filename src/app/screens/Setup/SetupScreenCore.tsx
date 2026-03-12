@@ -1,7 +1,7 @@
 /**
  * SetupScreen – image picker (gallery/upload/camera), grid config, and launch to Play.
  */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "@/screens/Setup/styles/SetupScreen.module.css";
 import { SAMPLE_PUZZLES } from "@/data/packs/samplePuzzles";
@@ -14,7 +14,6 @@ import {
 } from "./hooks";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { getBestTime } from "@/screens/Play/core/time/timeMode";
-import { getAdaptiveSuggestion } from "@/services/player/adaptiveDifficultyService";
 import { GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { STORAGE_KEY, type ImageSource } from "./setupScreenConstants";
 import { logger } from "@/utils/logger";
@@ -63,7 +62,6 @@ export function SetupScreen() {
     gridCols: effectiveCols,
   });
 
-  const suggestedGrid = useMemo(() => getAdaptiveSuggestion(getBestTime), []);
   const filteredPuzzles =
     selectedCategory === "all"
       ? SAMPLE_PUZZLES
@@ -159,7 +157,6 @@ export function SetupScreen() {
       onPickFile={handlePickFile}
       setFromBlob={setFromBlob}
       selectedPieceCount={effectiveRows * effectiveCols}
-      suggestedGrid={isPackFlow ? null : suggestedGrid}
       gridIndex={gridIndex}
       setGridIndex={setGridIndex}
       customRows={customRows}

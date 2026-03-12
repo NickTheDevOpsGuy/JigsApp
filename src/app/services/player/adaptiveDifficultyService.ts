@@ -96,13 +96,13 @@ export type AdaptiveSuggestion = {
 };
 
 const PRESET_LABELS = [
-  "Easy 🌱",
-  "Medium ⚡",
-  "Hard 🔥",
-  "Expert 👑",
-  "Master 🧠",
-  "Legend 🔮",
-  "Extreme 💀",
+  "Easy",
+  "Medium",
+  "Hard",
+  "Expert",
+  "Master",
+  "Legend",
+  "Extreme",
 ];
 
 /**

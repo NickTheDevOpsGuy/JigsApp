@@ -89,7 +89,7 @@
 /* Horizontal scrollbar – same blue as pick-a-puzzle / pack detail */
 .tray {
   scrollbar-width: thin;
-  scrollbar-color: rgba(96, 145, 219, 0.86) rgba(11, 20, 36, 0.82);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 .tray::-webkit-scrollbar {
@@ -97,16 +97,16 @@
 }
 
 .tray::-webkit-scrollbar-track {
-  background: rgba(11, 20, 36, 0.82);
+  background: var(--scrollbar-track);
   border-radius: 999px;
 }
 
 .tray::-webkit-scrollbar-thumb {
-  background: rgba(96, 145, 219, 0.86);
+  background: var(--scrollbar-thumb);
   border-radius: 999px;
-  border: 1px solid rgba(13, 26, 46, 0.9);
+  border: 1px solid var(--scrollbar-border);
 }
 
 .tray::-webkit-scrollbar-thumb:hover {
-  background: rgba(123, 175, 248, 0.92);
+  background: var(--scrollbar-thumb-hover);
 }
