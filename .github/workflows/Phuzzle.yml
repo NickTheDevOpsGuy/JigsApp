@@ -14,6 +14,8 @@ jobs:
   lint-typecheck:
     name: 🧩 Phuzzle
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     permissions:
       contents: read
@@ -31,7 +33,7 @@ jobs:
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: "22"
           cache: npm
           cache-dependency-path: package-lock.json
 
