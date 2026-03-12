@@ -149,6 +149,10 @@ export function usePlayScreenUI() {
     setDebug((d) => ({ ...d, showPerfOverlay: !d.showPerfOverlay }));
   }, []);
 
+  const toggleShowSilhouette = useCallback(() => {
+    setDebug((d) => ({ ...d, showSilhouette: !d.showSilhouette }));
+  }, []);
+
   const toggleImmersiveMode = useCallback(() => {
     setImmersiveMode((m) => !m);
   }, []);
@@ -292,6 +296,7 @@ export function usePlayScreenUI() {
     toggleHaptics,
     toggleDebug,
     togglePerfOverlay,
+    toggleShowSilhouette,
     toggleImmersiveMode,
   };
 }

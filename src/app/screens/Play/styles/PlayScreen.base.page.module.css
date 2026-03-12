@@ -74,7 +74,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 0 12px;
+  padding: 0 16px;
   padding-top: env(safe-area-inset-top, 0);
   min-width: 0;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);

@@ -50,6 +50,7 @@ export type UsePlayScreenTopBarPropsParams = {
   toggleFullscreen: () => void;
   toggleDebug: () => void;
   togglePerfOverlay: () => void;
+  toggleShowSilhouette: () => void;
   isFullscreen: boolean;
   isCoarsePointer: boolean;
   showDebug: boolean;

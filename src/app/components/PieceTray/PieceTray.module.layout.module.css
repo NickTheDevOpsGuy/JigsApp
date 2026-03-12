@@ -91,12 +91,27 @@
   display: flex;
   align-items: center;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96, 145, 219, 0.86) rgba(11, 20, 36, 0.82);
 }
 
 .scroller::-webkit-scrollbar {
-  display: none !important; /* Chrome, Safari, Opera */
+  height: 8px;
+}
+
+.scroller::-webkit-scrollbar-track {
+  background: rgba(11, 20, 36, 0.82);
+  border-radius: 999px;
+}
+
+.scroller::-webkit-scrollbar-thumb {
+  background: rgba(96, 145, 219, 0.86);
+  border-radius: 999px;
+  border: 1px solid rgba(13, 26, 46, 0.9);
+}
+
+.scroller::-webkit-scrollbar-thumb:hover {
+  background: rgba(123, 175, 248, 0.92);
 }
 
 .scrollerSnap {
@@ -131,12 +146,15 @@
   min-height: 56px;
   cursor: pointer;
   border-radius: 6px;
-  transition: all 0.15s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   flex-shrink: 0;
   touch-action: manipulation;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 0 transparent;
 }
 
 .blankSlot {
@@ -154,7 +172,8 @@
 
 .pieceButton:hover {
   background: transparent;
-  transform: scale(1.08);
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
 .pieceButton:active {

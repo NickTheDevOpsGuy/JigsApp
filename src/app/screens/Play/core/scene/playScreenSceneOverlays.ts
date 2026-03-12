@@ -68,6 +68,8 @@ export function buildCompletionProps(args: {
   onReplayClick: () => void;
   onNextPuzzle: () => void;
   focusReturnRef?: React.RefObject<HTMLButtonElement>;
+  onCompletionRecorded?: (stats: { dailyStreak: number }) => void;
+  onNewBest?: () => void;
 }): CompletionProps {
   const {
     isComplete,
@@ -97,6 +99,8 @@ export function buildCompletionProps(args: {
     canReplay,
     onReplayClick,
     onNextPuzzle,
+    onCompletionRecorded,
+    onNewBest,
   } = args;
 
   const focusReturnRefProp = focusReturnRef != null ? { focusReturnRef } : undefined;
@@ -132,6 +136,8 @@ export function buildCompletionProps(args: {
     canReplay,
     onReplayClick,
     onNextPuzzle,
+    onCompletionRecorded,
+    onNewBest,
     ...focusReturnRefProp,
   };
 }

@@ -1,4 +1,3 @@
-import { easeGravityDrop } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import type { PuzzleState } from "@/puzzle/core/types";
 import type { PuzzleManager } from "@/puzzle/manager/PuzzleManager";
 import type { PerfStats } from "@/screens/Play/components/overlay/ProfilerOverlay";
@@ -153,12 +152,11 @@ export function buildLockLerpOverrides(args: {
       const dy = p.y - from.y;
       if (Math.hypot(dx, dy) > maxTravel) continue;
       const t = Math.min(1, elapsed / LOCK_LERP_MS);
-      const easeX = 1 - (1 - t) ** 4;
-      const easeY = easeGravityDrop(t);
-      const liftPx = Math.min(LOCK_LIFT_MAX_PX, Math.max(4, p.h * 0.08));
+      const ease = 1 - (1 - t) ** 2.2;
+      const liftPx = Math.min(LOCK_LIFT_MAX_PX, Math.max(4, p.h * 0.06));
       const liftOffset = liftPx * (1 - t) ** 2;
-      const lerpX = from.x + dx * easeX;
-      const lerpY = from.y + dy * easeY - liftOffset;
+      const lerpX = from.x + dx * ease;
+      const lerpY = from.y + dy * ease - liftOffset;
       const minY = Math.min(from.y, p.y) - liftPx;
       const maxY = Math.max(from.y, p.y);
       lockLerpOverrides ??= new Map();
@@ -267,7 +265,6 @@ export function prepareCanvasForRender(
     dpr = Math.sqrt(pixelBudget / Math.max(1, cssW * cssH));
   }
   dpr = Math.max(1, Math.min(dpr, maxDpr));
-
   const targetW = Math.floor(cssW * dpr);
   const targetH = Math.floor(cssH * dpr);
   if (canvas.width !== targetW || canvas.height !== targetH) {
@@ -276,11 +273,34 @@ export function prepareCanvasForRender(
     canvas.style.width = `${cssW}px`;
     canvas.style.height = `${cssH}px`;
   }
-
   const ctx = canvas.getContext("2d", { willReadFrequently: false });
   if (!ctx) return null;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = reducedQuality ? "medium" : "high";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   return { ctx, cssW, cssH, dpr };
+}
+
+/** Empty (row,col) slots adjacent to at least one placed piece – potential snap targets when hovering. */
+export function getHoverSnapTargetSlots(
+  state: PuzzleState,
+): { row: number; col: number }[] {
+  const { rows, cols } = state.grid;
+  const placedAt = new Set<string>();
+  for (const p of state.pieces) {
+    if (!p.inTray && p.isPlaced) placedAt.add(`${p.row},${p.col}`);
+  }
+  const slots: { row: number; col: number }[] = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (placedAt.has(`${r},${c}`)) continue;
+      const hasPlacedNeighbor =
+        (r > 0 && placedAt.has(`${r - 1},${c}`)) ||
+        (r < rows - 1 && placedAt.has(`${r + 1},${c}`)) ||
+        (c > 0 && placedAt.has(`${r},${c - 1}`)) ||
+        (c < cols - 1 && placedAt.has(`${r},${c + 1}`));
+      if (hasPlacedNeighbor) slots.push({ row: r, col: c });
+    }
+  }
+  return slots;
 }

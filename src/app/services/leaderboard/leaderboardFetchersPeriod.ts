@@ -1,14 +1,16 @@
 /**
- * Period leaderboards: weekly/monthly best times and totals.
+ * Period leaderboards: weekly/monthly best times and totals, weekly efficiency.
  */
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import type {
   LeaderboardEntry,
   CompletionCountEntry,
+  EfficiencyEntry,
   PieceCutType,
   VisualModifierFilter,
   CompletionSourceFilter,
 } from "./leaderboardTypes";
+import { getCalendarWeekRange } from "./leaderboardTypes";
 import { resolveDisplayNames } from "./leaderboardFetchersShared";
 
 function getDateRange(period: "week" | "month"): { start: string; end: string } {
@@ -114,6 +116,7 @@ export async function getWeeklyTotalsLeaderboard(
     rank: i + 1,
     count,
     displayName: names.get(userId) ?? `Player ${userId.slice(0, 8)}`,
+    userId,
   }));
 }
 
@@ -148,5 +151,69 @@ export async function getMonthlyTotalsLeaderboard(
     rank: i + 1,
     count,
     displayName: names.get(userId) ?? `Player ${userId.slice(0, 8)}`,
+    userId,
+  }));
+}
+
+/** Weekly efficiency spotlight: best sec/move this calendar week (Mon–Sun). */
+export async function getWeeklyEfficiencyLeaderboard(
+  limit = 10,
+  cutType: PieceCutType = "all",
+  visualModifier: VisualModifierFilter = "all",
+  completionSource: CompletionSourceFilter = "all",
+): Promise<EfficiencyEntry[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  const today = new Date().toISOString().slice(0, 10);
+  const { start, end } = getCalendarWeekRange(today);
+
+  let query = supabase!
+    .from("completions")
+    .select("user_id, elapsed_seconds, move_count")
+    .gte("puzzle_date", start)
+    .lte("puzzle_date", end)
+    .not("move_count", "is", null)
+    .gt("move_count", 0);
+  if (cutType !== "all") query = query.eq("cut_type", cutType);
+  if (visualModifier !== "all") query = query.eq("visual_modifier", visualModifier);
+  if (completionSource !== "all") query = query.eq("completion_source", completionSource);
+
+  const { data, error } = await query;
+
+  if (error) return [];
+
+  const bestByUser = new Map<
+    string,
+    { elapsedSeconds: number; moveCount: number; efficiency: number }
+  >();
+  for (const row of data ?? []) {
+    const moveCount = row.move_count ?? 1;
+    const efficiency = row.elapsed_seconds / moveCount;
+    const cur = bestByUser.get(row.user_id);
+    if (cur == null || efficiency < cur.efficiency) {
+      bestByUser.set(row.user_id, {
+        elapsedSeconds: row.elapsed_seconds,
+        moveCount,
+        efficiency,
+      });
+    }
+  }
+
+  const sorted = [...bestByUser.entries()]
+    .sort((a, b) => a[1].efficiency - b[1].efficiency)
+    .slice(0, limit);
+
+  const names = await resolveDisplayNames(
+    sorted.map(([uid]) => uid),
+    new Set(),
+  );
+
+  return sorted.map(([userId, v], i) => ({
+    rank: i + 1,
+    displayName: names.get(userId) ?? `Player ${userId.slice(0, 8)}`,
+    userId,
+    efficiencySecPerMove: Math.round(v.efficiency * 10) / 10,
+    elapsedSeconds: v.elapsedSeconds,
+    moveCount: v.moveCount,
   }));
 }

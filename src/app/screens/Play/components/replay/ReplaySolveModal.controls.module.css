@@ -7,7 +7,7 @@
   padding: 0 16px 16px;
 }
 
-/* Dark grey square buttons, rounded corners, white icons */
+/* Rounded control buttons: glassmorphic with theme accent on hover */
 .controlBtn {
   display: inline-flex;
   align-items: center;
@@ -15,34 +15,39 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 1px solid rgba(80, 90, 110, 0.5);
-  border-radius: 10px;
-  background: #2d3340;
-  color: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  color: var(--color-text-primary);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   transition:
     border-color 0.15s,
     background 0.15s,
-    color 0.15s;
+    box-shadow 0.2s;
 }
 
 .controlBtn:hover {
-  border-color: rgba(120, 130, 150, 0.6);
-  background: #363d4a;
-  color: #fff;
+  border-color: color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
+  background: color-mix(in srgb, var(--color-bg-elevated) 96%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
 }
 
 .controlBtn:focus-visible {
-  outline: 2px solid rgba(117, 180, 255, 0.88);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 1px;
 }
 
-/* Play when active: slightly lighter background */
+/* Play when active: subtle brand glow */
 .controlBtnActive {
-  background: #3a4150;
-  border-color: rgba(100, 110, 130, 0.55);
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 18%,
+    var(--color-bg-elevated)
+  );
+  border-color: color-mix(in srgb, var(--color-brand-primary) 45%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
 }
 
 .speedTrigger {
@@ -52,21 +57,25 @@
   gap: 6px;
   min-height: 44px;
   padding: 0 14px;
-  border: 1px solid rgba(80, 90, 110, 0.5);
-  border-radius: 10px;
-  background: #2d3340;
-  color: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  color: var(--color-text-primary);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.2s;
 }
 
 .speedTrigger:hover {
-  border-color: rgba(130, 180, 255, 0.5);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
 }
 
 .speedTrigger:focus-visible {
-  outline: 2px solid rgba(117, 180, 255, 0.88);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 1px;
 }
 
@@ -75,7 +84,7 @@
   opacity: 0.9;
 }
 
-/* Nav: Back to Results (dark grey, arrow + text) | Next Puzzle (vibrant blue, text + triangle) */
+/* Nav: Back to Results | Next Puzzle – theme-driven with glow on primary */
 .navRow {
   flex-shrink: 0;
   display: flex;
@@ -92,21 +101,23 @@
   gap: 8px;
   min-height: 48px;
   padding: 0 16px;
-  border: 1px solid rgba(90, 100, 120, 0.5);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: #2d3340;
-  color: #fff;
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  color: var(--color-text-primary);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition:
     border-color 0.15s,
-    background 0.15s;
+    background 0.15s,
+    box-shadow 0.2s;
 }
 
 .navBtnSecondary:hover {
-  border-color: rgba(120, 130, 150, 0.6);
-  background: #363d4a;
+  border-color: color-mix(in srgb, var(--color-brand-primary) 40%, transparent);
+  background: color-mix(in srgb, var(--color-bg-elevated) 96%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
 }
 
 .navBtnPrimary {
@@ -119,24 +130,28 @@
   padding: 0 16px;
   border: none;
   border-radius: 12px;
-  background: #2563eb;
-  color: #fff;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4);
+  box-shadow:
+    0 2px 10px color-mix(in srgb, var(--color-brand-primary) 40%, transparent),
+    0 0 20px color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
   transition:
     background 0.15s,
-    box-shadow 0.15s;
+    box-shadow 0.2s;
 }
 
 .navBtnPrimary:hover {
-  background: #3b82f6;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.5);
+  background: var(--color-brand-hover);
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--color-brand-primary) 45%, transparent),
+    0 0 24px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
 }
 
 .navBtnPrimary:focus-visible,
 .navBtnSecondary:focus-visible {
-  outline: 2px solid rgba(117, 180, 255, 0.9);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }

@@ -17,26 +17,31 @@ export function CompletionOverlayStats(props: {
     maxGroupSize,
   } = props;
   return (
-    <div className={styles.completeStatCards} role="status" aria-live="polite">
-      <div className={styles.completeStatCard}>
-        <span className={styles.completeStatCardLabel}>Time</span>
-        <span className={styles.completeStatCardValue}>{formatTime(elapsedSeconds)}</span>
-      </div>
-      <div className={styles.completeStatCard}>
-        <span className={styles.completeStatCardLabel}>Moves</span>
-        <span className={styles.completeStatCardValue}>{moveCount}</span>
-      </div>
-      <div className={styles.completeStatCard}>
-        <span className={styles.completeStatCardLabel}>Pieces/min</span>
-        <span className={styles.completeStatCardValue}>{piecesPerMin.toFixed(1)}</span>
-      </div>
-      <div className={styles.completeStatCard}>
-        <span className={styles.completeStatCardLabel}>Largest Merge</span>
-        <span className={styles.completeStatCardValue}>
-          {maxGroupSize > 0
-            ? `${maxGroupSize} ${maxGroupSize === 1 ? "piece" : "pieces"}`
-            : "0 pieces"}
-        </span>
+    <div className={styles.completeStatsPanel} role="status" aria-live="polite">
+      <p className={styles.completeStatsPanelTitle}>Your stats</p>
+      <div className={styles.completeStatCards}>
+        <div className={styles.completeStatCard}>
+          <span className={styles.completeStatCardLabel}>Time</span>
+          <span className={styles.completeStatCardValue}>
+            {formatTime(elapsedSeconds)}
+          </span>
+        </div>
+        <div className={styles.completeStatCard}>
+          <span className={styles.completeStatCardLabel}>Moves</span>
+          <span className={styles.completeStatCardValue}>{moveCount}</span>
+        </div>
+        <div className={styles.completeStatCard}>
+          <span className={styles.completeStatCardLabel}>Pieces/min</span>
+          <span className={styles.completeStatCardValue}>{piecesPerMin.toFixed(1)}</span>
+        </div>
+        <div className={styles.completeStatCard}>
+          <span className={styles.completeStatCardLabel}>Largest Merge</span>
+          <span className={styles.completeStatCardValue}>
+            {maxGroupSize > 0
+              ? `${maxGroupSize} ${maxGroupSize === 1 ? "piece" : "pieces"}`
+              : "0 pieces"}
+          </span>
+        </div>
       </div>
     </div>
   );

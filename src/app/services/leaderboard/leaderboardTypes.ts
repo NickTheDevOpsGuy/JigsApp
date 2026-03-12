@@ -25,6 +25,17 @@ export type CompletionCountEntry = {
   rank: number;
   count: number;
   displayName: string;
+  userId?: string;
+};
+
+/** Weekly efficiency spotlight: sec/move (lower is better). */
+export type EfficiencyEntry = {
+  rank: number;
+  displayName: string;
+  userId?: string;
+  efficiencySecPerMove: number;
+  elapsedSeconds: number;
+  moveCount: number;
 };
 
 export type PersonalBestEntry = {

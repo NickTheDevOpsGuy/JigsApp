@@ -91,23 +91,30 @@ export function ReplaySolveModal({
     }
   };
 
+  const closeButton = (
+    <button
+      ref={closeBtnRef}
+      type="button"
+      className={styles.closeBtn}
+      onClick={onClose}
+      onPointerDown={stopProp}
+      aria-label="Close replay (Esc)"
+      title="Close (Esc)"
+    >
+      <X size={18} aria-hidden />
+    </button>
+  );
+
   const headerBlock = (
     <header className={styles.header}>
-      <Clapperboard size={20} className={styles.headerIcon} aria-hidden />
-      <h2 id="replay-solve-title" className={styles.headerTitle}>
-        Replay Solve
-      </h2>
-      <button
-        ref={closeBtnRef}
-        type="button"
-        className={styles.closeBtn}
-        onClick={onClose}
-        onPointerDown={stopProp}
-        aria-label="Close replay (Esc)"
-        title="Close (Esc)"
-      >
-        <X size={18} aria-hidden />
-      </button>
+      <div className={styles.headerLeft} aria-hidden />
+      <div className={styles.headerCenter}>
+        <Clapperboard size={20} className={styles.headerIcon} aria-hidden />
+        <h2 id="replay-solve-title" className={styles.headerTitle}>
+          Replay Solve
+        </h2>
+      </div>
+      <div className={styles.headerRight}>{useCutout && closeButton}</div>
     </header>
   );
 
@@ -217,17 +224,20 @@ export function ReplaySolveModal({
         <p id="replay-solve-subtitle" className={styles.subtitle}>
           Watch how the puzzle was completed
         </p>
-        <div className={styles.puzzleArea}>
-          {showPuzzleImage ? (
-            <img
-              src={completionImageUrl ?? ""}
-              alt="Puzzle completion"
-              className={styles.puzzleImage}
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className={styles.puzzlePlaceholder}>Puzzle view</div>
-          )}
+        <div className={styles.puzzleAreaWrapper}>
+          {!useCutout && closeButton}
+          <div className={styles.puzzleArea}>
+            {showPuzzleImage ? (
+              <img
+                src={completionImageUrl ?? ""}
+                alt="Puzzle completion"
+                className={styles.puzzleImage}
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className={styles.puzzlePlaceholder}>Puzzle view</div>
+            )}
+          </div>
         </div>
         {seekAndControls}
       </div>

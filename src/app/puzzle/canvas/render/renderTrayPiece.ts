@@ -1,13 +1,23 @@
 /**
  * renderTrayPiece – render single piece to offscreen canvas for tray thumbnails.
+ * Uses the same Path2D pipeline as the board: one path for clip, image, and stroke.
  */
 import type { Piece } from "@/puzzle/core/types";
 import { computeImageSourceRect } from "@/puzzle/canvas/utils/renderBoardHelpers";
+import {
+  drawSilhouetteShadow,
+  drawPieceImageInPath,
+  strokePieceOutline,
+} from "./renderBoardDrawPieceHelpers";
+
+export type RenderTrayPieceOptions = {
+  /** When true, render as solid color + black outline only (no image). For debugging silhouettes. */
+  debugSilhouette?: boolean;
+};
 
 /**
  * Render a single piece to a small canvas for use in the tray.
- * Returns an offscreen canvas that can be drawn or converted to data URL.
- * Applies piece.rotation so the preview matches the board (e.g. drag preview).
+ * Same Path2D silhouette as board: clip(path) → drawImage → stroke(path).
  */
 export function renderTrayPiece(
   piece: Piece,
@@ -15,12 +25,10 @@ export function renderTrayPiece(
   assembledW: number,
   assembledH: number,
   scale: number = 0.5,
+  options: RenderTrayPieceOptions = {},
 ): HTMLCanvasElement {
-  // Extra padding in CANVAS pixels (after scaling) to prevent clipping
   const CANVAS_PAD = 4;
-
   const maxDim = Math.max(piece.w, piece.h);
-  // Calculate scaled piece size, then add padding in canvas pixels
   const scaledSize = Math.ceil(maxDim * scale);
   const canvasSize = scaledSize + CANVAS_PAD * 2;
 
@@ -31,7 +39,6 @@ export function renderTrayPiece(
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
 
-  // Build clip path
   let path: Path2D | null = null;
   try {
     if (piece.shapePath && piece.shapePath.length > 0) {
@@ -47,43 +54,30 @@ export function renderTrayPiece(
     return canvas;
   }
 
-  // Transform order:
-  // 1. Move to canvas center (in canvas pixels)
-  // 2. Scale
-  // 3. Rotate
-  // 4. Offset to center the piece
-
   const canvasCenterX = canvasSize / 2;
   const canvasCenterY = canvasSize / 2;
-
   ctx.translate(canvasCenterX, canvasCenterY);
   ctx.scale(scale, scale);
   ctx.rotate((piece.rotation * Math.PI) / 180);
   ctx.translate(-piece.w / 2, -piece.h / 2);
 
-  ctx.save();
-  ctx.clip(path);
+  if (options.debugSilhouette) {
+    ctx.fillStyle = "rgba(180, 200, 220, 0.9)";
+    ctx.fill(path);
+    ctx.strokeStyle = "rgba(0,0,0,1)";
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.stroke(path);
+    return canvas;
+  }
 
+  drawSilhouetteShadow(ctx, path, false, piece.isPlaced);
   const cols = Math.round(assembledW / piece.tileW);
   const rows = Math.round(assembledH / piece.tileH);
   const rect = computeImageSourceRect(piece, img, cols, rows);
-  ctx.drawImage(
-    img,
-    rect.srcX,
-    rect.srcY,
-    rect.srcW,
-    rect.srcH,
-    rect.destX,
-    rect.destY,
-    rect.destW,
-    rect.destH,
-  );
-  ctx.restore();
-
-  // Keep outline nearly invisible to avoid noticeable edge lines.
-  ctx.strokeStyle = "rgba(0,0,0,0.10)";
-  ctx.lineWidth = 0.8 / scale;
-  ctx.stroke(path);
+  drawPieceImageInPath(ctx, path, img, rect);
+  strokePieceOutline(ctx, path, false, false, piece.isPlaced, piece.locked);
 
   return canvas;
 }

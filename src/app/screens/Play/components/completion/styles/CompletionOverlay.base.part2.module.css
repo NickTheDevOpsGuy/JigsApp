@@ -9,12 +9,30 @@
   text-align: center;
 }
 
+@keyframes completeTitlePop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .completeTitleText {
   margin: 0;
   font-size: clamp(1.7rem, 3.6vw, 2.3rem);
   font-weight: 700;
   color: var(--color-text-primary);
   letter-spacing: 0.01em;
+  animation: completeTitlePop 0.45s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeTitleText {
+    animation: none;
+  }
 }
 
 .completeTitlePhrase {
@@ -24,6 +42,13 @@
   color: var(--color-complete-gradient-start);
   text-align: center;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  animation: completeTitlePop 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) 0.08s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeTitlePhrase {
+    animation: none;
+  }
 }
 
 .completeTimeBlock {
@@ -92,6 +117,32 @@
     0 10px 30px rgba(15, 23, 42, 0.35);
 }
 
+/* Subtle glow ripple across the completed puzzle image */
+@keyframes completeRipple {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.completeImageWrapNew.completeImageGlow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand-primary) 25%, transparent) 0%,
+    transparent 60%
+  );
+  animation: completeRipple 1.2s ease-out 1;
+}
+
 .completeImageNew {
   display: block;
   width: 100%;
@@ -101,15 +152,42 @@
   object-position: center;
 }
 
-/* Two stat cards: Time | Moves – dark translucent, white border, icon + label + value */
+/* Stats panel: time / moves – prominent row of stat cards */
+.completeStatsPanel {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.completeStatsPanelTitle {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
 .completeStatCards {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
   width: 100%;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-  margin-top: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  background: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
+  overflow: hidden;
+}
+
+@keyframes completeStatCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .completeStatCard {
@@ -120,6 +198,29 @@
   padding: 14px 10px 12px;
   background: transparent;
   border-right: 1px solid var(--color-border);
+  opacity: 0;
+  animation: completeStatCardIn 0.4s ease-out both;
+}
+
+/* Stagger stat cards when panel reaches "time" phase */
+.completePanelNew[data-anim-phase="time"] .completeStatCard:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.completePanelNew[data-anim-phase="time"] .completeStatCard:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.completePanelNew[data-anim-phase="time"] .completeStatCard:nth-child(3) {
+  animation-delay: 0.19s;
+}
+.completePanelNew[data-anim-phase="time"] .completeStatCard:nth-child(4) {
+  animation-delay: 0.26s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeStatCard {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 .completeStatCard:last-child {

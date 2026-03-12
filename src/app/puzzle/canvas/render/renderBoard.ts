@@ -30,6 +30,7 @@ import type {
   DebugFlags,
   AnimationState,
   PieceCache,
+  PathCache,
 } from "@/puzzle/canvas/utils/renderBoardTypes";
 
 export type {
@@ -39,6 +40,7 @@ export type {
   DebugFlags,
   AnimationState,
   PieceCache,
+  PathCache,
 } from "@/puzzle/canvas/utils/renderBoardTypes";
 
 const LOCK_GLOW_MS = 580;
@@ -56,10 +58,23 @@ export function renderBoard(
   dragState?: DragState,
   animState?: AnimationState,
   pieceCache?: PieceCache,
+  pathCache?: PathCache,
   viewport?: ViewportTransform,
   snapParticles?: SnapParticle[],
 ) {
   const canvas = ctx.canvas;
+
+  if (pathCache && state.pieces.length > 0) {
+    for (const p of state.pieces) {
+      if (p.shapePath && p.shapePath.length > 0 && !pathCache.has(p.id)) {
+        try {
+          pathCache.set(p.id, new Path2D(p.shapePath));
+        } catch {
+          /* ignore invalid path */
+        }
+      }
+    }
+  }
 
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -129,14 +144,23 @@ export function renderBoard(
   }
 
   if (animState?.showGhostHint && !state.isComplete) {
-    drawGhostHints(ctx, state.pieces, img, cols, rows, animState.ghostAlpha ?? 0.35);
+    drawGhostHints(
+      ctx,
+      state.pieces,
+      img,
+      cols,
+      rows,
+      animState.ghostAlpha ?? 0.35,
+      pathCache,
+    );
   }
 
   const snapPreview = animState?.snapPreview;
   const showTargetSlotGlow =
     animState?.snapGlowEnabled !== false &&
     dragState?.activeId != null &&
-    snapPreview?.inSnapRange === true;
+    snapPreview &&
+    (snapPreview.nearSnap || snapPreview.inSnapRange);
   if (showTargetSlotGlow) {
     const active = state.pieces.find((p) => p.id === dragState!.activeId);
     if (active && !active.inTray) {
@@ -144,9 +168,26 @@ export function renderBoard(
       const cy = active.targetY - active.pad + active.h / 2;
       const radius = Math.max(active.w, active.h) * 0.55;
       const proximity = Math.max(0, snapPreview.proximity ?? 0);
-      const proximityEased = 1 - (1 - proximity) * (1 - proximity) * (1 - proximity);
+      const proximityEased = 1 - (1 - proximity) ** 3;
+      const inRange = snapPreview.inSnapRange === true;
       const veryCloseBoost = proximity > 0.82 ? ((proximity - 0.82) / 0.18) * 0.55 : 0;
-      const alpha = Math.min(1, 0.06 + 0.35 * proximityEased + veryCloseBoost);
+      const alpha = inRange
+        ? Math.min(1, 0.06 + 0.35 * proximityEased + veryCloseBoost)
+        : Math.min(0.5, 0.04 + 0.2 * proximityEased);
+      drawTargetSlotGlow(ctx, cx, cy, radius, alpha, nowMs);
+    }
+  }
+
+  /* Hover: edge highlight glow on potential snap targets (empty slots adjacent to placed). */
+  const hoverSlots = animState?.hoverSnapTargetSlots;
+  if (hoverSlots?.length && !dragState?.activeId) {
+    const tileW = assembledW / cols;
+    const tileH = assembledH / rows;
+    const radius = Math.max(tileW, tileH) * 0.52;
+    const alpha = 0.18;
+    for (const slot of hoverSlots) {
+      const cx = (slot.col + 0.5) * tileW;
+      const cy = (slot.row + 0.5) * tileH;
       drawTargetSlotGlow(ctx, cx, cy, radius, alpha, nowMs);
     }
   }
@@ -190,6 +231,7 @@ export function renderBoard(
       lockElapsedMs,
       animState,
       pieceCache,
+      pathCache,
       dpr,
     );
     if (
@@ -213,7 +255,7 @@ export function renderBoard(
       !p.isPlaced &&
       (p.row === 0 || p.row === rows - 1 || p.col === 0 || p.col === cols - 1)
     ) {
-      drawEdgePieceHighlight(ctx, drawPieceData);
+      drawEdgePieceHighlight(ctx, drawPieceData, pathCache);
     }
   }
 

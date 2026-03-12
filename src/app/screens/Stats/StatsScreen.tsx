@@ -99,6 +99,11 @@ export function StatsScreen() {
                   profileSaving={state.profileSaving}
                   loadData={loadData}
                   onNavigateToBoard={() => state.setActiveTab("leaderboard")}
+                  onSeeRankingFor4x4={() => {
+                    state.setActiveTab("leaderboard");
+                    state.setLeaderboardType("alltime");
+                    state.setAllTimeGrid("4x4");
+                  }}
                 />
               )}
 
@@ -106,6 +111,8 @@ export function StatsScreen() {
                 <LeaderboardTab
                   leaderboardType={state.leaderboardType}
                   setLeaderboardType={state.setLeaderboardType}
+                  leaderboardMetric={state.leaderboardMetric}
+                  setLeaderboardMetric={state.setLeaderboardMetric}
                   weekSubview={state.weekSubview}
                   setWeekSubview={state.setWeekSubview}
                   allTimeGrid={state.allTimeGrid}
@@ -119,8 +126,10 @@ export function StatsScreen() {
                   sourceFilter={state.sourceFilter}
                   setSourceFilter={state.setSourceFilter}
                   leaderboard={state.leaderboard}
+                  efficiencyLeaderboard={state.efficiencyLeaderboard}
                   weeklyTotalsLeaderboard={state.weeklyTotalsLeaderboard}
                   todayCompletionCount={state.todayCompletionCount}
+                  currentUserId={state.currentUserId}
                   weeklyAlbumSlots={state.weeklyAlbumSlots}
                   weeklyAlbumProgress={state.weeklyAlbumProgress}
                   weeklyCompleted={weeklyCompleted}

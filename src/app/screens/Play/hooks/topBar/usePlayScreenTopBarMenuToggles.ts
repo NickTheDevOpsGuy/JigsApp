@@ -33,6 +33,7 @@ export function buildHeaderMenuToggleProps(args: {
   setShowHowToPlay: (v: boolean) => void;
   toggleDebug: () => void;
   togglePerfOverlay: () => void;
+  toggleShowSilhouette: () => void;
   immersiveMode: boolean;
   handleToggleImmersiveMode: () => void;
   setProgressiveRevealMode: (fn: (v: boolean) => boolean) => void;
@@ -90,6 +91,7 @@ export function buildHeaderMenuToggleProps(args: {
     setShowHowToPlay,
     toggleDebug,
     togglePerfOverlay,
+    toggleShowSilhouette,
     immersiveMode,
     handleToggleImmersiveMode,
     setProgressiveRevealMode,
@@ -151,6 +153,7 @@ export function buildHeaderMenuToggleProps(args: {
     onShowHowToPlay: () => setShowHowToPlay(true),
     onToggleDebug: toggleDebug,
     onTogglePerfOverlay: togglePerfOverlay,
+    onToggleShowSilhouette: toggleShowSilhouette,
     immersiveMode,
     onToggleImmersiveMode: withHaptic(hapticsEnabled, handleToggleImmersiveMode),
     onToggleProgressiveReveal: withHaptic(hapticsEnabled, () =>

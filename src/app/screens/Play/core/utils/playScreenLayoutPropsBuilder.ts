@@ -40,6 +40,7 @@ interface PlayScreenLayoutArgs {
   showFeedbackChoice: boolean;
   state: import("@/puzzle/core/types").PuzzleState | null;
   completionProps: unknown;
+  postCompletionCta: { label: string; onNext: () => void } | null;
   replayPortalProps: unknown;
   mainRef: React.RefObject<HTMLDivElement>;
   boardRef: React.RefObject<HTMLDivElement>;
@@ -173,6 +174,7 @@ export function createPlayScreenLayoutProps(
       puzzleKey: args.puzzleKey,
       state: args.state,
       isComplete: args.isComplete,
+      postCompletionCta: args.postCompletionCta,
       isLoading: args.isLoading,
       elapsedLabel: `Solved in ${formatTime(args.elapsedSeconds)}!`,
       movesLabel: args.moveCount === 1 ? "1 move" : `${args.moveCount} moves`,

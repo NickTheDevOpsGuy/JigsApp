@@ -3,16 +3,24 @@
  */
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import type { LeaderboardEntry } from "@/services/leaderboard/leaderboardService";
+import type {
+  LeaderboardEntry,
+  EfficiencyEntry,
+} from "@/services/leaderboard/leaderboardService";
 import type {
   PieceCutType,
   VisualModifierFilter,
   CompletionSourceFilter,
 } from "@/services/leaderboard/leaderboardService";
 import type { StatsTab } from "../components/StatsTabBar";
-import type { LeaderboardType, WeekSubview, WeeklyAlbumSlot } from "../tabs";
+import type {
+  LeaderboardType,
+  LeaderboardSortMetric,
+  WeekSubview,
+  WeeklyAlbumSlot,
+} from "../tabs";
 
-export type { LeaderboardType };
+export type { LeaderboardType, LeaderboardSortMetric };
 
 const VALID_TABS: readonly StatsTab[] = ["profile", "leaderboard", "achievements"];
 
@@ -36,6 +44,8 @@ export function useStatsScreenState() {
   }, [tabFromUrl]);
 
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("today");
+  const [leaderboardMetric, setLeaderboardMetric] =
+    useState<LeaderboardSortMetric>("time");
   const [weekSubview, setWeekSubview] = useState<WeekSubview>("rankings");
   const [allTimeGrid, setAllTimeGrid] = useState<"3x3" | "4x4" | "5x5" | "6x6">("4x4");
   const [cutTypeFilter, setCutTypeFilter] = useState<PieceCutType>("all");
@@ -63,6 +73,9 @@ export function useStatsScreenState() {
   } | null>(null);
   const [displayNameInput, setDisplayNameInput] = useState("");
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [efficiencyLeaderboard, setEfficiencyLeaderboard] = useState<EfficiencyEntry[]>(
+    [],
+  );
   const [weeklyTotalsLeaderboard, setWeeklyTotalsLeaderboard] = useState<
     { rank: number; count: number; displayName: string }[]
   >([]);
@@ -85,6 +98,7 @@ export function useStatsScreenState() {
   const [shareCopied, setShareCopied] = useState(false);
   const [albumShareCopied, setAlbumShareCopied] = useState(false);
   const [raccoonName, setRaccoonName] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [rowAnimEpoch, setRowAnimEpoch] = useState(0);
 
   return {
@@ -92,6 +106,8 @@ export function useStatsScreenState() {
     setActiveTab,
     leaderboardType,
     setLeaderboardType,
+    leaderboardMetric,
+    setLeaderboardMetric,
     weekSubview,
     setWeekSubview,
     allTimeGrid,
@@ -112,6 +128,8 @@ export function useStatsScreenState() {
     setDisplayNameInput,
     leaderboard,
     setLeaderboard,
+    efficiencyLeaderboard,
+    setEfficiencyLeaderboard,
     weeklyTotalsLeaderboard,
     setWeeklyTotalsLeaderboard,
     weeklyAlbumSlots,
@@ -134,6 +152,8 @@ export function useStatsScreenState() {
     setAlbumShareCopied,
     raccoonName,
     setRaccoonName,
+    currentUserId,
+    setCurrentUserId,
     rowAnimEpoch,
     setRowAnimEpoch,
   };

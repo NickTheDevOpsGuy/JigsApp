@@ -38,4 +38,8 @@ export interface CompletionOverlayProps {
   onNextPuzzle?: () => void;
   /** Ref for focus return when coming back from replay (e.g. close button). */
   focusReturnRef?: React.RefObject<HTMLButtonElement>;
+  /** Called after Supabase completion record (e.g. for streak milestone toast). */
+  onCompletionRecorded?: (stats: { dailyStreak: number }) => void;
+  /** Called once when overlay is shown with a new personal best (e.g. haptic). */
+  onNewBest?: () => void;
 }

@@ -66,6 +66,7 @@ type PlayScreenLayoutProps = {
     };
     isPaused: boolean;
     onResume: () => void;
+    postCompletionCta: { label: string; onNext: () => void } | null;
   };
   tray: {
     show: boolean;
@@ -174,6 +175,17 @@ export function PlayScreenLayout({
                           {board.movesLabel}
                         </span>
                       </div>
+                      {board.postCompletionCta && (
+                        <div className={styles.boardCompleteNextCta}>
+                          <button
+                            type="button"
+                            className={styles.boardCompleteNextCtaBtn}
+                            onClick={board.postCompletionCta.onNext}
+                          >
+                            {board.postCompletionCta.label}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                   {board.isLoading && (

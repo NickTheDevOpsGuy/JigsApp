@@ -5,6 +5,7 @@ import React, { useEffect, useCallback, useState } from "react";
 import { X } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { useCompletionOverlayData } from "@/screens/Play/components/completion/useCompletionOverlayData";
+import { useCompletionConfetti } from "@/screens/Play/components/completion/useCompletionConfetti";
 import { CompletionOverlayActions } from "@/screens/Play/components/completion/CompletionOverlayActions";
 import { CompletionOverlayStats } from "@/screens/Play/components/completion/CompletionOverlayStats";
 import { useCompletionOverlayMenus } from "@/screens/Play/components/completion/useCompletionOverlayMenus";
@@ -48,11 +49,19 @@ export function CompletionOverlay({
   onReplayClick,
   onNextPuzzle,
   focusReturnRef,
+  onCompletionRecorded,
+  onNewBest,
 }: CompletionOverlayProps) {
   const [animPhase, setAnimPhase] = useState<"title" | "scale" | "glow" | "time">(
     "title",
   );
   const [imageError, setImageError] = useState(false);
+
+  useCompletionConfetti();
+
+  useEffect(() => {
+    if (isNewBest && onNewBest) onNewBest();
+  }, [isNewBest, onNewBest]);
 
   const handleClose = useCallback(() => onClose(), [onClose]);
 
@@ -71,6 +80,9 @@ export function CompletionOverlay({
     cutType,
     undoCount,
     puzzleShareUrl,
+    onCompletionRecorded: onCompletionRecorded
+      ? (stats) => onCompletionRecorded({ dailyStreak: stats.dailyStreak })
+      : undefined,
   });
   const {
     shareMenuOpen,

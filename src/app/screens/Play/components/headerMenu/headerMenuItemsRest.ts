@@ -76,6 +76,19 @@ export function getRestItems(
       checked: props.debug.showPerfOverlay,
     },
     {
+      id: "showSilhouette",
+      section: "settings",
+      visible: props.canShowDebug && !!props.onToggleShowSilhouette,
+      label: "Silhouette debug",
+      sortKey: "Silhouette debug",
+      title:
+        "Render pieces as solid color + black outline only (confirms shapes, no seams)",
+      onClick: c(props.onToggleShowSilhouette ?? (() => {})),
+      subMenu: "advanced",
+      isToggle: true,
+      checked: !!props.debug.showSilhouette,
+    },
+    {
       id: "resetStats",
       section: "settings",
       visible: !!props.onResetStats,

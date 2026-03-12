@@ -70,6 +70,7 @@ export type BuildHeaderMenuPropsArgs = {
   setShowHowToPlay: (v: boolean) => void;
   toggleDebug: () => void;
   togglePerfOverlay: () => void;
+  toggleShowSilhouette: () => void;
   immersiveMode: boolean;
   handleToggleImmersiveMode: () => void;
   progressiveRevealMode: boolean;

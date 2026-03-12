@@ -9,13 +9,12 @@ import type {
   DebugFlags,
   AnimationState,
   PieceCache,
+  PathCache,
 } from "@/puzzle/canvas/utils/renderBoardTypes";
 import {
   snapPopScale,
   snapGlowAlpha,
   drawSnapGlow,
-  applyPieceShadow,
-  clearPieceShadow,
   computeImageSourceRect,
   DRAG_LIFT_PX,
   DRAG_SCALE,
@@ -26,7 +25,12 @@ import {
   drawWrongRotationIcon,
   drawLockGlow,
 } from "./renderBoardDrawOverlays";
-import { strokePieceOutline, drawCachedPiece } from "./renderBoardDrawPieceHelpers";
+import {
+  drawSilhouetteShadow,
+  drawPieceImageInPath,
+  strokePieceOutline,
+  drawCachedPiece,
+} from "./renderBoardDrawPieceHelpers";
 export function drawPiece(
   ctx: CanvasRenderingContext2D,
   p: Piece,
@@ -42,6 +46,7 @@ export function drawPiece(
   lockElapsedMs: number,
   animState?: AnimationState,
   pieceCache?: PieceCache,
+  pathCache?: PathCache,
   dpr: number = 1,
 ) {
   const isSelected = animState?.selectedPieceId === p.id && !p.isPlaced;
@@ -91,12 +96,24 @@ export function drawPiece(
   }
 
   let path: Path2D | null = null;
-  try {
-    if (p.shapePath && p.shapePath.length > 0) {
+  if (pathCache && p.shapePath && p.shapePath.length > 0) {
+    path =
+      pathCache.get(p.id) ??
+      (() => {
+        try {
+          const q = new Path2D(p.shapePath);
+          pathCache.set(p.id, q);
+          return q;
+        } catch {
+          return null;
+        }
+      })();
+  } else if (p.shapePath && p.shapePath.length > 0) {
+    try {
       path = new Path2D(p.shapePath);
+    } catch {
+      path = null;
     }
-  } catch {
-    path = null;
   }
 
   if (!path) {
@@ -106,6 +123,22 @@ export function drawPiece(
     ctx.lineWidth = 2;
     ctx.fillRect(p.x, p.y, p.w, p.h);
     ctx.strokeRect(p.x, p.y, p.w, p.h);
+    ctx.restore();
+    return;
+  }
+
+  if (debug.showSilhouette) {
+    ctx.save();
+    ctx.translate(p.x + p.w / 2 + shake.x, p.y + p.h / 2 + shake.y);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.translate(-p.w / 2, -p.h / 2);
+    ctx.fillStyle = "rgba(180, 200, 220, 0.9)";
+    ctx.fill(path);
+    ctx.strokeStyle = "rgba(0,0,0,1)";
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.stroke(path);
     ctx.restore();
     return;
   }
@@ -150,26 +183,11 @@ export function drawPiece(
     const offCtx = off.getContext("2d");
     if (offCtx) {
       const rect = computeImageSourceRect(p, img, cols, rows);
-      offCtx.imageSmoothingEnabled = true;
-      offCtx.imageSmoothingQuality = "high";
       offCtx.scale(dpr, dpr);
       offCtx.translate(cacheW / 2, cacheH / 2);
       offCtx.rotate((p.rotation * Math.PI) / 180);
       offCtx.translate(-p.w / 2, -p.h / 2);
-      offCtx.save();
-      offCtx.clip(path);
-      offCtx.drawImage(
-        img,
-        rect.srcX,
-        rect.srcY,
-        rect.srcW,
-        rect.srcH,
-        rect.destX,
-        rect.destY,
-        rect.destW,
-        rect.destH,
-      );
-      offCtx.restore();
+      drawPieceImageInPath(offCtx, path, img, rect);
       pieceCache.set(cacheKey, off);
       cacheCanvas = off;
     }
@@ -201,30 +219,15 @@ export function drawPiece(
   }
 
   const rect = computeImageSourceRect(p, img, cols, rows);
-  ctx.save();
-  applyPieceShadow(ctx, isDragging, p.isPlaced);
   const liftY = isDragging ? -DRAG_LIFT_PX : 0;
+  ctx.save();
   ctx.translate(p.x + p.w / 2 + shake.x, p.y + p.h / 2 + shake.y + liftY);
   ctx.rotate((p.rotation * Math.PI) / 180);
   ctx.scale(scale, scale);
   ctx.translate(-p.w / 2, -p.h / 2);
-  ctx.save();
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.clip(path);
-  ctx.drawImage(
-    img,
-    rect.srcX,
-    rect.srcY,
-    rect.srcW,
-    rect.srcH,
-    rect.destX,
-    rect.destY,
-    rect.destW,
-    rect.destH,
-  );
-  ctx.restore();
-  clearPieceShadow(ctx);
+
+  drawSilhouetteShadow(ctx, path, isDragging, p.isPlaced);
+  drawPieceImageInPath(ctx, path, img, rect);
   strokePieceOutline(
     ctx,
     path,
@@ -253,9 +256,7 @@ export function drawPiece(
     ctx.stroke(path);
     ctx.restore();
   }
-  if (showLockGlow) {
-    drawLockGlow(ctx, path, lockElapsedMs);
-  }
+  if (showLockGlow) drawLockGlow(ctx, path, lockElapsedMs);
   if (debug.showBounds) {
     ctx.strokeStyle = "rgba(255,0,0,0.35)";
     ctx.lineWidth = 1;
@@ -274,14 +275,6 @@ export function drawPiece(
       Math.min(p.w, p.h),
       shakeElapsedMs,
     );
-  }
-  if (isSelected) {
-    ctx.strokeStyle = "#667eea";
-    ctx.lineWidth = 1.5;
-    ctx.stroke(path);
-    ctx.strokeStyle = "rgba(102, 126, 234, 0.35)";
-    ctx.lineWidth = 3;
-    ctx.stroke(path);
   }
   ctx.restore();
 }

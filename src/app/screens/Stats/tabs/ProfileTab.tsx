@@ -37,10 +37,12 @@ interface ProfileTabProps {
     puzzlesCompleted?: number;
     totalPlayTimeSeconds?: number;
     dailyStreak?: number;
+    bestDailyStreak?: number;
     level?: number;
     masteryStreak?: number;
     [key: string]: unknown;
   } | null;
+  onSeeRankingFor4x4?: () => void;
   weeklyAlbumSlots: {
     date: string;
     dayLabel: string;
@@ -67,6 +69,7 @@ export function ProfileTab({
   profileSaving,
   loadData,
   onNavigateToBoard,
+  onSeeRankingFor4x4,
 }: ProfileTabProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const displayName = (
@@ -75,6 +78,7 @@ export function ProfileTab({
     "Puzzler"
   ).slice(0, 32);
   const streak = stats?.dailyStreak ?? 0;
+  const bestStreak = stats?.bestDailyStreak ?? 0;
   const level = stats?.level ?? 1;
   const tier = levelToTier(level);
   const puzzles = stats?.puzzlesCompleted ?? 0;
@@ -92,6 +96,9 @@ export function ProfileTab({
           <strong>{displayName}</strong>
         </p>
         <p className={styles.profileStreak}>🔥 {streak} day streak</p>
+        {bestStreak > 0 && bestStreak !== streak && (
+          <p className={styles.profileStatMuted}>Best: {bestStreak} days</p>
+        )}
         <p className={styles.profileTier}>{tier}</p>
       </section>
 
@@ -105,6 +112,18 @@ export function ProfileTab({
             <span className={!hasBest ? styles.profileStatMuted : undefined}>
               {bestStr}
             </span>
+            {onSeeRankingFor4x4 && (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  className={styles.profileInlineLink}
+                  onClick={onSeeRankingFor4x4}
+                >
+                  See ranking
+                </button>
+              </>
+            )}
           </span>
         </div>
         <div className={styles.profileStatsRow}>

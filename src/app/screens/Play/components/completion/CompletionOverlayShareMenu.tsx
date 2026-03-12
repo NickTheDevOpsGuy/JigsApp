@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronDown, Share2, Swords } from "lucide-react";
+import { ChevronDown, Share2, Swords, Copy, Play } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { Modal } from "@/components/Modal/Modal";
@@ -21,6 +21,8 @@ export function CompletionOverlayShareMenu(props: {
   onShareChallenge?: () => void;
   onCopyChallenge?: () => void;
   completionData: UseCompletionOverlayDataResult;
+  canReplay?: boolean;
+  onReplayClick?: () => void;
 }) {
   const {
     shareRef,
@@ -32,6 +34,8 @@ export function CompletionOverlayShareMenu(props: {
     onShareChallenge,
     onCopyChallenge,
     completionData,
+    canReplay,
+    onReplayClick,
   } = props;
 
   const sharePopupOpen = completionData.sharePopupOpen;
@@ -75,14 +79,32 @@ export function CompletionOverlayShareMenu(props: {
                 type="button"
                 role="menuitem"
                 className={styles.completeShareDropdownItem}
-                title={canNativeShare ? "Share result" : "Copy result link"}
+                title={
+                  canNativeShare ? "Share result via social or apps" : "Copy result link"
+                }
                 onClick={() => {
                   const fn = canNativeShare ? onShareProgress : onCopyProgress;
                   if (typeof fn === "function") fn();
                 }}
               >
                 <Share2 size={16} aria-hidden />
-                <span>{copied ? "Copied!" : "Share Result"}</span>
+                <span>
+                  {copied ? "Copied!" : canNativeShare ? "Social share" : "Share Result"}
+                </span>
+              </button>
+            )}
+            {canNativeShare && onCopyProgress && (
+              <button
+                type="button"
+                role="menuitem"
+                className={styles.completeShareDropdownItem}
+                title="Copy result link to clipboard"
+                onClick={() => {
+                  if (typeof onCopyProgress === "function") onCopyProgress();
+                }}
+              >
+                <Copy size={16} aria-hidden />
+                <span>{copied ? "Copied!" : "Copy link"}</span>
               </button>
             )}
             {(onShareChallenge || onCopyChallenge) && (
@@ -103,6 +125,21 @@ export function CompletionOverlayShareMenu(props: {
               >
                 <Swords size={16} aria-hidden />
                 <span>{copied ? "Copied!" : "Challenge a Friend"}</span>
+              </button>
+            )}
+            {canReplay && onReplayClick && (
+              <button
+                type="button"
+                role="menuitem"
+                className={styles.completeShareDropdownItem}
+                title="Open replay viewer to watch your solve"
+                onClick={() => {
+                  completionData.setSharePopupOpen(false);
+                  onReplayClick();
+                }}
+              >
+                <Play size={16} aria-hidden />
+                <span>Replay viewer</span>
               </button>
             )}
           </div>

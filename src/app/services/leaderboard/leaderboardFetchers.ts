@@ -8,7 +8,11 @@ export {
   getPercentileRank,
 } from "./leaderboardFetchersShared";
 
-export { getDailyLeaderboard } from "./leaderboardFetchersDaily";
+export {
+  getDailyLeaderboard,
+  getDailyLeaderboardLeastMoves,
+  getDailyLeaderboardCleanest,
+} from "./leaderboardFetchersDaily";
 
 export {
   getStreakLeaderboard,
@@ -16,12 +20,17 @@ export {
   getCompletionCountLeaderboard,
 } from "./leaderboardFetchersStreaks";
 
-export { getAllTimeBestLeaderboard } from "./leaderboardFetchersAllTime";
+export {
+  getAllTimeBestLeaderboard,
+  getAllTimeBestLeastMoves,
+  getAllTimeBestCleanest,
+} from "./leaderboardFetchersAllTime";
 
 export {
   getPeriodLeaderboard,
   getWeeklyTotalsLeaderboard,
   getMonthlyTotalsLeaderboard,
+  getWeeklyEfficiencyLeaderboard,
 } from "./leaderboardFetchersPeriod";
 
 export { getMyPersonalBests } from "./leaderboardFetchersPersonal";

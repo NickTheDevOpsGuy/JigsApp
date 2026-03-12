@@ -46,6 +46,10 @@ interface CompletionOverlayGateProps {
   onNextPuzzle?: () => void;
   /** Ref for focus return when coming back from replay (e.g. close button). */
   focusReturnRef?: React.RefObject<HTMLButtonElement>;
+  /** Called after Supabase completion record (e.g. for 7-day streak toast). */
+  onCompletionRecorded?: (stats: { dailyStreak: number }) => void;
+  /** Called once when overlay is shown with a new personal best (e.g. haptic). */
+  onNewBest?: () => void;
 }
 
 export function CompletionOverlayGate({
@@ -73,6 +77,8 @@ export function CompletionOverlayGate({
   onReplayClick,
   onNextPuzzle,
   focusReturnRef,
+  onCompletionRecorded,
+  onNewBest,
 }: CompletionOverlayGateProps) {
   if (!show || !state) return null;
 
@@ -114,6 +120,8 @@ export function CompletionOverlayGate({
       usedHint={usedHint}
       visualModifier={dailyVisualModifier}
       isNewBest={isNewBest}
+      onCompletionRecorded={onCompletionRecorded}
+      onNewBest={onNewBest}
       isDaily={isDaily}
       cutType={pieceCutType}
       puzzleShareUrl={puzzleShareUrl}

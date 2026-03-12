@@ -5,11 +5,13 @@ import type {
   CompletionSourceFilter,
 } from "@/services/leaderboard/leaderboardService";
 import styles from "../StatsScreen.module.css";
-import type { LeaderboardType } from "./LeaderboardTab";
+import type { LeaderboardType, LeaderboardSortMetric } from "./LeaderboardTab";
 
 interface LeaderboardTabHeaderProps {
   leaderboardType: LeaderboardType;
   setLeaderboardType: (t: LeaderboardType) => void;
+  leaderboardMetric: LeaderboardSortMetric;
+  setLeaderboardMetric: (m: LeaderboardSortMetric) => void;
   filtersOpen: boolean;
   setFiltersOpen: (f: boolean | ((prev: boolean) => boolean)) => void;
   cutTypeFilter: PieceCutType;
@@ -25,6 +27,8 @@ interface LeaderboardTabHeaderProps {
 export function LeaderboardTabHeader({
   leaderboardType,
   setLeaderboardType,
+  leaderboardMetric,
+  setLeaderboardMetric,
   filtersOpen,
   setFiltersOpen,
   cutTypeFilter,
@@ -60,7 +64,27 @@ export function LeaderboardTabHeader({
         >
           All-time
         </button>
+        <button
+          type="button"
+          className={`${styles.boardModeBtn} ${leaderboardType === "efficiency" ? styles.boardModeBtnActive : ""}`}
+          onClick={() => setLeaderboardType("efficiency")}
+        >
+          Efficiency
+        </button>
       </div>
+      {(leaderboardType === "today" || leaderboardType === "alltime") && (
+        <select
+          id="leaderboard-metric-select"
+          className={styles.inlineFilterSelect}
+          value={leaderboardMetric}
+          onChange={(e) => setLeaderboardMetric(e.target.value as LeaderboardSortMetric)}
+          aria-label="Sort by"
+        >
+          <option value="time">Fastest</option>
+          <option value="moves">Least moves</option>
+          <option value="cleanest">Cleanest</option>
+        </select>
+      )}
       <button
         type="button"
         className={styles.filtersBar}
@@ -76,7 +100,8 @@ export function LeaderboardTabHeader({
         <div className={styles.controlsRow}>
           {(leaderboardType === "today" ||
             leaderboardType === "week" ||
-            leaderboardType === "alltime") && (
+            leaderboardType === "alltime" ||
+            leaderboardType === "efficiency") && (
             <>
               <select
                 id="cut-type-select"

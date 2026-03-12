@@ -15,6 +15,16 @@
   color: var(--color-text-secondary);
 }
 
+/* Current user row highlight */
+.leaderboardItemYou {
+  background: color-mix(in srgb, var(--color-brand-primary) 14%, transparent);
+  border-radius: 8px;
+}
+.youLabel {
+  font-weight: 600;
+  color: var(--color-brand-primary);
+}
+
 /* PZ-071: Mobile leaderboard – card layout with expandable details */
 @media (max-width: 600px) {
   .leaderboard {

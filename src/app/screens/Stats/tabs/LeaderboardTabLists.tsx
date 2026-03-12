@@ -1,7 +1,10 @@
 /**
- * LeaderboardTabLists – render time-based and completion-count leaderboard lists.
+ * LeaderboardTabLists – render time-based, completion-count, and efficiency leaderboard lists.
  */
-import type { LeaderboardEntry } from "@/services/leaderboard/leaderboardService";
+import type {
+  LeaderboardEntry,
+  EfficiencyEntry,
+} from "@/services/leaderboard/leaderboardService";
 import { formatTime, formatGap, PODIUM } from "../statsFormatting";
 import styles from "../StatsScreen.module.css";
 
@@ -11,12 +14,14 @@ export function renderTimeList(
   rowAnimEpoch: number,
   compact: boolean,
   showChampionBadge = false,
+  currentUserId?: string,
 ) {
   if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
   return (
     <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
       {entries.map((entry, index) => {
         const key = `time-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
+        const isYou = currentUserId != null && entry.userId === currentUserId;
         const next = entries[index + 1]?.elapsedSeconds;
         const gapInfo =
           index === 0 && typeof next === "number"
@@ -29,7 +34,7 @@ export function renderTimeList(
             key={key}
             className={`${styles.leaderboardItem} ${
               entry.rank <= 3 ? styles.leaderboardPodium : ""
-            } ${styles.leaderboardRowEnter}`}
+            } ${isYou ? styles.leaderboardItemYou : ""} ${styles.leaderboardRowEnter}`}
             style={{ animationDelay: `${index * 45}ms` }}
           >
             <span className={styles.rank}>
@@ -37,6 +42,7 @@ export function renderTimeList(
             </span>
             <span className={styles.player}>
               {entry.displayName}
+              {isYou && <span className={styles.youLabel}> (You)</span>}
               {showChampionBadge && entry.rank === 1 && (
                 <span className={styles.championBadge} title="Challenge winner">
                   {" "}
@@ -63,29 +69,77 @@ export function renderTimeList(
 }
 
 export function renderCompletionList(
-  entries: { rank: number; count: number; displayName: string }[],
+  entries: { rank: number; count: number; displayName: string; userId?: string }[],
   rowAnimEpoch: number,
   compact: boolean,
   emptyMsg = "No completions yet. Play puzzles!",
+  currentUserId?: string,
 ) {
   if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
   return (
     <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
       {entries.map((entry) => {
         const key = `completion-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
+        const isYou = currentUserId != null && entry.userId === currentUserId;
         return (
           <li
             key={key}
             className={`${styles.leaderboardItem} ${
               entry.rank <= 3 ? styles.leaderboardPodium : ""
-            } ${styles.leaderboardRowEnter}`}
+            } ${isYou ? styles.leaderboardItemYou : ""} ${styles.leaderboardRowEnter}`}
             style={{ animationDelay: `${(entry.rank - 1) * 45}ms` }}
           >
             <span className={styles.rank}>
               {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
             </span>
-            <span className={styles.player}>{entry.displayName}</span>
+            <span className={styles.player}>
+              {entry.displayName}
+              {isYou && <span className={styles.youLabel}> (You)</span>}
+            </span>
             <span className={styles.time}>{entry.count} puzzles</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+export function renderEfficiencyList(
+  entries: EfficiencyEntry[],
+  rowAnimEpoch: number,
+  compact: boolean,
+  emptyMsg = "No efficiency data this week.",
+  currentUserId?: string,
+) {
+  if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
+  return (
+    <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
+      {entries.map((entry) => {
+        const key = `efficiency-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
+        const isYou = currentUserId != null && entry.userId === currentUserId;
+        return (
+          <li
+            key={key}
+            className={`${styles.leaderboardItem} ${
+              entry.rank <= 3 ? styles.leaderboardPodium : ""
+            } ${isYou ? styles.leaderboardItemYou : ""} ${styles.leaderboardRowEnter}`}
+            style={{ animationDelay: `${(entry.rank - 1) * 45}ms` }}
+          >
+            <span className={styles.rank}>
+              {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+            </span>
+            <span className={styles.player}>
+              {entry.displayName}
+              {isYou && <span className={styles.youLabel}> (You)</span>}
+            </span>
+            <span className={styles.timeCol}>
+              <span className={styles.time}>
+                {entry.efficiencySecPerMove.toFixed(1)} s/move
+              </span>
+              <span className={styles.movesInfo}>
+                {formatTime(entry.elapsedSeconds)} · {entry.moveCount} moves
+              </span>
+            </span>
           </li>
         );
       })}

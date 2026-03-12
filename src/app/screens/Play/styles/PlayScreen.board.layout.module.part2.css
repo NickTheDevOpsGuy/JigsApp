@@ -33,12 +33,27 @@
   scroll-snap-stop: always;
   scroll-padding-inline: 0;
   padding: 8px 12px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96, 145, 219, 0.86) rgba(11, 20, 36, 0.82);
 }
 
 .trayScroll::-webkit-scrollbar {
-  display: none;
+  height: 8px;
+}
+
+.trayScroll::-webkit-scrollbar-track {
+  background: rgba(11, 20, 36, 0.82);
+  border-radius: 999px;
+}
+
+.trayScroll::-webkit-scrollbar-thumb {
+  background: rgba(96, 145, 219, 0.86);
+  border-radius: 999px;
+  border: 1px solid rgba(13, 26, 46, 0.9);
+}
+
+.trayScroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(123, 175, 248, 0.92);
 }
 
 .trayPieces {

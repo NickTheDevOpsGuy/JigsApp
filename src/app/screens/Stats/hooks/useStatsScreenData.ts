@@ -9,10 +9,15 @@ import {
 } from "@/services/leaderboard/leaderboardService";
 import {
   getDailyLeaderboard,
+  getDailyLeaderboardLeastMoves,
+  getDailyLeaderboardCleanest,
   getTodayCompletionCount,
   subscribeTodayCompletionCount,
   getWeeklyTotalsLeaderboard,
   getAllTimeBestLeaderboard,
+  getAllTimeBestLeastMoves,
+  getAllTimeBestCleanest,
+  getWeeklyEfficiencyLeaderboard,
 } from "@/services/leaderboard/leaderboardService";
 import { getMyAchievements } from "@/services/player/achievementsService";
 import { getMyStats } from "@/services/player/statsService";
@@ -31,6 +36,7 @@ export function useStatsScreenData(
   const {
     activeTab,
     leaderboardType,
+    leaderboardMetric,
     cutTypeFilter,
     modifierFilter,
     sourceFilter,
@@ -44,6 +50,7 @@ export function useStatsScreenData(
     setProfile,
     setDisplayNameInput,
     setLeaderboard,
+    setEfficiencyLeaderboard,
     setTodayCompletionCount,
     setWeeklyTotalsLeaderboard,
     setAchievements,
@@ -51,6 +58,7 @@ export function useStatsScreenData(
     setLeaderboardType,
     setWeekSubview: _setWeekSubview,
     setRaccoonName,
+    setCurrentUserId,
     setRowAnimEpoch,
     setProfileSaving,
   } = state;
@@ -96,10 +104,18 @@ export function useStatsScreenData(
     setDisplayNameInput(p?.displayName ?? "");
     setAchievements(a ?? []);
     const today = getTodayDateString();
+    const cutType = cutTypeFilter === "all" ? "all" : cutTypeFilter;
+    const visualModifier = modifierFilter;
+    const dailyFetcher =
+      leaderboardMetric === "moves"
+        ? getDailyLeaderboardLeastMoves
+        : leaderboardMetric === "cleanest"
+          ? getDailyLeaderboardCleanest
+          : getDailyLeaderboard;
     const [lb, todayCount, wklb] = await Promise.all([
-      getDailyLeaderboard(today, 10, cutTypeFilter, modifierFilter, sourceFilter),
+      dailyFetcher(today, 10, cutType, visualModifier, sourceFilter),
       getTodayCompletionCount(today),
-      getWeeklyTotalsLeaderboard(10, cutTypeFilter, modifierFilter, sourceFilter),
+      getWeeklyTotalsLeaderboard(10, cutType, visualModifier, sourceFilter),
     ]);
     setLeaderboard(lb);
     setRowAnimEpoch((n) => n + 1);
@@ -109,6 +125,7 @@ export function useStatsScreenData(
     setLoading(false);
   }, [
     configured,
+    leaderboardMetric,
     cutTypeFilter,
     modifierFilter,
     sourceFilter,
@@ -135,9 +152,14 @@ export function useStatsScreenData(
   useEffect(() => {
     if (!configured) return;
     getUserId().then((uid) => {
-      if (uid) setRaccoonName(getAnonymousDisplayName(uid));
+      if (uid) {
+        setRaccoonName(getAnonymousDisplayName(uid));
+        setCurrentUserId(uid);
+      } else {
+        setCurrentUserId(null);
+      }
     });
-  }, [configured, setRaccoonName]);
+  }, [configured, setRaccoonName, setCurrentUserId]);
 
   useEffect(() => {
     if (!configured || activeTab !== "leaderboard") return;
@@ -164,13 +186,13 @@ export function useStatsScreenData(
       const cutType = cutTypeFilter === "all" ? "all" : cutTypeFilter;
       const visualModifier = modifierFilter;
       if (leaderboardType === "today") {
-        const lb = await getDailyLeaderboard(
-          today,
-          10,
-          cutType,
-          visualModifier,
-          sourceFilter,
-        );
+        const fetcher =
+          leaderboardMetric === "moves"
+            ? getDailyLeaderboardLeastMoves
+            : leaderboardMetric === "cleanest"
+              ? getDailyLeaderboardCleanest
+              : getDailyLeaderboard;
+        const lb = await fetcher(today, 10, cutType, visualModifier, sourceFilter);
         setLeaderboard(lb);
         setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "week") {
@@ -182,15 +204,23 @@ export function useStatsScreenData(
         setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "alltime") {
         const [r, c] = allTimeGrid.split("x").map(Number);
-        const lb = await getAllTimeBestLeaderboard(
-          r,
-          c,
+        const fetcher =
+          leaderboardMetric === "moves"
+            ? getAllTimeBestLeastMoves
+            : leaderboardMetric === "cleanest"
+              ? getAllTimeBestCleanest
+              : getAllTimeBestLeaderboard;
+        const lb = await fetcher(r, c, 10, cutType, visualModifier, sourceFilter);
+        setLeaderboard(lb);
+        setRowAnimEpoch((n) => n + 1);
+      } else if (leaderboardType === "efficiency") {
+        const eff = await getWeeklyEfficiencyLeaderboard(
           10,
           cutType,
           visualModifier,
           sourceFilter,
         );
-        setLeaderboard(lb);
+        setEfficiencyLeaderboard(eff);
         setRowAnimEpoch((n) => n + 1);
       }
     };
@@ -199,12 +229,14 @@ export function useStatsScreenData(
     configured,
     activeTab,
     leaderboardType,
+    leaderboardMetric,
     allTimeGrid,
     cutTypeFilter,
     modifierFilter,
     sourceFilter,
     loadWeeklyAlbum,
     setLeaderboard,
+    setEfficiencyLeaderboard,
     setWeeklyTotalsLeaderboard,
     setRowAnimEpoch,
   ]);

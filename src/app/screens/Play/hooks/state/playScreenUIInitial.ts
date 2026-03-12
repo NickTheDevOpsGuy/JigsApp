@@ -146,4 +146,5 @@ export const DEBUG_INITIAL: DebugFlags = {
   showBounds: false,
   showIds: false,
   showPerfOverlay: false,
+  showSilhouette: false,
 };

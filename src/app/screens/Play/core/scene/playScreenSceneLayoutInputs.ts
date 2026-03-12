@@ -1,6 +1,7 @@
 /**
  * Build layout inputs (completion, replay, visuals) for play screen. Split out to keep playScreenSceneLayout under 300 lines.
  */
+import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { SHOW_DEBUG } from "@/screens/Play/core/utils/playScreenUtils";
 import {
   buildCompletionProps,
@@ -130,6 +131,19 @@ export function usePlayScreenLayoutInputs(ctx: any) {
       scene.setReplayBarOpen(true);
     },
     onNextPuzzle: handleNewGame,
+    onCompletionRecorded: (stats) => {
+      if (stats.dailyStreak === 7) {
+        scene.setShareToast("7-day streak! 🔥");
+        if (typeof navigator !== "undefined" && navigator.vibrate) {
+          navigator.vibrate([30, 50, 30, 50, 80]);
+        }
+      }
+    },
+    onNewBest: () => {
+      if (ui.hapticsEnabled && typeof navigator?.vibrate === "function") {
+        navigator.vibrate([20, 30, 20]);
+      }
+    },
   });
 
   const baseReplayProps = buildReplayPortalProps({
@@ -215,6 +229,15 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     showFeedbackChoice: ui.showFeedbackChoice,
     state,
     completionProps,
+    postCompletionCta:
+      scene.completionDismissed && state?.isComplete
+        ? {
+            label: isDailyPuzzleSession()
+              ? "Play today's puzzle"
+              : "One more from this pack",
+            onNext: handleNewGame,
+          }
+        : null,
     replayPortalProps,
     mainRef,
     boardRef,

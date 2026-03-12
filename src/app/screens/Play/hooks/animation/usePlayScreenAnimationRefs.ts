@@ -4,6 +4,7 @@ export function usePlayScreenAnimationRefs() {
   const rafRef = useRef<number | null>(null);
   const completedAtRef = useRef<number | null>(null);
   const pieceCacheRef = useRef<Map<string, HTMLCanvasElement>>(new Map());
+  const pathCacheRef = useRef<Map<string, Path2D>>(new Map());
   const lastCompleteRef = useRef<boolean>(false);
   const lastPieceCountRef = useRef<number>(0);
   const lastFrameTimeRef = useRef<number>(0);
@@ -19,6 +20,7 @@ export function usePlayScreenAnimationRefs() {
     rafRef,
     completedAtRef,
     pieceCacheRef,
+    pathCacheRef,
     lastCompleteRef,
     lastPieceCountRef,
     lastFrameTimeRef,

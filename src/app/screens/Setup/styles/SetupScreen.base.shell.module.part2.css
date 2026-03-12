@@ -1,11 +1,13 @@
+/* Keep glassmorphic X consistent with other dialogs (hover glow, focus ring) */
 .closeBtn:hover {
-  border-color: rgba(140, 184, 255, 0.78);
-  background: linear-gradient(180deg, rgba(31, 56, 96, 0.94), rgba(22, 42, 74, 0.94));
-  color: #e7f2ff;
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--color-brand-primary) 50%, transparent),
+    0 0 14px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }
 
 .closeBtn:focus-visible {
-  outline: 2px solid rgba(117, 180, 255, 0.92);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 

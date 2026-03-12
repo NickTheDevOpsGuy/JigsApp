@@ -3,17 +3,37 @@
  * Piece drawing (drawPiece, drawGhostHints) lives in renderBoardDrawPiece.ts.
  */
 import type { Piece, PuzzleState } from "@/puzzle/core/types";
+import type { PathCache } from "@/puzzle/canvas/utils/renderBoardTypes";
 import { drawPiece, drawGhostHints } from "./renderBoardDrawPiece";
 
 export { drawPiece, drawGhostHints };
 
-export function drawEdgePieceHighlight(ctx: CanvasRenderingContext2D, p: Piece) {
-  let path: Path2D | null = null;
-  try {
-    if (p.shapePath && p.shapePath.length > 0) path = new Path2D(p.shapePath);
-  } catch {
-    path = null;
+function getPathForPiece(pathCache: PathCache | undefined, p: Piece): Path2D | null {
+  if (pathCache && p.shapePath && p.shapePath.length > 0) {
+    const existing = pathCache.get(p.id);
+    if (existing) return existing;
+    try {
+      const path = new Path2D(p.shapePath);
+      pathCache.set(p.id, path);
+      return path;
+    } catch {
+      return null;
+    }
   }
+  if (!p.shapePath || p.shapePath.length === 0) return null;
+  try {
+    return new Path2D(p.shapePath);
+  } catch {
+    return null;
+  }
+}
+
+export function drawEdgePieceHighlight(
+  ctx: CanvasRenderingContext2D,
+  p: Piece,
+  pathCache?: PathCache,
+) {
+  const path = getPathForPiece(pathCache, p);
   if (!path) return;
   ctx.save();
   ctx.globalAlpha = 0.35;
@@ -26,10 +46,10 @@ export function drawEdgePieceHighlight(ctx: CanvasRenderingContext2D, p: Piece) 
   ctx.restore();
 }
 
-const COMPLETION_GLOW_DURATION_MS = 400;
-const COMPLETION_GLOW_ROW_FADE_MS = 120;
-const COMPLETION_GLOW_MAX_ALPHA = 0.28;
-const COMPLETION_GLOW_TOTAL_MS = 2400;
+const COMPLETION_GLOW_DURATION_MS = 500;
+const COMPLETION_GLOW_ROW_FADE_MS = 100;
+const COMPLETION_GLOW_MAX_ALPHA = 0.38;
+const COMPLETION_GLOW_TOTAL_MS = 2800;
 
 /**
  * Draw a wave of soft glow that ripples across the board row by row.

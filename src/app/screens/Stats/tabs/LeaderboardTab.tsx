@@ -1,17 +1,25 @@
 /**
  * LeaderboardTab – Today / Week / All-time leaderboards, filters, weekly album.
  */
-import type { LeaderboardEntry } from "@/services/leaderboard/leaderboardService";
+import type {
+  LeaderboardEntry,
+  EfficiencyEntry,
+} from "@/services/leaderboard/leaderboardService";
 import type {
   PieceCutType,
   VisualModifierFilter,
   CompletionSourceFilter,
 } from "@/services/leaderboard/leaderboardService";
-import { renderTimeList, renderCompletionList } from "./LeaderboardTabLists";
+import {
+  renderTimeList,
+  renderCompletionList,
+  renderEfficiencyList,
+} from "./LeaderboardTabLists";
 import { LeaderboardTabHeader } from "./LeaderboardTabHeader";
 import styles from "../StatsScreen.module.css";
 
-export type LeaderboardType = "today" | "week" | "alltime";
+export type LeaderboardType = "today" | "week" | "alltime" | "efficiency";
+export type LeaderboardSortMetric = "time" | "moves" | "cleanest";
 export type WeekSubview = "rankings" | "album";
 
 export interface WeeklyAlbumSlot {
@@ -27,6 +35,8 @@ export interface WeeklyAlbumSlot {
 interface LeaderboardTabProps {
   leaderboardType: LeaderboardType;
   setLeaderboardType: (t: LeaderboardType) => void;
+  leaderboardMetric: LeaderboardSortMetric;
+  setLeaderboardMetric: (m: LeaderboardSortMetric) => void;
   weekSubview: WeekSubview;
   setWeekSubview: (s: WeekSubview) => void;
   allTimeGrid: "3x3" | "4x4" | "5x5" | "6x6";
@@ -40,8 +50,15 @@ interface LeaderboardTabProps {
   sourceFilter: CompletionSourceFilter;
   setSourceFilter: (s: CompletionSourceFilter) => void;
   leaderboard: LeaderboardEntry[];
-  weeklyTotalsLeaderboard: { rank: number; count: number; displayName: string }[];
+  efficiencyLeaderboard: EfficiencyEntry[];
+  weeklyTotalsLeaderboard: {
+    rank: number;
+    count: number;
+    displayName: string;
+    userId?: string;
+  }[];
   todayCompletionCount: number;
+  currentUserId: string | null;
   weeklyAlbumSlots: WeeklyAlbumSlot[];
   weeklyAlbumProgress: number;
   weeklyCompleted: number;
@@ -53,6 +70,8 @@ interface LeaderboardTabProps {
 export function LeaderboardTab({
   leaderboardType,
   setLeaderboardType,
+  leaderboardMetric,
+  setLeaderboardMetric,
   weekSubview: _weekSubview,
   setWeekSubview: _setWeekSubview,
   allTimeGrid,
@@ -66,8 +85,10 @@ export function LeaderboardTab({
   sourceFilter,
   setSourceFilter,
   leaderboard,
+  efficiencyLeaderboard,
   weeklyTotalsLeaderboard,
   todayCompletionCount,
+  currentUserId,
   weeklyAlbumSlots: _weeklyAlbumSlots,
   weeklyAlbumProgress: _weeklyAlbumProgress,
   weeklyCompleted,
@@ -83,6 +104,8 @@ export function LeaderboardTab({
       <LeaderboardTabHeader
         leaderboardType={leaderboardType}
         setLeaderboardType={setLeaderboardType}
+        leaderboardMetric={leaderboardMetric}
+        setLeaderboardMetric={setLeaderboardMetric}
         filtersOpen={filtersOpen}
         setFiltersOpen={setFiltersOpen}
         cutTypeFilter={cutTypeFilter}
@@ -94,10 +117,13 @@ export function LeaderboardTab({
         allTimeGrid={allTimeGrid}
         setAllTimeGrid={setAllTimeGrid}
       />
-      {(leaderboardType === "week" || leaderboardType === "alltime") && (
+      {(leaderboardType === "week" ||
+        leaderboardType === "alltime" ||
+        leaderboardType === "efficiency") && (
         <h2 className={styles.leaderboardSubtitle}>
           {leaderboardType === "week" && `Weekly Rankings (${weekRangeLabel})`}
           {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
+          {leaderboardType === "efficiency" && `Weekly efficiency (${weekRangeLabel})`}
         </h2>
       )}
       {leaderboardType === "today" && (
@@ -117,6 +143,8 @@ export function LeaderboardTab({
           "No completions yet. Be the first!",
           rowAnimEpoch,
           compact,
+          false,
+          currentUserId ?? undefined,
         )}
       {leaderboardType === "week" &&
         renderCompletionList(
@@ -124,6 +152,7 @@ export function LeaderboardTab({
           rowAnimEpoch,
           compact,
           "No completions in the last 7 days.",
+          currentUserId ?? undefined,
         )}
       {leaderboardType === "alltime" &&
         renderTimeList(
@@ -131,6 +160,16 @@ export function LeaderboardTab({
           "No completions for this grid size yet.",
           rowAnimEpoch,
           compact,
+          false,
+          currentUserId ?? undefined,
+        )}
+      {leaderboardType === "efficiency" &&
+        renderEfficiencyList(
+          efficiencyLeaderboard,
+          rowAnimEpoch,
+          compact,
+          "No completions with moves recorded this week.",
+          currentUserId ?? undefined,
         )}
     </div>
   );

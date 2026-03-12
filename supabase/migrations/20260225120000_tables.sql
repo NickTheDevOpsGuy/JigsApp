@@ -202,3 +202,18 @@ $$;
 
 GRANT EXECUTE ON FUNCTION get_server_utc_now() TO anon;
 GRANT EXECUTE ON FUNCTION get_server_utc_now() TO authenticated;
+
+-- =============================================================================
+-- Indexes for leaderboard variants (least moves, cleanest solve)
+-- =============================================================================
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'completions' AND column_name = 'move_count') THEN
+    CREATE INDEX IF NOT EXISTS idx_completions_daily_least_moves ON completions(puzzle_date, move_count ASC NULLS LAST, elapsed_seconds) WHERE is_daily = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_completions_grid_least_moves ON completions(grid_rows, grid_cols, move_count ASC NULLS LAST, elapsed_seconds);
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'completions' AND column_name = 'undo_count') THEN
+    CREATE INDEX IF NOT EXISTS idx_completions_daily_cleanest ON completions(puzzle_date, undo_count ASC NULLS LAST, elapsed_seconds) WHERE is_daily = TRUE;
+    CREATE INDEX IF NOT EXISTS idx_completions_grid_cleanest ON completions(grid_rows, grid_cols, undo_count ASC NULLS LAST, elapsed_seconds);
+  END IF;
+END $$;

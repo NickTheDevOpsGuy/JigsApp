@@ -72,8 +72,8 @@ export function computeBoardSnapResult(
   if (Math.hypot(dx, dy) > toleranceBoardPx) return null;
   if (wouldOverlapAnyOtherGroup(pieces, gid, dx, dy, overlapEpsilonPx)) return null;
 
-  /** Allow small per-piece drift (e.g. from rounding) so whole group can snap and lock. */
-  const perPieceEpsilonPx = 3;
+  /** Allow small per-piece drift (e.g. from rounding/merge) so whole group can snap and lock. */
+  const perPieceEpsilonPx = 5;
   for (const p of groupPieces) {
     const t = getTilePos(p);
     const offX = Math.abs(p.targetX - t.x - dx);
@@ -229,6 +229,7 @@ export function computeNearSnapNudge(
 
 /**
  * After merging, snap the merged group to board if all at target positions.
+ * Verifies every piece would land on target with the same (dx, dy) so we don't lock when only one piece is close.
  */
 export function computeMergedGroupBoardSnapResult(
   pieces: Piece[],
@@ -244,5 +245,14 @@ export function computeMergedGroupBoardSnapResult(
   const dy = ref.targetY - tile.y;
 
   if (wouldOverlapAnyOtherGroup(pieces, groupId, dx, dy, overlapEpsilonPx)) return null;
+
+  const perPieceEpsilonPx = 5;
+  for (const p of groupPieces) {
+    const t = getTilePos(p);
+    const offX = Math.abs(p.targetX - t.x - dx);
+    const offY = Math.abs(p.targetY - t.y - dy);
+    if (offX > perPieceEpsilonPx || offY > perPieceEpsilonPx) return null;
+  }
+
   return { dx, dy };
 }

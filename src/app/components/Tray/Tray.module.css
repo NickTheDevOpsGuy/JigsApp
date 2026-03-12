@@ -60,8 +60,15 @@
   transform: translateY(0) scale(1);
 }
 
-.pieceSvg {
+.pieceSvg,
+.pieceImg {
   display: block;
+  vertical-align: middle;
+}
+
+.piecePlaceholder {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-btn);
 }
 
 .emptyTray {
@@ -79,21 +86,27 @@
   margin: 0;
 }
 
-/* Scrollbar styling */
+/* Horizontal scrollbar – same blue as pick-a-puzzle / pack detail */
+.tray {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96, 145, 219, 0.86) rgba(11, 20, 36, 0.82);
+}
+
 .tray::-webkit-scrollbar {
   height: 8px;
 }
 
 .tray::-webkit-scrollbar-track {
-  background: var(--color-bg-elevated);
-  border-radius: 4px;
+  background: rgba(11, 20, 36, 0.82);
+  border-radius: 999px;
 }
 
 .tray::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
-  border-radius: 4px;
+  background: rgba(96, 145, 219, 0.86);
+  border-radius: 999px;
+  border: 1px solid rgba(13, 26, 46, 0.9);
 }
 
 .tray::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: rgba(123, 175, 248, 0.92);
 }

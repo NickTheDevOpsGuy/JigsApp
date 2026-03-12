@@ -12,6 +12,8 @@ export type DebugFlags = {
   showBounds: boolean;
   showIds: boolean;
   showPerfOverlay?: boolean;
+  /** When true, render pieces as solid color + black outline only (no image). Confirms silhouettes, no seams. */
+  showSilhouette?: boolean;
 };
 
 export type AnimationState = {
@@ -34,6 +36,11 @@ export type AnimationState = {
   showAlignmentGrid?: boolean;
   /** Fog modifier: alpha for unplaced pieces (0 = clear, 0.5 = foggy). Placed pieces stay clear. */
   fogAlphaForUnplaced?: number;
+  /** When hovering a piece: empty (row,col) slots adjacent to placed pieces – potential snap targets. */
+  hoverSnapTargetSlots?: { row: number; col: number }[];
 };
 
 export type PieceCache = Map<string, HTMLCanvasElement>;
+
+/** Cache Path2D per piece.id so we create each shape once and reuse (avoids pause on load). */
+export type PathCache = Map<string, Path2D>;

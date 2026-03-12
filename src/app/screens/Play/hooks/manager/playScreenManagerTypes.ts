@@ -7,7 +7,7 @@ export type ResumeChoice = "resume" | "fresh" | null;
 
 export type PlayScreenManagerOptions = {
   initialSessionPieces?: SavedPiece[];
-  haptic?: (kind: "place" | "snap" | "rotate") => void;
+  haptic?: (kind: "place" | "snap" | "rotate" | "lock") => void;
   themeRef?: MutableRefObject<Theme | undefined>;
   onPlacementStreak?: () => void;
   snapScaleRef?: MutableRefObject<number>;

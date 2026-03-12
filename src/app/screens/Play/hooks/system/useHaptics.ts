@@ -4,13 +4,14 @@
 import { useCallback, useMemo } from "react";
 import { soundManager } from "@/audio/core/sounds";
 
-export type HapticKind = "tap" | "rotate" | "snap" | "place" | "complete";
+export type HapticKind = "tap" | "rotate" | "snap" | "place" | "lock" | "complete";
 
 const PATTERN_MS: Record<HapticKind, number | number[]> = {
   tap: 15,
   rotate: 20,
   snap: 30,
   place: 25,
+  lock: 18,
   complete: [20, 40, 20],
 };
 

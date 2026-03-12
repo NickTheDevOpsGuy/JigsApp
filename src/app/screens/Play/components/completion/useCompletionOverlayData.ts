@@ -12,6 +12,7 @@ import {
 } from "@/daily/dailyPuzzleCore";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { recordCompletion } from "@/services/player/statsService";
+import type { PlayerStatsData } from "@/services/player/statsService";
 import { checkAndUnlockAchievements } from "@/services/player/achievementsService";
 import { getPercentileRank } from "@/services/leaderboard/leaderboardService";
 import { useShareCardImage } from "@/screens/Play/hooks/share/useShareCardImage";
@@ -34,6 +35,8 @@ export type UseCompletionOverlayDataParams = {
   cutType: PieceCutType;
   undoCount: number;
   puzzleShareUrl?: string;
+  /** Called after Supabase record with updated stats (e.g. for 7-day streak toast). */
+  onCompletionRecorded?: (stats: PlayerStatsData) => void;
 };
 
 export type UseCompletionOverlayDataResult = ReturnType<typeof useCompletionOverlayData>;
@@ -54,6 +57,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     cutType,
     undoCount,
     puzzleShareUrl = "/",
+    onCompletionRecorded,
   } = params;
 
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
@@ -112,6 +116,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       });
       if (stats) {
         setMasteryStreak(stats.masteryStreak ?? 0);
+        onCompletionRecorded?.(stats);
         await checkAndUnlockAchievements({
           puzzlesCompleted: stats.puzzlesCompleted,
           dailyStreak: stats.dailyStreak,
@@ -121,7 +126,16 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       }
     };
     void run();
-  }, [elapsedSeconds, grid, isDaily, cutType, undoCount, usedHint, visualModifier]);
+  }, [
+    elapsedSeconds,
+    grid,
+    isDaily,
+    cutType,
+    undoCount,
+    usedHint,
+    visualModifier,
+    onCompletionRecorded,
+  ]);
 
   const rankPosition =
     percentile && percentile.totalPlayers >= 1

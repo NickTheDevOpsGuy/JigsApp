@@ -19,7 +19,7 @@ export type PlayScreenManagerEventsDeps = {
   grid: { rows: number; cols: number };
   optionsRef: MutableRefObject<
     | {
-        haptic?: (kind: "place" | "snap" | "rotate") => void;
+        haptic?: (kind: "place" | "snap" | "rotate" | "lock") => void;
         onPlacementStreak?: () => void;
         onSnapCheck?: () => void;
         wrongRotationHintRef?: MutableRefObject<{
@@ -150,7 +150,10 @@ export function createPlayScreenManagerEvents(
     onPieceLocked: (ids) => {
       const now = performance.now();
       for (const id of ids) lockMapRef.current.set(id, now);
-      if (ids.length > 0) soundManager.play("lock", { groupSize: ids.length });
+      if (ids.length > 0) {
+        soundManager.play("lock", { groupSize: ids.length });
+        optionsRef.current?.haptic?.("lock");
+      }
     },
     onSnapCheck: () => optionsRef.current?.onSnapCheck?.(),
     onWrongRotationHint: (groupId, pieceIds) => {
@@ -164,6 +167,14 @@ export function createPlayScreenManagerEvents(
     onPuzzleComplete: () => {
       placementTimesRef.current = [];
       setSnapCombo(0);
+      const now = performance.now();
+      const manager = getManager();
+      if (manager) {
+        const state = manager.getState();
+        for (const p of state.pieces) {
+          if (!p.inTray) lockMapRef.current.set(p.id, now);
+        }
+      }
       soundManager.play("complete");
     },
   };

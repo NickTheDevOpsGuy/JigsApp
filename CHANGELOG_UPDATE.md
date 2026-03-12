@@ -4,7 +4,45 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 🧩 Latest (share screen, draw order, seams, unwinnable fix, grid minimum)
+## 🏆 Latest (leaderboards, profile, completion flow, Supabase)
+
+### Leaderboard improvements
+
+- **Efficiency tab** — New “Efficiency” board mode: weekly best sec/move (calendar week Mon–Sun). Same filters (shape, modifier, source) as other views.
+- **Sort by** — For **Today** and **All-time**: dropdown **Fastest** | **Least moves** | **Cleanest**. Fetchers: `getDailyLeaderboardLeastMoves`, `getDailyLeaderboardCleanest`, `getAllTimeBestLeastMoves`, `getAllTimeBestCleanest`, `getWeeklyEfficiencyLeaderboard`.
+- **“You” on the board** — Leaderboard entries now include `userId`; the current user’s row is highlighted (light brand background) and shows “(You)” so you can see your rank at a glance on Today, Week, All-time, and Efficiency.
+- **Filters** — Shape, Modifier, and Source apply to all four modes (Today, Week, All-time, Efficiency). Grid size (3×3–6×6) remains All-time only.
+
+**Files** — `leaderboardFetchersDaily.ts`, `leaderboardFetchersAllTime.ts`, `leaderboardFetchersPeriod.ts`, `leaderboardTypes.ts` (EfficiencyEntry, userId on CompletionCountEntry); `LeaderboardTab.tsx`, `LeaderboardTabHeader.tsx`, `LeaderboardTabLists.tsx` (renderEfficiencyList, currentUserId, leaderboardItemYou, youLabel); `useStatsScreenState.ts` (currentUserId), `useStatsScreenData.ts` (setCurrentUserId); `StatsScreen.leaderboard.base.module.css` (`.leaderboardItemYou`, `.youLabel`).
+
+### Profile improvements
+
+- **Best streak** — When `bestDailyStreak` exists and differs from current streak, Profile shows “Best: N days” under the streak line.
+- **See ranking** — Link next to “Best (4×4)” that switches to the Board tab, sets All-time, and sets grid to 4×4 so you land on the all-time 4×4 leaderboard.
+
+**Files** — `ProfileTab.tsx` (bestStreak, onSeeRankingFor4x4, profileInlineLink); `StatsScreen.tsx` (onSeeRankingFor4x4 callback); `StatsScreen.profile.module.base.module.css` (`.profileInlineLink`).
+
+### Completion flow & “wow” feedback
+
+- **7-day streak** — When a completion is recorded and `dailyStreak === 7`, toast “7-day streak! 🔥” and a short haptic pattern (if supported).
+- **New personal best** — When the completion overlay opens with `isNewBest`, optional haptic (if enabled).
+- **Next CTA** — After closing the completion overlay, the completed board shows a CTA: “Play today’s puzzle” (daily) or “One more from this pack” (pack). Clicking it runs the same “next puzzle” action.
+- **Callbacks** — `onCompletionRecorded(stats)` and `onNewBest()` added to completion overlay props and wired from the play scene.
+
+**Files** — `useCompletionOverlayData.ts` (onCompletionRecorded), `CompletionOverlayGate.tsx`, `CompletionOverlayCore.tsx`, `completionOverlayTypes.ts` (onCompletionRecorded, onNewBest); `playScreenSceneOverlays.ts`, `playScreenSceneLayoutInputs.ts` (7-day toast, onNewBest haptic); `PlayScreenLayout.tsx`, `playScreenLayoutPropsBuilder.ts` (postCompletionCta); `PlayScreen.board.layout.module.part1.css` (`.boardCompleteNextCta`, `.boardCompleteNextCtaBtn`).
+
+### Supabase
+
+- **Tables migration** — `supabase/migrations/20260225120000_tables.sql`: added indexes for leaderboard variants (`idx_completions_daily_least_moves`, `idx_completions_grid_least_moves`, `idx_completions_daily_cleanest`, `idx_completions_grid_cleanest`).
+- **RLS** — No changes; `20260225120001_rls.sql` unchanged.
+
+### In-app changelog
+
+- **changelog.ts** — Version 43: leaderboard Efficiency + Sort by + “You” highlight; profile best streak + See ranking; completion 7-day toast, new-best haptic, Next CTA; Supabase indexes.
+
+---
+
+## 🧩 Earlier (share screen, draw order, seams, unwinnable fix, grid minimum)
 
 ### Share screen (no modal)
 
@@ -356,3 +394,33 @@ I shipped a bunch of improvements to the puzzle game I’ve been building:
 Docs and README are updated to match. If you want to try it or install it on your phone, the link is in the comments. 👇
 
 #Phuzzle #WebDev #PWA #React #SideProject
+
+---
+
+## LinkedIn post — Leaderboards & completion flow (v43)
+
+**Phuzzle’s leaderboards and completion flow got a solid upgrade.** 🧩
+
+**Leaderboards**
+
+- New **Efficiency** tab: weekly best “sec per move” so you can compete on efficiency, not just speed.
+- **Sort by** Fastest, Least moves, or Cleanest for Today and All-time.
+- **Your row** is highlighted with “(You)” on every board so you see your rank at a glance.
+- Same filters (shape, modifier, source) across all four views.
+
+**Profile**
+
+- **Best streak** is shown when it’s higher than your current streak.
+- **See ranking** next to your Best (4×4) time jumps straight to the All-time 4×4 leaderboard.
+
+**Completion**
+
+- **7-day streak** → toast + haptic when you hit a week of daily solves.
+- **New personal best** → short haptic when you beat your record.
+- After closing the win screen, a **Next** CTA (“Play today’s puzzle” or “One more from this pack”) so you can jump straight to the next puzzle.
+
+Backend: Supabase indexes for the new leaderboard queries; no new tables or RLS changes.
+
+If you’ve been playing the daily, this update should make it easier to see where you stand and to keep the habit going. Link in comments. 👇
+
+#Phuzzle #WebDev #React #SideProject #IndieGame

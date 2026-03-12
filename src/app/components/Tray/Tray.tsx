@@ -1,6 +1,7 @@
 // src/app/components/Tray/Tray.tsx
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import type { Piece } from "@/puzzle/core/types";
+import { renderTrayPiece } from "@/puzzle/canvas/render/renderTrayPiece";
 import styles from "./Tray.module.css";
 
 type TrayProps = {
@@ -13,6 +14,8 @@ type TrayProps = {
   assembledH: number;
 };
 
+const TRAY_SCALE = 0.5;
+
 export function Tray({
   corners,
   edges,
@@ -22,8 +25,55 @@ export function Tray({
   assembledW,
   assembledH,
 }: TrayProps) {
+  const [img, setImg] = useState<HTMLImageElement | null>(null);
+  const allPieces = useMemo(
+    () => [...corners, ...edges, ...center],
+    [corners, edges, center],
+  );
+  const pieceKey = useMemo(
+    () =>
+      allPieces
+        .map((p) => `${p.id}:${p.rotation}`)
+        .sort()
+        .join(","),
+    [allPieces],
+  );
+
+  useEffect(() => {
+    if (!imageUrl) {
+      setImg(null);
+      return;
+    }
+    const el = new Image();
+    el.onload = () => setImg(el);
+    el.src = imageUrl;
+    return () => {
+      el.src = "";
+    };
+  }, [imageUrl]);
+
+  const [thumbsById, setThumbsById] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    if (!img?.complete || img.naturalWidth === 0 || allPieces.length === 0) {
+      setThumbsById(new Map());
+      return;
+    }
+    const next = new Map<string, string>();
+    for (const piece of allPieces) {
+      try {
+        const canvas = renderTrayPiece(piece, img, assembledW, assembledH, TRAY_SCALE);
+        next.set(piece.id, canvas.toDataURL("image/png"));
+      } catch {
+        // skip failed piece
+      }
+    }
+    setThumbsById(next);
+  }, [img, pieceKey, assembledW, assembledH, allPieces]);
+
   const renderPiecePreview = (piece: Piece) => {
-    const scale = 0.5; // Show pieces at 50% size in tray
+    const dataUrl = thumbsById.get(piece.id);
+    const size = Math.max(piece.w, piece.h) * TRAY_SCALE + 8;
 
     return (
       <div
@@ -41,34 +91,20 @@ export function Tray({
         title={`Piece ${piece.id} - Click to place on board`}
         aria-label={`Place piece ${piece.id} on board`}
       >
-        <svg
-          width={piece.w * scale}
-          height={piece.h * scale}
-          viewBox={`0 0 ${piece.w} ${piece.h}`}
-          className={styles.pieceSvg}
-        >
-          <defs>
-            <clipPath id={`clip-${piece.id}`}>
-              <path d={piece.shapePath} />
-            </clipPath>
-          </defs>
-
-          <image
-            href={imageUrl}
-            x={-piece.targetX + piece.pad}
-            y={-piece.targetY + piece.pad}
-            width={assembledW}
-            height={assembledH}
-            clipPath={`url(#clip-${piece.id})`}
+        {dataUrl ? (
+          <img
+            src={dataUrl}
+            alt=""
+            width={size}
+            height={size}
+            className={styles.pieceImg}
           />
-
-          <path
-            d={piece.shapePath}
-            fill="none"
-            stroke="rgba(0,0,0,0.3)"
-            strokeWidth="1"
+        ) : (
+          <div
+            className={styles.piecePlaceholder}
+            style={{ width: size, height: size }}
           />
-        </svg>
+        )}
       </div>
     );
   };

@@ -5,8 +5,8 @@
 /** Lerp factor for smooth drag position (0–1; higher = snappier). */
 export const DRAG_LERP = 0.32;
 
-/** Duration of lock-place ease animation (ms). Longer + smooth easing so lock feels good in any direction. */
-export const LOCK_LERP_MS = 320;
+/** Duration of lock-place ease animation (ms). Slightly longer for a smoother, more consistent feel. */
+export const LOCK_LERP_MS = 380;
 
 /** Max upward lift (px) when piece snaps; actual lift scales with piece height for mobile and desktop. */
 export const LOCK_LIFT_MAX_PX = 12;

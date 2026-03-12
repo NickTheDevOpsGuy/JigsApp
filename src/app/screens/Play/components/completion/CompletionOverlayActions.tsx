@@ -87,6 +87,8 @@ export function CompletionOverlayActions(args: {
             onShareChallenge={onShareChallenge}
             onCopyChallenge={onCopyChallenge}
             completionData={completionData}
+            canReplay={canReplay}
+            onReplayClick={onReplayClick}
           />
         )}
         {showReplayNext && (

@@ -100,7 +100,7 @@
 
   .galleryWrap {
     gap: 6px;
-    margin: 4px 0 10px;
+    margin: 4px 0 20px;
   }
 
   .gallery {
@@ -161,7 +161,27 @@
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
+    scrollbar-color: rgba(96, 145, 219, 0.86) rgba(11, 20, 36, 0.82);
     padding-bottom: 2px;
+  }
+
+  .difficultyGrid::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .difficultyGrid::-webkit-scrollbar-track {
+    background: rgba(11, 20, 36, 0.82);
+    border-radius: 999px;
+  }
+
+  .difficultyGrid::-webkit-scrollbar-thumb {
+    background: rgba(96, 145, 219, 0.86);
+    border-radius: 999px;
+    border: 1px solid rgba(13, 26, 46, 0.9);
+  }
+
+  .difficultyGrid::-webkit-scrollbar-thumb:hover {
+    background: rgba(123, 175, 248, 0.92);
   }
 
   .difficultyCard {

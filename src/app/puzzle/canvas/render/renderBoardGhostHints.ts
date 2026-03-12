@@ -1,5 +1,5 @@
 import type { Piece } from "@/puzzle/core/types";
-import type { DebugFlags } from "@/puzzle/canvas/utils/renderBoardTypes";
+import type { DebugFlags, PathCache } from "@/puzzle/canvas/utils/renderBoardTypes";
 import { drawPiece } from "./renderBoardDrawPieceCore";
 
 /** Draw semi-transparent ghosts at correct positions for misplaced pieces. */
@@ -10,6 +10,7 @@ export function drawGhostHints(
   cols: number,
   rows: number,
   alpha = 0.35,
+  pathCache?: PathCache,
 ) {
   const popMap = new Map<string, number>();
   const nowMs = performance.now();
@@ -52,6 +53,7 @@ export function drawGhostHints(
       0,
       undefined,
       undefined,
+      pathCache,
       ghostDpr,
     );
     ctx.restore();

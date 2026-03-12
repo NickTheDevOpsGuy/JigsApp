@@ -73,7 +73,7 @@
   grid-template-columns: 44px 1fr auto;
   align-items: center;
   justify-items: center;
-  gap: 8px;
+  gap: 14px;
   margin-bottom: 8px;
   flex-shrink: 0;
 }

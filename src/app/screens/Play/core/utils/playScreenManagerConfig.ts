@@ -4,7 +4,7 @@ import type { PuzzleState } from "@/puzzle/core/types";
 import type { Theme } from "@/hooks/useTheme";
 
 export function buildPlayScreenManagerConfig(args: {
-  haptic?: (kind: "place" | "snap" | "rotate") => void;
+  haptic?: (kind: "place" | "snap" | "rotate" | "lock") => void;
   themeRef: MutableRefObject<Theme | undefined>;
   onPlacementStreak: () => void;
   initialSessionPieces?: SavedPiece[];

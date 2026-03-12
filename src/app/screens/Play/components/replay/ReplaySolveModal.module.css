@@ -156,11 +156,11 @@
   pointer-events: none;
 }
 
-/* Modal box: theme-driven */
+/* Modal box: theme-driven, taller to give board more space */
 .modal {
   width: 100%;
-  max-width: 520px;
-  max-height: calc(100vh - 40px);
+  max-width: 540px;
+  max-height: calc(100vh - 24px);
   display: flex;
   flex-direction: column;
   background: var(--color-bg-card);
@@ -170,16 +170,37 @@
   overflow: hidden;
 }
 
-/* Header: theme-driven */
+/* Header: title + icon centered over the board */
 .header {
   flex-shrink: 0;
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
   padding: 14px 16px 14px 18px;
   background: var(--color-bg-elevated);
   border-bottom: 1px solid var(--color-border);
   border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+.headerLeft,
+.headerRight {
+  width: 44px;
+  flex-shrink: 0;
+}
+
+.headerRight {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.headerCenter {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .headerIcon {
@@ -189,7 +210,6 @@
 }
 
 .headerTitle {
-  flex: 1;
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
@@ -197,29 +217,33 @@
   letter-spacing: 0.02em;
 }
 
-/* Close: small white X enclosed in subtle light blue circular glow */
+/* Glassmorphic close: rounded squircle, translucent bg, light blue glow on hover */
 .closeBtn {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: none;
-  border-radius: 999px;
-  background: transparent;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--color-text-primary);
   cursor: pointer;
   transition:
     background 0.15s,
-    box-shadow 0.15s;
-  box-shadow: 0 0 10px var(--color-border);
+    box-shadow 0.2s ease;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border) 60%, transparent);
 }
 
 .closeBtn:hover {
-  background: var(--color-action-hover);
-  box-shadow: 0 0 12px var(--color-border-strong);
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--color-brand-primary) 50%, transparent),
+    0 0 14px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }
 
 .closeBtn:focus-visible {
@@ -227,35 +251,57 @@
   outline-offset: 2px;
 }
 
-/* Subtitle: smaller, lighter grey text */
+/* Subtitle: "Watch how the puzzle was completed" – slightly larger and more prominent */
 .subtitle {
   flex-shrink: 0;
   margin: 0;
-  padding: 5px 18px 14px;
-  font-size: 0.78rem;
+  padding: 8px 18px 16px;
+  font-size: 0.88rem;
   font-weight: 500;
   color: var(--color-text-secondary);
   line-height: 1.35;
 }
 
-/* Puzzle display: large central rectangular area */
-.puzzleArea {
+/* Wrapper so close X can align with the board edge; larger min height for board */
+.puzzleAreaWrapper {
+  position: relative;
   flex: 1;
-  min-height: 200px;
+  min-height: 300px;
   margin: 0 14px 14px;
-  border-radius: var(--radius-btn);
+}
+
+/* Close button at top-right of board (modal mode) */
+.puzzleAreaWrapper .closeBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+}
+
+/* Puzzle display: large central area with neon-blue frame glow */
+.puzzleArea {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  margin: 0;
+  border-radius: 14px;
   overflow: hidden;
   background: var(--color-bg-primary);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 45%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 25%, transparent),
+    0 0 24px color-mix(in srgb, var(--color-brand-primary) 22%, transparent),
+    0 0 48px color-mix(in srgb, var(--color-brand-primary) 10%, transparent);
 }
 
 .puzzleImage {
   width: 100%;
   height: 100%;
-  min-height: 220px;
+  min-height: 280px;
   object-fit: contain;
   display: block;
 }
@@ -263,7 +309,7 @@
 .puzzlePlaceholder {
   width: 100%;
   height: 100%;
-  min-height: 220px;
+  min-height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -299,16 +345,16 @@
   position: relative;
 }
 
-/* Progress fill: theme accent */
+/* Progress fill: theme accent with subtle glow */
 .seekFill {
   height: 100%;
   background: var(--color-brand-primary);
   border-radius: 999px;
   transition: width 0.1s ease-out;
-  box-shadow: 0 0 8px var(--color-border);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-brand-primary) 40%, transparent);
 }
 
-/* Small circular handle */
+/* Seek handle with neon blue glow */
 .seekHandle {
   position: absolute;
   top: 50%;
@@ -318,7 +364,10 @@
   transform: translateY(-50%);
   background: var(--color-bg-elevated);
   border-radius: 999px;
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    var(--shadow-sm),
+    0 0 12px color-mix(in srgb, var(--color-brand-primary) 50%, transparent),
+    0 0 20px color-mix(in srgb, var(--color-brand-primary) 25%, transparent);
   pointer-events: none;
 }
 

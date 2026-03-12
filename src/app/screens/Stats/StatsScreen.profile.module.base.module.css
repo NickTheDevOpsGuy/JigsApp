@@ -69,6 +69,22 @@
   font-weight: 500;
 }
 
+/* Inline link e.g. "See ranking" next to Best (4×4) */
+.profileInlineLink {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 4px;
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+  cursor: pointer;
+  text-decoration: none;
+}
+.profileInlineLink:hover {
+  text-decoration: underline;
+}
+
 .profilePuzzleGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

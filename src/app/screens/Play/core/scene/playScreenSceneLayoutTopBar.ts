@@ -84,6 +84,7 @@ export function usePlayScreenTopBarPropsFromCtx(ctx: any) {
     toggleFullscreen: ui.toggleFullscreen,
     toggleDebug: ui.toggleDebug,
     togglePerfOverlay: ui.togglePerfOverlay,
+    toggleShowSilhouette: ui.toggleShowSilhouette,
     isFullscreen: ui.isFullscreen,
     isCoarsePointer: scene.isCoarsePointer,
     showDebug: SHOW_DEBUG,

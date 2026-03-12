@@ -18,6 +18,7 @@ import {
   updateDebugFps,
   shouldPublishState,
   prepareCanvasForRender,
+  getHoverSnapTargetSlots,
 } from "@/screens/Play/hooks/animation/usePlayScreenAnimationHelpers";
 import { soundManager } from "@/audio/core/sounds";
 import type { UsePlayScreenAnimationArgs } from "./usePlayScreenAnimationTypes";
@@ -58,6 +59,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     rafRef,
     completedAtRef,
     pieceCacheRef,
+    pathCacheRef,
     lastCompleteRef,
     lastPieceCountRef,
     lastFrameTimeRef,
@@ -79,6 +81,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
   useEffect(() => {
     if (!manager) return;
     pieceCacheRef.current.clear();
+    pathCacheRef.current.clear();
     const tick = (now: number) => {
       const canvas = canvasRef.current;
       const boardEl = boardRef.current;
@@ -214,6 +217,11 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
         dailyVisualModifier === "fog" && totalPieces > 0
           ? Math.max(0.15, 0.6 * (1 - placedCount / totalPieces))
           : 0;
+      const hoveredId = selectedIdRef.current;
+      const hoverSnapTargetSlots =
+        hoveredId && !isDragging && !st.isComplete
+          ? getHoverSnapTargetSlots(st)
+          : undefined;
       renderBoard(
         ctx,
         st,
@@ -227,8 +235,8 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
         dragState,
         {
           draggedGroupId,
-          hoveredPieceId: selectedIdRef.current,
-          selectedPieceId: selectedIdRef.current,
+          hoveredPieceId: hoveredId,
+          selectedPieceId: hoveredId,
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
           showGhostHint: effectiveShowGhost,
@@ -243,8 +251,10 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
           snapPreview,
           snapGlowEnabled,
           fogAlphaForUnplaced: fogAlphaForUnplaced > 0 ? fogAlphaForUnplaced : undefined,
+          hoverSnapTargetSlots,
         },
         pieceCache,
+        pathCacheRef.current,
         viewport,
         snapParticles,
       );

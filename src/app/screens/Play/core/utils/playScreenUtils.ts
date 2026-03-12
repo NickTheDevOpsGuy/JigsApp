@@ -182,4 +182,6 @@ export type DebugFlags = {
   showBounds: boolean;
   showIds: boolean;
   showPerfOverlay: boolean;
+  /** Render pieces as solid color + black outline only (no image). Confirms silhouettes, no seams. */
+  showSilhouette?: boolean;
 };

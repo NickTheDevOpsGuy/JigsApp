@@ -107,25 +107,29 @@
   overflow-x: hidden;
 }
 
+/* Glassmorphic close: rounded squircle, translucent bg, light blue glow on hover */
 .completeCloseBtn {
   position: absolute;
   top: max(var(--space-4), env(safe-area-inset-top, 0));
   right: max(var(--space-4), env(safe-area-inset-right, 0));
   appearance: none;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-elevated);
+  border: none;
+  background: color-mix(in srgb, var(--color-bg-elevated) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--color-text-primary);
   width: 44px;
   height: 44px;
-  border-radius: 50%;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition:
     background 0.15s,
-    border-color 0.15s;
+    box-shadow 0.2s ease;
   z-index: 10;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border) 60%, transparent);
 }
 
 .completePanelNew .completeCloseBtn {
@@ -137,6 +141,8 @@
 }
 
 .completePanelNew .completeCloseBtn:hover {
-  background: var(--color-bg-primary);
-  border-color: var(--color-brand-primary);
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--color-brand-primary) 50%, transparent),
+    0 0 14px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }

@@ -10,6 +10,7 @@ export type DebugFlags = {
   showBounds: boolean;
   showIds: boolean;
   showPerfOverlay: boolean;
+  showSilhouette?: boolean;
 };
 
 export type HeaderMenuProps = {
@@ -73,6 +74,7 @@ export type HeaderMenuProps = {
   onShowAbout?: () => void;
   onToggleDebug: () => void;
   onTogglePerfOverlay: () => void;
+  onToggleShowSilhouette?: () => void;
   immersiveMode: boolean;
   onToggleImmersiveMode: () => void;
   pieceCutType?: "classic" | "irregular" | "hard";
