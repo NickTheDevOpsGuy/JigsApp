@@ -5,7 +5,8 @@
   width: 100%;
   max-width: 100vw;
   box-sizing: border-box;
-  padding: max(8px, env(safe-area-inset-top)) 8px 8px;
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+    max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
   background: var(--color-bg-primary);
   overflow: hidden;
   overscroll-behavior: none;

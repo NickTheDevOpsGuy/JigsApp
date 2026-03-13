@@ -65,9 +65,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-4);
+  padding: max(var(--space-4), env(safe-area-inset-top)) max(var(--space-4), env(safe-area-inset-right))
+    max(var(--space-4), env(safe-area-inset-bottom)) max(var(--space-4), env(safe-area-inset-left));
   z-index: 1000;
   animation: fadeIn 0.3s ease;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -164,11 +166,13 @@
   color: var(--color-text-primary);
 }
 
-/* Mobile adjustments */
+/* Mobile: safe area, touch targets, readable text */
 @media (max-width: 600px) {
   .tutorialCard {
     padding: 20px;
-    max-width: 100%;
+    max-width: calc(100vw - 32px);
+    margin: 0 max(12px, env(safe-area-inset-left));
+    box-sizing: border-box;
   }
 
   .tutorialTitle {
@@ -176,10 +180,13 @@
   }
 
   .tutorialStep {
-    padding: 10px;
+    padding: 12px;
+    min-height: 44px;
+    box-sizing: border-box;
   }
 
   .stepText {
-    font-size: 13px;
+    font-size: 14px;
+    line-height: 1.45;
   }
 }

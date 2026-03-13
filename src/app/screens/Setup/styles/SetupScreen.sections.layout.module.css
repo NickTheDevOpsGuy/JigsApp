@@ -28,7 +28,7 @@
 .difficultySection,
 .timerSection {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .difficultySection {
@@ -46,7 +46,7 @@
 .difficultyGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 14px;
 }
 
 .difficultyCard {
@@ -55,7 +55,7 @@
   border-radius: 10px;
   background: linear-gradient(180deg, rgba(20, 33, 57, 0.94), rgba(14, 25, 43, 0.94));
   min-height: 56px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

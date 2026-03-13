@@ -14,21 +14,21 @@
 
 .playBody .trayWrap {
   flex-shrink: 0;
-  height: 186px;
+  height: 220px;
 }
 
 /* More tray height for large puzzles (49+ pieces) – prevents cramped layout */
 .playBody .trayWrap.trayWrapLarge {
-  height: 224px;
+  height: 268px;
 }
 
 @media (max-width: 900px) {
   .playBody .trayWrap {
-    height: 178px;
+    height: 210px;
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 206px;
+    height: 250px;
   }
 }
 
@@ -36,8 +36,7 @@
   .playBody .trayWrap {
     width: 100%;
     max-width: min(90vw, 420px);
-    /* Match desktop heights so tray is not cut off; same as tablet breakpoint */
-    height: 186px;
+    height: 260px;
     flex-shrink: 0;
     padding: 0 0 16px;
     padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
@@ -45,7 +44,7 @@
   }
 
   .playBody .trayWrap.trayWrapLarge {
-    height: 224px;
+    height: 300px;
   }
 }
 

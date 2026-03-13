@@ -19,83 +19,83 @@
   font-size: 13px;
 }
 
-/* Compact mode: 25–48 piece puzzles */
+/* Compact mode: 25–48 piece puzzles – larger thumbs so pieces are visible */
 .trayCompact .thumbWrap {
-  width: 54px;
-  height: 54px;
+  width: 60px;
+  height: 60px;
 }
 
 .trayCompact .pieceButton {
-  min-width: 58px;
-  min-height: 58px;
+  min-width: 64px;
+  min-height: 64px;
   padding: 2px;
 }
 
 .trayCompact .blankSlot {
-  min-width: 58px;
-  min-height: 58px;
+  min-width: 64px;
+  min-height: 64px;
   padding: 2px;
 }
 
 @media (max-width: 600px) {
   .trayCompact .thumbWrap {
-    width: 60px;
-    height: 60px;
+    width: 72px;
+    height: 72px;
   }
 
   .trayCompact .pieceButton,
   .trayCompact .blankSlot {
-    min-width: 64px;
-    min-height: 64px;
+    min-width: 78px;
+    min-height: 78px;
   }
 }
 
 .trayCompact .row {
-  gap: 8px;
+  gap: 10px;
 }
 
 .trayCompact .scroller {
-  padding: 8px 12px;
+  padding: 10px 12px;
   padding-inline-end: 12px;
 }
 
-/* Extra-compact for 49+ pieces – larger than before for visibility */
+/* Extra-compact for 49+ pieces – larger for visibility */
 .trayExtraCompact .thumbWrap {
-  width: 48px;
-  height: 48px;
+  width: 54px;
+  height: 54px;
 }
 
 .trayExtraCompact .pieceButton {
-  min-width: 52px;
-  min-height: 52px;
+  min-width: 58px;
+  min-height: 58px;
   padding: 2px;
 }
 
 .trayExtraCompact .blankSlot {
-  min-width: 52px;
-  min-height: 52px;
+  min-width: 58px;
+  min-height: 58px;
   padding: 2px;
 }
 
 @media (max-width: 600px) {
   .trayExtraCompact .thumbWrap {
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
   }
 
   .trayExtraCompact .pieceButton,
   .trayExtraCompact .blankSlot {
-    min-width: 60px;
-    min-height: 60px;
+    min-width: 68px;
+    min-height: 68px;
   }
 }
 
 .trayExtraCompact .row {
-  gap: 6px;
+  gap: 8px;
 }
 
 .trayExtraCompact .scroller {
-  padding: 8px 10px;
+  padding: 10px 12px;
   padding-inline-end: 12px;
 }
 
@@ -166,9 +166,9 @@
   }
 
   .scroller {
-    padding: 8px 14px;
-    padding-inline-end: 12px;
-    gap: 8px;
+    padding: 10px 14px;
+    padding-inline-end: 14px;
+    gap: 10px;
   }
 
   .scrollBtn {
@@ -181,12 +181,12 @@
   }
 
   .trayCompact .scroller {
-    padding: 8px 14px;
-    padding-inline-end: 12px;
+    padding: 10px 14px;
+    padding-inline-end: 14px;
   }
 
   .trayExtraCompact .scroller {
-    padding: 8px 12px;
-    padding-inline-end: 12px;
+    padding: 10px 12px;
+    padding-inline-end: 14px;
   }
 }

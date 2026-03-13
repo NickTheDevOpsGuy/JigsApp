@@ -4,8 +4,8 @@
   }
 
   .preview {
-    width: min(62vw, 54vh, 320px);
-    height: min(62vw, 54vh, 320px);
+    width: clamp(140px, 42vw, 180px);
+    height: clamp(140px, 42vw, 180px);
   }
 }
 
@@ -162,7 +162,7 @@
 
   .difficultySection,
   .timerSection {
-    gap: 6px;
+    gap: 10px;
     margin-top: 8px;
     margin-bottom: 10px;
   }
@@ -174,7 +174,7 @@
   .difficultyGrid {
     display: flex;
     flex-wrap: nowrap;
-    gap: 6px;
+    gap: 12px;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
@@ -206,8 +206,8 @@
   .difficultyCard {
     flex: 0 0 min(90px, 24vw);
     min-height: 46px;
-    padding: 5px 6px;
-    gap: 3px;
+    padding: 8px 10px;
+    gap: 4px;
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
@@ -226,18 +226,13 @@
     font-size: 0.68rem;
   }
 
+  /* Parity with Pack Detail: same image preview size */
   .preview,
-  .previewPackFlow {
-    width: clamp(120px, 38vw, 160px);
-    height: clamp(120px, 38vw, 160px);
-    min-height: 120px;
-    border-radius: 10px;
-  }
-
   .previewPackFlow {
     width: clamp(140px, 42vw, 180px);
     height: clamp(140px, 42vw, 180px);
     min-height: 140px;
+    border-radius: 10px;
   }
 
   .gridToggleBtn {

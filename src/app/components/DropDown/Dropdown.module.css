@@ -74,11 +74,13 @@
   font-size: 14px;
 }
 
-/* Mobile */
+/* Mobile: comfortable touch target, 16px input to avoid zoom */
 @media (max-width: 600px) {
   .select {
     padding: 12px 40px 12px 14px;
-    font-size: 14px;
+    font-size: 16px;
+    min-height: 44px;
+    box-sizing: border-box;
   }
 
   .label {

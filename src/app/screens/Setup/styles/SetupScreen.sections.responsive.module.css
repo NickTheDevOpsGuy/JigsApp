@@ -21,9 +21,10 @@
   font-size: 0.78rem;
 }
 
+/* Parity with Pack Detail puzzle card: same size as pack image preview */
 .preview {
-  width: min(56vw, 48vh, 280px);
-  height: min(56vw, 48vh, 280px);
+  width: clamp(140px, 42vw, 180px);
+  height: clamp(140px, 42vw, 180px);
   min-height: 140px;
   margin-top: 8px;
   align-self: center;
@@ -38,8 +39,8 @@
 }
 
 .previewPackFlow {
-  width: min(56vw, 48vh, 280px);
-  height: min(56vw, 48vh, 280px);
+  width: clamp(140px, 42vw, 180px);
+  height: clamp(140px, 42vw, 180px);
   min-height: 140px;
 }
 

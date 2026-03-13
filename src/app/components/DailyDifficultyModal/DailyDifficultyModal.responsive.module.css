@@ -114,13 +114,13 @@
   }
 
   .moreOptionsList {
-    gap: 6px;
-    margin-top: 8px;
+    gap: 10px;
+    margin-top: 10px;
   }
 
   .moreOptionsList .difficultyCard {
     min-height: 0;
-    padding: 9px 12px;
+    padding: 10px 14px;
   }
 
   .modifierHint {

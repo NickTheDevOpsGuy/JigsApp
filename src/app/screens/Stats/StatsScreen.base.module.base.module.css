@@ -51,9 +51,8 @@
     height: var(--app-vh-stable, 100dvh);
     min-height: var(--app-vh-stable, 100dvh);
     max-height: var(--app-vh-stable, 100dvh);
-    padding: 8px 10px 4px;
-    padding-top: max(8px, env(safe-area-inset-top));
-    padding-bottom: max(4px, env(safe-area-inset-bottom));
+    padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
+      max(4px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
     overflow: hidden;
     overscroll-behavior: none;
   }
