@@ -28,7 +28,8 @@
     overflow: hidden;
     overflow-x: hidden;
     padding: calc(72px + env(safe-area-inset-top, 0)) 8px
-      calc(var(--mobile-tray-height, 224px) + max(8px, env(safe-area-inset-bottom, 0))) 8px;
+      calc(var(--mobile-tray-height, 224px) + max(8px, env(safe-area-inset-bottom, 0)))
+      8px;
     padding-left: max(8px, env(safe-area-inset-left, 0));
     padding-right: max(8px, env(safe-area-inset-right, 0));
     display: flex;
@@ -100,8 +101,8 @@
   .topBar {
     min-height: 0;
     height: auto;
-    padding: calc(8px + env(safe-area-inset-top, 0)) max(8px, env(safe-area-inset-right, 0))
-      0 max(8px, env(safe-area-inset-left, 0));
+    padding: calc(8px + env(safe-area-inset-top, 0))
+      max(8px, env(safe-area-inset-right, 0)) 0 max(8px, env(safe-area-inset-left, 0));
     gap: 8px;
     background: transparent;
     border-bottom: none;

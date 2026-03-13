@@ -148,7 +148,9 @@ export async function fetchImageUrlAsDataUrl(
   const imageType = blobType || headerType.split(";")[0];
 
   if (!imageType.startsWith("image/")) {
-    throw new Error("That URL did not return an image. Try a direct PNG, JPG, or WebP link.");
+    throw new Error(
+      "That URL did not return an image. Try a direct PNG, JPG, or WebP link.",
+    );
   }
 
   if (!VALID_TYPES.includes(imageType)) {

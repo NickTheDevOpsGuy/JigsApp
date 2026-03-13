@@ -172,53 +172,69 @@ export function PlayScreenLayout({
 
   const handleTrayHandlePointerMove = React.useCallback<
     React.PointerEventHandler<HTMLButtonElement>
-  >((e) => {
-    if (!isMobile || !trayDragRef.current || trayDragRef.current.pointerId !== e.pointerId) {
-      return;
-    }
-    const drag = trayDragRef.current;
-    const dy = e.clientY - drag.startY;
-    if (Math.abs(dy) > 4) drag.moved = true;
-    const baseHeight = MOBILE_TRAY_HEIGHTS[drag.stateAtStart];
-    const maxRaise = MOBILE_TRAY_HEIGHTS.full - baseHeight;
-    const maxLower = baseHeight - MOBILE_TRAY_HEIGHTS.collapsed;
-    let nextOffset = dy;
-    if (dy < -maxRaise) {
-      nextOffset = -maxRaise - Math.sqrt(Math.abs(dy + maxRaise)) * 0.35;
-    } else if (dy > maxLower) {
-      nextOffset = maxLower + Math.sqrt(Math.abs(dy - maxLower)) * 0.35;
-    }
-    setTrayDragOffset(nextOffset);
-  }, [isMobile]);
+  >(
+    (e) => {
+      if (
+        !isMobile ||
+        !trayDragRef.current ||
+        trayDragRef.current.pointerId !== e.pointerId
+      ) {
+        return;
+      }
+      const drag = trayDragRef.current;
+      const dy = e.clientY - drag.startY;
+      if (Math.abs(dy) > 4) drag.moved = true;
+      const baseHeight = MOBILE_TRAY_HEIGHTS[drag.stateAtStart];
+      const maxRaise = MOBILE_TRAY_HEIGHTS.full - baseHeight;
+      const maxLower = baseHeight - MOBILE_TRAY_HEIGHTS.collapsed;
+      let nextOffset = dy;
+      if (dy < -maxRaise) {
+        nextOffset = -maxRaise - Math.sqrt(Math.abs(dy + maxRaise)) * 0.35;
+      } else if (dy > maxLower) {
+        nextOffset = maxLower + Math.sqrt(Math.abs(dy - maxLower)) * 0.35;
+      }
+      setTrayDragOffset(nextOffset);
+    },
+    [isMobile],
+  );
 
   const handleTrayHandlePointerUp = React.useCallback<
     React.PointerEventHandler<HTMLButtonElement>
-  >((e) => {
-    if (!isMobile || !trayDragRef.current || trayDragRef.current.pointerId !== e.pointerId) {
-      return;
-    }
-    const drag = trayDragRef.current;
-    const dy = e.clientY - drag.startY;
-    const dt = Math.max(1, performance.now() - drag.startedAt);
-    const velocity = dy / dt;
+  >(
+    (e) => {
+      if (
+        !isMobile ||
+        !trayDragRef.current ||
+        trayDragRef.current.pointerId !== e.pointerId
+      ) {
+        return;
+      }
+      const drag = trayDragRef.current;
+      const dy = e.clientY - drag.startY;
+      const dt = Math.max(1, performance.now() - drag.startedAt);
+      const velocity = dy / dt;
 
-    if (!drag.moved && Math.abs(dy) < 8) {
-      settleTray(mobileTrayState === "collapsed" ? 1 : mobileTrayState === "full" ? -1 : 1);
-    } else if (dy < -54 || velocity < -0.45) {
-      settleTray(1);
-    } else if (dy > 54 || velocity > 0.45) {
-      settleTray(-1);
-    } else {
-      setTrayDragOffset(0);
-    }
+      if (!drag.moved && Math.abs(dy) < 8) {
+        settleTray(
+          mobileTrayState === "collapsed" ? 1 : mobileTrayState === "full" ? -1 : 1,
+        );
+      } else if (dy < -54 || velocity < -0.45) {
+        settleTray(1);
+      } else if (dy > 54 || velocity > 0.45) {
+        settleTray(-1);
+      } else {
+        setTrayDragOffset(0);
+      }
 
-    trayDragRef.current = null;
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      /* ignore */
-    }
-  }, [isMobile, mobileTrayState, settleTray]);
+      trayDragRef.current = null;
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+    },
+    [isMobile, mobileTrayState, settleTray],
+  );
 
   const pageStyleWithTray = React.useMemo<React.CSSProperties>(
     () => ({

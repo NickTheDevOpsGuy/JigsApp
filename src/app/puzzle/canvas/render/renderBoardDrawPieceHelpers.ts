@@ -11,7 +11,10 @@ import { drawWrongRotationIcon, drawLockGlow } from "./renderBoardDrawOverlays";
 const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.45)";
 const OUTLINE_LINE_WIDTH = 1.75;
 
-function getPieceSurfaceVariation(piece: Piece): { brightness: number; saturation: number } {
+function getPieceSurfaceVariation(piece: Piece): {
+  brightness: number;
+  saturation: number;
+} {
   const seed = (piece.row + 1) * 97 + (piece.col + 1) * 193;
   const normalized = ((Math.sin(seed * 12.9898) + 1) / 2) * 2 - 1;
   return {
