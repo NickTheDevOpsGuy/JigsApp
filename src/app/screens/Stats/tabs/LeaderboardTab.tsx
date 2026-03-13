@@ -134,7 +134,8 @@ export function LeaderboardTab({
       {leaderboardType === "today" && (
         <div className={styles.boardInfoStrip}>
           <p className={styles.todayCompletionCount} aria-live="polite">
-            {todayCompletionCount} completion{todayCompletionCount !== 1 ? "s" : ""} so far
+            {todayCompletionCount} completion{todayCompletionCount !== 1 ? "s" : ""} so
+            far
           </p>
         </div>
       )}

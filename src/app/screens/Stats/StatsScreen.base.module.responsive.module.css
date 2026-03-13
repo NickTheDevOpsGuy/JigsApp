@@ -223,7 +223,8 @@
   gap: 2px;
   padding: 8px 10px;
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 26%, var(--color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 26%, var(--color-border));
   background: color-mix(in srgb, var(--color-brand-primary) 8%, transparent);
   color: var(--color-text-secondary);
 }

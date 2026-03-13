@@ -61,7 +61,9 @@ async function assertFallbackFlow(page: Page) {
 async function expectVisibleHeight(page: Page, locator: Locator) {
   const box = await locator.boundingBox();
   expect(box).not.toBeNull();
-  expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(page.viewportSize()!.height + 1);
+  expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(
+    page.viewportSize()!.height + 1,
+  );
 }
 
 test.describe("Stats modal parity", () => {
@@ -71,7 +73,9 @@ test.describe("Stats modal parity", () => {
     });
   });
 
-  test("desktop stats modal keeps major controls visible and usable", async ({ page }) => {
+  test("desktop stats modal keeps major controls visible and usable", async ({
+    page,
+  }) => {
     await openStats(page);
 
     if (await isSupabaseFallback(page)) {

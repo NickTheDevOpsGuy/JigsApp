@@ -95,7 +95,9 @@ export function LeaderboardTabHeader({
               id="leaderboard-metric-select"
               className={styles.sortClusterSelect}
               value={leaderboardMetric}
-              onChange={(e) => setLeaderboardMetric(e.target.value as LeaderboardSortMetric)}
+              onChange={(e) =>
+                setLeaderboardMetric(e.target.value as LeaderboardSortMetric)
+              }
               aria-label="Sort by"
             >
               <option value="time">Fastest</option>

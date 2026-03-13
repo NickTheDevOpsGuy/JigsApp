@@ -167,7 +167,8 @@
   color: var(--color-text-primary);
   padding: 4px 8px;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 38%, var(--color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 38%, var(--color-border));
   background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
 }
 

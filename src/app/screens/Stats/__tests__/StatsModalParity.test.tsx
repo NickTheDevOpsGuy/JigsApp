@@ -9,7 +9,11 @@ import { StatsTabBar } from "../components/StatsTabBar";
 import { ProfileTab } from "../tabs/ProfileTab";
 import { LeaderboardTabHeader } from "../tabs/LeaderboardTabHeader";
 import { AchievementsTab } from "../tabs/AchievementsTab";
-import { renderCompletionList, renderEfficiencyList, renderTimeList } from "../tabs/LeaderboardTabLists";
+import {
+  renderCompletionList,
+  renderEfficiencyList,
+  renderTimeList,
+} from "../tabs/LeaderboardTabLists";
 
 vi.mock("@/screens/Play/core/time/timeMode", () => ({
   getBestTime: vi.fn(() => 95),
@@ -164,7 +168,12 @@ describe("Stats modal parity", () => {
       <div>
         {renderTimeList([], "No completions yet. Be the first!", 0, true)}
         {renderCompletionList([], 0, true, "No completions in the last 7 days.")}
-        {renderEfficiencyList([], 0, true, "No completions with moves recorded this week.")}
+        {renderEfficiencyList(
+          [],
+          0,
+          true,
+          "No completions with moves recorded this week.",
+        )}
       </div>,
     );
 
