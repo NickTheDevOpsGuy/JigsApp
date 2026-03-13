@@ -75,8 +75,8 @@ export function drawAlignmentGrid(
 /** Lift offset (px) when dragging – subtle "pick up" effect. */
 export const DRAG_LIFT_PX = 6;
 
-/** Scale multiplier when dragging – piece feels physically lifted (1–2%). */
-export const DRAG_SCALE = 1.02;
+/** Scale multiplier when dragging – piece feels physically lifted. */
+export const DRAG_SCALE = 1.03;
 
 export function applyPieceShadow(
   ctx: CanvasRenderingContext2D,

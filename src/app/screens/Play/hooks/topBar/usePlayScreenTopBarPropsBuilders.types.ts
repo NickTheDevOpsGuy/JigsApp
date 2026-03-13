@@ -108,6 +108,7 @@ export type BuildHeaderMenuPropsArgs = {
 export type BuildHudPropsArgs = {
   state: PuzzleState | null;
   elapsedSeconds: number;
+  moveCount: number;
   adaptivePersonalityEnabled: boolean;
   piecesLeft: number;
   totalPieces: number;

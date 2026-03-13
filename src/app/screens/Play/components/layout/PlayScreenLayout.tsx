@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import { PieceTray } from "@/components/PieceTray/PieceTray";
 import type { Piece, PuzzleState } from "@/puzzle/core/types";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   Minimap,
   PlayScreenCoopView,
@@ -89,6 +90,14 @@ type PlayScreenLayoutProps = {
   overlaysProps: React.ComponentProps<typeof PlayScreenOverlays>;
 };
 
+type MobileTraySheetState = "collapsed" | "half" | "full";
+
+const MOBILE_TRAY_HEIGHTS: Record<MobileTraySheetState, number> = {
+  collapsed: 72,
+  half: 224,
+  full: 360,
+};
+
 export function PlayScreenLayout({
   coopViewProps,
   pageClassName,
@@ -106,11 +115,125 @@ export function PlayScreenLayout({
   tray,
   overlaysProps,
 }: PlayScreenLayoutProps) {
+  const isMobile = useMediaQuery("(max-width: 600px)");
+  const [mobileTrayState, setMobileTrayState] =
+    React.useState<MobileTraySheetState>("half");
+  const [trayDragOffset, setTrayDragOffset] = React.useState(0);
+  const trayDragRef = React.useRef<{
+    pointerId: number;
+    startY: number;
+    startedAt: number;
+    stateAtStart: MobileTraySheetState;
+    moved: boolean;
+  } | null>(null);
+
+  React.useEffect(() => {
+    if (!isMobile) {
+      setMobileTrayState("half");
+      setTrayDragOffset(0);
+    }
+  }, [isMobile]);
+
+  const trayOrder = React.useMemo<MobileTraySheetState[]>(
+    () => ["collapsed", "half", "full"],
+    [],
+  );
+  const currentTrayHeight = isMobile ? MOBILE_TRAY_HEIGHTS[mobileTrayState] : 0;
+  const trayReservedHeight = isMobile ? currentTrayHeight + 12 : 0;
+
+  const settleTray = React.useCallback(
+    (direction: -1 | 0 | 1) => {
+      setMobileTrayState((prev) => {
+        const index = trayOrder.indexOf(prev);
+        const nextIndex = Math.max(0, Math.min(trayOrder.length - 1, index + direction));
+        return trayOrder[nextIndex];
+      });
+      setTrayDragOffset(0);
+    },
+    [trayOrder],
+  );
+
+  const handleTrayHandlePointerDown = React.useCallback<
+    React.PointerEventHandler<HTMLButtonElement>
+  >(
+    (e) => {
+      if (!isMobile) return;
+      trayDragRef.current = {
+        pointerId: e.pointerId,
+        startY: e.clientY,
+        startedAt: performance.now(),
+        stateAtStart: mobileTrayState,
+        moved: false,
+      };
+      e.currentTarget.setPointerCapture(e.pointerId);
+    },
+    [isMobile, mobileTrayState],
+  );
+
+  const handleTrayHandlePointerMove = React.useCallback<
+    React.PointerEventHandler<HTMLButtonElement>
+  >((e) => {
+    if (!isMobile || !trayDragRef.current || trayDragRef.current.pointerId !== e.pointerId) {
+      return;
+    }
+    const drag = trayDragRef.current;
+    const dy = e.clientY - drag.startY;
+    if (Math.abs(dy) > 4) drag.moved = true;
+    const baseHeight = MOBILE_TRAY_HEIGHTS[drag.stateAtStart];
+    const maxRaise = MOBILE_TRAY_HEIGHTS.full - baseHeight;
+    const maxLower = baseHeight - MOBILE_TRAY_HEIGHTS.collapsed;
+    let nextOffset = dy;
+    if (dy < -maxRaise) {
+      nextOffset = -maxRaise - Math.sqrt(Math.abs(dy + maxRaise)) * 0.35;
+    } else if (dy > maxLower) {
+      nextOffset = maxLower + Math.sqrt(Math.abs(dy - maxLower)) * 0.35;
+    }
+    setTrayDragOffset(nextOffset);
+  }, [isMobile]);
+
+  const handleTrayHandlePointerUp = React.useCallback<
+    React.PointerEventHandler<HTMLButtonElement>
+  >((e) => {
+    if (!isMobile || !trayDragRef.current || trayDragRef.current.pointerId !== e.pointerId) {
+      return;
+    }
+    const drag = trayDragRef.current;
+    const dy = e.clientY - drag.startY;
+    const dt = Math.max(1, performance.now() - drag.startedAt);
+    const velocity = dy / dt;
+
+    if (!drag.moved && Math.abs(dy) < 8) {
+      settleTray(mobileTrayState === "collapsed" ? 1 : mobileTrayState === "full" ? -1 : 1);
+    } else if (dy < -54 || velocity < -0.45) {
+      settleTray(1);
+    } else if (dy > 54 || velocity > 0.45) {
+      settleTray(-1);
+    } else {
+      setTrayDragOffset(0);
+    }
+
+    trayDragRef.current = null;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  }, [isMobile, mobileTrayState, settleTray]);
+
+  const pageStyleWithTray = React.useMemo<React.CSSProperties>(
+    () => ({
+      ...pageStyle,
+      ["--mobile-tray-height" as string]: `${trayReservedHeight}px`,
+      ["--mobile-tray-drag-offset" as string]: `${trayDragOffset}px`,
+    }),
+    [pageStyle, trayReservedHeight, trayDragOffset],
+  );
+
   return (
     <PlayScreenCoopView {...coopViewProps}>
       <div
         className={pageClassName}
-        style={pageStyle}
+        style={pageStyleWithTray}
         ref={pageRef as React.RefObject<HTMLDivElement>}
       >
         {immersiveMode && (
@@ -142,6 +265,16 @@ export function PlayScreenLayout({
             ref={board.mainRef as React.RefObject<HTMLDivElement>}
           >
             <div className={styles.boardWrapper}>
+              {isMobile && tray.showUndoRedo && (
+                <div className={styles.boardUndoRedo}>
+                  <UndoRedoButtons
+                    canUndo={tray.canUndo}
+                    onUndo={tray.onUndo}
+                    canRedo={tray.canRedo}
+                    onRedo={tray.onRedo}
+                  />
+                </div>
+              )}
               <div
                 className={styles.boardProgressFrame}
                 data-complete={board.isComplete ? "true" : undefined}
@@ -236,10 +369,18 @@ export function PlayScreenLayout({
           </div>
           {tray.show && (
             <div
-              className={`${styles.trayArea} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
+              className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
               onPointerLeave={tray.onPointerLeave}
+              data-tray-state={isMobile ? mobileTrayState : undefined}
+              style={
+                isMobile
+                  ? ({
+                      ["--tray-sheet-height" as string]: `${currentTrayHeight}px`,
+                    } as React.CSSProperties)
+                  : undefined
+              }
             >
-              {tray.showUndoRedo && (
+              {tray.showUndoRedo && !isMobile && (
                 <div className={styles.undoRedoPillsWrap}>
                   <UndoRedoButtons
                     canUndo={tray.canUndo}
@@ -248,6 +389,28 @@ export function PlayScreenLayout({
                     onRedo={tray.onRedo}
                   />
                 </div>
+              )}
+              {isMobile && (
+                <button
+                  type="button"
+                  className={styles.traySheetHandle}
+                  onPointerDown={handleTrayHandlePointerDown}
+                  onPointerMove={handleTrayHandlePointerMove}
+                  onPointerUp={handleTrayHandlePointerUp}
+                  onPointerCancel={handleTrayHandlePointerUp}
+                  aria-label={`Pieces drawer, ${mobileTrayState}`}
+                  title="Open or close piece drawer"
+                >
+                  <span className={styles.traySheetHandleBar} />
+                  <span className={styles.traySheetHandleText}>
+                    {mobileTrayState === "collapsed"
+                      ? "▲"
+                      : mobileTrayState === "full"
+                        ? "▼"
+                        : "◆"}{" "}
+                    Pieces ({tray.trayPieces.length})
+                  </span>
+                </button>
               )}
               <div
                 className={`${styles.trayWrap} ${tray.isLargeTray ? styles.trayWrapLarge : ""}`}

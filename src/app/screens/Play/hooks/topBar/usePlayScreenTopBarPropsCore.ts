@@ -90,6 +90,7 @@ export function usePlayScreenTopBarProps(
     snapToleranceOverride,
     setSnapToleranceOverride,
     elapsedSeconds,
+    moveCount,
     piecesLeft,
     totalPieces,
     isComplete,
@@ -210,6 +211,7 @@ export function usePlayScreenTopBarProps(
   const hudProps = buildHudProps({
     state,
     elapsedSeconds,
+    moveCount,
     adaptivePersonalityEnabled,
     piecesLeft,
     totalPieces,

@@ -76,7 +76,7 @@ export function renderTrayPiece(
   const cols = Math.round(assembledW / piece.tileW);
   const rows = Math.round(assembledH / piece.tileH);
   const rect = computeImageSourceRect(piece, img, cols, rows);
-  drawPieceImageInPath(ctx, path, img, rect);
+  drawPieceImageInPath(ctx, path, img, rect, piece);
   strokePieceOutline(ctx, path, false, false, piece.isPlaced, piece.locked);
 
   return canvas;

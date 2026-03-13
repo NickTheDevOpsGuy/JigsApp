@@ -10,6 +10,7 @@ import type { TimeMode } from "@/screens/Play/core/time/timeMode";
 
 interface PlayHUDProps {
   elapsedSeconds: number;
+  moveCount: number;
   piecesLeft: number;
   totalPieces: number;
   isPaused: boolean;
@@ -38,6 +39,7 @@ const QUAD_FULL_NAMES: Record<number, string> = {
 
 export function PlayHUD({
   elapsedSeconds,
+  moveCount,
   piecesLeft,
   totalPieces,
   isPaused,
@@ -152,7 +154,16 @@ export function PlayHUD({
         <Pause size={14} />
       </button>
       <div
-        className={`${styles.hudPill} ${bounce ? styles.hudPillBounce : ""}`}
+        className={`${styles.hudPill} ${styles.hudPillMoves}`}
+        aria-label={`${moveCount} moves`}
+        title={`${moveCount} moves`}
+        role="status"
+      >
+        <span className={styles.hudMetaLabel}>Moves</span>
+        <span>{moveCount}</span>
+      </div>
+      <div
+        className={`${styles.hudPill} ${styles.hudPillProgress} ${bounce ? styles.hudPillBounce : ""}`}
         aria-label={`${piecesLeft} of ${totalPieces} pieces remaining`}
         title={`${piecesLeft} of ${totalPieces} pieces remaining`}
         role="status"

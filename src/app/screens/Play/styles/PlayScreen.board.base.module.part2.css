@@ -123,9 +123,46 @@
   max-height: 100%;
   position: relative;
   isolation: isolate;
-  background: var(--color-bg-elevated);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(82, 128, 196, 0.14), transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05), transparent 62%),
+    linear-gradient(180deg, rgba(13, 24, 43, 0.98), rgba(9, 16, 30, 0.98));
   border-radius: var(--radius-board, 20px);
   border: 2px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  box-shadow:
+    0 24px 48px rgba(2, 7, 18, 0.34),
+    0 8px 18px rgba(4, 10, 25, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   overflow: hidden;
+}
+
+.board::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.06), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(0, 0, 0, 0.08)),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.015) 0,
+      rgba(255, 255, 255, 0.015) 2px,
+      transparent 2px,
+      transparent 8px
+    );
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+
+.board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 58%,
+    rgba(0, 0, 0, 0.16) 100%
+  );
 }

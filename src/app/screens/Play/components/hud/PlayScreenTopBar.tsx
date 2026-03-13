@@ -20,6 +20,7 @@ export type PlayScreenTopBarProps = {
   showHud: boolean;
   hudProps: {
     elapsedSeconds: number;
+    moveCount: number;
     piecesLeft: number;
     totalPieces: number;
     isPaused: boolean;

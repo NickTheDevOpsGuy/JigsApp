@@ -160,6 +160,15 @@
     padding: 8px 10px;
   }
 
+  .urlInputRow {
+    grid-template-columns: 1fr;
+  }
+
+  .urlImportButton {
+    width: 100%;
+    min-height: 36px;
+  }
+
   .difficultySection,
   .timerSection {
     gap: 10px;

@@ -8,6 +8,7 @@ export function buildHudProps(args: BuildHudPropsArgs) {
   const {
     state,
     elapsedSeconds,
+    moveCount,
     adaptivePersonalityEnabled,
     piecesLeft,
     totalPieces,
@@ -32,6 +33,7 @@ export function buildHudProps(args: BuildHudPropsArgs) {
 
   return {
     elapsedSeconds,
+    moveCount,
     piecesLeft,
     totalPieces,
     isPaused,

@@ -11,6 +11,15 @@ import { drawWrongRotationIcon, drawLockGlow } from "./renderBoardDrawOverlays";
 const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.45)";
 const OUTLINE_LINE_WIDTH = 1.75;
 
+function getPieceSurfaceVariation(piece: Piece): { brightness: number; saturation: number } {
+  const seed = (piece.row + 1) * 97 + (piece.col + 1) * 193;
+  const normalized = ((Math.sin(seed * 12.9898) + 1) / 2) * 2 - 1;
+  return {
+    brightness: 1 + normalized * 0.02,
+    saturation: 1 + normalized * 0.01,
+  };
+}
+
 /**
  * Draw a soft drop shadow that follows the piece silhouette (path only).
  * Call before clip+drawImage so shadow sits behind the piece.
@@ -26,16 +35,21 @@ export function drawSilhouetteShadow(
   ctx.lineCap = "round";
   if (isDragging) {
     ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
-    ctx.shadowBlur = 28;
-    ctx.shadowOffsetX = 8;
-    ctx.shadowOffsetY = 12;
+    ctx.shadowBlur = 32;
+    ctx.shadowOffsetX = 10;
+    ctx.shadowOffsetY = 14;
   } else if (!isPlaced) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.2)";
-    ctx.shadowBlur = 6;
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.24)";
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 4;
+  } else {
+    ctx.shadowColor = "rgba(0, 0, 0, 0.08)";
+    ctx.shadowBlur = 2;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 1;
   }
-  if (isDragging || !isPlaced) {
+  if (isDragging || !isPlaced || isPlaced) {
     ctx.fillStyle = "rgba(0,0,0,0.35)";
     ctx.fill(path);
   }
@@ -51,11 +65,14 @@ export function drawPieceImageInPath(
   path: Path2D,
   img: HTMLImageElement,
   rect: ImageSourceRect,
+  piece: Piece,
 ): void {
+  const variation = getPieceSurfaceVariation(piece);
   ctx.save();
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   ctx.clip(path);
+  ctx.filter = `brightness(${variation.brightness}) saturate(${variation.saturation})`;
   ctx.drawImage(
     img,
     rect.srcX,
@@ -67,6 +84,31 @@ export function drawPieceImageInPath(
     rect.destW,
     rect.destH,
   );
+  ctx.filter = "none";
+
+  const topGlow = ctx.createLinearGradient(0, 0, 0, piece.h);
+  topGlow.addColorStop(0, "rgba(255,255,255,0.2)");
+  topGlow.addColorStop(0.18, "rgba(255,255,255,0.08)");
+  topGlow.addColorStop(0.45, "rgba(255,255,255,0)");
+  ctx.fillStyle = topGlow;
+  ctx.fill(path);
+
+  const bevelShade = ctx.createLinearGradient(0, 0, 0, piece.h);
+  bevelShade.addColorStop(0, "rgba(0,0,0,0)");
+  bevelShade.addColorStop(0.72, "rgba(0,0,0,0.04)");
+  bevelShade.addColorStop(1, "rgba(0,0,0,0.16)");
+  ctx.fillStyle = bevelShade;
+  ctx.fill(path);
+
+  const edgeRim = ctx.createLinearGradient(0, 0, piece.w, piece.h);
+  edgeRim.addColorStop(0, "rgba(255,255,255,0.08)");
+  edgeRim.addColorStop(0.55, "rgba(255,255,255,0)");
+  edgeRim.addColorStop(1, "rgba(0,0,0,0.12)");
+  ctx.strokeStyle = edgeRim;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke(path);
   ctx.restore();
 }
 
@@ -83,10 +125,12 @@ export function strokePieceOutline(
   locked: boolean,
   _showClusterOutline?: boolean,
 ): void {
-  if (isPlaced || locked) return;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
-  if (isDragging) {
+  if (isPlaced || locked) {
+    ctx.strokeStyle = "rgba(8, 16, 28, 0.16)";
+    ctx.lineWidth = 1.15;
+  } else if (isDragging) {
     ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
     ctx.lineWidth = OUTLINE_LINE_WIDTH;
   } else if (isSelected) {
@@ -135,12 +179,16 @@ export function drawCachedPiece(
   ctx.save();
   let cx = p.x + p.w / 2 + shakeX;
   let cy = p.y + p.h / 2 + shakeY;
+  const dragTiltDeg = isDragging ? ((p.row + p.col) % 2 === 0 ? -1.6 : 1.6) : 0;
   if (isDragging) {
     cx = Math.round(cx * dpr) / dpr;
     cy = Math.round(cy * dpr) / dpr;
     cy -= DRAG_LIFT_PX;
   }
   ctx.translate(cx, cy);
+  if (dragTiltDeg !== 0) {
+    ctx.rotate((dragTiltDeg * Math.PI) / 180);
+  }
   ctx.scale(scale, scale);
   ctx.translate(-cacheW / 2, -cacheH / 2);
 

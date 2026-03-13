@@ -116,3 +116,57 @@
   font-size: 0.84rem;
   font-weight: 600;
 }
+
+.urlImportPanel {
+  display: grid;
+  gap: 8px;
+}
+
+.urlInputRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.urlInput {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(90, 121, 175, 0.62);
+  background: rgba(18, 31, 56, 0.82);
+  color: #d7e9ff;
+  padding: 10px 12px;
+}
+
+.urlInput::placeholder {
+  color: rgba(166, 195, 234, 0.72);
+}
+
+.urlImportButton {
+  appearance: none;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(98, 168, 255, 0.75);
+  padding: 0 14px;
+  background: linear-gradient(180deg, #4d97f2, #3279d8);
+  color: #eff6ff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.urlImportButton:hover:not(:disabled) {
+  background: linear-gradient(180deg, #5aa2f8, #3a85e5);
+}
+
+.urlImportButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.urlHelp {
+  margin: 0;
+  color: #8fb2e2;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}

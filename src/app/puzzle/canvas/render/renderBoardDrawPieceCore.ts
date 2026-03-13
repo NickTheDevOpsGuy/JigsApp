@@ -187,7 +187,7 @@ export function drawPiece(
       offCtx.translate(cacheW / 2, cacheH / 2);
       offCtx.rotate((p.rotation * Math.PI) / 180);
       offCtx.translate(-p.w / 2, -p.h / 2);
-      drawPieceImageInPath(offCtx, path, img, rect);
+      drawPieceImageInPath(offCtx, path, img, rect, p);
       pieceCache.set(cacheKey, off);
       cacheCanvas = off;
     }
@@ -220,14 +220,18 @@ export function drawPiece(
 
   const rect = computeImageSourceRect(p, img, cols, rows);
   const liftY = isDragging ? -DRAG_LIFT_PX : 0;
+  const dragTiltDeg = isDragging ? ((p.row + p.col) % 2 === 0 ? -1.6 : 1.6) : 0;
   ctx.save();
   ctx.translate(p.x + p.w / 2 + shake.x, p.y + p.h / 2 + shake.y + liftY);
   ctx.rotate((p.rotation * Math.PI) / 180);
+  if (dragTiltDeg !== 0) {
+    ctx.rotate((dragTiltDeg * Math.PI) / 180);
+  }
   ctx.scale(scale, scale);
   ctx.translate(-p.w / 2, -p.h / 2);
 
   drawSilhouetteShadow(ctx, path, isDragging, p.isPlaced);
-  drawPieceImageInPath(ctx, path, img, rect);
+  drawPieceImageInPath(ctx, path, img, rect, p);
   strokePieceOutline(
     ctx,
     path,

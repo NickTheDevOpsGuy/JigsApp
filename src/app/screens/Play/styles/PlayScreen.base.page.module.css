@@ -182,6 +182,28 @@
   touch-action: pan-y manipulation;
 }
 
+.trayAreaSheet {
+  --tray-sheet-height: 224px;
+}
+
+.traySheetHandle {
+  display: none;
+}
+
+.traySheetHandleBar {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(206, 223, 255, 0.42);
+}
+
+.traySheetHandleText {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(235, 244, 255, 0.94);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .topBar,
   .topBarWrap,

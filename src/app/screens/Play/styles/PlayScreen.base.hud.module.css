@@ -29,6 +29,21 @@
   white-space: nowrap;
 }
 
+.hudPillMoves {
+  background: color-mix(in srgb, var(--color-bg-card) 92%, rgba(62, 120, 255, 0.14));
+}
+
+.hudPillProgress {
+  min-width: 0;
+}
+
+.hudMetaLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.74;
+}
+
 .hudPillBounce {
   animation: hudPillBounce 0.3s ease-out;
 }

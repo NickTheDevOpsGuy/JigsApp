@@ -5,7 +5,7 @@
     min-height: var(--app-vh-stable, 100dvh);
     overflow: hidden;
     overflow-x: hidden;
-    padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
+    padding-bottom: 0;
   }
 
   /* On short mobile (e.g. landscape), allow scroll so tray is reachable */
@@ -27,7 +27,8 @@
     min-width: 0;
     overflow: hidden;
     overflow-x: hidden;
-    padding: 6px 8px 0;
+    padding: calc(72px + env(safe-area-inset-top, 0)) 8px
+      calc(var(--mobile-tray-height, 224px) + max(8px, env(safe-area-inset-bottom, 0))) 8px;
     padding-left: max(8px, env(safe-area-inset-left, 0));
     padding-right: max(8px, env(safe-area-inset-right, 0));
     display: flex;
@@ -37,8 +38,8 @@
 
   .main {
     width: 100%;
-    max-width: min(90vw, 420px);
-    padding: 12px 0 4px;
+    max-width: min(94vw, 520px);
+    padding: 0;
     gap: 4px;
     align-items: center;
     justify-content: center;
@@ -48,7 +49,7 @@
   }
 
   .boardWrapper {
-    width: 100%;
+    width: min(94vw, 520px);
     max-width: 100%;
     flex: 1;
     min-height: 0;
@@ -56,7 +57,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 6px;
+    margin-top: 0;
+    max-height: min(80svh, calc(100dvh - var(--mobile-tray-height, 224px) - 116px));
   }
 
   .boardWrapper .boardProgressFrame {
@@ -76,6 +78,7 @@
     height: auto;
     aspect-ratio: 1 / 1;
     flex-shrink: 0;
+    border-radius: 22px;
   }
 
   /* Ensure square board fits within progress frame */
@@ -83,13 +86,62 @@
     max-height: 100%;
   }
 
+  .topBarWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-height: none;
+    z-index: 230;
+    overflow: visible;
+    pointer-events: none;
+  }
+
   .topBar {
+    min-height: 0;
+    height: auto;
+    padding: calc(8px + env(safe-area-inset-top, 0)) max(8px, env(safe-area-inset-right, 0))
+      0 max(8px, env(safe-area-inset-left, 0));
+    gap: 8px;
+    background: transparent;
+    border-bottom: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    pointer-events: none;
+  }
+
+  .topBarLeft,
+  .topBarCenter,
+  .topBarHud,
+  .headerMenuTriggerWrap,
+  .hud,
+  .hudPill,
+  .hudPillTimer,
+  .hudPillPause,
+  .headerMenuTrigger {
+    pointer-events: auto;
+  }
+
+  .topBarRight {
+    display: none;
+  }
+
+  .topBarCenter {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .topBarHud {
+    margin-left: auto;
+  }
+
+  .headerMenuTrigger {
+    min-width: 48px;
     min-height: 48px;
-    height: 48px;
-    padding: 0 max(8px, env(safe-area-inset-right, 0)) 0
-      max(8px, env(safe-area-inset-left, 0));
-    padding-top: env(safe-area-inset-top, 0);
-    gap: 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-bg-elevated) 88%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+    box-shadow: 0 10px 24px rgba(2, 7, 18, 0.28);
   }
   .title {
     display: none;
@@ -117,6 +169,8 @@
   }
   .hud {
     gap: 6px;
+    justify-content: flex-end;
+    flex: 0 1 auto;
   }
   .quadrantTimers {
     font-size: 10px;
@@ -126,12 +180,18 @@
     font-size: 10px;
   }
   .hudPill {
-    padding: 6px 10px;
+    min-height: 48px;
+    padding: 0 14px;
     font-size: 12px;
     gap: 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
+    border-color: color-mix(in srgb, var(--color-border) 88%, transparent);
+    box-shadow: 0 10px 24px rgba(2, 7, 18, 0.24);
   }
   .hudPillTimer {
-    padding: 6px 8px;
+    min-height: 48px;
+    padding: 0 14px;
     font-size: 12px;
   }
   .hudPillTimer .timerSuffix {
@@ -139,6 +199,20 @@
   }
   .hudPill {
     min-width: 0;
+  }
+
+  .hudPillProgress {
+    display: none;
+  }
+
+  .hudMetaLabel {
+    font-size: 9px;
+  }
+
+  .hudPillPause {
+    min-height: 48px;
+    min-width: 48px;
+    box-shadow: 0 10px 24px rgba(2, 7, 18, 0.24);
   }
   .hudPill span {
     overflow: hidden;
@@ -150,14 +224,94 @@
     border-width: 2px;
     border-radius: var(--radius-card, 16px);
   }
+
+  .boardUndoRedo {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    z-index: 9;
+    display: flex;
+    pointer-events: auto;
+  }
+
+  .boardUndoRedo .undoRedoPills {
+    box-shadow: 0 10px 24px rgba(2, 7, 18, 0.2);
+    background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  }
+
   .previewPanel {
-    top: calc(52px + 10px + env(safe-area-inset-top, 0));
+    top: calc(68px + env(safe-area-inset-top, 0));
     right: max(10px, env(safe-area-inset-right, 0));
     padding: 6px;
   }
   .previewImage {
     width: 100px;
     height: 100px;
+  }
+
+  .trayAreaSheet {
+    position: absolute;
+    left: max(8px, env(safe-area-inset-left, 0));
+    right: max(8px, env(safe-area-inset-right, 0));
+    bottom: 0;
+    z-index: 220;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .trayAreaSheet .trayWrap,
+  .trayAreaSheet .traySheetHandle {
+    pointer-events: auto;
+  }
+
+  .trayAreaSheet .trayWrap {
+    width: min(94vw, 520px);
+    max-width: 100%;
+    align-self: center;
+    height: calc(var(--tray-sheet-height, 224px) - 56px);
+    max-height: calc(var(--tray-sheet-height, 224px) - 56px);
+    padding: 0 0 max(10px, env(safe-area-inset-bottom, 0));
+    border-radius: 22px 22px 0 0;
+    background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
+    border-bottom: none;
+    box-shadow: 0 -18px 42px rgba(2, 7, 18, 0.34);
+    transform: translateY(var(--mobile-tray-drag-offset, 0px));
+    transition:
+      transform 180ms ease,
+      height 220ms ease,
+      max-height 220ms ease,
+      opacity 180ms ease;
+    overflow: hidden;
+  }
+
+  .trayAreaSheet[data-tray-state="collapsed"] .trayWrap {
+    height: 0;
+    max-height: 0;
+    opacity: 0;
+    border-width: 0;
+  }
+
+  .traySheetHandle {
+    width: min(94vw, 520px);
+    max-width: 100%;
+    min-height: 56px;
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 10px 16px 12px;
+    border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
+    border-bottom: none;
+    border-radius: 22px 22px 0 0;
+    background:
+      linear-gradient(180deg, rgba(21, 36, 63, 0.96), rgba(14, 25, 45, 0.96)),
+      color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
+    color: var(--color-text-primary);
+    box-shadow: 0 -10px 28px rgba(2, 7, 18, 0.26);
+    transform: translateY(var(--mobile-tray-drag-offset, 0px));
+    transition: transform 180ms ease;
+    touch-action: none;
   }
 
   /* Smaller hint so it doesn't stretch on mobile */

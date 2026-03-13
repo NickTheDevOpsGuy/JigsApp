@@ -1,7 +1,7 @@
 /**
  * Image source tabs (Gallery / Upload / Camera) and panel content for SetupScreen.
  */
-import { Camera, ChevronLeft, ChevronRight, Image, Upload } from "lucide-react";
+import { Camera, ChevronLeft, ChevronRight, Image, Link2, Upload } from "lucide-react";
 import { CATEGORIES } from "@/data/packs/samplePuzzles";
 import { CameraCapture } from "./CameraCapture";
 import { SetupGalleryThumbnail } from "./SetupGalleryThumbnail";
@@ -22,6 +22,9 @@ interface SetupImageSourcePanelProps {
   selectedPuzzle: SamplePuzzle | null;
   isLoading: boolean;
   onPickFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  imageUrlInput: string;
+  setImageUrlInput: (value: string) => void;
+  onImportUrl: () => void;
   setFromBlob: (blob: Blob) => Promise<boolean>;
   styles: Record<string, string>;
 }
@@ -40,6 +43,9 @@ export function SetupImageSourcePanel({
   selectedPuzzle,
   isLoading,
   onPickFile,
+  imageUrlInput,
+  setImageUrlInput,
+  onImportUrl,
   setFromBlob,
   styles,
 }: SetupImageSourcePanelProps) {
@@ -82,6 +88,17 @@ export function SetupImageSourcePanel({
         >
           <Upload size={16} />
           Upload
+        </button>
+        <button
+          role="tab"
+          aria-selected={imageSource === "url"}
+          aria-controls="image-source-panel"
+          className={`${styles.tab} ${imageSource === "url" ? styles.tabActive : ""}`}
+          onClick={() => setImageSource("url")}
+          title="Import an image from a URL"
+        >
+          <Link2 size={16} />
+          URL
         </button>
         <button
           role="tab"
@@ -173,6 +190,44 @@ export function SetupImageSourcePanel({
               disabled={isLoading}
             />
           </label>
+        ) : imageSource === "url" ? (
+          <div className={styles.urlImportPanel}>
+            <label className={styles.label} htmlFor="setup-image-url">
+              Paste direct image URL
+            </label>
+            <div className={styles.urlInputRow}>
+              <input
+                id="setup-image-url"
+                className={styles.urlInput}
+                type="url"
+                inputMode="url"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="https://example.com/puzzle.jpg"
+                value={imageUrlInput}
+                onChange={(e) => setImageUrlInput(e.currentTarget.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void onImportUrl();
+                  }
+                }}
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                className={styles.urlImportButton}
+                onClick={() => void onImportUrl()}
+                disabled={isLoading || !imageUrlInput.trim()}
+              >
+                Import
+              </button>
+            </div>
+            <p className={styles.urlHelp}>
+              Use a public PNG, JPG, or WebP link. Some sites block direct image fetches.
+            </p>
+          </div>
         ) : (
           <CameraCapture onCapture={setFromBlob} disabled={isLoading} />
         )}

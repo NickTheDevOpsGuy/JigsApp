@@ -4,4 +4,4 @@
 
 export const STORAGE_KEY = "phuzzle:imageDataUrl";
 
-export type ImageSource = "gallery" | "upload" | "camera";
+export type ImageSource = "gallery" | "upload" | "url" | "camera";

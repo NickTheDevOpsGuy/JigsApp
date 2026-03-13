@@ -103,6 +103,70 @@ function readBlobAsDataUrl(blob: Blob): Promise<string> {
   });
 }
 
+function normalizeImageUrl(rawUrl: string): string {
+  const trimmed = rawUrl.trim();
+  if (!trimmed) {
+    throw new Error("Enter an image URL to import.");
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    throw new Error("Enter a valid image URL starting with http:// or https://.");
+  }
+
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Only http:// and https:// image URLs are supported.");
+  }
+
+  return parsed.href;
+}
+
+export async function fetchImageUrlAsDataUrl(
+  rawUrl: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<string> {
+  const url = normalizeImageUrl(rawUrl);
+  let response: Response;
+
+  try {
+    response = await fetchImpl(url);
+  } catch {
+    throw new Error(
+      "Could not fetch that image URL. Make sure the link is public and allows cross-origin requests.",
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(`Could not fetch that image URL (${response.status}).`);
+  }
+
+  const blob = await response.blob();
+  const blobType = blob.type.toLowerCase();
+  const headerType = response.headers.get("content-type")?.toLowerCase() ?? "";
+  const imageType = blobType || headerType.split(";")[0];
+
+  if (!imageType.startsWith("image/")) {
+    throw new Error("That URL did not return an image. Try a direct PNG, JPG, or WebP link.");
+  }
+
+  if (!VALID_TYPES.includes(imageType)) {
+    throw new Error(
+      "That image format is not supported yet. Please use a PNG, JPG, or WebP URL.",
+    );
+  }
+
+  if (blob.size > MAX_FILE_SIZE) {
+    const sizeMB = (blob.size / (1024 * 1024)).toFixed(1);
+    throw new Error(
+      `Image is too large (${sizeMB}MB). Please choose one under 50MB, or try a smaller/resized version.`,
+    );
+  }
+
+  return readBlobAsDataUrl(blob);
+}
+
 export type UseImagePickerOptions = {
   gridRows?: number;
   gridCols?: number;
@@ -192,6 +256,34 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
     }
   };
 
+  const importFromUrl = async (rawUrl: string): Promise<boolean> => {
+    clearError();
+    setIsLoading(true);
+    setSelectedPuzzle(null);
+
+    try {
+      const dataUrl = await fetchImageUrlAsDataUrl(rawUrl);
+      const result = await validateImageForGrid(dataUrl, gridRows, gridCols);
+
+      if (!result.ok) {
+        const msg = result.suggestion
+          ? `${result.error} ${result.suggestion}`
+          : result.error;
+        throw new Error(msg);
+      }
+
+      setImgDataUrl(dataUrl);
+      return true;
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Could not load image. Try another.";
+      setError(message);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const clearImage = () => {
     setImgDataUrl(null);
     setSelectedPuzzle(null);
@@ -222,6 +314,7 @@ export function useImagePicker(options: UseImagePickerOptions = {}) {
     clearError,
     selectGalleryPuzzle,
     pickFile,
+    importFromUrl,
     setFromBlob,
     clearImage,
     validateBeforeStart,

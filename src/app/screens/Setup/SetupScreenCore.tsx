@@ -25,10 +25,17 @@ export function SetupScreen() {
   const puzzleIdParam = searchParams.get("puzzle");
   const gridParam = searchParams.get("grid");
   const [imageSource, setImageSource] = useState<ImageSource>(
-    sourceParam === "camera" ? "camera" : sourceParam === "upload" ? "upload" : "gallery",
+    sourceParam === "camera"
+      ? "camera"
+      : sourceParam === "upload"
+        ? "upload"
+        : sourceParam === "url"
+          ? "url"
+          : "gallery",
   );
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showGridPreview, setShowGridPreview] = useState(true);
+  const [imageUrlInput, setImageUrlInput] = useState("");
 
   const {
     gridIndex,
@@ -54,6 +61,7 @@ export function SetupScreen() {
     clearError,
     selectGalleryPuzzle,
     pickFile,
+    importFromUrl,
     setFromBlob,
     validateBeforeStart,
   } = useImagePicker({
@@ -112,6 +120,10 @@ export function SetupScreen() {
     if (!success) e.currentTarget.value = "";
   };
 
+  const handleImportUrl = async () => {
+    await importFromUrl(imageUrlInput);
+  };
+
   const handleStart = async () => {
     if (!imgDataUrl) return;
     const valid = await validateBeforeStart(effectiveRows, effectiveCols);
@@ -154,6 +166,9 @@ export function SetupScreen() {
       selectedPuzzle={selectedPuzzle}
       isLoading={isLoading}
       onPickFile={handlePickFile}
+      imageUrlInput={imageUrlInput}
+      setImageUrlInput={setImageUrlInput}
+      onImportUrl={handleImportUrl}
       setFromBlob={setFromBlob}
       selectedPieceCount={effectiveRows * effectiveCols}
       gridIndex={gridIndex}

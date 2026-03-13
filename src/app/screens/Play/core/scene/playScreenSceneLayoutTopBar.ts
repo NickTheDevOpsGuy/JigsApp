@@ -120,6 +120,7 @@ export function usePlayScreenTopBarPropsFromCtx(ctx: any) {
     snapToleranceOverride: ui.snapToleranceOverride,
     setSnapToleranceOverride: ui.setSnapToleranceOverride,
     elapsedSeconds: displayElapsedSeconds,
+    moveCount: scene.moveCountRef.current,
     piecesLeft: left,
     totalPieces: total,
     isComplete,

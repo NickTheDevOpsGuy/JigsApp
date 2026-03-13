@@ -93,6 +93,7 @@ export type UsePlayScreenTopBarPropsParams = {
   snapToleranceOverride: number;
   setSnapToleranceOverride: (value: number) => void;
   elapsedSeconds: number;
+  moveCount: number;
   piecesLeft: number;
   totalPieces: number;
   isComplete: boolean;
@@ -123,6 +124,7 @@ export type PlayScreenTopBarPropsResult = {
   headerMenuProps: HeaderMenuProps;
   hudProps: {
     elapsedSeconds: number;
+    moveCount: number;
     piecesLeft: number;
     totalPieces: number;
     isPaused: boolean;

@@ -145,6 +145,10 @@
   flex-shrink: 0;
 }
 
+.boardUndoRedo {
+  display: none;
+}
+
 @media (max-width: 600px) {
   .trayArea .undoRedoPillsWrap {
     width: 100%;

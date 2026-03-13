@@ -27,6 +27,9 @@ export function SetupScreenShell(props: {
   selectedPuzzle: import("@/data/packs/samplePuzzles").SamplePuzzle | null;
   isLoading: boolean;
   onPickFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  imageUrlInput: string;
+  setImageUrlInput: React.Dispatch<React.SetStateAction<string>>;
+  onImportUrl: () => void;
   setFromBlob: (blob: Blob) => Promise<boolean>;
   selectedPieceCount: number;
   gridIndex: number;
@@ -66,6 +69,9 @@ export function SetupScreenShell(props: {
     selectedPuzzle,
     isLoading,
     onPickFile,
+    imageUrlInput,
+    setImageUrlInput,
+    onImportUrl,
     setFromBlob,
     selectedPieceCount,
     gridIndex,
@@ -125,6 +131,9 @@ export function SetupScreenShell(props: {
             selectedPuzzle={selectedPuzzle}
             isLoading={isLoading}
             onPickFile={onPickFile}
+            imageUrlInput={imageUrlInput}
+            setImageUrlInput={setImageUrlInput}
+            onImportUrl={onImportUrl}
             setFromBlob={setFromBlob}
             selectedPieceCount={selectedPieceCount}
             styles={styles}
