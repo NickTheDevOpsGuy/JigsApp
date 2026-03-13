@@ -10,6 +10,28 @@ type IsGroupLocked = (groupId: string) => boolean;
 type ShiftGroup = (groupId: string, dx: number, dy: number) => void;
 type ComputeSnapPreview = () => DragState["preview"];
 
+const DRAG_LERP_FACTOR = 0.85;
+
+function applyMagneticDragDelta(
+  shiftGroup: ShiftGroup,
+  groupId: string,
+  desiredDx: number,
+  desiredDy: number,
+  computeSnapPreview: ComputeSnapPreview,
+): void {
+  const moveDx = Math.abs(desiredDx) < 0.35 ? desiredDx : desiredDx * DRAG_LERP_FACTOR;
+  const moveDy = Math.abs(desiredDy) < 0.35 ? desiredDy : desiredDy * DRAG_LERP_FACTOR;
+  shiftGroup(groupId, moveDx, moveDy);
+
+  const preview = computeSnapPreview();
+  if (!preview || preview.magnetStrength <= 0) return;
+
+  const magnetDx = preview.dx * preview.magnetStrength;
+  const magnetDy = preview.dy * preview.magnetStrength;
+  if (Math.abs(magnetDx) < 0.1 && Math.abs(magnetDy) < 0.1) return;
+  shiftGroup(groupId, magnetDx, magnetDy);
+}
+
 export function pointerDownOp(params: {
   pieceId: string;
   clientX: number;
@@ -65,7 +87,15 @@ export function pointerMoveOp(params: {
 
   const newX = params.clientX - params.boardRect.left - drag.offsetX;
   const newY = params.clientY - params.boardRect.top - drag.offsetY;
-  params.shiftGroup(piece.groupId, newX - piece.x, newY - piece.y);
+  const desiredDx = newX - piece.x;
+  const desiredDy = newY - piece.y;
+  applyMagneticDragDelta(
+    params.shiftGroup,
+    piece.groupId,
+    desiredDx,
+    desiredDy,
+    params.computeSnapPreview,
+  );
 
   return { ...drag, preview: params.computeSnapPreview() };
 }
@@ -120,7 +150,15 @@ export function pointerMoveBoardSpaceOp(params: {
 
   const newX = params.boardX - drag.offsetX;
   const newY = params.boardY - drag.offsetY;
-  params.shiftGroup(piece.groupId, newX - piece.x, newY - piece.y);
+  const desiredDx = newX - piece.x;
+  const desiredDy = newY - piece.y;
+  applyMagneticDragDelta(
+    params.shiftGroup,
+    piece.groupId,
+    desiredDx,
+    desiredDy,
+    params.computeSnapPreview,
+  );
 
   return { ...drag, preview: params.computeSnapPreview() };
 }

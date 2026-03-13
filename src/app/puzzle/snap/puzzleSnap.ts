@@ -5,6 +5,12 @@
 import type { Piece } from "@/puzzle/core/types";
 import { wouldOverlapAnyOtherGroup } from "@/puzzle/groups/groupUtils";
 import { buildRowColMap, getSolvedNeighborsFromMap } from "@/puzzle/groups/groupUtils";
+import type { DragPreview } from "@/puzzle/core/types";
+
+export const BOARD_MAGNET_RADIUS_PX = 25;
+export const BOARD_MAGNET_STRONG_RADIUS_PX = 10;
+export const EDGE_MAGNET_RADIUS_PX = 20;
+export const EDGE_MAGNET_STRONG_RADIUS_PX = 8;
 
 export type BoardSnapResult =
   | { kind: "snap"; dx: number; dy: number; groupId: string }
@@ -23,6 +29,20 @@ export type NeighborSnapResult = {
 export type NearSnapNudgeResult = { nudgeDx: number; nudgeDy: number } | null;
 
 export type MergedGroupBoardSnapResult = { dx: number; dy: number } | null;
+
+function computeMagnetStrength(
+  distancePx: number,
+  radiusPx: number,
+  strongRadiusPx: number,
+): number {
+  if (distancePx > radiusPx) return 0;
+  if (distancePx <= strongRadiusPx) {
+    const closeT = 1 - distancePx / Math.max(1, strongRadiusPx);
+    return Math.min(1, 0.72 + closeT * 0.28);
+  }
+  const t = 1 - distancePx / radiusPx;
+  return Math.max(0, 0.12 + t * t * 0.56);
+}
 
 function getTilePos(p: Piece): { x: number; y: number } {
   return { x: p.x + p.pad, y: p.y + p.pad };
@@ -255,4 +275,80 @@ export function computeMergedGroupBoardSnapResult(
   }
 
   return { dx, dy };
+}
+
+export function computeBoardMagnetPreview(
+  pieces: Piece[],
+  activeId: string,
+  snapToleranceBoardPx: number,
+  overlapEpsilonPx: number = 0,
+): DragPreview {
+  const active = pieces.find((p) => p.id === activeId);
+  if (!active || active.isPlaced || active.locked) return null;
+
+  const gid = active.groupId;
+  const groupPieces = getGroupPieces(pieces, gid);
+  if (!groupPieces.every((p) => p.rotation === 0)) return null;
+
+  const activeTile = getTilePos(active);
+  const dx = active.targetX - activeTile.x;
+  const dy = active.targetY - activeTile.y;
+  const distancePx = Math.hypot(dx, dy);
+  if (distancePx > BOARD_MAGNET_RADIUS_PX) return null;
+  if (wouldOverlapAnyOtherGroup(pieces, gid, dx, dy, overlapEpsilonPx)) return null;
+
+  const inSnapRange = distancePx <= snapToleranceBoardPx;
+  const magnetStrength = computeMagnetStrength(
+    distancePx,
+    BOARD_MAGNET_RADIUS_PX,
+    BOARD_MAGNET_STRONG_RADIUS_PX,
+  );
+
+  return {
+    kind: "board",
+    groupId: gid,
+    dx,
+    dy,
+    distancePx,
+    magnetStrength,
+    nearSnap: true,
+    inSnapRange,
+    proximity: Math.max(0, 1 - distancePx / BOARD_MAGNET_RADIUS_PX),
+  };
+}
+
+export function computeNeighborMagnetPreview(
+  pieces: Piece[],
+  activeId: string,
+  snapToleranceNeighborPx: number,
+  tileW: number,
+  tileH: number,
+  overlapEpsilonPx: number = 0,
+): DragPreview {
+  const result = computeNeighborSnapResult(
+    pieces,
+    activeId,
+    EDGE_MAGNET_RADIUS_PX,
+    tileW,
+    tileH,
+    overlapEpsilonPx,
+  );
+  if (!result) return null;
+
+  return {
+    kind: "neighbor",
+    groupId: pieces.find((p) => p.id === activeId)?.groupId ?? result.intoGroupId,
+    dx: result.dx,
+    dy: result.dy,
+    intoGroupId: result.intoGroupId,
+    distancePx: result.dist,
+    magnetStrength: computeMagnetStrength(
+      result.dist,
+      EDGE_MAGNET_RADIUS_PX,
+      EDGE_MAGNET_STRONG_RADIUS_PX,
+    ),
+    nearSnap: true,
+    inSnapRange: result.dist <= snapToleranceNeighborPx,
+    proximity: Math.max(0, 1 - result.dist / EDGE_MAGNET_RADIUS_PX),
+  };
 }

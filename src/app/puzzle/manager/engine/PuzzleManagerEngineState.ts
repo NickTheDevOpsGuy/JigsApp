@@ -8,12 +8,17 @@ import { createInitialPieces } from "@/puzzle/factories/createInitialPieces";
 import { UndoManager } from "@/puzzle/manager/undoManager";
 import {
   getUndoLimit,
+  getEffectiveTolerance,
   type EffectiveToleranceOptions,
 } from "@/puzzle/manager/state/puzzleManagerUtils";
 import {
   getGroupBounds as getGroupBoundsUtil,
   wouldOverlapAnyOtherGroup as wouldOverlapUtil,
 } from "@/puzzle/groups/groupUtils";
+import {
+  computeBoardMagnetPreview,
+  computeNeighborMagnetPreview,
+} from "@/puzzle/snap/puzzleSnap";
 import {
   CORRECT_EPSILON_PX,
   derivePlacedAndComplete,
@@ -299,7 +304,50 @@ export class PuzzleManagerState {
     );
   }
   protected computeSnapPreview(): DragPreview {
-    return null;
+    const activeId = this.drag.activeId;
+    if (!activeId) return null;
+
+    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.15 : 1;
+    const boardTolerance = getEffectiveTolerance(
+      this.snapToleranceBoardPx,
+      this.getToleranceOptions(),
+      firstSnapMult,
+    );
+    const neighborTolerance = getEffectiveTolerance(
+      this.snapToleranceNeighborPx,
+      this.getToleranceOptions(),
+      firstSnapMult,
+    );
+    const overlapEpsilonPx = this.isMobile ? 5 : 2;
+
+    const boardPreview = computeBoardMagnetPreview(
+      this.state.pieces,
+      activeId,
+      boardTolerance,
+      overlapEpsilonPx,
+    );
+    const neighborPreview = computeNeighborMagnetPreview(
+      this.state.pieces,
+      activeId,
+      neighborTolerance,
+      this.tileW,
+      this.tileH,
+      overlapEpsilonPx,
+    );
+
+    if (boardPreview && neighborPreview) {
+      const boardScore =
+        (boardPreview.inSnapRange ? 0.4 : 0) +
+        boardPreview.magnetStrength +
+        boardPreview.proximity;
+      const neighborScore =
+        (neighborPreview.inSnapRange ? 0.4 : 0) +
+        neighborPreview.magnetStrength +
+        neighborPreview.proximity;
+      return neighborScore > boardScore ? neighborPreview : boardPreview;
+    }
+
+    return boardPreview ?? neighborPreview;
   }
   getState(): PuzzleState {
     return this.state;

@@ -4,6 +4,7 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { X } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
+import { AppModal } from "@/components/AppModal";
 import { useCompletionOverlayData } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { useCompletionConfetti } from "@/screens/Play/components/completion/useCompletionConfetti";
 import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
@@ -126,7 +127,14 @@ export function CompletionOverlay({
   }, [handleClose]);
 
   return (
-    <div className={styles.completeOverlay}>
+    <AppModal
+      isOpen
+      onClose={handleClose}
+      surface="bare"
+      size="xl"
+      tone="celebration"
+      showCloseButton={false}
+    >
       <div
         className={`${styles.completePanel} ${styles.completePanelNew}`}
         data-anim-phase={animPhase}
@@ -144,6 +152,7 @@ export function CompletionOverlay({
 
         <div className={styles.completeTitleBlock} role="banner">
           <h2 className={styles.completeTitleText}>🧩 Puzzle complete!</h2>
+          <p className={styles.completeTitlePhraseSub}>You did it. That puzzle is solved.</p>
           {isNewBest && (
             <p className={styles.completeTitlePhraseHighlight}>New personal best! 🏆</p>
           )}
@@ -216,6 +225,6 @@ export function CompletionOverlay({
           onNextPuzzle={onNextPuzzle}
         />
       </div>
-    </div>
+    </AppModal>
   );
 }

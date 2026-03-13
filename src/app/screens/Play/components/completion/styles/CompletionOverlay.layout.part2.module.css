@@ -1,6 +1,7 @@
 /* Row: Share + (Watch Replay | Next Puzzle) module */
 .completeActionsRow {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   align-items: stretch;
   gap: 12px;
   width: 100%;
@@ -15,7 +16,6 @@
 
 .completeShareWrap {
   position: relative;
-  flex: 1;
   min-width: 0;
 }
 
@@ -25,24 +25,29 @@
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 10px 14px;
+  min-height: 64px;
+  padding: 12px 16px;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-text-primary);
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-btn);
+  border-radius: 16px;
   cursor: pointer;
   transition:
     background 0.2s,
-    border-color 0.2s;
+    border-color 0.2s,
+    transform 0.15s ease,
+    box-shadow 0.18s ease;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 12px 24px rgba(4, 10, 20, 0.16);
 }
 
 .completeShareTrigger:hover {
   background: var(--color-bg-secondary);
   border-color: var(--color-border-strong);
+  transform: translateY(-1px);
 }
 
 .completeShareTrigger:focus-visible {
@@ -74,6 +79,63 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-btn);
   box-shadow: var(--shadow-lg);
+}
+
+.completeShareSheet {
+  display: grid;
+  gap: 14px;
+}
+
+.completeSharePreviewCard {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
+  background:
+    radial-gradient(circle at top, rgba(74, 139, 235, 0.16), transparent 54%),
+    linear-gradient(180deg, rgba(17, 30, 53, 0.96), rgba(9, 16, 27, 0.94));
+}
+
+.completeSharePreviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.completeSharePreviewBrand {
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.completeSharePreviewTag {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
+  color: var(--color-text-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.completeSharePreviewStats {
+  display: grid;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.completeSharePreviewStats span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Share/taunt message preview – chat-bubble style like reference image */

@@ -73,10 +73,10 @@ export function drawAlignmentGrid(
 }
 
 /** Lift offset (px) when dragging – subtle "pick up" effect. */
-export const DRAG_LIFT_PX = 6;
+export const DRAG_LIFT_PX = 8;
 
 /** Scale multiplier when dragging – piece feels physically lifted. */
-export const DRAG_SCALE = 1.03;
+export const DRAG_SCALE = 1.05;
 
 export function applyPieceShadow(
   ctx: CanvasRenderingContext2D,
@@ -87,14 +87,14 @@ export function applyPieceShadow(
   ctx.lineCap = "round";
   if (isDragging) {
     ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
-    ctx.shadowBlur = 28;
-    ctx.shadowOffsetX = 8;
-    ctx.shadowOffsetY = 12;
+    ctx.shadowBlur = 34;
+    ctx.shadowOffsetX = 10;
+    ctx.shadowOffsetY = 16;
   } else if (!isPlaced) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-    ctx.shadowBlur = 4;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.22)";
+    ctx.shadowBlur = 8;
     ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
+    ctx.shadowOffsetY = 4;
   }
 }
 

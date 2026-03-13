@@ -37,6 +37,13 @@
   transform: translateY(-1px);
 }
 
+.puzzleCardFeatured {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 72%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 20%, transparent),
+    0 18px 32px rgba(7, 17, 36, 0.28);
+}
+
 .puzzleCard:disabled {
   opacity: 0.8;
   cursor: wait;
@@ -87,4 +94,18 @@
   background: var(--color-complete-gradient-start);
   color: white;
   border-radius: 50%;
+}
+
+.nextBadge {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-primary) 18%, var(--color-bg-primary));
+  color: var(--color-brand-primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }

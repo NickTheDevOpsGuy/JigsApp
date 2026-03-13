@@ -108,6 +108,11 @@ export type DragPreview = null | {
   dx: number;
   dy: number;
   intoGroupId?: string;
+  distancePx: number;
+  magnetStrength: number;
+  nearSnap: boolean;
+  inSnapRange: boolean;
+  proximity: number;
 };
 
 export type DragState = {

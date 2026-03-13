@@ -10,6 +10,8 @@ export function SetupScreenPreview(props: {
   imgDataUrl: string | null;
   effectiveRows: number;
   effectiveCols: number;
+  selectedPieceCount: number;
+  selectedPuzzleName?: string;
   showGridPreview: boolean;
   setShowGridPreview: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -21,6 +23,8 @@ export function SetupScreenPreview(props: {
     imgDataUrl,
     effectiveRows,
     effectiveCols,
+    selectedPieceCount,
+    selectedPuzzleName,
     showGridPreview,
     setShowGridPreview,
   } = props;
@@ -33,22 +37,39 @@ export function SetupScreenPreview(props: {
       {isLoading ? (
         <div className={styles.previewEmpty}>Loading...</div>
       ) : imgDataUrl ? (
-        <div className={styles.previewImageWrap}>
-          <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
-          <GridPreviewOverlay
-            rows={effectiveRows}
-            cols={effectiveCols}
-            visible={showGridPreview}
-          />
-          <button
-            type="button"
-            className={`${styles.gridToggleBtn} ${showGridPreview ? styles.gridToggleBtnActive : ""}`}
-            onClick={() => setShowGridPreview((v) => !v)}
-            title={showGridPreview ? "Hide grid preview" : "Show grid preview"}
-            aria-label={showGridPreview ? "Hide grid preview" : "Show grid preview"}
-          >
-            <Grid3X3 size={18} />
-          </button>
+        <div className={styles.previewStage}>
+          <div className={styles.previewMeta}>
+            <div className={styles.previewMetaText}>
+              <span className={styles.previewEyebrow}>Puzzle Preview</span>
+              <strong className={styles.previewTitle}>
+                {selectedPuzzleName ?? "Custom puzzle"}
+              </strong>
+            </div>
+            <div className={styles.previewStats}>
+              <span className={styles.previewStatChip}>
+                {effectiveRows} x {effectiveCols}
+              </span>
+              <span className={styles.previewStatChip}>{selectedPieceCount} pieces</span>
+            </div>
+          </div>
+
+          <div className={styles.previewImageWrap}>
+            <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
+            <GridPreviewOverlay
+              rows={effectiveRows}
+              cols={effectiveCols}
+              visible={showGridPreview}
+            />
+            <button
+              type="button"
+              className={`${styles.gridToggleBtn} ${showGridPreview ? styles.gridToggleBtnActive : ""}`}
+              onClick={() => setShowGridPreview((v) => !v)}
+              title={showGridPreview ? "Hide grid preview" : "Show grid preview"}
+              aria-label={showGridPreview ? "Hide grid preview" : "Show grid preview"}
+            >
+              <Grid3X3 size={18} />
+            </button>
+          </div>
         </div>
       ) : (
         <div className={styles.previewEmpty}>Select an image above</div>

@@ -33,6 +33,21 @@ describe("PuzzleManager", () => {
     expect(manager.getSnapPreviewState()).toBeNull();
   });
 
+  it("exposes board magnet preview when a dragged piece nears its target", () => {
+    const manager = createManager();
+    const piece = manager.getState().pieces[0];
+    manager.movePieceFromTray(piece.id);
+    const moved = manager.getState().pieces.find((p) => p.id === piece.id)!;
+
+    manager.pointerDownBoardSpace(piece.id, moved.x + 10, moved.y + 10);
+    manager.pointerMoveBoardSpace(moved.targetX + moved.pad - 14, moved.targetY + moved.pad - 12);
+
+    const preview = manager.getSnapPreviewState();
+    expect(preview).not.toBeNull();
+    expect(preview?.nearSnap).toBe(true);
+    expect(preview?.kind).toBe("board");
+  });
+
   it("uses pointerDownBoardSpace for programmatic drag (avoids DOMRect in tests)", () => {
     const manager = createManager();
     const pieceId = manager.getState().pieces[0].id;

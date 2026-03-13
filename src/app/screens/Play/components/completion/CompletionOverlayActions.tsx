@@ -1,7 +1,7 @@
 import React from "react";
+import { Play, Sparkles } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { CompletionOverlayShareMenu } from "@/screens/Play/components/completion/CompletionOverlayShareMenu";
-import { CompletionOverlayReplayNextMenu } from "@/screens/Play/components/completion/CompletionOverlayReplayNextMenu";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
 
 export function CompletionOverlayActions(args: {
@@ -36,11 +36,11 @@ export function CompletionOverlayActions(args: {
     shareRef,
     shareTriggerRef,
     dropdownPosition,
-    replayNextMenuOpen,
-    setReplayNextMenuOpen,
-    replayNextRef,
-    replayNextTriggerRef,
-    replayNextDropdownPosition,
+    replayNextMenuOpen: _replayNextMenuOpen,
+    setReplayNextMenuOpen: _setReplayNextMenuOpen,
+    replayNextRef: _replayNextRef,
+    replayNextTriggerRef: _replayNextTriggerRef,
+    replayNextDropdownPosition: _replayNextDropdownPosition,
     grid,
     puzzleShareUrl,
     elapsedSeconds,
@@ -69,6 +69,32 @@ export function CompletionOverlayActions(args: {
         Actions
       </div>
       <div className={styles.completeActionsRow}>
+        {onNextPuzzle && (
+          <button
+            type="button"
+            className={`${styles.completeActionBtn} ${styles.completeActionBtnPrimary}`}
+            onClick={onNextPuzzle}
+            title="Start the next puzzle"
+          >
+            <span className={styles.completeActionLead}>
+              <Sparkles size={18} aria-hidden="true" />
+              Next Puzzle
+            </span>
+          </button>
+        )}
+        {canReplay && onReplayClick && (
+          <button
+            type="button"
+            className={styles.completeActionBtn}
+            onClick={onReplayClick}
+            title="Watch replay of your solve"
+          >
+            <span className={styles.completeActionLead}>
+              <Play size={18} aria-hidden="true" />
+              Watch Replay
+            </span>
+          </button>
+        )}
         {showShare && (
           <CompletionOverlayShareMenu
             shareMenuOpen={shareMenuOpen}
@@ -89,18 +115,6 @@ export function CompletionOverlayActions(args: {
             completionData={completionData}
             canReplay={canReplay}
             onReplayClick={onReplayClick}
-          />
-        )}
-        {showReplayNext && (
-          <CompletionOverlayReplayNextMenu
-            replayNextMenuOpen={replayNextMenuOpen}
-            setReplayNextMenuOpen={setReplayNextMenuOpen}
-            replayNextRef={replayNextRef}
-            replayNextTriggerRef={replayNextTriggerRef}
-            replayNextDropdownPosition={replayNextDropdownPosition}
-            canReplay={canReplay}
-            onReplayClick={onReplayClick}
-            onNextPuzzle={onNextPuzzle}
           />
         )}
       </div>

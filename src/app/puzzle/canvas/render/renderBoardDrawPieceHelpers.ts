@@ -38,14 +38,14 @@ export function drawSilhouetteShadow(
   ctx.lineCap = "round";
   if (isDragging) {
     ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
-    ctx.shadowBlur = 32;
-    ctx.shadowOffsetX = 10;
-    ctx.shadowOffsetY = 14;
+    ctx.shadowBlur = 38;
+    ctx.shadowOffsetX = 12;
+    ctx.shadowOffsetY = 16;
   } else if (!isPlaced) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.24)";
-    ctx.shadowBlur = 10;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.28)";
+    ctx.shadowBlur = 14;
     ctx.shadowOffsetX = 3;
-    ctx.shadowOffsetY = 4;
+    ctx.shadowOffsetY = 5;
   } else {
     ctx.shadowColor = "rgba(0, 0, 0, 0.08)";
     ctx.shadowBlur = 2;
@@ -90,18 +90,27 @@ export function drawPieceImageInPath(
   ctx.filter = "none";
 
   const topGlow = ctx.createLinearGradient(0, 0, 0, piece.h);
-  topGlow.addColorStop(0, "rgba(255,255,255,0.2)");
-  topGlow.addColorStop(0.18, "rgba(255,255,255,0.08)");
+  topGlow.addColorStop(0, "rgba(255,255,255,0.24)");
+  topGlow.addColorStop(0.16, "rgba(255,255,255,0.12)");
   topGlow.addColorStop(0.45, "rgba(255,255,255,0)");
   ctx.fillStyle = topGlow;
   ctx.fill(path);
 
   const bevelShade = ctx.createLinearGradient(0, 0, 0, piece.h);
   bevelShade.addColorStop(0, "rgba(0,0,0,0)");
-  bevelShade.addColorStop(0.72, "rgba(0,0,0,0.04)");
-  bevelShade.addColorStop(1, "rgba(0,0,0,0.16)");
+  bevelShade.addColorStop(0.68, "rgba(0,0,0,0.06)");
+  bevelShade.addColorStop(1, "rgba(0,0,0,0.18)");
   ctx.fillStyle = bevelShade;
   ctx.fill(path);
+
+  ctx.save();
+  ctx.clip(path);
+  ctx.strokeStyle = "rgba(0,0,0,0.12)";
+  ctx.lineWidth = 3;
+  ctx.shadowColor = "rgba(0,0,0,0.12)";
+  ctx.shadowBlur = 6;
+  ctx.stroke(path);
+  ctx.restore();
 
   const edgeRim = ctx.createLinearGradient(0, 0, piece.w, piece.h);
   edgeRim.addColorStop(0, "rgba(255,255,255,0.08)");

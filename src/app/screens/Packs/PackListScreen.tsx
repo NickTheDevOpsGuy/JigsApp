@@ -10,12 +10,18 @@ import { loadPacksData } from "@/data/packs/loadPacksData";
 import { getPackProgress } from "@/data/packs/packCompletion";
 import { getCurrentSeason } from "@/utils/seasons";
 import type { PuzzlePack } from "@/data/packs/puzzlePacks";
+import {
+  PuzzlePackCarousel,
+  PuzzlePackCard,
+  PuzzlePackModule,
+} from "./components";
 
 export function PackListScreen() {
   const nav = useNavigate();
   const [packsData, setPacksData] = useState<Awaited<
     ReturnType<typeof loadPacksData>
   > | null>(null);
+  const [imgError, setImgError] = useState<Record<string, boolean>>({});
 
   const season = useMemo(() => getCurrentSeason(), []);
 
@@ -63,38 +69,42 @@ export function PackListScreen() {
             <Loader label="Loading packs…" />
           ) : (
             <div className={styles.packScrollViewport}>
-              <div className={styles.packGrid}>
+              <PuzzlePackModule
+                eyebrow="Collections"
+                title="Choose Your Next Pack"
+                subtitle="Seasonal favorites, themed collections, and progress that carries with you."
+              >
+                <PuzzlePackCarousel>
                 {orderedPacks.map((pack) => {
                   const puzzlesData = packsData.getPuzzlesForPack(pack);
                   const { completed, total } = getPackProgress(
                     puzzlesData.map((p) => p.id),
                   );
                   const isSeasonPick = pack.season === season;
+                  const heroPuzzle = puzzlesData[0];
+                  const progressPercent =
+                    total > 0 ? Math.round((completed / total) * 100) : 0;
 
                   return (
-                    <button
+                    <PuzzlePackCard
                       key={pack.id}
-                      type="button"
-                      className={`${styles.packCard} ${isSeasonPick ? styles.packCardSeasonal : ""}`}
                       onClick={() => nav(`/packs/${pack.id}`)}
-                      title={`Open ${pack.name}`}
-                      aria-label={`Open ${pack.name}: ${pack.description}`}
-                    >
-                      <div className={styles.packEmoji}>{pack.emoji}</div>
-                      <div className={styles.packInfo}>
-                        <span className={styles.packName}>{pack.name}</span>
-                        {isSeasonPick && (
-                          <span className={styles.seasonBadge}>Season&apos;s pick</span>
-                        )}
-                        <span className={styles.packDesc}>{pack.description}</span>
-                        <span className={styles.packProgress}>
-                          {total > 0 ? `${completed}/${total} completed` : "0 puzzles"}
-                        </span>
-                      </div>
-                    </button>
+                      name={pack.name}
+                      description={pack.description}
+                      completed={completed}
+                      total={total}
+                      coverImageUrl={!imgError[pack.id] ? heroPuzzle?.thumbnail ?? null : null}
+                      onCoverError={() =>
+                        setImgError((prev) => ({ ...prev, [pack.id]: true }))
+                      }
+                      emoji={pack.emoji}
+                      seasonTag={isSeasonPick ? "Season's Pick" : undefined}
+                      summary={`${progressPercent}%`}
+                    />
                   );
                 })}
-              </div>
+                </PuzzlePackCarousel>
+              </PuzzlePackModule>
             </div>
           )}
         </div>

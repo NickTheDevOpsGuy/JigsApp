@@ -160,6 +160,8 @@ export function SetupScreenShell(props: {
             imgDataUrl={imgDataUrl}
             effectiveRows={effectiveRows}
             effectiveCols={effectiveCols}
+            selectedPieceCount={selectedPieceCount}
+            selectedPuzzleName={selectedPuzzle?.name}
             showGridPreview={showGridPreview}
             setShowGridPreview={setShowGridPreview}
           />

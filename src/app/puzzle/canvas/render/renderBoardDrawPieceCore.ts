@@ -86,8 +86,16 @@ export function drawPiece(
     const proximity = preview.proximity;
     const proximityEased = 1 - (1 - proximity) ** 3;
     const size = Math.max(p.w, p.h);
-    const radius = size * (preview.inSnapRange ? 1.02 : 0.78);
-    const baseAlpha = preview.inSnapRange ? 0.5 : 0.22;
+    const radius =
+      size *
+      (preview.kind === "neighbor"
+        ? preview.inSnapRange
+          ? 0.92
+          : 0.7
+        : preview.inSnapRange
+          ? 1.02
+          : 0.78);
+    const baseAlpha = preview.inSnapRange ? 0.54 : preview.kind === "neighbor" ? 0.26 : 0.22;
     const veryCloseBoost = proximity > 0.82 ? ((proximity - 0.82) / 0.18) * 0.4 : 0;
     let alpha = Math.min(0.95, baseAlpha * (0.2 + 0.8 * proximityEased) + veryCloseBoost);
     const pulse = 0.92 + 0.08 * Math.sin(nowMs * 0.003);
@@ -253,7 +261,10 @@ export function drawPiece(
     const outlineAlpha = preview.inSnapRange
       ? 0.2 + 0.65 * proximityEased
       : 0.12 + 0.5 * proximityEased;
-    ctx.strokeStyle = `rgba(255, 220, 130, ${Math.min(0.88, outlineAlpha)})`;
+    ctx.strokeStyle =
+      preview.kind === "neighbor"
+        ? `rgba(162, 214, 255, ${Math.min(0.8, outlineAlpha)})`
+        : `rgba(255, 220, 130, ${Math.min(0.88, outlineAlpha)})`;
     ctx.lineWidth = preview.inSnapRange ? 6 : 5;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";

@@ -1,8 +1,9 @@
 import React from "react";
-import { ChevronDown, Share2, Swords, Copy, Play } from "lucide-react";
+import { ChevronDown, Share2, Swords, Copy, Play, Trophy } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
-import { Modal } from "@/components/Modal/Modal";
+import { AppModal } from "@/components/AppModal";
+import { formatTime } from "@/screens/Play/core/utils/playUtils";
 
 export function CompletionOverlayShareMenu(props: {
   shareMenuOpen: boolean;
@@ -61,18 +62,33 @@ export function CompletionOverlayShareMenu(props: {
           aria-hidden
         />
       </button>
-      <Modal
+      <AppModal
         isOpen={sharePopupOpen}
         onClose={() => setSharePopupOpen(false)}
-        title="Share"
-        showCloseButton
-        variant="compact"
+        title="Share your solve"
+        subtitle="Send a result card, copy a link, challenge a friend, or open the replay viewer."
+        size="wide"
       >
-        <div
-          className={styles.completeShareDropdown}
-          role="menu"
-          aria-label="Share options"
-        >
+        <div className={styles.completeShareSheet}>
+          <div className={styles.completeSharePreviewCard}>
+            <div className={styles.completeSharePreviewHeader}>
+              <span className={styles.completeSharePreviewBrand}>Phuzzle</span>
+              <span className={styles.completeSharePreviewTag}>Share Card</span>
+            </div>
+            <div className={styles.completeSharePreviewStats}>
+              <span>Time: {formatTime(props.elapsedSeconds)}</span>
+              {props.grid ? <span>Grid: {props.grid.rows}x{props.grid.cols}</span> : null}
+              <span>Accuracy: {Math.round(props.accuracyPercent)}%</span>
+              <span>
+                <Trophy size={14} aria-hidden="true" /> Ready to challenge a friend
+              </span>
+            </div>
+          </div>
+          <div
+            className={styles.completeShareDropdown}
+            role="menu"
+            aria-label="Share options"
+          >
           <div className={styles.completeShareDropdownActions}>
             {(onShareProgress || onCopyProgress) && (
               <button
@@ -144,7 +160,8 @@ export function CompletionOverlayShareMenu(props: {
             )}
           </div>
         </div>
-      </Modal>
+        </div>
+      </AppModal>
     </div>
   );
 }

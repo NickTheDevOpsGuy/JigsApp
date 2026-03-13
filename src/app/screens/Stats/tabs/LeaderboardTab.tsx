@@ -17,6 +17,7 @@ import {
 } from "./LeaderboardTabLists";
 import { LeaderboardTabHeader } from "./LeaderboardTabHeader";
 import styles from "../StatsScreen.module.css";
+import { LeaderboardModule } from "../components/LeaderboardModule";
 
 export type LeaderboardType = "today" | "week" | "alltime" | "efficiency";
 export type LeaderboardSortMetric = "time" | "moves" | "cleanest";
@@ -100,61 +101,54 @@ export function LeaderboardTab({
 
   return (
     <div className={`${styles.section} ${styles.leaderboardCard}`}>
-      <div className={styles.leaderboardCardTop}>
-        <div>
-          <p className={styles.profileSectionEyebrow}>Competition</p>
-          <h2 className={styles.leaderboardCardTitle}>Board</h2>
-        </div>
-      </div>
-      <LeaderboardTabHeader
-        leaderboardType={leaderboardType}
-        setLeaderboardType={setLeaderboardType}
-        leaderboardMetric={leaderboardMetric}
-        setLeaderboardMetric={setLeaderboardMetric}
-        filtersOpen={filtersOpen}
-        setFiltersOpen={setFiltersOpen}
-        cutTypeFilter={cutTypeFilter}
-        setCutTypeFilter={setCutTypeFilter}
-        modifierFilter={modifierFilter}
-        setModifierFilter={setModifierFilter}
-        sourceFilter={sourceFilter}
-        setSourceFilter={setSourceFilter}
-        allTimeGrid={allTimeGrid}
-        setAllTimeGrid={setAllTimeGrid}
-      />
-      {(leaderboardType === "week" ||
-        leaderboardType === "alltime" ||
-        leaderboardType === "efficiency") && (
-        <h2 className={styles.leaderboardSubtitle}>
-          {leaderboardType === "week" && `Weekly Rankings (${weekRangeLabel})`}
-          {leaderboardType === "alltime" && `All-time best (${allTimeGrid})`}
-          {leaderboardType === "efficiency" && `Weekly efficiency (${weekRangeLabel})`}
-        </h2>
-      )}
-      {leaderboardType === "today" && (
-        <div className={styles.boardInfoStrip}>
-          <p className={styles.todayCompletionCount} aria-live="polite">
-            {todayCompletionCount} completion{todayCompletionCount !== 1 ? "s" : ""} so
-            far
-          </p>
-        </div>
-      )}
-      {leaderboardType === "week" && (
-        <div className={styles.weekProgressStrip}>
-          <span>Weekly Album Progress</span>
-          <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong> days
-        </div>
-      )}
-      {leaderboardType === "today" &&
+      <LeaderboardModule
+        title="Leaderboard"
+        subtitle={
+          leaderboardType === "week"
+            ? `Weekly rankings (${weekRangeLabel})`
+            : leaderboardType === "alltime"
+              ? `All-time best (${allTimeGrid})`
+              : leaderboardType === "efficiency"
+                ? `Weekly efficiency (${weekRangeLabel})`
+                : `${todayCompletionCount} completion${todayCompletionCount !== 1 ? "s" : ""} so far`
+        }
+        headerSlot={
+          <LeaderboardTabHeader
+            leaderboardType={leaderboardType}
+            setLeaderboardType={setLeaderboardType}
+            leaderboardMetric={leaderboardMetric}
+            setLeaderboardMetric={setLeaderboardMetric}
+            filtersOpen={filtersOpen}
+            setFiltersOpen={setFiltersOpen}
+            cutTypeFilter={cutTypeFilter}
+            setCutTypeFilter={setCutTypeFilter}
+            modifierFilter={modifierFilter}
+            setModifierFilter={setModifierFilter}
+            sourceFilter={sourceFilter}
+            setSourceFilter={setSourceFilter}
+            allTimeGrid={allTimeGrid}
+            setAllTimeGrid={setAllTimeGrid}
+          />
+        }
+        infoSlot={
+          leaderboardType === "week" ? (
+            <div className={styles.weekProgressStrip}>
+              <span>Weekly Album Progress</span>
+              <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong> days
+            </div>
+          ) : undefined
+        }
+      >
+        {leaderboardType === "today" &&
         renderTimeList(
           leaderboard,
-          "No completions yet. Be the first!",
+          "Be the first to solve today's puzzle.",
           rowAnimEpoch,
           compact,
           false,
           currentUserId ?? undefined,
         )}
-      {leaderboardType === "week" &&
+        {leaderboardType === "week" &&
         renderCompletionList(
           weeklyTotalsLeaderboard,
           rowAnimEpoch,
@@ -179,6 +173,7 @@ export function LeaderboardTab({
           "No completions with moves recorded this week.",
           currentUserId ?? undefined,
         )}
+      </LeaderboardModule>
     </div>
   );
 }

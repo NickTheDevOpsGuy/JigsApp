@@ -116,6 +116,12 @@ export function SetupImageSourcePanel({
       <div id="image-source-panel" className={styles.imageSourcePanel} role="tabpanel">
         {imageSource === "gallery" ? (
           <>
+            <div className={styles.sourceSectionHeader}>
+              <span className={styles.sourceSectionEyebrow}>Puzzle Source</span>
+              <p className={styles.sourceSectionCopy}>
+                Pick a theme, then choose an image that matches the mood you want.
+              </p>
+            </div>
             <div className={styles.categories}>
               {CATEGORIES.map((cat) => (
                 <button
@@ -178,55 +184,67 @@ export function SetupImageSourcePanel({
             </div>
           </>
         ) : imageSource === "upload" ? (
-          <label className={styles.label}>
-            Choose photo (PNG, JPG, WebP)
-            <input
-              aria-label="Choose a photo (PNG, JPG, or WebP)"
-              title="Choose a photo file (PNG, JPG, or WebP)"
-              className={styles.file}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              onChange={onPickFile}
-              disabled={isLoading}
-            />
-          </label>
-        ) : imageSource === "url" ? (
-          <div className={styles.urlImportPanel}>
-            <label className={styles.label} htmlFor="setup-image-url">
-              Paste direct image URL
-            </label>
-            <div className={styles.urlInputRow}>
+          <div className={styles.sourceSectionHeader}>
+            <span className={styles.sourceSectionEyebrow}>Puzzle Source</span>
+            <p className={styles.sourceSectionCopy}>
+              Bring your own image and we&apos;ll turn it into a fresh puzzle.
+            </p>
+            <label className={styles.label}>
+              Choose photo (PNG, JPG, WebP)
               <input
-                id="setup-image-url"
-                className={styles.urlInput}
-                type="url"
-                inputMode="url"
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck={false}
-                placeholder="https://example.com/puzzle.jpg"
-                value={imageUrlInput}
-                onChange={(e) => setImageUrlInput(e.currentTarget.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    void onImportUrl();
-                  }
-                }}
+                aria-label="Choose a photo (PNG, JPG, or WebP)"
+                title="Choose a photo file (PNG, JPG, or WebP)"
+                className={styles.file}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={onPickFile}
                 disabled={isLoading}
               />
-              <button
-                type="button"
-                className={styles.urlImportButton}
-                onClick={() => void onImportUrl()}
-                disabled={isLoading || !imageUrlInput.trim()}
-              >
-                Import
-              </button>
-            </div>
-            <p className={styles.urlHelp}>
-              Use a public PNG, JPG, or WebP link. Some sites block direct image fetches.
+            </label>
+          </div>
+        ) : imageSource === "url" ? (
+          <div className={styles.sourceSectionHeader}>
+            <span className={styles.sourceSectionEyebrow}>Puzzle Source</span>
+            <p className={styles.sourceSectionCopy}>
+              Paste a direct image link to build a matching puzzle instantly.
             </p>
+            <div className={styles.urlImportPanel}>
+              <label className={styles.label} htmlFor="setup-image-url">
+                Paste direct image URL
+              </label>
+              <div className={styles.urlInputRow}>
+                <input
+                  id="setup-image-url"
+                  className={styles.urlInput}
+                  type="url"
+                  inputMode="url"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  placeholder="https://example.com/puzzle.jpg"
+                  value={imageUrlInput}
+                  onChange={(e) => setImageUrlInput(e.currentTarget.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void onImportUrl();
+                    }
+                  }}
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className={styles.urlImportButton}
+                  onClick={() => void onImportUrl()}
+                  disabled={isLoading || !imageUrlInput.trim()}
+                >
+                  Import
+                </button>
+              </div>
+              <p className={styles.urlHelp}>
+                Use a public PNG, JPG, or WebP link. Some sites block direct image fetches.
+              </p>
+            </div>
           </div>
         ) : (
           <CameraCapture onCapture={setFromBlob} disabled={isLoading} />

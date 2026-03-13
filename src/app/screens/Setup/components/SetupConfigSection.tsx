@@ -32,6 +32,8 @@ export function SetupConfigSection({
   const primaryDifficulties = GRID_OPTIONS.slice(0, 4).map((opt, index) => ({
     index,
     title: ["Easy", "Medium", "Hard", "Expert"][index],
+    rows: opt.rows,
+    cols: opt.cols,
     pieces: opt.rows * opt.cols,
   }));
   const isAdvancedSelection = gridIndex >= primaryDifficulties.length;
@@ -51,12 +53,22 @@ export function SetupConfigSection({
               aria-pressed={gridIndex === difficulty.index}
               title={`${difficulty.title}: ${difficulty.pieces} pieces`}
             >
+              <span className={styles.difficultyCardPreview} aria-hidden="true">
+                {Array.from({
+                  length: Math.min(9, Math.max(4, difficulty.rows * difficulty.cols)),
+                }).map((_, dotIndex) => (
+                  <span key={dotIndex} className={styles.difficultyCardPreviewDot} />
+                ))}
+              </span>
               <span className={styles.difficultyCardTitle}>
                 <Puzzle size={16} />
                 {difficulty.title}
               </span>
               <span className={styles.difficultyCardPieces}>
                 {difficulty.pieces} pieces
+              </span>
+              <span className={styles.difficultyCardGrid}>
+                {difficulty.rows} x {difficulty.cols} grid
               </span>
             </button>
           ))}
@@ -72,6 +84,13 @@ export function SetupConfigSection({
                   : `Custom: ${customRows * customCols} pieces`
               }
             >
+              <span className={styles.difficultyCardPreview} aria-hidden="true">
+                {Array.from({
+                  length: Math.min(9, Math.max(4, customRows * customCols)),
+                }).map((_, dotIndex) => (
+                  <span key={dotIndex} className={styles.difficultyCardPreviewDot} />
+                ))}
+              </span>
               <span className={styles.difficultyCardTitle}>
                 <Puzzle size={16} />
                 {selectedAdvanced.rows > 0
@@ -82,6 +101,11 @@ export function SetupConfigSection({
                 {selectedAdvanced.rows > 0
                   ? `${selectedAdvanced.rows * selectedAdvanced.cols} pieces`
                   : `${customRows * customCols} pieces`}
+              </span>
+              <span className={styles.difficultyCardGrid}>
+                {selectedAdvanced.rows > 0
+                  ? `${selectedAdvanced.rows} x ${selectedAdvanced.cols} grid`
+                  : `${customRows} x ${customCols} grid`}
               </span>
             </button>
           )}

@@ -8,6 +8,7 @@ import { Clapperboard, X } from "lucide-react";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import { ReplaySolveModalControls } from "./ReplaySolveModalControls";
+import { AppModal } from "@/components/AppModal";
 
 const styles = { ...baseStyles, ...controlStyles };
 
@@ -206,26 +207,16 @@ export function ReplaySolveModal({
   }
 
   return (
-    <div
-      className={styles.backdrop}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="replay-solve-title"
-      aria-describedby="replay-solve-subtitle"
-      tabIndex={-1}
-      onPointerDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-        else stopProp(e);
-      }}
-      onKeyDown={handleBackdropKeyDown}
+    <AppModal
+      isOpen
+      onClose={onClose}
+      title="Replay Solve"
+      subtitle="Watch how the puzzle was completed."
+      size="xl"
+      closeLabel="Close replay"
     >
       <div className={styles.modal} onPointerDown={stopProp}>
-        {headerBlock}
-        <p id="replay-solve-subtitle" className={styles.subtitle}>
-          Watch how the puzzle was completed
-        </p>
         <div className={styles.puzzleAreaWrapper}>
-          {!useCutout && closeButton}
           <div className={styles.puzzleArea}>
             {showPuzzleImage ? (
               <img
@@ -241,6 +232,6 @@ export function ReplaySolveModal({
         </div>
         {seekAndControls}
       </div>
-    </div>
+    </AppModal>
   );
 }

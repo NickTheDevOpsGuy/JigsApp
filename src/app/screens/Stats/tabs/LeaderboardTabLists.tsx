@@ -6,7 +6,11 @@ import type {
   EfficiencyEntry,
 } from "@/services/leaderboard/leaderboardService";
 import { formatTime, formatGap, PODIUM } from "../statsFormatting";
-import styles from "../StatsScreen.module.css";
+import {
+  LeaderboardEmptyState,
+  LeaderboardRow,
+  LeaderboardRows,
+} from "../components/LeaderboardModule";
 
 export function renderTimeList(
   entries: LeaderboardEntry[],
@@ -18,14 +22,11 @@ export function renderTimeList(
 ) {
   if (entries.length === 0) {
     return (
-      <div className={styles.emptyState}>
-        <p className={styles.emptyStateTitle}>No scores yet</p>
-        <p className={styles.emptyStateText}>{emptyMsg}</p>
-      </div>
+      <LeaderboardEmptyState title="No scores yet" text={`🏆 ${emptyMsg}`} />
     );
   }
   return (
-    <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
+    <LeaderboardRows>
       {entries.map((entry, index) => {
         const key = `time-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
         const isYou = currentUserId != null && entry.userId === currentUserId;
@@ -37,41 +38,23 @@ export function renderTimeList(
               ? `+${formatGap(next - entry.elapsedSeconds)} ahead of #3`
               : null;
         return (
-          <li
+          <LeaderboardRow
             key={key}
-            className={`${styles.leaderboardItem} ${
-              entry.rank <= 3 ? styles.leaderboardPodium : ""
-            } ${isYou ? styles.leaderboardItemYou : ""} ${styles.leaderboardRowEnter}`}
-            style={{ animationDelay: `${index * 45}ms` }}
-          >
-            <span className={styles.rank}>
-              {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-            </span>
-            <span className={styles.player}>
-              {entry.displayName}
-              {isYou && <span className={styles.youLabel}> (You)</span>}
-              {showChampionBadge && entry.rank === 1 && (
-                <span className={styles.championBadge} title="Challenge winner">
-                  {" "}
-                  🏆
-                </span>
-              )}
-            </span>
-            <span className={styles.timeCol}>
-              <span className={styles.time}>{formatTime(entry.elapsedSeconds)}</span>
-              {gapInfo && <span className={styles.gapInfo}>{gapInfo}</span>}
-              {(entry.moveCount != null || entry.undoCount != null) && (
-                <span className={styles.movesInfo} aria-label="Moves and undos">
-                  {entry.moveCount != null && `${entry.moveCount} moves`}
-                  {entry.moveCount != null && entry.undoCount != null && " · "}
-                  {entry.undoCount != null && `${entry.undoCount} undos`}
-                </span>
-              )}
-            </span>
-          </li>
+            rankLabel={entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+            name={`${entry.displayName}${isYou ? " (You)" : ""}${showChampionBadge && entry.rank === 1 ? " 🏆" : ""}`}
+            meta={gapInfo ?? undefined}
+            metric={formatTime(entry.elapsedSeconds)}
+            secondaryMetric={
+              entry.moveCount != null || entry.undoCount != null
+                ? `${entry.moveCount != null ? `${entry.moveCount} moves` : ""}${entry.moveCount != null && entry.undoCount != null ? " · " : ""}${entry.undoCount != null ? `${entry.undoCount} undos` : ""}`
+                : undefined
+            }
+            isCurrentPlayer={isYou}
+            isPodium={entry.rank <= 3}
+          />
         );
       })}
-    </ol>
+    </LeaderboardRows>
   );
 }
 
@@ -84,37 +67,27 @@ export function renderCompletionList(
 ) {
   if (entries.length === 0) {
     return (
-      <div className={styles.emptyState}>
-        <p className={styles.emptyStateTitle}>Nothing posted yet</p>
-        <p className={styles.emptyStateText}>{emptyMsg}</p>
-      </div>
+      <LeaderboardEmptyState title="Nothing posted yet" text={emptyMsg} />
     );
   }
   return (
-    <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
+    <LeaderboardRows>
       {entries.map((entry) => {
         const key = `completion-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
         const isYou = currentUserId != null && entry.userId === currentUserId;
         return (
-          <li
+          <LeaderboardRow
             key={key}
-            className={`${styles.leaderboardItem} ${
-              entry.rank <= 3 ? styles.leaderboardPodium : ""
-            } ${isYou ? styles.leaderboardItemYou : ""} ${styles.leaderboardRowEnter}`}
-            style={{ animationDelay: `${(entry.rank - 1) * 45}ms` }}
-          >
-            <span className={styles.rank}>
-              {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-            </span>
-            <span className={styles.player}>
-              {entry.displayName}
-              {isYou && <span className={styles.youLabel}> (You)</span>}
-            </span>
-            <span className={styles.time}>{entry.count} puzzles</span>
-          </li>
+            rankLabel={entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+            name={`${entry.displayName}${isYou ? " (You)" : ""}`}
+            metric={`${entry.count} puzzles`}
+            secondaryMetric="Weekly completions"
+            isCurrentPlayer={isYou}
+            isPodium={entry.rank <= 3}
+          />
         );
       })}
-    </ol>
+    </LeaderboardRows>
   );
 }
 
@@ -127,43 +100,26 @@ export function renderEfficiencyList(
 ) {
   if (entries.length === 0) {
     return (
-      <div className={styles.emptyState}>
-        <p className={styles.emptyStateTitle}>No efficiency runs yet</p>
-        <p className={styles.emptyStateText}>{emptyMsg}</p>
-      </div>
+      <LeaderboardEmptyState title="No efficiency runs yet" text={emptyMsg} />
     );
   }
   return (
-    <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
+    <LeaderboardRows>
       {entries.map((entry) => {
         const key = `efficiency-${entry.rank}-${entry.displayName}-${rowAnimEpoch}`;
         const isYou = currentUserId != null && entry.userId === currentUserId;
         return (
-          <li
+          <LeaderboardRow
             key={key}
-            className={`${styles.leaderboardItem} ${
-              entry.rank <= 3 ? styles.leaderboardPodium : ""
-            } ${isYou ? styles.leaderboardItemYou : ""} ${styles.leaderboardRowEnter}`}
-            style={{ animationDelay: `${(entry.rank - 1) * 45}ms` }}
-          >
-            <span className={styles.rank}>
-              {entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
-            </span>
-            <span className={styles.player}>
-              {entry.displayName}
-              {isYou && <span className={styles.youLabel}> (You)</span>}
-            </span>
-            <span className={styles.timeCol}>
-              <span className={styles.time}>
-                {entry.efficiencySecPerMove.toFixed(1)} s/move
-              </span>
-              <span className={styles.movesInfo}>
-                {formatTime(entry.elapsedSeconds)} · {entry.moveCount} moves
-              </span>
-            </span>
-          </li>
+            rankLabel={entry.rank <= 3 ? PODIUM[entry.rank - 1] : `#${entry.rank}`}
+            name={`${entry.displayName}${isYou ? " (You)" : ""}`}
+            metric={`${entry.efficiencySecPerMove.toFixed(1)} s/move`}
+            secondaryMetric={`${formatTime(entry.elapsedSeconds)} · ${entry.moveCount} moves`}
+            isCurrentPlayer={isYou}
+            isPodium={entry.rank <= 3}
+          />
         );
       })}
-    </ol>
+    </LeaderboardRows>
   );
 }

@@ -10,6 +10,7 @@ import { PACK_METADATA } from "@/data/packs/packMetadata";
 import { loadPacksData } from "@/data/packs/loadPacksData";
 import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packs/packCompletion";
+import { PuzzlePackDetail } from "./components";
 
 const SCROLL_STEP = 220;
 
@@ -40,6 +41,8 @@ export function PackDetailScreen() {
   const puzzles: SamplePuzzle[] =
     pack && packsData ? packsData.getPuzzlesForPack(pack) : [];
   const completed = getCompletedPuzzleIds();
+  const completedCount = puzzles.filter((puzzle) => completed.has(puzzle.id)).length;
+  const nextPuzzle = puzzles.find((puzzle) => !completed.has(puzzle.id)) ?? puzzles[0] ?? null;
 
   const handlePlay = (puzzle: SamplePuzzle) => {
     setCurrentPuzzleId(puzzle.id);
@@ -99,10 +102,15 @@ export function PackDetailScreen() {
             <ArrowLeft size={20} />
           </button>
           <div className={styles.packHeader}>
-            <div>
-              <h1 className={styles.title}>{packMeta.name}</h1>
-              <p className={styles.desc}>{packMeta.description}</p>
-            </div>
+            <PuzzlePackDetail
+              title={packMeta.name}
+              description={packMeta.description}
+              completed={completedCount}
+              total={puzzles.length}
+              nextLabel={nextPuzzle?.name ?? null}
+            >
+              <div />
+            </PuzzlePackDetail>
           </div>
         </div>
 
@@ -130,7 +138,7 @@ export function PackDetailScreen() {
                   <button
                     key={puzzle.id}
                     type="button"
-                    className={styles.puzzleCard}
+                    className={`${styles.puzzleCard} ${nextPuzzle?.id === puzzle.id ? styles.puzzleCardFeatured : ""}`}
                     onClick={() => handlePlay(puzzle)}
                     title={`Play ${puzzle.name}`}
                     aria-label={`Play ${puzzle.name}`}
@@ -157,6 +165,9 @@ export function PackDetailScreen() {
                     <span className={styles.playHint}>
                       <Play size={12} /> Play
                     </span>
+                    {nextPuzzle?.id === puzzle.id && (
+                      <span className={styles.nextBadge}>Next</span>
+                    )}
                   </button>
                 );
               })}

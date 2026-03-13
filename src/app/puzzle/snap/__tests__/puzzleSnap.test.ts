@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  computeBoardMagnetPreview,
+  computeNeighborMagnetPreview,
   computeBoardSnapResult,
   computeNeighborSnapResult,
 } from "@/puzzle/snap/puzzleSnap";
@@ -160,5 +162,68 @@ describe("computeBoardSnapResult", () => {
 
     expect(computeBoardSnapResult([active, blocker], "active", 20, 0)).toBeNull();
     expect(computeBoardSnapResult([active, blocker], "active", 20, 3)?.kind).toBe("snap");
+  });
+});
+
+describe("magnet previews", () => {
+  it("returns board magnet preview when a piece is near its target", () => {
+    const active = makePiece({
+      id: "active",
+      row: 0,
+      col: 0,
+      x: 6,
+      y: 4,
+      targetX: 10,
+      targetY: 10,
+      groupId: "gA",
+      tileW: 40,
+      tileH: 40,
+      pad: 10,
+      rotation: 0,
+    });
+
+    const preview = computeBoardMagnetPreview([active], "active", 12, 0);
+    expect(preview).not.toBeNull();
+    expect(preview?.kind).toBe("board");
+    expect(preview?.nearSnap).toBe(true);
+    expect(preview?.magnetStrength).toBeGreaterThan(0);
+  });
+
+  it("returns neighbor magnet preview when solved neighbors are close enough", () => {
+    const active = makePiece({
+      id: "active",
+      row: 0,
+      col: 0,
+      x: 0,
+      y: 0,
+      groupId: "gA",
+      tileW: 40,
+      tileH: 40,
+      pad: 10,
+    });
+    const rightNeighbor = makePiece({
+      id: "right",
+      row: 0,
+      col: 1,
+      x: 30,
+      y: 0,
+      groupId: "gR",
+      tileW: 40,
+      tileH: 40,
+      pad: 10,
+    });
+
+    const preview = computeNeighborMagnetPreview(
+      [active, rightNeighbor],
+      "active",
+      14,
+      40,
+      40,
+      0,
+    );
+    expect(preview).not.toBeNull();
+    expect(preview?.kind).toBe("neighbor");
+    expect(preview?.intoGroupId).toBe("gR");
+    expect(preview?.magnetStrength).toBeGreaterThan(0);
   });
 });

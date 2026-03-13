@@ -30,38 +30,19 @@ export class PuzzleManagerActions extends PuzzleManagerState {
   }
 
   getSnapPreviewState(): {
+    kind?: "board" | "neighbor";
     nearSnap: boolean;
     inSnapRange: boolean;
     proximity: number;
   } | null {
-    const activeId = this.drag.activeId;
-    if (!activeId) return null;
-
-    const active = this.findPiece(activeId);
-    if (!active || active.isPlaced) return null;
-
-    const groupPieces = this.getGroupPieces(active.groupId);
-    if (!groupPieces.every((p) => p.rotation === 0)) return null;
-
-    const activeTile = this.tilePos(active);
-    const dx = active.targetX - activeTile.x;
-    const dy = active.targetY - activeTile.y;
-    const distance = Math.hypot(dx, dy);
-    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.15 : 1;
-    const tolerance = this.getEffectiveBoardSnapTolerance(firstSnapMult);
-    const nearThreshold = tolerance * 1.5;
-    const wouldOverlap = this.wouldOverlapAnyOtherGroup(
-      active.groupId,
-      dx,
-      dy,
-      this.isMobile ? 3 : 0,
-    );
-
-    const inSnapRange = distance <= tolerance && !wouldOverlap;
-    const nearSnap = distance <= nearThreshold && !wouldOverlap;
-    const proximity = nearSnap ? Math.max(0, 1 - distance / nearThreshold) : 0;
-
-    return { nearSnap: nearSnap || inSnapRange, inSnapRange, proximity };
+    const preview = this.drag.preview ?? this.computeSnapPreview();
+    if (!preview) return null;
+    return {
+      kind: preview.kind,
+      nearSnap: preview.nearSnap,
+      inSnapRange: preview.inSnapRange,
+      proximity: preview.proximity,
+    };
   }
 
   protected getEffectiveBoardSnapTolerance(multiplier = 1): number {

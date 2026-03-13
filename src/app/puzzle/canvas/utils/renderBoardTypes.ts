@@ -31,7 +31,12 @@ export type AnimationState = {
   lockLerpOverrides?: Map<string, { x: number; y: number }>;
   undoSnapBackOverrides?: Map<string, { x: number; y: number }>;
   wrongRotationHint?: { groupId: string; pieceIds: string[]; triggeredAt: number };
-  snapPreview?: { nearSnap: boolean; inSnapRange: boolean; proximity: number } | null;
+  snapPreview?: {
+    kind?: "board" | "neighbor";
+    nearSnap: boolean;
+    inSnapRange: boolean;
+    proximity: number;
+  } | null;
   snapGlowEnabled?: boolean;
   showAlignmentGrid?: boolean;
   /** Fog modifier: alpha for unplaced pieces (0 = clear, 0.5 = foggy). Placed pieces stay clear. */

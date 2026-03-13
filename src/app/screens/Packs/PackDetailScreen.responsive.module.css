@@ -75,8 +75,8 @@
   }
 
   .packHeader {
-    flex-direction: row;
-    gap: 0;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .title {
@@ -86,6 +86,10 @@
   .desc {
     font-size: 12px;
     margin-top: 2px;
+  }
+
+  .packStatus {
+    justify-items: start;
   }
 
   .puzzleGrid {
