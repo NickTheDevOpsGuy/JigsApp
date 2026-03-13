@@ -24,16 +24,29 @@ const CATEGORY_ALIAS: Record<string, string> = {
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-  nature: "🌿 Nature",
-  animals: "🐶 Animals",
-  food: "🍔 Food",
-  cozy: "🏠 Cozy",
-  space: "🌌 Space",
-  retro: "🧠 Retro",
-  art: "🖼 Art",
-  gaming: "🎮 Gaming",
-  seasonal: "🌸 Seasonal",
-  cute: "🧁 Cute",
+  nature: "🌿",
+  animals: "🐾",
+  food: "🍕",
+  cozy: "🛋️",
+  space: "🪐",
+  retro: "📼",
+  art: "🎨",
+  gaming: "🎮",
+  seasonal: "🍂",
+  cute: "✨",
+};
+
+const CATEGORY_NAMES: Record<string, string> = {
+  nature: "Nature",
+  animals: "Animals",
+  food: "Food",
+  cozy: "Cozy",
+  space: "Space",
+  retro: "Retro",
+  art: "Art",
+  gaming: "Gaming",
+  seasonal: "Seasonal",
+  cute: "Cute",
 };
 
 const CATEGORY_ORDER = [
@@ -100,15 +113,17 @@ export const SAMPLE_PUZZLES: SamplePuzzle[] = Object.entries(puzzleImages)
 const discoveredCategories = [...new Set(SAMPLE_PUZZLES.map((p) => p.category))].sort();
 
 export const CATEGORIES = [
-  { id: "all", label: "All" },
+  { id: "all", label: "All", name: "All" },
   ...CATEGORY_ORDER.filter((cat) => discoveredCategories.includes(cat)).map((cat) => ({
     id: cat,
     label: CATEGORY_LABELS[cat] ?? kebabToTitle(cat),
+    name: CATEGORY_NAMES[cat] ?? kebabToTitle(cat),
   })),
   ...discoveredCategories
     .filter((cat) => !CATEGORY_ORDER.includes(cat as (typeof CATEGORY_ORDER)[number]))
     .map((cat) => ({
       id: cat,
       label: CATEGORY_LABELS[cat] ?? kebabToTitle(cat),
+      name: CATEGORY_NAMES[cat] ?? kebabToTitle(cat),
     })),
 ];

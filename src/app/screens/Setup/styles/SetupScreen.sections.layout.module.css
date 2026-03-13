@@ -28,12 +28,12 @@
 .difficultySection,
 .timerSection {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .difficultySection {
-  margin-top: 6px;
-  margin-bottom: 8px;
+  margin-top: 12px;
+  margin-bottom: 16px;
 }
 
 .configSectionLabel {
@@ -46,7 +46,7 @@
 .difficultyGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
 }
 
 .difficultyCard {
@@ -55,12 +55,12 @@
   border-radius: 10px;
   background: linear-gradient(180deg, rgba(20, 33, 57, 0.94), rgba(14, 25, 43, 0.94));
   min-height: 56px;
-  padding: 6px 8px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   cursor: pointer;
   color: #dfecff;
 }

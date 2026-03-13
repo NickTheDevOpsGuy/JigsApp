@@ -39,48 +39,58 @@
   }
 
   .cardScroll {
-    padding: 8px 0 12px;
+    padding: 12px 0 16px;
+    gap: 10px;
   }
 
   .packScrollViewport {
-    padding: 6px 0;
+    padding: 6px 0 12px;
   }
 
   .subtitle {
     font-size: 13px;
-    margin-bottom: 8px;
+    margin: 0;
+    line-height: 1.5;
   }
 
   .seasonNote {
     font-size: 12px;
-    margin-bottom: 2px;
+    margin: 0;
+    line-height: 1.4;
   }
 
   .packGrid {
-    gap: 8px;
+    gap: 12px;
   }
 
   .packCard {
     padding: 10px 12px;
-    gap: 8px;
-    min-height: 64px;
-    min-width: 220px;
-    max-width: 280px;
+    gap: 10px;
+    min-height: 56px;
+    min-width: 180px;
+    max-width: 240px;
   }
 
   .packEmoji {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+  }
+
+  .packInfo {
+    gap: 6px;
   }
 
   .packName {
     font-size: 14px;
+    line-height: 1.35;
   }
 
   .packDesc {
     font-size: 12px;
+    line-height: 1.35;
   }
 
   .packProgress {
-    font-size: 12px;
+    font-size: 11px;
+    line-height: 1.3;
   }
 }

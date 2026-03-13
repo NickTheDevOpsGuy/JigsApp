@@ -45,10 +45,15 @@
   max-width: 620px;
 }
 
+/* Pack flow: more space between difficulty, preview, and buttons */
+.cardPackFlow .cardBody {
+  gap: var(--space-8);
+}
+
 .cardBody {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-6);
   min-width: 0;
   flex: 1 1 auto;
   min-height: 0;

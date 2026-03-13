@@ -105,7 +105,8 @@ export function SetupImageSourcePanel({
                   key={cat.id}
                   className={`${styles.categoryBtn} ${selectedCategory === cat.id ? styles.categoryBtnActive : ""}`}
                   onClick={() => setSelectedCategory(cat.id)}
-                  title={`Filter by ${cat.label}`}
+                  title={`Filter by ${cat.name}`}
+                  aria-label={`Filter by ${cat.name}`}
                 >
                   {cat.label}
                 </button>

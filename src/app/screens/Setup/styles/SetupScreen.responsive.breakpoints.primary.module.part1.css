@@ -36,7 +36,7 @@
   }
 
   .cardBody {
-    gap: 6px;
+    gap: 12px;
   }
 
   .cardPackFlow .cardBody {
@@ -104,13 +104,15 @@
 
   .gallery {
     min-height: 0;
-    padding: 4px;
+    padding: 4px 4px 10px;
     gap: 4px;
     max-height: 64px;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+    scroll-padding-inline: 8px;
     scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
 
   .gallery::-webkit-scrollbar {
@@ -160,9 +162,9 @@
 
   .difficultySection,
   .timerSection {
-    gap: 2px;
-    margin-top: 2px;
-    margin-bottom: 4px;
+    gap: 6px;
+    margin-top: 8px;
+    margin-bottom: 10px;
   }
 
   .configSectionLabel {
@@ -176,9 +178,10 @@
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+    scroll-padding-inline: 8px;
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-    padding-bottom: 2px;
+    padding-bottom: 10px;
   }
 
   .difficultyGrid::-webkit-scrollbar {
@@ -206,6 +209,7 @@
     padding: 5px 6px;
     gap: 3px;
     scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 
   .difficultyCardTitle {
@@ -243,15 +247,15 @@
 
   .actionRow {
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding-top: var(--space-2);
-    padding-bottom: 2px;
-    margin-top: 4px;
+    gap: 10px;
+    padding-top: 14px;
+    padding-bottom: 4px;
+    margin-top: 12px;
     flex-shrink: 0;
   }
 
   .actionRowPackFlow {
-    margin-top: 2px;
+    margin-top: 10px;
   }
 
   .backActionBtn,

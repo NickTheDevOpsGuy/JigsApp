@@ -59,7 +59,7 @@
   }
 
   .scrollViewport {
-    padding: var(--space-2) 0;
+    padding: var(--space-2) 0 12px;
   }
 
   .scrollBtn {
@@ -96,16 +96,13 @@
   .puzzleCard {
     width: clamp(130px, 38vw, 160px);
     padding: 9px 8px;
-    gap: 4px;
+    gap: 0;
   }
 
-  .puzzleName {
-    font-size: 12px;
-    height: 1.2em;
-  }
-
+  /* No text on cards on mobile — image only, less busy (name/play still in button title/aria-label) */
+  .puzzleName,
   .playHint {
-    font-size: 11px;
+    display: none;
   }
 }
 

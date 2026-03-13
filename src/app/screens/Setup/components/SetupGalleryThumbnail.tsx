@@ -1,8 +1,8 @@
 /**
  * Gallery thumbnail for sample puzzle in SetupScreen.
+ * No text overlay on the image so the picture is easy to see on mobile.
  */
 import { useState } from "react";
-import { Puzzle } from "lucide-react";
 import { SAMPLE_PUZZLES } from "@/data/packs/samplePuzzles";
 import styles from "@/screens/Setup/styles/SetupScreen.module.css";
 
@@ -39,13 +39,6 @@ export function SetupGalleryThumbnail({
       ) : (
         <img src={puzzle.thumbnail} alt={puzzle.name} onError={() => setImgError(true)} />
       )}
-      <span className={styles.galleryItemMeta}>
-        <span className={styles.galleryItemName}>{puzzle.name}</span>
-        <span className={styles.galleryItemPieces}>
-          <Puzzle size={12} />
-          {pieceCount} pieces
-        </span>
-      </span>
     </button>
   );
 }

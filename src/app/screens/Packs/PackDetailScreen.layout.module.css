@@ -2,9 +2,10 @@
   display: inline-flex;
   flex-direction: row;
   gap: var(--space-3);
-  padding: 0 var(--space-2);
+  padding: 0 12px 4px;
   align-items: stretch;
   min-width: min-content;
+  box-sizing: border-box;
 }
 
 .puzzleCard {
@@ -27,6 +28,7 @@
     transform 0.15s;
   min-height: 0;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .puzzleCard:hover:not(:disabled) {

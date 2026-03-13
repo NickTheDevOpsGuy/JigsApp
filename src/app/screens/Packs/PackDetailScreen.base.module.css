@@ -94,17 +94,19 @@
   padding-bottom: var(--space-3);
 }
 
+/* Horizontal scroll: full-card snap, blue scrollbar (parity with desktop/mobile) */
 .scrollViewport {
   flex: 1 1 auto;
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 12px;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   -webkit-overflow-scrolling: touch;
-  padding: var(--space-3) 0;
+  padding: var(--space-3) 0 12px;
 }
 
 .scrollViewport::-webkit-scrollbar {

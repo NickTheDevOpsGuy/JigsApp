@@ -97,4 +97,5 @@
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   scrollbar-gutter: stable;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline: 8px;
 }
