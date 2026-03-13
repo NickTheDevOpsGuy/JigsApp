@@ -29,7 +29,8 @@ export async function getDailyLeaderboard(
         .eq("is_daily", true);
       if (cutType !== "all") query = query.eq("cut_type", cutType);
       if (visualModifier !== "all") query = query.eq("visual_modifier", visualModifier);
-      if (completionSource !== "all") query = query.eq("completion_source", completionSource);
+      if (completionSource !== "all")
+        query = query.eq("completion_source", completionSource);
       const { data, error } = await query
         .order("elapsed_seconds", { ascending: true })
         .limit(limit);
@@ -69,20 +70,21 @@ export async function getDailyLeaderboardLeastMoves(
         .not("move_count", "is", null);
       if (cutType !== "all") query = query.eq("cut_type", cutType);
       if (visualModifier !== "all") query = query.eq("visual_modifier", visualModifier);
-      if (completionSource !== "all") query = query.eq("completion_source", completionSource);
+      if (completionSource !== "all")
+        query = query.eq("completion_source", completionSource);
       const { data, error } = await query
         .order("move_count", { ascending: true })
         .order("elapsed_seconds", { ascending: true })
         .limit(limit * 4);
       if (error) return [];
       const bestByUser = new Map<
-    string,
-    {
-      elapsedSeconds: number;
-      completedAt?: string;
-      moveCount: number;
-      undoCount?: number | null;
-    }
+        string,
+        {
+          elapsedSeconds: number;
+          completedAt?: string;
+          moveCount: number;
+          undoCount?: number | null;
+        }
       >();
       for (const row of data ?? []) {
         const cur = bestByUser.get(row.user_id);
@@ -142,20 +144,21 @@ export async function getDailyLeaderboardCleanest(
         .eq("is_daily", true);
       if (cutType !== "all") query = query.eq("cut_type", cutType);
       if (visualModifier !== "all") query = query.eq("visual_modifier", visualModifier);
-      if (completionSource !== "all") query = query.eq("completion_source", completionSource);
+      if (completionSource !== "all")
+        query = query.eq("completion_source", completionSource);
       const { data, error } = await query
         .order("undo_count", { ascending: true, nullsFirst: false })
         .order("elapsed_seconds", { ascending: true })
         .limit(limit * 4);
       if (error) return [];
       const bestByUser = new Map<
-    string,
-    {
-      elapsedSeconds: number;
-      completedAt?: string;
-      moveCount?: number | null;
-      undoCount: number;
-    }
+        string,
+        {
+          elapsedSeconds: number;
+          completedAt?: string;
+          moveCount?: number | null;
+          undoCount: number;
+        }
       >();
       for (const row of data ?? []) {
         const undos = row.undo_count ?? 999;

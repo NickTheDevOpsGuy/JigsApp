@@ -98,7 +98,11 @@
   align-items: center;
   padding: 0 12px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-brand-primary) 16%, var(--color-bg-elevated));
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 16%,
+    var(--color-bg-elevated)
+  );
   border: 1px solid color-mix(in srgb, var(--color-brand-primary) 36%, transparent);
   color: var(--color-text-primary);
   font-size: 12px;

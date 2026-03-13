@@ -242,7 +242,8 @@ export function SetupImageSourcePanel({
                 </button>
               </div>
               <p className={styles.urlHelp}>
-                Use a public PNG, JPG, or WebP link. Some sites block direct image fetches.
+                Use a public PNG, JPG, or WebP link. Some sites block direct image
+                fetches.
               </p>
             </div>
           </div>

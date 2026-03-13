@@ -49,7 +49,10 @@ export async function getPeriodLeaderboard(
       .order("elapsed_seconds", { ascending: true })
       .limit(limit * 5);
     if (error) return [];
-    const bestByUser = new Map<string, { elapsedSeconds: number; completedAt?: string }>();
+    const bestByUser = new Map<
+      string,
+      { elapsedSeconds: number; completedAt?: string }
+    >();
     for (const row of data ?? []) {
       const cur = bestByUser.get(row.user_id);
       if (cur == null || row.elapsed_seconds < cur.elapsedSeconds) {
@@ -93,7 +96,8 @@ export async function getWeeklyTotalsLeaderboard(
         .lte("puzzle_date", end);
       if (cutType !== "all") query = query.eq("cut_type", cutType);
       if (visualModifier !== "all") query = query.eq("visual_modifier", visualModifier);
-      if (completionSource !== "all") query = query.eq("completion_source", completionSource);
+      if (completionSource !== "all")
+        query = query.eq("completion_source", completionSource);
       const { data, error } = await query;
       if (error) return [];
       const countByUser = new Map<string, number>();
@@ -174,12 +178,13 @@ export async function getWeeklyEfficiencyLeaderboard(
         .gt("move_count", 0);
       if (cutType !== "all") query = query.eq("cut_type", cutType);
       if (visualModifier !== "all") query = query.eq("visual_modifier", visualModifier);
-      if (completionSource !== "all") query = query.eq("completion_source", completionSource);
+      if (completionSource !== "all")
+        query = query.eq("completion_source", completionSource);
       const { data, error } = await query.limit(limit * 8);
       if (error) return [];
       const bestByUser = new Map<
-    string,
-    { elapsedSeconds: number; moveCount: number; efficiency: number }
+        string,
+        { elapsedSeconds: number; moveCount: number; efficiency: number }
       >();
       for (const row of data ?? []) {
         const moveCount = row.move_count ?? 1;

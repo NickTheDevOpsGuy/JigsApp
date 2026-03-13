@@ -7,7 +7,10 @@ type CacheRecord<T> = {
 
 const leaderboardCache = new Map<string, CacheRecord<unknown>>();
 
-export function withLeaderboardCache<T>(key: string, loader: () => Promise<T>): Promise<T> {
+export function withLeaderboardCache<T>(
+  key: string,
+  loader: () => Promise<T>,
+): Promise<T> {
   const now = Date.now();
   const cached = leaderboardCache.get(key) as CacheRecord<T> | undefined;
   if (cached && cached.expiresAt > now) return cached.value;

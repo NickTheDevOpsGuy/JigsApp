@@ -95,7 +95,11 @@
 .difficultyCardPreviewDot {
   height: 10px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(152, 205, 255, 0.82), rgba(56, 108, 181, 0.78));
+  background: linear-gradient(
+    180deg,
+    rgba(152, 205, 255, 0.82),
+    rgba(56, 108, 181, 0.78)
+  );
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
     0 2px 4px rgba(2, 10, 22, 0.22);

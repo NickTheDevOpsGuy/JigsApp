@@ -95,7 +95,11 @@ export function drawPiece(
         : preview.inSnapRange
           ? 1.02
           : 0.78);
-    const baseAlpha = preview.inSnapRange ? 0.54 : preview.kind === "neighbor" ? 0.26 : 0.22;
+    const baseAlpha = preview.inSnapRange
+      ? 0.54
+      : preview.kind === "neighbor"
+        ? 0.26
+        : 0.22;
     const veryCloseBoost = proximity > 0.82 ? ((proximity - 0.82) / 0.18) * 0.4 : 0;
     let alpha = Math.min(0.95, baseAlpha * (0.2 + 0.8 * proximityEased) + veryCloseBoost);
     const pulse = 0.92 + 0.08 * Math.sin(nowMs * 0.003);

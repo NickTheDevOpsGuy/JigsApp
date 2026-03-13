@@ -19,7 +19,9 @@ export function PuzzlePackProgress({
       <div className={styles.progressTrack} aria-hidden="true">
         <span className={styles.progressFill} style={{ width: `${percent}%` }} />
       </div>
-      <p className={`${styles.progressText} ${isComplete ? styles.progressComplete : ""}`}>
+      <p
+        className={`${styles.progressText} ${isComplete ? styles.progressComplete : ""}`}
+      >
         {isComplete ? `✔ ${completeLabel}` : `${completed} / ${total} completed`}
       </p>
     </div>

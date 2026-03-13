@@ -9,8 +9,14 @@ export function LeaderboardModule(props: {
   infoSlot?: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const { eyebrow = "Competition", title, subtitle, headerSlot, infoSlot, children } =
-    props;
+  const {
+    eyebrow = "Competition",
+    title,
+    subtitle,
+    headerSlot,
+    infoSlot,
+    children,
+  } = props;
 
   return (
     <section className={styles.moduleCard}>

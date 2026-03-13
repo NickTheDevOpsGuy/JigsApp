@@ -134,45 +134,46 @@ export function LeaderboardTab({
           leaderboardType === "week" ? (
             <div className={styles.weekProgressStrip}>
               <span>Weekly Album Progress</span>
-              <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong> days
+              <strong>{weeklyCompleted}</strong> <strong>/</strong> <strong>7</strong>{" "}
+              days
             </div>
           ) : undefined
         }
       >
         {leaderboardType === "today" &&
-        renderTimeList(
-          leaderboard,
-          "Be the first to solve today's puzzle.",
-          rowAnimEpoch,
-          compact,
-          false,
-          currentUserId ?? undefined,
-        )}
+          renderTimeList(
+            leaderboard,
+            "Be the first to solve today's puzzle.",
+            rowAnimEpoch,
+            compact,
+            false,
+            currentUserId ?? undefined,
+          )}
         {leaderboardType === "week" &&
-        renderCompletionList(
-          weeklyTotalsLeaderboard,
-          rowAnimEpoch,
-          compact,
-          "No completions in the last 7 days.",
-          currentUserId ?? undefined,
-        )}
-      {leaderboardType === "alltime" &&
-        renderTimeList(
-          leaderboard,
-          "No completions for this grid size yet.",
-          rowAnimEpoch,
-          compact,
-          false,
-          currentUserId ?? undefined,
-        )}
-      {leaderboardType === "efficiency" &&
-        renderEfficiencyList(
-          efficiencyLeaderboard,
-          rowAnimEpoch,
-          compact,
-          "No completions with moves recorded this week.",
-          currentUserId ?? undefined,
-        )}
+          renderCompletionList(
+            weeklyTotalsLeaderboard,
+            rowAnimEpoch,
+            compact,
+            "No completions in the last 7 days.",
+            currentUserId ?? undefined,
+          )}
+        {leaderboardType === "alltime" &&
+          renderTimeList(
+            leaderboard,
+            "No completions for this grid size yet.",
+            rowAnimEpoch,
+            compact,
+            false,
+            currentUserId ?? undefined,
+          )}
+        {leaderboardType === "efficiency" &&
+          renderEfficiencyList(
+            efficiencyLeaderboard,
+            rowAnimEpoch,
+            compact,
+            "No completions with moves recorded this week.",
+            currentUserId ?? undefined,
+          )}
       </LeaderboardModule>
     </div>
   );

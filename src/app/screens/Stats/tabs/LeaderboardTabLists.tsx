@@ -21,9 +21,7 @@ export function renderTimeList(
   currentUserId?: string,
 ) {
   if (entries.length === 0) {
-    return (
-      <LeaderboardEmptyState title="No scores yet" text={`🏆 ${emptyMsg}`} />
-    );
+    return <LeaderboardEmptyState title="No scores yet" text={`🏆 ${emptyMsg}`} />;
   }
   return (
     <LeaderboardRows>
@@ -66,9 +64,7 @@ export function renderCompletionList(
   currentUserId?: string,
 ) {
   if (entries.length === 0) {
-    return (
-      <LeaderboardEmptyState title="Nothing posted yet" text={emptyMsg} />
-    );
+    return <LeaderboardEmptyState title="Nothing posted yet" text={emptyMsg} />;
   }
   return (
     <LeaderboardRows>
@@ -99,9 +95,7 @@ export function renderEfficiencyList(
   currentUserId?: string,
 ) {
   if (entries.length === 0) {
-    return (
-      <LeaderboardEmptyState title="No efficiency runs yet" text={emptyMsg} />
-    );
+    return <LeaderboardEmptyState title="No efficiency runs yet" text={emptyMsg} />;
   }
   return (
     <LeaderboardRows>

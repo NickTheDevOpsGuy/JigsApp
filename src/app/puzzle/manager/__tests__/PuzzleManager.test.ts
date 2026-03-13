@@ -40,7 +40,10 @@ describe("PuzzleManager", () => {
     const moved = manager.getState().pieces.find((p) => p.id === piece.id)!;
 
     manager.pointerDownBoardSpace(piece.id, moved.x + 10, moved.y + 10);
-    manager.pointerMoveBoardSpace(moved.targetX + moved.pad - 14, moved.targetY + moved.pad - 12);
+    manager.pointerMoveBoardSpace(
+      moved.targetX + moved.pad - 14,
+      moved.targetY + moved.pad - 12,
+    );
 
     const preview = manager.getSnapPreviewState();
     expect(preview).not.toBeNull();

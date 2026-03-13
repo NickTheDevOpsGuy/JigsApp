@@ -42,7 +42,8 @@ export function PackDetailScreen() {
     pack && packsData ? packsData.getPuzzlesForPack(pack) : [];
   const completed = getCompletedPuzzleIds();
   const completedCount = puzzles.filter((puzzle) => completed.has(puzzle.id)).length;
-  const nextPuzzle = puzzles.find((puzzle) => !completed.has(puzzle.id)) ?? puzzles[0] ?? null;
+  const nextPuzzle =
+    puzzles.find((puzzle) => !completed.has(puzzle.id)) ?? puzzles[0] ?? null;
 
   const handlePlay = (puzzle: SamplePuzzle) => {
     setCurrentPuzzleId(puzzle.id);

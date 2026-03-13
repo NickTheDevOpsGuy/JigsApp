@@ -152,7 +152,9 @@ export function CompletionOverlay({
 
         <div className={styles.completeTitleBlock} role="banner">
           <h2 className={styles.completeTitleText}>🧩 Puzzle complete!</h2>
-          <p className={styles.completeTitlePhraseSub}>You did it. That puzzle is solved.</p>
+          <p className={styles.completeTitlePhraseSub}>
+            You did it. That puzzle is solved.
+          </p>
           {isNewBest && (
             <p className={styles.completeTitlePhraseHighlight}>New personal best! 🏆</p>
           )}

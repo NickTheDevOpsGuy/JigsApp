@@ -23,7 +23,9 @@ export function PuzzlePackDetail({
   const isComplete = total > 0 && completed >= total;
 
   return (
-    <section className={`${styles.detailHeader} ${isComplete ? styles.completeCelebrate : ""}`}>
+    <section
+      className={`${styles.detailHeader} ${isComplete ? styles.completeCelebrate : ""}`}
+    >
       <div className={styles.detailStatusRow}>
         <div>
           <h1 className={styles.title}>{title}</h1>
