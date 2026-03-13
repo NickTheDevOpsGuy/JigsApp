@@ -40,51 +40,72 @@ export function LeaderboardTabHeader({
   allTimeGrid,
   setAllTimeGrid,
 }: LeaderboardTabHeaderProps) {
+  const sortLabel =
+    leaderboardMetric === "time"
+      ? "Fastest"
+      : leaderboardMetric === "moves"
+        ? "Least moves"
+        : "Cleanest";
+  const filterSummary = [
+    cutTypeFilter === "all" ? null : cutTypeFilter,
+    modifierFilter === "all" ? null : modifierFilter,
+    sourceFilter === "all" ? null : sourceFilter,
+    leaderboardType === "alltime" ? allTimeGrid : null,
+  ]
+    .filter(Boolean)
+    .join(" • ");
+
   return (
     <div className={styles.leaderboardHeader}>
-      <div className={styles.boardModeSwitch} role="tablist" aria-label="Board mode">
-        <button
-          type="button"
-          className={`${styles.boardModeBtn} ${leaderboardType === "today" ? styles.boardModeBtnActive : ""}`}
-          onClick={() => setLeaderboardType("today")}
-        >
-          Today
-        </button>
-        <button
-          type="button"
-          className={`${styles.boardModeBtn} ${leaderboardType === "week" ? styles.boardModeBtnActive : ""}`}
-          onClick={() => setLeaderboardType("week")}
-        >
-          Week
-        </button>
-        <button
-          type="button"
-          className={`${styles.boardModeBtn} ${leaderboardType === "alltime" ? styles.boardModeBtnActive : ""}`}
-          onClick={() => setLeaderboardType("alltime")}
-        >
-          All-time
-        </button>
-        <button
-          type="button"
-          className={`${styles.boardModeBtn} ${leaderboardType === "efficiency" ? styles.boardModeBtnActive : ""}`}
-          onClick={() => setLeaderboardType("efficiency")}
-        >
-          Efficiency
-        </button>
+      <div className={styles.leaderboardControlRow}>
+        <div className={styles.boardModeSwitch} role="tablist" aria-label="Board mode">
+          <button
+            type="button"
+            className={`${styles.boardModeBtn} ${leaderboardType === "today" ? styles.boardModeBtnActive : ""}`}
+            onClick={() => setLeaderboardType("today")}
+          >
+            Today
+          </button>
+          <button
+            type="button"
+            className={`${styles.boardModeBtn} ${leaderboardType === "week" ? styles.boardModeBtnActive : ""}`}
+            onClick={() => setLeaderboardType("week")}
+          >
+            Week
+          </button>
+          <button
+            type="button"
+            className={`${styles.boardModeBtn} ${leaderboardType === "alltime" ? styles.boardModeBtnActive : ""}`}
+            onClick={() => setLeaderboardType("alltime")}
+          >
+            All-time
+          </button>
+          <button
+            type="button"
+            className={`${styles.boardModeBtn} ${leaderboardType === "efficiency" ? styles.boardModeBtnActive : ""}`}
+            onClick={() => setLeaderboardType("efficiency")}
+          >
+            Efficiency
+          </button>
+        </div>
+        {(leaderboardType === "today" || leaderboardType === "alltime") && (
+          <label className={styles.sortCluster} htmlFor="leaderboard-metric-select">
+            <span className={styles.sortClusterLabel}>Sort</span>
+            <select
+              id="leaderboard-metric-select"
+              className={styles.sortClusterSelect}
+              value={leaderboardMetric}
+              onChange={(e) => setLeaderboardMetric(e.target.value as LeaderboardSortMetric)}
+              aria-label="Sort by"
+            >
+              <option value="time">Fastest</option>
+              <option value="moves">Least moves</option>
+              <option value="cleanest">Cleanest</option>
+            </select>
+            <span className={styles.sortClusterValue}>{sortLabel}</span>
+          </label>
+        )}
       </div>
-      {(leaderboardType === "today" || leaderboardType === "alltime") && (
-        <select
-          id="leaderboard-metric-select"
-          className={styles.inlineFilterSelect}
-          value={leaderboardMetric}
-          onChange={(e) => setLeaderboardMetric(e.target.value as LeaderboardSortMetric)}
-          aria-label="Sort by"
-        >
-          <option value="time">Fastest</option>
-          <option value="moves">Least moves</option>
-          <option value="cleanest">Cleanest</option>
-        </select>
-      )}
       <button
         type="button"
         className={styles.filtersBar}
@@ -93,74 +114,86 @@ export function LeaderboardTabHeader({
         aria-label="Filters"
       >
         <Filter size={18} />
-        <span>Filters</span>
+        <span className={styles.filtersBarTitle}>Filters</span>
+        <span className={styles.filtersSummary}>
+          {filterSummary || "All shapes, modifiers, and sources"}
+        </span>
         <ChevronDown size={18} className={filtersOpen ? styles.filtersChevronOpen : ""} />
       </button>
       {filtersOpen && (
-        <div className={styles.controlsRow}>
-          {(leaderboardType === "today" ||
-            leaderboardType === "week" ||
-            leaderboardType === "alltime" ||
-            leaderboardType === "efficiency") && (
-            <>
-              <select
-                id="cut-type-select"
-                className={styles.inlineFilterSelect}
-                value={cutTypeFilter}
-                onChange={(e) => setCutTypeFilter(e.target.value as PieceCutType)}
-                aria-label="Filter by shape"
-              >
-                <option value="all">All Shapes</option>
-                <option value="classic">Classic Shape</option>
-                <option value="irregular">Irregular Shape</option>
-                <option value="hard">Hard Shape</option>
-              </select>
-              <select
-                id="modifier-select"
-                className={styles.inlineFilterSelect}
-                value={modifierFilter}
-                onChange={(e) =>
-                  setModifierFilter(e.target.value as VisualModifierFilter)
-                }
-                aria-label="Filter by modifier"
-              >
-                <option value="all">All Modifiers</option>
-                <option value="none">No Modifier</option>
-                <option value="fog">Fog Modifier</option>
-                <option value="night">Night Modifier</option>
-                <option value="sepia">Sepia Modifier</option>
-              </select>
-              <select
-                id="source-select"
-                className={styles.inlineFilterSelect}
-                value={sourceFilter}
-                onChange={(e) =>
-                  setSourceFilter(e.target.value as CompletionSourceFilter)
-                }
-                aria-label="Filter by source"
-              >
-                <option value="all">All Sources</option>
-                <option value="daily">Daily</option>
-                <option value="pack">Pack</option>
-                <option value="custom">Custom</option>
-              </select>
-            </>
-          )}
-          {leaderboardType === "alltime" && (
+        <div className={styles.filtersPanel}>
+          <div className={styles.filterField}>
+            <label className={styles.filterLabel} htmlFor="cut-type-select">
+              Shape
+            </label>
             <select
-              id="alltime-grid-select"
+              id="cut-type-select"
               className={styles.inlineFilterSelect}
-              value={allTimeGrid}
-              onChange={(e) =>
-                setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")
-              }
-              aria-label="Filter all-time by grid size"
+              value={cutTypeFilter}
+              onChange={(e) => setCutTypeFilter(e.target.value as PieceCutType)}
+              aria-label="Filter by shape"
             >
-              <option value="3x3">3x3 Grid</option>
-              <option value="4x4">4x4 Grid</option>
-              <option value="5x5">5x5 Grid</option>
-              <option value="6x6">6x6 Grid</option>
+              <option value="all">All Shapes</option>
+              <option value="classic">Classic Shape</option>
+              <option value="irregular">Irregular Shape</option>
+              <option value="hard">Hard Shape</option>
             </select>
+          </div>
+          <div className={styles.filterField}>
+            <label className={styles.filterLabel} htmlFor="modifier-select">
+              Modifier
+            </label>
+            <select
+              id="modifier-select"
+              className={styles.inlineFilterSelect}
+              value={modifierFilter}
+              onChange={(e) => setModifierFilter(e.target.value as VisualModifierFilter)}
+              aria-label="Filter by modifier"
+            >
+              <option value="all">All Modifiers</option>
+              <option value="none">No Modifier</option>
+              <option value="fog">Fog Modifier</option>
+              <option value="night">Night Modifier</option>
+              <option value="sepia">Sepia Modifier</option>
+            </select>
+          </div>
+          <div className={styles.filterField}>
+            <label className={styles.filterLabel} htmlFor="source-select">
+              Source
+            </label>
+            <select
+              id="source-select"
+              className={styles.inlineFilterSelect}
+              value={sourceFilter}
+              onChange={(e) => setSourceFilter(e.target.value as CompletionSourceFilter)}
+              aria-label="Filter by source"
+            >
+              <option value="all">All Sources</option>
+              <option value="daily">Daily</option>
+              <option value="pack">Pack</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          {leaderboardType === "alltime" && (
+            <div className={styles.filterField}>
+              <label className={styles.filterLabel} htmlFor="alltime-grid-select">
+                Grid
+              </label>
+              <select
+                id="alltime-grid-select"
+                className={styles.inlineFilterSelect}
+                value={allTimeGrid}
+                onChange={(e) =>
+                  setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")
+                }
+                aria-label="Filter all-time by grid size"
+              >
+                <option value="3x3">3x3 Grid</option>
+                <option value="4x4">4x4 Grid</option>
+                <option value="5x5">5x5 Grid</option>
+                <option value="6x6">6x6 Grid</option>
+              </select>
+            </div>
           )}
         </div>
       )}

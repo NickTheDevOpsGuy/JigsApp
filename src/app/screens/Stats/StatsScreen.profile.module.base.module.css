@@ -1,23 +1,30 @@
 .profileLayout {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 10px;
   min-width: 0;
 }
 
 .profileBlock {
-  padding: 14px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.profileBlock:last-of-type {
-  border-bottom: none;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 98%, transparent);
 }
 
 .profileIdentity {
-  margin: 0 0 2px 0;
-  font-size: 1.1rem;
+  margin: 0;
+  font-size: 1.2rem;
   color: var(--color-text-primary);
+}
+
+.profileSectionEyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
 }
 
 .profileRaccoon {
@@ -37,17 +44,104 @@
 }
 
 .profileTier {
-  margin: 0;
+  margin: 4px 0 0;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-brand-primary);
 }
 
 .profileBlockTitle {
-  margin: 0 0 10px 0;
-  font-size: 0.95rem;
-  font-weight: 600;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--color-text-primary);
+}
+
+.profileBlockHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.profileHeroBlock {
+  padding: 16px 14px;
+}
+
+.profileStatsBlock {
+  /* Intentionally shared section shell for stats grouping. */
+}
+
+.profileHeroHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.profileHeroMeta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.profileMetaBadge {
+  display: grid;
+  gap: 2px;
+  min-width: 72px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 26%, var(--color-border));
+  background: color-mix(in srgb, var(--color-brand-primary) 10%, transparent);
+  text-align: center;
+}
+
+.profileMetaBadge strong {
+  font-size: 1rem;
+  color: var(--color-text-primary);
+}
+
+.profileMetaLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.profileStatTiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.profileStatTile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg-card) 82%, transparent);
+  min-width: 0;
+}
+
+.profileStatTileLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.profileStatTileValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .profileStatsRow {
@@ -74,12 +168,14 @@
   background: none;
   border: none;
   padding: 0;
-  margin-left: 4px;
-  font-size: inherit;
+  margin-left: 0;
+  margin-top: 2px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--color-brand-primary);
   cursor: pointer;
   text-decoration: none;
+  align-self: flex-start;
 }
 .profileInlineLink:hover {
   text-decoration: underline;
@@ -89,7 +185,6 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  margin-bottom: 10px;
 }
 
 .profilePuzzleSlot {
@@ -126,10 +221,11 @@
   background: none;
   border: none;
   padding: 0;
-  font-size: 0.9rem;
+  font-size: 12px;
   font-weight: 600;
   color: var(--color-brand-primary);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .profileViewAll:hover {
@@ -205,9 +301,8 @@
 }
 
 /* No divider line under Daily Mastery (or between it and Settings) */
-.profileBlock.profileBlockMastery {
-  border-bottom: none;
-}
-.profileBlockMastery + .profileBlock {
-  border-top: none;
+.profileMasteryCount {
+  font-size: 0.95rem;
+  color: var(--color-brand-primary);
+  font-variant-numeric: tabular-nums;
 }

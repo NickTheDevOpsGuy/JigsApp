@@ -1,18 +1,18 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "43";
+export const CHANGELOG_VERSION = "44";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      "🏆 Leaderboard – New **Efficiency** tab (weekly best sec/move). **Sort by**: Fastest, Least moves, or Cleanest for Today and All-time. Your row is highlighted with “(You)” on all boards. Filters (shape, modifier, source) apply to all four views.",
-      "👤 Profile – **Best streak** shown when different from current (e.g. “Best: 12 days”). **See ranking** link next to Best (4×4) jumps to the All-time 4×4 leaderboard.",
-      "🎉 Completion – **7-day streak** toast and haptic when you hit a week of daily solves. **New personal best** triggers a short haptic. **Next CTA** after closing the overlay: “Play today’s puzzle” or “One more from this pack” so you can jump straight to the next puzzle.",
-      "📊 Supabase – Indexes added for least-moves and cleanest-solve leaderboard queries (tables migration only; RLS unchanged).",
-      "🏆 Leaderboard – Week view now has the same filters as Today (shape, modifier, source); share button removed from Stats/leaderboard header.",
+      "🏆 Board refresh – Efficiency tab, cleaner sort, shared filters, and highlighted “You” rows.",
+      "👤 Profile refresh – Best streak, See ranking, tighter stats, and cleaner settings.",
+      "🎉 Completion polish – 7-day streak toast, PB haptic, and faster next-puzzle CTA.",
+      "📊 Supabase – Faster least-moves and cleanest leaderboard queries.",
+      "🏆 Week board – Same filters as Today, no header share button.",
       "📤 Challenge share – Share card image is now image-only (just the puzzle with a gold border); share message picks a random taunt (e.g. “BOOM! I just crushed that puzzle!”, “Another one in the books!”, “Puzzle demolished. Your turn.”) so each challenge feels a bit different.",
       "🔄 Start over – Menu → Navigation → Start over restarts the current puzzle from the beginning (same image and difficulty) so you can escape an unwinnable state after resuming.",
       "📤 Share card – Challenge card is image-only (puzzle + gold border); result card has message and full URL. Share message includes time and moves.",

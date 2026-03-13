@@ -144,8 +144,8 @@
 .achievement {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  gap: 14px;
+  padding: 14px;
   background: var(--color-bg-elevated);
   border-radius: 12px;
   border: 1px solid var(--color-border);
@@ -182,6 +182,54 @@
   color: var(--color-brand-primary);
   font-weight: 700;
   font-size: 18px;
+}
+
+.achievementMeta {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+
+.achievementStatus {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.badgesSection {
+  display: grid;
+  gap: 12px;
+}
+
+.badgesHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.badgesTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.badgesProgress {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 26%, var(--color-border));
+  background: color-mix(in srgb, var(--color-brand-primary) 8%, transparent);
+  color: var(--color-text-secondary);
+}
+
+.badgesProgress strong {
+  color: var(--color-text-primary);
 }
 
 /* Profile – layout matching mock */

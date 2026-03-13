@@ -26,12 +26,15 @@ export function StatsScreenHeader({
         activeTab === "leaderboard" ? styles.headerLeaderboard : ""
       }`}
     >
-      <h1 className={styles.title}>
-        {headerTitle}
-        {activeTab === "leaderboard" && (
-          <span className={styles.titleProgress}>{weeklyAlbumProgress}/7</span>
-        )}
-      </h1>
+      <div className={styles.headerTitleGroup}>
+        <p className={styles.headerEyebrow}>Phuzzle</p>
+        <h1 className={styles.title}>
+          {headerTitle}
+          {activeTab === "leaderboard" && (
+            <span className={styles.titleProgress}>{weeklyAlbumProgress}/7 weekly</span>
+          )}
+        </h1>
+      </div>
       <div className={styles.headerActions}>
         <Button
           size="sm"

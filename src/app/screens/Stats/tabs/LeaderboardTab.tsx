@@ -100,7 +100,12 @@ export function LeaderboardTab({
 
   return (
     <div className={`${styles.section} ${styles.leaderboardCard}`}>
-      <h2 className={styles.leaderboardCardTitle}>Board</h2>
+      <div className={styles.leaderboardCardTop}>
+        <div>
+          <p className={styles.profileSectionEyebrow}>Competition</p>
+          <h2 className={styles.leaderboardCardTitle}>Board</h2>
+        </div>
+      </div>
       <LeaderboardTabHeader
         leaderboardType={leaderboardType}
         setLeaderboardType={setLeaderboardType}
@@ -127,9 +132,11 @@ export function LeaderboardTab({
         </h2>
       )}
       {leaderboardType === "today" && (
-        <p className={styles.todayCompletionCount} aria-live="polite">
-          {todayCompletionCount} completion{todayCompletionCount !== 1 ? "s" : ""} so far
-        </p>
+        <div className={styles.boardInfoStrip}>
+          <p className={styles.todayCompletionCount} aria-live="polite">
+            {todayCompletionCount} completion{todayCompletionCount !== 1 ? "s" : ""} so far
+          </p>
+        </div>
       )}
       {leaderboardType === "week" && (
         <div className={styles.weekProgressStrip}>

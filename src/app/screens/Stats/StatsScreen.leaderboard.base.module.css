@@ -117,13 +117,13 @@
 /* Mobile: Stats / Leaderboard – compact layout */
 @media (max-width: 600px) {
   .card {
-    padding: 12px 10px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+    padding: 10px 10px 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
     border-radius: 14px;
   }
 
   .header {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .title {
@@ -132,16 +132,16 @@
 
   .titleProgress {
     font-size: 11px;
-    padding: 2px 6px;
+    padding: 3px 7px;
   }
 
   .tabs {
     gap: 4px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .tabs button {
-    padding: 10px 6px;
+    padding: 8px 6px;
     font-size: 12px;
   }
 
@@ -181,16 +181,6 @@
   .leaderboardHeader {
     gap: 8px;
     margin-bottom: 8px;
-  }
-
-  .controlsRow {
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .inlineFilterSelect {
-    flex: 1 1 0;
-    min-width: 0;
   }
 
   /* Leaderboard card layout (PZ-071) – see rules above in same media query */

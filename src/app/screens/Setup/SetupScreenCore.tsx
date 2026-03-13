@@ -13,7 +13,6 @@ import {
   useSetupScreenGalleryScroll,
 } from "./hooks";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import { getBestTime } from "@/screens/Play/core/time/timeMode";
 import { GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { STORAGE_KEY, type ImageSource } from "./setupScreenConstants";
 import { logger } from "@/utils/logger";

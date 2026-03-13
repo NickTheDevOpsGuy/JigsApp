@@ -31,23 +31,48 @@
   box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
-.controlsRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap;
+.filtersPanel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg-card) 72%, transparent);
+}
+
+.filterField {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.filterLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
 }
 
 .inlineFilterSelect {
-  flex: 1 1 0;
+  width: 100%;
   min-width: 0;
-  min-height: 36px;
-  padding: 7px 10px;
-  border-radius: 8px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border-radius: 10px;
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-primary);
-  font-size: 12px;
+  font-size: 13px;
+}
+
+.boardInfoStrip {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg-card) 78%, transparent);
 }
 
 .weekProgressStrip {
@@ -190,4 +215,39 @@
   font-size: 12px;
   color: var(--color-text-secondary);
   text-align: center;
+}
+@media (max-width: 600px) {
+  .leaderboardControlRow {
+    grid-template-columns: 1fr;
+  }
+
+  .filtersPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .profileBlock {
+    padding: 12px;
+  }
+
+  .profileHeroHeader {
+    flex-direction: column;
+  }
+
+  .profileHeroMeta {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .profileMetaBadge {
+    flex: 1;
+  }
+
+  .profileStatTiles {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .profileBlockHeader {
+    margin-bottom: 10px;
+  }
 }

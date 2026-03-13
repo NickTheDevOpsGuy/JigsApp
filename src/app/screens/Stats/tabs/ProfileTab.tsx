@@ -90,51 +90,84 @@ export function ProfileTab({
 
   return (
     <div className={styles.profileLayout}>
-      {/* Identity */}
-      <section className={styles.profileBlock}>
-        <p className={styles.profileIdentity}>
-          <strong>{displayName}</strong>
-        </p>
-        <p className={styles.profileStreak}>🔥 {streak} day streak</p>
+      <section className={`${styles.profileBlock} ${styles.profileHeroBlock}`}>
+        <div className={styles.profileHeroHeader}>
+          <div>
+            <p className={styles.profileSectionEyebrow}>Player</p>
+            <p className={styles.profileIdentity}>
+              <strong>{displayName}</strong>
+            </p>
+            <p className={styles.profileTier}>{tier}</p>
+          </div>
+          <div className={styles.profileHeroMeta}>
+            <div className={styles.profileMetaBadge}>
+              <span className={styles.profileMetaLabel}>Streak</span>
+              <strong>{streak}d</strong>
+            </div>
+            <div className={styles.profileMetaBadge}>
+              <span className={styles.profileMetaLabel}>Level</span>
+              <strong>{level}</strong>
+            </div>
+          </div>
+        </div>
         {bestStreak > 0 && bestStreak !== streak && (
-          <p className={styles.profileStatMuted}>Best: {bestStreak} days</p>
+          <p className={styles.profileStatMuted}>Best streak: {bestStreak} days</p>
         )}
-        <p className={styles.profileTier}>{tier}</p>
       </section>
 
-      {/* Stats: Puzzles + Best (4×4) on one line, Total Time below */}
-      <section className={styles.profileBlock}>
-        <h2 className={styles.profileBlockTitle}>Stats</h2>
-        <div className={styles.profileStatsRow}>
-          <span>Puzzles: {puzzles}</span>
-          <span>
-            Best (4×4):{" "}
-            <span className={!hasBest ? styles.profileStatMuted : undefined}>
+      <section className={`${styles.profileBlock} ${styles.profileStatsBlock}`}>
+        <div className={styles.profileBlockHeader}>
+          <div>
+            <p className={styles.profileSectionEyebrow}>Progress</p>
+            <h2 className={styles.profileBlockTitle}>Stats</h2>
+          </div>
+        </div>
+        <div className={styles.profileStatTiles}>
+          <div className={styles.profileStatTile}>
+            <span className={styles.profileStatTileLabel}>Puzzles</span>
+            <strong className={styles.profileStatTileValue}>{puzzles}</strong>
+          </div>
+          <div className={styles.profileStatTile}>
+            <span className={styles.profileStatTileLabel}>4x4 best</span>
+            <strong
+              className={`${styles.profileStatTileValue} ${!hasBest ? styles.profileStatMuted : ""}`}
+            >
               {bestStr}
-            </span>
+            </strong>
             {onSeeRankingFor4x4 && (
-              <>
-                {" "}
-                <button
-                  type="button"
-                  className={styles.profileInlineLink}
-                  onClick={onSeeRankingFor4x4}
-                >
-                  See ranking
-                </button>
-              </>
+              <button
+                type="button"
+                className={styles.profileInlineLink}
+                onClick={onSeeRankingFor4x4}
+              >
+                See ranking
+              </button>
             )}
-          </span>
-        </div>
-        <div className={styles.profileStatsRow}>
-          <span>Total Time: {totalTime}</span>
+          </div>
+          <div className={styles.profileStatTile}>
+            <span className={styles.profileStatTileLabel}>Total time</span>
+            <strong className={styles.profileStatTileValue}>{totalTime}</strong>
+          </div>
         </div>
       </section>
 
-      {/* Finished Puzzles – only show when there are completed puzzles */}
       {puzzles > 0 && (
         <section className={styles.profileBlock}>
-          <h2 className={styles.profileBlockTitle}>Finished Puzzles</h2>
+          <div className={styles.profileBlockHeader}>
+            <div>
+              <p className={styles.profileSectionEyebrow}>Collection</p>
+              <h2 className={styles.profileBlockTitle}>Finished Puzzles</h2>
+            </div>
+            {onNavigateToBoard && (
+              <button
+                type="button"
+                className={styles.profileViewAll}
+                onClick={onNavigateToBoard}
+              >
+                View board
+              </button>
+            )}
+          </div>
           <div className={styles.profilePuzzleGrid}>
             {Array.from({ length: 7 }, (_, i) => {
               const slot = weeklyAlbumSlots[i];
@@ -161,24 +194,28 @@ export function ProfileTab({
               );
             })}
           </div>
-          {onNavigateToBoard && (
-            <button
-              type="button"
-              className={styles.profileViewAll}
-              onClick={onNavigateToBoard}
-            >
-              View All →
-            </button>
-          )}
         </section>
       )}
 
-      {/* Daily Mastery */}
       <section className={`${styles.profileBlock} ${styles.profileBlockMastery}`}>
-        <h2 className={styles.profileBlockTitle}>Daily Mastery {masteryCount} / 7</h2>
+        <div className={styles.profileBlockHeader}>
+          <div>
+            <p className={styles.profileSectionEyebrow}>Consistency</p>
+            <h2 className={styles.profileBlockTitle}>Daily Mastery</h2>
+          </div>
+          <strong className={styles.profileMasteryCount}>{masteryCount}/7</strong>
+        </div>
+        <div
+          className={styles.profileMasteryBar}
+          aria-label={`Daily mastery ${masteryCount} out of 7`}
+        >
+          <div
+            className={styles.profileMasteryFill}
+            style={{ width: `${(masteryCount / 7) * 100}%` }}
+          />
+        </div>
       </section>
 
-      {/* Settings (expandable) */}
       <section className={styles.profileBlock}>
         <button
           type="button"
@@ -186,20 +223,29 @@ export function ProfileTab({
           onClick={() => setSettingsOpen((o) => !o)}
           aria-expanded={settingsOpen}
         >
-          Settings {settingsOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          <span>
+            <span className={styles.profileSectionEyebrow}>Account</span>
+            <span className={styles.profileSettingsTitle}>Settings</span>
+          </span>
+          {settingsOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </button>
         {settingsOpen && (
           <div className={styles.profileSettingsContent}>
-            <p className={styles.hint}>Display name (for leaderboards)</p>
-            <input
-              type="text"
-              className={styles.displayNameInput}
-              value={displayNameInput}
-              onChange={(e) => setDisplayNameInput(e.target.value)}
-              placeholder="Puzzler"
-              maxLength={32}
-              aria-label="Display name"
-            />
+            <div className={styles.profileSettingsField}>
+              <label className={styles.profileSettingsLabel} htmlFor="stats-display-name">
+                Display name
+              </label>
+              <input
+                id="stats-display-name"
+                type="text"
+                className={styles.displayNameInput}
+                value={displayNameInput}
+                onChange={(e) => setDisplayNameInput(e.target.value)}
+                placeholder="Puzzler"
+                maxLength={32}
+                aria-label="Display name"
+              />
+            </div>
             <label className={styles.checkboxLabel}>
               <input
                 type="checkbox"
@@ -217,7 +263,7 @@ export function ProfileTab({
               {profileSaving ? "Saving…" : "Save"}
             </Button>
             {stats && (stats.level ?? 1) >= 5 && (
-              <>
+              <div className={styles.profilePrestigeBox}>
                 <p className={styles.hint}>
                   Prestige: reset to Level 1 and earn ★. Completions kept.
                 </p>
@@ -231,7 +277,7 @@ export function ProfileTab({
                 >
                   Prestige Reset ★
                 </Button>
-              </>
+              </div>
             )}
           </div>
         )}

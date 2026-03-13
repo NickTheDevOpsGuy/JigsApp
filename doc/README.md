@@ -11,6 +11,7 @@ This folder contains developer docs for Phuzzle.
 
 - Main architecture and file/folder split notes live in [../README.md](../README.md) under **Internal structure (recent split)**.
 - Mobile/touch release checks live in [MOBILE_QA.md](MOBILE_QA.md).
+- Stats modal parity and cross-device checks live in [STATS_UI_QA.md](STATS_UI_QA.md).
 - Markdown lint config for docs lives at `/.markdownlint-cli2.jsonc`.
 
 ## Reference
@@ -21,6 +22,7 @@ This folder contains developer docs for Phuzzle.
 - [CHANGES.md](CHANGES.md) - Full feature list and code structure
 - [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md) - Feature history and migrations
 - [MOBILE_QA.md](MOBILE_QA.md) - Real-device iPhone/Android checklist and release gate
+- [STATS_UI_QA.md](STATS_UI_QA.md) - Profile / Board / Badges parity checklist for mobile and desktop
 
 ## Future ideas
 

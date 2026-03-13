@@ -16,7 +16,14 @@ export function renderTimeList(
   showChampionBadge = false,
   currentUserId?: string,
 ) {
-  if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
+  if (entries.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <p className={styles.emptyStateTitle}>No scores yet</p>
+        <p className={styles.emptyStateText}>{emptyMsg}</p>
+      </div>
+    );
+  }
   return (
     <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
       {entries.map((entry, index) => {
@@ -75,7 +82,14 @@ export function renderCompletionList(
   emptyMsg = "No completions yet. Play puzzles!",
   currentUserId?: string,
 ) {
-  if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
+  if (entries.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <p className={styles.emptyStateTitle}>Nothing posted yet</p>
+        <p className={styles.emptyStateText}>{emptyMsg}</p>
+      </div>
+    );
+  }
   return (
     <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
       {entries.map((entry) => {
@@ -111,7 +125,14 @@ export function renderEfficiencyList(
   emptyMsg = "No efficiency data this week.",
   currentUserId?: string,
 ) {
-  if (entries.length === 0) return <p className={styles.empty}>{emptyMsg}</p>;
+  if (entries.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <p className={styles.emptyStateTitle}>No efficiency runs yet</p>
+        <p className={styles.emptyStateText}>{emptyMsg}</p>
+      </div>
+    );
+  }
   return (
     <ol className={`${styles.leaderboard} ${compact ? styles.leaderboardCompact : ""}`}>
       {entries.map((entry) => {
