@@ -14,12 +14,13 @@
 }
 
 .playHint {
-  font-size: 12px;
-  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -33,29 +34,35 @@
 
 @media (max-width: 600px) {
   .page {
+    height: var(--app-vh-stable, 100dvh);
     min-height: var(--app-vh-stable, 100dvh);
+    max-height: var(--app-vh-stable, 100dvh);
     padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right))
       max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
-    align-items: center;
+    align-items: stretch;
     justify-content: flex-start;
   }
 
   .card {
-    flex: 0 1 auto;
-    align-self: center;
-    padding: var(--space-2);
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 6px 8px 8px;
   }
 
   .header {
-    margin-bottom: var(--space-2);
+    margin-bottom: 4px;
     flex-shrink: 0;
   }
 
   .puzzleGridWrap {
-    flex: 0 1 auto;
-    padding-top: var(--space-2);
-    padding-bottom: var(--space-2);
-    gap: var(--space-2);
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    gap: 6px;
   }
 
   .scrollViewport {
@@ -93,15 +100,18 @@
   }
 
   .puzzleGrid {
-    gap: var(--space-3);
-    padding: 0 var(--space-2);
+    gap: 16px;
+    padding: 0 14px;
   }
 
-  /* Parity with Setup (choose a puzzle) preview: same image size */
   .puzzleCard {
-    width: clamp(140px, 42vw, 180px);
-    padding: 9px 8px;
-    gap: 0;
+    width: clamp(140px, 38vw, 168px);
+    padding: 10px 8px;
+    gap: 6px;
+  }
+
+  .scrollProgressWrap {
+    padding: 0 2px 6px;
   }
 
   /* No text on cards on mobile — image only, less busy (name/play still in button title/aria-label) */

@@ -7,9 +7,9 @@ import type { ImageSourceRect } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { DRAG_LIFT_PX } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { drawWrongRotationIcon, drawLockGlow } from "./renderBoardDrawOverlays";
 
-/** Outer stroke style: single outline, rounded joins, no duplicate passes. */
-const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.45)";
-const OUTLINE_LINE_WIDTH = 1.75;
+/** Outer stroke: separates pieces visually, tactile outline. */
+const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.5)";
+const OUTLINE_LINE_WIDTH = 2;
 
 function getPieceSurfaceVariation(piece: Piece): {
   brightness: number;
@@ -25,7 +25,7 @@ function getPieceSurfaceVariation(piece: Piece): {
 
 /**
  * Draw a soft drop shadow that follows the piece silhouette (path only).
- * Call before clip+drawImage so shadow sits behind the piece.
+ * Stronger when dragging so the piece feels elevated. Slight inner shadow simulates cardboard thickness.
  */
 export function drawSilhouetteShadow(
   ctx: CanvasRenderingContext2D,
@@ -37,23 +37,25 @@ export function drawSilhouetteShadow(
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   if (isDragging) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
-    ctx.shadowBlur = 38;
-    ctx.shadowOffsetX = 12;
-    ctx.shadowOffsetY = 16;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+    ctx.shadowBlur = 44;
+    ctx.shadowOffsetX = 14;
+    ctx.shadowOffsetY = 18;
+    ctx.fillStyle = "rgba(0,0,0,0.4)";
+    ctx.fill(path);
   } else if (!isPlaced) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.28)";
-    ctx.shadowBlur = 14;
-    ctx.shadowOffsetX = 3;
-    ctx.shadowOffsetY = 5;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.32)";
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 6;
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.fill(path);
   } else {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.08)";
-    ctx.shadowBlur = 2;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.1)";
+    ctx.shadowBlur = 3;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 1;
-  }
-  if (isDragging || !isPlaced || isPlaced) {
-    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    ctx.fillStyle = "rgba(0,0,0,0.12)";
     ctx.fill(path);
   }
   ctx.restore();
@@ -89,35 +91,38 @@ export function drawPieceImageInPath(
   );
   ctx.filter = "none";
 
+  /* Top bevel highlight – light from above, cardboard raised look */
   const topGlow = ctx.createLinearGradient(0, 0, 0, piece.h);
-  topGlow.addColorStop(0, "rgba(255,255,255,0.24)");
-  topGlow.addColorStop(0.16, "rgba(255,255,255,0.12)");
-  topGlow.addColorStop(0.45, "rgba(255,255,255,0)");
+  topGlow.addColorStop(0, "rgba(255,255,255,0.28)");
+  topGlow.addColorStop(0.12, "rgba(255,255,255,0.14)");
+  topGlow.addColorStop(0.4, "rgba(255,255,255,0)");
   ctx.fillStyle = topGlow;
   ctx.fill(path);
 
+  /* Bottom bevel – depth / cardboard thickness */
   const bevelShade = ctx.createLinearGradient(0, 0, 0, piece.h);
   bevelShade.addColorStop(0, "rgba(0,0,0,0)");
-  bevelShade.addColorStop(0.68, "rgba(0,0,0,0.06)");
-  bevelShade.addColorStop(1, "rgba(0,0,0,0.18)");
+  bevelShade.addColorStop(0.6, "rgba(0,0,0,0.06)");
+  bevelShade.addColorStop(1, "rgba(0,0,0,0.22)");
   ctx.fillStyle = bevelShade;
   ctx.fill(path);
 
+  /* Inner rim – simulates cardboard edge thickness (subtle dark inside edge) */
   ctx.save();
-  ctx.clip(path);
-  ctx.strokeStyle = "rgba(0,0,0,0.12)";
-  ctx.lineWidth = 3;
-  ctx.shadowColor = "rgba(0,0,0,0.12)";
-  ctx.shadowBlur = 6;
+  ctx.strokeStyle = "rgba(0,0,0,0.2)";
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
   ctx.stroke(path);
   ctx.restore();
 
+  /* Soft edge highlight for tactile separation */
   const edgeRim = ctx.createLinearGradient(0, 0, piece.w, piece.h);
-  edgeRim.addColorStop(0, "rgba(255,255,255,0.08)");
-  edgeRim.addColorStop(0.55, "rgba(255,255,255,0)");
-  edgeRim.addColorStop(1, "rgba(0,0,0,0.12)");
+  edgeRim.addColorStop(0, "rgba(255,255,255,0.1)");
+  edgeRim.addColorStop(0.5, "rgba(255,255,255,0)");
+  edgeRim.addColorStop(1, "rgba(0,0,0,0.14)");
   ctx.strokeStyle = edgeRim;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   ctx.stroke(path);

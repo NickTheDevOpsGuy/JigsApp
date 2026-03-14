@@ -175,3 +175,13 @@ body {
     background-color 0.2s ease,
     color 0.2s ease;
 }
+
+/* Hide all scrollbars app-wide – content still scrolls, no visible scrollbar */
+#root,
+#root * {
+  scrollbar-width: none;
+}
+#root *::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none;
+}

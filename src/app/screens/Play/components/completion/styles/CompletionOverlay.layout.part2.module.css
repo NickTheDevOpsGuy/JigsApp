@@ -1,16 +1,20 @@
-/* Row: Share + (Watch Replay | Next Puzzle) module */
+/* Row: Next Puzzle (primary) + Watch Replay + Results – same size and layout */
 .completeActionsRow {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   align-items: stretch;
   gap: 12px;
   width: 100%;
 }
 
-/* Replay/Next dropdown module – same pattern as Share */
+@media (max-width: 420px) {
+  .completeActionsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
 .completeReplayNextWrap {
   position: relative;
-  flex: 1;
   min-width: 0;
 }
 

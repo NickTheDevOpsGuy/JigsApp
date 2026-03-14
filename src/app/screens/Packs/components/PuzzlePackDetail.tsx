@@ -19,7 +19,6 @@ export function PuzzlePackDetail({
   nextLabel,
   children,
 }: PuzzlePackDetailProps) {
-  const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
   const isComplete = total > 0 && completed >= total;
 
   return (
@@ -29,16 +28,20 @@ export function PuzzlePackDetail({
       <div className={styles.detailStatusRow}>
         <div>
           <h1 className={styles.title}>{title}</h1>
-          <p className={styles.subtitle}>{description}</p>
+          {description ? <p className={styles.subtitle}>{description}</p> : null}
         </div>
         <div className={styles.statusGroup}>
-          <span className={styles.statusChip}>
-            {isComplete ? "✔ Pack Complete" : `${percent}% complete`}
-          </span>
+          {isComplete ? (
+            <span className={styles.statusChip}>✔ Pack Complete</span>
+          ) : null}
           {nextLabel ? <p className={styles.statusHint}>Up next: {nextLabel}</p> : null}
         </div>
       </div>
-      <PuzzlePackProgress completed={completed} total={total} />
+      <PuzzlePackProgress
+        completed={completed}
+        total={total}
+        showPercentInline={!isComplete}
+      />
       {children}
     </section>
   );

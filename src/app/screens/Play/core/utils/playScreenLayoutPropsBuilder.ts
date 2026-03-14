@@ -201,7 +201,7 @@ export function createPlayScreenLayoutProps(
       immersiveMode: args.immersiveMode,
       showImmersiveUi: args.showImmersiveUi,
       onPointerLeave: args.immersiveMode ? args.scheduleImmersiveHide : undefined,
-      showUndoRedo: !args.isPaused,
+      showUndoRedo: true,
       canUndo: Boolean(
         args.manager?.canUndo() && !args.isPaused && !args.state?.isComplete,
       ),

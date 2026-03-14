@@ -3,7 +3,7 @@ import { PuzzlePackProgress } from "./PuzzlePackProgress";
 
 type PuzzlePackCardProps = {
   name: string;
-  description: string;
+  description?: string;
   completed: number;
   total: number;
   coverImageUrl?: string | null;
@@ -16,7 +16,6 @@ type PuzzlePackCardProps = {
 
 export function PuzzlePackCard({
   name,
-  description,
   completed,
   total,
   coverImageUrl,
@@ -47,7 +46,6 @@ export function PuzzlePackCard({
           <h3 className={styles.name}>{name}</h3>
           {summary ? <span className={styles.summary}>{summary}</span> : null}
         </div>
-        <p className={styles.description}>{description}</p>
         <PuzzlePackProgress completed={completed} total={total} />
       </div>
     </button>

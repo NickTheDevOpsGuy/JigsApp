@@ -10,7 +10,7 @@ import { loadPacksData } from "@/data/packs/loadPacksData";
 import { getPackProgress } from "@/data/packs/packCompletion";
 import { getCurrentSeason } from "@/utils/seasons";
 import type { PuzzlePack } from "@/data/packs/puzzlePacks";
-import { PuzzlePackCarousel, PuzzlePackCard, PuzzlePackModule } from "./components";
+import { PackCarouselWithNav, PuzzlePackCard, PuzzlePackModule } from "./components";
 
 export function PackListScreen() {
   const nav = useNavigate();
@@ -64,46 +64,43 @@ export function PackListScreen() {
           {!packsData ? (
             <Loader label="Loading packs…" />
           ) : (
-            <div className={styles.packScrollViewport}>
-              <PuzzlePackModule
-                eyebrow="Collections"
-                title="Choose Your Next Pack"
-                subtitle="Seasonal favorites, themed collections, and progress that carries with you."
-              >
-                <PuzzlePackCarousel>
-                  {orderedPacks.map((pack) => {
-                    const puzzlesData = packsData.getPuzzlesForPack(pack);
-                    const { completed, total } = getPackProgress(
-                      puzzlesData.map((p) => p.id),
-                    );
-                    const isSeasonPick = pack.season === season;
-                    const heroPuzzle = puzzlesData[0];
-                    const progressPercent =
-                      total > 0 ? Math.round((completed / total) * 100) : 0;
+            <PuzzlePackModule
+              eyebrow="Collections"
+              title="Choose Your Next Pack"
+              subtitle="Seasonal favorites and progress that carries with you."
+            >
+              <PackCarouselWithNav>
+                {orderedPacks.map((pack) => {
+                  const puzzlesData = packsData.getPuzzlesForPack(pack);
+                  const { completed, total } = getPackProgress(
+                    puzzlesData.map((p) => p.id),
+                  );
+                  const isSeasonPick = pack.season === season;
+                  const heroPuzzle = puzzlesData[0];
+                  const progressPercent =
+                    total > 0 ? Math.round((completed / total) * 100) : 0;
 
-                    return (
-                      <PuzzlePackCard
-                        key={pack.id}
-                        onClick={() => nav(`/packs/${pack.id}`)}
-                        name={pack.name}
-                        description={pack.description}
-                        completed={completed}
-                        total={total}
-                        coverImageUrl={
-                          !imgError[pack.id] ? (heroPuzzle?.thumbnail ?? null) : null
-                        }
-                        onCoverError={() =>
-                          setImgError((prev) => ({ ...prev, [pack.id]: true }))
-                        }
-                        emoji={pack.emoji}
-                        seasonTag={isSeasonPick ? "Season's Pick" : undefined}
-                        summary={`${progressPercent}%`}
-                      />
-                    );
-                  })}
-                </PuzzlePackCarousel>
-              </PuzzlePackModule>
-            </div>
+                  return (
+                    <PuzzlePackCard
+                      key={pack.id}
+                      onClick={() => nav(`/packs/${pack.id}`)}
+                      name={pack.name}
+                      completed={completed}
+                      total={total}
+                      coverImageUrl={
+                        !imgError[pack.id] ? (heroPuzzle?.thumbnail ?? null) : null
+                      }
+                      onCoverError={() =>
+                        setImgError((prev) => ({ ...prev, [pack.id]: true }))
+                      }
+                      emoji={pack.emoji}
+                      seasonTag={isSeasonPick ? "Season's Pick" : undefined}
+                      summary={`${progressPercent}%`}
+                    />
+                  );
+                })}
+              </PackCarouselWithNav>
+            </PuzzlePackModule>
           )}
         </div>
       </div>

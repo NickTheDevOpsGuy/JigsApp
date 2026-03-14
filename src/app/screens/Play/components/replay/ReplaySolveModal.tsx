@@ -4,7 +4,8 @@
  * puzzle area, seek bar with time, control row (<< 5s Play 5s >> Speed 1x), nav (Back to Results | Next Puzzle).
  */
 import React, { useEffect, useRef, useState } from "react";
-import { Clapperboard, X } from "lucide-react";
+import { Clapperboard, Trophy, X } from "lucide-react";
+import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import { ReplaySolveModalControls } from "./ReplaySolveModalControls";
@@ -35,6 +36,8 @@ export interface ReplaySolveModalProps {
   boardRect?: { top: number; left: number; width: number; height: number } | null;
   onBackToResults?: () => void;
   onNextPuzzle?: () => void;
+  /** For result header: "26 moves" (optional) */
+  moveCount?: number;
 }
 
 export function ReplaySolveModal({
@@ -58,6 +61,7 @@ export function ReplaySolveModal({
   boardRect,
   onBackToResults,
   onNextPuzzle,
+  moveCount,
 }: ReplaySolveModalProps) {
   const useCutout = Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
   const progressPct =
@@ -76,10 +80,31 @@ export function ReplaySolveModal({
         e.preventDefault();
         onClose();
       }
+      if (e.key === " ") {
+        e.preventDefault();
+        if (isPaused) onPlay();
+        else onPause();
+      }
+      if (onSeek && totalSnapshots > 1) {
+        const maxIdx = totalSnapshots - 1;
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          onSeek(Math.max(0, currentIndex - 1));
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          onSeek(Math.min(maxIdx, currentIndex + 1));
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          onSeek(0);
+        } else if (e.key === "End") {
+          e.preventDefault();
+          onSeek(maxIdx);
+        }
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
+  }, [onClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
 
   const stopProp = (e: React.PointerEvent) => e.stopPropagation();
 
@@ -105,6 +130,19 @@ export function ReplaySolveModal({
       <X size={18} aria-hidden />
     </button>
   );
+
+  const resultHeader =
+    totalSeconds >= 0 ? (
+      <div className={styles.resultHeader}>
+        <span className={styles.resultTime}>
+          <Trophy size={18} className={styles.resultTimeIcon} aria-hidden />
+          Solved in {formatTime(totalSeconds)}
+        </span>
+        {typeof moveCount === "number" && (
+          <span className={styles.resultMoves}>{moveCount} {moveCount === 1 ? "move" : "moves"}</span>
+        )}
+      </div>
+    ) : null;
 
   const headerBlock = (
     <header className={styles.header}>
@@ -186,6 +224,7 @@ export function ReplaySolveModal({
         <div className={styles.backdropCutoutContent}>
           <div className={styles.cutoutTopBar} onPointerDown={stopProp}>
             {headerBlock}
+            {resultHeader}
           </div>
           <div className={styles.cutoutBottomBar} onPointerDown={stopProp}>
             <div
@@ -216,6 +255,7 @@ export function ReplaySolveModal({
       closeLabel="Close replay"
     >
       <div className={styles.modal} onPointerDown={stopProp}>
+        {resultHeader}
         <div className={styles.puzzleAreaWrapper}>
           <div className={styles.puzzleArea}>
             {showPuzzleImage ? (

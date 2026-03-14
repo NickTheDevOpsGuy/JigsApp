@@ -2,8 +2,8 @@
  * PlayHUD – timer, pieces left, pause button (top bar center).
  * Speedrun: quadrant timers (TL, TR, BL, BR) with PB comparison.
  */
-import React, { useEffect, useState } from "react";
-import { Clock, Heart, Pause, Puzzle } from "lucide-react";
+import React from "react";
+import { Clock, Heart, Pause } from "lucide-react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import type { TimeMode } from "@/screens/Play/core/time/timeMode";
@@ -40,8 +40,8 @@ const QUAD_FULL_NAMES: Record<number, string> = {
 export function PlayHUD({
   elapsedSeconds,
   moveCount,
-  piecesLeft,
-  totalPieces,
+  piecesLeft: _piecesLeft,
+  totalPieces: _totalPieces,
   isPaused,
   isComplete: _isComplete,
   timeMode,
@@ -68,21 +68,6 @@ export function PlayHUD({
   const isTimeAttack = timeMode === "timeattack";
   const countdownTotal = countdownMinutes * 60;
   const isLowTime = isCountdown && elapsedSeconds > 0 && elapsedSeconds <= 60;
-  const [bounce, setBounce] = useState(false);
-
-  useEffect(() => {
-    setBounce(true);
-    const t = setTimeout(() => setBounce(false), 300);
-    return () => clearTimeout(t);
-  }, [piecesLeft]);
-
-  const piecesLabel =
-    uiTone === "competitive"
-      ? `${piecesLeft} left`
-      : uiTone === "calm"
-        ? `${piecesLeft} remaining`
-        : `${piecesLeft} / ${totalPieces}`;
-
   return (
     <div
       className={`${styles.hud} ${uiTone === "competitive" ? styles.hudCompetitive : ""} ${uiTone === "calm" ? styles.hudCalm : ""}`}
@@ -161,15 +146,6 @@ export function PlayHUD({
       >
         <span className={styles.hudMetaLabel}>Moves</span>
         <span>{moveCount}</span>
-      </div>
-      <div
-        className={`${styles.hudPill} ${styles.hudPillProgress} ${bounce ? styles.hudPillBounce : ""}`}
-        aria-label={`${piecesLeft} of ${totalPieces} pieces remaining`}
-        title={`${piecesLeft} of ${totalPieces} pieces remaining`}
-        role="status"
-      >
-        <Puzzle size={14} />
-        <span>{piecesLabel}</span>
       </div>
     </div>
   );

@@ -1,13 +1,16 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "44";
+export const CHANGELOG_VERSION = "45";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🧩 Puzzle piece realism – Deeper jigsaw tabs/sockets, stronger drop shadow and bevel, inner rim for cardboard thickness, and clearer outline so pieces feel tactile and physical.",
+      "✋ Drag feel – Dragged pieces lift more (12px), scale to 1.04×, and draw above others with a stronger shadow for a satisfying pick-up feel.",
+      "🧲 Magnetic snap – Larger snap radius and stronger pull so pieces smoothly slide into place; 120ms lock animation for a quick, satisfying snap.",
       "🏆 Board refresh – Efficiency tab, cleaner sort, shared filters, and highlighted “You” rows.",
       "👤 Profile refresh – Best streak, See ranking, tighter stats, and cleaner settings.",
       "🎉 Completion polish – 7-day streak toast, PB haptic, and faster next-puzzle CTA.",

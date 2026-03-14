@@ -7,10 +7,11 @@ import { wouldOverlapAnyOtherGroup } from "@/puzzle/groups/groupUtils";
 import { buildRowColMap, getSolvedNeighborsFromMap } from "@/puzzle/groups/groupUtils";
 import type { DragPreview } from "@/puzzle/core/types";
 
-export const BOARD_MAGNET_RADIUS_PX = 25;
-export const BOARD_MAGNET_STRONG_RADIUS_PX = 10;
-export const EDGE_MAGNET_RADIUS_PX = 20;
-export const EDGE_MAGNET_STRONG_RADIUS_PX = 8;
+/** Magnetic snap: radius (px) within which piece is pulled toward correct position. */
+export const BOARD_MAGNET_RADIUS_PX = 32;
+export const BOARD_MAGNET_STRONG_RADIUS_PX = 14;
+export const EDGE_MAGNET_RADIUS_PX = 26;
+export const EDGE_MAGNET_STRONG_RADIUS_PX = 10;
 
 export type BoardSnapResult =
   | { kind: "snap"; dx: number; dy: number; groupId: string }

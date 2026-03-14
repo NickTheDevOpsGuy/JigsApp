@@ -20,7 +20,7 @@ import { ConfirmModal } from "@/components/Modal/Modal";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { BEST_TIME_PREFIX } from "@/screens/Play/core/time/timeMode";
-import { Image, Camera, Package, Trophy, Megaphone } from "lucide-react";
+import { Image, Package, Trophy, Megaphone } from "lucide-react";
 import {
   isTodayDailyCompleted,
   getCurrentStreak,
@@ -105,15 +105,6 @@ export function MenuScreen() {
             <button
               type="button"
               className={styles.cornerBtn}
-              onClick={() => setShowFeedbackChoice(true)}
-              aria-label="Feedback"
-              data-testid="menu-feedback"
-            >
-              <Megaphone size={24} />
-            </button>
-            <button
-              type="button"
-              className={styles.cornerBtn}
               onClick={() => setShowHelpChoice(true)}
               aria-label="Help"
               data-testid="menu-help"
@@ -184,12 +175,13 @@ export function MenuScreen() {
           </Button>
           <Button
             variant="outline"
-            onClick={() => nav("/new?source=camera")}
+            onClick={() => setShowFeedbackChoice(true)}
             className={styles.actionCard}
-            aria-label="Snap a Picture"
+            aria-label="Feedback"
+            data-testid="menu-feedback-action"
           >
-            <Camera size={22} />
-            <span className={styles.actionLabel}>Snap a Picture</span>
+            <Megaphone size={22} />
+            <span className={styles.actionLabel}>Feedback</span>
           </Button>
         </div>
 

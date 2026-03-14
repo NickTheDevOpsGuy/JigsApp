@@ -41,7 +41,7 @@
 }
 
 .header {
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
   flex-shrink: 0;
 }
 
@@ -146,14 +146,13 @@
 .puzzleGridWrap {
   flex: 1 1 auto;
   display: flex;
-  align-items: stretch;
-  gap: 0;
+  align-items: center;
+  gap: 10px;
   min-width: 0;
-  padding-top: var(--space-3);
-  padding-bottom: var(--space-3);
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-2);
 }
 
-/* Horizontal scroll: full-card snap, blue scrollbar (parity with desktop/mobile) */
 .scrollViewport {
   flex: 1 1 auto;
   min-width: 0;
@@ -161,54 +160,60 @@
   overflow-y: hidden;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: 12px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scroll-padding-inline: 20px;
+  scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  padding: var(--space-3) 0 12px;
+  padding: 10px 0 14px;
 }
 
 .scrollViewport::-webkit-scrollbar {
-  height: 8px;
-}
-
-.scrollViewport::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-  border-radius: 999px;
-}
-
-.scrollViewport::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 999px;
-  border: 1px solid var(--scrollbar-border);
-}
-
-.scrollViewport::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
+  display: none;
 }
 
 .scrollBtn {
   flex-shrink: 0;
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-btn);
+  background: color-mix(in srgb, var(--color-bg-elevated) 98%, var(--color-brand-primary));
+  border: none;
+  border-radius: 50%;
   color: var(--color-text-primary);
   cursor: pointer;
-  align-self: center;
+  box-shadow: 0 4px 16px rgba(11, 99, 184, 0.16);
+  transition: background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
 .scrollBtn:hover:not(:disabled) {
-  background: var(--color-bg-primary);
-  border-color: var(--color-brand-primary);
+  background: color-mix(in srgb, var(--color-brand-primary) 22%, var(--color-bg-elevated));
+  color: var(--color-brand-primary);
+  box-shadow: 0 6px 20px rgba(11, 99, 184, 0.28);
 }
 
 .scrollBtn:disabled {
-  opacity: 0.4;
-  cursor: default;
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+.scrollProgressWrap {
+  padding: 0 4px 8px;
+}
+
+.scrollProgressTrack {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(26, 43, 74, 0.6);
+}
+
+.scrollProgressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-brand-primary);
+  box-shadow: 0 0 10px rgba(11, 99, 184, 0.4);
+  transition: width 0.15s ease-out;
 }

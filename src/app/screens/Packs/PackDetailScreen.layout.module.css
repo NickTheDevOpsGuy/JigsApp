@@ -1,8 +1,8 @@
 .puzzleGrid {
   display: inline-flex;
   flex-direction: row;
-  gap: var(--space-3);
-  padding: 0 12px 4px;
+  gap: 20px;
+  padding: 0 20px 4px;
   align-items: stretch;
   min-width: min-content;
   box-sizing: border-box;
@@ -10,38 +10,48 @@
 
 .puzzleCard {
   flex: 0 0 auto;
-  width: clamp(140px, 42vw, 180px);
+  width: clamp(152px, 44vw, 200px);
   min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 10px 9px;
+  gap: 8px;
+  padding: 12px 10px;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-btn);
+  border-radius: 14px;
   cursor: pointer;
   text-align: center;
   transition:
-    border-color 0.15s,
-    background 0.15s,
-    transform 0.15s;
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   min-height: 0;
-  scroll-snap-align: start;
+  scroll-snap-align: center;
   scroll-snap-stop: always;
 }
 
 .puzzleCard:hover:not(:disabled) {
   background: var(--color-bg-primary);
-  border-color: var(--color-brand-primary);
-  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(7, 17, 36, 0.24);
 }
 
 .puzzleCardFeatured {
-  border-color: color-mix(in srgb, var(--color-brand-primary) 72%, transparent);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 65%, transparent);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 20%, transparent),
-    0 18px 32px rgba(7, 17, 36, 0.28);
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 24%, transparent),
+    0 0 20px color-mix(in srgb, var(--color-brand-primary) 18%, transparent),
+    0 12px 28px rgba(7, 17, 36, 0.22);
+}
+
+.puzzleCardFeatured:hover:not(:disabled) {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 32%, transparent),
+    0 0 24px color-mix(in srgb, var(--color-brand-primary) 22%, transparent),
+    0 12px 28px rgba(7, 17, 36, 0.22);
 }
 
 .puzzleCard:disabled {
@@ -58,7 +68,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  border-radius: var(--radius-btn);
+  border-radius: 10px;
   overflow: hidden;
   background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
@@ -97,15 +107,15 @@
 }
 
 .nextBadge {
-  min-height: 24px;
+  min-height: 22px;
   display: inline-flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 8px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-brand-primary) 18%, var(--color-bg-primary));
+  background: color-mix(in srgb, var(--color-brand-primary) 20%, var(--color-bg-primary));
   color: var(--color-brand-primary);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }

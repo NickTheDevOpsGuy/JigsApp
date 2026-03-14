@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronDown, Share2, Swords, Copy, Play, Trophy } from "lucide-react";
+import { ClipboardList, Share2, Swords, Copy, Play, Image } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { AppModal } from "@/components/AppModal";
@@ -47,33 +47,30 @@ export function CompletionOverlayShareMenu(props: {
       <button
         ref={shareTriggerRef}
         type="button"
-        className={styles.completeShareTrigger}
+        className={styles.completeActionBtn}
         onClick={() => setSharePopupOpen(true)}
         aria-expanded={sharePopupOpen}
-        aria-haspopup="true"
-        aria-label="Share options"
-        title="Share or challenge a friend"
+        aria-haspopup="dialog"
+        aria-label="Puzzle results and share options"
+        title="View results, share card, copy link, challenge a friend, or watch replay"
       >
-        <Share2 size={18} aria-hidden />
-        <span>{sharePopupOpen ? "Close menu" : "Share"}</span>
-        <ChevronDown
-          size={16}
-          className={sharePopupOpen ? styles.completeShareChevronOpen : ""}
-          aria-hidden
-        />
+        <span className={styles.completeActionLead}>
+          <ClipboardList size={18} aria-hidden />
+          Results
+        </span>
       </button>
       <AppModal
         isOpen={sharePopupOpen}
         onClose={() => setSharePopupOpen(false)}
-        title="Share your solve"
-        subtitle="Send a result card, copy a link, challenge a friend, or open the replay viewer."
+        title="Puzzle Results"
+        subtitle="Share your result, challenge a friend, or watch the replay."
         size="wide"
       >
         <div className={styles.completeShareSheet}>
           <div className={styles.completeSharePreviewCard}>
             <div className={styles.completeSharePreviewHeader}>
               <span className={styles.completeSharePreviewBrand}>Phuzzle</span>
-              <span className={styles.completeSharePreviewTag}>Share Card</span>
+              <span className={styles.completeSharePreviewTag}>Solve details</span>
             </div>
             <div className={styles.completeSharePreviewStats}>
               <span>Time: {formatTime(props.elapsedSeconds)}</span>
@@ -83,17 +80,27 @@ export function CompletionOverlayShareMenu(props: {
                 </span>
               ) : null}
               <span>Accuracy: {Math.round(props.accuracyPercent)}%</span>
-              <span>
-                <Trophy size={14} aria-hidden="true" /> Ready to challenge a friend
-              </span>
             </div>
           </div>
           <div
             className={styles.completeShareDropdown}
             role="menu"
-            aria-label="Share options"
+            aria-label="Results actions"
           >
             <div className={styles.completeShareDropdownActions}>
+              <button
+                type="button"
+                role="menuitem"
+                className={styles.completeShareDropdownItem}
+                title="Download or share result card image"
+                onClick={() => {
+                  void completionData.handleShareCard().catch(() => {});
+                }}
+                disabled={completionData.isGenerating}
+              >
+                <Image size={16} aria-hidden />
+                <span>{completionData.isGenerating ? "…" : "Share Card"}</span>
+              </button>
               {(onShareProgress || onCopyProgress) && (
                 <button
                   type="button"
@@ -114,8 +121,8 @@ export function CompletionOverlayShareMenu(props: {
                     {copied
                       ? "Copied!"
                       : canNativeShare
-                        ? "Social share"
-                        : "Share Result"}
+                        ? "Share result"
+                        : "Copy link"}
                   </span>
                 </button>
               )}
@@ -150,7 +157,7 @@ export function CompletionOverlayShareMenu(props: {
                   }}
                 >
                   <Swords size={16} aria-hidden />
-                  <span>{copied ? "Copied!" : "Challenge a Friend"}</span>
+                  <span>{copied ? "Copied!" : "Challenge Friend"}</span>
                 </button>
               )}
               {canReplay && onReplayClick && (

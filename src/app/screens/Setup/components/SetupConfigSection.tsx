@@ -51,24 +51,14 @@ export function SetupConfigSection({
               className={`${styles.difficultyCard} ${gridIndex === difficulty.index ? styles.difficultyCardActive : ""}`}
               onClick={() => setGridIndex(difficulty.index)}
               aria-pressed={gridIndex === difficulty.index}
-              title={`${difficulty.title}: ${difficulty.pieces} pieces`}
+              title={difficulty.title}
             >
-              <span className={styles.difficultyCardPreview} aria-hidden="true">
-                {Array.from({
-                  length: Math.min(9, Math.max(4, difficulty.rows * difficulty.cols)),
-                }).map((_, dotIndex) => (
-                  <span key={dotIndex} className={styles.difficultyCardPreviewDot} />
-                ))}
-              </span>
               <span className={styles.difficultyCardTitle}>
                 <Puzzle size={16} />
                 {difficulty.title}
               </span>
               <span className={styles.difficultyCardPieces}>
                 {difficulty.pieces} pieces
-              </span>
-              <span className={styles.difficultyCardGrid}>
-                {difficulty.rows} x {difficulty.cols} grid
               </span>
             </button>
           ))}
@@ -78,35 +68,19 @@ export function SetupConfigSection({
               className={`${styles.difficultyCard} ${styles.difficultyCardActive}`}
               onClick={() => setGridIndex(gridIndex)}
               aria-pressed
-              title={
-                selectedAdvanced.rows > 0
-                  ? `${selectedAdvanced.rows * selectedAdvanced.cols} pieces`
-                  : `Custom: ${customRows * customCols} pieces`
-              }
+              title={selectedAdvanced.rows > 0 ? selectedAdvanced.label.split(" ")[0] : "Custom"}
             >
-              <span className={styles.difficultyCardPreview} aria-hidden="true">
-                {Array.from({
-                  length: Math.min(9, Math.max(4, customRows * customCols)),
-                }).map((_, dotIndex) => (
-                  <span key={dotIndex} className={styles.difficultyCardPreviewDot} />
-                ))}
-              </span>
               <span className={styles.difficultyCardTitle}>
                 <Puzzle size={16} />
                 {selectedAdvanced.rows > 0
                   ? selectedAdvanced.label.split(" ")[0]
                   : "Custom"}
               </span>
-              <span className={styles.difficultyCardPieces}>
-                {selectedAdvanced.rows > 0
-                  ? `${selectedAdvanced.rows * selectedAdvanced.cols} pieces`
-                  : `${customRows * customCols} pieces`}
-              </span>
-              <span className={styles.difficultyCardGrid}>
-                {selectedAdvanced.rows > 0
-                  ? `${selectedAdvanced.rows} x ${selectedAdvanced.cols} grid`
-                  : `${customRows} x ${customCols} grid`}
-              </span>
+              {selectedAdvanced.rows > 0 && (
+                <span className={styles.difficultyCardPieces}>
+                  {selectedAdvanced.rows * selectedAdvanced.cols} pieces
+                </span>
+              )}
             </button>
           )}
         </div>

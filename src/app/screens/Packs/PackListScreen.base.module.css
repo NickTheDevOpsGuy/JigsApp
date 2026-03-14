@@ -21,7 +21,7 @@
 
 .card {
   width: 100%;
-  max-width: min(520px, 94vw);
+  max-width: min(420px, 94vw);
   min-width: 0;
   margin: 0 auto;
   flex: 0 1 auto;
@@ -32,7 +32,7 @@
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
-  padding: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   box-shadow: var(--shadow-md);
   overflow: hidden;
   overflow-x: hidden;
@@ -47,42 +47,6 @@
   overflow: hidden;
   padding: 16px 0 20px;
   gap: 12px;
-}
-
-/* Horizontal scroll: full-card snap, blue scrollbar (parity with desktop/mobile) */
-.packScrollViewport {
-  flex: 1 1 auto;
-  min-height: 0;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: 12px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-  padding: 8px 0 12px;
-  margin: 0 -4px;
-}
-
-.packScrollViewport::-webkit-scrollbar {
-  height: 8px;
-}
-
-.packScrollViewport::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-  border-radius: 999px;
-}
-
-.packScrollViewport::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 999px;
-  border: 1px solid var(--scrollbar-border);
-}
-
-.packScrollViewport::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
 }
 
 .header {

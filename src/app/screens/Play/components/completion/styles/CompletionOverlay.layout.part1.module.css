@@ -157,7 +157,7 @@
 
 .completeActionBtn {
   width: 100%;
-  min-height: 62px;
+  min-height: 64px;
   padding: 0 18px;
   border-radius: var(--radius-btn);
   border: 1px solid var(--color-border);
@@ -165,10 +165,10 @@
   color: var(--color-text-primary);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 12px;
-  font-size: 1.04rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition:
     border-color 0.18s ease,
@@ -197,12 +197,11 @@
 }
 
 .completeActionBtnPrimary {
-  margin-top: 4px;
-  min-height: 68px;
+  min-height: 64px;
   background: var(--color-brand-primary);
   border-color: var(--color-brand-primary);
   color: var(--color-text-on-brand);
-  font-size: 1.18rem;
+  font-size: 1rem;
   font-weight: 600;
   box-shadow: var(--shadow-md);
 }

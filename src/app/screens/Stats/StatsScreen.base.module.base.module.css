@@ -51,20 +51,28 @@
     height: var(--app-vh-stable, 100dvh);
     min-height: var(--app-vh-stable, 100dvh);
     max-height: var(--app-vh-stable, 100dvh);
-    padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
-      max(4px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+      max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
     overflow: hidden;
     overscroll-behavior: none;
   }
 
   .card {
-    flex: 0 1 auto;
+    flex: 1 1 auto;
     max-height: 100%;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    overflow-y: hidden;
-    overflow-x: hidden;
+    overflow: hidden;
+    padding: 8px 10px 6px;
+  }
+
+  .header {
+    margin-bottom: 6px;
+  }
+
+  .cardContent {
+    min-height: 0;
   }
 
   /* Prevent leaderboard/achievements from going off screen to the right */
@@ -77,7 +85,7 @@
 
 .card {
   width: 100%;
-  max-width: 520px;
+  max-width: 420px;
   min-width: 0;
   flex: 0 1 auto;
   max-height: 100%;
@@ -87,7 +95,7 @@
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
-  padding: 12px 12px 10px;
+  padding: 10px 12px 8px;
   box-shadow: var(--shadow-lg);
   position: relative;
   overflow-y: hidden;
@@ -102,27 +110,6 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-}
-
-.cardContent::-webkit-scrollbar {
-  width: 8px;
-}
-
-.cardContent::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-  border-radius: 999px;
-}
-
-.cardContent::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 999px;
-  border: 1px solid var(--scrollbar-border);
-}
-
-.cardContent::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
 }
 
 .header {

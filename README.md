@@ -37,11 +37,8 @@ Upload an image, break it into pieces, and snap them together piece by piece.
 
 ### Gameplay Demo
 
-If the GIF link below is broken, check the folder name casing. GitHub is case-sensitive.  
-Common fixes:
-
-- `./assets/...` vs `./Assets/...`
-- `preview.gif` vs `Preview.gif`
+If the GIF link below is broken, check the path: the preview asset lives at repo root (e.g. `./Assets/Preview/preview.gif`).  
+GitHub is case-sensitive — use the exact folder name (`Assets` vs `assets`).
 
 [![Play Phuzzle](./Assets/Preview/preview.gif)](https://phuzzle.vercel.app/)
 
@@ -78,7 +75,7 @@ A calm, cozy puzzle you can open anytime, part mindfulness, part challenge.
 - **Social** — Stats, leaderboards (Today / Week / All-time / **Efficiency**; Sort by Fastest, Least moves, or Cleanest for Today and All-time; filters: shape, modifier, source for all views; **your row** highlighted with “(You)” on every board), profile (best streak, “See ranking” for 4×4), anonymous mode (raccoon names), share puzzle image; win overlay **share screen** (inline, no modal): **Share Result** and **Share with People** with native share/copy plus **Share Card** + Download options; **Share Card** PNG: challenge card is **image-only** (gradient + puzzle image with gold border); result card has time, moves, pieces, accuracy, full URL; share message uses **random taunt phrases** (e.g. “BOOM! I just crushed that puzzle!”, “Another one in the books!”, “Puzzle demolished. Your turn.”) plus time/moves and “Same puzzle, same difficulty” with full URL; **Replay** — after completing a puzzle you can **Watch Replay** from the win screen; **Replay Solve** modal shows the live puzzle (board cutout) with play/pause, seek bar, and 1×–3× speed; co-op (Play with Friend via link); **weekly album** (Stats → Leaderboard → Week → Album): 7-slot page with daily puzzle thumbnails and mastery badges (⚡ = completed with no hints, no undo)
 - **Analytics** — Live completion counter, percentile ranking (Top X%); **mastery** completions (daily with no hints and no undo) tracked for weekly album and mastery streak
 
-Full feature list → [CHANGES.md](doc/CHANGES.md). In-app **What’s New** popup → `src/app/data/content/changelog.ts`.
+Full feature list → [doc/CHANGES.md](doc/CHANGES.md). In-app **What’s New** popup: `src/app/data/content/changelog.ts`.
 
 ---
 

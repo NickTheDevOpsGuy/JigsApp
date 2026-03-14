@@ -1,4 +1,4 @@
-/* Parity with Menu, Stats, Packs: one viewport, card scrolls inside with blue scrollbar */
+/* One viewport, no page scroll; on mobile card fits and does not scroll */
 .page {
   height: var(--app-vh-stable, 100dvh);
   min-height: var(--app-vh-stable, 100dvh);
@@ -10,50 +10,66 @@
   align-items: center;
   justify-content: center;
   background: var(--color-bg-primary);
-  padding: max(var(--space-3), env(safe-area-inset-top))
-    max(var(--space-3), env(safe-area-inset-right))
-    max(var(--space-3), env(safe-area-inset-bottom))
-    max(var(--space-3), env(safe-area-inset-left));
+  padding: max(var(--space-2), env(safe-area-inset-top))
+    max(var(--space-2), env(safe-area-inset-right))
+    max(var(--space-2), env(safe-area-inset-bottom))
+    max(var(--space-2), env(safe-area-inset-left));
   overflow: hidden;
   overscroll-behavior: none;
 }
 
 .card {
-  width: min(520px, 100%);
+  width: min(420px, 100%);
   max-height: 100%;
   min-height: 0;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
-  padding: var(--space-6);
+  padding: var(--space-4);
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  overflow-y: auto;
+  gap: var(--space-3);
   overflow-x: hidden;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
-.card::-webkit-scrollbar {
-  width: 8px;
-}
+@media (max-width: 600px) {
+  .page {
+    padding: 6px 8px;
+  }
 
-.card::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-  border-radius: 999px;
-}
+  .card {
+    padding: 10px 12px;
+    gap: var(--space-2);
+    overflow: hidden;
+    overflow-y: hidden;
+    flex: 1 1 auto;
+  }
 
-.card::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 999px;
-  border: 1px solid var(--scrollbar-border);
-}
+  .title {
+    margin: 0 0 var(--space-1);
+    font-size: 1.1rem;
+  }
 
-.card::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
+  .label {
+    gap: var(--space-1);
+  }
+
+  .row {
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .primary,
+  .secondary {
+    height: 44px;
+  }
+
+  .select {
+    height: 44px;
+  }
 }
 
 .title {

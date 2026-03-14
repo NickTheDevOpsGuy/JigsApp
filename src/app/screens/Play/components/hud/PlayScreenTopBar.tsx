@@ -7,7 +7,6 @@ import { CoopStatusIndicator } from "@/screens/Play/components/coop/CoopStatusIn
 import { PlayHUD } from "./PlayHUD";
 import { TopBarButtons } from "./TopBarButtons";
 import { HeaderMenu } from "@/screens/Play/components/headerMenu/HeaderMenu";
-import { TopBarKeyboardHints } from "./TopBarKeyboardHints";
 import type { RealtimeStatus } from "@/screens/Play/hooks/gameplay/usePuzzleSession";
 import type { TimeMode } from "@/screens/Play/core/time/timeMode";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
@@ -89,9 +88,6 @@ export function PlayScreenTopBar({
               <PlayHUD {...hudProps} />
             </div>
           )}
-          <TopBarKeyboardHints
-            hidden={topBarButtonsProps.isCoarsePointer || hideMenuAndButtons}
-          />
         </div>
         {!hideMenuAndButtons && <TopBarButtons {...topBarButtonsProps} />}
       </div>

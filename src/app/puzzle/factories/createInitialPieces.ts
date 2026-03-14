@@ -4,10 +4,11 @@
 import type { GridSize, Piece, PieceEdges, PieceCutType } from "@/puzzle/core/types";
 import { buildPiecePath } from "@/puzzle/core/shape";
 
+/** Must match or exceed shape.ts depth so knobs fit within piece bounds. */
 const CUT_DEPTH_PCT: Record<PieceCutType, number> = {
-  classic: 0.17,
-  irregular: 0.2,
-  hard: 0.12,
+  classic: 0.2,
+  irregular: 0.22,
+  hard: 0.14,
 };
 
 type CreateInitialPiecesArgs = {

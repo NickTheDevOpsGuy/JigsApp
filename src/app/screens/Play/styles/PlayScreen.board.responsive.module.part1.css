@@ -49,6 +49,15 @@
     overflow-x: hidden;
   }
 
+  .playBody .trayArea {
+    width: 100%;
+    max-width: min(94vw, 520px);
+  }
+
+  .playBody .trayWrap {
+    max-width: 100%;
+  }
+
   .boardWrapper {
     width: min(94vw, 520px);
     max-width: 100%;

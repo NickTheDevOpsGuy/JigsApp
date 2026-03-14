@@ -1,3 +1,39 @@
+.puzzleImageWrap {
+  margin-bottom: 10px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+.puzzleImage {
+  display: block;
+  width: 100%;
+  max-height: 130px;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (max-width: 600px) {
+  .puzzleImageWrap {
+    margin-bottom: 8px;
+  }
+
+  .puzzleImage {
+    max-height: 100px;
+  }
+
+  .difficultyCardLabel {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 600px) and (max-height: 700px) {
+  .puzzleImage {
+    max-height: 72px;
+  }
+}
+
 .recommendedBadge {
   position: absolute;
   top: -10px;
@@ -27,7 +63,7 @@
 
 .difficultyCardLabel {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-primary);
   overflow-wrap: break-word;
   word-break: break-word;
@@ -42,7 +78,7 @@
 .difficultyCardLine {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
   min-width: 0;
   flex: 1;
@@ -71,16 +107,16 @@
   border: 1px solid var(--color-border);
   background: var(--color-bg-card);
   color: var(--color-text-primary);
-  padding: 10px 16px;
+  padding: 8px 12px;
   border-radius: var(--radius-btn);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.15s ease;
 }
 
@@ -96,13 +132,13 @@
 .moreOptionsList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 6px;
+  margin-top: 8px;
 }
 
 .moreOptionsList .difficultyCard {
   min-height: 0;
-  padding: 10px 14px;
+  padding: 6px 10px;
 }
 
 .moreOptionsList .difficultyCardIcon {

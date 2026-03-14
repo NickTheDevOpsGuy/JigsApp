@@ -4,6 +4,16 @@ Detailed list of features. See [README](../README.md) for a quick overview.
 
 ---
 
+## Recent: Puzzle piece realism and snap feel
+
+- **Jigsaw shapes** — Deeper tabs/sockets and curve params in `src/app/puzzle/core/shape.ts`; edge pieces keep flat outer sides; interior pieces use randomized tab/blank. Pad aligned in `src/app/puzzle/factories/createInitialPieces.ts`.
+- **Piece depth and shading** — Stronger drop shadow (dragging and unplaced), top bevel highlight, bottom shade, inner rim stroke for cardboard thickness, clearer outline in `src/app/puzzle/canvas/render/renderBoardDrawPieceHelpers.ts`.
+- **Drag feel** — Lift 12px, scale 1.04× when dragging in `src/app/puzzle/canvas/utils/renderBoardHelpersCore.ts`; piece draws above others with stronger shadow.
+- **Magnetic snap** — Larger snap radius and stronger pull in `src/app/puzzle/snap/puzzleSnap.ts`; 120ms lock animation and higher magnetic pull strength in `src/app/screens/Play/hooks/animation/usePlayScreenAnimationConstants.ts`.
+- **Docs** — README preview path note; in-app changelog in `src/app/data/content/changelog.ts` (v45).
+
+---
+
 ## Recent: Home bar, leaderboard filters, docs
 
 - **Home bar** — Top bar now shows "Phuzzle" (center) with date above the card; Feedback (megaphone) and Help (?) in the bar. No "Daily Phuzzle" label in the bar.

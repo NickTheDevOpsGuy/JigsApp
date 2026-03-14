@@ -125,6 +125,14 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
         <p className={styles.subtitle}>Same puzzle for everyone</p>
       </div>
 
+      <div className={styles.puzzleImageWrap}>
+        <img
+          src={puzzle.fullImage}
+          alt="Today's puzzle"
+          className={styles.puzzleImage}
+        />
+      </div>
+
       {showFreezeOffer && (
         <div
           className={styles.freezeOffer}
@@ -168,6 +176,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
               index={i}
               selected={selectedIndex === i}
               onSelect={() => setSelectedIndex(i)}
+              isRecommended={i === RECOMMENDED_INDEX}
             />
           ))}
         </div>
@@ -197,6 +206,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
                   index={idx}
                   selected={selectedIndex === idx}
                   onSelect={() => setSelectedIndex(idx)}
+                  isRecommended={false}
                 />
               );
             })}
@@ -212,18 +222,31 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   );
 }
 
+/** Display label: difficulty name + piece count only (no grid size like "3×3"). */
+function getDifficultyDisplayLabel(
+  opt: (typeof GRID_OPTIONS)[number],
+  isRecommended: boolean,
+): string {
+  const name = opt.label.split(/\s/)[0] ?? opt.label;
+  const recommended = isRecommended ? " (Recommended)" : "";
+  return `${name} - ${opt.pieces} pieces${recommended}`;
+}
+
 function DifficultyCard({
   opt,
   index,
   selected,
   onSelect,
+  isRecommended,
 }: {
   opt: (typeof GRID_OPTIONS)[number];
   index: number;
   selected: boolean;
   onSelect: () => void;
+  isRecommended: boolean;
 }) {
   const color = DIFFICULTY_COLORS[index];
+  const displayLabel = getDifficultyDisplayLabel(opt, isRecommended);
   return (
     <button
       type="button"
@@ -232,7 +255,7 @@ function DifficultyCard({
       style={{ "--difficulty-accent": color } as React.CSSProperties}
     >
       <span className={styles.difficultyCardLine}>
-        <span className={styles.difficultyCardLabel}>{opt.label}</span>
+        <span className={styles.difficultyCardLabel}>{displayLabel}</span>
       </span>
       {selected && <Check size={18} className={styles.difficultyCardCheck} />}
     </button>

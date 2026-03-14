@@ -28,12 +28,12 @@
 .difficultySection,
 .timerSection {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .difficultySection {
-  margin-top: 12px;
-  margin-bottom: 16px;
+  margin-top: 8px;
+  margin-bottom: 10px;
 }
 
 .configSectionLabel {
@@ -46,23 +46,26 @@
 .difficultyGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 10px;
 }
 
 .difficultyCard {
   appearance: none;
+  box-sizing: border-box;
   border: 1px solid rgba(89, 118, 168, 0.62);
   border-radius: 10px;
   background: linear-gradient(180deg, rgba(20, 33, 57, 0.94), rgba(14, 25, 43, 0.94));
-  min-height: 118px;
-  padding: 10px 12px;
+  min-height: 72px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 6px;
+  gap: 4px;
   cursor: pointer;
   color: #dfecff;
+  overflow: hidden;
+  outline: none;
   transition:
     transform 140ms ease,
     border-color 140ms ease,
@@ -88,12 +91,12 @@
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 4px;
-  margin-bottom: 4px;
+  gap: 3px;
+  margin-bottom: 2px;
 }
 
 .difficultyCardPreviewDot {
-  height: 10px;
+  height: 8px;
   border-radius: 999px;
   background: linear-gradient(
     180deg,
@@ -108,13 +111,13 @@
 .difficultyCardTitle {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.78rem;
+  gap: 4px;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
 .difficultyCardPieces {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: #c9dcf8;
   font-weight: 600;
 }

@@ -44,10 +44,10 @@ describe("ReplaySolveModal", () => {
     expect(screen.getByRole("button", { name: /close replay/i })).toBeTruthy();
   });
 
-  it("renders rewind and fast forward controls", () => {
+  it("renders restart and go to end controls", () => {
     render(<ReplaySolveModal {...defaultProps} />);
-    expect(screen.getByRole("button", { name: /rewind/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /fast forward/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /restart/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /go to end/i })).toBeTruthy();
   });
 
   it("shows time display", () => {

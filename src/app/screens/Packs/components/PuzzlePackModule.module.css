@@ -31,13 +31,92 @@
   line-height: 1.45;
 }
 
+/* Carousel with left/right nav and scroll progress */
+.carouselWithNavWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.carouselNavRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.carouselNavBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-bg-elevated) 98%, var(--color-brand-primary));
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 4px 16px rgba(11, 99, 184, 0.18);
+}
+
+.carouselNavBtn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-brand-primary) 22%, var(--color-bg-elevated));
+  color: var(--color-brand-primary);
+  box-shadow: 0 6px 20px rgba(11, 99, 184, 0.28);
+}
+
+.carouselNavBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.packScrollViewport {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 20px;
+  scrollbar-width: none;
+}
+
+.packScrollViewport::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollProgressWrap {
+  padding: 0 4px;
+}
+
+.scrollProgressTrack {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(26, 43, 74, 0.6);
+}
+
+.scrollProgressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-brand-primary);
+  box-shadow: 0 0 10px rgba(11, 99, 184, 0.4);
+  transition: width 0.15s ease-out;
+}
+
 .carousel {
   display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 4px 4px 10px;
-  scrollbar-width: none;
+  gap: 22px;
+  padding: 8px 20px 12px;
+  width: max-content;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 .carousel::-webkit-scrollbar {
@@ -47,11 +126,12 @@
 .packCard {
   position: relative;
   display: grid;
-  gap: 12px;
-  width: min(286px, 78vw);
-  min-width: 240px;
-  padding: 14px;
-  border-radius: 22px;
+  gap: 8px;
+  width: min(260px, 82vw);
+  min-width: 220px;
+  max-width: 280px;
+  padding: 10px 12px;
+  border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--color-border) 86%, transparent);
   background:
     radial-gradient(circle at top, rgba(72, 130, 228, 0.18), transparent 52%),
@@ -62,7 +142,9 @@
     transform 120ms ease,
     box-shadow 120ms ease,
     border-color 120ms ease;
-  scroll-snap-align: start;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  flex-shrink: 0;
 }
 
 .packCard:hover {
@@ -73,9 +155,9 @@
 
 .packCover {
   position: relative;
-  aspect-ratio: 1.2 / 1;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 14px;
   border: 1px solid rgba(130, 163, 218, 0.18);
   background:
     radial-gradient(circle at top, rgba(79, 147, 242, 0.24), transparent 58%),
@@ -124,40 +206,53 @@
 
 .cardBody {
   display: grid;
-  gap: 10px;
+  gap: 6px;
 }
 
 .headingRow {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .name {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--color-text-primary);
+  line-height: 1.25;
 }
 
 .summary {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-brand-primary);
 }
 
-.description {
-  margin: 0;
-  font-size: 0.86rem;
-  line-height: 1.45;
-  color: var(--color-text-secondary);
-}
-
 .progressBlock {
   display: grid;
-  gap: 8px;
+  gap: 6px;
+}
+
+.progressBarRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.progressBarRow .progressTrack {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.progressPercent {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
 }
 
 .progressTrack {
@@ -242,6 +337,26 @@
   }
   100% {
     transform: scale(1);
+  }
+}
+
+/* Mobile: narrower card so next card peeks */
+@media (max-width: 540px) {
+  .packCard {
+    width: min(260px, 72vw);
+    min-width: 200px;
+  }
+}
+
+/* Desktop: show 3–4 cards; tablet ~2; mobile 1 + peek handled by card width above */
+@media (min-width: 900px) {
+  .packScrollViewport {
+    scroll-padding-inline: 24px;
+  }
+
+  .carousel {
+    gap: 24px;
+    padding: 8px 24px 12px;
   }
 }
 

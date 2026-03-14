@@ -214,38 +214,38 @@
   }
 
   .difficultyCard {
-    flex: 0 0 min(132px, 34vw);
-    min-height: 110px;
-    padding: 8px 10px;
-    gap: 4px;
+    flex: 0 0 min(120px, 32vw);
+    min-height: 68px;
+    padding: 6px 8px;
+    gap: 3px;
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
 
   .difficultyCardPreview {
-    gap: 3px;
+    gap: 2px;
   }
 
   .difficultyCardPreviewDot {
-    height: 8px;
+    height: 6px;
   }
 
   .difficultyCardTitle {
-    font-size: 0.72rem;
-    gap: 4px;
+    font-size: 0.7rem;
+    gap: 3px;
   }
 
   .difficultyCardTitle svg {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
   }
 
   .difficultyCardPieces {
-    font-size: 0.68rem;
+    font-size: 0.64rem;
   }
 
   .difficultyCardGrid {
-    font-size: 0.64rem;
+    font-size: 0.6rem;
   }
 
   .preview,

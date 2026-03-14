@@ -38,7 +38,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ### In-app changelog
 
-- **changelog.ts** — Version 43: leaderboard Efficiency + Sort by + “You” highlight; profile best streak + See ranking; completion 7-day toast, new-best haptic, Next CTA; Supabase indexes.
+- **src/app/data/content/changelog.ts** — Version 45: puzzle piece realism (deeper jigsaw, shadow/bevel/inner rim), drag feel (lift 12px, scale 1.04×), magnetic snap (larger radius, 120ms lock). Version 43: leaderboard Efficiency + Sort by + “You” highlight; profile best streak + See ranking; completion 7-day toast, new-best haptic, Next CTA; Supabase indexes.
 
 ---
 
@@ -73,7 +73,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 - **README.md** — Features: 3×3 to 10×10 grids; share screen (inline, no modal); win screen share copy; grid presets Starter (3×3); Polish: piece draw order, pixel-aligned seams.
 - **doc/CHANGES.md** — New “Recent” section for share screen, draw order, seams, unwinnable fix, grid minimum; grid sizes 3×3 to 10×10.
-- **src/app/data/changelog.ts** — Version 28: share screen, piece order, seam alignment, unwinnable fix, grid 3×3.
+- **src/app/data/content/changelog.ts** — Version 28: share screen, piece order, seam alignment, unwinnable fix, grid 3×3.
 
 ---
 
@@ -96,7 +96,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 - **Completion** — `CompletionOverlayGate.tsx` (precision stats, uiTone), `CompletionOverlay.tsx`, `CompletionStatsBlock.tsx` (precision row, bonus), `completionMessages.ts` (tone-based message sets).
 - **Puzzle / snap** — `puzzleSnap.ts` (NeighborSnapResult.dist), `PuzzleManager.ts` (onPieceSnapped with precisionPx, dynamicDifficultyMultiplierRef), `puzzleManagerUtils.ts` (EffectiveToleranceOptions.dynamicDifficultyMultiplierRef), `playScreenManagerEvents.ts` (onPrecisionSnap).
 - **Service** — `adaptiveDifficultyService.ts` (`getToleranceMultiplier(rows, cols)`).
-- **In-app changelog** — `src/app/data/changelog.ts` version 26 with the five new mode entries. **README.md** — Features and Documentation updated; key-files note for play modes.
+- **In-app changelog** — `src/app/data/content/changelog.ts` version 26 with the five new mode entries. **README.md** — Features and Documentation updated; key-files note for play modes.
 
 ---
 
@@ -135,7 +135,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 ### Docs
 
 - **README** — File/folder structure includes refactor adds (Stats hooks, PieceTray hooks, SFX split, Play hooks, Setup gallery scroll, LeaderboardTabLists; menuConfigConstants, headerMenuItemsDisplay/Rest, viewportStorage; playScreenAnimationOverrides).
-- **changelog.ts** — Version 19: Win screen Share as menu option; lock animation restored in usePlayScreenAnimation. Version 18: menu config, header items, viewport, pointer types. Version 17: code refactor. Version 16: smooth lock, completion, tray.
+- **src/app/data/content/changelog.ts** — Version 19: Win screen Share as menu option; lock animation restored in usePlayScreenAnimation. Version 18: menu config, header items, viewport, pointer types. Version 17: code refactor. Version 16: smooth lock, completion, tray.
 
 ---
 

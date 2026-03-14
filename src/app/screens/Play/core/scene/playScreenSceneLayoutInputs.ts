@@ -179,6 +179,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
       ? {
           ...baseReplayProps,
           completionImageUrl: scene.completionImageUrl ?? undefined,
+          moveCount: scene.moveCountRef.current,
           onBackToResults: () => {
             behavior.replay.stopReplay();
             scene.setReplayBarOpen(false);

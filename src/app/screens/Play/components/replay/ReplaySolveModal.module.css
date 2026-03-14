@@ -108,14 +108,14 @@
   width: 100%;
   background: var(--color-bg-card);
   border-bottom: 1px solid var(--color-border);
-  padding: 14px 16px 14px 18px;
+  padding: 10px 14px 0 16px;
 }
 .cutoutBottomBar {
   flex-shrink: 0;
   width: 100%;
   background: var(--color-bg-card);
   border-top: 1px solid var(--color-border);
-  padding: 14px 16px 20px;
+  padding: 10px 14px 14px;
   box-shadow: var(--shadow-lg);
 }
 
@@ -217,6 +217,39 @@
   letter-spacing: 0.02em;
 }
 
+/* Result header: "Solved in 0:39" + "26 moves" – cleaner hierarchy */
+.resultHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 16px 12px;
+  margin: 0 -2px 0 0;
+}
+
+.resultTime {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.resultTimeIcon {
+  flex-shrink: 0;
+  color: var(--color-brand-primary);
+  opacity: 0.95;
+}
+
+.resultMoves {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
 /* Glassmorphic close: rounded squircle, translucent bg, light blue glow on hover */
 .closeBtn {
   flex-shrink: 0;
@@ -251,23 +284,28 @@
   outline-offset: 2px;
 }
 
-/* Subtitle: "Watch how the puzzle was completed" – slightly larger and more prominent */
+/* Subtitle: "Watch how the puzzle was completed" */
 .subtitle {
   flex-shrink: 0;
   margin: 0;
-  padding: 8px 18px 16px;
-  font-size: 0.88rem;
+  padding: 4px 14px 10px;
+  font-size: 0.82rem;
   font-weight: 500;
   color: var(--color-text-secondary);
   line-height: 1.35;
 }
 
-/* Wrapper so close X can align with the board edge; larger min height for board */
+/* Puzzle as hero: more space, less empty margin */
 .puzzleAreaWrapper {
   position: relative;
-  flex: 1;
-  min-height: 300px;
-  margin: 0 14px 14px;
+  flex: 1 1 auto;
+  min-height: 280px;
+  margin: 0 10px 10px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Close button at top-right of board (modal mode) */
@@ -278,24 +316,24 @@
   z-index: 2;
 }
 
-/* Puzzle display: large central area with neon-blue frame glow */
+/* Puzzle display: hero area, prominent center, soft blue frame */
 .puzzleArea {
   width: 100%;
+  max-width: 100%;
   height: 100%;
-  min-height: 300px;
+  min-height: 260px;
   margin: 0;
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
   background: var(--color-bg-primary);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 40%, transparent);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 25%, transparent),
-    0 0 24px color-mix(in srgb, var(--color-brand-primary) 22%, transparent),
-    0 0 48px color-mix(in srgb, var(--color-brand-primary) 10%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 20%, transparent),
+    0 0 20px color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
 }
 
 .puzzleImage {
@@ -317,13 +355,13 @@
   font-size: 0.9rem;
 }
 
-/* Seek row: progress bar and time */
+/* Timeline: video-player style, thicker bar, clear playhead */
 .seekRow {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 16px 14px;
+  gap: 10px;
+  padding: 0 14px 10px;
 }
 
 .seekBarWrap {
@@ -331,50 +369,51 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .seekBar {
   flex: 1;
-  height: 8px;
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
+  height: 12px;
+  background: rgba(26, 43, 74, 0.6);
+  border: none;
   border-radius: 999px;
   overflow: visible;
   cursor: pointer;
   position: relative;
+  touch-action: none;
 }
 
-/* Progress fill: theme accent with subtle glow */
+/* Progress fill: Phuzzle blue with smooth animation */
 .seekFill {
   height: 100%;
-  background: var(--color-brand-primary);
+  background: linear-gradient(90deg, var(--color-brand-primary), #60a5fa);
   border-radius: 999px;
-  transition: width 0.1s ease-out;
-  box-shadow: 0 0 10px color-mix(in srgb, var(--color-brand-primary) 40%, transparent);
+  transition: width 0.12s ease-out;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 45%, transparent);
 }
 
-/* Seek handle with neon blue glow */
+/* Playhead: clear circular handle */
 .seekHandle {
   position: absolute;
   top: 50%;
-  width: 12px;
-  height: 12px;
-  margin-left: -6px;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
   transform: translateY(-50%);
   background: var(--color-bg-elevated);
-  border-radius: 999px;
+  border: 2px solid var(--color-brand-primary);
+  border-radius: 50%;
   box-shadow:
-    var(--shadow-sm),
-    0 0 12px color-mix(in srgb, var(--color-brand-primary) 50%, transparent),
-    0 0 20px color-mix(in srgb, var(--color-brand-primary) 25%, transparent);
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 0 14px color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
   pointer-events: none;
 }
 
 .seekTime {
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
 }

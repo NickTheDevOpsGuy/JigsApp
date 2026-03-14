@@ -1,14 +1,15 @@
 /**
  * Seek bar, play/pause/speed controls, and nav (Back to Results | Next Puzzle) for ReplaySolveModal.
  */
-import React from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Play,
   Pause,
-  ChevronDown,
   ChevronLeft,
   SkipBack,
   SkipForward,
+  RotateCcw,
+  RotateCw,
 } from "lucide-react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
@@ -74,17 +75,61 @@ export function ReplaySolveModalControls({
     else onPause();
   };
 
+  const seekBarRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const getIndexFromClientX = useCallback(
+    (clientX: number) => {
+      const el = seekBarRef.current;
+      if (!el) return currentIndex;
+      const rect = el.getBoundingClientRect();
+      const x = (clientX - rect.left) / rect.width;
+      return Math.min(
+        totalSnapshots - 1,
+        Math.max(0, Math.round(x * (totalSnapshots - 1))),
+      );
+    },
+    [totalSnapshots, currentIndex],
+  );
+
+  const handleSeek = useCallback(
+    (clientX: number) => {
+      if (!onSeek || totalSnapshots <= 1) return;
+      onSeek(getIndexFromClientX(clientX));
+    },
+    [onSeek, totalSnapshots, getIndexFromClientX],
+  );
+
   const handleSeekBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!onSeek || totalSnapshots <= 1) return;
-    const el = e.currentTarget;
-    const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const index = Math.min(
-      totalSnapshots - 1,
-      Math.max(0, Math.round(x * (totalSnapshots - 1))),
-    );
-    onSeek(index);
+    handleSeek(e.clientX);
   };
+
+  const handleSeekBarPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!onSeek || totalSnapshots <= 1) return;
+    stopProp(e);
+    setIsDragging(true);
+    seekBarRef.current?.setPointerCapture(e.pointerId);
+    handleSeek(e.clientX);
+  };
+
+  const handlePointerMove = useCallback(
+    (e: PointerEvent) => handleSeek(e.clientX),
+    [handleSeek],
+  );
+  const handlePointerUp = useCallback(() => setIsDragging(false), []);
+
+  React.useEffect(() => {
+    if (!isDragging) return;
+    document.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("pointerup", handlePointerUp);
+    document.addEventListener("pointercancel", handlePointerUp);
+    return () => {
+      document.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("pointerup", handlePointerUp);
+      document.removeEventListener("pointercancel", handlePointerUp);
+    };
+  }, [isDragging, handlePointerMove, handlePointerUp]);
 
   const handleSeekBarKeyDown = (e: React.KeyboardEvent) => {
     if (!onSeek || totalSnapshots <= 1) return;
@@ -109,7 +154,8 @@ export function ReplaySolveModalControls({
       <div className={styles.seekRow}>
         <div className={styles.seekBarWrap}>
           <div
-            className={styles.seekBar}
+            ref={seekBarRef}
+            className={`${styles.seekBar} ${isDragging ? styles.seekBarDragging : ""}`}
             role="slider"
             tabIndex={0}
             aria-valuenow={currentIndex}
@@ -117,7 +163,7 @@ export function ReplaySolveModalControls({
             aria-valuemax={Math.max(0, totalSnapshots - 1)}
             aria-label="Replay progress"
             onClick={handleSeekBarClick}
-            onPointerDown={stopProp}
+            onPointerDown={handleSeekBarPointerDown}
             onKeyDown={handleSeekBarKeyDown}
           >
             <div className={styles.seekFill} style={{ width: `${progressPct}%` }} />
@@ -125,6 +171,9 @@ export function ReplaySolveModalControls({
           </div>
           <span className={styles.seekTime} aria-live="polite">
             {formatTime(elapsedSeconds)} / {formatTime(totalSeconds)}
+          </span>
+          <span className={styles.speedBadge} aria-hidden="true">
+            {effectiveSpeed}x
           </span>
         </div>
       </div>
@@ -135,10 +184,10 @@ export function ReplaySolveModalControls({
           className={styles.controlBtn}
           onClick={onRewind}
           onPointerDown={stopProp}
-          aria-label="Rewind to start"
-          title="Rewind"
+          aria-label="Restart from beginning"
+          title="Restart"
         >
-          &lt;&lt;
+          <RotateCcw size={20} aria-hidden />
         </button>
         {onSkipBack15 && (
           <button
@@ -147,14 +196,14 @@ export function ReplaySolveModalControls({
             onClick={onSkipBack15}
             onPointerDown={stopProp}
             aria-label="Back 5 seconds"
-            title="Back 5 seconds"
+            title="Back 5s"
           >
             <SkipBack size={20} aria-hidden />
           </button>
         )}
         <button
           type="button"
-          className={`${styles.controlBtn} ${!isPaused ? styles.controlBtnActive : ""}`}
+          className={`${styles.controlBtn} ${styles.controlBtnPlay} ${!isPaused ? styles.controlBtnActive : ""}`}
           onClick={handlePlayPause}
           onPointerDown={stopProp}
           aria-label={isPaused ? "Play" : "Pause"}
@@ -173,7 +222,7 @@ export function ReplaySolveModalControls({
             onClick={onSkipForward15}
             onPointerDown={stopProp}
             aria-label="Forward 5 seconds"
-            title="Forward 5 seconds"
+            title="Forward 5s"
           >
             <SkipForward size={20} aria-hidden />
           </button>
@@ -183,10 +232,10 @@ export function ReplaySolveModalControls({
           className={styles.controlBtn}
           onClick={onFastForward}
           onPointerDown={stopProp}
-          aria-label="Fast forward to end"
-          title="Fast forward"
+          aria-label="Go to end"
+          title="End"
         >
-          &gt;&gt;
+          <RotateCw size={20} aria-hidden />
         </button>
         <button
           type="button"
@@ -194,10 +243,9 @@ export function ReplaySolveModalControls({
           onClick={cycleSpeed}
           onPointerDown={stopProp}
           aria-label={`Playback speed ${effectiveSpeed}x. Click to change.`}
-          title="Click to cycle speed (1x → 2x → 3x)"
+          title="Speed"
         >
-          Speed {effectiveSpeed}x
-          <ChevronDown size={16} className={styles.speedChevron} aria-hidden />
+          {effectiveSpeed}x
         </button>
       </div>
 
@@ -211,7 +259,7 @@ export function ReplaySolveModalControls({
           }}
           onPointerDown={stopProp}
         >
-          <ChevronLeft size={20} aria-hidden />
+          <ChevronLeft size={18} aria-hidden />
           Back to Results
         </button>
         {onNextPuzzle && (

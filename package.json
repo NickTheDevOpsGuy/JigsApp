@@ -46,8 +46,9 @@
   },
   "overrides": {
     "tmp": ">=0.2.4",
-      "minimatch": "^9.0.5",
-  "serialize-javascript": "^7.0.3"
+    "minimatch": "^9.0.5",
+    "serialize-javascript": "^7.0.3",
+    "yauzl": ">=3.2.1"
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",

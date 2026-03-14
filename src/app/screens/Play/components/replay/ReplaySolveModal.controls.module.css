@@ -1,56 +1,117 @@
-/* Control row: << 5s Play 5s >>, Speed 1x */
+/* Speed badge next to timeline */
+.speedBadge {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
+}
+
+.seekBarDragging {
+  cursor: grabbing;
+}
+
+/* Control row: media player style – circular buttons, equal spacing */
 .controlRow {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 16px 16px;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 14px 12px;
 }
 
-/* Rounded control buttons: glassmorphic with theme accent on hover */
 .controlBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   padding: 0;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-bg-elevated) 94%, transparent);
   color: var(--color-text-primary);
-  font-size: 1rem;
-  font-weight: 700;
   cursor: pointer;
   transition:
-    border-color 0.15s,
-    background 0.15s,
-    box-shadow 0.2s;
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
 .controlBtn:hover {
-  border-color: color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
-  background: color-mix(in srgb, var(--color-bg-elevated) 96%, transparent);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 55%, transparent);
+  background: color-mix(in srgb, var(--color-bg-elevated) 98%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--color-brand-primary) 25%, transparent);
+  transform: translateY(-1px);
 }
 
 .controlBtn:focus-visible {
   outline: 2px solid var(--color-focus-ring);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
-/* Play when active: subtle brand glow */
+.controlBtnPlay {
+  width: 46px;
+  height: 46px;
+}
+
 .controlBtnActive {
   background: color-mix(
     in srgb,
-    var(--color-brand-primary) 18%,
+    var(--color-brand-primary) 22%,
     var(--color-bg-elevated)
   );
-  border-color: color-mix(in srgb, var(--color-brand-primary) 45%, transparent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }
 
 .speedTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 94%, transparent);
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.speedTrigger:hover {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+  transform: translateY(-1px);
+}
+
+.speedTrigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Nav: equal height, Next Puzzle primary */
+.navRow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+
+.navBtnSecondary {
+  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -61,63 +122,21 @@
   border-radius: 12px;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
   color: var(--color-text-primary);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition:
-    border-color 0.15s,
-    box-shadow 0.2s;
-}
-
-.speedTrigger:hover {
-  border-color: color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
-}
-
-.speedTrigger:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 1px;
-}
-
-.speedChevron {
-  flex-shrink: 0;
-  opacity: 0.9;
-}
-
-/* Nav: Back to Results | Next Puzzle – theme-driven with glow on primary */
-.navRow {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px 20px;
-}
-
-.navBtnSecondary {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 16px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
-  color: var(--color-text-primary);
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s,
-    box-shadow 0.2s;
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
 .navBtnSecondary:hover {
-  border-color: color-mix(in srgb, var(--color-brand-primary) 40%, transparent);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 45%, transparent);
   background: color-mix(in srgb, var(--color-bg-elevated) 96%, transparent);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
+  transform: translateY(-1px);
 }
 
 .navBtnPrimary {
@@ -125,29 +144,31 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 16px;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
   border: none;
   border-radius: 12px;
   background: var(--color-brand-primary);
   color: var(--color-text-on-brand);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   box-shadow:
     0 2px 10px color-mix(in srgb, var(--color-brand-primary) 40%, transparent),
-    0 0 20px color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
+    0 0 18px color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
   transition:
-    background 0.15s,
-    box-shadow 0.2s;
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
 .navBtnPrimary:hover {
   background: var(--color-brand-hover);
   box-shadow:
-    0 4px 14px color-mix(in srgb, var(--color-brand-primary) 45%, transparent),
-    0 0 24px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+    0 4px 14px color-mix(in srgb, var(--color-brand-primary) 48%, transparent),
+    0 0 22px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+  transform: translateY(-1px);
 }
 
 .navBtnPrimary:focus-visible,

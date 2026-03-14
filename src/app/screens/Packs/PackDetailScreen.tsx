@@ -12,8 +12,6 @@ import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packs/packCompletion";
 import { PuzzlePackDetail } from "./components";
 
-const SCROLL_STEP = 220;
-
 export function PackDetailScreen() {
   const nav = useNavigate();
   const { packId } = useParams<{ packId: string }>();
@@ -23,7 +21,9 @@ export function PackDetailScreen() {
   > | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadPacksData().then(setPacksData);
@@ -32,8 +32,11 @@ export function PackDetailScreen() {
   const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 2);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    const maxScroll = scrollWidth - clientWidth;
+    setCanScrollLeft(scrollLeft > 2);
+    setCanScrollRight(scrollLeft < maxScroll - 2);
+    setScrollProgress(maxScroll <= 0 ? 0 : scrollLeft / maxScroll);
   }, []);
 
   const packMeta = PACK_METADATA.find((p) => p.id === packId);
@@ -50,8 +53,14 @@ export function PackDetailScreen() {
     nav(`/new?puzzle=${encodeURIComponent(puzzle.id)}`);
   };
 
-  const scrollBy = (delta: number) => {
-    scrollRef.current?.scrollBy({ left: delta, behavior: "smooth" });
+  const scrollByOneCard = (direction: 1 | -1) => {
+    const el = scrollRef.current;
+    const grid = gridRef.current;
+    if (!el || !grid) return;
+    const first = grid.firstElementChild as HTMLElement | null;
+    const cardWidth = first ? first.offsetWidth : 180;
+    const gap = 20;
+    el.scrollBy({ left: (cardWidth + gap) * direction, behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -119,12 +128,12 @@ export function PackDetailScreen() {
           <button
             type="button"
             className={styles.scrollBtn}
-            onClick={() => scrollBy(-SCROLL_STEP)}
+            onClick={() => scrollByOneCard(-1)}
             disabled={!canScrollLeft}
-            aria-label="Scroll left"
-            title="Scroll left"
+            aria-label="Previous puzzles"
+            title="Previous"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={22} />
           </button>
           <div
             ref={scrollRef}
@@ -132,17 +141,18 @@ export function PackDetailScreen() {
             role="list"
             aria-label="Puzzle list"
           >
-            <div className={styles.puzzleGrid}>
+            <div ref={gridRef} className={styles.puzzleGrid}>
               {puzzles.map((puzzle) => {
                 const isCompleted = completed.has(puzzle.id);
+                const isUpNext = nextPuzzle?.id === puzzle.id;
                 return (
                   <button
                     key={puzzle.id}
                     type="button"
-                    className={`${styles.puzzleCard} ${nextPuzzle?.id === puzzle.id ? styles.puzzleCardFeatured : ""}`}
+                    className={`${styles.puzzleCard} ${isUpNext ? styles.puzzleCardFeatured : ""}`}
                     onClick={() => handlePlay(puzzle)}
-                    title={`Play ${puzzle.name}`}
-                    aria-label={`Play ${puzzle.name}`}
+                    title={`Solve ${puzzle.name}`}
+                    aria-label={`Solve ${puzzle.name}`}
                   >
                     <div className={styles.puzzleThumb}>
                       {imgError[puzzle.id] ? (
@@ -164,10 +174,10 @@ export function PackDetailScreen() {
                     </div>
                     <span className={styles.puzzleName}>{puzzle.name}</span>
                     <span className={styles.playHint}>
-                      <Play size={12} /> Play
+                      <Play size={14} aria-hidden /> Solve
                     </span>
-                    {nextPuzzle?.id === puzzle.id && (
-                      <span className={styles.nextBadge}>Next</span>
+                    {isUpNext && (
+                      <span className={styles.nextBadge}>Up next</span>
                     )}
                   </button>
                 );
@@ -177,13 +187,21 @@ export function PackDetailScreen() {
           <button
             type="button"
             className={styles.scrollBtn}
-            onClick={() => scrollBy(SCROLL_STEP)}
+            onClick={() => scrollByOneCard(1)}
             disabled={!canScrollRight}
-            aria-label="Scroll right"
-            title="Scroll right"
+            aria-label="Next puzzles"
+            title="Next"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={22} />
           </button>
+        </div>
+        <div className={styles.scrollProgressWrap} aria-hidden="true">
+          <div className={styles.scrollProgressTrack}>
+            <div
+              className={styles.scrollProgressFill}
+              style={{ width: `${scrollProgress * 100}%` }}
+            />
+          </div>
         </div>
       </div>
     </div>

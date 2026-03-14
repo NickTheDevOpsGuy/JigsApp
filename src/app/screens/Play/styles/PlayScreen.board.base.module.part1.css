@@ -1,9 +1,10 @@
-/* Layout: board on top, tray below – like pre-layout behavior (desktop and mobile) */
+/* Layout: board on top, tray below – tray centered on board width */
 .playBody {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 12px;
   position: relative;
 }
@@ -11,11 +12,23 @@
 .playBody .main {
   flex: 1;
   min-height: 0;
+  width: 100%;
+  max-width: min(90vw, 700px);
+}
+
+.playBody .trayArea {
+  width: 100%;
+  max-width: min(90vw, 700px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .playBody .trayWrap {
   flex-shrink: 0;
   height: 220px;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* More tray height for large puzzles (49+ pieces) – prevents cramped layout */
@@ -36,7 +49,7 @@
 @media (max-width: 600px) {
   .playBody .trayWrap {
     width: 100%;
-    max-width: min(90vw, 420px);
+    max-width: 100%;
     height: 260px;
     flex-shrink: 0;
     padding: 0 0 16px;

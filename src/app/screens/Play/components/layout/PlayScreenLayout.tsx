@@ -310,7 +310,7 @@ export function PlayScreenLayout({
                   ref={board.boardRef as React.RefObject<HTMLDivElement>}
                   data-testid="play-board"
                 >
-                  {board.isComplete && (
+                  {board.isComplete && !replayPortalProps && (
                     <div
                       className={styles.boardCompleteMessage}
                       role="status"

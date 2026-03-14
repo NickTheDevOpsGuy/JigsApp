@@ -109,11 +109,26 @@ canvas {
     width: 100%;
     height: 100%;
     min-height: var(--app-vh-stable, 100dvh);
+    max-height: var(--app-vh-stable, 100dvh);
     overflow: hidden;
     overflow-x: hidden;
     overflow-y: hidden;
     -webkit-overflow-scrolling: auto;
   }
+
+  /* All screens: fit viewport, no page scroll. Cards fill and do not scroll. */
+  #root .page {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: var(--app-vh-stable, 100dvh);
+  }
+  #root .page > .card {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    overflow-y: hidden;
+  }
+
   h1 {
     font-size: var(--font-h1-mobile, 22px);
   }
