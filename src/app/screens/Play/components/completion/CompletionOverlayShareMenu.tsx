@@ -87,54 +87,54 @@ export function CompletionOverlayShareMenu(props: {
               aria-label="Share actions"
             >
               <div className={styles.completeShareDropdownActions}>
-              <button
-                type="button"
-                role="menuitem"
-                className={styles.completeShareDropdownItem}
-                title="Download or share result card image"
-                onClick={() => {
-                  void completionData.handleShareCard().catch(() => {});
-                }}
-                disabled={completionData.isGenerating}
-              >
-                <Image size={16} aria-hidden />
-                <span>{completionData.isGenerating ? "…" : "Share Card"}</span>
-              </button>
-              {(onShareProgress || onCopyProgress) && (
                 <button
                   type="button"
                   role="menuitem"
                   className={styles.completeShareDropdownItem}
-                  title={
-                    canNativeShare
-                      ? "Share result via social or apps"
-                      : "Copy result link"
-                  }
+                  title="Download or share result card image"
                   onClick={() => {
-                    const fn = canNativeShare ? onShareProgress : onCopyProgress;
-                    if (typeof fn === "function") fn();
+                    void completionData.handleShareCard().catch(() => {});
                   }}
+                  disabled={completionData.isGenerating}
                 >
-                  <Share2 size={16} aria-hidden />
-                  <span>
-                    {copied ? "Copied!" : canNativeShare ? "Share result" : "Copy link"}
-                  </span>
+                  <Image size={16} aria-hidden />
+                  <span>{completionData.isGenerating ? "…" : "Share Card"}</span>
                 </button>
-              )}
-              {canNativeShare && onCopyProgress && (
-                <button
-                  type="button"
-                  role="menuitem"
-                  className={styles.completeShareDropdownItem}
-                  title="Copy result link to clipboard"
-                  onClick={() => {
-                    if (typeof onCopyProgress === "function") onCopyProgress();
-                  }}
-                >
-                  <Copy size={16} aria-hidden />
-                  <span>{copied ? "Copied!" : "Copy link"}</span>
-                </button>
-              )}
+                {(onShareProgress || onCopyProgress) && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.completeShareDropdownItem}
+                    title={
+                      canNativeShare
+                        ? "Share result via social or apps"
+                        : "Copy result link"
+                    }
+                    onClick={() => {
+                      const fn = canNativeShare ? onShareProgress : onCopyProgress;
+                      if (typeof fn === "function") fn();
+                    }}
+                  >
+                    <Share2 size={16} aria-hidden />
+                    <span>
+                      {copied ? "Copied!" : canNativeShare ? "Share result" : "Copy link"}
+                    </span>
+                  </button>
+                )}
+                {canNativeShare && onCopyProgress && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.completeShareDropdownItem}
+                    title="Copy result link to clipboard"
+                    onClick={() => {
+                      if (typeof onCopyProgress === "function") onCopyProgress();
+                    }}
+                  >
+                    <Copy size={16} aria-hidden />
+                    <span>{copied ? "Copied!" : "Copy link"}</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
