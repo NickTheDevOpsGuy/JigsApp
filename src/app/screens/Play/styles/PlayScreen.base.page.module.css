@@ -1,6 +1,7 @@
 /* src/app/screens/Play/PlayScreen.module.css - Dark Mode Support */
 
 .page {
+  --play-board-tray-width: min(98vw, 760px);
   box-sizing: border-box;
   min-height: var(--app-vh-stable, 100dvh);
   height: 100%;
@@ -11,7 +12,7 @@
   overflow: hidden;
   padding-left: max(0px, env(safe-area-inset-left, 0));
   padding-right: max(0px, env(safe-area-inset-right, 0));
-  padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+  padding-bottom: max(4px, env(safe-area-inset-bottom, 0));
   /* PZ-045: Prevent text selection and Safari callouts on touch */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -36,7 +37,7 @@
 
 .zenMode .topBar,
 .zenMode .hud,
-.zenMode .trayWrap {
+.zenMode .trayArea .tray {
   transition:
     opacity 0.4s ease,
     transform 0.4s ease;
@@ -73,9 +74,9 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 0 12px;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
   padding-top: env(safe-area-inset-top, 0);
   min-width: 0;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
@@ -85,6 +86,18 @@
   transition:
     transform 0.25s ease,
     opacity 0.2s ease;
+}
+
+/* Inner bar: same width as board, so timer aligns to board left edge */
+.topBarInner {
+  width: 100%;
+  max-width: var(--play-board-tray-width);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px;
+  min-width: 0;
 }
 
 .topBarWrap {
@@ -153,14 +166,9 @@
   background: linear-gradient(to top, rgba(255, 255, 255, 0.06), transparent);
 }
 
-/* Board controls: Undo/Redo directly below board. Spacing: 12px board→controls, 12px controls→tray */
+/* Undo/Redo now in tray row (right side of tray); boardControlsRow unused */
 .boardControlsRow {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 12px;
-  margin-bottom: 12px;
+  display: none;
 }
 
 .trayArea {
@@ -180,7 +188,8 @@
   pointer-events: none;
 }
 
-.trayWrap {
+/* Tray (PieceTray root) – single card; layout in board.base, transitions here */
+.trayArea .tray {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -189,7 +198,6 @@
   transition:
     max-height 0.25s ease,
     opacity 0.2s ease;
-  /* Prevent double-tap zoom on mobile while keeping touch scroll */
   touch-action: pan-y manipulation;
 }
 
@@ -229,7 +237,7 @@
   .topBar,
   .topBarWrap,
   .trayArea,
-  .trayWrap,
+  .trayArea .tray,
   .immersivePeekTop,
   .immersivePeekBottom {
     transition: none !important;

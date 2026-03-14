@@ -1,6 +1,7 @@
 /* Mobile – no scroll, aligned layout like desktop */
 @media (max-width: 600px) {
   .page {
+    --play-board-tray-width: min(93vw, 720px);
     height: var(--app-vh-stable, 100dvh);
     min-height: var(--app-vh-stable, 100dvh);
     overflow: hidden;
@@ -22,16 +23,17 @@
   }
 
   .playBody {
-    gap: 4px;
+    --play-board-tray-width: min(93vw, 720px);
+    gap: 0;
     min-height: 0;
     min-width: 0;
     overflow: hidden;
     overflow-x: hidden;
-    padding: calc(60px + env(safe-area-inset-top, 0)) 6px
-      calc(var(--mobile-tray-height, 224px) + max(6px, env(safe-area-inset-bottom, 0)))
-      6px;
-    padding-left: max(6px, env(safe-area-inset-left, 0));
-    padding-right: max(6px, env(safe-area-inset-right, 0));
+    padding: calc(44px + env(safe-area-inset-top, 0)) 4px
+      calc(var(--mobile-tray-height, 224px) + max(2px, env(safe-area-inset-bottom, 0)))
+      4px;
+    padding-left: max(4px, env(safe-area-inset-left, 0));
+    padding-right: max(4px, env(safe-area-inset-right, 0));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -39,9 +41,9 @@
 
   .main {
     width: 100%;
-    max-width: min(94vw, 520px);
+    max-width: min(95vw, 1280px);
     padding: 0;
-    gap: 2px;
+    gap: 0;
     align-items: center;
     justify-content: center;
     min-height: 0;
@@ -49,17 +51,18 @@
     overflow-x: hidden;
   }
 
+  /* Tray same width as board on mobile */
   .playBody .trayArea {
-    width: 100%;
-    max-width: min(94vw, 520px);
+    width: var(--play-board-tray-width);
+    max-width: var(--play-board-tray-width);
   }
 
-  .playBody .trayWrap {
+  .playBody .trayArea .tray {
     max-width: 100%;
   }
 
   .boardWrapper {
-    width: min(95vw, 520px);
+    width: var(--play-board-tray-width);
     max-width: 100%;
     flex: 1;
     min-height: 0;
@@ -184,9 +187,9 @@
     font-size: 10px;
   }
   .hudPill {
-    min-height: 48px;
-    padding: 0 14px;
-    font-size: 12px;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 14px;
     gap: 6px;
     border-radius: 999px;
     background: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
@@ -194,9 +197,9 @@
     box-shadow: 0 10px 24px rgba(2, 7, 18, 0.24);
   }
   .hudPillTimer {
-    min-height: 48px;
-    padding: 0 14px;
-    font-size: 12px;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 14px;
   }
   .hudPillTimer .timerSuffix {
     display: none;
@@ -214,8 +217,8 @@
   }
 
   .hudPillPause {
-    min-height: 48px;
-    min-width: 48px;
+    min-height: 44px;
+    min-width: 44px;
     box-shadow: 0 10px 24px rgba(2, 7, 18, 0.24);
   }
   .hudPill span {
@@ -230,7 +233,8 @@
   }
 
   .trayMobileControls {
-    width: min(94vw, 520px);
+    width: 100%;
+    max-width: 100%;
     max-width: 100%;
     align-self: center;
     display: flex;
@@ -268,13 +272,14 @@
     pointer-events: none;
   }
 
-  .trayAreaSheet .trayWrap,
+  .trayAreaSheet .tray,
   .trayAreaSheet .trayBottomBar {
     pointer-events: auto;
   }
 
   .trayAreaSheet .trayBottomBar {
-    width: min(94vw, 520px);
+    width: 100%;
+    max-width: 100%;
     max-width: 100%;
     min-height: 40px;
     padding: 6px 12px 8px;
@@ -290,10 +295,10 @@
     touch-action: none;
   }
 
-  .trayAreaSheet .trayWrap {
-    width: min(94vw, 520px);
+  .trayAreaSheet .tray {
+    width: 100%;
     max-width: 100%;
-    align-self: center;
+    align-self: stretch;
     height: calc(var(--tray-sheet-height, 224px) - 40px);
     max-height: calc(var(--tray-sheet-height, 224px) - 40px);
     padding: 0 0 max(10px, env(safe-area-inset-bottom, 0));
@@ -311,7 +316,7 @@
     overflow: hidden;
   }
 
-  .trayAreaSheet[data-tray-state="collapsed"] .trayWrap {
+  .trayAreaSheet[data-tray-state="collapsed"] .tray {
     height: 0;
     max-height: 0;
     opacity: 0;
@@ -366,7 +371,7 @@
       padding-right: max(10px, env(safe-area-inset-right, 0));
     }
 
-    .playBody .trayWrap {
+    .playBody .trayArea .tray {
       padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
     }
   }

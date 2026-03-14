@@ -1,6 +1,6 @@
 /**
- * shape – buildPiecePath for jigsaw pieces; knob/tab geometry.
- * Supports classic, irregular, and hard cut types.
+ * shape – buildPiecePath for jigsaw pieces; organic bulb-shaped tabs, smooth bezier silhouette.
+ * Supports classic, irregular, and hard cut types. Border pieces use flat outer edges.
  */
 import type { EdgeType, PieceEdges, PieceCutType } from "@/puzzle/core/types";
 
@@ -14,12 +14,12 @@ type ShapeArgs = {
 
 const CUT_PARAMS: Record<
   PieceCutType,
-  { depthPct: number; widthPct: number; curvePct: number }
+  { depthPct: number; widthPct: number; entryPct: number; bulbPct: number }
 > = {
-  // Realistic jigsaw: deeper tabs/sockets, clear interlock. Edge pieces keep flat outer sides.
-  classic: { depthPct: 0.2, widthPct: 0.34, curvePct: 0.12 },
-  irregular: { depthPct: 0.22, widthPct: 0.32, curvePct: 0.18 },
-  hard: { depthPct: 0.14, widthPct: 0.27, curvePct: 0.09 },
+  // Organic bulb: smooth entry curve, rounded bulb, smooth exit. No perfect circles.
+  classic: { depthPct: 0.2, widthPct: 0.34, entryPct: 0.16, bulbPct: 0.32 },
+  irregular: { depthPct: 0.22, widthPct: 0.32, entryPct: 0.18, bulbPct: 0.35 },
+  hard: { depthPct: 0.14, widthPct: 0.27, entryPct: 0.12, bulbPct: 0.28 },
 };
 
 function knobDepth(tileW: number, tileH: number, cutType: PieceCutType) {
@@ -44,9 +44,13 @@ function edgeDir(edge: EdgeType): 0 | 1 | -1 {
   return edge === "tab" ? 1 : -1;
 }
 
+/**
+ * Organic bulb tab: smooth entry → rounded bulb → smooth exit.
+ * Two cubics per tab; entryPct/bulbPct give natural curvature (not circular).
+ */
 export function buildPiecePath(args: ShapeArgs): string {
   const { tileW, tileH, pad, edges, cutType = "classic" } = args;
-  const curvePct = CUT_PARAMS[cutType].curvePct;
+  const { entryPct, bulbPct } = CUT_PARAMS[cutType];
 
   const kd = knobDepth(tileW, tileH, cutType);
   const kwTop = knobWidth(tileW, tileH, true, cutType);
@@ -70,8 +74,8 @@ export function buildPiecePath(args: ShapeArgs): string {
     if (topDir === 0) return `L ${x1} ${y0}`;
     return [
       `L ${a} ${y0}`,
-      `C ${a + kwTop * curvePct} ${y0} ${a + kwTop * curvePct} ${y0 + out} ${mid} ${y0 + out}`,
-      `C ${b - kwTop * curvePct} ${y0 + out} ${b - kwTop * curvePct} ${y0} ${b} ${y0}`,
+      `C ${a + kwTop * entryPct} ${y0} ${mid - kwTop * bulbPct} ${y0 + out} ${mid} ${y0 + out}`,
+      `C ${mid + kwTop * bulbPct} ${y0 + out} ${b - kwTop * entryPct} ${y0} ${b} ${y0}`,
       `L ${x1} ${y0}`,
     ].join(" ");
   }
@@ -84,8 +88,8 @@ export function buildPiecePath(args: ShapeArgs): string {
     if (rightDir === 0) return `L ${x1} ${y1}`;
     return [
       `L ${x1} ${a}`,
-      `C ${x1} ${a + kwSide * curvePct} ${x1 + out} ${a + kwSide * curvePct} ${x1 + out} ${mid}`,
-      `C ${x1 + out} ${b - kwSide * curvePct} ${x1} ${b - kwSide * curvePct} ${x1} ${b}`,
+      `C ${x1 + out} ${a + kwSide * entryPct} ${x1 + out} ${mid - kwSide * bulbPct} ${x1 + out} ${mid}`,
+      `C ${x1 + out} ${mid + kwSide * bulbPct} ${x1} ${b - kwSide * entryPct} ${x1} ${b}`,
       `L ${x1} ${y1}`,
     ].join(" ");
   }
@@ -98,8 +102,8 @@ export function buildPiecePath(args: ShapeArgs): string {
     if (bottomDir === 0) return `L ${x0} ${y1}`;
     return [
       `L ${a} ${y1}`,
-      `C ${a - kwTop * curvePct} ${y1} ${a - kwTop * curvePct} ${y1 + out} ${mid} ${y1 + out}`,
-      `C ${b + kwTop * curvePct} ${y1 + out} ${b + kwTop * curvePct} ${y1} ${b} ${y1}`,
+      `C ${a - kwTop * entryPct} ${y1} ${mid + kwTop * bulbPct} ${y1 + out} ${mid} ${y1 + out}`,
+      `C ${mid - kwTop * bulbPct} ${y1 + out} ${b + kwTop * entryPct} ${y1} ${b} ${y1}`,
       `L ${x0} ${y1}`,
     ].join(" ");
   }
@@ -112,13 +116,13 @@ export function buildPiecePath(args: ShapeArgs): string {
     if (leftDir === 0) return `L ${x0} ${y0}`;
     return [
       `L ${x0} ${a}`,
-      `C ${x0} ${a - kwSide * curvePct} ${x0 + out} ${a - kwSide * curvePct} ${x0 + out} ${mid}`,
-      `C ${x0 + out} ${b + kwSide * curvePct} ${x0} ${b + kwSide * curvePct} ${x0} ${b}`,
+      `C ${x0 + out} ${a - kwSide * entryPct} ${x0 + out} ${mid + kwSide * bulbPct} ${x0 + out} ${mid}`,
+      `C ${x0 + out} ${mid - kwSide * bulbPct} ${x0} ${b + kwSide * entryPct} ${x0} ${b}`,
       `L ${x0} ${y0}`,
     ].join(" ");
   }
 
-  // Build path clockwise
+  // Build path clockwise; smooth bezier joins at corners via lineJoin in renderer
   const d = [`M ${x0} ${y0}`, topEdge(), rightEdge(), bottomEdge(), leftEdge(), `Z`].join(
     " ",
   );

@@ -43,10 +43,11 @@ export function usePieceTrayScroll(displayedLength: number) {
     if (clamped !== scrollLeft) {
       el.scrollLeft = clamped;
     }
-    const hasOverflow = maxScroll > 8;
+    const threshold = 2;
+    const hasOverflow = maxScroll > threshold;
     setCanScroll(hasOverflow);
-    setCanScrollLeft(hasOverflow && clamped > 4);
-    setCanScrollRight(hasOverflow && clamped < maxScroll - 4);
+    setCanScrollLeft(hasOverflow && clamped > threshold);
+    setCanScrollRight(hasOverflow && clamped < maxScroll - threshold);
     const pct = maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, clamped / maxScroll));
     setScrollProgress(pct);
   }, []);
@@ -56,6 +57,18 @@ export function usePieceTrayScroll(displayedLength: number) {
     if (!el) return;
     const { maxScroll } = getHorizontalScrollMetrics(el);
     const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + delta));
+    el.scrollTo({ left: target, behavior: "smooth" });
+  }, []);
+
+  /** Scroll by one piece (snap pitch) so scroll stops align with full pieces. */
+  const scrollByOnePiece = useCallback((direction: 1 | -1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const pitch = getTraySnapPitchPx(el);
+    const stepPx = Math.max(80, pitch);
+    const step = stepPx * direction;
+    const { maxScroll } = getHorizontalScrollMetrics(el);
+    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + step));
     el.scrollTo({ left: target, behavior: "smooth" });
   }, []);
 
@@ -105,11 +118,10 @@ export function usePieceTrayScroll(displayedLength: number) {
 
     const run = () => {
       updateScrollProgress();
-      if (displayedLength > 20) {
-        requestAnimationFrame(() => requestAnimationFrame(updateScrollProgress));
-        setTimeout(updateScrollProgress, 150);
-        setTimeout(updateScrollProgress, 400);
-      }
+      requestAnimationFrame(() => requestAnimationFrame(updateScrollProgress));
+      setTimeout(updateScrollProgress, 0);
+      setTimeout(updateScrollProgress, 150);
+      setTimeout(updateScrollProgress, 400);
     };
     run();
     el.addEventListener("scroll", updateScrollProgress);
@@ -120,7 +132,13 @@ export function usePieceTrayScroll(displayedLength: number) {
     el.addEventListener("touchcancel", onTouchDone, { passive: true });
     const ro = new ResizeObserver(run);
     ro.observe(el);
+    const t1 = setTimeout(updateScrollProgress, 0);
+    const t2 = setTimeout(updateScrollProgress, 150);
+    const t3 = setTimeout(updateScrollProgress, 400);
     return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
       el.removeEventListener("scroll", updateScrollProgress);
       el.removeEventListener("scrollend", run);
       el.removeEventListener("touchstart", onTouchStart);
@@ -138,5 +156,6 @@ export function usePieceTrayScroll(displayedLength: number) {
     canScrollLeft,
     canScrollRight,
     scrollBy,
+    scrollByOnePiece,
   };
 }

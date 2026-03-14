@@ -5,8 +5,8 @@
 /** Lerp factor for smooth drag position (0–1; higher = snappier). */
 export const DRAG_LERP = 0.32;
 
-/** Duration of lock-place ease animation (ms). Short (100–150ms) for satisfying snap. */
-export const LOCK_LERP_MS = 120;
+/** Duration of lock-place ease animation (ms). Smooth settle when releasing. */
+export const LOCK_LERP_MS = 140;
 
 /** Max upward lift (px) when piece snaps; actual lift scales with piece height for mobile and desktop. */
 export const LOCK_LIFT_MAX_PX = 12;
@@ -17,6 +17,11 @@ export const MAGNETIC_PULL_STRENGTH = 0.15;
 /** When idle: throttle redraw to this FPS for 50+ piece puzzles. */
 export const IDLE_TARGET_FPS = 30;
 export const IDLE_MIN_INTERVAL_MS = 1000 / IDLE_TARGET_FPS;
+
+/** When idle and 64+ pieces: throttle more aggressively to reduce CPU. */
+export const LARGE_PUZZLE_PIECE_COUNT = 64;
+export const IDLE_TARGET_FPS_LARGE = 18;
+export const IDLE_MIN_INTERVAL_MS_LARGE = 1000 / IDLE_TARGET_FPS_LARGE;
 
 /** Piece count above which we throttle idle redraws. Lower when battery saver is on. */
 export function getHighPieceCountThreshold(batterySaverMode: boolean): number {

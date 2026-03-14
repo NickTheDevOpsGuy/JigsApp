@@ -119,6 +119,7 @@ export type SubMenuId =
   | "help"
   | "manualControls"
   | "modes"
+  | "moves"
   | "navigation"
   | "pieceShape"
   | "share"

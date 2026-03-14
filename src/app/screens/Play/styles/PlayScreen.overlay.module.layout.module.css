@@ -78,10 +78,10 @@
     padding: 8px 12px;
   }
   .playBody {
-    gap: 8px;
-    padding: 0 6px;
+    gap: 0;
+    padding: 0 4px;
   }
-  .playBody .trayWrap {
+  .playBody .trayArea .tray {
     padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
   }
   .undoRedoBtn {

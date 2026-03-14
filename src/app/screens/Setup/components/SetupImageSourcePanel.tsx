@@ -18,6 +18,7 @@ interface SetupImageSourcePanelProps {
   galleryRef: React.RefObject<HTMLDivElement>;
   canScrollLeft: boolean;
   canScrollRight: boolean;
+  galleryScrollProgress: number;
   selectGalleryPuzzle: (puzzle: SamplePuzzle) => void;
   selectedPuzzle: SamplePuzzle | null;
   isLoading: boolean;
@@ -39,6 +40,7 @@ export function SetupImageSourcePanel({
   galleryRef,
   canScrollLeft,
   canScrollRight,
+  galleryScrollProgress,
   selectGalleryPuzzle,
   selectedPuzzle,
   isLoading,
@@ -56,9 +58,9 @@ export function SetupImageSourcePanel({
     const cardWidth = firstCard?.offsetWidth ?? 96;
     const gap = Number.parseFloat(getComputedStyle(gallery).columnGap || "8") || 8;
     const pitch = Math.max(1, Math.round(cardWidth + gap));
-    const step = pitch * 2;
+    const stepPx = Math.max(120, pitch * 2);
     const maxScroll = Math.max(0, gallery.scrollWidth - gallery.clientWidth);
-    const rawTarget = gallery.scrollLeft + direction * step;
+    const rawTarget = gallery.scrollLeft + direction * stepPx;
     const snappedTarget = Math.round(rawTarget / pitch) * pitch;
     const clamped = Math.max(0, Math.min(maxScroll, snappedTarget));
     gallery.scrollTo({ left: clamped, behavior: "smooth" });
@@ -181,6 +183,19 @@ export function SetupImageSourcePanel({
               >
                 <ChevronRight size={18} />
               </button>
+            </div>
+            <div
+              className={styles.galleryScrollBar}
+              role="progressbar"
+              aria-valuenow={Math.round(galleryScrollProgress * 100)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Gallery scroll position"
+            >
+              <div
+                className={styles.galleryScrollBarFill}
+                style={{ width: `${galleryScrollProgress * 100}%` }}
+              />
             </div>
           </>
         ) : imageSource === "upload" ? (

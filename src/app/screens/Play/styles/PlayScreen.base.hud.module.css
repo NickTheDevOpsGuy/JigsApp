@@ -20,12 +20,12 @@
 .hudPill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   border: 1px solid var(--color-border);
   background: var(--color-bg-card);
-  padding: 6px 10px;
+  padding: 8px 14px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 15px;
   white-space: nowrap;
 }
 
@@ -36,9 +36,9 @@
 .hudMoveCount {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
   white-space: nowrap;
@@ -50,8 +50,8 @@
 .hudPlacedTotal {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 13px;
+  gap: 5px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
   white-space: nowrap;
@@ -94,6 +94,8 @@
 .hudPillTimer {
   composes: hudPill;
   flex-shrink: 0; /* Prevent timer from being squeezed off on mobile */
+  padding: 8px 14px;
+  font-size: 15px;
 }
 
 .hudPillTimer.timerLow {
@@ -119,7 +121,7 @@
 }
 
 .timerSuffix {
-  font-size: 11px;
+  font-size: 12px;
   opacity: 0.8;
   margin-left: 4px;
 }

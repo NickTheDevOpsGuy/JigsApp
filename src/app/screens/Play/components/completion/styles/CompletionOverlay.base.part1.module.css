@@ -99,12 +99,40 @@
   -webkit-backdrop-filter: blur(20px);
   box-shadow: var(--shadow-lg);
   border-radius: var(--radius-card);
-  animation: completePanelEnter 0.4s ease-out both;
+  animation: completePanelEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   margin: auto;
   position: relative;
   z-index: 1;
   min-width: 0;
   overflow-x: hidden;
+}
+
+/* Brief celebratory glow behind panel (rewarding but not flashy) */
+.completePanelNew::before {
+  content: "";
+  position: absolute;
+  inset: -24px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand-primary) 18%, transparent) 0%,
+    color-mix(in srgb, var(--color-brand-primary) 6%, transparent) 45%,
+    transparent 70%
+  );
+  opacity: 0;
+  animation: completeGlowBurst 0.7s ease-out both;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completePanelNew {
+    animation: completePanelEnterReduced 0.25s ease-out both;
+  }
+  .completePanelNew::before {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 /* Glassmorphic close: rounded squircle, translucent bg, light blue glow on hover */

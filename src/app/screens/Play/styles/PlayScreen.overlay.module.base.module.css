@@ -139,9 +139,9 @@
   font: inherit;
   color: inherit;
   background: var(--color-bg-card);
-  padding: 6px 10px;
-  min-width: 36px;
-  min-height: 36px;
+  padding: 8px 12px;
+  min-width: 40px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;

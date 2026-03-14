@@ -2,30 +2,38 @@
  * Snap animation, glow, and particle helpers for renderBoard. Split out to keep renderBoardHelpersCore under 300 lines.
  */
 
-const SNAP_GLOW_MS = 260;
+/** Glow duration when a piece snaps; fade completes within 150–200ms. */
+export const SNAP_GLOW_MS = 180;
 
+/** Short ease (~120ms) for snap; subtle pop when pieces connect then gentle settle. */
 export function snapPopScale(tMs: number): number {
   if (tMs <= 0) return 1;
-  if (tMs >= 150) return 1;
+  if (tMs >= 120) return 1;
 
-  const popPeak = 1.14;
-  if (tMs < 50) {
-    const k = tMs / 50;
+  const popPeak = 1.07;
+  if (tMs < 36) {
+    const k = tMs / 36;
     return 1 + (popPeak - 1) * easeOutBack(k);
   }
 
-  const k = (tMs - 50) / 100;
+  const k = (tMs - 36) / 84;
   return popPeak - (popPeak - 1) * easeOutBounce(k);
 }
 
-/** Alpha for snap glow (0 = no glow, fades out over SNAP_GLOW_MS). */
+/** Alpha for snap glow at target position; smooth fade over SNAP_GLOW_MS. */
 export function snapGlowAlpha(elapsedMs: number): number {
   if (elapsedMs <= 0 || elapsedMs >= SNAP_GLOW_MS) return 0;
   const t = elapsedMs / SNAP_GLOW_MS;
-  return 0.22 * (1 - t) * (1 - t * 0.5);
+  return 0.24 * (1 - t) * (1 - t * 0.5);
 }
 
-/** Draw a radial glow at (cx, cy). Used for snap/placement feedback. */
+/** Soft pulse factor (0.97–1) for glow during snap; one gentle wave. */
+export function snapGlowPulse(elapsedMs: number): number {
+  if (elapsedMs <= 0 || elapsedMs >= SNAP_GLOW_MS) return 1;
+  return 0.96 + 0.04 * Math.sin((elapsedMs / SNAP_GLOW_MS) * Math.PI);
+}
+
+/** Draw a radial glow at (cx, cy). Used for snap placement feedback at target position. */
 export function drawSnapGlow(
   ctx: CanvasRenderingContext2D,
   cx: number,
@@ -87,12 +95,13 @@ export function drawTargetSlotGlow(
     return;
   }
   ctx.save();
-  const r = radius * 1.1;
-  const hot = Math.min(1, a > 0.35 ? 0.6 + (0.2 * (a - 0.35)) / 0.15 : a * 1.3);
+  const r = radius * 1.15;
+  /* Slightly brighter core so faint highlight is visible without giving away the puzzle */
+  const hot = Math.min(1, a > 0.3 ? 0.55 + (0.28 * (a - 0.3)) / 0.2 : a * 1.4);
   const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-  gradient.addColorStop(0, `rgba(255, 248, 200, ${hot})`);
-  gradient.addColorStop(0.35, `rgba(255, 230, 170, ${a * 0.4})`);
-  gradient.addColorStop(0.6, `rgba(255, 200, 120, ${a * 0.15})`);
+  gradient.addColorStop(0, `rgba(255, 250, 210, ${hot})`);
+  gradient.addColorStop(0.32, `rgba(255, 235, 175, ${a * 0.48})`);
+  gradient.addColorStop(0.58, `rgba(255, 205, 125, ${a * 0.18})`);
   gradient.addColorStop(1, "rgba(255, 190, 100, 0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(cx - r, cy - r, r * 2, r * 2);

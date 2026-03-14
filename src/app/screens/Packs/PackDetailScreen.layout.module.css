@@ -1,11 +1,13 @@
 .puzzleGrid {
   display: inline-flex;
   flex-direction: row;
+  flex-wrap: nowrap;
   gap: 20px;
   padding: 0 20px 4px;
   align-items: stretch;
   min-width: min-content;
   box-sizing: border-box;
+  direction: ltr;
 }
 
 .puzzleCard {
@@ -28,7 +30,7 @@
     transform 0.2s ease,
     box-shadow 0.2s ease;
   min-height: 0;
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 

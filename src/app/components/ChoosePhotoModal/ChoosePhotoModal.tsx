@@ -4,7 +4,7 @@
  */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Puzzle, Check, ChevronLeft } from "lucide-react";
+import { Puzzle, Check } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { SAMPLE_PUZZLES } from "@/data/packs/samplePuzzles";
@@ -55,14 +55,34 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
 
   const title = step === "image" ? "Choose Photo" : "Choose difficulty";
 
+  const goToStep = (target: Step) => {
+    if (target === "image") setStep("image");
+    else if (target === "difficulty" && selectedPuzzle) setStep("difficulty");
+  };
+
   return (
     <Modal isOpen onClose={onClose} title={title} showCloseButton>
-      <div className={styles.stepIndicator}>
-        <span className={step === "image" ? styles.stepCurrent : ""}>Image</span>
-        <span className={styles.stepSep}>→</span>
-        <span className={step === "difficulty" ? styles.stepCurrent : ""}>
+      <div className={styles.stepIndicator} role="navigation" aria-label="Steps">
+        <button
+          type="button"
+          className={`${styles.stepLink} ${step === "image" ? styles.stepCurrent : ""}`}
+          onClick={() => goToStep("image")}
+          aria-current={step === "image" ? "step" : undefined}
+          title="Go to image selection"
+        >
+          Image
+        </button>
+        <span className={styles.stepSep} aria-hidden>→</span>
+        <button
+          type="button"
+          className={`${styles.stepLink} ${step === "difficulty" ? styles.stepCurrent : ""}`}
+          onClick={() => goToStep("difficulty")}
+          disabled={!selectedPuzzle}
+          aria-current={step === "difficulty" ? "step" : undefined}
+          title={selectedPuzzle ? "Go to difficulty selection" : "Select an image first"}
+        >
           Difficulty
-        </span>
+        </button>
       </div>
 
       {step === "image" && (
@@ -76,6 +96,8 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
                   type="button"
                   className={`${styles.galleryCard} ${selectedPuzzle?.id === puzzle.id ? styles.galleryCardSelected : ""}`}
                   onClick={() => setSelectedPuzzle(puzzle)}
+                  title={`Select: ${puzzle.name}`}
+                  aria-label={puzzle.name}
                 >
                   {imgError[puzzle.id] ? (
                     <span className={styles.placeholder}>?</span>
@@ -100,6 +122,8 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
             className={styles.nextBtn}
             disabled={!selectedPuzzle}
             onClick={() => setStep("difficulty")}
+            title="Continue to difficulty selection"
+            aria-label="Continue to difficulty selection"
           >
             Next: Difficulty
           </button>
@@ -112,6 +136,8 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
                 onClose();
                 navigate("/new");
               }}
+              title="Open custom image upload"
+              aria-label="Upload your own image"
             >
               upload your own image
             </button>
@@ -121,15 +147,6 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
 
       {step === "difficulty" && selectedPuzzle && (
         <div className={styles.stepBody}>
-          <button
-            type="button"
-            className={styles.backBtn}
-            onClick={() => setStep("image")}
-            aria-label="Back to gallery"
-          >
-            <ChevronLeft size={18} />
-            Back
-          </button>
           <div className={styles.previewWrap}>
             <img
               src={selectedPuzzle.fullImage}
@@ -149,6 +166,8 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
                   type="button"
                   className={`${styles.difficultyCard} ${selected ? styles.difficultyCardSelected : ""}`}
                   onClick={() => setDifficultyIndex(i)}
+                  title={`Select ${name}: ${pieces} pieces`}
+                  aria-label={`${name}, ${pieces} pieces`}
                 >
                   <Puzzle size={16} />
                   <span>
@@ -159,7 +178,13 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
               );
             })}
           </div>
-          <button type="button" className={styles.startBtn} onClick={handleStart}>
+          <button
+            type="button"
+            className={styles.startBtn}
+            onClick={handleStart}
+            title="Start puzzle with selected options"
+            aria-label="Start puzzle"
+          >
             Start Puzzle →
           </button>
         </div>

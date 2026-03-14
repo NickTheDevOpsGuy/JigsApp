@@ -195,6 +195,10 @@ function formatKey(key: string): string {
     "⌘⇧Z": "⌘⇧Z",
     "Ctrl+Y": "Ctrl+Y",
     "⌘Y": "⌘Y",
+    "↑": "↑",
+    "↓": "↓",
+    "←": "←",
+    "→": "→",
   };
   return keyMap[key] ?? key;
 }

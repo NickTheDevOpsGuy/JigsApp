@@ -14,7 +14,9 @@ import type {
 import {
   snapPopScale,
   snapGlowAlpha,
+  snapGlowPulse,
   drawSnapGlow,
+  SNAP_GLOW_MS,
   computeImageSourceRect,
   DRAG_LIFT_PX,
   DRAG_SCALE,
@@ -66,12 +68,18 @@ export function drawPiece(
   const popScale = start != null ? snapPopScale(popElapsedMs) : 1;
   const scale = popScale * (isDragging ? DRAG_SCALE : 1);
   const snapGlowEnabled = animState?.snapGlowEnabled !== false;
+  /** Soft pulse on piece image when just snapped (0.98–1 over ~150ms) */
+  const piecePulseAlpha =
+    start != null && popElapsedMs < 150
+      ? 0.98 + 0.02 * Math.sin((popElapsedMs / 150) * Math.PI)
+      : 1;
 
-  if (snapGlowEnabled && start != null && popElapsedMs < 320) {
+  if (snapGlowEnabled && start != null && popElapsedMs < SNAP_GLOW_MS) {
     const cx = p.x + p.w / 2;
     const cy = p.y + p.h / 2;
     const radius = Math.max(p.w, p.h) * 0.55;
-    drawSnapGlow(ctx, cx, cy, radius, snapGlowAlpha(popElapsedMs));
+    const glowAlpha = snapGlowAlpha(popElapsedMs) * snapGlowPulse(popElapsedMs);
+    drawSnapGlow(ctx, cx, cy, radius, glowAlpha);
   }
 
   const preview = animState?.snapPreview;
@@ -95,13 +103,14 @@ export function drawPiece(
         : preview.inSnapRange
           ? 1.02
           : 0.78);
+    /* Snap confidence: clearer feedback when in range, still subtle when only near */
     const baseAlpha = preview.inSnapRange
-      ? 0.54
+      ? 0.62
       : preview.kind === "neighbor"
-        ? 0.26
-        : 0.22;
-    const veryCloseBoost = proximity > 0.82 ? ((proximity - 0.82) / 0.18) * 0.4 : 0;
-    let alpha = Math.min(0.95, baseAlpha * (0.2 + 0.8 * proximityEased) + veryCloseBoost);
+        ? 0.28
+        : 0.24;
+    const veryCloseBoost = proximity > 0.82 ? ((proximity - 0.82) / 0.18) * 0.38 : 0;
+    let alpha = Math.min(0.95, baseAlpha * (0.25 + 0.75 * proximityEased) + veryCloseBoost);
     const pulse = 0.92 + 0.08 * Math.sin(nowMs * 0.003);
     alpha *= pulse;
     drawSnapGlow(ctx, cx, cy, radius, alpha);
@@ -183,6 +192,7 @@ export function drawPiece(
       showWrongRotationHint,
       shakeElapsedMs,
       animState?.showClusterOutline,
+      piecePulseAlpha,
     );
     return;
   }
@@ -226,6 +236,7 @@ export function drawPiece(
       showWrongRotationHint,
       shakeElapsedMs,
       animState?.showClusterOutline,
+      piecePulseAlpha,
     );
     return;
   }
@@ -243,7 +254,12 @@ export function drawPiece(
   ctx.translate(-p.w / 2, -p.h / 2);
 
   drawSilhouetteShadow(ctx, path, isDragging, p.isPlaced);
+  if (piecePulseAlpha < 1) {
+    ctx.save();
+    ctx.globalAlpha *= piecePulseAlpha;
+  }
   drawPieceImageInPath(ctx, path, img, rect, p);
+  if (piecePulseAlpha < 1) ctx.restore();
   strokePieceOutline(
     ctx,
     path,
@@ -262,13 +278,14 @@ export function drawPiece(
   ) {
     ctx.save();
     const proximityEased = 1 - (1 - preview.proximity) ** 2;
+    /* Outline strength increases with proximity for snap confidence */
     const outlineAlpha = preview.inSnapRange
-      ? 0.2 + 0.65 * proximityEased
-      : 0.12 + 0.5 * proximityEased;
+      ? 0.28 + 0.62 * proximityEased
+      : 0.14 + 0.52 * proximityEased;
     ctx.strokeStyle =
       preview.kind === "neighbor"
-        ? `rgba(162, 214, 255, ${Math.min(0.8, outlineAlpha)})`
-        : `rgba(255, 220, 130, ${Math.min(0.88, outlineAlpha)})`;
+        ? `rgba(162, 214, 255, ${Math.min(0.82, outlineAlpha)})`
+        : `rgba(255, 220, 130, ${Math.min(0.9, outlineAlpha)})`;
     ctx.lineWidth = preview.inSnapRange ? 6 : 5;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";

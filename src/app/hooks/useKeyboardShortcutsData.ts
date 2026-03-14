@@ -5,6 +5,8 @@ export const SHORTCUTS = [
   { keys: ["R"], action: "Rotate selected piece" },
   { keys: ["Shift+R"], action: "Rotate counter-clockwise" },
   { keys: ["↑ ↓ ← →"], action: "Move selected piece" },
+  { keys: ["Ctrl+Z", "⌘Z"], action: "Undo" },
+  { keys: ["Ctrl+Shift+Z", "⌘⇧Z", "Ctrl+Y", "⌘Y"], action: "Redo" },
   { keys: ["P"], action: "Toggle preview" },
   { keys: ["F"], action: "Fullscreen" },
   { keys: ["M"], action: "Mute / Unmute sound" },
@@ -20,6 +22,8 @@ export const SHORTCUT_GROUPS = [
     title: "Gameplay",
     shortcuts: [
       { keys: ["Space"], action: "Pause / Resume" },
+      { keys: ["Ctrl+Z", "⌘Z"], action: "Undo" },
+      { keys: ["Ctrl+Shift+Z", "⌘⇧Z"], action: "Redo" },
       { keys: ["P"], action: "Toggle preview" },
       { keys: ["N"], action: "New puzzle" },
       { keys: ["Esc"], action: "Close / Unpause" },
@@ -48,6 +52,6 @@ export const SHORTCUT_GROUPS = [
   {
     id: "help",
     title: "Help",
-    shortcuts: [{ keys: ["?"], action: "Show shortcuts" }],
+    shortcuts: [{ keys: ["?", "F1"], action: "Show shortcuts" }],
   },
 ] as const;

@@ -75,10 +75,8 @@ export function SetupScreen() {
       ? SAMPLE_PUZZLES
       : SAMPLE_PUZZLES.filter((p) => p.category === selectedCategory);
   const previewRef = useRef<HTMLDivElement>(null);
-  const { galleryRef, canScrollLeft, canScrollRight } = useSetupScreenGalleryScroll([
-    filteredPuzzles.length,
-    selectedCategory,
-  ]);
+  const { galleryRef, canScrollLeft, canScrollRight, scrollProgress } =
+    useSetupScreenGalleryScroll([filteredPuzzles.length, selectedCategory]);
 
   useEffect(() => {
     if (imgDataUrl && previewRef.current) {
@@ -172,6 +170,7 @@ export function SetupScreen() {
       galleryRef={galleryRef as import("react").RefObject<HTMLDivElement>}
       canScrollLeft={canScrollLeft}
       canScrollRight={canScrollRight}
+      galleryScrollProgress={scrollProgress}
       selectGalleryPuzzle={selectGalleryPuzzle}
       selectedPuzzle={selectedPuzzle}
       isLoading={isLoading}

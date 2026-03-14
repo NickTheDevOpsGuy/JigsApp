@@ -13,7 +13,6 @@ import {
   CompletionOverlayGate,
   PauseOverlay,
   ReplaySolveModal,
-  UndoRedoButtons,
 } from "@/screens/Play/components";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
 import { SnapComboMeter } from "@/screens/Play/components/hud/SnapComboMeter";
@@ -373,20 +372,6 @@ export function PlayScreenLayout({
               </div>
             </div>
           </div>
-          {tray.show && tray.showUndoRedo && (
-            <div
-              className={styles.boardControlsRow}
-              role="group"
-              aria-label="Board controls"
-            >
-              <UndoRedoButtons
-                canUndo={tray.canUndo}
-                onUndo={tray.onUndo}
-                canRedo={tray.canRedo}
-                onRedo={tray.onRedo}
-              />
-            </div>
-          )}
           {tray.show && (
             <div
               className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
@@ -423,19 +408,16 @@ export function PlayScreenLayout({
                   </button>
                 </div>
               )}
-              <div
-                className={`${styles.trayWrap} ${tray.isLargeTray ? styles.trayWrapLarge : ""}`}
-              >
-                <PieceTray
-                  key={tray.puzzleKey ?? undefined}
-                  ref={tray.trayRef as React.RefObject<HTMLDivElement>}
-                  pieces={tray.trayPieces}
-                  image={overlaysProps.previewImage}
-                  grid={tray.trayGrid}
-                  onPieceClick={tray.onTrayPieceClick}
-                  highlightedPieceIds={tray.highlightedPieceIds}
-                />
-              </div>
+              <PieceTray
+                key={tray.puzzleKey ?? undefined}
+                ref={tray.trayRef as React.RefObject<HTMLDivElement>}
+                pieces={tray.trayPieces}
+                image={overlaysProps.previewImage}
+                grid={tray.trayGrid}
+                onPieceClick={tray.onTrayPieceClick}
+                highlightedPieceIds={tray.highlightedPieceIds}
+                className={tray.isLargeTray ? styles.trayWrapLarge : undefined}
+              />
             </div>
           )}
         </div>

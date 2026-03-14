@@ -69,6 +69,11 @@ export function HeaderMenuSubmenuPanel({
               {SUBMENU_DESCRIPTIONS.pieceShape}
             </p>
           )}
+          {activeSubMenu === "moves" && (
+            <p className={styles.headerMenuSubmenuHint}>
+              {SUBMENU_DESCRIPTIONS.moves}
+            </p>
+          )}
         </div>
       )}
       {activeSubMenu === "about" && (

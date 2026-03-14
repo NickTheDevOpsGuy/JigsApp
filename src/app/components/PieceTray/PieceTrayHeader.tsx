@@ -25,22 +25,18 @@ export function PieceTrayHeader({
 }: PieceTrayHeaderProps) {
   return (
     <div className={styles.header}>
-      <div className={styles.titleRow}>
-        <span className={styles.title}>Pieces ({pieceCount})</span>
-        <div className={styles.headerControls}>
-          <TrayFilterButton value={filter} onChange={setFilter} hasImage={hasImage} />
-          <button
-            type="button"
-            className={styles.randomBtn}
-            onClick={onShuffle}
-            disabled={pieceCount === 0}
-            aria-label="Randomize piece order"
-            title="Randomize order"
-          >
-            <Shuffle size={18} aria-hidden />
-          </button>
-        </div>
-      </div>
+      <span className={styles.title}>Pieces ({pieceCount})</span>
+      <TrayFilterButton value={filter} onChange={setFilter} hasImage={hasImage} />
+      <button
+        type="button"
+        className={styles.randomBtn}
+        onClick={onShuffle}
+        disabled={pieceCount === 0}
+        aria-label="Randomize piece order"
+        title="Randomize order"
+      >
+        <Shuffle size={18} aria-hidden />
+      </button>
     </div>
   );
 }

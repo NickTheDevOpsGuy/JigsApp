@@ -8,10 +8,10 @@ import type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/heade
 
 interface BaseSectionProps {
   hasSubMenuItems: (
-    id: "contribute" | "help" | "pieceShape" | "modes" | "manualControls" | "effects",
+    id: "contribute" | "help" | "pieceShape" | "modes" | "manualControls" | "moves" | "effects",
   ) => boolean;
   setActiveSubMenu: (
-    id: "contribute" | "help" | "pieceShape" | "modes" | "manualControls" | "effects",
+    id: "contribute" | "help" | "pieceShape" | "modes" | "manualControls" | "moves" | "effects",
   ) => void;
 }
 
@@ -57,6 +57,19 @@ export function HeaderMenuControlsSection({
 }: BaseSectionProps) {
   return (
     <>
+      {hasSubMenuItems("moves") && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => setActiveSubMenu("moves")}
+          aria-label="Moves"
+          title={SUBMENU_DESCRIPTIONS.moves}
+        >
+          {SUB_MENU_LABELS.moves}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
+      )}
       {hasSubMenuItems("pieceShape") && (
         <button
           type="button"

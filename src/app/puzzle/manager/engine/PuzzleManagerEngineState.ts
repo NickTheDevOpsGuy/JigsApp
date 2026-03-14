@@ -59,6 +59,8 @@ export class PuzzleManagerState {
   protected readonly targetStartX: number;
   protected readonly targetStartY: number;
   protected readonly boardInset: number;
+  /** When position delta is below this (px), skip recomputing snap preview to reduce collision checks. */
+  protected lastSnapPreviewPiecePosition: { x: number; y: number } | null = null;
 
   constructor(options: PuzzleManagerOptions, events: PuzzleManagerEvents = {}) {
     const {

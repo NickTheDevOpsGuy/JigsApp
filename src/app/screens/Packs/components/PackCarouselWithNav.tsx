@@ -21,16 +21,17 @@ export function PackCarouselWithNav({ children }: PackCarouselWithNavProps) {
     const el = scrollRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
-    const maxScroll = scrollWidth - clientWidth;
-    if (maxScroll <= 0) {
+    const maxScroll = Math.max(0, scrollWidth - clientWidth);
+    const threshold = 2;
+    if (maxScroll <= threshold) {
       setScrollProgress(0);
       setCanScrollLeft(false);
       setCanScrollRight(false);
       return;
     }
     setScrollProgress(scrollLeft / maxScroll);
-    setCanScrollLeft(scrollLeft > 1);
-    setCanScrollRight(scrollLeft < maxScroll - 1);
+    setCanScrollLeft(scrollLeft > threshold);
+    setCanScrollRight(scrollLeft < maxScroll - threshold);
   }, []);
 
   useEffect(() => {
@@ -40,21 +41,30 @@ export function PackCarouselWithNav({ children }: PackCarouselWithNavProps) {
     el.addEventListener("scroll", updateScrollState);
     const ro = new ResizeObserver(updateScrollState);
     ro.observe(el);
+    const t1 = setTimeout(updateScrollState, 0);
+    const t2 = setTimeout(updateScrollState, 150);
+    const t3 = setTimeout(updateScrollState, 400);
     return () => {
       el.removeEventListener("scroll", updateScrollState);
       ro.disconnect();
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
     };
   }, [updateScrollState, children]);
 
   const scrollByOneCard = useCallback((direction: 1 | -1) => {
     const el = scrollRef.current;
     const track = trackRef.current;
-    if (!el || !track) return;
-    const firstCard = track.firstElementChild as HTMLElement | null;
-    const cardWidth = firstCard ? firstCard.offsetWidth : 280;
+    if (!el) return;
+    const firstCard = track?.firstElementChild as HTMLElement | null;
+    const cardWidth = firstCard?.offsetWidth ?? 280;
     const gap = 22;
-    const step = (cardWidth + gap) * direction;
-    el.scrollBy({ left: step, behavior: "smooth" });
+    const stepPx = Math.max(180, cardWidth + gap);
+    const step = stepPx * direction;
+    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + step));
+    el.scrollTo({ left: target, behavior: "smooth" });
   }, []);
 
   return (

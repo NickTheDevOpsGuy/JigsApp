@@ -95,25 +95,25 @@
 
 @media (min-width: 1400px) {
   .modal[data-variant="choosePuzzle"] {
-    max-width: min(96vw, 1200px);
+    max-width: min(96vw, 640px);
   }
 }
 
 @media (min-width: 1025px) and (max-width: 1399px) {
   .modal[data-variant="choosePuzzle"] {
-    max-width: min(96vw, 960px);
+    max-width: min(96vw, 560px);
   }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
   .modal[data-variant="choosePuzzle"] {
-    max-width: min(94vw, 720px);
+    max-width: min(94vw, 480px);
   }
 }
 
 @media (max-width: 640px) {
   .modal[data-variant="choosePuzzle"] {
-    max-width: min(100vw - 24px, 480px);
+    max-width: min(calc(100vw - 24px), 400px);
   }
 }
 
@@ -142,7 +142,7 @@
   }
 
   .modal[data-variant="choosePuzzle"] {
-    max-width: min(calc(100vw - 16px), 480px);
+    max-width: min(calc(100vw - 16px), 400px);
   }
 
   .header {

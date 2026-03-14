@@ -11,23 +11,23 @@ import { usePieceTrayScroll } from "./usePieceTrayScroll";
 import { usePieceTrayThumbs } from "./usePieceTrayThumbs";
 import styles from "./PieceTray.module.css";
 
-// Thumb sizes - smaller for more pieces so they all fit; mobile a touch larger for visibility
+// Tray piece size: desktop ~10–15% larger, mobile ~15–20% larger for easier see/grab
 function getThumbSize(pieceCount: number, isMobile: boolean): number {
   if (isMobile) {
-    if (pieceCount >= 64) return 44;
-    if (pieceCount >= 49) return 48;
-    if (pieceCount >= 36) return 52;
-    if (pieceCount >= 25) return 56;
-    if (pieceCount >= 16) return 62;
-    return 70;
+    if (pieceCount >= 64) return 70;
+    if (pieceCount >= 49) return 78;
+    if (pieceCount >= 36) return 84;
+    if (pieceCount >= 25) return 92;
+    if (pieceCount >= 16) return 100;
+    return 110;
   }
   // Desktop
-  if (pieceCount >= 64) return 40;
-  if (pieceCount >= 49) return 44;
-  if (pieceCount >= 36) return 48;
-  if (pieceCount >= 25) return 52;
-  if (pieceCount >= 16) return 56;
-  return 60;
+  if (pieceCount >= 64) return 55;
+  if (pieceCount >= 49) return 61;
+  if (pieceCount >= 36) return 67;
+  if (pieceCount >= 25) return 72;
+  if (pieceCount >= 16) return 78;
+  return 84;
 }
 
 type Props = {
@@ -36,6 +36,8 @@ type Props = {
   grid: { rows: number; cols: number };
   onPieceClick: (pieceId: string) => void;
   highlightedPieceIds?: Set<string>;
+  /** Optional class from layout (e.g. large tray variant) */
+  className?: string;
 };
 
 type TraySlot = { kind: "piece"; piece: Piece };
@@ -47,7 +49,7 @@ export function buildTraySlots(displayed: Piece[], totalSlots: number): TraySlot
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
-  { pieces, image, grid, onPieceClick, highlightedPieceIds },
+  { pieces, image, grid, onPieceClick, highlightedPieceIds, className },
   ref,
 ) {
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -66,19 +68,17 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const {
     scrollerRef,
     scrollProgress,
-    canScroll,
     canScrollLeft,
     canScrollRight,
-    scrollBy,
+    scrollByOnePiece,
   } = usePieceTrayScroll(traySlots.length);
   const thumbsById = usePieceTrayThumbs(displayed, image, grid, thumbSize, compact);
-  const likelyOverflows = traySlots.length >= 8;
 
   const emptyText = "Drag pieces here to store them";
 
   return (
     <div
-      className={`${styles.tray} ${compact ? styles.trayCompact : ""} ${extraCompact ? styles.trayExtraCompact : ""}`}
+      className={`${styles.tray} ${compact ? styles.trayCompact : ""} ${extraCompact ? styles.trayExtraCompact : ""} ${className ?? ""}`.trim()}
       ref={ref}
     >
       <PieceTrayHeader
@@ -89,7 +89,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         onShuffle={onShuffle}
       />
 
-      {traySlots.length > 0 && canScroll && (
+      {traySlots.length > 0 && (
         <div
           className={styles.scrollIndicator}
           role="progressbar"
@@ -106,20 +106,18 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       )}
 
       <div className={styles.scrollerWrap}>
-        {likelyOverflows && canScroll && (
-          <button
-            type="button"
-            className={styles.scrollBtn}
-            onClick={() => scrollBy(-180)}
-            disabled={!canScrollLeft}
-            aria-label="Scroll left"
-            title="Scroll left"
-          >
-            <ChevronLeft size={20} />
-          </button>
-        )}
+        <button
+          type="button"
+          className={styles.scrollBtn}
+          onClick={() => scrollByOnePiece(-1)}
+          disabled={!canScrollLeft}
+          aria-label="Scroll left"
+          title="Scroll left"
+        >
+          <ChevronLeft size={20} />
+        </button>
         <div
-          className={`${styles.scroller} ${traySlots.length > 0 && traySlots.length < 25 ? styles.scrollerSnap : ""}`}
+          className={`${styles.scroller} ${traySlots.length > 0 ? styles.scrollerSnap : ""}`}
           ref={scrollerRef}
           role="list"
         >
@@ -155,18 +153,16 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
             </div>
           )}
         </div>
-        {likelyOverflows && canScroll && (
-          <button
-            type="button"
-            className={styles.scrollBtn}
-            onClick={() => scrollBy(180)}
-            disabled={!canScrollRight}
-            aria-label="Scroll right"
-            title="Scroll right"
-          >
-            <ChevronRight size={20} />
-          </button>
-        )}
+        <button
+          type="button"
+          className={styles.scrollBtn}
+          onClick={() => scrollByOnePiece(1)}
+          disabled={!canScrollRight}
+          aria-label="Scroll right"
+          title="Scroll right"
+        >
+          <ChevronRight size={20} />
+        </button>
       </div>
     </div>
   );

@@ -33,7 +33,24 @@
     radial-gradient(1px 1px at 40% 25%, rgba(255, 255, 255, 0.7), transparent),
     radial-gradient(1.5px 1.5px at 30% 80%, rgba(255, 220, 150, 0.55), transparent);
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 0;
+  animation: overlayCelebrationStarsIn 0.5s ease-out 0.1s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlayCelebration::after {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+@keyframes overlayCelebrationStarsIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.85;
+  }
 }
 
 .panel {

@@ -67,7 +67,7 @@
 }
 
 .modal[data-variant="choosePuzzle"] {
-  max-width: min(96vw, 960px);
+  max-width: min(96vw, 560px);
   max-height: 90vh;
 }
 

@@ -23,6 +23,7 @@ export function SetupScreenShell(props: {
   galleryRef: React.RefObject<HTMLDivElement>;
   canScrollLeft: boolean;
   canScrollRight: boolean;
+  galleryScrollProgress: number;
   selectGalleryPuzzle: (p: import("@/data/packs/samplePuzzles").SamplePuzzle) => void;
   selectedPuzzle: import("@/data/packs/samplePuzzles").SamplePuzzle | null;
   isLoading: boolean;
@@ -65,6 +66,7 @@ export function SetupScreenShell(props: {
     galleryRef,
     canScrollLeft,
     canScrollRight,
+    galleryScrollProgress,
     selectGalleryPuzzle,
     selectedPuzzle,
     isLoading,
@@ -129,6 +131,7 @@ export function SetupScreenShell(props: {
               galleryRef={galleryRef}
               canScrollLeft={canScrollLeft}
               canScrollRight={canScrollRight}
+              galleryScrollProgress={galleryScrollProgress}
               selectGalleryPuzzle={selectGalleryPuzzle}
               selectedPuzzle={selectedPuzzle}
               isLoading={isLoading}

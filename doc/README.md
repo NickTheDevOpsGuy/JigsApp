@@ -1,39 +1,50 @@
-# Phuzzle documentation
+# Phuzzle docs
 
-This folder contains developer docs for Phuzzle.
+Developer documentation for Phuzzle. For project overview and setup, see the [main README](../README.md).
 
-## Setup guides
+---
 
-- `SUPABASE_SETUP.md` - Supabase setup for leaderboards, stats, achievements, and co-op
-- `LIGHTHOUSE.md` - Lighthouse CI setup and token troubleshooting
+## Setup
 
-## Architecture and mobile
+| Doc | What it covers |
+|-----|----------------|
+| [SUPABASE_SETUP.md](SUPABASE_SETUP.md) | Supabase: leaderboards, stats, co-op. Create project, env vars, migrations, Realtime. |
+| [LIGHTHOUSE.md](LIGHTHOUSE.md) | Lighthouse CI, where reports go, fixing the "GitHub token not set" warning. |
 
-- Main architecture and file/folder split notes live in [../README.md](../README.md) under **Internal structure (recent split)**.
-- Mobile/touch release checks live in [MOBILE_QA.md](MOBILE_QA.md).
-- Stats modal parity and cross-device checks live in [STATS_UI_QA.md](STATS_UI_QA.md).
-- Markdown lint config for docs lives at `/.markdownlint-cli2.jsonc`.
+---
 
-## Reference
+## Features & behavior
 
-- [BUG_REPORT.md](BUG_REPORT.md) - Bug report flow (About → Report a bug; mailto, screenshots)
-- [STREAK-FREEZE.md](STREAK-FREEZE.md) - Streak freeze (streak shield) behavior and storage keys
-- [SHARING.md](SHARING.md) - Completion share and co-op share flows
-- [CHANGES.md](CHANGES.md) - Full feature list and code structure
-- [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md) - Feature history and migrations
-- [MOBILE_QA.md](MOBILE_QA.md) - Real-device iPhone/Android checklist and release gate
-- [STATS_UI_QA.md](STATS_UI_QA.md) - Profile / Board / Badges parity checklist for mobile and desktop
+| Doc | What it covers |
+|-----|----------------|
+| [CHANGES.md](CHANGES.md) | Feature list and recent changes. |
+| [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md) | Implemented features (daily countdown, streak freeze, piece shapes, etc.) and where they live in code. |
+| [FUTURE.md](FUTURE.md) | Ideas and possible future features. |
+| [SHARING.md](SHARING.md) | Completion share (image + result) and co-op share ("Play with friend"). |
+| [STREAK-FREEZE.md](STREAK-FREEZE.md) | Streak freeze (streak shield): how you earn it, when it applies, storage keys. |
+| [BUG_REPORT.md](BUG_REPORT.md) | In-app bug report: where it is, what it does, main files. |
 
-## Future ideas
+---
 
-- [FUTURE.md](FUTURE.md) - Planned and brainstormed features
+## QA & testing
+
+| Doc | What it covers |
+|-----|----------------|
+| [MOBILE_QA.md](MOBILE_QA.md) | Mobile release checklist: devices, core flows, safe areas, regression commands. |
+| [STATS_UI_QA.md](STATS_UI_QA.md) | Stats modal QA: Profile, Board, Badges on mobile and desktop. |
+
+---
 
 ## Session notes
 
-- [SESSION_2025-03-06.md](SESSION_2025-03-06.md) - Replay modal, Back to Results, focus return, target glow, completion snapshot, pause vs win screen
-- [SESSION_SUMMARY.md](SESSION_SUMMARY.md) - Development session summary (long form)
+| Doc | What it covers |
+|-----|----------------|
+| [SESSION_SUMMARY.md](SESSION_SUMMARY.md) | Session summary (layout, piece drawer, input, leaderboards, etc.). |
+
+---
 
 ## Quick links
 
-- Main README: [../README.md](../README.md) — overview, getting started, **file/folder structure** (expandable tree)
-- Supabase migrations: `supabase/migrations/`
+- **Main README:** [../README.md](../README.md) — overview, getting started, file structure.
+- **Supabase migrations:** `supabase/migrations/`
+- **Markdown lint config:** `/.markdownlint-cli2.jsonc`

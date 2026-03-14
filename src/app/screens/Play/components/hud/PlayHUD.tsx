@@ -1,9 +1,9 @@
 /**
  * PlayHUD – timer, move count, placed/total with puzzle icon (top bar center).
- * Speedrun: quadrant timers; Time Attack: lives.
+ * Pause button toggles game pause. Speedrun: quadrant timers; Time Attack: lives.
  */
 import React from "react";
-import { Clock, Heart, Puzzle } from "lucide-react";
+import { Clock, Heart, Pause, Play, Puzzle } from "lucide-react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import type { TimeMode } from "@/screens/Play/core/time/timeMode";
@@ -26,6 +26,8 @@ interface PlayHUDProps {
   zenModeEnabled?: boolean;
   /** Adaptive Personality: competitive = snappier copy; calm = softer copy */
   uiTone?: "competitive" | "calm";
+  /** Layout slot: left = timer/moves/pieces (board edge); center = pause only */
+  slot?: "left" | "center";
 }
 
 const QUAD_LABELS = ["TL", "TR", "BL", "BR"] as const;
@@ -42,17 +44,18 @@ export function PlayHUD({
   moveCount,
   piecesLeft,
   totalPieces,
-  isPaused: _isPaused,
-  isComplete: _isComplete,
+  isPaused,
+  isComplete,
   timeMode,
   countdownMinutes = 10,
   bestTimeSeconds,
   quadrantTimes,
   quadrantPbs,
   lives,
-  onTogglePause: _onTogglePause,
+  onTogglePause,
   zenModeEnabled,
   uiTone,
+  slot,
 }: PlayHUDProps) {
   const placedCount = Math.max(0, totalPieces - piecesLeft);
   const showTimer = !zenModeEnabled && timeMode !== "relaxed";
@@ -62,12 +65,32 @@ export function PlayHUD({
   const countdownTotal = countdownMinutes * 60;
   const isLowTime = isCountdown && elapsedSeconds > 0 && elapsedSeconds <= 60;
 
+  const showPause = !zenModeEnabled && !isComplete && timeMode !== "relaxed";
+
+  const showLeft = slot === undefined || slot === "left";
+  const showCenter = slot === undefined || slot === "center";
+
   return (
     <div
       className={`${styles.hud} ${uiTone === "competitive" ? styles.hudCompetitive : ""} ${uiTone === "calm" ? styles.hudCalm : ""}`}
       data-ui-tone={uiTone ?? undefined}
     >
-      {isSpeedrun && quadrantTimes && (
+      {showCenter && showPause && (
+        <button
+          type="button"
+          className={styles.hudPillPause}
+          onClick={onTogglePause}
+          aria-label={isPaused ? "Resume" : "Pause"}
+          title={isPaused ? "Resume game" : "Pause game"}
+        >
+          {isPaused ? (
+            <Play size={18} aria-hidden />
+          ) : (
+            <Pause size={18} aria-hidden />
+          )}
+        </button>
+      )}
+      {showLeft && isSpeedrun && quadrantTimes && (
         <div className={styles.quadrantTimers}>
           {([0, 1, 2, 3] as const).map((q) => {
             const t = quadrantTimes[q];
@@ -85,7 +108,7 @@ export function PlayHUD({
           })}
         </div>
       )}
-      {isTimeAttack && lives != null && (
+      {showLeft && isTimeAttack && lives != null && (
         <div className={styles.hudPillTimer} title="Lives remaining">
           {[1, 2, 3].map((i) => (
             <Heart
@@ -98,7 +121,7 @@ export function PlayHUD({
           ))}
         </div>
       )}
-      {showTimer && !isSpeedrun && !isTimeAttack && (
+      {showLeft && showTimer && !isSpeedrun && !isTimeAttack && (
         <div
           className={`${styles.hudPillTimer} ${isLowTime ? styles.timerLow : ""}`}
           title={
@@ -107,7 +130,7 @@ export function PlayHUD({
               : "Elapsed time"
           }
         >
-          <Clock size={14} />
+          <Clock size={16} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
           {isCountdown && (
             <span className={styles.timerSuffix}>/ {formatTime(countdownTotal)}</span>
@@ -117,13 +140,13 @@ export function PlayHUD({
           )}
         </div>
       )}
-      {showTimer && (isSpeedrun || isTimeAttack) && (
+      {showLeft && showTimer && (isSpeedrun || isTimeAttack) && (
         <div className={styles.hudPillTimer} title="Elapsed time (speedrun)">
-          <Clock size={14} />
+          <Clock size={16} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
         </div>
       )}
-      {!isSpeedrun && !isTimeAttack && (
+      {showLeft && !isSpeedrun && !isTimeAttack && (
         <>
           <div
             className={styles.hudMoveCount}
@@ -142,7 +165,7 @@ export function PlayHUD({
             <span className={styles.hudPlacedTotalText}>
               {placedCount}/{totalPieces}
             </span>
-            <Puzzle size={14} className={styles.hudPlacedTotalIcon} aria-hidden />
+            <Puzzle size={16} className={styles.hudPlacedTotalIcon} aria-hidden />
           </div>
         </>
       )}

@@ -1,13 +1,13 @@
 /* Fog: per-piece clarity on board (canvas); global fog on preview + tray only */
 .modifierFog .previewPanel,
-.modifierFog .trayWrap {
+.modifierFog .trayArea .tray {
   filter: contrast(calc(1 - var(--fog-strength, 0)))
     brightness(calc(1 - var(--fog-strength, 0) * 0.45));
 }
 
 .modifierNight .board,
 .modifierNight .previewPanel,
-.modifierNight .trayWrap {
+.modifierNight .trayArea .tray {
   filter: brightness(0.72) saturate(0.82);
 }
 
@@ -25,7 +25,7 @@
 
 .modifierSepia .board,
 .modifierSepia .previewPanel,
-.modifierSepia .trayWrap {
+.modifierSepia .trayArea .tray {
   filter: sepia(0.78) saturate(0.75) contrast(1.05);
 }
 

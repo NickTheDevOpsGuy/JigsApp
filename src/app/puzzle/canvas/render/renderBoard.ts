@@ -166,16 +166,32 @@ export function renderBoard(
     if (active && !active.inTray) {
       const cx = active.targetX - active.pad + active.w / 2;
       const cy = active.targetY - active.pad + active.h / 2;
-      const radius = Math.max(active.w, active.h) * 0.55;
+      const radius = Math.max(active.w, active.h) * 0.58;
       const proximity = Math.max(0, snapPreview.proximity ?? 0);
       const proximityEased = 1 - (1 - proximity) ** 3;
       const inRange = snapPreview.inSnapRange === true;
-      const veryCloseBoost = proximity > 0.82 ? ((proximity - 0.82) / 0.18) * 0.55 : 0;
+      const veryCloseBoost = proximity > 0.82 ? ((proximity - 0.82) / 0.18) * 0.5 : 0;
+      /* Faint highlight where piece will snap; stronger when in range for confidence */
       const alpha = inRange
-        ? Math.min(1, 0.06 + 0.35 * proximityEased + veryCloseBoost)
-        : Math.min(0.5, 0.04 + 0.2 * proximityEased);
+        ? Math.min(1, 0.1 + 0.42 * proximityEased + veryCloseBoost)
+        : Math.min(0.55, 0.06 + 0.28 * proximityEased);
       drawTargetSlotGlow(ctx, cx, cy, radius, alpha, nowMs);
     }
+  }
+
+  /* Fade highlight once placed: brief glow at just-snapped position */
+  const PLACED_GLOW_MS = 280;
+  for (const p of state.pieces) {
+    if (p.inTray) continue;
+    const lockAt = lockMap.get(p.id);
+    if (lockAt == null) continue;
+    const elapsed = nowMs - lockAt;
+    if (elapsed >= PLACED_GLOW_MS) continue;
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const radius = Math.max(p.w, p.h) * 0.55;
+    const alpha = 0.26 * (1 - elapsed / PLACED_GLOW_MS);
+    drawTargetSlotGlow(ctx, cx, cy, radius, alpha, nowMs);
   }
 
   /* Hover: edge highlight glow on potential snap targets (empty slots adjacent to placed). */

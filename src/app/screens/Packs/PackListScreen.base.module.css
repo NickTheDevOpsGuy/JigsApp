@@ -69,8 +69,8 @@
 .stepIndicator {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.7rem;
+  gap: 6px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text-secondary);
   flex-shrink: 0;
@@ -86,7 +86,7 @@
 
 .stepSeparator {
   opacity: 0.6;
-  font-size: 0.65rem;
+  font-size: 0.8rem;
 }
 
 .backBtn {

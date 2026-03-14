@@ -85,9 +85,11 @@
   cursor: not-allowed;
 }
 
+/* Left-to-right horizontal scroll; start snap = full cards, no half-draw; padding = guard rails */
 .packScrollViewport {
   flex: 1 1 auto;
   min-width: 0;
+  direction: ltr;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
@@ -123,11 +125,13 @@
 
 .carousel {
   display: flex;
+  flex-wrap: nowrap;
   gap: 22px;
   padding: 8px 20px 12px;
   width: max-content;
   min-height: 0;
   box-sizing: border-box;
+  direction: ltr;
 }
 
 .carousel::-webkit-scrollbar {
@@ -153,7 +157,7 @@
     transform 120ms ease,
     box-shadow 120ms ease,
     border-color 120ms ease;
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   scroll-snap-stop: always;
   flex-shrink: 0;
 }

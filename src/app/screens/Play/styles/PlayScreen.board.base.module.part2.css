@@ -42,7 +42,7 @@
 }
 
 .boardWrapper {
-  width: min(95vw, 520px);
+  width: var(--play-board-tray-width, min(98vw, 760px));
   max-width: 100%;
   aspect-ratio: 1 / 1;
   max-height: 100%;
@@ -52,7 +52,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   position: relative;
   z-index: 105;
   touch-action: manipulation;
@@ -78,8 +78,8 @@
   --progress: 0;
   --progress-color: var(--color-progress-75, #22c55e);
   position: relative;
-  padding: 8px;
-  border-radius: calc(var(--radius-board, 16px) + 8px);
+  padding: 4px;
+  border-radius: calc(var(--radius-board, 16px) + 4px);
   background: conic-gradient(
     from -90deg,
     var(--progress-color) 0deg,
@@ -97,8 +97,8 @@
 }
 
 .boardProgressFrame:not([style]) {
-  padding: 8px;
-  border-radius: calc(var(--radius-board, 16px) + 8px);
+  padding: 4px;
+  border-radius: calc(var(--radius-board, 16px) + 4px);
   background: var(--color-border);
 }
 
@@ -114,8 +114,9 @@
   }
 }
 
+/* Board surface: physical puzzle mat – texture, soft inner shadow, faint vignette */
 .board {
-  width: min(95vw, 520px);
+  width: 100%;
   aspect-ratio: 1 / 1;
   max-width: 100%;
   max-height: 100%;
@@ -130,37 +131,55 @@
   box-shadow:
     0 24px 48px rgba(2, 7, 18, 0.34),
     0 8px 18px rgba(4, 10, 25, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 4px 16px rgba(0, 0, 0, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
   overflow: hidden;
 }
 
+/* Subtle texture gradient – mat surface; light top-left to soft shadow bottom-right */
 .board::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.06), transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(0, 0, 0, 0.08)),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      transparent 35%,
+      transparent 65%,
+      rgba(0, 0, 0, 0.06) 100%
+    ),
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 55%),
     repeating-linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.015) 0,
-      rgba(255, 255, 255, 0.015) 2px,
+      rgba(255, 255, 255, 0.012) 0,
+      rgba(255, 255, 255, 0.012) 2px,
       transparent 2px,
       transparent 8px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent 0,
+      transparent 6px,
+      rgba(0, 0, 0, 0.015) 6px,
+      rgba(0, 0, 0, 0.015) 7px
     );
-  mix-blend-mode: screen;
-  opacity: 0.75;
+  mix-blend-mode: overlay;
+  opacity: 0.85;
 }
 
+/* Faint vignette toward edges – mat recedes at border */
 .board::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: radial-gradient(
-    circle at center,
-    transparent 58%,
-    rgba(0, 0, 0, 0.16) 100%
+    ellipse 95% 95% at 50% 50%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.08) 78%,
+    rgba(0, 0, 0, 0.2) 100%
   );
 }

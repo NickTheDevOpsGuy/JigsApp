@@ -3,6 +3,9 @@ import { renderBoard } from "@/puzzle/canvas/render/renderBoard";
 import { SHOW_DEBUG } from "@/screens/Play/core/utils/playScreenUtils";
 import {
   IDLE_MIN_INTERVAL_MS,
+  IDLE_MIN_INTERVAL_MS_LARGE,
+  LARGE_PUZZLE_PIECE_COUNT,
+  LOCK_LERP_MS,
   getHighPieceCountThreshold,
   IDLE_GHOST_MS,
 } from "@/screens/Play/hooks/animation/usePlayScreenAnimationConstants";
@@ -103,11 +106,26 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       const inCompletionFlourish = completionElapsed < 800;
       const pieceCount = st.pieces.length;
       const reducedMotion = reduceMotionRef.current;
+      const lockMap = lockMapRef.current ?? new Map<string, number>();
+      const hasActiveLockLerp = [...lockMap.entries()].some(
+        ([, lockAt]) => now - lockAt < LOCK_LERP_MS,
+      );
+      const snapParticles = snapParticlesRef?.current ?? [];
+      const SNAP_PARTICLE_MS = 520;
+      const hasActiveSnapParticles = snapParticles.some((p) => now - p.t0 < SNAP_PARTICLE_MS);
       const throttleIdle =
-        pieceCount >= HIGH_PIECE_COUNT_THRESHOLD && !isDragging && !inCompletionFlourish;
+        pieceCount >= HIGH_PIECE_COUNT_THRESHOLD &&
+        !isDragging &&
+        !inCompletionFlourish &&
+        !hasActiveLockLerp &&
+        !hasActiveSnapParticles;
+      const useLargePuzzleInterval =
+        throttleIdle && pieceCount >= LARGE_PUZZLE_PIECE_COUNT;
       const minFrameIntervalMs = reducedMotion
         ? Math.max(IDLE_MIN_INTERVAL_MS, 28)
-        : IDLE_MIN_INTERVAL_MS;
+        : useLargePuzzleInterval
+          ? IDLE_MIN_INTERVAL_MS_LARGE
+          : IDLE_MIN_INTERVAL_MS;
       if (throttleIdle && now - lastFrameTimeRef.current < minFrameIntervalMs) {
         rafRef.current = requestAnimationFrame(tick);
         return;
@@ -167,7 +185,6 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       });
 
       const popMap = popMapRef.current ?? new Map<string, number>();
-      const lockMap = lockMapRef.current ?? new Map<string, number>();
 
       const lockLerpOverrides = buildLockLerpOverrides({
         st,
@@ -190,7 +207,6 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       });
 
       const pieceCache = pieceCacheRef.current;
-      const snapParticles = snapParticlesRef?.current ?? [];
       const hint = wrongRotationHintRef?.current;
       const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
       const snapPreview =

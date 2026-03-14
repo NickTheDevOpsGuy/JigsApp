@@ -17,23 +17,25 @@
   min-height: 36px;
 }
 
-/* Visual "you are here" scroll position indicator */
+/* Blue scroll progress bar (match Choose Puzzle / Packs) */
 .scrollIndicator {
   flex-shrink: 0;
-  height: 4px;
-  background: var(--color-bg-secondary);
-  border-radius: 4px;
+  height: 6px;
+  background: rgba(26, 43, 74, 0.6);
+  border-radius: 999px;
   overflow: hidden;
-  margin: 0 12px 8px;
+  margin: 0 12px 6px;
 }
 
 .scrollIndicatorFill {
   height: 100%;
   background: var(--color-brand-primary);
-  border-radius: 3px;
-  transition: width 0.1s ease-out;
+  border-radius: inherit;
+  box-shadow: 0 0 10px rgba(11, 99, 184, 0.4);
+  transition: width 0.15s ease-out;
 }
 
+/* Piece rail: single horizontal scroll container, no inner card styling */
 .scrollerWrap {
   flex: 1;
   display: flex;
@@ -41,7 +43,7 @@
   gap: 6px;
   min-width: 0;
   overflow: hidden;
-  padding: 0 4px;
+  padding: 0 4px 8px;
 }
 
 .scrollBtn {
@@ -81,15 +83,14 @@
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  /* Hard-stop horizontal edges; no blank rubber-band runout beyond first/last piece. */
   overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
-  /* Minimal right padding so scroll doesn't show big blank past last piece */
   scroll-padding-inline-end: 0;
-  padding: 8px 12px;
+  padding: 6px 12px;
   padding-inline-end: 12px;
   display: flex;
   align-items: center;
+  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -114,14 +115,14 @@
   background: var(--scrollbar-thumb-hover);
 }
 
+/* Snap so pieces align cleanly; no partially visible pieces when scroll stops */
 .scrollerSnap {
   scroll-snap-type: x mandatory;
   scroll-snap-stop: always;
-  scroll-padding-inline: 0;
-  scroll-behavior: smooth;
+  scroll-padding-inline: 12px;
 }
 
-/* Width fits content only so scroll doesn't show blank space past last piece */
+/* Consistent spacing between pieces; width fits content for clean scroll end */
 .row {
   display: flex;
   gap: 8px;
@@ -130,6 +131,7 @@
   min-width: max-content;
   flex: 0 0 auto;
   box-sizing: border-box;
+  padding-inline: 0;
 }
 
 .scrollerSnap .pieceButton {
@@ -180,11 +182,15 @@
   transform: scale(0.98);
 }
 
+/* Mobile: comfortable tap targets for pieces (min 48px for easy tap) */
 @media (pointer: coarse) {
   .segment button,
-  .scrollBtn,
-  .pieceButton {
+  .scrollBtn {
     min-height: 44px;
+  }
+  .pieceButton {
+    min-height: 48px;
+    min-width: 48px;
   }
 }
 

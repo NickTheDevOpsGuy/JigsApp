@@ -3,10 +3,41 @@
   outline-offset: 2px;
 }
 
-/* Puzzle complete – plain text, not a button */
+/* Puzzle complete – plain text, not a button; subtle star accents */
 .completeTitleBlock {
   margin: 0 auto;
   text-align: center;
+  position: relative;
+}
+
+.completeTitleBlock::before,
+.completeTitleBlock::after {
+  content: "✦";
+  position: absolute;
+  top: 50%;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--color-brand-primary) 70%, white);
+  opacity: 0;
+  animation: completeStarTwinkle 1s ease-out both;
+  pointer-events: none;
+}
+
+.completeTitleBlock::before {
+  left: 0.5rem;
+  animation-delay: 0.25s;
+}
+
+.completeTitleBlock::after {
+  right: 0.5rem;
+  animation-delay: 0.45s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeTitleBlock::before,
+  .completeTitleBlock::after {
+    animation: none;
+    opacity: 0.35;
+  }
 }
 
 @keyframes completeTitlePop {

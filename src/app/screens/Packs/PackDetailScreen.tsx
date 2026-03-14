@@ -33,9 +33,10 @@ export function PackDetailScreen() {
     const el = scrollRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
-    const maxScroll = scrollWidth - clientWidth;
-    setCanScrollLeft(scrollLeft > 2);
-    setCanScrollRight(scrollLeft < maxScroll - 2);
+    const maxScroll = Math.max(0, scrollWidth - clientWidth);
+    const threshold = 2;
+    setCanScrollLeft(maxScroll > threshold && scrollLeft > threshold);
+    setCanScrollRight(maxScroll > threshold && scrollLeft < maxScroll - threshold);
     setScrollProgress(maxScroll <= 0 ? 0 : scrollLeft / maxScroll);
   }, []);
 
@@ -58,24 +59,33 @@ export function PackDetailScreen() {
   const scrollByOneCard = (direction: 1 | -1) => {
     const el = scrollRef.current;
     const grid = gridRef.current;
-    if (!el || !grid) return;
-    const first = grid.firstElementChild as HTMLElement | null;
-    const cardWidth = first ? first.offsetWidth : 180;
+    if (!el) return;
+    const first = grid?.firstElementChild as HTMLElement | null;
+    const cardWidth = first?.offsetWidth ?? 180;
     const gap = 20;
-    el.scrollBy({ left: (cardWidth + gap) * direction, behavior: "smooth" });
+    const stepPx = Math.max(120, cardWidth + gap);
+    const step = stepPx * direction;
+    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + step));
+    el.scrollTo({ left: target, behavior: "smooth" });
   };
 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const raf = requestAnimationFrame(() => updateScrollState());
+    updateScrollState();
     el.addEventListener("scroll", updateScrollState);
     const ro = new ResizeObserver(updateScrollState);
     ro.observe(el);
+    const t1 = setTimeout(updateScrollState, 0);
+    const t2 = setTimeout(updateScrollState, 150);
+    const t3 = setTimeout(updateScrollState, 400);
     return () => {
-      cancelAnimationFrame(raf);
       el.removeEventListener("scroll", updateScrollState);
       ro.disconnect();
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
     };
   }, [packId, packsData, updateScrollState]);
 

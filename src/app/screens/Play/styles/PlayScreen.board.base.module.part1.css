@@ -1,11 +1,13 @@
-/* Layout: board on top, board controls, tray. Spacing scale: 4,8,12,16,24,32 */
+/* Layout: minimal HUD–board gap; tray attached to bottom of board, same width */
 .playBody {
+  --play-board-tray-width: min(98vw, 760px);
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 0;
+  padding-top: 0;
   position: relative;
 }
 
@@ -13,49 +15,48 @@
   flex: 1;
   min-height: 0;
   width: 100%;
-  max-width: min(95vw, 520px);
+  max-width: min(98vw, 1280px);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* Tray area: same width as board, attached directly below it */
 .playBody .trayArea {
-  width: 100%;
-  max-width: min(95vw, 520px);
+  width: var(--play-board-tray-width);
+  max-width: var(--play-board-tray-width);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  align-self: center;
+  flex-shrink: 0;
 }
 
-/* Tray: desktop max 180px; mobile max 22vh per spec */
-.playBody .trayWrap {
-  flex-shrink: 0;
-  width: 100%;
-  max-width: 100%;
+/* Tray (PieceTray root) is the single card; layout only – one surface, one border, one radius in component */
+.playBody .trayArea .tray {
+  flex: 1;
+  min-width: 0;
   max-height: 180px;
   height: 180px;
 }
 
-.playBody .trayWrap.trayWrapLarge {
+.playBody .trayArea .tray.trayWrapLarge {
   max-height: 180px;
   height: 180px;
 }
 
 @media (max-width: 600px) {
   .playBody .main {
-    max-width: min(95vw, 520px);
+    max-width: min(98vw, 1280px);
     min-height: 50dvh;
   }
 
-  .playBody .trayWrap {
+  .playBody .trayArea .tray {
     max-height: 22vh;
     height: 22vh;
-    padding: 0 0 12px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
-    align-self: center;
   }
 
-  .playBody .trayWrap.trayWrapLarge {
+  .playBody .trayArea .tray.trayWrapLarge {
     max-height: 22vh;
     height: 22vh;
   }
@@ -67,8 +68,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 8px;
+  gap: 0;
+  padding: 0;
 }
 
 .loadingOverlay {

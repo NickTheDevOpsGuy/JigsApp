@@ -80,20 +80,21 @@
   }
 }
 
-/* Drag preview overlay - piece floats on top when dragging to tray */
+/* Drag preview overlay – scale up when picked up, stronger shadow for tactile feel */
 .dragPreview {
   position: fixed;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(1.04);
   will-change: transform;
+  transition: transform 0.12s ease-out;
 }
 
 .dragPreview img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.4)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
   image-rendering: auto;
   will-change: transform, filter;
 }

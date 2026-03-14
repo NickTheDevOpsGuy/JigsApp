@@ -1,96 +1,101 @@
-# Stats UI QA Checklist
+# Stats UI QA checklist
 
-Manual parity pass for the Phuzzle stats modal on mobile and desktop.
+Manual pass for the Stats modal on mobile and desktop.
+
+---
 
 ## Coverage
 
-- Profile
-- Board / leaderboards
-- Badges
+- Profile, Board (leaderboards), Badges
 - Settings inside Profile
-- Shared modal shell, header, tabs, empty states, and scroll behavior
+- Modal shell: header, tabs, empty states, scroll
 
-## Devices and viewports
+---
 
-- iPhone SE or equivalent narrow phone
-- iPhone 13/14/15 class phone
-- Pixel-class Android phone
-- iPad or small tablet portrait
-- Narrow desktop window around 520px to 768px
-- Standard desktop width
+## Devices / viewports
+
+- iPhone SE or similar narrow phone
+- iPhone 13/14/15 class
+- Pixel-class Android
+- iPad or small tablet (portrait)
+- Desktop 520px–768px and full width
+
+---
 
 ## Modal shell
 
-- Modal opens centered on desktop and feels screen-native on phone.
-- Header does not waste vertical space.
-- Close button stays visible at all supported sizes.
-- Long content scrolls inside the modal body, not the page behind it.
-- Reopen the modal after closing; scroll position and layout reset correctly.
+- Opens centered on desktop; feels native on phone.
+- Header compact; close button always visible.
+- Long content scrolls inside the modal only.
+- Reopen modal: scroll and layout reset.
 
-## Top tabs
+---
 
-- `Profile`, `Board`, and `Badges` remain on one row at normal widths.
-- On narrow widths, tabs remain readable and horizontally usable without broken wrapping.
-- Active tab state is obvious on both desktop and mobile.
-- Board progress pill remains visually attached to the tab.
-- Switching tabs preserves expected state without clipping or jumpy scroll.
+## Tabs (Profile, Board, Badges)
+
+- All three on one row at normal width.
+- Narrow: tabs still readable and usable; no broken wrap.
+- Active tab clearly indicated.
+- Board progress pill stays with the tab.
+- Switching tabs: no clipping or jumpy scroll.
+
+---
 
 ## Profile
 
-- Name, tier, streak, and level read as one clear hero group.
-- Stats tiles are easy to scan on phone and desktop.
-- `See ranking` reads like a secondary action tied to the 4x4 stat.
-- Finished puzzles grid does not create large dead space when partially filled.
-- Daily Mastery bar and count stay aligned at all widths.
+- Name, tier, streak, level read as one hero block.
+- Stat tiles easy to scan.
+- “See ranking” reads as secondary action.
+- Finished puzzles grid: no big empty gap when partly filled.
+- Daily Mastery bar and count aligned at all widths.
 
-## Settings
+---
 
-- Settings expansion feels attached to Profile, not like a separate panel.
-- Display name field matches surrounding UI density and spacing.
-- Checkbox row remains tappable and aligned.
-- Save action is reachable without awkward extra scroll on phones.
-- Expanded and collapsed states both look intentional.
+## Settings (inside Profile)
+
+- Feels part of Profile, not a separate panel.
+- Display name field matches UI density.
+- Checkbox row tappable and aligned.
+- Save reachable without excessive scroll on phone.
+
+---
 
 ## Board / leaderboard
 
-- `Today / Week / All-time / Efficiency` segmented control fits cleanly at all widths.
-- Sort control stays visually anchored to the segmented row.
-- Filters collapsed state shows a concise summary, not a vague placeholder.
-- Expanded filters remain readable on narrow screens and do not overlap.
-- All-time grid filter appears only for all-time.
-- Empty states feel polished and intentional, not placeholder text.
-- Current-user highlighting remains visible in all leaderboard modes.
+- Today / Week / All-time / Efficiency control fits at all widths.
+- Sort control anchored to that row.
+- Filters: collapsed shows a clear summary; expanded readable on narrow screens.
+- All-time grid filter only for all-time.
+- Empty states intentional, not placeholder.
+- Current user highlighted in all modes.
+
+---
 
 ## Badges
 
-- Badge list spacing matches Profile and Board.
-- Progress count is visible immediately.
-- Locked and unlocked states are easy to scan.
-- Long badge names and descriptions do not break alignment.
+- Spacing consistent with Profile and Board.
+- Progress count visible.
+- Locked vs unlocked easy to tell apart.
+- Long names/descriptions don’t break layout.
 
-## Cross-state parity
+---
 
-- Empty data
-- Partially filled profile
-- Fully populated profile
-- Long display name
-- Large leaderboard list
-- Locked-only badges
-- Mixed locked and unlocked badges
-- Settings open while switching tabs and returning
+## Cross-state
 
-## Input and accessibility smoke
+Check: empty data, partly filled profile, full profile, long display name, large leaderboard list, locked-only badges, mixed badges, settings open while switching tabs.
 
-- Mouse, touch, and keyboard all work for tabs, filters, sort, and settings.
-- `Escape` closes the modal on desktop.
-- Focus order is sane when tabbing.
-- Focus indicators remain visible on interactive controls.
-- Touch targets remain comfortable on phones.
-- Text remains readable at increased OS text size.
+---
 
-## Regression gate
+## Input and a11y
 
-Run before merge:
+- Mouse, touch, keyboard work for tabs, filters, sort, settings.
+- Escape closes modal on desktop.
+- Focus order sensible; focus visible on controls.
+- Touch targets comfortable; text readable at increased OS text size.
+
+---
+
+## Before merge
 
 ```bash
 npm run typecheck

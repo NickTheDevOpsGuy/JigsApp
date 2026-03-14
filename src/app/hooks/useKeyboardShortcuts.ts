@@ -139,6 +139,16 @@ export function useKeyboardShortcuts({
         e.preventDefault();
         action = "showHelp";
       }
+      // Ctrl+Z / Cmd+Z - Undo
+      else if (key === "z" && mod && !shift) {
+        e.preventDefault();
+        action = "undo";
+      }
+      // Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y / Cmd+Y - Redo
+      else if ((key === "z" && mod && shift) || (key === "y" && mod && !shift)) {
+        e.preventDefault();
+        action = "redo";
+      }
 
       if (action) {
         onAction(action);

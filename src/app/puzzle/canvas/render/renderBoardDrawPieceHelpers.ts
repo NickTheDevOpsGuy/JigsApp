@@ -7,9 +7,9 @@ import type { ImageSourceRect } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { DRAG_LIFT_PX } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { drawWrongRotationIcon, drawLockGlow } from "./renderBoardDrawOverlays";
 
-/** Outer stroke: separates pieces visually, tactile outline. */
-const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.5)";
-const OUTLINE_LINE_WIDTH = 2;
+/** Outer stroke: emphasizes classic jigsaw shape; rounded joins for natural tabs/sockets. */
+const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.48)";
+const OUTLINE_LINE_WIDTH = 1.75;
 
 function getPieceSurfaceVariation(piece: Piece): {
   brightness: number;
@@ -25,7 +25,8 @@ function getPieceSurfaceVariation(piece: Piece): {
 
 /**
  * Draw a soft drop shadow that follows the piece silhouette (path only).
- * Stronger when dragging so the piece feels elevated. Slight inner shadow simulates cardboard thickness.
+ * Idle: soft small shadow. Dragging: slightly larger shadow for lift. Placed: minimal shadow.
+ * Suggests cardboard thickness without heavy 3D.
  */
 export function drawSilhouetteShadow(
   ctx: CanvasRenderingContext2D,
@@ -37,25 +38,25 @@ export function drawSilhouetteShadow(
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   if (isDragging) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-    ctx.shadowBlur = 44;
-    ctx.shadowOffsetX = 14;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.52)";
+    ctx.shadowBlur = 36;
+    ctx.shadowOffsetX = 12;
     ctx.shadowOffsetY = 18;
     ctx.fillStyle = "rgba(0,0,0,0.4)";
     ctx.fill(path);
   } else if (!isPlaced) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.32)";
-    ctx.shadowBlur = 18;
-    ctx.shadowOffsetX = 4;
-    ctx.shadowOffsetY = 6;
-    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.26)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = "rgba(0,0,0,0.22)";
     ctx.fill(path);
   } else {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.1)";
-    ctx.shadowBlur = 3;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.08)";
+    ctx.shadowBlur = 2;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 1;
-    ctx.fillStyle = "rgba(0,0,0,0.12)";
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
     ctx.fill(path);
   }
   ctx.restore();
@@ -91,38 +92,40 @@ export function drawPieceImageInPath(
   );
   ctx.filter = "none";
 
-  /* Top bevel highlight – light from above, cardboard raised look */
+  /* Subtle bevel highlight – light from above; matte, not glossy */
   const topGlow = ctx.createLinearGradient(0, 0, 0, piece.h);
-  topGlow.addColorStop(0, "rgba(255,255,255,0.28)");
-  topGlow.addColorStop(0.12, "rgba(255,255,255,0.14)");
-  topGlow.addColorStop(0.4, "rgba(255,255,255,0)");
+  topGlow.addColorStop(0, "rgba(255,255,255,0.14)");
+  topGlow.addColorStop(0.06, "rgba(255,255,255,0.07)");
+  topGlow.addColorStop(0.38, "rgba(255,255,255,0)");
   ctx.fillStyle = topGlow;
   ctx.fill(path);
 
-  /* Bottom bevel – depth / cardboard thickness */
+  /* Faint inner bevel – slight depth; cardboard thickness */
   const bevelShade = ctx.createLinearGradient(0, 0, 0, piece.h);
   bevelShade.addColorStop(0, "rgba(0,0,0,0)");
-  bevelShade.addColorStop(0.6, "rgba(0,0,0,0.06)");
-  bevelShade.addColorStop(1, "rgba(0,0,0,0.22)");
+  bevelShade.addColorStop(0.6, "rgba(0,0,0,0.05)");
+  bevelShade.addColorStop(1, "rgba(0,0,0,0.14)");
   ctx.fillStyle = bevelShade;
   ctx.fill(path);
 
-  /* Inner rim – simulates cardboard edge thickness (subtle dark inside edge) */
-  ctx.save();
-  ctx.strokeStyle = "rgba(0,0,0,0.2)";
-  ctx.lineWidth = 2.5;
+  /* Edge shading: light top-left to dark bottom-right so tabs/sockets feel natural */
+  const edgeShade = ctx.createLinearGradient(0, 0, piece.w, piece.h);
+  edgeShade.addColorStop(0, "rgba(255,255,255,0.06)");
+  edgeShade.addColorStop(0.4, "rgba(0,0,0,0.05)");
+  edgeShade.addColorStop(1, "rgba(0,0,0,0.16)");
+  ctx.strokeStyle = edgeShade;
+  ctx.lineWidth = 1.8;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   ctx.stroke(path);
-  ctx.restore();
 
-  /* Soft edge highlight for tactile separation */
+  /* Soft outer edge – tactile separation; clean seams when placed */
   const edgeRim = ctx.createLinearGradient(0, 0, piece.w, piece.h);
-  edgeRim.addColorStop(0, "rgba(255,255,255,0.1)");
+  edgeRim.addColorStop(0, "rgba(255,255,255,0.08)");
   edgeRim.addColorStop(0.5, "rgba(255,255,255,0)");
-  edgeRim.addColorStop(1, "rgba(0,0,0,0.14)");
+  edgeRim.addColorStop(1, "rgba(0,0,0,0.1)");
   ctx.strokeStyle = edgeRim;
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.25;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   ctx.stroke(path);
@@ -145,8 +148,8 @@ export function strokePieceOutline(
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   if (isPlaced || locked) {
-    ctx.strokeStyle = "rgba(8, 16, 28, 0.16)";
-    ctx.lineWidth = 1.15;
+    ctx.strokeStyle = "rgba(8, 16, 28, 0.12)";
+    ctx.lineWidth = 1;
   } else if (isDragging) {
     ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
     ctx.lineWidth = OUTLINE_LINE_WIDTH;
@@ -192,6 +195,8 @@ export function drawCachedPiece(
   showWrongRotationHint: boolean = false,
   wrongRotationElapsedMs: number = 0,
   showClusterOutline?: boolean,
+  /** Soft pulse alpha (0.98–1) when piece just snapped; 1 = no pulse */
+  snapPulseAlpha: number = 1,
 ): void {
   ctx.save();
   let cx = p.x + p.w / 2 + shakeX;
@@ -214,7 +219,10 @@ export function drawCachedPiece(
   drawSilhouetteShadow(ctx, path, isDragging, p.isPlaced);
   ctx.restore();
 
+  if (snapPulseAlpha < 1) ctx.save();
+  if (snapPulseAlpha < 1) ctx.globalAlpha *= snapPulseAlpha;
   ctx.drawImage(cacheCanvas, 0, 0, cachePxW, cachePxH, 0, 0, cacheW, cacheH);
+  if (snapPulseAlpha < 1) ctx.restore();
 
   ctx.save();
   toPieceSpace(ctx, cacheW, cacheH, p);

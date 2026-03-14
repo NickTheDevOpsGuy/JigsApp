@@ -16,6 +16,7 @@ export const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   help: "Help",
   manualControls: "Controls",
   modes: "Modes",
+  moves: "Moves",
   navigation: "Navigate",
   pieceShape: "Piece Shape",
   share: "Share",
@@ -30,6 +31,7 @@ export const SUBMENU_PARENT: Partial<Record<SubMenuId, SubMenuId>> = {
   manualControls: "controls",
   modes: "controls",
   pieceShape: "controls",
+  moves: "controls",
 };
 
 export const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
@@ -44,6 +46,7 @@ export const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
   help: "How to play and keyboard shortcuts",
   manualControls: "Undo, redo, reset view, zoom",
   modes: "Drift, relaxed, deliberate detach, timer",
+  moves: "Undo and redo last moves",
   navigation: "Home and new puzzle",
   pieceShape: "Applies to next puzzle",
   share: "Play with a friend (co-op)",
@@ -56,8 +59,9 @@ export function getSubmenuDescription(id: SubMenuId): string {
   return SUBMENU_DESCRIPTIONS[id] ?? SUB_MENU_LABELS[id];
 }
 
-/** Settings submenus in alphabetical order by label (Advanced, Appearance, Assistance, Audio, …). */
+/** Settings submenus in order (Moves first, then alphabetical). */
 export const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
+  "moves", // Moves (undo/redo) – alpha
   "advanced", // Advanced
   "display", // Appearance
   "assistance", // Assistance

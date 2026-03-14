@@ -1,58 +1,52 @@
 # Lighthouse CI
 
-Lighthouse runs in CI on every PR (performance, accessibility, best practices). Reports are saved to `lhci-reports/`.
-
-This doc also explains the common "GitHub token not set" warning and how tokens map between GitHub Actions and LHCI.
-
-**Accessibility (a11y):** The app includes a **skip link** (“Skip to main content”) that is visually hidden until focused (keyboard Tab from top). It moves focus to `<main id="main">`, which wraps the primary content. This helps keyboard and screen reader users bypass repeated navigation. When auditing with Lighthouse or axe, the landmark and skip link should satisfy common a11y checks for “bypass blocks” and main content region.
+Lighthouse runs in CI on every PR (performance, accessibility, best practices). Reports go to `lhci-reports/`.
 
 ---
 
-## Token naming (what goes where)
+## “GitHub token not set” warning
 
-- `github.token` - A GitHub Actions expression (built-in context), not a secret name. Use `${{ github.token }}` to get the token value.
-- `GITHUB_TOKEN` - Environment variable automatically set by GitHub Actions in every job.
-- `LHCI_UPLOAD__GITHUB_TOKEN` - LHCI env var for `upload.githubToken`. Passing `${{ github.token }}` into this enables optional status checks when using LHCI upload modes that post back to GitHub.
-- `lighthouserc.cjs` - Reads `process.env.GITHUB_TOKEN || process.env.LHCI_GITHUB_APP_TOKEN`. In GitHub Actions, `GITHUB_TOKEN` is already set.
-
----
-
-## Fixing "GitHub token not set" warning
-
-### In CI (GitHub Actions)
-
-No extra setup is required. GitHub sets `GITHUB_TOKEN` automatically. The workflow may also pass:
+**In CI (GitHub Actions)**  
+Nothing extra. GitHub sets `GITHUB_TOKEN`. You can also set:
 
 ```yaml
 env:
   LHCI_UPLOAD__GITHUB_TOKEN: ${{ github.token }}
 ```
 
-That is redundant but explicit.
-
-### Local runs
-
-To remove the warning locally, set one of:
+**Locally**  
+To remove the warning:
 
 ```bash
-# Option 1: inline
+# Option 1
 LHCI_UPLOAD__GITHUB_TOKEN=ghp_xxx npx lhci autorun
 
-# Option 2: export in your shell
+# Option 2
 export LHCI_UPLOAD__GITHUB_TOKEN=ghp_xxx
 npx lhci autorun
 ```
 
-Token creation: GitHub -> Settings -> Developer settings -> Personal access tokens.
-
-Notes:
-
-- For filesystem output only, a token is not required.
-- A token is only used for optional GitHub status checks when using upload modes like `temporary-public-storage`.
+Create a token: GitHub → Settings → Developer settings → Personal access tokens.  
+For filesystem-only output you don’t need a token; it’s only for optional GitHub status checks (e.g. upload modes).
 
 ---
 
-## Where to find the output
+## Token names
 
-- Local: `./lhci-reports`
-- CI artifacts: the workflow uploads reports if configured to do so
+- `github.token` — GitHub Actions context value.
+- `GITHUB_TOKEN` — Env var set by GitHub Actions.
+- `LHCI_UPLOAD__GITHUB_TOKEN` — LHCI env var for upload; passing the token enables status checks.
+- `lighthouserc.cjs` reads `process.env.GITHUB_TOKEN` or `process.env.LHCI_GITHUB_APP_TOKEN`.
+
+---
+
+## Where output goes
+
+- **Local:** `./lhci-reports`
+- **CI:** Reports are uploaded as artifacts if the workflow is configured for it.
+
+---
+
+## Accessibility
+
+The app has a **skip link** (“Skip to main content”) that is hidden until focused (Tab from top). It moves focus to `<main id="main">`. This helps keyboard and screen reader users skip repeated nav. Lighthouse/axe “bypass blocks” and main landmark checks should pass.

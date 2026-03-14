@@ -38,8 +38,12 @@ export class PuzzleManagerInteractions extends PuzzleManagerActions {
     this.zCounter = result.zCounter;
   }
 
+  /** Min position delta (px) before recomputing snap preview; reduces collision checks on large puzzles. */
+  private static readonly SNAP_PREVIEW_THROTTLE_PX = 2.5;
+
   pointerMove(clientX: number, clientY: number, boardRect: DOMRect) {
-    this.drag = pointerMoveOp({
+    const prevPreview = this.drag.preview;
+    const newDrag = pointerMoveOp({
       clientX,
       clientY,
       boardRect,
@@ -48,6 +52,20 @@ export class PuzzleManagerInteractions extends PuzzleManagerActions {
       shiftGroup: this.shiftGroup.bind(this),
       computeSnapPreview: this.computeSnapPreview.bind(this),
     });
+    const active = this.findPiece(newDrag.activeId ?? "");
+    if (
+      active &&
+      this.lastSnapPreviewPiecePosition &&
+      Math.hypot(
+        active.x - this.lastSnapPreviewPiecePosition.x,
+        active.y - this.lastSnapPreviewPiecePosition.y,
+      ) < PuzzleManagerInteractions.SNAP_PREVIEW_THROTTLE_PX
+    ) {
+      this.drag = { ...newDrag, preview: prevPreview ?? newDrag.preview };
+    } else {
+      if (active) this.lastSnapPreviewPiecePosition = { x: active.x, y: active.y };
+      this.drag = newDrag;
+    }
   }
 
   pointerDownBoardSpace(pieceId: string, boardX: number, boardY: number) {
@@ -66,7 +84,8 @@ export class PuzzleManagerInteractions extends PuzzleManagerActions {
   }
 
   pointerMoveBoardSpace(boardX: number, boardY: number) {
-    this.drag = pointerMoveBoardSpaceOp({
+    const prevPreview = this.drag.preview;
+    const newDrag = pointerMoveBoardSpaceOp({
       boardX,
       boardY,
       drag: this.drag,
@@ -74,6 +93,20 @@ export class PuzzleManagerInteractions extends PuzzleManagerActions {
       shiftGroup: this.shiftGroup.bind(this),
       computeSnapPreview: this.computeSnapPreview.bind(this),
     });
+    const active = this.findPiece(newDrag.activeId ?? "");
+    if (
+      active &&
+      this.lastSnapPreviewPiecePosition &&
+      Math.hypot(
+        active.x - this.lastSnapPreviewPiecePosition.x,
+        active.y - this.lastSnapPreviewPiecePosition.y,
+      ) < PuzzleManagerInteractions.SNAP_PREVIEW_THROTTLE_PX
+    ) {
+      this.drag = { ...newDrag, preview: prevPreview ?? newDrag.preview };
+    } else {
+      if (active) this.lastSnapPreviewPiecePosition = { x: active.x, y: active.y };
+      this.drag = newDrag;
+    }
   }
 
   pointerUp() {
@@ -86,6 +119,7 @@ export class PuzzleManagerInteractions extends PuzzleManagerActions {
         this.clampAllBoardGroupsInsideBoardInterior.bind(this),
       recomputeDerivedState: this.recomputeDerivedState.bind(this),
     });
+    this.lastSnapPreviewPiecePosition = null;
   }
 
   protected override trySnapActiveGroupToBoard(): boolean {

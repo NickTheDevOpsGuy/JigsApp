@@ -130,12 +130,8 @@
   }
 
   .header {
-    padding: 6px 10px 8px 10px;
-    gap: 4px;
-  }
-
-  .titleRow {
-    min-height: 28px;
+    padding: 6px 10px 8px;
+    gap: 8px;
   }
 
   .randomBtn {
