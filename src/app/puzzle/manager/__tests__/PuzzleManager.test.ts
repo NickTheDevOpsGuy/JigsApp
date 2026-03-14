@@ -37,13 +37,27 @@ describe("PuzzleManager", () => {
     const manager = createManager();
     const piece = manager.getState().pieces[0];
     manager.movePieceFromTray(piece.id);
-    const moved = manager.getState().pieces.find((p) => p.id === piece.id)!;
+    let moved = manager.getState().pieces.find((p) => p.id === piece.id)!;
+
+    // Board magnet preview is only when rotation === 0; rotate to 0 first
+    while (moved.rotation !== 0) {
+      manager.rotateGroup(moved.id);
+      moved = manager.getState().pieces.find((p) => p.id === piece.id)!;
+    }
 
     manager.pointerDownBoardSpace(piece.id, moved.x + 10, moved.y + 10);
-    manager.pointerMoveBoardSpace(
-      moved.targetX + moved.pad - 14,
-      moved.targetY + moved.pad - 12,
-    );
+    // Move toward target in steps so piece enters magnet radius (lerp means one move is not enough)
+    const steps = 8;
+    const offsetX = 10;
+    const offsetY = 10;
+    const finalPieceX = moved.targetX - moved.pad + 10;
+    const finalPieceY = moved.targetY - moved.pad + 10;
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      const boardX = moved.x + offsetX + t * (finalPieceX + offsetX - (moved.x + offsetX));
+      const boardY = moved.y + offsetY + t * (finalPieceY + offsetY - (moved.y + offsetY));
+      manager.pointerMoveBoardSpace(boardX, boardY);
+    }
 
     const preview = manager.getSnapPreviewState();
     expect(preview).not.toBeNull();
