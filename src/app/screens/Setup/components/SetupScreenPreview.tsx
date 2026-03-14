@@ -38,21 +38,6 @@ export function SetupScreenPreview(props: {
         <div className={styles.previewEmpty}>Loading...</div>
       ) : imgDataUrl ? (
         <div className={styles.previewStage}>
-          <div className={styles.previewMeta}>
-            <div className={styles.previewMetaText}>
-              <span className={styles.previewEyebrow}>Puzzle Preview</span>
-              <strong className={styles.previewTitle}>
-                {selectedPuzzleName ?? "Custom puzzle"}
-              </strong>
-            </div>
-            <div className={styles.previewStats}>
-              <span className={styles.previewStatChip}>
-                {effectiveRows} x {effectiveCols}
-              </span>
-              <span className={styles.previewStatChip}>{selectedPieceCount} pieces</span>
-            </div>
-          </div>
-
           <div className={styles.previewImageWrap}>
             <img className={styles.previewImg} src={imgDataUrl} alt="Preview" />
             <GridPreviewOverlay

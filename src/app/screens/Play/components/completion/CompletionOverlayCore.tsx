@@ -164,19 +164,6 @@ export function CompletionOverlay({
           <p className={styles.completeTitlePhrase}>
             {pickCompletionPhrase(elapsedSeconds, moveCount, undoCount)}
           </p>
-          {completionData.newlyUnlocked?.length > 0 &&
-            (() => {
-              const firstId = completionData.newlyUnlocked[0];
-              const achievement = ACHIEVEMENT_DEFS.find((a) => a.id === firstId);
-              const text = achievement
-                ? `${achievement.icon} Achievement unlocked: ${achievement.name}`
-                : "Achievement unlocked! 🏆";
-              return (
-                <p className={styles.completeAchievementUnlock} role="status">
-                  {text}
-                </p>
-              );
-            })()}
         </div>
 
         {imageUrl && !imageError && (
@@ -191,6 +178,20 @@ export function CompletionOverlay({
             />
           </div>
         )}
+
+        {completionData.newlyUnlocked?.length > 0 &&
+          (() => {
+            const firstId = completionData.newlyUnlocked[0];
+            const achievement = ACHIEVEMENT_DEFS.find((a) => a.id === firstId);
+            const text = achievement
+              ? `${achievement.icon} Achievement unlocked: ${achievement.name}`
+              : "Achievement unlocked! 🏆";
+            return (
+              <p className={styles.completeAchievementUnlock} role="status">
+                {text}
+              </p>
+            );
+          })()}
 
         <CompletionOverlayStats
           elapsedSeconds={elapsedSeconds}

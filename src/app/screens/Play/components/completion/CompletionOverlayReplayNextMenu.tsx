@@ -64,14 +64,14 @@ export function CompletionOverlayReplayNextMenu(props: {
                 type="button"
                 role="menuitem"
                 className={styles.completeShareDropdownItem}
-                title="Watch replay of your solve"
+                title="Review your solve"
                 onClick={() => {
                   setReplayNextMenuOpen(false);
                   onReplayClick();
                 }}
               >
                 <Play size={16} aria-hidden />
-                <span>Watch Replay</span>
+                <span>Review Solve</span>
               </button>
             )}
             {onNextPuzzle && (

@@ -68,7 +68,7 @@
 }
 
 .completeAchievementUnlock {
-  margin: 0.5em 0 0;
+  margin: 0.4em 0 0;
   padding: 6px 12px;
   font-size: clamp(0.85rem, 2vw, 1rem);
   font-weight: 600;

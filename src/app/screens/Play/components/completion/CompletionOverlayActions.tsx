@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Sparkles } from "lucide-react";
+import { Film, Sparkles } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { CompletionOverlayShareMenu } from "@/screens/Play/components/completion/CompletionOverlayShareMenu";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
@@ -87,11 +87,11 @@ export function CompletionOverlayActions(args: {
             type="button"
             className={styles.completeActionBtn}
             onClick={onReplayClick}
-            title="Watch replay of your solve"
+            title="Review your solve"
           >
             <span className={styles.completeActionLead}>
-              <Play size={18} aria-hidden="true" />
-              Watch Replay
+              <Film size={18} aria-hidden="true" />
+              Review Solve
             </span>
           </button>
         )}

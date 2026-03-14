@@ -1,4 +1,4 @@
-/* Row: Next Puzzle (primary) + Watch Replay + Results – same size and layout */
+/* Row: Next Puzzle (primary) + Review Solve + Share */
 .completeActionsRow {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -91,7 +91,8 @@
   gap: 10px;
 }
 
-.completeSharePreviewCard {
+.completeSharePreviewCard,
+.completeShareSummaryCard {
   display: grid;
   gap: 8px;
   padding: 12px 14px;
@@ -100,6 +101,21 @@
   background:
     radial-gradient(circle at top, rgba(74, 139, 235, 0.16), transparent 54%),
     linear-gradient(180deg, rgba(17, 30, 53, 0.96), rgba(9, 16, 27, 0.94));
+}
+
+.completeShareActionsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.completeShareGroupLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .completeSharePreviewHeader {
@@ -204,13 +220,21 @@
   line-height: 1.35;
 }
 
-/* Results modal: compact utility sheet layout */
-.resultsModalBody {
+/* Share modal: compact utility sheet layout */
+.shareModalBody {
   padding: 14px 18px 18px !important;
 }
 
 @media (max-width: 720px) {
-  .resultsModalBody {
+  .shareModalBody {
     padding: 12px 14px 16px !important;
+  }
+
+  .shareModalBody .completeShareSheet {
+    gap: 8px;
+  }
+
+  .shareModalBody .completeShareSummaryCard {
+    padding: 10px 12px;
   }
 }

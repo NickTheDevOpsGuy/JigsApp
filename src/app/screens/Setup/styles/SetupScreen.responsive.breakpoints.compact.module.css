@@ -238,8 +238,8 @@
   }
 
   .previewImageWrap {
-    min-height: 180px;
-    max-height: min(50vh, 320px);
+    min-height: 200px;
+    max-height: min(55vh, 340px);
     aspect-ratio: 1 / 1;
     border-radius: 12px;
   }

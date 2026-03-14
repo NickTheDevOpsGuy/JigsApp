@@ -281,16 +281,6 @@ export function PlayScreenLayout({
             ref={board.mainRef as React.RefObject<HTMLDivElement>}
           >
             <div className={styles.boardWrapper}>
-              {isMobile && tray.showUndoRedo && (
-                <div className={styles.boardUndoRedo}>
-                  <UndoRedoButtons
-                    canUndo={tray.canUndo}
-                    onUndo={tray.onUndo}
-                    canRedo={tray.canRedo}
-                    onRedo={tray.onRedo}
-                  />
-                </div>
-              )}
               <div
                 className={styles.boardProgressFrame}
                 data-complete={board.isComplete ? "true" : undefined}
@@ -396,6 +386,16 @@ export function PlayScreenLayout({
                   : undefined
               }
             >
+              {tray.showUndoRedo && isMobile && (
+                <div className={styles.trayMobileControls}>
+                  <UndoRedoButtons
+                    canUndo={tray.canUndo}
+                    onUndo={tray.onUndo}
+                    canRedo={tray.canRedo}
+                    onRedo={tray.onRedo}
+                  />
+                </div>
+              )}
               {tray.showUndoRedo && !isMobile && (
                 <div className={styles.undoRedoPillsWrap}>
                   <UndoRedoButtons
