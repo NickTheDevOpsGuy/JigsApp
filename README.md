@@ -194,6 +194,12 @@ Useful scripts:
 - Data/services are grouped by domain: `src/app/data/content|menu|packs/` and `src/app/services/leaderboard|player|session/`.
 - Markdown linting is scoped to repo docs via `.markdownlint-cli2.jsonc` (excludes `node_modules`, `dist`, `coverage`).
 
+### Newer files and folders
+
+- **Packs screen** — `src/app/screens/Packs/components/`: `PackCarouselWithNav.tsx` (carousel with left/right arrows and blue scroll progress bar), `PuzzlePackModule.tsx`, `PuzzlePackCard.tsx`, `PuzzlePackDetail.tsx`, `PuzzlePackProgress.tsx`, `PuzzlePackCarousel.tsx`. Pack list uses `PackCarouselWithNav`; pack detail screen uses `PuzzlePackDetail` and its own puzzle carousel.
+- **Replay** — `src/app/screens/Play/components/replay/`: `ReplaySolveModal.tsx` (full-screen/cutout replay with result header “Solved in X” / “N moves”), `ReplaySolveModalControls.tsx` (timeline, media-style controls, speed badge, Back to Results / Next Puzzle), `ReplaySolveModal.module.css`, `ReplaySolveModal.controls.module.css`; `ReplayBar.tsx`, `ReplayBarStepControls.tsx`, `ReplayBarSpeedControls.tsx` for inline replay bar. In-app changelog: `src/app/data/content/changelog.ts`.
+- **Completion / Results** — Win overlay and “Puzzle Results” modal: `src/app/screens/Play/components/completion/` (e.g. `CompletionOverlayShareMenu.tsx` for Results modal with Share Card, Copy Link, Challenge Friend, Replay).
+
 ### UI consistency notes
 
 - **Design tokens** — Screens, cards, and modals use shared CSS variables so the app stays uniform and theme-aware. Use these when adding or changing UI:
@@ -334,6 +340,7 @@ src/app/assets/puzzles/
 │   │   ├── screens/
 │   │   │   ├── Menu/
 │   │   │   ├── Packs/
+│   │   │   │   └── components/   (PackCarouselWithNav, PuzzlePackModule, PuzzlePackCard, PuzzlePackDetail, PuzzlePackProgress)
 │   │   │   ├── Play/
 │   │   │   │   ├── core/{scene,share,time,utils}/
 │   │   │   │   ├── components/{completion,coop,headerMenu,hud,layout,overlay,replay}/

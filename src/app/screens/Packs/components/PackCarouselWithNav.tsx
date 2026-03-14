@@ -70,7 +70,12 @@ export function PackCarouselWithNav({ children }: PackCarouselWithNavProps) {
         >
           <ChevronLeft size={22} aria-hidden />
         </button>
-        <div ref={scrollRef} className={styles.packScrollViewport} role="region" aria-label="Puzzle packs">
+        <div
+          ref={scrollRef}
+          className={styles.packScrollViewport}
+          role="region"
+          aria-label="Puzzle packs"
+        >
           <div ref={trackRef} className={styles.carousel}>
             {children}
           </div>

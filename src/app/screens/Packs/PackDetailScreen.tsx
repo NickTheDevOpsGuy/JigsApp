@@ -176,9 +176,7 @@ export function PackDetailScreen() {
                     <span className={styles.playHint}>
                       <Play size={14} aria-hidden /> Solve
                     </span>
-                    {isUpNext && (
-                      <span className={styles.nextBadge}>Up next</span>
-                    )}
+                    {isUpNext && <span className={styles.nextBadge}>Up next</span>}
                   </button>
                 );
               })}

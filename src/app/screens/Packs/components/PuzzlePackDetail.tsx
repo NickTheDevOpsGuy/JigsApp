@@ -31,9 +31,7 @@ export function PuzzlePackDetail({
           {description ? <p className={styles.subtitle}>{description}</p> : null}
         </div>
         <div className={styles.statusGroup}>
-          {isComplete ? (
-            <span className={styles.statusChip}>✔ Pack Complete</span>
-          ) : null}
+          {isComplete ? <span className={styles.statusChip}>✔ Pack Complete</span> : null}
           {nextLabel ? <p className={styles.statusHint}>Up next: {nextLabel}</p> : null}
         </div>
       </div>

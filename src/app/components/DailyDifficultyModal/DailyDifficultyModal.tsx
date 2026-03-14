@@ -126,11 +126,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       </div>
 
       <div className={styles.puzzleImageWrap}>
-        <img
-          src={puzzle.fullImage}
-          alt="Today's puzzle"
-          className={styles.puzzleImage}
-        />
+        <img src={puzzle.fullImage} alt="Today's puzzle" className={styles.puzzleImage} />
       </div>
 
       {showFreezeOffer && (

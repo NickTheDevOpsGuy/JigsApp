@@ -118,11 +118,7 @@ export function CompletionOverlayShareMenu(props: {
                 >
                   <Share2 size={16} aria-hidden />
                   <span>
-                    {copied
-                      ? "Copied!"
-                      : canNativeShare
-                        ? "Share result"
-                        : "Copy link"}
+                    {copied ? "Copied!" : canNativeShare ? "Share result" : "Copy link"}
                   </span>
                 </button>
               )}

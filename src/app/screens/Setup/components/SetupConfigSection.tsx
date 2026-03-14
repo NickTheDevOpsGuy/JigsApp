@@ -68,7 +68,11 @@ export function SetupConfigSection({
               className={`${styles.difficultyCard} ${styles.difficultyCardActive}`}
               onClick={() => setGridIndex(gridIndex)}
               aria-pressed
-              title={selectedAdvanced.rows > 0 ? selectedAdvanced.label.split(" ")[0] : "Custom"}
+              title={
+                selectedAdvanced.rows > 0
+                  ? selectedAdvanced.label.split(" ")[0]
+                  : "Custom"
+              }
             >
               <span className={styles.difficultyCardTitle}>
                 <Puzzle size={16} />

@@ -139,7 +139,9 @@ export function ReplaySolveModal({
           Solved in {formatTime(totalSeconds)}
         </span>
         {typeof moveCount === "number" && (
-          <span className={styles.resultMoves}>{moveCount} {moveCount === 1 ? "move" : "moves"}</span>
+          <span className={styles.resultMoves}>
+            {moveCount} {moveCount === 1 ? "move" : "moves"}
+          </span>
         )}
       </div>
     ) : null;

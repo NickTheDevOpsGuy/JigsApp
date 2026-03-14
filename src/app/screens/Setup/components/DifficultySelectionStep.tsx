@@ -37,8 +37,8 @@ export function DifficultySelectionStep({
 }: DifficultySelectionStepProps) {
   const imageDataUrl = useCustomSource
     ? customImageDataUrl
-    : selectedPackPuzzle?.fullImage ?? null;
-  const puzzleId = useCustomSource ? null : selectedPackPuzzle?.id ?? null;
+    : (selectedPackPuzzle?.fullImage ?? null);
+  const puzzleId = useCustomSource ? null : (selectedPackPuzzle?.id ?? null);
 
   const opt = DIFFICULTY_OPTIONS[gridIndex] ?? GRID_OPTIONS[1];
   const rows = opt.rows;
@@ -62,11 +62,7 @@ export function DifficultySelectionStep({
   return (
     <div className={styles.difficultyStep}>
       <div className={styles.previewWithGridWrap}>
-        <img
-          src={imageDataUrl}
-          alt="Puzzle preview"
-          className={styles.previewImage}
-        />
+        <img src={imageDataUrl} alt="Puzzle preview" className={styles.previewImage} />
         <div
           className={styles.gridOverlay}
           style={{

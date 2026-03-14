@@ -178,17 +178,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--color-bg-elevated) 98%, var(--color-brand-primary));
+  background: color-mix(
+    in srgb,
+    var(--color-bg-elevated) 98%,
+    var(--color-brand-primary)
+  );
   border: none;
   border-radius: 50%;
   color: var(--color-text-primary);
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(11, 99, 184, 0.16);
-  transition: background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .scrollBtn:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-brand-primary) 22%, var(--color-bg-elevated));
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 22%,
+    var(--color-bg-elevated)
+  );
   color: var(--color-brand-primary);
   box-shadow: 0 6px 20px rgba(11, 99, 184, 0.28);
 }
