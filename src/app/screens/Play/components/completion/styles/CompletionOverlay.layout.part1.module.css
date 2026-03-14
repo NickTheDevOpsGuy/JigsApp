@@ -125,7 +125,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
+  gap: 8px;
 }
 
 .completeShareDivider {
@@ -157,8 +157,8 @@
 
 .completeActionBtn {
   width: 100%;
-  min-height: 64px;
-  padding: 0 18px;
+  min-height: 52px;
+  padding: 0 16px;
   border-radius: var(--radius-btn);
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
@@ -166,8 +166,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  font-size: 1rem;
+  gap: 10px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -197,11 +197,11 @@
 }
 
 .completeActionBtnPrimary {
-  min-height: 64px;
+  min-height: 52px;
   background: var(--color-brand-primary);
   border-color: var(--color-brand-primary);
   color: var(--color-text-on-brand);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   box-shadow: var(--shadow-md);
 }

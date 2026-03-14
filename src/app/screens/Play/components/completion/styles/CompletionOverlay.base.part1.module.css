@@ -91,8 +91,8 @@
 
 .completePanelNew {
   max-width: min(780px, 96vw);
-  padding: 22px 24px 24px;
-  gap: 14px;
+  padding: 18px 20px 20px;
+  gap: 10px;
   border: 1px solid var(--color-border);
   background: var(--color-bg-card);
   backdrop-filter: blur(20px);

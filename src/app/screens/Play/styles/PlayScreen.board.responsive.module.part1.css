@@ -22,16 +22,16 @@
   }
 
   .playBody {
-    gap: 6px;
+    gap: 4px;
     min-height: 0;
     min-width: 0;
     overflow: hidden;
     overflow-x: hidden;
-    padding: calc(72px + env(safe-area-inset-top, 0)) 8px
-      calc(var(--mobile-tray-height, 224px) + max(8px, env(safe-area-inset-bottom, 0)))
-      8px;
-    padding-left: max(8px, env(safe-area-inset-left, 0));
-    padding-right: max(8px, env(safe-area-inset-right, 0));
+    padding: calc(60px + env(safe-area-inset-top, 0)) 6px
+      calc(var(--mobile-tray-height, 224px) + max(6px, env(safe-area-inset-bottom, 0)))
+      6px;
+    padding-left: max(6px, env(safe-area-inset-left, 0));
+    padding-right: max(6px, env(safe-area-inset-right, 0));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -41,7 +41,7 @@
     width: 100%;
     max-width: min(94vw, 520px);
     padding: 0;
-    gap: 4px;
+    gap: 2px;
     align-items: center;
     justify-content: center;
     min-height: 0;
@@ -68,7 +68,7 @@
     align-items: center;
     justify-content: center;
     margin-top: 0;
-    max-height: min(80svh, calc(100dvh - var(--mobile-tray-height, 224px) - 116px));
+    max-height: min(80svh, calc(100dvh - var(--mobile-tray-height, 224px) - 100px));
   }
 
   .boardWrapper .boardProgressFrame {
@@ -251,13 +251,13 @@
   }
 
   .previewPanel {
-    top: calc(68px + env(safe-area-inset-top, 0));
-    right: max(10px, env(safe-area-inset-right, 0));
-    padding: 6px;
+    top: calc(56px + 8px + env(safe-area-inset-top, 0));
+    right: max(8px, env(safe-area-inset-right, 0));
+    padding: 5px;
   }
   .previewImage {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
   }
 
   .trayAreaSheet {
@@ -306,14 +306,14 @@
   .traySheetHandle {
     width: min(94vw, 520px);
     max-width: 100%;
-    min-height: 56px;
+    min-height: 48px;
     display: grid;
     justify-items: center;
-    gap: 8px;
-    padding: 10px 16px 12px;
+    gap: 6px;
+    padding: 8px 14px 10px;
     border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
     border-bottom: none;
-    border-radius: 22px 22px 0 0;
+    border-radius: 20px 20px 0 0;
     background:
       linear-gradient(180deg, rgba(21, 36, 63, 0.96), rgba(14, 25, 45, 0.96)),
       color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);

@@ -62,15 +62,15 @@
   }
 
   .completeActionBtn {
-    min-height: 50px;
-    padding: 0 14px;
+    min-height: 48px;
+    padding: 0 12px;
     border-radius: var(--radius-btn);
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 
   .completeActionBtnPrimary {
-    min-height: 54px;
-    font-size: 1rem;
+    min-height: 48px;
+    font-size: 0.9rem;
   }
 }
 

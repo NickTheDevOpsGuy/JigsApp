@@ -1,5 +1,5 @@
 import React from "react";
-import { ClipboardList, Share2, Swords, Copy, Play, Image } from "lucide-react";
+import { ClipboardList, Share2, Swords, Copy, Image } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { AppModal } from "@/components/AppModal";
@@ -22,8 +22,6 @@ export function CompletionOverlayShareMenu(props: {
   onShareChallenge?: () => void;
   onCopyChallenge?: () => void;
   completionData: UseCompletionOverlayDataResult;
-  canReplay?: boolean;
-  onReplayClick?: () => void;
 }) {
   const {
     shareRef,
@@ -35,8 +33,6 @@ export function CompletionOverlayShareMenu(props: {
     onShareChallenge,
     onCopyChallenge,
     completionData,
-    canReplay,
-    onReplayClick,
   } = props;
 
   const sharePopupOpen = completionData.sharePopupOpen;
@@ -52,7 +48,7 @@ export function CompletionOverlayShareMenu(props: {
         aria-expanded={sharePopupOpen}
         aria-haspopup="dialog"
         aria-label="Puzzle results and share options"
-        title="View results, share card, copy link, challenge a friend, or watch replay"
+        title="View results, share card, copy link, challenge a friend"
       >
         <span className={styles.completeActionLead}>
           <ClipboardList size={18} aria-hidden />
@@ -63,8 +59,9 @@ export function CompletionOverlayShareMenu(props: {
         isOpen={sharePopupOpen}
         onClose={() => setSharePopupOpen(false)}
         title="Puzzle Results"
-        subtitle="Share your result, challenge a friend, or watch the replay."
+        subtitle="Share your result, copy link, or challenge a friend."
         size="wide"
+        bodyClassName={styles.resultsModalBody}
       >
         <div className={styles.completeShareSheet}>
           <div className={styles.completeSharePreviewCard}>
@@ -153,22 +150,7 @@ export function CompletionOverlayShareMenu(props: {
                   }}
                 >
                   <Swords size={16} aria-hidden />
-                  <span>{copied ? "Copied!" : "Challenge Friend"}</span>
-                </button>
-              )}
-              {canReplay && onReplayClick && (
-                <button
-                  type="button"
-                  role="menuitem"
-                  className={styles.completeShareDropdownItem}
-                  title="Open replay viewer to watch your solve"
-                  onClick={() => {
-                    completionData.setSharePopupOpen(false);
-                    onReplayClick();
-                  }}
-                >
-                  <Play size={16} aria-hidden />
-                  <span>Replay viewer</span>
+                  <span>{copied ? "Copied!" : "Challenge friend"}</span>
                 </button>
               )}
             </div>
