@@ -11,7 +11,7 @@
   overflow: hidden;
   padding-left: max(0px, env(safe-area-inset-left, 0));
   padding-right: max(0px, env(safe-area-inset-right, 0));
-  padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
   /* PZ-045: Prevent text selection and Safari callouts on touch */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -68,13 +68,13 @@
 }
 
 .topBar {
-  height: 56px;
+  height: 48px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 0 16px;
+  gap: 8px;
+  padding: 0 10px 0 12px;
   padding-top: env(safe-area-inset-top, 0);
   min-width: 0;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
@@ -90,7 +90,7 @@
   flex-shrink: 0;
   overflow-x: hidden;
   overflow-y: visible;
-  max-height: 56px;
+  max-height: 48px;
   transition: max-height 0.25s ease;
   position: relative;
   z-index: 200;
@@ -184,6 +184,16 @@
 
 .trayAreaSheet {
   --tray-sheet-height: 224px;
+}
+
+.trayBottomBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+  padding: 6px 12px 8px;
 }
 
 .traySheetHandle {

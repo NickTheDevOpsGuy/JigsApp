@@ -1,9 +1,9 @@
 /**
- * PlayHUD – timer, pieces left, pause button (top bar center).
- * Speedrun: quadrant timers (TL, TR, BL, BR) with PB comparison.
+ * PlayHUD – timer, move count, placed/total with puzzle icon (top bar center).
+ * Speedrun: quadrant timers; Time Attack: lives.
  */
 import React from "react";
-import { Clock, Heart, Pause } from "lucide-react";
+import { Clock, Heart, Puzzle } from "lucide-react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import type { TimeMode } from "@/screens/Play/core/time/timeMode";
@@ -26,6 +26,8 @@ interface PlayHUDProps {
   zenModeEnabled?: boolean;
   /** Adaptive Personality: competitive = snappier copy; calm = softer copy */
   uiTone?: "competitive" | "calm";
+  /** Split layout: left = timer + moves (board left); right = placed/total (board right) */
+  layout?: "left" | "right";
 }
 
 const QUAD_LABELS = ["TL", "TR", "BL", "BR"] as const;
@@ -40,9 +42,9 @@ const QUAD_FULL_NAMES: Record<number, string> = {
 export function PlayHUD({
   elapsedSeconds,
   moveCount,
-  piecesLeft: _piecesLeft,
-  totalPieces: _totalPieces,
-  isPaused,
+  piecesLeft,
+  totalPieces,
+  isPaused: _isPaused,
   isComplete: _isComplete,
   timeMode,
   countdownMinutes = 10,
@@ -50,30 +52,28 @@ export function PlayHUD({
   quadrantTimes,
   quadrantPbs,
   lives,
-  onTogglePause,
+  onTogglePause: _onTogglePause,
   zenModeEnabled,
   uiTone,
+  layout,
 }: PlayHUDProps) {
-  const pauseTitle =
-    uiTone === "competitive"
-      ? isPaused
-        ? "Resume"
-        : "Pause"
-      : isPaused
-        ? "Resume the timer"
-        : "Pause the timer";
+  const placedCount = Math.max(0, totalPieces - piecesLeft);
   const showTimer = !zenModeEnabled && timeMode !== "relaxed";
   const isCountdown = timeMode === "countdown";
   const isSpeedrun = timeMode === "speedrun";
   const isTimeAttack = timeMode === "timeattack";
   const countdownTotal = countdownMinutes * 60;
   const isLowTime = isCountdown && elapsedSeconds > 0 && elapsedSeconds <= 60;
+
+  const showLeft = !layout || layout === "left";
+  const showRight = !layout || layout === "right";
+
   return (
     <div
-      className={`${styles.hud} ${uiTone === "competitive" ? styles.hudCompetitive : ""} ${uiTone === "calm" ? styles.hudCalm : ""}`}
+      className={`${styles.hud} ${layout === "left" ? styles.hudLeft : ""} ${layout === "right" ? styles.hudRight : ""} ${uiTone === "competitive" ? styles.hudCompetitive : ""} ${uiTone === "calm" ? styles.hudCalm : ""}`}
       data-ui-tone={uiTone ?? undefined}
     >
-      {isSpeedrun && quadrantTimes && (
+      {showLeft && isSpeedrun && quadrantTimes && (
         <div className={styles.quadrantTimers}>
           {([0, 1, 2, 3] as const).map((q) => {
             const t = quadrantTimes[q];
@@ -91,7 +91,7 @@ export function PlayHUD({
           })}
         </div>
       )}
-      {isTimeAttack && lives != null && (
+      {showLeft && isTimeAttack && lives != null && (
         <div className={styles.hudPillTimer} title="Lives remaining">
           {[1, 2, 3].map((i) => (
             <Heart
@@ -104,7 +104,7 @@ export function PlayHUD({
           ))}
         </div>
       )}
-      {showTimer && !isSpeedrun && !isTimeAttack && (
+      {showLeft && showTimer && !isSpeedrun && !isTimeAttack && (
         <div
           className={`${styles.hudPillTimer} ${isLowTime ? styles.timerLow : ""}`}
           title={
@@ -123,30 +123,35 @@ export function PlayHUD({
           )}
         </div>
       )}
-      {showTimer && (isSpeedrun || isTimeAttack) && (
+      {showLeft && showTimer && (isSpeedrun || isTimeAttack) && (
         <div className={styles.hudPillTimer} title="Elapsed time (speedrun)">
           <Clock size={14} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
         </div>
       )}
-      <button
-        type="button"
-        className={styles.hudPillPause}
-        onClick={onTogglePause}
-        aria-label={isPaused ? "Resume" : "Pause"}
-        title={pauseTitle}
-      >
-        <Pause size={14} />
-      </button>
-      <div
-        className={`${styles.hudPill} ${styles.hudPillMoves}`}
-        aria-label={`${moveCount} moves`}
-        title={`${moveCount} moves`}
-        role="status"
-      >
-        <span className={styles.hudMetaLabel}>Moves</span>
-        <span>{moveCount}</span>
-      </div>
+      {showLeft && !isSpeedrun && !isTimeAttack && (
+        <div
+          className={styles.hudMoveCount}
+          aria-label={`${moveCount} ${moveCount === 1 ? "move" : "moves"}`}
+          title={`${moveCount} ${moveCount === 1 ? "move" : "moves"}`}
+          role="status"
+        >
+          {moveCount} {moveCount === 1 ? "move" : "moves"}
+        </div>
+      )}
+      {showRight && !isSpeedrun && !isTimeAttack && (
+        <div
+          className={styles.hudPlacedTotal}
+          aria-label={`${placedCount} of ${totalPieces} pieces placed`}
+          title={`Pieces placed: ${placedCount}/${totalPieces}`}
+          role="status"
+        >
+          <span className={styles.hudPlacedTotalText}>
+            {placedCount}/{totalPieces}
+          </span>
+          <Puzzle size={14} className={styles.hudPlacedTotalIcon} aria-hidden />
+        </div>
+      )}
     </div>
   );
 }

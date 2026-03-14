@@ -100,6 +100,7 @@ export function SetupScreenShell(props: {
             styles={styles}
             isPackFlow={isPackFlow}
             selectedPuzzleName={selectedPuzzleName}
+            hasImage={!!imgDataUrl}
             onClose={onClose}
           />
 
@@ -118,26 +119,44 @@ export function SetupScreenShell(props: {
             </div>
           )}
 
-          <SetupImageSourcePanel
-            imageSource={imageSource}
-            setImageSource={setImageSource}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            filteredPuzzles={filteredPuzzles}
-            galleryRef={galleryRef}
-            canScrollLeft={canScrollLeft}
-            canScrollRight={canScrollRight}
-            selectGalleryPuzzle={selectGalleryPuzzle}
-            selectedPuzzle={selectedPuzzle}
-            isLoading={isLoading}
-            onPickFile={onPickFile}
-            imageUrlInput={imageUrlInput}
-            setImageUrlInput={setImageUrlInput}
-            onImportUrl={onImportUrl}
-            setFromBlob={setFromBlob}
-            selectedPieceCount={selectedPieceCount}
-            styles={styles}
-          />
+          {!isPackFlow && (
+            <SetupImageSourcePanel
+              imageSource={imageSource}
+              setImageSource={setImageSource}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              filteredPuzzles={filteredPuzzles}
+              galleryRef={galleryRef}
+              canScrollLeft={canScrollLeft}
+              canScrollRight={canScrollRight}
+              selectGalleryPuzzle={selectGalleryPuzzle}
+              selectedPuzzle={selectedPuzzle}
+              isLoading={isLoading}
+              onPickFile={onPickFile}
+              imageUrlInput={imageUrlInput}
+              setImageUrlInput={setImageUrlInput}
+              onImportUrl={onImportUrl}
+              setFromBlob={setFromBlob}
+              selectedPieceCount={selectedPieceCount}
+              styles={styles}
+            />
+          )}
+
+          {isPackFlow && (
+            <SetupScreenPreview
+              styles={styles}
+              isPackFlow={true}
+              previewRef={previewRef}
+              isLoading={isLoading}
+              imgDataUrl={imgDataUrl}
+              effectiveRows={effectiveRows}
+              effectiveCols={effectiveCols}
+              selectedPieceCount={selectedPieceCount}
+              selectedPuzzleName={selectedPuzzle?.name}
+              showGridPreview={showGridPreview}
+              setShowGridPreview={setShowGridPreview}
+            />
+          )}
 
           <SetupConfigSection
             gridIndex={gridIndex}
@@ -150,21 +169,24 @@ export function SetupScreenShell(props: {
             minGrid={minGrid}
             maxGrid={maxGrid}
             styles={styles}
+            packFlow={isPackFlow}
           />
 
-          <SetupScreenPreview
-            styles={styles}
-            isPackFlow={isPackFlow}
-            previewRef={previewRef}
-            isLoading={isLoading}
-            imgDataUrl={imgDataUrl}
-            effectiveRows={effectiveRows}
-            effectiveCols={effectiveCols}
-            selectedPieceCount={selectedPieceCount}
-            selectedPuzzleName={selectedPuzzle?.name}
-            showGridPreview={showGridPreview}
-            setShowGridPreview={setShowGridPreview}
-          />
+          {!isPackFlow && (
+            <SetupScreenPreview
+              styles={styles}
+              isPackFlow={isPackFlow}
+              previewRef={previewRef}
+              isLoading={isLoading}
+              imgDataUrl={imgDataUrl}
+              effectiveRows={effectiveRows}
+              effectiveCols={effectiveCols}
+              selectedPieceCount={selectedPieceCount}
+              selectedPuzzleName={selectedPuzzle?.name}
+              showGridPreview={showGridPreview}
+              setShowGridPreview={setShowGridPreview}
+            />
+          )}
         </div>
 
         <div

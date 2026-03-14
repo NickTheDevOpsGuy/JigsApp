@@ -48,8 +48,18 @@
     flex-shrink: 0;
   }
 
+  .stepIndicator {
+    font-size: 0.62rem;
+    gap: 2px;
+  }
+
+  .stepSeparator {
+    font-size: 0.58rem;
+  }
+
   .title {
     font-size: 1rem;
+    min-width: 0;
   }
 
   .titleIcon {

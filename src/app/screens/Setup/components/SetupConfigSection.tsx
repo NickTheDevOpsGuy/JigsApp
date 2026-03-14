@@ -15,6 +15,8 @@ export type SetupConfigSectionProps = {
   minGrid: number;
   maxGrid: number;
   styles: Record<string, string>;
+  /** When true (pack flow), only show Easy/Medium/Hard/Expert; no custom grid. */
+  packFlow?: boolean;
 };
 
 export function SetupConfigSection({
@@ -28,6 +30,7 @@ export function SetupConfigSection({
   minGrid,
   maxGrid,
   styles,
+  packFlow = false,
 }: SetupConfigSectionProps) {
   const primaryDifficulties = GRID_OPTIONS.slice(0, 4).map((opt, index) => ({
     index,
@@ -36,8 +39,9 @@ export function SetupConfigSection({
     cols: opt.cols,
     pieces: opt.rows * opt.cols,
   }));
-  const isAdvancedSelection = gridIndex >= primaryDifficulties.length;
+  const isAdvancedSelection = !packFlow && gridIndex >= primaryDifficulties.length;
   const selectedAdvanced = GRID_OPTIONS[gridIndex];
+  const effectiveGridIndex = packFlow && gridIndex > 3 ? 1 : gridIndex;
 
   return (
     <>
@@ -48,9 +52,9 @@ export function SetupConfigSection({
             <button
               key={difficulty.index}
               type="button"
-              className={`${styles.difficultyCard} ${gridIndex === difficulty.index ? styles.difficultyCardActive : ""}`}
+              className={`${styles.difficultyCard} ${effectiveGridIndex === difficulty.index ? styles.difficultyCardActive : ""}`}
               onClick={() => setGridIndex(difficulty.index)}
-              aria-pressed={gridIndex === difficulty.index}
+              aria-pressed={effectiveGridIndex === difficulty.index}
               title={difficulty.title}
             >
               <span className={styles.difficultyCardTitle}>
@@ -90,7 +94,7 @@ export function SetupConfigSection({
         </div>
       </section>
 
-      {isCustom && (
+      {!packFlow && isCustom && (
         <div>
           <div className={styles.customGrid}>
             <label className={styles.customGridLabel}>

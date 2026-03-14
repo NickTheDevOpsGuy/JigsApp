@@ -5,7 +5,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { Menu, ChevronRight, Check } from "lucide-react";
+import { Settings, ChevronRight, Check } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import {
@@ -220,7 +220,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
           title={open ? "Close settings" : "Open settings menu"}
           onClick={() => setOpen((s) => !s)}
         >
-          <Menu size={16} />
+          <Settings size={18} aria-hidden />
           <span className={styles.btnText}>Settings</span>
         </Button>
       </div>

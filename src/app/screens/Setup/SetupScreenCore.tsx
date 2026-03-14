@@ -23,6 +23,7 @@ export function SetupScreen() {
   const [searchParams] = useSearchParams();
   const sourceParam = searchParams.get("source");
   const puzzleIdParam = searchParams.get("puzzle");
+  const packIdParam = searchParams.get("pack");
   const gridParam = searchParams.get("grid");
   const [imageSource, setImageSource] = useState<ImageSource>(
     sourceParam === "camera"
@@ -96,6 +97,11 @@ export function SetupScreen() {
   }, [puzzleIdParam, selectGalleryPuzzle]);
 
   useEffect(() => {
+    if (!puzzleIdParam) return;
+    if (gridIndex > 3) setGridIndex(1);
+  }, [puzzleIdParam, gridIndex, setGridIndex]);
+
+  useEffect(() => {
     if (!gridParam) return;
     const m = gridParam.toLowerCase().match(/^(\d+)x(\d+)$/);
     if (!m) return;
@@ -150,8 +156,12 @@ export function SetupScreen() {
       styles={styles}
       isPackFlow={isPackFlow}
       selectedPuzzleName={selectedPuzzle?.name}
-      onClose={() => nav(isPackFlow ? "/packs" : "/")}
-      onBack={() => nav(isPackFlow ? "/packs" : "/")}
+      onClose={() =>
+        nav(isPackFlow ? (packIdParam ? `/packs/${packIdParam}` : "/packs") : "/")
+      }
+      onBack={() =>
+        nav(isPackFlow ? (packIdParam ? `/packs/${packIdParam}` : "/packs") : "/")
+      }
       error={error}
       clearError={clearError}
       imageSource={imageSource}

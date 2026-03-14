@@ -23,8 +23,8 @@ export function SetupScreenPreview(props: {
     imgDataUrl,
     effectiveRows,
     effectiveCols,
-    selectedPieceCount,
-    selectedPuzzleName,
+    selectedPieceCount: _selectedPieceCount,
+    selectedPuzzleName: _selectedPuzzleName,
     showGridPreview,
     setShowGridPreview,
   } = props;

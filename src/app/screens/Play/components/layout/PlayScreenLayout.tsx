@@ -12,7 +12,6 @@ import {
   PlayScreenTopBar,
   CompletionOverlayGate,
   PauseOverlay,
-  UndoRedoButtons,
   ReplaySolveModal,
 } from "@/screens/Play/components";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
@@ -386,47 +385,28 @@ export function PlayScreenLayout({
                   : undefined
               }
             >
-              {tray.showUndoRedo && isMobile && (
-                <div className={styles.trayMobileControls}>
-                  <UndoRedoButtons
-                    canUndo={tray.canUndo}
-                    onUndo={tray.onUndo}
-                    canRedo={tray.canRedo}
-                    onRedo={tray.onRedo}
-                  />
-                </div>
-              )}
-              {tray.showUndoRedo && !isMobile && (
-                <div className={styles.undoRedoPillsWrap}>
-                  <UndoRedoButtons
-                    canUndo={tray.canUndo}
-                    onUndo={tray.onUndo}
-                    canRedo={tray.canRedo}
-                    onRedo={tray.onRedo}
-                  />
-                </div>
-              )}
               {isMobile && (
-                <button
-                  type="button"
-                  className={styles.traySheetHandle}
-                  onPointerDown={handleTrayHandlePointerDown}
-                  onPointerMove={handleTrayHandlePointerMove}
-                  onPointerUp={handleTrayHandlePointerUp}
-                  onPointerCancel={handleTrayHandlePointerUp}
-                  aria-label={`Pieces drawer, ${mobileTrayState}`}
-                  title="Open or close piece drawer"
-                >
-                  <span className={styles.traySheetHandleBar} />
-                  <span className={styles.traySheetHandleText}>
-                    {mobileTrayState === "collapsed"
-                      ? "▲"
-                      : mobileTrayState === "full"
-                        ? "▼"
-                        : "◆"}{" "}
-                    Pieces ({tray.trayPieces.length})
-                  </span>
-                </button>
+                <div className={styles.trayBottomBar}>
+                  <button
+                    type="button"
+                    className={styles.traySheetHandle}
+                    onPointerDown={handleTrayHandlePointerDown}
+                    onPointerMove={handleTrayHandlePointerMove}
+                    onPointerUp={handleTrayHandlePointerUp}
+                    onPointerCancel={handleTrayHandlePointerUp}
+                    aria-label={`Pieces drawer, ${mobileTrayState}`}
+                    title="Open or close piece drawer"
+                  >
+                    <span className={styles.traySheetHandleBar} />
+                    <span className={styles.traySheetHandleText}>
+                      {mobileTrayState === "collapsed"
+                        ? "▲"
+                        : mobileTrayState === "full"
+                          ? "▼"
+                          : "◆"}
+                    </span>
+                  </button>
+                </div>
               )}
               <div
                 className={`${styles.trayWrap} ${tray.isLargeTray ? styles.trayWrapLarge : ""}`}

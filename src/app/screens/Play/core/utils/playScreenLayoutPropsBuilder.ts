@@ -133,6 +133,15 @@ export function createPlayScreenLayoutProps(
       immersiveMode: args.topBarProps.immersiveMode,
       showImmersiveUi: args.topBarProps.showImmersiveUi,
       onPointerLeave: args.topBarProps.onPointerLeave,
+      showUndoRedo: !!args.manager && !args.isComplete,
+      canUndo: Boolean(
+        args.manager?.canUndo() && !args.isPaused && !args.state?.isComplete,
+      ),
+      canRedo: Boolean(
+        args.manager?.canRedo() && !args.isPaused && !args.state?.isComplete,
+      ),
+      onUndo: args.handleUndo,
+      onRedo: args.handleRedo,
     },
     hideTopBarControls: args.replayBarOpen,
     modalsProps: {

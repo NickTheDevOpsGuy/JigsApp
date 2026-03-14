@@ -112,6 +112,29 @@
   flex-shrink: 0;
 }
 
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.stepSegment {
+  white-space: nowrap;
+}
+
+.stepSegmentCurrent {
+  color: var(--color-brand-primary);
+}
+
+.stepSeparator {
+  opacity: 0.6;
+  font-size: 0.65rem;
+}
+
 .title {
   margin: 0;
   display: inline-flex;

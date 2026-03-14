@@ -8,6 +8,8 @@ import styles from "./MenuScreen.module.css";
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
+import { PackChoiceModal } from "@/components/PackChoiceModal";
+import { ChoosePhotoModal } from "@/components/ChoosePhotoModal";
 import { DailyCountdown } from "@/components/DailyCountdown/DailyCountdown";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
@@ -63,6 +65,8 @@ export function MenuScreen() {
   const [starImgFailed, setStarImgFailed] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
+  const [showPackModal, setShowPackModal] = useState(false);
+  const [showChoosePhotoModal, setShowChoosePhotoModal] = useState(false);
   const [showHelpChoice, setShowHelpChoice] = useState(false);
   const [showFeedbackChoice, setShowFeedbackChoice] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
@@ -157,7 +161,7 @@ export function MenuScreen() {
 
           <Button
             variant="outline"
-            onClick={() => nav("/packs")}
+            onClick={() => setShowPackModal(true)}
             className={styles.actionCard}
             aria-label="Puzzle Packs"
           >
@@ -166,7 +170,7 @@ export function MenuScreen() {
           </Button>
           <Button
             variant="outline"
-            onClick={() => nav("/new")}
+            onClick={() => setShowChoosePhotoModal(true)}
             className={styles.actionCard}
             aria-label="Choose Photo"
           >
@@ -280,6 +284,11 @@ export function MenuScreen() {
         }}
       />
       <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
+      <PackChoiceModal isOpen={showPackModal} onClose={() => setShowPackModal(false)} />
+      <ChoosePhotoModal
+        isOpen={showChoosePhotoModal}
+        onClose={() => setShowChoosePhotoModal(false)}
+      />
       <DailyDifficultyModal
         isOpen={showDailyModal}
         onClose={() => setShowDailyModal(false)}

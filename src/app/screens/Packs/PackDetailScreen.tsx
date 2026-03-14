@@ -50,7 +50,9 @@ export function PackDetailScreen() {
 
   const handlePlay = (puzzle: SamplePuzzle) => {
     setCurrentPuzzleId(puzzle.id);
-    nav(`/new?puzzle=${encodeURIComponent(puzzle.id)}`);
+    nav(
+      `/new?puzzle=${encodeURIComponent(puzzle.id)}&pack=${encodeURIComponent(packId ?? "")}`,
+    );
   };
 
   const scrollByOneCard = (direction: 1 | -1) => {
@@ -111,16 +113,34 @@ export function PackDetailScreen() {
           >
             <ArrowLeft size={20} />
           </button>
-          <div className={styles.packHeader}>
-            <PuzzlePackDetail
-              title={packMeta.name}
-              description={packMeta.description}
-              completed={completedCount}
-              total={puzzles.length}
-              nextLabel={nextPuzzle?.name ?? null}
+          <div className={styles.packHeaderRow}>
+            <div className={styles.packHeader}>
+              <PuzzlePackDetail
+                title={packMeta.name}
+                description={packMeta.description}
+                completed={completedCount}
+                total={puzzles.length}
+                nextLabel={nextPuzzle?.name ?? null}
+              >
+                <div />
+              </PuzzlePackDetail>
+            </div>
+            <div
+              className={styles.stepIndicator}
+              aria-label="Progress: Pack, Puzzle, Difficulty"
             >
-              <div />
-            </PuzzlePackDetail>
+              <span className={styles.stepSegment}>Pack</span>
+              <span className={styles.stepSeparator} aria-hidden>
+                →
+              </span>
+              <span className={`${styles.stepSegment} ${styles.stepSegmentCurrent}`}>
+                Puzzle
+              </span>
+              <span className={styles.stepSeparator} aria-hidden>
+                →
+              </span>
+              <span className={styles.stepSegment}>Difficulty</span>
+            </div>
           </div>
         </div>
 

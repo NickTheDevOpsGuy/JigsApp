@@ -47,7 +47,25 @@ export function PackListScreen() {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className={styles.title}>Puzzle Packs</h1>
+          <div className={styles.headerTitleRow}>
+            <h1 className={styles.title}>Puzzle Packs</h1>
+            <div
+              className={styles.stepIndicator}
+              aria-label="Progress: Pack, Puzzle, Difficulty"
+            >
+              <span className={`${styles.stepSegment} ${styles.stepSegmentCurrent}`}>
+                Pack
+              </span>
+              <span className={styles.stepSeparator} aria-hidden>
+                →
+              </span>
+              <span className={styles.stepSegment}>Puzzle</span>
+              <span className={styles.stepSeparator} aria-hidden>
+                →
+              </span>
+              <span className={styles.stepSegment}>Difficulty</span>
+            </div>
+          </div>
         </div>
 
         <div className={styles.cardScroll}>

@@ -1,0 +1,279 @@
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.stepCurrent {
+  color: var(--color-brand-primary);
+}
+
+.stepSep {
+  opacity: 0.7;
+}
+
+.stepBody {
+  min-width: 0;
+}
+
+.subtitle {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.loading {
+  margin: 12px 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  color: var(--color-brand-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.backBtn:hover {
+  text-decoration: underline;
+}
+
+.packList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.packCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.packCard:hover {
+  background: var(--color-bg-card);
+  border-color: var(--color-brand-primary);
+}
+
+.packThumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.packThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.packEmoji {
+  font-size: 24px;
+}
+
+.packName {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.puzzleList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+.puzzleCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 6px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.puzzleCard:hover {
+  border-color: var(--color-brand-primary);
+}
+
+.puzzleCardSelected {
+  border-color: var(--color-brand-primary);
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 15%,
+    var(--color-bg-elevated)
+  );
+}
+
+.puzzleThumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-bg-primary);
+}
+
+.puzzleThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.completedBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-complete-gradient-start, #22c55e);
+  color: white;
+  border-radius: 50%;
+}
+
+.puzzleName {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.nextBtn {
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand, #fff);
+  border: none;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nextBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nextBtn:not(:disabled):hover {
+  opacity: 0.95;
+}
+
+.previewWrap {
+  margin-bottom: 12px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  max-height: 120px;
+}
+
+.previewImg {
+  display: block;
+  width: 100%;
+  max-height: 120px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.difficultyStack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.difficultyCard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.difficultyCard:hover {
+  border-color: var(--color-brand-primary);
+}
+
+.difficultyCardSelected {
+  border-color: var(--color-brand-primary);
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 18%,
+    var(--color-bg-elevated)
+  );
+}
+
+.difficultyCheck {
+  margin-left: auto;
+  color: var(--color-brand-primary);
+  flex-shrink: 0;
+}
+
+.startBtn {
+  width: 100%;
+  padding: 12px 20px;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand, #fff);
+  border: none;
+  border-radius: var(--radius-btn);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.startBtn:hover {
+  opacity: 0.95;
+}

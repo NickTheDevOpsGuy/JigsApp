@@ -121,8 +121,9 @@
   }
 
   .topBarLeft,
-  .topBarCenter,
-  .topBarHud,
+  .topBarHudLeft,
+  .topBarHudRight,
+  .topBarUndoRedo,
   .headerMenuTriggerWrap,
   .hud,
   .hudPill,
@@ -133,16 +134,11 @@
   }
 
   .topBarRight {
-    display: none;
+    gap: 6px;
   }
 
-  .topBarCenter {
-    justify-content: flex-end;
-    gap: 8px;
-  }
-
-  .topBarHud {
-    margin-left: auto;
+  .topBarHudLeft {
+    gap: 6px;
   }
 
   .headerMenuTrigger {
@@ -275,17 +271,33 @@
   }
 
   .trayAreaSheet .trayWrap,
-  .trayAreaSheet .traySheetHandle,
-  .trayAreaSheet .trayMobileControls {
+  .trayAreaSheet .trayBottomBar {
     pointer-events: auto;
+  }
+
+  .trayAreaSheet .trayBottomBar {
+    width: min(94vw, 520px);
+    max-width: 100%;
+    min-height: 40px;
+    padding: 6px 12px 8px;
+    border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
+    border-bottom: none;
+    border-radius: 20px 20px 0 0;
+    background:
+      linear-gradient(180deg, rgba(21, 36, 63, 0.96), rgba(14, 25, 45, 0.96)),
+      color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
+    box-shadow: 0 -10px 28px rgba(2, 7, 18, 0.26);
+    transform: translateY(var(--mobile-tray-drag-offset, 0px));
+    transition: transform 180ms ease;
+    touch-action: none;
   }
 
   .trayAreaSheet .trayWrap {
     width: min(94vw, 520px);
     max-width: 100%;
     align-self: center;
-    height: calc(var(--tray-sheet-height, 224px) - 48px - 40px);
-    max-height: calc(var(--tray-sheet-height, 224px) - 48px - 40px);
+    height: calc(var(--tray-sheet-height, 224px) - 40px);
+    max-height: calc(var(--tray-sheet-height, 224px) - 40px);
     padding: 0 0 max(10px, env(safe-area-inset-bottom, 0));
     border-radius: 22px 22px 0 0;
     background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
@@ -309,24 +321,23 @@
   }
 
   .traySheetHandle {
-    width: min(94vw, 520px);
-    max-width: 100%;
-    min-height: 48px;
-    display: grid;
-    justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 6px;
-    padding: 8px 14px 10px;
-    border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
-    border-bottom: none;
-    border-radius: 20px 20px 0 0;
-    background:
-      linear-gradient(180deg, rgba(21, 36, 63, 0.96), rgba(14, 25, 45, 0.96)),
-      color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
+    min-height: 40px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
     color: var(--color-text-primary);
-    box-shadow: 0 -10px 28px rgba(2, 7, 18, 0.26);
-    transform: translateY(var(--mobile-tray-drag-offset, 0px));
-    transition: transform 180ms ease;
+    cursor: grab;
     touch-action: none;
+  }
+
+  .traySheetHandle:active {
+    cursor: grabbing;
   }
 
   /* Smaller hint so it doesn't stretch on mobile */

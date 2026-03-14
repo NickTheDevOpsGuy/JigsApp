@@ -1,3 +1,11 @@
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
 .topBarLeft {
   display: flex;
   align-items: center;
@@ -5,19 +13,24 @@
   flex: 0 0 auto;
 }
 
-.topBarCenter {
+.topBarHudLeft {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 1 1 auto;
-  justify-content: center;
+  gap: 8px;
   min-width: 0;
 }
 
-.topBarHud {
+.topBarHudRight {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.topBarUndoRedo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .keyboardHints {
@@ -87,7 +100,7 @@
   align-items: center;
   gap: 8px;
   flex: 0 0 auto;
-  margin-left: 14px;
+  min-width: 0;
 }
 
 @media (max-width: 1100px) {
