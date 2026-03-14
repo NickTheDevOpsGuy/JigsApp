@@ -26,8 +26,6 @@ interface PlayHUDProps {
   zenModeEnabled?: boolean;
   /** Adaptive Personality: competitive = snappier copy; calm = softer copy */
   uiTone?: "competitive" | "calm";
-  /** Split layout: left = timer + moves (board left); right = placed/total (board right) */
-  layout?: "left" | "right";
 }
 
 const QUAD_LABELS = ["TL", "TR", "BL", "BR"] as const;
@@ -55,7 +53,6 @@ export function PlayHUD({
   onTogglePause: _onTogglePause,
   zenModeEnabled,
   uiTone,
-  layout,
 }: PlayHUDProps) {
   const placedCount = Math.max(0, totalPieces - piecesLeft);
   const showTimer = !zenModeEnabled && timeMode !== "relaxed";
@@ -65,15 +62,12 @@ export function PlayHUD({
   const countdownTotal = countdownMinutes * 60;
   const isLowTime = isCountdown && elapsedSeconds > 0 && elapsedSeconds <= 60;
 
-  const showLeft = !layout || layout === "left";
-  const showRight = !layout || layout === "right";
-
   return (
     <div
-      className={`${styles.hud} ${layout === "left" ? styles.hudLeft : ""} ${layout === "right" ? styles.hudRight : ""} ${uiTone === "competitive" ? styles.hudCompetitive : ""} ${uiTone === "calm" ? styles.hudCalm : ""}`}
+      className={`${styles.hud} ${uiTone === "competitive" ? styles.hudCompetitive : ""} ${uiTone === "calm" ? styles.hudCalm : ""}`}
       data-ui-tone={uiTone ?? undefined}
     >
-      {showLeft && isSpeedrun && quadrantTimes && (
+      {isSpeedrun && quadrantTimes && (
         <div className={styles.quadrantTimers}>
           {([0, 1, 2, 3] as const).map((q) => {
             const t = quadrantTimes[q];
@@ -91,7 +85,7 @@ export function PlayHUD({
           })}
         </div>
       )}
-      {showLeft && isTimeAttack && lives != null && (
+      {isTimeAttack && lives != null && (
         <div className={styles.hudPillTimer} title="Lives remaining">
           {[1, 2, 3].map((i) => (
             <Heart
@@ -104,7 +98,7 @@ export function PlayHUD({
           ))}
         </div>
       )}
-      {showLeft && showTimer && !isSpeedrun && !isTimeAttack && (
+      {showTimer && !isSpeedrun && !isTimeAttack && (
         <div
           className={`${styles.hudPillTimer} ${isLowTime ? styles.timerLow : ""}`}
           title={
@@ -123,24 +117,23 @@ export function PlayHUD({
           )}
         </div>
       )}
-      {showLeft && showTimer && (isSpeedrun || isTimeAttack) && (
+      {showTimer && (isSpeedrun || isTimeAttack) && (
         <div className={styles.hudPillTimer} title="Elapsed time (speedrun)">
           <Clock size={14} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
         </div>
       )}
-      {showLeft && !isSpeedrun && !isTimeAttack && (
-        <div
-          className={styles.hudMoveCount}
-          aria-label={`${moveCount} ${moveCount === 1 ? "move" : "moves"}`}
-          title={`${moveCount} ${moveCount === 1 ? "move" : "moves"}`}
-          role="status"
-        >
-          {moveCount} {moveCount === 1 ? "move" : "moves"}
-        </div>
-      )}
-      {showRight && !isSpeedrun && !isTimeAttack && (
-        <div
+      {!isSpeedrun && !isTimeAttack && (
+        <>
+          <div
+            className={styles.hudMoveCount}
+            aria-label={`${moveCount} ${moveCount === 1 ? "move" : "moves"}`}
+            title={`${moveCount} ${moveCount === 1 ? "move" : "moves"}`}
+            role="status"
+          >
+            {moveCount} {moveCount === 1 ? "move" : "moves"}
+          </div>
+          <div
           className={styles.hudPlacedTotal}
           aria-label={`${placedCount} of ${totalPieces} pieces placed`}
           title={`Pieces placed: ${placedCount}/${totalPieces}`}
@@ -151,6 +144,7 @@ export function PlayHUD({
           </span>
           <Puzzle size={14} className={styles.hudPlacedTotalIcon} aria-hidden />
         </div>
+        </>
       )}
     </div>
   );

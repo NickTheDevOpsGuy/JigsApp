@@ -68,13 +68,14 @@
 }
 
 .topBar {
-  height: 48px;
+  height: 44px;
+  max-height: 44px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 0 10px 0 12px;
+  padding: 0 12px;
   padding-top: env(safe-area-inset-top, 0);
   min-width: 0;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
@@ -90,7 +91,7 @@
   flex-shrink: 0;
   overflow-x: hidden;
   overflow-y: visible;
-  max-height: 48px;
+  max-height: 44px;
   transition: max-height 0.25s ease;
   position: relative;
   z-index: 200;
@@ -150,6 +151,16 @@
 [data-theme="ocean"] .immersivePeekBottom,
 [data-theme="forest"] .immersivePeekBottom {
   background: linear-gradient(to top, rgba(255, 255, 255, 0.06), transparent);
+}
+
+/* Board controls: Undo/Redo directly below board. Spacing: 12px board→controls, 12px controls→tray */
+.boardControlsRow {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 .trayArea {

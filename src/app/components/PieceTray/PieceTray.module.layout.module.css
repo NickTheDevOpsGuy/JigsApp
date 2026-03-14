@@ -20,11 +20,11 @@
 /* Visual "you are here" scroll position indicator */
 .scrollIndicator {
   flex-shrink: 0;
-  height: 6px;
+  height: 4px;
   background: var(--color-bg-secondary);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
-  margin: 0 12px 6px;
+  margin: 0 12px 8px;
 }
 
 .scrollIndicatorFill {

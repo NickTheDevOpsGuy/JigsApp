@@ -1,12 +1,12 @@
 /**
- * Play screen top bar: Left = Settings, Timer, Moves; Right = 0/16, Undo/Redo, New Puzzle.
+ * Play screen top bar (HUD): [Settings] [Timer] [Moves] [Pieces 0/16].
+ * Minimal only; max control height 44px. Undo/Redo live below board per spec.
  */
 import React from "react";
 import type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/headerMenuConfig";
 import { CoopStatusIndicator } from "@/screens/Play/components/coop/CoopStatusIndicator";
 import { PlayHUD } from "./PlayHUD";
 import { TopBarButtons } from "./TopBarButtons";
-import { UndoRedoButtons } from "./UndoRedoButtons";
 import { HeaderMenu } from "@/screens/Play/components/headerMenu/HeaderMenu";
 import type { RealtimeStatus } from "@/screens/Play/hooks/gameplay/usePuzzleSession";
 import type { TimeMode } from "@/screens/Play/core/time/timeMode";
@@ -51,13 +51,7 @@ export type PlayScreenTopBarProps = {
   immersiveMode: boolean;
   showImmersiveUi: boolean;
   onPointerLeave?: () => void;
-  /** When true (e.g. replay mode), hide menu and right-side buttons so they can't be opened. */
   hideMenuAndButtons?: boolean;
-  showUndoRedo?: boolean;
-  canUndo?: boolean;
-  canRedo?: boolean;
-  onUndo?: () => void;
-  onRedo?: () => void;
 };
 
 export function PlayScreenTopBar({
@@ -72,11 +66,6 @@ export function PlayScreenTopBar({
   showImmersiveUi,
   onPointerLeave,
   hideMenuAndButtons = false,
-  showUndoRedo = false,
-  canUndo = false,
-  canRedo = false,
-  onUndo,
-  onRedo,
 }: PlayScreenTopBarProps) {
   return (
     <div
@@ -93,29 +82,12 @@ export function PlayScreenTopBar({
             />
           )}
           {showHud && (
-            <div className={styles.topBarHudLeft} aria-live="polite">
-              <PlayHUD {...hudProps} layout="left" />
+            <div className={styles.topBarHud} aria-live="polite">
+              <PlayHUD {...hudProps} />
             </div>
           )}
         </div>
-        <div className={styles.topBarRight}>
-          {showHud && (
-            <div className={styles.topBarHudRight} aria-live="polite">
-              <PlayHUD {...hudProps} layout="right" />
-            </div>
-          )}
-          {showUndoRedo && onUndo && onRedo && (
-            <div className={styles.topBarUndoRedo}>
-              <UndoRedoButtons
-                canUndo={canUndo}
-                onUndo={onUndo}
-                canRedo={canRedo}
-                onRedo={onRedo}
-              />
-            </div>
-          )}
-          {!hideMenuAndButtons && <TopBarButtons {...topBarButtonsProps} />}
-        </div>
+        {!hideMenuAndButtons && <TopBarButtons {...topBarButtonsProps} />}
       </div>
     </div>
   );

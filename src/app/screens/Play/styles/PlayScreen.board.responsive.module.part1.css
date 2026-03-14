@@ -59,16 +59,16 @@
   }
 
   .boardWrapper {
-    width: min(94vw, 520px);
+    width: min(95vw, 520px);
     max-width: 100%;
     flex: 1;
     min-height: 0;
     min-width: 0;
+    max-height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 0;
-    max-height: min(80svh, calc(100dvh - var(--mobile-tray-height, 224px) - 100px));
   }
 
   .boardWrapper .boardProgressFrame {
@@ -121,9 +121,7 @@
   }
 
   .topBarLeft,
-  .topBarHudLeft,
-  .topBarHudRight,
-  .topBarUndoRedo,
+  .topBarHud,
   .headerMenuTriggerWrap,
   .hud,
   .hudPill,
@@ -134,11 +132,11 @@
   }
 
   .topBarRight {
-    gap: 6px;
+    gap: 8px;
   }
 
-  .topBarHudLeft {
-    gap: 6px;
+  .topBarHud {
+    gap: 8px;
   }
 
   .headerMenuTrigger {

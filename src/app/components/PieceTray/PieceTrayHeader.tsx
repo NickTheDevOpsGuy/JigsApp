@@ -26,7 +26,7 @@ export function PieceTrayHeader({
   return (
     <div className={styles.header}>
       <div className={styles.titleRow}>
-        <span className={styles.title}>Piece Drawer ({pieceCount})</span>
+        <span className={styles.title}>Pieces ({pieceCount})</span>
         <div className={styles.headerControls}>
           <TrayFilterButton value={filter} onChange={setFilter} hasImage={hasImage} />
           <button

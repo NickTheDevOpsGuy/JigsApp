@@ -67,7 +67,7 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
 
       {step === "image" && (
         <div className={styles.stepBody}>
-          <p className={styles.subtitle}>Pick from the gallery</p>
+          <p className={styles.subtitle}>Pick from the gallery.</p>
           <div className={styles.galleryGrid}>
             {SAMPLE_PUZZLES.slice(0, 24).map((puzzle) => {
               return (

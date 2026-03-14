@@ -13,24 +13,11 @@
   flex: 0 0 auto;
 }
 
-.topBarHudLeft {
+.topBarHud {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
-}
-
-.topBarHudRight {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.topBarUndoRedo {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
 }
 
 .keyboardHints {
@@ -173,28 +160,40 @@
 
 .undoRedoPills {
   display: inline-flex;
-  gap: 6px;
-  padding: 4px 6px;
-  border-radius: 9999px;
+  gap: 0;
+  padding: 0;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
   border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+/* Segmented style when inside board controls row: [ ⟲ Undo | Redo ⟳ ] */
+.boardControlsRow .undoRedoPills {
+  border-radius: 12px;
 }
 
 .undoRedoPill {
   appearance: none;
   border: none;
-  border-radius: 9999px;
-  padding: 6px 10px;
+  border-radius: 0;
+  padding: 8px 12px;
   min-height: 36px;
+  max-height: 44px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 13px;
   font-weight: 500;
   color: var(--color-text-primary);
   background: transparent;
   cursor: pointer;
   transition: all 0.15s ease;
+  border-right: 1px solid var(--color-border);
+}
+
+.undoRedoPill:last-child {
+  border-right: none;
 }
 
 @media (pointer: coarse) {

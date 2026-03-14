@@ -7,16 +7,6 @@
   transition: opacity 0.25s ease;
 }
 
-.hud.hudLeft,
-.hud.hudRight {
-  flex: none;
-  justify-content: flex-start;
-}
-
-.hud.hudRight {
-  justify-content: flex-end;
-}
-
 /* Adaptive Personality: subtle animation tone */
 .hudCompetitive .hudPill {
   transition-duration: 0.15s;

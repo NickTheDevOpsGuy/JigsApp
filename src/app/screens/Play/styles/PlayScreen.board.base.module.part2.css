@@ -42,7 +42,7 @@
 }
 
 .boardWrapper {
-  width: min(90vw, 700px);
+  width: min(95vw, 520px);
   max-width: 100%;
   aspect-ratio: 1 / 1;
   max-height: 100%;
@@ -52,11 +52,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   position: relative;
-  /* Above fixed preview panel so pieces never render behind it */
   z-index: 105;
-  /* Prevent double-tap zoom on mobile; pan/zoom handled by canvas touch-action: none */
   touch-action: manipulation;
 }
 
@@ -81,7 +79,7 @@
   --progress-color: var(--color-progress-75, #22c55e);
   position: relative;
   padding: 8px;
-  border-radius: calc(var(--radius-board, 20px) + 8px);
+  border-radius: calc(var(--radius-board, 16px) + 8px);
   background: conic-gradient(
     from -90deg,
     var(--progress-color) 0deg,
@@ -100,7 +98,7 @@
 
 .boardProgressFrame:not([style]) {
   padding: 8px;
-  border-radius: calc(var(--radius-board, 20px) + 8px);
+  border-radius: calc(var(--radius-board, 16px) + 8px);
   background: var(--color-border);
 }
 
@@ -117,7 +115,7 @@
 }
 
 .board {
-  width: min(90vw, 600px);
+  width: min(95vw, 520px);
   aspect-ratio: 1 / 1;
   max-width: 100%;
   max-height: 100%;

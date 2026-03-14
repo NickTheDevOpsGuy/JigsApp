@@ -13,6 +13,7 @@ import {
   CompletionOverlayGate,
   PauseOverlay,
   ReplaySolveModal,
+  UndoRedoButtons,
 } from "@/screens/Play/components";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
 import { SnapComboMeter } from "@/screens/Play/components/hud/SnapComboMeter";
@@ -372,6 +373,16 @@ export function PlayScreenLayout({
               </div>
             </div>
           </div>
+          {tray.show && tray.showUndoRedo && (
+            <div className={styles.boardControlsRow} role="group" aria-label="Board controls">
+              <UndoRedoButtons
+                canUndo={tray.canUndo}
+                onUndo={tray.onUndo}
+                canRedo={tray.canRedo}
+                onRedo={tray.onRedo}
+              />
+            </div>
+          )}
           {tray.show && (
             <div
               className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
