@@ -93,3 +93,27 @@
   font-weight: 500;
   color: var(--color-text-secondary);
 }
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  padding: 8px 0;
+}
+
+.toggleRow input {
+  accent-color: var(--color-brand-primary);
+  width: 18px;
+  height: 18px;
+}
+
+.toggleHint {
+  margin: 0 0 0 28px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}

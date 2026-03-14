@@ -103,6 +103,8 @@ export type BuildHeaderMenuPropsArgs = {
   toggleMusic: () => void;
   toggleHaptics: () => void;
   toggleFullscreen: () => void;
+  colorblindFriendly: boolean;
+  onToggleColorBlindFriendly: () => void;
 };
 
 export type BuildHudPropsArgs = {

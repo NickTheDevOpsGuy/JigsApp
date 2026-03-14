@@ -6,13 +6,13 @@ Phuzzle uses Supabase for leaderboards, stats, achievements, profiles, and co-op
 
 ## What Supabase provides
 
-| Feature | Description |
-|---------|-------------|
-| Leaderboards | Daily, weekly, all-time; streaks; best times per grid |
-| Player stats | Completions, play time, streaks |
-| Achievements | Badges (first puzzle, streaks, speed runs, etc.) |
-| Profile | Display name, anonymous mode (raccoon names on leaderboards) |
-| Co-op | “Play with friend” real-time sessions |
+| Feature        | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| Leaderboards   | Daily, weekly, all-time; streaks; best times per grid         |
+| Player stats   | Completions, play time, streaks                               |
+| Achievements   | Badges (first puzzle, streaks, speed runs, etc.)              |
+| Profile        | Display name, anonymous mode (raccoon names on leaderboards)  |
+| Co-op          | “Play with friend” real-time sessions                         |
 | Daily comments | Reactions and comments on daily puzzle; report for moderation |
 
 ---
@@ -53,10 +53,10 @@ Anonymous users can have stats and leaderboard entries without signing up.
 
 Two migration files (both idempotent):
 
-| File | Contents |
-|------|----------|
+| File                                            | Contents                                   |
+| ----------------------------------------------- | ------------------------------------------ |
 | `supabase/migrations/20260225120000_tables.sql` | Tables, indexes, Realtime, server-time RPC |
-| `supabase/migrations/20260225120001_rls.sql` | RLS policies |
+| `supabase/migrations/20260225120001_rls.sql`    | RLS policies                               |
 
 **Option A — CLI**
 
@@ -107,13 +107,13 @@ If you see “Connect Supabase to track your stats…”:
 
 ## Main tables
 
-| Table | Purpose |
-|-------|---------|
-| `player_stats` | Per-user: completions, play time, streaks |
-| `completions` | Each completion; used for leaderboards |
-| `player_profiles` | Display name, leaderboard visibility |
-| `user_achievements` | Unlocked achievements per user |
-| `puzzle_sessions` | Co-op session state |
+| Table               | Purpose                                   |
+| ------------------- | ----------------------------------------- |
+| `player_stats`      | Per-user: completions, play time, streaks |
+| `completions`       | Each completion; used for leaderboards    |
+| `player_profiles`   | Display name, leaderboard visibility      |
+| `user_achievements` | Unlocked achievements per user            |
+| `puzzle_sessions`   | Co-op session state                       |
 
 ---
 
@@ -127,21 +127,25 @@ If leaderboards stay empty after completing puzzles, check that RLS migrations r
 
 ## Troubleshooting
 
-**Anonymous sign-in fails**  
+**Anonymous sign-in fails**
+
 - Confirm Anonymous auth is enabled and not restricted.
 
-**Leaderboards empty**  
-- Complete at least one puzzle.  
+**Leaderboards empty**
+
+- Complete at least one puzzle.
 - Confirm migrations and that the client has an anonymous session.
 
-**Co-op not syncing / WebSocket closes**  
-- Realtime: `puzzle_sessions` and `completions` in `supabase_realtime`.  
-- Env vars set in Vercel and app redeployed.  
+**Co-op not syncing / WebSocket closes**
+
+- Realtime: `puzzle_sessions` and `completions` in `supabase_realtime`.
+- Env vars set in Vercel and app redeployed.
 - Try incognito (extensions can block WebSockets).
 
-**Env vars not loading**  
-- Names must start with `VITE_`.  
-- Restart dev server.  
+**Env vars not loading**
+
+- Names must start with `VITE_`.
+- Restart dev server.
 - Check for `.env` syntax errors.
 
 ---

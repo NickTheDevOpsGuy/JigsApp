@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Modal } from "@/components/Modal/Modal";
 import { useTheme, THEMES, THEME_LABELS, type Theme } from "@/hooks/useTheme";
+import { useColorBlindFriendly } from "@/hooks/useColorBlindFriendly";
 import { soundManager, type AudioProfile, type SnapSoundPref } from "@/audio/core/sounds";
 import { audioManager } from "@/audio/manager/audioManager";
 import { Check } from "lucide-react";
@@ -65,6 +66,7 @@ type ThemeModalProps = {
 
 export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeModalProps) {
   const { theme, setTheme } = useTheme();
+  const { colorblindFriendly, setColorblindFriendly } = useColorBlindFriendly();
   const optionRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const [masterVolume, setMasterVolume] = useState(() => soundManager.getMasterVolume());
   const [sfxVolume, setSfxVolume] = useState(() => soundManager.getSfxVolume());
@@ -103,6 +105,22 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
       title="Theme & Sounds"
       showCloseButton={true}
     >
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Accessibility</h3>
+        <label className={styles.toggleRow}>
+          <input
+            type="checkbox"
+            checked={colorblindFriendly}
+            onChange={(e) => setColorblindFriendly(e.target.checked)}
+            aria-label="Color blind friendly"
+          />
+          <span>Color blind friendly</span>
+        </label>
+        <p className={styles.toggleHint}>
+          Use blue for progress and &quot;done&quot; states so red–green isn&apos;t the
+          only cue.
+        </p>
+      </div>
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Theme</h3>
         <div className={styles.options}>

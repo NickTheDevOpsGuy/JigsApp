@@ -21,16 +21,18 @@ Triggered from the win overlay after completing a puzzle. Works without any back
 - Create a session; share the URL. Someone else opens it and sees the same puzzle.
 - Moves sync in real time via Supabase Realtime.
 
-**Flow:**  
-1. Start any puzzle.  
-2. Menu → Share → **Play with friend**.  
-3. A session is created; you get a share URL.  
-4. Friend opens the URL.  
+**Flow:**
+
+1. Start any puzzle.
+2. Menu → Share → **Play with friend**.
+3. A session is created; you get a share URL.
+4. Friend opens the URL.
 5. Either side moves a piece; the other sees it.
 
-**Key files:**  
-- `puzzleSessionService.ts` — create/get/update session, Realtime subscribe.  
-- `usePuzzleSession.ts` — read `?session=...` from URL, create/join, push state, subscribe.  
+**Key files:**
+
+- `puzzleSessionService.ts` — create/get/update session, Realtime subscribe.
+- `usePuzzleSession.ts` — read `?session=...` from URL, create/join, push state, subscribe.
 - PlayScreen uses `usePuzzleSession`; on remote state, calls `manager.restoreFromSaved()`.
 
 ---
@@ -49,11 +51,13 @@ Verification steps are in [SUPABASE_SETUP.md](SUPABASE_SETUP.md#verifying-share-
 
 ## Troubleshooting
 
-**Co-op: WebSocket closes before connection**  
-- Confirm `puzzle_sessions` and `completions` are in the Realtime publication.  
-- Check env vars on Vercel and redeploy.  
+**Co-op: WebSocket closes before connection**
+
+- Confirm `puzzle_sessions` and `completions` are in the Realtime publication.
+- Check env vars on Vercel and redeploy.
 - Try incognito or disable ad blockers.
 
-**Vercel: “Failed to fetch” or blank screen**  
-- Hard refresh (Cmd+Shift+R / Ctrl+Shift+R) or clear site data.  
+**Vercel: “Failed to fetch” or blank screen**
+
+- Hard refresh (Cmd+Shift+R / Ctrl+Shift+R) or clear site data.
 - Cached HTML may point at old chunks; app may auto-reload on chunk failure.

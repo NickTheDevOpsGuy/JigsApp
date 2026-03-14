@@ -1,7 +1,7 @@
 .hud {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex: 1;
   justify-content: center;
   transition: opacity 0.25s ease;
@@ -17,15 +17,21 @@
   transition-timing-function: ease-in-out;
 }
 
+/* Shared pill size so timer, pause, moves, pieces line up (same height, circles/pills) */
 .hudPill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  min-width: 36px;
+  box-sizing: border-box;
   border: 1px solid var(--color-border);
   background: var(--color-bg-card);
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -34,27 +40,20 @@
 }
 
 .hudMoveCount {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
+  composes: hudPill;
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
-  white-space: nowrap;
-  border: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-bg-card) 92%, rgba(62, 120, 255, 0.12));
   letter-spacing: 0.02em;
+  background: color-mix(in srgb, var(--color-bg-card) 92%, rgba(62, 120, 255, 0.12));
 }
 
 .hudPlacedTotal {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  composes: hudPill;
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
-  white-space: nowrap;
+  gap: 5px;
 }
 
 .hudPlacedTotalText {
@@ -93,9 +92,7 @@
 
 .hudPillTimer {
   composes: hudPill;
-  flex-shrink: 0; /* Prevent timer from being squeezed off on mobile */
-  padding: 8px 14px;
-  font-size: 15px;
+  flex-shrink: 0;
 }
 
 .hudPillTimer.timerLow {

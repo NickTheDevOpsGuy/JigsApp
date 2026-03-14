@@ -12,6 +12,18 @@ export function getDisplayItems(
 ): MenuItemConfig[] {
   return [
     {
+      id: "colorblindFriendly",
+      section: "settings",
+      visible: true,
+      label: "Color blind friendly",
+      sortKey: "Color blind friendly",
+      title: "Use blue for progress and done states (easier for red–green color vision)",
+      onClick: c(props.onToggleColorBlindFriendly ?? (() => {})),
+      subMenu: "display",
+      isToggle: true,
+      checked: props.colorblindFriendly ?? false,
+    },
+    {
       id: "showPreview",
       section: "settings",
       visible: true,

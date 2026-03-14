@@ -29,14 +29,14 @@ Only when auto-apply is off (e.g. E2E). A modal may offer “Use your streak fre
 
 ## Storage keys (localStorage)
 
-| Key | Purpose |
-|-----|--------|
-| `phuzzle:streakFreeze` | Freeze count (0 or 1) |
-| `phuzzle:streakFreezeWeek` | Current week key |
-| `phuzzle:streakFreezeEarnedWeek` | Week when freeze was last earned |
-| `phuzzle:streakFreeze:used:YYYY-MM-DD` | Freeze used for this date |
+| Key                                        | Purpose                            |
+| ------------------------------------------ | ---------------------------------- |
+| `phuzzle:streakFreeze`                     | Freeze count (0 or 1)              |
+| `phuzzle:streakFreezeWeek`                 | Current week key                   |
+| `phuzzle:streakFreezeEarnedWeek`           | Week when freeze was last earned   |
+| `phuzzle:streakFreeze:used:YYYY-MM-DD`     | Freeze used for this date          |
 | `phuzzle:streakFreezeDismissed:YYYY-MM-DD` | User dismissed offer for this date |
-| `phuzzle:testDisableAutoStreakFreeze` | E2E: `"true"` disables auto-apply |
+| `phuzzle:testDisableAutoStreakFreeze`      | E2E: `"true"` disables auto-apply  |
 
 ---
 

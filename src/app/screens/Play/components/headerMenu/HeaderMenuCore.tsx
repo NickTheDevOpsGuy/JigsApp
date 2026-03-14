@@ -5,8 +5,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { Settings, ChevronRight, Check } from "lucide-react";
-import { Button } from "@/components/Button/Button";
+import { Menu, ChevronRight, Check } from "lucide-react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import {
   buildMenuItems,
@@ -211,18 +210,17 @@ export function HeaderMenu(props: HeaderMenuProps) {
   return (
     <div className={styles.headerMenuWrap} ref={rootRef}>
       <div className={styles.headerMenuTriggerWrap} ref={triggerWrapRef}>
-        <Button
-          size="sm"
+        <button
+          type="button"
           className={styles.headerMenuTrigger}
           aria-haspopup="menu"
           aria-expanded={open}
-          aria-label={open ? "Close settings" : "Open settings"}
-          title={open ? "Close settings" : "Open settings menu"}
+          aria-label={open ? "Close menu" : "Open menu"}
+          title={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((s) => !s)}
         >
-          <Settings size={18} aria-hidden />
-          <span className={styles.btnText}>Settings</span>
-        </Button>
+          <Menu size={20} aria-hidden />
+        </button>
       </div>
 
       {open &&

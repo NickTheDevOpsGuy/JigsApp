@@ -58,6 +58,9 @@
   --color-hud-done-bg: rgba(0, 200, 100, 0.15);
   --color-hud-done-border: rgba(0, 200, 100, 0.3);
   --color-focus-ring: rgba(11, 99, 184, 0.3);
+  /* Progress ring (board): green by default; override with --color-progress-75 for color-blind-friendly (e.g. blue) */
+  --color-progress-75: #22c55e;
+  --color-progress-90: #16a34a;
   /* Scrollbars – same on all screens and viewports (parity) */
   --scrollbar-track: rgba(11, 20, 36, 0.82);
   --scrollbar-thumb: rgba(96, 145, 219, 0.86);
@@ -172,6 +175,8 @@ html.theme-dark {
   --color-hud-done-bg: rgba(0, 200, 100, 0.2);
   --color-hud-done-border: rgba(0, 200, 100, 0.4);
   --color-focus-ring: rgba(74, 159, 245, 0.3);
+  --color-progress-75: #22c55e;
+  --color-progress-90: #16a34a;
   --color-error: #f87171;
   --color-error-hover: #fca5a5;
   --color-error-bg: rgba(248, 113, 113, 0.15);

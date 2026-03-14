@@ -25,12 +25,12 @@ No server is used; reporting is client-side only via `mailto`.
 
 ## Main files
 
-| Path | Purpose |
-|------|--------|
-| `src/app/components/BugReportModal/BugReportModal.tsx` | Modal UI, form state, file input, mailto build |
-| `src/app/components/BugReportModal/BugReportModal.module.css` | Styles |
-| `src/app/components/FeedbackChoiceModal/` | Home: “Report a bug” / “Suggest a feature” choice |
-| `src/app/components/HelpChoiceModal/HelpChoiceModal.tsx` | Help menu: report / suggest when handlers provided |
-| `src/app/screens/Play/components/headerMenuItemsRest.ts` | “Report a bug” under Feedback in Settings |
+| Path                                                          | Purpose                                            |
+| ------------------------------------------------------------- | -------------------------------------------------- |
+| `src/app/components/BugReportModal/BugReportModal.tsx`        | Modal UI, form state, file input, mailto build     |
+| `src/app/components/BugReportModal/BugReportModal.module.css` | Styles                                             |
+| `src/app/components/FeedbackChoiceModal/`                     | Home: “Report a bug” / “Suggest a feature” choice  |
+| `src/app/components/HelpChoiceModal/HelpChoiceModal.tsx`      | Help menu: report / suggest when handlers provided |
+| `src/app/screens/Play/components/headerMenuItemsRest.ts`      | “Report a bug” under Feedback in Settings          |
 
 Callers can pass an optional `environmentSnippet` (e.g. puzzle type, grid size) to add to the email body.

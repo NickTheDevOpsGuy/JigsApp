@@ -1,0 +1,66 @@
+/* ============================================
+   Color-blind friendly mode (Settings → Display)
+   Uses blue/brand for progress and “done” so red–green is not the only cue.
+   ============================================ */
+
+/* Light / dark / space (base themes) */
+html.colorblind-friendly,
+html.colorblind-friendly.theme-light,
+html.colorblind-friendly.theme-dark,
+html.colorblind-friendly.theme-space {
+  --color-progress-75: var(--color-brand-primary);
+  --color-progress-90: var(--color-brand-hover);
+  --color-hud-done-bg: color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
+  --color-hud-done-border: color-mix(
+    in srgb,
+    var(--color-brand-primary) 35%,
+    transparent
+  );
+  --color-complete-gradient-start: var(--color-brand-primary);
+  --color-complete-gradient-end: color-mix(
+    in srgb,
+    var(--color-brand-primary) 70%,
+    white
+  );
+  --color-complete-text-shadow: color-mix(
+    in srgb,
+    var(--color-brand-primary) 50%,
+    transparent
+  );
+}
+
+/* Ocean: already blue; ensure progress/done use brand */
+html.colorblind-friendly.theme-ocean {
+  --color-progress-75: var(--color-brand-primary);
+  --color-progress-90: var(--color-brand-hover);
+  --color-hud-done-bg: color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+  --color-hud-done-border: color-mix(
+    in srgb,
+    var(--color-brand-primary) 40%,
+    transparent
+  );
+  --color-complete-gradient-start: var(--color-brand-primary);
+  --color-complete-gradient-end: #93c5fd;
+}
+
+/* Forest: replace green “done” with blue */
+html.colorblind-friendly.theme-forest {
+  --color-progress-75: #3b82f6;
+  --color-progress-90: #2563eb;
+  --color-hud-done-bg: rgba(59, 130, 246, 0.2);
+  --color-hud-done-border: rgba(59, 130, 246, 0.4);
+  --color-complete-gradient-start: #3b82f6;
+  --color-complete-gradient-end: #93c5fd;
+  --color-complete-text-shadow: rgba(59, 130, 246, 0.5);
+}
+
+/* Sunset: replace green “done” with blue */
+html.colorblind-friendly.theme-sunset {
+  --color-progress-75: #3b82f6;
+  --color-progress-90: #2563eb;
+  --color-hud-done-bg: rgba(59, 130, 246, 0.2);
+  --color-hud-done-border: rgba(59, 130, 246, 0.4);
+  --color-complete-gradient-start: #3b82f6;
+  --color-complete-gradient-end: #93c5fd;
+  --color-complete-text-shadow: rgba(59, 130, 246, 0.5);
+}

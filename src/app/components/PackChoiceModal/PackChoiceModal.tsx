@@ -235,7 +235,9 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         >
           Pack
         </button>
-        <span className={styles.stepSep} aria-hidden>→</span>
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
         <button
           type="button"
           className={`${styles.stepLink} ${step === "puzzle" ? styles.stepCurrent : ""}`}
@@ -246,7 +248,9 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         >
           Puzzle
         </button>
-        <span className={styles.stepSep} aria-hidden>→</span>
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
         <button
           type="button"
           className={`${styles.stepLink} ${step === "difficulty" ? styles.stepCurrent : ""}`}
@@ -310,7 +314,9 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                                 }
                               />
                             ) : (
-                              <span className={styles.packEmoji}>{meta?.emoji ?? "🧩"}</span>
+                              <span className={styles.packEmoji}>
+                                {meta?.emoji ?? "🧩"}
+                              </span>
                             )}
                           </div>
                           <span className={styles.packName}>{pack.name}</span>
@@ -378,7 +384,11 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                       type="button"
                       className={`${styles.puzzleCard} ${selectedPuzzle?.id === puzzle.id ? styles.puzzleCardSelected : ""}`}
                       onClick={() => setSelectedPuzzle(puzzle)}
-                      title={isDone ? `Select: ${puzzle.name} (completed)` : `Select: ${puzzle.name}`}
+                      title={
+                        isDone
+                          ? `Select: ${puzzle.name} (completed)`
+                          : `Select: ${puzzle.name}`
+                      }
                       aria-label={isDone ? `${puzzle.name} (completed)` : puzzle.name}
                     >
                       <div className={styles.puzzleThumb}>

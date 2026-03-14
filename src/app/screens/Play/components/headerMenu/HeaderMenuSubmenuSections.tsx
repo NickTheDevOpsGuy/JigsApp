@@ -8,10 +8,24 @@ import type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/heade
 
 interface BaseSectionProps {
   hasSubMenuItems: (
-    id: "contribute" | "help" | "pieceShape" | "modes" | "manualControls" | "moves" | "effects",
+    id:
+      | "contribute"
+      | "help"
+      | "pieceShape"
+      | "modes"
+      | "manualControls"
+      | "moves"
+      | "effects",
   ) => boolean;
   setActiveSubMenu: (
-    id: "contribute" | "help" | "pieceShape" | "modes" | "manualControls" | "moves" | "effects",
+    id:
+      | "contribute"
+      | "help"
+      | "pieceShape"
+      | "modes"
+      | "manualControls"
+      | "moves"
+      | "effects",
   ) => void;
 }
 

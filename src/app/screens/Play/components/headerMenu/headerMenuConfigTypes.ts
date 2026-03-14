@@ -104,6 +104,9 @@ export type HeaderMenuProps = {
   onToggleAdaptivePersonality?: () => void;
   minimapVisible?: boolean;
   onToggleMinimap?: () => void;
+  /** Color-blind friendly: progress/done use blue instead of green (Settings → Display) */
+  colorblindFriendly?: boolean;
+  onToggleColorBlindFriendly?: () => void;
 };
 
 export type SubMenuId =

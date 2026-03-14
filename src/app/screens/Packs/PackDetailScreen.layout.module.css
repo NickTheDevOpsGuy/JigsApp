@@ -1,9 +1,10 @@
+/* Horizontal rail: same pattern as Pack/Choose modals – snap, no half cards */
 .puzzleGrid {
   display: inline-flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  gap: 20px;
-  padding: 0 20px 4px;
+  gap: 8px;
+  padding: 4px 14px 8px;
   align-items: stretch;
   min-width: min-content;
   box-sizing: border-box;

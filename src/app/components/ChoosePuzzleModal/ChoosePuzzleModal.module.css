@@ -127,7 +127,10 @@
   );
   color: var(--color-text-primary);
   box-shadow: 0 4px 16px rgba(11, 99, 184, 0.18);
-  transition: background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .gridScrollBtn:hover:not(:disabled) {
@@ -161,7 +164,7 @@
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: 16px;
+  scroll-padding-inline: 14px;
   scrollbar-width: none;
 }
 
@@ -169,12 +172,12 @@
   display: none;
 }
 
-/* Grid: single row LTR horizontal rail; padding = guard rails so first/last don't sit flush */
+/* Grid: single row LTR horizontal rail (match Pack modal rail); snap = full cards only */
 .puzzleGrid {
   display: flex;
   flex-wrap: nowrap;
-  gap: 12px;
-  padding: 4px 16px 8px;
+  gap: 8px;
+  padding: 4px 14px 8px;
   width: max-content;
   box-sizing: border-box;
   direction: ltr;
@@ -211,7 +214,9 @@
   background: var(--color-bg-primary);
   padding: 0;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   text-align: left;
@@ -322,11 +327,7 @@
 .puzzleTileSelected {
   border-color: var(--color-brand-primary);
   box-shadow: 0 0 0 2px var(--color-brand-primary);
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 8%,
-    var(--color-bg-primary)
-  );
+  background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-bg-primary));
 }
 
 .tileImageWrap {

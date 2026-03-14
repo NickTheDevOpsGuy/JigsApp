@@ -112,7 +112,9 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       );
       const snapParticles = snapParticlesRef?.current ?? [];
       const SNAP_PARTICLE_MS = 520;
-      const hasActiveSnapParticles = snapParticles.some((p) => now - p.t0 < SNAP_PARTICLE_MS);
+      const hasActiveSnapParticles = snapParticles.some(
+        (p) => now - p.t0 < SNAP_PARTICLE_MS,
+      );
       const throttleIdle =
         pieceCount >= HIGH_PIECE_COUNT_THRESHOLD &&
         !isDragging &&

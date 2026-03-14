@@ -110,7 +110,10 @@ export function drawPiece(
         ? 0.28
         : 0.24;
     const veryCloseBoost = proximity > 0.82 ? ((proximity - 0.82) / 0.18) * 0.38 : 0;
-    let alpha = Math.min(0.95, baseAlpha * (0.25 + 0.75 * proximityEased) + veryCloseBoost);
+    let alpha = Math.min(
+      0.95,
+      baseAlpha * (0.25 + 0.75 * proximityEased) + veryCloseBoost,
+    );
     const pulse = 0.92 + 0.08 * Math.sin(nowMs * 0.003);
     alpha *= pulse;
     drawSnapGlow(ctx, cx, cy, radius, alpha);

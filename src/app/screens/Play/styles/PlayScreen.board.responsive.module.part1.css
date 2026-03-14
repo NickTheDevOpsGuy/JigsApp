@@ -51,10 +51,10 @@
     overflow-x: hidden;
   }
 
-  /* Tray same width as board on mobile */
+  /* Tray aligned to visible board edge (inset to match progress frame) */
   .playBody .trayArea {
-    width: var(--play-board-tray-width);
-    max-width: var(--play-board-tray-width);
+    width: calc(var(--play-board-tray-width) - 4px);
+    max-width: calc(var(--play-board-tray-width) - 4px);
   }
 
   .playBody .trayArea .tray {
@@ -145,19 +145,12 @@
   .headerMenuTrigger {
     min-width: 48px;
     min-height: 48px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-bg-elevated) 88%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-    box-shadow: 0 10px 24px rgba(2, 7, 18, 0.28);
+    border-radius: 8px;
+    background: none;
+    border: none;
   }
   .title {
     display: none;
-  }
-  .btnText {
-    display: none;
-  }
-  .headerMenuTrigger .btnText {
-    display: inline;
   }
   .iconBtn {
     padding: 8px 10px;

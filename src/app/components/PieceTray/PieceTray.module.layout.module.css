@@ -24,7 +24,7 @@
   background: rgba(26, 43, 74, 0.6);
   border-radius: 999px;
   overflow: hidden;
-  margin: 0 12px 6px;
+  margin: 0 14px 10px;
 }
 
 .scrollIndicatorFill {
@@ -40,10 +40,10 @@
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
   overflow: hidden;
-  padding: 0 4px 8px;
+  padding: 10px 14px 14px;
 }
 
 .scrollBtn {
@@ -86,8 +86,8 @@
   overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
   scroll-padding-inline-end: 0;
-  padding: 6px 12px;
-  padding-inline-end: 12px;
+  padding: 8px 10px;
+  padding-inline-end: 10px;
   display: flex;
   align-items: center;
   scroll-behavior: smooth;

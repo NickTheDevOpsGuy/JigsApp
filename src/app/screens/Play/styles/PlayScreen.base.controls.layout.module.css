@@ -6,29 +6,19 @@
 }
 
 .topBarInner {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 14px;
   min-width: 0;
 }
 
 .topBarLeft {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
   flex: 0 1 auto;
   min-width: 0;
-  justify-self: start;
-}
-
-/* Center: pause button only, truly centered over board */
-.topBarCenter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  justify-self: center;
 }
 
 .topBarHud {
@@ -103,7 +93,7 @@
 .topBarRight {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   flex: 0 1 auto;
   min-width: 0;
   justify-self: end;

@@ -3,7 +3,7 @@
  * Pause button toggles game pause. Speedrun: quadrant timers; Time Attack: lives.
  */
 import React from "react";
-import { Clock, Heart, Pause, Play, Puzzle } from "lucide-react";
+import { Clock, Heart, Pause, Play, Puzzle, AlertTriangle } from "lucide-react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import type { TimeMode } from "@/screens/Play/core/time/timeMode";
@@ -26,8 +26,8 @@ interface PlayHUDProps {
   zenModeEnabled?: boolean;
   /** Adaptive Personality: competitive = snappier copy; calm = softer copy */
   uiTone?: "competitive" | "calm";
-  /** Layout slot: left = timer/moves/pieces (board edge); center = pause only */
-  slot?: "left" | "center";
+  /** Layout slot: left = timer, pause, moves, pieces */
+  slot?: "left";
 }
 
 const QUAD_LABELS = ["TL", "TR", "BL", "BR"] as const;
@@ -68,28 +68,12 @@ export function PlayHUD({
   const showPause = !zenModeEnabled && !isComplete && timeMode !== "relaxed";
 
   const showLeft = slot === undefined || slot === "left";
-  const showCenter = slot === undefined || slot === "center";
 
   return (
     <div
       className={`${styles.hud} ${uiTone === "competitive" ? styles.hudCompetitive : ""} ${uiTone === "calm" ? styles.hudCalm : ""}`}
       data-ui-tone={uiTone ?? undefined}
     >
-      {showCenter && showPause && (
-        <button
-          type="button"
-          className={styles.hudPillPause}
-          onClick={onTogglePause}
-          aria-label={isPaused ? "Resume" : "Pause"}
-          title={isPaused ? "Resume game" : "Pause game"}
-        >
-          {isPaused ? (
-            <Play size={18} aria-hidden />
-          ) : (
-            <Pause size={18} aria-hidden />
-          )}
-        </button>
-      )}
       {showLeft && isSpeedrun && quadrantTimes && (
         <div className={styles.quadrantTimers}>
           {([0, 1, 2, 3] as const).map((q) => {
@@ -126,11 +110,17 @@ export function PlayHUD({
           className={`${styles.hudPillTimer} ${isLowTime ? styles.timerLow : ""}`}
           title={
             isCountdown
-              ? `Countdown timer (${formatTime(countdownTotal)} total)`
+              ? isLowTime
+                ? `Low time – ${formatTime(elapsedSeconds)} left`
+                : `Countdown timer (${formatTime(countdownTotal)} total)`
               : "Elapsed time"
           }
         >
-          <Clock size={16} />
+          {isLowTime ? (
+            <AlertTriangle size={16} aria-hidden />
+          ) : (
+            <Clock size={16} aria-hidden />
+          )}
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
           {isCountdown && (
             <span className={styles.timerSuffix}>/ {formatTime(countdownTotal)}</span>
@@ -145,6 +135,17 @@ export function PlayHUD({
           <Clock size={16} />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
         </div>
+      )}
+      {showLeft && showPause && (
+        <button
+          type="button"
+          className={styles.hudPillPause}
+          onClick={onTogglePause}
+          aria-label={isPaused ? "Resume" : "Pause"}
+          title={isPaused ? "Resume game" : "Pause game"}
+        >
+          {isPaused ? <Play size={18} aria-hidden /> : <Pause size={18} aria-hidden />}
+        </button>
       )}
       {showLeft && !isSpeedrun && !isTimeAttack && (
         <>

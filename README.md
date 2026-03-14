@@ -18,6 +18,7 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the gallery, uplo
 - [Preview](#preview)
 - [Features](#features)
 - [Roadmap](#roadmap)
+- [Accessibility](#accessibility)
 - [Tech](#tech)
 - [Get started](#get-started)
 - [Contributing](#contributing)
@@ -36,7 +37,7 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the gallery, uplo
 
 ## Features
 
-- **Play:** Drag, drop, rotate; board and neighbor snap; group merging. Grids from 3×3 to 12×12. Gallery, upload, camera, and curated packs. Piece tray with filters (All, Edges, Color). Zoom and pan. Undo/redo with snap-back. Continue and start over.
+- **Play:** Drag, drop, rotate; board and neighbor snap; group merging. Grids from 3×3 to 12×12. Gallery, upload, camera, and curated packs. Piece tray with filters (All, Edges, Color); unified HUD pills (timer, pause, moves, pieces); compact gap between board and tray. Zoom and pan. Undo/redo with snap-back. Continue and start over.
 - **Daily:** Daily puzzle, streaks, countdown, streak shield (freeze). Comments and reactions after completion.
 - **Modes:** Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality. Magnetic Snap and Snap Glow toggles. Reference preview, snap combo, piece shapes, percentile badges, themes.
 - **Social:** Stats, profile, leaderboards (Today, Week, All-time, Efficiency). Share result, share card, challenge links, replay viewer. Co-op play with shareable links.
@@ -50,6 +51,12 @@ Details: [doc/CHANGES.md](doc/CHANGES.md).
 
 - Import puzzle from URL
 - Stronger offline-first for puzzle images
+
+---
+
+## Accessibility
+
+- **Color vision:** The UI uses blue as the main brand color (buttons, links, selection), which works well for most color vision types. A **Color blind friendly** option (Settings → Display in Play, or Theme & Sounds from the menu) switches progress, “done,” and success states to blue so red–green is not the only cue; it applies to all screens and all themes. We avoid **color-only** cues: low-time warning shows a warning icon as well as red styling; co-op status shows text and icons (e.g. WifiOff, spinner) with color. Focus rings and sufficient contrast are used for interactive elements.
 
 ---
 

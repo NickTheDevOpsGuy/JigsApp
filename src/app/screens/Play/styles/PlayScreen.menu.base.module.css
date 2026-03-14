@@ -3,7 +3,7 @@
 }
 
 .headerMenuWrap .headerMenuTrigger:hover:not(:disabled) {
-  background: var(--color-action-hover);
+  background: color-mix(in srgb, var(--color-text-primary) 12%, transparent);
 }
 
 .headerMenuPanel {

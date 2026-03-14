@@ -6,6 +6,7 @@ High-level feature list and recent changes. For project overview see [README](..
 
 ## Recent (high level)
 
+- **Play HUD & tray** — Unified pill size for timer, pause, moves, pieces (0/16). Hamburger and HUD in one board-aligned strip. Small gap between board and tray (like HUD–board). Color blind friendly option (Settings → Display or Theme & Sounds).
 - **Puzzle pieces** — Organic bulb-shaped tabs/sockets, smoother silhouettes, subtle depth (shadow, bevel). Drag lift and snap polish; ~120ms snap ease. Save/continue unchanged.
 - **Choose Puzzle** — Horizontal scroll with arrows and blue bar; full-width tray; mobile layout shrunk for small screens.
 - **Play layout** — Bigger board (max 920px). Tray full width; Undo/Redo on the right of the tray. Timer centered in top bar; pause button in HUD. Top bar and HUD larger (52px bar, bigger fonts).

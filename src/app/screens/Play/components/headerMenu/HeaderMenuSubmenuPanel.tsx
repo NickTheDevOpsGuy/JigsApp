@@ -70,9 +70,7 @@ export function HeaderMenuSubmenuPanel({
             </p>
           )}
           {activeSubMenu === "moves" && (
-            <p className={styles.headerMenuSubmenuHint}>
-              {SUBMENU_DESCRIPTIONS.moves}
-            </p>
+            <p className={styles.headerMenuSubmenuHint}>{SUBMENU_DESCRIPTIONS.moves}</p>
           )}
         </div>
       )}

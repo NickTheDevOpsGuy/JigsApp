@@ -84,7 +84,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     const grid = el.firstElementChild;
     const firstTile = grid?.firstElementChild as HTMLElement | undefined;
     const cardWidth = firstTile?.offsetWidth ?? 100;
-    const gap = 12;
+    const gap = 8;
     const stepPx = Math.max(100, cardWidth + gap);
     const step = stepPx * direction;
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
@@ -137,23 +137,37 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         <button
           type="button"
           className={`${styles.stepLink} ${styles.stepCurrent}`}
-          onClick={() => gridScrollRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
+          onClick={() =>
+            gridScrollRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            })
+          }
           title="Puzzle image selection"
           aria-label="Image selection"
         >
           Image
         </button>
-        <span className={styles.stepSep} aria-hidden>→</span>
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
         <button
           type="button"
           className={`${styles.stepLink} ${selectedPuzzle ? styles.stepCurrent : ""}`}
-          onClick={() => difficultySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })}
+          onClick={() =>
+            difficultySectionRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            })
+          }
           title="Difficulty selection"
           aria-label="Difficulty selection"
         >
           Difficulty
         </button>
-        <span className={styles.stepSep} aria-hidden>→</span>
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
         <button
           type="button"
           className={`${styles.stepLink} ${canStart ? styles.stepCurrent : ""}`}
@@ -169,17 +183,17 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
       {/* FilterBar: FilterChips */}
       <div className={styles.filterBar} role="group" aria-label="Filter by category">
         {CATEGORIES.map((cat) => (
-        <button
-          key={cat.id}
-          type="button"
-          className={`${styles.filterChip} ${filterCategory === cat.id ? styles.filterChipActive : ""}`}
-          onClick={() => setFilterCategory(cat.id)}
-          aria-pressed={filterCategory === cat.id}
-          aria-label={`Filter: ${cat.name}`}
-          title={`Filter by ${cat.name}`}
-        >
-          {cat.label}
-        </button>
+          <button
+            key={cat.id}
+            type="button"
+            className={`${styles.filterChip} ${filterCategory === cat.id ? styles.filterChipActive : ""}`}
+            onClick={() => setFilterCategory(cat.id)}
+            aria-pressed={filterCategory === cat.id}
+            aria-label={`Filter: ${cat.name}`}
+            title={`Filter by ${cat.name}`}
+          >
+            {cat.label}
+          </button>
         ))}
       </div>
 

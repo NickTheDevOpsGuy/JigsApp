@@ -65,13 +65,8 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     grid,
   );
   const traySlots = buildTraySlots(displayed, totalSlots);
-  const {
-    scrollerRef,
-    scrollProgress,
-    canScrollLeft,
-    canScrollRight,
-    scrollByOnePiece,
-  } = usePieceTrayScroll(traySlots.length);
+  const { scrollerRef, scrollProgress, canScrollLeft, canScrollRight, scrollByOnePiece } =
+    usePieceTrayScroll(traySlots.length);
   const thumbsById = usePieceTrayThumbs(displayed, image, grid, thumbSize, compact);
 
   const emptyText = "Drag pieces here to store them";

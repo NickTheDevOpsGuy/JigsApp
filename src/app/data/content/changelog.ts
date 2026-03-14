@@ -1,13 +1,17 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "45";
+export const CHANGELOG_VERSION = "46";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "🎯 HUD pills – Timer, pause, moves, and pieces (0/16) now use the same pill size and spacing.",
+      "📐 Tray gap – Smaller gap between board and piece tray (matches HUD spacing).",
+      "🍔 Top bar – Hamburger and HUD sit in one board-aligned strip with even spacing.",
+      "♿ Color blind mode – Progress and “done” use blue in Settings → Display or Theme & Sounds.",
       "🧩 Puzzle piece realism – Deeper jigsaw tabs/sockets, stronger drop shadow and bevel, inner rim for cardboard thickness, and clearer outline so pieces feel tactile and physical.",
       "✋ Drag feel – Dragged pieces lift more (12px), scale to 1.04×, and draw above others with a stronger shadow for a satisfying pick-up feel.",
       "🧲 Magnetic snap – Larger snap radius and stronger pull so pieces smoothly slide into place; 120ms lock animation for a quick, satisfying snap.",

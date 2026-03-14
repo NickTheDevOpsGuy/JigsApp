@@ -2,6 +2,7 @@
  * Builds headerMenuProps, hudProps, and topBarButtonsProps for PlayScreenTopBar.
  * Extracted from PlayScreen to keep the main component smaller.
  */
+import { useColorBlindFriendly } from "@/hooks/useColorBlindFriendly";
 import type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/headerMenuConfigTypes";
 import { buildHeaderMenuProps } from "@/screens/Play/hooks/topBar/usePlayScreenTopBarPropsBuilders";
 import {
@@ -16,6 +17,7 @@ import type {
 export function usePlayScreenTopBarProps(
   params: UsePlayScreenTopBarPropsParams,
 ): PlayScreenTopBarPropsResult {
+  const { colorblindFriendly, toggleColorblindFriendly } = useColorBlindFriendly();
   const {
     theme,
     setTheme,
@@ -206,6 +208,8 @@ export function usePlayScreenTopBarProps(
     toggleMusic,
     toggleHaptics,
     toggleFullscreen,
+    colorblindFriendly,
+    onToggleColorBlindFriendly: toggleColorblindFriendly,
   });
 
   const hudProps = buildHudProps({
@@ -248,7 +252,7 @@ export function usePlayScreenTopBarProps(
     sessionId,
     realtimeStatus,
     connectedCount,
-    showHud: !isComplete && !isPaused,
+    showHud: !isComplete,
     immersiveMode,
     showImmersiveUi,
     onPointerLeave: immersiveMode ? scheduleImmersiveHide : undefined,

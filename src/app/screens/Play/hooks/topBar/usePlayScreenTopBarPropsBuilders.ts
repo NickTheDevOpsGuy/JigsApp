@@ -91,6 +91,8 @@ export function buildHeaderMenuProps(args: BuildHeaderMenuPropsArgs): HeaderMenu
     toggleMusic,
     toggleHaptics,
     toggleFullscreen,
+    colorblindFriendly,
+    onToggleColorBlindFriendly,
   } = args;
 
   return {
@@ -218,5 +220,7 @@ export function buildHeaderMenuProps(args: BuildHeaderMenuPropsArgs): HeaderMenu
     onZoomIn: () => viewport.zoomIn(),
     onZoomOut: () => viewport.zoomOut(),
     progressiveRevealMode,
+    colorblindFriendly: args.colorblindFriendly,
+    onToggleColorBlindFriendly: args.onToggleColorBlindFriendly,
   };
 }

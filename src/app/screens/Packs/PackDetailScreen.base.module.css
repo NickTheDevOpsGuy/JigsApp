@@ -186,7 +186,7 @@
   padding-bottom: var(--space-2);
 }
 
-/* Left-to-right horizontal scroll; start snap = full cards, no half-draw; padding = guard rails */
+/* Left-to-right horizontal scroll; snap = full cards only (match Pack/Choose modals) */
 .scrollViewport {
   flex: 1 1 auto;
   min-width: 0;
@@ -195,7 +195,7 @@
   overflow-y: hidden;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: 20px;
+  scroll-padding-inline: 14px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   padding: 10px 0 14px;

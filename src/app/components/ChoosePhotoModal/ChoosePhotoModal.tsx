@@ -72,7 +72,9 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
         >
           Image
         </button>
-        <span className={styles.stepSep} aria-hidden>→</span>
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
         <button
           type="button"
           className={`${styles.stepLink} ${step === "difficulty" ? styles.stepCurrent : ""}`}

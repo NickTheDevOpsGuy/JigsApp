@@ -135,16 +135,10 @@
 .hudPillPause {
   composes: hudPill;
   cursor: pointer;
-  border: none;
+  border: 1px solid var(--color-border);
   font: inherit;
   color: inherit;
   background: var(--color-bg-card);
-  padding: 8px 12px;
-  min-width: 40px;
-  min-height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .hudPillPause:hover {

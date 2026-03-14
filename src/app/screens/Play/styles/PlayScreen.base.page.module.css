@@ -64,8 +64,27 @@
 }
 
 .headerMenuTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 44px;
   min-width: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.headerMenuTrigger:hover {
+  background: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+}
+
+.headerMenuTrigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 .topBar {
@@ -73,10 +92,10 @@
   max-height: 44px;
   flex-shrink: 0;
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 0;
-  padding: 0;
+  align-items: center;
+  padding: 0 max(8px, env(safe-area-inset-right, 0)) 0
+    max(8px, env(safe-area-inset-left, 0));
   padding-top: env(safe-area-inset-top, 0);
   min-width: 0;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
@@ -88,15 +107,24 @@
     opacity 0.2s ease;
 }
 
-/* Inner bar: same width as board, so timer aligns to board left edge */
+/* Single strip aligned to board: hamburger, coop?, timer, pause, moves, pieces, then right buttons */
 .topBarInner {
-  width: 100%;
+  min-width: 0;
   max-width: var(--play-board-tray-width);
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 0 8px;
+  gap: 14px;
+  padding-inline: 14px 12px;
+}
+
+/* Hamburger starts where timer is (board edge); HUD group has internal spacing */
+.topBarLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 0 1 auto;
   min-width: 0;
 }
 

@@ -7,6 +7,7 @@ import posthog from "posthog-js";
 
 import { App } from "./App";
 import { ThemeProvider } from "./hooks/useTheme";
+import { ColorBlindProvider } from "./hooks/useColorBlindFriendly";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Global styles
@@ -30,7 +31,9 @@ ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <ErrorBoundary>
       <ThemeProvider>
-        <App />
+        <ColorBlindProvider>
+          <App />
+        </ColorBlindProvider>
       </ThemeProvider>
     </ErrorBoundary>
   </React.StrictMode>,

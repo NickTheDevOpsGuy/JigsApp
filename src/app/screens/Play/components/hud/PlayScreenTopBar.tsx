@@ -74,23 +74,16 @@ export function PlayScreenTopBar({
     >
       <div className={styles.topBar}>
         <div className={styles.topBarInner}>
-          <div className={styles.topBarLeft}>
-            {!hideMenuAndButtons && <HeaderMenu {...headerMenuProps} />}
-            {sessionId && (
-              <CoopStatusIndicator
-                status={realtimeStatus}
-                connectedCount={connectedCount}
-              />
-            )}
-            {showHud && (
-              <div className={styles.topBarHud} aria-live="polite">
-                <PlayHUD {...hudProps} slot="left" />
-              </div>
-            )}
-          </div>
+          {!hideMenuAndButtons && <HeaderMenu {...headerMenuProps} />}
+          {sessionId && (
+            <CoopStatusIndicator
+              status={realtimeStatus}
+              connectedCount={connectedCount}
+            />
+          )}
           {showHud && (
-            <div className={styles.topBarCenter} aria-live="polite">
-              <PlayHUD {...hudProps} slot="center" />
+            <div className={styles.topBarLeft} aria-live="polite">
+              <PlayHUD {...hudProps} slot="left" />
             </div>
           )}
           <div className={styles.topBarRight}>
