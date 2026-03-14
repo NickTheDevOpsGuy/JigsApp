@@ -1,2 +1,502 @@
-@import "./CompletionOverlay.base.part1.module.css";
-@import "./CompletionOverlay.base.part2.module.css";
+.completeOverlay {
+  --color-completion-accent: var(--color-progress-75, #22c55e);
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: completionFadeIn 0.5s ease-out;
+  padding: var(--space-4);
+  padding-top: max(var(--space-4), env(safe-area-inset-top, 0));
+  padding-bottom: max(var(--space-6), env(safe-area-inset-bottom, 0) + var(--space-4));
+  overflow-y: hidden;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Starry celebratory background */
+.completeOverlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 15%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(2px 2px at 80% 18%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 1px at 40% 25%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 60% 22%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1.5px 1.5px at 30% 80%, rgba(255, 220, 150, 0.6), transparent),
+    radial-gradient(1.5px 1.5px at 70% 75%, rgba(255, 220, 150, 0.6), transparent);
+  background-size: 200% 200%;
+  background-position:
+    0 0,
+    100% 0,
+    50% 30%,
+    50% 20%,
+    20% 100%,
+    80% 100%;
+  pointer-events: none;
+}
+
+.completeOverlay::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background:
+    radial-gradient(
+      ellipse 120% 80% at 15% 10%,
+      rgba(251, 191, 36, 0.25) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 120% 80% at 85% 10%,
+      rgba(251, 191, 36, 0.25) 0%,
+      transparent 55%
+    );
+  pointer-events: none;
+}
+
+.completePanel {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  max-width: min(360px, 90vw);
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  text-align: center;
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  max-height: 90vh;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.completePanelNew {
+  max-width: min(780px, 96vw);
+  padding: 18px 20px 20px;
+  gap: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-card);
+  animation: completePanelEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  margin: auto;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+/* Brief celebratory glow behind panel (rewarding but not flashy) */
+.completePanelNew::before {
+  content: "";
+  position: absolute;
+  inset: -24px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand-primary) 18%, transparent) 0%,
+    color-mix(in srgb, var(--color-brand-primary) 6%, transparent) 45%,
+    transparent 70%
+  );
+  opacity: 0;
+  animation: completeGlowBurst 0.7s ease-out both;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completePanelNew {
+    animation: completePanelEnterReduced 0.25s ease-out both;
+  }
+  .completePanelNew::before {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Glassmorphic close: rounded squircle, translucent bg, light blue glow on hover */
+.completeCloseBtn {
+  position: absolute;
+  top: max(var(--space-4), env(safe-area-inset-top, 0));
+  right: max(var(--space-4), env(safe-area-inset-right, 0));
+  appearance: none;
+  border: none;
+  background: color-mix(in srgb, var(--color-bg-elevated) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--color-text-primary);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    box-shadow 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border) 60%, transparent);
+}
+
+.completePanelNew .completeCloseBtn {
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+
+.completePanelNew .completeCloseBtn:hover {
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--color-brand-primary) 50%, transparent),
+    0 0 14px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+}
+
+.completeCloseBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Puzzle complete – plain text, not a button; subtle star accents */
+.completeTitleBlock {
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+.completeTitleBlock::before,
+.completeTitleBlock::after {
+  content: "✦";
+  position: absolute;
+  top: 50%;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--color-brand-primary) 70%, white);
+  opacity: 0;
+  animation: completeStarTwinkle 1s ease-out both;
+  pointer-events: none;
+}
+
+.completeTitleBlock::before {
+  left: 0.5rem;
+  animation-delay: 0.25s;
+}
+
+.completeTitleBlock::after {
+  right: 0.5rem;
+  animation-delay: 0.45s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeTitleBlock::before,
+  .completeTitleBlock::after {
+    animation: none;
+    opacity: 0.35;
+  }
+}
+
+@keyframes completeTitlePop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.completeTitleText {
+  margin: 0;
+  font-size: clamp(1.7rem, 3.6vw, 2.3rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 0.01em;
+  animation: completeTitlePop 0.45s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeTitleText {
+    animation: none;
+  }
+}
+
+.completeTitlePhrase {
+  margin: 0.35em 0 0.1em;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 600;
+  color: var(--color-complete-gradient-start);
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  animation: completeTitlePop 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) 0.08s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeTitlePhrase {
+    animation: none;
+  }
+}
+
+.completeTitlePhraseHighlight {
+  margin: 0.2em 0 0;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  font-weight: 700;
+  color: var(--color-complete-gradient-start);
+  text-align: center;
+}
+
+.completeTitlePhraseSub {
+  margin: 0.15em 0 0;
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.completeAchievementUnlock {
+  margin: 0.4em 0 0;
+  padding: 6px 12px;
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: color-mix(
+    in srgb,
+    var(--color-complete-gradient-start) 25%,
+    var(--color-bg-card)
+  );
+  border-radius: var(--radius-btn);
+  text-align: center;
+  display: inline-block;
+  animation: completeTitlePop 0.35s cubic-bezier(0.34, 1.2, 0.64, 1) 0.15s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeAchievementUnlock {
+    animation: none;
+  }
+}
+
+.completeTimeBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
+}
+
+.completeTimeBlock.completeTimeVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.completeTimeValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-completion-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.completeTimeValue svg {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.completeTimeLabel {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.completeImageWrapNew {
+  position: relative;
+  width: 100%;
+  max-height: min(42vh, 380px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--color-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0.96);
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
+    box-shadow 0.5s ease-out;
+}
+
+.completeImageWrapNew.completeImageScaled {
+  transform: scale(1);
+}
+
+.completeImageWrapNew.completeImageGlow {
+  box-shadow:
+    0 0 0 1px var(--color-border-strong),
+    0 0 0 6px rgba(0, 0, 0, 0.08),
+    0 10px 30px rgba(15, 23, 42, 0.35);
+}
+
+/* Subtle glow ripple across the completed puzzle image */
+@keyframes completeRipple {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.completeImageWrapNew.completeImageGlow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand-primary) 25%, transparent) 0%,
+    transparent 60%
+  );
+  animation: completeRipple 1.2s ease-out 1;
+}
+
+.completeImageNew {
+  display: block;
+  width: 100%;
+  height: min(40vw, 380px);
+  max-height: min(44vh, 380px);
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Stats panel: time / moves – prominent row of stat cards */
+.completeStatsPanel {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.completeStatsPanelTitle {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.completeStatCards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  background: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
+  overflow: hidden;
+}
+
+@keyframes completeStatCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.completeStatCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 8px 8px;
+  background: transparent;
+  border-right: 1px solid var(--color-border);
+  opacity: 0;
+  animation: completeStatCardIn 0.4s ease-out both;
+}
+
+.completeStatCardIcon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-primary) 14%, transparent);
+  color: color-mix(in srgb, var(--color-brand-primary) 88%, white 12%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Stagger stat cards when panel reaches "time" phase */
+.completePanelNew[data-anim-phase="time"] .completeStatCard:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.completePanelNew[data-anim-phase="time"] .completeStatCard:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.completePanelNew[data-anim-phase="time"] .completeStatCard:nth-child(3) {
+  animation-delay: 0.19s;
+}
+.completePanelNew[data-anim-phase="time"] .completeStatCard:nth-child(4) {
+  animation-delay: 0.26s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeStatCard {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.completeStatCard:last-child {
+  border-right: none;
+}
+
+.completeStatCardLabel {
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.completeStatCardValue {
+  font-size: clamp(1.1rem, 2.4vw, 1.55rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}

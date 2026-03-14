@@ -1,13 +1,17 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "46";
+export const CHANGELOG_VERSION = "48";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📦 Puzzle Packs – Same layout as Choose Puzzle; only labels and data differ.",
+      "🧭 Breadcrumbs – Click Pack, Puzzle, Difficulty, or Start to jump to that step.",
+      "🖼️ One modal – Pack and puzzle pickers share one reusable layout.",
+      "📱 Mobile touch – Board blocks page scroll so pieces follow your finger; 48px tap targets.",
       "🎯 HUD pills – Timer, pause, moves, and pieces (0/16) now use the same pill size and spacing.",
       "📐 Tray gap – Smaller gap between board and piece tray (matches HUD spacing).",
       "🍔 Top bar – Hamburger and HUD sit in one board-aligned strip with even spacing.",

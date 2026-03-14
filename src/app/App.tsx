@@ -141,6 +141,7 @@ export function App() {
     const handleContextMenu = (event: MouseEvent) => {
       if (allowContextMenuTarget(event.target)) return;
       event.preventDefault();
+      event.stopPropagation();
     };
 
     const handleDragStart = (event: DragEvent) => {
@@ -153,7 +154,11 @@ export function App() {
       event.preventDefault();
     };
 
-    document.addEventListener("contextmenu", handleContextMenu, true);
+    /* Prevent long-press context menu on Android/iOS; use capture so we run before any child. */
+    document.addEventListener("contextmenu", handleContextMenu, {
+      capture: true,
+      passive: false,
+    });
     document.addEventListener("dragstart", handleDragStart, true);
     document.addEventListener("selectstart", handleSelectStart, true);
     return () => {

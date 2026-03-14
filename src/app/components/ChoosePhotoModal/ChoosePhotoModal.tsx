@@ -61,7 +61,7 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
   };
 
   return (
-    <Modal isOpen onClose={onClose} title={title} showCloseButton>
+    <Modal isOpen onClose={onClose} title={title} showCloseButton variant="choosePuzzle">
       <div className={styles.stepIndicator} role="navigation" aria-label="Steps">
         <button
           type="button"

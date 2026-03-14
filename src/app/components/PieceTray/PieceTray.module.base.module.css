@@ -1,2 +1,192 @@
-@import "./PieceTray.module.base.module.part1.css";
-@import "./PieceTray.module.base.module.part2.css";
+/* src/app/components/PieceTray/PieceTray.module.css */
+
+/* Single tray card: compact dock; height set by play screen (110–160px, max 20vh) */
+.tray {
+  min-height: 0;
+  flex-shrink: 0;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-elevated);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  margin: 0 12px 16px 12px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.handle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  min-height: 32px;
+  max-height: 40px;
+  cursor: pointer;
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.handle:hover {
+  background: var(--color-bg-elevated);
+}
+
+.handleBar {
+  display: block;
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border-strong);
+}
+
+.handleLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* Collapsed: 8vh desktop, 6vh mobile; hide header content and scroller (PDF) */
+.trayCollapsed,
+.trayLarge.trayCollapsed {
+  height: 8vh;
+  min-height: 48px;
+}
+
+.trayCollapsed .header {
+  display: none;
+}
+
+.trayCollapsed .scroller,
+.trayCollapsed .scrollIndicator {
+  display: none !important;
+}
+
+/* Header: Pieces (n) + Filter + Shuffle – simple flex row; must receive pointer events */
+.header {
+  padding: 6px 12px 8px;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  z-index: 3;
+  position: relative;
+  pointer-events: auto;
+  background: var(--color-bg-elevated);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+@keyframes piecePulse {
+  0%,
+  100% {
+    box-shadow: none;
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 3px var(--color-accent);
+    transform: scale(1.08);
+  }
+}
+
+.pieceButtonPulse {
+  animation: piecePulse 0.6s ease-in-out 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pieceButtonPulse {
+    animation: none;
+  }
+}
+
+.randomBtn {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  padding: 8px;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.randomBtn:hover:not(:disabled) {
+  background: var(--color-bg-card);
+  border-color: var(--color-brand-primary);
+}
+
+.randomBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.randomBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.title {
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.segment {
+  display: flex;
+  gap: 4px;
+}
+
+.segment button {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-btn);
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  min-height: 40px;
+}

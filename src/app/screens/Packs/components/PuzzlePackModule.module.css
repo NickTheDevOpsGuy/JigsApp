@@ -49,8 +49,10 @@
 
 .carouselNavBtn {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  min-width: 48px;
+  min-height: 48px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,6 +70,9 @@
     box-shadow 0.2s ease,
     opacity 0.2s ease;
   box-shadow: 0 4px 16px rgba(11, 99, 184, 0.18);
+  touch-action: manipulation;
+  position: relative;
+  z-index: 2;
 }
 
 .carouselNavBtn:hover:not(:disabled) {

@@ -37,11 +37,11 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the gallery, uplo
 
 ## Features
 
-- **Play:** Drag, drop, rotate; board and neighbor snap; group merging. Grids from 3×3 to 12×12. Gallery, upload, camera, and curated packs. Piece tray with filters (All, Edges, Color); unified HUD pills (timer, pause, moves, pieces); compact gap between board and tray. Zoom and pan. Undo/redo with snap-back. Continue and start over.
+- **Play:** Drag, drop, rotate; board and neighbor snap; group merging. Grids from 3×3 to 12×12. Gallery, upload, camera, and curated packs. Pack and puzzle pickers share one modal layout (Pack → Puzzle → Difficulty → Start) with clickable breadcrumbs. Piece tray with filters (All, Edges, Color); unified HUD pills (timer, pause, moves, pieces); compact gap between board and tray. Zoom and pan. Undo/redo with snap-back. Continue and start over.
 - **Daily:** Daily puzzle, streaks, countdown, streak shield (freeze). Comments and reactions after completion.
 - **Modes:** Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality. Magnetic Snap and Snap Glow toggles. Reference preview, snap combo, piece shapes, percentile badges, themes.
 - **Social:** Stats, profile, leaderboards (Today, Week, All-time, Efficiency). Share result, share card, challenge links, replay viewer. Co-op play with shareable links.
-- **Quality:** Bug report with optional screenshots. Mobile layouts. PWA install.
+- **Quality:** Bug report with optional screenshots. Mobile layouts: touch drag on the board (pieces follow your finger; page scroll is disabled over the board so drag works), tappable tray and carousel buttons (48px hit areas). PWA install.
 
 Details: [doc/CHANGES.md](doc/CHANGES.md).
 

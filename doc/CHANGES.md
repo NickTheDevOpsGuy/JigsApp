@@ -6,6 +6,8 @@ High-level feature list and recent changes. For project overview see [README](..
 
 ## Recent (high level)
 
+- **Puzzle Packs & Choose Puzzle parity** — Puzzle Packs dialog uses the same layout as Choose Puzzle (filters, horizontal rail, difficulty, CTA). Breadcrumbs (Pack → Puzzle → Difficulty → Start) are clickable so you can jump to any step. One reusable modal shell for both flows.
+- **Mobile touch & input** — Touch drag on the board works again: the board area uses `touch-action: none` so the browser doesn’t scroll the page while you drag pieces; pointer capture and pointer events (down/move/up) handle drag. Tray buttons (Filter, Shuffle) and all carousel/rail arrows use 48px minimum hit areas, `touch-action: manipulation`, and correct z-index so they’re tappable on mobile. Dialogs use consistent sizing (e.g. 92% width, 85vh max on mobile).
 - **Play HUD & tray** — Unified pill size for timer, pause, moves, pieces (0/16). Hamburger and HUD in one board-aligned strip. Small gap between board and tray (like HUD–board). Color blind friendly option (Settings → Display or Theme & Sounds).
 - **Puzzle pieces** — Organic bulb-shaped tabs/sockets, smoother silhouettes, subtle depth (shadow, bevel). Drag lift and snap polish; ~120ms snap ease. Save/continue unchanged.
 - **Choose Puzzle** — Horizontal scroll with arrows and blue bar; full-width tray; mobile layout shrunk for small screens.
@@ -21,7 +23,7 @@ High-level feature list and recent changes. For project overview see [README](..
 
 ## Core gameplay
 
-- Drag and drop; tap to rotate on mobile. Board snap and neighbor snap; groups move together. No auto-nudge on release.
+- Drag and drop (mouse and touch); tap to rotate on mobile. The board area disables browser touch scrolling so piece drag works; pointer capture keeps drag events on the canvas. Board snap and neighbor snap; groups move together. No auto-nudge on release.
 - Grid sizes 3×3–10×10 presets; custom up to 12×12. Sources: gallery, upload, camera.
 - Tray: full width, horizontal scroll, Undo/Redo on the right. Filters (All, Edges, Color). Zoom/pan (scroll or pinch); viewport persists.
 - Timer modes: elapsed, countdown, relaxed, best time. Percentile badges; completion badges (Speed Demon, Chill Mode, etc.).

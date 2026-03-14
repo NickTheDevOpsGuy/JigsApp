@@ -60,23 +60,36 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   }, []);
 
   useEffect(() => {
+    if (!isOpen) return;
     const el = gridScrollRef.current;
-    if (!el) return;
-    updateScrollState();
-    el.addEventListener("scroll", updateScrollState);
-    const ro = new ResizeObserver(updateScrollState);
-    ro.observe(el);
-    const t1 = setTimeout(updateScrollState, 0);
-    const t2 = setTimeout(updateScrollState, 150);
-    const t3 = setTimeout(updateScrollState, 400);
+    const runUpdate = () => {
+      requestAnimationFrame(() => updateScrollState());
+    };
+    runUpdate();
+    const t0 = setTimeout(updateScrollState, 0);
+    const t1 = setTimeout(updateScrollState, 80);
+    const t2 = setTimeout(updateScrollState, 250);
+    const t3 = setTimeout(updateScrollState, 500);
+    if (el) {
+      el.addEventListener("scroll", updateScrollState);
+      const ro = new ResizeObserver(updateScrollState);
+      ro.observe(el);
+      return () => {
+        el.removeEventListener("scroll", updateScrollState);
+        ro.disconnect();
+        clearTimeout(t0);
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
+    }
     return () => {
-      el.removeEventListener("scroll", updateScrollState);
-      ro.disconnect();
+      clearTimeout(t0);
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [updateScrollState, filteredPuzzles.length]);
+  }, [isOpen, updateScrollState, filteredPuzzles.length]);
 
   const scrollGridBy = useCallback((direction: 1 | -1) => {
     const el = gridScrollRef.current;
@@ -172,8 +185,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
           type="button"
           className={`${styles.stepLink} ${canStart ? styles.stepCurrent : ""}`}
           onClick={() => startButtonRef.current?.focus()}
-          disabled={!canStart}
-          title={canStart ? "Start puzzle" : "Select an image first"}
+          title={canStart ? "Start puzzle" : "Jump to Start"}
           aria-label="Start puzzle"
         >
           Start

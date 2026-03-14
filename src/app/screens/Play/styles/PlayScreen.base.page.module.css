@@ -115,15 +115,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 10px;
   padding-inline: 14px 12px;
 }
 
-/* Hamburger starts where timer is (board edge); HUD group has internal spacing */
+/* Hamburger and HUD (timer, pause, moves) tight together */
 .topBarLeft {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 4px;
   flex: 0 1 auto;
   min-width: 0;
 }

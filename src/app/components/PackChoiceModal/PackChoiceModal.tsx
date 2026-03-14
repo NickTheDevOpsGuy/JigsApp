@@ -1,8 +1,8 @@
 /**
- * PackChoiceModal – Puzzle Packs as a popup modal with steps: Pack → Puzzle → Difficulty.
- * Same pattern as Today's Puzzle: modal with steps, then navigate to /play.
+ * PackChoiceModal – Visually matches Choose Puzzle dialog.
+ * Flow: Pack → Puzzle → Difficulty → Start. Same layout structure, spacing, and interaction pattern.
  */
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Puzzle, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
@@ -15,31 +15,53 @@ import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packs/packComp
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import styles from "./PackChoiceModal.module.css";
+import styles from "@/components/ChoosePuzzleModal/ChoosePuzzleModal.module.css";
 
 const PRIMARY_DIFFICULTIES = GRID_OPTIONS.slice(0, 4);
+const DIFFICULTY_NAMES = ["Easy", "Medium", "Hard", "Expert"] as const;
 const RECOMMENDED_INDEX = 1;
 
-type Step = "pack" | "puzzle" | "difficulty";
+const PACK_FILTERS = [
+  { id: "all", name: "All", label: "All" },
+  ...PACK_METADATA.map((p) => ({ id: p.id, name: p.name, label: p.name })),
+];
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
 };
 
+function filterPacks(packs: PuzzlePack[], categoryId: string): PuzzlePack[] {
+  return categoryId === "all" ? packs : packs.filter((p) => p.id === categoryId);
+}
+
 export function PackChoiceModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
-  const [step, setStep] = useState<Step>("pack");
   const [packsData, setPacksData] = useState<Awaited<
     ReturnType<typeof loadPacksData>
   > | null>(null);
   const [selectedPack, setSelectedPack] = useState<PuzzlePack | null>(null);
   const [selectedPuzzle, setSelectedPuzzle] = useState<SamplePuzzle | null>(null);
   const [difficultyIndex, setDifficultyIndex] = useState(RECOMMENDED_INDEX);
+  const [filterCategory, setFilterCategory] = useState("all");
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
+
+  const packs = packsData?.PUZZLE_PACKS ?? [];
+  const filteredPacks = useMemo(
+    () => filterPacks(packs, filterCategory),
+    [packs, filterCategory],
+  );
+  const puzzles: SamplePuzzle[] =
+    selectedPack && packsData ? packsData.getPuzzlesForPack(selectedPack) : [];
+  const completed = getCompletedPuzzleIds();
 
   const packScrollRef = useRef<HTMLDivElement>(null);
   const puzzleScrollRef = useRef<HTMLDivElement>(null);
+  const packSectionRef = useRef<HTMLDivElement>(null);
+  const puzzleSectionRef = useRef<HTMLDivElement>(null);
+  const difficultySectionRef = useRef<HTMLDivElement>(null);
+  const startButtonRef = useRef<HTMLButtonElement>(null);
+
   const [packScrollProgress, setPackScrollProgress] = useState(0);
   const [canScrollPackLeft, setCanScrollPackLeft] = useState(false);
   const [canScrollPackRight, setCanScrollPackRight] = useState(false);
@@ -52,10 +74,12 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     if (!el) return;
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
     const left = el.scrollLeft;
-    const threshold = 1;
+    const threshold = 2;
     setCanScrollPackLeft(maxScroll > threshold && left > threshold);
     setCanScrollPackRight(maxScroll > threshold && left < maxScroll - threshold);
-    setPackScrollProgress(maxScroll <= 0 ? 0 : left / maxScroll);
+    setPackScrollProgress(
+      maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, left / maxScroll)),
+    );
   }, []);
 
   const updatePuzzleScrollState = useCallback(() => {
@@ -63,20 +87,22 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     if (!el) return;
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
     const left = el.scrollLeft;
-    const threshold = 1;
+    const threshold = 2;
     setCanScrollPuzzleLeft(maxScroll > threshold && left > threshold);
     setCanScrollPuzzleRight(maxScroll > threshold && left < maxScroll - threshold);
-    setPuzzleScrollProgress(maxScroll <= 0 ? 0 : left / maxScroll);
+    setPuzzleScrollProgress(
+      maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, left / maxScroll)),
+    );
   }, []);
 
   const scrollPackBy = useCallback((direction: 1 | -1) => {
     const el = packScrollRef.current;
     if (!el) return;
-    const rail = el.firstElementChild as HTMLElement | null;
-    const first = rail?.firstElementChild as HTMLElement | null;
-    const cardWidth = first?.offsetWidth ?? 92;
+    const grid = el.firstElementChild;
+    const firstTile = grid?.firstElementChild as HTMLElement | undefined;
+    const cardWidth = firstTile?.offsetWidth ?? 100;
     const gap = 8;
-    const stepPx = Math.max(90, cardWidth + gap);
+    const stepPx = Math.max(100, cardWidth + gap);
     const step = stepPx * direction;
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
     const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + step));
@@ -86,11 +112,11 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
   const scrollPuzzleBy = useCallback((direction: 1 | -1) => {
     const el = puzzleScrollRef.current;
     if (!el) return;
-    const rail = el.firstElementChild as HTMLElement | null;
-    const first = rail?.firstElementChild as HTMLElement | null;
-    const cardWidth = first?.offsetWidth ?? 88;
+    const grid = el.firstElementChild;
+    const firstTile = grid?.firstElementChild as HTMLElement | undefined;
+    const cardWidth = firstTile?.offsetWidth ?? 100;
     const gap = 8;
-    const stepPx = Math.max(85, cardWidth + gap);
+    const stepPx = Math.max(100, cardWidth + gap);
     const step = stepPx * direction;
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
     const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + step));
@@ -98,35 +124,30 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      loadPacksData().then(setPacksData);
-      setStep("pack");
-      setSelectedPack(null);
-      setSelectedPuzzle(null);
-      setDifficultyIndex(RECOMMENDED_INDEX);
-    }
+    if (isOpen) loadPacksData().then(setPacksData);
   }, [isOpen]);
 
   useEffect(() => {
-    if (step !== "pack" || !packsData) return;
+    if (!isOpen) return;
+    setSelectedPack(null);
+    setSelectedPuzzle(null);
+    setDifficultyIndex(RECOMMENDED_INDEX);
+    setFilterCategory("all");
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !packsData) return;
     const el = packScrollRef.current;
-    const run = () => {
-      requestAnimationFrame(() => {
-        updatePackScrollState();
-      });
-    };
-    run();
+    const runUpdate = () => requestAnimationFrame(updatePackScrollState);
+    runUpdate();
     const t0 = setTimeout(updatePackScrollState, 0);
-    const t1 = setTimeout(updatePackScrollState, 150);
-    const t2 = setTimeout(updatePackScrollState, 400);
-    const t3 = setTimeout(updatePackScrollState, 600);
-    const t4 = setTimeout(updatePackScrollState, 900);
+    const t1 = setTimeout(updatePackScrollState, 80);
+    const t2 = setTimeout(updatePackScrollState, 250);
+    const t3 = setTimeout(updatePackScrollState, 500);
     if (el) {
       el.addEventListener("scroll", updatePackScrollState);
       const ro = new ResizeObserver(updatePackScrollState);
       ro.observe(el);
-      const inner = el.firstElementChild;
-      if (inner) ro.observe(inner);
       return () => {
         el.removeEventListener("scroll", updatePackScrollState);
         ro.disconnect();
@@ -134,7 +155,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         clearTimeout(t1);
         clearTimeout(t2);
         clearTimeout(t3);
-        clearTimeout(t4);
       };
     }
     return () => {
@@ -142,30 +162,22 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
-      clearTimeout(t4);
     };
-  }, [step, packsData, updatePackScrollState]);
+  }, [isOpen, packsData, updatePackScrollState, filteredPacks.length]);
 
   useEffect(() => {
-    if (step !== "puzzle" || !selectedPack) return;
-    const run = () => {
-      requestAnimationFrame(() => {
-        updatePuzzleScrollState();
-      });
-    };
-    run();
-    const t0 = setTimeout(updatePuzzleScrollState, 0);
-    const t1 = setTimeout(updatePuzzleScrollState, 150);
-    const t2 = setTimeout(updatePuzzleScrollState, 400);
-    const t3 = setTimeout(updatePuzzleScrollState, 600);
-    const t4 = setTimeout(updatePuzzleScrollState, 900);
+    if (!selectedPack || puzzles.length === 0) return;
     const el = puzzleScrollRef.current;
+    const runUpdate = () => requestAnimationFrame(updatePuzzleScrollState);
+    runUpdate();
+    const t0 = setTimeout(updatePuzzleScrollState, 0);
+    const t1 = setTimeout(updatePuzzleScrollState, 80);
+    const t2 = setTimeout(updatePuzzleScrollState, 250);
+    const t3 = setTimeout(updatePuzzleScrollState, 500);
     if (el) {
       el.addEventListener("scroll", updatePuzzleScrollState);
       const ro = new ResizeObserver(updatePuzzleScrollState);
       ro.observe(el);
-      const inner = el.firstElementChild;
-      if (inner) ro.observe(inner);
       return () => {
         el.removeEventListener("scroll", updatePuzzleScrollState);
         ro.disconnect();
@@ -173,7 +185,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         clearTimeout(t1);
         clearTimeout(t2);
         clearTimeout(t3);
-        clearTimeout(t4);
       };
     }
     return () => {
@@ -181,13 +192,8 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
-      clearTimeout(t4);
     };
-  }, [step, selectedPack, packsData, updatePuzzleScrollState]);
-
-  const puzzles: SamplePuzzle[] =
-    selectedPack && packsData ? packsData.getPuzzlesForPack(selectedPack) : [];
-  const completed = getCompletedPuzzleIds();
+  }, [selectedPack, updatePuzzleScrollState, puzzles.length]);
 
   const handleStart = () => {
     if (!selectedPuzzle || !packsData) return;
@@ -202,36 +208,35 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     navigate("/play");
   };
 
+  const canStart = selectedPuzzle != null;
+
   if (!isOpen) return null;
 
-  const title =
-    step === "pack"
-      ? "Puzzle Packs"
-      : step === "puzzle"
-        ? (selectedPack?.name ?? "Choose puzzle")
-        : "Choose difficulty";
-
-  const goToStep = (target: Step) => {
-    if (target === "pack") {
-      setStep("pack");
-      setSelectedPack(null);
-      setSelectedPuzzle(null);
-    } else if (target === "puzzle" && selectedPack) {
-      setStep("puzzle");
-    } else if (target === "difficulty" && selectedPuzzle) {
-      setStep("difficulty");
-    }
-  };
-
   return (
-    <Modal isOpen onClose={onClose} title={title} showCloseButton>
-      <div className={styles.stepIndicator} role="navigation" aria-label="Steps">
+    <Modal
+      isOpen
+      onClose={onClose}
+      title="Choose Pack"
+      showCloseButton
+      variant="choosePuzzle"
+    >
+      {/* Step indicator: Pack → Puzzle → Difficulty → Start (same as Choose Puzzle) */}
+      <div
+        className={styles.stepIndicator}
+        role="navigation"
+        aria-label="Steps: Pack, Puzzle, Difficulty, Start"
+      >
         <button
           type="button"
-          className={`${styles.stepLink} ${step === "pack" ? styles.stepCurrent : ""}`}
-          onClick={() => goToStep("pack")}
-          aria-current={step === "pack" ? "step" : undefined}
-          title="Go to pack selection"
+          className={`${styles.stepLink} ${!selectedPack ? styles.stepCurrent : ""}`}
+          onClick={() =>
+            packSectionRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            })
+          }
+          title="Pack selection"
+          aria-label="Pack selection"
         >
           Pack
         </button>
@@ -240,11 +245,15 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         </span>
         <button
           type="button"
-          className={`${styles.stepLink} ${step === "puzzle" ? styles.stepCurrent : ""}`}
-          onClick={() => goToStep("puzzle")}
-          disabled={!selectedPack}
-          aria-current={step === "puzzle" ? "step" : undefined}
-          title={selectedPack ? "Go to puzzle selection" : "Select a pack first"}
+          className={`${styles.stepLink} ${selectedPack ? styles.stepCurrent : ""}`}
+          onClick={() =>
+            puzzleSectionRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            })
+          }
+          title="Puzzle selection"
+          aria-label="Puzzle selection"
         >
           Puzzle
         </button>
@@ -253,115 +262,162 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         </span>
         <button
           type="button"
-          className={`${styles.stepLink} ${step === "difficulty" ? styles.stepCurrent : ""}`}
-          onClick={() => goToStep("difficulty")}
-          disabled={!selectedPuzzle}
-          aria-current={step === "difficulty" ? "step" : undefined}
-          title={selectedPuzzle ? "Go to difficulty selection" : "Select a puzzle first"}
+          className={`${styles.stepLink} ${selectedPuzzle ? styles.stepCurrent : ""}`}
+          onClick={() =>
+            difficultySectionRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            })
+          }
+          title="Difficulty selection"
+          aria-label="Difficulty selection"
         >
           Difficulty
         </button>
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
+        <button
+          type="button"
+          className={`${styles.stepLink} ${canStart ? styles.stepCurrent : ""}`}
+          onClick={() => startButtonRef.current?.focus()}
+          title={canStart ? "Start puzzle" : "Jump to Start"}
+          aria-label="Start puzzle"
+        >
+          Start
+        </button>
       </div>
 
-      {step === "pack" && (
-        <div className={styles.stepBody}>
-          <p className={styles.railLabel}>Choose a pack</p>
-          {!packsData ? (
-            <p className={styles.loading}>Loading…</p>
-          ) : (
-            <>
-              <div className={styles.railScrollWrap}>
-                <button
-                  type="button"
-                  className={styles.railScrollBtn}
-                  onClick={() => scrollPackBy(-1)}
-                  disabled={!canScrollPackLeft}
-                  aria-label="Scroll left"
-                  title="Scroll left"
-                >
-                  <ChevronLeft size={22} aria-hidden />
-                </button>
-                <div
-                  ref={packScrollRef}
-                  className={styles.railScroller}
-                  role="list"
-                  aria-label="Pack list"
-                >
-                  <div className={styles.packRail}>
-                    {packsData.PUZZLE_PACKS.map((pack) => {
-                      const meta = PACK_METADATA.find((p) => p.id === pack.id);
-                      const puzzleList = packsData.getPuzzlesForPack(pack);
-                      const hero = puzzleList[0];
-                      return (
-                        <button
-                          key={pack.id}
-                          type="button"
-                          className={styles.packCard}
-                          onClick={() => {
-                            setSelectedPack(pack);
-                            setStep("puzzle");
-                          }}
-                          title={`Select pack: ${pack.name}`}
-                          aria-label={`Select pack: ${pack.name}`}
-                        >
-                          <div className={styles.packThumb}>
-                            {hero && !imgError[pack.id] ? (
-                              <img
-                                src={hero.thumbnail}
-                                alt=""
-                                onError={() =>
-                                  setImgError((prev) => ({ ...prev, [pack.id]: true }))
-                                }
-                              />
-                            ) : (
-                              <span className={styles.packEmoji}>
-                                {meta?.emoji ?? "🧩"}
-                              </span>
-                            )}
-                          </div>
-                          <span className={styles.packName}>{pack.name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className={styles.railScrollBtn}
-                  onClick={() => scrollPackBy(1)}
-                  disabled={!canScrollPackRight}
-                  aria-label="Scroll right"
-                  title="Scroll right"
-                >
-                  <ChevronRight size={22} aria-hidden />
-                </button>
-              </div>
-              <div
-                className={styles.railScrollBar}
-                role="progressbar"
-                aria-valuenow={Math.round(packScrollProgress * 100)}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label="Scroll position"
-                title="Scroll position"
-              >
-                <div
-                  className={styles.railScrollBarFill}
-                  style={{ width: `${packScrollProgress * 100}%` }}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      )}
+      {/* Filter chips (same as Choose Puzzle) */}
+      <div className={styles.filterBar} role="group" aria-label="Filter by category">
+        {PACK_FILTERS.map((cat) => (
+          <button
+            key={cat.id}
+            type="button"
+            className={`${styles.filterChip} ${filterCategory === cat.id ? styles.filterChipActive : ""}`}
+            onClick={() => setFilterCategory(cat.id)}
+            aria-pressed={filterCategory === cat.id}
+            aria-label={`Filter: ${cat.name}`}
+            title={`Filter by ${cat.name}`}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
 
-      {step === "puzzle" && selectedPack && (
-        <div className={styles.stepBody}>
-          <p className={styles.railLabel}>Choose a puzzle</p>
-          <div className={styles.railScrollWrap}>
+      {/* Pack rail: same structure as Choose Puzzle rail */}
+      <p className={styles.railLabel} ref={packSectionRef}>
+        Choose a pack
+      </p>
+      <div className={styles.gridScrollWrap}>
+        <button
+          type="button"
+          className={styles.gridScrollBtn}
+          onClick={() => scrollPackBy(-1)}
+          disabled={!canScrollPackLeft}
+          aria-label="Scroll left"
+          title="Scroll left"
+        >
+          <ChevronLeft size={22} aria-hidden />
+        </button>
+        <div
+          ref={packScrollRef}
+          className={styles.puzzleGridScroller}
+          role="listbox"
+          aria-label="Choose a pack"
+        >
+          <div className={styles.puzzleGrid}>
+            {!packsData ? (
+              <div className={styles.puzzleTile} style={{ pointerEvents: "none" }}>
+                <div className={styles.tileImageWrap}>
+                  <span className={styles.tilePlaceholder}>…</span>
+                </div>
+                <span className={styles.tileTitle}>Loading…</span>
+              </div>
+            ) : (
+              filteredPacks.map((pack) => {
+                const meta = PACK_METADATA.find((p) => p.id === pack.id);
+                const puzzleList = packsData.getPuzzlesForPack(pack);
+                const hero = puzzleList[0];
+                const selected = selectedPack?.id === pack.id;
+                return (
+                  <button
+                    key={pack.id}
+                    type="button"
+                    role="option"
+                    aria-selected={selected}
+                    className={`${styles.puzzleTile} ${selected ? styles.puzzleTileSelected : ""}`}
+                    onClick={() => {
+                      setSelectedPack(pack);
+                      setSelectedPuzzle(null);
+                      setDifficultyIndex(RECOMMENDED_INDEX);
+                    }}
+                    title={`Select: ${pack.name}`}
+                    aria-label={`Select ${pack.name}`}
+                  >
+                    <div className={styles.tileImageWrap}>
+                      {hero && !imgError[pack.id] ? (
+                        <img
+                          src={hero.thumbnail}
+                          alt=""
+                          loading="lazy"
+                          className={styles.tileImage}
+                          onError={() =>
+                            setImgError((prev) => ({ ...prev, [pack.id]: true }))
+                          }
+                        />
+                      ) : (
+                        <span className={styles.tilePlaceholder}>
+                          {meta?.emoji ?? "🧩"}
+                        </span>
+                      )}
+                    </div>
+                    <span className={styles.tileTitle}>{pack.name}</span>
+                    <div className={styles.tileHoverOverlay} aria-hidden />
+                    {selected && (
+                      <div className={styles.tileSelectedIndicator} aria-hidden />
+                    )}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+        <button
+          type="button"
+          className={styles.gridScrollBtn}
+          onClick={() => scrollPackBy(1)}
+          disabled={!canScrollPackRight}
+          aria-label="Scroll right"
+          title="Scroll right"
+        >
+          <ChevronRight size={22} aria-hidden />
+        </button>
+      </div>
+      <div
+        className={styles.gridScrollBar}
+        role="progressbar"
+        aria-valuenow={Math.round(packScrollProgress * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Scroll position"
+      >
+        <div
+          className={styles.gridScrollBarFill}
+          style={{ width: `${packScrollProgress * 100}%` }}
+        />
+      </div>
+
+      {/* Puzzle section: always in DOM so breadcrumb "Puzzle" can scroll here */}
+      <p className={styles.railLabel} ref={puzzleSectionRef}>
+        Choose a puzzle
+      </p>
+      {selectedPack && puzzles.length > 0 ? (
+        <>
+          <div className={styles.gridScrollWrap}>
             <button
               type="button"
-              className={styles.railScrollBtn}
+              className={styles.gridScrollBtn}
               onClick={() => scrollPuzzleBy(-1)}
               disabled={!canScrollPuzzleLeft}
               aria-label="Scroll left"
@@ -371,48 +427,48 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             </button>
             <div
               ref={puzzleScrollRef}
-              className={styles.railScroller}
-              role="list"
-              aria-label="Puzzle list"
+              className={styles.puzzleGridScroller}
+              role="listbox"
+              aria-label="Choose a puzzle"
             >
-              <div className={styles.puzzleRail}>
+              <div className={styles.puzzleGrid}>
                 {puzzles.map((puzzle) => {
+                  const selected = selectedPuzzle?.id === puzzle.id;
                   const isDone = completed.has(puzzle.id);
                   return (
                     <button
                       key={puzzle.id}
                       type="button"
-                      className={`${styles.puzzleCard} ${selectedPuzzle?.id === puzzle.id ? styles.puzzleCardSelected : ""}`}
+                      role="option"
+                      aria-selected={selected}
+                      className={`${styles.puzzleTile} ${selected ? styles.puzzleTileSelected : ""}`}
                       onClick={() => setSelectedPuzzle(puzzle)}
-                      title={
-                        isDone
-                          ? `Select: ${puzzle.name} (completed)`
-                          : `Select: ${puzzle.name}`
-                      }
-                      aria-label={isDone ? `${puzzle.name} (completed)` : puzzle.name}
+                      title={`Select: ${puzzle.name}${isDone ? " (completed)" : ""}`}
+                      aria-label={`Select ${puzzle.name}${isDone ? " (completed)" : ""}`}
                     >
-                      <div className={styles.puzzleThumb}>
+                      <div className={styles.tileImageWrap}>
                         {imgError[puzzle.id] ? (
-                          <span>?</span>
+                          <span className={styles.tilePlaceholder}>?</span>
                         ) : (
                           <img
                             src={puzzle.thumbnail}
                             alt=""
+                            loading="lazy"
+                            className={styles.tileImage}
                             onError={() =>
-                              setImgError((prev) => ({
-                                ...prev,
-                                [puzzle.id]: true,
-                              }))
+                              setImgError((prev) => ({ ...prev, [puzzle.id]: true }))
                             }
                           />
                         )}
-                        {isDone && (
-                          <span className={styles.completedBadge} aria-hidden>
-                            <Check size={12} />
-                          </span>
-                        )}
                       </div>
-                      <span className={styles.puzzleName}>{puzzle.name}</span>
+                      <span className={styles.tileTitle}>
+                        {puzzle.name}
+                        {isDone ? " ✓" : ""}
+                      </span>
+                      <div className={styles.tileHoverOverlay} aria-hidden />
+                      {selected && (
+                        <div className={styles.tileSelectedIndicator} aria-hidden />
+                      )}
                     </button>
                   );
                 })}
@@ -420,7 +476,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             </div>
             <button
               type="button"
-              className={styles.railScrollBtn}
+              className={styles.gridScrollBtn}
               onClick={() => scrollPuzzleBy(1)}
               disabled={!canScrollPuzzleRight}
               aria-label="Scroll right"
@@ -430,76 +486,104 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             </button>
           </div>
           <div
-            className={styles.railScrollBar}
+            className={styles.gridScrollBar}
             role="progressbar"
             aria-valuenow={Math.round(puzzleScrollProgress * 100)}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-label="Scroll position"
-            title="Scroll position"
           >
             <div
-              className={styles.railScrollBarFill}
+              className={styles.gridScrollBarFill}
               style={{ width: `${puzzleScrollProgress * 100}%` }}
             />
           </div>
-          <button
-            type="button"
-            className={styles.nextBtn}
-            disabled={!selectedPuzzle}
-            onClick={() => setStep("difficulty")}
-            title="Continue to difficulty selection"
-            aria-label="Continue to difficulty selection"
-          >
-            Next: Difficulty
-          </button>
+        </>
+      ) : (
+        <p
+          className={styles.railLabel}
+          style={{
+            marginTop: 0,
+            fontWeight: 400,
+            color: "var(--color-text-secondary)",
+            fontSize: "13px",
+          }}
+        >
+          Select a pack above to choose a puzzle
+        </p>
+      )}
+
+      {/* Selected preview (same as Choose Puzzle) */}
+      {selectedPuzzle && (
+        <div className={styles.selectedPreview}>
+          <img src={selectedPuzzle.fullImage} alt="" className={styles.previewImage} />
         </div>
       )}
 
-      {step === "difficulty" && selectedPuzzle && (
-        <div className={styles.stepBody}>
-          <div className={styles.previewWrap}>
-            <img
-              src={selectedPuzzle.fullImage}
-              alt={selectedPuzzle.name}
-              className={styles.previewImg}
-            />
-          </div>
-          <div className={styles.difficultyStack}>
-            {PRIMARY_DIFFICULTIES.map((opt, i) => {
-              const name =
-                ["Easy", "Medium", "Hard", "Expert"][i] ?? opt.label.split(" ")[0];
-              const pieces = opt.rows * opt.cols;
-              const selected = difficultyIndex === i;
-              return (
-                <button
-                  key={`${opt.rows}x${opt.cols}`}
-                  type="button"
-                  className={`${styles.difficultyCard} ${selected ? styles.difficultyCardSelected : ""}`}
-                  onClick={() => setDifficultyIndex(i)}
-                  title={`Select ${name}: ${pieces} pieces`}
-                  aria-label={`${name}, ${pieces} pieces`}
-                >
-                  <Puzzle size={16} />
-                  <span>
-                    {name} – {pieces} pieces
-                  </span>
-                  {selected && <Check size={16} className={styles.difficultyCheck} />}
-                </button>
-              );
-            })}
-          </div>
-          <button
-            type="button"
-            className={styles.startBtn}
-            onClick={handleStart}
-            title="Start puzzle with selected options"
-            aria-label="Start puzzle"
-          >
-            Start Puzzle →
-          </button>
-        </div>
-      )}
+      {/* Difficulty section (identical to Choose Puzzle) */}
+      <div
+        ref={difficultySectionRef}
+        className={styles.difficultySelector}
+        role="group"
+        aria-label="Choose difficulty"
+        aria-disabled={!selectedPuzzle}
+      >
+        {PRIMARY_DIFFICULTIES.map((opt, i) => {
+          const name = DIFFICULTY_NAMES[i] ?? opt.label.split(" ")[0];
+          const pieces = opt.rows * opt.cols;
+          const active = difficultyIndex === i;
+          return (
+            <button
+              key={`${opt.rows}x${opt.cols}`}
+              type="button"
+              className={`${styles.difficultyBtn} ${active ? styles.difficultyBtnActive : ""}`}
+              onClick={() => setDifficultyIndex(i)}
+              disabled={!selectedPuzzle}
+              aria-pressed={active}
+              aria-label={`${name}, ${pieces} pieces`}
+              title={`Select ${name}: ${pieces} pieces`}
+            >
+              <Puzzle size={16} aria-hidden />
+              <span>
+                {name} – {pieces} pieces
+              </span>
+              {active && (
+                <Check size={16} className={styles.difficultyCheck} aria-hidden />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Start Puzzle button (same as Choose Puzzle) */}
+      <button
+        ref={startButtonRef}
+        type="button"
+        className={styles.startPuzzleButton}
+        onClick={handleStart}
+        disabled={!canStart}
+        title="Start puzzle with selected image and difficulty"
+        aria-label="Start puzzle"
+      >
+        Start Puzzle
+      </button>
+
+      {/* Footer link (same as Choose Puzzle) */}
+      <p className={styles.uploadLinkWrap}>
+        Or{" "}
+        <button
+          type="button"
+          className={styles.uploadLink}
+          onClick={() => {
+            onClose();
+            navigate("/new");
+          }}
+          title="Open custom image upload"
+          aria-label="Upload your own image"
+        >
+          upload your own image
+        </button>
+      </p>
     </Modal>
   );
 }

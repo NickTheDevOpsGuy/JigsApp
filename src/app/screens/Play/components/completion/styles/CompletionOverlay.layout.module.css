@@ -1,2 +1,453 @@
-@import "./CompletionOverlay.layout.part1.module.css";
-@import "./CompletionOverlay.layout.part2.module.css";
+.completeStats {
+  background: color-mix(in srgb, var(--color-bg-elevated) 95%, var(--color-bg-card));
+  border-radius: var(--radius-btn);
+  padding: 2px 0;
+  margin-bottom: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.completeStatRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.completeStatRow:last-child {
+  border-bottom: none;
+}
+
+.completeStatIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-brand-primary);
+  opacity: 0.9;
+}
+
+.completeStatLabelValue {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.completeStatLabel {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.completeStatValue {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.completeStatValueRank {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-brand-primary);
+}
+
+.completeStatBonus {
+  font-size: 0.9em;
+  color: var(--color-brand-primary);
+  font-weight: 600;
+}
+
+.completeStatsNew {
+  margin: 0;
+  padding: 0;
+}
+
+.completeStatsLine {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.completePrimaryActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.completePrimaryActions .completePrimaryBtn:only-child {
+  grid-column: 1 / -1;
+}
+
+.completePrimaryBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 12px;
+  min-height: 64px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.15s;
+}
+
+.completePrimaryBtn:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-strong);
+}
+
+.completePrimaryBtnTitle {
+  font-size: 1rem;
+}
+
+.completePrimaryBtnSub {
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.completeNextPuzzleIcon {
+  flex-shrink: 0;
+  color: var(--color-brand-primary, #2563eb);
+}
+
+.completeShareSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.completeShareDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.completeShareDivider::before,
+.completeShareDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.completeActionsList {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.completeActionBtn {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    transform 0.15s ease;
+}
+
+.completeActionBtn:hover {
+  border-color: var(--color-brand-primary);
+  background: var(--color-bg-primary);
+}
+
+.completeActionBtn:active {
+  transform: translateY(1px);
+}
+
+.completeActionBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.completeActionLead {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.completeActionBtnPrimary {
+  min-height: 52px;
+  background: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+}
+
+.completeActionBtnPrimary:hover {
+  background: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
+}
+
+/* Row: Next Puzzle (primary) + Review Solve + Share */
+.completeActionsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+}
+
+@media (max-width: 420px) {
+  .completeActionsRow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.completeReplayNextWrap {
+  position: relative;
+  min-width: 0;
+}
+
+.completeShareWrap {
+  position: relative;
+  min-width: 0;
+}
+
+.completeShareTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.15s ease,
+    box-shadow 0.18s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 12px 24px rgba(4, 10, 20, 0.16);
+}
+
+.completeShareTrigger:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-strong);
+  transform: translateY(-1px);
+}
+
+.completeShareTrigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.completeShareTriggerPrimary {
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  border-color: var(--color-brand-primary);
+}
+
+.completeShareTriggerPrimary:hover {
+  background: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
+}
+
+.completeShareChevronOpen {
+  transform: rotate(180deg);
+}
+
+.completeShareDropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  box-shadow: var(--shadow-lg);
+}
+
+.completeShareSheet {
+  display: grid;
+  gap: 10px;
+}
+
+.completeSharePreviewCard,
+.completeShareSummaryCard {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: var(--radius-card);
+  border: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
+  background:
+    radial-gradient(circle at top, rgba(74, 139, 235, 0.16), transparent 54%),
+    linear-gradient(180deg, rgba(17, 30, 53, 0.96), rgba(9, 16, 27, 0.94));
+}
+
+.completeShareActionsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.completeShareGroupLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.completeSharePreviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.completeSharePreviewBrand {
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.completeSharePreviewTag {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
+  color: var(--color-text-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.completeSharePreviewStats {
+  display: grid;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.completeSharePreviewStats span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Share/taunt message preview – chat-bubble style like reference image */
+.completeShareMessagePreview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.completeShareBubble {
+  background: color-mix(in srgb, var(--color-bg-elevated) 85%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.completeShareBubbleResult {
+  background: color-mix(in srgb, var(--color-bg-card) 90%, transparent);
+  border-color: var(--color-border);
+}
+
+.completeShareBubbleChallenge {
+  background: color-mix(in srgb, var(--color-bg-card) 90%, transparent);
+  border-color: var(--color-border);
+}
+
+.completeShareBubbleIntro {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.completeShareBubbleChallenge .completeShareBubbleIntro,
+.completeShareBubbleChallenge .completeShareBubbleTitle,
+.completeShareBubbleChallenge .completeShareBubbleLine,
+.completeShareBubbleChallenge .completeShareBubbleCta,
+.completeShareBubbleChallenge .completeShareBubbleUrl {
+  color: var(--color-text-primary);
+}
+
+.completeShareBubbleTitle {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.completeShareBubbleIcon {
+  font-size: 1rem;
+}
+
+.completeShareBubbleLine {
+  margin: 0 0 4px;
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+  line-height: 1.35;
+}
+
+/* Share modal: compact utility sheet layout */
+.shareModalBody {
+  padding: 14px 18px 18px !important;
+}
+
+@media (max-width: 720px) {
+  .shareModalBody {
+    padding: 12px 14px 16px !important;
+  }
+
+  .shareModalBody .completeShareSheet {
+    gap: 8px;
+  }
+
+  .shareModalBody .completeShareSummaryCard {
+    padding: 10px 12px;
+  }
+}

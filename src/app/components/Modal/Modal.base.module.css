@@ -66,6 +66,7 @@
   background: var(--color-bg-card);
 }
 
+/* Shared by Choose Puzzle, Pack Choice, and Choose Photo for parity */
 .modal[data-variant="choosePuzzle"] {
   max-width: min(96vw, 560px);
   max-height: 90vh;

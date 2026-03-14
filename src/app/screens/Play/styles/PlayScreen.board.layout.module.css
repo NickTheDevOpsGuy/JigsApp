@@ -1,2 +1,270 @@
-@import "./PlayScreen.board.layout.module.part1.css";
-@import "./PlayScreen.board.layout.module.part2.css";
+/* Fog: per-piece clarity on board (canvas); global fog on preview + tray only */
+.modifierFog .previewPanel,
+.modifierFog .trayArea .tray {
+  filter: contrast(calc(1 - var(--fog-strength, 0)))
+    brightness(calc(1 - var(--fog-strength, 0) * 0.45));
+}
+
+.modifierNight .board,
+.modifierNight .previewPanel,
+.modifierNight .trayArea .tray {
+  filter: brightness(0.72) saturate(0.82);
+}
+
+.modifierNight .board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 45%,
+    rgba(0, 0, 0, 0.42) 100%
+  );
+}
+
+.modifierSepia .board,
+.modifierSepia .previewPanel,
+.modifierSepia .trayArea .tray {
+  filter: sepia(0.78) saturate(0.75) contrast(1.05);
+}
+
+/* Share-card style banner at top of board when complete */
+.boardCompleteMessage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.boardCompleteBanner {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.62) 0%,
+    rgba(0, 0, 0, 0.35) 70%,
+    transparent 100%
+  );
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.boardCompleteBannerLine {
+  font-family: "Fredoka", system-ui, sans-serif;
+  font-size: clamp(1.05rem, 3.5vw, 1.4rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.98);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.02em;
+}
+
+.boardCompleteBannerSub {
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.boardCompleteNextCta {
+  pointer-events: auto;
+  padding: 8px 20px 14px;
+}
+
+.boardCompleteNextCtaBtn {
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.98);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    transform 0.1s;
+}
+
+.boardCompleteNextCtaBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.boardCompleteNextCtaBtn:active {
+  transform: scale(0.98);
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  /* GPU acceleration for smoother rendering */
+  will-change: contents;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.previewPanel {
+  position: fixed;
+  top: calc(56px + 8px + env(safe-area-inset-top, 0));
+  right: max(10px, env(safe-area-inset-right, 0));
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-btn);
+  padding: 6px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  touch-action: none;
+  cursor: move;
+}
+
+.previewImage {
+  display: block;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.tray {
+  width: clamp(220px, 26vw, 340px);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-elevated);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .main {
+    flex-direction: column;
+  }
+  .tray {
+    width: auto;
+    height: 160px;
+  }
+}
+
+.trayHeader {
+  padding: 8px 12px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trayHelp {
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.trayScroll {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-snap-stop: always;
+  scroll-padding-inline: 0;
+  padding: 8px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.trayScroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.trayScroll::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+.trayScroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 1px solid var(--scrollbar-border);
+}
+
+.trayScroll::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+.trayPieces {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+  align-items: center;
+}
+
+.trayPiece {
+  cursor: pointer;
+  border-radius: 4px;
+  scroll-snap-align: start;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+
+.trayPiece:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.trayEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.debugInfo {
+  padding: 6px 12px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+}
+
+.tray hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 10px 0;
+}
+
+/* Short viewport (e.g. MacBook Air, small laptop): allow vertical scroll so tray is reachable */
+@media (max-height: 700px) {
+  .page {
+    height: auto;
+    min-height: var(--app-vh-dynamic, 100dvh);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .playBody {
+    flex: none;
+    min-height: min(80vh, 600px);
+  }
+}

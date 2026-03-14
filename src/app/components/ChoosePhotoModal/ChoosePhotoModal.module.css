@@ -1,3 +1,4 @@
+/* Parity with ChoosePuzzleModal: same step indicator spacing */
 .stepIndicator {
   display: flex;
   align-items: center;
@@ -5,7 +6,8 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .stepCurrent {

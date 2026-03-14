@@ -1,7 +1,7 @@
 .hud {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   flex: 1;
   justify-content: center;
   transition: opacity 0.25s ease;

@@ -1,1 +1,305 @@
-@import "./SetupScreen.responsive.breakpoints.primary.module.part1.css";
+@media (max-width: 960px) {
+  .card {
+    max-width: 620px;
+  }
+
+  .preview {
+    width: clamp(140px, 42vw, 180px);
+    height: clamp(140px, 42vw, 180px);
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    height: var(--app-vh-stable, 100dvh);
+    min-height: var(--app-vh-stable, 100dvh);
+    max-height: var(--app-vh-stable, 100dvh);
+    padding: 4px 4px 2px;
+    padding-top: max(4px, env(safe-area-inset-top, 0));
+    padding-bottom: max(2px, env(safe-area-inset-bottom, 0));
+    padding-left: max(4px, env(safe-area-inset-left, 0));
+    padding-right: max(4px, env(safe-area-inset-right, 0));
+    align-items: stretch;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: pan-y;
+  }
+
+  .card {
+    border-radius: 10px;
+    padding: 6px 8px 6px;
+    max-height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .cardBody {
+    gap: 12px;
+  }
+
+  .cardPackFlow .cardBody {
+    flex: 0 1 auto;
+  }
+
+  .headerRow {
+    padding-bottom: 4px;
+    flex-shrink: 0;
+  }
+
+  .stepIndicator {
+    font-size: 0.8125rem;
+    gap: 4px;
+  }
+
+  .stepSeparator {
+    font-size: 0.75rem;
+  }
+
+  .title {
+    font-size: 1rem;
+    min-width: 0;
+  }
+
+  .titleIcon {
+    display: none;
+  }
+
+  .closeBtn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .recommendCard {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .recommendButton {
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 10px;
+  }
+
+  .tab {
+    min-height: 36px;
+    font-size: 0.8rem;
+    gap: 5px;
+  }
+
+  .imageSourcePanel {
+    gap: 8px;
+  }
+
+  .categories {
+    flex-wrap: nowrap;
+    gap: 4px;
+    overflow: hidden;
+    padding: 2px 0 4px;
+  }
+
+  .categoryBtn {
+    flex: 0 0 auto;
+    min-width: max-content;
+    font-size: clamp(0.7rem, 2.4vw, 0.8rem);
+    min-height: 38px;
+    padding: 0 12px;
+  }
+
+  .galleryWrap {
+    gap: 4px;
+    margin: 2px 0 8px;
+  }
+
+  .gallery {
+    min-height: 0;
+    padding: 4px 4px 10px;
+    gap: 4px;
+    max-height: 64px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  .gallery::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .gallery::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 999px;
+  }
+
+  .gallery::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 999px;
+    border: 1px solid var(--scrollbar-border);
+  }
+
+  .gallery::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+
+  .galleryItem {
+    flex: 0 0 56px;
+    width: 56px;
+    min-width: 56px;
+    height: 56px;
+    aspect-ratio: auto;
+  }
+
+  .galleryItemName {
+    font-size: 0.72rem;
+  }
+
+  .galleryItemPieces {
+    font-size: 0.68rem;
+  }
+
+  .label {
+    gap: 4px;
+    font-size: 0.8rem;
+  }
+
+  .file {
+    min-height: 36px;
+    padding: 8px 10px;
+  }
+
+  .urlInputRow {
+    grid-template-columns: 1fr;
+  }
+
+  .urlImportButton {
+    width: 100%;
+    min-height: 36px;
+  }
+
+  .difficultySection,
+  .timerSection {
+    gap: 10px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+  }
+
+  .configSectionLabel {
+    font-size: 0.82rem;
+  }
+
+  .difficultyGrid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    padding-bottom: 10px;
+  }
+
+  .difficultyGrid::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .difficultyGrid::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 999px;
+  }
+
+  .difficultyGrid::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 999px;
+    border: 1px solid var(--scrollbar-border);
+  }
+
+  .difficultyGrid::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+
+  .difficultyCard {
+    flex: 0 0 min(120px, 32vw);
+    min-height: 68px;
+    padding: 6px 8px;
+    gap: 3px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .difficultyCardPreview {
+    gap: 2px;
+  }
+
+  .difficultyCardPreviewDot {
+    height: 6px;
+  }
+
+  .difficultyCardTitle {
+    font-size: 0.7rem;
+    gap: 3px;
+  }
+
+  .difficultyCardTitle svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .difficultyCardPieces {
+    font-size: 0.64rem;
+  }
+
+  .difficultyCardGrid {
+    font-size: 0.6rem;
+  }
+
+  .preview,
+  .previewPackFlow {
+    width: 100%;
+    min-height: 0;
+    border-radius: 10px;
+  }
+
+  .previewMeta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .previewStats {
+    justify-content: flex-start;
+  }
+
+  .previewImageWrap {
+    min-height: 180px;
+    border-radius: 12px;
+  }
+
+  .gridToggleBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .actionRow {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding-top: 14px;
+    padding-bottom: 4px;
+    margin-top: 12px;
+    flex-shrink: 0;
+  }
+
+  .actionRowPackFlow {
+    margin-top: 10px;
+  }
+
+  .backActionBtn,
+  .startBtn {
+    min-height: 44px;
+    font-size: 0.85rem;
+  }
+}

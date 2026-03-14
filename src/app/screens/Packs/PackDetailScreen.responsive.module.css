@@ -79,9 +79,10 @@
   }
 
   .scrollBtn {
-    width: 32px;
-    min-width: 32px;
-    height: 32px;
+    min-width: 48px;
+    min-height: 48px;
+    width: 48px;
+    height: 48px;
   }
 
   .backBtn {

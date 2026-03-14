@@ -18,7 +18,7 @@ button {
   font-family: inherit;
 }
 
-/* Prevent long-press callouts/context menus on touch devices across core UI targets */
+/* Prevent long-press callouts/context menus on touch devices (Android, iPhone) */
 button,
 a,
 img,
@@ -28,8 +28,12 @@ canvas,
 }
 
 @media (pointer: coarse) {
-  body {
+  html,
+  body,
+  #root {
     -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   input,
@@ -39,6 +43,8 @@ canvas,
   [contenteditable="true"],
   [data-allow-context-menu="true"] {
     -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    user-select: text;
   }
 }
 

@@ -120,6 +120,7 @@
 .modal[data-variant="choosePuzzle"] .content {
   overflow-y: auto;
   overflow-x: hidden;
+  pointer-events: auto;
 }
 
 @media (max-width: 600px) {
@@ -132,8 +133,9 @@
   }
 
   .modal {
+    width: 92%;
     max-width: min(380px, calc(100vw - 16px));
-    max-height: min(90dvh, calc(100dvh - 16px));
+    max-height: 85vh;
     margin: auto 0;
     overflow: hidden;
     display: flex;
