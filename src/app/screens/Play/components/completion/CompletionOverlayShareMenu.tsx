@@ -135,6 +135,7 @@ export function CompletionOverlayShareMenu(props: {
                   <span>{copied ? "Copied!" : "Copy link"}</span>
                 </button>
               )}
+              </div>
             </div>
           </div>
           {(onShareChallenge || onCopyChallenge) && (
