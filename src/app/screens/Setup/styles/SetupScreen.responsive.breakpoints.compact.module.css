@@ -1,3 +1,275 @@
+/* Mobile viewport: fit entire setup in one screen without vertical scroll (700–800px height) */
+@media (max-width: 720px) and (max-height: 800px) {
+  .card {
+    padding: 4px 5px 4px;
+  }
+
+  .cardBody {
+    gap: 8px;
+  }
+
+  .headerRow {
+    padding-bottom: 1px;
+  }
+
+  .title {
+    font-size: 0.88rem;
+  }
+
+  .tabs {
+    padding: 2px 3px;
+  }
+
+  .tab {
+    min-height: 28px;
+    font-size: 0.72rem;
+    gap: 3px;
+  }
+
+  .tab svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .imageSourcePanel {
+    gap: 4px;
+  }
+
+  .sourceSectionHeader {
+    display: grid;
+    gap: 1px;
+  }
+
+  .sourceSectionEyebrow {
+    font-size: 0.62rem;
+  }
+
+  .sourceSectionCopy {
+    font-size: 0.76rem;
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .categories {
+    padding: 1px 0 2px;
+    gap: 3px;
+  }
+
+  .categoryBtn {
+    min-height: 28px;
+    padding: 0 6px;
+    font-size: 0.68rem;
+  }
+
+  .galleryWrap {
+    margin: 1px 0 2px;
+    gap: 3px;
+  }
+
+  .gallery {
+    max-height: 44px;
+    min-height: 44px;
+    padding: 3px;
+    gap: 3px;
+  }
+
+  .galleryScrollBtn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .galleryItem {
+    flex: 0 0 40px;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+  }
+
+  .galleryItemMeta {
+    padding: 6px 3px 3px;
+  }
+
+  .galleryItemName {
+    font-size: 0.64rem;
+  }
+
+  .galleryItemPieces {
+    font-size: 0.6rem;
+  }
+
+  .label {
+    font-size: 0.76rem;
+    gap: 1px;
+  }
+
+  .file {
+    min-height: 32px;
+    padding: 5px 6px;
+  }
+
+  .urlImportPanel {
+    gap: 4px;
+  }
+
+  .urlInput {
+    min-height: 32px;
+    padding: 5px 6px;
+  }
+
+  .urlImportButton {
+    min-height: 32px;
+  }
+
+  .urlHelp {
+    font-size: 0.68rem;
+    margin: 0;
+  }
+
+  .customGrid {
+    gap: 4px;
+  }
+
+  .customGridLabel {
+    font-size: 0.76rem;
+  }
+
+  .customGridInput {
+    min-height: 32px;
+    padding: 5px 6px;
+  }
+
+  .customGridTimes {
+    padding-bottom: 6px;
+  }
+
+  .customGridHint {
+    margin: 2px 0 0;
+    font-size: 0.7rem;
+  }
+
+  .difficultySection {
+    margin-top: 1px;
+    margin-bottom: 2px;
+    gap: 3px;
+  }
+
+  .configSectionLabel {
+    font-size: 0.76rem;
+  }
+
+  .difficultyGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    overflow-x: visible;
+    overflow-y: visible;
+    flex-wrap: unset;
+    padding-bottom: 0;
+  }
+
+  .difficultyCard {
+    min-height: 32px;
+    padding: 3px 5px;
+    gap: 1px;
+    flex: none;
+    min-width: 0;
+  }
+
+  .difficultyCardPreview {
+    display: none;
+  }
+
+  .difficultyCardTitle {
+    font-size: 0.62rem;
+    gap: 1px;
+  }
+
+  .difficultyCardTitle svg {
+    width: 9px;
+    height: 9px;
+  }
+
+  .difficultyCardPieces {
+    font-size: 0.58rem;
+  }
+
+  .difficultyCardGrid {
+    font-size: 0.56rem;
+  }
+
+  .preview,
+  .previewPackFlow {
+    padding: 4px;
+    border-radius: 6px;
+    min-height: 0;
+    flex-shrink: 1;
+    margin-top: 0;
+  }
+
+  .previewEmpty {
+    padding: 8px 6px;
+    font-size: 0.78rem;
+  }
+
+  .previewStage {
+    gap: 3px;
+  }
+
+  .previewMeta {
+    gap: 1px;
+  }
+
+  .previewEyebrow {
+    font-size: 0.6rem;
+  }
+
+  .previewTitle {
+    font-size: 0.76rem;
+  }
+
+  .previewStats {
+    gap: 3px;
+  }
+
+  .previewStatChip {
+    min-height: 20px;
+    padding: 0 5px;
+    font-size: 0.64rem;
+  }
+
+  .previewImageWrap {
+    min-height: 44px;
+    max-height: 52px;
+    aspect-ratio: 1 / 1;
+    border-radius: 6px;
+  }
+
+  .gridToggleBtn {
+    width: 28px;
+    height: 28px;
+    top: 3px;
+    right: 3px;
+  }
+
+  .actionRow {
+    margin-top: 4px;
+    padding-top: 6px;
+    padding-bottom: 2px;
+    flex-shrink: 0;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .actionRowPackFlow {
+    margin-top: 4px;
+  }
+
+  .backActionBtn,
+  .startBtn {
+    min-height: 34px;
+    font-size: 0.78rem;
+  }
+}
+
 /* Very short viewport: parity with Pack Detail preview size */
 @media (max-width: 720px) and (max-height: 580px) {
   .preview,

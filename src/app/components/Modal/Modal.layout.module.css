@@ -54,7 +54,7 @@
   color: var(--color-text-primary);
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   display: flex;
@@ -98,7 +98,7 @@
     padding: 8px;
     align-items: center;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -123,7 +123,7 @@
 
   .content {
     padding: 10px 12px 12px;
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
@@ -137,7 +137,7 @@
   }
 
   .contentCompact {
-    overflow-y: auto;
+    overflow-y: hidden;
     padding: 8px 10px 10px;
     min-height: 0;
   }

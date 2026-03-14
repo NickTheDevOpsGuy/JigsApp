@@ -47,6 +47,20 @@
   }
 }
 
+/* Mobile viewport: fit entire setup in one screen (no vertical scroll) */
+@media (max-width: 720px) and (max-height: 800px) {
+  .cardBody {
+    overflow: hidden;
+    flex: 1 1 0;
+    min-height: 0;
+    gap: 8px;
+  }
+
+  .cardPackFlow .cardBody {
+    gap: 8px;
+  }
+}
+
 .pagePackFlow {
   align-items: flex-start;
 }
@@ -83,7 +97,7 @@
   min-width: 0;
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
