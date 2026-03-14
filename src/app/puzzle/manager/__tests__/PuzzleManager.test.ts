@@ -54,8 +54,10 @@ describe("PuzzleManager", () => {
     const finalPieceY = moved.targetY - moved.pad + 10;
     for (let i = 1; i <= steps; i++) {
       const t = i / steps;
-      const boardX = moved.x + offsetX + t * (finalPieceX + offsetX - (moved.x + offsetX));
-      const boardY = moved.y + offsetY + t * (finalPieceY + offsetY - (moved.y + offsetY));
+      const boardX =
+        moved.x + offsetX + t * (finalPieceX + offsetX - (moved.x + offsetX));
+      const boardY =
+        moved.y + offsetY + t * (finalPieceY + offsetY - (moved.y + offsetY));
       manager.pointerMoveBoardSpace(boardX, boardY);
     }
 
