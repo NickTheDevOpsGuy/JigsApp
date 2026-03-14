@@ -374,7 +374,11 @@ export function PlayScreenLayout({
             </div>
           </div>
           {tray.show && tray.showUndoRedo && (
-            <div className={styles.boardControlsRow} role="group" aria-label="Board controls">
+            <div
+              className={styles.boardControlsRow}
+              role="group"
+              aria-label="Board controls"
+            >
               <UndoRedoButtons
                 canUndo={tray.canUndo}
                 onUndo={tray.onUndo}

@@ -134,16 +134,16 @@ export function PlayHUD({
             {moveCount} {moveCount === 1 ? "move" : "moves"}
           </div>
           <div
-          className={styles.hudPlacedTotal}
-          aria-label={`${placedCount} of ${totalPieces} pieces placed`}
-          title={`Pieces placed: ${placedCount}/${totalPieces}`}
-          role="status"
-        >
-          <span className={styles.hudPlacedTotalText}>
-            {placedCount}/{totalPieces}
-          </span>
-          <Puzzle size={14} className={styles.hudPlacedTotalIcon} aria-hidden />
-        </div>
+            className={styles.hudPlacedTotal}
+            aria-label={`${placedCount} of ${totalPieces} pieces placed`}
+            title={`Pieces placed: ${placedCount}/${totalPieces}`}
+            role="status"
+          >
+            <span className={styles.hudPlacedTotalText}>
+              {placedCount}/{totalPieces}
+            </span>
+            <Puzzle size={14} className={styles.hudPlacedTotalIcon} aria-hidden />
+          </div>
         </>
       )}
     </div>
