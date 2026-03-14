@@ -91,8 +91,6 @@ export function buildHeaderMenuProps(args: BuildHeaderMenuPropsArgs): HeaderMenu
     toggleMusic,
     toggleHaptics,
     toggleFullscreen,
-    colorblindFriendly,
-    onToggleColorBlindFriendly,
   } = args;
 
   return {
