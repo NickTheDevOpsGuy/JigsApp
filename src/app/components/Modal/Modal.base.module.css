@@ -66,6 +66,11 @@
   background: var(--color-bg-card);
 }
 
+.modal[data-variant="choosePuzzle"] {
+  max-width: min(96vw, 960px);
+  max-height: 90vh;
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;

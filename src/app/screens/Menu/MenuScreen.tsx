@@ -9,7 +9,7 @@ import logoImg from "@/assets/ui/phuzzle-logo-512.png";
 import { Button } from "@/components/Button/Button";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { PackChoiceModal } from "@/components/PackChoiceModal";
-import { ChoosePhotoModal } from "@/components/ChoosePhotoModal";
+import { ChoosePuzzleModal } from "@/components/ChoosePuzzleModal";
 import { DailyCountdown } from "@/components/DailyCountdown/DailyCountdown";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
@@ -285,7 +285,7 @@ export function MenuScreen() {
       />
       <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <PackChoiceModal isOpen={showPackModal} onClose={() => setShowPackModal(false)} />
-      <ChoosePhotoModal
+      <ChoosePuzzleModal
         isOpen={showChoosePhotoModal}
         onClose={() => setShowChoosePhotoModal(false)}
       />
