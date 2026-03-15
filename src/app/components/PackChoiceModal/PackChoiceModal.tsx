@@ -340,12 +340,13 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             categoryOptions={PACK_FILTERS.map((c) => ({
               id: c.id,
               name: c.name,
-              label: c.label,
+              label: c.id === "all" ? "✨ All" : c.label,
             }))}
             selectedCategoryId={filterCategory}
             onCategorySelect={setFilterCategory}
             onApply={() => setFilterOpen(false)}
             onReset={() => setFilterCategory("all")}
+            autoApplyOnSelect
           />
           <p className={styles.railLabel}>Choose a pack</p>
           <div className={styles.gridScrollWrap}>
@@ -374,13 +375,14 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                     <span className={styles.tileTitle}>Loading…</span>
                   </div>
                 ) : (
-                  filteredPacks.map((pack) => {
+                  filteredPacks.map((pack, packIndex) => {
                     const meta = PACK_METADATA.find((p) => p.id === pack.id);
                     const puzzleList = packsData.getPuzzlesForPack(pack);
                     const hero = puzzleList[0];
                     const { completed: completedCount, total } = getPackProgress(
                       puzzleList.map((p) => p.id),
                     );
+                    const eagerLoad = packIndex < 8;
                     return (
                       <button
                         key={pack.id}
@@ -402,7 +404,8 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                             <img
                               src={hero.thumbnail}
                               alt=""
-                              loading="lazy"
+                              loading={eagerLoad ? "eager" : "lazy"}
+                              decoding="async"
                               className={styles.tileImage}
                               onError={() =>
                                 setImgError((prev) => ({ ...prev, [pack.id]: true }))
@@ -476,8 +479,9 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
               aria-label="Choose a puzzle"
             >
               <div className={styles.puzzleGrid}>
-                {puzzles.map((puzzle) => {
+                {puzzles.map((puzzle, puzzleIndex) => {
                   const isDone = completed.has(puzzle.id);
+                  const eagerLoad = puzzleIndex < 12;
                   return (
                     <button
                       key={puzzle.id}
@@ -500,7 +504,8 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                           <img
                             src={puzzle.thumbnail}
                             alt=""
-                            loading="lazy"
+                            loading={eagerLoad ? "eager" : "lazy"}
+                            decoding="async"
                             className={styles.tileImage}
                             onError={() =>
                               setImgError((prev) => ({

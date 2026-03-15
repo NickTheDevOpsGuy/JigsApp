@@ -38,6 +38,8 @@ export function FeaturedPackHero({
               className={styles.featuredHeroImage}
               src={coverImageUrl}
               alt=""
+              loading="eager"
+              decoding="async"
               onError={onCoverError}
             />
           ) : (

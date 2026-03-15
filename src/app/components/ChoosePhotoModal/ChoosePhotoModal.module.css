@@ -75,7 +75,7 @@
   border-radius: 8px;
   overflow: hidden;
   border: 2px solid var(--color-border);
-  background: var(--color-bg-primary);
+  background: var(--color-bg-elevated);
   padding: 0;
   cursor: pointer;
   transition: border-color 0.15s;

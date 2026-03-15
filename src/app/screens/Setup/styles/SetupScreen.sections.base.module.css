@@ -42,7 +42,7 @@
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  background: rgba(16, 29, 53, 0.95);
+  background: var(--color-bg-elevated);
   padding: 0;
   scroll-snap-align: start;
   scroll-snap-stop: always;

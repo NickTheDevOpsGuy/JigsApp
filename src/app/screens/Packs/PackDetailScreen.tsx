@@ -172,9 +172,10 @@ export function PackDetailScreen() {
             aria-label="Puzzle list"
           >
             <div ref={gridRef} className={styles.puzzleGrid}>
-              {puzzles.map((puzzle) => {
+              {puzzles.map((puzzle, index) => {
                 const isCompleted = completed.has(puzzle.id);
                 const isUpNext = nextPuzzle?.id === puzzle.id;
+                const eagerLoad = index < 8;
                 return (
                   <button
                     key={puzzle.id}
@@ -191,6 +192,8 @@ export function PackDetailScreen() {
                         <img
                           src={puzzle.thumbnail}
                           alt={puzzle.name}
+                          loading={eagerLoad ? "eager" : "lazy"}
+                          decoding="async"
                           onError={() =>
                             setImgError((prev) => ({ ...prev, [puzzle.id]: true }))
                           }

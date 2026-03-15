@@ -441,7 +441,8 @@
   overflow: hidden;
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--color-border) 90%, var(--color-bg-primary));
-  background: var(--color-bg-primary);
+  /* Lighter placeholder so images don’t appear “black” while loading */
+  background: var(--color-bg-elevated);
 }
 
 .tileImage {

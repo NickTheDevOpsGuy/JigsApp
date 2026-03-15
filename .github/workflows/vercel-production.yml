@@ -21,6 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "lts/*"
+
       - name: Deploy to Vercel (Production)
         uses: amondnet/vercel-action@v25
         with:

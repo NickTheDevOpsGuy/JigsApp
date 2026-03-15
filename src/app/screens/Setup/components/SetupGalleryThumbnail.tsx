@@ -13,12 +13,14 @@ export function SetupGalleryThumbnail({
   pieceCount,
   isSelected,
   isLoading,
+  eagerLoad = false,
   onSelect,
 }: {
   puzzle: GalleryPuzzle;
   pieceCount: number;
   isSelected: boolean;
   isLoading: boolean;
+  eagerLoad?: boolean;
   onSelect: () => void;
 }) {
   const [imgError, setImgError] = useState(false);
@@ -37,7 +39,13 @@ export function SetupGalleryThumbnail({
           ?
         </div>
       ) : (
-        <img src={puzzle.thumbnail} alt={puzzle.name} onError={() => setImgError(true)} />
+        <img
+          src={puzzle.thumbnail}
+          alt={puzzle.name}
+          loading={eagerLoad ? "eager" : "lazy"}
+          decoding="async"
+          onError={() => setImgError(true)}
+        />
       )}
     </button>
   );

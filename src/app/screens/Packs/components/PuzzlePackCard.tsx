@@ -33,6 +33,8 @@ export function PuzzlePackCard({
             className={styles.packCoverImage}
             src={coverImageUrl}
             alt=""
+            loading="eager"
+            decoding="async"
             onError={onCoverError}
           />
         ) : (

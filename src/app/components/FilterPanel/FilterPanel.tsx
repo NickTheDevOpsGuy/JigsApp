@@ -26,7 +26,8 @@ export interface FilterPanelProps {
   difficultyOptions?: FilterOption[];
   selectedDifficultyId?: string;
   onDifficultySelect?: (id: string) => void;
-  onApply: () => void;
+  /** When autoApplyOnSelect is true, called with the selected category id. */
+  onApply: (selectedCategoryId?: string) => void;
   onReset: () => void;
   /** When true, selecting a category closes the sheet and applies immediately (no Apply button). */
   autoApplyOnSelect?: boolean;
@@ -76,7 +77,7 @@ export function FilterPanel({
   const handleCategorySelect = (id: string) => {
     onCategorySelect(id);
     if (autoApplyOnSelect) {
-      onApply();
+      onApply(id);
       onClose();
     }
   };

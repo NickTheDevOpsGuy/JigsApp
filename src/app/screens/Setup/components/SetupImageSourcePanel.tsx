@@ -160,13 +160,14 @@ export function SetupImageSourcePanel({
                     No puzzles in this category yet
                   </div>
                 ) : (
-                  filteredPuzzles.map((puzzle) => (
+                  filteredPuzzles.map((puzzle, index) => (
                     <SetupGalleryThumbnail
                       key={puzzle.id}
                       puzzle={puzzle}
                       pieceCount={selectedPieceCount}
                       isSelected={selectedPuzzle?.id === puzzle.id}
                       isLoading={isLoading}
+                      eagerLoad={index < 12}
                       onSelect={() => selectGalleryPuzzle(puzzle)}
                     />
                   ))

@@ -247,9 +247,9 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
             }))}
             selectedCategoryId={filterCategory}
             onCategorySelect={setFilterCategory}
-            onApply={() => {
+            onApply={(selectedId) => {
               setFilterOpen(false);
-              if (filterCategory !== "all") setStep("puzzle");
+              if (selectedId && selectedId !== "all") setStep("puzzle");
             }}
             onReset={() => setFilterCategory("all")}
             autoApplyOnSelect
@@ -285,7 +285,10 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
             }))}
             selectedCategoryId={filterCategory}
             onCategorySelect={setFilterCategory}
-            onApply={() => setFilterOpen(false)}
+            onApply={(id) => {
+              setFilterOpen(false);
+              if (id && id !== "all") setStep("puzzle");
+            }}
             onReset={() => setFilterCategory("all")}
             autoApplyOnSelect
           />
@@ -308,12 +311,13 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
               aria-label="Choose a puzzle"
             >
               <div className={styles.puzzleGrid}>
-                {filteredPuzzles.map((puzzle) => (
+                {filteredPuzzles.map((puzzle, index) => (
                   <PuzzleTile
                     key={puzzle.id}
                     puzzle={puzzle}
                     selected={selectedPuzzle?.id === puzzle.id}
                     imgError={imgError[puzzle.id]}
+                    eagerLoad={index < 12}
                     onSelect={() => {
                       setSelectedPuzzle(puzzle);
                       setDifficultyIndex(1);
@@ -426,6 +430,7 @@ type PuzzleTileProps = {
   puzzle: SamplePuzzle;
   selected: boolean;
   imgError: boolean;
+  eagerLoad?: boolean;
   onSelect: () => void;
   onImgError: () => void;
 };
@@ -434,6 +439,7 @@ function PuzzleTile({
   puzzle,
   selected,
   imgError,
+  eagerLoad = false,
   onSelect,
   onImgError,
 }: PuzzleTileProps) {
@@ -454,7 +460,8 @@ function PuzzleTile({
           <img
             src={puzzle.thumbnail}
             alt=""
-            loading="lazy"
+            loading={eagerLoad ? "eager" : "lazy"}
+            decoding="async"
             className={styles.tileImage}
             onError={onImgError}
           />

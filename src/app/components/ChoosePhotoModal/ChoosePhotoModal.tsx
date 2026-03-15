@@ -91,7 +91,8 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
         <div className={styles.stepBody}>
           <p className={styles.subtitle}>Pick from the gallery.</p>
           <div className={styles.galleryGrid}>
-            {SAMPLE_PUZZLES.slice(0, 24).map((puzzle) => {
+            {SAMPLE_PUZZLES.slice(0, 24).map((puzzle, index) => {
+              const eagerLoad = index < 12;
               return (
                 <button
                   key={puzzle.id}
@@ -107,6 +108,8 @@ export function ChoosePhotoModal({ isOpen, onClose }: Props) {
                     <img
                       src={puzzle.thumbnail}
                       alt=""
+                      loading={eagerLoad ? "eager" : "lazy"}
+                      decoding="async"
                       onError={() =>
                         setImgError((prev) => ({
                           ...prev,

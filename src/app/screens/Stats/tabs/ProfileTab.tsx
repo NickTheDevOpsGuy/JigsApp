@@ -183,7 +183,8 @@ export function ProfileTab({
                       src={slot.imageUrl}
                       alt=""
                       className={styles.profilePuzzleThumb}
-                      loading="lazy"
+                      loading={i < 7 ? "eager" : "lazy"}
+                      decoding="async"
                     />
                   ) : filled ? (
                     <span className={styles.profilePuzzlePlaceholder} aria-hidden>
