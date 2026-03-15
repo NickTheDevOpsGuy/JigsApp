@@ -61,7 +61,7 @@ export function CompletionOverlayActions(args: {
     canReplay,
     onReplayClick,
     onNextPuzzle,
-    onClose: _onClose,   // ← FIXED: rename unused variable
+    onClose: _onClose, // ← FIXED: rename unused variable
     grid,
   } = args;
 

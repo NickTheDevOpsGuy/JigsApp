@@ -230,11 +230,7 @@ function AchievementCycler({ achievements }: { achievements: string[] }) {
   const text = achievements[index] ?? achievements[0];
 
   return (
-    <p
-      className={styles.completeAchievementPhased}
-      role="status"
-      aria-live="polite"
-    >
+    <p className={styles.completeAchievementPhased} role="status" aria-live="polite">
       {text}
     </p>
   );
