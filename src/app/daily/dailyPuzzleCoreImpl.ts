@@ -54,6 +54,17 @@ export function getTodayDateString(): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** Epoch for daily puzzle number (UTC). Day 1 = 2024-01-01. */
+const DAILY_EPOCH_MS = new Date("2024-01-01T00:00:00.000Z").getTime();
+const MS_PER_DAY = 86400000;
+
+/** Deterministic daily puzzle number for today (days since epoch). Used for Daily Share format. */
+export function getDailyPuzzleNumber(): number {
+  const now = Date.now();
+  const days = Math.floor((now - DAILY_EPOCH_MS) / MS_PER_DAY);
+  return Math.max(1, days);
+}
+
 /** Get user's preferred daily difficulty index (0–6), or null if not set */
 export function getDailyPreferredDifficultyIndex(): number | null {
   try {

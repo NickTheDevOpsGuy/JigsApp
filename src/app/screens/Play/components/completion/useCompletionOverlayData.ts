@@ -9,7 +9,12 @@ import {
   DAILY_DATE_KEY,
   getCurrentStreak,
   getTodayDateString,
+  getDailyPuzzleNumber,
 } from "@/daily/dailyPuzzleCore";
+import {
+  buildDailyShareMessage,
+  getDailyShareCompletionGrid,
+} from "@/screens/Play/core/share/shareMessages";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { recordCompletion } from "@/services/player/statsService";
 import type { PlayerStatsData } from "@/services/player/statsService";
@@ -35,6 +40,7 @@ export type UseCompletionOverlayDataParams = {
   cutType: PieceCutType;
   undoCount: number;
   puzzleShareUrl?: string;
+  puzzleName?: string;
   /** Called after Supabase record with updated stats (e.g. for 7-day streak toast). */
   onCompletionRecorded?: (stats: PlayerStatsData) => void;
 };
@@ -57,10 +63,14 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     cutType,
     undoCount,
     puzzleShareUrl = "/",
+    puzzleName,
     onCompletionRecorded,
   } = params;
 
+  const PLAY_BASE = "https://phuzzle.vercel.app";
+
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
+  const [dailyCopied, setDailyCopied] = useState(false);
   const [_streak, setStreak] = useState<number>(0);
   const [_masteryStreak, setMasteryStreak] = useState<number>(0);
   const [newlyUnlocked, setNewlyUnlocked] = useState<string[]>([]);
@@ -176,6 +186,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       useSeasonalFrame,
       puzzleShareUrl,
       pieceCount: grid ? grid.rows * grid.cols : 0,
+      puzzleName,
       mode: "result",
     });
   }, [
@@ -190,6 +201,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     useSeasonalFrame,
     puzzleShareUrl,
     grid,
+    puzzleName,
   ]);
 
   const handleShareResultCard = useCallback(async () => {
@@ -204,6 +216,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       useSeasonalFrame,
       puzzleShareUrl,
       pieceCount: grid ? grid.rows * grid.cols : 0,
+      puzzleName,
       mode: "result",
     });
   }, [
@@ -218,6 +231,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     useSeasonalFrame,
     puzzleShareUrl,
     grid,
+    puzzleName,
   ]);
 
   const handleShareChallengeCard = useCallback(async () => {
@@ -232,6 +246,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       useSeasonalFrame,
       puzzleShareUrl,
       pieceCount: grid ? grid.rows * grid.cols : 0,
+      puzzleName,
       mode: "challenge",
     });
   }, [
@@ -246,7 +261,74 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     useSeasonalFrame,
     puzzleShareUrl,
     grid,
+    puzzleName,
   ]);
+
+  const getDailyShareText = useCallback((): string => {
+    if (!grid || !isDaily) return "";
+    const pieceCount = grid.rows * grid.cols;
+    const dailyLink =
+      puzzleShareUrl.startsWith("http")
+        ? puzzleShareUrl
+        : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
+    const completionGrid = getDailyShareCompletionGrid({
+      pieceCount,
+      elapsedSeconds,
+      moveCount,
+      usedHint,
+      undoCount,
+    });
+    return buildDailyShareMessage({
+      dailyNumber: getDailyPuzzleNumber(),
+      pieceCount,
+      elapsedSeconds,
+      moveCount,
+      dailyLink,
+      completionGrid,
+    });
+  }, [
+    grid,
+    isDaily,
+    puzzleShareUrl,
+    elapsedSeconds,
+    moveCount,
+    usedHint,
+    undoCount,
+  ]);
+
+  const handleCopyDailyShare = useCallback(async () => {
+    const text = getDailyShareText();
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      setDailyCopied(true);
+      setTimeout(() => setDailyCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }, [getDailyShareText]);
+
+  const handleNativeDailyShare = useCallback(async () => {
+    const text = getDailyShareText();
+    if (!text) return;
+    const dailyLink =
+      puzzleShareUrl.startsWith("http")
+        ? puzzleShareUrl
+        : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: "Phuzzle Daily",
+          text,
+          url: dailyLink,
+        });
+      } catch {
+        await handleCopyDailyShare();
+      }
+    } else {
+      await handleCopyDailyShare();
+    }
+  }, [getDailyShareText, puzzleShareUrl, handleCopyDailyShare]);
 
   return {
     sharePopupOpen,
@@ -262,5 +344,9 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     handleShareCard,
     handleShareResultCard,
     handleShareChallengeCard,
+    getDailyShareText,
+    handleCopyDailyShare,
+    handleNativeDailyShare,
+    dailyCopied,
   };
 }

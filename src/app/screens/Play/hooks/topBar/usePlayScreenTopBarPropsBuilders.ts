@@ -86,6 +86,8 @@ export function buildHeaderMenuProps(args: BuildHeaderMenuPropsArgs): HeaderMenu
     toggleAdaptivePersonality,
     minimapVisible,
     toggleMinimap,
+    undoRedoEnabled,
+    onToggleUndoRedo,
     setShowPreview,
     toggleSound,
     toggleMusic,
@@ -134,7 +136,9 @@ export function buildHeaderMenuProps(args: BuildHeaderMenuPropsArgs): HeaderMenu
     onNewPuzzle: () => setShowNewGameModal(true),
     onStartThisPuzzleOver,
     isComplete,
-    canUndo: !!(manager?.canUndo() && !isPaused && !state?.isComplete),
+    undoRedoEnabled,
+    onToggleUndoRedo,
+    canUndo: !!(undoRedoEnabled && manager?.canUndo() && !isPaused && !state?.isComplete),
     onUndo: createUndoRedoHandler(
       manager ?? null,
       "undo",
@@ -148,7 +152,7 @@ export function buildHeaderMenuProps(args: BuildHeaderMenuPropsArgs): HeaderMenu
         undoSnapBackRef.current = { fromPositions, startMs: performance.now() };
       },
     ),
-    canRedo: !!(manager?.canRedo() && !isPaused && !state?.isComplete),
+    canRedo: !!(undoRedoEnabled && manager?.canRedo() && !isPaused && !state?.isComplete),
     onRedo: createUndoRedoHandler(
       manager ?? null,
       "redo",

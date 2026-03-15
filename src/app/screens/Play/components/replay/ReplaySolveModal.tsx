@@ -38,6 +38,8 @@ export interface ReplaySolveModalProps {
   onNextPuzzle?: () => void;
   /** For result header: "26 moves" (optional) */
   moveCount?: number;
+  /** Shown in top-right of cutout bar when in pack flow, e.g. "One more from this pack" */
+  packRemainingLabel?: string | null;
 }
 
 export function ReplaySolveModal({
@@ -62,6 +64,7 @@ export function ReplaySolveModal({
   onBackToResults,
   onNextPuzzle,
   moveCount,
+  packRemainingLabel,
 }: ReplaySolveModalProps) {
   const useCutout = Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
   const progressPct =
@@ -155,7 +158,12 @@ export function ReplaySolveModal({
           Replay Solve
         </h2>
       </div>
-      <div className={styles.headerRight}>{useCutout && closeButton}</div>
+      <div className={styles.headerRight}>
+        {packRemainingLabel && (
+          <span className={styles.packRemainingLabel}>{packRemainingLabel}</span>
+        )}
+        {useCutout && closeButton}
+      </div>
     </header>
   );
 

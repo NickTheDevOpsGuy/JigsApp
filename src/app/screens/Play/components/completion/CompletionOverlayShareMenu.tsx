@@ -14,14 +14,17 @@ export function CompletionOverlayShareMenu(props: {
   grid?: { rows: number; cols: number };
   puzzleShareUrl: string;
   elapsedSeconds: number;
+  moveCount?: number;
   accuracyPercent: number;
   copied: boolean;
   canNativeShare: boolean;
   onShareProgress?: () => void;
   onCopyProgress?: () => void;
-  onShareChallenge?: () => void;
-  onCopyChallenge?: () => void;
+  onShareChallenge?: (challengeUrl?: string) => void;
+  onCopyChallenge?: (challengeUrl?: string) => void;
   completionData: UseCompletionOverlayDataResult;
+  /** When true, only render the share modal (opened by Share Puzzle button) */
+  hideTrigger?: boolean;
 }) {
   const {
     shareRef,
@@ -33,6 +36,7 @@ export function CompletionOverlayShareMenu(props: {
     onShareChallenge,
     onCopyChallenge,
     completionData,
+    hideTrigger = false,
   } = props;
 
   const sharePopupOpen = completionData.sharePopupOpen;
@@ -40,21 +44,23 @@ export function CompletionOverlayShareMenu(props: {
 
   return (
     <div className={styles.completeShareWrap} ref={shareRef}>
-      <button
-        ref={shareTriggerRef}
-        type="button"
-        className={styles.completeActionBtn}
-        onClick={() => setSharePopupOpen(true)}
-        aria-expanded={sharePopupOpen}
-        aria-haspopup="dialog"
-        aria-label="Share your solve"
-        title="Share your result, copy link, or challenge a friend"
-      >
-        <span className={styles.completeActionLead}>
-          <Share2 size={18} aria-hidden />
-          Share
-        </span>
-      </button>
+      {!hideTrigger && (
+        <button
+          ref={shareTriggerRef}
+          type="button"
+          className={styles.completeActionBtn}
+          onClick={() => setSharePopupOpen(true)}
+          aria-expanded={sharePopupOpen}
+          aria-haspopup="dialog"
+          aria-label="Share your solve"
+          title="Share your result, copy link, or challenge a friend"
+        >
+          <span className={styles.completeActionLead}>
+            <Share2 size={18} aria-hidden />
+            Share
+          </span>
+        </button>
+      )}
       <AppModal
         isOpen={sharePopupOpen}
         onClose={() => setSharePopupOpen(false)}
@@ -153,12 +159,14 @@ export function CompletionOverlayShareMenu(props: {
                     className={styles.completeShareDropdownItem}
                     title={canNativeShare ? "Challenge a friend" : "Copy challenge link"}
                     onClick={() => {
+                      const challengeUrl =
+                        props.puzzleShareUrl +
+                        (props.puzzleShareUrl.includes("?") ? "&" : "?") +
+                        `ct=${props.elapsedSeconds}&cm=${props.moveCount ?? 0}`;
                       if (canNativeShare) {
-                        void completionData.handleShareChallengeCard().catch(() => {
-                          if (typeof onShareChallenge === "function") onShareChallenge();
-                        });
+                        void completionData.handleShareChallengeCard().catch(() => {});
                       } else if (typeof onCopyChallenge === "function") {
-                        onCopyChallenge();
+                        onCopyChallenge(challengeUrl);
                       }
                     }}
                   >

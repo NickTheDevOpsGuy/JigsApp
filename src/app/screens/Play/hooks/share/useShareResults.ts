@@ -24,6 +24,7 @@ export function useShareResults(args: {
   accuracyPercent?: number;
   moveCount?: number;
   maxGroupSize?: number;
+  puzzleName?: string;
 }) {
   const {
     elapsedSeconds,
@@ -33,6 +34,7 @@ export function useShareResults(args: {
     accuracyPercent = 100,
     moveCount,
     maxGroupSize,
+    puzzleName,
   } = args;
   const [copied, setCopied] = useState(false);
 
@@ -62,18 +64,25 @@ export function useShareResults(args: {
       pieceCount: state?.totalCount ?? 0,
       accuracyPercent,
       playUrl: fullProgressUrl,
-    });
-  }, [elapsedSeconds, state?.totalCount, accuracyPercent, fullProgressUrl]);
-
-  const getChallengeShareTextWithUrl = useCallback(() => {
-    return buildChallengeShareMessage({
-      elapsedSeconds,
-      pieceCount: state?.totalCount ?? 0,
-      playUrl: fullChallengeUrl,
       moveCount,
-      maxGroupSize,
+      puzzleName,
     });
-  }, [elapsedSeconds, state?.totalCount, fullChallengeUrl, moveCount, maxGroupSize]);
+  }, [elapsedSeconds, state?.totalCount, accuracyPercent, fullProgressUrl, moveCount, puzzleName]);
+
+  const getChallengeShareTextWithUrl = useCallback(
+    (overrideChallengeUrl?: string) => {
+      const url = overrideChallengeUrl ?? fullChallengeUrl;
+      return buildChallengeShareMessage({
+        elapsedSeconds,
+        pieceCount: state?.totalCount ?? 0,
+        playUrl: url,
+        moveCount,
+        maxGroupSize,
+        puzzleName,
+      });
+    },
+    [elapsedSeconds, state?.totalCount, fullChallengeUrl, moveCount, maxGroupSize, puzzleName],
+  );
 
   const shareUrls: ShareUrls = useMemo(() => {
     const text = encodeURIComponent(getShareText());
@@ -103,16 +112,19 @@ export function useShareResults(args: {
     }
   }, [getProgressShareTextWithUrl]);
 
-  const handleCopyChallenge = useCallback(async () => {
-    const text = getChallengeShareTextWithUrl();
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      logger.error("Failed to copy:", err);
-    }
-  }, [getChallengeShareTextWithUrl]);
+  const handleCopyChallenge = useCallback(
+    async (overrideChallengeUrl?: string) => {
+      const text = getChallengeShareTextWithUrl(overrideChallengeUrl);
+      try {
+        await navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        logger.error("Failed to copy:", err);
+      }
+    },
+    [getChallengeShareTextWithUrl],
+  );
 
   const canNativeShare = typeof navigator !== "undefined" && !!navigator.share;
 
@@ -133,22 +145,26 @@ export function useShareResults(args: {
     }
   }, [getProgressShareTextWithUrl, fullProgressUrl, handleCopyResults]);
 
-  const handleNativeChallengeShare = useCallback(async () => {
-    if (!navigator.share) {
-      await handleCopyChallenge();
-      return;
-    }
-    const text = getChallengeShareTextWithUrl();
-    try {
-      await navigator.share({
-        title: "Phuzzle Puzzle Share",
-        text,
-        url: fullChallengeUrl,
-      });
-    } catch (err) {
-      logger.warn("Share cancelled or failed:", err);
-    }
-  }, [getChallengeShareTextWithUrl, fullChallengeUrl, handleCopyChallenge]);
+  const handleNativeChallengeShare = useCallback(
+    async (overrideChallengeUrl?: string) => {
+      const url = overrideChallengeUrl ?? fullChallengeUrl;
+      if (!navigator.share) {
+        await handleCopyChallenge(url);
+        return;
+      }
+      const text = getChallengeShareTextWithUrl(url);
+      try {
+        await navigator.share({
+          title: "Phuzzle Puzzle Share",
+          text,
+          url: url.startsWith("http") ? url : `${PLAY_BASE}${url.startsWith("/") ? url : `/${url}`}`,
+        });
+      } catch (err) {
+        logger.warn("Share cancelled or failed:", err);
+      }
+    },
+    [getChallengeShareTextWithUrl, fullChallengeUrl, handleCopyChallenge],
+  );
 
   return {
     copied,

@@ -66,6 +66,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     handleDownloadImage,
     handleNewGame,
     puzzleShareUrl,
+    puzzleName,
     share,
     handlePointerDown,
     handlePointerMove,
@@ -106,6 +107,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
       state?.grid != null &&
       (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds),
     puzzleShareUrl,
+    puzzleName,
     share: {
       copied: share.copied,
       canNativeShare: share.canNativeShare,
@@ -189,6 +191,9 @@ export function usePlayScreenLayoutInputs(ctx: any) {
             });
           },
           onNextPuzzle: handleNewGame,
+          packRemainingLabel: searchParams?.get("pack")
+            ? "One more from this pack"
+            : undefined,
         }
       : null;
 

@@ -17,7 +17,11 @@ import { useDownloadImage } from "@/screens/Play/hooks/share/useDownloadImage";
 import { usePlayScreenTrayPieces } from "@/screens/Play/hooks/gameplay/usePlayScreenTrayPieces";
 import { usePlayScreenImmersiveControls } from "@/screens/Play/hooks/gameplay/usePlayScreenImmersiveControls";
 import { getBestTime } from "@/screens/Play/core/time/timeMode";
-import { STORAGE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
+import {
+  STORAGE_KEY,
+  PUZZLE_NAME_KEY,
+} from "@/screens/Play/core/utils/playScreenUtils";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { SESSION_ID_PARAM } from "@/screens/Play/hooks/gameplay/usePuzzleSession";
 const DAILY_PARAM = "daily";
 const GRID_PARAM = "grid";
@@ -157,6 +161,7 @@ export function usePlayScreenInteractions(ctx: any) {
             100,
         )
       : 100;
+  const puzzleName = safeLocalStorage.getItem(PUZZLE_NAME_KEY) ?? undefined;
   const share = useShareResults({
     elapsedSeconds: stableElapsedSeconds,
     state,
@@ -165,6 +170,7 @@ export function usePlayScreenInteractions(ctx: any) {
     accuracyPercent: shareAccuracyPercent,
     moveCount: scene.moveCountRef.current,
     maxGroupSize: scene.maxGroupSizeRef.current,
+    puzzleName: puzzleName || undefined,
   });
 
   const handleSharePuzzle = usePlayScreenSharePuzzle({
@@ -272,5 +278,6 @@ export function usePlayScreenInteractions(ctx: any) {
     bestTimeSeconds,
     handleUndo,
     handleRedo,
+    puzzleName: puzzleName || undefined,
   };
 }

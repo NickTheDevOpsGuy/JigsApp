@@ -13,7 +13,11 @@ import {
   useSetupScreenGalleryScroll,
 } from "./hooks";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import { GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
+import {
+  GRID_ONCE_KEY,
+  PUZZLE_ID_KEY,
+  PUZZLE_NAME_KEY,
+} from "@/screens/Play/core/utils/playScreenUtils";
 import { STORAGE_KEY, type ImageSource } from "./setupScreenConstants";
 import { logger } from "@/utils/logger";
 import { SetupScreenShell } from "./components/SetupScreenShell";
@@ -25,6 +29,21 @@ export function SetupScreen() {
   const puzzleIdParam = searchParams.get("puzzle");
   const packIdParam = searchParams.get("pack");
   const gridParam = searchParams.get("grid");
+  const ctParam = searchParams.get("ct");
+  const cmParam = searchParams.get("cm");
+  const challengeFromFriend =
+    ctParam != null &&
+    cmParam != null &&
+    puzzleIdParam != null &&
+    gridParam != null
+      ? (() => {
+          const timeSeconds = parseInt(ctParam, 10);
+          const moves = parseInt(cmParam, 10);
+          if (!Number.isFinite(timeSeconds) || !Number.isFinite(moves) || timeSeconds < 0 || moves < 0)
+            return undefined;
+          return { timeSeconds, moves };
+        })()
+      : undefined;
   const [imageSource, setImageSource] = useState<ImageSource>(
     sourceParam === "camera"
       ? "camera"
@@ -139,6 +158,13 @@ export function SetupScreen() {
       saveGrid();
       safeLocalStorage.removeItem("phuzzle:dailyDate");
       setCurrentPuzzleId(selectedPuzzle?.id ?? null);
+      if (selectedPuzzle) {
+        safeLocalStorage.setItem(PUZZLE_ID_KEY, selectedPuzzle.id);
+        safeLocalStorage.setItem(PUZZLE_NAME_KEY, selectedPuzzle.name);
+      } else {
+        safeLocalStorage.removeItem(PUZZLE_ID_KEY);
+        safeLocalStorage.removeItem(PUZZLE_NAME_KEY);
+      }
       nav("/play");
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -196,6 +222,7 @@ export function SetupScreen() {
       showGridPreview={showGridPreview}
       setShowGridPreview={setShowGridPreview}
       onStart={handleStart}
+      challengeFromFriend={challengeFromFriend}
     />
   );
 }

@@ -4,6 +4,10 @@
 export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
 export const GRID_ONCE_KEY = "phuzzle:gridSizeOnce";
+/** Puzzle id for share link (set by Setup when starting a specific puzzle). */
+export const PUZZLE_ID_KEY = "phuzzle:puzzleId";
+/** Puzzle display name for share message (set by Setup when starting a specific puzzle). */
+export const PUZZLE_NAME_KEY = "phuzzle:puzzleName";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
 export const PIECE_LOCKING_EXPLICIT_KEY = "phuzzle:pieceLockingExplicit";
 export const AUTO_ROTATE_ON_SNAP_KEY = "phuzzle:autoRotateOnSnap";
@@ -28,6 +32,7 @@ export const DYNAMIC_DIFFICULTY_KEY = "phuzzle:dynamicDifficulty";
 export const ADAPTIVE_PERSONALITY_KEY = "phuzzle:adaptivePersonality";
 export const MINIMAP_VISIBLE_KEY = "phuzzle:minimapVisible";
 export const MINIMAP_POSITION_KEY = "phuzzle:minimapPosition";
+export const UNDO_REDO_ENABLED_KEY = "phuzzle:undoRedoEnabled";
 
 export const SHOW_DEBUG = import.meta.env.VITE_SHOW_DEBUG === "true";
 

@@ -22,13 +22,14 @@ interface CompletionOverlayGateProps {
   isNewBest: boolean;
   /** Path to this puzzle for share link (e.g. /daily or /play?session=xxx). */
   puzzleShareUrl: string;
+  puzzleName?: string;
   share: {
     copied: boolean;
     canNativeShare: boolean;
     handleCopyResults: () => void;
     handleNativeShare: () => void;
     handleCopyChallenge: () => void;
-    handleNativeChallengeShare: () => void;
+    handleNativeChallengeShare: (challengeUrl?: string) => void;
   };
   onDownloadImage: () => void;
   onClose: () => void;
@@ -65,6 +66,7 @@ export function CompletionOverlayGate({
   pieceCutType,
   isNewBest,
   puzzleShareUrl,
+  puzzleName,
   share,
   onDownloadImage,
   onClose,
@@ -125,6 +127,7 @@ export function CompletionOverlayGate({
       isDaily={isDaily}
       cutType={pieceCutType}
       puzzleShareUrl={puzzleShareUrl}
+      puzzleName={puzzleName}
       copied={share.copied}
       canNativeShare={share.canNativeShare}
       onShareProgress={share.handleNativeShare}

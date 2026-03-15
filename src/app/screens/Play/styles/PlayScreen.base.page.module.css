@@ -81,8 +81,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 38px;
-  min-width: 38px;
+  min-height: 42px;
+  min-width: 42px;
   padding: 0;
   border: none;
   background: none;
@@ -102,8 +102,8 @@
 }
 
 .topBar {
-  height: 40px;
-  max-height: 40px;
+  height: 46px;
+  max-height: 46px;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
@@ -145,7 +145,7 @@
   flex-shrink: 0;
   overflow-x: hidden;
   overflow-y: visible;
-  max-height: 40px;
+  max-height: 46px;
   transition: max-height 0.25s ease;
   position: relative;
   z-index: 200;

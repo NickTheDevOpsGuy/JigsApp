@@ -3,6 +3,7 @@ import type { GridSize } from "@/puzzle/core/types";
 import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { createPuzzleSession } from "@/services/session/puzzleSessionService";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { PUZZLE_ID_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 
 type UsePlayScreenShareSessionArgs = {
   isComplete: boolean;
@@ -53,6 +54,10 @@ export function usePlayScreenShareSession({
       return `/play?${dailyParam}=1&${gridParam}=${grid.rows}x${grid.cols}`;
     }
     if (sessionId) return `/play?${sessionIdParam}=${sessionId}`;
+    const puzzleId = safeLocalStorage.getItem(PUZZLE_ID_KEY);
+    if (puzzleId && grid) {
+      return `/play?puzzle=${encodeURIComponent(puzzleId)}&${gridParam}=${grid.rows}x${grid.cols}`;
+    }
     if (grid) return `/play?${gridParam}=${grid.rows}x${grid.cols}`;
     return "/";
   }, [dailyParam, grid, gridParam, sessionId, sessionIdParam, shareSessionId]);

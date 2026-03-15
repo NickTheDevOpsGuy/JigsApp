@@ -342,7 +342,7 @@
 .completeImageWrapNew {
   position: relative;
   width: 100%;
-  max-height: min(42vh, 380px);
+  min-height: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
   overflow: hidden;
@@ -393,13 +393,39 @@
   animation: completeRipple 1.2s ease-out 1;
 }
 
+/* Full image visible: contain so nothing is cropped; max dimensions keep it within panel */
 .completeImageNew {
   display: block;
-  width: 100%;
-  height: min(40vw, 380px);
-  max-height: min(44vh, 380px);
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(45vh, 400px);
   object-fit: contain;
   object-position: center;
+}
+
+/* Share shortcut on completion card – compact, non-cluttering */
+.completeCardShareBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  z-index: 1;
+  transition: background 0.15s ease;
+}
+.completeCardShareBtn:hover {
+  background: rgba(0, 0, 0, 0.65);
+}
+.completeCardShareBtn:focus-visible {
+  outline: 2px solid var(--color-brand-primary, #3b82f6);
+  outline-offset: 2px;
 }
 
 /* Stats panel: time / moves – prominent row of stat cards */

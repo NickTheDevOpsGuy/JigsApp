@@ -6,6 +6,7 @@ import { SetupImageSourcePanel } from "./SetupImageSourcePanel";
 import { SetupConfigSection } from "./SetupConfigSection";
 import { SetupScreenHeader } from "./SetupScreenHeader";
 import { SetupScreenPreview } from "./SetupScreenPreview";
+import { ChallengeIntroBanner } from "./ChallengeIntroBanner";
 
 export function SetupScreenShell(props: {
   styles: Record<string, string>;
@@ -49,6 +50,8 @@ export function SetupScreenShell(props: {
   showGridPreview: boolean;
   setShowGridPreview: React.Dispatch<React.SetStateAction<boolean>>;
   onStart: () => void;
+  /** When present, show "Your friend challenged you" banner (from Beat My Puzzle link). */
+  challengeFromFriend?: { timeSeconds: number; moves: number };
 }) {
   const {
     styles,
@@ -92,6 +95,7 @@ export function SetupScreenShell(props: {
     showGridPreview,
     setShowGridPreview,
     onStart,
+    challengeFromFriend,
   } = props;
 
   return (
@@ -105,6 +109,17 @@ export function SetupScreenShell(props: {
             hasImage={!!imgDataUrl}
             onClose={onClose}
           />
+
+          {isPackFlow && challengeFromFriend && (
+            <ChallengeIntroBanner
+              puzzleName={selectedPuzzleName}
+              pieceCount={selectedPieceCount}
+              challengeTimeSeconds={challengeFromFriend.timeSeconds}
+              challengeMoves={challengeFromFriend.moves}
+              onPlay={onStart}
+              disabled={!imgDataUrl || isLoading}
+            />
+          )}
 
           {error && (
             <div className={styles.error} role="alert">

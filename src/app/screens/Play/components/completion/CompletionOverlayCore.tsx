@@ -48,6 +48,7 @@ export function CompletionOverlay({
   precisionBonusPoints: _precisionBonusPoints,
   uiTone: _uiTone,
   puzzleShareUrl = "/",
+  puzzleName,
   canReplay = false,
   onReplayClick,
   onNextPuzzle,
@@ -83,6 +84,7 @@ export function CompletionOverlay({
     cutType,
     undoCount,
     puzzleShareUrl,
+    puzzleName,
     onCompletionRecorded: onCompletionRecorded
       ? (stats) => onCompletionRecorded({ dailyStreak: stats.dailyStreak })
       : undefined,
@@ -176,6 +178,15 @@ export function CompletionOverlay({
               className={styles.completeImageNew}
               onError={() => setImageError(true)}
             />
+            <button
+              type="button"
+              className={styles.completeCardShareBtn}
+              onClick={() => completionData.setSharePopupOpen(true)}
+              title="Share result"
+              aria-label="Share result"
+            >
+              Share
+            </button>
           </div>
         )}
 
@@ -215,6 +226,7 @@ export function CompletionOverlay({
           grid={grid}
           puzzleShareUrl={puzzleShareUrl}
           elapsedSeconds={elapsedSeconds}
+          moveCount={moveCount}
           accuracyPercent={accuracyPercent}
           copied={copied}
           canNativeShare={canNativeShare}
@@ -226,6 +238,7 @@ export function CompletionOverlay({
           canReplay={canReplay}
           onReplayClick={onReplayClick}
           onNextPuzzle={onNextPuzzle}
+          isDaily={isDaily}
         />
       </div>
     </AppModal>

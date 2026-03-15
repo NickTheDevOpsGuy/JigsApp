@@ -211,6 +211,14 @@ export function HeaderMenu(props: HeaderMenuProps) {
   const hasSubMenu = (id: SubMenuId) => hasSubMenuItems(id, groups);
 
   const navItems = groups.settingsItems.filter((i) => i.subMenu === "navigation");
+  const playPanelItems = [
+    ...navItems,
+    ...groups.settingsItems.filter((i) => i.subMenu === "share"),
+  ].sort((a, b) =>
+    (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
+      sensitivity: "base",
+    }),
+  );
   const aboutPanelItems = [
     ...groups.helpItems,
     ...groups.aboutItems,
@@ -220,11 +228,6 @@ export function HeaderMenu(props: HeaderMenuProps) {
   const handleRootClick = (root: RootMenuId) => {
     if (root === "leaderboard") {
       navigate("/stats");
-      setOpen(false);
-      return;
-    }
-    if (root === "coop") {
-      props.onSharePuzzle?.();
       setOpen(false);
       return;
     }
@@ -300,11 +303,9 @@ export function HeaderMenu(props: HeaderMenuProps) {
                     title={
                       id === "leaderboard"
                         ? "View leaderboards"
-                        : id === "coop"
-                          ? "Play with a friend"
-                          : id === "settings"
-                            ? "Gameplay, assistance, appearance, audio, advanced"
-                            : undefined
+                        : id === "settings"
+                          ? "Gameplay, assistance, appearance, audio, advanced"
+                          : undefined
                     }
                   >
                     {ROOT_MENU_LABELS[id]}
@@ -344,7 +345,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
                     </button>
                   ))}
                 {showPlayList &&
-                  navItems.map((item) => (
+                  playPanelItems.map((item) => (
                     <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
                   ))}
                 {showAboutList &&

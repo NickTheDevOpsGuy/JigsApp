@@ -48,6 +48,9 @@ export type HeaderMenuProps = {
   onUndo?: () => void;
   canRedo?: boolean;
   onRedo?: () => void;
+  /** When false, undo/redo are disabled (menu and shortcuts). Toggle in Settings → Gameplay. */
+  undoRedoEnabled?: boolean;
+  onToggleUndoRedo?: () => void;
   onResetView?: () => void;
   onTogglePreview: () => void;
   onToggleSound: () => void;
@@ -109,8 +112,8 @@ export type HeaderMenuProps = {
   onToggleColorBlindFriendly?: () => void;
 };
 
-/** Root menu: only these 5. All config (Moves, Navigate, Share, Audio, etc.) lives under Settings. */
-export type RootMenuId = "play" | "leaderboard" | "coop" | "settings" | "about";
+/** Root menu: Play, Leaderboard, Settings, About. Co-op lives under Play. */
+export type RootMenuId = "play" | "leaderboard" | "settings" | "about";
 
 export type SubMenuId =
   | "about"

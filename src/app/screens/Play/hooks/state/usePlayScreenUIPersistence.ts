@@ -27,6 +27,7 @@ import {
   ADAPTIVE_PERSONALITY_KEY,
   MINIMAP_VISIBLE_KEY,
   MINIMAP_POSITION_KEY,
+  UNDO_REDO_ENABLED_KEY,
 } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
@@ -54,6 +55,7 @@ export function usePlayScreenUIPersistence(state: {
   adaptivePersonalityEnabled: boolean;
   minimapVisible: boolean;
   minimapPosition: string;
+  undoRedoEnabled: boolean;
 }) {
   useEffect(() => {
     try {
@@ -290,4 +292,15 @@ export function usePlayScreenUIPersistence(state: {
       /* ignore */
     }
   }, [state.minimapPosition]);
+
+  useEffect(() => {
+    try {
+      safeLocalStorage.setItem(
+        UNDO_REDO_ENABLED_KEY,
+        state.undoRedoEnabled ? "true" : "false",
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [state.undoRedoEnabled]);
 }

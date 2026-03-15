@@ -156,10 +156,12 @@
   pointer-events: none;
 }
 
-/* Modal box: theme-driven, taller to give board more space */
+/* Modal box: theme-driven, fills available height so video area is not cut off */
 .modal {
   width: 100%;
   max-width: 540px;
+  height: 100%;
+  min-height: 0;
   max-height: calc(100dvh - 24px);
   display: flex;
   flex-direction: column;
@@ -183,15 +185,28 @@
   border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 
-.headerLeft,
-.headerRight {
+.headerLeft {
   width: 44px;
   flex-shrink: 0;
 }
 
 .headerRight {
+  flex-shrink: 0;
+  min-width: 44px;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 10px;
+}
+
+.packRemainingLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
 }
 
 .headerCenter {
@@ -295,11 +310,11 @@
   line-height: 1.35;
 }
 
-/* Puzzle as hero: board-focused, compact margins */
+/* Puzzle as hero: board-focused, compact margins; min-height: 0 so it shrinks on mobile */
 .puzzleAreaWrapper {
   position: relative;
   flex: 1 1 auto;
-  min-height: 240px;
+  min-height: 120px;
   margin: 0 8px 8px;
   min-width: 0;
   display: flex;
@@ -316,12 +331,12 @@
   z-index: 2;
 }
 
-/* Puzzle display: hero area, compact */
+/* Puzzle display: hero area, compact; no fixed min-height so it fits viewport */
 .puzzleArea {
   width: 100%;
   max-width: 100%;
   height: 100%;
-  min-height: 220px;
+  min-height: 0;
   margin: 0;
   border-radius: var(--radius-card);
   overflow: hidden;
@@ -339,7 +354,7 @@
 .puzzleImage {
   width: 100%;
   height: 100%;
-  min-height: 220px;
+  min-height: 0;
   object-fit: contain;
   display: block;
 }
@@ -347,7 +362,7 @@
 .puzzlePlaceholder {
   width: 100%;
   height: 100%;
-  min-height: 220px;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -418,14 +433,15 @@
   color: var(--color-text-secondary);
 }
 
-/* Mobile: tighter replay viewer */
+/* Mobile: tighter replay viewer; prevent video/puzzle area cut-off */
 @media (max-width: 600px) {
   .cutoutTopBar {
     padding: 4px 10px 0 12px;
+    padding-top: max(4px, env(safe-area-inset-top));
   }
 
   .cutoutBottomBar {
-    padding: 6px 10px 10px;
+    padding: 6px 10px max(10px, env(safe-area-inset-bottom));
   }
 
   .header {
@@ -448,18 +464,19 @@
     font-size: 0.78rem;
   }
 
+  .modal {
+    max-height: 100%;
+  }
+
   .puzzleAreaWrapper {
-    min-height: 200px;
+    min-height: 80px;
     margin: 0 6px 6px;
   }
 
-  .puzzleArea {
-    min-height: 180px;
-  }
-
+  .puzzleArea,
   .puzzleImage,
   .puzzlePlaceholder {
-    min-height: 180px;
+    min-height: 0;
   }
 
   .closeBtn {

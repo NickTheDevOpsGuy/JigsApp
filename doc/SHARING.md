@@ -1,18 +1,32 @@
 # Sharing in Phuzzle
 
-Two kinds of sharing: **completion share** (your result) and **co-op share** (play with a friend in real time).
+Sharing in Phuzzle: **completion share** (your result), **Daily Share** (Wordle-style, daily only), and **co-op share** (play with a friend in real time).
 
 ---
 
 ## 1. Completion share (no Supabase)
 
 - Share your finished puzzle: image, time, moves, link to the same puzzle.
-- **Share Result** — completion summary (time, moves, accuracy).
-- **Share with People** — same puzzle + difficulty; native share or copy.
-- Share card PNG: challenge (image only) or result (stats + URL). Download supported.
-- **Key files:** `useShareResults.ts`, `useDownloadImage.ts`, `useShareCardImage.ts`, `CompletionOverlay.tsx`.
+- **Share Result** — completion summary (time, moves, accuracy); opens share modal with Share Card, copy, native share.
+- **Beat My Puzzle** — challenge link with your time/moves; share card image + message; link includes `ct`/`cm` so friends see a challenge intro.
+- Share card PNG: challenge or result (stats + URL). Download supported.
+- **Key files:** `useShareResults.ts`, `useDownloadImage.ts`, `useShareCardImage.ts`, `CompletionOverlay.tsx`, `shareMessages.ts`.
 
 Triggered from the win overlay after completing a puzzle. Works without any backend.
+
+---
+
+## 1b. Daily Share (Wordle-style, daily only)
+
+- **When:** Only after completing the **Daily Puzzle**. A **Daily Share** button appears on the win screen (with Next Puzzle, Share Result, Beat My Puzzle, Review Solve).
+- **What:** A compact, copyable text block similar to Wordle shares:
+  - `Phuzzle Daily #N` (N = deterministic daily number)
+  - Difficulty • piece count
+  - ⏱ time, 🔁 moves
+  - A 4-cell emoji grid (🟦 = hit, ⬜ = miss): completed, good time, efficient moves, clean solve (no hint/undo)
+  - Play link (opens the same daily)
+- **How:** Copy to clipboard or native share (mobile). No image required; the text is self-contained.
+- **Key files:** `shareMessages.ts` (`buildDailyShareMessage`, `getDailyShareCompletionGrid`), `dailyPuzzleCoreImpl.ts` (`getDailyPuzzleNumber`), `useCompletionOverlayData.ts` (daily share handlers), `CompletionOverlayActions.tsx` (Daily Share button when `isDaily`).
 
 ---
 

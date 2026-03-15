@@ -145,5 +145,7 @@ export function usePlayScreenTopBarPropsFromCtx(ctx: any) {
     toggleAdaptivePersonality: ui.toggleAdaptivePersonality,
     minimapVisible: ui.minimapVisible,
     toggleMinimap: ui.toggleMinimap,
+    undoRedoEnabled: ui.undoRedoEnabled,
+    onToggleUndoRedo: ui.toggleUndoRedo,
   });
 }

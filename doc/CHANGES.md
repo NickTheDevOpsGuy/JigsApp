@@ -6,6 +6,7 @@ High-level feature list and recent changes. For project overview see [README](..
 
 ## Recent (high level)
 
+- **Daily Share (Wordle-style)** — After completing the Daily Puzzle, a **Daily Share** button appears on the win screen (only for daily). It generates a compact, copyable text block: `Phuzzle Daily #N`, difficulty • pieces, ⏱ time, 🔁 moves, a 4-cell emoji grid (🟦/⬜ for completed, good time, efficient moves, clean solve), and a play link. Copy to clipboard or native share on mobile. See [SHARING.md](SHARING.md).
 - **Puzzle Packs & Choose Puzzle parity** — Puzzle Packs dialog uses the same layout as Choose Puzzle (filters, horizontal rail, difficulty, CTA). Breadcrumbs (Pack → Puzzle → Difficulty → Start) are clickable so you can jump to any step. One reusable modal shell for both flows.
 - **Mobile touch & input** — Touch drag on the board works again: the board area uses `touch-action: none` so the browser doesn’t scroll the page while you drag pieces; pointer capture and pointer events (down/move/up) handle drag. Tray buttons (Filter, Shuffle) and all carousel/rail arrows use 48px minimum hit areas, `touch-action: manipulation`, and correct z-index so they’re tappable on mobile. Dialogs use consistent sizing (e.g. 92% width, 85vh max on mobile).
 - **Play HUD & tray** — Unified pill size for timer, pause, moves, pieces (0/16). Hamburger and HUD in one board-aligned strip. Small gap between board and tray (like HUD–board). Color blind friendly option (Settings → Display or Theme & Sounds).
@@ -42,7 +43,7 @@ High-level feature list and recent changes. For project overview see [README](..
 
 ## Social and progress
 
-- Daily puzzle and streak; streak freeze ([STREAK-FREEZE.md](STREAK-FREEZE.md)). Weekly album (7 days, mastery badge). Share result or co-op link ([SHARING.md](SHARING.md)).
+- Daily puzzle and streak; streak freeze ([STREAK-FREEZE.md](STREAK-FREEZE.md)). **Daily Share** — Wordle-style result block for the daily only (daily #, stats, emoji grid, play link); copy or native share. Weekly album (7 days, mastery badge). Share result, Beat My Puzzle challenge, or co-op link ([SHARING.md](SHARING.md)).
 - Daily comments and reactions after completion. Co-op: share link, real-time sync (Supabase).
 - Leaderboards and live completion counter; percentile ranking on completion overlay.
 

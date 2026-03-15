@@ -17,6 +17,7 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the gallery, uplo
 
 - [Preview](#preview)
 - [Features](#features)
+- [Documentation](#documentation)
 - [Roadmap](#roadmap)
 - [Accessibility](#accessibility)
 - [Tech](#tech)
@@ -38,12 +39,32 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the gallery, uplo
 ## Features
 
 - **Play:** Drag, drop, rotate; board and neighbor snap; group merging. Grids from 3×3 to 12×12. Gallery, upload, camera, and curated packs. Pack and puzzle pickers share one modal layout (Pack → Puzzle → Difficulty → Start) with clickable breadcrumbs. Piece tray with filters (All, Edges, Color); unified HUD pills (timer, pause, moves, pieces); compact gap between board and tray. Zoom and pan. Undo/redo with snap-back. Continue and start over.
-- **Daily:** Daily puzzle, streaks, countdown, streak shield (freeze). Comments and reactions after completion.
+- **Daily:** Daily puzzle, streaks, countdown, streak shield (freeze). **Daily Share** — after finishing the daily, share a Wordle-style result (daily #, difficulty, time, moves, emoji grid, play link) via copy or native share. Comments and reactions after completion.
 - **Modes:** Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality. Magnetic Snap and Snap Glow toggles. Reference preview, snap combo, piece shapes, percentile badges, themes.
-- **Social:** Stats, profile, leaderboards (Today, Week, All-time, Efficiency). Share result, share card, challenge links, replay viewer. Co-op play with shareable links.
+- **Social:** Stats, profile, leaderboards (Today, Week, All-time, Efficiency). Share result, share card, Beat My Puzzle challenge links, Daily Share (Wordle-style for daily only), replay viewer. Co-op play with shareable links.
 - **Quality:** Bug report with optional screenshots. Mobile layouts: touch drag on the board (pieces follow your finger; page scroll is disabled over the board so drag works), tappable tray and carousel buttons (48px hit areas). PWA install.
 
 Details: [doc/CHANGES.md](doc/CHANGES.md).
+
+---
+
+## Documentation
+
+All project docs live in **[doc/](doc/)**. Full index: [doc/README.md](doc/README.md).
+
+| Doc | Description |
+| --- | --- |
+| [doc/CHANGES.md](doc/CHANGES.md) | Feature list and recent changes |
+| [doc/FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | Implemented features and where they live in code |
+| [doc/FUTURE.md](doc/FUTURE.md) | Ideas and possible future features |
+| [doc/SHARING.md](doc/SHARING.md) | Completion share, Daily Share (Wordle-style), co-op share |
+| [doc/STREAK-FREEZE.md](doc/STREAK-FREEZE.md) | Streak freeze (streak shield): earn it, when it applies |
+| [doc/BUG_REPORT.md](doc/BUG_REPORT.md) | In-app bug report: where it is, what it does |
+| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase: leaderboards, stats, co-op, env vars, migrations |
+| [doc/LIGHTHOUSE.md](doc/LIGHTHOUSE.md) | Lighthouse CI, reports, "GitHub token not set" warning |
+| [doc/MOBILE_QA.md](doc/MOBILE_QA.md) | Mobile release checklist and regression commands |
+| [doc/STATS_UI_QA.md](doc/STATS_UI_QA.md) | Stats modal QA: Profile, Board, Badges |
+| [doc/SESSION_SUMMARY.md](doc/SESSION_SUMMARY.md) | Session notes (layout, piece drawer, leaderboards, etc.) |
 
 ---
 

@@ -59,31 +59,29 @@ export function getSubmenuDescription(id: SubMenuId): string {
   return SUBMENU_DESCRIPTIONS[id] ?? SUB_MENU_LABELS[id];
 }
 
-/** Root menu: exactly 5 items. All config lives under Settings. */
+/** Root menu: alpha order. Co-op is under Play. */
 export const ROOT_MENU_ORDER: import("./headerMenuConfigTypes").RootMenuId[] = [
-  "play",
-  "leaderboard",
-  "coop",
-  "settings",
   "about",
+  "leaderboard",
+  "play",
+  "settings",
 ];
 
 export const ROOT_MENU_LABELS: Record<
   import("./headerMenuConfigTypes").RootMenuId,
   string
 > = {
-  play: "Play",
-  leaderboard: "Leaderboard",
-  coop: "Co-op",
-  settings: "Settings",
   about: "About",
+  leaderboard: "Leaderboard",
+  play: "Play",
+  settings: "Settings",
 };
 
-/** Settings submenus: only these 5 (no Moves/Navigate/Share at root). */
+/** Settings submenus: alpha by label (Advanced, Assistance, Audio, Appearance, Gameplay). */
 export const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
-  "gameplay",
-  "assistance",
-  "display",
-  "audio",
   "advanced",
+  "assistance",
+  "audio",
+  "display",
+  "gameplay",
 ];

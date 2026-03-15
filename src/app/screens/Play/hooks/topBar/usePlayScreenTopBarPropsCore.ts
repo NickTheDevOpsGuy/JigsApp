@@ -117,6 +117,8 @@ export function usePlayScreenTopBarProps(
     toggleAdaptivePersonality,
     minimapVisible,
     toggleMinimap,
+    undoRedoEnabled,
+    onToggleUndoRedo,
     autoRotateOnSnap,
     setAutoRotateOnSnap,
   } = params;
@@ -203,6 +205,8 @@ export function usePlayScreenTopBarProps(
     toggleAdaptivePersonality,
     minimapVisible,
     toggleMinimap,
+    undoRedoEnabled,
+    onToggleUndoRedo,
     setShowPreview,
     toggleSound,
     toggleMusic,

@@ -21,12 +21,13 @@ export interface CompletionOverlayProps {
   isDaily?: boolean;
   cutType?: PieceCutType;
   puzzleShareUrl?: string;
+  puzzleName?: string;
   copied?: boolean;
   canNativeShare?: boolean;
   onShareProgress?: () => void;
-  onShareChallenge?: () => void;
+  onShareChallenge?: (challengeUrl?: string) => void;
   onCopyProgress?: () => void;
-  onCopyChallenge?: () => void;
+  onCopyChallenge?: (challengeUrl?: string) => void;
   onDownloadImage: () => void;
   onClose: () => void;
   precisionModeEnabled?: boolean;

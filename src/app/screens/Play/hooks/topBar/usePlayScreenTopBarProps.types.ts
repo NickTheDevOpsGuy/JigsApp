@@ -118,6 +118,8 @@ export type UsePlayScreenTopBarPropsParams = {
   toggleAdaptivePersonality: () => void;
   minimapVisible: boolean;
   toggleMinimap: () => void;
+  undoRedoEnabled: boolean;
+  onToggleUndoRedo: () => void;
 };
 
 export type PlayScreenTopBarPropsResult = {

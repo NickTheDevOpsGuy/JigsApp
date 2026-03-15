@@ -50,13 +50,14 @@ export function buildCompletionProps(args: {
   pieceCutType: PieceCutType;
   isNewBest: boolean;
   puzzleShareUrl: string;
+  puzzleName?: string;
   share: {
     copied: boolean;
     canNativeShare: boolean;
     handleCopyResults: () => void;
     handleNativeShare: () => Promise<void> | void;
     handleCopyChallenge: () => void;
-    handleNativeChallengeShare: () => Promise<void> | void;
+    handleNativeChallengeShare: (challengeUrl?: string) => Promise<void> | void;
   };
   onDownloadImage: () => Promise<void> | void;
   onClose: () => void;
@@ -89,6 +90,7 @@ export function buildCompletionProps(args: {
     pieceCutType,
     isNewBest,
     puzzleShareUrl,
+    puzzleName,
     share,
     onDownloadImage,
     onClose,
@@ -125,6 +127,7 @@ export function buildCompletionProps(args: {
     pieceCutType,
     isNewBest,
     puzzleShareUrl,
+    puzzleName,
     share,
     onDownloadImage,
     onClose,

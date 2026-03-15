@@ -28,6 +28,7 @@ import {
   ADAPTIVE_PERSONALITY_KEY,
   MINIMAP_VISIBLE_KEY,
   MINIMAP_POSITION_KEY,
+  UNDO_REDO_ENABLED_KEY,
 } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
@@ -86,6 +87,7 @@ export function getPlayScreenUIStorageInitial(): {
   adaptivePersonalityEnabled: boolean;
   minimapVisible: boolean;
   minimapPosition: "bottom-left" | "bottom-right" | "top-left" | "top-right";
+  undoRedoEnabled: boolean;
 } {
   let snapToleranceOverride = 1;
   try {
@@ -129,6 +131,7 @@ export function getPlayScreenUIStorageInitial(): {
     dynamicDifficultyEnabled: getBool(DYNAMIC_DIFFICULTY_KEY, false),
     adaptivePersonalityEnabled: getBool(ADAPTIVE_PERSONALITY_KEY, false),
     minimapVisible: getBool(MINIMAP_VISIBLE_KEY, true),
+    undoRedoEnabled: getBool(UNDO_REDO_ENABLED_KEY, true),
     minimapPosition: (() => {
       try {
         const v = safeLocalStorage.getItem(MINIMAP_POSITION_KEY);

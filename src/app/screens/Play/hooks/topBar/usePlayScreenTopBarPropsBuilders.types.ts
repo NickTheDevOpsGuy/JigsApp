@@ -98,6 +98,8 @@ export type BuildHeaderMenuPropsArgs = {
   toggleAdaptivePersonality: () => void;
   minimapVisible: boolean;
   toggleMinimap: () => void;
+  undoRedoEnabled: boolean;
+  onToggleUndoRedo: () => void;
   setShowPreview: (fn: (p: boolean) => boolean) => void;
   toggleSound: () => void;
   toggleMusic: () => void;

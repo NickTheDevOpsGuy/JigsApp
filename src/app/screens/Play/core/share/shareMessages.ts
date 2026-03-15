@@ -1,12 +1,14 @@
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 
-type ShareMessageArgs = {
+export type ShareMessageArgs = {
   elapsedSeconds: number;
   pieceCount: number;
   playUrl: string;
   accuracyPercent?: number;
   moveCount?: number;
   maxGroupSize?: number;
+  /** Display name of the puzzle (e.g. from win screen data). */
+  puzzleName?: string;
 };
 
 function clampPercent(value: number): number {
@@ -28,58 +30,116 @@ export function getPiecesLine(pieceCount: number): string {
   return `${pieceCount} Pieces • ${getDifficultyLabel(pieceCount)}`;
 }
 
+/**
+ * Share Result – brag/summary share. Exact message structure per spec.
+ */
 export function buildProgressShareMessage(args: ShareMessageArgs): string {
-  const accuracy = clampPercent(args.accuracyPercent ?? 100);
+  const time = formatTime(args.elapsedSeconds);
+  const difficulty = getDifficultyLabel(args.pieceCount);
+  const pieces = args.pieceCount;
+  const moves = args.moveCount ?? 0;
+  const puzzleName = args.puzzleName?.trim() || "Puzzle";
   return [
-    "🧩 Puzzle complete! Nice solve!",
+    "🧩 Just finished a Phuzzle!",
     "",
-    `• Time: ${formatTime(args.elapsedSeconds)}`,
-    `• ${getPiecesLine(args.pieceCount)}`,
-    `• ${accuracy}% accuracy`,
+    `Puzzle: ${puzzleName}`,
+    `Difficulty: ${difficulty} (${pieces} pieces)`,
     "",
-    "Same puzzle, same difficulty:",
+    `⏱ Time: ${time}`,
+    `🔁 Moves: ${moves}`,
     "",
+    "Play the same puzzle:",
     args.playUrl,
   ].join("\n");
 }
 
-const CHALLENGE_PHRASES = [
-  "BOOM! I just crushed that puzzle! 😎",
-  "Another one in the books! 💪",
-  "Puzzle demolished. Your turn. 🧩",
-  "That was too easy. Try me. 😏",
-  "Solved. Who's next? 👀",
-  "Crushed it. Think you can keep up? 🏆",
-  "Done and dusted. Beat that! ✨",
-  "Easy. Your move. 😉",
+const CHALLENGE_TAUNT_LINES = [
+  "Think you can beat me?",
+  "Puzzle demolished. Your turn.",
+  "Let's see if you're faster.",
+  "Another puzzle down. Your move.",
+  "This one took me {moves} moves. Beat that.",
 ];
 
-function pickChallengePhrase(): string {
-  return CHALLENGE_PHRASES[Math.floor(Math.random() * CHALLENGE_PHRASES.length)];
+function pickChallengeTauntLine(moves: number): string {
+  const line =
+    CHALLENGE_TAUNT_LINES[Math.floor(Math.random() * CHALLENGE_TAUNT_LINES.length)];
+  return line.replace("{moves}", String(moves));
 }
 
-export function buildChallengeShareMessage(args: ShareMessageArgs): string {
-  const timeAndMoves =
-    args.moveCount != null && args.moveCount > 0
-      ? `I did it in ${formatTime(args.elapsedSeconds)} and ${args.moveCount} moves.`
-      : `I did it in ${formatTime(args.elapsedSeconds)}.`;
-  const largestMerge =
-    args.maxGroupSize != null && args.maxGroupSize > 0
-      ? `• Largest merge: ${args.maxGroupSize} ${args.maxGroupSize === 1 ? "piece" : "pieces"}`
-      : null;
-  const bullets = [
-    `• ${pickChallengePhrase()}`,
-    `• ${timeAndMoves}`,
-    ...(largestMerge ? [largestMerge] : []),
-    "• Think you can beat me? Let me know if you need lessons! 😉",
-  ];
+/** Daily Share – Wordle-style compact format. Only for Daily Puzzle. */
+export type DailyShareMessageArgs = {
+  dailyNumber: number;
+  pieceCount: number;
+  elapsedSeconds: number;
+  moveCount: number;
+  dailyLink: string;
+  /** 4 cells: completed, good time, efficient moves, clean solve (no hint/undo). Deterministic. */
+  completionGrid: string;
+};
+
+export function buildDailyShareMessage(args: DailyShareMessageArgs): string {
+  const time = formatTime(args.elapsedSeconds);
+  const difficulty = getDifficultyLabel(args.pieceCount);
   return [
-    "🧩 Phuzzle Challenge",
+    `Phuzzle Daily #${args.dailyNumber}`,
+    `${difficulty} • ${args.pieceCount} pieces`,
     "",
-    ...bullets,
+    `⏱ ${time}`,
+    `🔁 ${args.moveCount}`,
     "",
-    "Same puzzle, same difficulty:",
+    args.completionGrid,
     "",
+    "Play:",
+    args.dailyLink,
+  ].join("\n");
+}
+
+/** Deterministic 4-cell grid: completed, good time, efficient moves, no hint/undo. */
+export type DailyShareGridArgs = {
+  pieceCount: number;
+  elapsedSeconds: number;
+  moveCount: number;
+  usedHint: boolean;
+  undoCount: number;
+};
+
+const FILLED = "🟦";
+const EMPTY = "⬜";
+
+export function getDailyShareCompletionGrid(args: DailyShareGridArgs): string {
+  const { pieceCount, elapsedSeconds, moveCount, usedHint, undoCount } = args;
+  const completed = true;
+  const goodTime = elapsedSeconds <= Math.ceil(pieceCount * 3.5);
+  const efficientMoves = moveCount <= pieceCount * 2.5;
+  const cleanSolve = !usedHint && undoCount === 0;
+  const c1 = completed ? FILLED : EMPTY;
+  const c2 = goodTime ? FILLED : EMPTY;
+  const c3 = efficientMoves ? FILLED : EMPTY;
+  const c4 = cleanSolve ? FILLED : EMPTY;
+  return `${c1}${c2}${c3}${c4}`;
+}
+
+/**
+ * Beat My Puzzle – challenge share. Exact structure per spec.
+ */
+export function buildChallengeShareMessage(args: ShareMessageArgs): string {
+  const time = formatTime(args.elapsedSeconds);
+  const moves = args.moveCount ?? 0;
+  const difficulty = getDifficultyLabel(args.pieceCount);
+  const pieces = args.pieceCount;
+  const puzzleName = args.puzzleName?.trim() || "Puzzle";
+  const firstLine = pickChallengeTauntLine(moves);
+  return [
+    `🧩 ${firstLine}`,
+    "",
+    `Puzzle: ${puzzleName}`,
+    `Difficulty: ${difficulty} (${pieces} pieces)`,
+    "",
+    `⏱ Time: ${time}`,
+    `🔁 Moves: ${moves}`,
+    "",
+    "Try the same puzzle:",
     args.playUrl,
   ].join("\n");
 }

@@ -143,6 +143,27 @@ export function drawPuzzleIcon(
   ctx.restore();
 }
 
+/**
+ * Draw text lines at y (baseline of first line); each line centered in rect width.
+ */
+export function drawTextLines(
+  ctx: CanvasRenderingContext2D,
+  rect: Rect,
+  lines: string[],
+  y: number,
+  lineHeight: number,
+  font: string,
+  fillStyle: string,
+) {
+  ctx.font = font;
+  ctx.fillStyle = fillStyle;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  lines.forEach((line, i) => {
+    ctx.fillText(line, rect.x + rect.w / 2, y + i * lineHeight + lineHeight / 2);
+  });
+}
+
 export function drawChipRow(
   ctx: CanvasRenderingContext2D,
   rowBounds: Rect,

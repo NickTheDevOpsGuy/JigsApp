@@ -201,19 +201,18 @@
 
   .completeImageWrapNew {
     border-radius: var(--radius-card);
-    max-height: min(36vh, 220px);
-    min-height: 160px;
-    aspect-ratio: unset;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
+  /* Full image on mobile: contain within available space, no crop */
   .completeImageNew {
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: auto;
     max-width: 100%;
-    max-height: 100%;
+    max-height: min(38vh, 280px);
     object-fit: contain;
     object-position: center;
   }
@@ -258,16 +257,17 @@
   }
 
   .completeImageWrapNew {
-    max-height: min(22vh, 180px);
+    min-height: 0;
     border-radius: var(--radius-btn);
   }
 
   .completeImageNew {
     width: auto;
-    height: 100%;
+    height: auto;
     max-width: 100%;
-    max-height: 100%;
+    max-height: min(32vh, 220px);
     object-fit: contain;
+    object-position: center;
   }
 
   .completePrimaryActions {

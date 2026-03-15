@@ -21,6 +21,7 @@ export function usePlayScreenShortcutsFromSetup(
     state,
     setState,
     isPaused: ui.isPaused,
+    undoRedoEnabled: ui.undoRedoEnabled,
     showShortcuts: ui.showShortcuts,
     showHelpChoice: ui.showHelpChoice,
     showNewGameModal: ui.showNewGameModal,

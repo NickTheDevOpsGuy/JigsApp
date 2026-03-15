@@ -8,7 +8,7 @@
  */
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Puzzle, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Puzzle, Check, ChevronLeft, ChevronRight, ChevronDown, X } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/packs/samplePuzzles";
@@ -17,6 +17,7 @@ import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import styles from "./ChoosePuzzleModal.module.css";
+import { FilterPanel } from "@/components/FilterPanel/FilterPanel";
 
 const PRIMARY_DIFFICULTIES = GRID_OPTIONS.slice(0, 4);
 const DIFFICULTY_NAMES = ["Easy", "Medium", "Hard", "Expert"] as const;
@@ -40,6 +41,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   const [selectedPuzzle, setSelectedPuzzle] = useState<SamplePuzzle | null>(null);
   const [difficultyIndex, setDifficultyIndex] = useState(1);
   const [filterCategory, setFilterCategory] = useState("all");
+  const [filterOpen, setFilterOpen] = useState(false);
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
 
   const filteredPuzzles = useMemo(
@@ -70,7 +72,13 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     setSelectedPuzzle(null);
     setDifficultyIndex(1);
     setFilterCategory("all");
+    setFilterOpen(false);
   }, [isOpen]);
+
+  const activeFilterLabel =
+    filterCategory !== "all"
+      ? CATEGORIES.find((c) => c.id === filterCategory)?.name ?? filterCategory
+      : null;
 
   useEffect(() => {
     if (!isOpen || step !== "puzzle") return;
@@ -209,34 +217,93 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         </button>
       </nav>
 
-      {/* Step 1: Category only — no puzzle list, no preview, no difficulty */}
+      {/* Step 1: Category only – clean Filter control + optional chips */}
       {step === "category" && (
         <>
-          <p className={styles.railLabel}>Choose a category</p>
-          <div className={styles.filterBar} role="group" aria-label="Filter by category">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                className={`${styles.filterChip} ${filterCategory === cat.id ? styles.filterChipActive : ""}`}
-                onClick={() => {
-                  setFilterCategory(cat.id);
-                  setStep("puzzle");
-                }}
-                aria-pressed={filterCategory === cat.id}
-                aria-label={`Category: ${cat.name}`}
-                title={`${cat.name} – choose a puzzle in this category`}
-              >
-                {cat.label}
-              </button>
-            ))}
+          <div className={styles.filterControlRow}>
+            <button
+              type="button"
+              className={styles.filterTriggerBtn}
+              onClick={() => setFilterOpen(true)}
+              aria-label="Open filter"
+              aria-haspopup="dialog"
+              aria-expanded={filterOpen}
+            >
+              Filter <ChevronDown size={16} aria-hidden />
+            </button>
           </div>
+          {activeFilterLabel && (
+            <div className={styles.activeChipsRow}>
+              <span className={styles.activeChip}>
+                {activeFilterLabel}
+                <button
+                  type="button"
+                  className={styles.activeChipRemove}
+                  onClick={() => setFilterCategory("all")}
+                  aria-label={`Remove filter ${activeFilterLabel}`}
+                >
+                  <X size={12} aria-hidden />
+                </button>
+              </span>
+            </div>
+          )}
+          <FilterPanel
+            isOpen={filterOpen}
+            onClose={() => setFilterOpen(false)}
+            title="Filter by category"
+            categoryOptions={CATEGORIES.map((c) => ({ id: c.id, name: c.name, label: c.label }))}
+            selectedCategoryId={filterCategory}
+            onCategorySelect={setFilterCategory}
+            onApply={() => {
+              setFilterOpen(false);
+              if (filterCategory !== "all") setStep("puzzle");
+            }}
+            onReset={() => setFilterCategory("all")}
+          />
+          <p className={styles.railLabel}>Choose a category</p>
         </>
       )}
 
-      {/* Step 2: Puzzle rail only — thumbnail + title; NO large preview, NO difficulty */}
+      {/* Step 2: Puzzle rail — same Filter control + chips, then rail */}
       {step === "puzzle" && (
         <>
+          <div className={styles.filterControlRow}>
+            <button
+              type="button"
+              className={styles.filterTriggerBtn}
+              onClick={() => setFilterOpen(true)}
+              aria-label="Open filter"
+              aria-haspopup="dialog"
+              aria-expanded={filterOpen}
+            >
+              Filter <ChevronDown size={16} aria-hidden />
+            </button>
+          </div>
+          {activeFilterLabel && (
+            <div className={styles.activeChipsRow}>
+              <span className={styles.activeChip}>
+                {activeFilterLabel}
+                <button
+                  type="button"
+                  className={styles.activeChipRemove}
+                  onClick={() => setFilterCategory("all")}
+                  aria-label={`Remove filter ${activeFilterLabel}`}
+                >
+                  <X size={12} aria-hidden />
+                </button>
+              </span>
+            </div>
+          )}
+          <FilterPanel
+            isOpen={filterOpen}
+            onClose={() => setFilterOpen(false)}
+            title="Filter by category"
+            categoryOptions={CATEGORIES.map((c) => ({ id: c.id, name: c.name, label: c.label }))}
+            selectedCategoryId={filterCategory}
+            onCategorySelect={setFilterCategory}
+            onApply={() => setFilterOpen(false)}
+            onReset={() => setFilterCategory("all")}
+          />
           <p className={styles.railLabel}>Choose a puzzle</p>
           <div className={styles.gridScrollWrap}>
             <button
@@ -301,13 +368,10 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         </>
       )}
 
-      {/* Step 3: Setup — ONLY place with large preview + difficulty + Start */}
+      {/* Step 3: Setup — difficulty + Start only (image already seen on puzzle step) */}
       {step === "setup" && selectedPuzzle && (
         <>
           <h2 className={styles.setupPuzzleName}>{selectedPuzzle.name}</h2>
-          <div className={styles.selectedPreview}>
-            <img src={selectedPuzzle.fullImage} alt="" className={styles.previewImage} />
-          </div>
           <div
             className={styles.difficultySelector}
             role="group"

@@ -1,13 +1,14 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "48";
+export const CHANGELOG_VERSION = "49";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📅 Daily Share – After completing the Daily Puzzle, a new **Daily Share** button appears on the win screen. It copies or shares a compact, Wordle-style text block: daily number, difficulty, time, moves, a small emoji progress grid (🟦/⬜), and a link to play the same daily. Copy to clipboard or use native share on mobile.",
       "📦 Puzzle Packs – Same layout as Choose Puzzle; only labels and data differ.",
       "🧭 Breadcrumbs – Click Pack, Puzzle, Difficulty, or Start to jump to that step.",
       "🖼️ One modal – Pack and puzzle pickers share one reusable layout.",

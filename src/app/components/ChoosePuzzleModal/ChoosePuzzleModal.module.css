@@ -94,6 +94,78 @@
   );
 }
 
+/* Single Filter (and optional Sort) control – shared with PackChoiceModal */
+.filterControlRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.filterTriggerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.filterTriggerBtn:hover {
+  border-color: var(--color-brand-primary);
+  background: color-mix(in srgb, var(--color-brand-primary) 10%, var(--color-bg-elevated));
+}
+
+.activeChipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.activeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-brand-primary);
+  background: color-mix(in srgb, var(--color-brand-primary) 14%, var(--color-bg-elevated));
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.activeChipRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.activeChipRemove:hover {
+  background: color-mix(in srgb, var(--color-text-primary) 35%, transparent);
+}
+
 .setupPuzzleName {
   margin: 0 0 12px;
   font-size: 1.25rem;
@@ -222,13 +294,14 @@
 .puzzleTile {
   position: relative;
   flex-shrink: 0;
-  width: 100px;
-  min-height: 120px;
+  width: 80px;
+  min-height: 98px;
   display: flex;
   flex-direction: column;
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border) 80%, transparent);
   background: var(--color-bg-primary);
   padding: 0;
   cursor: pointer;
@@ -285,30 +358,21 @@
     border-radius: 3px;
   }
 
-  /* Mobile: 1 full card + partial next to signal horizontal scroll */
+  /* Mobile: smaller cards, 1 full + partial next to signal horizontal scroll */
   .puzzleTile {
-    width: min(72vw, 240px);
+    width: min(56vw, 180px);
     min-height: 0;
-    border-width: 2px;
-    border-radius: 12px;
+    border-width: 1px;
+    border-radius: 10px;
   }
 
   .puzzleTile .tileTitle {
-    font-size: 12px;
-    padding: 6px 8px 8px;
+    font-size: 11px;
+    padding: 4px 6px 6px;
   }
 
   .tilePlaceholder {
-    font-size: 18px;
-  }
-
-  .selectedPreview {
-    max-height: 100px;
-    margin-bottom: 8px;
-  }
-
-  .previewImage {
-    max-height: 100px;
+    font-size: 16px;
   }
 
   .difficultySelector {
@@ -348,6 +412,14 @@
   background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-bg-primary));
 }
 
+.puzzleTile .tileImageWrap {
+  border-color: color-mix(in srgb, var(--color-border) 85%, var(--color-bg-primary));
+}
+
+.puzzleTileSelected .tileImageWrap {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 70%, transparent);
+}
+
 .tileImageWrap {
   position: relative;
   width: 100%;
@@ -357,19 +429,23 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--color-border) 90%, var(--color-bg-primary));
+  background: var(--color-bg-primary);
 }
 
 .tileImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
 }
 
 .tileTitle {
   flex-shrink: 0;
-  padding: 4px 6px 6px;
-  font-size: 11px;
+  padding: 3px 5px 5px;
+  font-size: 10px;
   font-weight: 500;
   color: var(--color-text-primary);
   line-height: 1.2;
@@ -379,7 +455,7 @@
 }
 
 .tilePlaceholder {
-  font-size: 24px;
+  font-size: 20px;
   color: var(--color-text-secondary);
 }
 
@@ -401,23 +477,6 @@
   inset: 0;
   box-shadow: inset 0 0 0 2px var(--color-brand-primary);
   pointer-events: none;
-}
-
-.selectedPreview {
-  flex-shrink: 0;
-  margin-bottom: 12px;
-  border-radius: var(--radius-card);
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  max-height: 160px;
-}
-
-.previewImage {
-  display: block;
-  width: 100%;
-  max-height: 160px;
-  object-fit: cover;
-  object-position: center;
 }
 
 .difficultySelector {

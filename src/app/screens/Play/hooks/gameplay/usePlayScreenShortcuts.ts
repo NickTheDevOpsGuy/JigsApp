@@ -13,6 +13,8 @@ type UsePlayScreenShortcutsArgs = {
   state: PuzzleState | null;
   setState: (st: PuzzleState) => void;
   isPaused: boolean;
+  /** When false, Ctrl/Cmd+Z undo/redo do nothing */
+  undoRedoEnabled?: boolean;
   showShortcuts: boolean;
   showHelpChoice: boolean;
   showNewGameModal: boolean;
@@ -47,6 +49,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
     state,
     setState,
     isPaused,
+    undoRedoEnabled = true,
     showShortcuts,
     showHelpChoice,
     showNewGameModal,
@@ -170,26 +173,30 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
           break;
         }
         case "undo":
-          createUndoRedoHandler(
-            manager ?? null,
-            "undo",
-            setState,
-            () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
-            soundManager.play.bind(soundManager),
-            onUndoSuccess,
-            onSnapBackAnimate,
-          )();
+          if (undoRedoEnabled) {
+            createUndoRedoHandler(
+              manager ?? null,
+              "undo",
+              setState,
+              () => Boolean(manager?.canUndo() && !isPaused && !state?.isComplete),
+              soundManager.play.bind(soundManager),
+              onUndoSuccess,
+              onSnapBackAnimate,
+            )();
+          }
           break;
         case "redo":
-          createUndoRedoHandler(
-            manager ?? null,
-            "redo",
-            setState,
-            () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
-            soundManager.play.bind(soundManager),
-            undefined,
-            onSnapBackAnimate,
-          )();
+          if (undoRedoEnabled) {
+            createUndoRedoHandler(
+              manager ?? null,
+              "redo",
+              setState,
+              () => Boolean(manager?.canRedo() && !isPaused && !state?.isComplete),
+              soundManager.play.bind(soundManager),
+              undefined,
+              onSnapBackAnimate,
+            )();
+          }
           break;
         case "sendToTray":
           if (manager && state && !isPaused && selectedPieceId) {
@@ -220,6 +227,7 @@ export function usePlayScreenShortcuts(args: UsePlayScreenShortcutsArgs) {
     [
       state,
       isPaused,
+      undoRedoEnabled,
       showShortcuts,
       showHelpChoice,
       showNewGameModal,
