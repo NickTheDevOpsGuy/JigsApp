@@ -53,7 +53,7 @@
 
 @media (max-width: 600px) {
   .playBody .main {
-    max-width: min(98vw, 1280px);
+    max-width: 100%;
     min-height: 0;
     flex: 0 1 auto;
   }

@@ -272,12 +272,14 @@ export function PlayScreenLayout({
         {replayPortalProps &&
           createPortal(<ReplaySolveModal {...replayPortalProps} />, document.body)}
 
-        <div className={styles.boardLayoutShell}>
+        {/* Mandatory structure: BoardLayoutShell > TopBar, BoardContainer, TrayDock. Board is the only layout anchor. */}
+        <div className={styles.boardLayoutShell} data-layout="board-layout-shell">
           <PlayScreenTopBar {...topBarProps} hideMenuAndButtons={hideTopBarControls} />
 
-          <div className={styles.playBody}>
+          <div className={styles.playBody} data-layout="play-body">
             <div
               className={styles.main}
+              data-layout="board-container"
               ref={board.mainRef as React.RefObject<HTMLDivElement>}
             >
               <div className={styles.boardWrapper}>
@@ -377,11 +379,12 @@ export function PlayScreenLayout({
                 </div>
               </div>
             </div>
-            {tray.show && (
-              <div
-                className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
-                onPointerLeave={tray.onPointerLeave}
-                data-tray-state={isMobile ? mobileTrayState : undefined}
+          {tray.show && (
+            <div
+              className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
+              data-layout="tray-dock"
+              onPointerLeave={tray.onPointerLeave}
+              data-tray-state={isMobile ? mobileTrayState : undefined}
                 style={
                   isMobile
                     ? ({
