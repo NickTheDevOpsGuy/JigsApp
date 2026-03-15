@@ -19,11 +19,11 @@
 
 .scrollIndicator {
   flex-shrink: 0;
-  height: 5px;
+  height: 4px;
   background: rgba(26, 43, 74, 0.6);
   border-radius: 999px;
   overflow: hidden;
-  margin: 0 10px 6px;
+  margin: 0 8px 4px;
 }
 
 .scrollIndicatorFill {
@@ -41,7 +41,7 @@
   gap: 6px;
   min-width: 0;
   overflow: hidden;
-  padding: 4px 8px 8px;
+  padding: 4px 6px 6px;
   position: relative;
   z-index: 2;
   pointer-events: auto;

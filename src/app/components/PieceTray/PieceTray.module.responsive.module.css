@@ -39,14 +39,14 @@
 
 @media (max-width: 600px) {
   .trayCompact .thumbWrap {
-    width: 72px;
-    height: 72px;
+    width: 76px;
+    height: 76px;
   }
 
   .trayCompact .pieceButton,
   .trayCompact .blankSlot {
-    min-width: 78px;
-    min-height: 78px;
+    min-width: 82px;
+    min-height: 82px;
   }
 }
 
@@ -79,14 +79,14 @@
 
 @media (max-width: 600px) {
   .trayExtraCompact .thumbWrap {
-    width: 64px;
-    height: 64px;
+    width: 68px;
+    height: 68px;
   }
 
   .trayExtraCompact .pieceButton,
   .trayExtraCompact .blankSlot {
-    min-width: 68px;
-    min-height: 68px;
+    min-width: 72px;
+    min-height: 72px;
   }
 }
 

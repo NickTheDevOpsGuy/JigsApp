@@ -11,15 +11,15 @@ import { usePieceTrayScroll } from "./usePieceTrayScroll";
 import { usePieceTrayThumbs } from "./usePieceTrayThumbs";
 import styles from "./PieceTray.module.css";
 
-/* Piece preview in tray: mobile 64–72px, desktop 72–84px; tray stays compact */
+/* Piece preview: slightly larger on mobile for readability; tray stays compact */
 function getThumbSize(pieceCount: number, isMobile: boolean): number {
   if (isMobile) {
-    if (pieceCount >= 64) return 64;
-    if (pieceCount >= 49) return 66;
-    if (pieceCount >= 36) return 68;
-    if (pieceCount >= 25) return 70;
-    if (pieceCount >= 16) return 72;
-    return 72;
+    if (pieceCount >= 64) return 68;
+    if (pieceCount >= 49) return 70;
+    if (pieceCount >= 36) return 72;
+    if (pieceCount >= 25) return 74;
+    if (pieceCount >= 16) return 76;
+    return 76;
   }
   if (pieceCount >= 64) return 72;
   if (pieceCount >= 49) return 75;

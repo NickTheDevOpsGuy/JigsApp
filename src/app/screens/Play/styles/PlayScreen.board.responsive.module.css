@@ -98,14 +98,21 @@
 
   .boardLayoutShell .topBarWrap {
     width: 100%;
+    max-height: 38px;
   }
 
+  /* Mobile HUD compact: Menu | Time | Pause | Moves | Pieces – reduced height, padding, radius */
   .topBar {
     min-height: 0;
     height: auto;
-    padding: calc(8px + env(safe-area-inset-top, 0))
-      max(8px, env(safe-area-inset-right, 0)) 0 max(8px, env(safe-area-inset-left, 0));
-    gap: 8px;
+    padding: calc(6px + env(safe-area-inset-top, 0))
+      max(6px, env(safe-area-inset-right, 0)) 0 max(6px, env(safe-area-inset-left, 0));
+    gap: 4px;
+  }
+
+  .topBarInner {
+    padding-inline: 10px 8px;
+    gap: 6px;
   }
 
   .topBarLeft,
@@ -120,17 +127,17 @@
   }
 
   .topBarRight {
-    gap: 8px;
+    gap: 4px;
   }
 
   .topBarHud {
-    gap: 8px;
+    gap: 4px;
   }
 
   .headerMenuTrigger {
-    min-width: 48px;
-    min-height: 48px;
-    border-radius: 8px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 6px;
     background: none;
     border: none;
   }
@@ -138,22 +145,22 @@
     display: none;
   }
   .iconBtn {
-    padding: 8px 10px;
+    padding: 6px 8px;
     font-size: 12px;
-    border-radius: 8px;
-    min-height: 44px;
-    min-width: 44px;
+    border-radius: 6px;
+    min-height: 36px;
+    min-width: 36px;
   }
   .undoRedoSegment {
-    border-radius: 8px;
+    border-radius: 6px;
   }
   .undoRedoBtn {
-    padding: 8px 10px;
-    min-height: 44px;
-    min-width: 44px;
+    padding: 6px 8px;
+    min-height: 36px;
+    min-width: 36px;
   }
   .hud {
-    gap: 6px;
+    gap: 4px;
     justify-content: flex-end;
     flex: 0 1 auto;
   }
@@ -165,19 +172,19 @@
     font-size: 10px;
   }
   .hudPill {
-    min-height: 44px;
-    padding: 0 12px;
-    font-size: 14px;
-    gap: 6px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
-    border-color: color-mix(in srgb, var(--color-border) 88%, transparent);
-    box-shadow: 0 10px 24px rgba(2, 7, 18, 0.24);
+    min-height: 32px;
+    padding: 0 8px;
+    font-size: 13px;
+    gap: 4px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+    border-color: color-mix(in srgb, var(--color-border) 90%, transparent);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
   .hudPillTimer {
-    min-height: 44px;
-    padding: 0 12px;
-    font-size: 14px;
+    min-height: 32px;
+    padding: 0 8px;
+    font-size: 13px;
   }
   .hudPillTimer .timerSuffix {
     display: none;
@@ -195,9 +202,9 @@
   }
 
   .hudPillPause {
-    min-height: 44px;
-    min-width: 44px;
-    box-shadow: 0 10px 24px rgba(2, 7, 18, 0.24);
+    min-height: 32px;
+    min-width: 32px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
   .hudPill span {
     overflow: hidden;
@@ -255,8 +262,8 @@
   .trayAreaSheet .trayBottomBar {
     width: 100%;
     max-width: 100%;
-    min-height: 28px;
-    padding: 4px 12px 6px;
+    min-height: 24px;
+    padding: 2px 12px 4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -284,11 +291,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    min-height: 28px;
-    padding: 4px 10px;
+    gap: 0;
+    min-height: 24px;
+    padding: 2px 10px;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     background: transparent;
     color: var(--color-text-secondary);
     cursor: grab;
@@ -300,8 +307,9 @@
   }
 
   .traySheetHandleBar {
-    width: 32px;
-    height: 3px;
+    width: 28px;
+    height: 2px;
+    border-radius: 1px;
   }
 
   /* Smaller hint so it doesn't stretch on mobile */
