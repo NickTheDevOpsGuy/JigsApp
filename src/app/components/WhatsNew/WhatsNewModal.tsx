@@ -38,7 +38,9 @@ export function WhatsNewModal({ isOpen, onClose }: WhatsNewModalProps) {
             <h3 className={styles.sectionTitle}>{section.title}</h3>
             <ul className={styles.list}>
               {section.items.slice(0, MAX_FEATURES).map((item, j) => {
-                const text = String(item).replace(/^[\s•·]*/, "").trim();
+                const text = String(item)
+                  .replace(/^[\s•·]*/, "")
+                  .trim();
                 return (
                   <li key={j} className={styles.item}>
                     {text ? `• ${text}` : null}
