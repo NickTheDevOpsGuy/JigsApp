@@ -268,7 +268,9 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                       setDifficultyIndex(1);
                       setStep("setup");
                     }}
-                    onImgError={() => setImgError((prev) => ({ ...prev, [puzzle.id]: true }))}
+                    onImgError={() =>
+                      setImgError((prev) => ({ ...prev, [puzzle.id]: true }))
+                    }
                   />
                 ))}
               </div>
