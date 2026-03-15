@@ -45,12 +45,10 @@ describe("shareMessages", () => {
       puzzleName: "Forest Path",
     });
 
-    expect(text).toMatch(/^🧩 /);
-    expect(text).toContain("Puzzle: Forest Path");
-    expect(text).toContain("Difficulty: Medium (16 pieces)");
-    expect(text).toContain("⏱ Time: 1:42");
-    expect(text).toContain("🔁 Moves: 42");
-    expect(text).toContain("Try the same puzzle:");
+    expect(text).toMatch(
+      /^I solved this puzzle in 1:42 with 42 moves\. Think you can beat me\?/,
+    );
+    expect(text).toContain("Forest Path");
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc");
   });
 
@@ -61,11 +59,11 @@ describe("shareMessages", () => {
       playUrl: "https://phuzzle.vercel.app/play?grid=3x3",
       moveCount: 19,
     });
-    expect(text).toContain("Puzzle: Puzzle");
-    expect(text).toContain("Difficulty: Easy (9 pieces)");
-    expect(text).toContain("⏱ Time: 0:36");
-    expect(text).toContain("🔁 Moves: 19");
-    expect(text).toContain("Try the same puzzle:");
+    expect(text).toMatch(
+      /^I solved this puzzle in 0:36 with 19 moves\. Think you can beat me\?/,
+    );
+    expect(text).toContain("Puzzle");
+    expect(text).toContain("https://phuzzle.vercel.app/play?grid=3x3");
   });
 
   describe("Daily Share", () => {

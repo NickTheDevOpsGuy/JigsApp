@@ -5,17 +5,17 @@ import { describe, it, expect } from "vitest";
 import { snapGlowAlpha, snapPopScale } from "../renderBoardHelpersCore";
 
 describe("snapGlowAlpha", () => {
-  it("returns 0 for elapsed <= 0 or >= SNAP_GLOW_MS (180)", () => {
+  it("returns 0 for elapsed <= 0 or >= SNAP_GLOW_MS (120)", () => {
     expect(snapGlowAlpha(-1)).toBe(0);
     expect(snapGlowAlpha(0)).toBe(0);
-    expect(snapGlowAlpha(180)).toBe(0);
+    expect(snapGlowAlpha(120)).toBe(0);
     expect(snapGlowAlpha(250)).toBe(0);
   });
 
   it("returns positive alpha at start and decreases over time", () => {
     const atStart = snapGlowAlpha(1);
-    const mid = snapGlowAlpha(90);
-    const nearEnd = snapGlowAlpha(160);
+    const mid = snapGlowAlpha(50);
+    const nearEnd = snapGlowAlpha(100);
     expect(atStart).toBeGreaterThan(0);
     expect(mid).toBeGreaterThan(0);
     expect(nearEnd).toBeGreaterThan(0);
