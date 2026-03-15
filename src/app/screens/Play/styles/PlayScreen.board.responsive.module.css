@@ -1,4 +1,4 @@
-/* Mobile – no scroll, aligned layout like desktop */
+/* Mobile visual balance (48): board centered, tray under board, small gap, no big whitespace */
 @media (max-width: 600px) {
   .page {
     --play-board-tray-width: min(93vw, 720px);

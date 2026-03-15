@@ -16,6 +16,13 @@ body {
 
 button {
   font-family: inherit;
+  transition:
+    transform var(--transition-duration-ui, 140ms)
+      var(--ease-out-smooth, cubic-bezier(0.2, 0.8, 0.2, 1)),
+    filter var(--transition-duration-ui, 140ms) ease,
+    box-shadow var(--transition-duration-ui, 140ms) ease,
+    background-color var(--transition-duration-ui, 140ms) ease,
+    border-color var(--transition-duration-ui, 140ms) ease;
 }
 
 /* Prevent long-press callouts/context menus on touch devices (Android, iPhone) */

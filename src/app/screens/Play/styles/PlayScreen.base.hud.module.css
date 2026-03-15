@@ -18,6 +18,7 @@
 }
 
 /* Shared pill size so timer, pause, moves, pieces line up (same height, circles/pills) */
+/* Depth (47): HUD compact info layer – subtle shadow */
 .hudPill {
   display: inline-flex;
   align-items: center;
@@ -33,6 +34,7 @@
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .hudPillMoves {

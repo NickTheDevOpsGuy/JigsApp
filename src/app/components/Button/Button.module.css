@@ -11,7 +11,13 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--transition-duration-ui, 140ms)
+      var(--ease-out-smooth, cubic-bezier(0.2, 0.8, 0.2, 1)),
+    filter var(--transition-duration-ui, 140ms) ease,
+    box-shadow var(--transition-duration-ui, 140ms) ease,
+    background-color var(--transition-duration-ui, 140ms) ease,
+    border-color var(--transition-duration-ui, 140ms) ease;
 }
 
 .button:disabled {
@@ -28,12 +34,13 @@
 
 .primary:hover:not(:disabled) {
   background: var(--color-brand-hover);
+  filter: brightness(1.05);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
 .primary:active:not(:disabled) {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.97);
 }
 
 .secondary {
@@ -48,7 +55,7 @@
 }
 
 .secondary:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 .ghost {
@@ -62,7 +69,7 @@
 }
 
 .ghost:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 /* Outline: blue border/text, light background - for secondary CTAs */
@@ -78,7 +85,7 @@
 }
 
 .outline:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
 }
 
 /* Sizes */

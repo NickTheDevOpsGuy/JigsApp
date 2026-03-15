@@ -92,19 +92,19 @@ export function drawPieceImageInPath(
   );
   ctx.filter = "none";
 
-  /* Subtle bevel highlight – light from above; matte, not glossy */
+  /* Piece material (43): soft highlight on top edge, subtle bevel – physical cardboard */
   const topGlow = ctx.createLinearGradient(0, 0, 0, piece.h);
-  topGlow.addColorStop(0, "rgba(255,255,255,0.14)");
-  topGlow.addColorStop(0.06, "rgba(255,255,255,0.07)");
-  topGlow.addColorStop(0.38, "rgba(255,255,255,0)");
+  topGlow.addColorStop(0, "rgba(255,255,255,0.18)");
+  topGlow.addColorStop(0.05, "rgba(255,255,255,0.08)");
+  topGlow.addColorStop(0.35, "rgba(255,255,255,0)");
   ctx.fillStyle = topGlow;
   ctx.fill(path);
 
-  /* Faint inner bevel – slight depth; cardboard thickness */
+  /* Faint inner shadow near borders – cardboard thickness */
   const bevelShade = ctx.createLinearGradient(0, 0, 0, piece.h);
   bevelShade.addColorStop(0, "rgba(0,0,0,0)");
-  bevelShade.addColorStop(0.6, "rgba(0,0,0,0.05)");
-  bevelShade.addColorStop(1, "rgba(0,0,0,0.14)");
+  bevelShade.addColorStop(0.55, "rgba(0,0,0,0.06)");
+  bevelShade.addColorStop(1, "rgba(0,0,0,0.16)");
   ctx.fillStyle = bevelShade;
   ctx.fill(path);
 

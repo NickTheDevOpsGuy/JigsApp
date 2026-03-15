@@ -15,6 +15,10 @@
   --radius-btn: 10px;
   --radius-card: 16px;
   --radius-board: 20px;
+  /* Motion: consistent easing and duration (41–46) */
+  --ease-out-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-duration-ui: 140ms;
+  --transition-duration-dialog: 200ms;
   /* Typography mobile (fluid across narrow/wide phones) */
   --font-h1-mobile: clamp(21px, 5.8vw, 24px);
   --font-h2-mobile: clamp(17px, 4.9vw, 20px);

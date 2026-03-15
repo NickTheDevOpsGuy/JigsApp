@@ -1,3 +1,4 @@
+/* Completion celebration (49): snap → glow → pulse → dialog in 300–500ms */
 .completeOverlay {
   --color-completion-accent: var(--color-progress-75, #22c55e);
   position: fixed;
@@ -8,7 +9,8 @@
   align-items: center;
   justify-content: center;
   z-index: 2000;
-  animation: completionFadeIn 0.5s ease-out;
+  opacity: 0;
+  animation: completionFadeIn 0.35s var(--ease-out-smooth, ease-out) forwards;
   padding: var(--space-4);
   padding-top: max(var(--space-4), env(safe-area-inset-top, 0));
   padding-bottom: max(var(--space-6), env(safe-area-inset-bottom, 0) + var(--space-4));
@@ -99,7 +101,8 @@
   -webkit-backdrop-filter: blur(20px);
   box-shadow: var(--shadow-lg);
   border-radius: var(--radius-card);
-  animation: completePanelEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: completePanelEnter 0.4s
+    var(--ease-out-smooth, cubic-bezier(0.2, 0.8, 0.2, 1)) 0.08s both;
   margin: auto;
   position: relative;
   z-index: 1;
@@ -120,7 +123,7 @@
     transparent 70%
   );
   opacity: 0;
-  animation: completeGlowBurst 0.7s ease-out both;
+  animation: completeGlowBurst 0.45s var(--ease-out-smooth, ease-out) both;
   pointer-events: none;
   z-index: -1;
 }
