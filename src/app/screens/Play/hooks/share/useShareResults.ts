@@ -67,7 +67,14 @@ export function useShareResults(args: {
       moveCount,
       puzzleName,
     });
-  }, [elapsedSeconds, state?.totalCount, accuracyPercent, fullProgressUrl, moveCount, puzzleName]);
+  }, [
+    elapsedSeconds,
+    state?.totalCount,
+    accuracyPercent,
+    fullProgressUrl,
+    moveCount,
+    puzzleName,
+  ]);
 
   const getChallengeShareTextWithUrl = useCallback(
     (overrideChallengeUrl?: string) => {
@@ -81,7 +88,14 @@ export function useShareResults(args: {
         puzzleName,
       });
     },
-    [elapsedSeconds, state?.totalCount, fullChallengeUrl, moveCount, maxGroupSize, puzzleName],
+    [
+      elapsedSeconds,
+      state?.totalCount,
+      fullChallengeUrl,
+      moveCount,
+      maxGroupSize,
+      puzzleName,
+    ],
   );
 
   const shareUrls: ShareUrls = useMemo(() => {
@@ -157,7 +171,9 @@ export function useShareResults(args: {
         await navigator.share({
           title: "Phuzzle Puzzle Share",
           text,
-          url: url.startsWith("http") ? url : `${PLAY_BASE}${url.startsWith("/") ? url : `/${url}`}`,
+          url: url.startsWith("http")
+            ? url
+            : `${PLAY_BASE}${url.startsWith("/") ? url : `/${url}`}`,
         });
       } catch (err) {
         logger.warn("Share cancelled or failed:", err);

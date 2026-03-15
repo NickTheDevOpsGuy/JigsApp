@@ -32,14 +32,16 @@ export function SetupScreen() {
   const ctParam = searchParams.get("ct");
   const cmParam = searchParams.get("cm");
   const challengeFromFriend =
-    ctParam != null &&
-    cmParam != null &&
-    puzzleIdParam != null &&
-    gridParam != null
+    ctParam != null && cmParam != null && puzzleIdParam != null && gridParam != null
       ? (() => {
           const timeSeconds = parseInt(ctParam, 10);
           const moves = parseInt(cmParam, 10);
-          if (!Number.isFinite(timeSeconds) || !Number.isFinite(moves) || timeSeconds < 0 || moves < 0)
+          if (
+            !Number.isFinite(timeSeconds) ||
+            !Number.isFinite(moves) ||
+            timeSeconds < 0 ||
+            moves < 0
+          )
             return undefined;
           return { timeSeconds, moves };
         })()

@@ -52,19 +52,19 @@ Details: [doc/CHANGES.md](doc/CHANGES.md).
 
 All project docs live in **[doc/](doc/)**. Full index: [doc/README.md](doc/README.md).
 
-| Doc | Description |
-| --- | --- |
-| [doc/CHANGES.md](doc/CHANGES.md) | Feature list and recent changes |
-| [doc/FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | Implemented features and where they live in code |
-| [doc/FUTURE.md](doc/FUTURE.md) | Ideas and possible future features |
-| [doc/SHARING.md](doc/SHARING.md) | Completion share, Daily Share (Wordle-style), co-op share |
-| [doc/STREAK-FREEZE.md](doc/STREAK-FREEZE.md) | Streak freeze (streak shield): earn it, when it applies |
-| [doc/BUG_REPORT.md](doc/BUG_REPORT.md) | In-app bug report: where it is, what it does |
-| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) | Supabase: leaderboards, stats, co-op, env vars, migrations |
-| [doc/LIGHTHOUSE.md](doc/LIGHTHOUSE.md) | Lighthouse CI, reports, "GitHub token not set" warning |
-| [doc/MOBILE_QA.md](doc/MOBILE_QA.md) | Mobile release checklist and regression commands |
-| [doc/STATS_UI_QA.md](doc/STATS_UI_QA.md) | Stats modal QA: Profile, Board, Badges |
-| [doc/SESSION_SUMMARY.md](doc/SESSION_SUMMARY.md) | Session notes (layout, piece drawer, leaderboards, etc.) |
+| Doc                                                        | Description                                                |
+| ---------------------------------------------------------- | ---------------------------------------------------------- |
+| [doc/CHANGES.md](doc/CHANGES.md)                           | Feature list and recent changes                            |
+| [doc/FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | Implemented features and where they live in code           |
+| [doc/FUTURE.md](doc/FUTURE.md)                             | Ideas and possible future features                         |
+| [doc/SHARING.md](doc/SHARING.md)                           | Completion share, Daily Share (Wordle-style), co-op share  |
+| [doc/STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze (streak shield): earn it, when it applies    |
+| [doc/BUG_REPORT.md](doc/BUG_REPORT.md)                     | In-app bug report: where it is, what it does               |
+| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase: leaderboards, stats, co-op, env vars, migrations |
+| [doc/LIGHTHOUSE.md](doc/LIGHTHOUSE.md)                     | Lighthouse CI, reports, "GitHub token not set" warning     |
+| [doc/MOBILE_QA.md](doc/MOBILE_QA.md)                       | Mobile release checklist and regression commands           |
+| [doc/STATS_UI_QA.md](doc/STATS_UI_QA.md)                   | Stats modal QA: Profile, Board, Badges                     |
+| [doc/SESSION_SUMMARY.md](doc/SESSION_SUMMARY.md)           | Session notes (layout, piece drawer, leaderboards, etc.)   |
 
 ---
 

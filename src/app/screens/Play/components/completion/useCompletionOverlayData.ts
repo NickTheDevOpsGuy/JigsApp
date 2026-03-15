@@ -267,10 +267,9 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
   const getDailyShareText = useCallback((): string => {
     if (!grid || !isDaily) return "";
     const pieceCount = grid.rows * grid.cols;
-    const dailyLink =
-      puzzleShareUrl.startsWith("http")
-        ? puzzleShareUrl
-        : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
+    const dailyLink = puzzleShareUrl.startsWith("http")
+      ? puzzleShareUrl
+      : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
     const completionGrid = getDailyShareCompletionGrid({
       pieceCount,
       elapsedSeconds,
@@ -286,15 +285,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       dailyLink,
       completionGrid,
     });
-  }, [
-    grid,
-    isDaily,
-    puzzleShareUrl,
-    elapsedSeconds,
-    moveCount,
-    usedHint,
-    undoCount,
-  ]);
+  }, [grid, isDaily, puzzleShareUrl, elapsedSeconds, moveCount, usedHint, undoCount]);
 
   const handleCopyDailyShare = useCallback(async () => {
     const text = getDailyShareText();
@@ -311,10 +302,9 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
   const handleNativeDailyShare = useCallback(async () => {
     const text = getDailyShareText();
     if (!text) return;
-    const dailyLink =
-      puzzleShareUrl.startsWith("http")
-        ? puzzleShareUrl
-        : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
+    const dailyLink = puzzleShareUrl.startsWith("http")
+      ? puzzleShareUrl
+      : `${PLAY_BASE}${puzzleShareUrl.startsWith("/") ? puzzleShareUrl : `/${puzzleShareUrl}`}`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({

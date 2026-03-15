@@ -72,9 +72,7 @@ export function usePlayScreenUI() {
   const [minimapPosition, setMinimapPosition] = useState<
     "bottom-left" | "bottom-right" | "top-left" | "top-right"
   >(storageInitial.minimapPosition);
-  const [undoRedoEnabled, setUndoRedoEnabled] = useState(
-    storageInitial.undoRedoEnabled,
-  );
+  const [undoRedoEnabled, setUndoRedoEnabled] = useState(storageInitial.undoRedoEnabled);
 
   const [dailyPreferredModifier, setDailyPreferredModifierState] =
     useState<DailyVisualModifier>(getDailyPreferredModifier);

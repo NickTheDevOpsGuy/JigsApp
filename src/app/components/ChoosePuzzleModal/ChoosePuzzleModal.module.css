@@ -116,12 +116,18 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .filterTriggerBtn:hover {
   border-color: var(--color-brand-primary);
-  background: color-mix(in srgb, var(--color-brand-primary) 10%, var(--color-bg-elevated));
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 10%,
+    var(--color-bg-elevated)
+  );
 }
 
 .activeChipsRow {
@@ -139,7 +145,11 @@
   padding: 4px 8px 4px 10px;
   border-radius: 999px;
   border: 1px solid var(--color-brand-primary);
-  background: color-mix(in srgb, var(--color-brand-primary) 14%, var(--color-bg-elevated));
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 14%,
+    var(--color-bg-elevated)
+  );
   color: var(--color-text-primary);
   font-size: 12px;
   font-weight: 600;

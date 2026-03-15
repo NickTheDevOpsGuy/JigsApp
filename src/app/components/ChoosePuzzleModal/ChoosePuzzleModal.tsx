@@ -77,7 +77,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
 
   const activeFilterLabel =
     filterCategory !== "all"
-      ? CATEGORIES.find((c) => c.id === filterCategory)?.name ?? filterCategory
+      ? (CATEGORIES.find((c) => c.id === filterCategory)?.name ?? filterCategory)
       : null;
 
   useEffect(() => {
@@ -251,7 +251,11 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
             isOpen={filterOpen}
             onClose={() => setFilterOpen(false)}
             title="Filter by category"
-            categoryOptions={CATEGORIES.map((c) => ({ id: c.id, name: c.name, label: c.label }))}
+            categoryOptions={CATEGORIES.map((c) => ({
+              id: c.id,
+              name: c.name,
+              label: c.label,
+            }))}
             selectedCategoryId={filterCategory}
             onCategorySelect={setFilterCategory}
             onApply={() => {
@@ -298,7 +302,11 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
             isOpen={filterOpen}
             onClose={() => setFilterOpen(false)}
             title="Filter by category"
-            categoryOptions={CATEGORIES.map((c) => ({ id: c.id, name: c.name, label: c.label }))}
+            categoryOptions={CATEGORIES.map((c) => ({
+              id: c.id,
+              name: c.name,
+              label: c.label,
+            }))}
             selectedCategoryId={filterCategory}
             onCategorySelect={setFilterCategory}
             onApply={() => setFilterOpen(false)}

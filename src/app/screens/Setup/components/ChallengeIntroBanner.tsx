@@ -16,16 +16,21 @@ export function ChallengeIntroBanner(props: {
   onPlay: () => void;
   disabled?: boolean;
 }) {
-  const { puzzleName, pieceCount, challengeTimeSeconds, challengeMoves, onPlay, disabled } = props;
+  const {
+    puzzleName,
+    pieceCount,
+    challengeTimeSeconds,
+    challengeMoves,
+    onPlay,
+    disabled,
+  } = props;
   const difficulty = getDifficultyLabel(pieceCount);
   const timeStr = formatTime(challengeTimeSeconds);
 
   return (
     <section className={styles.banner} aria-label="Challenge from friend">
       <p className={styles.message}>Your friend challenged you to beat their puzzle.</p>
-      {puzzleName && (
-        <p className={styles.puzzleName}>Puzzle: {puzzleName}</p>
-      )}
+      {puzzleName && <p className={styles.puzzleName}>Puzzle: {puzzleName}</p>}
       <p className={styles.stats}>
         Difficulty: {difficulty} ({pieceCount} pieces)
       </p>

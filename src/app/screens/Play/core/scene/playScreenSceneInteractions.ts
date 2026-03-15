@@ -17,10 +17,7 @@ import { useDownloadImage } from "@/screens/Play/hooks/share/useDownloadImage";
 import { usePlayScreenTrayPieces } from "@/screens/Play/hooks/gameplay/usePlayScreenTrayPieces";
 import { usePlayScreenImmersiveControls } from "@/screens/Play/hooks/gameplay/usePlayScreenImmersiveControls";
 import { getBestTime } from "@/screens/Play/core/time/timeMode";
-import {
-  STORAGE_KEY,
-  PUZZLE_NAME_KEY,
-} from "@/screens/Play/core/utils/playScreenUtils";
+import { STORAGE_KEY, PUZZLE_NAME_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { SESSION_ID_PARAM } from "@/screens/Play/hooks/gameplay/usePuzzleSession";
 const DAILY_PARAM = "daily";

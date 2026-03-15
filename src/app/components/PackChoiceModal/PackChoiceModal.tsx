@@ -145,7 +145,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
 
   const activeFilterLabel =
     filterCategory !== "all"
-      ? PACK_FILTERS.find((c) => c.id === filterCategory)?.name ?? filterCategory
+      ? (PACK_FILTERS.find((c) => c.id === filterCategory)?.name ?? filterCategory)
       : null;
 
   useEffect(() => {
@@ -337,7 +337,11 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             isOpen={filterOpen}
             onClose={() => setFilterOpen(false)}
             title="Filter packs"
-            categoryOptions={PACK_FILTERS.map((c) => ({ id: c.id, name: c.name, label: c.label }))}
+            categoryOptions={PACK_FILTERS.map((c) => ({
+              id: c.id,
+              name: c.name,
+              label: c.label,
+            }))}
             selectedCategoryId={filterCategory}
             onCategorySelect={setFilterCategory}
             onApply={() => setFilterOpen(false)}
