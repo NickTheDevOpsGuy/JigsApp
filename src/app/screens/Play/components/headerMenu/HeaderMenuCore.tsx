@@ -15,7 +15,6 @@ import {
 } from "@/screens/Play/components/headerMenu/headerMenuConfig";
 import {
   SUB_MENU_LABELS,
-  SUBMENU_PARENT,
   SETTINGS_SUBMENU_ORDER,
   ROOT_MENU_ORDER,
   ROOT_MENU_LABELS,
