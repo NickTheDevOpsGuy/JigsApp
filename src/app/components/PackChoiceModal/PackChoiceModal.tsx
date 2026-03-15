@@ -133,15 +133,20 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     if (isOpen) loadPacksData().then(setPacksData);
   }, [isOpen]);
 
+  const defaultPackId =
+    packs.some((p) => p.id === "art") ? "art" : packs[0]?.id ?? "all";
+
   useEffect(() => {
     if (!isOpen) return;
-    setStep("pack");
-    setSelectedPack(null);
-    setSelectedPuzzle(null);
-    setDifficultyIndex(RECOMMENDED_INDEX);
-    setFilterCategory("all");
     setFilterOpen(false);
-  }, [isOpen]);
+    setDifficultyIndex(RECOMMENDED_INDEX);
+    setFilterCategory(defaultPackId);
+    const packToSelect = defaultPackId === "all" ? null : packs.find((p) => p.id === defaultPackId) ?? null;
+    setSelectedPack(packToSelect);
+    const puzzleList = packToSelect && packsData ? packsData.getPuzzlesForPack(packToSelect) : [];
+    setSelectedPuzzle(puzzleList[0] ?? null);
+    setStep(packToSelect && puzzleList.length > 0 ? "puzzle" : "pack");
+  }, [isOpen, defaultPackId, packs, packsData]);
 
   const activeFilterLabel =
     filterCategory !== "all"

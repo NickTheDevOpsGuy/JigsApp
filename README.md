@@ -44,6 +44,7 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the gallery, uplo
 - **Social:** Stats, profile, leaderboards (Today, Week, All-time, Efficiency). Share result, share card, Beat My Puzzle challenge links, Daily Share (Wordle-style for daily only), replay viewer. Co-op play with shareable links.
 - **Quality:** Bug report with optional screenshots. Mobile layouts: touch drag on the board (pieces follow your finger; page scroll is disabled over the board so drag works), tappable tray and carousel buttons (48px hit areas). PWA install.
 
+In-app **What's New** (changelog) uses a single bullet per item; source: `src/app/data/content/changelog.ts`.  
 Details: [doc/CHANGES.md](doc/CHANGES.md).
 
 ---

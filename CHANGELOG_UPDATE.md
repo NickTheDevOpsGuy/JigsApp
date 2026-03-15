@@ -38,7 +38,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ### In-app changelog
 
-- **src/app/data/content/changelog.ts** — Version 45: puzzle piece realism (deeper jigsaw, shadow/bevel/inner rim), drag feel (lift 12px, scale 1.04×), magnetic snap (larger radius, 120ms lock). Version 43: leaderboard Efficiency + Sort by + “You” highlight; profile best streak + See ranking; completion 7-day toast, new-best haptic, Next CTA; Supabase indexes.
+- **src/app/data/content/changelog.ts** — Entries are plain text (no leading bullet); What's New renders one bullet per item. Version 45: puzzle piece realism (deeper jigsaw, shadow/bevel/inner rim), drag feel (lift 12px, scale 1.04×), magnetic snap (larger radius, 120ms lock). Version 43: leaderboard Efficiency + Sort by + “You” highlight; profile best streak + See ranking; completion 7-day toast, new-best haptic, Next CTA; Supabase indexes.
 
 ---
 

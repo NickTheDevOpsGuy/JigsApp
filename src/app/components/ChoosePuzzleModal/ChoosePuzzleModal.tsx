@@ -66,15 +66,19 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     setScrollProgress(maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, left / maxScroll)));
   }, []);
 
+  const defaultCategory =
+    CATEGORIES.some((c) => c.id === "art") ? "art" : CATEGORIES[1]?.id ?? "all";
+
   useEffect(() => {
     if (!isOpen) return;
-    setFilterCategory("all");
     setFilterOpen(false);
     setDifficultyIndex(1);
-    const firstPuzzle = SAMPLE_PUZZLES[0] ?? null;
+    setFilterCategory(defaultCategory);
+    const filtered = filterPuzzles(SAMPLE_PUZZLES, defaultCategory);
+    const firstPuzzle = filtered[0] ?? null;
     setSelectedPuzzle(firstPuzzle);
     setStep(firstPuzzle ? "setup" : "category");
-  }, [isOpen]);
+  }, [isOpen, defaultCategory]);
 
   const activeFilterOption = CATEGORIES.find((c) => c.id === filterCategory);
   const filterTriggerLabel =

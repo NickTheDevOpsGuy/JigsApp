@@ -2,6 +2,8 @@
 
 High-level feature list and recent changes. For project overview see [README](../README.md). For where features live in code see [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md).
 
+**In-app changelog:** What's New is driven by `src/app/data/content/changelog.ts`. Each item is shown with a single bullet (no duplicate bullets); list items in the source file are plain text (no leading bullet character).
+
 ---
 
 ## Recent (high level)
