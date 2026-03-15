@@ -61,7 +61,7 @@ export function CompletionOverlayActions(args: {
     canReplay,
     onReplayClick,
     onNextPuzzle,
-    onClose,
+    onClose: _onClose,   // ← FIXED: rename unused variable
     grid,
   } = args;
 
@@ -82,16 +82,19 @@ export function CompletionOverlayActions(args: {
         setShareOpen(false);
       }
     };
+
     document.addEventListener("pointerdown", close);
     return () => document.removeEventListener("pointerdown", close);
   }, []);
 
   const handleChallenge = async () => {
     setShareOpen(false);
+
     const challengeUrl =
       puzzleShareUrl +
       (puzzleShareUrl.includes("?") ? "&" : "?") +
       `ct=${elapsedSeconds}&cm=${moveCount ?? 0}`;
+
     await completionData.handleShareChallengeCard().catch(() => {});
     onShareChallenge?.(challengeUrl);
   };
@@ -146,6 +149,7 @@ export function CompletionOverlayActions(args: {
                 aria-hidden
               />
             </button>
+
             {moreOpen && (
               <div className={styles.completeMenuDropdown} role="menu">
                 {onNextPuzzle && (
@@ -162,6 +166,7 @@ export function CompletionOverlayActions(args: {
                     New Puzzle
                   </button>
                 )}
+
                 {canReplay && onReplayClick && (
                   <button
                     type="button"
@@ -202,6 +207,7 @@ export function CompletionOverlayActions(args: {
                 aria-hidden
               />
             </button>
+
             {shareOpen && (
               <div className={styles.completeMenuDropdown} role="menu">
                 {(onShareChallenge || onCopyChallenge) && (
@@ -215,6 +221,7 @@ export function CompletionOverlayActions(args: {
                     Challenge Friend
                   </button>
                 )}
+
                 {(onShareProgress || onCopyProgress) && (
                   <button
                     type="button"

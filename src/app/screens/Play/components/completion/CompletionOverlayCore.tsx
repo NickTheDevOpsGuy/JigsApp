@@ -79,6 +79,7 @@ export function CompletionOverlay({
       ? (stats) => onCompletionRecorded({ dailyStreak: stats.dailyStreak })
       : undefined,
   });
+
   const {
     shareMenuOpen,
     setShareMenuOpen,
@@ -99,6 +100,7 @@ export function CompletionOverlay({
   useEffect(() => {
     const t2 = setTimeout(() => setPhase(2), PHASE2_MS);
     const t3 = setTimeout(() => setPhase(3), PHASE3_MS);
+
     return () => {
       clearTimeout(t2);
       clearTimeout(t3);
@@ -109,9 +111,15 @@ export function CompletionOverlay({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        onNextPuzzle?.() ?? onClose();
+
+        if (onNextPuzzle) {
+          onNextPuzzle();
+        } else {
+          onClose();
+        }
       }
     };
+
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose, onNextPuzzle]);
@@ -119,10 +127,12 @@ export function CompletionOverlay({
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const cleanSolve = undoCount === 0 && !usedHint;
   const achievements: string[] = [];
+
   if (cleanSolve) achievements.push("⭐ Clean Solve");
   if (isNewBest) achievements.push("🏆 New Personal Best");
-  if (isDaily && completionData.newlyUnlocked?.length === 0 && !isNewBest)
+  if (isDaily && completionData.newlyUnlocked?.length === 0 && !isNewBest) {
     achievements.push("🔥 Streak Progress");
+  }
 
   return (
     <AppModal
@@ -152,6 +162,7 @@ export function CompletionOverlay({
 
         <div className={styles.completeCelebrationBlock}>
           <h2 className={styles.completePhasedTitle}>Puzzle Complete</h2>
+
           {imageUrl && !imageError && (
             <div className={styles.completeImageWrapPhased}>
               <img
@@ -162,6 +173,7 @@ export function CompletionOverlay({
               />
             </div>
           )}
+
           {phase >= 3 && achievements.length > 0 && (
             <AchievementCycler achievements={achievements} />
           )}
@@ -204,16 +216,25 @@ export function CompletionOverlay({
 
 function AchievementCycler({ achievements }: { achievements: string[] }) {
   const [index, setIndex] = useState(0);
+
   useEffect(() => {
     if (achievements.length <= 1) return;
+
     const id = setInterval(() => {
       setIndex((i) => (i + 1) % achievements.length);
     }, 1000);
+
     return () => clearInterval(id);
   }, [achievements.length]);
+
   const text = achievements[index] ?? achievements[0];
+
   return (
-    <p className={styles.completeAchievementPhased} role="status" aria-live="polite">
+    <p
+      className={styles.completeAchievementPhased}
+      role="status"
+      aria-live="polite"
+    >
       {text}
     </p>
   );
