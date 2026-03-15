@@ -379,12 +379,12 @@ export function PlayScreenLayout({
                 </div>
               </div>
             </div>
-          {tray.show && (
-            <div
-              className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
-              data-layout="tray-dock"
-              onPointerLeave={tray.onPointerLeave}
-              data-tray-state={isMobile ? mobileTrayState : undefined}
+            {tray.show && (
+              <div
+                className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
+                data-layout="tray-dock"
+                onPointerLeave={tray.onPointerLeave}
+                data-tray-state={isMobile ? mobileTrayState : undefined}
                 style={
                   isMobile
                     ? ({
