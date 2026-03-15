@@ -6,36 +6,36 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: flex-start;
   gap: 0;
   padding-top: 0;
-  padding-right: 24px;
   position: relative;
+  width: 100%;
 }
 
-/* Main: only as tall as the board so tray sits right below; small gap below HUD */
+/* Main: board container; width bound to shell (board-aligned) */
 .playBody .main {
   flex: 0 1 auto;
   min-height: 0;
   width: 100%;
-  max-width: min(98vw, 1280px);
+  max-width: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding-top: 10px;
 }
 
-/* Tray area: just a touch of space below board */
+/* Tray area: docked under board; small gap 8–12px */
 .playBody .trayArea {
-  width: calc(var(--play-board-tray-width) - 4px);
-  max-width: calc(var(--play-board-tray-width) - 4px);
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  align-self: center;
+  align-self: stretch;
   flex-shrink: 0;
-  margin-top: 6px;
+  margin-top: 10px;
 }
 
 /* Tray: compact dock; max 20% screen height; mobile 110–130px, desktop 140–160px */

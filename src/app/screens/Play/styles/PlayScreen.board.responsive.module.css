@@ -29,19 +29,20 @@
     min-width: 0;
     overflow: hidden;
     overflow-x: hidden;
-    padding: calc(44px + env(safe-area-inset-top, 0)) 4px
-      calc(var(--mobile-tray-height, 224px) + max(2px, env(safe-area-inset-bottom, 0)))
-      4px;
+    padding: 0;
     padding-left: max(4px, env(safe-area-inset-left, 0));
     padding-right: max(4px, env(safe-area-inset-right, 0));
+    padding-bottom: calc(
+      var(--mobile-tray-height, 224px) + max(2px, env(safe-area-inset-bottom, 0))
+    );
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
 
   .main {
     width: 100%;
-    max-width: min(95vw, 1280px);
+    max-width: 100%;
     padding: 0;
     gap: 0;
     align-items: center;
@@ -51,10 +52,9 @@
     overflow-x: hidden;
   }
 
-  /* Tray aligned to visible board edge (inset to match progress frame) */
   .playBody .trayArea {
-    width: calc(var(--play-board-tray-width) - 4px);
-    max-width: calc(var(--play-board-tray-width) - 4px);
+    width: 100%;
+    max-width: 100%;
   }
 
   .playBody .trayArea .tray {
@@ -99,15 +99,8 @@
     max-height: 100%;
   }
 
-  .topBarWrap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    max-height: none;
-    z-index: 230;
-    overflow: visible;
-    pointer-events: none;
+  .boardLayoutShell .topBarWrap {
+    width: 100%;
   }
 
   .topBar {
@@ -116,11 +109,6 @@
     padding: calc(8px + env(safe-area-inset-top, 0))
       max(8px, env(safe-area-inset-right, 0)) 0 max(8px, env(safe-area-inset-left, 0));
     gap: 8px;
-    background: transparent;
-    border-bottom: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    pointer-events: none;
   }
 
   .topBarLeft,
@@ -255,8 +243,10 @@
 
   .trayAreaSheet {
     position: absolute;
-    left: max(8px, env(safe-area-inset-left, 0));
-    right: max(8px, env(safe-area-inset-right, 0));
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--play-board-tray-width);
+    max-width: 100%;
     bottom: 0;
     z-index: 220;
     display: flex;

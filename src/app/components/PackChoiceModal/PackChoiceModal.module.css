@@ -1,0 +1,50 @@
+/* PackChoiceModal – breadcrumbs, pack meta, setup step only. Rest uses ChoosePuzzleModal. */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.breadcrumbCurrent {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.packMeta {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.completedBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-complete-gradient-start, #22c55e);
+  color: white;
+  border-radius: 50%;
+}
+
+.setupPuzzleName {
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: center;
+}

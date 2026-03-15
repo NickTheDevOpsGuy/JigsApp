@@ -263,8 +263,6 @@ export function PlayScreenLayout({
           />
         )}
 
-        <PlayScreenTopBar {...topBarProps} hideMenuAndButtons={hideTopBarControls} />
-
         <PlayScreenModals {...modalsProps} replayBarOpen={hideTopBarControls} />
 
         <FeedbackChoiceModal {...feedbackProps} />
@@ -274,14 +272,17 @@ export function PlayScreenLayout({
         {replayPortalProps &&
           createPortal(<ReplaySolveModal {...replayPortalProps} />, document.body)}
 
-        <div className={styles.playBody}>
-          <div
-            className={styles.main}
-            ref={board.mainRef as React.RefObject<HTMLDivElement>}
-          >
-            <div className={styles.boardWrapper}>
-              <div
-                className={styles.boardProgressFrame}
+        <div className={styles.boardLayoutShell}>
+          <PlayScreenTopBar {...topBarProps} hideMenuAndButtons={hideTopBarControls} />
+
+          <div className={styles.playBody}>
+            <div
+              className={styles.main}
+              ref={board.mainRef as React.RefObject<HTMLDivElement>}
+            >
+              <div className={styles.boardWrapper}>
+                <div
+                  className={styles.boardProgressFrame}
                 data-complete={board.isComplete ? "true" : undefined}
                 style={
                   board.state?.totalCount && !board.isComplete
@@ -293,85 +294,85 @@ export function PlayScreenLayout({
                       }
                     : undefined
                 }
-              >
-                <div
-                  className={styles.board}
-                  ref={board.boardRef as React.RefObject<HTMLDivElement>}
-                  data-testid="play-board"
                 >
-                  {board.isComplete && !replayPortalProps && (
-                    <div
-                      className={styles.boardCompleteMessage}
-                      role="status"
-                      aria-live="polite"
-                    >
-                      <div className={styles.boardCompleteBanner}>
-                        <span className={styles.boardCompleteBannerLine}>
-                          {board.elapsedLabel}
-                        </span>
-                        <span className={styles.boardCompleteBannerSub}>
-                          {board.movesLabel}
-                        </span>
-                      </div>
-                      {board.postCompletionCta && (
-                        <div className={styles.boardCompleteNextCta}>
-                          <button
-                            type="button"
-                            className={styles.boardCompleteNextCtaBtn}
-                            onClick={board.postCompletionCta.onNext}
-                          >
-                            {board.postCompletionCta.label}
-                          </button>
+                  <div
+                    className={styles.board}
+                    ref={board.boardRef as React.RefObject<HTMLDivElement>}
+                    data-testid="play-board"
+                  >
+                    {board.isComplete && !replayPortalProps && (
+                      <div
+                        className={styles.boardCompleteMessage}
+                        role="status"
+                        aria-live="polite"
+                      >
+                        <div className={styles.boardCompleteBanner}>
+                          <span className={styles.boardCompleteBannerLine}>
+                            {board.elapsedLabel}
+                          </span>
+                          <span className={styles.boardCompleteBannerSub}>
+                            {board.movesLabel}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  )}
-                  {board.isLoading && (
-                    <div className={styles.loadingOverlay} aria-label="Loading puzzle">
-                      <div className={styles.spinner} />
-                      <span>Loading puzzle…</span>
-                    </div>
-                  )}
-                  {!board.state?.isComplete && <SnapComboMeter combo={board.snapCombo} />}
-                  <canvas
-                    key={board.puzzleKey ?? undefined}
-                    className={styles.canvas}
-                    ref={board.canvasRef as React.RefObject<HTMLCanvasElement>}
-                    style={replayPortalProps ? { pointerEvents: "none" } : undefined}
-                    onPointerDown={board.handlers.onPointerDown}
-                    onPointerMove={board.handlers.onPointerMove}
-                    onPointerUp={board.handlers.onPointerUp}
-                    onPointerCancel={board.handlers.onPointerCancel}
-                    onLostPointerCapture={board.handlers.onLostPointerCapture}
-                    onContextMenu={board.handlers.onContextMenu}
-                    onWheel={(e) => board.viewport.handleWheel(e, board.boardRef.current)}
-                  />
-                  {board.state?.pieces?.[0] &&
-                    board.state.grid &&
-                    board.minimapVisible &&
-                    !board.minimapSuppressed &&
-                    board.state.grid.rows * board.state.grid.cols >= 25 && (
-                      <Minimap
-                        pieces={board.state.pieces}
-                        grid={board.state.grid}
-                        assembledW={board.state.grid.cols * board.state.pieces[0].tileW}
-                        assembledH={board.state.grid.rows * board.state.pieces[0].tileH}
-                        viewport={board.viewport.viewport}
-                        containerW={board.boardSize.w}
-                        containerH={board.boardSize.h}
-                        setViewport={board.viewport.setViewport}
-                        visible={!board.isPaused && !board.isComplete}
-                        position={board.minimapPosition}
-                        onCyclePosition={board.onCycleMinimapPosition}
-                      />
+                        {board.postCompletionCta && (
+                          <div className={styles.boardCompleteNextCta}>
+                            <button
+                              type="button"
+                              className={styles.boardCompleteNextCtaBtn}
+                              onClick={board.postCompletionCta.onNext}
+                            >
+                              {board.postCompletionCta.label}
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     )}
-                  {board.isPaused && !replayPortalProps && !board.isComplete && (
-                    <PauseOverlay onResume={board.onResume} />
-                  )}
+                    {board.isLoading && (
+                      <div className={styles.loadingOverlay} aria-label="Loading puzzle">
+                        <div className={styles.spinner} />
+                        <span>Loading puzzle…</span>
+                      </div>
+                    )}
+                    {!board.state?.isComplete && <SnapComboMeter combo={board.snapCombo} />}
+                    <canvas
+                      key={board.puzzleKey ?? undefined}
+                      className={styles.canvas}
+                      ref={board.canvasRef as React.RefObject<HTMLCanvasElement>}
+                      style={replayPortalProps ? { pointerEvents: "none" } : undefined}
+                      onPointerDown={board.handlers.onPointerDown}
+                      onPointerMove={board.handlers.onPointerMove}
+                      onPointerUp={board.handlers.onPointerUp}
+                      onPointerCancel={board.handlers.onPointerCancel}
+                      onLostPointerCapture={board.handlers.onLostPointerCapture}
+                      onContextMenu={board.handlers.onContextMenu}
+                      onWheel={(e) => board.viewport.handleWheel(e, board.boardRef.current)}
+                    />
+                    {board.state?.pieces?.[0] &&
+                      board.state.grid &&
+                      board.minimapVisible &&
+                      !board.minimapSuppressed &&
+                      board.state.grid.rows * board.state.grid.cols >= 25 && (
+                        <Minimap
+                          pieces={board.state.pieces}
+                          grid={board.state.grid}
+                          assembledW={board.state.grid.cols * board.state.pieces[0].tileW}
+                          assembledH={board.state.grid.rows * board.state.pieces[0].tileH}
+                          viewport={board.viewport.viewport}
+                          containerW={board.boardSize.w}
+                          containerH={board.boardSize.h}
+                          setViewport={board.viewport.setViewport}
+                          visible={!board.isPaused && !board.isComplete}
+                          position={board.minimapPosition}
+                          onCyclePosition={board.onCycleMinimapPosition}
+                        />
+                      )}
+                    {board.isPaused && !replayPortalProps && !board.isComplete && (
+                      <PauseOverlay onResume={board.onResume} />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           {tray.show && (
             <div
               className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
@@ -420,6 +421,7 @@ export function PlayScreenLayout({
               />
             </div>
           )}
+          </div>
         </div>
 
         <PlayScreenOverlays {...overlaysProps} />

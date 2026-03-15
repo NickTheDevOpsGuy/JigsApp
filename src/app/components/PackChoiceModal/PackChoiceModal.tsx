@@ -1,6 +1,8 @@
 /**
- * PackChoiceModal – Visually matches Choose Puzzle dialog.
- * Flow: Pack → Puzzle → Difficulty → Start. Same layout structure, spacing, and interaction pattern.
+ * PackChoiceModal – Strict 3-step flow with breadcrumbs.
+ * Step 1: Choose Pack (packs only; cover, name, count, progress).
+ * Step 2: Choose Puzzle (puzzles in pack; thumbnail, name, completion). No preview.
+ * Step 3: Puzzle Setup (ONLY place with large preview + difficulty + Start).
  */
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,13 +11,18 @@ import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { PACK_METADATA } from "@/data/packs/packMetadata";
 import { loadPacksData } from "@/data/packs/loadPacksData";
-import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
-import type { PuzzlePack } from "@/data/packs/puzzlePacks";
-import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packs/packCompletion";
+import {
+  getCompletedPuzzleIds,
+  getPackProgress,
+  setCurrentPuzzleId,
+} from "@/data/packs/packCompletion";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
+import type { PuzzlePack } from "@/data/packs/puzzlePacks";
 import styles from "@/components/ChoosePuzzleModal/ChoosePuzzleModal.module.css";
+import localStyles from "./PackChoiceModal.module.css";
 
 const PRIMARY_DIFFICULTIES = GRID_OPTIONS.slice(0, 4);
 const DIFFICULTY_NAMES = ["Easy", "Medium", "Hard", "Expert"] as const;
@@ -25,6 +32,8 @@ const PACK_FILTERS = [
   { id: "all", name: "All", label: "All" },
   ...PACK_METADATA.map((p) => ({ id: p.id, name: p.name, label: p.name })),
 ];
+
+type Step = "pack" | "puzzle" | "setup";
 
 type Props = {
   isOpen: boolean;
@@ -37,6 +46,7 @@ function filterPacks(packs: PuzzlePack[], categoryId: string): PuzzlePack[] {
 
 export function PackChoiceModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
+  const [step, setStep] = useState<Step>("pack");
   const [packsData, setPacksData] = useState<Awaited<
     ReturnType<typeof loadPacksData>
   > | null>(null);
@@ -57,11 +67,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
 
   const packScrollRef = useRef<HTMLDivElement>(null);
   const puzzleScrollRef = useRef<HTMLDivElement>(null);
-  const packSectionRef = useRef<HTMLDivElement>(null);
-  const puzzleSectionRef = useRef<HTMLDivElement>(null);
-  const difficultySectionRef = useRef<HTMLDivElement>(null);
-  const startButtonRef = useRef<HTMLButtonElement>(null);
-
   const [packScrollProgress, setPackScrollProgress] = useState(0);
   const [canScrollPackLeft, setCanScrollPackLeft] = useState(false);
   const [canScrollPackRight, setCanScrollPackRight] = useState(false);
@@ -103,9 +108,11 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     const cardWidth = firstTile?.offsetWidth ?? 100;
     const gap = 8;
     const stepPx = Math.max(100, cardWidth + gap);
-    const step = stepPx * direction;
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + step));
+    const target = Math.max(
+      0,
+      Math.min(maxScroll, el.scrollLeft + stepPx * direction),
+    );
     el.scrollTo({ left: target, behavior: "smooth" });
   }, []);
 
@@ -117,9 +124,11 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     const cardWidth = firstTile?.offsetWidth ?? 100;
     const gap = 8;
     const stepPx = Math.max(100, cardWidth + gap);
-    const step = stepPx * direction;
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + step));
+    const target = Math.max(
+      0,
+      Math.min(maxScroll, el.scrollLeft + stepPx * direction),
+    );
     el.scrollTo({ left: target, behavior: "smooth" });
   }, []);
 
@@ -129,6 +138,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
 
   useEffect(() => {
     if (!isOpen) return;
+    setStep("pack");
     setSelectedPack(null);
     setSelectedPuzzle(null);
     setDifficultyIndex(RECOMMENDED_INDEX);
@@ -138,8 +148,8 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
   useEffect(() => {
     if (!isOpen || !packsData) return;
     const el = packScrollRef.current;
-    const runUpdate = () => requestAnimationFrame(updatePackScrollState);
-    runUpdate();
+    const run = () => requestAnimationFrame(updatePackScrollState);
+    run();
     const t0 = setTimeout(updatePackScrollState, 0);
     const t1 = setTimeout(updatePackScrollState, 80);
     const t2 = setTimeout(updatePackScrollState, 250);
@@ -163,13 +173,13 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [isOpen, packsData, updatePackScrollState, filteredPacks.length]);
+  }, [isOpen, packsData, updatePackScrollState, filteredPacks.length, step]);
 
   useEffect(() => {
-    if (!selectedPack || puzzles.length === 0) return;
+    if (step !== "puzzle" || !selectedPack || puzzles.length === 0) return;
     const el = puzzleScrollRef.current;
-    const runUpdate = () => requestAnimationFrame(updatePuzzleScrollState);
-    runUpdate();
+    const run = () => requestAnimationFrame(updatePuzzleScrollState);
+    run();
     const t0 = setTimeout(updatePuzzleScrollState, 0);
     const t1 = setTimeout(updatePuzzleScrollState, 80);
     const t2 = setTimeout(updatePuzzleScrollState, 250);
@@ -193,12 +203,13 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [selectedPack, updatePuzzleScrollState, puzzles.length]);
+  }, [step, selectedPack, updatePuzzleScrollState, puzzles.length]);
 
   const handleStart = () => {
     if (!selectedPuzzle || !packsData) return;
     const grid =
-      PRIMARY_DIFFICULTIES[difficultyIndex] ?? PRIMARY_DIFFICULTIES[RECOMMENDED_INDEX];
+      PRIMARY_DIFFICULTIES[difficultyIndex] ??
+      PRIMARY_DIFFICULTIES[RECOMMENDED_INDEX];
     clearPuzzleState();
     safeLocalStorage.setItem(STORAGE_KEY, selectedPuzzle.fullImage);
     safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
@@ -208,212 +219,208 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     navigate("/play");
   };
 
-  const canStart = selectedPuzzle != null;
+  const goToStep = (target: Step) => {
+    setStep(target);
+    if (target === "pack") {
+      setSelectedPack(null);
+      setSelectedPuzzle(null);
+    } else if (target === "puzzle") {
+      setSelectedPuzzle(null);
+    }
+  };
 
   if (!isOpen) return null;
+
+  const modalTitle =
+    step === "pack"
+      ? "Choose Pack"
+      : step === "puzzle"
+        ? selectedPack?.name ?? "Choose Puzzle"
+        : "Puzzle Setup";
 
   return (
     <Modal
       isOpen
       onClose={onClose}
-      title="Choose Pack"
+      title={modalTitle}
       showCloseButton
       variant="choosePuzzle"
     >
-      {/* Step indicator: Pack → Puzzle → Difficulty → Start (same as Choose Puzzle) */}
-      <div
-        className={styles.stepIndicator}
+      {/* Breadcrumbs: Phuzzle Packs → Pack Name → Puzzle Name */}
+      <nav
+        className={localStyles.breadcrumb}
         role="navigation"
-        aria-label="Steps: Pack, Puzzle, Difficulty, Start"
+        aria-label="Pack and puzzle selection steps"
       >
         <button
           type="button"
-          className={`${styles.stepLink} ${!selectedPack ? styles.stepCurrent : ""}`}
-          onClick={() =>
-            packSectionRef.current?.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-            })
-          }
-          title="Pack selection"
-          aria-label="Pack selection"
+          className={styles.stepLink}
+          onClick={() => goToStep("pack")}
+          title="Back to pack selection"
+          aria-label="Phuzzle Packs"
         >
-          Pack
+          Phuzzle Packs
         </button>
-        <span className={styles.stepSep} aria-hidden>
-          →
-        </span>
-        <button
-          type="button"
-          className={`${styles.stepLink} ${selectedPack ? styles.stepCurrent : ""}`}
-          onClick={() =>
-            puzzleSectionRef.current?.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-            })
-          }
-          title="Puzzle selection"
-          aria-label="Puzzle selection"
-        >
-          Puzzle
-        </button>
-        <span className={styles.stepSep} aria-hidden>
-          →
-        </span>
-        <button
-          type="button"
-          className={`${styles.stepLink} ${selectedPuzzle ? styles.stepCurrent : ""}`}
-          onClick={() =>
-            difficultySectionRef.current?.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-            })
-          }
-          title="Difficulty selection"
-          aria-label="Difficulty selection"
-        >
-          Difficulty
-        </button>
-        <span className={styles.stepSep} aria-hidden>
-          →
-        </span>
-        <button
-          type="button"
-          className={`${styles.stepLink} ${canStart ? styles.stepCurrent : ""}`}
-          onClick={() => startButtonRef.current?.focus()}
-          title={canStart ? "Start puzzle" : "Jump to Start"}
-          aria-label="Start puzzle"
-        >
-          Start
-        </button>
-      </div>
+        {selectedPack && (
+          <>
+            <span className={styles.stepSep} aria-hidden>
+              →
+            </span>
+            <button
+              type="button"
+              className={styles.stepLink}
+              onClick={() => goToStep("puzzle")}
+              title={`Back to puzzles in ${selectedPack.name}`}
+              aria-label={selectedPack.name}
+            >
+              {selectedPack.name}
+            </button>
+          </>
+        )}
+        {selectedPuzzle && (
+          <>
+            <span className={styles.stepSep} aria-hidden>
+              →
+            </span>
+            <span className={localStyles.breadcrumbCurrent} aria-current="location">
+              {selectedPuzzle.name}
+            </span>
+          </>
+        )}
+      </nav>
 
-      {/* Filter chips (same as Choose Puzzle) */}
-      <div className={styles.filterBar} role="group" aria-label="Filter by category">
-        {PACK_FILTERS.map((cat) => (
-          <button
-            key={cat.id}
-            type="button"
-            className={`${styles.filterChip} ${filterCategory === cat.id ? styles.filterChipActive : ""}`}
-            onClick={() => setFilterCategory(cat.id)}
-            aria-pressed={filterCategory === cat.id}
-            aria-label={`Filter: ${cat.name}`}
-            title={`Filter by ${cat.name}`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Pack rail: same structure as Choose Puzzle rail */}
-      <p className={styles.railLabel} ref={packSectionRef}>
-        Choose a pack
-      </p>
-      <div className={styles.gridScrollWrap}>
-        <button
-          type="button"
-          className={styles.gridScrollBtn}
-          onClick={() => scrollPackBy(-1)}
-          disabled={!canScrollPackLeft}
-          aria-label="Scroll left"
-          title="Scroll left"
-        >
-          <ChevronLeft size={22} aria-hidden />
-        </button>
-        <div
-          ref={packScrollRef}
-          className={styles.puzzleGridScroller}
-          role="listbox"
-          aria-label="Choose a pack"
-        >
-          <div className={styles.puzzleGrid}>
-            {!packsData ? (
-              <div className={styles.puzzleTile} style={{ pointerEvents: "none" }}>
-                <div className={styles.tileImageWrap}>
-                  <span className={styles.tilePlaceholder}>…</span>
-                </div>
-                <span className={styles.tileTitle}>Loading…</span>
-              </div>
-            ) : (
-              filteredPacks.map((pack) => {
-                const meta = PACK_METADATA.find((p) => p.id === pack.id);
-                const puzzleList = packsData.getPuzzlesForPack(pack);
-                const hero = puzzleList[0];
-                const selected = selectedPack?.id === pack.id;
-                return (
-                  <button
-                    key={pack.id}
-                    type="button"
-                    role="option"
-                    aria-selected={selected}
-                    className={`${styles.puzzleTile} ${selected ? styles.puzzleTileSelected : ""}`}
-                    onClick={() => {
-                      setSelectedPack(pack);
-                      setSelectedPuzzle(null);
-                      setDifficultyIndex(RECOMMENDED_INDEX);
-                    }}
-                    title={`Select: ${pack.name}`}
-                    aria-label={`Select ${pack.name}`}
+      {/* Step 1: Pack selection only */}
+      {step === "pack" && (
+        <>
+          <div className={styles.filterBar} role="group" aria-label="Filter by category">
+            {PACK_FILTERS.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`${styles.filterChip} ${filterCategory === cat.id ? styles.filterChipActive : ""}`}
+                onClick={() => setFilterCategory(cat.id)}
+                aria-pressed={filterCategory === cat.id}
+                aria-label={`Filter: ${cat.name}`}
+                title={`Filter by ${cat.name}`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+          <p className={styles.railLabel}>Choose a pack</p>
+          <div className={styles.gridScrollWrap}>
+            <button
+              type="button"
+              className={styles.gridScrollBtn}
+              onClick={() => scrollPackBy(-1)}
+              disabled={!canScrollPackLeft}
+              aria-label="Scroll left"
+              title="Scroll left"
+            >
+              <ChevronLeft size={22} aria-hidden />
+            </button>
+            <div
+              ref={packScrollRef}
+              className={styles.puzzleGridScroller}
+              role="listbox"
+              aria-label="Choose a pack"
+            >
+              <div className={styles.puzzleGrid}>
+                {!packsData ? (
+                  <div
+                    className={styles.puzzleTile}
+                    style={{ pointerEvents: "none" }}
                   >
                     <div className={styles.tileImageWrap}>
-                      {hero && !imgError[pack.id] ? (
-                        <img
-                          src={hero.thumbnail}
-                          alt=""
-                          loading="lazy"
-                          className={styles.tileImage}
-                          onError={() =>
-                            setImgError((prev) => ({ ...prev, [pack.id]: true }))
-                          }
-                        />
-                      ) : (
-                        <span className={styles.tilePlaceholder}>
-                          {meta?.emoji ?? "🧩"}
-                        </span>
-                      )}
+                      <span className={styles.tilePlaceholder}>…</span>
                     </div>
-                    <span className={styles.tileTitle}>{pack.name}</span>
-                    <div className={styles.tileHoverOverlay} aria-hidden />
-                    {selected && (
-                      <div className={styles.tileSelectedIndicator} aria-hidden />
-                    )}
-                  </button>
-                );
-              })
-            )}
+                    <span className={styles.tileTitle}>Loading…</span>
+                  </div>
+                ) : (
+                  filteredPacks.map((pack) => {
+                    const meta = PACK_METADATA.find((p) => p.id === pack.id);
+                    const puzzleList = packsData.getPuzzlesForPack(pack);
+                    const hero = puzzleList[0];
+                    const { completed: completedCount, total } = getPackProgress(
+                      puzzleList.map((p) => p.id),
+                    );
+                    return (
+                      <button
+                        key={pack.id}
+                        type="button"
+                        role="option"
+                        aria-selected={false}
+                        className={styles.puzzleTile}
+                        onClick={() => {
+                          setSelectedPack(pack);
+                          setSelectedPuzzle(null);
+                          setDifficultyIndex(RECOMMENDED_INDEX);
+                          setStep("puzzle");
+                        }}
+                        title={`Select: ${pack.name}`}
+                        aria-label={`${pack.name}, ${total} puzzles, ${completedCount} solved`}
+                      >
+                        <div className={styles.tileImageWrap}>
+                          {hero && !imgError[pack.id] ? (
+                            <img
+                              src={hero.thumbnail}
+                              alt=""
+                              loading="lazy"
+                              className={styles.tileImage}
+                              onError={() =>
+                                setImgError((prev) => ({ ...prev, [pack.id]: true }))
+                              }
+                            />
+                          ) : (
+                            <span className={styles.tilePlaceholder}>
+                              {meta?.emoji ?? "🧩"}
+                            </span>
+                          )}
+                        </div>
+                        <span className={styles.tileTitle}>{pack.name}</span>
+                        <span className={localStyles.packMeta}>
+                          {total} puzzle{total !== 1 ? "s" : ""}
+                          {" · "}
+                          {completedCount} / {total} solved
+                        </span>
+                        <div className={styles.tileHoverOverlay} aria-hidden />
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+            <button
+              type="button"
+              className={styles.gridScrollBtn}
+              onClick={() => scrollPackBy(1)}
+              disabled={!canScrollPackRight}
+              aria-label="Scroll right"
+              title="Scroll right"
+            >
+              <ChevronRight size={22} aria-hidden />
+            </button>
           </div>
-        </div>
-        <button
-          type="button"
-          className={styles.gridScrollBtn}
-          onClick={() => scrollPackBy(1)}
-          disabled={!canScrollPackRight}
-          aria-label="Scroll right"
-          title="Scroll right"
-        >
-          <ChevronRight size={22} aria-hidden />
-        </button>
-      </div>
-      <div
-        className={styles.gridScrollBar}
-        role="progressbar"
-        aria-valuenow={Math.round(packScrollProgress * 100)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Scroll position"
-      >
-        <div
-          className={styles.gridScrollBarFill}
-          style={{ width: `${packScrollProgress * 100}%` }}
-        />
-      </div>
+          <div
+            className={styles.gridScrollBar}
+            role="progressbar"
+            aria-valuenow={Math.round(packScrollProgress * 100)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Scroll position"
+          >
+            <div
+              className={styles.gridScrollBarFill}
+              style={{ width: `${packScrollProgress * 100}%` }}
+            />
+          </div>
+        </>
+      )}
 
-      {/* Puzzle section: always in DOM so breadcrumb "Puzzle" can scroll here */}
-      <p className={styles.railLabel} ref={puzzleSectionRef}>
-        Choose a puzzle
-      </p>
-      {selectedPack && puzzles.length > 0 ? (
+      {/* Step 2: Puzzle selection only (no large preview) */}
+      {step === "puzzle" && selectedPack && puzzles.length > 0 && (
         <>
+          <p className={styles.railLabel}>Choose a puzzle</p>
           <div className={styles.gridScrollWrap}>
             <button
               type="button"
@@ -433,18 +440,21 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             >
               <div className={styles.puzzleGrid}>
                 {puzzles.map((puzzle) => {
-                  const selected = selectedPuzzle?.id === puzzle.id;
                   const isDone = completed.has(puzzle.id);
                   return (
                     <button
                       key={puzzle.id}
                       type="button"
                       role="option"
-                      aria-selected={selected}
-                      className={`${styles.puzzleTile} ${selected ? styles.puzzleTileSelected : ""}`}
-                      onClick={() => setSelectedPuzzle(puzzle)}
+                      aria-selected={false}
+                      className={styles.puzzleTile}
+                      onClick={() => {
+                        setSelectedPuzzle(puzzle);
+                        setDifficultyIndex(RECOMMENDED_INDEX);
+                        setStep("setup");
+                      }}
                       title={`Select: ${puzzle.name}${isDone ? " (completed)" : ""}`}
-                      aria-label={`Select ${puzzle.name}${isDone ? " (completed)" : ""}`}
+                      aria-label={`${puzzle.name}${isDone ? ", completed" : ""}`}
                     >
                       <div className={styles.tileImageWrap}>
                         {imgError[puzzle.id] ? (
@@ -456,9 +466,17 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                             loading="lazy"
                             className={styles.tileImage}
                             onError={() =>
-                              setImgError((prev) => ({ ...prev, [puzzle.id]: true }))
+                              setImgError((prev) => ({
+                                ...prev,
+                                [puzzle.id]: true,
+                              }))
                             }
                           />
+                        )}
+                        {isDone && (
+                          <span className={localStyles.completedBadge} aria-hidden>
+                            <Check size={12} />
+                          </span>
                         )}
                       </div>
                       <span className={styles.tileTitle}>
@@ -466,9 +484,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                         {isDone ? " ✓" : ""}
                       </span>
                       <div className={styles.tileHoverOverlay} aria-hidden />
-                      {selected && (
-                        <div className={styles.tileSelectedIndicator} aria-hidden />
-                      )}
                     </button>
                   );
                 })}
@@ -499,91 +514,78 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             />
           </div>
         </>
-      ) : (
-        <p
-          className={styles.railLabel}
-          style={{
-            marginTop: 0,
-            fontWeight: 400,
-            color: "var(--color-text-secondary)",
-            fontSize: "13px",
-          }}
-        >
-          Select a pack above to choose a puzzle
+      )}
+
+      {/* Step 3: Puzzle Setup — ONLY place with large preview + difficulty + Start */}
+      {step === "setup" && selectedPuzzle && (
+        <>
+          <h2 className={localStyles.setupPuzzleName}>{selectedPuzzle.name}</h2>
+          <div className={styles.selectedPreview}>
+            <img
+              src={selectedPuzzle.fullImage}
+              alt=""
+              className={styles.previewImage}
+            />
+          </div>
+          <div
+            className={styles.difficultySelector}
+            role="group"
+            aria-label="Choose difficulty"
+          >
+            {PRIMARY_DIFFICULTIES.map((opt, i) => {
+              const name = DIFFICULTY_NAMES[i] ?? opt.label.split(" ")[0];
+              const pieces = opt.rows * opt.cols;
+              const active = difficultyIndex === i;
+              return (
+                <button
+                  key={`${opt.rows}x${opt.cols}`}
+                  type="button"
+                  className={`${styles.difficultyBtn} ${active ? styles.difficultyBtnActive : ""}`}
+                  onClick={() => setDifficultyIndex(i)}
+                  aria-pressed={active}
+                  aria-label={`${name}, ${pieces} pieces`}
+                  title={`Select ${name}: ${pieces} pieces`}
+                >
+                  <Puzzle size={16} aria-hidden />
+                  <span>
+                    {name} – {pieces} pieces
+                  </span>
+                  {active && (
+                    <Check size={16} className={styles.difficultyCheck} aria-hidden />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            className={styles.startPuzzleButton}
+            onClick={handleStart}
+            title="Start puzzle with selected difficulty"
+            aria-label="Start puzzle"
+          >
+            Start Puzzle
+          </button>
+        </>
+      )}
+
+      {(step === "pack" || step === "puzzle") && (
+        <p className={styles.uploadLinkWrap}>
+          Or{" "}
+          <button
+            type="button"
+            className={styles.uploadLink}
+            onClick={() => {
+              onClose();
+              navigate("/new");
+            }}
+            title="Open custom image upload"
+            aria-label="Upload your own image"
+          >
+            upload your own image
+          </button>
         </p>
       )}
-
-      {/* Puzzle preview rule: only show after a puzzle is selected (not on pack selection). */}
-      {selectedPuzzle && (
-        <div className={styles.selectedPreview}>
-          <img src={selectedPuzzle.fullImage} alt="" className={styles.previewImage} />
-        </div>
-      )}
-
-      {/* Difficulty section (identical to Choose Puzzle) */}
-      <div
-        ref={difficultySectionRef}
-        className={styles.difficultySelector}
-        role="group"
-        aria-label="Choose difficulty"
-        aria-disabled={!selectedPuzzle}
-      >
-        {PRIMARY_DIFFICULTIES.map((opt, i) => {
-          const name = DIFFICULTY_NAMES[i] ?? opt.label.split(" ")[0];
-          const pieces = opt.rows * opt.cols;
-          const active = difficultyIndex === i;
-          return (
-            <button
-              key={`${opt.rows}x${opt.cols}`}
-              type="button"
-              className={`${styles.difficultyBtn} ${active ? styles.difficultyBtnActive : ""}`}
-              onClick={() => setDifficultyIndex(i)}
-              disabled={!selectedPuzzle}
-              aria-pressed={active}
-              aria-label={`${name}, ${pieces} pieces`}
-              title={`Select ${name}: ${pieces} pieces`}
-            >
-              <Puzzle size={16} aria-hidden />
-              <span>
-                {name} – {pieces} pieces
-              </span>
-              {active && (
-                <Check size={16} className={styles.difficultyCheck} aria-hidden />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Start Puzzle button (same as Choose Puzzle) */}
-      <button
-        ref={startButtonRef}
-        type="button"
-        className={styles.startPuzzleButton}
-        onClick={handleStart}
-        disabled={!canStart}
-        title="Start puzzle with selected image and difficulty"
-        aria-label="Start puzzle"
-      >
-        Start Puzzle
-      </button>
-
-      {/* Footer link (same as Choose Puzzle) */}
-      <p className={styles.uploadLinkWrap}>
-        Or{" "}
-        <button
-          type="button"
-          className={styles.uploadLink}
-          onClick={() => {
-            onClose();
-            navigate("/new");
-          }}
-          title="Open custom image upload"
-          aria-label="Upload your own image"
-        >
-          upload your own image
-        </button>
-      </p>
     </Modal>
   );
 }
