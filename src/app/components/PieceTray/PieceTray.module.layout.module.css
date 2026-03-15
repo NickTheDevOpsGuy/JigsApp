@@ -17,14 +17,13 @@
   min-height: 36px;
 }
 
-/* Blue scroll progress bar (match Choose Puzzle / Packs) */
 .scrollIndicator {
   flex-shrink: 0;
-  height: 6px;
+  height: 5px;
   background: rgba(26, 43, 74, 0.6);
   border-radius: 999px;
   overflow: hidden;
-  margin: 0 14px 10px;
+  margin: 0 10px 6px;
 }
 
 .scrollIndicatorFill {
@@ -35,15 +34,14 @@
   transition: width 0.15s ease-out;
 }
 
-/* Piece rail: single horizontal scroll container, no inner card styling */
 .scrollerWrap {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
   overflow: hidden;
-  padding: 6px 10px 10px;
+  padding: 4px 8px 8px;
   position: relative;
   z-index: 2;
   pointer-events: auto;

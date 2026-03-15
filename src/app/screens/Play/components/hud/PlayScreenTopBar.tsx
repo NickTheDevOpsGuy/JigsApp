@@ -70,7 +70,7 @@ export function PlayScreenTopBar({
   return (
     <div
       className={`${styles.topBarWrap} ${immersiveMode && !showImmersiveUi ? styles.immersiveTopHidden : ""}`}
-      data-layout="top-bar"
+      data-layout="top-hud"
       onPointerLeave={onPointerLeave}
       role="region"
       aria-label="Game controls"

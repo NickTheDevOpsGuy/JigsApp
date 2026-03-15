@@ -1,7 +1,7 @@
-/* Mobile visual balance (48): board centered, tray under board, small gap, no big whitespace */
+/* Mobile: same GameplayShell structure; in-flow tray (no floating); shell width ~full minus safe margins */
 @media (max-width: 600px) {
   .page {
-    --play-board-tray-width: min(93vw, 720px);
+    --play-board-tray-width: min(calc(100vw - 24px), 720px);
     height: var(--app-vh-stable, 100dvh);
     min-height: var(--app-vh-stable, 100dvh);
     overflow: hidden;
@@ -9,7 +9,6 @@
     padding-bottom: 0;
   }
 
-  /* On short mobile (e.g. landscape), allow scroll so tray is reachable */
   @media (max-height: 500px) {
     .page {
       height: auto;
@@ -23,7 +22,7 @@
   }
 
   .playBody {
-    --play-board-tray-width: min(93vw, 720px);
+    --play-board-tray-width: min(calc(100vw - 24px), 720px);
     gap: 0;
     min-height: 0;
     min-width: 0;
@@ -32,9 +31,7 @@
     padding: 0;
     padding-left: max(4px, env(safe-area-inset-left, 0));
     padding-right: max(4px, env(safe-area-inset-right, 0));
-    padding-bottom: calc(
-      var(--mobile-tray-height, 224px) + max(2px, env(safe-area-inset-bottom, 0))
-    );
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -241,18 +238,13 @@
     height: 80px;
   }
 
+  /* Tray in-flow (no floating): same stack as desktop; width = GameplayShell */
   .trayAreaSheet {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: var(--play-board-tray-width);
+    width: 100%;
     max-width: 100%;
-    bottom: 0;
-    z-index: 220;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    pointer-events: none;
+    align-items: stretch;
   }
 
   .trayAreaSheet .tray,
@@ -263,47 +255,28 @@
   .trayAreaSheet .trayBottomBar {
     width: 100%;
     max-width: 100%;
-    max-width: 100%;
-    min-height: 40px;
-    padding: 6px 12px 8px;
-    border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
-    border-bottom: none;
-    border-radius: 20px 20px 0 0;
-    background:
-      linear-gradient(180deg, rgba(21, 36, 63, 0.96), rgba(14, 25, 45, 0.96)),
-      color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
-    box-shadow: 0 -10px 28px rgba(2, 7, 18, 0.26);
-    transform: translateY(var(--mobile-tray-drag-offset, 0px));
-    transition: transform 180ms ease;
-    touch-action: none;
+    min-height: 28px;
+    padding: 4px 12px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
   }
 
   .trayAreaSheet .tray {
     width: 100%;
     max-width: 100%;
     align-self: stretch;
-    height: calc(var(--tray-sheet-height, 224px) - 40px);
-    max-height: calc(var(--tray-sheet-height, 224px) - 40px);
-    padding: 0 0 max(10px, env(safe-area-inset-bottom, 0));
-    border-radius: 22px 22px 0 0;
-    background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
-    border-bottom: none;
-    box-shadow: 0 -18px 42px rgba(2, 7, 18, 0.34);
-    transform: translateY(var(--mobile-tray-drag-offset, 0px));
-    transition:
-      transform 180ms ease,
-      height 220ms ease,
-      max-height 220ms ease,
-      opacity 180ms ease;
-    overflow: hidden;
+    flex: 0 0 auto;
+    padding: 0 0 max(8px, env(safe-area-inset-bottom, 0));
+    border-radius: 16px;
+    transform: none;
   }
 
   .trayAreaSheet[data-tray-state="collapsed"] .tray {
-    height: 0;
-    max-height: 0;
-    opacity: 0;
-    border-width: 0;
+    display: none;
   }
 
   .traySheetHandle {
@@ -311,19 +284,24 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    min-height: 40px;
-    padding: 6px 10px;
+    gap: 2px;
+    min-height: 28px;
+    padding: 4px 10px;
     border: none;
-    border-radius: 12px;
+    border-radius: 8px;
     background: transparent;
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
     cursor: grab;
     touch-action: none;
   }
 
   .traySheetHandle:active {
     cursor: grabbing;
+  }
+
+  .traySheetHandleBar {
+    width: 32px;
+    height: 3px;
   }
 
   /* Smaller hint so it doesn't stretch on mobile */

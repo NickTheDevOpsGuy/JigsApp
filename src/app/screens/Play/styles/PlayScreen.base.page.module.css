@@ -21,7 +21,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Board-anchored layout: top bar, board, tray share one shell; shell width = board width */
+/* GameplayShell: single layout anchor. TopHUD, PuzzleBoard, TrayHandle, PieceTray share same left edge and width. */
 .boardLayoutShell {
   width: 100%;
   max-width: var(--play-board-tray-width);

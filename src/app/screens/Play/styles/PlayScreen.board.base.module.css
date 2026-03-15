@@ -1,5 +1,4 @@
-/* Visual hierarchy (41): 1. Board (dominant) 2. Tray (secondary) 3. HUD (compact) 4. Menus/dialogs (overlays) */
-/* Layout: board up near HUD (no extra gap); tray nudged left a tad */
+/* GameplayShell body: board expands to fill; tray docked below with 8–12px gap */
 .playBody {
   --play-board-tray-width: min(98vw, 760px);
   flex: 1;
@@ -14,9 +13,9 @@
   width: 100%;
 }
 
-/* Main: board container; width bound to shell (board-aligned) */
+/* PuzzleBoard container: expands to fill space between TopHUD and tray */
 .playBody .main {
-  flex: 0 1 auto;
+  flex: 1;
   min-height: 0;
   width: 100%;
   max-width: 100%;
@@ -26,7 +25,7 @@
   padding-top: 10px;
 }
 
-/* Tray area: docked under board; small gap 8–12px */
+/* Tray dock: 8–12px gap below board; same width as shell */
 .playBody .trayArea {
   width: 100%;
   max-width: 100%;
@@ -38,34 +37,34 @@
   margin-top: 10px;
 }
 
-/* Tray: compact dock; max 20% screen height; mobile 110–130px, desktop 140–160px */
+/* PieceTray: compact; board remains dominant */
 .playBody .trayArea .tray {
   flex: 0 0 auto;
   min-width: 0;
-  height: clamp(140px, 16vh, 160px);
-  max-height: min(160px, 20vh);
+  height: clamp(100px, 12vh, 130px);
+  max-height: min(130px, 18vh);
 }
 
 .playBody .trayArea .tray.trayWrapLarge {
-  height: clamp(140px, 16vh, 160px);
-  max-height: min(160px, 20vh);
+  height: clamp(100px, 12vh, 130px);
+  max-height: min(130px, 18vh);
 }
 
 @media (max-width: 600px) {
   .playBody .main {
     max-width: 100%;
     min-height: 0;
-    flex: 0 1 auto;
+    flex: 1;
   }
 
   .playBody .trayArea .tray {
-    height: clamp(110px, 14vh, 130px);
-    max-height: min(130px, 20vh);
+    height: clamp(88px, 11vh, 110px);
+    max-height: min(110px, 16vh);
   }
 
   .playBody .trayArea .tray.trayWrapLarge {
-    height: clamp(110px, 14vh, 130px);
-    max-height: min(130px, 20vh);
+    height: clamp(88px, 11vh, 110px);
+    max-height: min(110px, 16vh);
   }
 }
 

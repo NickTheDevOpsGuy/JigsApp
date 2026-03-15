@@ -188,7 +188,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         <button
           type="button"
           className={`${styles.stepLink} ${step === "setup" ? styles.stepCurrent : ""}`}
-          onClick={() => step === "setup" && selectedPuzzle && undefined}
           disabled={step !== "setup" || !selectedPuzzle}
           title="Setup"
           aria-current={step === "setup" ? "step" : undefined}

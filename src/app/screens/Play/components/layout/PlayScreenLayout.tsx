@@ -272,14 +272,14 @@ export function PlayScreenLayout({
         {replayPortalProps &&
           createPortal(<ReplaySolveModal {...replayPortalProps} />, document.body)}
 
-        {/* Mandatory structure: BoardShell > TopHUD, PuzzleBoard, TrayHandle, PieceTray. Board is the only layout anchor. */}
-        <div className={styles.boardLayoutShell} data-layout="board-shell">
+        {/* GameplayShell: single layout anchor. TopHUD, PuzzleBoard, TrayHandle, PieceTray share same left edge and width. */}
+        <div className={styles.boardLayoutShell} data-layout="gameplay-shell">
           <PlayScreenTopBar {...topBarProps} hideMenuAndButtons={hideTopBarControls} />
 
           <div className={styles.playBody} data-layout="play-body">
             <div
               className={styles.main}
-              data-layout="board-container"
+              data-layout="puzzle-board"
               ref={board.mainRef as React.RefObject<HTMLDivElement>}
             >
               <div className={styles.boardWrapper}>
@@ -394,7 +394,7 @@ export function PlayScreenLayout({
                 }
               >
                 {isMobile && (
-                  <div className={styles.trayBottomBar}>
+                  <div className={styles.trayBottomBar} data-layout="tray-handle">
                     <button
                       type="button"
                       className={styles.traySheetHandle}
@@ -416,16 +416,18 @@ export function PlayScreenLayout({
                     </button>
                   </div>
                 )}
-                <PieceTray
-                  key={tray.puzzleKey ?? undefined}
-                  ref={tray.trayRef as React.RefObject<HTMLDivElement>}
-                  pieces={tray.trayPieces}
-                  image={overlaysProps.previewImage}
-                  grid={tray.trayGrid}
-                  onPieceClick={tray.onTrayPieceClick}
-                  highlightedPieceIds={tray.highlightedPieceIds}
-                  className={tray.isLargeTray ? styles.trayWrapLarge : undefined}
-                />
+                <div data-layout="piece-tray" style={{ width: "100%", minWidth: 0 }}>
+                  <PieceTray
+                    key={tray.puzzleKey ?? undefined}
+                    ref={tray.trayRef as React.RefObject<HTMLDivElement>}
+                    pieces={tray.trayPieces}
+                    image={overlaysProps.previewImage}
+                    grid={tray.trayGrid}
+                    onPieceClick={tray.onTrayPieceClick}
+                    highlightedPieceIds={tray.highlightedPieceIds}
+                    className={tray.isLargeTray ? styles.trayWrapLarge : undefined}
+                  />
+                </div>
               </div>
             )}
           </div>
