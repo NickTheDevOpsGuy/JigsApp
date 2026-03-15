@@ -11,22 +11,22 @@ import { usePieceTrayScroll } from "./usePieceTrayScroll";
 import { usePieceTrayThumbs } from "./usePieceTrayThumbs";
 import styles from "./PieceTray.module.css";
 
-/* Piece preview: mobile sized to fit compact tray (64–80px rail); desktop slightly larger */
+/* Tray piece size: minimum 44–56px per spec; compact on mobile, slightly larger on desktop */
 function getThumbSize(pieceCount: number, isMobile: boolean): number {
   if (isMobile) {
-    if (pieceCount >= 64) return 48;
-    if (pieceCount >= 49) return 50;
-    if (pieceCount >= 36) return 52;
-    if (pieceCount >= 25) return 54;
+    if (pieceCount >= 64) return 44;
+    if (pieceCount >= 49) return 48;
+    if (pieceCount >= 36) return 50;
+    if (pieceCount >= 25) return 52;
     if (pieceCount >= 16) return 56;
     return 56;
   }
-  if (pieceCount >= 64) return 72;
-  if (pieceCount >= 49) return 75;
-  if (pieceCount >= 36) return 78;
-  if (pieceCount >= 25) return 80;
-  if (pieceCount >= 16) return 82;
-  return 84;
+  if (pieceCount >= 64) return 56;
+  if (pieceCount >= 49) return 58;
+  if (pieceCount >= 36) return 62;
+  if (pieceCount >= 25) return 68;
+  if (pieceCount >= 16) return 72;
+  return 80;
 }
 
 type Props = {

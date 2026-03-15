@@ -1,11 +1,13 @@
 import React from "react";
-import { Clock3, MoveRight, Sparkles, SplitSquareVertical } from "lucide-react";
+import { Clock3, MoveRight, Puzzle, Sparkles } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
+import { getDifficultyLabel } from "@/screens/Play/core/share/shareMessages";
 
 export function CompletionOverlayStats(props: {
   elapsedSeconds: number;
   moveCount: number;
+  pieceCount: number;
   piecesPerMin: number;
   rotationCount: number;
   maxGroupSize: number;
@@ -13,10 +15,12 @@ export function CompletionOverlayStats(props: {
   const {
     elapsedSeconds,
     moveCount,
+    pieceCount,
     piecesPerMin,
     rotationCount: _rotationCount,
-    maxGroupSize,
+    maxGroupSize: _maxGroupSize,
   } = props;
+  const difficulty = getDifficultyLabel(pieceCount);
   return (
     <div className={styles.completeStatsPanel} role="status" aria-live="polite">
       <p className={styles.completeStatsPanelTitle}>Your stats</p>
@@ -39,21 +43,17 @@ export function CompletionOverlayStats(props: {
         </div>
         <div className={styles.completeStatCard}>
           <span className={styles.completeStatCardIcon} aria-hidden="true">
-            <Sparkles size={16} />
+            <Puzzle size={16} />
           </span>
-          <span className={styles.completeStatCardLabel}>Pieces/min</span>
-          <span className={styles.completeStatCardValue}>{piecesPerMin.toFixed(1)}</span>
+          <span className={styles.completeStatCardLabel}>Pieces</span>
+          <span className={styles.completeStatCardValue}>{pieceCount}</span>
         </div>
         <div className={styles.completeStatCard}>
           <span className={styles.completeStatCardIcon} aria-hidden="true">
-            <SplitSquareVertical size={16} />
+            <Sparkles size={16} />
           </span>
-          <span className={styles.completeStatCardLabel}>Largest Merge</span>
-          <span className={styles.completeStatCardValue}>
-            {maxGroupSize > 0
-              ? `${maxGroupSize} ${maxGroupSize === 1 ? "piece" : "pieces"}`
-              : "0 pieces"}
-          </span>
+          <span className={styles.completeStatCardLabel}>Difficulty</span>
+          <span className={styles.completeStatCardValue}>{difficulty}</span>
         </div>
       </div>
     </div>

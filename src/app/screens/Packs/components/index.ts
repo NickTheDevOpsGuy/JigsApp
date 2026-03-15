@@ -1,3 +1,4 @@
+export { FeaturedPackHero } from "./FeaturedPackHero";
 export { PackCarouselWithNav } from "./PackCarouselWithNav";
 export { PuzzlePackModule } from "./PuzzlePackModule";
 export { PuzzlePackCarousel } from "./PuzzlePackCarousel";

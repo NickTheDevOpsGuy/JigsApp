@@ -16,7 +16,7 @@ export const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   help: "Help",
   manualControls: "Controls",
   modes: "Modes",
-  moves: "Moves",
+  moves: "Move",
   navigation: "Navigate",
   pieceShape: "Piece Shape",
   share: "Share",
@@ -77,11 +77,12 @@ export const ROOT_MENU_LABELS: Record<
   settings: "Settings",
 };
 
-/** Settings submenus: alpha by label (Advanced, Assistance, Audio, Appearance, Gameplay). */
+/** Settings submenus: Advanced, Assistance, Audio, Appearance, Gameplay, Move (Undo/Redo). */
 export const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
   "advanced",
   "assistance",
   "audio",
   "display",
   "gameplay",
+  "moves",
 ];

@@ -10,7 +10,12 @@ import { loadPacksData } from "@/data/packs/loadPacksData";
 import { getPackProgress } from "@/data/packs/packCompletion";
 import { getCurrentSeason } from "@/utils/seasons";
 import type { PuzzlePack } from "@/data/packs/puzzlePacks";
-import { PackCarouselWithNav, PuzzlePackCard, PuzzlePackModule } from "./components";
+import {
+  FeaturedPackHero,
+  PackCarouselWithNav,
+  PuzzlePackCard,
+  PuzzlePackModule,
+} from "./components";
 
 export function PackListScreen() {
   const nav = useNavigate();
@@ -21,14 +26,26 @@ export function PackListScreen() {
 
   const season = useMemo(() => getCurrentSeason(), []);
 
-  /** Order packs: season's pick first, then the rest. Use loaded PUZZLE_PACKS so we pass real PuzzlePack to getPuzzlesForPack. */
-  const orderedPacks = useMemo((): PuzzlePack[] => {
-    if (!packsData) return [];
+  /** Featured pack: season's pick or first pack. */
+  const featuredPack = useMemo((): PuzzlePack | null => {
+    if (!packsData) return null;
     const { PUZZLE_PACKS } = packsData;
     const seasonPack = PUZZLE_PACKS.find((p) => p.season === season);
-    if (!seasonPack) return [...PUZZLE_PACKS];
-    return [seasonPack, ...PUZZLE_PACKS.filter((p) => p.id !== seasonPack.id)];
+    return seasonPack ?? PUZZLE_PACKS[0] ?? null;
   }, [packsData, season]);
+
+  /** Packs already started (completed > 0). */
+  const continuePacks = useMemo((): PuzzlePack[] => {
+    if (!packsData) return [];
+    return packsData.PUZZLE_PACKS.filter((pack) => {
+      const puzzlesData = packsData.getPuzzlesForPack(pack);
+      const { completed } = getPackProgress(puzzlesData.map((p) => p.id));
+      return completed > 0;
+    });
+  }, [packsData]);
+
+  /** All packs for horizontal rail (snap, arrows, no half cards). */
+  const allPacks = useMemo(() => packsData?.PUZZLE_PACKS ?? [], [packsData]);
 
   useEffect(() => {
     loadPacksData().then(setPacksData);
@@ -73,52 +90,112 @@ export function PackListScreen() {
             Curated themes to explore. Complete puzzles to track your progress.
           </p>
 
-          {season && (
-            <p className={styles.seasonNote} aria-live="polite">
-              Season&apos;s pick: {season.charAt(0).toUpperCase() + season.slice(1)}
-            </p>
-          )}
-
           {!packsData ? (
             <Loader label="Loading packs…" />
           ) : (
-            <PuzzlePackModule
-              eyebrow="Collections"
-              title="Choose Your Next Pack"
-              subtitle="Seasonal favorites and progress that carries with you."
-            >
-              <PackCarouselWithNav>
-                {orderedPacks.map((pack) => {
-                  const puzzlesData = packsData.getPuzzlesForPack(pack);
-                  const { completed, total } = getPackProgress(
-                    puzzlesData.map((p) => p.id),
-                  );
-                  const isSeasonPick = pack.season === season;
-                  const heroPuzzle = puzzlesData[0];
-                  const progressPercent =
-                    total > 0 ? Math.round((completed / total) * 100) : 0;
+            <>
+              {featuredPack && (
+                <FeaturedPackHero
+                  name={featuredPack.name}
+                  description={featuredPack.description}
+                  completed={
+                    getPackProgress(
+                      packsData.getPuzzlesForPack(featuredPack).map((p) => p.id),
+                    ).completed
+                  }
+                  total={
+                    getPackProgress(
+                      packsData.getPuzzlesForPack(featuredPack).map((p) => p.id),
+                    ).total
+                  }
+                  coverImageUrl={
+                    !imgError[featuredPack.id]
+                      ? (packsData.getPuzzlesForPack(featuredPack)[0]?.thumbnail ?? null)
+                      : null
+                  }
+                  onCoverError={() =>
+                    setImgError((prev) => ({ ...prev, [featuredPack.id]: true }))
+                  }
+                  emoji={featuredPack.emoji}
+                  onClick={() => nav(`/packs/${featuredPack.id}`)}
+                />
+              )}
 
-                  return (
-                    <PuzzlePackCard
-                      key={pack.id}
-                      onClick={() => nav(`/packs/${pack.id}`)}
-                      name={pack.name}
-                      completed={completed}
-                      total={total}
-                      coverImageUrl={
-                        !imgError[pack.id] ? (heroPuzzle?.thumbnail ?? null) : null
-                      }
-                      onCoverError={() =>
-                        setImgError((prev) => ({ ...prev, [pack.id]: true }))
-                      }
-                      emoji={pack.emoji}
-                      seasonTag={isSeasonPick ? "Season's Pick" : undefined}
-                      summary={`${progressPercent}%`}
-                    />
-                  );
-                })}
-              </PackCarouselWithNav>
-            </PuzzlePackModule>
+              {continuePacks.length > 0 && (
+                <PuzzlePackModule
+                  eyebrow="Continue Playing"
+                  title="Pick up where you left off"
+                  subtitle="Packs you've already started."
+                >
+                  <div className={styles.packRow}>
+                    {continuePacks.map((pack) => {
+                      const puzzlesData = packsData.getPuzzlesForPack(pack);
+                      const { completed, total } = getPackProgress(
+                        puzzlesData.map((p) => p.id),
+                      );
+                      const heroPuzzle = puzzlesData[0];
+                      const progressPercent =
+                        total > 0 ? Math.round((completed / total) * 100) : 0;
+                      return (
+                        <PuzzlePackCard
+                          key={pack.id}
+                          onClick={() => nav(`/packs/${pack.id}`)}
+                          name={pack.name}
+                          completed={completed}
+                          total={total}
+                          coverImageUrl={
+                            !imgError[pack.id] ? (heroPuzzle?.thumbnail ?? null) : null
+                          }
+                          onCoverError={() =>
+                            setImgError((prev) => ({ ...prev, [pack.id]: true }))
+                          }
+                          emoji={pack.emoji}
+                          summary={`${progressPercent}%`}
+                        />
+                      );
+                    })}
+                  </div>
+                </PuzzlePackModule>
+              )}
+
+              <PuzzlePackModule
+                eyebrow="All Packs"
+                title="Browse all packs"
+                subtitle="Scroll for more. Tap a pack to see puzzles."
+              >
+                <PackCarouselWithNav>
+                  {allPacks.map((pack) => {
+                    const puzzlesData = packsData.getPuzzlesForPack(pack);
+                    const { completed, total } = getPackProgress(
+                      puzzlesData.map((p) => p.id),
+                    );
+                    const isSeasonPick = pack.season === season;
+                    const heroPuzzle = puzzlesData[0];
+                    const progressPercent =
+                      total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                    return (
+                      <PuzzlePackCard
+                        key={pack.id}
+                        onClick={() => nav(`/packs/${pack.id}`)}
+                        name={pack.name}
+                        completed={completed}
+                        total={total}
+                        coverImageUrl={
+                          !imgError[pack.id] ? (heroPuzzle?.thumbnail ?? null) : null
+                        }
+                        onCoverError={() =>
+                          setImgError((prev) => ({ ...prev, [pack.id]: true }))
+                        }
+                        emoji={pack.emoji}
+                        seasonTag={isSeasonPick ? "Season's Pick" : undefined}
+                        summary={`${progressPercent}%`}
+                      />
+                    );
+                  })}
+                </PackCarouselWithNav>
+              </PuzzlePackModule>
+            </>
           )}
         </div>
       </div>

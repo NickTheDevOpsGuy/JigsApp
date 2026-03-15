@@ -8,7 +8,7 @@
  */
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Puzzle, Check, ChevronLeft, ChevronRight, ChevronDown, X } from "lucide-react";
+import { Puzzle, Check, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/packs/samplePuzzles";
@@ -75,10 +75,13 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     setFilterOpen(false);
   }, [isOpen]);
 
-  const activeFilterLabel =
-    filterCategory !== "all"
-      ? (CATEGORIES.find((c) => c.id === filterCategory)?.name ?? filterCategory)
-      : null;
+  const activeFilterOption = CATEGORIES.find((c) => c.id === filterCategory);
+  const filterTriggerLabel =
+    filterCategory === "all"
+      ? "✨ All Packs"
+      : activeFilterOption
+        ? `${activeFilterOption.label ?? ""} ${activeFilterOption.name}`.trim()
+        : "Filter";
 
   useEffect(() => {
     if (!isOpen || step !== "puzzle") return;
@@ -217,7 +220,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         </button>
       </nav>
 
-      {/* Step 1: Category only – clean Filter control + optional chips */}
+      {/* Step 1: Category only – filter trigger shows active filter (e.g. 🌿 Nature ▾) */}
       {step === "category" && (
         <>
           <div className={styles.filterControlRow}>
@@ -229,24 +232,9 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
               aria-haspopup="dialog"
               aria-expanded={filterOpen}
             >
-              Filter <ChevronDown size={16} aria-hidden />
+              {filterTriggerLabel} <ChevronDown size={16} aria-hidden />
             </button>
           </div>
-          {activeFilterLabel && (
-            <div className={styles.activeChipsRow}>
-              <span className={styles.activeChip}>
-                {activeFilterLabel}
-                <button
-                  type="button"
-                  className={styles.activeChipRemove}
-                  onClick={() => setFilterCategory("all")}
-                  aria-label={`Remove filter ${activeFilterLabel}`}
-                >
-                  <X size={12} aria-hidden />
-                </button>
-              </span>
-            </div>
-          )}
           <FilterPanel
             isOpen={filterOpen}
             onClose={() => setFilterOpen(false)}
@@ -254,7 +242,8 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
             categoryOptions={CATEGORIES.map((c) => ({
               id: c.id,
               name: c.name,
-              label: c.label,
+              label:
+                c.id === "all" ? "✨ All Packs" : `${c.label ?? ""} ${c.name}`.trim(),
             }))}
             selectedCategoryId={filterCategory}
             onCategorySelect={setFilterCategory}
@@ -263,6 +252,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
               if (filterCategory !== "all") setStep("puzzle");
             }}
             onReset={() => setFilterCategory("all")}
+            autoApplyOnSelect
           />
           <p className={styles.railLabel}>Choose a category</p>
         </>
@@ -280,24 +270,9 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
               aria-haspopup="dialog"
               aria-expanded={filterOpen}
             >
-              Filter <ChevronDown size={16} aria-hidden />
+              {filterTriggerLabel} <ChevronDown size={16} aria-hidden />
             </button>
           </div>
-          {activeFilterLabel && (
-            <div className={styles.activeChipsRow}>
-              <span className={styles.activeChip}>
-                {activeFilterLabel}
-                <button
-                  type="button"
-                  className={styles.activeChipRemove}
-                  onClick={() => setFilterCategory("all")}
-                  aria-label={`Remove filter ${activeFilterLabel}`}
-                >
-                  <X size={12} aria-hidden />
-                </button>
-              </span>
-            </div>
-          )}
           <FilterPanel
             isOpen={filterOpen}
             onClose={() => setFilterOpen(false)}
@@ -305,12 +280,14 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
             categoryOptions={CATEGORIES.map((c) => ({
               id: c.id,
               name: c.name,
-              label: c.label,
+              label:
+                c.id === "all" ? "✨ All Packs" : `${c.label ?? ""} ${c.name}`.trim(),
             }))}
             selectedCategoryId={filterCategory}
             onCategorySelect={setFilterCategory}
             onApply={() => setFilterOpen(false)}
             onReset={() => setFilterCategory("all")}
+            autoApplyOnSelect
           />
           <p className={styles.railLabel}>Choose a puzzle</p>
           <div className={styles.gridScrollWrap}>

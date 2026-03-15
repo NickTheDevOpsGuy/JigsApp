@@ -101,15 +101,16 @@
   outline-offset: 2px;
 }
 
+/* HUD bar: aligned with board width; slightly increased height for breathing room; Undo/Redo only in menu */
 .topBar {
-  height: 46px;
-  max-height: 46px;
+  height: 52px;
+  max-height: 52px;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 max(8px, env(safe-area-inset-right, 0)) 0
-    max(8px, env(safe-area-inset-left, 0));
+  padding: 0 max(var(--gap-small, 8px), env(safe-area-inset-right, 0)) 0
+    max(var(--gap-small, 8px), env(safe-area-inset-left, 0));
   padding-top: env(safe-area-inset-top, 0);
   min-width: 0;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
@@ -145,7 +146,7 @@
   flex-shrink: 0;
   overflow-x: hidden;
   overflow-y: visible;
-  max-height: 46px;
+  max-height: 52px;
   transition: max-height 0.25s ease;
   position: relative;
   z-index: 200;

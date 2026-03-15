@@ -28,6 +28,8 @@ export interface FilterPanelProps {
   onDifficultySelect?: (id: string) => void;
   onApply: () => void;
   onReset: () => void;
+  /** When true, selecting a category closes the sheet and applies immediately (no Apply button). */
+  autoApplyOnSelect?: boolean;
   /** Anchor for desktop popover; if not set, panel is centered */
   anchorRef?: React.RefObject<HTMLElement | null>;
 }
@@ -62,12 +64,21 @@ export function FilterPanel({
   onDifficultySelect,
   onApply,
   onReset,
+  autoApplyOnSelect = false,
 }: FilterPanelProps) {
   const isMobile = useMediaQuery("(max-width: 600px)");
 
   const handleApply = () => {
     onApply();
     onClose();
+  };
+
+  const handleCategorySelect = (id: string) => {
+    onCategorySelect(id);
+    if (autoApplyOnSelect) {
+      onApply();
+      onClose();
+    }
   };
 
   const handleReset = () => {
@@ -105,7 +116,7 @@ export function FilterPanel({
                   name="filter-category"
                   value={opt.id}
                   checked={selectedCategoryId === opt.id}
-                  onChange={() => onCategorySelect(opt.id)}
+                  onChange={() => handleCategorySelect(opt.id)}
                   className={styles.radio}
                 />
                 <span>{opt.label ?? opt.name}</span>
@@ -158,9 +169,11 @@ export function FilterPanel({
         <button type="button" className={styles.resetBtn} onClick={handleReset}>
           Reset
         </button>
-        <button type="button" className={styles.applyBtn} onClick={handleApply}>
-          Apply
-        </button>
+        {!autoApplyOnSelect && (
+          <button type="button" className={styles.applyBtn} onClick={handleApply}>
+            Apply
+          </button>
+        )}
       </div>
     </div>
   );

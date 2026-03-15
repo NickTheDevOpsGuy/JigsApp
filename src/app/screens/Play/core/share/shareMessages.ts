@@ -53,20 +53,6 @@ export function buildProgressShareMessage(args: ShareMessageArgs): string {
   ].join("\n");
 }
 
-const CHALLENGE_TAUNT_LINES = [
-  "Think you can beat me?",
-  "Puzzle demolished. Your turn.",
-  "Let's see if you're faster.",
-  "Another puzzle down. Your move.",
-  "This one took me {moves} moves. Beat that.",
-];
-
-function pickChallengeTauntLine(moves: number): string {
-  const line =
-    CHALLENGE_TAUNT_LINES[Math.floor(Math.random() * CHALLENGE_TAUNT_LINES.length)];
-  return line.replace("{moves}", String(moves));
-}
-
 /** Daily Share – Wordle-style compact format. Only for Daily Puzzle. */
 export type DailyShareMessageArgs = {
   dailyNumber: number;
@@ -121,25 +107,16 @@ export function getDailyShareCompletionGrid(args: DailyShareGridArgs): string {
 }
 
 /**
- * Beat My Puzzle – challenge share. Exact structure per spec.
+ * Beat My Puzzle – challenge share. Per spec: "I solved this puzzle in 1:42 with 31 moves. Think you can beat me?" + puzzle image and link.
  */
 export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const time = formatTime(args.elapsedSeconds);
   const moves = args.moveCount ?? 0;
-  const difficulty = getDifficultyLabel(args.pieceCount);
-  const pieces = args.pieceCount;
   const puzzleName = args.puzzleName?.trim() || "Puzzle";
-  const firstLine = pickChallengeTauntLine(moves);
   return [
-    `🧩 ${firstLine}`,
+    `I solved this puzzle in ${time} with ${moves} ${moves === 1 ? "move" : "moves"}. Think you can beat me?`,
     "",
-    `Puzzle: ${puzzleName}`,
-    `Difficulty: ${difficulty} (${pieces} pieces)`,
-    "",
-    `⏱ Time: ${time}`,
-    `🔁 Moves: ${moves}`,
-    "",
-    "Try the same puzzle:",
+    puzzleName,
     args.playUrl,
   ].join("\n");
 }

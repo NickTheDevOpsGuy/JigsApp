@@ -52,7 +52,7 @@ export function getNavControlsModesItems(
       sortKey: "  Undo & Redo",
       title: "Allow undoing and redoing moves (keyboard: Ctrl/Cmd+Z)",
       onClick: c(props.onToggleUndoRedo ?? (() => {})),
-      subMenu: "gameplay",
+      subMenu: "moves",
       isToggle: true,
       checked: props.undoRedoEnabled !== false,
     },
@@ -64,7 +64,7 @@ export function getNavControlsModesItems(
       sortKey: "Undo",
       title: "Revert last piece placement",
       onClick: c(props.onUndo ?? (() => {})),
-      subMenu: "gameplay",
+      subMenu: "moves",
       disabled: !props.undoRedoEnabled || !props.canUndo,
       disabledTitle: !props.undoRedoEnabled
         ? "Turn on Undo & Redo above"
@@ -80,7 +80,7 @@ export function getNavControlsModesItems(
       sortKey: "Redo",
       title: "Reapply last undone move",
       onClick: c(props.onRedo ?? (() => {})),
-      subMenu: "gameplay",
+      subMenu: "moves",
       disabled: !props.undoRedoEnabled || !props.canRedo,
       disabledTitle: !props.undoRedoEnabled
         ? "Turn on Undo & Redo above"

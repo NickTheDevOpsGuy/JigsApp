@@ -122,3 +122,11 @@
   color: var(--color-text-secondary);
   line-height: 1.5;
 }
+
+.packRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-normal, 16px);
+  width: 100%;
+  min-width: 0;
+}

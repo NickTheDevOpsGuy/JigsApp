@@ -90,6 +90,39 @@ export function CompletionOverlayActions(args: {
             </span>
           </button>
         )}
+        {(onShareChallenge || onCopyChallenge) && (
+          <button
+            type="button"
+            className={styles.completeActionBtn}
+            onClick={async () => {
+              const challengeUrl =
+                puzzleShareUrl +
+                (puzzleShareUrl.includes("?") ? "&" : "?") +
+                `ct=${elapsedSeconds}&cm=${moveCount ?? 0}`;
+              await completionData.handleShareChallengeCard().catch(() => {});
+              onShareChallenge?.(challengeUrl);
+            }}
+            title="Send challenge: same puzzle, your stats to beat"
+          >
+            <span className={styles.completeActionLead}>
+              <Swords size={18} aria-hidden="true" />
+              Send Challenge
+            </span>
+          </button>
+        )}
+        {showShareResult && (
+          <button
+            type="button"
+            className={styles.completeActionBtn}
+            onClick={() => completionData.setSharePopupOpen(true)}
+            title="Share your result (link and stats)"
+          >
+            <span className={styles.completeActionLead}>
+              <Share2 size={18} aria-hidden="true" />
+              Share Result
+            </span>
+          </button>
+        )}
         {showDailyShare && (
           <button
             type="button"
@@ -109,49 +142,16 @@ export function CompletionOverlayActions(args: {
             </span>
           </button>
         )}
-        {showShareResult && (
-          <button
-            type="button"
-            className={styles.completeActionBtn}
-            onClick={() => completionData.setSharePopupOpen(true)}
-            title="Share your result (link and stats)"
-          >
-            <span className={styles.completeActionLead}>
-              <Share2 size={18} aria-hidden="true" />
-              Share Result
-            </span>
-          </button>
-        )}
-        {(onShareChallenge || onCopyChallenge) && (
-          <button
-            type="button"
-            className={styles.completeActionBtn}
-            onClick={async () => {
-              const challengeUrl =
-                puzzleShareUrl +
-                (puzzleShareUrl.includes("?") ? "&" : "?") +
-                `ct=${elapsedSeconds}&cm=${moveCount ?? 0}`;
-              await completionData.handleShareChallengeCard().catch(() => {});
-              onShareChallenge?.(challengeUrl);
-            }}
-            title="Challenge a friend to beat your puzzle"
-          >
-            <span className={styles.completeActionLead}>
-              <Swords size={18} aria-hidden="true" />
-              Beat My Puzzle
-            </span>
-          </button>
-        )}
         {canReplay && onReplayClick && (
           <button
             type="button"
             className={styles.completeActionBtn}
             onClick={onReplayClick}
-            title="Review your solve"
+            title="Replay your solve"
           >
             <span className={styles.completeActionLead}>
               <Film size={18} aria-hidden="true" />
-              Review Solve
+              Replay Solve
             </span>
           </button>
         )}

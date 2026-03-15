@@ -2,8 +2,8 @@
  * Snap animation, glow, and particle helpers for renderBoard. Split out to keep renderBoardHelpersCore under 300 lines.
  */
 
-/** Glow duration when a piece snaps; fade completes within 150–200ms. */
-export const SNAP_GLOW_MS = 180;
+/** Quick glow flash when a piece snaps; ~120ms per spec. */
+export const SNAP_GLOW_MS = 120;
 
 /** Short ease (~120ms) for snap; subtle pop when pieces connect then gentle settle. */
 export function snapPopScale(tMs: number): number {

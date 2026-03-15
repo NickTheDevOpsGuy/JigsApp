@@ -75,8 +75,8 @@ export function drawAlignmentGrid(
 /** Lift offset (px) when dragging – piece feels elevated and tactile. */
 export const DRAG_LIFT_PX = 10;
 
-/** Scale when dragging (1.03–1.06) – subtle lift, smooth movement. */
-export const DRAG_SCALE = 1.05;
+/** Scale when dragging (~1.04) – piece lift, render above others. */
+export const DRAG_SCALE = 1.04;
 
 export function applyPieceShadow(
   ctx: CanvasRenderingContext2D,
@@ -86,10 +86,10 @@ export function applyPieceShadow(
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   if (isDragging) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
-    ctx.shadowBlur = 42;
-    ctx.shadowOffsetX = 12;
-    ctx.shadowOffsetY = 20;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+    ctx.shadowBlur = 22;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 8;
   } else if (!isPlaced) {
     ctx.shadowColor = "rgba(0, 0, 0, 0.22)";
     ctx.shadowBlur = 8;

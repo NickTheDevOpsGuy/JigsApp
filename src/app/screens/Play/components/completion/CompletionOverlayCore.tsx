@@ -207,6 +207,7 @@ export function CompletionOverlay({
         <CompletionOverlayStats
           elapsedSeconds={elapsedSeconds}
           moveCount={moveCount}
+          pieceCount={grid ? grid.rows * grid.cols : 0}
           piecesPerMin={piecesPerMin}
           rotationCount={rotationCount}
           maxGroupSize={maxGroupSize}

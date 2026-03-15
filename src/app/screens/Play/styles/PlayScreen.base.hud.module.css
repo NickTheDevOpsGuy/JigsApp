@@ -1,9 +1,11 @@
+/* HUD: Timer, Moves, Piece count only; aligned with board width; slightly increased height for breathing room */
 .hud {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--gap-small, 8px);
   flex: 1;
   justify-content: center;
+  min-height: 44px;
   transition: opacity 0.25s ease;
 }
 

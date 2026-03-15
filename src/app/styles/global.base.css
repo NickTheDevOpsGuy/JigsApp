@@ -11,6 +11,10 @@
   --space-6: 24px;
   --space-8: 32px;
   --space-12: 48px;
+  /* Layout rhythm: 8px small gap, 16px normal gap, 24px section gap */
+  --gap-small: 8px;
+  --gap-normal: 16px;
+  --gap-section: 24px;
   /* Corner radius (PDF) */
   --radius-btn: 10px;
   --radius-card: 16px;

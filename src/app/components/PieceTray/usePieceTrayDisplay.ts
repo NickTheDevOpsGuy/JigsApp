@@ -65,10 +65,11 @@ export function usePieceTrayDisplay(
   /* Start with shuffle so tray order is randomized from the beginning */
   const [shuffleKey, setShuffleKey] = useState(1);
 
+  /* Edge priority: at puzzle start show edge pieces first. */
   useEffect(() => {
     if (!image || hasAutoSelectedClustersRef.current) return;
     hasAutoSelectedClustersRef.current = true;
-    setFilter("clusters");
+    setFilter("arranged");
   }, [image]);
 
   const hueById = useMemo(() => {
