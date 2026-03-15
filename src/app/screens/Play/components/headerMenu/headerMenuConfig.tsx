@@ -6,6 +6,7 @@ export type {
   DebugFlags,
   HeaderMenuProps,
   SubMenuId,
+  RootMenuId,
   MenuItemConfig,
 } from "@/screens/Play/components/headerMenu/headerMenuConfigTypes";
 

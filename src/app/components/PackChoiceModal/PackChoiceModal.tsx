@@ -513,7 +513,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         </p>
       )}
 
-      {/* Selected preview (same as Choose Puzzle) */}
+      {/* Puzzle preview rule: only show after a puzzle is selected (not on pack selection). */}
       {selectedPuzzle && (
         <div className={styles.selectedPreview}>
           <img src={selectedPuzzle.fullImage} alt="" className={styles.previewImage} />

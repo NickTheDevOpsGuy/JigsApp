@@ -29,6 +29,8 @@ type Props = {
   renderItem: (item: MenuItemConfig) => React.ReactNode;
   headerMenuProps: HeaderMenuProps;
   setOpen: (open: boolean) => void;
+  onBack?: () => void;
+  backLabel?: string;
 };
 
 export function HeaderMenuSubmenuPanel({
@@ -39,11 +41,14 @@ export function HeaderMenuSubmenuPanel({
   renderItem,
   headerMenuProps: props,
   setOpen,
+  onBack,
+  backLabel,
 }: Props) {
-  const handleBack = () => {
+  const defaultBack = () => {
     const parent = activeSubMenu ? SUBMENU_PARENT[activeSubMenu] : null;
     setActiveSubMenu(parent ?? null);
   };
+  const handleBack = onBack ?? defaultBack;
 
   return (
     <>
@@ -52,8 +57,8 @@ export function HeaderMenuSubmenuPanel({
         className={styles.headerMenuBack}
         role="menuitem"
         onClick={handleBack}
-        aria-label="Back"
-        title="Back to main menu"
+        aria-label={backLabel ? `Back to ${backLabel}` : "Back"}
+        title={backLabel ? `Back to ${backLabel}` : "Back to main menu"}
       >
         <ChevronLeft size={16} />
         Back

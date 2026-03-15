@@ -1,22 +1,24 @@
 /**
- * HeaderMenu – hamburger menu with Theme, Gameplay, Display, Audio, Advanced.
- * Fix: render menu in a portal (document.body) so it stays above the board/canvas layers.
+ * HeaderMenu – root: Play, Leaderboard, Co-op, Settings, About. Settings contains Gameplay, Assistance, Appearance, Audio, Advanced.
  */
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { Menu, ChevronRight, Check } from "lucide-react";
+import { Menu, ChevronRight, ChevronLeft, Check } from "lucide-react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import {
   buildMenuItems,
   type HeaderMenuProps,
   type MenuItemConfig,
   type SubMenuId,
+  type RootMenuId,
 } from "@/screens/Play/components/headerMenu/headerMenuConfig";
 import {
   SUB_MENU_LABELS,
   SUBMENU_PARENT,
   SETTINGS_SUBMENU_ORDER,
+  ROOT_MENU_ORDER,
+  ROOT_MENU_LABELS,
   getSubmenuDescription,
 } from "@/screens/Play/components/headerMenu/headerMenuConstants";
 import { HeaderMenuSubmenuPanel } from "@/screens/Play/components/headerMenu/HeaderMenuSubmenuPanel";
@@ -32,11 +34,10 @@ export type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/heade
 export function HeaderMenu(props: HeaderMenuProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [activeRoot, setActiveRoot] = useState<RootMenuId | null>(null);
   const [activeSubMenu, setActiveSubMenu] = useState<SubMenuId | null>(null);
 
   const rootRef = useRef<HTMLDivElement | null>(null);
-
-  // Button does not forward refs; use wrapper for measuring
   const triggerWrapRef = useRef<HTMLDivElement | null>(null);
 
   const [menuRect, setMenuRect] = useState<{
@@ -49,6 +50,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   useEffect(() => {
     if (!open) {
+      setActiveRoot(null);
       setActiveSubMenu(null);
       setMenuRect(null);
     }
@@ -71,7 +73,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
       left,
       minWidth: Math.min(rect.width, maxWidth),
     });
-  }, [open, activeSubMenu]);
+  }, [open, activeRoot, activeSubMenu]);
 
   useEffect(() => {
     if (!open) return;
@@ -92,9 +94,11 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (activeSubMenu) {
-          const parent = SUBMENU_PARENT[activeSubMenu];
-          setActiveSubMenu(parent ?? null);
+        if (activeSubMenu && activeRoot === "settings") {
+          setActiveSubMenu(null);
+        } else if (activeRoot) {
+          setActiveRoot(null);
+          setActiveSubMenu(null);
         } else {
           setOpen(false);
         }
@@ -202,10 +206,46 @@ export function HeaderMenu(props: HeaderMenuProps) {
     );
   };
 
-  const mainMenuSubmenus = SETTINGS_SUBMENU_ORDER.filter((id) =>
+  const settingsSubmenus = SETTINGS_SUBMENU_ORDER.filter((id) =>
     hasSubMenuItems(id, groups),
   );
   const hasSubMenu = (id: SubMenuId) => hasSubMenuItems(id, groups);
+
+  const navItems = groups.settingsItems.filter((i) => i.subMenu === "navigation");
+  const aboutPanelItems = [
+    ...groups.helpItems,
+    ...groups.aboutItems,
+    ...groups.contributeItems,
+  ];
+
+  const handleRootClick = (root: RootMenuId) => {
+    if (root === "leaderboard") {
+      navigate("/stats");
+      setOpen(false);
+      return;
+    }
+    if (root === "coop") {
+      props.onSharePuzzle?.();
+      setOpen(false);
+      return;
+    }
+    setActiveRoot(root);
+  };
+
+  const handleBack = () => {
+    if (activeSubMenu && activeRoot === "settings") {
+      setActiveSubMenu(null);
+    } else {
+      setActiveRoot(null);
+      setActiveSubMenu(null);
+    }
+  };
+
+  const showRootMenu = !activeRoot && !activeSubMenu;
+  const showSettingsList = activeRoot === "settings" && !activeSubMenu;
+  const showPlayList = activeRoot === "play";
+  const showAboutList = activeRoot === "about";
+  const showSubPanel = activeRoot === "settings" && activeSubMenu;
 
   return (
     <div className={styles.headerMenuWrap} ref={rootRef}>
@@ -236,7 +276,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
               minWidth: menuRect.minWidth,
             }}
           >
-            {activeSubMenu ? (
+            {showSubPanel && activeSubMenu ? (
               <HeaderMenuSubmenuPanel
                 activeSubMenu={activeSubMenu}
                 setActiveSubMenu={setActiveSubMenu}
@@ -245,43 +285,75 @@ export function HeaderMenu(props: HeaderMenuProps) {
                 renderItem={renderItem}
                 headerMenuProps={props}
                 setOpen={setOpen}
+                onBack={handleBack}
+                backLabel="Settings"
               />
-            ) : (
+            ) : showRootMenu ? (
               <>
-                {hasSubMenu("about") && (
-                  <button
-                    type="button"
-                    className={styles.headerMenuSubmenuTrigger}
-                    role="menuitem"
-                    onClick={() => setActiveSubMenu("about")}
-                    aria-label="About"
-                    title="About Phuzzle, help, and contributors"
-                  >
-                    {SUB_MENU_LABELS.about}
-                    <ChevronRight size={16} className={styles.headerMenuChevron} />
-                  </button>
-                )}
-
-                <div className={styles.headerMenuDivider} />
-
-                {mainMenuSubmenus.map((id) => (
+                {ROOT_MENU_ORDER.map((id) => (
                   <button
                     key={id}
                     type="button"
                     className={styles.headerMenuSubmenuTrigger}
                     role="menuitem"
-                    onClick={() => setActiveSubMenu(id)}
-                    aria-label={
-                      SUB_MENU_LABELS[id].replace(/\p{Emoji}/gu, "").trim() || id
+                    onClick={() => handleRootClick(id)}
+                    aria-label={ROOT_MENU_LABELS[id]}
+                    title={
+                      id === "leaderboard"
+                        ? "View leaderboards"
+                        : id === "coop"
+                          ? "Play with a friend"
+                          : id === "settings"
+                            ? "Gameplay, assistance, appearance, audio, advanced"
+                            : undefined
                     }
-                    title={getSubmenuDescription(id)}
                   >
-                    {SUB_MENU_LABELS[id]}
-                    <ChevronRight size={16} className={styles.headerMenuChevron} />
+                    {ROOT_MENU_LABELS[id]}
+                    {(id === "play" || id === "settings" || id === "about") && (
+                      <ChevronRight size={16} className={styles.headerMenuChevron} />
+                    )}
                   </button>
                 ))}
               </>
-            )}
+            ) : showSettingsList || showPlayList || showAboutList ? (
+              <>
+                <button
+                  type="button"
+                  className={styles.headerMenuBack}
+                  role="menuitem"
+                  onClick={handleBack}
+                  aria-label="Back"
+                  title="Back to main menu"
+                >
+                  <ChevronLeft size={16} />
+                  Back
+                </button>
+                <div className={styles.headerMenuDivider} />
+                {showSettingsList &&
+                  settingsSubmenus.map((id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      className={styles.headerMenuSubmenuTrigger}
+                      role="menuitem"
+                      onClick={() => setActiveSubMenu(id)}
+                      aria-label={SUB_MENU_LABELS[id]}
+                      title={getSubmenuDescription(id)}
+                    >
+                      {SUB_MENU_LABELS[id]}
+                      <ChevronRight size={16} className={styles.headerMenuChevron} />
+                    </button>
+                  ))}
+                {showPlayList &&
+                  navItems.map((item) => (
+                    <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
+                  ))}
+                {showAboutList &&
+                  aboutPanelItems.map((item) => (
+                    <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
+                  ))}
+              </>
+            ) : null}
           </div>,
           document.body,
         )}

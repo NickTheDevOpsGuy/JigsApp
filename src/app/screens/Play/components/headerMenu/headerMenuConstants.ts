@@ -8,7 +8,7 @@ export const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   advanced: "Advanced",
   audio: "Audio",
   assistance: "Assistance",
-  contribute: "About",
+  contribute: "Get Involved",
   controls: "Gameplay",
   display: "Appearance",
   effects: "Effects",
@@ -42,7 +42,7 @@ export const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
   contribute: "About Phuzzle and how to get involved",
   controls: "Piece shape, modes, and manual controls",
   display: "Preview, effects, immersive mode, and theme",
-  gameplay: "Piece shape, modes, and manual controls",
+  gameplay: "Magnetic Snap, Progressive Reveal, Snap Glow, Unlock Pieces, Undo, Redo",
   help: "How to play and keyboard shortcuts",
   manualControls: "Undo, redo, reset view, zoom",
   modes: "Drift, relaxed, deliberate detach, timer",
@@ -59,15 +59,31 @@ export function getSubmenuDescription(id: SubMenuId): string {
   return SUBMENU_DESCRIPTIONS[id] ?? SUB_MENU_LABELS[id];
 }
 
-/** Settings submenus in order (Moves first, then alphabetical). */
+/** Root menu: exactly 5 items. All config lives under Settings. */
+export const ROOT_MENU_ORDER: import("./headerMenuConfigTypes").RootMenuId[] = [
+  "play",
+  "leaderboard",
+  "coop",
+  "settings",
+  "about",
+];
+
+export const ROOT_MENU_LABELS: Record<
+  import("./headerMenuConfigTypes").RootMenuId,
+  string
+> = {
+  play: "Play",
+  leaderboard: "Leaderboard",
+  coop: "Co-op",
+  settings: "Settings",
+  about: "About",
+};
+
+/** Settings submenus: only these 5 (no Moves/Navigate/Share at root). */
 export const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
-  "moves", // Moves (undo/redo) – alpha
-  "advanced", // Advanced
-  "display", // Appearance
-  "assistance", // Assistance
-  "audio", // Audio
-  "controls", // Gameplay
-  "stats", // Leaderboard
-  "navigation", // Navigate
-  "share", // Share
+  "gameplay",
+  "assistance",
+  "display",
+  "audio",
+  "advanced",
 ];

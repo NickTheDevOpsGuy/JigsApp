@@ -109,6 +109,9 @@ export type HeaderMenuProps = {
   onToggleColorBlindFriendly?: () => void;
 };
 
+/** Root menu: only these 5. All config (Moves, Navigate, Share, Audio, etc.) lives under Settings. */
+export type RootMenuId = "play" | "leaderboard" | "coop" | "settings" | "about";
+
 export type SubMenuId =
   | "about"
   | "advanced"
