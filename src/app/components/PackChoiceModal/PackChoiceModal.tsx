@@ -179,6 +179,12 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
   }, [isOpen, packsData, updatePackScrollState, filteredPacks.length, step]);
 
   useEffect(() => {
+    if (step === "puzzle" && selectedPack && puzzles.length > 0 && !selectedPuzzle) {
+      setSelectedPuzzle(puzzles[0]);
+    }
+  }, [step, selectedPack, puzzles, selectedPuzzle]);
+
+  useEffect(() => {
     if (step !== "puzzle" || !selectedPack || puzzles.length === 0) return;
     const el = puzzleScrollRef.current;
     const run = () => requestAnimationFrame(updatePuzzleScrollState);

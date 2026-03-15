@@ -37,11 +37,14 @@ export function WhatsNewModal({ isOpen, onClose }: WhatsNewModalProps) {
           <div key={i} className={styles.section}>
             <h3 className={styles.sectionTitle}>{section.title}</h3>
             <ul className={styles.list}>
-              {section.items.slice(0, MAX_FEATURES).map((item, j) => (
-                <li key={j} className={styles.item}>
-                  {item}
-                </li>
-              ))}
+              {section.items.slice(0, MAX_FEATURES).map((item, j) => {
+                const text = String(item).replace(/^[\s•·]*/, "").trim();
+                return (
+                  <li key={j} className={styles.item}>
+                    {text ? `• ${text}` : null}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}

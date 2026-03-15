@@ -107,16 +107,18 @@ export function getDailyShareCompletionGrid(args: DailyShareGridArgs): string {
 }
 
 /**
- * Beat My Puzzle – challenge share. Per spec: "I solved this puzzle in 1:42 with 31 moves. Think you can beat me?" + puzzle image and link.
+ * Beat My Puzzle – challenge share. Per spec: "I solved this puzzle in 1:42 with 31 moves. Think you can beat me?" + puzzle image, difficulty, puzzle link.
  */
 export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const time = formatTime(args.elapsedSeconds);
   const moves = args.moveCount ?? 0;
   const puzzleName = args.puzzleName?.trim() || "Puzzle";
+  const difficulty = getDifficultyLabel(args.pieceCount);
   return [
     `I solved this puzzle in ${time} with ${moves} ${moves === 1 ? "move" : "moves"}. Think you can beat me?`,
     "",
     puzzleName,
+    `Difficulty: ${difficulty}`,
     args.playUrl,
   ].join("\n");
 }

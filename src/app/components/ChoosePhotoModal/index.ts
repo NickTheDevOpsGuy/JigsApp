@@ -1,1 +1,0 @@
-export { ChoosePhotoModal } from "./ChoosePhotoModal";

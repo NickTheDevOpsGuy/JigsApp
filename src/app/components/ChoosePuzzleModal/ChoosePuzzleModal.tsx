@@ -68,11 +68,12 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
 
   useEffect(() => {
     if (!isOpen) return;
-    setStep("category");
-    setSelectedPuzzle(null);
-    setDifficultyIndex(1);
     setFilterCategory("all");
     setFilterOpen(false);
+    setDifficultyIndex(1);
+    const firstPuzzle = SAMPLE_PUZZLES[0] ?? null;
+    setSelectedPuzzle(firstPuzzle);
+    setStep(firstPuzzle ? "setup" : "category");
   }, [isOpen]);
 
   const activeFilterOption = CATEGORIES.find((c) => c.id === filterCategory);
@@ -82,6 +83,17 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
       : activeFilterOption
         ? `${activeFilterOption.label ?? ""} ${activeFilterOption.name}`.trim()
         : "Filter";
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const inList =
+      selectedPuzzle && filteredPuzzles.some((p) => p.id === selectedPuzzle.id);
+    if (!inList && filteredPuzzles.length > 0) {
+      setSelectedPuzzle(filteredPuzzles[0]);
+    } else if (!inList) {
+      setSelectedPuzzle(null);
+    }
+  }, [isOpen, filterCategory, filteredPuzzles, selectedPuzzle?.id]);
 
   useEffect(() => {
     if (!isOpen || step !== "puzzle") return;
