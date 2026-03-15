@@ -50,7 +50,7 @@
     max-width: 100%;
     min-width: 0;
     padding: 0;
-    padding-top: 4px;
+    padding-top: 14px;
     gap: 0;
     align-items: center;
     justify-content: center;
@@ -295,10 +295,6 @@
     padding: 0 0 max(8px, env(safe-area-inset-bottom, 0));
     border-radius: 16px;
     transform: none;
-  }
-
-  .trayAreaSheet[data-tray-state="collapsed"] .tray {
-    display: none;
   }
 
   .traySheetHandle {

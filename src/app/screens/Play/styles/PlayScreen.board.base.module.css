@@ -13,7 +13,7 @@
   width: 100%;
 }
 
-/* PuzzleBoard container: expands to fill space between TopHUD and tray; minimal gap */
+/* PuzzleBoard container: expands to fill space between TopHUD and tray; extra top space so board isn't squished */
 .playBody .main {
   flex: 1;
   min-height: 0;
@@ -22,7 +22,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 8px;
+  padding-top: 18px;
 }
 
 /* Tray dock: 8–12px gap below board; same width as shell */
@@ -55,7 +55,7 @@
     max-width: 100%;
     min-height: 0;
     flex: 1;
-    padding-top: 4px;
+    padding-top: 14px;
   }
 
   .playBody .trayArea {
