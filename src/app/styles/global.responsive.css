@@ -93,11 +93,12 @@ canvas {
   transition: none !important;
 }
 
-/* Mobile (Android & iPhone): lock viewport, no document scroll – only in-app scroll areas scroll */
+/* Mobile (iPhone 16 393×852, Android): lock to 100dvh – no document scroll anywhere */
 @media (max-width: 600px) {
   html {
-    min-height: var(--app-vh-stable, 100dvh);
-    height: var(--app-vh-stable, 100dvh);
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
     overflow: hidden;
     -webkit-text-size-adjust: 100%;
   }
@@ -106,13 +107,13 @@ canvas {
     position: fixed;
     inset: 0;
     width: 100%;
-    height: 100%;
-    min-height: var(--app-vh-stable, 100dvh);
-    max-height: var(--app-vh-stable, 100dvh);
+    max-width: 100vw;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
     overflow: hidden;
     overscroll-behavior: none;
     font-size: var(--font-body-mobile, 15px);
-    /* Prevent iOS rubber-band and Android overscroll from moving the document */
     -webkit-overflow-scrolling: auto;
   }
 
@@ -120,26 +121,26 @@ canvas {
     position: absolute;
     inset: 0;
     width: 100%;
-    height: 100%;
-    min-height: var(--app-vh-stable, 100dvh);
-    max-height: var(--app-vh-stable, 100dvh);
+    max-width: 100vw;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
     overflow: hidden;
-    overflow-x: hidden;
-    overflow-y: hidden;
     -webkit-overflow-scrolling: auto;
   }
 
-  /* All screens: fit viewport, no page scroll. Cards fill and do not scroll. */
+  /* Every full-page screen fits exactly in viewport; no page scroll */
   #root .page {
     flex: 1 1 auto;
     min-height: 0;
-    max-height: var(--app-vh-stable, 100dvh);
+    height: 100%;
+    max-height: 100dvh;
+    overflow: hidden;
   }
   #root .page > .card {
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
-    overflow-y: hidden;
   }
 
   h1 {

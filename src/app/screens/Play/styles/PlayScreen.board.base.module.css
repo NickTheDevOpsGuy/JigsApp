@@ -55,16 +55,21 @@
     max-width: 100%;
     min-height: 0;
     flex: 1;
+    padding-top: 4px;
+  }
+
+  .playBody .trayArea {
+    margin-top: 6px;
   }
 
   .playBody .trayArea .tray {
-    height: clamp(88px, 11vh, 110px);
-    max-height: min(110px, 16vh);
+    height: clamp(64px, 8vh, 80px);
+    max-height: 80px;
   }
 
   .playBody .trayArea .tray.trayWrapLarge {
-    height: clamp(88px, 11vh, 110px);
-    max-height: min(110px, 16vh);
+    height: clamp(64px, 8vh, 80px);
+    max-height: 80px;
   }
 }
 

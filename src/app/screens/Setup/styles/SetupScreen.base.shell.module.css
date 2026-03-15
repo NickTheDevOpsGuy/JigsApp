@@ -1,9 +1,10 @@
 .page {
-  height: var(--app-vh-stable, 100dvh);
-  min-height: var(--app-vh-stable, 100dvh);
-  max-height: var(--app-vh-stable, 100dvh);
+  height: 100dvh;
+  min-height: 100dvh;
+  max-height: 100dvh;
   width: 100%;
   box-sizing: border-box;
+  overflow: hidden;
   padding: max(var(--space-2), env(safe-area-inset-top))
     max(var(--space-2), env(safe-area-inset-right))
     max(var(--space-2), env(safe-area-inset-bottom))

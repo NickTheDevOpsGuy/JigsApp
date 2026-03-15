@@ -1,37 +1,45 @@
-/* Mobile: same GameplayShell structure; in-flow tray (no floating); shell width ~full minus safe margins */
+/* Mobile: shrink everything to fit viewport; one compact stack */
 @media (max-width: 600px) {
   .page {
-    --play-board-tray-width: min(calc(100vw - 24px), 720px);
-    height: var(--app-vh-stable, 100dvh);
-    min-height: var(--app-vh-stable, 100dvh);
+    --play-board-tray-width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
     overflow: hidden;
-    overflow-x: hidden;
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
     padding-bottom: 0;
+  }
+
+  .boardLayoutShell {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
   @media (max-height: 500px) {
     .page {
-      height: auto;
-      min-height: var(--app-vh-dynamic, 100dvh);
-      overflow-y: hidden;
+      height: 100dvh;
+      min-height: 100dvh;
     }
     .playBody {
-      flex: none;
-      min-height: min(85vh, 500px);
+      min-height: 0;
     }
   }
 
   .playBody {
-    --play-board-tray-width: min(calc(100vw - 24px), 720px);
+    --play-board-tray-width: 100%;
     gap: 0;
     min-height: 0;
-    min-width: 0;
+    flex: 1;
     overflow: hidden;
-    overflow-x: hidden;
     padding: 0;
-    padding-left: max(4px, env(safe-area-inset-left, 0));
-    padding-right: max(4px, env(safe-area-inset-right, 0));
-    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: max(4px, env(safe-area-inset-bottom, 0));
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -40,18 +48,22 @@
   .main {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     padding: 0;
+    padding-top: 4px;
     gap: 0;
     align-items: center;
     justify-content: center;
+    flex: 1;
     min-height: 0;
-    min-width: 0;
-    overflow-x: hidden;
+    overflow: hidden;
   }
 
   .playBody .trayArea {
     width: 100%;
     max-width: 100%;
+    flex-shrink: 0;
+    margin-top: 6px;
   }
 
   .playBody .trayArea .tray {
@@ -59,16 +71,15 @@
   }
 
   .boardWrapper {
-    width: var(--play-board-tray-width);
+    width: 100%;
     max-width: 100%;
     flex: 1;
     min-height: 0;
-    min-width: 0;
     max-height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 0;
+    margin: 0;
   }
 
   .boardWrapper .boardProgressFrame {
@@ -77,6 +88,7 @@
     min-width: 0;
     width: 100%;
     max-width: 100%;
+    max-height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -85,34 +97,37 @@
   .board {
     width: 100%;
     max-width: 100%;
+    max-height: 100%;
     height: auto;
     aspect-ratio: 1 / 1;
-    flex-shrink: 0;
-    border-radius: 22px;
+    flex-shrink: 1;
+    min-width: 0;
+    min-height: 0;
+    border-radius: 12px;
   }
 
-  /* Ensure square board fits within progress frame */
   .boardWrapper .boardProgressFrame .board {
     max-height: 100%;
   }
 
   .boardLayoutShell .topBarWrap {
     width: 100%;
-    max-height: 38px;
+    max-height: 34px;
+    flex-shrink: 0;
   }
 
-  /* Mobile HUD compact: Menu | Time | Pause | Moves | Pieces – reduced height, padding, radius */
+  /* Mobile HUD: minimal height so board + tray fit */
   .topBar {
     min-height: 0;
     height: auto;
-    padding: calc(6px + env(safe-area-inset-top, 0))
-      max(6px, env(safe-area-inset-right, 0)) 0 max(6px, env(safe-area-inset-left, 0));
-    gap: 4px;
+    padding: calc(4px + env(safe-area-inset-top, 0))
+      max(4px, env(safe-area-inset-right, 0)) 0 max(4px, env(safe-area-inset-left, 0));
+    gap: 3px;
   }
 
   .topBarInner {
-    padding-inline: 10px 8px;
-    gap: 6px;
+    padding-inline: 6px 4px;
+    gap: 4px;
   }
 
   .topBarLeft,
@@ -135,8 +150,8 @@
   }
 
   .headerMenuTrigger {
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 36px;
+    min-height: 36px;
     border-radius: 6px;
     background: none;
     border: none;
@@ -145,11 +160,11 @@
     display: none;
   }
   .iconBtn {
-    padding: 6px 8px;
-    font-size: 12px;
+    padding: 4px 6px;
+    font-size: 11px;
     border-radius: 6px;
-    min-height: 36px;
-    min-width: 36px;
+    min-height: 32px;
+    min-width: 32px;
   }
   .undoRedoSegment {
     border-radius: 6px;
@@ -172,19 +187,19 @@
     font-size: 10px;
   }
   .hudPill {
-    min-height: 32px;
-    padding: 0 8px;
-    font-size: 13px;
-    gap: 4px;
-    border-radius: 8px;
+    min-height: 28px;
+    padding: 0 6px;
+    font-size: 12px;
+    gap: 3px;
+    border-radius: 6px;
     background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
     border-color: color-mix(in srgb, var(--color-border) 90%, transparent);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   }
   .hudPillTimer {
-    min-height: 32px;
-    padding: 0 8px;
-    font-size: 13px;
+    min-height: 28px;
+    padding: 0 6px;
+    font-size: 12px;
   }
   .hudPillTimer .timerSuffix {
     display: none;
@@ -202,9 +217,9 @@
   }
 
   .hudPillPause {
-    min-height: 32px;
-    min-width: 32px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    min-height: 28px;
+    min-width: 28px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   }
   .hudPill span {
     overflow: hidden;
@@ -262,8 +277,8 @@
   .trayAreaSheet .trayBottomBar {
     width: 100%;
     max-width: 100%;
-    min-height: 24px;
-    padding: 2px 12px 4px;
+    min-height: 20px;
+    padding: 2px 8px 2px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -292,10 +307,10 @@
     align-items: center;
     justify-content: center;
     gap: 0;
-    min-height: 24px;
-    padding: 2px 10px;
+    min-height: 20px;
+    padding: 0 8px;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     background: transparent;
     color: var(--color-text-secondary);
     cursor: grab;
@@ -307,7 +322,7 @@
   }
 
   .traySheetHandleBar {
-    width: 28px;
+    width: 24px;
     height: 2px;
     border-radius: 1px;
   }

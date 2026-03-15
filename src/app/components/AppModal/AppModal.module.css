@@ -181,6 +181,19 @@
     border-radius: 24px 24px 18px 18px;
     animation-name: sheetIn;
   }
+}
+
+/* Mobile (iPhone 16): panel fits in viewport, no document scroll */
+@media (max-width: 600px) {
+  .panel {
+    max-height: calc(100dvh - 24px);
+  }
+
+  .body {
+    overflow-y: auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+  }
 
   .panelBare {
     width: 100%;

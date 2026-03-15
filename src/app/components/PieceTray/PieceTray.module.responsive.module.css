@@ -39,14 +39,14 @@
 
 @media (max-width: 600px) {
   .trayCompact .thumbWrap {
-    width: 76px;
-    height: 76px;
+    width: 52px;
+    height: 52px;
   }
 
   .trayCompact .pieceButton,
   .trayCompact .blankSlot {
-    min-width: 82px;
-    min-height: 82px;
+    min-width: 56px;
+    min-height: 56px;
   }
 }
 
@@ -79,14 +79,14 @@
 
 @media (max-width: 600px) {
   .trayExtraCompact .thumbWrap {
-    width: 68px;
-    height: 68px;
+    width: 46px;
+    height: 46px;
   }
 
   .trayExtraCompact .pieceButton,
   .trayExtraCompact .blankSlot {
-    min-width: 72px;
-    min-height: 72px;
+    min-width: 50px;
+    min-height: 50px;
   }
 }
 
@@ -114,7 +114,7 @@
   display: none;
 }
 
-/* Mobile: padding around buttons, match desktop feel */
+/* Mobile: shrink tray to fit viewport */
 @media (max-width: 600px) {
   .tray,
   .trayLarge,
@@ -130,59 +130,64 @@
   }
 
   .header {
-    padding: 6px 10px 8px;
-    gap: 8px;
+    padding: 3px 6px 4px;
+    gap: 4px;
+    font-size: 12px;
   }
 
   .randomBtn {
-    min-width: 44px;
-    min-height: 44px;
-    padding: 10px;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 6px;
   }
 
   .title {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .tray {
-    /* Match desktop: side and bottom margins so tray is not cut off and looks like desktop */
-    margin: 0 12px 16px 12px;
-    margin-bottom: max(16px, env(safe-area-inset-bottom, 0));
-    border-radius: var(--radius-card);
+    margin: 0;
+    border-radius: 12px;
     padding: 0;
     width: 100%;
     box-sizing: border-box;
   }
 
   .segment button {
-    padding: 8px 12px;
-    font-size: 12px;
-    border-radius: var(--radius-btn);
-    min-height: 44px;
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 6px;
+    min-height: 36px;
   }
 
   .scroller {
-    padding: 10px 14px;
-    padding-inline-end: 14px;
-    gap: 10px;
+    padding: 2px 4px 4px;
+    gap: 4px;
   }
 
   .scrollBtn {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 36px;
+    min-height: 36px;
   }
 
   .scrollerSnap {
-    scroll-padding-inline-end: 12px;
+    scroll-padding-inline-end: 4px;
   }
 
   .trayCompact .scroller {
-    padding: 10px 14px;
-    padding-inline-end: 14px;
+    padding: 2px 4px 4px;
   }
 
   .trayExtraCompact .scroller {
-    padding: 10px 12px;
-    padding-inline-end: 14px;
+    padding: 2px 4px 4px;
+  }
+
+  .scrollIndicator {
+    margin: 0 4px 2px;
+    height: 3px;
+  }
+
+  .scrollerWrap {
+    padding: 2px 4px 4px;
   }
 }

@@ -24,9 +24,12 @@
   --font-h2-mobile: clamp(17px, 4.9vw, 20px);
   --font-body-mobile: clamp(15px, 3.9vw, 16px);
   --line-height-body: 1.45;
-  /* Mobile viewport vars; App.tsx updates these from visualViewport when available. */
+  /* Mobile viewport: 100dvh = dynamic viewport (iPhone 16 portrait ~393×852 logical). No document scroll. */
   --app-vh-dynamic: 100dvh;
   --app-vh-stable: 100svh;
+  /* iPhone 16 (6.1") logical portrait: 393×852; use for max dimensions where needed */
+  --vp-mobile-width: 393px;
+  --vp-mobile-height: 852px;
 
   /* Light theme colors */
   --color-bg-primary: #f3f7ff;

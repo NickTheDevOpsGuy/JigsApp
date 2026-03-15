@@ -11,9 +11,9 @@
 
 @media (max-width: 720px) {
   .page {
-    height: var(--app-vh-stable, 100dvh);
-    min-height: var(--app-vh-stable, 100dvh);
-    max-height: var(--app-vh-stable, 100dvh);
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
     padding: 4px 4px 2px;
     padding-top: max(4px, env(safe-area-inset-top, 0));
     padding-bottom: max(2px, env(safe-area-inset-bottom, 0));

@@ -36,7 +36,7 @@
   .page {
     height: var(--app-vh-stable, 100dvh);
     min-height: var(--app-vh-stable, 100dvh);
-    max-height: var(--app-vh-stable, 100dvh);
+    max-height: 100dvh;
     padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right))
       max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
     align-items: stretch;
