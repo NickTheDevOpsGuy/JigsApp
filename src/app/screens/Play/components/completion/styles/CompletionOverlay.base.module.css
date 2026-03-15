@@ -529,3 +529,342 @@
   font-variant-numeric: tabular-nums;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
+
+/* ---------- Phased celebration layout ---------- */
+.completePanelPhased {
+  max-width: min(520px, 96vw);
+  width: 100%;
+  min-width: 0;
+  padding: 16px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: auto;
+  position: relative;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-lg);
+  animation: completePanelEnter 0.35s var(--ease-out-smooth, ease-out) both;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completePanelPhased {
+    animation: completePanelEnterReduced 0.2s ease-out both;
+  }
+}
+
+/* Stats bar: horizontal, slides down from top in Phase 2 */
+.completeStatsBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  width: 100%;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+}
+
+.completeStatsBarVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeStatsBar {
+    transition: none;
+  }
+  .completeStatsBarVisible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.completeStatsBarItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.completeStatsBarItem svg {
+  flex-shrink: 0;
+  opacity: 0.85;
+  color: var(--color-brand-primary);
+}
+
+/* Celebration block: title + image + achievement */
+.completeCelebrationBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: center;
+}
+
+.completePhasedTitle {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 1.85rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+  animation: completeTitlePop 0.35s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completePhasedTitle {
+    animation: none;
+  }
+}
+
+/* Image: board pulse 1 → 1.02 → 1, glow ripple (no confetti) */
+.completeImageWrapPhased {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  transform: scale(1);
+  animation: completeBoardPulse 1.4s ease-in-out 0.15s 1;
+  box-shadow:
+    0 0 0 1px var(--color-border-strong),
+    0 8px 24px rgba(15, 23, 42, 0.25);
+}
+
+.completeImageWrapPhased::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand-primary) 22%, transparent) 0%,
+    transparent 55%
+  );
+  animation: completeGlowRipple 1.2s ease-out 0.2s 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeImageWrapPhased {
+    animation: none;
+  }
+  .completeImageWrapPhased::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@keyframes completeBoardPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes completeGlowRipple {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+.completeImagePhased {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(42vh, 320px);
+  object-fit: contain;
+  object-position: center;
+  vertical-align: middle;
+}
+
+.completeAchievementPhased {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: clamp(0.9rem, 2.2vw, 1rem);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: color-mix(
+    in srgb,
+    var(--color-complete-gradient-start, #22c55e) 20%,
+    var(--color-bg-card)
+  );
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--color-border);
+  animation: completeTitlePop 0.25s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeAchievementPhased {
+    animation: none;
+  }
+}
+
+/* Actions: primary button + two dropdown menus */
+.completeActionsPhased {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.completePrimaryBtn {
+  width: 100%;
+  max-width: 280px;
+  min-height: 56px;
+  padding: 14px 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-on-brand);
+  background: var(--color-brand-primary);
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition:
+    background 0.15s ease,
+    transform 0.12s ease;
+}
+
+.completePrimaryBtn:hover {
+  background: var(--color-brand-hover);
+}
+
+.completePrimaryBtn:active {
+  transform: scale(0.98);
+}
+
+.completePrimaryBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.completeMenusRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.completeMenuWrap {
+  position: relative;
+}
+
+.completeMenuTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  min-height: 44px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.completeMenuTrigger:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-strong);
+}
+
+.completeMenuTrigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.completeMenuChevronOpen {
+  transform: rotate(180deg);
+}
+
+.completeMenuDropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 6px;
+  min-width: 180px;
+  padding: 6px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  animation: completeDropdownIn 0.18s ease-out both;
+}
+
+@keyframes completeDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.completeMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease;
+}
+
+.completeMenuItem:hover {
+  background: var(--color-bg-secondary);
+}
+
+.completeMenuItem:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}

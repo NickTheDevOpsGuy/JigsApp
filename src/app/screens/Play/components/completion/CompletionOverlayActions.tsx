@@ -1,5 +1,17 @@
-import React from "react";
-import { Calendar, Film, Sparkles, Share2, Swords } from "lucide-react";
+/**
+ * Win screen actions: one primary Next Puzzle; two dropdowns (More Options, Share Results).
+ * No X close; no individual action buttons outside the menus.
+ */
+import React, { useState, useRef, useEffect } from "react";
+import {
+  ChevronDown,
+  Sparkles,
+  MoreHorizontal,
+  Share2,
+  Swords,
+  Film,
+  ImagePlus,
+} from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { CompletionOverlayShareMenu } from "@/screens/Play/components/completion/CompletionOverlayShareMenu";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
@@ -30,20 +42,11 @@ export function CompletionOverlayActions(args: {
   canReplay: boolean;
   onReplayClick?: () => void;
   onNextPuzzle?: () => void;
+  onClose: () => void;
   isDaily?: boolean;
+  focusReturnRef?: React.RefObject<HTMLButtonElement | null>;
 }) {
   const {
-    shareMenuOpen,
-    setShareMenuOpen,
-    shareRef,
-    shareTriggerRef,
-    dropdownPosition,
-    replayNextMenuOpen: _replayNextMenuOpen,
-    setReplayNextMenuOpen: _setReplayNextMenuOpen,
-    replayNextRef: _replayNextRef,
-    replayNextTriggerRef: _replayNextTriggerRef,
-    replayNextDropdownPosition: _replayNextDropdownPosition,
-    grid,
     puzzleShareUrl,
     elapsedSeconds,
     moveCount,
@@ -58,126 +61,197 @@ export function CompletionOverlayActions(args: {
     canReplay,
     onReplayClick,
     onNextPuzzle,
-    isDaily,
+    onClose,
+    grid,
   } = args;
 
-  const showShareResult = !!(onShareProgress || onCopyProgress);
-  const showDailyShare =
-    !!isDaily &&
-    !!completionData.handleCopyDailyShare &&
-    !!completionData.handleNativeDailyShare;
-  const showShare = showShareResult || !!(onShareChallenge || onCopyChallenge);
-  const showReplayNext = !!(canReplay && onReplayClick) || !!onNextPuzzle;
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+  const shareRef = useRef<HTMLDivElement>(null);
 
-  if (!showShare && !showReplayNext && !showDailyShare) return null;
+  useEffect(() => {
+    const close = (e: MouseEvent) => {
+      if (
+        moreRef.current &&
+        !moreRef.current.contains(e.target as Node) &&
+        shareRef.current &&
+        !shareRef.current.contains(e.target as Node)
+      ) {
+        setMoreOpen(false);
+        setShareOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, []);
+
+  const handleChallenge = async () => {
+    setShareOpen(false);
+    const challengeUrl =
+      puzzleShareUrl +
+      (puzzleShareUrl.includes("?") ? "&" : "?") +
+      `ct=${elapsedSeconds}&cm=${moveCount ?? 0}`;
+    await completionData.handleShareChallengeCard().catch(() => {});
+    onShareChallenge?.(challengeUrl);
+  };
+
+  const handleShareResult = () => {
+    setShareOpen(false);
+    completionData.setSharePopupOpen(true);
+  };
+
+  const hasMoreOptions = !!onNextPuzzle || (canReplay && onReplayClick);
+  const hasShareOptions = !!(
+    onShareChallenge ||
+    onCopyChallenge ||
+    onShareProgress ||
+    onCopyProgress
+  );
 
   return (
-    <section className={styles.completeShareSection} aria-label="Actions">
-      <div className={styles.completeShareDivider} aria-hidden>
-        Actions
+    <section className={styles.completeActionsPhased} aria-label="Actions">
+      {onNextPuzzle && (
+        <button
+          ref={args.focusReturnRef as React.RefObject<HTMLButtonElement>}
+          type="button"
+          className={styles.completePrimaryBtn}
+          onClick={onNextPuzzle}
+          title="Next Puzzle"
+        >
+          <Sparkles size={22} aria-hidden />
+          Next Puzzle
+        </button>
+      )}
+
+      <div className={styles.completeMenusRow}>
+        {hasMoreOptions && (
+          <div className={styles.completeMenuWrap} ref={moreRef}>
+            <button
+              type="button"
+              className={styles.completeMenuTrigger}
+              onClick={() => {
+                setMoreOpen((o) => !o);
+                setShareOpen(false);
+              }}
+              aria-expanded={moreOpen}
+              aria-haspopup="true"
+              aria-label="More options"
+            >
+              <MoreHorizontal size={18} aria-hidden />
+              More Options
+              <ChevronDown
+                size={16}
+                className={moreOpen ? styles.completeMenuChevronOpen : ""}
+                aria-hidden
+              />
+            </button>
+            {moreOpen && (
+              <div className={styles.completeMenuDropdown} role="menu">
+                {onNextPuzzle && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.completeMenuItem}
+                    onClick={() => {
+                      setMoreOpen(false);
+                      onNextPuzzle();
+                    }}
+                  >
+                    <ImagePlus size={18} aria-hidden />
+                    New Puzzle
+                  </button>
+                )}
+                {canReplay && onReplayClick && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.completeMenuItem}
+                    onClick={() => {
+                      setMoreOpen(false);
+                      onReplayClick();
+                    }}
+                  >
+                    <Film size={18} aria-hidden />
+                    Replay Solve
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {hasShareOptions && (
+          <div className={styles.completeMenuWrap} ref={shareRef}>
+            <button
+              type="button"
+              className={styles.completeMenuTrigger}
+              onClick={() => {
+                setShareOpen((o) => !o);
+                setMoreOpen(false);
+              }}
+              aria-expanded={shareOpen}
+              aria-haspopup="true"
+              aria-label="Share results"
+            >
+              <Share2 size={18} aria-hidden />
+              Share Results
+              <ChevronDown
+                size={16}
+                className={shareOpen ? styles.completeMenuChevronOpen : ""}
+                aria-hidden
+              />
+            </button>
+            {shareOpen && (
+              <div className={styles.completeMenuDropdown} role="menu">
+                {(onShareChallenge || onCopyChallenge) && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.completeMenuItem}
+                    onClick={() => void handleChallenge()}
+                  >
+                    <Swords size={18} aria-hidden />
+                    Challenge Friend
+                  </button>
+                )}
+                {(onShareProgress || onCopyProgress) && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.completeMenuItem}
+                    onClick={handleShareResult}
+                  >
+                    <Share2 size={18} aria-hidden />
+                    Share Result
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      <div className={styles.completeActionsRow}>
-        {onNextPuzzle && (
-          <button
-            type="button"
-            className={`${styles.completeActionBtn} ${styles.completeActionBtnPrimary}`}
-            onClick={onNextPuzzle}
-            title="Start the next puzzle"
-          >
-            <span className={styles.completeActionLead}>
-              <Sparkles size={18} aria-hidden="true" />
-              Next Puzzle
-            </span>
-          </button>
-        )}
-        {(onShareChallenge || onCopyChallenge) && (
-          <button
-            type="button"
-            className={styles.completeActionBtn}
-            onClick={async () => {
-              const challengeUrl =
-                puzzleShareUrl +
-                (puzzleShareUrl.includes("?") ? "&" : "?") +
-                `ct=${elapsedSeconds}&cm=${moveCount ?? 0}`;
-              await completionData.handleShareChallengeCard().catch(() => {});
-              onShareChallenge?.(challengeUrl);
-            }}
-            title="Send challenge: same puzzle, your stats to beat"
-          >
-            <span className={styles.completeActionLead}>
-              <Swords size={18} aria-hidden="true" />
-              Send Challenge
-            </span>
-          </button>
-        )}
-        {showShareResult && (
-          <button
-            type="button"
-            className={styles.completeActionBtn}
-            onClick={() => completionData.setSharePopupOpen(true)}
-            title="Share your result (link and stats)"
-          >
-            <span className={styles.completeActionLead}>
-              <Share2 size={18} aria-hidden="true" />
-              Share Result
-            </span>
-          </button>
-        )}
-        {showDailyShare && (
-          <button
-            type="button"
-            className={styles.completeActionBtn}
-            onClick={() => {
-              if (canNativeShare) {
-                void completionData.handleNativeDailyShare();
-              } else {
-                void completionData.handleCopyDailyShare();
-              }
-            }}
-            title="Share daily result (Wordle-style)"
-          >
-            <span className={styles.completeActionLead}>
-              <Calendar size={18} aria-hidden="true" />
-              {completionData.dailyCopied ? "Copied!" : "Daily Share"}
-            </span>
-          </button>
-        )}
-        {canReplay && onReplayClick && (
-          <button
-            type="button"
-            className={styles.completeActionBtn}
-            onClick={onReplayClick}
-            title="Replay your solve"
-          >
-            <span className={styles.completeActionLead}>
-              <Film size={18} aria-hidden="true" />
-              Replay Solve
-            </span>
-          </button>
-        )}
-        {showShare && (
-          <CompletionOverlayShareMenu
-            shareMenuOpen={shareMenuOpen}
-            setShareMenuOpen={setShareMenuOpen}
-            shareRef={shareRef}
-            shareTriggerRef={shareTriggerRef}
-            dropdownPosition={dropdownPosition}
-            grid={grid}
-            puzzleShareUrl={puzzleShareUrl}
-            elapsedSeconds={elapsedSeconds}
-            moveCount={moveCount}
-            accuracyPercent={accuracyPercent}
-            copied={copied}
-            canNativeShare={canNativeShare}
-            onShareProgress={onShareProgress}
-            onCopyProgress={onCopyProgress}
-            onShareChallenge={onShareChallenge}
-            onCopyChallenge={onCopyChallenge}
-            completionData={completionData}
-            hideTrigger
-          />
-        )}
-      </div>
+
+      <CompletionOverlayShareMenu
+        shareMenuOpen={args.shareMenuOpen}
+        setShareMenuOpen={args.setShareMenuOpen}
+        shareRef={args.shareRef}
+        shareTriggerRef={args.shareTriggerRef}
+        dropdownPosition={args.dropdownPosition}
+        grid={grid}
+        puzzleShareUrl={puzzleShareUrl}
+        elapsedSeconds={elapsedSeconds}
+        moveCount={moveCount}
+        accuracyPercent={accuracyPercent}
+        copied={copied}
+        canNativeShare={canNativeShare}
+        onShareProgress={onShareProgress}
+        onCopyProgress={onCopyProgress}
+        onShareChallenge={onShareChallenge}
+        onCopyChallenge={onCopyChallenge}
+        completionData={completionData}
+        hideTrigger
+      />
     </section>
   );
 }

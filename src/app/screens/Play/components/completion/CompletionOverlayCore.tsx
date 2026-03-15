@@ -1,23 +1,19 @@
 /**
- * CompletionOverlay – success screen with direct share actions.
+ * CompletionOverlay – phased celebration win screen: Phase 1 image + pulse/ripple,
+ * Phase 2 stats bar slide down, Phase 3 achievement text. One primary Next Puzzle;
+ * secondary actions in More Options and Share Results dropdowns. No confetti, no X close.
  */
-import React, { useEffect, useCallback, useState } from "react";
-import { X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { AppModal } from "@/components/AppModal";
 import { useCompletionOverlayData } from "@/screens/Play/components/completion/useCompletionOverlayData";
-import { useCompletionConfetti } from "@/screens/Play/components/completion/useCompletionConfetti";
-import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
-import { ACHIEVEMENT_DEFS } from "@/data/content/achievements";
 import { CompletionOverlayActions } from "@/screens/Play/components/completion/CompletionOverlayActions";
 import { CompletionOverlayStats } from "@/screens/Play/components/completion/CompletionOverlayStats";
 import { useCompletionOverlayMenus } from "@/screens/Play/components/completion/useCompletionOverlayMenus";
 import type { CompletionOverlayProps } from "@/screens/Play/components/completion/completionOverlayTypes";
 
-const _ANIM_PHASE_TITLE_MS = 0;
-const ANIM_PHASE_SCALE_MS = 400;
-const ANIM_PHASE_GLOW_MS = 700;
-const ANIM_PHASE_TIME_MS = 1000;
+const PHASE2_MS = 600;
+const PHASE3_MS = 1200;
 
 export function CompletionOverlay({
   elapsedSeconds,
@@ -56,18 +52,12 @@ export function CompletionOverlay({
   onCompletionRecorded,
   onNewBest,
 }: CompletionOverlayProps) {
-  const [animPhase, setAnimPhase] = useState<"title" | "scale" | "glow" | "time">(
-    "title",
-  );
+  const [phase, setPhase] = useState<1 | 2 | 3>(1);
   const [imageError, setImageError] = useState(false);
-
-  useCompletionConfetti();
 
   useEffect(() => {
     if (isNewBest && onNewBest) onNewBest();
   }, [isNewBest, onNewBest]);
-
-  const handleClose = useCallback(() => onClose(), [onClose]);
 
   const completionData = useCompletionOverlayData({
     elapsedSeconds,
@@ -107,11 +97,9 @@ export function CompletionOverlay({
   }, [imageUrl]);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setAnimPhase("scale"), ANIM_PHASE_SCALE_MS);
-    const t2 = setTimeout(() => setAnimPhase("glow"), ANIM_PHASE_GLOW_MS);
-    const t3 = setTimeout(() => setAnimPhase("time"), ANIM_PHASE_TIME_MS);
+    const t2 = setTimeout(() => setPhase(2), PHASE2_MS);
+    const t3 = setTimeout(() => setPhase(3), PHASE3_MS);
     return () => {
-      clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
     };
@@ -121,97 +109,63 @@ export function CompletionOverlay({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        handleClose();
+        onNextPuzzle?.() ?? onClose();
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [handleClose]);
+  }, [onClose, onNextPuzzle]);
+
+  const pieceCount = grid ? grid.rows * grid.cols : 0;
+  const cleanSolve = undoCount === 0 && !usedHint;
+  const achievements: string[] = [];
+  if (cleanSolve) achievements.push("⭐ Clean Solve");
+  if (isNewBest) achievements.push("🏆 New Personal Best");
+  if (isDaily && completionData.newlyUnlocked?.length === 0 && !isNewBest)
+    achievements.push("🔥 Streak Progress");
 
   return (
     <AppModal
       isOpen
-      onClose={handleClose}
+      onClose={onNextPuzzle ?? onClose}
       surface="bare"
       size="xl"
       tone="celebration"
       showCloseButton={false}
     >
       <div
-        className={`${styles.completePanel} ${styles.completePanelNew}`}
-        data-anim-phase={animPhase}
+        className={styles.completePanelPhased}
+        data-phase={phase}
+        data-phase1={phase >= 1 ? "true" : undefined}
+        data-phase2={phase >= 2 ? "true" : undefined}
+        data-phase3={phase >= 3 ? "true" : undefined}
       >
-        <button
-          ref={focusReturnRef}
-          type="button"
-          className={styles.completeCloseBtn}
-          onClick={handleClose}
-          aria-label="Close"
-          title="Close"
-        >
-          <X size={24} />
-        </button>
-
-        <div className={styles.completeTitleBlock} role="banner">
-          <h2 className={styles.completeTitleText}>🧩 Puzzle complete!</h2>
-          <p className={styles.completeTitlePhraseSub}>
-            You did it. That puzzle is solved.
-          </p>
-          {isNewBest && (
-            <p className={styles.completeTitlePhraseHighlight}>New personal best! 🏆</p>
-          )}
-          {isDaily && completionData.newlyUnlocked?.length === 0 && !isNewBest && (
-            <p className={styles.completeTitlePhraseSub}>Daily streak +1 🔥</p>
-          )}
-          <p className={styles.completeTitlePhrase}>
-            {pickCompletionPhrase(elapsedSeconds, moveCount, undoCount)}
-          </p>
-        </div>
-
-        {imageUrl && !imageError && (
-          <div
-            className={`${styles.completeImageWrapNew} ${animPhase !== "title" ? styles.completeImageScaled : ""} ${animPhase === "glow" || animPhase === "time" ? styles.completeImageGlow : ""}`}
-          >
-            <img
-              src={imageUrl}
-              alt="Completed puzzle"
-              className={styles.completeImageNew}
-              onError={() => setImageError(true)}
-            />
-            <button
-              type="button"
-              className={styles.completeCardShareBtn}
-              onClick={() => completionData.setSharePopupOpen(true)}
-              title="Share result"
-              aria-label="Share result"
-            >
-              Share
-            </button>
-          </div>
-        )}
-
-        {completionData.newlyUnlocked?.length > 0 &&
-          (() => {
-            const firstId = completionData.newlyUnlocked[0];
-            const achievement = ACHIEVEMENT_DEFS.find((a) => a.id === firstId);
-            const text = achievement
-              ? `${achievement.icon} Achievement unlocked: ${achievement.name}`
-              : "Achievement unlocked! 🏆";
-            return (
-              <p className={styles.completeAchievementUnlock} role="status">
-                {text}
-              </p>
-            );
-          })()}
-
         <CompletionOverlayStats
           elapsedSeconds={elapsedSeconds}
           moveCount={moveCount}
-          pieceCount={grid ? grid.rows * grid.cols : 0}
+          pieceCount={pieceCount}
           piecesPerMin={piecesPerMin}
           rotationCount={rotationCount}
           maxGroupSize={maxGroupSize}
+          phase={phase}
         />
+
+        <div className={styles.completeCelebrationBlock}>
+          <h2 className={styles.completePhasedTitle}>Puzzle Complete</h2>
+          {imageUrl && !imageError && (
+            <div className={styles.completeImageWrapPhased}>
+              <img
+                src={imageUrl}
+                alt="Completed puzzle"
+                className={styles.completeImagePhased}
+                onError={() => setImageError(true)}
+              />
+            </div>
+          )}
+          {phase >= 3 && achievements.length > 0 && (
+            <AchievementCycler achievements={achievements} />
+          )}
+        </div>
 
         <CompletionOverlayActions
           shareMenuOpen={shareMenuOpen}
@@ -239,9 +193,28 @@ export function CompletionOverlay({
           canReplay={canReplay}
           onReplayClick={onReplayClick}
           onNextPuzzle={onNextPuzzle}
+          onClose={onClose}
           isDaily={isDaily}
+          focusReturnRef={focusReturnRef}
         />
       </div>
     </AppModal>
+  );
+}
+
+function AchievementCycler({ achievements }: { achievements: string[] }) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (achievements.length <= 1) return;
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % achievements.length);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [achievements.length]);
+  const text = achievements[index] ?? achievements[0];
+  return (
+    <p className={styles.completeAchievementPhased} role="status" aria-live="polite">
+      {text}
+    </p>
   );
 }

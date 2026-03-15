@@ -167,6 +167,37 @@
     overflow: hidden;
   }
 
+  .completePanelPhased {
+    padding: 12px 16px 20px;
+    gap: 12px;
+    max-height: calc(
+      100dvh - max(16px, env(safe-area-inset-top, 0)) -
+        max(20px, env(safe-area-inset-bottom, 0) + 16px)
+    );
+    overflow-y: auto;
+  }
+
+  .completeStatsBar {
+    padding: 8px 12px;
+    gap: 12px 18px;
+    font-size: 0.85rem;
+  }
+
+  .completeImagePhased {
+    max-height: min(36vh, 260px);
+  }
+
+  .completePrimaryBtn {
+    min-height: 52px;
+    max-width: 100%;
+  }
+
+  .completeMenuTrigger {
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
   /* Keep completion panel fully visible on mobile with no vertical scrolling. */
   .completeOverlay .completePanelNew {
     margin: 0;
