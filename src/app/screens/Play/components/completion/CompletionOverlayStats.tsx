@@ -16,7 +16,7 @@ export function CompletionOverlayStats(props: {
     elapsedSeconds,
     moveCount,
     pieceCount,
-    piecesPerMin,
+    piecesPerMin: _piecesPerMin,
     rotationCount: _rotationCount,
     maxGroupSize: _maxGroupSize,
   } = props;

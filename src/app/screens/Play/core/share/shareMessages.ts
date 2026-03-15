@@ -11,7 +11,7 @@ export type ShareMessageArgs = {
   puzzleName?: string;
 };
 
-function clampPercent(value: number): number {
+function _clampPercent(value: number): number {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
