@@ -1,7 +1,10 @@
 /**
- * ChoosePuzzleModal – Flow: Image → Difficulty → Start.
- * State machine: Choose Image (State 1) → Choose Difficulty (State 2) → Start Puzzle (State 3).
- * Puzzle rail: horizontal left-to-right scroll with arrows, snap, and blue progress bar.
+ * ChoosePuzzleModal – Strict 4-step flow (same model as Puzzle Packs).
+ * Step 1: Choose Source Category (categories only; no preview, no difficulty).
+ * Step 2: Choose Puzzle (puzzle rail only; thumbnail + title; no large preview).
+ * Step 3: Puzzle Setup (ONLY place with large preview + difficulty + Start).
+ * Step 4: Start (action: Start Puzzle button on Setup step).
+ * Breadcrumb: Category → Puzzle → Setup → Start.
  */
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +21,8 @@ import styles from "./ChoosePuzzleModal.module.css";
 const PRIMARY_DIFFICULTIES = GRID_OPTIONS.slice(0, 4);
 const DIFFICULTY_NAMES = ["Easy", "Medium", "Hard", "Expert"] as const;
 
+type Step = "category" | "puzzle" | "setup";
+
 type Props = {
   isOpen: boolean;
   onClose: () => void;
@@ -31,6 +36,7 @@ function filterPuzzles(puzzles: SamplePuzzle[], categoryId: string): SamplePuzzl
 
 export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
+  const [step, setStep] = useState<Step>("category");
   const [selectedPuzzle, setSelectedPuzzle] = useState<SamplePuzzle | null>(null);
   const [difficultyIndex, setDifficultyIndex] = useState(1);
   const [filterCategory, setFilterCategory] = useState("all");
@@ -42,7 +48,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   );
 
   const gridScrollRef = useRef<HTMLDivElement>(null);
-  const difficultySectionRef = useRef<HTMLDivElement>(null);
   const startButtonRef = useRef<HTMLButtonElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -61,15 +66,20 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
 
   useEffect(() => {
     if (!isOpen) return;
+    setStep("category");
+    setSelectedPuzzle(null);
+    setDifficultyIndex(1);
+    setFilterCategory("all");
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || step !== "puzzle") return;
     const el = gridScrollRef.current;
-    const runUpdate = () => {
-      requestAnimationFrame(() => updateScrollState());
-    };
+    const runUpdate = () => requestAnimationFrame(updateScrollState);
     runUpdate();
     const t0 = setTimeout(updateScrollState, 0);
     const t1 = setTimeout(updateScrollState, 80);
     const t2 = setTimeout(updateScrollState, 250);
-    const t3 = setTimeout(updateScrollState, 500);
     if (el) {
       el.addEventListener("scroll", updateScrollState);
       const ro = new ResizeObserver(updateScrollState);
@@ -80,16 +90,14 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         clearTimeout(t0);
         clearTimeout(t1);
         clearTimeout(t2);
-        clearTimeout(t3);
       };
     }
     return () => {
       clearTimeout(t0);
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
     };
-  }, [isOpen, updateScrollState, filteredPuzzles.length]);
+  }, [isOpen, step, updateScrollState, filteredPuzzles.length]);
 
   const scrollGridBy = useCallback((direction: 1 | -1) => {
     const el = gridScrollRef.current;
@@ -99,24 +107,12 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     const cardWidth = firstTile?.offsetWidth ?? 100;
     const gap = 8;
     const stepPx = Math.max(100, cardWidth + gap);
-    const step = stepPx * direction;
-    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + step));
+    const target = Math.max(
+      0,
+      Math.min(el.scrollWidth - el.clientWidth, el.scrollLeft + stepPx * direction),
+    );
     el.scrollTo({ left: target, behavior: "smooth" });
   }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      setSelectedPuzzle(null);
-      setDifficultyIndex(1);
-      setFilterCategory("all");
-    }
-  }, [isOpen]);
-
-  const onSelectImage = (puzzle: SamplePuzzle) => {
-    setSelectedPuzzle(puzzle);
-    setDifficultyIndex(1);
-  };
 
   const handleStart = () => {
     if (!selectedPuzzle) return;
@@ -131,213 +127,247 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
 
   const canStart = selectedPuzzle != null;
 
+  const goToStep = (target: Step) => {
+    setStep(target);
+    if (target === "category") {
+      setFilterCategory("all");
+      setSelectedPuzzle(null);
+    } else if (target === "puzzle") {
+      setSelectedPuzzle(null);
+    }
+  };
+
   if (!isOpen) return null;
+
+  const modalTitle =
+    step === "category"
+      ? "Choose Category"
+      : step === "puzzle"
+        ? "Choose Puzzle"
+        : "Puzzle Setup";
 
   return (
     <Modal
       isOpen
       onClose={onClose}
-      title="Choose Puzzle"
+      title={modalTitle}
       showCloseButton
       variant="choosePuzzle"
     >
-      {/* StepIndicator: Image → Difficulty → Start (clickable: focus/scroll to section) */}
-      <div
+      {/* Breadcrumb: Category → Puzzle → Setup → Start */}
+      <nav
         className={styles.stepIndicator}
         role="navigation"
-        aria-label="Steps: Image, Difficulty, Start"
+        aria-label="Steps: Category, Puzzle, Setup, Start"
       >
         <button
           type="button"
-          className={`${styles.stepLink} ${styles.stepCurrent}`}
-          onClick={() =>
-            gridScrollRef.current?.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-            })
-          }
-          title="Puzzle image selection"
-          aria-label="Image selection"
+          className={`${styles.stepLink} ${step === "category" ? styles.stepCurrent : ""}`}
+          onClick={() => goToStep("category")}
+          title="Category selection"
+          aria-current={step === "category" ? "step" : undefined}
         >
-          Image
+          Category
         </button>
         <span className={styles.stepSep} aria-hidden>
           →
         </span>
         <button
           type="button"
-          className={`${styles.stepLink} ${selectedPuzzle ? styles.stepCurrent : ""}`}
-          onClick={() =>
-            difficultySectionRef.current?.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-            })
-          }
-          title="Difficulty selection"
-          aria-label="Difficulty selection"
+          className={`${styles.stepLink} ${step === "puzzle" ? styles.stepCurrent : ""}`}
+          onClick={() => step !== "category" && goToStep("puzzle")}
+          disabled={step === "category"}
+          title="Puzzle selection"
+          aria-current={step === "puzzle" ? "step" : undefined}
         >
-          Difficulty
+          Puzzle
         </button>
         <span className={styles.stepSep} aria-hidden>
           →
         </span>
         <button
           type="button"
-          className={`${styles.stepLink} ${canStart ? styles.stepCurrent : ""}`}
-          onClick={() => startButtonRef.current?.focus()}
-          title={canStart ? "Start puzzle" : "Jump to Start"}
-          aria-label="Start puzzle"
+          className={`${styles.stepLink} ${step === "setup" ? styles.stepCurrent : ""}`}
+          onClick={() => step === "setup" && selectedPuzzle && undefined}
+          disabled={step !== "setup" || !selectedPuzzle}
+          title="Setup"
+          aria-current={step === "setup" ? "step" : undefined}
+        >
+          Setup
+        </button>
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
+        <button
+          type="button"
+          className={`${styles.stepLink} ${step === "setup" && canStart ? styles.stepCurrent : ""}`}
+          onClick={() => canStart && startButtonRef.current?.focus()}
+          disabled={!canStart}
+          title={canStart ? "Start puzzle" : "Select a puzzle and difficulty first"}
+          aria-label="Start"
         >
           Start
         </button>
-      </div>
+      </nav>
 
-      {/* FilterBar: FilterChips */}
-      <div className={styles.filterBar} role="group" aria-label="Filter by category">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.id}
-            type="button"
-            className={`${styles.filterChip} ${filterCategory === cat.id ? styles.filterChipActive : ""}`}
-            onClick={() => setFilterCategory(cat.id)}
-            aria-pressed={filterCategory === cat.id}
-            aria-label={`Filter: ${cat.name}`}
-            title={`Filter by ${cat.name}`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Puzzle rail: horizontal left→right scroll */}
-      <p className={styles.railLabel}>Choose a puzzle</p>
-      <div className={styles.gridScrollWrap}>
-        <button
-          type="button"
-          className={styles.gridScrollBtn}
-          onClick={() => scrollGridBy(-1)}
-          disabled={!canScrollLeft}
-          aria-label="Scroll left"
-          title="Scroll left"
-        >
-          <ChevronLeft size={22} aria-hidden />
-        </button>
-        <div
-          ref={gridScrollRef}
-          className={styles.puzzleGridScroller}
-          role="listbox"
-          aria-label="Choose a puzzle image"
-        >
-          <div className={styles.puzzleGrid}>
-            {filteredPuzzles.map((puzzle) => (
-              <PuzzleTile
-                key={puzzle.id}
-                puzzle={puzzle}
-                selected={selectedPuzzle?.id === puzzle.id}
-                imgError={imgError[puzzle.id]}
-                onSelect={() => onSelectImage(puzzle)}
-                onImgError={() => setImgError((prev) => ({ ...prev, [puzzle.id]: true }))}
-              />
+      {/* Step 1: Category only — no puzzle list, no preview, no difficulty */}
+      {step === "category" && (
+        <>
+          <p className={styles.railLabel}>Choose a category</p>
+          <div className={styles.filterBar} role="group" aria-label="Filter by category">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`${styles.filterChip} ${filterCategory === cat.id ? styles.filterChipActive : ""}`}
+                onClick={() => {
+                  setFilterCategory(cat.id);
+                  setStep("puzzle");
+                }}
+                aria-pressed={filterCategory === cat.id}
+                aria-label={`Category: ${cat.name}`}
+                title={`${cat.name} – choose a puzzle in this category`}
+              >
+                {cat.label}
+              </button>
             ))}
           </div>
-        </div>
-        <button
-          type="button"
-          className={styles.gridScrollBtn}
-          onClick={() => scrollGridBy(1)}
-          disabled={!canScrollRight}
-          aria-label="Scroll right"
-          title="Scroll right"
-        >
-          <ChevronRight size={22} aria-hidden />
-        </button>
-      </div>
-      {/* Blue bar: scroll position indicator underneath */}
-      <div
-        className={styles.gridScrollBar}
-        role="progressbar"
-        aria-valuenow={Math.round(scrollProgress * 100)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Scroll position"
-      >
-        <div
-          className={styles.gridScrollBarFill}
-          style={{ width: `${scrollProgress * 100}%` }}
-        />
-      </div>
-
-      {/* SelectedPreview + PreviewImage */}
-      {selectedPuzzle && (
-        <div className={styles.selectedPreview}>
-          <img src={selectedPuzzle.fullImage} alt="" className={styles.previewImage} />
-        </div>
+        </>
       )}
 
-      {/* DifficultySelector: DifficultyButtons[] – enabled only when image selected */}
-      <div
-        ref={difficultySectionRef}
-        className={styles.difficultySelector}
-        role="group"
-        aria-label="Choose difficulty"
-        aria-disabled={!selectedPuzzle}
-      >
-        {PRIMARY_DIFFICULTIES.map((opt, i) => {
-          const name = DIFFICULTY_NAMES[i] ?? opt.label.split(" ")[0];
-          const pieces = opt.rows * opt.cols;
-          const active = difficultyIndex === i;
-          return (
+      {/* Step 2: Puzzle rail only — thumbnail + title; NO large preview, NO difficulty */}
+      {step === "puzzle" && (
+        <>
+          <p className={styles.railLabel}>Choose a puzzle</p>
+          <div className={styles.gridScrollWrap}>
             <button
-              key={`${opt.rows}x${opt.cols}`}
               type="button"
-              className={`${styles.difficultyBtn} ${active ? styles.difficultyBtnActive : ""}`}
-              onClick={() => setDifficultyIndex(i)}
-              disabled={!selectedPuzzle}
-              aria-pressed={active}
-              aria-label={`${name}, ${pieces} pieces`}
-              title={`Select ${name}: ${pieces} pieces`}
+              className={styles.gridScrollBtn}
+              onClick={() => scrollGridBy(-1)}
+              disabled={!canScrollLeft}
+              aria-label="Scroll left"
+              title="Scroll left"
             >
-              <Puzzle size={16} aria-hidden />
-              <span>
-                {name} – {pieces} pieces
-              </span>
-              {active && (
-                <Check size={16} className={styles.difficultyCheck} aria-hidden />
-              )}
+              <ChevronLeft size={22} aria-hidden />
             </button>
-          );
-        })}
-      </div>
+            <div
+              ref={gridScrollRef}
+              className={styles.puzzleGridScroller}
+              role="listbox"
+              aria-label="Choose a puzzle"
+            >
+              <div className={styles.puzzleGrid}>
+                {filteredPuzzles.map((puzzle) => (
+                  <PuzzleTile
+                    key={puzzle.id}
+                    puzzle={puzzle}
+                    selected={selectedPuzzle?.id === puzzle.id}
+                    imgError={imgError[puzzle.id]}
+                    onSelect={() => {
+                      setSelectedPuzzle(puzzle);
+                      setDifficultyIndex(1);
+                      setStep("setup");
+                    }}
+                    onImgError={() => setImgError((prev) => ({ ...prev, [puzzle.id]: true }))}
+                  />
+                ))}
+              </div>
+            </div>
+            <button
+              type="button"
+              className={styles.gridScrollBtn}
+              onClick={() => scrollGridBy(1)}
+              disabled={!canScrollRight}
+              aria-label="Scroll right"
+              title="Scroll right"
+            >
+              <ChevronRight size={22} aria-hidden />
+            </button>
+          </div>
+          <div
+            className={styles.gridScrollBar}
+            role="progressbar"
+            aria-valuenow={Math.round(scrollProgress * 100)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Scroll position"
+          >
+            <div
+              className={styles.gridScrollBarFill}
+              style={{ width: `${scrollProgress * 100}%` }}
+            />
+          </div>
+        </>
+      )}
 
-      {/* StartPuzzleButton */}
-      <button
-        ref={startButtonRef}
-        type="button"
-        className={styles.startPuzzleButton}
-        onClick={handleStart}
-        disabled={!canStart}
-        title="Start puzzle with selected image and difficulty"
-        aria-label="Start puzzle"
-      >
-        Start Puzzle
-      </button>
+      {/* Step 3: Setup — ONLY place with large preview + difficulty + Start */}
+      {step === "setup" && selectedPuzzle && (
+        <>
+          <h2 className={styles.setupPuzzleName}>{selectedPuzzle.name}</h2>
+          <div className={styles.selectedPreview}>
+            <img src={selectedPuzzle.fullImage} alt="" className={styles.previewImage} />
+          </div>
+          <div
+            className={styles.difficultySelector}
+            role="group"
+            aria-label="Choose difficulty"
+          >
+            {PRIMARY_DIFFICULTIES.map((opt, i) => {
+              const name = DIFFICULTY_NAMES[i] ?? opt.label.split(" ")[0];
+              const pieces = opt.rows * opt.cols;
+              const active = difficultyIndex === i;
+              return (
+                <button
+                  key={`${opt.rows}x${opt.cols}`}
+                  type="button"
+                  className={`${styles.difficultyBtn} ${active ? styles.difficultyBtnActive : ""}`}
+                  onClick={() => setDifficultyIndex(i)}
+                  aria-pressed={active}
+                  aria-label={`${name}, ${pieces} pieces`}
+                  title={`Select ${name}: ${pieces} pieces`}
+                >
+                  <Puzzle size={16} aria-hidden />
+                  <span>
+                    {name} – {pieces} pieces
+                  </span>
+                  {active && (
+                    <Check size={16} className={styles.difficultyCheck} aria-hidden />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            ref={startButtonRef}
+            type="button"
+            className={styles.startPuzzleButton}
+            onClick={handleStart}
+            disabled={!canStart}
+            title="Start puzzle with selected image and difficulty"
+            aria-label="Start puzzle"
+          >
+            Start Puzzle
+          </button>
+        </>
+      )}
 
-      {/* UploadLink */}
-      <p className={styles.uploadLinkWrap}>
-        Or{" "}
-        <button
-          type="button"
-          className={styles.uploadLink}
-          onClick={() => {
-            onClose();
-            navigate("/new");
-          }}
-          title="Open custom image upload"
-          aria-label="Upload your own image"
-        >
-          upload your own image
-        </button>
-      </p>
+      {(step === "category" || step === "puzzle") && (
+        <p className={styles.uploadLinkWrap}>
+          Or{" "}
+          <button
+            type="button"
+            className={styles.uploadLink}
+            onClick={() => {
+              onClose();
+              navigate("/new");
+            }}
+            title="Open custom image upload"
+            aria-label="Upload your own image"
+          >
+            upload your own image
+          </button>
+        </p>
+      )}
     </Modal>
   );
 }

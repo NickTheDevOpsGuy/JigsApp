@@ -67,6 +67,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
 
   const packScrollRef = useRef<HTMLDivElement>(null);
   const puzzleScrollRef = useRef<HTMLDivElement>(null);
+  const startButtonRef = useRef<HTMLButtonElement>(null);
   const [packScrollProgress, setPackScrollProgress] = useState(0);
   const [canScrollPackLeft, setCanScrollPackLeft] = useState(false);
   const [canScrollPackRight, setCanScrollPackRight] = useState(false);
@@ -239,47 +240,59 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       showCloseButton
       variant="choosePuzzle"
     >
-      {/* Breadcrumbs: Phuzzle Packs → Pack Name → Puzzle Name */}
+      {/* Breadcrumb: Pack → Puzzle → Setup → Start (same model as Choose-a-picture) */}
       <nav
         className={localStyles.breadcrumb}
         role="navigation"
-        aria-label="Pack and puzzle selection steps"
+        aria-label="Steps: Pack, Puzzle, Setup, Start"
       >
         <button
           type="button"
-          className={styles.stepLink}
+          className={`${styles.stepLink} ${step === "pack" ? styles.stepCurrent : ""}`}
           onClick={() => goToStep("pack")}
-          title="Back to pack selection"
-          aria-label="Phuzzle Packs"
+          title="Pack selection"
+          aria-current={step === "pack" ? "step" : undefined}
         >
-          Phuzzle Packs
+          Pack
         </button>
-        {selectedPack && (
-          <>
-            <span className={styles.stepSep} aria-hidden>
-              →
-            </span>
-            <button
-              type="button"
-              className={styles.stepLink}
-              onClick={() => goToStep("puzzle")}
-              title={`Back to puzzles in ${selectedPack.name}`}
-              aria-label={selectedPack.name}
-            >
-              {selectedPack.name}
-            </button>
-          </>
-        )}
-        {selectedPuzzle && (
-          <>
-            <span className={styles.stepSep} aria-hidden>
-              →
-            </span>
-            <span className={localStyles.breadcrumbCurrent} aria-current="location">
-              {selectedPuzzle.name}
-            </span>
-          </>
-        )}
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
+        <button
+          type="button"
+          className={`${styles.stepLink} ${step === "puzzle" ? styles.stepCurrent : ""}`}
+          onClick={() => step !== "pack" && goToStep("puzzle")}
+          disabled={step === "pack"}
+          title="Puzzle selection"
+          aria-current={step === "puzzle" ? "step" : undefined}
+        >
+          Puzzle
+        </button>
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
+        <button
+          type="button"
+          className={`${styles.stepLink} ${step === "setup" ? styles.stepCurrent : ""}`}
+          disabled={step !== "setup" || !selectedPuzzle}
+          title="Setup"
+          aria-current={step === "setup" ? "step" : undefined}
+        >
+          Setup
+        </button>
+        <span className={styles.stepSep} aria-hidden>
+          →
+        </span>
+        <button
+          type="button"
+          className={`${styles.stepLink} ${step === "setup" && selectedPuzzle ? styles.stepCurrent : ""}`}
+          onClick={() => selectedPuzzle && startButtonRef.current?.focus()}
+          disabled={!selectedPuzzle}
+          title={selectedPuzzle ? "Start puzzle" : "Select a puzzle first"}
+          aria-label="Start"
+        >
+          Start
+        </button>
       </nav>
 
       {/* Step 1: Pack selection only */}
@@ -544,6 +557,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             })}
           </div>
           <button
+            ref={startButtonRef}
             type="button"
             className={styles.startPuzzleButton}
             onClick={handleStart}

@@ -272,8 +272,8 @@ export function PlayScreenLayout({
         {replayPortalProps &&
           createPortal(<ReplaySolveModal {...replayPortalProps} />, document.body)}
 
-        {/* Mandatory structure: BoardLayoutShell > TopBar, BoardContainer, TrayDock. Board is the only layout anchor. */}
-        <div className={styles.boardLayoutShell} data-layout="board-layout-shell">
+        {/* Mandatory structure: BoardShell > TopHUD, PuzzleBoard, TrayHandle, PieceTray. Board is the only layout anchor. */}
+        <div className={styles.boardLayoutShell} data-layout="board-shell">
           <PlayScreenTopBar {...topBarProps} hideMenuAndButtons={hideTopBarControls} />
 
           <div className={styles.playBody} data-layout="play-body">

@@ -94,6 +94,14 @@
   );
 }
 
+.setupPuzzleName {
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
 .railLabel {
   margin: 0 0 8px;
   font-size: 14px;
