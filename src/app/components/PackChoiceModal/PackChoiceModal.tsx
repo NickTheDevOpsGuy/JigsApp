@@ -109,10 +109,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     const gap = 8;
     const stepPx = Math.max(100, cardWidth + gap);
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-    const target = Math.max(
-      0,
-      Math.min(maxScroll, el.scrollLeft + stepPx * direction),
-    );
+    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + stepPx * direction));
     el.scrollTo({ left: target, behavior: "smooth" });
   }, []);
 
@@ -125,10 +122,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     const gap = 8;
     const stepPx = Math.max(100, cardWidth + gap);
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-    const target = Math.max(
-      0,
-      Math.min(maxScroll, el.scrollLeft + stepPx * direction),
-    );
+    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + stepPx * direction));
     el.scrollTo({ left: target, behavior: "smooth" });
   }, []);
 
@@ -208,8 +202,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
   const handleStart = () => {
     if (!selectedPuzzle || !packsData) return;
     const grid =
-      PRIMARY_DIFFICULTIES[difficultyIndex] ??
-      PRIMARY_DIFFICULTIES[RECOMMENDED_INDEX];
+      PRIMARY_DIFFICULTIES[difficultyIndex] ?? PRIMARY_DIFFICULTIES[RECOMMENDED_INDEX];
     clearPuzzleState();
     safeLocalStorage.setItem(STORAGE_KEY, selectedPuzzle.fullImage);
     safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
@@ -235,7 +228,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     step === "pack"
       ? "Choose Pack"
       : step === "puzzle"
-        ? selectedPack?.name ?? "Choose Puzzle"
+        ? (selectedPack?.name ?? "Choose Puzzle")
         : "Puzzle Setup";
 
   return (
@@ -327,10 +320,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             >
               <div className={styles.puzzleGrid}>
                 {!packsData ? (
-                  <div
-                    className={styles.puzzleTile}
-                    style={{ pointerEvents: "none" }}
-                  >
+                  <div className={styles.puzzleTile} style={{ pointerEvents: "none" }}>
                     <div className={styles.tileImageWrap}>
                       <span className={styles.tilePlaceholder}>…</span>
                     </div>
@@ -521,11 +511,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         <>
           <h2 className={localStyles.setupPuzzleName}>{selectedPuzzle.name}</h2>
           <div className={styles.selectedPreview}>
-            <img
-              src={selectedPuzzle.fullImage}
-              alt=""
-              className={styles.previewImage}
-            />
+            <img src={selectedPuzzle.fullImage} alt="" className={styles.previewImage} />
           </div>
           <div
             className={styles.difficultySelector}

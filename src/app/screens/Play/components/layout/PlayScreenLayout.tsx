@@ -283,17 +283,17 @@ export function PlayScreenLayout({
               <div className={styles.boardWrapper}>
                 <div
                   className={styles.boardProgressFrame}
-                data-complete={board.isComplete ? "true" : undefined}
-                style={
-                  board.state?.totalCount && !board.isComplete
-                    ? {
-                        ["--progress" as string]:
-                          board.state.placedCount / board.state.totalCount,
-                        ["--progress-color" as string]:
-                          "var(--color-progress-75, #22c55e)",
-                      }
-                    : undefined
-                }
+                  data-complete={board.isComplete ? "true" : undefined}
+                  style={
+                    board.state?.totalCount && !board.isComplete
+                      ? {
+                          ["--progress" as string]:
+                            board.state.placedCount / board.state.totalCount,
+                          ["--progress-color" as string]:
+                            "var(--color-progress-75, #22c55e)",
+                        }
+                      : undefined
+                  }
                 >
                   <div
                     className={styles.board}
@@ -333,7 +333,9 @@ export function PlayScreenLayout({
                         <span>Loading puzzle…</span>
                       </div>
                     )}
-                    {!board.state?.isComplete && <SnapComboMeter combo={board.snapCombo} />}
+                    {!board.state?.isComplete && (
+                      <SnapComboMeter combo={board.snapCombo} />
+                    )}
                     <canvas
                       key={board.puzzleKey ?? undefined}
                       className={styles.canvas}
@@ -345,7 +347,9 @@ export function PlayScreenLayout({
                       onPointerCancel={board.handlers.onPointerCancel}
                       onLostPointerCapture={board.handlers.onLostPointerCapture}
                       onContextMenu={board.handlers.onContextMenu}
-                      onWheel={(e) => board.viewport.handleWheel(e, board.boardRef.current)}
+                      onWheel={(e) =>
+                        board.viewport.handleWheel(e, board.boardRef.current)
+                      }
                     />
                     {board.state?.pieces?.[0] &&
                       board.state.grid &&
@@ -373,54 +377,54 @@ export function PlayScreenLayout({
                 </div>
               </div>
             </div>
-          {tray.show && (
-            <div
-              className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
-              onPointerLeave={tray.onPointerLeave}
-              data-tray-state={isMobile ? mobileTrayState : undefined}
-              style={
-                isMobile
-                  ? ({
-                      ["--tray-sheet-height" as string]: `${currentTrayHeight}px`,
-                    } as React.CSSProperties)
-                  : undefined
-              }
-            >
-              {isMobile && (
-                <div className={styles.trayBottomBar}>
-                  <button
-                    type="button"
-                    className={styles.traySheetHandle}
-                    onPointerDown={handleTrayHandlePointerDown}
-                    onPointerMove={handleTrayHandlePointerMove}
-                    onPointerUp={handleTrayHandlePointerUp}
-                    onPointerCancel={handleTrayHandlePointerUp}
-                    aria-label={`Pieces drawer, ${mobileTrayState}`}
-                    title="Open or close piece drawer"
-                  >
-                    <span className={styles.traySheetHandleBar} />
-                    <span className={styles.traySheetHandleText}>
-                      {mobileTrayState === "collapsed"
-                        ? "▲"
-                        : mobileTrayState === "full"
-                          ? "▼"
-                          : "◆"}
-                    </span>
-                  </button>
-                </div>
-              )}
-              <PieceTray
-                key={tray.puzzleKey ?? undefined}
-                ref={tray.trayRef as React.RefObject<HTMLDivElement>}
-                pieces={tray.trayPieces}
-                image={overlaysProps.previewImage}
-                grid={tray.trayGrid}
-                onPieceClick={tray.onTrayPieceClick}
-                highlightedPieceIds={tray.highlightedPieceIds}
-                className={tray.isLargeTray ? styles.trayWrapLarge : undefined}
-              />
-            </div>
-          )}
+            {tray.show && (
+              <div
+                className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
+                onPointerLeave={tray.onPointerLeave}
+                data-tray-state={isMobile ? mobileTrayState : undefined}
+                style={
+                  isMobile
+                    ? ({
+                        ["--tray-sheet-height" as string]: `${currentTrayHeight}px`,
+                      } as React.CSSProperties)
+                    : undefined
+                }
+              >
+                {isMobile && (
+                  <div className={styles.trayBottomBar}>
+                    <button
+                      type="button"
+                      className={styles.traySheetHandle}
+                      onPointerDown={handleTrayHandlePointerDown}
+                      onPointerMove={handleTrayHandlePointerMove}
+                      onPointerUp={handleTrayHandlePointerUp}
+                      onPointerCancel={handleTrayHandlePointerUp}
+                      aria-label={`Pieces drawer, ${mobileTrayState}`}
+                      title="Open or close piece drawer"
+                    >
+                      <span className={styles.traySheetHandleBar} />
+                      <span className={styles.traySheetHandleText}>
+                        {mobileTrayState === "collapsed"
+                          ? "▲"
+                          : mobileTrayState === "full"
+                            ? "▼"
+                            : "◆"}
+                      </span>
+                    </button>
+                  </div>
+                )}
+                <PieceTray
+                  key={tray.puzzleKey ?? undefined}
+                  ref={tray.trayRef as React.RefObject<HTMLDivElement>}
+                  pieces={tray.trayPieces}
+                  image={overlaysProps.previewImage}
+                  grid={tray.trayGrid}
+                  onPieceClick={tray.onTrayPieceClick}
+                  highlightedPieceIds={tray.highlightedPieceIds}
+                  className={tray.isLargeTray ? styles.trayWrapLarge : undefined}
+                />
+              </div>
+            )}
           </div>
         </div>
 
