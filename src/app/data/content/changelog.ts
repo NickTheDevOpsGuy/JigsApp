@@ -1,13 +1,17 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "49";
+export const CHANGELOG_VERSION = "50";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "• Mobile HUD bar is taller so it’s not cut off.",
+      "• Tray “arranged” filter now includes all pieces (corners, edges, interior).",
+      "• Pack data preloads on the menu so puzzle packs aren’t empty on first open.",
+      "• Puzzle catalog preloads too so Pick an image shows the full list with “All Packs” right away.",
       "📅 Daily Share – After completing the Daily Puzzle, a new **Daily Share** button appears on the win screen. It copies or shares a compact, Wordle-style text block: daily number, difficulty, time, moves, a small emoji progress grid (🟦/⬜), and a link to play the same daily. Copy to clipboard or use native share on mobile.",
       "📦 Puzzle Packs – Same layout as Choose Puzzle; only labels and data differ.",
       "🧭 Breadcrumbs – Click Pack, Puzzle, Difficulty, or Start to jump to that step.",

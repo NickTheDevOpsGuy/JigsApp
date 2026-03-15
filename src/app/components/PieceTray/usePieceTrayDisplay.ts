@@ -123,16 +123,17 @@ export function usePieceTrayDisplay(
         break;
       }
       case "arranged": {
+        const cornersSorted = [...corners].sort(byGrid);
         const edgesSorted = [...edges].sort(byGrid);
         if (!image || interior.length === 0) {
-          result = edgesSorted;
+          result = [...cornersSorted, ...edgesSorted];
         } else {
           const interiorClustered = clusterPiecesByDominantColor(
             interior,
             hueById,
             byGrid,
           );
-          result = [...edgesSorted, ...interiorClustered];
+          result = [...cornersSorted, ...edgesSorted, ...interiorClustered];
         }
         break;
       }

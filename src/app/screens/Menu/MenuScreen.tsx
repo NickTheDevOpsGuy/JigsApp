@@ -30,6 +30,7 @@ import {
 } from "@/daily/dailyPuzzleCore";
 import { getTodayCompletionCount } from "@/services/leaderboard/leaderboardService";
 import { shouldShowChangelog } from "@/data/content/changelog";
+import { preloadPacksData, preloadPuzzleCatalog } from "@/data/packs/loadPacksData";
 
 /** Star icon for Start Today's Puzzle. Use public/assets/star.png or fallback to character. */
 const STAR_ICON = "/assets/star.png";
@@ -81,6 +82,11 @@ export function MenuScreen() {
 
   useEffect(() => {
     if (shouldShowChangelog()) setShowWhatsNew(true);
+  }, []);
+
+  useEffect(() => {
+    preloadPacksData();
+    preloadPuzzleCatalog();
   }, []);
 
   useEffect(() => {
