@@ -174,7 +174,8 @@ export function drawPiece(
   const cachePxW = Math.ceil(cacheW * dpr);
   const cachePxH = Math.ceil(cacheH * dpr);
   const cached = pieceCache?.get(cacheKey);
-  if (cached && cached.width === cachePxW && cached.height === cachePxH) {
+  const useCache = !(p.isPlaced || p.locked);
+  if (cached && cached.width === cachePxW && cached.height === cachePxH && useCache) {
     drawCachedPiece(
       ctx,
       p,
@@ -218,7 +219,7 @@ export function drawPiece(
     }
   }
 
-  if (cacheCanvas) {
+  if (cacheCanvas && useCache) {
     drawCachedPiece(
       ctx,
       p,
@@ -261,7 +262,7 @@ export function drawPiece(
     ctx.save();
     ctx.globalAlpha *= piecePulseAlpha;
   }
-  drawPieceImageInPath(ctx, path, img, rect, p);
+  drawPieceImageInPath(ctx, path, img, rect, p, p.isPlaced || p.locked);
   if (piecePulseAlpha < 1) ctx.restore();
   strokePieceOutline(
     ctx,

@@ -266,7 +266,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
             onCategorySelect={setFilterCategory}
             onApply={(selectedId) => {
               setFilterOpen(false);
-              if (selectedId && selectedId !== "all") setStep("puzzle");
+              if (selectedId) setStep("puzzle");
             }}
             onReset={() => setFilterCategory("all")}
             autoApplyOnSelect
@@ -304,7 +304,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
             onCategorySelect={setFilterCategory}
             onApply={(id) => {
               setFilterOpen(false);
-              if (id && id !== "all") setStep("puzzle");
+              if (id) setStep("puzzle");
             }}
             onReset={() => setFilterCategory("all")}
             autoApplyOnSelect
@@ -420,24 +420,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
             Start Puzzle
           </button>
         </>
-      )}
-
-      {(step === "category" || step === "puzzle") && (
-        <p className={styles.uploadLinkWrap}>
-          Or{" "}
-          <button
-            type="button"
-            className={styles.uploadLink}
-            onClick={() => {
-              onClose();
-              navigate("/new");
-            }}
-            title="Open custom image upload"
-            aria-label="Upload your own image"
-          >
-            upload your own image
-          </button>
-        </p>
       )}
     </Modal>
   );

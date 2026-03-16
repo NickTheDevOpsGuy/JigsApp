@@ -1,4 +1,3 @@
-export { DashboardTab } from "./DashboardTab";
 export { ProfileTab } from "./ProfileTab";
 export { LeaderboardTab } from "./LeaderboardTab";
 export type {

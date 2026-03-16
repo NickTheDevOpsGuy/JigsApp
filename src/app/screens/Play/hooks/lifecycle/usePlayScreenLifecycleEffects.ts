@@ -26,6 +26,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     showGhostWhenIdle,
     setQuadrantTimes,
     setCompletionDismissed,
+    setShowWinOverlay,
     setCompletionImageUrl,
     setLives,
     dynamicDifficultyEnabled,
@@ -134,6 +135,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     usedHintRef.current = showGhostHint || showGhostWhenIdle;
     setQuadrantTimes({ 0: null, 1: null, 2: null, 3: null });
     setCompletionDismissed(false);
+    setShowWinOverlay?.(false);
     setCompletionImageUrl(undefined);
     setLives(3);
   }, [
@@ -195,6 +197,17 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       setShareToast(null);
     }
   }, [state?.isComplete, setShowStreakToast, setShareToast]);
+
+  /** After completion, run brief animation (glow/pulse) then show win overlay. */
+  const COMPLETION_ANIMATION_MS = 600;
+  useEffect(() => {
+    if (!state?.isComplete) {
+      setShowWinOverlay?.(false);
+      return;
+    }
+    const t = setTimeout(() => setShowWinOverlay?.(true), COMPLETION_ANIMATION_MS);
+    return () => clearTimeout(t);
+  }, [state?.isComplete, setShowWinOverlay]);
 
   useEffect(() => {
     audioManager.setPaused(isPaused);

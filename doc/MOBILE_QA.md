@@ -29,11 +29,10 @@ Manual pass on real devices before release.
 - Long-press does not open browser context menu.
 - Help / Stats open and close correctly.
 
-**Setup (`/new`)**
+**Puzzle selection (Choose Photo / Puzzle Packs modals from home)**
 
-- Preview fits screen.
-- Difficulty and controls reachable.
-- Upload / gallery tabs work.
+- Category or pack filters load; first category/pack shows content (e.g. Art).
+- Preview and difficulty step visible; Start launches play.
 
 **Play (`/play`)**
 

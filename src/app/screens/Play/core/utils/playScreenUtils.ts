@@ -4,9 +4,9 @@
 export const STORAGE_KEY = "phuzzle:imageDataUrl";
 export const GRID_KEY = "phuzzle:gridSize";
 export const GRID_ONCE_KEY = "phuzzle:gridSizeOnce";
-/** Puzzle id for share link (set by Setup when starting a specific puzzle). */
+/** Puzzle id for share link (set when starting a specific puzzle from picker). */
 export const PUZZLE_ID_KEY = "phuzzle:puzzleId";
-/** Puzzle display name for share message (set by Setup when starting a specific puzzle). */
+/** Puzzle display name for share message (set when starting a specific puzzle from picker). */
 export const PUZZLE_NAME_KEY = "phuzzle:puzzleName";
 export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
 export const PIECE_LOCKING_EXPLICIT_KEY = "phuzzle:pieceLockingExplicit";

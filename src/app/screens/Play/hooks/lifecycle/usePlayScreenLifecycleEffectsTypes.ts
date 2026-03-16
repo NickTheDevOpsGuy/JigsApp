@@ -23,6 +23,7 @@ export interface UsePlayScreenLifecycleEffectsArgs {
   showGhostWhenIdle: boolean;
   setQuadrantTimes: Dispatch<SetStateAction<Record<0 | 1 | 2 | 3, number | null>>>;
   setCompletionDismissed: (v: boolean) => void;
+  setShowWinOverlay?: (v: boolean) => void;
   setCompletionImageUrl: (url: string | undefined) => void;
   setLives: Dispatch<SetStateAction<number>>;
   dynamicDifficultyEnabled: boolean;

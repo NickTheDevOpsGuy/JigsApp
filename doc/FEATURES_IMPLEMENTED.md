@@ -84,7 +84,7 @@ XP on completion (per piece + bonus); levels. At level 5+, prestige reset to Lv1
 
 Start: date above card; top bar (Stats, Phuzzle, Feedback, Help); streak and countdown or taglines; Today’s Puzzle, Packs, Choose Photo, Snap.  
 Win: drop-up for Continue/Play again; cycling message; “New best time!” or performance badge; Share Result / Share with People; URL on share card only.  
-**Files:** `MenuScreen.tsx`, `DailyCountdown.tsx`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompletionSharePopup.tsx`, `useShareCardImage.ts`, `completionMessages.ts`, `menuTips.ts`.
+**Files:** `MenuScreen.tsx`, `DailyCountdown.tsx`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompletionSharePopup.tsx`, `useShareCardImage.ts`, `completionMessages.ts`.
 
 ---
 

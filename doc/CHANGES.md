@@ -8,6 +8,8 @@ High-level feature list and recent changes. For project overview see [README](..
 
 ## Recent (high level)
 
+- **Completion flow & piece polish** — Win screen always appears after the last piece locks (brief board glow then overlay). Placed pieces no longer show outline or edge strokes so adjacent pieces meet with no visible gaps; unplaced pieces keep a crisp jigsaw look. Lock tolerance tightened for exact placement.
+- **Single puzzle flow** — New puzzle uses only the staged modals: **Choose Photo** (catalog: category → puzzle → setup) and **Puzzle Packs** (pack → puzzle → setup). The full-page setup screen was removed; `/new` redirects to home. Pack detail “Play” starts the puzzle directly (storage + `/play`). “Upload your own image” links were removed from both modals.
 - **Daily Share (Wordle-style)** — After completing the Daily Puzzle, a **Daily Share** button appears on the win screen (only for daily). It generates a compact, copyable text block: `Phuzzle Daily #N`, difficulty • pieces, ⏱ time, 🔁 moves, a 4-cell emoji grid (🟦/⬜ for completed, good time, efficient moves, clean solve), and a play link. Copy to clipboard or native share on mobile. See [SHARING.md](SHARING.md).
 - **Puzzle Packs & Choose Puzzle parity** — Puzzle Packs dialog uses the same layout as Choose Puzzle (filters, horizontal rail, difficulty, CTA). Breadcrumbs (Pack → Puzzle → Difficulty → Start) are clickable so you can jump to any step. One reusable modal shell for both flows.
 - **Mobile touch & input** — Touch drag on the board works again: the board area uses `touch-action: none` so the browser doesn’t scroll the page while you drag pieces; pointer capture and pointer events (down/move/up) handle drag. Tray buttons (Filter, Shuffle) and all carousel/rail arrows use 48px minimum hit areas, `touch-action: manipulation`, and correct z-index so they’re tappable on mobile. Dialogs use consistent sizing (e.g. 92% width, 85vh max on mobile).
@@ -27,7 +29,7 @@ High-level feature list and recent changes. For project overview see [README](..
 ## Core gameplay
 
 - Drag and drop (mouse and touch); tap to rotate on mobile. The board area disables browser touch scrolling so piece drag works; pointer capture keeps drag events on the canvas. Board snap and neighbor snap; groups move together. No auto-nudge on release.
-- Grid sizes 3×3–10×10 presets; custom up to 12×12. Sources: gallery, upload, camera.
+- Grid sizes 3×3–10×10 presets; custom up to 12×12. Puzzle source: catalog or packs via staged modals (Choose Photo, Puzzle Packs) only.
 - Tray: full width, horizontal scroll, Undo/Redo on the right. Filters (All, Edges, Color). Zoom/pan (scroll or pinch); viewport persists.
 - Timer modes: elapsed, countdown, relaxed, best time. Percentile badges; completion badges (Speed Demon, Chill Mode, etc.).
 - Piece shapes: Classic, Irregular, Hard (Settings). Optional piece locking, ghost hints, reference preview (full or progressive).
@@ -55,6 +57,6 @@ High-level feature list and recent changes. For project overview see [README](..
 
 - **Play** — `PlayScreen.tsx` → Controller → Main → Scene; hooks in `screens/Play/hooks/` (lifecycle, board, pointer, viewport, replay). Layout: `PlayScreenLayout.tsx`.
 - **Puzzle** — `PuzzleManager` + split modules (`*Ops`, engine, runtime). Snap/restore in `puzzleSnap.ts`, `puzzleManagerRestore.ts`. Shape in `puzzle/core/shape.ts`; piece draw in `renderBoardDrawPieceCore.ts`, `renderBoardDrawPieceHelpers.ts`.
-- **Setup** — `SetupScreen`; hooks for grid, image picker, gallery scroll. Difficulty and image source in config section and `SetupImageSourcePanel`.
+- **Puzzle selection** — `ChoosePuzzleModal` (catalog) and `PackChoiceModal` (packs); staged flows only. The former full-page Setup screen is no longer used; `/new` redirects to `/`.
 - **Stats** — `StatsScreen`; state and data hooks; tabs for Profile, Board, Badges. Leaderboard fetchers and weekly album.
 - **Completion** — `CompletionOverlay`, share popup, share card image, replay modal. Tray: `PieceTray`, scroll and thumbs hooks.

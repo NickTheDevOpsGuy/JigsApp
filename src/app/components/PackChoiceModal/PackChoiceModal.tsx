@@ -620,24 +620,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
           </button>
         </>
       )}
-
-      {(step === "pack" || step === "puzzle") && (
-        <p className={styles.uploadLinkWrap}>
-          Or{" "}
-          <button
-            type="button"
-            className={styles.uploadLink}
-            onClick={() => {
-              onClose();
-              navigate("/new");
-            }}
-            title="Open custom image upload"
-            aria-label="Upload your own image"
-          >
-            upload your own image
-          </button>
-        </p>
-      )}
     </Modal>
   );
 }

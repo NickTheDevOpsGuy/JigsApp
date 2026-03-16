@@ -64,16 +64,8 @@ export function usePlayScreenPrimarySetup() {
     if (!puzzleParam || sessionIdFromUrl) return;
     const imageUrl = safeLocalStorage.getItem(STORAGE_KEY) ?? "";
     if (imageUrl) return;
-    const gridParam = searchParams.get(GRID_PARAM);
-    const ct = searchParams.get("ct");
-    const cm = searchParams.get("cm");
-    let toNew = gridParam
-      ? `/new?puzzle=${encodeURIComponent(puzzleParam)}&grid=${gridParam}`
-      : `/new?puzzle=${encodeURIComponent(puzzleParam)}`;
-    if (ct != null && ct !== "") toNew += `&ct=${encodeURIComponent(ct)}`;
-    if (cm != null && cm !== "") toNew += `&cm=${encodeURIComponent(cm)}`;
-    navigate(toNew, { replace: true });
-  }, [puzzleParam, sessionIdFromUrl, navigate, searchParams]);
+    navigate("/", { replace: true });
+  }, [puzzleParam, sessionIdFromUrl, navigate]);
 
   React.useEffect(() => {
     safeLocalStorage.removeItem(GRID_ONCE_KEY);

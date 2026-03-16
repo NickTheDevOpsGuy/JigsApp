@@ -10,7 +10,13 @@ import { PACK_METADATA } from "@/data/packs/packMetadata";
 import { loadPacksData } from "@/data/packs/loadPacksData";
 import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packs/packCompletion";
+import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
+import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { PuzzlePackDetail } from "./components";
+
+const DEFAULT_GRID_INDEX = 1;
 
 export function PackDetailScreen() {
   const nav = useNavigate();
@@ -51,9 +57,11 @@ export function PackDetailScreen() {
 
   const handlePlay = (puzzle: SamplePuzzle) => {
     setCurrentPuzzleId(puzzle.id);
-    nav(
-      `/new?puzzle=${encodeURIComponent(puzzle.id)}&pack=${encodeURIComponent(packId ?? "")}`,
-    );
+    const grid = GRID_OPTIONS[DEFAULT_GRID_INDEX] ?? GRID_OPTIONS[0];
+    clearPuzzleState();
+    safeLocalStorage.setItem(STORAGE_KEY, puzzle.fullImage);
+    safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
+    nav("/play");
   };
 
   const scrollByOneCard = (direction: 1 | -1) => {

@@ -54,7 +54,7 @@ export function usePlayScreenInteractions(ctx: any) {
 
   const handleNewGame = useCallback(() => {
     clearPuzzleState();
-    navigate("/new");
+    navigate("/");
   }, [navigate]);
 
   const {

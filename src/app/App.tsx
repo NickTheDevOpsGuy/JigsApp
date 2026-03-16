@@ -14,11 +14,6 @@ import styles from "./App.module.css";
 const MenuScreen = lazy(() =>
   import("@/screens/Menu/MenuScreen").then((m) => ({ default: m.MenuScreen })),
 );
-const NewGameScreen = lazy(() =>
-  import("@/screens/NewGame/NewGameScreen").then((m) => ({
-    default: m.NewGameScreen,
-  })),
-);
 const PlayScreen = lazy(() =>
   import("@/screens/Play/PlayScreen").then((m) => ({ default: m.PlayScreen })),
 );
@@ -191,14 +186,7 @@ export function App() {
                 </ErrorBoundary>
               }
             />
-            <Route
-              path="/new"
-              element={
-                <ErrorBoundary>
-                  <NewGameScreen />
-                </ErrorBoundary>
-              }
-            />
+            <Route path="/new" element={<Navigate to="/" replace />} />
             <Route
               path="/play"
               element={

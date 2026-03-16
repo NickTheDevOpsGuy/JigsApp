@@ -39,6 +39,8 @@ export function usePlayScreenSceneState(grid: { rows: number; cols: number } | n
   const [showResetStatsConfirm, setShowResetStatsConfirm] = React.useState(false);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = React.useState(false);
   const [completionDismissed, setCompletionDismissed] = React.useState(false);
+  /** True after completion animation (glow/pulse) has played; then win overlay is shown. */
+  const [showWinOverlay, setShowWinOverlay] = React.useState(false);
   const [replayBarOpen, setReplayBarOpen] = React.useState(false);
   const [replayBarBoardRect, setReplayBarBoardRect] = React.useState<{
     top: number;
@@ -131,6 +133,8 @@ export function usePlayScreenSceneState(grid: { rows: number; cols: number } | n
     setShowClearCacheConfirm,
     completionDismissed,
     setCompletionDismissed,
+    showWinOverlay,
+    setShowWinOverlay,
     replayBarOpen,
     setReplayBarOpen,
     replayBarBoardRect,

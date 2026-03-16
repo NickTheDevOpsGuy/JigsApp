@@ -1,13 +1,17 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "50";
+export const CHANGELOG_VERSION = "51";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "Completion flow – Win screen always appears after the last piece locks; brief board glow then overlay.",
+      "Piece seams – Placed pieces no longer show outline or edge strokes so adjacent pieces meet with no visible gaps.",
+      "Jigsaw look – Unplaced pieces keep crisp outline and depth; placed pieces blend into one continuous image.",
+      "Single puzzle flow – New puzzle uses only the staged modals (Choose Photo, Puzzle Packs). Removed the full-page setup screen; /new redirects to home.",
       "Mobile HUD bar is taller so it’s not cut off.",
       "Tray “arranged” filter now includes all pieces (corners, edges, interior).",
       "Pack data preloads on the menu so puzzle packs aren’t empty on first open.",

@@ -1,6 +1,7 @@
 import type { Piece, PuzzleState } from "@/puzzle/core/types";
 
-export const CORRECT_EPSILON_PX = 3;
+/** Tolerance for "correct" position; 1px allows subpixel rounding after exact target placement. */
+export const CORRECT_EPSILON_PX = 1;
 
 export function isPieceCorrect(
   p: Piece,

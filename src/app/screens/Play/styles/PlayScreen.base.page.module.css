@@ -122,7 +122,7 @@
     opacity 0.2s ease;
 }
 
-/* Single strip aligned to board: Settings | Timer | Pause | Moves | Pieces; width tied to shell/board */
+/* Single strip aligned to board: [Left] [Center HUD] [Right]; center HUD over board */
 .topBarInner {
   min-width: 0;
   width: 100%;
@@ -133,12 +133,21 @@
   padding-inline: 14px 12px;
 }
 
-/* Hamburger and HUD (timer, pause, moves) tight together */
+/* Left: menu + coop */
 .topBarLeft {
   display: flex;
   align-items: center;
   gap: 4px;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+/* Center: timer, pause, moves, pieces – centered over the game board */
+.topBarCenter {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
 }
 

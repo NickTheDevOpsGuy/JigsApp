@@ -86,11 +86,11 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     fogStrength,
   });
 
+  const showCompletionOverlay = (isComplete && scene.showWinOverlay) || showE2ECompletion;
   const completionProps = buildCompletionProps({
     focusReturnRef: scene.completionFocusRef,
-    isComplete,
+    showCompletionOverlay,
     completionDismissed: scene.completionDismissed,
-    showE2ECompletion,
     state,
     displayElapsedSeconds,
     completionImageUrl: scene.completionImageUrl,
@@ -119,6 +119,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     onDownloadImage: handleDownloadImage,
     onClose: () => {
       scene.setCompletionDismissed(true);
+      scene.setShowWinOverlay?.(false);
       scene.setCompletionImageUrl(undefined);
       scene.viewport.reset();
     },
@@ -130,6 +131,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     onReplayClick: () => {
       behavior.replay.startReplay();
       scene.setCompletionDismissed(true);
+      scene.setShowWinOverlay?.(false);
       scene.setReplayBarOpen(true);
     },
     onNextPuzzle: handleNewGame,

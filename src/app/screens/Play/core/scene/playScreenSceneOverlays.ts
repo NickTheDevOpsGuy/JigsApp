@@ -34,9 +34,9 @@ export function buildPlayScreenPageVisuals(args: {
 }
 
 export function buildCompletionProps(args: {
-  isComplete: boolean;
+  /** True when we should show the win overlay (after completion animation or e2e). */
+  showCompletionOverlay: boolean;
   completionDismissed: boolean;
-  showE2ECompletion: boolean;
   state: PuzzleState | null;
   displayElapsedSeconds: number;
   completionImageUrl?: string;
@@ -73,10 +73,9 @@ export function buildCompletionProps(args: {
   onNewBest?: () => void;
 }): CompletionProps {
   const {
-    isComplete,
+    showCompletionOverlay,
     completionDismissed,
     focusReturnRef,
-    showE2ECompletion,
     state,
     displayElapsedSeconds,
     completionImageUrl,
@@ -107,11 +106,7 @@ export function buildCompletionProps(args: {
 
   const focusReturnRefProp = focusReturnRef != null ? { focusReturnRef } : undefined;
 
-  if (
-    !((isComplete && !completionDismissed) || (showE2ECompletion && !completionDismissed))
-  ) {
-    return null;
-  }
+  if (!showCompletionOverlay || completionDismissed) return null;
   if (!state) return null;
 
   return {

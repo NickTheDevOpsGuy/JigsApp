@@ -82,6 +82,7 @@ export function usePlayScreenBehavior(setup: any) {
     showGhostWhenIdle: ui.showGhostWhenIdle,
     setQuadrantTimes: scene.setQuadrantTimes,
     setCompletionDismissed: scene.setCompletionDismissed,
+    setShowWinOverlay: scene.setShowWinOverlay,
     setCompletionImageUrl: scene.setCompletionImageUrl,
     setLives: scene.setLives,
     dynamicDifficultyEnabled: ui.dynamicDifficultyEnabled,

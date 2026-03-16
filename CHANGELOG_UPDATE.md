@@ -4,7 +4,15 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 🏆 Latest (leaderboards, profile, completion flow, Supabase)
+## 🧩 Latest (completion flow, piece seams, single puzzle flow)
+
+- **Completion flow** — Win screen always appears after the last piece locks; brief completion animation (glow/pulse) then overlay. No skip.
+- **Piece seams & jigsaw look** — Placed pieces no longer draw outline or edge strokes so adjacent pieces meet with no visible gaps. Unplaced pieces keep crisp outline and depth. Slight increase in seam bleed for high-DPR.
+- **Single puzzle flow** — New puzzle uses only the staged modals (Choose Photo, Puzzle Packs). Full-page setup screen removed; `/new` redirects to `/`. HandleNewGame navigates to `/`. “Upload your own image” links removed from both modals. Pack detail “Play” sets storage and navigates to `/play`. Play menu “New Puzzle” is a single action. Changelog version 51.
+
+---
+
+## 🏆 Earlier (leaderboards, profile, completion flow, Supabase)
 
 ### Leaderboard improvements
 
@@ -67,7 +75,7 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 ### Grid minimum 3×3
 
 - **2×2 removed** — Smallest grid is 3×3. Presets and custom/parseGrid clamp to minimum 3 rows/cols.
-- **Files** — `useGridConfig.ts` (MIN_GRID 3), `playScreenUtils.ts` (MIN_GRID_SIZE 3, parseGrid clamp), `playScreenUtils.test.ts` (parseGrid "2x2" → 3×3).
+- **Files** — `playScreenUtils.ts` (MIN_GRID_SIZE 3, parseGrid clamp), `playScreenUtils.test.ts` (parseGrid "2x2" → 3×3).
 
 ### Docs
 
@@ -122,7 +130,6 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 - **Piece Tray** — `components/PieceTray/usePieceTrayDisplay.ts`, `usePieceTrayScroll.ts`, `usePieceTrayThumbs.ts`; PieceTray uses them for filter/scroll/thumbs.
 - **SFX** — `audio/soundsSfxTypes.ts`, `soundsSfxSnap.ts`, `soundsSfxMisc.ts`, `soundsSfxComplete.ts`; `soundsSfx.ts` re-exports.
 - **Play hooks** — `useSnapComboAnnouncer.ts`, `usePlayScreenUIPersistence.ts`; usePlayScreenManager and usePlayScreenUI use them.
-- **Setup** — `screens/Setup/hooks/useSetupScreenGalleryScroll.ts` for gallery scroll state.
 - **Leaderboard** — `screens/Stats/tabs/LeaderboardTabLists.tsx` (renderTimeList, renderCompletionList).
 - **Menu config** — `data/menuConfigConstants.ts` (TIME_MODE_LABELS, MenuNode); `menuConfig.ts` re-exports getMenuTree and MenuNode.
 - **Header menu items** — `headerMenuItemsDisplay.ts` (display/effects/assistance/piece shape), `headerMenuItemsRest.ts` (audio/advanced/stats/share/contribute/help); `headerMenuItemsDisplayRest.ts` composes getDisplayAudioAdvancedItems.

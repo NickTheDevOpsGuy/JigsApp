@@ -7,7 +7,7 @@
 
 # Phuzzle
 
-A cozy jigsaw puzzle game built with React. Pick a puzzle from the gallery, uploads, camera, or packs—then snap pieces together with smooth drag-and-drop and satisfying feedback.
+A cozy jigsaw puzzle game built with React. Pick a puzzle from the catalog or packs using the staged modal flows—then snap pieces together with smooth drag-and-drop and satisfying feedback.
 
 **Play:** [phuzzle.vercel.app](https://phuzzle.vercel.app)
 
@@ -38,7 +38,7 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the gallery, uplo
 
 ## Features
 
-- **Play:** Drag, drop, rotate; board and neighbor snap; group merging. Grids from 3×3 to 12×12. Gallery, upload, camera, and curated packs. Pack and puzzle pickers share one modal layout (Pack → Puzzle → Difficulty → Start) with clickable breadcrumbs. Piece tray with filters (All, Edges, Color); unified HUD pills (timer, pause, moves, pieces); compact gap between board and tray. Zoom and pan. Undo/redo with snap-back. Continue and start over.
+- **Play:** Drag, drop, rotate; board and neighbor snap; group merging. Grids from 3×3 to 12×12. Puzzle selection only via staged modals: **Choose Photo** (catalog: category → puzzle → difficulty → start) and **Puzzle Packs** (pack → puzzle → difficulty → start), with clickable breadcrumbs. Piece tray with filters (All, Edges, Color); unified HUD pills (timer, pause, moves, pieces); compact gap between board and tray. Zoom and pan. Undo/redo in menu. Continue and start over. Placed pieces meet seamlessly (no visible gaps); unplaced pieces keep a clear jigsaw look.
 - **Daily:** Daily puzzle, streaks, countdown, streak shield (freeze). **Daily Share** — after finishing the daily, share a Wordle-style result (daily #, difficulty, time, moves, emoji grid, play link) via copy or native share. Comments and reactions after completion.
 - **Modes:** Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality. Magnetic Snap and Snap Glow toggles. Reference preview, snap combo, piece shapes, percentile badges, themes.
 - **Social:** Stats, profile, leaderboards (Today, Week, All-time, Efficiency). Share result, share card, Beat My Puzzle challenge links, Daily Share (Wordle-style for daily only), replay viewer. Co-op play with shareable links.

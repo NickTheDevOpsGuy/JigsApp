@@ -72,16 +72,8 @@ export default defineConfig(({ mode }) => {
               return "puzzles";
             }
             // Screen chunks: use short names to avoid CSS preload failures.
-            // Vite/Rollup can truncate or misderive chunk names from long module paths
-            // (e.g. "NewGameScreen" → "NewGameScree"), causing "Unable to preload CSS" errors.
-            // Play + Setup + NewGame + Menu in one chunk to avoid circular chunk warnings
-            // (for example: play-setup <-> menu).
-            if (
-              id.includes("screens/Play") ||
-              id.includes("screens/Setup") ||
-              id.includes("screens/NewGame") ||
-              id.includes("screens/Menu")
-            ) {
+            // Play + Menu in one chunk to avoid circular chunk warnings (e.g. play-setup <-> menu).
+            if (id.includes("screens/Play") || id.includes("screens/Menu")) {
               return "play-setup";
             }
             if (id.includes("screens/Stats")) return "stats";

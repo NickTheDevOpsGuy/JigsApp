@@ -7,9 +7,9 @@ import type { ImageSourceRect } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { DRAG_LIFT_PX } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { drawWrongRotationIcon, drawLockGlow } from "./renderBoardDrawOverlays";
 
-/** Outer stroke: emphasizes classic jigsaw shape; rounded joins for natural tabs/sockets. */
-const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.48)";
-const OUTLINE_LINE_WIDTH = 1.75;
+/** Outer stroke: crisp jigsaw silhouette; rounded joins for natural tabs/sockets. */
+const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.56)";
+const OUTLINE_LINE_WIDTH = 1.85;
 
 function getPieceSurfaceVariation(piece: Piece): {
   brightness: number;
@@ -64,7 +64,7 @@ export function drawSilhouetteShadow(
 
 /**
  * Clip by path and draw the piece image. Same Path2D as stroke – no mismatch.
- * Call after shadow, then stroke(path) after restore.
+ * When isPlacedOrLocked, skip edge strokes so adjacent pieces meet seamlessly (no gaps).
  */
 export function drawPieceImageInPath(
   ctx: CanvasRenderingContext2D,
@@ -72,6 +72,7 @@ export function drawPieceImageInPath(
   img: HTMLImageElement,
   rect: ImageSourceRect,
   piece: Piece,
+  isPlacedOrLocked: boolean = false,
 ): void {
   const variation = getPieceSurfaceVariation(piece);
   ctx.save();
@@ -92,7 +93,13 @@ export function drawPieceImageInPath(
   );
   ctx.filter = "none";
 
-  /* Piece material (43): soft highlight on top edge, subtle bevel – physical cardboard */
+  if (isPlacedOrLocked) {
+    /* Placed/locked: no edge strokes so pieces meet with no visible seam. */
+    ctx.restore();
+    return;
+  }
+
+  /* Unplaced: soft highlight and bevel so piece reads as physical jigsaw. */
   const topGlow = ctx.createLinearGradient(0, 0, 0, piece.h);
   topGlow.addColorStop(0, "rgba(255,255,255,0.18)");
   topGlow.addColorStop(0.05, "rgba(255,255,255,0.08)");
@@ -100,7 +107,6 @@ export function drawPieceImageInPath(
   ctx.fillStyle = topGlow;
   ctx.fill(path);
 
-  /* Faint inner shadow near borders – cardboard thickness */
   const bevelShade = ctx.createLinearGradient(0, 0, 0, piece.h);
   bevelShade.addColorStop(0, "rgba(0,0,0,0)");
   bevelShade.addColorStop(0.55, "rgba(0,0,0,0.06)");
@@ -119,7 +125,6 @@ export function drawPieceImageInPath(
   ctx.lineCap = "round";
   ctx.stroke(path);
 
-  /* Soft outer edge – tactile separation; clean seams when placed */
   const edgeRim = ctx.createLinearGradient(0, 0, piece.w, piece.h);
   edgeRim.addColorStop(0, "rgba(255,255,255,0.08)");
   edgeRim.addColorStop(0.5, "rgba(255,255,255,0)");
@@ -134,7 +139,7 @@ export function drawPieceImageInPath(
 
 /**
  * Single outline stroke using the same path. Rounded joins; one pass only.
- * No stroke for placed/locked pieces.
+ * Placed/locked: no stroke so adjacent pieces meet seamlessly (no visible seam).
  */
 export function strokePieceOutline(
   ctx: CanvasRenderingContext2D,
@@ -145,12 +150,10 @@ export function strokePieceOutline(
   locked: boolean,
   _showClusterOutline?: boolean,
 ): void {
+  if (isPlaced || locked) return;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
-  if (isPlaced || locked) {
-    ctx.strokeStyle = "rgba(8, 16, 28, 0.12)";
-    ctx.lineWidth = 1;
-  } else if (isDragging) {
+  if (isDragging) {
     ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
     ctx.lineWidth = OUTLINE_LINE_WIDTH;
   } else if (isSelected) {
