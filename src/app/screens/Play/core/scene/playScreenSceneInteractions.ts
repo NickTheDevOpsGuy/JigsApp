@@ -26,7 +26,6 @@ const GRID_PARAM = "grid";
 export function usePlayScreenInteractions(ctx: any) {
   const { setup, behavior } = ctx;
   const {
-    navigate,
     sessionId,
     session: _session,
     createSession,
