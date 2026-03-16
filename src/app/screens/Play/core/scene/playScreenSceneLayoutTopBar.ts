@@ -89,7 +89,7 @@ export function usePlayScreenTopBarPropsFromCtx(ctx: any) {
     isCoarsePointer: scene.isCoarsePointer,
     showDebug: SHOW_DEBUG,
     debug: ui.debug,
-    setShowNewGameModal: ui.setShowNewGameModal,
+    setShowNewGameModal: ui.setShowChoosePuzzleModal,
     onStartThisPuzzleOver: scene.startThisPuzzleOver,
     setShowShortcuts: ui.setShowShortcuts,
     setShowHowToPlay: ui.setShowHowToPlay,

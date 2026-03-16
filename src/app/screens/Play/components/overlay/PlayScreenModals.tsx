@@ -1,10 +1,11 @@
 /**
- * Play screen modal dialogs: resume choice, help choice, theme, new game, reset stats, clear cache.
+ * Play screen modal dialogs: resume choice, help choice, theme, puzzle picker, reset stats, clear cache.
  */
 import React from "react";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { ThemeModal } from "@/components/ThemeModal";
+import { ChoosePuzzleModal } from "@/components/ChoosePuzzleModal";
 import { PlayConfirmModals } from "./PlayConfirmModals";
 import type { ResumeChoice } from "@/screens/Play/hooks/manager/usePlayScreenManager";
 
@@ -23,6 +24,8 @@ export type PlayScreenModalsProps = {
   showNewGameModal: boolean;
   setShowNewGameModal: (show: boolean) => void;
   onConfirmNewGame: () => void;
+  showChoosePuzzleModal: boolean;
+  setShowChoosePuzzleModal: (show: boolean) => void;
   showResetStatsConfirm: boolean;
   setShowResetStatsConfirm: (show: boolean) => void;
   showClearCacheConfirm: boolean;
@@ -46,6 +49,8 @@ export function PlayScreenModals({
   showNewGameModal,
   setShowNewGameModal,
   onConfirmNewGame,
+  showChoosePuzzleModal,
+  setShowChoosePuzzleModal,
   showResetStatsConfirm,
   setShowResetStatsConfirm,
   showClearCacheConfirm,
@@ -56,6 +61,11 @@ export function PlayScreenModals({
 
   return (
     <>
+      <ChoosePuzzleModal
+        isOpen={showChoosePuzzleModal}
+        onClose={() => setShowChoosePuzzleModal(false)}
+      />
+
       <ConfirmModal
         isOpen={!blockReplayModals && awaitingResumeChoice && resumeChoice === null}
         onClose={() => setResumeChoice("resume")}

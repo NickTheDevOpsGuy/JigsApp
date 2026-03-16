@@ -86,6 +86,7 @@ export function usePlayScreenUI() {
   const [showHelpChoice, setShowHelpChoice] = useState(false);
   const [showFeedbackChoice, setShowFeedbackChoice] = useState(false);
   const [showNewGameModal, setShowNewGameModal] = useState(false);
+  const [showChoosePuzzleModal, setShowChoosePuzzleModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [selectedPieceId, setSelectedPieceId] = useState<string | null>(null);
 
@@ -289,6 +290,8 @@ export function usePlayScreenUI() {
     setShowFeedbackChoice,
     showNewGameModal,
     setShowNewGameModal,
+    showChoosePuzzleModal,
+    setShowChoosePuzzleModal,
     showThemeModal,
     setShowThemeModal,
     dailyPreferredModifier,

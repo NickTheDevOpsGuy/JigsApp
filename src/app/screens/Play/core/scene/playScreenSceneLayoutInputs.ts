@@ -229,6 +229,8 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     hapticsEnabled: ui.hapticsEnabled,
     showNewGameModal: ui.showNewGameModal,
     setShowNewGameModal: ui.setShowNewGameModal,
+    showChoosePuzzleModal: ui.showChoosePuzzleModal,
+    setShowChoosePuzzleModal: ui.setShowChoosePuzzleModal,
     handleNewGame,
     showResetStatsConfirm: scene.showResetStatsConfirm,
     setShowResetStatsConfirm: scene.setShowResetStatsConfirm,

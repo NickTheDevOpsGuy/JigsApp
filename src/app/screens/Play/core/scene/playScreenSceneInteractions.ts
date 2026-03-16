@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 
-import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { createUndoRedoHandler } from "@/screens/Play/core/utils/playUtils";
 import { soundManager } from "@/audio/core/sounds";
 import { usePlayScreenBoardInteractions } from "@/screens/Play/hooks/gameplay/usePlayScreenBoardInteractions";
@@ -53,9 +52,8 @@ export function usePlayScreenInteractions(ctx: any) {
   } = behavior;
 
   const handleNewGame = useCallback(() => {
-    clearPuzzleState();
-    navigate("/");
-  }, [navigate]);
+    ui.setShowChoosePuzzleModal?.(true);
+  }, [ui]);
 
   const {
     handlePointerDown,
