@@ -233,42 +233,27 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         </button>
       </nav>
 
-      {/* Step 1: Category only – filter trigger shows active filter (e.g. 🌿 Nature ▾) */}
+      {/* Step 1: Category grid — click a category to go straight to puzzle rail */}
       {step === "category" && (
-        <>
-          <div className={styles.filterControlRow}>
+        <div className={styles.categoryGrid}>
+          {CATEGORIES.map((cat) => (
             <button
+              key={cat.id}
               type="button"
-              className={styles.filterTriggerBtn}
-              onClick={() => setFilterOpen(true)}
-              aria-label="Open filter"
-              aria-haspopup="dialog"
-              aria-expanded={filterOpen}
+              className={styles.categoryCard}
+              onClick={() => {
+                setFilterCategory(cat.id);
+                setSelectedPuzzle(null);
+                setStep("puzzle");
+              }}
             >
-              {filterTriggerLabel} <ChevronDown size={16} aria-hidden />
+              <span className={styles.categoryCardEmoji}>
+                {cat.id === "all" ? "✨" : cat.label}
+              </span>
+              <span className={styles.categoryCardName}>{cat.name}</span>
             </button>
-          </div>
-          <FilterPanel
-            isOpen={filterOpen}
-            onClose={() => setFilterOpen(false)}
-            title="Filter by category"
-            categoryOptions={CATEGORIES.map((c) => ({
-              id: c.id,
-              name: c.name,
-              label:
-                c.id === "all" ? "✨ All Packs" : `${c.label ?? ""} ${c.name}`.trim(),
-            }))}
-            selectedCategoryId={filterCategory}
-            onCategorySelect={setFilterCategory}
-            onApply={(selectedId) => {
-              setFilterOpen(false);
-              if (selectedId) setStep("puzzle");
-            }}
-            onReset={() => setFilterCategory("all")}
-            autoApplyOnSelect
-          />
-          <p className={styles.railLabel}>Choose a category</p>
-        </>
+          ))}
+        </div>
       )}
 
       {/* Step 2: Puzzle rail — same Filter control + chips, then rail */}

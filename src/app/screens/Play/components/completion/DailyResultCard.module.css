@@ -1,0 +1,175 @@
+/* DailyResultCard.module.css */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 18px 16px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  /* Subtle glow on completion */
+  box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.15), 0 8px 32px rgba(0,0,0,0.18);
+}
+
+/* ── Streak row ── */
+.streakRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: color-mix(in srgb, #f97316 8%, var(--color-bg-card));
+  border: 1px solid color-mix(in srgb, #f97316 25%, transparent);
+  border-radius: 12px;
+}
+.flame {
+  color: #f97316;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.4));
+}
+.streakInfo {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex: 1;
+}
+.streakNum {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--color-text-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.streakLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.freezeBadge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  padding: 3px 8px;
+  background: color-mix(in srgb, #60a5fa 12%, var(--color-bg-card));
+  border: 1px solid color-mix(in srgb, #60a5fa 30%, transparent);
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+/* ── Meta: puzzle number + date ── */
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.puzzleNum {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-brand-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.date {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* ── Stats row ── */
+.statsRow {
+  display: flex;
+  gap: 8px;
+}
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+.statVal {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.statLbl {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Emoji grid — the Wordle moment ── */
+.emojiGrid {
+  margin: 0;
+  text-align: center;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  letter-spacing: 2px;
+  font-family: inherit;
+  white-space: pre;
+  /* Subtle card background so it pops */
+  padding: 10px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+/* ── Share button — primary, impossible to miss ── */
+.shareBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--color-brand-primary);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+  transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s;
+}
+.shareBtn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+.shareBtn:active { transform: translateY(0); }
+
+/* ── Countdown ── */
+.countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-secondary);
+}
+.countdownLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.countdownTime {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}

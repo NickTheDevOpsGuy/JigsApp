@@ -126,7 +126,7 @@ export function usePlayScreenBoardInteractions({
     },
     onDragStarted: () => {
       setIsDraggingBoard(true);
-      moveCountRef.current += 1;
+      // Do NOT count move here — only count if the piece was actually dragged (not just tapped)
       const now = performance.now();
       dragStartTimeRef.current = now;
       const grid = stateRef.current?.grid;
@@ -138,6 +138,10 @@ export function usePlayScreenBoardInteractions({
     },
     onDragEnded: () => {
       setIsDraggingBoard(false);
+      // Only count as a move if the piece was actually dragged, not just tapped
+      if (didDragRef.current) {
+        moveCountRef.current += 1;
+      }
       dragStartTimeRef.current = null;
     },
     onRotate: () => {
