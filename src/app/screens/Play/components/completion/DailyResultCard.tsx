@@ -106,7 +106,13 @@ export function DailyResultCard({
   const [copied, setCopied] = useState(false);
   const cleanSolve = undoCount === 0 && !usedHint;
 
-  const emojiGrid = buildEmojiGrid(pieceCount, elapsedSeconds, moveCount, usedHint, undoCount);
+  const emojiGrid = buildEmojiGrid(
+    pieceCount,
+    elapsedSeconds,
+    moveCount,
+    usedHint,
+    undoCount,
+  );
 
   const getShareText = useCallback((): string => {
     const PLAY_BASE = "https://phuzzle.vercel.app";
@@ -128,7 +134,15 @@ export function DailyResultCard({
       dailyLink: link,
       completionGrid,
     });
-  }, [puzzleShareUrl, pieceCount, elapsedSeconds, moveCount, usedHint, undoCount, dailyNumber]);
+  }, [
+    puzzleShareUrl,
+    pieceCount,
+    elapsedSeconds,
+    moveCount,
+    usedHint,
+    undoCount,
+    dailyNumber,
+  ]);
 
   const handleShare = useCallback(async () => {
     const text = getShareText();
@@ -151,7 +165,9 @@ export function DailyResultCard({
         setCopied(true);
         setTimeout(() => setCopied(false), 2200);
         onShared?.();
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
   }, [getShareText, puzzleShareUrl, canNativeShare, onShared]);
 
@@ -200,7 +216,9 @@ export function DailyResultCard({
       </div>
 
       {/* Emoji grid — the Wordle moment */}
-      <pre className={styles.emojiGrid} aria-label="Solve summary">{emojiGrid}</pre>
+      <pre className={styles.emojiGrid} aria-label="Solve summary">
+        {emojiGrid}
+      </pre>
 
       {/* Share — primary action, full width, impossible to miss */}
       <button
@@ -209,10 +227,15 @@ export function DailyResultCard({
         onClick={() => void handleShare()}
         aria-label={copied ? "Copied to clipboard" : "Share result"}
       >
-        {copied
-          ? <><Check size={16} aria-hidden /> Copied!</>
-          : <><Share2 size={16} aria-hidden /> {canNativeShare ? "Share" : "Copy Result"}</>
-        }
+        {copied ? (
+          <>
+            <Check size={16} aria-hidden /> Copied!
+          </>
+        ) : (
+          <>
+            <Share2 size={16} aria-hidden /> {canNativeShare ? "Share" : "Copy Result"}
+          </>
+        )}
       </button>
 
       {/* Countdown — creates urgency and reason to return */}

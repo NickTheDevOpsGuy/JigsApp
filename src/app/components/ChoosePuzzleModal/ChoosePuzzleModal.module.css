@@ -25,7 +25,9 @@
   cursor: pointer;
   color: var(--color-text-secondary);
   opacity: 0.45;
-  transition: color 0.15s, opacity 0.15s;
+  transition:
+    color 0.15s,
+    opacity 0.15s;
   background: none;
   border: none;
   font: inherit;
@@ -625,7 +627,10 @@
   border: 1px solid var(--color-border);
   border-radius: 14px;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    transform 0.1s;
   min-height: 90px;
 }
 
