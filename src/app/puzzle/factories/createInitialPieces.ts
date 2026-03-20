@@ -7,8 +7,8 @@ import { buildPiecePath } from "@/puzzle/core/shape";
 /** Must match or exceed shape.ts depth so knobs fit within piece bounds. */
 const CUT_DEPTH_PCT: Record<PieceCutType, number> = {
   classic: 0.28,
-  irregular: 0.30,
-  hard: 0.20,
+  irregular: 0.3,
+  hard: 0.2,
 };
 
 type CreateInitialPiecesArgs = {

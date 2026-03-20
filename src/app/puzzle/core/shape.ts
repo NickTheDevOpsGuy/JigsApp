@@ -12,10 +12,13 @@ type ShapeArgs = {
   cutType?: PieceCutType;
 };
 
-const CUT_PARAMS: Record<PieceCutType, { depthPct: number; neckRatio: number; bulbRadiusRatio: number }> = {
-  classic:   { depthPct: 0.26, neckRatio: 0.42, bulbRadiusRatio: 0.36 },
-  irregular: { depthPct: 0.28, neckRatio: 0.40, bulbRadiusRatio: 0.38 },
-  hard:      { depthPct: 0.20, neckRatio: 0.46, bulbRadiusRatio: 0.30 },
+const CUT_PARAMS: Record<
+  PieceCutType,
+  { depthPct: number; neckRatio: number; bulbRadiusRatio: number }
+> = {
+  classic: { depthPct: 0.26, neckRatio: 0.42, bulbRadiusRatio: 0.36 },
+  irregular: { depthPct: 0.28, neckRatio: 0.4, bulbRadiusRatio: 0.38 },
+  hard: { depthPct: 0.2, neckRatio: 0.46, bulbRadiusRatio: 0.3 },
 };
 
 // Bezier magic number for circular arc: 4/3 * tan(π/8) ≈ 0.5523
@@ -23,7 +26,10 @@ const K = 0.5523;
 
 function getKnobDims(tileW: number, tileH: number, cutType: PieceCutType) {
   const p = CUT_PARAMS[cutType];
-  const depth = Math.max(14, Math.min(56, Math.round(Math.min(tileW, tileH) * p.depthPct)));
+  const depth = Math.max(
+    14,
+    Math.min(56, Math.round(Math.min(tileW, tileH) * p.depthPct)),
+  );
   const knobW = tileW * 0.44;
   const neckW = knobW * p.neckRatio;
   const radius = knobW * p.bulbRadiusRatio;
@@ -40,23 +46,27 @@ export function buildPiecePath(args: ShapeArgs): string {
   const { depth, neckW, radius } = getKnobDims(tileW, tileH, cutType);
   const hk = K * radius;
 
-  const x0 = pad, y0 = pad;
-  const x1 = pad + tileW, y1 = pad + tileH;
+  const x0 = pad,
+    y0 = pad;
+  const x1 = pad + tileW,
+    y1 = pad + tileH;
   const mx = (x0 + x1) / 2;
   const my = (y0 + y1) / 2;
 
-  const topDir    = edgeDir(edges.top);
-  const rightDir  = edgeDir(edges.right);
+  const topDir = edgeDir(edges.top);
+  const rightDir = edgeDir(edges.right);
   const bottomDir = edgeDir(edges.bottom);
-  const leftDir   = edgeDir(edges.left);
+  const leftDir = edgeDir(edges.left);
 
   // TOP edge (left→right). tab: s=-1 (up), socket: s=+1 (into piece)
   function topEdge(): string {
     if (topDir === 0) return `L ${x1} ${y0}`;
     const s = -topDir;
-    const cx = mx, cy = y0 + s * (depth - radius);
+    const cx = mx,
+      cy = y0 + s * (depth - radius);
     const tangY = cy - s * radius;
-    const nl = cx - neckW, nr = cx + neckW;
+    const nl = cx - neckW,
+      nr = cx + neckW;
     const mc = s * Math.abs(tangY - y0) * 0.55;
     return [
       `L ${nl} ${y0}`,
@@ -72,9 +82,11 @@ export function buildPiecePath(args: ShapeArgs): string {
   function rightEdge(): string {
     if (rightDir === 0) return `L ${x1} ${y1}`;
     const s = rightDir;
-    const cy = my, cx = x1 + s * (depth - radius);
+    const cy = my,
+      cx = x1 + s * (depth - radius);
     const tangX = cx - s * radius;
-    const nl = cy - neckW, nr = cy + neckW;
+    const nl = cy - neckW,
+      nr = cy + neckW;
     const mc = s * Math.abs(tangX - x1) * 0.55;
     return [
       `L ${x1} ${nl}`,
@@ -90,9 +102,11 @@ export function buildPiecePath(args: ShapeArgs): string {
   function bottomEdge(): string {
     if (bottomDir === 0) return `L ${x0} ${y1}`;
     const s = bottomDir;
-    const cx = mx, cy = y1 + s * (depth - radius);
+    const cx = mx,
+      cy = y1 + s * (depth - radius);
     const tangY = cy - s * radius;
-    const nl = cx + neckW, nr = cx - neckW;
+    const nl = cx + neckW,
+      nr = cx - neckW;
     const mc = s * Math.abs(tangY - y1) * 0.55;
     return [
       `L ${nl} ${y1}`,
@@ -108,9 +122,11 @@ export function buildPiecePath(args: ShapeArgs): string {
   function leftEdge(): string {
     if (leftDir === 0) return `L ${x0} ${y0}`;
     const s = -leftDir;
-    const cy = my, cx = x0 + s * (depth - radius);
+    const cy = my,
+      cx = x0 + s * (depth - radius);
     const tangX = cx - s * radius;
-    const nl = cy + neckW, nr = cy - neckW;
+    const nl = cy + neckW,
+      nr = cy - neckW;
     const mc = s * Math.abs(tangX - x0) * 0.55;
     return [
       `L ${x0} ${nl}`,
@@ -122,5 +138,7 @@ export function buildPiecePath(args: ShapeArgs): string {
     ].join(" ");
   }
 
-  return [`M ${x0} ${y0}`, topEdge(), rightEdge(), bottomEdge(), leftEdge(), `Z`].join(" ");
+  return [`M ${x0} ${y0}`, topEdge(), rightEdge(), bottomEdge(), leftEdge(), `Z`].join(
+    " ",
+  );
 }
