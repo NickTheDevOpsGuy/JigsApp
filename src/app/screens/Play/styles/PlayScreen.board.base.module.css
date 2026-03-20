@@ -8,7 +8,7 @@
   align-items: stretch;
   justify-content: flex-start;
   gap: 0;
-  padding-top: 20px;
+  padding-top: 8px;
   position: relative;
   width: 100%;
 }
@@ -39,21 +39,21 @@
   margin-top: 6px;
   background: color-mix(in srgb, var(--color-bg-primary) 85%, rgba(0, 0, 0, 0.06));
   border-radius: 0 0 var(--radius-board, 20px) var(--radius-board, 20px);
-  padding-bottom: 20px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
 }
 
 /* PieceTray: minimal height; piece size 44–56px; board remains dominant */
 .playBody .trayArea .tray {
   flex: 0 0 auto;
   min-width: 0;
-  height: clamp(100px, 12vh, 130px);
-  max-height: min(130px, 18vh);
-  min-height: 56px;
+  height: clamp(110px, 14vh, 150px);
+  max-height: min(150px, 20vh);
+  min-height: 80px;
 }
 
 .playBody .trayArea .tray.trayWrapLarge {
-  height: clamp(100px, 12vh, 130px);
-  max-height: min(130px, 18vh);
+  height: clamp(110px, 14vh, 150px);
+  max-height: min(150px, 20vh);
 }
 
 @media (max-width: 600px) {

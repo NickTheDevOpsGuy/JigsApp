@@ -20,33 +20,33 @@ const CATEGORY_ALIAS: Record<string, string> = {
   art: "art",
   gaming: "gaming",
   seasonal: "seasonal",
-  cute: "cute",
+  holidays: "holidays",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
   nature: "🌿",
   animals: "🐾",
   food: "🍕",
-  cozy: "🛋️",
+  cozy: "🎵",
   space: "🪐",
   retro: "📼",
   art: "🎨",
   gaming: "🎮",
   seasonal: "🍂",
-  cute: "✨",
+  holidays: "🎄",
 };
 
 const CATEGORY_NAMES: Record<string, string> = {
   nature: "Nature",
   animals: "Animals",
   food: "Food",
-  cozy: "Cozy",
+  cozy: "Music",
   space: "Space",
   retro: "Retro",
   art: "Art",
   gaming: "Gaming",
   seasonal: "Seasonal",
-  cute: "Cute",
+  holidays: "Holidays",
 };
 
 const CATEGORY_ORDER = [
@@ -59,7 +59,7 @@ const CATEGORY_ORDER = [
   "art",
   "gaming",
   "seasonal",
-  "cute",
+  "holidays",
 ] as const;
 
 /**
@@ -67,7 +67,7 @@ const CATEGORY_ORDER = [
  *
  * Folder structure (one level or nested subfolders):
  *   src/app/assets/puzzles/
- *     nature/  animals/  food/  cozy/  space/  retro/  art/  gaming/  seasonal/  cute/
+ *     nature/  animals/  food/  music/  space/  retro/  art/  gaming/  seasonal/  holidays/
  *
  * Folder name = category. Puzzle name = filename (kebab-case → Title Case).
  * Add/remove images; rebuild to see changes. Max 10 pack categories.
