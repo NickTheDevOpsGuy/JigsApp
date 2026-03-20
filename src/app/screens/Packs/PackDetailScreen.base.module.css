@@ -326,7 +326,11 @@ button.stepItem:focus-visible {
 
 /* Done */
 .stepItemDone .stepNum {
-  background: color-mix(in srgb, var(--color-brand-primary) 15%, var(--color-bg-elevated));
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 15%,
+    var(--color-bg-elevated)
+  );
   border-color: var(--color-brand-primary);
   color: var(--color-brand-primary);
   font-size: 14px;
@@ -336,9 +340,17 @@ button.stepItem:focus-visible {
   opacity: 0.75;
 }
 button.stepItemDone:hover .stepNum {
-  background: color-mix(in srgb, var(--color-brand-primary) 25%, var(--color-bg-elevated));
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 25%,
+    var(--color-bg-elevated)
+  );
 }
 
 /* Future */
-.stepItemFuture .stepNum { opacity: 0.38; }
-.stepItemFuture .stepLabel { opacity: 0.28; }
+.stepItemFuture .stepNum {
+  opacity: 0.38;
+}
+.stepItemFuture .stepLabel {
+  opacity: 0.28;
+}

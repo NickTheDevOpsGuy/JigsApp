@@ -66,19 +66,28 @@ export function PackListScreen() {
           </button>
           <div className={styles.headerTitleRow}>
             <h1 className={styles.title}>Puzzle Packs</h1>
-            <nav className={styles.stepIndicator} aria-label="Steps: Pack, Puzzle, Difficulty">
+            <nav
+              className={styles.stepIndicator}
+              aria-label="Steps: Pack, Puzzle, Difficulty"
+            >
               <span className={`${styles.stepItem} ${styles.stepItemActive}`}>
-                <span className={styles.stepNum} aria-hidden>1</span>
+                <span className={styles.stepNum} aria-hidden>
+                  1
+                </span>
                 <span className={styles.stepLabel}>Pack</span>
               </span>
               <span className={styles.stepConnector} aria-hidden />
               <span className={`${styles.stepItem} ${styles.stepItemFuture}`}>
-                <span className={styles.stepNum} aria-hidden>2</span>
+                <span className={styles.stepNum} aria-hidden>
+                  2
+                </span>
                 <span className={styles.stepLabel}>Puzzle</span>
               </span>
               <span className={styles.stepConnector} aria-hidden />
               <span className={`${styles.stepItem} ${styles.stepItemFuture}`}>
-                <span className={styles.stepNum} aria-hidden>3</span>
+                <span className={styles.stepNum} aria-hidden>
+                  3
+                </span>
                 <span className={styles.stepLabel}>Difficulty</span>
               </span>
             </nav>

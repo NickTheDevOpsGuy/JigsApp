@@ -143,24 +143,33 @@ export function PackDetailScreen() {
                 <div />
               </PuzzlePackDetail>
             </div>
-            <nav className={styles.stepIndicator} aria-label="Steps: Pack, Puzzle, Difficulty">
+            <nav
+              className={styles.stepIndicator}
+              aria-label="Steps: Pack, Puzzle, Difficulty"
+            >
               <button
                 type="button"
                 className={`${styles.stepItem} ${styles.stepItemDone}`}
                 onClick={() => nav("/packs")}
                 title="Back to packs"
               >
-                <span className={styles.stepNum} aria-hidden>✓</span>
+                <span className={styles.stepNum} aria-hidden>
+                  ✓
+                </span>
                 <span className={styles.stepLabel}>Pack</span>
               </button>
               <span className={styles.stepConnector} aria-hidden />
               <span className={`${styles.stepItem} ${styles.stepItemActive}`}>
-                <span className={styles.stepNum} aria-hidden>2</span>
+                <span className={styles.stepNum} aria-hidden>
+                  2
+                </span>
                 <span className={styles.stepLabel}>Puzzle</span>
               </span>
               <span className={styles.stepConnector} aria-hidden />
               <span className={`${styles.stepItem} ${styles.stepItemFuture}`}>
-                <span className={styles.stepNum} aria-hidden>3</span>
+                <span className={styles.stepNum} aria-hidden>
+                  3
+                </span>
                 <span className={styles.stepLabel}>Difficulty</span>
               </span>
             </nav>
