@@ -4,12 +4,12 @@
  * Step 2: Choose Puzzle (puzzles in pack; thumbnail, name, completion). No preview.
  * Step 3: Puzzle Setup (ONLY place with large preview + difficulty + Start).
  */
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Puzzle, Check, ChevronLeft, ChevronRight, ChevronDown, X } from "lucide-react";
+import { Puzzle, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
-import { PACK_METADATA } from "@/data/packs/packMetadata";
+import { PACK_METADATA, type PackMetadata } from "@/data/packs/packMetadata";
 import { loadPacksData } from "@/data/packs/loadPacksData";
 import {
   getCompletedPuzzleIds,
@@ -23,16 +23,10 @@ import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 import type { PuzzlePack } from "@/data/packs/puzzlePacks";
 import styles from "@/components/ChoosePuzzleModal/ChoosePuzzleModal.module.css";
 import localStyles from "./PackChoiceModal.module.css";
-import { FilterPanel } from "@/components/FilterPanel/FilterPanel";
 
 const PRIMARY_DIFFICULTIES = GRID_OPTIONS.slice(0, 4);
 const DIFFICULTY_NAMES = ["Easy", "Medium", "Hard", "Expert"] as const;
 const RECOMMENDED_INDEX = 1;
-
-const PACK_FILTERS = [
-  { id: "all", name: "All", label: "All" },
-  ...PACK_METADATA.map((p) => ({ id: p.id, name: p.name, label: p.name })),
-];
 
 type Step = "pack" | "puzzle" | "setup";
 
@@ -40,10 +34,6 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
 };
-
-function filterPacks(packs: PuzzlePack[], categoryId: string): PuzzlePack[] {
-  return categoryId === "all" ? packs : packs.filter((p) => p.id === categoryId);
-}
 
 export function PackChoiceModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
@@ -54,15 +44,10 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
   const [selectedPack, setSelectedPack] = useState<PuzzlePack | null>(null);
   const [selectedPuzzle, setSelectedPuzzle] = useState<SamplePuzzle | null>(null);
   const [difficultyIndex, setDifficultyIndex] = useState(RECOMMENDED_INDEX);
-  const [filterCategory, setFilterCategory] = useState("all");
-  const [filterOpen, setFilterOpen] = useState(false);
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
 
   const packs = packsData?.PUZZLE_PACKS ?? [];
-  const filteredPacks = useMemo(
-    () => filterPacks(packs, filterCategory),
-    [packs, filterCategory],
-  );
+  const filteredPacks = packs;
   const puzzles: SamplePuzzle[] =
     selectedPack && packsData ? packsData.getPuzzlesForPack(selectedPack) : [];
   const completed = getCompletedPuzzleIds();
@@ -133,30 +118,14 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     if (isOpen) loadPacksData().then(setPacksData);
   }, [isOpen]);
 
-  const defaultPackId = packs.some((p) => p.id === "art")
-    ? "art"
-    : (packs[0]?.id ?? "all");
-
   useEffect(() => {
     if (!isOpen) return;
-    setFilterOpen(false);
     setDifficultyIndex(RECOMMENDED_INDEX);
-    setFilterCategory(defaultPackId);
-    const packToSelect =
-      defaultPackId === "all"
-        ? null
-        : (packs.find((p) => p.id === defaultPackId) ?? null);
-    setSelectedPack(packToSelect);
-    const puzzleList =
-      packToSelect && packsData ? packsData.getPuzzlesForPack(packToSelect) : [];
-    setSelectedPuzzle(puzzleList[0] ?? null);
-    setStep(packToSelect && puzzleList.length > 0 ? "puzzle" : "pack");
-  }, [isOpen, defaultPackId, packs, packsData]);
+    setSelectedPack(null);
+    setSelectedPuzzle(null);
+    setStep("pack");
+  }, [isOpen]);
 
-  const activeFilterLabel =
-    filterCategory !== "all"
-      ? (PACK_FILTERS.find((c) => c.id === filterCategory)?.name ?? filterCategory)
-      : null;
 
   useEffect(() => {
     if (!isOpen || !packsData) return;
@@ -264,106 +233,66 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       showCloseButton
       variant="choosePuzzle"
     >
-      {/* Breadcrumb: Pack → Puzzle → Setup → Start (same model as Choose-a-picture) */}
+      {/* Step indicator: numbered circles */}
       <nav
-        className={localStyles.breadcrumb}
+        className={styles.stepIndicator}
         role="navigation"
-        aria-label="Steps: Pack, Puzzle, Setup, Start"
+        aria-label="Steps: Pack, Puzzle, Setup"
       >
         <button
           type="button"
-          className={`${styles.stepLink} ${step === "pack" ? styles.stepCurrent : ""}`}
+          className={[
+            styles.stepItem,
+            step === "pack" ? styles.stepItemActive : styles.stepItemDone,
+          ].join(" ")}
           onClick={() => goToStep("pack")}
-          title="Pack selection"
           aria-current={step === "pack" ? "step" : undefined}
+          title="Back to pack selection"
         >
-          Pack
+          <span className={styles.stepNum} aria-hidden>
+            {step === "pack" ? "1" : "✓"}
+          </span>
+          <span className={styles.stepLabel}>Pack</span>
         </button>
-        <span className={styles.stepSep} aria-hidden>
-          →
-        </span>
+
+        <span className={styles.stepConnector} aria-hidden />
+
         <button
           type="button"
-          className={`${styles.stepLink} ${step === "puzzle" ? styles.stepCurrent : ""}`}
+          className={[
+            styles.stepItem,
+            step === "puzzle" ? styles.stepItemActive : "",
+            step === "setup" ? styles.stepItemDone : "",
+            step === "pack" ? styles.stepItemFuture : "",
+          ].join(" ")}
           onClick={() => step !== "pack" && goToStep("puzzle")}
           disabled={step === "pack"}
-          title="Puzzle selection"
           aria-current={step === "puzzle" ? "step" : undefined}
+          title={step !== "pack" ? "Back to puzzle selection" : undefined}
         >
-          Puzzle
+          <span className={styles.stepNum} aria-hidden>
+            {step === "setup" ? "✓" : "2"}
+          </span>
+          <span className={styles.stepLabel}>Puzzle</span>
         </button>
-        <span className={styles.stepSep} aria-hidden>
-          →
-        </span>
-        <button
-          type="button"
-          className={`${styles.stepLink} ${step === "setup" ? styles.stepCurrent : ""}`}
-          disabled={step !== "setup" || !selectedPuzzle}
-          title="Setup"
+
+        <span className={styles.stepConnector} aria-hidden />
+
+        <span
+          className={[
+            styles.stepItem,
+            step === "setup" ? styles.stepItemActive : styles.stepItemFuture,
+          ].join(" ")}
           aria-current={step === "setup" ? "step" : undefined}
         >
-          Setup
-        </button>
-        <span className={styles.stepSep} aria-hidden>
-          →
+          <span className={styles.stepNum} aria-hidden>3</span>
+          <span className={styles.stepLabel}>Setup</span>
         </span>
-        <button
-          type="button"
-          className={`${styles.stepLink} ${step === "setup" && selectedPuzzle ? styles.stepCurrent : ""}`}
-          onClick={() => selectedPuzzle && startButtonRef.current?.focus()}
-          disabled={!selectedPuzzle}
-          title={selectedPuzzle ? "Start puzzle" : "Select a puzzle first"}
-          aria-label="Start"
-        >
-          Start
-        </button>
       </nav>
 
       {/* Step 1: Pack selection only – clean Filter control + optional chips */}
       {step === "pack" && (
         <>
-          <div className={styles.filterControlRow}>
-            <button
-              type="button"
-              className={styles.filterTriggerBtn}
-              onClick={() => setFilterOpen(true)}
-              aria-label="Open filter"
-              aria-haspopup="dialog"
-              aria-expanded={filterOpen}
-            >
-              Filter <ChevronDown size={16} aria-hidden />
-            </button>
-          </div>
-          {activeFilterLabel && (
-            <div className={styles.activeChipsRow}>
-              <span className={styles.activeChip}>
-                {activeFilterLabel}
-                <button
-                  type="button"
-                  className={styles.activeChipRemove}
-                  onClick={() => setFilterCategory("all")}
-                  aria-label={`Remove filter ${activeFilterLabel}`}
-                >
-                  <X size={12} aria-hidden />
-                </button>
-              </span>
-            </div>
-          )}
-          <FilterPanel
-            isOpen={filterOpen}
-            onClose={() => setFilterOpen(false)}
-            title="Filter packs"
-            categoryOptions={PACK_FILTERS.map((c) => ({
-              id: c.id,
-              name: c.name,
-              label: c.id === "all" ? "✨ All" : c.label,
-            }))}
-            selectedCategoryId={filterCategory}
-            onCategorySelect={setFilterCategory}
-            onApply={() => setFilterOpen(false)}
-            onReset={() => setFilterCategory("all")}
-            autoApplyOnSelect
-          />
           <p className={styles.railLabel}>Choose a pack</p>
           <div className={styles.gridScrollWrap}>
             <button
@@ -392,7 +321,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                   </div>
                 ) : (
                   filteredPacks.map((pack, packIndex) => {
-                    const meta = PACK_METADATA.find((p) => p.id === pack.id);
+                    const meta = PACK_METADATA.find((p: PackMetadata) => p.id === pack.id);
                     const puzzleList = packsData.getPuzzlesForPack(pack);
                     const hero = puzzleList[0];
                     const { completed: completedCount, total } = getPackProgress(
@@ -574,10 +503,15 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         </>
       )}
 
-      {/* Step 3: Puzzle Setup — difficulty + Start only (image already seen on puzzle step) */}
+      {/* Step 3: Puzzle Setup */}
       {step === "setup" && selectedPuzzle && (
         <>
-          <h2 className={localStyles.setupPuzzleName}>{selectedPuzzle.name}</h2>
+          <div className={localStyles.setupHeader}>
+            <div className={localStyles.setupThumb}>
+              <img src={selectedPuzzle.thumbnail} alt="" className={localStyles.setupThumbImg} />
+            </div>
+            <h2 className={localStyles.setupPuzzleName}>{selectedPuzzle.name}</h2>
+          </div>
           <div
             className={styles.difficultySelector}
             role="group"

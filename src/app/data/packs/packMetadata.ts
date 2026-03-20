@@ -40,11 +40,10 @@ export const PACK_METADATA: PackMetadata[] = [
   },
   {
     id: "cozy",
-    name: "Cozy",
-    description: "Cabins, fireplaces, rainy windows, cozy rooms",
-    emoji: "🏠",
+    name: "Music",
+    description: "Instruments, concerts, vinyl records, musicians",
+    emoji: "🎵",
     category: "cozy",
-    season: "winter",
   },
   {
     id: "space",
@@ -83,10 +82,11 @@ export const PACK_METADATA: PackMetadata[] = [
     category: "seasonal",
   },
   {
-    id: "cute",
-    name: "Cute",
-    description: "Kawaii, pastel animals, whimsical art",
-    emoji: "🧁",
-    category: "cute",
+    id: "holidays",
+    name: "Holidays",
+    description: "Christmas, Halloween, Easter, New Year celebrations",
+    emoji: "🎄",
+    category: "holidays",
+    season: "winter",
   },
 ];
