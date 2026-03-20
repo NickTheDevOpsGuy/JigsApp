@@ -72,8 +72,8 @@ export class PuzzleManagerState {
       pieceHeight,
       scatterPadding = 16,
       pad = 18,
-      snapToleranceBoardPx = 40,
-      snapToleranceNeighborPx = 56,
+      snapToleranceBoardPx = 60,
+      snapToleranceNeighborPx = 80,
       snapScaleRef,
       relaxedToleranceMultiplierRef,
       snapToleranceOverrideRef,
@@ -309,7 +309,7 @@ export class PuzzleManagerState {
     const activeId = this.drag.activeId;
     if (!activeId) return null;
 
-    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.15 : 1;
+    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.22 : 1;
     const boardTolerance = getEffectiveTolerance(
       this.snapToleranceBoardPx,
       this.getToleranceOptions(),

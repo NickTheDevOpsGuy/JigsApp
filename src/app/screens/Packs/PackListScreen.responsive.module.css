@@ -34,15 +34,6 @@
     height: 36px;
   }
 
-  .stepIndicator {
-    font-size: 0.8125rem;
-    gap: 4px;
-  }
-
-  .stepSeparator {
-    font-size: 0.75rem;
-  }
-
   .title {
     font-size: 1rem;
   }
@@ -113,3 +104,7 @@
     line-height: 1.3;
   }
 }
+
+  /* Step indicator mobile */
+  .stepNum { width: 22px; height: 22px; font-size: 11px; }
+  .stepLabel { font-size: 9px; }

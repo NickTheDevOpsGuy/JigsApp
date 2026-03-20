@@ -8,10 +8,10 @@ import { buildRowColMap, getSolvedNeighborsFromMap } from "@/puzzle/groups/group
 import type { DragPreview } from "@/puzzle/core/types";
 
 /** Magnetic snap: radius (px) within which piece is pulled toward correct position. */
-export const BOARD_MAGNET_RADIUS_PX = 32;
-export const BOARD_MAGNET_STRONG_RADIUS_PX = 14;
-export const EDGE_MAGNET_RADIUS_PX = 26;
-export const EDGE_MAGNET_STRONG_RADIUS_PX = 10;
+export const BOARD_MAGNET_RADIUS_PX = 48;
+export const BOARD_MAGNET_STRONG_RADIUS_PX = 22;
+export const EDGE_MAGNET_RADIUS_PX = 38;
+export const EDGE_MAGNET_STRONG_RADIUS_PX = 16;
 
 export type BoardSnapResult =
   | { kind: "snap"; dx: number; dy: number; groupId: string }
@@ -94,7 +94,7 @@ export function computeBoardSnapResult(
   if (wouldOverlapAnyOtherGroup(pieces, gid, dx, dy, overlapEpsilonPx)) return null;
 
   /** Allow small per-piece drift (e.g. from rounding/merge) so whole group can snap and lock. */
-  const perPieceEpsilonPx = 5;
+  const perPieceEpsilonPx = 10;
   for (const p of groupPieces) {
     const t = getTilePos(p);
     const offX = Math.abs(p.targetX - t.x - dx);
@@ -222,7 +222,7 @@ export function computeNearSnapNudge(
   pieces: Piece[],
   activeId: string,
   toleranceBoardPx: number,
-  nudgeFactor: number = 0.35,
+  nudgeFactor: number = 0.48,
   overlapEpsilonPx: number = 0,
 ): NearSnapNudgeResult {
   const active = pieces.find((p) => p.id === activeId);
@@ -267,7 +267,7 @@ export function computeMergedGroupBoardSnapResult(
 
   if (wouldOverlapAnyOtherGroup(pieces, groupId, dx, dy, overlapEpsilonPx)) return null;
 
-  const perPieceEpsilonPx = 5;
+  const perPieceEpsilonPx = 10;
   for (const p of groupPieces) {
     const t = getTilePos(p);
     const offX = Math.abs(p.targetX - t.x - dx);

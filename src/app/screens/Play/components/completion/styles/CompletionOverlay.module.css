@@ -1,3 +1,225 @@
-@import "./CompletionOverlay.base.module.css";
-@import "./CompletionOverlay.layout.module.css";
-@import "./CompletionOverlay.responsive.module.css";
+/* CompletionOverlay – win screen styles */
+
+/* ── Main panel ── */
+.completePanelPhased {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 8px 0 4px;
+}
+
+/* ── Stats bar ── */
+.completeStatsBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px 16px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  flex-shrink: 0;
+}
+
+.completeStatsBarVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.completeStatsBarItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Celebration block (image + title + achievements) ── */
+.completeCelebrationBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.completePhasedTitle {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--color-text-primary);
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.completeImageWrapPhased {
+  width: 100%;
+  max-width: 340px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 3px solid var(--color-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.completeImagePhased {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.completeAchievementPhased {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-brand-primary);
+  text-align: center;
+  padding: 6px 16px;
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
+  border-radius: 999px;
+}
+
+/* ── Action buttons row ── */
+.completeActionsPhased {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.completeMenusRow {
+  display: flex;
+  gap: 10px;
+}
+
+.completePrimaryBtn {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--color-brand-primary);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.12s;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.completePrimaryBtn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.completePrimaryBtn:active {
+  transform: translateY(0);
+}
+
+/* ── Dropdown menus ── */
+.completeMenuWrap {
+  position: relative;
+  flex: 1;
+}
+
+.completeMenuTrigger {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.completeMenuTrigger:hover {
+  border-color: var(--color-brand-primary);
+  background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-bg-elevated));
+}
+
+.completeMenuChevronOpen {
+  transform: rotate(180deg);
+}
+
+.completeMenuDropdown {
+  position: fixed;
+  z-index: 1000;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 180px;
+}
+
+.completeMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+  width: 100%;
+}
+
+.completeMenuItem:hover {
+  background: var(--color-bg-elevated);
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .completePanelPhased {
+    gap: 12px;
+    padding: 4px 0;
+  }
+
+  .completePhasedTitle {
+    font-size: 1.3rem;
+  }
+
+  .completeStatsBar {
+    gap: 12px;
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .completeImageWrapPhased {
+    max-width: 260px;
+  }
+
+  .completePrimaryBtn {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+}

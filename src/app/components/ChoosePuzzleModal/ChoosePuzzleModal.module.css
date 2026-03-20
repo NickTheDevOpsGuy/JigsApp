@@ -3,57 +3,113 @@
 .stepIndicator {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  margin-bottom: 12px;
+  gap: 0;
+  margin-bottom: 16px;
   flex-shrink: 0;
 }
 
-.stepCurrent {
-  color: var(--color-brand-primary);
+/* Connecting line between steps */
+.stepConnector {
+  flex: 1;
+  height: 2px;
+  background: var(--color-border);
+  transition: background 0.2s;
 }
 
-.stepSep {
-  opacity: 0.25;
-  pointer-events: none;
-  font-size: 11px;
-}
-
-.stepLink {
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  opacity: 0.45;
-  transition:
-    color 0.15s,
-    opacity 0.15s;
+/* Base step item */
+.stepItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
   background: none;
   border: none;
-  font: inherit;
-  font-size: 13px;
-  padding: 0;
-}
-
-.stepLink:hover {
-  color: var(--color-brand-primary);
-  text-decoration: underline;
-}
-
-.stepLink:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-.stepLink:disabled {
+  padding: 0 4px;
   cursor: default;
-  opacity: 0.5;
+  flex-shrink: 0;
+  font: inherit;
 }
 
-.stepLink:disabled:hover {
-  text-decoration: none;
-  color: inherit;
+button.stepItem {
+  cursor: pointer;
+}
+
+button.stepItem:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+button.stepItem:disabled {
+  cursor: default;
+}
+
+/* Step circle */
+.stepNum {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  line-height: 1;
+}
+
+/* Step label */
+.stepLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  transition: color 0.2s, opacity 0.2s;
+  white-space: nowrap;
+}
+
+/* ── Active step ── */
+.stepItemActive .stepNum {
+  background: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+  color: #fff;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
+}
+
+.stepItemActive .stepLabel {
+  color: var(--color-brand-primary);
+  opacity: 1;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+/* ── Completed step ── */
+.stepItemDone .stepNum {
+  background: color-mix(in srgb, var(--color-brand-primary) 15%, var(--color-bg-elevated));
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+  font-size: 15px;
+}
+
+.stepItemDone .stepLabel {
+  color: var(--color-brand-primary);
+  opacity: 0.75;
+}
+
+button.stepItemDone:hover .stepNum {
+  background: color-mix(in srgb, var(--color-brand-primary) 25%, var(--color-bg-elevated));
+}
+
+/* ── Future step ── */
+.stepItemFuture .stepNum {
+  opacity: 0.4;
+}
+
+.stepItemFuture .stepLabel {
+  opacity: 0.35;
 }
 
 .filterBar {
@@ -281,8 +337,8 @@
 .puzzleGrid {
   display: flex;
   flex-wrap: nowrap;
-  gap: 8px;
-  padding: 4px 14px 8px;
+  gap: 10px;
+  padding: 4px 14px 8px 14px;
   width: max-content;
   box-sizing: border-box;
   direction: ltr;
@@ -309,8 +365,8 @@
 .puzzleTile {
   position: relative;
   flex-shrink: 0;
-  width: 80px;
-  min-height: 98px;
+  width: 110px;
+  min-height: 130px;
   display: flex;
   flex-direction: column;
   border-radius: 10px;
@@ -331,9 +387,17 @@
 /* Mobile: shrink grid, arrows, bar and spacing so modal fits */
 @media (max-width: 640px) {
   .stepIndicator {
-    font-size: 13px;
-    margin-bottom: 8px;
-    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .stepNum {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .stepLabel {
+    font-size: 10px;
   }
 
   .filterBar {
@@ -375,7 +439,7 @@
 
   /* Mobile: smaller cards, 1 full + partial next to signal horizontal scroll */
   .puzzleTile {
-    width: min(56vw, 180px);
+    width: min(42vw, 150px);
     min-height: 0;
     border-width: 1px;
     border-radius: 10px;
@@ -627,10 +691,7 @@
   border: 1px solid var(--color-border);
   border-radius: 14px;
   cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s,
-    transform 0.1s;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
   min-height: 90px;
 }
 
@@ -686,5 +747,62 @@
 
   .categoryCardName {
     font-size: 11px;
+  }
+}
+
+/* Setup step: thumbnail + title side by side */
+.setupHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.setupThumb {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+.setupThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.setupHeaderText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.setupPuzzleName {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* backToPuzzlesBtn removed */
+
+/* stepLinkPlain removed */
+
+@media (max-width: 640px) {
+  .setupThumb {
+    width: 56px;
+    height: 56px;
+  }
+  .setupPuzzleName {
+    font-size: 1rem;
   }
 }

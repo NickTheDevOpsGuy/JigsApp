@@ -55,28 +55,7 @@
   min-width: 0;
 }
 
-.stepIndicator {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.stepSegment {
-  white-space: nowrap;
-}
-
-.stepSegmentCurrent {
-  color: var(--color-brand-primary);
-}
-
-.stepSeparator {
-  opacity: 0.6;
-  font-size: 0.8rem;
-}
+/* step indicator moved to shared block below */
 
 .backBtn {
   display: flex;
@@ -268,3 +247,98 @@
   box-shadow: 0 0 10px rgba(11, 99, 184, 0.4);
   transition: width 0.15s ease-out;
 }
+
+/* ── Step indicator: numbered circles (Pack → Puzzle → Difficulty) ── */
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.stepConnector {
+  flex: 1;
+  height: 2px;
+  background: var(--color-border);
+  min-width: 12px;
+  max-width: 32px;
+}
+
+.stepItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0 3px;
+  cursor: default;
+  flex-shrink: 0;
+  font: inherit;
+}
+
+button.stepItem {
+  cursor: pointer;
+}
+
+button.stepItem:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.stepNum {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  line-height: 1;
+}
+
+.stepLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  opacity: 0.45;
+  white-space: nowrap;
+}
+
+/* Active */
+.stepItemActive .stepNum {
+  background: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+  color: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+}
+.stepItemActive .stepLabel {
+  color: var(--color-brand-primary);
+  opacity: 1;
+  font-weight: 800;
+  font-size: 11px;
+}
+
+/* Done */
+.stepItemDone .stepNum {
+  background: color-mix(in srgb, var(--color-brand-primary) 15%, var(--color-bg-elevated));
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+  font-size: 14px;
+}
+.stepItemDone .stepLabel {
+  color: var(--color-brand-primary);
+  opacity: 0.75;
+}
+button.stepItemDone:hover .stepNum {
+  background: color-mix(in srgb, var(--color-brand-primary) 25%, var(--color-bg-elevated));
+}
+
+/* Future */
+.stepItemFuture .stepNum { opacity: 0.38; }
+.stepItemFuture .stepLabel { opacity: 0.28; }

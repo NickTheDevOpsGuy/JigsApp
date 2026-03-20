@@ -6,9 +6,9 @@ import { buildPiecePath } from "@/puzzle/core/shape";
 
 /** Must match or exceed shape.ts depth so knobs fit within piece bounds. */
 const CUT_DEPTH_PCT: Record<PieceCutType, number> = {
-  classic: 0.2,
-  irregular: 0.22,
-  hard: 0.14,
+  classic: 0.26,
+  irregular: 0.28,
+  hard: 0.18,
 };
 
 type CreateInitialPiecesArgs = {
@@ -98,7 +98,7 @@ export function createInitialPieces(args: CreateInitialPiecesArgs): Piece[] {
   const edges = buildEdgesForGrid(grid);
   const depthPct = CUT_DEPTH_PCT[cutType];
   const rawPad = Math.ceil(Math.min(tileW, tileH) * depthPct);
-  const minPad = Math.max(10, Math.min(34, rawPad));
+  const minPad = Math.max(12, Math.min(52, rawPad));
   const effectivePad = Math.max(pad, minPad);
 
   const w = tileW + effectivePad * 2;

@@ -7,9 +7,9 @@ import type { ImageSourceRect } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { DRAG_LIFT_PX } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { drawWrongRotationIcon, drawLockGlow } from "./renderBoardDrawOverlays";
 
-/** Outer stroke: crisp jigsaw silhouette; rounded joins for natural tabs/sockets. */
-const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.56)";
-const OUTLINE_LINE_WIDTH = 1.85;
+/** Outer stroke: crisp silhouette without heavy inner bleed on curves. */
+const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.38)";
+const OUTLINE_LINE_WIDTH = 1.65;
 
 function getPieceSurfaceVariation(piece: Piece): {
   brightness: number;
@@ -109,31 +109,13 @@ export function drawPieceImageInPath(
 
   const bevelShade = ctx.createLinearGradient(0, 0, 0, piece.h);
   bevelShade.addColorStop(0, "rgba(0,0,0,0)");
-  bevelShade.addColorStop(0.55, "rgba(0,0,0,0.06)");
-  bevelShade.addColorStop(1, "rgba(0,0,0,0.16)");
+  bevelShade.addColorStop(0.55, "rgba(0,0,0,0.05)");
+  bevelShade.addColorStop(1, "rgba(0,0,0,0.12)");
   ctx.fillStyle = bevelShade;
   ctx.fill(path);
 
-  /* Edge shading: light top-left to dark bottom-right so tabs/sockets feel natural */
-  const edgeShade = ctx.createLinearGradient(0, 0, piece.w, piece.h);
-  edgeShade.addColorStop(0, "rgba(255,255,255,0.06)");
-  edgeShade.addColorStop(0.4, "rgba(0,0,0,0.05)");
-  edgeShade.addColorStop(1, "rgba(0,0,0,0.16)");
-  ctx.strokeStyle = edgeShade;
-  ctx.lineWidth = 1.8;
-  ctx.lineJoin = "round";
-  ctx.lineCap = "round";
-  ctx.stroke(path);
-
-  const edgeRim = ctx.createLinearGradient(0, 0, piece.w, piece.h);
-  edgeRim.addColorStop(0, "rgba(255,255,255,0.08)");
-  edgeRim.addColorStop(0.5, "rgba(255,255,255,0)");
-  edgeRim.addColorStop(1, "rgba(0,0,0,0.1)");
-  ctx.strokeStyle = edgeRim;
-  ctx.lineWidth = 1.25;
-  ctx.lineJoin = "round";
-  ctx.lineCap = "round";
-  ctx.stroke(path);
+  /* No in-clip stroke: stroking the silhouette here painted dark arcs across the image
+   * (especially on tabs). Outer edge comes from strokePieceOutline after the cache. */
   ctx.restore();
 }
 

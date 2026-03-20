@@ -8,7 +8,7 @@
  */
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Puzzle, Check, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { Puzzle, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/packs/samplePuzzles";
@@ -17,7 +17,6 @@ import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import styles from "./ChoosePuzzleModal.module.css";
-import { FilterPanel } from "@/components/FilterPanel/FilterPanel";
 
 const PRIMARY_DIFFICULTIES = GRID_OPTIONS.slice(0, 4);
 const DIFFICULTY_NAMES = ["Easy", "Medium", "Hard", "Expert"] as const;
@@ -41,7 +40,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   const [selectedPuzzle, setSelectedPuzzle] = useState<SamplePuzzle | null>(null);
   const [difficultyIndex, setDifficultyIndex] = useState(1);
   const [filterCategory, setFilterCategory] = useState("all");
-  const [filterOpen, setFilterOpen] = useState(false);
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
 
   const filteredPuzzles = useMemo(
@@ -68,7 +66,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
 
   useEffect(() => {
     if (!isOpen) return;
-    setFilterOpen(false);
     setDifficultyIndex(1);
     setFilterCategory("all");
     const filtered = filterPuzzles(SAMPLE_PUZZLES, "all");
@@ -77,13 +74,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     setStep("category");
   }, [isOpen]);
 
-  const activeFilterOption = CATEGORIES.find((c) => c.id === filterCategory);
-  const filterTriggerLabel =
-    filterCategory === "all"
-      ? "✨ All Packs"
-      : activeFilterOption
-        ? `${activeFilterOption.label ?? ""} ${activeFilterOption.name}`.trim()
-        : "Filter";
 
   useEffect(() => {
     if (!isOpen) return;
@@ -145,6 +135,9 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     safeLocalStorage.setItem(STORAGE_KEY, selectedPuzzle.fullImage);
     safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
     safeLocalStorage.removeItem("phuzzle:dailyDate");
+    // Preload image into browser cache before navigating so play screen starts instantly
+    const preload = new Image();
+    preload.src = selectedPuzzle.fullImage;
     onClose();
     navigate("/play");
   };
@@ -178,65 +171,72 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
       showCloseButton
       variant="choosePuzzle"
     >
-      {/* Breadcrumb: Category → Puzzle → Setup → Start */}
+      {/* Step indicator */}
       <nav
         className={styles.stepIndicator}
         role="navigation"
-        aria-label="Steps: Category, Puzzle, Setup, Start"
+        aria-label="Steps: Category, Puzzle, Setup"
       >
+        {/* Step 1: Category */}
         <button
           type="button"
-          className={`${styles.stepLink} ${step === "category" ? styles.stepCurrent : ""}`}
+          className={[
+            styles.stepItem,
+            step === "category" ? styles.stepItemActive : "",
+            step !== "category" ? styles.stepItemDone : "",
+          ].join(" ")}
           onClick={() => goToStep("category")}
-          title="Category selection"
           aria-current={step === "category" ? "step" : undefined}
+          title="Back to category selection"
         >
-          Category
+          <span className={styles.stepNum} aria-hidden>
+            {step !== "category" ? "✓" : "1"}
+          </span>
+          <span className={styles.stepLabel}>Pack</span>
         </button>
-        <span className={styles.stepSep} aria-hidden>
-          →
-        </span>
+
+        <span className={styles.stepConnector} aria-hidden />
+
+        {/* Step 2: Puzzle */}
         <button
           type="button"
-          className={`${styles.stepLink} ${step === "puzzle" ? styles.stepCurrent : ""}`}
+          className={[
+            styles.stepItem,
+            step === "puzzle" ? styles.stepItemActive : "",
+            step === "setup" ? styles.stepItemDone : "",
+            step === "category" ? styles.stepItemFuture : "",
+          ].join(" ")}
           onClick={() => step !== "category" && goToStep("puzzle")}
           disabled={step === "category"}
-          title="Puzzle selection"
           aria-current={step === "puzzle" ? "step" : undefined}
+          title={step !== "category" ? "Back to puzzle selection" : undefined}
         >
-          Puzzle
+          <span className={styles.stepNum} aria-hidden>
+            {step === "setup" ? "✓" : "2"}
+          </span>
+          <span className={styles.stepLabel}>Puzzle</span>
         </button>
-        <span className={styles.stepSep} aria-hidden>
-          →
-        </span>
-        <button
-          type="button"
-          className={`${styles.stepLink} ${step === "setup" ? styles.stepCurrent : ""}`}
-          disabled={step !== "setup" || !selectedPuzzle}
-          title="Setup"
+
+        <span className={styles.stepConnector} aria-hidden />
+
+        {/* Step 3: Setup */}
+        <span
+          className={[
+            styles.stepItem,
+            step === "setup" ? styles.stepItemActive : "",
+            step !== "setup" ? styles.stepItemFuture : "",
+          ].join(" ")}
           aria-current={step === "setup" ? "step" : undefined}
         >
-          Setup
-        </button>
-        <span className={styles.stepSep} aria-hidden>
-          →
+          <span className={styles.stepNum} aria-hidden>3</span>
+          <span className={styles.stepLabel}>Setup</span>
         </span>
-        <button
-          type="button"
-          className={`${styles.stepLink} ${step === "setup" && canStart ? styles.stepCurrent : ""}`}
-          onClick={() => canStart && startButtonRef.current?.focus()}
-          disabled={!canStart}
-          title={canStart ? "Start puzzle" : "Select a puzzle and difficulty first"}
-          aria-label="Start"
-        >
-          Start
-        </button>
       </nav>
 
       {/* Step 1: Category grid — click a category to go straight to puzzle rail */}
       {step === "category" && (
         <div className={styles.categoryGrid}>
-          {CATEGORIES.map((cat) => (
+          {CATEGORIES.filter((cat) => cat.id !== "all").map((cat) => (
             <button
               key={cat.id}
               type="button"
@@ -248,7 +248,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
               }}
             >
               <span className={styles.categoryCardEmoji}>
-                {cat.id === "all" ? "✨" : cat.label}
+{cat.label}
               </span>
               <span className={styles.categoryCardName}>{cat.name}</span>
             </button>
@@ -256,52 +256,28 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         </div>
       )}
 
-      {/* Step 2: Puzzle rail — same Filter control + chips, then rail */}
+      {/* Step 2: Puzzle rail */}
       {step === "puzzle" && (
         <>
-          <div className={styles.filterControlRow}>
-            <button
-              type="button"
-              className={styles.filterTriggerBtn}
-              onClick={() => setFilterOpen(true)}
-              aria-label="Open filter"
-              aria-haspopup="dialog"
-              aria-expanded={filterOpen}
-            >
-              {filterTriggerLabel} <ChevronDown size={16} aria-hidden />
-            </button>
-          </div>
-          <FilterPanel
-            isOpen={filterOpen}
-            onClose={() => setFilterOpen(false)}
-            title="Filter by category"
-            categoryOptions={CATEGORIES.map((c) => ({
-              id: c.id,
-              name: c.name,
-              label:
-                c.id === "all" ? "✨ All Packs" : `${c.label ?? ""} ${c.name}`.trim(),
-            }))}
-            selectedCategoryId={filterCategory}
-            onCategorySelect={setFilterCategory}
-            onApply={(id) => {
-              setFilterOpen(false);
-              if (id) setStep("puzzle");
-            }}
-            onReset={() => setFilterCategory("all")}
-            autoApplyOnSelect
-          />
-          <p className={styles.railLabel}>Choose a puzzle</p>
+          <p className={styles.railLabel}>
+            {filterCategory !== "all" && CATEGORIES.find((c) => c.id === filterCategory)
+              ? `${CATEGORIES.find((c) => c.id === filterCategory)!.label ?? ""} ${CATEGORIES.find((c) => c.id === filterCategory)!.name}`.trim()
+              : "All Packs"}{" "}
+            — pick a puzzle
+          </p>
           <div className={styles.gridScrollWrap}>
-            <button
-              type="button"
-              className={styles.gridScrollBtn}
-              onClick={() => scrollGridBy(-1)}
-              disabled={!canScrollLeft}
-              aria-label="Scroll left"
-              title="Scroll left"
-            >
-              <ChevronLeft size={22} aria-hidden />
-            </button>
+            {(canScrollLeft || canScrollRight) && (
+              <button
+                type="button"
+                className={styles.gridScrollBtn}
+                onClick={() => scrollGridBy(-1)}
+                disabled={!canScrollLeft}
+                aria-label="Scroll left"
+                title="Scroll left"
+              >
+                <ChevronLeft size={22} aria-hidden />
+              </button>
+            )}
             <div
               ref={gridScrollRef}
               className={styles.puzzleGridScroller}
@@ -315,7 +291,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                     puzzle={puzzle}
                     selected={selectedPuzzle?.id === puzzle.id}
                     imgError={imgError[puzzle.id]}
-                    eagerLoad={index < 12}
+                    eagerLoad={index < 32}
                     onSelect={() => {
                       setSelectedPuzzle(puzzle);
                       setDifficultyIndex(1);
@@ -328,16 +304,18 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                 ))}
               </div>
             </div>
-            <button
-              type="button"
-              className={styles.gridScrollBtn}
-              onClick={() => scrollGridBy(1)}
-              disabled={!canScrollRight}
-              aria-label="Scroll right"
-              title="Scroll right"
-            >
-              <ChevronRight size={22} aria-hidden />
-            </button>
+            {(canScrollLeft || canScrollRight) && (
+              <button
+                type="button"
+                className={styles.gridScrollBtn}
+                onClick={() => scrollGridBy(1)}
+                disabled={!canScrollRight}
+                aria-label="Scroll right"
+                title="Scroll right"
+              >
+                <ChevronRight size={22} aria-hidden />
+              </button>
+            )}
           </div>
           <div
             className={styles.gridScrollBar}
@@ -355,10 +333,18 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         </>
       )}
 
-      {/* Step 3: Setup — difficulty + Start only (image already seen on puzzle step) */}
+      {/* Step 3: Setup — thumbnail + difficulty + Start */}
       {step === "setup" && selectedPuzzle && (
         <>
-          <h2 className={styles.setupPuzzleName}>{selectedPuzzle.name}</h2>
+          <div className={styles.setupHeader}>
+            <div className={styles.setupThumb}>
+              <img src={selectedPuzzle.thumbnail} alt="" className={styles.setupThumbImg} />
+            </div>
+            <div className={styles.setupHeaderText}>
+              <h2 className={styles.setupPuzzleName}>{selectedPuzzle.name}</h2>
+
+            </div>
+          </div>
           <div
             className={styles.difficultySelector}
             role="group"

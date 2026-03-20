@@ -200,8 +200,8 @@ export function usePlayScreenManager(
       // Only mark "did run" and disconnect after we actually create the manager (so on mobile,
       // if board is 0x0 at fallback time, ResizeObserver can still fire when layout completes).
       // Declare ro, fallbackId, retryIdRef before tryRun so runSizing() can safely reference them (avoids TDZ).
-      const RETRY_MS = 400;
-      const MAX_WAIT_MS = 2800;
+      const RETRY_MS = 200;
+      const MAX_WAIT_MS = 2400;
       const retryIdRef = { current: null as ReturnType<typeof setInterval> | null };
       const ro = new ResizeObserver(() => {
         if (didRunRef.current) return;
@@ -213,7 +213,7 @@ export function usePlayScreenManager(
         if (didRunRef.current) return;
         runSizing();
         if (didRunRef.current) return;
-        let elapsed = 500;
+        let elapsed = 0;
         retryIdRef.current = setInterval(() => {
           elapsed += RETRY_MS;
           if (didRunRef.current || elapsed > MAX_WAIT_MS) {
@@ -233,7 +233,7 @@ export function usePlayScreenManager(
             retryIdRef.current = null;
           }
         };
-      }, 500);
+      }, 48);
       const tryRun = () => {
         if (didRunRef.current || !mainEl || !boardEl) return;
         const r = boardEl.getBoundingClientRect();
@@ -242,6 +242,14 @@ export function usePlayScreenManager(
       };
       ro.observe(boardEl);
       tryRun();
+      /* Board can be 0×0 for a frame after image load; retry over a few paints before 48ms fallback. */
+      let chain = 0;
+      const chainRun = () => {
+        if (didRunRef.current || chain++ >= 8) return;
+        tryRun();
+        if (!didRunRef.current) requestAnimationFrame(chainRun);
+      };
+      requestAnimationFrame(chainRun);
       sizingCleanupRef.current = () => {
         ro.disconnect();
         clearTimeout(fallbackId);

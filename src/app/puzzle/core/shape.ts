@@ -16,16 +16,16 @@ const CUT_PARAMS: Record<
   PieceCutType,
   { depthPct: number; widthPct: number; entryPct: number; bulbPct: number }
 > = {
-  // Organic bulb: smooth entry curve, rounded bulb, smooth exit. No perfect circles.
-  classic: { depthPct: 0.2, widthPct: 0.34, entryPct: 0.16, bulbPct: 0.32 },
-  irregular: { depthPct: 0.22, widthPct: 0.32, entryPct: 0.18, bulbPct: 0.35 },
-  hard: { depthPct: 0.14, widthPct: 0.27, entryPct: 0.12, bulbPct: 0.28 },
+  /* Narrower neck (lower entryPct) + wider bulb curve → rounder, less “trapezoid” tabs. */
+  classic: { depthPct: 0.26, widthPct: 0.42, entryPct: 0.06, bulbPct: 0.58 },
+  irregular: { depthPct: 0.28, widthPct: 0.40, entryPct: 0.07, bulbPct: 0.56 },
+  hard: { depthPct: 0.18, widthPct: 0.32, entryPct: 0.05, bulbPct: 0.48 },
 };
 
 function knobDepth(tileW: number, tileH: number, cutType: PieceCutType) {
   const p = CUT_PARAMS[cutType];
   const raw = Math.round(Math.min(tileW, tileH) * p.depthPct);
-  return Math.max(10, Math.min(38, raw));
+  return Math.max(12, Math.min(52, raw));
 }
 
 function knobWidth(

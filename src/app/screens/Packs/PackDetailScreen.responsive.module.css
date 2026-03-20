@@ -57,15 +57,6 @@
     flex-shrink: 0;
   }
 
-  .stepIndicator {
-    font-size: 0.8125rem;
-    gap: 4px;
-  }
-
-  .stepSeparator {
-    font-size: 0.75rem;
-  }
-
   .puzzleGridWrap {
     flex: 1 1 auto;
     min-height: 0;
@@ -136,3 +127,7 @@
     width: clamp(140px, 42vw, 180px);
   }
 }
+
+  /* Step indicator mobile */
+  .stepNum { width: 22px; height: 22px; font-size: 11px; }
+  .stepLabel { font-size: 9px; }
