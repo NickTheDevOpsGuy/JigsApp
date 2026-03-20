@@ -26,7 +26,9 @@
   color: var(--color-text-primary);
   opacity: 0;
   transform: translateY(-8px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
   flex-shrink: 0;
 }
 
@@ -113,7 +115,9 @@
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.12s;
+  transition:
+    opacity 0.15s,
+    transform 0.12s;
   box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
   display: flex;
   align-items: center;
@@ -150,7 +154,9 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .completeMenuTrigger:hover {

@@ -74,7 +74,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     setStep("category");
   }, [isOpen]);
 
-
   useEffect(() => {
     if (!isOpen) return;
     const inList =
@@ -228,7 +227,9 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
           ].join(" ")}
           aria-current={step === "setup" ? "step" : undefined}
         >
-          <span className={styles.stepNum} aria-hidden>3</span>
+          <span className={styles.stepNum} aria-hidden>
+            3
+          </span>
           <span className={styles.stepLabel}>Setup</span>
         </span>
       </nav>
@@ -247,9 +248,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                 setStep("puzzle");
               }}
             >
-              <span className={styles.categoryCardEmoji}>
-{cat.label}
-              </span>
+              <span className={styles.categoryCardEmoji}>{cat.label}</span>
               <span className={styles.categoryCardName}>{cat.name}</span>
             </button>
           ))}
@@ -338,11 +337,14 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         <>
           <div className={styles.setupHeader}>
             <div className={styles.setupThumb}>
-              <img src={selectedPuzzle.thumbnail} alt="" className={styles.setupThumbImg} />
+              <img
+                src={selectedPuzzle.thumbnail}
+                alt=""
+                className={styles.setupThumbImg}
+              />
             </div>
             <div className={styles.setupHeaderText}>
               <h2 className={styles.setupPuzzleName}>{selectedPuzzle.name}</h2>
-
             </div>
           </div>
           <div

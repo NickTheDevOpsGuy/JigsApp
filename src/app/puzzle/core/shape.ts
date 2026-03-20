@@ -18,7 +18,7 @@ const CUT_PARAMS: Record<
 > = {
   /* Narrower neck (lower entryPct) + wider bulb curve → rounder, less “trapezoid” tabs. */
   classic: { depthPct: 0.26, widthPct: 0.42, entryPct: 0.06, bulbPct: 0.58 },
-  irregular: { depthPct: 0.28, widthPct: 0.40, entryPct: 0.07, bulbPct: 0.56 },
+  irregular: { depthPct: 0.28, widthPct: 0.4, entryPct: 0.07, bulbPct: 0.56 },
   hard: { depthPct: 0.18, widthPct: 0.32, entryPct: 0.05, bulbPct: 0.48 },
 };
 
