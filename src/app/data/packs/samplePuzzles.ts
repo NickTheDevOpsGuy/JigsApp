@@ -114,7 +114,7 @@ const discoveredCategories = [...new Set(SAMPLE_PUZZLES.map((p) => p.category))]
 
 export const CATEGORIES = [
   { id: "all", label: "All", name: "All" },
-  ...CATEGORY_ORDER.filter((cat) => discoveredCategories.includes(cat)).map((cat) => ({
+  ...CATEGORY_ORDER.map((cat) => ({
     id: cat,
     label: CATEGORY_LABELS[cat] ?? kebabToTitle(cat),
     name: CATEGORY_NAMES[cat] ?? kebabToTitle(cat),
