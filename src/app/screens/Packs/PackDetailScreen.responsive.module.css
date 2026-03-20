@@ -106,7 +106,7 @@
   }
 
   .puzzleCard {
-    width: clamp(140px, 38vw, 168px);
+    width: clamp(150px, 40vw, 180px);
     padding: 10px 8px;
     gap: 6px;
   }
@@ -128,12 +128,6 @@
   }
 }
 
-/* Step indicator mobile */
-.stepNum {
-  width: 22px;
-  height: 22px;
-  font-size: 11px;
-}
-.stepLabel {
-  font-size: 9px;
-}
+  /* Step indicator mobile */
+  .stepNum { width: 22px; height: 22px; font-size: 11px; }
+  .stepLabel { font-size: 9px; }

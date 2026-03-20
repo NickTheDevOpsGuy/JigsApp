@@ -72,8 +72,8 @@ export class PuzzleManagerState {
       pieceHeight,
       scatterPadding = 16,
       pad = 18,
-      snapToleranceBoardPx = 60,
-      snapToleranceNeighborPx = 80,
+      snapToleranceBoardPx = 72,
+      snapToleranceNeighborPx = 96,
       snapScaleRef,
       relaxedToleranceMultiplierRef,
       snapToleranceOverrideRef,
@@ -102,7 +102,7 @@ export class PuzzleManagerState {
     this.rotationStepDeg = rotationStepDeg;
 
     const cutType = options.cutType ?? "classic";
-    const depthPct = cutType === "irregular" ? 0.26 : cutType === "hard" ? 0.14 : 0.22;
+    const depthPct = cutType === "irregular" ? 0.30 : cutType === "hard" ? 0.20 : 0.28;
     const minPad = Math.ceil(Math.min(pieceWidth, pieceHeight) * depthPct);
     this.pad = Math.max(pad, minPad);
     this.tileW = pieceWidth;

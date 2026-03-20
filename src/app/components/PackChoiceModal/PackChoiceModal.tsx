@@ -126,7 +126,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     setStep("pack");
   }, [isOpen]);
 
-
   useEffect(() => {
     if (!isOpen || !packsData) return;
     const el = packScrollRef.current;
@@ -285,7 +284,9 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
           ].join(" ")}
           aria-current={step === "setup" ? "step" : undefined}
         >
-          <span className={styles.stepNum} aria-hidden>3</span>
+          <span className={styles.stepNum} aria-hidden>
+            3
+          </span>
           <span className={styles.stepLabel}>Setup</span>
         </span>
       </nav>
@@ -321,7 +322,9 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                   </div>
                 ) : (
                   filteredPacks.map((pack, packIndex) => {
-                    const meta = PACK_METADATA.find((p: PackMetadata) => p.id === pack.id);
+                    const meta = PACK_METADATA.find(
+                      (p: PackMetadata) => p.id === pack.id,
+                    );
                     const puzzleList = packsData.getPuzzlesForPack(pack);
                     const hero = puzzleList[0];
                     const { completed: completedCount, total } = getPackProgress(
@@ -508,7 +511,11 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         <>
           <div className={localStyles.setupHeader}>
             <div className={localStyles.setupThumb}>
-              <img src={selectedPuzzle.thumbnail} alt="" className={localStyles.setupThumbImg} />
+              <img
+                src={selectedPuzzle.thumbnail}
+                alt=""
+                className={localStyles.setupThumbImg}
+              />
             </div>
             <h2 className={localStyles.setupPuzzleName}>{selectedPuzzle.name}</h2>
           </div>

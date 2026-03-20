@@ -53,7 +53,7 @@ export function shouldIgnoreNeighborJitterOverlap(
 
   // Allow tiny float/rounding drift so valid edge neighbors don't get collision-blocked
   // (e.g. right-edge pieces locking next to already-placed left neighbor).
-  const jitterPx = 6;
+  const jitterPx = 12;
   const shallowEdgeOverlap =
     (overlapX > 0 && overlapX <= jitterPx) || (overlapY > 0 && overlapY <= jitterPx);
   if (shallowEdgeOverlap) return true;

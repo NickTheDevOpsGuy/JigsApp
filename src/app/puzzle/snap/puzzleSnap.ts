@@ -94,7 +94,7 @@ export function computeBoardSnapResult(
   if (wouldOverlapAnyOtherGroup(pieces, gid, dx, dy, overlapEpsilonPx)) return null;
 
   /** Allow small per-piece drift (e.g. from rounding/merge) so whole group can snap and lock. */
-  const perPieceEpsilonPx = 10;
+  const perPieceEpsilonPx = 16;
   for (const p of groupPieces) {
     const t = getTilePos(p);
     const offX = Math.abs(p.targetX - t.x - dx);
@@ -267,7 +267,7 @@ export function computeMergedGroupBoardSnapResult(
 
   if (wouldOverlapAnyOtherGroup(pieces, groupId, dx, dy, overlapEpsilonPx)) return null;
 
-  const perPieceEpsilonPx = 10;
+  const perPieceEpsilonPx = 16;
   for (const p of groupPieces) {
     const t = getTilePos(p);
     const offX = Math.abs(p.targetX - t.x - dx);

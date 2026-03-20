@@ -21,7 +21,7 @@
   display: grid;
   gap: 12px;
   padding: 14px;
-  min-height: 256px;
+  min-height: 280px;
   min-width: 240px;
   max-width: 286px;
   background: var(--color-bg-elevated);

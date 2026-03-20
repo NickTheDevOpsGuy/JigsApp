@@ -57,10 +57,7 @@ button.stepItem:disabled {
   border: 2px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    color 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
   line-height: 1;
 }
 
@@ -70,9 +67,7 @@ button.stepItem:disabled {
   font-weight: 600;
   color: var(--color-text-secondary);
   opacity: 0.5;
-  transition:
-    color 0.2s,
-    opacity 0.2s;
+  transition: color 0.2s, opacity 0.2s;
   white-space: nowrap;
 }
 
@@ -93,11 +88,7 @@ button.stepItem:disabled {
 
 /* ── Completed step ── */
 .stepItemDone .stepNum {
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 15%,
-    var(--color-bg-elevated)
-  );
+  background: color-mix(in srgb, var(--color-brand-primary) 15%, var(--color-bg-elevated));
   border-color: var(--color-brand-primary);
   color: var(--color-brand-primary);
   font-size: 15px;
@@ -109,11 +100,7 @@ button.stepItem:disabled {
 }
 
 button.stepItemDone:hover .stepNum {
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 25%,
-    var(--color-bg-elevated)
-  );
+  background: color-mix(in srgb, var(--color-brand-primary) 25%, var(--color-bg-elevated));
 }
 
 /* ── Future step ── */
@@ -378,8 +365,8 @@ button.stepItemDone:hover .stepNum {
 .puzzleTile {
   position: relative;
   flex-shrink: 0;
-  width: 110px;
-  min-height: 130px;
+  width: 130px;
+  min-height: 155px;
   display: flex;
   flex-direction: column;
   border-radius: 10px;
@@ -704,10 +691,7 @@ button.stepItemDone:hover .stepNum {
   border: 1px solid var(--color-border);
   border-radius: 14px;
   cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s,
-    transform 0.1s;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
   min-height: 90px;
 }
 
@@ -722,12 +706,12 @@ button.stepItemDone:hover .stepNum {
 }
 
 .categoryCardEmoji {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   line-height: 1;
 }
 
 .categoryCardName {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-text-primary);
   text-align: center;

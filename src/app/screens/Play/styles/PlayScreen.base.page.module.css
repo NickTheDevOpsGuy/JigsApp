@@ -105,8 +105,8 @@
 
 /* HUD bar: aligned with board width; slightly increased height for breathing room; Undo/Redo only in menu */
 .topBar {
-  height: 52px;
-  max-height: 52px;
+  height: 56px;
+  max-height: 56px;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
@@ -157,7 +157,7 @@
   flex-shrink: 0;
   overflow-x: hidden;
   overflow-y: visible;
-  max-height: 52px;
+  max-height: 56px;
   transition: max-height 0.25s ease;
   position: relative;
   z-index: 200;

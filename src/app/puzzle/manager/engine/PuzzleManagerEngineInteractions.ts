@@ -19,7 +19,7 @@ import { PuzzleManagerActions } from "@/puzzle/manager/engine/PuzzleManagerEngin
 
 export class PuzzleManagerInteractions extends PuzzleManagerActions {
   private getSnapOverlapEpsilonPx(): number {
-    return this.isMobile ? 5 : 2;
+    return this.isMobile ? 12 : 8;
   }
 
   pointerDown(pieceId: string, clientX: number, clientY: number, pieceRect: DOMRect) {

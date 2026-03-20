@@ -1,6 +1,6 @@
 /**
- * shape – buildPiecePath for jigsaw pieces; organic bulb-shaped tabs, smooth bezier silhouette.
- * Supports classic, irregular, and hard cut types. Border pieces use flat outer edges.
+ * shape – buildPiecePath for jigsaw pieces.
+ * Circular knob geometry: single cubic neck sweep + k=0.5523 circle arc.
  */
 import type { EdgeType, PieceEdges, PieceCutType } from "@/puzzle/core/types";
 
@@ -12,31 +12,22 @@ type ShapeArgs = {
   cutType?: PieceCutType;
 };
 
-const CUT_PARAMS: Record<
-  PieceCutType,
-  { depthPct: number; widthPct: number; entryPct: number; bulbPct: number }
-> = {
-  /* Narrower neck (lower entryPct) + wider bulb curve → rounder, less “trapezoid” tabs. */
-  classic: { depthPct: 0.26, widthPct: 0.42, entryPct: 0.06, bulbPct: 0.58 },
-  irregular: { depthPct: 0.28, widthPct: 0.4, entryPct: 0.07, bulbPct: 0.56 },
-  hard: { depthPct: 0.18, widthPct: 0.32, entryPct: 0.05, bulbPct: 0.48 },
+const CUT_PARAMS: Record<PieceCutType, { depthPct: number; neckRatio: number; bulbRadiusRatio: number }> = {
+  classic:   { depthPct: 0.26, neckRatio: 0.42, bulbRadiusRatio: 0.36 },
+  irregular: { depthPct: 0.28, neckRatio: 0.40, bulbRadiusRatio: 0.38 },
+  hard:      { depthPct: 0.20, neckRatio: 0.46, bulbRadiusRatio: 0.30 },
 };
 
-function knobDepth(tileW: number, tileH: number, cutType: PieceCutType) {
-  const p = CUT_PARAMS[cutType];
-  const raw = Math.round(Math.min(tileW, tileH) * p.depthPct);
-  return Math.max(12, Math.min(52, raw));
-}
+// Bezier magic number for circular arc: 4/3 * tan(π/8) ≈ 0.5523
+const K = 0.5523;
 
-function knobWidth(
-  tileW: number,
-  tileH: number,
-  horizontal: boolean,
-  cutType: PieceCutType,
-) {
+function getKnobDims(tileW: number, tileH: number, cutType: PieceCutType) {
   const p = CUT_PARAMS[cutType];
-  const base = horizontal ? tileW : tileH;
-  return Math.round(base * p.widthPct);
+  const depth = Math.max(14, Math.min(56, Math.round(Math.min(tileW, tileH) * p.depthPct)));
+  const knobW = tileW * 0.44;
+  const neckW = knobW * p.neckRatio;
+  const radius = knobW * p.bulbRadiusRatio;
+  return { depth, neckW, radius };
 }
 
 function edgeDir(edge: EdgeType): 0 | 1 | -1 {
@@ -44,88 +35,92 @@ function edgeDir(edge: EdgeType): 0 | 1 | -1 {
   return edge === "tab" ? 1 : -1;
 }
 
-/**
- * Organic bulb tab: smooth entry → rounded bulb → smooth exit.
- * Two cubics per tab; entryPct/bulbPct give natural curvature (not circular).
- */
 export function buildPiecePath(args: ShapeArgs): string {
   const { tileW, tileH, pad, edges, cutType = "classic" } = args;
-  const { entryPct, bulbPct } = CUT_PARAMS[cutType];
+  const { depth, neckW, radius } = getKnobDims(tileW, tileH, cutType);
+  const hk = K * radius;
 
-  const kd = knobDepth(tileW, tileH, cutType);
-  const kwTop = knobWidth(tileW, tileH, true, cutType);
-  const kwSide = knobWidth(tileW, tileH, false, cutType);
+  const x0 = pad, y0 = pad;
+  const x1 = pad + tileW, y1 = pad + tileH;
+  const mx = (x0 + x1) / 2;
+  const my = (y0 + y1) / 2;
 
-  const x0 = pad;
-  const y0 = pad;
-  const x1 = pad + tileW;
-  const y1 = pad + tileH;
-
-  const topDir = edgeDir(edges.top);
-  const rightDir = edgeDir(edges.right);
+  const topDir    = edgeDir(edges.top);
+  const rightDir  = edgeDir(edges.right);
   const bottomDir = edgeDir(edges.bottom);
-  const leftDir = edgeDir(edges.left);
+  const leftDir   = edgeDir(edges.left);
 
+  // TOP edge (left→right). tab: s=-1 (up), socket: s=+1 (into piece)
   function topEdge(): string {
-    const mid = (x0 + x1) / 2;
-    const a = mid - kwTop / 2;
-    const b = mid + kwTop / 2;
-    const out = -kd * topDir;
     if (topDir === 0) return `L ${x1} ${y0}`;
+    const s = -topDir;
+    const cx = mx, cy = y0 + s * (depth - radius);
+    const tangY = cy - s * radius;
+    const nl = cx - neckW, nr = cx + neckW;
+    const mc = s * Math.abs(tangY - y0) * 0.55;
     return [
-      `L ${a} ${y0}`,
-      `C ${a + kwTop * entryPct} ${y0} ${mid - kwTop * bulbPct} ${y0 + out} ${mid} ${y0 + out}`,
-      `C ${mid + kwTop * bulbPct} ${y0 + out} ${b - kwTop * entryPct} ${y0} ${b} ${y0}`,
+      `L ${nl} ${y0}`,
+      `C ${nl} ${y0 + mc} ${cx - radius} ${tangY} ${cx - radius} ${cy}`,
+      `C ${cx - radius} ${cy + s * hk} ${cx - hk} ${cy + s * radius} ${cx} ${cy + s * radius}`,
+      `C ${cx + hk} ${cy + s * radius} ${cx + radius} ${cy + s * hk} ${cx + radius} ${cy}`,
+      `C ${cx + radius} ${tangY} ${nr} ${y0 + mc} ${nr} ${y0}`,
       `L ${x1} ${y0}`,
     ].join(" ");
   }
 
+  // RIGHT edge (top→bottom). tab: s=+1 (right), socket: s=-1 (into piece)
   function rightEdge(): string {
-    const mid = (y0 + y1) / 2;
-    const a = mid - kwSide / 2;
-    const b = mid + kwSide / 2;
-    const out = kd * rightDir;
     if (rightDir === 0) return `L ${x1} ${y1}`;
+    const s = rightDir;
+    const cy = my, cx = x1 + s * (depth - radius);
+    const tangX = cx - s * radius;
+    const nl = cy - neckW, nr = cy + neckW;
+    const mc = s * Math.abs(tangX - x1) * 0.55;
     return [
-      `L ${x1} ${a}`,
-      `C ${x1 + out} ${a + kwSide * entryPct} ${x1 + out} ${mid - kwSide * bulbPct} ${x1 + out} ${mid}`,
-      `C ${x1 + out} ${mid + kwSide * bulbPct} ${x1} ${b - kwSide * entryPct} ${x1} ${b}`,
+      `L ${x1} ${nl}`,
+      `C ${x1 + mc} ${nl} ${tangX} ${cy - radius} ${cx} ${cy - radius}`,
+      `C ${cx + s * hk} ${cy - radius} ${cx + s * radius} ${cy - hk} ${cx + s * radius} ${cy}`,
+      `C ${cx + s * radius} ${cy + hk} ${cx + s * hk} ${cy + radius} ${cx} ${cy + radius}`,
+      `C ${tangX} ${cy + radius} ${x1 + mc} ${nr} ${x1} ${nr}`,
       `L ${x1} ${y1}`,
     ].join(" ");
   }
 
+  // BOTTOM edge (right→left). tab: s=+1 (down), socket: s=-1 (into piece)
   function bottomEdge(): string {
-    const mid = (x0 + x1) / 2;
-    const a = mid + kwTop / 2;
-    const b = mid - kwTop / 2;
-    const out = kd * bottomDir;
     if (bottomDir === 0) return `L ${x0} ${y1}`;
+    const s = bottomDir;
+    const cx = mx, cy = y1 + s * (depth - radius);
+    const tangY = cy - s * radius;
+    const nl = cx + neckW, nr = cx - neckW;
+    const mc = s * Math.abs(tangY - y1) * 0.55;
     return [
-      `L ${a} ${y1}`,
-      `C ${a - kwTop * entryPct} ${y1} ${mid + kwTop * bulbPct} ${y1 + out} ${mid} ${y1 + out}`,
-      `C ${mid - kwTop * bulbPct} ${y1 + out} ${b + kwTop * entryPct} ${y1} ${b} ${y1}`,
+      `L ${nl} ${y1}`,
+      `C ${nl} ${y1 + mc} ${cx + radius} ${tangY} ${cx + radius} ${cy}`,
+      `C ${cx + radius} ${cy + s * hk} ${cx + hk} ${cy + s * radius} ${cx} ${cy + s * radius}`,
+      `C ${cx - hk} ${cy + s * radius} ${cx - radius} ${cy + s * hk} ${cx - radius} ${cy}`,
+      `C ${cx - radius} ${tangY} ${nr} ${y1 + mc} ${nr} ${y1}`,
       `L ${x0} ${y1}`,
     ].join(" ");
   }
 
+  // LEFT edge (bottom→top). tab: s=-1 (left), socket: s=+1 (into piece)
   function leftEdge(): string {
-    const mid = (y0 + y1) / 2;
-    const a = mid + kwSide / 2;
-    const b = mid - kwSide / 2;
-    const out = -kd * leftDir;
     if (leftDir === 0) return `L ${x0} ${y0}`;
+    const s = -leftDir;
+    const cy = my, cx = x0 + s * (depth - radius);
+    const tangX = cx - s * radius;
+    const nl = cy + neckW, nr = cy - neckW;
+    const mc = s * Math.abs(tangX - x0) * 0.55;
     return [
-      `L ${x0} ${a}`,
-      `C ${x0 + out} ${a - kwSide * entryPct} ${x0 + out} ${mid + kwSide * bulbPct} ${x0 + out} ${mid}`,
-      `C ${x0 + out} ${mid - kwSide * bulbPct} ${x0} ${b + kwSide * entryPct} ${x0} ${b}`,
+      `L ${x0} ${nl}`,
+      `C ${x0 + mc} ${nl} ${tangX} ${cy + radius} ${cx} ${cy + radius}`,
+      `C ${cx + s * hk} ${cy + radius} ${cx + s * radius} ${cy + hk} ${cx + s * radius} ${cy}`,
+      `C ${cx + s * radius} ${cy - hk} ${cx + s * hk} ${cy - radius} ${cx} ${cy - radius}`,
+      `C ${tangX} ${cy - radius} ${x0 + mc} ${nr} ${x0} ${nr}`,
       `L ${x0} ${y0}`,
     ].join(" ");
   }
 
-  // Build path clockwise; smooth bezier joins at corners via lineJoin in renderer
-  const d = [`M ${x0} ${y0}`, topEdge(), rightEdge(), bottomEdge(), leftEdge(), `Z`].join(
-    " ",
-  );
-
-  return d;
+  return [`M ${x0} ${y0}`, topEdge(), rightEdge(), bottomEdge(), leftEdge(), `Z`].join(" ");
 }
