@@ -61,6 +61,11 @@
 }
 
 @media (max-width: 640px) {
-  .setupThumb { width: 56px; height: 56px; }
-  .setupPuzzleName { font-size: 1rem; }
+  .setupThumb {
+    width: 56px;
+    height: 56px;
+  }
+  .setupPuzzleName {
+    font-size: 1rem;
+  }
 }
