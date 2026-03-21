@@ -249,12 +249,22 @@ export function ReplaySolveModal({
         />
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskTopRight}`}
-          style={{ top, left: right - cutoutRadius, width: cutoutRadius, height: cutoutRadius }}
+          style={{
+            top,
+            left: right - cutoutRadius,
+            width: cutoutRadius,
+            height: cutoutRadius,
+          }}
           aria-hidden="true"
         />
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskBottomLeft}`}
-          style={{ top: bottom - cutoutRadius, left, width: cutoutRadius, height: cutoutRadius }}
+          style={{
+            top: bottom - cutoutRadius,
+            left,
+            width: cutoutRadius,
+            height: cutoutRadius,
+          }}
           aria-hidden="true"
         />
         <div
