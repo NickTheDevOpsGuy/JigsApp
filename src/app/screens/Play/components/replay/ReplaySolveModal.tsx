@@ -221,30 +221,22 @@ export function ReplaySolveModal({
         <div
           data-cutout-panel
           style={{ top: 0, left: 0, right: 0, height: top }}
-          onPointerDown={(e) =>
-            e.target === e.currentTarget && invokeMaybeAsync(onClose)
-          }
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
           style={{ top, left: 0, width: left, height }}
-          onPointerDown={(e) =>
-            e.target === e.currentTarget && invokeMaybeAsync(onClose)
-          }
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
           style={{ top, left: right, right: 0, height }}
-          onPointerDown={(e) =>
-            e.target === e.currentTarget && invokeMaybeAsync(onClose)
-          }
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
           style={{ top: bottom, left: 0, right: 0, bottom: 0 }}
-          onPointerDown={(e) =>
-            e.target === e.currentTarget && invokeMaybeAsync(onClose)
-          }
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div className={styles.backdropCutoutContent}>
           <div className={styles.cutoutTopBar} onPointerDown={stopProp}>

@@ -297,7 +297,9 @@ export function getCurrentStreak(): number {
   }
 
   for (let i = 0; i < 365; i++) {
-    const sy = d.getFullYear(), sm = String(d.getMonth()+1).padStart(2,"0"), sd = String(d.getDate()).padStart(2,"0");
+    const sy = d.getFullYear(),
+      sm = String(d.getMonth() + 1).padStart(2, "0"),
+      sd = String(d.getDate()).padStart(2, "0");
     const dateStr = `${sy}-${sm}-${sd}`;
     const completed =
       safeLocalStorage.getItem(`${DAILY_PREFIX}${dateStr}:completed`) === "true" ||

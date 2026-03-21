@@ -64,8 +64,11 @@ export function ensureServerTimeResync(): void {
   document.addEventListener("visibilitychange", onVisible);
 
   if (periodicResyncTimer == null) {
-    periodicResyncTimer = setInterval(() => {
-      void syncServerTime();
-    }, 60 * 60 * 1000);
+    periodicResyncTimer = setInterval(
+      () => {
+        void syncServerTime();
+      },
+      60 * 60 * 1000,
+    );
   }
 }

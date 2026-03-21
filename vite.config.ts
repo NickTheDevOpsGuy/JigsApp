@@ -80,7 +80,11 @@ export default defineConfig(({ mode }) => {
             if (id.includes("screens/Packs/PackListScreen")) return "pack-list";
             if (id.includes("screens/Packs/PackDetailScreen")) return "pack-detail";
             if (id.includes("screens/Packs/")) return "pack-list";
-            if (id.includes("components/PackChoiceModal") || id.includes("components/ChoosePuzzleModal")) return "modals";
+            if (
+              id.includes("components/PackChoiceModal") ||
+              id.includes("components/ChoosePuzzleModal")
+            )
+              return "modals";
             // Split vendor chunks to avoid a single >500kB bundle
             if (id.includes("node_modules")) {
               if (id.includes("react-dom") || id.includes("react/")) {

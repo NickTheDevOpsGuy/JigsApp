@@ -114,7 +114,10 @@ export function buildCompletionProps(args: {
     elapsedSeconds: displayElapsedSeconds,
     state,
     // Treat empty string src as missing — imgRef.current?.src is "" before load
-    imageUrl: (imageRefUrl || undefined) ?? (completionImageUrl || undefined) ?? (fallbackImageUrl || undefined),
+    imageUrl:
+      (imageRefUrl || undefined) ??
+      (completionImageUrl || undefined) ??
+      (fallbackImageUrl || undefined),
     undoCount,
     moveCount,
     rotationCount,

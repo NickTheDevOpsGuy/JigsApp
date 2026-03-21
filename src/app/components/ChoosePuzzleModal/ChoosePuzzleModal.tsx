@@ -15,13 +15,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Puzzle,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Camera,
-} from "lucide-react";
+import { Puzzle, Check, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/packs/samplePuzzles";
@@ -86,7 +80,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     setSelectedPuzzle(firstPuzzle);
     setStep("category");
   }, [isOpen]);
-
 
   useEffect(() => {
     if (!isOpen) return;
@@ -181,9 +174,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   const onUploadCtaKeyDown = (e: KeyboardEvent<HTMLLabelElement>) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault();
-    e.currentTarget
-      .querySelector<HTMLInputElement>('input[type="file"]')
-      ?.click();
+    e.currentTarget.querySelector<HTMLInputElement>('input[type="file"]')?.click();
   };
 
   const goToStep = (target: Step) => {
@@ -270,7 +261,9 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
           ].join(" ")}
           aria-current={step === "setup" ? "step" : undefined}
         >
-          <span className={styles.stepNum} aria-hidden>3</span>
+          <span className={styles.stepNum} aria-hidden>
+            3
+          </span>
           <span className={styles.stepLabel}>Setup</span>
         </span>
       </nav>
@@ -289,9 +282,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                 setStep("puzzle");
               }}
             >
-              <span className={styles.categoryCardEmoji}>
-{cat.label}
-              </span>
+              <span className={styles.categoryCardEmoji}>{cat.label}</span>
               <span className={styles.categoryCardName}>{cat.name}</span>
             </button>
           ))}
@@ -407,11 +398,14 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         <>
           <div className={styles.setupHeader}>
             <div className={styles.setupThumb}>
-              <img src={selectedPuzzle.thumbnail} alt="" className={styles.setupThumbImg} />
+              <img
+                src={selectedPuzzle.thumbnail}
+                alt=""
+                className={styles.setupThumbImg}
+              />
             </div>
             <div className={styles.setupHeaderText}>
               <h2 className={styles.setupPuzzleName}>{selectedPuzzle.name}</h2>
-
             </div>
           </div>
           <div

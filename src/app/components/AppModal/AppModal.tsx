@@ -70,11 +70,7 @@ export function AppModal({
     .join(" ");
 
   return createPortal(
-    <div
-      className={styles.backdrop}
-      onClick={onClose}
-      role="presentation"
-    >
+    <div className={styles.backdrop} onClick={onClose} role="presentation">
       <div
         className={dialogClass}
         role="dialog"

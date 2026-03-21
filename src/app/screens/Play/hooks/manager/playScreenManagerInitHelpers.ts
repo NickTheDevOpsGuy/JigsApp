@@ -19,7 +19,7 @@ export function deriveBoardLayout(
   const cutTypeRaw = safeLocalStorage.getItem(CUT_TYPE_KEY);
   const cutType: PieceCutType =
     cutTypeRaw === "irregular" || cutTypeRaw === "hard" ? cutTypeRaw : "classic";
-  const cutDepthPct = cutType === "irregular" ? 0.28 : cutType === "hard" ? 0.20 : 0.26;
+  const cutDepthPct = cutType === "irregular" ? 0.28 : cutType === "hard" ? 0.2 : 0.26;
 
   const boardW = rectW;
   const boardH = rectH;
