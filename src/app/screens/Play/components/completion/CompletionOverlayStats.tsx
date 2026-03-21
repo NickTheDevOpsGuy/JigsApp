@@ -1,4 +1,3 @@
-import React from "react";
 import { Clock3, MoveRight, Puzzle } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";

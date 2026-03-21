@@ -14,13 +14,12 @@ test.describe("Packs and Stats", () => {
     await dismissWhatsNewModalIfOpen(page);
     await page.getByRole("button", { name: /puzzle packs/i }).click();
 
-    await expect(page).toHaveURL(/\/packs/, { timeout: 15000 });
-    await expect(page.getByRole("heading", { name: /puzzle packs/i })).toBeVisible({
+    const dialog = page.getByRole("dialog", { name: /choose pack/i });
+    await expect(dialog).toBeVisible({
       timeout: 15000,
     });
-    await expect(page.getByRole("button", { name: /back to menu/i })).toBeVisible({
-      timeout: 10000,
-    });
+    await expect(dialog.getByRole("listbox", { name: /choose a pack/i })).toBeVisible();
+    await expect(dialog.getByRole("option", { name: /nature, .* puzzles/i })).toBeVisible();
   });
 
   test("Stats screen loads", async ({ page }) => {

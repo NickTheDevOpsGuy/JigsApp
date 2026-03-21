@@ -2,7 +2,6 @@
  * Play screen top bar (HUD): [Settings] [Timer] [Moves] [Pieces 0/16].
  * Minimal only; max control height 44px. Undo/Redo live in Settings → Moves only.
  */
-import React from "react";
 import type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/headerMenuConfig";
 import { CoopStatusIndicator } from "@/screens/Play/components/coop/CoopStatusIndicator";
 import { PlayHUD } from "./PlayHUD";

@@ -1,106 +1,58 @@
-/**
- * useOnboarding – step-based tips: start (drag piece), tray, zoom. Persisted in localStorage.
- * All hint screens auto-dismiss after 3 seconds.
- */
-import { useCallback, useEffect, useRef, useState } from "react";
-import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { useState, useCallback, useEffect } from "react";
+import type { OnboardingState } from "@/screens/Play/components/overlay/PlayToasts.types";
 
-const STORAGE_KEY = "phuzzle:onboarding";
-const HINT_AUTO_DISMISS_MS = 3_000;
+const TRAY_TIP_KEY = "phuzzle:onboarding:trayTip";
+const ZOOM_TIP_KEY = "phuzzle:onboarding:zoomTip";
+const FIRST_SNAP_KEY = "phuzzle:onboarding:firstSnap";
 
-export type OnboardingStep =
-  | "start" // show "Drag a piece"
-  | "firstSnapDone" // celebrated, show tray tip
-  | "trayTipSeen" // show zoom tip (if applicable)
-  | "done";
-
-function getStoredStep(): OnboardingStep {
-  if (typeof window === "undefined") return "done";
-  const v = safeLocalStorage.getItem(STORAGE_KEY);
-  if (v === "start" || v === "firstSnapDone" || v === "trayTipSeen" || v === "done") {
-    return v;
-  }
-  return "start";
-}
-
-function setStoredStep(step: OnboardingStep): void {
-  safeLocalStorage.setItem(STORAGE_KEY, step);
-}
-
-export function useOnboarding(placedCount: number, pieceCount: number) {
-  const [step, setStepState] = useState<OnboardingStep>(() => getStoredStep());
+export function useOnboarding(placedCount: number, totalCount: number): OnboardingState {
+  const [needsTrayTip, setNeedsTrayTip] = useState(
+    () => localStorage.getItem(TRAY_TIP_KEY) !== "done"
+  );
+  const [needsZoomTip, setNeedsZoomTip] = useState(
+    () => totalCount >= 25 && localStorage.getItem(ZOOM_TIP_KEY) !== "done"
+  );
   const [showFirstSnapToast, setShowFirstSnapToast] = useState(false);
-  const prevPlacedRef = useRef(placedCount);
+  const firstSnapShownRef = { current: false };
 
-  const setStep = useCallback((next: OnboardingStep) => {
-    setStepState(next);
-    setStoredStep(next);
-  }, []);
-
-  // Detect first snap (0 → 1)
+  // Show first-snap toast when first piece is placed
   useEffect(() => {
-    if (prevPlacedRef.current === 0 && placedCount === 1 && step === "start") {
-      setStep("firstSnapDone");
+    if (placedCount === 1 && !firstSnapShownRef.current && localStorage.getItem(FIRST_SNAP_KEY) !== "done") {
+      firstSnapShownRef.current = true;
       setShowFirstSnapToast(true);
-      const t = setTimeout(() => setShowFirstSnapToast(false), HINT_AUTO_DISMISS_MS);
-      return () => clearTimeout(t);
     }
-    prevPlacedRef.current = placedCount;
-  }, [placedCount, step, setStep]);
+  }, [placedCount]);
 
-  const dismissStartTip = useCallback(() => {
-    setStep("done");
-  }, [setStep]);
+  // Show zoom tip for large puzzles when 10% placed
+  useEffect(() => {
+    if (totalCount >= 25 && placedCount > 0 && placedCount / totalCount >= 0.1) {
+      if (localStorage.getItem(ZOOM_TIP_KEY) !== "done") {
+        setNeedsZoomTip(true);
+      }
+    }
+  }, [placedCount, totalCount]);
 
   const dismissTrayTip = useCallback(() => {
-    setStep(pieceCount >= 16 ? "trayTipSeen" : "done");
-  }, [setStep, pieceCount]);
+    localStorage.setItem(TRAY_TIP_KEY, "done");
+    setNeedsTrayTip(false);
+  }, []);
 
   const dismissZoomTip = useCallback(() => {
-    setStep("done");
-  }, [setStep]);
+    localStorage.setItem(ZOOM_TIP_KEY, "done");
+    setNeedsZoomTip(false);
+  }, []);
 
-  const needsStartTip = step === "start";
-  const [trayTipVisible, setTrayTipVisible] = useState(false);
-  useEffect(() => {
-    if (step !== "firstSnapDone") return;
-    // Show tray tip after first-snap toast has dismissed (3s) so they don’t overlap
-    const t = setTimeout(() => setTrayTipVisible(true), 3500);
-    return () => clearTimeout(t);
-  }, [step]);
-  const needsTrayTip = step === "firstSnapDone" && trayTipVisible;
-  const needsZoomTip = step === "trayTipSeen" && pieceCount >= 16;
-
-  // Auto-dismiss all hint screens after 3 seconds
-  useEffect(() => {
-    if (step === "start") {
-      const t = setTimeout(() => setStep("done"), HINT_AUTO_DISMISS_MS);
-      return () => clearTimeout(t);
-    }
-  }, [step, setStep]);
-  useEffect(() => {
-    if (!needsTrayTip) return;
-    const t = setTimeout(() => dismissTrayTip(), HINT_AUTO_DISMISS_MS);
-    return () => clearTimeout(t);
-  }, [needsTrayTip, dismissTrayTip]);
-  useEffect(() => {
-    if (!needsZoomTip) return;
-    const t = setTimeout(() => dismissZoomTip(), HINT_AUTO_DISMISS_MS);
-    return () => clearTimeout(t);
-  }, [needsZoomTip, dismissZoomTip]);
+  const dismissFirstSnapToast = useCallback(() => {
+    localStorage.setItem(FIRST_SNAP_KEY, "done");
+    setShowFirstSnapToast(false);
+  }, []);
 
   return {
-    step,
-    needsStartTip,
     needsTrayTip,
     needsZoomTip,
     showFirstSnapToast,
-    dismissStartTip,
     dismissTrayTip,
     dismissZoomTip,
+    dismissFirstSnapToast,
   };
-}
-
-export function resetOnboarding() {
-  setStoredStep("start");
 }

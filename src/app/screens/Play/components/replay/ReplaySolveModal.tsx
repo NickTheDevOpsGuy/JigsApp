@@ -201,6 +201,9 @@ export function ReplaySolveModal({
     const { top, left, width, height } = boardRect;
     const right = left + width;
     const bottom = top + height;
+    /** Keep playback + nav directly under the board (not viewport bottom). */
+    const controlsGapPx = 8;
+    const controlsTopPx = bottom + controlsGapPx;
     /* Align controls with board; cutoutBottomBar has padding-left: 16px */
     const barPaddingLeft = 16;
     const controlsLeft = left - barPaddingLeft;
@@ -243,19 +246,26 @@ export function ReplaySolveModal({
             {headerBlock}
             {resultHeader}
           </div>
-          <div className={styles.cutoutBottomBar} onPointerDown={stopProp}>
-            <div
-              className={styles.cutoutBottomBarInner}
-              style={{
-                width: innerWidth,
-                marginLeft: controlsLeft + (width - innerWidth) / 2,
-              }}
-            >
-              <p id="replay-solve-subtitle" className={styles.subtitle}>
-                Watch how the puzzle was completed
-              </p>
-              {seekAndControls}
-            </div>
+        </div>
+        <div
+          className={styles.cutoutBottomBar}
+          style={{
+            top: controlsTopPx,
+            maxHeight: `calc(100dvh - ${controlsTopPx}px - env(safe-area-inset-bottom, 0px))`,
+          }}
+          onPointerDown={stopProp}
+        >
+          <div
+            className={styles.cutoutBottomBarInner}
+            style={{
+              width: innerWidth,
+              marginLeft: controlsLeft + (width - innerWidth) / 2,
+            }}
+          >
+            <p id="replay-solve-subtitle" className={styles.subtitle}>
+              Watch how the puzzle was completed
+            </p>
+            {seekAndControls}
           </div>
         </div>
       </div>

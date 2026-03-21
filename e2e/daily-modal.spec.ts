@@ -24,7 +24,7 @@ test.describe("Today's Puzzle modal", () => {
     });
   });
 
-  test("shows all difficulty levels including Extreme 9×9", async ({ page }) => {
+  test("shows all difficulty levels including Extreme", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
@@ -40,7 +40,7 @@ test.describe("Today's Puzzle modal", () => {
     });
     await expect(page.getByRole("button", { name: /master/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /extreme/i })).toBeVisible();
-    await expect(page.getByText(/9×9/)).toBeVisible();
+    await expect(page.getByRole("button", { name: /extreme - 81 pieces/i })).toBeVisible();
   });
 
   test("starts puzzle when difficulty selected", async ({ page }) => {
@@ -57,9 +57,7 @@ test.describe("Today's Puzzle modal", () => {
     await page.getByRole("button", { name: /start puzzle/i }).click();
 
     await expect(page).toHaveURL(/\/play/, { timeout: 15000 });
-    await expect(
-      page.getByRole("status", { name: /pieces remaining/i }).first(),
-    ).toBeVisible({
+    await expect(page.getByRole("status", { name: /pieces placed/i }).first()).toBeVisible({
       timeout: 15000,
     });
   });

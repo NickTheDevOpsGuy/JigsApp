@@ -91,18 +91,21 @@
   background-repeat: no-repeat;
   pointer-events: none;
 }
+/* Header + stats only; controls live in .cutoutBottomBar fixed under the board cutout */
 .backdropCutoutContent {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 2101;
   pointer-events: none;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: stretch;
   max-height: 100dvh;
   min-height: 0;
-  overflow-y: auto;
   overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
@@ -117,14 +120,23 @@
   padding: 6px 12px 0 14px;
 }
 .cutoutBottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 2102;
   flex-shrink: 0;
   width: 100%;
+  box-sizing: border-box;
   background: var(--color-bg-card);
   border-top: 1px solid var(--color-border);
   padding: 8px 12px 12px;
   padding-bottom: max(12px, env(safe-area-inset-bottom));
   box-shadow: var(--shadow-lg);
   pointer-events: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .cutoutBottomBarInner {

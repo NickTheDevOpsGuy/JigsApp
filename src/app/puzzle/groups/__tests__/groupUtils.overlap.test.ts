@@ -166,12 +166,14 @@ describe("wouldOverlapAnyOtherGroup", () => {
       w: 60,
       h: 60,
     });
+    // Diagonal grid neighbors (|dRow|+|dCol| !== 1) so neighbor-jitter does not
+    // suppress real tile overlap; same-row adjacent cells at x≈30 are treated as shallow edge overlap.
     const p2 = makePiece({
       id: "b",
-      row: 0,
+      row: 1,
       col: 1,
-      x: 30,
-      y: 0,
+      x: 20,
+      y: 20,
       groupId: "g2",
       pad: 10,
       tileW: 40,

@@ -2,7 +2,6 @@
  * PlayHUD – timer, move count, placed/total with puzzle icon (top bar center).
  * Pause button toggles game pause. Speedrun: quadrant timers; Time Attack: lives.
  */
-import React from "react";
 import { Clock, Heart, Pause, Play, Puzzle, AlertTriangle } from "lucide-react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";

@@ -4,7 +4,7 @@ import { dismissWhatsNewModalIfOpen } from "./helpers";
 const TINY_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
-const ROUTES = ["/", "/new", "/play"] as const;
+const ROUTES = ["/", "/play"] as const;
 
 test.describe("Mobile context menu guard", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
@@ -26,13 +26,7 @@ test.describe("Mobile context menu guard", () => {
       await dismissWhatsNewModalIfOpen(page);
 
       if (route === "/play") {
-        await expect(
-          page.getByRole("status", { name: /pieces remaining/i }).first(),
-        ).toBeVisible({
-          timeout: 15000,
-        });
-      } else if (route === "/new") {
-        await expect(page.getByRole("tab", { name: /gallery/i })).toBeVisible({
+        await expect(page.getByRole("status", { name: /pieces placed/i }).first()).toBeVisible({
           timeout: 15000,
         });
       } else {
@@ -62,9 +56,9 @@ test.describe("Mobile context menu guard", () => {
   }
 
   test("does not block context menu on text inputs", async ({ page }) => {
-    await page.goto("/new");
+    await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
-    await expect(page.getByRole("tab", { name: /gallery/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /choose photo/i })).toBeVisible({
       timeout: 15000,
     });
 

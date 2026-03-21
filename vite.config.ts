@@ -59,7 +59,10 @@ export default defineConfig(({ mode }) => {
           manualChunks(id) {
             // Keep storage/time/daily helpers in stable shared chunks to avoid
             // cross-chunk initialization cycles (menu <-> play-setup).
-            if (id.includes("utils/safeLocalStorage")) {
+            if (
+              id.includes("utils/safeLocalStorage") ||
+              id.includes("screens/Play/core/utils/playScreenUtils")
+            ) {
               return "storage";
             }
             if (id.includes("screens/Play/timeMode")) {

@@ -18,12 +18,10 @@ test.describe("Play screen", () => {
   test("loads play screen with puzzle", async ({ page }) => {
     await page.goto("/play");
 
-    await expect(
-      page.getByRole("status", { name: /pieces remaining/i }).first(),
-    ).toBeVisible({
+    await expect(page.getByRole("status", { name: /pieces placed/i }).first()).toBeVisible({
       timeout: 15000,
     });
-    await expect(page.getByRole("button", { name: /settings/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /open menu/i })).toBeVisible({
       timeout: 5000,
     });
   });
@@ -38,9 +36,7 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/play");
 
-    await expect(
-      page.getByRole("status", { name: /pieces remaining/i }).first(),
-    ).toBeVisible({
+    await expect(page.getByRole("status", { name: /pieces placed/i }).first()).toBeVisible({
       timeout: 15000,
     });
     // Layout: board on top, tray below; tray always visible
@@ -54,7 +50,7 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
       timeout: 20000,
     });
-    const shareTrigger = page.getByRole("button", { name: /share options/i });
+    const shareTrigger = page.getByRole("button", { name: /share results/i });
     await expect(shareTrigger).toBeVisible({
       timeout: 10000,
     });
@@ -62,7 +58,7 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByRole("menuitem", { name: /challenge a friend/i })).toBeVisible(
+    await expect(page.getByRole("menuitem", { name: /challenge friend/i })).toBeVisible(
       {
         timeout: 10000,
       },
@@ -77,7 +73,7 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
       timeout: 20000,
     });
-    const shareTrigger = page.getByRole("button", { name: /share options/i });
+    const shareTrigger = page.getByRole("button", { name: /share results/i });
     await expect(shareTrigger).toBeVisible({
       timeout: 10000,
     });

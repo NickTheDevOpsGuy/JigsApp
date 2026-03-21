@@ -44,9 +44,10 @@ export default defineConfig({
       ? "npm run dev -- --host 127.0.0.1 --port 4173 --strictPort"
       : "npm run build && npm run preview -- --host 127.0.0.1 --port 4173 --strictPort",
     url: "http://127.0.0.1:4173",
-    // Always launch this repo's server so tests cannot attach to another
-    // project already running on the default Vite port.
-    reuseExistingServer: false,
+    // In local development, reuse an already running Phuzzle server if one exists
+    // so Playwright can still run while we iterate in parallel. CI still launches
+    // a clean server for isolation.
+    reuseExistingServer: !isCI,
     timeout: 300000,
   },
 });

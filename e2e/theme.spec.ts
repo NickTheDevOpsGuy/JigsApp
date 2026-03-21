@@ -18,13 +18,12 @@ test.describe("Theme", () => {
 
     await page.goto("/play");
 
-    await expect(
-      page.getByRole("button", { name: /open settings|settings/i }),
-    ).toBeVisible({
+    await expect(page.getByRole("button", { name: /open menu/i })).toBeVisible({
       timeout: 15000,
     });
 
-    await page.getByRole("button", { name: /open settings|settings/i }).click();
+    await page.getByRole("button", { name: /open menu/i }).click();
+    await page.getByRole("menuitem", { name: /^settings$/i }).click();
     await page.getByRole("menuitem", { name: /appearance|display/i }).click();
     await page.getByTestId("open-theme-modal").click();
 
