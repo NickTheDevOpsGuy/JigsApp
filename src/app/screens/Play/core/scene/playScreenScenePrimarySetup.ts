@@ -20,6 +20,7 @@ import {
 } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { startDailyPuzzle } from "@/daily/dailyPuzzle";
+import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 
 const DAILY_PARAM = "daily";
@@ -32,6 +33,9 @@ export function usePlayScreenPrimarySetup() {
   const showE2ECompletion = searchParams.get("e2eCompletion") === "1";
 
   const [dailyLinkApplied, setDailyLinkApplied] = React.useState(false);
+  const [isDailySession, setIsDailySession] = React.useState(
+    () => searchParams.get(DAILY_PARAM) === "1" || isDailyPuzzleSession(),
+  );
   const gridParamFromUrl = searchParams.get(GRID_PARAM);
   const localGrid = useMemo(() => {
     // Read GRID_ONCE_KEY atomically: consume it immediately so StrictMode double-render
@@ -55,6 +59,7 @@ export function usePlayScreenPrimarySetup() {
     const grid = parseGrid(gridParam ?? null);
     const result = startDailyPuzzle(grid);
     if (result) {
+      setIsDailySession(true);
       safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
       setDailyLinkApplied(true);
       navigate("/play", { replace: true });
@@ -210,5 +215,6 @@ export function usePlayScreenPrimarySetup() {
     setCountdownMinutes,
     scene,
     managerResult,
+    isDailySession,
   };
 }

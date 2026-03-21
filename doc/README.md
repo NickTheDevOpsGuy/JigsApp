@@ -28,10 +28,11 @@ Developer documentation for Phuzzle. For project overview and setup, see the [ma
 
 ## QA & testing
 
-| Doc                              | What it covers                                                                  |
-| -------------------------------- | ------------------------------------------------------------------------------- |
-| [MOBILE_QA.md](MOBILE_QA.md)     | Mobile release checklist: devices, core flows, safe areas, regression commands. |
-| [STATS_UI_QA.md](STATS_UI_QA.md) | Stats modal QA: Profile, Board, Badges on mobile and desktop.                   |
+| Doc                                  | What it covers                                                                     |
+| ------------------------------------ | ---------------------------------------------------------------------------------- |
+| [MOBILE_QA.md](MOBILE_QA.md)         | Mobile release checklist: devices, core flows, safe areas, regression commands.    |
+| [RELEASE_AUDIT.md](RELEASE_AUDIT.md) | Formal release audit: coverage, findings, feature-vs-spec review, release verdict. |
+| [STATS_UI_QA.md](STATS_UI_QA.md)     | Stats modal QA: Profile, Board, Badges on mobile and desktop.                      |
 
 ---
 

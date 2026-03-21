@@ -26,6 +26,7 @@ export function CompletionOverlayShareMenu(props: {
   shareProgressText?: string;
   shareChallengeText?: string;
   completionData: UseCompletionOverlayDataResult;
+  isDaily?: boolean;
   /** When true, only render the share modal (opened by Share Puzzle button) */
   hideTrigger?: boolean;
 }) {
@@ -119,6 +120,29 @@ export function CompletionOverlayShareMenu(props: {
               aria-label="Share actions"
             >
               <div className={styles.completeShareDropdownActions}>
+                {props.isDaily && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={styles.completeShareDropdownItem}
+                    title="Copy or share the daily Wordle-style summary"
+                    onClick={() =>
+                      void runBusyAction("share", async () => {
+                        await completionData.handleNativeDailyShare();
+                      })
+                    }
+                    disabled={busyAction !== null}
+                  >
+                    <Share2 size={16} aria-hidden />
+                    <span>
+                      {busyAction === "share"
+                        ? "Sharing..."
+                        : completionData.dailyCopied
+                          ? "Copied!"
+                          : "Daily Share"}
+                    </span>
+                  </button>
+                )}
                 <button
                   type="button"
                   role="menuitem"

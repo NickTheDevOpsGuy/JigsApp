@@ -1,7 +1,7 @@
 /**
  * Build layout inputs (completion, replay, visuals) for play screen. Split out to keep playScreenSceneLayout under 300 lines.
  */
-import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
+import React from "react";
 import { SHOW_DEBUG } from "@/screens/Play/core/utils/playScreenUtils";
 import {
   buildCompletionProps,
@@ -33,6 +33,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     lastEventTimestamp,
     lastDbWriteMs,
     channelName,
+    isDailySession,
   } = setup;
   const {
     manager,
@@ -86,6 +87,14 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     fogStrength,
   });
 
+  const completionDailyRef = React.useRef(false);
+  if (isDailySession) {
+    completionDailyRef.current = true;
+  } else if (!state?.isComplete) {
+    completionDailyRef.current = false;
+  }
+  const completionIsDaily = isDailySession || completionDailyRef.current;
+
   const showCompletionOverlay = (isComplete && scene.showWinOverlay) || showE2ECompletion;
   const completionProps = buildCompletionProps({
     focusReturnRef: scene.completionFocusRef,
@@ -126,6 +135,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
       scene.viewport.reset();
     },
     usedHint: scene.usedHintRef.current,
+    isDaily: completionIsDaily,
     precisionModeEnabled: ui.precisionModeEnabled,
     precisionSnaps: scene.precisionSnapsRef.current,
     adaptivePersonalityEnabled: ui.adaptivePersonalityEnabled,
@@ -244,9 +254,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     postCompletionCta:
       scene.completionDismissed && state?.isComplete
         ? {
-            label: isDailyPuzzleSession()
-              ? "Play today's puzzle"
-              : "One more from this pack",
+            label: completionIsDaily ? "Play today's puzzle" : "One more from this pack",
             onNext: handleNewGame,
           }
         : null,

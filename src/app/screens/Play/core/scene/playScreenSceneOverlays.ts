@@ -1,7 +1,6 @@
 import React from "react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import type { PuzzleState, PieceCutType } from "@/puzzle/core/types";
-import { isDailyPuzzleSession } from "@/daily/dailyPuzzleCore";
 import { STORAGE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { CompletionOverlayGate, ReplayBar } from "@/screens/Play/components";
@@ -64,6 +63,7 @@ export function buildCompletionProps(args: {
   onDownloadImage: () => Promise<void> | void;
   onClose: () => void;
   usedHint: boolean;
+  isDaily: boolean;
   precisionModeEnabled: boolean;
   precisionSnaps: number[];
   adaptivePersonalityEnabled: boolean;
@@ -133,7 +133,7 @@ export function buildCompletionProps(args: {
     onDownloadImage,
     onClose,
     usedHint,
-    isDaily: isDailyPuzzleSession(),
+    isDaily: args.isDaily,
     precisionModeEnabled,
     precisionSnaps,
     adaptivePersonalityEnabled,

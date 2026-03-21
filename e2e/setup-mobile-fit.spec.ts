@@ -7,10 +7,10 @@ const MOBILE_VIEWPORTS = [
   { width: 360, height: 740 },
 ] as const;
 
-async function openChoosePhoto(page: Page) {
+async function openQuickPlay(page: Page) {
   await page.goto("/", { waitUntil: "domcontentloaded", timeout: 45000 });
   await dismissWhatsNewModalIfOpen(page);
-  await page.getByRole("button", { name: /choose photo/i }).click();
+  await page.getByRole("button", { name: /quick play/i }).click();
   await expect(page.getByRole("dialog", { name: /choose category/i })).toBeVisible({
     timeout: 15000,
   });
@@ -41,7 +41,7 @@ async function expectNoBodyScroll(page: Page) {
   expect(after.scrollY).toBe(0);
 }
 
-test.describe("Choose-photo mobile viewport fit", () => {
+test.describe("Quick-play mobile viewport fit", () => {
   test.use({ hasTouch: true });
 
   for (const viewport of MOBILE_VIEWPORTS) {
@@ -54,7 +54,7 @@ test.describe("Choose-photo mobile viewport fit", () => {
         localStorage.setItem("phuzzle:lastSeenChangelog", "999");
       });
 
-      await openChoosePhoto(page);
+      await openQuickPlay(page);
       await expect(page.getByRole("button", { name: /nature/i })).toBeVisible();
       await expectNoBodyScroll(page);
 
@@ -74,14 +74,14 @@ test.describe("Choose-photo mobile viewport fit", () => {
     });
   }
 
-  test("iPhone SE layout stays fixed on choose-photo modal", async ({ page }) => {
+  test("iPhone SE layout stays fixed on quick-play modal", async ({ page }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 375, height: 667 });
     await page.addInitScript(async () => {
       localStorage.setItem("phuzzle:lastSeenChangelog", "999");
     });
 
-    await openChoosePhoto(page);
+    await openQuickPlay(page);
     await expect(page.getByRole("button", { name: /nature/i })).toBeVisible();
     await expectNoBodyScroll(page);
   });

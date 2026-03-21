@@ -284,6 +284,7 @@ export function CompletionOverlayActions(args: {
         shareProgressText={args.shareProgressText}
         shareChallengeText={args.shareChallengeText}
         completionData={completionData}
+        isDaily={args.isDaily}
         hideTrigger
       />
 

@@ -7,8 +7,12 @@ import styles from "./FeedbackChoiceModal.module.css";
 
 const DEFAULT_EMAIL = "anickclark@gmail.com";
 
+export function buildFeedbackMailtoUrl(subject: string, body: string) {
+  return `mailto:${DEFAULT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 function openMailto(subject: string, body: string) {
-  const encoded = `mailto:${DEFAULT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const encoded = buildFeedbackMailtoUrl(subject, body);
   window.location.href = encoded;
 }
 

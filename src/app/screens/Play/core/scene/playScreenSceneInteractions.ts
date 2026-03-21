@@ -5,7 +5,6 @@ import { soundManager } from "@/audio/core/sounds";
 import { usePlayScreenBoardInteractions } from "@/screens/Play/hooks/gameplay/usePlayScreenBoardInteractions";
 import { usePlayScreenAnimation } from "@/screens/Play/hooks/animation/usePlayScreenAnimation";
 import {
-  isDailyPuzzleSession,
   getDailyVisualModifier,
   getDailyPreferredModifier,
 } from "@/daily/dailyPuzzleCore";
@@ -35,6 +34,7 @@ export function usePlayScreenInteractions(ctx: any) {
     ui,
     scene,
     sessionResult: _sessionResult,
+    isDailySession,
   } = setup;
   const {
     manager,
@@ -49,6 +49,14 @@ export function usePlayScreenInteractions(ctx: any) {
     popMapRef,
     replay,
   } = behavior;
+
+  const activeDailySessionRef = React.useRef(false);
+  if (isDailySession) {
+    activeDailySessionRef.current = true;
+  } else if (!state?.isComplete) {
+    activeDailySessionRef.current = false;
+  }
+  const activeDailySession = isDailySession || activeDailySessionRef.current;
 
   const handleNewGame = useCallback(() => {
     ui.setShowChoosePuzzleModal?.(true);
@@ -118,7 +126,7 @@ export function usePlayScreenInteractions(ctx: any) {
     onUndoSnapBackComplete: () => {
       undoSnapBackRef.current = null;
     },
-    dailyVisualModifier: isDailyPuzzleSession()
+    dailyVisualModifier: activeDailySession
       ? getDailyVisualModifier()
       : (ui.dailyPreferredModifier ?? getDailyPreferredModifier()),
     replayBarOpen: scene.replayBarOpen,
@@ -126,6 +134,7 @@ export function usePlayScreenInteractions(ctx: any) {
 
   const { puzzleShareUrl } = usePlayScreenShareSession({
     isComplete: state?.isComplete ?? false,
+    isDailySession: activeDailySession,
     sessionId,
     grid,
     storageKey: STORAGE_KEY,
@@ -200,7 +209,7 @@ export function usePlayScreenInteractions(ctx: any) {
   const left = Math.max(0, total - placed);
   const isComplete = state?.isComplete ?? false;
 
-  const dailyVisualModifier = isDailyPuzzleSession()
+  const dailyVisualModifier = activeDailySession
     ? getDailyVisualModifier()
     : (ui.dailyPreferredModifier ?? getDailyPreferredModifier());
   const fogStrength =

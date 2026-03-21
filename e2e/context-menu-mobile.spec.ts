@@ -60,7 +60,7 @@ test.describe("Mobile context menu guard", () => {
   test("does not block context menu on text inputs", async ({ page }) => {
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
-    await expect(page.getByRole("button", { name: /choose photo/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /quick play/i })).toBeVisible({
       timeout: 15000,
     });
 
