@@ -75,7 +75,11 @@
     0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
   aspect-ratio: 4 / 3;
   background:
-    radial-gradient(circle at top, color-mix(in srgb, var(--color-brand-primary) 18%, transparent), transparent 62%),
+    radial-gradient(
+      circle at top,
+      color-mix(in srgb, var(--color-brand-primary) 18%, transparent),
+      transparent 62%
+    ),
     var(--color-bg-card);
   display: grid;
   place-items: center;
@@ -396,7 +400,11 @@
   border: 1px solid color-mix(in srgb, var(--color-border) 84%, transparent);
   border-radius: 12px;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-brand-primary) 8%, transparent), transparent),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-brand-primary) 8%, transparent),
+      transparent
+    ),
     color-mix(in srgb, var(--color-bg-elevated) 94%, transparent);
 }
 
@@ -412,11 +420,7 @@
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
-  font-family:
-    "SFMono-Regular",
-    "JetBrains Mono",
-    ui-monospace,
-    monospace;
+  font-family: "SFMono-Regular", "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.82rem;
   line-height: 1.45;
   color: var(--color-text-primary);

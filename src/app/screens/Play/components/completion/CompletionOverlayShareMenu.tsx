@@ -46,9 +46,9 @@ export function CompletionOverlayShareMenu(props: {
   const setSharePopupOpen = completionData.setSharePopupOpen;
   const shareProgressText = props.shareProgressText?.trim() ?? "";
   const shareChallengeText = props.shareChallengeText?.trim() ?? "";
-  const [busyAction, setBusyAction] = useState<"card" | "share" | "copy" | "challenge" | null>(
-    null,
-  );
+  const [busyAction, setBusyAction] = useState<
+    "card" | "share" | "copy" | "challenge" | null
+  >(null);
 
   const runBusyAction = async (
     kind: "card" | "share" | "copy" | "challenge",
@@ -188,7 +188,13 @@ export function CompletionOverlayShareMenu(props: {
                     disabled={busyAction !== null}
                   >
                     <Copy size={16} aria-hidden />
-                    <span>{busyAction === "copy" ? "Copying..." : copied ? "Copied!" : "Copy link"}</span>
+                    <span>
+                      {busyAction === "copy"
+                        ? "Copying..."
+                        : copied
+                          ? "Copied!"
+                          : "Copy link"}
+                    </span>
                   </button>
                 )}
               </div>
@@ -200,7 +206,9 @@ export function CompletionOverlayShareMenu(props: {
               {shareChallengeText && (
                 <div className={styles.completeSharePreviewBlock}>
                   <span className={styles.completeSharePreviewLabel}>Preview</span>
-                  <pre className={styles.completeSharePreviewText}>{shareChallengeText}</pre>
+                  <pre className={styles.completeSharePreviewText}>
+                    {shareChallengeText}
+                  </pre>
                 </div>
               )}
               <div
@@ -216,20 +224,19 @@ export function CompletionOverlayShareMenu(props: {
                     title={canNativeShare ? "Challenge a friend" : "Copy challenge link"}
                     onClick={() =>
                       void runBusyAction("challenge", async () => {
-                      const challengeUrl =
-                        buildChallengePlayUrl(
+                        const challengeUrl = buildChallengePlayUrl(
                           props.puzzleShareUrl,
                           props.elapsedSeconds,
                           props.moveCount ?? 0,
                         );
-                      if (canNativeShare) {
-                        if (typeof onShareChallenge === "function") {
-                          await onShareChallenge(challengeUrl);
+                        if (canNativeShare) {
+                          if (typeof onShareChallenge === "function") {
+                            await onShareChallenge(challengeUrl);
+                          }
+                        } else if (typeof onCopyChallenge === "function") {
+                          await onCopyChallenge(challengeUrl);
                         }
-                      } else if (typeof onCopyChallenge === "function") {
-                        await onCopyChallenge(challengeUrl);
-                      }
-                    })
+                      })
                     }
                     disabled={busyAction !== null}
                   >

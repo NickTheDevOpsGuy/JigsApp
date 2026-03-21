@@ -206,7 +206,13 @@ export function useShareResults(args: {
         logger.warn("Share cancelled or failed:", err);
       }
     },
-    [elapsedSeconds, fullChallengeUrl, getChallengeShareTextWithUrl, handleCopyChallenge, moveCount],
+    [
+      elapsedSeconds,
+      fullChallengeUrl,
+      getChallengeShareTextWithUrl,
+      handleCopyChallenge,
+      moveCount,
+    ],
   );
 
   return {

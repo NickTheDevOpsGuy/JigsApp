@@ -10,10 +10,8 @@
   background: rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  padding: max(16px, env(safe-area-inset-top, 0))
-    max(16px, env(safe-area-inset-right, 0))
-    max(16px, env(safe-area-inset-bottom, 0))
-    max(16px, env(safe-area-inset-left, 0));
+  padding: max(16px, env(safe-area-inset-top, 0)) max(16px, env(safe-area-inset-right, 0))
+    max(16px, env(safe-area-inset-bottom, 0)) max(16px, env(safe-area-inset-left, 0));
   box-sizing: border-box;
   overflow-y: auto;
 }
@@ -122,8 +120,7 @@
   .backdrop {
     align-items: flex-end;
     padding: max(12px, env(safe-area-inset-top, 0))
-      max(12px, env(safe-area-inset-right, 0))
-      max(12px, env(safe-area-inset-bottom, 0))
+      max(12px, env(safe-area-inset-right, 0)) max(12px, env(safe-area-inset-bottom, 0))
       max(12px, env(safe-area-inset-left, 0));
   }
 

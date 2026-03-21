@@ -110,8 +110,11 @@ export function CompletionOverlayActions(args: {
   const handleChallenge = async () => {
     setShareOpen(false);
 
-    const challengeUrl =
-      buildChallengePlayUrl(puzzleShareUrl, elapsedSeconds, moveCount ?? 0);
+    const challengeUrl = buildChallengePlayUrl(
+      puzzleShareUrl,
+      elapsedSeconds,
+      moveCount ?? 0,
+    );
     await onShareChallenge?.(challengeUrl);
   };
 

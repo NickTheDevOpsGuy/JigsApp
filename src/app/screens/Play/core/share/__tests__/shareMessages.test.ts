@@ -74,7 +74,9 @@ describe("shareMessages", () => {
       102,
       42,
     );
-    expect(url).toBe("https://phuzzle.vercel.app/play?puzzle=forest&grid=4x4&ct=102&cm=42");
+    expect(url).toBe(
+      "https://phuzzle.vercel.app/play?puzzle=forest&grid=4x4&ct=102&cm=42",
+    );
   });
 
   describe("Daily Share", () => {

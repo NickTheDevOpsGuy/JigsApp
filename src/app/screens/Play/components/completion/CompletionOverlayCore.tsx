@@ -220,7 +220,10 @@ export function CompletionOverlay({
           <h2 className={styles.completePhasedTitle}>Puzzle Complete</h2>
 
           {summaryChips.length > 0 && (
-            <div className={styles.completeSummaryChips} aria-label="Completion highlights">
+            <div
+              className={styles.completeSummaryChips}
+              aria-label="Completion highlights"
+            >
               {summaryChips.map((chip) => (
                 <span key={chip} className={styles.completeSummaryChip}>
                   {chip}
