@@ -80,7 +80,13 @@ test.describe("Play screen", () => {
       timeout: 10000,
     });
     await shareTrigger.click();
-    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
+    const shareDialog = page.getByRole("dialog", { name: /share results/i });
+    await expect(shareDialog).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(
+      shareDialog.getByRole("button", { name: /^Share Result$/i }),
+    ).toBeVisible({
       timeout: 10000,
     });
 

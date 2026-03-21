@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: "autoUpdate",
-        includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.png"],
+        includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.webp"],
         manifest: {
           name: "Phuzzle",
           short_name: "Phuzzle",

@@ -83,6 +83,14 @@ describe("puzzleStorage", () => {
       expect(loadPuzzleState()).toBeNull();
     });
 
+    it("returns null when no saved state exists without clearing or broadcasting", () => {
+      const removeSpy = vi.spyOn(localStorageMock, "removeItem");
+
+      expect(loadPuzzleState()).toBeNull();
+      expect(removeSpy).not.toHaveBeenCalled();
+      expect(store).toEqual({});
+    });
+
     it("returns null for version mismatch", () => {
       const valid: SavedPuzzleState = {
         version: 99,

@@ -5,6 +5,7 @@
  */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { formatLocalYmd, parseLocalYmd } from "@/utils/dateUtils";
+import { dispatchMenuRefresh } from "@/utils/menuRefresh";
 export { GRID_OPTIONS } from "./dailyGridOptions";
 import { GRID_OPTIONS } from "./dailyGridOptions";
 
@@ -44,6 +45,7 @@ export function getDailyPreferredModifier(): DailyVisualModifier {
 export function setDailyPreferredModifier(modifier: DailyVisualModifier): void {
   try {
     safeLocalStorage.setItem(DAILY_PREFERRED_MODIFIER_KEY, modifier);
+    dispatchMenuRefresh();
   } catch {
     /* ignore */
   }
@@ -85,6 +87,7 @@ export function getDailyPreferredDifficultyIndex(): number | null {
 export function setDailyPreferredDifficultyIndex(index: number): void {
   try {
     safeLocalStorage.setItem(DAILY_PREFERRED_GRID_KEY, String(index));
+    dispatchMenuRefresh();
   } catch {
     /* ignore */
   }
@@ -94,6 +97,7 @@ export function setDailyPreferredDifficultyIndex(index: number): void {
 export function clearDailyPreferredDifficulty(): void {
   try {
     safeLocalStorage.removeItem(DAILY_PREFERRED_GRID_KEY);
+    dispatchMenuRefresh();
   } catch {
     /* ignore */
   }
@@ -129,6 +133,7 @@ export function dismissFreezeOfferToday(): void {
       `${STREAK_FREEZE_DISMISSED_KEY}:${getTodayDateString()}`,
       "true",
     );
+    dispatchMenuRefresh();
   } catch {
     /* ignore */
   }
@@ -178,6 +183,7 @@ export function recordDailyCompletion(elapsedSeconds: number): number {
     safeLocalStorage.setItem(`${DAILY_PREFIX}${dateStr}:time`, String(elapsedSeconds));
     const streak = getCurrentStreak();
     tryEarnStreakFreeze(streak);
+    dispatchMenuRefresh();
     return streak;
   } catch {
     /* ignore */
@@ -189,7 +195,9 @@ export function recordDailyCompletion(elapsedSeconds: number): number {
 export function getTodayDailyTime(): number | null {
   try {
     const raw = safeLocalStorage.getItem(`${DAILY_PREFIX}${getTodayDateString()}:time`);
-    return raw ? parseInt(raw, 10) : null;
+    if (!raw) return null;
+    const value = parseInt(raw, 10);
+    return Number.isNaN(value) ? null : value;
   } catch {
     return null;
   }
@@ -226,6 +234,7 @@ export function tryEarnStreakFreeze(currentStreak: number): number {
     const newCount = Math.min(1, count + 1);
     safeLocalStorage.setItem(STREAK_FREEZE_KEY, String(newCount));
     safeLocalStorage.setItem(STREAK_FREEZE_EARNED_WEEK_KEY, weekKey);
+    dispatchMenuRefresh();
     return newCount;
   } catch {
     return getStreakFreezeCount();
@@ -239,10 +248,11 @@ export function refreshStreakFreeze(): number {
     const storedWeek = safeLocalStorage.getItem(STREAK_FREEZE_WEEK_KEY);
     if (storedWeek !== weekKey) {
       safeLocalStorage.setItem(STREAK_FREEZE_WEEK_KEY, weekKey);
+      dispatchMenuRefresh();
     }
     return getStreakFreezeCount();
   } catch {
-    return 1;
+    return getStreakFreezeCount();
   }
 }
 
@@ -266,6 +276,7 @@ export function useStreakFreeze(forDate: string): boolean {
   try {
     safeLocalStorage.setItem(STREAK_FREEZE_KEY, String(count - 1));
     safeLocalStorage.setItem(`${STREAK_FREEZE_KEY}:used:${forDate}`, "true");
+    dispatchMenuRefresh();
     return true;
   } catch {
     return false;

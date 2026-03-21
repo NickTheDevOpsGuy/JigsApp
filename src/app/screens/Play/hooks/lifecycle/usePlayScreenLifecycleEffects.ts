@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import posthog from "posthog-js";
 import type { Piece } from "@/puzzle/core/types";
 import type { UsePlayScreenLifecycleEffectsArgs } from "./usePlayScreenLifecycleEffectsTypes";
+import { canvasToObjectUrl, revokeObjectUrl } from "@/utils/async";
 
 export type { UsePlayScreenLifecycleEffectsArgs } from "./usePlayScreenLifecycleEffectsTypes";
 
@@ -222,17 +223,28 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
 
   useEffect(() => {
     if (!state?.isComplete || completionDismissed || !state) return;
+    let cancelled = false;
     const id = requestAnimationFrame(() => {
-      const canvas = canvasRef.current;
-      if (!canvas || canvas.width <= 0 || canvas.height <= 0) return;
-      try {
-        const dataUrl = canvas.toDataURL("image/png");
-        setCompletionImageUrl(dataUrl);
-      } catch {
-        // ignore toDataURL failures
-      }
+      void (async () => {
+        const canvas = canvasRef.current;
+        if (!canvas || canvas.width <= 0 || canvas.height <= 0) return;
+        try {
+          const url = await canvasToObjectUrl(canvas, "image/png");
+          if (!url || cancelled) {
+            revokeObjectUrl(url);
+            return;
+          }
+          revokeObjectUrl(completionImageUrl);
+          setCompletionImageUrl(url);
+        } catch {
+          // ignore snapshot failures
+        }
+      })();
     });
-    return () => cancelAnimationFrame(id);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(id);
+    };
   }, [
     state?.isComplete,
     completionDismissed,
@@ -241,6 +253,12 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     setCompletionImageUrl,
     completionImageUrl,
   ]);
+
+  useEffect(() => {
+    return () => {
+      revokeObjectUrl(completionImageUrl);
+    };
+  }, [completionImageUrl]);
 
   useEffect(() => {
     return () => {

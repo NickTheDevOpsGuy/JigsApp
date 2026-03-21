@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import styles from "./AppModal.module.css";
 
 const BODY_SCROLL_LOCK_ATTR = "data-app-modal-lock-count";
+const BODY_SCROLL_Y_ATTR = "data-app-modal-scroll-y";
 const FOCUSABLE_SELECTOR = [
   "button:not([disabled])",
   "[href]",
@@ -98,11 +99,30 @@ export function AppModal({
     document.addEventListener("keydown", trapFocus);
 
     const body = document.body;
+    const root = document.documentElement;
     const prev = body.style.overflow;
+    const prevBodyPosition = body.style.position;
+    const prevBodyTop = body.style.top;
+    const prevBodyWidth = body.style.width;
+    const prevBodyHeight = body.style.height;
+    const prevBodyInset = body.style.inset;
+    const prevRootOverflow = root.style.overflow;
+    const prevRootHeight = root.style.height;
     const existingLockCount = Number(body.getAttribute(BODY_SCROLL_LOCK_ATTR) ?? "0");
     const nextLockCount = existingLockCount + 1;
     body.setAttribute(BODY_SCROLL_LOCK_ATTR, String(nextLockCount));
-    body.style.overflow = "hidden";
+    if (existingLockCount === 0) {
+      const scrollY = window.scrollY;
+      body.setAttribute(BODY_SCROLL_Y_ATTR, String(scrollY));
+      body.style.overflow = "hidden";
+      body.style.position = "fixed";
+      body.style.top = `-${scrollY}px`;
+      body.style.inset = "0";
+      body.style.width = "100%";
+      body.style.height = "100dvh";
+      root.style.overflow = "hidden";
+      root.style.height = "100dvh";
+    }
 
     const focusTarget = window.requestAnimationFrame(() => {
       const dialogEl = dialogRef.current;
@@ -120,7 +140,17 @@ export function AppModal({
       const remainingLockCount = Math.max(0, currentLockCount - 1);
       if (remainingLockCount === 0) {
         body.style.overflow = prev;
+        body.style.position = prevBodyPosition;
+        body.style.top = prevBodyTop;
+        body.style.inset = prevBodyInset;
+        body.style.width = prevBodyWidth;
+        body.style.height = prevBodyHeight;
+        root.style.overflow = prevRootOverflow;
+        root.style.height = prevRootHeight;
         body.removeAttribute(BODY_SCROLL_LOCK_ATTR);
+        const scrollY = Number(body.getAttribute(BODY_SCROLL_Y_ATTR) ?? "0");
+        body.removeAttribute(BODY_SCROLL_Y_ATTR);
+        window.scrollTo(0, scrollY);
       } else {
         body.setAttribute(BODY_SCROLL_LOCK_ATTR, String(remainingLockCount));
       }

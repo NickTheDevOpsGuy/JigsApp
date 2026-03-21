@@ -38,10 +38,10 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the catalog or pa
 
 ## Features
 
-- **Play:** Drag, drop, rotate; board and neighbor snap; group merging. Grids from 3×3 to 12×12. Puzzle selection only via staged modals: **Choose Photo** (catalog: category → puzzle → difficulty → start) and **Puzzle Packs** (pack → puzzle → difficulty → start), with clickable breadcrumbs. Piece tray with filters (All, Edges, Color); unified HUD pills (timer, pause, moves, pieces); compact gap between board and tray. Zoom and pan. Undo/redo in menu. Continue and start over. Placed pieces meet seamlessly (no visible gaps); unplaced pieces keep a clear jigsaw look.
-- **Daily:** Daily puzzle, streaks, countdown, streak shield (freeze), a home-screen momentum panel, and a 7-day daily-history strip with streak nudges. **Daily Share** — after finishing the daily, share a Wordle-style result (daily #, difficulty, time, moves, emoji grid, play link) via copy or native share. Comments and reactions after completion.
+- **Play:** Drag, drop, rotate; board and neighbor snap; group merging. Grids from 3×3 to 12×12. Puzzle selection starts from a streamlined mobile home with one clear primary CTA, then staged modals: **Quick Play** (catalog: category → puzzle → difficulty → start) and **Puzzle Packs** (pack → puzzle → difficulty → start), with clickable breadcrumbs. Piece tray with filters (All, Edges, Color); unified HUD pills (timer, pause, moves, pieces); compact gap between board and tray. Zoom and pan. Undo/redo in menu. Continue and start over. Placed pieces meet seamlessly (no visible gaps); unplaced pieces keep a clear jigsaw look.
+- **Daily:** Daily puzzle, streaks, countdown, streak shield (freeze), a compact home momentum strip, and a 7-day daily-history row with streak nudges. **Daily Share** — after finishing the daily, share a Wordle-style result (daily #, difficulty, time, moves, emoji grid, play link) via copy or native share. Comments and reactions after completion.
 - **Modes:** Zen, Mystery, Precision, Dynamic Difficulty, Adaptive Personality. Magnetic Snap and Snap Glow toggles. Reference preview, snap combo, piece shapes, percentile badges, themes.
-- **Social:** Stats, profile, leaderboards (Today, Week, All-time, Efficiency). Share result, share card, Beat My Puzzle challenge links, Daily Share (Wordle-style for daily only), replay viewer. Co-op play with shareable links. Home also surfaces a continue-your-puzzle card when you have saved progress.
+- **Social:** Stats, profile, leaderboards (Today, Week, All-time, Efficiency). Share result, share card, Beat My Puzzle challenge links, Daily Share (Wordle-style for daily only), replay viewer. Co-op play with shareable links. Home also surfaces a resume card when you have saved progress and refreshes automatically when daily or save data changes.
 - **Quality:** Bug report with optional screenshots. Mobile layouts: touch drag on the board (pieces follow your finger; page scroll is disabled over the board so drag works), tappable tray and carousel buttons (48px hit areas). PWA install.
 
 In-app **What's New** (changelog) uses a single bullet per item; source: `src/app/data/content/changelog.ts`.  
@@ -100,7 +100,13 @@ npm install
 npm run dev
 ```
 
-Useful scripts: `npm run build`, `npm run preview`, `npm run test`, `npm run test:e2e` (Vitest and Playwright use 4 workers; run `npx playwright install` once).
+Useful scripts: `npm run build`, `npm run preview`, `npm run test`, `npm run test:e2e`, `npm run lighthouse`, `npm run check:images` (Vitest and Playwright use 4 workers; run `npx playwright install` once). The image audit is useful before shipping large social or puzzle assets.
+
+Image budget quick rule:
+- Puzzle assets should usually stay under `500 kB` each after optimization.
+- `1 MB+` is a warning sign.
+- `2 MB+` is too large for normal gameplay assets and should be compressed or converted before shipping.
+- Social/OG images should ideally stay under `250 kB`, and `500 kB+` should be treated as too heavy.
 
 ---
 

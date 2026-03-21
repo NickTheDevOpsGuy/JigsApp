@@ -12,6 +12,7 @@ import {
   dismissFreezeOfferToday,
   parseLocalYmd,
   getLocalWeekMondayYmd,
+  getTodayDailyTime,
 } from "../dailyPuzzleCore";
 
 const DAILY_PREFIX = "phuzzle:daily:";
@@ -166,6 +167,17 @@ describe("refreshStreakFreeze", () => {
     const result = refreshStreakFreeze();
     expect(result).toBe(0);
     expect(getStreakFreezeCount()).toBe(0);
+  });
+});
+
+describe("getTodayDailyTime", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("returns null when stored time is invalid", () => {
+    localStorage.setItem(`${DAILY_PREFIX}${getTodayDateString()}:time`, "not-a-number");
+    expect(getTodayDailyTime()).toBeNull();
   });
 });
 

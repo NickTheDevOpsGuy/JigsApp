@@ -191,7 +191,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
 
   const modalTitle =
     step === "category"
-      ? "🎵 Choose a Puzzle Image"
+      ? "Choose Category"
       : step === "puzzle"
         ? "Choose Puzzle"
         : "Puzzle Setup";
@@ -225,7 +225,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
           <span className={styles.stepNum} aria-hidden>
             {step !== "category" ? "✓" : "1"}
           </span>
-          <span className={styles.stepLabel}>Pack</span>
+          <span className={styles.stepLabel}>Category</span>
         </button>
 
         <span className={styles.stepConnector} aria-hidden />
@@ -276,6 +276,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
               key={cat.id}
               type="button"
               className={styles.categoryCard}
+              aria-label={cat.name}
               onClick={() => {
                 setFilterCategory(cat.id);
                 setSelectedPuzzle(null);
@@ -292,6 +293,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
               tabIndex={0}
               onKeyDown={onUploadCtaKeyDown}
               aria-label="Use your own photo: upload an image from your device"
+              role="button"
             >
               <span className={styles.uploadCtaIconWrap} aria-hidden>
                 <Camera size={22} strokeWidth={2} />

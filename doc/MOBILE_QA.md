@@ -29,7 +29,7 @@ Manual pass on real devices before release.
 - Long-press does not open browser context menu.
 - Help / Stats open and close correctly.
 
-**Puzzle selection (Choose Photo / Puzzle Packs modals from home)**
+**Puzzle selection (Quick Play / Puzzle Packs modals from home)**
 
 - Category or pack filters load; first category/pack shows content (e.g. Art).
 - Preview and difficulty step visible; Start launches play.

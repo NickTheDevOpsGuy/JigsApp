@@ -6,6 +6,9 @@ import { X } from "lucide-react";
 import styles from "./Modal.module.css";
 import { Button } from "@/components/Button/Button";
 
+const BODY_SCROLL_LOCK_ATTR = "data-modal-lock-count";
+const BODY_SCROLL_Y_ATTR = "data-modal-scroll-y";
+
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -34,13 +37,58 @@ export function Modal({
   );
 
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "hidden";
+    if (!isOpen) return;
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    const body = document.body;
+    const root = document.documentElement;
+    const prevBodyOverflow = body.style.overflow;
+    const prevBodyPosition = body.style.position;
+    const prevBodyTop = body.style.top;
+    const prevBodyWidth = body.style.width;
+    const prevBodyHeight = body.style.height;
+    const prevBodyInset = body.style.inset;
+    const prevRootOverflow = root.style.overflow;
+    const prevRootHeight = root.style.height;
+    const existingLockCount = Number(body.getAttribute(BODY_SCROLL_LOCK_ATTR) ?? "0");
+    const nextLockCount = existingLockCount + 1;
+
+    body.setAttribute(BODY_SCROLL_LOCK_ATTR, String(nextLockCount));
+    if (existingLockCount === 0) {
+      const scrollY = window.scrollY;
+      body.setAttribute(BODY_SCROLL_Y_ATTR, String(scrollY));
+      body.style.overflow = "hidden";
+      body.style.position = "fixed";
+      body.style.top = `-${scrollY}px`;
+      body.style.inset = "0";
+      body.style.width = "100%";
+      body.style.height = "100dvh";
+      root.style.overflow = "hidden";
+      root.style.height = "100dvh";
     }
+
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
+
+      const currentLockCount = Number(body.getAttribute(BODY_SCROLL_LOCK_ATTR) ?? "1");
+      const remainingLockCount = Math.max(0, currentLockCount - 1);
+      if (remainingLockCount === 0) {
+        body.style.overflow = prevBodyOverflow;
+        body.style.position = prevBodyPosition;
+        body.style.top = prevBodyTop;
+        body.style.width = prevBodyWidth;
+        body.style.height = prevBodyHeight;
+        body.style.inset = prevBodyInset;
+        root.style.overflow = prevRootOverflow;
+        root.style.height = prevRootHeight;
+        body.removeAttribute(BODY_SCROLL_LOCK_ATTR);
+        const scrollY = Number(body.getAttribute(BODY_SCROLL_Y_ATTR) ?? "0");
+        body.removeAttribute(BODY_SCROLL_Y_ATTR);
+        window.scrollTo(0, scrollY);
+      } else {
+        body.setAttribute(BODY_SCROLL_LOCK_ATTR, String(remainingLockCount));
+      }
     };
   }, [isOpen, handleKeyDown]);
 

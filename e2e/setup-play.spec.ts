@@ -8,11 +8,11 @@ test.describe("Setup → Play flow", () => {
     });
   });
 
-  test("opens choose-photo modal and shows category step", async ({ page }) => {
+  test("opens quick-play modal and shows category step", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
-    await page.getByRole("button", { name: /choose photo/i }).click();
+    await page.getByRole("button", { name: /quick play/i }).click();
 
     const dialog = page.getByRole("dialog", { name: /choose category/i });
     await expect(dialog).toBeVisible({ timeout: 15000 });
@@ -25,7 +25,7 @@ test.describe("Setup → Play flow", () => {
   test("selects gallery puzzle and starts game", async ({ page }) => {
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
-    await page.getByRole("button", { name: /choose photo/i }).click();
+    await page.getByRole("button", { name: /quick play/i }).click();
 
     const dialog = page.getByRole("dialog", { name: /choose category/i });
     await dialog.getByRole("button", { name: /nature/i }).click();

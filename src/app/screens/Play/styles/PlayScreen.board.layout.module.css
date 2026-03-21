@@ -53,7 +53,7 @@
 }
 
 .boardCompleteBannerLine {
-  font-family: "Fredoka", system-ui, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.05rem, 3.5vw, 1.4rem);
   font-weight: 700;
   color: rgba(255, 255, 255, 0.98);

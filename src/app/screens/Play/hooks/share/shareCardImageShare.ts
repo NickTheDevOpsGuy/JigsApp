@@ -61,5 +61,5 @@ export async function shareOrDownloadCard(args: {
   link.href = url;
   link.download = "phuzzle-completion-card.png";
   link.click();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }

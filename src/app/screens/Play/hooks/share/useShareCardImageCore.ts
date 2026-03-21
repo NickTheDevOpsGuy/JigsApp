@@ -14,6 +14,7 @@ import { loadImage } from "@/screens/Play/hooks/share/shareCardImageUtils";
 import { shareOrDownloadCard } from "@/screens/Play/hooks/share/shareCardImageShare";
 import { getDifficultyLabel } from "@/screens/Play/core/share/shareMessages";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
+import { canvasToBlob, yieldToMainThread } from "@/utils/async";
 
 type Percentile = { topPercent: number; totalPlayers: number } | null;
 
@@ -61,6 +62,7 @@ export function useShareCardImage() {
       setIsGenerating(true);
       const mode = args.mode ?? "result";
       try {
+        await yieldToMainThread();
         const playPath = args.puzzleShareUrl ?? "/";
         let playUrl = playPath.startsWith("http")
           ? playPath
@@ -71,6 +73,7 @@ export function useShareCardImage() {
         }
 
         const img = await loadImage(args.imageUrl);
+        await yieldToMainThread();
         const scale = 2;
         const canvas = document.createElement("canvas");
         canvas.width = CARD_W * scale;
@@ -164,9 +167,8 @@ export function useShareCardImage() {
             CARD_H,
           );
         }
-        const blob = await new Promise<Blob | null>((resolve) =>
-          (outCtx ? outCanvas : canvas).toBlob(resolve, "image/png"),
-        );
+        await yieldToMainThread();
+        const blob = await canvasToBlob(outCtx ? outCanvas : canvas, "image/png");
         if (!blob) return;
         await shareOrDownloadCard({
           blob,

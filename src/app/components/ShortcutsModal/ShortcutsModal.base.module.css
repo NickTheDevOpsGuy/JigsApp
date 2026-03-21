@@ -75,7 +75,7 @@
 
 .titleRow h2 {
   margin: 0;
-  font-family: "Fredoka", sans-serif;
+  font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--color-text-primary);

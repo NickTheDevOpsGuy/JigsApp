@@ -6,6 +6,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import type { Piece } from "@/puzzle/core/types";
 import { renderTrayPiece } from "@/puzzle/canvas/render/renderTrayPiece";
+import { canvasToObjectUrl, revokeObjectUrls, yieldToMainThread } from "@/utils/async";
 
 const BATCH_SIZE = 12;
 
@@ -27,12 +28,15 @@ export function usePieceTrayThumbs(
   const [thumbsById, setThumbsById] = useState<Map<string, string>>(new Map());
   const [imageLoadCount, setImageLoadCount] = useState(0);
   const displayedRef = useRef(displayed);
+  const urlsRef = useRef<Map<string, string>>(new Map());
   displayedRef.current = displayed;
 
   const key = useMemo(() => trayVisualKey(displayed), [displayed]);
 
   useEffect(() => {
     if (!image || displayed.length === 0) {
+      revokeObjectUrls(urlsRef.current.values());
+      urlsRef.current = new Map();
       setThumbsById(new Map());
       return;
     }
@@ -49,7 +53,7 @@ export function usePieceTrayThumbs(
     const assembledW = grid.cols * (displayed[0]?.tileW ?? 1);
     const assembledH = grid.rows * (displayed[0]?.tileH ?? 1);
 
-    const renderOne = (p: Piece): string | null => {
+    const renderOne = async (p: Piece): Promise<string | null> => {
       try {
         if (!p.w || !p.h || p.w <= 0 || p.h <= 0) return null;
         // Use the larger dimension to ensure square canvas fits rotated piece
@@ -64,52 +68,84 @@ export function usePieceTrayThumbs(
         );
         if (!Number.isFinite(scale) || scale <= 0) return null;
         const c = renderTrayPiece(p, image, assembledW, assembledH, scale);
-        return c.toDataURL("image/png");
+        return await canvasToObjectUrl(c, "image/png");
       } catch {
         return null;
       }
     };
 
     if (displayed.length < 60) {
-      const m = new Map<string, string>();
-      for (const p of displayed) {
-        const data = renderOne(p);
-        if (data) m.set(p.id, data);
-      }
-      setThumbsById(m);
+      let cancelled = false;
+      void (async () => {
+        await yieldToMainThread();
+        const entries = await Promise.all(
+          displayed.map(async (p) => [p.id, await renderOne(p)] as const),
+        );
+        const next = new Map<string, string>();
+        for (const [id, url] of entries) {
+          if (url) next.set(id, url);
+        }
+        if (cancelled) {
+          revokeObjectUrls(next.values());
+          return;
+        }
+        revokeObjectUrls(urlsRef.current.values());
+        urlsRef.current = next;
+        setThumbsById(next);
+      })();
+      return () => {
+        cancelled = true;
+      };
       return;
     }
 
+    revokeObjectUrls(urlsRef.current.values());
+    urlsRef.current = new Map();
     setThumbsById(new Map());
     let cancelled = false;
     let index = 0;
 
-    const processBatch = () => {
+    const processBatch = async () => {
       if (cancelled) return;
       const current = displayedRef.current;
       const next = new Map<string, string>();
       const end = Math.min(index + BATCH_SIZE, current.length);
+      await yieldToMainThread();
       for (let i = index; i < end; i++) {
         const p = current[i];
-        const data = renderOne(p);
+        const data = await renderOne(p);
         if (data) next.set(p.id, data);
+      }
+      if (cancelled) {
+        revokeObjectUrls(next.values());
+        return;
       }
       setThumbsById((prev) => {
         const merged = new Map(prev);
         next.forEach((v, k) => merged.set(k, v));
+        urlsRef.current = merged;
         return merged;
       });
       index += BATCH_SIZE;
       if (index < displayedRef.current.length) {
-        requestAnimationFrame(processBatch);
+        requestAnimationFrame(() => {
+          void processBatch();
+        });
       }
     };
 
-    processBatch();
+    void processBatch();
     return () => {
       cancelled = true;
     };
   }, [key, image, grid, thumbSize, compact, imageLoadCount]);
+
+  useEffect(() => {
+    return () => {
+      revokeObjectUrls(urlsRef.current.values());
+      urlsRef.current = new Map();
+    };
+  }, []);
 
   return thumbsById;
 }

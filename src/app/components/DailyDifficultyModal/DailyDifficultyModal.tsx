@@ -60,8 +60,10 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       import("@/daily/dailyPuzzle").then(setDailyModule);
       const idx = getDailyPreferredDifficultyIndex();
       setSelectedIndex(idx ?? RECOMMENDED_INDEX);
+      setShowMore(false);
     } else {
       setDailyModule(null);
+      setShowMore(false);
     }
   }, [isOpen]);
 

@@ -4,6 +4,7 @@
 import { useCallback } from "react";
 import type React from "react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
+import { canvasToBlob, yieldToMainThread } from "@/utils/async";
 
 export function useDownloadImage(args: {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -13,7 +14,7 @@ export function useDownloadImage(args: {
 }) {
   const { canvasRef, imgRef, state, elapsedSeconds } = args;
 
-  return useCallback(() => {
+  return useCallback(async () => {
     const canvas = canvasRef.current;
     const img = imgRef.current;
     if (!canvas || !img) return;
@@ -38,9 +39,15 @@ export function useDownloadImage(args: {
       shareCanvas.height - textHeight / 2 + 10,
     );
 
+    await yieldToMainThread();
+    const blob = await canvasToBlob(shareCanvas, "image/png");
+    if (!blob) return;
+
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.download = `phuzzle-${formatTime(elapsedSeconds).replace(":", "m")}s.png`;
-    link.href = shareCanvas.toDataURL("image/png");
+    link.href = url;
     link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
   }, [canvasRef, imgRef, state?.totalCount, elapsedSeconds]);
 }

@@ -1,45 +1,39 @@
 /**
- * MenuScreen – home: date above card, Phuzzle in bar, Packs, Custom, Stats, Help, About.
+ * MenuScreen – mobile-first home with one clear play CTA and lightweight daily momentum.
  */
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Megaphone, Trophy } from "lucide-react";
+
 import styles from "./MenuScreen.module.css";
 
 import logoImg from "@/assets/ui/phuzzle-logo-512.png";
-import { Button } from "@/components/Button/Button";
-import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
-import { PackChoiceModal } from "@/components/PackChoiceModal";
+import { AdvancedModal } from "@/components/AdvancedModal";
+import { AboutModal } from "@/components/AboutModal";
 import { ChoosePuzzleModal } from "@/components/ChoosePuzzleModal";
 import { DailyCountdown } from "@/components/DailyCountdown/DailyCountdown";
-import { HelpChoiceModal } from "@/components/HelpChoiceModal";
+import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
-import { AdvancedModal } from "@/components/AdvancedModal";
+import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { TutorialOverlay } from "@/components/HowToPlay";
-import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
-import { AboutModal } from "@/components/AboutModal";
-import { WhatsNewModal } from "@/components/WhatsNew";
 import { ConfirmModal } from "@/components/Modal/Modal";
-import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
-import { loadPuzzleState } from "@/puzzle/storage/puzzleStorage";
-import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import { BEST_TIME_PREFIX } from "@/screens/Play/core/time/timeMode";
-import { formatTime } from "@/screens/Play/core/utils/playUtils";
-import { Image, Package, Trophy, Megaphone } from "lucide-react";
-import {
-  isTodayDailyCompleted,
-  getCurrentStreak,
-  getTodayDateString,
-  getTodayDailyTime,
-  getStreakFreezeCount,
-  getDailyPuzzleNumber,
-  parseLocalYmd,
-  formatLocalYmd,
-} from "@/daily/dailyPuzzleCore";
-import { getTodayCompletionCount } from "@/services/leaderboard/leaderboardService";
+import { PackChoiceModal } from "@/components/PackChoiceModal";
+import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
+import { WhatsNewModal } from "@/components/WhatsNew";
 import { shouldShowChangelog } from "@/data/content/changelog";
 import { preloadPacksData, preloadPuzzleCatalog } from "@/data/packs/loadPacksData";
+import { formatTime } from "@/screens/Play/core/utils/playUtils";
+import { BEST_TIME_PREFIX } from "@/screens/Play/core/time/timeMode";
+import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { HomeTopBar } from "@/screens/Menu/components/HomeTopBar";
+import { MomentumStrip } from "@/screens/Menu/components/MomentumStrip";
+import { PrimaryDailyAction } from "@/screens/Menu/components/PrimaryDailyAction";
+import { ResumePuzzleCard } from "@/screens/Menu/components/ResumePuzzleCard";
+import { SecondaryActions } from "@/screens/Menu/components/SecondaryActions";
+import { useMenuHomeData } from "@/screens/Menu/hooks/useMenuHomeData";
+import { isDailyPuzzleSession } from "@/daily/dailyPuzzle";
 
-/** Star icon for Start Today's Puzzle. Use public/assets/star.png or fallback to character. */
 const STAR_ICON = "/assets/star.png";
 
 function getMenuDate(): string {
@@ -50,15 +44,14 @@ function getMenuDate(): string {
   });
 }
 
-/** Rotating taglines for delight — one per day of week so it's consistent. */
 const MENU_TAGLINES = [
-  "Be one of the first to solve today's puzzle.",
-  "One puzzle a day. You've got this. ✨",
-  "Today's puzzle is waiting for you. 🧩",
-  "Ready when you are.",
-  "One puzzle. One win. 🌟",
-  "Your daily dose of satisfaction.",
-  "Time to piece it together. 💪",
+  "Open the app. Start the daily. Keep the streak moving.",
+  "Your daily puzzle is ready when you are.",
+  "One puzzle, one clean win.",
+  "Fast start. Sharp finish.",
+  "Today’s puzzle is waiting for you.",
+  "A quick play session beats scrolling.",
+  "Small challenge. Solid payoff.",
 ];
 
 function getMenuTagline(): string {
@@ -75,41 +68,9 @@ function formatSavedAt(savedAt: number): string {
   });
 }
 
-function getRecentDailyStatuses(days: number): Array<{
-  date: string;
-  label: string;
-  completed: boolean;
-  isToday: boolean;
-}> {
-  const result: Array<{
-    date: string;
-    label: string;
-    completed: boolean;
-    isToday: boolean;
-  }> = [];
-  const today = getTodayDateString();
-  const todayDate = parseLocalYmd(today);
-
-  for (let offset = days - 1; offset >= 0; offset--) {
-    const date = new Date(todayDate);
-    date.setDate(date.getDate() - offset);
-    const ymd = formatLocalYmd(date);
-    result.push({
-      date: ymd,
-      label: date.toLocaleDateString(undefined, { weekday: "short" }),
-      completed: safeLocalStorage.getItem(`phuzzle:daily:${ymd}:completed`) === "true",
-      isToday: ymd === today,
-    });
-  }
-
-  return result;
-}
-
 export function MenuScreen() {
   const nav = useNavigate();
-  const [menuDate] = useState(() => getMenuDate());
-  const [streak] = useState(() => getCurrentStreak());
-  const [savedPuzzle] = useState(() => loadPuzzleState());
+  const { menuSnapshot, todayPlayersSolved, refreshSnapshot } = useMenuHomeData();
   const [starImgFailed, setStarImgFailed] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
@@ -123,12 +84,17 @@ export function MenuScreen() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showClearCacheConfirm, setShowClearCacheConfirm] = useState(false);
   const [showResetStatsConfirm, setShowResetStatsConfirm] = useState(false);
-  const [todayPlayersSolved, setTodayPlayersSolved] = useState<number | null>(null);
-  const todayCompleted = isTodayDailyCompleted();
-  const todayTime = getTodayDailyTime();
-  const streakFreezeCount = getStreakFreezeCount();
-  const dailyPuzzleNumber = getDailyPuzzleNumber();
-  const recentDailyStatuses = getRecentDailyStatuses(7);
+
+  const {
+    streak,
+    savedPuzzle,
+    todayCompleted,
+    todayTime,
+    streakFreezeCount,
+    dailyPuzzleNumber,
+    recentDailyStatuses,
+  } = menuSnapshot;
+
   const hasDaily = true;
   const savedPuzzleProgress = savedPuzzle
     ? Math.round(
@@ -137,15 +103,25 @@ export function MenuScreen() {
           100,
       )
     : null;
-  const dailyMomentumMessage = todayCompleted
-    ? todayTime != null
-      ? `Daily #${dailyPuzzleNumber} complete in ${formatTime(todayTime)}. A fresh one lands tomorrow.`
-      : `Daily #${dailyPuzzleNumber} complete. Come back tomorrow to keep the streak alive.`
+  const hasInProgressDaily = Boolean(savedPuzzle) && isDailyPuzzleSession() && !todayCompleted;
+
+  const primaryStatus = hasInProgressDaily
+    ? savedPuzzleProgress != null
+      ? `${savedPuzzleProgress}% solved so far`
+      : `Daily #${dailyPuzzleNumber} is waiting`
+    : todayCompleted
+      ? todayTime != null
+        ? `Completed in ${formatTime(todayTime)}`
+        : "Completed today"
+      : `Daily #${dailyPuzzleNumber} is live`;
+
+  const momentumHint = todayCompleted
+    ? "Fresh puzzle lands tomorrow"
     : streak > 0 && streak < 5
-      ? `Solve today to push your streak to ${streak + 1}. Reach day 5 to earn a streak freeze.`
+      ? `Push your streak to ${streak + 1}`
       : streakFreezeCount > 0
-        ? `You have ${streakFreezeCount} streak ${streakFreezeCount === 1 ? "freeze" : "freezes"} banked. Keep the run alive today.`
-        : `Daily #${dailyPuzzleNumber} is live. Build your streak and chase the leaderboard.`;
+        ? `${streakFreezeCount} freeze${streakFreezeCount === 1 ? "" : "s"} banked`
+        : "Daily waiting";
 
   useEffect(() => {
     if (shouldShowChangelog()) setShowWhatsNew(true);
@@ -156,171 +132,81 @@ export function MenuScreen() {
     preloadPuzzleCatalog();
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    void getTodayCompletionCount(getTodayDateString())
-      .then((count: number) => {
-        if (!cancelled) setTodayPlayersSolved(count);
-      })
-      .catch(() => {
-        if (!cancelled) setTodayPlayersSolved(null);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <div className={styles.homeBar}>
-          <button
-            type="button"
-            className={styles.cornerBtn}
-            onClick={() => nav("/stats")}
-            aria-label="Leaderboard"
-            data-testid="menu-stats"
-          >
-            <Trophy size={24} />
-          </button>
-          <p className={styles.dailyTitleInBar} aria-live="polite">
-            {menuDate}
-          </p>
-          <div className={styles.cornerBtns}>
-            <button
-              type="button"
-              className={styles.cornerBtn}
-              onClick={() => setShowHelpChoice(true)}
-              aria-label="Help"
-              data-testid="menu-help"
-            >
-              ?
-            </button>
-          </div>
-        </div>
+        <HomeTopBar
+          logoSrc={logoImg}
+          menuDate={getMenuDate()}
+          onOpenStats={() => nav("/stats")}
+          onOpenHelp={() => setShowHelpChoice(true)}
+          statsIcon={<Trophy size={22} />}
+        />
+
         <div className={styles.header}>
-          <img className={styles.logo} src={logoImg} alt="Phuzzle logo" />
           <div className={styles.headerBlurb}>
-            {streak > 0 && (
-              <p className={styles.streakLine}>Welcome back. Day {streak} streak 🔥</p>
-            )}
-            {todayPlayersSolved != null && todayPlayersSolved >= 10 ? (
-              <p className={styles.playersSolved} aria-live="polite">
-                {todayPlayersSolved.toLocaleString()} players solved today&apos;s puzzle.
-                Can you?
-              </p>
-            ) : (
-              <p className={styles.teaserLine}>{getMenuTagline()}</p>
-            )}
+            <p className={styles.teaserLine}>
+              {todayPlayersSolved != null && todayPlayersSolved >= 10
+                ? `${todayPlayersSolved.toLocaleString()} players solved today.`
+                : getMenuTagline()}
+            </p>
           </div>
         </div>
 
         <div className={styles.actionsGrid}>
+          <PrimaryDailyAction
+            hasDaily={hasDaily}
+            todayCompleted={todayCompleted}
+            hasInProgressDaily={hasInProgressDaily}
+            primaryStatus={primaryStatus}
+            starIconSrc={STAR_ICON}
+            starImgFailed={starImgFailed}
+            onStarError={() => setStarImgFailed(true)}
+            onClick={() => {
+              if (hasInProgressDaily) {
+                nav("/play");
+                return;
+              }
+              setShowDailyModal(true);
+            }}
+          />
+
+          <MomentumStrip
+            streak={streak}
+            streakFreezeCount={streakFreezeCount}
+            momentumHint={momentumHint}
+            recentDailyStatuses={recentDailyStatuses}
+          />
+
           {savedPuzzle && savedPuzzleProgress != null && (
-            <Button
-              variant="secondary"
+            <ResumePuzzleCard
+              title={hasInProgressDaily ? "Resume today’s daily" : "Resume saved puzzle"}
+              contextLabel={hasInProgressDaily ? `Daily #${dailyPuzzleNumber}` : "Quick Play"}
+              progress={savedPuzzleProgress}
+              rows={savedPuzzle.grid.rows}
+              cols={savedPuzzle.grid.cols}
+              elapsedLabel={formatTime(savedPuzzle.elapsedSeconds)}
+              savedAtLabel={formatSavedAt(savedPuzzle.savedAt)}
               onClick={() => nav("/play")}
-              className={`${styles.actionCard} ${styles.actionCardFullWidth} ${styles.resumeCard}`}
-              aria-label="Continue your saved puzzle"
-            >
-              <span className={styles.resumeTitle}>Continue your puzzle</span>
-              <span className={styles.resumeMeta}>
-                {savedPuzzleProgress}% solved · {savedPuzzle.grid.rows}x
-                {savedPuzzle.grid.cols} · {formatTime(savedPuzzle.elapsedSeconds)}
-              </span>
-              <span className={styles.resumeHint}>
-                Saved {formatSavedAt(savedPuzzle.savedAt)}
-              </span>
-            </Button>
+            />
           )}
 
-          <div className={`${styles.momentumCard} ${styles.actionCardFullWidth}`}>
-            <div className={styles.momentumHeader}>
-              <span className={styles.momentumEyebrow}>Daily Momentum</span>
-              <span className={styles.momentumBadge}>#{dailyPuzzleNumber}</span>
-            </div>
-            <p className={styles.momentumMessage}>{dailyMomentumMessage}</p>
-            <div className={styles.momentumStats} aria-label="Daily progress summary">
-              <span className={styles.momentumStat}>🔥 {streak} day streak</span>
-              <span className={styles.momentumStat}>
-                🧊 {streakFreezeCount} freeze{streakFreezeCount === 1 ? "" : "s"}
-              </span>
-              <span className={styles.momentumStat}>
-                {todayCompleted ? "✅ Solved today" : "🎯 Daily waiting"}
-              </span>
-            </div>
-            <div className={styles.dailyHistory} aria-label="Last seven daily results">
-              {recentDailyStatuses.map((entry) => (
-                <div key={entry.date} className={styles.dailyHistoryItem}>
-                  <span
-                    className={`${styles.dailyHistoryDot} ${
-                      entry.completed
-                        ? styles.dailyHistoryDotComplete
-                        : styles.dailyHistoryDotMiss
-                    } ${entry.isToday ? styles.dailyHistoryDotToday : ""}`}
-                    aria-hidden
-                  />
-                  <span className={styles.dailyHistoryLabel}>{entry.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Button
-            variant="primary"
-            onClick={() => setShowDailyModal(true)}
-            disabled={!hasDaily}
-            className={styles.actionCard}
-            aria-label={todayCompleted ? "Today's Puzzle (completed)" : "Today's Puzzle"}
-          >
-            {starImgFailed ? (
-              <span className={styles.starFallback} aria-hidden>
-                ★
-              </span>
-            ) : (
-              <img
-                src={STAR_ICON}
-                alt=""
-                className={styles.starIcon}
-                onError={() => setStarImgFailed(true)}
-              />
-            )}
-            <span className={styles.actionLabel}>
-              {todayCompleted ? "Today's Puzzle ✓" : "Today's Puzzle"}
-            </span>
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => setShowPackModal(true)}
-            className={styles.actionCard}
-            aria-label="Music Puzzle Packs"
-          >
-            <Package size={22} />
-            <span className={styles.actionLabel}>🎵 Puzzle Packs</span>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowChoosePhotoModal(true)}
-            className={styles.actionCard}
-            aria-label="Music Choose a Puzzle Image"
-          >
-            <Image size={22} />
-            <span className={styles.actionLabel}>🎵 Choose a Puzzle Image</span>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowFeedbackChoice(true)}
-            className={styles.actionCard}
-            aria-label="Feedback"
-            data-testid="menu-feedback-action"
-          >
-            <Megaphone size={22} />
-            <span className={styles.actionLabel}>Feedback</span>
-          </Button>
+          <SecondaryActions
+            onOpenPacks={() => setShowPackModal(true)}
+            onOpenQuickPlay={() => setShowChoosePhotoModal(true)}
+          />
         </div>
+
+        <button
+          type="button"
+          onClick={() => setShowFeedbackChoice(true)}
+          className={styles.feedbackLink}
+          aria-label="Feedback"
+          data-testid="menu-feedback-action"
+        >
+          <Megaphone size={16} />
+          <span>Feedback</span>
+        </button>
 
         <div className={styles.homeCountdownWrap}>
           <DailyCountdown variant="home" />
@@ -391,11 +277,13 @@ export function MenuScreen() {
               k?.startsWith("phuzzle:viewport:") ||
               k === "phuzzle:puzzleState" ||
               k === "phuzzle:puzzleStateBackup"
-            )
+            ) {
               keysToRemove.push(k);
+            }
           }
           keysToRemove.forEach((k) => safeLocalStorage.removeItem(k));
           setShowClearCacheConfirm(false);
+          refreshSnapshot();
         }}
         title="Clear Cache?"
         message="This will clear saved puzzle state and viewport settings."

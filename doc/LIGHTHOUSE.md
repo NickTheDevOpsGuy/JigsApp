@@ -4,6 +4,33 @@ Lighthouse runs in CI on every PR (performance, accessibility, best practices). 
 
 ---
 
+## Run it locally
+
+Use the repo scripts:
+
+```bash
+npm run lighthouse
+```
+
+Useful variants:
+
+```bash
+npm run lighthouse:collect
+npm run lighthouse:assert
+npm run lighthouse:open
+npm run check:images
+```
+
+What they do:
+
+- `npm run lighthouse` builds the app and runs the full LHCI flow.
+- `npm run lighthouse:collect` builds and collects reports only.
+- `npm run lighthouse:assert` checks the collected results against thresholds.
+- `npm run lighthouse:open` opens the generated local HTML report on macOS.
+- `npm run check:images` reports the heaviest shipped image assets and estimates WebP savings when `cwebp` is available.
+
+---
+
 ## “GitHub token not set” warning
 
 **In CI (GitHub Actions)**  
@@ -67,10 +94,55 @@ If your cached Playwright revision differs, adjust the `chromium-####` segment t
 - **Local:** `./lhci-reports`
 - **CI:** Reports are uploaded as artifacts if the workflow is configured for it.
 
-The local `npm run lhci` script builds the app first, then runs `lhci autorun`.
+The local `npm run lighthouse` and `npm run lhci` scripts both build the app first, then run `lhci autorun`.
 
 ---
 
 ## Accessibility
 
 The app has a **skip link** (“Skip to main content”) that is hidden until focused (Tab from top). It moves focus to `<main id="main">`. This helps keyboard and screen reader users skip repeated nav. Lighthouse/axe “bypass blocks” and main landmark checks should pass.
+
+---
+
+## Recent baseline improvements
+
+- Added explicit page `meta description`
+- Added `color-scheme` metadata for light/dark aware browser UI
+- Removed the runtime Google Fonts dependency in favor of local/system font stacks
+- Added stable local scripts so Lighthouse can be run without remembering raw `lhci` commands
+- Ignored Lighthouse output folders in ESLint so lint stays reliable after audits
+- Added a repo image-audit script so oversized puzzle and social assets are easy to spot before shipping
+- Converted the heaviest shipped social image and several top puzzle outliers to WebP to cut transfer size sharply
+
+---
+
+## Image budget
+
+Use these as the project guardrails when adding new assets:
+
+- **Puzzle images**
+  - Ideal: `200-500 kB`
+  - Acceptable: up to `1 MB`
+  - Too large: `2 MB+`
+- **Hero / social / OG images**
+  - Ideal: `100-250 kB`
+  - Acceptable: up to `500 kB`
+  - Too large: `1 MB+`
+- **Small UI images / icons**
+  - Ideal: under `100 kB`
+
+Practical rule: if a puzzle image lands above `1 MB`, run `npm run check:images` and compress it before merging. If it lands above `2 MB`, treat that as a blocker unless there is a very unusual reason.
+
+Recommended formats:
+
+- Prefer `webp` for large photographic or illustrated puzzle assets
+- Keep `png` only when you truly need lossless transparency
+- Use `jpg` only when it materially beats `webp` for a given asset
+
+Current workflow:
+
+```bash
+npm run check:images
+```
+
+This prints the heaviest shipped image assets and, when `cwebp` is available, estimates how much smaller a WebP version would be.

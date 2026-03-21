@@ -7,7 +7,14 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 export default [
   // Ignore build output and dependencies
   {
-    ignores: ["dist", "node_modules", "coverage"],
+    ignores: [
+      "dist",
+      "node_modules",
+      "coverage",
+      "test-results",
+      "playwright-report",
+      "lhci-reports",
+    ],
   },
 
   // CommonJS config files (Node globals)

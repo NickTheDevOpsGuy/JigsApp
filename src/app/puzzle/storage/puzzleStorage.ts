@@ -3,6 +3,7 @@
  */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { logger } from "@/utils/logger";
+import { dispatchMenuRefresh } from "@/utils/menuRefresh";
 import type { Piece, GridSize } from "@/puzzle/core/types";
 
 const PUZZLE_STATE_KEY = "phuzzle:puzzleState";
@@ -42,7 +43,11 @@ export type SavedPuzzleState = {
 
 export type LoadResult =
   | { ok: true; state: SavedPuzzleState }
-  | { ok: false; reason: "corrupted" | "version_mismatch" | "invalid"; cleared: boolean };
+  | {
+      ok: false;
+      reason: "missing" | "corrupted" | "version_mismatch" | "invalid";
+      cleared: boolean;
+    };
 
 function isValidPiece(p: unknown, grid: GridSize): p is SavedPiece {
   if (!p || typeof p !== "object") return false;
@@ -139,7 +144,7 @@ function validateState(raw: unknown): LoadResult {
 function tryLoadFromStorage(key: string): LoadResult {
   try {
     const raw = safeLocalStorage.getItem(key);
-    if (!raw) return { ok: false, reason: "corrupted", cleared: false };
+    if (!raw) return { ok: false, reason: "missing", cleared: false };
     const parsed = JSON.parse(raw) as unknown;
     return validateState(parsed);
   } catch {
@@ -151,6 +156,7 @@ function clearBoth(): void {
   try {
     safeLocalStorage.removeItem(PUZZLE_STATE_KEY);
     safeLocalStorage.removeItem(PUZZLE_BACKUP_KEY);
+    dispatchMenuRefresh();
   } catch (e) {
     logger.warn("Failed to clear puzzle state:", e);
   }
@@ -197,6 +203,7 @@ export function savePuzzleState(
       safeLocalStorage.setItem(PUZZLE_BACKUP_KEY, existing);
     }
     safeLocalStorage.setItem(PUZZLE_STATE_KEY, JSON.stringify(state));
+    dispatchMenuRefresh();
   } catch (e) {
     logger.warn("Failed to save puzzle state:", e);
   }
@@ -220,6 +227,7 @@ export function loadPuzzleState(): SavedPuzzleState | null {
       try {
         // Restore backup to main so next load is fast
         safeLocalStorage.setItem(PUZZLE_STATE_KEY, JSON.stringify(state));
+        dispatchMenuRefresh();
       } catch {
         // Ignore
       }
@@ -227,7 +235,12 @@ export function loadPuzzleState(): SavedPuzzleState | null {
     }
   }
 
-  // Both failed or backup too old – clear corrupted data
+  // No saved state at all is normal; don't clear or broadcast refresh events.
+  if (!main.ok && !backup.ok && main.reason === "missing" && backup.reason === "missing") {
+    return null;
+  }
+
+  // Both failed or backup too old – clear corrupted/stale data
   clearBoth();
   return null;
 }

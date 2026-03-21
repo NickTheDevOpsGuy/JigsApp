@@ -82,7 +82,7 @@ XP on completion (per piece + bonus); levels. At level 5+, prestige reset to Lv1
 
 ## Start page and win screen
 
-Start: date above card; top bar (Stats, Phuzzle, Feedback, Help); streak and countdown or taglines; Today’s Puzzle, Packs, Choose Photo, Snap.  
+Start: compact top bar (Stats, Phuzzle, Help); one primary `Play Today’s Puzzle` CTA that switches to `Continue Daily` when today is already in progress; momentum strip with streak, freezes, and 7-day history; optional resume card with clearer daily context; secondary actions for Puzzle Packs and Quick Play; Feedback as a lightweight action.  
 Win: drop-up for Continue/Play again; cycling message; “New best time!” or performance badge; Share Result / Share with People; URL on share card only.  
 **Files:** `MenuScreen.tsx`, `DailyCountdown.tsx`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompletionSharePopup.tsx`, `useShareCardImage.ts`, `completionMessages.ts`.
 

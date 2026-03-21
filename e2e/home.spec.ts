@@ -17,15 +17,15 @@ test.describe("Home / Menu", () => {
   test("shows main action buttons", async ({ page }) => {
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
-    await expect(page.getByRole("button", { name: /today's puzzle/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /choose photo/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /play today'?s puzzle/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /quick play/i })).toBeVisible();
   });
 
   test("corner buttons: Stats on left, Help on right", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
-    await expect(page.getByRole("button", { name: /today's puzzle/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /play today'?s puzzle/i })).toBeVisible({
       timeout: 15000,
     });
     const statsBtn = page.getByTestId("menu-stats");
@@ -41,7 +41,7 @@ test.describe("Home / Menu", () => {
     test.setTimeout(60000);
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
-    await expect(page.getByRole("button", { name: /today's puzzle/i })).toBeVisible({
+    await expect(page.getByRole("button", { name: /play today'?s puzzle/i })).toBeVisible({
       timeout: 15000,
     });
     await page.getByTestId("menu-help").click();

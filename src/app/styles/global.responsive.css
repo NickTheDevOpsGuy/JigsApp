@@ -71,12 +71,12 @@ canvas {
 
 /* Playful/logo font */
 .font-display {
-  font-family: "Fredoka", system-ui, sans-serif;
+  font-family: var(--font-display);
 }
 
 /* Monospace for timer */
 .font-mono {
-  font-family: "SF Mono", "Roboto Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 

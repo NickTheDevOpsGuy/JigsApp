@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import type { Piece } from "@/puzzle/core/types";
 import { renderTrayPiece } from "@/puzzle/canvas/render/renderTrayPiece";
+import { canvasToObjectUrl, revokeObjectUrls, yieldToMainThread } from "@/utils/async";
 import styles from "./Tray.module.css";
 
 type TrayProps = {
@@ -56,20 +57,44 @@ export function Tray({
 
   useEffect(() => {
     if (!img?.complete || img.naturalWidth === 0 || allPieces.length === 0) {
+      revokeObjectUrls(thumbsById.values());
       setThumbsById(new Map());
       return;
     }
-    const next = new Map<string, string>();
-    for (const piece of allPieces) {
-      try {
-        const canvas = renderTrayPiece(piece, img, assembledW, assembledH, TRAY_SCALE);
-        next.set(piece.id, canvas.toDataURL("image/png"));
-      } catch {
-        // skip failed piece
+    let cancelled = false;
+    void (async () => {
+      await yieldToMainThread();
+      const entries = await Promise.all(
+        allPieces.map(async (piece) => {
+          try {
+            const canvas = renderTrayPiece(piece, img, assembledW, assembledH, TRAY_SCALE);
+            return [piece.id, await canvasToObjectUrl(canvas, "image/png")] as const;
+          } catch {
+            return [piece.id, null] as const;
+          }
+        }),
+      );
+      const next = new Map<string, string>();
+      for (const [id, url] of entries) {
+        if (url) next.set(id, url);
       }
-    }
-    setThumbsById(next);
+      if (cancelled) {
+        revokeObjectUrls(next.values());
+        return;
+      }
+      revokeObjectUrls(thumbsById.values());
+      setThumbsById(next);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [img, pieceKey, assembledW, assembledH, allPieces]);
+
+  useEffect(() => {
+    return () => {
+      revokeObjectUrls(thumbsById.values());
+    };
+  }, [thumbsById]);
 
   const renderPiecePreview = (piece: Piece) => {
     const dataUrl = thumbsById.get(piece.id);
