@@ -191,7 +191,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
 
   const modalTitle =
     step === "category"
-      ? "Choose Category"
+      ? "🎵 Choose a Puzzle Image"
       : step === "puzzle"
         ? "Choose Puzzle"
         : "Puzzle Setup";

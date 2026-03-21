@@ -169,19 +169,19 @@ export function MenuScreen() {
             variant="outline"
             onClick={() => setShowPackModal(true)}
             className={styles.actionCard}
-            aria-label="Puzzle Packs"
+            aria-label="Music Puzzle Packs"
           >
             <Package size={22} />
-            <span className={styles.actionLabel}>Puzzle Packs</span>
+            <span className={styles.actionLabel}>🎵 Puzzle Packs</span>
           </Button>
           <Button
             variant="outline"
             onClick={() => setShowChoosePhotoModal(true)}
             className={styles.actionCard}
-            aria-label="Choose Photo"
+            aria-label="Music Choose a Puzzle Image"
           >
             <Image size={22} />
-            <span className={styles.actionLabel}>Choose Photo</span>
+            <span className={styles.actionLabel}>🎵 Choose a Puzzle Image</span>
           </Button>
           <Button
             variant="outline"

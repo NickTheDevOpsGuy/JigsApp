@@ -39,11 +39,11 @@ export const PACK_METADATA: PackMetadata[] = [
     category: "food",
   },
   {
-    id: "cozy",
+    id: "music",
     name: "Music",
     description: "Instruments, concerts, vinyl records, musicians",
     emoji: "🎵",
-    category: "cozy",
+    category: "music",
   },
   {
     id: "space",

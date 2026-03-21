@@ -65,7 +65,7 @@ export function PackListScreen() {
             <ArrowLeft size={20} />
           </button>
           <div className={styles.headerTitleRow}>
-            <h1 className={styles.title}>Puzzle Packs</h1>
+            <h1 className={styles.title}>🎵 Puzzle Packs</h1>
             <nav
               className={styles.stepIndicator}
               aria-label="Steps: Pack, Puzzle, Difficulty"

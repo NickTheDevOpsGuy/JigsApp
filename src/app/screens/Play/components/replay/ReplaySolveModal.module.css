@@ -61,6 +61,45 @@
     );
 }
 
+.cutoutCornerMask {
+  position: fixed;
+  z-index: 2100;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 120% 80% at 50% 20%,
+      var(--replay-backdrop-glow-a) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 100% 100% at 80% 80%,
+      var(--replay-backdrop-glow-b) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      var(--replay-backdrop-top) 0%,
+      var(--replay-backdrop-mid) 40%,
+      var(--replay-backdrop-bottom) 100%
+    );
+}
+
+.cutoutCornerMaskTopLeft {
+  border-bottom-right-radius: 20px;
+}
+
+.cutoutCornerMaskTopRight {
+  border-bottom-left-radius: 20px;
+}
+
+.cutoutCornerMaskBottomLeft {
+  border-top-right-radius: 20px;
+}
+
+.cutoutCornerMaskBottomRight {
+  border-top-left-radius: 20px;
+}
+
 .backdropCutout > [data-cutout-panel]::before {
   content: "";
   position: absolute;
@@ -124,14 +163,10 @@
   left: 0;
   right: 0;
   z-index: 2102;
-  flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
-  background: var(--color-bg-card);
-  border-top: 1px solid var(--color-border);
-  padding: 8px 12px 12px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
-  box-shadow: var(--shadow-lg);
+  padding: 4px 12px 10px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
   pointer-events: auto;
   overflow-x: hidden;
   overflow-y: auto;
@@ -144,6 +179,13 @@
   min-width: 0;
   max-width: 100%;
   pointer-events: auto;
+  border-radius: calc(var(--radius-card) + 2px);
+  background: color-mix(in srgb, var(--color-bg-card) 96%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 18%, var(--color-border));
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.28),
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
+  overflow: hidden;
 }
 
 /* Sharp starfield: theme-driven star color (--replay-star) */
@@ -325,11 +367,12 @@
 .subtitle {
   flex-shrink: 0;
   margin: 0;
-  padding: 2px 12px 6px;
+  padding: 8px 12px 4px;
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--color-text-secondary);
   line-height: 1.35;
+  text-align: center;
 }
 
 /* Puzzle as hero: board-focused, compact margins; min-height: 0 so it shrinks on mobile */
@@ -398,7 +441,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px 8px;
+  padding: 0 12px 6px;
   max-width: 100%;
 }
 
@@ -466,7 +509,7 @@
   }
 
   .cutoutBottomBar {
-    padding: 6px 10px max(10px, env(safe-area-inset-bottom));
+    padding: 4px 10px max(8px, env(safe-area-inset-bottom));
   }
 
   .header {

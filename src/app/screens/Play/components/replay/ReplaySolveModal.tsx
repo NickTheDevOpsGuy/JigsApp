@@ -201,8 +201,9 @@ export function ReplaySolveModal({
     const { top, left, width, height } = boardRect;
     const right = left + width;
     const bottom = top + height;
-    /** Keep playback + nav directly under the board (not viewport bottom). */
-    const controlsGapPx = 8;
+    const cutoutRadius = 20;
+    /** Keep playback + nav tucked just beneath the board. */
+    const controlsGapPx = 4;
     const controlsTopPx = bottom + controlsGapPx;
     /* Align controls with board; cutoutBottomBar has padding-left: 16px */
     const barPaddingLeft = 16;
@@ -240,6 +241,31 @@ export function ReplaySolveModal({
           data-cutout-panel
           style={{ top: bottom, left: 0, right: 0, bottom: 0 }}
           onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
+        />
+        <div
+          className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskTopLeft}`}
+          style={{ top, left, width: cutoutRadius, height: cutoutRadius }}
+          aria-hidden="true"
+        />
+        <div
+          className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskTopRight}`}
+          style={{ top, left: right - cutoutRadius, width: cutoutRadius, height: cutoutRadius }}
+          aria-hidden="true"
+        />
+        <div
+          className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskBottomLeft}`}
+          style={{ top: bottom - cutoutRadius, left, width: cutoutRadius, height: cutoutRadius }}
+          aria-hidden="true"
+        />
+        <div
+          className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskBottomRight}`}
+          style={{
+            top: bottom - cutoutRadius,
+            left: right - cutoutRadius,
+            width: cutoutRadius,
+            height: cutoutRadius,
+          }}
+          aria-hidden="true"
         />
         <div className={styles.backdropCutoutContent}>
           <div className={styles.cutoutTopBar} onPointerDown={stopProp}>
