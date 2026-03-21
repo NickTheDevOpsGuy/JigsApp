@@ -13,6 +13,7 @@ Possible enhancements and ideas. Not a commitment list.
 - **Circular progress ring** — Around board; color shift at 75% / 95%. Implemented.
 - **Drift mode** — Unplaced pieces nudge periodically. Implemented.
 - **Snap sound picker** — Preference in Theme modal. Implemented.
+- **Home return hooks** — Continue-your-puzzle card plus daily momentum/streak nudges on the menu. Implemented.
 
 ---
 

@@ -20,13 +20,18 @@ import { AboutModal } from "@/components/AboutModal";
 import { WhatsNewModal } from "@/components/WhatsNew";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
+import { loadPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { BEST_TIME_PREFIX } from "@/screens/Play/core/time/timeMode";
+import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import { Image, Package, Trophy, Megaphone } from "lucide-react";
 import {
   isTodayDailyCompleted,
   getCurrentStreak,
   getTodayDateString,
+  getTodayDailyTime,
+  getStreakFreezeCount,
+  getDailyPuzzleNumber,
 } from "@/daily/dailyPuzzleCore";
 import { getTodayCompletionCount } from "@/services/leaderboard/leaderboardService";
 import { shouldShowChangelog } from "@/data/content/changelog";
@@ -59,10 +64,20 @@ function getMenuTagline(): string {
   return MENU_TAGLINES[day] ?? MENU_TAGLINES[0];
 }
 
+function formatSavedAt(savedAt: number): string {
+  return new Date(savedAt).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 export function MenuScreen() {
   const nav = useNavigate();
   const [menuDate] = useState(() => getMenuDate());
   const [streak] = useState(() => getCurrentStreak());
+  const [savedPuzzle] = useState(() => loadPuzzleState());
   const [starImgFailed, setStarImgFailed] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showDailyModal, setShowDailyModal] = useState(false);
@@ -78,7 +93,26 @@ export function MenuScreen() {
   const [showResetStatsConfirm, setShowResetStatsConfirm] = useState(false);
   const [todayPlayersSolved, setTodayPlayersSolved] = useState<number | null>(null);
   const todayCompleted = isTodayDailyCompleted();
+  const todayTime = getTodayDailyTime();
+  const streakFreezeCount = getStreakFreezeCount();
+  const dailyPuzzleNumber = getDailyPuzzleNumber();
   const hasDaily = true;
+  const savedPuzzleProgress = savedPuzzle
+    ? Math.round(
+        (savedPuzzle.pieces.filter((piece) => piece.isPlaced).length /
+          Math.max(1, savedPuzzle.pieces.length)) *
+          100,
+      )
+    : null;
+  const dailyMomentumMessage = todayCompleted
+    ? todayTime != null
+      ? `Daily #${dailyPuzzleNumber} complete in ${formatTime(todayTime)}. A fresh one lands tomorrow.`
+      : `Daily #${dailyPuzzleNumber} complete. Come back tomorrow to keep the streak alive.`
+    : streak > 0 && streak < 5
+      ? `Solve today to push your streak to ${streak + 1}. Reach day 5 to earn a streak freeze.`
+      : streakFreezeCount > 0
+        ? `You have ${streakFreezeCount} streak ${streakFreezeCount === 1 ? "freeze" : "freezes"} banked. Keep the run alive today.`
+        : `Daily #${dailyPuzzleNumber} is live. Build your streak and chase the leaderboard.`;
 
   useEffect(() => {
     if (shouldShowChangelog()) setShowWhatsNew(true);
@@ -90,9 +124,19 @@ export function MenuScreen() {
   }, []);
 
   useEffect(() => {
-    getTodayCompletionCount(getTodayDateString()).then((count: number) => {
-      setTodayPlayersSolved(count);
-    });
+    let cancelled = false;
+
+    void getTodayCompletionCount(getTodayDateString())
+      .then((count: number) => {
+        if (!cancelled) setTodayPlayersSolved(count);
+      })
+      .catch(() => {
+        if (!cancelled) setTodayPlayersSolved(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -141,6 +185,39 @@ export function MenuScreen() {
         </div>
 
         <div className={styles.actionsGrid}>
+          {savedPuzzle && savedPuzzleProgress != null && (
+            <Button
+              variant="secondary"
+              onClick={() => nav("/play")}
+              className={`${styles.actionCard} ${styles.actionCardFullWidth} ${styles.resumeCard}`}
+              aria-label="Continue your saved puzzle"
+            >
+              <span className={styles.resumeTitle}>Continue your puzzle</span>
+              <span className={styles.resumeMeta}>
+                {savedPuzzleProgress}% solved · {savedPuzzle.grid.rows}x
+                {savedPuzzle.grid.cols} · {formatTime(savedPuzzle.elapsedSeconds)}
+              </span>
+              <span className={styles.resumeHint}>
+                Saved {formatSavedAt(savedPuzzle.savedAt)}
+              </span>
+            </Button>
+          )}
+
+          <div className={`${styles.momentumCard} ${styles.actionCardFullWidth}`}>
+            <div className={styles.momentumHeader}>
+              <span className={styles.momentumEyebrow}>Daily Momentum</span>
+              <span className={styles.momentumBadge}>#{dailyPuzzleNumber}</span>
+            </div>
+            <p className={styles.momentumMessage}>{dailyMomentumMessage}</p>
+            <div className={styles.momentumStats} aria-label="Daily progress summary">
+              <span className={styles.momentumStat}>🔥 {streak} day streak</span>
+              <span className={styles.momentumStat}>🧊 {streakFreezeCount} freeze</span>
+              <span className={styles.momentumStat}>
+                {todayCompleted ? "✅ Solved today" : "🎯 Daily waiting"}
+              </span>
+            </div>
+          </div>
+
           <Button
             variant="primary"
             onClick={() => setShowDailyModal(true)}

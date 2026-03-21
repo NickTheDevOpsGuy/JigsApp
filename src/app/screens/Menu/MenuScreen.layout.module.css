@@ -52,6 +52,105 @@
   grid-column: 1 / -1;
 }
 
+.resumeCard {
+  align-items: flex-start;
+  text-align: left;
+  gap: 4px;
+  padding: 14px 16px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-brand-light) 65%, white) 0%, transparent 100%),
+    var(--color-bg-elevated);
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 30%, var(--color-border));
+}
+
+.resumeTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.resumeMeta,
+.resumeHint {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.resumeMeta {
+  color: var(--color-text-primary);
+}
+
+.resumeHint {
+  color: var(--color-text-secondary);
+}
+
+.momentumCard {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--color-border);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-brand-light) 55%, transparent), transparent 42%),
+    var(--color-bg-elevated);
+  box-shadow: var(--shadow-sm);
+}
+
+.momentumHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.momentumEyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.momentumBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-primary) 14%, white);
+  color: var(--color-brand-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.momentumMessage {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.momentumStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.momentumStat {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .whatsNewCard {
   display: flex;
   flex-direction: row;
@@ -170,6 +269,22 @@
     min-height: 52px;
     padding: 10px 12px;
     gap: 4px;
+  }
+
+  .resumeCard,
+  .momentumCard {
+    padding: 12px;
+  }
+
+  .resumeTitle,
+  .momentumMessage {
+    font-size: 13px;
+  }
+
+  .resumeMeta,
+  .resumeHint,
+  .momentumStat {
+    font-size: 12px;
   }
 
   .actionLabel {
