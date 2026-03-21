@@ -9,7 +9,7 @@ Developer documentation for Phuzzle. For project overview and setup, see the [ma
 | Doc                                    | What it covers                                                                        |
 | -------------------------------------- | ------------------------------------------------------------------------------------- |
 | [SUPABASE_SETUP.md](SUPABASE_SETUP.md) | Supabase: leaderboards, stats, co-op. Create project, env vars, migrations, Realtime. |
-| [LIGHTHOUSE.md](LIGHTHOUSE.md)         | Lighthouse CI, where reports go, fixing the "GitHub token not set" warning.           |
+| [LIGHTHOUSE.md](LIGHTHOUSE.md)         | Lighthouse CI, where reports go, GitHub token note, and local Chrome setup tips.      |
 
 ---
 

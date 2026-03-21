@@ -76,3 +76,8 @@ npm run typecheck
 npm run test
 npm run test:e2e
 ```
+
+Notes:
+
+- `npm run test` uses Vitest with 4 workers.
+- `npm run test:e2e` uses Playwright with 4 workers.

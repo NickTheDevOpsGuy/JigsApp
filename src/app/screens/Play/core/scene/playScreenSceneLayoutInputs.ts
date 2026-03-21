@@ -115,6 +115,8 @@ export function usePlayScreenLayoutInputs(ctx: any) {
       handleNativeShare: share.handleNativeShare,
       handleCopyChallenge: share.handleCopyChallenge,
       handleNativeChallengeShare: share.handleNativeChallengeShare,
+      getProgressShareTextWithUrl: share.getProgressShareTextWithUrl,
+      getChallengeShareTextWithUrl: share.getChallengeShareTextWithUrl,
     },
     onDownloadImage: handleDownloadImage,
     onClose: () => {

@@ -49,6 +49,8 @@ export default defineConfig(({ mode }) => {
       exclude: ["node_modules", "**/e2e/**"],
       globals: true,
       setupFiles: ["./src/test/setup.ts"],
+      minWorkers: 4,
+      maxWorkers: 4,
     },
     build: {
       // Single CSS bundle avoids "Unable to preload CSS for /assets/..." errors on Vercel.

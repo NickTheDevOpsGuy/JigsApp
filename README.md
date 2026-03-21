@@ -100,7 +100,7 @@ npm install
 npm run dev
 ```
 
-Useful scripts: `npm run build`, `npm run preview`, `npm run test`, `npm run test:e2e` (run `npx playwright install` once).
+Useful scripts: `npm run build`, `npm run preview`, `npm run test`, `npm run test:e2e` (Vitest and Playwright use 4 workers; run `npx playwright install` once).
 
 ---
 

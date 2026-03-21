@@ -25,12 +25,12 @@ Run these locally before you commit; CI will run them on the PR as well.
 | ------------------- | ------------------------------ |
 | `npm run lint`      | ESLint (TypeScript + jsx-a11y) |
 | `npm run typecheck` | TypeScript (no emit)           |
-| `npm run test`      | Unit tests (Vitest)            |
+| `npm run test`      | Unit tests (Vitest, 4 workers) |
 | `npm run build`     | Production build               |
 
 Optional:
 
-- `npm run test:e2e` — Playwright E2E tests (run `npx playwright install` once; ensure port 5173 is free or app is not already running).
+- `npm run test:e2e` — Playwright E2E tests with 4 workers (run `npx playwright install` once; ensure port 5173 is free or app is not already running).
 - `npm run format:check` — Prettier; use `npm run format` to fix.
 
 Running the same commands before each commit helps catch issues early.

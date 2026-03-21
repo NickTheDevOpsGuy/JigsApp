@@ -31,6 +31,28 @@ For filesystem-only output you don’t need a token; it’s only for optional Gi
 
 ---
 
+## Local Chrome setup
+
+LHCI needs a Chrome/Chromium binary. If you see `Chrome installation not found`, point LHCI at a local browser binary.
+
+If Playwright browsers are already installed, this usually works on macOS:
+
+```bash
+CHROME_PATH="$HOME/Library/Caches/ms-playwright/chromium-1208/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing" \
+npm run lhci
+```
+
+You can also run collect directly while debugging:
+
+```bash
+CHROME_PATH="$HOME/Library/Caches/ms-playwright/chromium-1208/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing" \
+npx lhci collect --staticDistDir=./dist --numberOfRuns=1 --settings.preset=desktop
+```
+
+If your cached Playwright revision differs, adjust the `chromium-####` segment to match the folder under `~/Library/Caches/ms-playwright/`.
+
+---
+
 ## Token names
 
 - `github.token` — GitHub Actions context value.
@@ -44,6 +66,8 @@ For filesystem-only output you don’t need a token; it’s only for optional Gi
 
 - **Local:** `./lhci-reports`
 - **CI:** Reports are uploaded as artifacts if the workflow is configured for it.
+
+The local `npm run lhci` script builds the app first, then runs `lhci autorun`.
 
 ---
 
