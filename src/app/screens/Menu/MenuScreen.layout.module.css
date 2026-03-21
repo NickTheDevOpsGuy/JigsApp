@@ -58,9 +58,14 @@
   gap: 4px;
   padding: 14px 16px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--color-brand-light) 65%, white) 0%, transparent 100%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-brand-light) 65%, white) 0%,
+      transparent 100%
+    ),
     var(--color-bg-elevated);
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 30%, var(--color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 30%, var(--color-border));
 }
 
 .resumeTitle {
@@ -92,7 +97,11 @@
   border-radius: var(--radius-btn);
   border: 1px solid var(--color-border);
   background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--color-brand-light) 55%, transparent), transparent 42%),
+    radial-gradient(
+      circle at top right,
+      color-mix(in srgb, var(--color-brand-light) 55%, transparent),
+      transparent 42%
+    ),
     var(--color-bg-elevated);
   box-shadow: var(--shadow-sm);
 }
