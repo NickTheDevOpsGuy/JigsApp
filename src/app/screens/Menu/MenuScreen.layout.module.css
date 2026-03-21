@@ -160,6 +160,46 @@
   font-weight: 600;
 }
 
+.dailyHistory {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dailyHistoryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dailyHistoryDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background: var(--color-border);
+}
+
+.dailyHistoryDotComplete {
+  background: var(--color-brand-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand-primary) 14%, transparent);
+}
+
+.dailyHistoryDotMiss {
+  background: color-mix(in srgb, var(--color-text-secondary) 35%, transparent);
+}
+
+.dailyHistoryDotToday {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 70%, white);
+}
+
+.dailyHistoryLabel {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
 .whatsNewCard {
   display: flex;
   flex-direction: row;
@@ -294,6 +334,10 @@
   .resumeHint,
   .momentumStat {
     font-size: 12px;
+  }
+
+  .dailyHistory {
+    gap: 6px;
   }
 
   .actionLabel {

@@ -32,6 +32,8 @@ import {
   getTodayDailyTime,
   getStreakFreezeCount,
   getDailyPuzzleNumber,
+  parseLocalYmd,
+  formatLocalYmd,
 } from "@/daily/dailyPuzzleCore";
 import { getTodayCompletionCount } from "@/services/leaderboard/leaderboardService";
 import { shouldShowChangelog } from "@/data/content/changelog";
@@ -73,6 +75,36 @@ function formatSavedAt(savedAt: number): string {
   });
 }
 
+function getRecentDailyStatuses(days: number): Array<{
+  date: string;
+  label: string;
+  completed: boolean;
+  isToday: boolean;
+}> {
+  const result: Array<{
+    date: string;
+    label: string;
+    completed: boolean;
+    isToday: boolean;
+  }> = [];
+  const today = getTodayDateString();
+  const todayDate = parseLocalYmd(today);
+
+  for (let offset = days - 1; offset >= 0; offset--) {
+    const date = new Date(todayDate);
+    date.setDate(date.getDate() - offset);
+    const ymd = formatLocalYmd(date);
+    result.push({
+      date: ymd,
+      label: date.toLocaleDateString(undefined, { weekday: "short" }),
+      completed: safeLocalStorage.getItem(`phuzzle:daily:${ymd}:completed`) === "true",
+      isToday: ymd === today,
+    });
+  }
+
+  return result;
+}
+
 export function MenuScreen() {
   const nav = useNavigate();
   const [menuDate] = useState(() => getMenuDate());
@@ -96,6 +128,7 @@ export function MenuScreen() {
   const todayTime = getTodayDailyTime();
   const streakFreezeCount = getStreakFreezeCount();
   const dailyPuzzleNumber = getDailyPuzzleNumber();
+  const recentDailyStatuses = getRecentDailyStatuses(7);
   const hasDaily = true;
   const savedPuzzleProgress = savedPuzzle
     ? Math.round(
@@ -211,10 +244,27 @@ export function MenuScreen() {
             <p className={styles.momentumMessage}>{dailyMomentumMessage}</p>
             <div className={styles.momentumStats} aria-label="Daily progress summary">
               <span className={styles.momentumStat}>🔥 {streak} day streak</span>
-              <span className={styles.momentumStat}>🧊 {streakFreezeCount} freeze</span>
+              <span className={styles.momentumStat}>
+                🧊 {streakFreezeCount} freeze{streakFreezeCount === 1 ? "" : "s"}
+              </span>
               <span className={styles.momentumStat}>
                 {todayCompleted ? "✅ Solved today" : "🎯 Daily waiting"}
               </span>
+            </div>
+            <div className={styles.dailyHistory} aria-label="Last seven daily results">
+              {recentDailyStatuses.map((entry) => (
+                <div key={entry.date} className={styles.dailyHistoryItem}>
+                  <span
+                    className={`${styles.dailyHistoryDot} ${
+                      entry.completed
+                        ? styles.dailyHistoryDotComplete
+                        : styles.dailyHistoryDotMiss
+                    } ${entry.isToday ? styles.dailyHistoryDotToday : ""}`}
+                    aria-hidden
+                  />
+                  <span className={styles.dailyHistoryLabel}>{entry.label}</span>
+                </div>
+              ))}
             </div>
           </div>
 

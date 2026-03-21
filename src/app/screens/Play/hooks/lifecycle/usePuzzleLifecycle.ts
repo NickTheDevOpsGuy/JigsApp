@@ -6,6 +6,7 @@ import {
   loadPuzzleState,
   clearPuzzleState,
 } from "@/puzzle/storage/puzzleStorage";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { soundManager } from "@/audio/core/sounds";
 import { logger } from "@/utils/logger";
 
@@ -41,7 +42,7 @@ export function usePuzzleLifecycle({
   const boardSizeRef = useRef({ w: 900, h: 520 });
 
   // Grid from localStorage
-  const grid = useMemo(() => parseGrid(localStorage.getItem(GRID_KEY)), []);
+  const grid = useMemo(() => parseGrid(safeLocalStorage.getItem(GRID_KEY)), []);
 
   // Helper: compute tile size that makes puzzle fill board nicely
   const computeTileSize = useCallback(
@@ -70,7 +71,7 @@ export function usePuzzleLifecycle({
   useEffect(() => {
     if (!state || state.isComplete) return;
 
-    const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
+    const imageUrl = safeLocalStorage.getItem(STORAGE_KEY) || "";
     savePuzzleState(imageUrl, state.grid, state.pieces, elapsedSeconds);
   }, [state, elapsedSeconds]);
 
@@ -85,7 +86,7 @@ export function usePuzzleLifecycle({
     boardSizeRef.current = { w: boardW, h: boardH };
 
     const pieceSize = computeTileSize(boardW, boardH);
-    const imageUrl = localStorage.getItem(STORAGE_KEY) || "";
+    const imageUrl = safeLocalStorage.getItem(STORAGE_KEY) || "";
 
     // Check for saved game state
     const savedState = loadPuzzleState();
