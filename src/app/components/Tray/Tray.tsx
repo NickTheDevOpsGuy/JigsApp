@@ -67,7 +67,13 @@ export function Tray({
       const entries = await Promise.all(
         allPieces.map(async (piece) => {
           try {
-            const canvas = renderTrayPiece(piece, img, assembledW, assembledH, TRAY_SCALE);
+            const canvas = renderTrayPiece(
+              piece,
+              img,
+              assembledW,
+              assembledH,
+              TRAY_SCALE,
+            );
             return [piece.id, await canvasToObjectUrl(canvas, "image/png")] as const;
           } catch {
             return [piece.id, null] as const;

@@ -236,7 +236,12 @@ export function loadPuzzleState(): SavedPuzzleState | null {
   }
 
   // No saved state at all is normal; don't clear or broadcast refresh events.
-  if (!main.ok && !backup.ok && main.reason === "missing" && backup.reason === "missing") {
+  if (
+    !main.ok &&
+    !backup.ok &&
+    main.reason === "missing" &&
+    backup.reason === "missing"
+  ) {
     return null;
   }
 

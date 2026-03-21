@@ -103,7 +103,8 @@ export function MenuScreen() {
           100,
       )
     : null;
-  const hasInProgressDaily = Boolean(savedPuzzle) && isDailyPuzzleSession() && !todayCompleted;
+  const hasInProgressDaily =
+    Boolean(savedPuzzle) && isDailyPuzzleSession() && !todayCompleted;
 
   const primaryStatus = hasInProgressDaily
     ? savedPuzzleProgress != null
@@ -181,7 +182,9 @@ export function MenuScreen() {
           {savedPuzzle && savedPuzzleProgress != null && (
             <ResumePuzzleCard
               title={hasInProgressDaily ? "Resume today’s daily" : "Resume saved puzzle"}
-              contextLabel={hasInProgressDaily ? `Daily #${dailyPuzzleNumber}` : "Quick Play"}
+              contextLabel={
+                hasInProgressDaily ? `Daily #${dailyPuzzleNumber}` : "Quick Play"
+              }
               progress={savedPuzzleProgress}
               rows={savedPuzzle.grid.rows}
               cols={savedPuzzle.grid.cols}

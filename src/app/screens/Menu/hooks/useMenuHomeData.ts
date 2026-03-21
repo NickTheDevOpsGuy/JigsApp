@@ -65,9 +65,7 @@ function getMenuSnapshot(): MenuSnapshot {
 }
 
 export function useMenuHomeData() {
-  const [menuSnapshot, setMenuSnapshot] = useState<MenuSnapshot>(() =>
-    getMenuSnapshot(),
-  );
+  const [menuSnapshot, setMenuSnapshot] = useState<MenuSnapshot>(() => getMenuSnapshot());
   const [todayPlayersSolved, setTodayPlayersSolved] = useState<number | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
 
@@ -89,10 +87,7 @@ export function useMenuHomeData() {
 
     return () => {
       window.removeEventListener("focus", refreshSnapshot);
-      window.removeEventListener(
-        MENU_REFRESH_EVENT,
-        refreshSnapshot as EventListener,
-      );
+      window.removeEventListener(MENU_REFRESH_EVENT, refreshSnapshot as EventListener);
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [refreshSnapshot]);

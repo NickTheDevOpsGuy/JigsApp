@@ -103,6 +103,7 @@ npm run dev
 Useful scripts: `npm run build`, `npm run preview`, `npm run test`, `npm run test:e2e`, `npm run lighthouse`, `npm run check:images` (Vitest and Playwright use 4 workers; run `npx playwright install` once). The image audit is useful before shipping large social or puzzle assets.
 
 Image budget quick rule:
+
 - Puzzle assets should usually stay under `500 kB` each after optimization.
 - `1 MB+` is a warning sign.
 - `2 MB+` is too large for normal gameplay assets and should be compressed or converted before shipping.
