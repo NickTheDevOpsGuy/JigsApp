@@ -58,6 +58,8 @@ export function buildCompletionProps(args: {
     handleNativeShare: () => Promise<void> | void;
     handleCopyChallenge: () => void;
     handleNativeChallengeShare: (challengeUrl?: string) => Promise<void> | void;
+    getProgressShareTextWithUrl: () => string;
+    getChallengeShareTextWithUrl: (challengeUrl?: string) => string;
   };
   onDownloadImage: () => Promise<void> | void;
   onClose: () => void;

@@ -10,7 +10,10 @@
   background: rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  padding: 16px;
+  padding: max(16px, env(safe-area-inset-top, 0))
+    max(16px, env(safe-area-inset-right, 0))
+    max(16px, env(safe-area-inset-bottom, 0))
+    max(16px, env(safe-area-inset-left, 0));
   box-sizing: border-box;
   overflow-y: auto;
 }
@@ -118,13 +121,25 @@
 @media (max-width: 600px) {
   .backdrop {
     align-items: flex-end;
-    padding: 0;
+    padding: max(12px, env(safe-area-inset-top, 0))
+      max(12px, env(safe-area-inset-right, 0))
+      max(12px, env(safe-area-inset-bottom, 0))
+      max(12px, env(safe-area-inset-left, 0));
   }
 
   .dialog {
     max-width: 100%;
     width: 100%;
     border-radius: 20px 20px 0 0;
-    max-height: 92dvh;
+    max-height: calc(
+      100dvh - max(12px, env(safe-area-inset-top, 0)) -
+        max(12px, env(safe-area-inset-bottom, 0))
+    );
+  }
+
+  .toneCelebration {
+    align-self: center;
+    width: min(100%, 560px);
+    border-radius: 24px;
   }
 }

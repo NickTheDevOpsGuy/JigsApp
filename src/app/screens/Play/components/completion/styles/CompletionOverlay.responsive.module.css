@@ -168,7 +168,7 @@
   }
 
   .completePanelPhased {
-    padding: 12px 16px 20px;
+    padding: 12px 14px 18px;
     gap: 12px;
     max-height: calc(
       100dvh - max(16px, env(safe-area-inset-top, 0)) -
@@ -183,13 +183,41 @@
     font-size: 0.85rem;
   }
 
+  .completeCelebrationBlock {
+    padding: 18px 8px 12px;
+    gap: 10px;
+  }
+
   .completeImagePhased {
-    max-height: min(36vh, 260px);
+    max-height: min(30vh, 220px);
+  }
+
+  .completeImageWrapPhased {
+    max-width: min(100%, 320px);
+    padding: 10px;
+  }
+
+  .completeSummaryChips {
+    gap: 6px;
+  }
+
+  .completeSummaryChip {
+    min-height: 28px;
+    padding: 6px 10px;
+    font-size: 0.76rem;
   }
 
   .completePrimaryBtn {
     min-height: 52px;
     max-width: 100%;
+  }
+
+  .completeMenusRow {
+    flex-direction: column;
+  }
+
+  .completeMenuWrap {
+    min-width: 0;
   }
 
   .completeMenuTrigger {

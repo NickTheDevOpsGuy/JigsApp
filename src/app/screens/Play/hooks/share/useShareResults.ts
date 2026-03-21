@@ -1,8 +1,9 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PuzzleState } from "@/puzzle/core/types";
 import { logger } from "@/utils/logger";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import {
+  buildChallengePlayUrl,
   buildChallengeShareMessage,
   buildProgressShareMessage,
 } from "@/screens/Play/core/share/shareMessages";
@@ -37,6 +38,26 @@ export function useShareResults(args: {
     puzzleName,
   } = args;
   const [copied, setCopied] = useState(false);
+  const copyResetTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimeoutRef.current != null) {
+        window.clearTimeout(copyResetTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const triggerCopiedState = useCallback(() => {
+    setCopied(true);
+    if (copyResetTimeoutRef.current != null) {
+      window.clearTimeout(copyResetTimeoutRef.current);
+    }
+    copyResetTimeoutRef.current = window.setTimeout(() => {
+      setCopied(false);
+      copyResetTimeoutRef.current = null;
+    }, 2000);
+  }, []);
 
   const fullProgressUrl = useMemo(() => {
     const path = progressShareUrl.startsWith("http")
@@ -78,7 +99,11 @@ export function useShareResults(args: {
 
   const getChallengeShareTextWithUrl = useCallback(
     (overrideChallengeUrl?: string) => {
-      const url = overrideChallengeUrl ?? fullChallengeUrl;
+      const url = buildChallengePlayUrl(
+        overrideChallengeUrl ?? fullChallengeUrl,
+        elapsedSeconds,
+        moveCount ?? 0,
+      );
       return buildChallengeShareMessage({
         elapsedSeconds,
         pieceCount: state?.totalCount ?? 0,
@@ -119,25 +144,23 @@ export function useShareResults(args: {
     const text = getProgressShareTextWithUrl();
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      triggerCopiedState();
     } catch (err) {
       logger.error("Failed to copy:", err);
     }
-  }, [getProgressShareTextWithUrl]);
+  }, [getProgressShareTextWithUrl, triggerCopiedState]);
 
   const handleCopyChallenge = useCallback(
     async (overrideChallengeUrl?: string) => {
       const text = getChallengeShareTextWithUrl(overrideChallengeUrl);
       try {
         await navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        triggerCopiedState();
       } catch (err) {
         logger.error("Failed to copy:", err);
       }
     },
-    [getChallengeShareTextWithUrl],
+    [getChallengeShareTextWithUrl, triggerCopiedState],
   );
 
   const canNativeShare = typeof navigator !== "undefined" && !!navigator.share;
@@ -161,7 +184,11 @@ export function useShareResults(args: {
 
   const handleNativeChallengeShare = useCallback(
     async (overrideChallengeUrl?: string) => {
-      const url = overrideChallengeUrl ?? fullChallengeUrl;
+      const url = buildChallengePlayUrl(
+        overrideChallengeUrl ?? fullChallengeUrl,
+        elapsedSeconds,
+        moveCount ?? 0,
+      );
       if (!navigator.share) {
         await handleCopyChallenge(url);
         return;
@@ -179,7 +206,7 @@ export function useShareResults(args: {
         logger.warn("Share cancelled or failed:", err);
       }
     },
-    [getChallengeShareTextWithUrl, fullChallengeUrl, handleCopyChallenge],
+    [elapsedSeconds, fullChallengeUrl, getChallengeShareTextWithUrl, handleCopyChallenge, moveCount],
   );
 
   return {

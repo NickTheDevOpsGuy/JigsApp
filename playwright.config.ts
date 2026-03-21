@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const isCI = !!process.env.CI;
 const useDevServer = process.env.PW_USE_DEV_SERVER === "1";
+const localChromiumUse = isCI ? {} : { channel: "chrome" as const };
 
 /**
  * Playwright config for Phuzzle E2E tests.
@@ -21,11 +22,12 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "chromium", use: { ...devices["Desktop Chrome"], ...localChromiumUse } },
     {
       name: "chromium-tz-la",
       use: {
         ...devices["Desktop Chrome"],
+        ...localChromiumUse,
         timezoneId: "America/Los_Angeles",
       },
     },
@@ -33,6 +35,7 @@ export default defineConfig({
       name: "chromium-tz-auckland",
       use: {
         ...devices["Desktop Chrome"],
+        ...localChromiumUse,
         timezoneId: "Pacific/Auckland",
       },
     },

@@ -2,10 +2,20 @@
  * AppModal – richer modal used for win screen and share menus.
  * Supports surface, size, tone, subtitle, bodyClassName props.
  */
-import React, { useEffect, useCallback, useId } from "react";
+import React, { useEffect, useCallback, useId, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import styles from "./AppModal.module.css";
+
+const BODY_SCROLL_LOCK_ATTR = "data-app-modal-lock-count";
+const FOCUSABLE_SELECTOR = [
+  "button:not([disabled])",
+  "[href]",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
 
 type AppModalProps = {
   isOpen: boolean;
@@ -39,6 +49,9 @@ export function AppModal({
   closeLabel = "Close",
 }: AppModalProps) {
   const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const accessibleName = useMemo(() => title ?? "Dialog", [title]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -47,16 +60,79 @@ export function AppModal({
     [onClose],
   );
 
+  const trapFocus = useCallback((e: KeyboardEvent) => {
+    if (e.key !== "Tab" || !dialogRef.current) return;
+
+    const focusable = Array.from(
+      dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+    ).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
+
+    if (focusable.length === 0) {
+      e.preventDefault();
+      dialogRef.current.focus();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const active = document.activeElement as HTMLElement | null;
+
+    if (e.shiftKey) {
+      if (!active || active === first || !dialogRef.current.contains(active)) {
+        e.preventDefault();
+        last.focus();
+      }
+      return;
+    }
+
+    if (!active || active === last || !dialogRef.current.contains(active)) {
+      e.preventDefault();
+      first.focus();
+    }
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
+    restoreFocusRef.current = document.activeElement as HTMLElement | null;
     document.addEventListener("keydown", handleKeyDown);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", trapFocus);
+
+    const body = document.body;
+    const prev = body.style.overflow;
+    const existingLockCount = Number(body.getAttribute(BODY_SCROLL_LOCK_ATTR) ?? "0");
+    const nextLockCount = existingLockCount + 1;
+    body.setAttribute(BODY_SCROLL_LOCK_ATTR, String(nextLockCount));
+    body.style.overflow = "hidden";
+
+    const focusTarget = window.requestAnimationFrame(() => {
+      const dialogEl = dialogRef.current;
+      if (!dialogEl) return;
+      const firstFocusable = dialogEl.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+      (firstFocusable ?? dialogEl).focus({ preventScroll: true });
+    });
+
     return () => {
+      window.cancelAnimationFrame(focusTarget);
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", trapFocus);
+
+      const currentLockCount = Number(body.getAttribute(BODY_SCROLL_LOCK_ATTR) ?? "1");
+      const remainingLockCount = Math.max(0, currentLockCount - 1);
+      if (remainingLockCount === 0) {
+        body.style.overflow = prev;
+        body.removeAttribute(BODY_SCROLL_LOCK_ATTR);
+      } else {
+        body.setAttribute(BODY_SCROLL_LOCK_ATTR, String(remainingLockCount));
+      }
+
+      const restoreTarget = restoreFocusRef.current;
+      if (restoreTarget && document.contains(restoreTarget)) {
+        window.requestAnimationFrame(() => {
+          restoreTarget.focus({ preventScroll: true });
+        });
+      }
     };
-  }, [isOpen, handleKeyDown]);
+  }, [isOpen, handleKeyDown, trapFocus]);
 
   if (!isOpen) return null;
 
@@ -72,11 +148,13 @@ export function AppModal({
   return createPortal(
     <div className={styles.backdrop} onClick={onClose} role="presentation">
       <div
+        ref={dialogRef}
         className={dialogClass}
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
-        aria-label={title ? undefined : "Dialog"}
+        aria-label={title ? undefined : accessibleName}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
       >

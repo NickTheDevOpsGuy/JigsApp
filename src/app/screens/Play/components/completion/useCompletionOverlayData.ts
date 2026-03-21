@@ -2,7 +2,7 @@
  * Completion overlay: percentile, recordCompletion, daily/best-time effects, share state.
  * No logic change – extracted from CompletionOverlay.
  */
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { setBestTime } from "@/screens/Play/core/time/timeMode";
 import {
   recordDailyCompletion,
@@ -72,14 +72,16 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
 
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
   const [dailyCopied, setDailyCopied] = useState(false);
-  const [_streak, setStreak] = useState<number>(0);
-  const [_masteryStreak, setMasteryStreak] = useState<number>(0);
+  const [dailyStreak, setDailyStreak] = useState<number>(0);
+  const [masteryStreak, setMasteryStreak] = useState<number>(0);
   const [newlyUnlocked, setNewlyUnlocked] = useState<string[]>([]);
   const [percentile, setPercentile] = useState<{
     topPercent: number;
     totalPlayers: number;
   } | null>(null);
   const [useSeasonalFrame, setUseSeasonalFrame] = useState(true);
+  const [completionRecorded, setCompletionRecorded] = useState(false);
+  const copyResetTimeoutRef = useRef<number | null>(null);
 
   const { shareCard, isGenerating } = useShareCardImage();
 
@@ -92,7 +94,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
   useEffect(() => {
     if (!isDaily) return;
     const newStreak = recordDailyCompletion(elapsedSeconds);
-    setStreak(newStreak);
+    setDailyStreak(newStreak);
     const weekKey = getLocalWeekMondayYmd(getTodayDateString());
     safeLocalStorage.setItem(`phuzzle:weeklyAlbumNudge:${weekKey}`, "true");
     safeLocalStorage.removeItem(DAILY_DATE_KEY);
@@ -100,31 +102,51 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
 
   useEffect(() => {
     if (!grid) return;
-    getPercentileRank(grid.rows, grid.cols, elapsedSeconds, visualModifier).then(
-      setPercentile,
-    );
+    let cancelled = false;
+
+    void getPercentileRank(grid.rows, grid.cols, elapsedSeconds, visualModifier)
+      .then((result) => {
+        if (!cancelled) {
+          setPercentile(result);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setPercentile(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [grid?.rows, grid?.cols, elapsedSeconds, visualModifier]);
 
   useEffect(() => {
     if (!grid) return;
+    let cancelled = false;
+
     const run = async () => {
-      const dailyStreak = isDaily ? getCurrentStreak() : 0;
-      const stats = await recordCompletion({
-        elapsedSeconds,
-        grid,
-        isDaily: !!isDaily,
-        dailyStreak,
-        usedUndo: undoCount > 0,
-        usedHint,
-        cutType,
-        visualModifier,
-        moveCount,
-        undoCount,
-        completionSource: isDaily ? "daily" : "custom",
-      });
-      if (stats) {
+      try {
+        const nextDailyStreak = isDaily ? getCurrentStreak() : 0;
+        const stats = await recordCompletion({
+          elapsedSeconds,
+          grid,
+          isDaily: !!isDaily,
+          dailyStreak: nextDailyStreak,
+          usedUndo: undoCount > 0,
+          usedHint,
+          cutType,
+          visualModifier,
+          moveCount,
+          undoCount,
+          completionSource: isDaily ? "daily" : "custom",
+        });
+        if (!stats || cancelled) return;
+
         setMasteryStreak(stats.masteryStreak ?? 0);
+        setCompletionRecorded(true);
         onCompletionRecorded?.(stats);
+
         const unlocked = await checkAndUnlockAchievements({
           puzzlesCompleted: stats.puzzlesCompleted,
           dailyStreak: stats.dailyStreak,
@@ -132,20 +154,40 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
           lastCompletion: { elapsedSeconds, grid },
           undoCount,
         });
-        if (unlocked.length > 0) setNewlyUnlocked(unlocked);
+
+        if (!cancelled && unlocked.length > 0) {
+          setNewlyUnlocked(unlocked);
+        }
+      } catch {
+        if (!cancelled) {
+          setCompletionRecorded(false);
+        }
       }
     };
     void run();
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     elapsedSeconds,
     grid,
     isDaily,
     cutType,
+    moveCount,
     undoCount,
     usedHint,
     visualModifier,
     onCompletionRecorded,
   ]);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimeoutRef.current != null) {
+        window.clearTimeout(copyResetTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const rankPosition =
     percentile && percentile.totalPlayers >= 1
@@ -290,7 +332,13 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     try {
       await navigator.clipboard.writeText(text);
       setDailyCopied(true);
-      setTimeout(() => setDailyCopied(false), 2000);
+      if (copyResetTimeoutRef.current != null) {
+        window.clearTimeout(copyResetTimeoutRef.current);
+      }
+      copyResetTimeoutRef.current = window.setTimeout(() => {
+        setDailyCopied(false);
+        copyResetTimeoutRef.current = null;
+      }, 2000);
     } catch {
       /* ignore */
     }
@@ -323,6 +371,9 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     useSeasonalFrame,
     setUseSeasonalFrame,
     percentile,
+    dailyStreak,
+    masteryStreak,
+    completionRecorded,
     rankPosition,
     percentileBadgeTier,
     newlyUnlocked,

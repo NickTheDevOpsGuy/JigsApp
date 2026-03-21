@@ -28,6 +28,8 @@ export interface CompletionOverlayProps {
   onShareChallenge?: (challengeUrl?: string) => void;
   onCopyProgress?: () => void;
   onCopyChallenge?: (challengeUrl?: string) => void;
+  shareProgressText?: string;
+  shareChallengeText?: string;
   onDownloadImage: () => void;
   onClose: () => void;
   precisionModeEnabled?: boolean;

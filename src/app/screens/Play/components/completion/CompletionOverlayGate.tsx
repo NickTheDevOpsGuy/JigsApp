@@ -30,6 +30,8 @@ interface CompletionOverlayGateProps {
     handleNativeShare: () => void;
     handleCopyChallenge: () => void;
     handleNativeChallengeShare: (challengeUrl?: string) => void;
+    getProgressShareTextWithUrl: () => string;
+    getChallengeShareTextWithUrl: (challengeUrl?: string) => string;
   };
   onDownloadImage: () => void;
   onClose: () => void;
@@ -134,6 +136,8 @@ export function CompletionOverlayGate({
       onShareChallenge={share.handleNativeChallengeShare}
       onCopyProgress={share.handleCopyResults}
       onCopyChallenge={share.handleCopyChallenge}
+      shareProgressText={share.getProgressShareTextWithUrl()}
+      shareChallengeText={share.getChallengeShareTextWithUrl()}
       onDownloadImage={onDownloadImage}
       onClose={onClose}
       precisionModeEnabled={precisionModeEnabled}

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Share2, Swords, Copy, Image } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { AppModal } from "@/components/AppModal";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
+import { buildChallengePlayUrl } from "@/screens/Play/core/share/shareMessages";
 
 export function CompletionOverlayShareMenu(props: {
   shareMenuOpen: boolean;
@@ -22,6 +23,8 @@ export function CompletionOverlayShareMenu(props: {
   onCopyProgress?: () => void;
   onShareChallenge?: (challengeUrl?: string) => void;
   onCopyChallenge?: (challengeUrl?: string) => void;
+  shareProgressText?: string;
+  shareChallengeText?: string;
   completionData: UseCompletionOverlayDataResult;
   /** When true, only render the share modal (opened by Share Puzzle button) */
   hideTrigger?: boolean;
@@ -41,6 +44,23 @@ export function CompletionOverlayShareMenu(props: {
 
   const sharePopupOpen = completionData.sharePopupOpen;
   const setSharePopupOpen = completionData.setSharePopupOpen;
+  const shareProgressText = props.shareProgressText?.trim() ?? "";
+  const shareChallengeText = props.shareChallengeText?.trim() ?? "";
+  const [busyAction, setBusyAction] = useState<"card" | "share" | "copy" | "challenge" | null>(
+    null,
+  );
+
+  const runBusyAction = async (
+    kind: "card" | "share" | "copy" | "challenge",
+    action: () => Promise<void> | void,
+  ) => {
+    setBusyAction(kind);
+    try {
+      await action();
+    } finally {
+      setBusyAction(null);
+    }
+  };
 
   return (
     <div className={styles.completeShareWrap} ref={shareRef}>
@@ -87,6 +107,12 @@ export function CompletionOverlayShareMenu(props: {
           </div>
           <div className={styles.completeShareActionsGroup}>
             <span className={styles.completeShareGroupLabel}>Share</span>
+            {shareProgressText && (
+              <div className={styles.completeSharePreviewBlock}>
+                <span className={styles.completeSharePreviewLabel}>Preview</span>
+                <pre className={styles.completeSharePreviewText}>{shareProgressText}</pre>
+              </div>
+            )}
             <div
               className={styles.completeShareDropdown}
               role="menu"
@@ -98,13 +124,19 @@ export function CompletionOverlayShareMenu(props: {
                   role="menuitem"
                   className={styles.completeShareDropdownItem}
                   title="Download or share result card image"
-                  onClick={() => {
-                    void completionData.handleShareCard().catch(() => {});
-                  }}
-                  disabled={completionData.isGenerating}
+                  onClick={() =>
+                    void runBusyAction("card", async () => {
+                      await completionData.handleShareCard().catch(() => {});
+                    })
+                  }
+                  disabled={completionData.isGenerating || busyAction !== null}
                 >
                   <Image size={16} aria-hidden />
-                  <span>{completionData.isGenerating ? "…" : "Share Card"}</span>
+                  <span>
+                    {completionData.isGenerating || busyAction === "card"
+                      ? "Preparing card..."
+                      : "Share Card"}
+                  </span>
                 </button>
                 {(onShareProgress || onCopyProgress) && (
                   <button
@@ -116,14 +148,27 @@ export function CompletionOverlayShareMenu(props: {
                         ? "Share result via social or apps"
                         : "Copy result link"
                     }
-                    onClick={() => {
-                      const fn = canNativeShare ? onShareProgress : onCopyProgress;
-                      if (typeof fn === "function") fn();
-                    }}
+                    onClick={() =>
+                      void runBusyAction(canNativeShare ? "share" : "copy", async () => {
+                        const fn = canNativeShare ? onShareProgress : onCopyProgress;
+                        if (typeof fn === "function") {
+                          await fn();
+                        }
+                      })
+                    }
+                    disabled={busyAction !== null}
                   >
                     <Share2 size={16} aria-hidden />
                     <span>
-                      {copied ? "Copied!" : canNativeShare ? "Share result" : "Copy link"}
+                      {busyAction === "share"
+                        ? "Opening Share..."
+                        : busyAction === "copy"
+                          ? "Copying..."
+                          : copied
+                            ? "Copied!"
+                            : canNativeShare
+                              ? "Share result"
+                              : "Copy link"}
                     </span>
                   </button>
                 )}
@@ -133,12 +178,17 @@ export function CompletionOverlayShareMenu(props: {
                     role="menuitem"
                     className={styles.completeShareDropdownItem}
                     title="Copy result link to clipboard"
-                    onClick={() => {
-                      if (typeof onCopyProgress === "function") onCopyProgress();
-                    }}
+                    onClick={() =>
+                      void runBusyAction("copy", async () => {
+                        if (typeof onCopyProgress === "function") {
+                          await onCopyProgress();
+                        }
+                      })
+                    }
+                    disabled={busyAction !== null}
                   >
                     <Copy size={16} aria-hidden />
-                    <span>{copied ? "Copied!" : "Copy link"}</span>
+                    <span>{busyAction === "copy" ? "Copying..." : copied ? "Copied!" : "Copy link"}</span>
                   </button>
                 )}
               </div>
@@ -147,6 +197,12 @@ export function CompletionOverlayShareMenu(props: {
           {(onShareChallenge || onCopyChallenge) && (
             <div className={styles.completeShareActionsGroup}>
               <span className={styles.completeShareGroupLabel}>Challenge</span>
+              {shareChallengeText && (
+                <div className={styles.completeSharePreviewBlock}>
+                  <span className={styles.completeSharePreviewLabel}>Preview</span>
+                  <pre className={styles.completeSharePreviewText}>{shareChallengeText}</pre>
+                </div>
+              )}
               <div
                 className={styles.completeShareDropdown}
                 role="menu"
@@ -158,20 +214,35 @@ export function CompletionOverlayShareMenu(props: {
                     role="menuitem"
                     className={styles.completeShareDropdownItem}
                     title={canNativeShare ? "Challenge a friend" : "Copy challenge link"}
-                    onClick={() => {
+                    onClick={() =>
+                      void runBusyAction("challenge", async () => {
                       const challengeUrl =
-                        props.puzzleShareUrl +
-                        (props.puzzleShareUrl.includes("?") ? "&" : "?") +
-                        `ct=${props.elapsedSeconds}&cm=${props.moveCount ?? 0}`;
+                        buildChallengePlayUrl(
+                          props.puzzleShareUrl,
+                          props.elapsedSeconds,
+                          props.moveCount ?? 0,
+                        );
                       if (canNativeShare) {
-                        void completionData.handleShareChallengeCard().catch(() => {});
+                        if (typeof onShareChallenge === "function") {
+                          await onShareChallenge(challengeUrl);
+                        }
                       } else if (typeof onCopyChallenge === "function") {
-                        onCopyChallenge(challengeUrl);
+                        await onCopyChallenge(challengeUrl);
                       }
-                    }}
+                    })
+                    }
+                    disabled={busyAction !== null}
                   >
                     <Swords size={16} aria-hidden />
-                    <span>{copied ? "Copied!" : "Challenge friend"}</span>
+                    <span>
+                      {busyAction === "challenge"
+                        ? canNativeShare
+                          ? "Opening Share..."
+                          : "Copying..."
+                        : copied
+                          ? "Copied!"
+                          : "Challenge friend"}
+                    </span>
                   </button>
                 </div>
               </div>

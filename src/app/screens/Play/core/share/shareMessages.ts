@@ -11,7 +11,7 @@ export type ShareMessageArgs = {
   puzzleName?: string;
 };
 
-function _clampPercent(value: number): number {
+function clampPercent(value: number): number {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
@@ -30,6 +30,19 @@ export function getPiecesLine(pieceCount: number): string {
   return `${pieceCount} Pieces • ${getDifficultyLabel(pieceCount)}`;
 }
 
+export function buildChallengePlayUrl(
+  playUrl: string,
+  elapsedSeconds: number,
+  moveCount = 0,
+): string {
+  const isAbsolute = /^https?:\/\//i.test(playUrl);
+  const base = isAbsolute ? undefined : "https://phuzzle.vercel.app";
+  const url = new URL(playUrl, base);
+  url.searchParams.set("ct", String(elapsedSeconds));
+  url.searchParams.set("cm", String(moveCount));
+  return isAbsolute ? url.toString() : `${url.pathname}${url.search}${url.hash}`;
+}
+
 /**
  * Share Result – brag/summary share. Exact message structure per spec.
  */
@@ -39,16 +52,18 @@ export function buildProgressShareMessage(args: ShareMessageArgs): string {
   const pieces = args.pieceCount;
   const moves = args.moveCount ?? 0;
   const puzzleName = args.puzzleName?.trim() || "Puzzle";
+  const accuracy = clampPercent(args.accuracyPercent ?? 100);
   return [
-    "🧩 Just finished a Phuzzle!",
+    "🧩 Phuzzle Complete",
     "",
-    `Puzzle: ${puzzleName}`,
-    `Difficulty: ${difficulty} (${pieces} pieces)`,
+    puzzleName,
+    `${difficulty} • ${pieces} pieces`,
     "",
     `⏱ Time: ${time}`,
     `🔁 Moves: ${moves}`,
+    `🎯 Accuracy: ${accuracy}%`,
     "",
-    "Play the same puzzle:",
+    "Play this exact puzzle:",
     args.playUrl,
   ].join("\n");
 }
@@ -114,12 +129,17 @@ export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const moves = args.moveCount ?? 0;
   const puzzleName = args.puzzleName?.trim() || "Puzzle";
   const difficulty = getDifficultyLabel(args.pieceCount);
+  const challengeUrl = buildChallengePlayUrl(args.playUrl, args.elapsedSeconds, moves);
   return [
-    `I solved this puzzle in ${time} with ${moves} ${moves === 1 ? "move" : "moves"}. Think you can beat me?`,
+    "🧩 Phuzzle Challenge",
     "",
-    puzzleName,
-    `Difficulty: ${difficulty}`,
+    `Think you can beat my run on ${puzzleName}?`,
     "",
-    args.playUrl,
+    `${difficulty} • ${args.pieceCount} pieces`,
+    `⏱ Time to beat: ${time}`,
+    `🔁 Moves to beat: ${moves}`,
+    "",
+    "Play this exact puzzle:",
+    challengeUrl,
   ].join("\n");
 }

@@ -8,6 +8,9 @@ const COMPLETION_PHRASES_FAST = [
   "You're on fire! 🔥",
   "Warp speed! 🚀",
   "Unstoppable! 🏆",
+  "Sharp pace. Sharp solve. ⚡",
+  "Fast finish, cleaner than ever. 🚀",
+  "You read that puzzle instantly. 👀",
 ];
 const COMPLETION_PHRASES_MEDIUM = [
   "Nice solve! ⭐",
@@ -20,6 +23,9 @@ const COMPLETION_PHRASES_MEDIUM = [
   "Awesome! 🌟",
   "Clean work! 🎯",
   "Yes!! 🎊",
+  "Great eye for detail. 👏",
+  "That was a polished solve. ✨",
+  "Strong finish. Nicely played. 🧩",
 ];
 const COMPLETION_PHRASES_STEADY = [
   "Nice solve! ⭐",
@@ -30,6 +36,9 @@ const COMPLETION_PHRASES_STEADY = [
   "Nailed it! 🎯",
   "Puzzle solved! 🧩",
   "That felt good! ✨",
+  "Steady hands, smart choices. 🌟",
+  "Patient play pays off. 💪",
+  "You kept it controlled all the way through. 🎯",
 ];
 
 /** Zero undos = flawless / clean solve — extra delight */
@@ -40,6 +49,8 @@ const COMPLETION_PHRASES_FLAWLESS = [
   "Perfect run! ⭐",
   "First try, best try! 🌟",
   "Zero mistakes. Respect. 👑",
+  "Clean all the way through. That’s skill. ✨",
+  "Every move looked intentional. 🎯",
 ];
 
 export function pickCompletionPhrase(

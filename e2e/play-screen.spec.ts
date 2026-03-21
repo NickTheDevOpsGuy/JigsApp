@@ -106,5 +106,31 @@ test.describe("Play screen", () => {
 
     expect(before.scrollHeight - before.clientHeight).toBeLessThanOrEqual(2);
     expect(after.scrollY).toBe(0);
+
+    const completionCard = page.getByRole("dialog", { name: /dialog/i });
+    const cardBounds = await completionCard.boundingBox();
+    expect(cardBounds).not.toBeNull();
+    expect(cardBounds!.y).toBeGreaterThan(0);
+  });
+
+  test("mobile completion actions open as dialogs", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /share results/i }).click();
+    await expect(page.getByRole("dialog", { name: /share results/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /challenge friend/i })).toBeVisible();
+  });
+
+  test("share modal challenge action remains available on desktop", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /share results/i }).click();
+    await page.getByRole("menuitem", { name: /share result/i }).click();
+
+    await expect(page.getByRole("dialog", { name: /share your solve/i })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: /challenge friend/i })).toBeVisible();
   });
 });

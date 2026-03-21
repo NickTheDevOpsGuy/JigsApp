@@ -7,6 +7,7 @@
   min-height: 0;
   width: 100%;
   gap: 0;
+  overflow: hidden;
 }
 
 /* ── Stats bar (phase 2) ── */
@@ -14,6 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 16px;
   padding: 14px 20px;
   background: color-mix(in srgb, var(--color-bg-card) 80%, transparent);
@@ -47,7 +49,8 @@
   align-items: center;
   gap: 12px;
   padding: 24px 20px 16px;
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .completePhasedTitle {
@@ -63,7 +66,7 @@
 /* ── Puzzle image ── */
 .completeImageWrapPhased {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   border-radius: 14px;
   overflow: hidden;
   border: 2px solid color-mix(in srgb, var(--color-brand-primary) 40%, transparent);
@@ -71,14 +74,45 @@
     0 4px 24px rgba(0, 0, 0, 0.25),
     0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
   aspect-ratio: 4 / 3;
-  background: var(--color-bg-card);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--color-brand-primary) 18%, transparent), transparent 62%),
+    var(--color-bg-card);
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  box-sizing: border-box;
 }
 
 .completeImagePhased {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
+  border-radius: 10px;
+}
+
+.completeSummaryChips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 460px;
+}
+
+.completeSummaryChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-align: center;
 }
 
 /* ── Achievement cycler (phase 3) ── */
@@ -136,12 +170,14 @@
 /* Secondary menus row */
 .completeMenusRow {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
 .completeMenuWrap {
   position: relative;
   flex: 1;
+  min-width: min(180px, 100%);
 }
 
 .completeMenuTrigger {
@@ -235,6 +271,15 @@
   background: var(--color-bg-elevated);
 }
 
+.completeActionBtn:disabled,
+.completeMenuItem:disabled,
+.completePrimaryBtn:disabled,
+.completeMenuTrigger:disabled,
+.completeActionSheetItem:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .completeActionLead {
   display: inline-flex;
   align-items: center;
@@ -244,6 +289,41 @@
 /* Share modal body */
 .shareModalBody {
   padding: 0 !important;
+}
+
+.completeActionSheetBody {
+  padding: 0 !important;
+}
+
+.completeActionSheet {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.completeActionSheetItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 0.98rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.completeActionSheetItem:first-child {
+  border-top: none;
+}
+
+.completeActionSheetItem:hover {
+  background: var(--color-bg-secondary);
 }
 
 .completeShareSheet {
@@ -306,6 +386,40 @@
   letter-spacing: 0.08em;
   color: var(--color-text-secondary);
   margin-bottom: 10px;
+}
+
+.completeSharePreviewBlock {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-border) 84%, transparent);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-brand-primary) 8%, transparent), transparent),
+    color-mix(in srgb, var(--color-bg-elevated) 94%, transparent);
+}
+
+.completeSharePreviewLabel {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.completeSharePreviewText {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family:
+    "SFMono-Regular",
+    "JetBrains Mono",
+    ui-monospace,
+    monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--color-text-primary);
 }
 
 .completeShareDropdown {

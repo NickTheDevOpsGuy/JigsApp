@@ -3,13 +3,14 @@
  * Phase 2 stats bar slide down, Phase 3 achievement text. One primary Next Puzzle;
  * secondary actions in More Options and Share Results dropdowns. No confetti, no X close.
  */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { AppModal } from "@/components/AppModal";
 import { useCompletionOverlayData } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { CompletionOverlayActions } from "@/screens/Play/components/completion/CompletionOverlayActions";
 import { CompletionOverlayStats } from "@/screens/Play/components/completion/CompletionOverlayStats";
 import { useCompletionOverlayMenus } from "@/screens/Play/components/completion/useCompletionOverlayMenus";
+import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
 import type { CompletionOverlayProps } from "@/screens/Play/components/completion/completionOverlayTypes";
 
 const PHASE2_MS = 600;
@@ -37,6 +38,8 @@ export function CompletionOverlay({
   onShareChallenge,
   onCopyProgress,
   onCopyChallenge,
+  shareProgressText,
+  shareChallengeText,
   onDownloadImage: _onDownloadImage,
   onClose,
   precisionModeEnabled: _precisionModeEnabled,
@@ -127,12 +130,65 @@ export function CompletionOverlay({
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const cleanSolve = undoCount === 0 && !usedHint;
   const achievements: string[] = [];
+  const summaryChips: string[] = [];
 
   if (cleanSolve) achievements.push("⭐ Clean Solve");
   if (isNewBest) achievements.push("🏆 New Personal Best");
   if (isDaily && completionData.newlyUnlocked?.length === 0 && !isNewBest) {
     achievements.push("🔥 Streak Progress");
   }
+
+  if (completionData.percentileBadgeTier) {
+    summaryChips.push(completionData.percentileBadgeTier);
+  }
+  if (isDaily && completionData.dailyStreak > 0) {
+    summaryChips.push(`${completionData.dailyStreak}-day daily streak`);
+  }
+  if (completionData.masteryStreak > 0) {
+    summaryChips.push(`Mastery ${completionData.masteryStreak}`);
+  }
+  if (completionData.newlyUnlocked.length > 0) {
+    summaryChips.push(
+      `${completionData.newlyUnlocked.length} achievement${
+        completionData.newlyUnlocked.length === 1 ? "" : "s"
+      } unlocked`,
+    );
+  }
+
+  const celebrationMessages = useMemo(() => {
+    const skillMessages: string[] = [
+      pickCompletionPhrase(elapsedSeconds, moveCount, undoCount),
+    ];
+
+    if (accuracyPercent >= 95) {
+      skillMessages.push("Precision game. Your piece placement was sharp.");
+    }
+    if (piecesPerMin >= 6) {
+      skillMessages.push("Fast hands, sharp eyes. That was a quick solve.");
+    }
+    if (maxGroupSize >= Math.max(4, Math.ceil(pieceCount * 0.45))) {
+      skillMessages.push("Great pattern recognition. You built big sections smoothly.");
+    }
+    if (cleanSolve) {
+      skillMessages.push("Clean decisions all the way through. Nice control.");
+    }
+    if (isNewBest) {
+      skillMessages.push("That pace was real skill. You just raised your own bar.");
+    }
+
+    return [...new Set([...skillMessages, ...achievements])];
+  }, [
+    accuracyPercent,
+    achievements,
+    cleanSolve,
+    elapsedSeconds,
+    isNewBest,
+    maxGroupSize,
+    moveCount,
+    pieceCount,
+    piecesPerMin,
+    undoCount,
+  ]);
 
   return (
     <AppModal
@@ -163,6 +219,16 @@ export function CompletionOverlay({
         <div className={styles.completeCelebrationBlock}>
           <h2 className={styles.completePhasedTitle}>Puzzle Complete</h2>
 
+          {summaryChips.length > 0 && (
+            <div className={styles.completeSummaryChips} aria-label="Completion highlights">
+              {summaryChips.map((chip) => (
+                <span key={chip} className={styles.completeSummaryChip}>
+                  {chip}
+                </span>
+              ))}
+            </div>
+          )}
+
           {imageUrl && !imageError && (
             <div className={styles.completeImageWrapPhased}>
               <img
@@ -174,8 +240,8 @@ export function CompletionOverlay({
             </div>
           )}
 
-          {phase >= 3 && achievements.length > 0 && (
-            <AchievementCycler achievements={achievements} />
+          {phase >= 3 && celebrationMessages.length > 0 && (
+            <AchievementCycler achievements={celebrationMessages} />
           )}
         </div>
 
@@ -201,6 +267,8 @@ export function CompletionOverlay({
           onCopyProgress={onCopyProgress}
           onShareChallenge={onShareChallenge}
           onCopyChallenge={onCopyChallenge}
+          shareProgressText={shareProgressText}
+          shareChallengeText={shareChallengeText}
           completionData={completionData}
           canReplay={canReplay}
           onReplayClick={onReplayClick}
