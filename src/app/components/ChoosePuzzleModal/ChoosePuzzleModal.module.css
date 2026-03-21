@@ -57,10 +57,7 @@ button.stepItem:disabled {
   border: 2px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    color 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
   line-height: 1;
 }
 
@@ -70,9 +67,7 @@ button.stepItem:disabled {
   font-weight: 600;
   color: var(--color-text-secondary);
   opacity: 0.5;
-  transition:
-    color 0.2s,
-    opacity 0.2s;
+  transition: color 0.2s, opacity 0.2s;
   white-space: nowrap;
 }
 
@@ -93,11 +88,7 @@ button.stepItem:disabled {
 
 /* ── Completed step ── */
 .stepItemDone .stepNum {
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 15%,
-    var(--color-bg-elevated)
-  );
+  background: color-mix(in srgb, var(--color-brand-primary) 15%, var(--color-bg-elevated));
   border-color: var(--color-brand-primary);
   color: var(--color-brand-primary);
   font-size: 15px;
@@ -109,11 +100,7 @@ button.stepItem:disabled {
 }
 
 button.stepItemDone:hover .stepNum {
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 25%,
-    var(--color-bg-elevated)
-  );
+  background: color-mix(in srgb, var(--color-brand-primary) 25%, var(--color-bg-elevated));
 }
 
 /* ── Future step ── */
@@ -483,8 +470,30 @@ button.stepItemDone:hover .stepNum {
     max-height: 40px;
   }
 
-  .uploadLinkWrap {
-    margin-top: 8px;
+  .categoryUploadRow {
+    margin-top: 6px;
+  }
+
+  .uploadCta {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+
+  .uploadCtaIconWrap {
+    width: 44px;
+    height: 44px;
+  }
+
+  .uploadCtaIconWrap svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .uploadCtaTitle {
+    font-size: 13px;
+  }
+
+  .uploadCtaSub {
     font-size: 11px;
   }
 }
@@ -590,11 +599,11 @@ button.stepItemDone:hover .stepNum {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -658,31 +667,108 @@ button.stepItemDone:hover .stepNum {
   outline-offset: 2px;
 }
 
-.uploadLinkWrap {
-  margin: 12px 0 0;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  text-align: center;
+/* Custom photo upload – card-style CTA (matches category tiles, not a raw link) */
+.categoryUploadRow {
+  grid-column: 1 / -1;
+  margin-top: 6px;
   flex-shrink: 0;
 }
 
-.uploadLink {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--color-brand-primary);
-  font-weight: 600;
+.uploadCta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
+  border-radius: 14px;
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 10%,
+    var(--color-bg-elevated)
+  );
+  color: var(--color-text-primary);
   cursor: pointer;
-  text-decoration: underline;
+  text-align: left;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.12s ease;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--color-text-primary) 6%, transparent);
 }
 
-.uploadLink:hover {
-  opacity: 0.9;
+.uploadCta:hover {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 55%, var(--color-border));
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 16%,
+    var(--color-bg-elevated)
+  );
+  box-shadow:
+    0 4px 20px color-mix(in srgb, var(--color-brand-primary) 18%, transparent),
+    0 1px 0 color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  transform: translateY(-1px);
 }
 
-.uploadLink:focus-visible {
+.uploadCta:active {
+  transform: translateY(0);
+}
+
+.uploadCta:focus-visible {
   outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
+  outline-offset: 3px;
+}
+
+.uploadCtaInput {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.uploadCtaIconWrap {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 22%,
+    var(--color-bg-primary)
+  );
+  color: var(--color-brand-primary);
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 35%, transparent);
+}
+
+.uploadCtaCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.uploadCtaTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.uploadCtaSub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  line-height: 1.35;
+  opacity: 0.92;
 }
 
 /* ── Category step: inline grid of clickable category cards ── */
@@ -704,10 +790,7 @@ button.stepItemDone:hover .stepNum {
   border: 1px solid var(--color-border);
   border-radius: 14px;
   cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s,
-    transform 0.1s;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
   min-height: 90px;
 }
 
@@ -777,9 +860,9 @@ button.stepItemDone:hover .stepNum {
 
 .setupThumb {
   flex-shrink: 0;
-  width: 72px;
-  height: 72px;
-  border-radius: 10px;
+  width: 84px;
+  height: 84px;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);

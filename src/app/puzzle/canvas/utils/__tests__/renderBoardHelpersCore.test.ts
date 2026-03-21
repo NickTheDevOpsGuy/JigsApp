@@ -25,19 +25,22 @@ describe("snapGlowAlpha", () => {
 });
 
 describe("snapPopScale", () => {
-  it("returns 1 for t <= 0 or t >= 120", () => {
+  it("returns 1 for t <= 0 or after full settle (~140ms)", () => {
     expect(snapPopScale(-1)).toBe(1);
     expect(snapPopScale(0)).toBe(1);
-    expect(snapPopScale(120)).toBe(1);
-    expect(snapPopScale(150)).toBe(1);
+    expect(snapPopScale(140)).toBe(1);
+    expect(snapPopScale(200)).toBe(1);
   });
 
-  it("returns subtle peak scale (~1.06) during pop then settles toward 1", () => {
-    const peak = snapPopScale(25);
-    const settling = snapPopScale(90);
-    expect(peak).toBeGreaterThanOrEqual(1.02);
-    expect(peak).toBeLessThanOrEqual(1.1);
+  it("returns a small peak (~1.03) then eases to 1 without overshoot", () => {
+    const midRise = snapPopScale(22);
+    const atPeak = snapPopScale(44);
+    const settling = snapPopScale(95);
+    expect(midRise).toBeGreaterThan(1.008);
+    expect(midRise).toBeLessThan(atPeak);
+    expect(atPeak).toBeCloseTo(1.028, 2);
+    expect(settling).toBeGreaterThan(0.998);
+    expect(settling).toBeLessThanOrEqual(atPeak);
     expect(settling).toBeGreaterThanOrEqual(1);
-    expect(settling).toBeLessThanOrEqual(1.08);
   });
 });

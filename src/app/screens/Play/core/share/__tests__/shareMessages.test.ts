@@ -49,6 +49,7 @@ describe("shareMessages", () => {
       /^I solved this puzzle in 1:42 with 42 moves\. Think you can beat me\?/,
     );
     expect(text).toContain("Forest Path");
+    expect(text).toMatch(/Difficulty: Medium\n\nhttps:\/\//);
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc");
   });
 
@@ -63,6 +64,7 @@ describe("shareMessages", () => {
       /^I solved this puzzle in 0:36 with 19 moves\. Think you can beat me\?/,
     );
     expect(text).toContain("Puzzle");
+    expect(text).toMatch(/Difficulty: Easy\n\nhttps:\/\//);
     expect(text).toContain("https://phuzzle.vercel.app/play?grid=3x3");
   });
 

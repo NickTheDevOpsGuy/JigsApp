@@ -6,6 +6,7 @@ import ReactDOM from "react-dom/client";
 import posthog from "posthog-js";
 
 import { App } from "./App";
+import { ensureServerTimeResync } from "./services/player/serverTimeService";
 import { ThemeProvider } from "./hooks/useTheme";
 import { ColorBlindProvider } from "./hooks/useColorBlindFriendly";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -26,6 +27,8 @@ const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Root container missing in index.html");
 }
+
+ensureServerTimeResync();
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>

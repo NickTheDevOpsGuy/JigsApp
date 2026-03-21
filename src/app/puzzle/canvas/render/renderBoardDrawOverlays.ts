@@ -47,13 +47,13 @@ export function drawLockGlow(
   path: Path2D,
   elapsedMs: number,
 ) {
-  const LOCK_GLOW_MS = 580;
+  const LOCK_GLOW_MS = 640;
   const t = elapsedMs / LOCK_GLOW_MS;
-  const alpha = Math.max(0, 0.65 * (1 - t) * (1 - t * 0.3));
+  const alpha = Math.max(0, 0.42 * (1 - t) * (1 - t * 0.35));
   if (alpha <= 0) return;
   ctx.save();
-  ctx.strokeStyle = `rgba(255, 235, 200, ${alpha * 0.7})`;
-  ctx.lineWidth = 5;
+  ctx.strokeStyle = `rgba(255, 235, 200, ${alpha * 0.55})`;
+  ctx.lineWidth = 3.5;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   ctx.stroke(path);

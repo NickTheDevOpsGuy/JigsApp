@@ -78,6 +78,16 @@ export function usePlayScreenManager(
   const [puzzleKey, setPuzzleKey] = useState(0);
   const refsReady = useBoardRefsReady(mainRef, boardRef);
 
+  // Eagerly start loading the puzzle image as soon as possible (before refs are ready)
+  // so that by the time the board is sized and ready, the image is already in browser cache.
+  useEffect(() => {
+    const imageUrl = safeLocalStorage.getItem(STORAGE_KEY);
+    if (!imageUrl) return;
+    const img = new Image();
+    img.src = imageUrl;
+    // No-op: just primes the browser cache. The main effect will create its own Image().
+  }, []);
+
   // Initial setup: create manager with square tiles
   useEffect(() => {
     sizingCleanupRef.current = null;
@@ -233,7 +243,7 @@ export function usePlayScreenManager(
             retryIdRef.current = null;
           }
         };
-      }, 48);
+      }, 0);
       const tryRun = () => {
         if (didRunRef.current || !mainEl || !boardEl) return;
         const r = boardEl.getBoundingClientRect();
@@ -245,7 +255,7 @@ export function usePlayScreenManager(
       /* Board can be 0×0 for a frame after image load; retry over a few paints before 48ms fallback. */
       let chain = 0;
       const chainRun = () => {
-        if (didRunRef.current || chain++ >= 8) return;
+        if (didRunRef.current || chain++ >= 5) return;
         tryRun();
         if (!didRunRef.current) requestAnimationFrame(chainRun);
       };

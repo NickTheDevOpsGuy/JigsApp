@@ -19,7 +19,7 @@ export function deriveBoardLayout(
   const cutTypeRaw = safeLocalStorage.getItem(CUT_TYPE_KEY);
   const cutType: PieceCutType =
     cutTypeRaw === "irregular" || cutTypeRaw === "hard" ? cutTypeRaw : "classic";
-  const cutDepthPct = cutType === "irregular" ? 0.2 : cutType === "hard" ? 0.12 : 0.17;
+  const cutDepthPct = cutType === "irregular" ? 0.28 : cutType === "hard" ? 0.20 : 0.26;
 
   const boardW = rectW;
   const boardH = rectH;
@@ -45,7 +45,7 @@ export function deriveBoardLayout(
   let { pieceWidth, pieceHeight } = fitTileSizeAtInset(BOARD_INSET_PX);
   const padReserve = Math.max(
     18,
-    Math.min(34, Math.ceil(Math.min(pieceWidth, pieceHeight) * cutDepthPct)),
+    Math.min(52, Math.ceil(Math.min(pieceWidth, pieceHeight) * cutDepthPct)),
   );
   const effectiveInset = BOARD_INSET_PX + padReserve;
   ({ pieceWidth, pieceHeight } = fitTileSizeAtInset(effectiveInset));

@@ -34,9 +34,11 @@ export function usePlayScreenPrimarySetup() {
   const [dailyLinkApplied, setDailyLinkApplied] = React.useState(false);
   const gridParamFromUrl = searchParams.get(GRID_PARAM);
   const localGrid = useMemo(() => {
-    const fromStorage = parseGrid(
-      safeLocalStorage.getItem(GRID_ONCE_KEY) ?? safeLocalStorage.getItem(GRID_KEY),
-    );
+    // Read GRID_ONCE_KEY atomically: consume it immediately so StrictMode double-render
+    // and back-navigation don't re-apply a stale grid size.
+    const onceVal = safeLocalStorage.getItem(GRID_ONCE_KEY);
+    if (onceVal) safeLocalStorage.removeItem(GRID_ONCE_KEY);
+    const fromStorage = parseGrid(onceVal ?? safeLocalStorage.getItem(GRID_KEY));
     if (fromStorage) return fromStorage;
     const fromUrl = parseGrid(gridParamFromUrl ?? null);
     if (fromUrl) return fromUrl;
@@ -66,10 +68,6 @@ export function usePlayScreenPrimarySetup() {
     if (imageUrl) return;
     navigate("/", { replace: true });
   }, [puzzleParam, sessionIdFromUrl, navigate]);
-
-  React.useEffect(() => {
-    safeLocalStorage.removeItem(GRID_ONCE_KEY);
-  }, []);
 
   const sessionResult = usePuzzleSession(localImageUrl, localGrid);
   const {

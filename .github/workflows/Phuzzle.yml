@@ -65,7 +65,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: 🎭 E2E tests (Playwright)
-        run: npx playwright test --project=chromium
+        run: npx playwright test --project=chromium --project=chromium-tz-la --project=chromium-tz-auckland
 
       - name: 🔦 Lighthouse CI (perf, a11y)
         env:

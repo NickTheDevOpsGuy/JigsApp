@@ -14,28 +14,36 @@ import {
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
+import {
+  invokeMaybeAsync,
+  invokeMaybeAsyncIndex,
+  invokeMaybeAsyncSpeed,
+  type ReplaySeekCb,
+  type ReplaySpeedCb,
+  type ReplayVoidCb,
+} from "@/screens/Play/components/replay/replayInvoke";
 
 const styles = { ...baseStyles, ...controlStyles };
 
 export interface ReplaySolveModalControlsProps {
   isPaused: boolean;
-  onPlay: () => void;
-  onPause: () => void;
-  onRewind: () => void;
-  onFastForward: () => void;
-  onSkipBack15?: () => void;
-  onSkipForward15?: () => void;
+  onPlay: ReplayVoidCb;
+  onPause: ReplayVoidCb;
+  onRewind: ReplayVoidCb;
+  onFastForward: ReplayVoidCb;
+  onSkipBack15?: ReplayVoidCb;
+  onSkipForward15?: ReplayVoidCb;
   effectiveSpeed: number;
-  onSpeedChange: (speed: number) => void;
+  onSpeedChange: ReplaySpeedCb;
   currentIndex: number;
   totalSnapshots: number;
   elapsedSeconds: number;
   totalSeconds: number;
-  onSeek?: (index: number) => void;
+  onSeek?: ReplaySeekCb;
   progressPct: number;
-  onBackToResults?: () => void;
-  onClose: () => void;
-  onNextPuzzle?: () => void;
+  onBackToResults?: ReplayVoidCb;
+  onClose: ReplayVoidCb;
+  onNextPuzzle?: ReplayVoidCb;
 }
 
 const SPEEDS = [1, 2, 3] as const;
@@ -67,12 +75,12 @@ export function ReplaySolveModalControls({
   const cycleSpeed = () => {
     const idx = SPEEDS.indexOf(effectiveSpeed as 1 | 2 | 3);
     const next = SPEEDS[(idx + 1) % SPEEDS.length];
-    onSpeedChange(next);
+    invokeMaybeAsyncSpeed(onSpeedChange, next);
   };
 
   const handlePlayPause = () => {
-    if (isPaused) onPlay();
-    else onPause();
+    if (isPaused) invokeMaybeAsync(onPlay);
+    else invokeMaybeAsync(onPause);
   };
 
   const seekBarRef = useRef<HTMLDivElement>(null);
@@ -95,7 +103,7 @@ export function ReplaySolveModalControls({
   const handleSeek = useCallback(
     (clientX: number) => {
       if (!onSeek || totalSnapshots <= 1) return;
-      onSeek(getIndexFromClientX(clientX));
+      invokeMaybeAsyncIndex(onSeek, getIndexFromClientX(clientX));
     },
     [onSeek, totalSnapshots, getIndexFromClientX],
   );
@@ -136,16 +144,16 @@ export function ReplaySolveModalControls({
     const maxIdx = totalSnapshots - 1;
     if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
       e.preventDefault();
-      onSeek(Math.max(0, currentIndex - 1));
+      invokeMaybeAsyncIndex(onSeek, Math.max(0, currentIndex - 1));
     } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
       e.preventDefault();
-      onSeek(Math.min(maxIdx, currentIndex + 1));
+      invokeMaybeAsyncIndex(onSeek, Math.min(maxIdx, currentIndex + 1));
     } else if (e.key === "Home") {
       e.preventDefault();
-      onSeek(0);
+      invokeMaybeAsyncIndex(onSeek, 0);
     } else if (e.key === "End") {
       e.preventDefault();
-      onSeek(maxIdx);
+      invokeMaybeAsyncIndex(onSeek, maxIdx);
     }
   };
 
@@ -182,7 +190,7 @@ export function ReplaySolveModalControls({
         <button
           type="button"
           className={styles.controlBtn}
-          onClick={onRewind}
+          onClick={() => invokeMaybeAsync(onRewind)}
           onPointerDown={stopProp}
           aria-label="Restart from beginning"
           title="Restart"
@@ -193,7 +201,7 @@ export function ReplaySolveModalControls({
           <button
             type="button"
             className={styles.controlBtn}
-            onClick={onSkipBack15}
+            onClick={() => invokeMaybeAsync(onSkipBack15)}
             onPointerDown={stopProp}
             aria-label="Back 5 seconds"
             title="Back 5s"
@@ -219,7 +227,7 @@ export function ReplaySolveModalControls({
           <button
             type="button"
             className={styles.controlBtn}
-            onClick={onSkipForward15}
+            onClick={() => invokeMaybeAsync(onSkipForward15)}
             onPointerDown={stopProp}
             aria-label="Forward 5 seconds"
             title="Forward 5s"
@@ -230,7 +238,7 @@ export function ReplaySolveModalControls({
         <button
           type="button"
           className={styles.controlBtn}
-          onClick={onFastForward}
+          onClick={() => invokeMaybeAsync(onFastForward)}
           onPointerDown={stopProp}
           aria-label="Go to end"
           title="End"
@@ -254,8 +262,8 @@ export function ReplaySolveModalControls({
           type="button"
           className={styles.navBtnSecondary}
           onClick={() => {
-            if (onBackToResults) onBackToResults();
-            else onClose();
+            if (onBackToResults) invokeMaybeAsync(onBackToResults);
+            else invokeMaybeAsync(onClose);
           }}
           onPointerDown={stopProp}
         >
@@ -267,8 +275,9 @@ export function ReplaySolveModalControls({
             type="button"
             className={styles.navBtnPrimary}
             onClick={() => {
-              onClose();
-              onNextPuzzle();
+              void Promise.resolve(onClose())
+                .then(() => invokeMaybeAsync(onNextPuzzle))
+                .catch(() => {});
             }}
             onPointerDown={stopProp}
           >

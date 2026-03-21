@@ -54,6 +54,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     undoSnapBackRef,
     onUndoSnapBackComplete: _onUndoSnapBackComplete,
     dailyVisualModifier = "none",
+    replayBarOpen = false,
   } = args;
   const autoBatterySaverMode = useAutoBatterySaver();
   const effectiveBatterySaverMode = batterySaverMode || autoBatterySaverMode;
@@ -116,6 +117,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
         (p) => now - p.t0 < SNAP_PARTICLE_MS,
       );
       const throttleIdle =
+        !replayBarOpen &&
         pieceCount >= HIGH_PIECE_COUNT_THRESHOLD &&
         !isDragging &&
         !inCompletionFlourish &&
@@ -289,9 +291,26 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
+
+    // Pause RAF when tab is hidden — saves battery/CPU
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+      } else {
+        if (!rafRef.current) {
+          rafRef.current = requestAnimationFrame(tick);
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [
     manager,
@@ -313,5 +332,6 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     batterySaverMode,
     autoBatterySaverMode,
     dailyVisualModifier,
+    replayBarOpen,
   ]);
 }

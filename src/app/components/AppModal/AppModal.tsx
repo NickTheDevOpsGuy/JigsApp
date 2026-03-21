@@ -1,4 +1,8 @@
-import React, { useCallback, useEffect, useId } from "react";
+/**
+ * AppModal – richer modal used for win screen and share menus.
+ * Supports surface, size, tone, subtitle, bodyClassName props.
+ */
+import React, { useEffect, useCallback, useId } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import styles from "./AppModal.module.css";
@@ -10,11 +14,14 @@ type AppModalProps = {
   subtitle?: string;
   children: React.ReactNode;
   showCloseButton?: boolean;
-  size?: "md" | "wide" | "xl";
+  /** "bare" = no header padding, content fills top */
   surface?: "default" | "bare";
+  /** "xl" = wide centered card; "wide" = slightly wider for share menus */
+  size?: "default" | "xl" | "wide";
+  /** "celebration" = gradient border + festive backdrop */
   tone?: "default" | "celebration";
   bodyClassName?: string;
-  panelClassName?: string;
+  /** Accessible name for the close button (default "Close"). */
   closeLabel?: string;
 };
 
@@ -25,18 +32,17 @@ export function AppModal({
   subtitle,
   children,
   showCloseButton = true,
-  size = "md",
   surface = "default",
+  size = "default",
   tone = "default",
   bodyClassName,
-  panelClassName,
   closeLabel = "Close",
 }: AppModalProps) {
   const titleId = useId();
 
   const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
     },
     [onClose],
   );
@@ -44,63 +50,66 @@ export function AppModal({
   useEffect(() => {
     if (!isOpen) return;
     document.addEventListener("keydown", handleKeyDown);
+    const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
+      document.body.style.overflow = prev;
     };
-  }, [handleKeyDown, isOpen]);
+  }, [isOpen, handleKeyDown]);
 
   if (!isOpen) return null;
 
-  const panelSizeClass =
-    size === "xl" ? styles.panelXl : size === "wide" ? styles.panelWide : "";
+  const dialogClass = [
+    styles.dialog,
+    size === "xl" ? styles.sizeXl : size === "wide" ? styles.sizeWide : "",
+    surface === "bare" ? styles.surfaceBare : "",
+    tone === "celebration" ? styles.toneCelebration : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return createPortal(
     <div
-      className={`${styles.overlay} ${tone === "celebration" ? styles.overlayCelebration : ""}`}
-      onPointerDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
+      className={styles.backdrop}
+      onClick={onClose}
       role="presentation"
     >
-      <section
-        className={`${styles.panel} ${panelSizeClass} ${surface === "bare" ? styles.panelBare : ""} ${panelClassName ?? ""}`}
+      <div
+        className={dialogClass}
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
+        aria-label={title ? undefined : "Dialog"}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
       >
-        {(title || subtitle || showCloseButton) && (
-          <header className={styles.header}>
-            <div className={styles.headerText}>
-              {title ? (
-                <h2 id={titleId} className={styles.title}>
-                  {title}
-                </h2>
-              ) : null}
-              {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
-            </div>
-            {showCloseButton ? (
-              <button
-                type="button"
-                className={styles.closeButton}
-                onClick={onClose}
-                aria-label={closeLabel}
-              >
-                <X size={18} aria-hidden="true" />
-              </button>
-            ) : null}
-          </header>
+        {showCloseButton && (
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label={closeLabel}
+            title={closeLabel}
+          >
+            <X size={20} aria-hidden />
+          </button>
         )}
-        <div
-          className={`${styles.body} ${surface === "bare" ? styles.bodyBare : ""} ${bodyClassName ?? ""}`}
-        >
+        {(title || subtitle) && surface !== "bare" && (
+          <div className={styles.header}>
+            {title && (
+              <h2 id={titleId} className={styles.title}>
+                {title}
+              </h2>
+            )}
+            {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+          </div>
+        )}
+        <div className={[styles.body, bodyClassName].filter(Boolean).join(" ")}>
           {children}
         </div>
-      </section>
+      </div>
     </div>,
     document.body,
   );
 }
-
-export default AppModal;

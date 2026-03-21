@@ -1,227 +1,128 @@
-.overlay {
+/* AppModal – richer modal for win screen and share menus */
+
+.backdrop {
   position: fixed;
   inset: 0;
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
-    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
-  background: color-mix(in srgb, var(--color-overlay) 88%, rgba(2, 6, 14, 0.74));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  z-index: 2200;
-  animation: overlayIn 200ms ease forwards;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
-.overlay::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at top, rgba(83, 150, 255, 0.15), transparent 48%),
-    radial-gradient(circle at bottom, rgba(32, 78, 148, 0.12), transparent 38%);
-  pointer-events: none;
-}
-
-.overlayCelebration::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(2px 2px at 20% 15%, rgba(255, 255, 255, 0.9), transparent),
-    radial-gradient(2px 2px at 80% 18%, rgba(255, 255, 255, 0.9), transparent),
-    radial-gradient(1px 1px at 40% 25%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(1.5px 1.5px at 30% 80%, rgba(255, 220, 150, 0.55), transparent);
-  pointer-events: none;
-  opacity: 0;
-  animation: overlayCelebrationStarsIn 0.5s ease-out 0.1s both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .overlayCelebration::after {
-    animation: none;
-    opacity: 0.7;
-  }
-}
-
-@keyframes overlayCelebrationStarsIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 0.85;
-  }
-}
-
-.panel {
+.dialog {
   position: relative;
-  width: min(100%, 480px);
-  max-height: min(90dvh, 860px);
-  min-height: 0;
-  border-radius: 26px;
-  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-  background: color-mix(in srgb, var(--color-bg-card) 94%, transparent);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
   box-shadow:
-    0 30px 80px rgba(2, 8, 18, 0.46),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  overflow: hidden;
+    0 24px 64px rgba(0, 0, 0, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  animation: panelIn 200ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.panel .body {
-  flex: 1 1 0;
-  min-height: 0;
+/* Size variants */
+.sizeXl {
+  max-width: 560px;
 }
 
-.panelWide {
-  width: min(100%, 760px);
+.sizeWide {
+  max-width: 520px;
 }
 
-.panelXl {
-  width: min(100%, 920px);
+/* Surface: bare = content fills top, no header padding */
+.surfaceBare {
+  background: var(--color-bg-primary);
 }
 
-.panelBare {
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  overflow: visible;
+.surfaceBare .body {
+  padding: 0;
 }
 
+/* Tone: celebration = glowing border */
+.toneCelebration {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 60%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 30%, transparent),
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    0 0 40px color-mix(in srgb, var(--color-brand-primary) 15%, transparent);
+}
+
+/* Header */
 .header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px 22px 0;
-}
-
-.headerText {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
+  padding: 20px 24px 0;
+  flex-shrink: 0;
 }
 
 .title {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: clamp(1.2rem, 2.8vw, 1.5rem);
+  margin: 0 0 4px;
+  font-size: 1.15rem;
   font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.3;
 }
 
 .subtitle {
   margin: 0;
+  font-size: 13px;
   color: var(--color-text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
-.closeButton {
-  appearance: none;
-  width: 44px;
-  height: 44px;
-  border: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--color-bg-elevated) 88%, transparent);
-  color: var(--color-text-primary);
-  display: inline-flex;
+/* Body */
+.body {
+  flex: 1;
+  min-height: 0;
+  padding: 20px 24px 24px;
+  overflow-y: auto;
+}
+
+/* Close button */
+.closeBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  border-radius: 50%;
   cursor: pointer;
-  transition:
-    transform 120ms ease,
-    border-color 120ms ease,
-    background 120ms ease;
+  color: var(--color-text-secondary);
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
 }
 
-.closeButton:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--color-brand-primary) 52%, transparent);
-  background: color-mix(in srgb, var(--color-bg-elevated) 96%, transparent);
+.closeBtn:hover {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
 }
 
-.body {
-  padding: 20px 22px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: hidden;
-}
-
-.bodyBare {
-  padding: 0;
-  overflow: visible;
-}
-
-@keyframes overlayIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes panelIn {
-  from {
-    opacity: 0;
-    transform: translateY(24px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@media (max-width: 720px) {
-  .overlay {
-    align-items: flex-end;
-    padding: 12px 12px max(12px, env(safe-area-inset-bottom)) 12px;
-  }
-
-  .panel {
-    width: 100%;
-    max-height: min(92dvh, 920px);
-    border-radius: 24px 24px 18px 18px;
-    animation-name: sheetIn;
-  }
-}
-
-/* Mobile (iPhone 16): panel fits in viewport, no document scroll */
+/* Mobile */
 @media (max-width: 600px) {
-  .panel {
-    max-height: calc(100dvh - 24px);
+  .backdrop {
+    align-items: flex-end;
+    padding: 0;
   }
 
-  .panel .body {
-    flex: 1 1 0;
-    min-height: 0;
-  }
-
-  .body {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 16px 18px max(18px, env(safe-area-inset-bottom));
-  }
-
-  .panelBare {
+  .dialog {
+    max-width: 100%;
     width: 100%;
-  }
-
-  .header {
-    padding: 16px 18px 0;
-  }
-}
-
-@keyframes sheetIn {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+    border-radius: 20px 20px 0 0;
+    max-height: 92dvh;
   }
 }

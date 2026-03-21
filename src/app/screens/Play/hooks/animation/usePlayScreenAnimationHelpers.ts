@@ -152,10 +152,10 @@ export function buildLockLerpOverrides(args: {
       const dy = p.y - from.y;
       if (Math.hypot(dx, dy) > maxTravel) continue;
       const t = Math.min(1, elapsed / LOCK_LERP_MS);
-      /* Cubic ease-out for smooth, satisfying settle when releasing */
-      const ease = 1 - (1 - t) ** 3;
-      const liftPx = Math.min(LOCK_LIFT_MAX_PX, Math.max(4, p.h * 0.06));
-      const liftOffset = liftPx * (1 - t) ** 2;
+      /* Quintic ease-out — softer deceleration than cubic (less abrupt “snap into lock”) */
+      const ease = 1 - (1 - t) ** 5;
+      const liftPx = Math.min(LOCK_LIFT_MAX_PX, Math.max(3, p.h * 0.045));
+      const liftOffset = liftPx * (1 - t) ** 3;
       const lerpX = from.x + dx * ease;
       const lerpY = from.y + dy * ease - liftOffset;
       const minY = Math.min(from.y, p.y) - liftPx;

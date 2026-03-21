@@ -41,4 +41,6 @@ export interface UsePlayScreenAnimationArgs {
   } | null>;
   onUndoSnapBackComplete?: () => void;
   dailyVisualModifier?: "none" | "fog" | "night" | "sepia";
+  /** When true, do not idle-throttle RAF — replay scrub/playback must redraw every tick. */
+  replayBarOpen?: boolean;
 }

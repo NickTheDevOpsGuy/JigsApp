@@ -119,6 +119,7 @@ export function buildChallengeShareMessage(args: ShareMessageArgs): string {
     "",
     puzzleName,
     `Difficulty: ${difficulty}`,
+    "",
     args.playUrl,
   ].join("\n");
 }

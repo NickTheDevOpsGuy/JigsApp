@@ -6,6 +6,8 @@ const COMPLETION_PHRASES_FAST = [
   "Blink and you missed it! 👀",
   "Lightning! ⚡",
   "You're on fire! 🔥",
+  "Warp speed! 🚀",
+  "Unstoppable! 🏆",
 ];
 const COMPLETION_PHRASES_MEDIUM = [
   "Nice solve! ⭐",
@@ -16,6 +18,8 @@ const COMPLETION_PHRASES_MEDIUM = [
   "Love it! 💜",
   "You did it! 🎉",
   "Awesome! 🌟",
+  "Clean work! 🎯",
+  "Yes!! 🎊",
 ];
 const COMPLETION_PHRASES_STEADY = [
   "Nice solve! ⭐",
@@ -35,6 +39,7 @@ const COMPLETION_PHRASES_FLAWLESS = [
   "No undos — pure skill! 💪",
   "Perfect run! ⭐",
   "First try, best try! 🌟",
+  "Zero mistakes. Respect. 👑",
 ];
 
 export function pickCompletionPhrase(

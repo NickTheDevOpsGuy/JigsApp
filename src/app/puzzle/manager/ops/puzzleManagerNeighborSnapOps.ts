@@ -58,7 +58,7 @@ export function trySnapActiveGroupToNeighborOp({
     if (!findPiece(activeId)) return false;
   }
 
-  const firstSnapMult = (state.placedCount ?? 0) === 0 ? 1.15 : 1;
+  const firstSnapMult = (state.placedCount ?? 0) === 0 ? 1.06 : 1;
   const tolerance = getEffectiveTolerance(
     snapToleranceNeighborPx,
     getToleranceOptions(),
@@ -115,7 +115,7 @@ export function tryNearSnapNudgeOp({
   findPiece,
   shiftGroup,
 }: TryNearSnapNudgeOpArgs): void {
-  const firstSnapMult = (state.placedCount ?? 0) === 0 ? 1.15 : 1;
+  const firstSnapMult = (state.placedCount ?? 0) === 0 ? 1.06 : 1;
   const tolerance = getEffectiveTolerance(
     snapToleranceBoardPx,
     getToleranceOptions(),

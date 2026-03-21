@@ -8,6 +8,7 @@ import {
   recordDailyCompletion,
   DAILY_DATE_KEY,
   getCurrentStreak,
+  getLocalWeekMondayYmd,
   getTodayDateString,
   getDailyPuzzleNumber,
 } from "@/daily/dailyPuzzleCore";
@@ -92,11 +93,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     if (!isDaily) return;
     const newStreak = recordDailyCompletion(elapsedSeconds);
     setStreak(newStreak);
-    const today = new Date(`${getTodayDateString()}T00:00:00.000Z`);
-    const day = today.getUTCDay();
-    const diffToMonday = day === 0 ? 6 : day - 1;
-    today.setUTCDate(today.getUTCDate() - diffToMonday);
-    const weekKey = today.toISOString().slice(0, 10);
+    const weekKey = getLocalWeekMondayYmd(getTodayDateString());
     safeLocalStorage.setItem(`phuzzle:weeklyAlbumNudge:${weekKey}`, "true");
     safeLocalStorage.removeItem(DAILY_DATE_KEY);
   }, [isDaily, elapsedSeconds]);

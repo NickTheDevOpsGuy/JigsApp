@@ -14,14 +14,19 @@
   cursor: grabbing;
 }
 
-/* Control row: compact media player – circular buttons */
+/* Control row: compact media player – circular buttons (wraps on narrow widths) */
 .controlRow {
   flex-shrink: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  align-content: center;
   gap: 8px;
+  row-gap: 10px;
   padding: 0 12px 8px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .controlBtn {
@@ -105,9 +110,12 @@
 .navRow {
   flex-shrink: 0;
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: stretch;
   gap: 8px;
   padding: 0 12px 10px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .navBtnSecondary {
@@ -175,4 +183,40 @@
 .navBtnSecondary:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
+}
+
+@media (max-width: 420px) {
+  .controlRow {
+    gap: 6px;
+    row-gap: 8px;
+    padding: 0 8px 6px;
+  }
+
+  .controlBtn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .controlBtnPlay {
+    width: 38px;
+    height: 38px;
+  }
+
+  .speedTrigger {
+    min-width: 36px;
+    min-height: 34px;
+    padding: 0 8px;
+    font-size: 0.78rem;
+  }
+
+  .navRow {
+    flex-direction: column;
+    padding: 0 10px 10px;
+  }
+
+  .navBtnSecondary,
+  .navBtnPrimary {
+    flex: none;
+    width: 100%;
+  }
 }

@@ -38,3 +38,34 @@ export function getSecondsUntilNextUtcMidnight(now: Date): number {
   const secsIntoDay = (now.getTime() / 1000) % 86400;
   return Math.ceil(86400 - secsIntoDay);
 }
+
+let resyncListenersAttached = false;
+let periodicResyncTimer: ReturnType<typeof setInterval> | null = null;
+
+/** Refresh server offset (same RPC as initial sync). */
+export async function resyncServerTime(): Promise<Date> {
+  return syncServerTime();
+}
+
+/**
+ * Re-sync on tab focus and hourly so long sessions don't drift.
+ * Idempotent; safe to call from app bootstrap.
+ */
+export function ensureServerTimeResync(): void {
+  if (typeof document === "undefined") return;
+  if (resyncListenersAttached) return;
+  resyncListenersAttached = true;
+
+  const onVisible = () => {
+    if (document.visibilityState === "visible") {
+      void syncServerTime();
+    }
+  };
+  document.addEventListener("visibilitychange", onVisible);
+
+  if (periodicResyncTimer == null) {
+    periodicResyncTimer = setInterval(() => {
+      void syncServerTime();
+    }, 60 * 60 * 1000);
+  }
+}

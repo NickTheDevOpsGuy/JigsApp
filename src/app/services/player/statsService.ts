@@ -3,7 +3,7 @@
  */
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import { ensureSignedIn } from "@/supabase/auth";
-import { getTodayDateString } from "@/daily/dailyPuzzleCore";
+import { getTodayDateString, getYesterdayDateString } from "@/daily/dailyPuzzleCore";
 
 export type PlayerStatsData = {
   puzzlesCompleted: number;
@@ -90,9 +90,8 @@ export async function recordCompletion(args: {
   if (!userId) return null;
 
   const today = getTodayDateString();
-  const yesterday = new Date(`${today}T00:00:00.000Z`);
-  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  /** Local calendar yesterday — matches puzzle_date / getTodayDateString() (not UTC parsing of YYYY-MM-DD). */
+  const yesterdayStr = getYesterdayDateString();
   const cutType = args.cutType ?? "classic";
   const visualModifier = args.visualModifier ?? "none";
   const completionSource = args.completionSource ?? "custom";

@@ -5,14 +5,14 @@
 /** Lerp factor for smooth drag position (0–1; higher = snappier). */
 export const DRAG_LERP = 0.32;
 
-/** Duration of lock-place ease animation (ms). Smooth settle when releasing. */
-export const LOCK_LERP_MS = 140;
+/** Duration of lock-place ease animation (ms). Longer = softer settle (less “hard lock”). */
+export const LOCK_LERP_MS = 205;
 
-/** Max upward lift (px) when piece snaps; actual lift scales with piece height for mobile and desktop. */
-export const LOCK_LIFT_MAX_PX = 12;
+/** Max upward lift (px) when piece snaps; keep small so the lock doesn’t feel punchy. */
+export const LOCK_LIFT_MAX_PX = 7;
 
-/** Magnetic snap: fraction of snap delta applied per frame when within snap radius (smooth slide into place). */
-export const MAGNETIC_PULL_STRENGTH = 0.15;
+/** Magnetic snap: fraction of snap delta per frame; lower = gentler slide toward slot. */
+export const MAGNETIC_PULL_STRENGTH = 0.11;
 
 /** When idle: throttle redraw to this FPS for 50+ piece puzzles. */
 export const IDLE_TARGET_FPS = 30;

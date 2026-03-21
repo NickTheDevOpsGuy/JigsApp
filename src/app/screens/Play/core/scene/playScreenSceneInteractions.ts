@@ -121,6 +121,7 @@ export function usePlayScreenInteractions(ctx: any) {
     dailyVisualModifier: isDailyPuzzleSession()
       ? getDailyVisualModifier()
       : (ui.dailyPreferredModifier ?? getDailyPreferredModifier()),
+    replayBarOpen: scene.replayBarOpen,
   });
 
   const { puzzleShareUrl } = usePlayScreenShareSession({

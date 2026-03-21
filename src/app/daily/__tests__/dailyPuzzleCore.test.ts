@@ -10,6 +10,8 @@ import {
   initStreakFreeze,
   wasFreezeOfferDismissedToday,
   dismissFreezeOfferToday,
+  parseLocalYmd,
+  getLocalWeekMondayYmd,
 } from "../dailyPuzzleCore";
 
 const DAILY_PREFIX = "phuzzle:daily:";
@@ -43,6 +45,24 @@ describe("getTodayDateString", () => {
   it("returns YYYY-MM-DD format", () => {
     const result = getTodayDateString();
     expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe("parseLocalYmd", () => {
+  it("uses local calendar components (not UTC parse of YYYY-MM-DD)", () => {
+    const d = parseLocalYmd("2026-06-15");
+    expect(d.getFullYear()).toBe(2026);
+    expect(d.getMonth()).toBe(5);
+    expect(d.getDate()).toBe(15);
+  });
+});
+
+describe("getLocalWeekMondayYmd", () => {
+  it("returns Monday of the same ISO week for Wednesday", () => {
+    expect(getLocalWeekMondayYmd("2026-06-17")).toBe("2026-06-15");
+  });
+  it("returns previous Monday for Sunday", () => {
+    expect(getLocalWeekMondayYmd("2026-06-21")).toBe("2026-06-15");
   });
 });
 

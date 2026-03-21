@@ -6,9 +6,22 @@
  * Step 4: Start (action: Start Puzzle button on Setup step).
  * Breadcrumb: Category → Puzzle → Setup → Start.
  */
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+  type KeyboardEvent,
+} from "react";
 import { useNavigate } from "react-router-dom";
-import { Puzzle, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Puzzle,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Camera,
+} from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/packs/samplePuzzles";
@@ -73,6 +86,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     setSelectedPuzzle(firstPuzzle);
     setStep("category");
   }, [isOpen]);
+
 
   useEffect(() => {
     if (!isOpen) return;
@@ -142,6 +156,35 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   };
 
   const canStart = selectedPuzzle != null;
+
+  const handleCustomUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      if (!dataUrl) return;
+      const grid = PRIMARY_DIFFICULTIES[difficultyIndex] ?? PRIMARY_DIFFICULTIES[1];
+      clearPuzzleState();
+      safeLocalStorage.setItem(STORAGE_KEY, dataUrl);
+      safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
+      safeLocalStorage.removeItem("phuzzle:dailyDate");
+      onClose();
+      navigate("/play");
+    };
+    reader.readAsDataURL(file);
+    // Reset input so same file can be re-selected
+    e.target.value = "";
+  };
+
+  const onUploadCtaKeyDown = (e: KeyboardEvent<HTMLLabelElement>) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.currentTarget
+      .querySelector<HTMLInputElement>('input[type="file"]')
+      ?.click();
+  };
 
   const goToStep = (target: Step) => {
     setStep(target);
@@ -227,9 +270,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
           ].join(" ")}
           aria-current={step === "setup" ? "step" : undefined}
         >
-          <span className={styles.stepNum} aria-hidden>
-            3
-          </span>
+          <span className={styles.stepNum} aria-hidden>3</span>
           <span className={styles.stepLabel}>Setup</span>
         </span>
       </nav>
@@ -248,10 +289,36 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                 setStep("puzzle");
               }}
             >
-              <span className={styles.categoryCardEmoji}>{cat.label}</span>
+              <span className={styles.categoryCardEmoji}>
+{cat.label}
+              </span>
               <span className={styles.categoryCardName}>{cat.name}</span>
             </button>
           ))}
+          <div className={styles.categoryUploadRow}>
+            <label
+              className={styles.uploadCta}
+              tabIndex={0}
+              onKeyDown={onUploadCtaKeyDown}
+              aria-label="Use your own photo: upload an image from your device"
+            >
+              <span className={styles.uploadCtaIconWrap} aria-hidden>
+                <Camera size={22} strokeWidth={2} />
+              </span>
+              <span className={styles.uploadCtaCopy}>
+                <span className={styles.uploadCtaTitle}>Use your own photo</span>
+                <span className={styles.uploadCtaSub}>
+                  Upload any image instead of a pack
+                </span>
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                className={styles.uploadCtaInput}
+                onChange={handleCustomUpload}
+              />
+            </label>
+          </div>
         </div>
       )}
 
@@ -295,6 +362,9 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                       setSelectedPuzzle(puzzle);
                       setDifficultyIndex(1);
                       setStep("setup");
+                      // Start preloading image immediately when puzzle is selected
+                      const preloadOnSelect = new Image();
+                      preloadOnSelect.src = puzzle.fullImage;
                     }}
                     onImgError={() =>
                       setImgError((prev) => ({ ...prev, [puzzle.id]: true }))
@@ -337,14 +407,11 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         <>
           <div className={styles.setupHeader}>
             <div className={styles.setupThumb}>
-              <img
-                src={selectedPuzzle.thumbnail}
-                alt=""
-                className={styles.setupThumbImg}
-              />
+              <img src={selectedPuzzle.thumbnail} alt="" className={styles.setupThumbImg} />
             </div>
             <div className={styles.setupHeaderText}>
               <h2 className={styles.setupPuzzleName}>{selectedPuzzle.name}</h2>
+
             </div>
           </div>
           <div

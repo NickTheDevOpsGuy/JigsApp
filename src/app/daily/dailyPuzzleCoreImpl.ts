@@ -4,6 +4,7 @@
  * For puzzle selection, dynamically import dailyPuzzle.
  */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { formatLocalYmd, parseLocalYmd } from "@/utils/dateUtils";
 export { GRID_OPTIONS } from "./dailyGridOptions";
 import { GRID_OPTIONS } from "./dailyGridOptions";
 
@@ -50,15 +51,17 @@ export function setDailyPreferredModifier(modifier: DailyVisualModifier): void {
 
 /** Get today's date string in user's local timezone (YYYY-MM-DD) */
 export function getTodayDateString(): string {
-  const d = new Date();
-  return d.toISOString().slice(0, 10);
+  return formatLocalYmd(new Date());
 }
 
 /** Epoch for daily puzzle number (UTC). Day 1 = 2024-01-01. */
 const DAILY_EPOCH_MS = new Date("2024-01-01T00:00:00.000Z").getTime();
 const MS_PER_DAY = 86400000;
 
-/** Deterministic daily puzzle number for today (days since epoch). Used for Daily Share format. */
+/**
+ * Deterministic daily puzzle number (UTC calendar days since 2024-01-01 UTC).
+ * Differs from getTodayDateString() near timezone boundaries — share copy uses this; storage keys use local date.
+ */
 export function getDailyPuzzleNumber(): number {
   const now = Date.now();
   const days = Math.floor((now - DAILY_EPOCH_MS) / MS_PER_DAY);
@@ -96,11 +99,14 @@ export function clearDailyPreferredDifficulty(): void {
   }
 }
 
-/** Get yesterday's date string (UTC, consistent with getTodayDateString) */
+/** Get yesterday's date string in the user's local timezone (consistent with getTodayDateString). */
 export function getYesterdayDateString(): string {
   const d = new Date();
-  d.setUTCDate(d.getUTCDate() - 1);
-  return d.toISOString().slice(0, 10);
+  d.setDate(d.getDate() - 1);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 /** True if user dismissed the streak freeze offer today (don't show again this session) */
@@ -279,10 +285,20 @@ function wasFreezeUsedFor(dateStr: string): boolean {
 export function getCurrentStreak(): number {
   const today = getTodayDateString();
   let streak = 0;
-  const d = new Date(today);
+  const d = parseLocalYmd(today);
+
+  // If today not yet completed, start counting from yesterday so existing
+  // streak is visible before user completes today's puzzle
+  const todayCompleted =
+    safeLocalStorage.getItem(`${DAILY_PREFIX}${today}:completed`) === "true" ||
+    wasFreezeUsedFor(today);
+  if (!todayCompleted) {
+    d.setDate(d.getDate() - 1);
+  }
 
   for (let i = 0; i < 365; i++) {
-    const dateStr = d.toISOString().slice(0, 10);
+    const sy = d.getFullYear(), sm = String(d.getMonth()+1).padStart(2,"0"), sd = String(d.getDate()).padStart(2,"0");
+    const dateStr = `${sy}-${sm}-${sd}`;
     const completed =
       safeLocalStorage.getItem(`${DAILY_PREFIX}${dateStr}:completed`) === "true" ||
       wasFreezeUsedFor(dateStr);

@@ -5,19 +5,24 @@
 /** Quick glow flash when a piece snaps; ~120ms per spec. */
 export const SNAP_GLOW_MS = 120;
 
-/** Short ease (~120ms) for snap; subtle pop when pieces connect then gentle settle. */
+/** Short ease for snap: small scale bump only — no overshoot/bounce (feels less “hard”). */
 export function snapPopScale(tMs: number): number {
   if (tMs <= 0) return 1;
-  if (tMs >= 120) return 1;
+  const totalMs = 140;
+  if (tMs >= totalMs) return 1;
 
-  const popPeak = 1.07;
-  if (tMs < 36) {
-    const k = tMs / 36;
-    return 1 + (popPeak - 1) * easeOutBack(k);
+  const popPeak = 1.028;
+  const riseMs = 44;
+  if (tMs < riseMs) {
+    const k = tMs / riseMs;
+    /* easeOutCubic — no back-overshoot vs easeOutBack */
+    const e = 1 - (1 - k) ** 3;
+    return 1 + (popPeak - 1) * e;
   }
 
-  const k = (tMs - 36) / 84;
-  return popPeak - (popPeak - 1) * easeOutBounce(k);
+  const k = (tMs - riseMs) / (totalMs - riseMs);
+  const e = 1 - (1 - k) ** 3;
+  return popPeak - (popPeak - 1) * e;
 }
 
 /** Alpha for snap glow at target position; smooth fade over SNAP_GLOW_MS. */

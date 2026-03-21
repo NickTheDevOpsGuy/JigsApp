@@ -8,10 +8,10 @@ import { buildRowColMap, getSolvedNeighborsFromMap } from "@/puzzle/groups/group
 import type { DragPreview } from "@/puzzle/core/types";
 
 /** Magnetic snap: radius (px) within which piece is pulled toward correct position. */
-export const BOARD_MAGNET_RADIUS_PX = 48;
-export const BOARD_MAGNET_STRONG_RADIUS_PX = 22;
-export const EDGE_MAGNET_RADIUS_PX = 38;
-export const EDGE_MAGNET_STRONG_RADIUS_PX = 16;
+export const BOARD_MAGNET_RADIUS_PX = 56;
+export const BOARD_MAGNET_STRONG_RADIUS_PX = 30;
+export const EDGE_MAGNET_RADIUS_PX = 48;
+export const EDGE_MAGNET_STRONG_RADIUS_PX = 24;
 
 export type BoardSnapResult =
   | { kind: "snap"; dx: number; dy: number; groupId: string }

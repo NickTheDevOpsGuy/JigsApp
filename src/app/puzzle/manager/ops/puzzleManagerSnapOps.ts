@@ -66,7 +66,8 @@ export function trySnapActiveGroupToBoardOp(params: SnapToBoardParams): boolean 
   const active = pieces.find((p) => p.id === activeId);
   if (!active) return false;
 
-  const firstSnapMult = placedCount === 0 ? 1.15 : 1;
+  /** Slight first-piece forgiveness without a wide “vacuum snap” (was 1.15). */
+  const firstSnapMult = placedCount === 0 ? 1.06 : 1;
   const tolerance = getEffectiveTolerance(
     snapToleranceBoardPx,
     getToleranceOptions(),

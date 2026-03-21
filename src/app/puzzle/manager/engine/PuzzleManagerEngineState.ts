@@ -309,7 +309,7 @@ export class PuzzleManagerState {
     const activeId = this.drag.activeId;
     if (!activeId) return null;
 
-    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.22 : 1;
+    const firstSnapMult = (this.state.placedCount ?? 0) === 0 ? 1.06 : 1;
     const boardTolerance = getEffectiveTolerance(
       this.snapToleranceBoardPx,
       this.getToleranceOptions(),

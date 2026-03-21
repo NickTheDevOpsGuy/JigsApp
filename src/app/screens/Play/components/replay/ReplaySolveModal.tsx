@@ -10,32 +10,39 @@ import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import { ReplaySolveModalControls } from "./ReplaySolveModalControls";
 import { AppModal } from "@/components/AppModal";
+import {
+  invokeMaybeAsync,
+  invokeMaybeAsyncIndex,
+  type ReplaySeekCb,
+  type ReplaySpeedCb,
+  type ReplayVoidCb,
+} from "@/screens/Play/components/replay/replayInvoke";
 
 const styles = { ...baseStyles, ...controlStyles };
 
 export interface ReplaySolveModalProps {
   isPaused: boolean;
-  onPlay: () => void;
-  onPause: () => void;
-  onRewind: () => void;
-  onFastForward: () => void;
-  onSkipBack15?: () => void;
-  onSkipForward15?: () => void;
+  onPlay: ReplayVoidCb;
+  onPause: ReplayVoidCb;
+  onRewind: ReplayVoidCb;
+  onFastForward: ReplayVoidCb;
+  onSkipBack15?: ReplayVoidCb;
+  onSkipForward15?: ReplayVoidCb;
   speed: number;
-  onSpeedChange: (speed: number) => void;
+  onSpeedChange: ReplaySpeedCb;
   speedExplicitlyChosen?: boolean;
   currentIndex: number;
   totalSnapshots: number;
   elapsedSeconds: number;
   totalSeconds: number;
-  onSeek?: (index: number) => void;
-  onClose: () => void;
+  onSeek?: ReplaySeekCb;
+  onClose: ReplayVoidCb;
   /** Optional completion/snapshot image when no board cutout (fallback only) */
   completionImageUrl?: string | null;
   /** When set, backdrop has a cutout so the live canvas shows through for playback */
   boardRect?: { top: number; left: number; width: number; height: number } | null;
-  onBackToResults?: () => void;
-  onNextPuzzle?: () => void;
+  onBackToResults?: ReplayVoidCb;
+  onNextPuzzle?: ReplayVoidCb;
   /** For result header: "26 moves" (optional) */
   moveCount?: number;
   /** Shown in top-right of cutout bar when in pack flow, e.g. "One more from this pack" */
@@ -81,27 +88,27 @@ export function ReplaySolveModal({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        onClose();
+        invokeMaybeAsync(onClose);
       }
       if (e.key === " ") {
         e.preventDefault();
-        if (isPaused) onPlay();
-        else onPause();
+        if (isPaused) invokeMaybeAsync(onPlay);
+        else invokeMaybeAsync(onPause);
       }
       if (onSeek && totalSnapshots > 1) {
         const maxIdx = totalSnapshots - 1;
         if (e.key === "ArrowLeft") {
           e.preventDefault();
-          onSeek(Math.max(0, currentIndex - 1));
+          invokeMaybeAsyncIndex(onSeek, Math.max(0, currentIndex - 1));
         } else if (e.key === "ArrowRight") {
           e.preventDefault();
-          onSeek(Math.min(maxIdx, currentIndex + 1));
+          invokeMaybeAsyncIndex(onSeek, Math.min(maxIdx, currentIndex + 1));
         } else if (e.key === "Home") {
           e.preventDefault();
-          onSeek(0);
+          invokeMaybeAsyncIndex(onSeek, 0);
         } else if (e.key === "End") {
           e.preventDefault();
-          onSeek(maxIdx);
+          invokeMaybeAsyncIndex(onSeek, maxIdx);
         }
       }
     };
@@ -116,7 +123,7 @@ export function ReplaySolveModal({
   const handleBackdropKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      if (e.target === e.currentTarget) onClose();
+      if (e.target === e.currentTarget) invokeMaybeAsync(onClose);
     }
   };
 
@@ -125,7 +132,7 @@ export function ReplaySolveModal({
       ref={closeBtnRef}
       type="button"
       className={styles.closeBtn}
-      onClick={onClose}
+      onClick={() => invokeMaybeAsync(onClose)}
       onPointerDown={stopProp}
       aria-label="Close replay (Esc)"
       title="Close (Esc)"
@@ -197,8 +204,8 @@ export function ReplaySolveModal({
     /* Align controls with board; cutoutBottomBar has padding-left: 16px */
     const barPaddingLeft = 16;
     const controlsLeft = left - barPaddingLeft;
-    /* Clamp width so controls stay usable on very narrow or very wide boards */
-    const innerMinWidth = 280;
+    /* Match board width when possible; avoid forcing 280px on small boards (was clipping control row). */
+    const innerMinWidth = 200;
     const innerMaxWidth = typeof window !== "undefined" ? window.innerWidth - 32 : 520;
     const innerWidth = Math.min(innerMaxWidth, Math.max(innerMinWidth, width));
     return (
@@ -214,22 +221,30 @@ export function ReplaySolveModal({
         <div
           data-cutout-panel
           style={{ top: 0, left: 0, right: 0, height: top }}
-          onPointerDown={(e) => e.target === e.currentTarget && onClose()}
+          onPointerDown={(e) =>
+            e.target === e.currentTarget && invokeMaybeAsync(onClose)
+          }
         />
         <div
           data-cutout-panel
           style={{ top, left: 0, width: left, height }}
-          onPointerDown={(e) => e.target === e.currentTarget && onClose()}
+          onPointerDown={(e) =>
+            e.target === e.currentTarget && invokeMaybeAsync(onClose)
+          }
         />
         <div
           data-cutout-panel
           style={{ top, left: right, right: 0, height }}
-          onPointerDown={(e) => e.target === e.currentTarget && onClose()}
+          onPointerDown={(e) =>
+            e.target === e.currentTarget && invokeMaybeAsync(onClose)
+          }
         />
         <div
           data-cutout-panel
           style={{ top: bottom, left: 0, right: 0, bottom: 0 }}
-          onPointerDown={(e) => e.target === e.currentTarget && onClose()}
+          onPointerDown={(e) =>
+            e.target === e.currentTarget && invokeMaybeAsync(onClose)
+          }
         />
         <div className={styles.backdropCutoutContent}>
           <div className={styles.cutoutTopBar} onPointerDown={stopProp}>
