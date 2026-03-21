@@ -19,7 +19,9 @@ test.describe("Packs and Stats", () => {
       timeout: 15000,
     });
     await expect(dialog.getByRole("listbox", { name: /choose a pack/i })).toBeVisible();
-    await expect(dialog.getByRole("option", { name: /nature, .* puzzles/i })).toBeVisible();
+    await expect(
+      dialog.getByRole("option", { name: /nature, .* puzzles/i }),
+    ).toBeVisible();
   });
 
   test("Stats screen loads", async ({ page }) => {

@@ -26,7 +26,9 @@ test.describe("Mobile context menu guard", () => {
       await dismissWhatsNewModalIfOpen(page);
 
       if (route === "/play") {
-        await expect(page.getByRole("status", { name: /pieces placed/i }).first()).toBeVisible({
+        await expect(
+          page.getByRole("status", { name: /pieces placed/i }).first(),
+        ).toBeVisible({
           timeout: 15000,
         });
       } else {

@@ -18,7 +18,9 @@ test.describe("Play screen", () => {
   test("loads play screen with puzzle", async ({ page }) => {
     await page.goto("/play");
 
-    await expect(page.getByRole("status", { name: /pieces placed/i }).first()).toBeVisible({
+    await expect(
+      page.getByRole("status", { name: /pieces placed/i }).first(),
+    ).toBeVisible({
       timeout: 15000,
     });
     await expect(page.getByRole("button", { name: /open menu/i })).toBeVisible({
@@ -36,7 +38,9 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/play");
 
-    await expect(page.getByRole("status", { name: /pieces placed/i }).first()).toBeVisible({
+    await expect(
+      page.getByRole("status", { name: /pieces placed/i }).first(),
+    ).toBeVisible({
       timeout: 15000,
     });
     // Layout: board on top, tray below; tray always visible
@@ -58,11 +62,9 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByRole("menuitem", { name: /challenge friend/i })).toBeVisible(
-      {
-        timeout: 10000,
-      },
-    );
+    await expect(page.getByRole("menuitem", { name: /challenge friend/i })).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("completion overlay fits on mobile without body scroll", async ({ page }) => {

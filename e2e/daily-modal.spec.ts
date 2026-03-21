@@ -40,7 +40,9 @@ test.describe("Today's Puzzle modal", () => {
     });
     await expect(page.getByRole("button", { name: /master/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /extreme/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /extreme - 81 pieces/i })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /extreme - 81 pieces/i }),
+    ).toBeVisible();
   });
 
   test("starts puzzle when difficulty selected", async ({ page }) => {
@@ -57,7 +59,9 @@ test.describe("Today's Puzzle modal", () => {
     await page.getByRole("button", { name: /start puzzle/i }).click();
 
     await expect(page).toHaveURL(/\/play/, { timeout: 15000 });
-    await expect(page.getByRole("status", { name: /pieces placed/i }).first()).toBeVisible({
+    await expect(
+      page.getByRole("status", { name: /pieces placed/i }).first(),
+    ).toBeVisible({
       timeout: 15000,
     });
   });

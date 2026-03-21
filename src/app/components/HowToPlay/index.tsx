@@ -4,7 +4,7 @@ const TUTORIAL_KEY = "phuzzle:tutorialDone";
 
 export function useShouldShowTutorial(): [boolean, () => void] {
   const [showTutorial, setShowTutorial] = useState(
-    () => localStorage.getItem(TUTORIAL_KEY) !== "done"
+    () => localStorage.getItem(TUTORIAL_KEY) !== "done",
   );
 
   const dismissTutorial = useCallback(() => {
@@ -52,7 +52,15 @@ export function TutorialOverlay({
         }}
       >
         <h2 style={{ margin: "0 0 16px", fontSize: 20, fontWeight: 800 }}>How to Play</h2>
-        <ul style={{ margin: "0 0 20px", paddingLeft: 20, lineHeight: 1.7, fontSize: 14, color: "var(--color-text-secondary)" }}>
+        <ul
+          style={{
+            margin: "0 0 20px",
+            paddingLeft: 20,
+            lineHeight: 1.7,
+            fontSize: 14,
+            color: "var(--color-text-secondary)",
+          }}
+        >
           <li>Drag pieces from the tray onto the board</li>
           <li>Pieces snap when near the correct spot</li>
           <li>Pinch or scroll to zoom; drag the board to pan</li>

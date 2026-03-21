@@ -63,7 +63,10 @@ test.describe("Choose-photo mobile viewport fit", () => {
       await expect(page.getByRole("listbox", { name: /choose a puzzle/i })).toBeVisible();
       await expectNoBodyScroll(page);
 
-      await page.getByRole("option", { name: /select /i }).first().click();
+      await page
+        .getByRole("option", { name: /select /i })
+        .first()
+        .click();
       await expect(page.getByRole("dialog", { name: /puzzle setup/i })).toBeVisible();
       await expect(page.getByRole("group", { name: /choose difficulty/i })).toBeVisible();
       await expect(page.getByRole("button", { name: /start puzzle/i })).toBeVisible();

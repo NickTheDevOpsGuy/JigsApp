@@ -20,10 +20,16 @@ export function UndoRedoButtons({
         aria-label="Undo"
         title="Undo"
         style={{
-          appearance: "none", border: "1px solid var(--color-border)",
-          background: "var(--color-bg-elevated)", color: "var(--color-text-primary)",
-          padding: "6px 8px", borderRadius: 8, cursor: canUndo ? "pointer" : "not-allowed",
-          opacity: canUndo ? 1 : 0.4, display: "flex", alignItems: "center",
+          appearance: "none",
+          border: "1px solid var(--color-border)",
+          background: "var(--color-bg-elevated)",
+          color: "var(--color-text-primary)",
+          padding: "6px 8px",
+          borderRadius: 8,
+          cursor: canUndo ? "pointer" : "not-allowed",
+          opacity: canUndo ? 1 : 0.4,
+          display: "flex",
+          alignItems: "center",
         }}
       >
         <Undo2 size={16} aria-hidden />
@@ -35,10 +41,16 @@ export function UndoRedoButtons({
         aria-label="Redo"
         title="Redo"
         style={{
-          appearance: "none", border: "1px solid var(--color-border)",
-          background: "var(--color-bg-elevated)", color: "var(--color-text-primary)",
-          padding: "6px 8px", borderRadius: 8, cursor: canRedo ? "pointer" : "not-allowed",
-          opacity: canRedo ? 1 : 0.4, display: "flex", alignItems: "center",
+          appearance: "none",
+          border: "1px solid var(--color-border)",
+          background: "var(--color-bg-elevated)",
+          color: "var(--color-text-primary)",
+          padding: "6px 8px",
+          borderRadius: 8,
+          cursor: canRedo ? "pointer" : "not-allowed",
+          opacity: canRedo ? 1 : 0.4,
+          display: "flex",
+          alignItems: "center",
         }}
       >
         <Redo2 size={16} aria-hidden />

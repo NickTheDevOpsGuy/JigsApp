@@ -31,13 +31,18 @@ test.describe("Setup → Play flow", () => {
     await dialog.getByRole("button", { name: /nature/i }).click();
     await expect(page.getByRole("dialog", { name: /choose puzzle/i })).toBeVisible();
 
-    await page.getByRole("option", { name: /select /i }).first().click();
+    await page
+      .getByRole("option", { name: /select /i })
+      .first()
+      .click();
     await expect(page.getByRole("dialog", { name: /puzzle setup/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /start puzzle/i })).toBeEnabled();
     await page.getByRole("button", { name: /start puzzle/i }).click();
 
     await expect(page).toHaveURL(/\/play/);
-    await expect(page.getByRole("status", { name: /pieces placed/i }).first()).toBeVisible();
+    await expect(
+      page.getByRole("status", { name: /pieces placed/i }).first(),
+    ).toBeVisible();
   });
 
   test("setup supports advanced difficulties in the staged modal flow", async ({
@@ -48,6 +53,8 @@ test.describe("Setup → Play flow", () => {
     await page.getByRole("button", { name: /today's puzzle/i }).click();
     await expect(page.getByRole("dialog", { name: /today's puzzle/i })).toBeVisible();
     await page.getByRole("button", { name: /more options/i }).click();
-    await expect(page.getByRole("button", { name: /extreme - 81 pieces/i })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /extreme - 81 pieces/i }),
+    ).toBeVisible();
   });
 });

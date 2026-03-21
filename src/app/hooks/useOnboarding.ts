@@ -7,17 +7,21 @@ const FIRST_SNAP_KEY = "phuzzle:onboarding:firstSnap";
 
 export function useOnboarding(placedCount: number, totalCount: number): OnboardingState {
   const [needsTrayTip, setNeedsTrayTip] = useState(
-    () => localStorage.getItem(TRAY_TIP_KEY) !== "done"
+    () => localStorage.getItem(TRAY_TIP_KEY) !== "done",
   );
   const [needsZoomTip, setNeedsZoomTip] = useState(
-    () => totalCount >= 25 && localStorage.getItem(ZOOM_TIP_KEY) !== "done"
+    () => totalCount >= 25 && localStorage.getItem(ZOOM_TIP_KEY) !== "done",
   );
   const [showFirstSnapToast, setShowFirstSnapToast] = useState(false);
   const firstSnapShownRef = { current: false };
 
   // Show first-snap toast when first piece is placed
   useEffect(() => {
-    if (placedCount === 1 && !firstSnapShownRef.current && localStorage.getItem(FIRST_SNAP_KEY) !== "done") {
+    if (
+      placedCount === 1 &&
+      !firstSnapShownRef.current &&
+      localStorage.getItem(FIRST_SNAP_KEY) !== "done"
+    ) {
       firstSnapShownRef.current = true;
       setShowFirstSnapToast(true);
     }
