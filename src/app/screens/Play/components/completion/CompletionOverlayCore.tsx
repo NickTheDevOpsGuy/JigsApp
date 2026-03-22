@@ -3,7 +3,7 @@
  * Phase 2 stats bar slide down, Phase 3 achievement text. One primary Next Puzzle;
  * secondary actions in More Options and Share Results dropdowns. No confetti, no X close.
  */
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { AppModal } from "@/components/AppModal";
 import { useCompletionOverlayData } from "@/screens/Play/components/completion/useCompletionOverlayData";
@@ -47,10 +47,13 @@ export function CompletionOverlay({
   precisionBonusPoints: _precisionBonusPoints,
   uiTone: _uiTone,
   puzzleShareUrl = "/",
+  challengeShareReady = true,
+  ensureChallengeShareUrl,
   puzzleName,
   canReplay = false,
   onReplayClick,
   onNextPuzzle,
+  nextPuzzleLabel = "Next Puzzle",
   focusReturnRef,
   onCompletionRecorded,
   onNewBest,
@@ -261,6 +264,8 @@ export function CompletionOverlay({
           replayNextDropdownPosition={replayNextDropdownPosition}
           grid={grid}
           puzzleShareUrl={puzzleShareUrl}
+          challengeShareReady={challengeShareReady}
+          ensureChallengeShareUrl={ensureChallengeShareUrl}
           elapsedSeconds={elapsedSeconds}
           moveCount={moveCount}
           accuracyPercent={accuracyPercent}
@@ -276,6 +281,7 @@ export function CompletionOverlay({
           canReplay={canReplay}
           onReplayClick={onReplayClick}
           onNextPuzzle={onNextPuzzle}
+          nextPuzzleLabel={nextPuzzleLabel}
           onClose={onClose}
           isDaily={isDaily}
           focusReturnRef={focusReturnRef}

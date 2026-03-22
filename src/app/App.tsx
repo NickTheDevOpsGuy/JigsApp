@@ -8,27 +8,34 @@ import { initStreakFreeze } from "@/daily/dailyPuzzleCore";
 import { ensureSignedIn } from "@/supabase/auth";
 import { OfflineIndicator } from "@/components/OfflineIndicator/OfflineIndicator";
 import { ErrorBoundary } from "@/components/ErrorBoundary/ErrorBoundary";
+import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
+import {
+  loadMenuScreenModule,
+  loadPackDetailScreenModule,
+  loadPackListScreenModule,
+  loadStatsScreenModule,
+} from "@/screens/routeLoaders";
 import styles from "./App.module.css";
 
 // Route-level code splitting: load screens on demand to keep initial chunk smaller
 const MenuScreen = lazy(() =>
-  import("@/screens/Menu/MenuScreen").then((m) => ({ default: m.MenuScreen })),
+  loadMenuScreenModule().then((m) => ({ default: m.MenuScreen })),
 );
 const PlayScreen = lazy(() =>
-  import("@/screens/Play/PlayScreen").then((m) => ({ default: m.PlayScreen })),
+  loadPlayScreenModule().then((m) => ({ default: m.PlayScreen })),
 );
 const StatsScreen = lazy(() =>
-  import("@/screens/Stats/StatsScreen").then((m) => ({
+  loadStatsScreenModule().then((m) => ({
     default: m.StatsScreen,
   })),
 );
 const PackListScreen = lazy(() =>
-  import("@/screens/Packs/PackListScreen").then((m) => ({
+  loadPackListScreenModule().then((m) => ({
     default: m.PackListScreen,
   })),
 );
 const PackDetailScreen = lazy(() =>
-  import("@/screens/Packs/PackDetailScreen").then((m) => ({
+  loadPackDetailScreenModule().then((m) => ({
     default: m.PackDetailScreen,
   })),
 );

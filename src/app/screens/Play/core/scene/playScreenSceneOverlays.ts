@@ -49,6 +49,8 @@ export function buildCompletionProps(args: {
   pieceCutType: PieceCutType;
   isNewBest: boolean;
   puzzleShareUrl: string;
+  challengeShareReady: boolean;
+  ensureChallengeShareUrl: () => Promise<string>;
   puzzleName?: string;
   share: {
     copied: boolean;
@@ -70,6 +72,7 @@ export function buildCompletionProps(args: {
   canReplay: boolean;
   onReplayClick: () => void;
   onNextPuzzle: () => void;
+  nextPuzzleLabel?: string;
   focusReturnRef?: React.RefObject<HTMLButtonElement>;
   onCompletionRecorded?: (stats: { dailyStreak: number }) => void;
   onNewBest?: () => void;
@@ -91,6 +94,8 @@ export function buildCompletionProps(args: {
     pieceCutType,
     isNewBest,
     puzzleShareUrl,
+    challengeShareReady,
+    ensureChallengeShareUrl,
     puzzleName,
     share,
     onDownloadImage,
@@ -102,6 +107,7 @@ export function buildCompletionProps(args: {
     canReplay,
     onReplayClick,
     onNextPuzzle,
+    nextPuzzleLabel,
     onCompletionRecorded,
     onNewBest,
   } = args;
@@ -128,6 +134,8 @@ export function buildCompletionProps(args: {
     pieceCutType,
     isNewBest,
     puzzleShareUrl,
+    challengeShareReady,
+    ensureChallengeShareUrl,
     puzzleName,
     share,
     onDownloadImage,
@@ -140,6 +148,7 @@ export function buildCompletionProps(args: {
     canReplay,
     onReplayClick,
     onNextPuzzle,
+    nextPuzzleLabel,
     onCompletionRecorded,
     onNewBest,
     ...focusReturnRefProp,

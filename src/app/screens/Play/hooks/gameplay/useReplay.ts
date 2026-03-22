@@ -15,6 +15,20 @@ function getIntervalMs(speed: number): number {
   return Math.max(8, Math.floor(TICK_MS / speed));
 }
 
+function buildBlankReplaySnapshot(first: ReplaySnapshot): ReplaySnapshot {
+  return {
+    elapsedSeconds: 0,
+    moveCount: 0,
+    savedPieces: first.savedPieces.map((piece) => ({
+      ...piece,
+      isPlaced: false,
+      locked: false,
+      inTray: true,
+      groupId: piece.id,
+    })),
+  };
+}
+
 export type ReplaySnapshot = {
   elapsedSeconds: number;
   moveCount: number;
@@ -63,6 +77,12 @@ export function useReplay(
     setSnapshots([...list]);
   }, [manager, replayStateRef]);
 
+  const getReplayList = useCallback((): ReplaySnapshot[] => {
+    const list = snapshotsRef.current;
+    if (list.length === 0) return [];
+    return [buildBlankReplaySnapshot(list[0]), ...list];
+  }, []);
+
   const stopReplay = useCallback(() => {
     if (rafRef.current != null) {
       cancelAnimationFrame(rafRef.current);
@@ -78,14 +98,14 @@ export function useReplay(
   }, [manager, setState]);
 
   const startReplay = useCallback(() => {
-    const list = snapshotsRef.current;
+    const list = getReplayList();
     if (!manager || list.length === 0) return;
     setReplayIndex(0);
     manager.restoreFromSaved(list[0].savedPieces);
     setState(manager.getState());
     setIsReplaying(true);
     setIsReplayPaused(true); // Start paused so user presses Play to start
-  }, [manager, setState]);
+  }, [getReplayList, manager, setState]);
 
   const pauseReplay = useCallback(() => {
     if (rafRef.current != null) {
@@ -96,7 +116,7 @@ export function useReplay(
   }, []);
 
   const resumeReplay = useCallback(() => {
-    const list = snapshotsRef.current;
+    const list = getReplayList();
     if (!manager || list.length === 0) return;
     hasAdvancedThisResumeRef.current = false;
     // If user resumes from the end, restart from frame 0 so Play always replays.
@@ -107,11 +127,11 @@ export function useReplay(
     }
     setIsReplaying(true);
     setIsReplayPaused(false);
-  }, [manager, replayIndex, setState]);
+  }, [getReplayList, manager, replayIndex, setState]);
 
   useEffect(() => {
     if (!isReplaying || isReplayPaused || !manager) return;
-    const list = snapshotsRef.current;
+    const list = getReplayList();
     if (list.length === 0) return;
 
     const intervalMs = getIntervalMs(replaySpeed);
@@ -152,9 +172,10 @@ export function useReplay(
         rafRef.current = null;
       }
     };
-  }, [isReplaying, isReplayPaused, manager, setState, replaySpeed]);
+  }, [getReplayList, isReplaying, isReplayPaused, manager, setState, replaySpeed]);
 
-  const currentSnapshot = snapshots[replayIndex] ?? null;
+  const replaySnapshots = getReplayList();
+  const currentSnapshot = replaySnapshots[replayIndex] ?? null;
   const replayElapsedSeconds = currentSnapshot?.elapsedSeconds ?? 0;
   const replayMoveCount = currentSnapshot?.moveCount ?? 0;
 
@@ -172,7 +193,7 @@ export function useReplay(
   }, []);
 
   const goToStart = useCallback(() => {
-    const list = snapshotsRef.current;
+    const list = getReplayList();
     if (!manager || list.length === 0) return;
     if (rafRef.current != null) {
       cancelAnimationFrame(rafRef.current);
@@ -182,10 +203,10 @@ export function useReplay(
     manager.restoreFromSaved(list[0].savedPieces);
     setState(manager.getState());
     setIsReplayPaused(true);
-  }, [manager, setState]);
+  }, [getReplayList, manager, setState]);
 
   const goToEnd = useCallback(() => {
-    const list = snapshotsRef.current;
+    const list = getReplayList();
     if (!manager || list.length === 0) return;
     if (rafRef.current != null) {
       cancelAnimationFrame(rafRef.current);
@@ -197,11 +218,11 @@ export function useReplay(
     setState(manager.getState());
     setIsReplaying(false);
     setIsReplayPaused(true);
-  }, [manager, setState]);
+  }, [getReplayList, manager, setState]);
 
   const seekToIndex = useCallback(
     (index: number) => {
-      const list = snapshotsRef.current;
+      const list = getReplayList();
       if (!manager || list.length === 0) return;
       if (rafRef.current != null) {
         cancelAnimationFrame(rafRef.current);
@@ -213,7 +234,7 @@ export function useReplay(
       setState(manager.getState());
       setIsReplayPaused(true);
     },
-    [manager, setState],
+    [getReplayList, manager, setState],
   );
 
   /** Seek to the snapshot whose elapsedSeconds is closest to current + deltaSeconds (e.g. ±15s). */
@@ -234,7 +255,7 @@ export function useReplay(
       }
       seekToIndex(bestIdx);
     },
-    [manager, replayIndex, seekToIndex],
+    [getReplayList, manager, replayIndex, seekToIndex],
   );
 
   const setReplaySpeedWithChoice = useCallback((speed: number) => {
@@ -244,6 +265,7 @@ export function useReplay(
 
   return {
     snapshots,
+    replaySnapshots,
     recordSnapshot,
     isReplaying,
     isReplayPaused,

@@ -1,7 +1,6 @@
 /**
  * OnboardingTooltip – lightweight dismissible tip for onboarding (e.g. "Drag a piece to start").
  */
-import React from "react";
 import styles from "./OnboardingTooltip.module.css";
 
 type Props = {

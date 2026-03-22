@@ -14,6 +14,8 @@ export function CompletionOverlayShareMenu(props: {
   dropdownPosition: { top: number; left: number; minWidth: number } | null;
   grid?: { rows: number; cols: number };
   puzzleShareUrl: string;
+  challengeShareReady: boolean;
+  ensureChallengeShareUrl?: () => Promise<string>;
   elapsedSeconds: number;
   moveCount?: number;
   accuracyPercent: number;
@@ -35,6 +37,8 @@ export function CompletionOverlayShareMenu(props: {
     shareTriggerRef,
     copied,
     canNativeShare,
+    challengeShareReady,
+    ensureChallengeShareUrl,
     onShareProgress,
     onCopyProgress,
     onShareChallenge,
@@ -62,6 +66,14 @@ export function CompletionOverlayShareMenu(props: {
       setBusyAction(null);
     }
   };
+
+  const progressPreviewLines = shareProgressText
+    ? shareProgressText.split("\n").filter((line) => line.trim().length > 0).slice(0, 4)
+    : [];
+  const challengePreviewLines =
+    challengeShareReady && shareChallengeText
+      ? shareChallengeText.split("\n").filter((line) => line.trim().length > 0).slice(0, 3)
+      : [];
 
   return (
     <div className={styles.completeShareWrap} ref={shareRef}>
@@ -108,10 +120,16 @@ export function CompletionOverlayShareMenu(props: {
           </div>
           <div className={styles.completeShareActionsGroup}>
             <span className={styles.completeShareGroupLabel}>Share</span>
-            {shareProgressText && (
+            {progressPreviewLines.length > 0 && (
               <div className={styles.completeSharePreviewBlock}>
-                <span className={styles.completeSharePreviewLabel}>Preview</span>
-                <pre className={styles.completeSharePreviewText}>{shareProgressText}</pre>
+                <span className={styles.completeSharePreviewLabel}>Includes</span>
+                <div className={styles.completeSharePreviewList}>
+                  {progressPreviewLines.map((line) => (
+                    <span key={line} className={styles.completeSharePreviewLine}>
+                      {line}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
             <div
@@ -156,10 +174,11 @@ export function CompletionOverlayShareMenu(props: {
                   disabled={completionData.isGenerating || busyAction !== null}
                 >
                   <Image size={16} aria-hidden />
-                  <span>
+                  <span className={styles.completeShareActionCopy}>
                     {completionData.isGenerating || busyAction === "card"
                       ? "Preparing card..."
-                      : "Share Card"}
+                      : "Share card image"}
+                    <small>Adds the puzzle image</small>
                   </span>
                 </button>
                 {(onShareProgress || onCopyProgress) && (
@@ -183,16 +202,17 @@ export function CompletionOverlayShareMenu(props: {
                     disabled={busyAction !== null}
                   >
                     <Share2 size={16} aria-hidden />
-                    <span>
+                    <span className={styles.completeShareActionCopy}>
                       {busyAction === "share"
                         ? "Opening Share..."
                         : busyAction === "copy"
                           ? "Copying..."
-                          : copied
-                            ? "Copied!"
-                            : canNativeShare
+                        : copied
+                          ? "Copied!"
+                          : canNativeShare
                               ? "Share result"
                               : "Copy link"}
+                      <small>Time, moves, turns, and link</small>
                     </span>
                   </button>
                 )}
@@ -212,12 +232,13 @@ export function CompletionOverlayShareMenu(props: {
                     disabled={busyAction !== null}
                   >
                     <Copy size={16} aria-hidden />
-                    <span>
+                    <span className={styles.completeShareActionCopy}>
                       {busyAction === "copy"
                         ? "Copying..."
                         : copied
                           ? "Copied!"
                           : "Copy link"}
+                      <small>Send the exact puzzle URL</small>
                     </span>
                   </button>
                 )}
@@ -227,12 +248,25 @@ export function CompletionOverlayShareMenu(props: {
           {(onShareChallenge || onCopyChallenge) && (
             <div className={styles.completeShareActionsGroup}>
               <span className={styles.completeShareGroupLabel}>Challenge</span>
-              {shareChallengeText && (
+              {challengeShareReady && challengePreviewLines.length > 0 ? (
                 <div className={styles.completeSharePreviewBlock}>
-                  <span className={styles.completeSharePreviewLabel}>Preview</span>
-                  <pre className={styles.completeSharePreviewText}>
-                    {shareChallengeText}
-                  </pre>
+                  <span className={styles.completeSharePreviewLabel}>Challenge includes</span>
+                  <div className={styles.completeSharePreviewList}>
+                    {challengePreviewLines.map((line) => (
+                      <span key={line} className={styles.completeSharePreviewLine}>
+                        {line}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.completeSharePreviewBlock}>
+                  <span className={styles.completeSharePreviewLabel}>Challenge status</span>
+                  <div className={styles.completeSharePreviewList}>
+                    <span className={styles.completeSharePreviewLine}>
+                      Preparing an exact challenge link for this puzzle.
+                    </span>
+                  </div>
                 </div>
               )}
               <div
@@ -245,11 +279,20 @@ export function CompletionOverlayShareMenu(props: {
                     type="button"
                     role="menuitem"
                     className={styles.completeShareDropdownItem}
-                    title={canNativeShare ? "Challenge a friend" : "Copy challenge link"}
+                    title={
+                      challengeShareReady
+                        ? canNativeShare
+                          ? "Challenge a friend"
+                          : "Copy challenge link"
+                        : "Create exact challenge link"
+                    }
                     onClick={() =>
                       void runBusyAction("challenge", async () => {
+                        const baseChallengeUrl = ensureChallengeShareUrl
+                          ? await ensureChallengeShareUrl()
+                          : props.puzzleShareUrl;
                         const challengeUrl = buildChallengePlayUrl(
-                          props.puzzleShareUrl,
+                          baseChallengeUrl,
                           props.elapsedSeconds,
                           props.moveCount ?? 0,
                         );
@@ -265,7 +308,7 @@ export function CompletionOverlayShareMenu(props: {
                     disabled={busyAction !== null}
                   >
                     <Swords size={16} aria-hidden />
-                    <span>
+                    <span className={styles.completeShareActionCopy}>
                       {busyAction === "challenge"
                         ? canNativeShare
                           ? "Opening Share..."
@@ -273,6 +316,11 @@ export function CompletionOverlayShareMenu(props: {
                         : copied
                           ? "Copied!"
                           : "Challenge friend"}
+                      <small>
+                        {challengeShareReady
+                          ? "Same puzzle, same difficulty, your score to beat"
+                          : "Creates the exact puzzle link, then shares it"}
+                      </small>
                     </span>
                   </button>
                 </div>

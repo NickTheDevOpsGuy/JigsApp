@@ -35,7 +35,7 @@ export function trySnapToBoard(piece: Piece, snapTolerancePx: number): boolean {
 export function trySnapToNeighbor(
   a: Piece,
   b: Piece,
-  grid: GridSize,
+  _grid: GridSize,
   snapTolerancePx: number,
 ): boolean {
   if (a.rotation !== b.rotation) return false;

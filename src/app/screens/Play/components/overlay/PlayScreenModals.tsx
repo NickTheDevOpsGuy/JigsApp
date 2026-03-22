@@ -1,7 +1,6 @@
 /**
  * Play screen modal dialogs: resume choice, help choice, theme, puzzle picker, reset stats, clear cache.
  */
-import React from "react";
 import { ConfirmModal } from "@/components/Modal/Modal";
 import { HelpChoiceModal } from "@/components/HelpChoiceModal";
 import { ThemeModal } from "@/components/ThemeModal";

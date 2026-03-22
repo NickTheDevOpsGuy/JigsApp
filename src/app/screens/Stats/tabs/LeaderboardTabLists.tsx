@@ -16,7 +16,7 @@ export function renderTimeList(
   entries: LeaderboardEntry[],
   emptyMsg: string,
   rowAnimEpoch: number,
-  compact: boolean,
+  _compact: boolean,
   showChampionBadge = false,
   currentUserId?: string,
 ) {
@@ -59,7 +59,7 @@ export function renderTimeList(
 export function renderCompletionList(
   entries: { rank: number; count: number; displayName: string; userId?: string }[],
   rowAnimEpoch: number,
-  compact: boolean,
+  _compact: boolean,
   emptyMsg = "No completions yet. Play puzzles!",
   currentUserId?: string,
 ) {
@@ -90,7 +90,7 @@ export function renderCompletionList(
 export function renderEfficiencyList(
   entries: EfficiencyEntry[],
   rowAnimEpoch: number,
-  compact: boolean,
+  _compact: boolean,
   emptyMsg = "No efficiency data this week.",
   currentUserId?: string,
 ) {

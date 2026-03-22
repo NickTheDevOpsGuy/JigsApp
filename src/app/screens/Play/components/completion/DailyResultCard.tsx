@@ -81,7 +81,7 @@ function useNextPuzzleCountdown() {
 function buildEmojiGrid(
   pieceCount: number,
   elapsedSeconds: number,
-  moveCount: number,
+  _moveCount: number,
   usedHint: boolean,
   undoCount: number,
 ): string {

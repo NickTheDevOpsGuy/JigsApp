@@ -109,23 +109,30 @@
 /* Nav: compact, Next Puzzle primary */
 .navRow {
   flex-shrink: 0;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   align-items: stretch;
-  gap: 8px;
+  gap: 10px;
   padding: 0 12px 10px;
+  width: 100%;
   max-width: 100%;
   box-sizing: border-box;
 }
 
+.navRowSingle {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 320px;
+  margin: 0 auto;
+}
+
 .navBtnSecondary {
-  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 40px;
-  padding: 0 12px;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-btn);
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
@@ -148,13 +155,13 @@
 }
 
 .navBtnPrimary {
-  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 40px;
-  padding: 0 12px;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0 16px;
   border: none;
   border-radius: var(--radius-btn);
   background: var(--color-brand-primary);
@@ -210,13 +217,11 @@
   }
 
   .navRow {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     padding: 0 10px 10px;
   }
 
-  .navBtnSecondary,
-  .navBtnPrimary {
-    flex: none;
-    width: 100%;
+  .navRowSingle {
+    max-width: 100%;
   }
 }

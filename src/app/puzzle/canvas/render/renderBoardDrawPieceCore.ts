@@ -40,7 +40,7 @@ export function drawPiece(
   cols: number,
   rows: number,
   popMap: PopMap,
-  lockMap: LockMap,
+  _lockMap: LockMap,
   nowMs: number,
   debug: DebugFlags,
   isDragging: boolean,

@@ -396,7 +396,7 @@
   display: grid;
   gap: 8px;
   margin-bottom: 12px;
-  padding: 12px;
+  padding: 12px 14px;
   border: 1px solid color-mix(in srgb, var(--color-border) 84%, transparent);
   border-radius: 12px;
   background:
@@ -416,14 +416,16 @@
   color: var(--color-text-secondary);
 }
 
-.completeSharePreviewText {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-family: "SFMono-Regular", "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.82rem;
-  line-height: 1.45;
+.completeSharePreviewList {
+  display: grid;
+  gap: 6px;
+}
+
+.completeSharePreviewLine {
+  font-size: 0.87rem;
+  line-height: 1.4;
   color: var(--color-text-primary);
+  word-break: break-word;
 }
 
 .completeShareDropdown {
@@ -439,7 +441,7 @@
 
 .completeShareDropdownItem {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 10px 12px;
   background: none;
@@ -453,6 +455,17 @@
   transition:
     background 0.1s,
     border-color 0.1s;
+}
+
+.completeShareActionCopy {
+  display: grid;
+  gap: 2px;
+}
+
+.completeShareActionCopy small {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
 }
 
 .completeShareDropdownItem:hover {

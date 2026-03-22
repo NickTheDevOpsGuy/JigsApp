@@ -25,7 +25,6 @@ const CARD_RADIUS = 24;
 const PAD = 40;
 const HEADER_H = 56;
 const IMAGE_H = 800;
-const _STATS_H = 150;
 const CTA_H = 48;
 const FOOTER_H = 44;
 const GAP = 16;
@@ -108,7 +107,7 @@ export function useShareCardImage() {
         strokeRoundedRect(ctx, imageRect, 16, gold, 2);
         y += IMAGE_H + GAP;
 
-        // Stats: puzzle name, difficulty, time, moves
+        // Stats: puzzle name, difficulty, time, moves/turns
         const difficulty = getDifficultyLabel(args.pieceCount);
         const timeStr = formatTime(args.elapsedSeconds);
         const movesStr = String(args.moveCount ?? 0);
@@ -126,6 +125,7 @@ export function useShareCardImage() {
           `Difficulty: ${difficulty} (${args.pieceCount} pieces)`,
           `Time: ${timeStr}`,
           `Moves: ${movesStr}`,
+          `Turns: ${movesStr}`,
         ];
         statsLines.forEach((line) => {
           ctx.fillText(line, panel.x + panel.w / 2, y + lineHeight / 2);
@@ -133,10 +133,14 @@ export function useShareCardImage() {
         });
         y += GAP;
 
-        // CTA: Think you can beat me?
+        // CTA changes by share mode so result stays informational.
         ctx.font = "600 26px system-ui, -apple-system, sans-serif";
         ctx.fillStyle = "#F8FAFC";
-        ctx.fillText("Think you can beat me?", panel.x + panel.w / 2, y + CTA_H / 2);
+        const ctaText =
+          mode === "challenge"
+            ? "Can you best me? Prove it!"
+            : "Share your finished puzzle";
+        ctx.fillText(ctaText, panel.x + panel.w / 2, y + CTA_H / 2);
         y += CTA_H + 8;
 
         // Footer: phuzzle.app

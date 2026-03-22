@@ -2,14 +2,16 @@ import { defineConfig, devices } from "@playwright/test";
 
 const isCI = !!process.env.CI;
 const useDevServer = process.env.PW_USE_DEV_SERVER === "1";
-const localChromiumUse = isCI ? {} : { channel: "chrome" as const };
+const localChromiumUse =
+  !isCI && process.env.PW_USE_CHROME === "1" ? { channel: "chrome" as const } : {};
 
 /**
  * Playwright config for Phuzzle E2E tests.
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: "./e2e",
+  testDir: "./src/app",
+  testMatch: "**/*.e2e.spec.ts",
   timeout: 60_000,
   fullyParallel: true,
   forbidOnly: isCI,

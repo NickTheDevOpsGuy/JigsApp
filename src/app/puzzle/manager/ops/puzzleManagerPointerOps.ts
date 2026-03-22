@@ -174,12 +174,12 @@ export function pointerUpOp(params: {
   if (!params.drag.activeId) return params.drag;
 
   performance.mark("snap-neighbor-start");
-  const _snappedNeighbor = params.trySnapActiveGroupToNeighbor();
+  params.trySnapActiveGroupToNeighbor();
   performance.mark("snap-neighbor-end");
   performance.measure("snap-neighbor", "snap-neighbor-start", "snap-neighbor-end");
 
   performance.mark("snap-board-start");
-  const _snappedBoard = params.trySnapActiveGroupToBoard();
+  params.trySnapActiveGroupToBoard();
   performance.mark("snap-board-end");
   performance.measure("snap-board", "snap-board-start", "snap-board-end");
 

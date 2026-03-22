@@ -9,6 +9,7 @@ import { Loader } from "@/components/Loader";
 import { loadPacksData } from "@/data/packs/loadPacksData";
 import { getPackProgress } from "@/data/packs/packCompletion";
 import { getCurrentSeason } from "@/utils/seasons";
+import { loadPackDetailScreenModule } from "@/screens/routeLoaders";
 import type { PuzzlePack } from "@/data/packs/puzzlePacks";
 import {
   FeaturedPackHero,
@@ -47,6 +48,11 @@ export function PackListScreen() {
   /** All packs for horizontal rail (snap, arrows, no half cards). */
   const allPacks = useMemo(() => packsData?.PUZZLE_PACKS ?? [], [packsData]);
 
+  const openPack = (packId: string) => {
+    void loadPackDetailScreenModule();
+    nav(`/packs/${packId}`);
+  };
+
   useEffect(() => {
     loadPacksData().then(setPacksData);
   }, []);
@@ -65,7 +71,7 @@ export function PackListScreen() {
             <ArrowLeft size={20} />
           </button>
           <div className={styles.headerTitleRow}>
-            <h1 className={styles.title}>🎵 Puzzle Packs</h1>
+            <h1 className={styles.title}>Puzzle Packs</h1>
             <nav
               className={styles.stepIndicator}
               aria-label="Steps: Pack, Puzzle, Difficulty"
@@ -126,7 +132,7 @@ export function PackListScreen() {
                     setImgError((prev) => ({ ...prev, [featuredPack.id]: true }))
                   }
                   emoji={featuredPack.emoji}
-                  onClick={() => nav(`/packs/${featuredPack.id}`)}
+                  onClick={() => openPack(featuredPack.id)}
                 />
               )}
 
@@ -148,7 +154,7 @@ export function PackListScreen() {
                       return (
                         <PuzzlePackCard
                           key={pack.id}
-                          onClick={() => nav(`/packs/${pack.id}`)}
+                          onClick={() => openPack(pack.id)}
                           name={pack.name}
                           completed={completed}
                           total={total}
@@ -186,7 +192,7 @@ export function PackListScreen() {
                     return (
                       <PuzzlePackCard
                         key={pack.id}
-                        onClick={() => nav(`/packs/${pack.id}`)}
+                        onClick={() => openPack(pack.id)}
                         name={pack.name}
                         completed={completed}
                         total={total}

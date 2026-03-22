@@ -157,6 +157,8 @@ export function ReplaySolveModalControls({
     }
   };
 
+  const hasNextPuzzle = Boolean(onNextPuzzle);
+
   return (
     <>
       <div className={styles.seekRow}>
@@ -257,7 +259,9 @@ export function ReplaySolveModalControls({
         </button>
       </div>
 
-      <div className={styles.navRow}>
+      <div
+        className={`${styles.navRow} ${!hasNextPuzzle ? styles.navRowSingle : ""}`}
+      >
         <button
           type="button"
           className={styles.navBtnSecondary}

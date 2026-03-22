@@ -14,7 +14,7 @@ import {
   useCallback,
   type KeyboardEvent,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Puzzle, Check, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
@@ -22,6 +22,7 @@ import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/packs/samplePuzzles";
 import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
+import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import styles from "./ChoosePuzzleModal.module.css";
 
@@ -43,6 +44,7 @@ function filterPuzzles(puzzles: SamplePuzzle[], categoryId: string): SamplePuzzl
 
 export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState<Step>("category");
   const [selectedPuzzle, setSelectedPuzzle] = useState<SamplePuzzle | null>(null);
   const [difficultyIndex, setDifficultyIndex] = useState(1);
@@ -59,6 +61,19 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const getScrollMetrics = useCallback((el: HTMLDivElement) => {
+    const grid = el.firstElementChild as HTMLElement | null;
+    const firstTile = grid?.firstElementChild as HTMLElement | null;
+    if (!firstTile) return null;
+    const styles = window.getComputedStyle(grid ?? el);
+    const gap = Number.parseFloat(styles.columnGap || styles.gap || "0") || 0;
+    const cardWidth = firstTile.getBoundingClientRect().width;
+    const step = Math.max(1, cardWidth + gap);
+    const visibleCount = Math.max(1, Math.floor((el.clientWidth + gap) / step));
+    const maxIndex = Math.max(0, (grid?.children.length ?? 1) - visibleCount);
+    return { step, visibleCount, maxIndex };
+  }, []);
 
   const updateScrollState = useCallback(() => {
     const el = gridScrollRef.current;
@@ -119,20 +134,25 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     };
   }, [isOpen, step, updateScrollState, filteredPuzzles.length]);
 
-  const scrollGridBy = useCallback((direction: 1 | -1) => {
-    const el = gridScrollRef.current;
-    if (!el) return;
-    const grid = el.firstElementChild;
-    const firstTile = grid?.firstElementChild as HTMLElement | undefined;
-    const cardWidth = firstTile?.offsetWidth ?? 100;
-    const gap = 8;
-    const stepPx = Math.max(100, cardWidth + gap);
-    const target = Math.max(
-      0,
-      Math.min(el.scrollWidth - el.clientWidth, el.scrollLeft + stepPx * direction),
-    );
-    el.scrollTo({ left: target, behavior: "smooth" });
-  }, []);
+  const scrollGridBy = useCallback(
+    (direction: 1 | -1) => {
+      const el = gridScrollRef.current;
+      if (!el) return;
+      const metrics = getScrollMetrics(el);
+      if (!metrics) return;
+      const currentIndex = Math.round(el.scrollLeft / metrics.step);
+      const targetIndex = Math.max(
+        0,
+        Math.min(metrics.maxIndex, currentIndex + metrics.visibleCount * direction),
+      );
+      const target = Math.min(
+        Math.max(0, el.scrollWidth - el.clientWidth),
+        targetIndex * metrics.step,
+      );
+      el.scrollTo({ left: target, behavior: "smooth" });
+    },
+    [getScrollMetrics],
+  );
 
   const handleStart = () => {
     if (!selectedPuzzle) return;
@@ -144,7 +164,8 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     // Preload image into browser cache before navigating so play screen starts instantly
     const preload = new Image();
     preload.src = selectedPuzzle.fullImage;
-    onClose();
+    void loadPlayScreenModule();
+    if (location.pathname === "/play") onClose();
     navigate("/play");
   };
 
@@ -163,7 +184,8 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
       safeLocalStorage.setItem(STORAGE_KEY, dataUrl);
       safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
       safeLocalStorage.removeItem("phuzzle:dailyDate");
-      onClose();
+      void loadPlayScreenModule();
+      if (location.pathname === "/play") onClose();
       navigate("/play");
     };
     reader.readAsDataURL(file);
@@ -188,6 +210,8 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   };
 
   if (!isOpen) return null;
+
+  const categoryMeta = CATEGORIES.find((c) => c.id === filterCategory);
 
   const modalTitle =
     step === "category"
@@ -319,24 +343,22 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
       {step === "puzzle" && (
         <>
           <p className={styles.railLabel}>
-            {filterCategory !== "all" && CATEGORIES.find((c) => c.id === filterCategory)
-              ? `${CATEGORIES.find((c) => c.id === filterCategory)!.label ?? ""} ${CATEGORIES.find((c) => c.id === filterCategory)!.name}`.trim()
+            {filterCategory !== "all" && categoryMeta
+              ? `${categoryMeta.label ?? ""} ${categoryMeta.name}`.trim()
               : "All Packs"}{" "}
             — pick a puzzle
           </p>
           <div className={styles.gridScrollWrap}>
-            {(canScrollLeft || canScrollRight) && (
-              <button
-                type="button"
-                className={styles.gridScrollBtn}
-                onClick={() => scrollGridBy(-1)}
-                disabled={!canScrollLeft}
-                aria-label="Scroll left"
-                title="Scroll left"
-              >
-                <ChevronLeft size={22} aria-hidden />
-              </button>
-            )}
+            <button
+              type="button"
+              className={styles.gridScrollBtn}
+              onClick={() => scrollGridBy(-1)}
+              disabled={!canScrollLeft}
+              aria-label="Scroll left"
+              title="Scroll left"
+            >
+              <ChevronLeft size={22} aria-hidden />
+            </button>
             <div
               ref={gridScrollRef}
               className={styles.puzzleGridScroller}
@@ -366,18 +388,16 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                 ))}
               </div>
             </div>
-            {(canScrollLeft || canScrollRight) && (
-              <button
-                type="button"
-                className={styles.gridScrollBtn}
-                onClick={() => scrollGridBy(1)}
-                disabled={!canScrollRight}
-                aria-label="Scroll right"
-                title="Scroll right"
-              >
-                <ChevronRight size={22} aria-hidden />
-              </button>
-            )}
+            <button
+              type="button"
+              className={styles.gridScrollBtn}
+              onClick={() => scrollGridBy(1)}
+              disabled={!canScrollRight}
+              aria-label="Scroll right"
+              title="Scroll right"
+            >
+              <ChevronRight size={22} aria-hidden />
+            </button>
           </div>
           <div
             className={styles.gridScrollBar}
@@ -405,9 +425,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                 alt=""
                 className={styles.setupThumbImg}
               />
-            </div>
-            <div className={styles.setupHeaderText}>
-              <h2 className={styles.setupPuzzleName}>{selectedPuzzle.name}</h2>
             </div>
           </div>
           <div

@@ -203,7 +203,7 @@ export function ReplaySolveModal({
     const bottom = top + height;
     const cutoutRadius = 20;
     /** Keep playback + nav tucked just beneath the board. */
-    const controlsGapPx = 4;
+    const controlsGapPx = 14;
     const controlsTopPx = bottom + controlsGapPx;
     /* Align controls with board; cutoutBottomBar has padding-left: 16px */
     const barPaddingLeft = 16;

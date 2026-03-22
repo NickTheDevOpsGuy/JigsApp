@@ -1,7 +1,7 @@
 /**
  * TrayFilterButton – compact "Filter" dropdown; pops up above trigger on desktop and mobile.
  */
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, Filter } from "lucide-react";
 import styles from "./TrayFilterButton.module.css";

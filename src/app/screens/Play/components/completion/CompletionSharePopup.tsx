@@ -2,7 +2,6 @@
  * Share modal: Home button, then two share options side by side (Copy link, Share Card).
  * Readable contrast; optional Download.
  */
-import React from "react";
 import { Copy, Image, Download, Home } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { buildProgressShareMessage } from "@/screens/Play/core/share/shareMessages";

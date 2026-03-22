@@ -132,7 +132,8 @@ export function usePlayScreenInteractions(ctx: any) {
     replayBarOpen: scene.replayBarOpen,
   });
 
-  const { puzzleShareUrl } = usePlayScreenShareSession({
+  const { puzzleShareUrl, challengeShareReady, ensureChallengeShareUrl } =
+    usePlayScreenShareSession({
     isComplete: state?.isComplete ?? false,
     isDailySession: activeDailySession,
     sessionId,
@@ -268,6 +269,8 @@ export function usePlayScreenInteractions(ctx: any) {
     handleTrayPieceClick,
     puzzleShareUrl,
     share,
+    challengeShareReady,
+    ensureChallengeShareUrl,
     handleSharePuzzle,
     handleDownloadImage,
     trayPieces,

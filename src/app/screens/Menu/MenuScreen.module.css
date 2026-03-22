@@ -1,3 +1,474 @@
-@import "./MenuScreen.base.module.css";
-@import "./MenuScreen.layout.module.css";
-@import "./MenuScreen.responsive.module.css";
+/* ─────────────────────────────────────────────────────
+   MenuScreen
+   On mobile  → page fills the real screen natively
+   On desktop → outer canvas centers a phone-shell preview
+   ───────────────────────────────────────────────────── */
+
+/* ── Outer canvas: fills viewport on all sizes ── */
+.canvas {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: var(--app-vh-stable, 100dvh);
+  background: #080810;
+  /* desktop gets a subtle vignette so the shell lifts off */
+  background-image: radial-gradient(
+    ellipse 70% 55% at 50% 0%,
+    rgba(99, 102, 241, 0.07) 0%,
+    transparent 65%
+  );
+}
+
+/* ── Phone shell: the actual mobile UI container ── */
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 430px; /* iPhone 14 Pro max width */
+  min-height: var(--app-vh-stable, 100dvh);
+
+  /* On real mobile this is the screen background */
+  background: var(--color-bg-primary, #0f0f17);
+  background-image: radial-gradient(
+    ellipse 80% 30% at 50% -2%,
+    rgba(99, 102, 241, 0.13) 0%,
+    transparent 65%
+  );
+
+  padding-top: max(14px, env(safe-area-inset-top, 14px));
+  padding-bottom: max(28px, env(safe-area-inset-bottom, 28px));
+  padding-left: 22px;
+  padding-right: 22px;
+  box-sizing: border-box;
+  overscroll-behavior: none;
+}
+
+/* On desktop: give the shell a visible phone-frame feel */
+@media (min-width: 500px) {
+  .canvas {
+    align-items: center;
+    padding: 32px 0;
+  }
+
+  .page {
+    min-height: 0; /* natural height, not viewport */
+    height: auto;
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+      0 32px 80px rgba(0, 0, 0, 0.7),
+      0 8px 24px rgba(0, 0, 0, 0.4);
+    /* Ensure content fills the phone shell naturally */
+    padding-top: 20px;
+    padding-bottom: 32px;
+  }
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.logoMark {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.logoText {
+  font-family: "Fredoka", system-ui, sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--color-text-primary, #f1f1f5);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBtn {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  background: var(--color-bg-elevated, rgba(255, 255, 255, 0.05));
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.5));
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.iconBtn:hover {
+  background: var(--color-bg-card, rgba(255, 255, 255, 0.09));
+  color: var(--color-text-primary, #f1f1f5);
+}
+
+.feedbackEmoji {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ── Main content ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+}
+
+/* ── Puzzle label ── */
+.puzzleLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 14px;
+}
+
+.puzzleLabelTag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-brand-primary, #6366f1);
+  opacity: 0.9;
+}
+
+.puzzleLabelNum {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--color-text-primary, #f1f1f5);
+  line-height: 1.1;
+}
+
+/* ── Primary CTA ── */
+.primaryBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 17px 20px;
+  gap: 12px;
+  background: var(--color-brand-primary, #6366f1);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 4px 20px rgba(99, 102, 241, 0.3);
+  transition:
+    opacity 0.15s,
+    transform 0.12s,
+    box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.primaryBtn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 8px 28px rgba(99, 102, 241, 0.38);
+}
+
+.primaryBtn:active {
+  transform: scale(0.985);
+  opacity: 1;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
+}
+
+.primaryBtnDone {
+  background: var(--color-bg-elevated, rgba(255, 255, 255, 0.06));
+  color: var(--color-text-primary, #f1f1f5);
+  box-shadow: none;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+}
+
+.primaryBtnDone:hover {
+  opacity: 0.8;
+  box-shadow: none;
+}
+
+.primaryBtnInner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.primaryBtnTitle {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.primaryBtnSub {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.68;
+  font-variant-numeric: tabular-nums;
+}
+
+.primaryBtnArrow {
+  flex-shrink: 0;
+  opacity: 0.75;
+  transition: transform 0.15s;
+}
+
+.primaryBtn:hover .primaryBtnArrow {
+  transform: translateX(2px);
+}
+
+/* ── Streak row ── */
+.streakRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0 0;
+}
+
+.weeklyCard {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(99, 102, 241, 0.24);
+  background:
+    linear-gradient(180deg, rgba(99, 102, 241, 0.14), rgba(99, 102, 241, 0.04)),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+}
+
+.weeklyCardHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.weeklyCardTag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a5b4fc;
+}
+
+.weeklyCardCount {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-primary, #f1f1f5);
+}
+
+.weeklyCardText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(241, 241, 245, 0.78);
+}
+
+.streakStat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.streakIcon {
+  color: #f97316;
+  flex-shrink: 0;
+}
+
+.freezeIcon {
+  color: #60a5fa;
+  flex-shrink: 0;
+}
+
+.streakVal {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary, #f1f1f5);
+  font-variant-numeric: tabular-nums;
+}
+
+.streakUnit {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.45));
+}
+
+/* Week dots — right-aligned */
+.weekDots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+}
+
+.dotWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-border, rgba(255, 255, 255, 0.12));
+  transition:
+    background 0.2s,
+    transform 0.15s;
+}
+
+.dotDone {
+  background: var(--color-brand-primary, #6366f1);
+}
+
+.dotToday {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+
+.dotToday.dotDone {
+  background: var(--color-brand-primary, #6366f1);
+}
+
+.dotDay {
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.35));
+  text-transform: uppercase;
+}
+
+.dotDayToday {
+  color: var(--color-brand-primary, #6366f1);
+}
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  background: var(--color-border, rgba(255, 255, 255, 0.08));
+  margin: 22px 0;
+}
+
+/* ── Secondary nav rows ── */
+.secondaryNav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.secondaryRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--color-text-primary, #f1f1f5);
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.secondaryRow:hover {
+  background: var(--color-bg-elevated, rgba(255, 255, 255, 0.05));
+}
+
+.secondaryRow:active {
+  background: var(--color-bg-card, rgba(255, 255, 255, 0.08));
+}
+
+.secondaryIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--color-bg-elevated, rgba(255, 255, 255, 0.06));
+  color: var(--color-brand-primary, #6366f1);
+  flex-shrink: 0;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+}
+
+.secondaryText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.secondaryLabel {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  color: var(--color-text-primary, #f1f1f5);
+}
+
+.secondaryDesc {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.42));
+}
+
+.secondaryArrow {
+  flex-shrink: 0;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.3));
+  transition: transform 0.12s;
+}
+
+.secondaryRow:hover .secondaryArrow {
+  transform: translateX(2px);
+}
+
+/* ── Short screens ── */
+@media (max-height: 700px) {
+  .main {
+    padding-top: 12px;
+  }
+  .puzzleLabel {
+    margin-bottom: 10px;
+  }
+  .puzzleLabelNum {
+    font-size: 18px;
+  }
+  .streakRow {
+    padding-top: 12px;
+  }
+  .divider {
+    margin: 14px 0;
+  }
+}

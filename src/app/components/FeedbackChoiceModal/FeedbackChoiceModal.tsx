@@ -1,19 +1,65 @@
 /**
  * FeedbackChoiceModal – choose Report a bug or Suggest a feature.
- * Opens mailto for the chosen type; caller can pass custom email or use default.
+ * Opens the configured feedback forms for the chosen type via POST submission.
  */
 import { Modal } from "@/components/Modal/Modal";
+import { FEEDBACK_FORM_TARGETS, normalizeFeedbackFormUrl } from "./feedbackLinks";
 import styles from "./FeedbackChoiceModal.module.css";
 
-const DEFAULT_EMAIL = "anickclark@gmail.com";
+type FeedbackFormFields = {
+  subject: string;
+  body?: string;
+  environment?: string;
+};
 
-export function buildFeedbackMailtoUrl(subject: string, body: string) {
-  return `mailto:${DEFAULT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+export function buildFeedbackFormSubmission(
+  target: string,
+  subject: string,
+  body?: string,
+  environmentSnippet?: string,
+) {
+  const action = normalizeFeedbackFormUrl(target);
+  if (!action) return null;
+
+  const fields: FeedbackFormFields = { subject };
+  if (body) fields.body = body;
+  if (environmentSnippet) fields.environment = environmentSnippet;
+
+  return { action, method: "POST" as const, target: "_blank", fields };
 }
 
-function openMailto(subject: string, body: string) {
-  const encoded = buildFeedbackMailtoUrl(subject, body);
-  window.location.href = encoded;
+function submitFeedbackForm(
+  target: string,
+  subject: string,
+  body?: string,
+  environmentSnippet?: string,
+) {
+  const submission = buildFeedbackFormSubmission(
+    target,
+    subject,
+    body,
+    environmentSnippet,
+  );
+  if (!submission) return;
+
+  const form = document.createElement("form");
+  form.action = submission.action;
+  form.method = submission.method;
+  form.target = submission.target;
+  form.style.display = "none";
+
+  for (const [name, value] of Object.entries(submission.fields)) {
+    if (!value) continue;
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+  form.remove();
 }
 
 type FeedbackChoiceModalProps = {
@@ -29,21 +75,22 @@ export function FeedbackChoiceModal({
   environmentSnippet,
 }: FeedbackChoiceModalProps) {
   const handleReportBug = () => {
-    const body = [
+    submitFeedbackForm(
+      FEEDBACK_FORM_TARGETS.bug,
+      "Phuzzle Bug Report",
       "What went wrong?",
-      "",
-      "---",
-      environmentSnippet ? `Environment:\n${environmentSnippet}` : "",
-    ]
-      .filter(Boolean)
-      .join("\n");
-    openMailto("Phuzzle Bug Report", body);
+      environmentSnippet,
+    );
     onClose();
   };
 
   const handleSuggestFeature = () => {
-    const body = "I'd like to suggest:\n\n";
-    openMailto("Phuzzle Feature Request", body);
+    submitFeedbackForm(
+      FEEDBACK_FORM_TARGETS.feature,
+      "Phuzzle Feature Request",
+      "I'd like to suggest:",
+      environmentSnippet,
+    );
     onClose();
   };
 

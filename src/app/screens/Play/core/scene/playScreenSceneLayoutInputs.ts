@@ -67,6 +67,8 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     handleDownloadImage,
     handleNewGame,
     puzzleShareUrl,
+    challengeShareReady,
+    ensureChallengeShareUrl,
     puzzleName,
     share,
     handlePointerDown,
@@ -96,6 +98,11 @@ export function usePlayScreenLayoutInputs(ctx: any) {
   const completionIsDaily = isDailySession || completionDailyRef.current;
 
   const showCompletionOverlay = (isComplete && scene.showWinOverlay) || showE2ECompletion;
+  const nextPuzzleLabel = completionIsDaily
+    ? "Play today's puzzle"
+    : searchParams?.get("pack")
+      ? "One more from this pack"
+      : "New puzzle";
   const completionProps = buildCompletionProps({
     focusReturnRef: scene.completionFocusRef,
     showCompletionOverlay,
@@ -116,6 +123,8 @@ export function usePlayScreenLayoutInputs(ctx: any) {
       state?.grid != null &&
       (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds),
     puzzleShareUrl,
+    challengeShareReady,
+    ensureChallengeShareUrl,
     puzzleName,
     share: {
       copied: share.copied,
@@ -147,6 +156,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
       scene.setReplayBarOpen(true);
     },
     onNextPuzzle: handleNewGame,
+    nextPuzzleLabel,
     onCompletionRecorded: (stats) => {
       if (stats.dailyStreak === 7) {
         scene.setShareToast("7-day streak! 🔥");
@@ -174,7 +184,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     speed: behavior.replay.replaySpeed,
     onSpeedChange: behavior.replay.setReplaySpeed,
     currentIndex: behavior.replay.replayIndex,
-    totalSnapshots: behavior.replay.snapshots.length,
+    totalSnapshots: behavior.replay.replaySnapshots.length,
     elapsedSeconds: behavior.replay.replayElapsedSeconds,
     totalSeconds:
       behavior.replay.snapshots.length > 0
@@ -254,7 +264,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     postCompletionCta:
       scene.completionDismissed && state?.isComplete
         ? {
-            label: completionIsDaily ? "Play today's puzzle" : "One more from this pack",
+            label: nextPuzzleLabel,
             onNext: handleNewGame,
           }
         : null,

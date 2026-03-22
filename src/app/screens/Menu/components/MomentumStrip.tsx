@@ -17,11 +17,11 @@ export function MomentumStrip({
   recentDailyStatuses,
 }: MomentumStripProps) {
   return (
-    <div className={`${styles.momentumCard} ${styles.actionCardFullWidth}`}>
+    <div className={styles.momentumStrip}>
       <div className={styles.momentumSummary} aria-label="Daily progress summary">
         <div className={styles.momentumMetric}>
           <Flame size={16} aria-hidden />
-          <span>{streak} day streak</span>
+          <span>{streak} streak</span>
         </div>
         <div className={styles.momentumMetric}>
           <Snowflake size={16} aria-hidden />

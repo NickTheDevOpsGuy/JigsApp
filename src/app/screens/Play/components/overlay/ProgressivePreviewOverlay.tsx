@@ -2,7 +2,7 @@
  * ProgressivePreviewOverlay – reveals image only where pieces are correctly placed.
  * No full preview; small revealed regions per correct placement.
  */
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import type { Piece } from "@/puzzle/core/types";
 
 type Props = {

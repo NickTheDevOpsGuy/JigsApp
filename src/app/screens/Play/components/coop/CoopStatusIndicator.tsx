@@ -2,7 +2,6 @@
  * CoopStatusIndicator – small status for co-op Realtime connection.
  * Visible only when degraded (reconnecting/disconnected); text + icon so not color-only.
  */
-import React from "react";
 import { WifiOff, Loader2 } from "lucide-react";
 import type { RealtimeStatus } from "@/screens/Play/hooks/gameplay/usePuzzleSession";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";

@@ -25,16 +25,6 @@ export function getNavControlsModesItems(
       subMenu: "navigation",
     },
     {
-      id: "new",
-      section: "settings",
-      visible: true,
-      label: "New puzzle",
-      sortKey: "New puzzle",
-      title: "Start a fresh puzzle",
-      onClick: c(props.onNewPuzzle),
-      subMenu: "navigation",
-    },
-    {
       id: "startOver",
       section: "settings",
       visible: !!props.onStartThisPuzzleOver && !props.isComplete,

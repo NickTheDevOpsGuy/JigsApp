@@ -18,6 +18,7 @@ import {
   setDailyPreferredDifficultyIndex,
 } from "@/daily/dailyPuzzleCore";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
+import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import styles from "./DailyDifficultyModal.module.css";
 
 const DIFFICULTY_COLORS = [
@@ -79,13 +80,25 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   if (!isOpen) return null;
   if (!dailyModule)
     return (
-      <Modal isOpen onClose={onClose} title="Today's Puzzle" showCloseButton>
+      <Modal
+        isOpen
+        onClose={onClose}
+        title="Today's Puzzle"
+        showCloseButton
+        variant="choosePuzzle"
+      >
         <p className={styles.subtitle}>Loading…</p>
       </Modal>
     );
   if (!puzzle)
     return (
-      <Modal isOpen onClose={onClose} title="Today's Puzzle" showCloseButton>
+      <Modal
+        isOpen
+        onClose={onClose}
+        title="Today's Puzzle"
+        showCloseButton
+        variant="choosePuzzle"
+      >
         <p className={styles.subtitle}>No puzzles available.</p>
       </Modal>
     );
@@ -107,6 +120,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     );
     if (result) {
       setDailyPreferredDifficultyIndex(selectedIndex);
+      void loadPlayScreenModule();
       onClose();
       navigate("/play");
     }
@@ -121,6 +135,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       onClose={onClose}
       title="Today's Puzzle"
       showCloseButton={true}
+      variant="choosePuzzle"
     >
       <div className={styles.headerCustom}>
         <Puzzle size={24} className={styles.headerIcon} />

@@ -22,8 +22,6 @@ export function StatsScreen() {
   const { loadData, handleSaveProfile } = useStatsScreenData(configured, state);
 
   const weeklyCompleted = Math.max(0, Math.min(7, state.weeklyAlbumProgress));
-  const _weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
-  const _masteryPuzzlesRemaining = Math.max(0, 1 - (state.stats?.masteryStreak ?? 0));
   const headerTitle =
     state.activeTab === "leaderboard"
       ? "Board"

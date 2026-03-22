@@ -14,6 +14,8 @@ import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
+import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
+import { loadPackListScreenModule } from "@/screens/routeLoaders";
 import { PuzzlePackDetail } from "./components";
 
 const DEFAULT_GRID_INDEX = 1;
@@ -61,6 +63,7 @@ export function PackDetailScreen() {
     clearPuzzleState();
     safeLocalStorage.setItem(STORAGE_KEY, puzzle.fullImage);
     safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
+    void loadPlayScreenModule();
     nav("/play");
   };
 
@@ -125,7 +128,10 @@ export function PackDetailScreen() {
           <button
             type="button"
             className={styles.backBtn}
-            onClick={() => nav("/packs")}
+            onClick={() => {
+              void loadPackListScreenModule();
+              nav("/packs");
+            }}
             aria-label="Back to packs"
             title="Back to packs"
           >
@@ -150,7 +156,10 @@ export function PackDetailScreen() {
               <button
                 type="button"
                 className={`${styles.stepItem} ${styles.stepItemDone}`}
-                onClick={() => nav("/packs")}
+                onClick={() => {
+                  void loadPackListScreenModule();
+                  nav("/packs");
+                }}
                 title="Back to packs"
               >
                 <span className={styles.stepNum} aria-hidden>

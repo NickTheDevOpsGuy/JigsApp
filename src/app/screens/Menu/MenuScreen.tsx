@@ -1,322 +1,229 @@
 /**
- * MenuScreen – mobile-first home with one clear play CTA and lightweight daily momentum.
+ * MenuScreen – full-bleed mobile home. Fills the screen, no floating card.
+ * Primary: Play Today. Secondary: Packs + Quick Play as rows. Tertiary: Feedback link.
  */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Megaphone, Trophy } from "lucide-react";
-
+import { Package, ImagePlus, ChevronRight, Flame, Snowflake, Trophy } from "lucide-react";
+import { useHomeData } from "./hooks/useHomeData";
+import type { WeekDot } from "./hooks/useHomeData";
+import { ChoosePuzzleModal } from "@/components/ChoosePuzzleModal";
+import { PackChoiceModal } from "@/components/PackChoiceModal";
+import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
+import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
+import { loadStatsScreenModule } from "@/screens/routeLoaders";
+import { STORAGE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import styles from "./MenuScreen.module.css";
 
-import logoImg from "@/assets/ui/phuzzle-logo-512.png";
-import { AdvancedModal } from "@/components/AdvancedModal";
-import { AboutModal } from "@/components/AboutModal";
-import { ChoosePuzzleModal } from "@/components/ChoosePuzzleModal";
-import { DailyCountdown } from "@/components/DailyCountdown/DailyCountdown";
-import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
-import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
-import { HelpChoiceModal } from "@/components/HelpChoiceModal";
-import { TutorialOverlay } from "@/components/HowToPlay";
-import { ConfirmModal } from "@/components/Modal/Modal";
-import { PackChoiceModal } from "@/components/PackChoiceModal";
-import { ShortcutsModal } from "@/components/ShortcutsModal/ShortcutsModal";
-import { WhatsNewModal } from "@/components/WhatsNew";
-import { shouldShowChangelog } from "@/data/content/changelog";
-import { preloadPacksData, preloadPuzzleCatalog } from "@/data/packs/loadPacksData";
-import { formatTime } from "@/screens/Play/core/utils/playUtils";
-import { BEST_TIME_PREFIX } from "@/screens/Play/core/time/timeMode";
-import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
-import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import { HomeTopBar } from "@/screens/Menu/components/HomeTopBar";
-import { MomentumStrip } from "@/screens/Menu/components/MomentumStrip";
-import { PrimaryDailyAction } from "@/screens/Menu/components/PrimaryDailyAction";
-import { ResumePuzzleCard } from "@/screens/Menu/components/ResumePuzzleCard";
-import { SecondaryActions } from "@/screens/Menu/components/SecondaryActions";
-import { useMenuHomeData } from "@/screens/Menu/hooks/useMenuHomeData";
-import { isDailyPuzzleSession } from "@/daily/dailyPuzzle";
-
-const STAR_ICON = "/assets/star.png";
-
-function getMenuDate(): string {
-  return new Date().toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-const MENU_TAGLINES = [
-  "Open the app. Start the daily. Keep the streak moving.",
-  "Your daily puzzle is ready when you are.",
-  "One puzzle, one clean win.",
-  "Fast start. Sharp finish.",
-  "Today’s puzzle is waiting for you.",
-  "A quick play session beats scrolling.",
-  "Small challenge. Solid payoff.",
-];
-
-function getMenuTagline(): string {
-  const day = new Date().getDay();
-  return MENU_TAGLINES[day] ?? MENU_TAGLINES[0];
-}
-
-function formatSavedAt(savedAt: number): string {
-  return new Date(savedAt).toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
 export function MenuScreen() {
-  const nav = useNavigate();
-  const { menuSnapshot, todayPlayersSolved, refreshSnapshot } = useMenuHomeData();
-  const [starImgFailed, setStarImgFailed] = useState(false);
-  const [showWhatsNew, setShowWhatsNew] = useState(false);
-  const [showDailyModal, setShowDailyModal] = useState(false);
-  const [showPackModal, setShowPackModal] = useState(false);
-  const [showChoosePhotoModal, setShowChoosePhotoModal] = useState(false);
-  const [showHelpChoice, setShowHelpChoice] = useState(false);
-  const [showFeedbackChoice, setShowFeedbackChoice] = useState(false);
-  const [showHowToPlay, setShowHowToPlay] = useState(false);
-  const [showShortcuts, setShowShortcuts] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [showClearCacheConfirm, setShowClearCacheConfirm] = useState(false);
-  const [showResetStatsConfirm, setShowResetStatsConfirm] = useState(false);
-
+  const navigate = useNavigate();
+  const [showChoosePuzzleModal, setShowChoosePuzzleModal] = useState(false);
+  const [showPackChoiceModal, setShowPackChoiceModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const {
     streak,
-    savedPuzzle,
-    todayCompleted,
-    todayTime,
-    streakFreezeCount,
-    dailyPuzzleNumber,
-    recentDailyStatuses,
-  } = menuSnapshot;
+    freezes,
+    puzzleNumber,
+    gridLabel,
+    isCompleted,
+    todayTimeLabel,
+    weekDots,
+    weeklyCompleted,
+    weeklyRemaining,
+  } = useHomeData();
 
-  const hasDaily = true;
-  const savedPuzzleProgress = savedPuzzle
-    ? Math.round(
-        (savedPuzzle.pieces.filter((piece) => piece.isPlaced).length /
-          Math.max(1, savedPuzzle.pieces.length)) *
-          100,
-      )
-    : null;
-  const hasInProgressDaily =
-    Boolean(savedPuzzle) && isDailyPuzzleSession() && !todayCompleted;
+  const handleDailyPlay = () => {
+    void loadPlayScreenModule();
+    navigate("/play?daily=1");
+  };
 
-  const primaryStatus = hasInProgressDaily
-    ? savedPuzzleProgress != null
-      ? `${savedPuzzleProgress}% solved so far`
-      : `Daily #${dailyPuzzleNumber} is waiting`
-    : todayCompleted
-      ? todayTime != null
-        ? `Completed in ${formatTime(todayTime)}`
-        : "Completed today"
-      : `Daily #${dailyPuzzleNumber} is live`;
+  const handleQuickPlay = () => {
+    const hasImage = !!safeLocalStorage.getItem(STORAGE_KEY);
+    if (hasImage) {
+      void loadPlayScreenModule();
+      navigate("/play");
+      return;
+    }
+    setShowChoosePuzzleModal(true);
+  };
 
-  const momentumHint = todayCompleted
-    ? "Fresh puzzle lands tomorrow"
-    : streak > 0 && streak < 5
-      ? `Push your streak to ${streak + 1}`
-      : streakFreezeCount > 0
-        ? `${streakFreezeCount} freeze${streakFreezeCount === 1 ? "" : "s"} banked`
-        : "Daily waiting";
+  const handlePacks = () => {
+    void loadPlayScreenModule();
+    setShowPackChoiceModal(true);
+  };
+  const handleStats = () => {
+    void loadStatsScreenModule();
+    navigate("/stats");
+  };
 
-  useEffect(() => {
-    if (shouldShowChangelog()) setShowWhatsNew(true);
-  }, []);
-
-  useEffect(() => {
-    preloadPacksData();
-    preloadPuzzleCatalog();
-  }, []);
+  const handleFeedback = () => setShowFeedbackModal(true);
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <HomeTopBar
-          logoSrc={logoImg}
-          menuDate={getMenuDate()}
-          onOpenStats={() => nav("/stats")}
-          onOpenHelp={() => setShowHelpChoice(true)}
-          statsIcon={<Trophy size={22} />}
-        />
+    <>
+      <div className={styles.canvas}>
+        <div className={styles.page}>
+          {/* ─── Header ─── */}
+          <header className={styles.header}>
+            <div className={styles.logo}>
+              <span className={styles.logoMark} aria-hidden>
+                🧩
+              </span>
+              <span className={styles.logoText}>Phuzzle</span>
+            </div>
+            <div className={styles.headerActions}>
+              <button
+                type="button"
+                className={styles.iconBtn}
+                onClick={handleFeedback}
+                aria-label="Feedback"
+                title="Feedback"
+                data-testid="menu-feedback-action"
+              >
+                <span className={styles.feedbackEmoji} aria-hidden>
+                  📣
+                </span>
+              </button>
+              <button
+                type="button"
+                className={styles.iconBtn}
+                onClick={handleStats}
+                aria-label="View stats"
+                title="Stats"
+              >
+                <Trophy size={18} aria-hidden />
+              </button>
+            </div>
+          </header>
 
-        <div className={styles.header}>
-          <div className={styles.headerBlurb}>
-            <p className={styles.teaserLine}>
-              {todayPlayersSolved != null && todayPlayersSolved >= 10
-                ? `${todayPlayersSolved.toLocaleString()} players solved today.`
-                : getMenuTagline()}
-            </p>
-          </div>
-        </div>
+          {/* ─── Main content ─── */}
+          <main className={styles.main}>
+            {/* Daily puzzle label */}
+            <div className={styles.puzzleLabel}>
+              <span className={styles.puzzleLabelTag}>TODAY'S PUZZLE</span>
+              <span className={styles.puzzleLabelNum}>Daily #{puzzleNumber}</span>
+            </div>
 
-        <div className={styles.actionsGrid}>
-          <PrimaryDailyAction
-            hasDaily={hasDaily}
-            todayCompleted={todayCompleted}
-            hasInProgressDaily={hasInProgressDaily}
-            primaryStatus={primaryStatus}
-            starIconSrc={STAR_ICON}
-            starImgFailed={starImgFailed}
-            onStarError={() => setStarImgFailed(true)}
-            onClick={() => {
-              if (hasInProgressDaily) {
-                nav("/play");
-                return;
+            {/* Primary CTA */}
+            <button
+              type="button"
+              className={`${styles.primaryBtn} ${isCompleted ? styles.primaryBtnDone : ""}`}
+              onClick={handleDailyPlay}
+              aria-label={
+                isCompleted
+                  ? "Today's puzzle complete — play again"
+                  : "Play today's puzzle"
               }
-              setShowDailyModal(true);
-            }}
-          />
+            >
+              <div className={styles.primaryBtnInner}>
+                <span className={styles.primaryBtnTitle}>
+                  {isCompleted ? "Completed ✓" : "Play Today"}
+                </span>
+                <span className={styles.primaryBtnSub}>
+                  {gridLabel}
+                  {todayTimeLabel ? ` · ${todayTimeLabel}` : ""}
+                </span>
+              </div>
+              <ChevronRight size={20} className={styles.primaryBtnArrow} aria-hidden />
+            </button>
 
-          <MomentumStrip
-            streak={streak}
-            streakFreezeCount={streakFreezeCount}
-            momentumHint={momentumHint}
-            recentDailyStatuses={recentDailyStatuses}
-          />
+            {/* ─── Streak strip ─── */}
+            <div className={styles.streakRow}>
+              <div className={styles.streakStat}>
+                <Flame size={14} className={styles.streakIcon} aria-hidden />
+                <span className={styles.streakVal}>{streak}</span>
+                <span className={styles.streakUnit}>streak</span>
+              </div>
+              {freezes > 0 && (
+                <div className={styles.streakStat}>
+                  <Snowflake size={13} className={styles.freezeIcon} aria-hidden />
+                  <span className={styles.streakVal}>{freezes}</span>
+                  <span className={styles.streakUnit}>
+                    freeze{freezes !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              )}
+              <div className={styles.weekDots} role="list" aria-label="This week">
+                {weekDots.map(({ day, done, isToday }: WeekDot, i: number) => (
+                  <div
+                    key={i}
+                    className={styles.dotWrap}
+                    role="listitem"
+                    title={`${day}${done ? " — done" : ""}${isToday ? " (today)" : ""}`}
+                  >
+                    <div
+                      className={`${styles.dot} ${done ? styles.dotDone : ""} ${isToday ? styles.dotToday : ""}`}
+                    />
+                    <span
+                      className={`${styles.dotDay} ${isToday ? styles.dotDayToday : ""}`}
+                    >
+                      {day}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-          {savedPuzzle && savedPuzzleProgress != null && (
-            <ResumePuzzleCard
-              title={hasInProgressDaily ? "Resume today’s daily" : "Resume saved puzzle"}
-              contextLabel={
-                hasInProgressDaily ? `Daily #${dailyPuzzleNumber}` : "Quick Play"
-              }
-              progress={savedPuzzleProgress}
-              rows={savedPuzzle.grid.rows}
-              cols={savedPuzzle.grid.cols}
-              elapsedLabel={formatTime(savedPuzzle.elapsedSeconds)}
-              savedAtLabel={formatSavedAt(savedPuzzle.savedAt)}
-              onClick={() => nav("/play")}
-            />
-          )}
+            <section className={styles.weeklyCard} aria-label="Weekly progress">
+              <div className={styles.weeklyCardHeader}>
+                <span className={styles.weeklyCardTag}>WEEKLY ALBUM</span>
+                <span className={styles.weeklyCardCount}>{weeklyCompleted}/7</span>
+              </div>
+              <p className={styles.weeklyCardText}>
+                {weeklyRemaining === 0
+                  ? "Full week complete. Keep the streak alive with another daily solve."
+                  : weeklyRemaining === 1
+                    ? "One more daily puzzle fills this week's album."
+                    : `${weeklyRemaining} more daily puzzles fill this week's album.`}
+              </p>
+            </section>
 
-          <SecondaryActions
-            onOpenPacks={() => setShowPackModal(true)}
-            onOpenQuickPlay={() => setShowChoosePhotoModal(true)}
-          />
-        </div>
+            {/* ─── Divider ─── */}
+            <div className={styles.divider} aria-hidden />
 
-        <button
-          type="button"
-          onClick={() => setShowFeedbackChoice(true)}
-          className={styles.feedbackLink}
-          aria-label="Feedback"
-          data-testid="menu-feedback-action"
-        >
-          <Megaphone size={16} />
-          <span>Feedback</span>
-        </button>
+            {/* ─── Secondary actions ─── */}
+            <nav className={styles.secondaryNav} aria-label="More options">
+              <button type="button" className={styles.secondaryRow} onClick={handlePacks}>
+                <span className={styles.secondaryIcon} aria-hidden>
+                  <Package size={18} strokeWidth={1.75} />
+                </span>
+                <span className={styles.secondaryText}>
+                  <span className={styles.secondaryLabel}>Puzzle Packs</span>
+                  <span className={styles.secondaryDesc}>Hand-picked themed puzzles</span>
+                </span>
+                <ChevronRight size={16} className={styles.secondaryArrow} aria-hidden />
+              </button>
 
-        <div className={styles.homeCountdownWrap}>
-          <DailyCountdown variant="home" />
+              <button
+                type="button"
+                className={styles.secondaryRow}
+                onClick={handleQuickPlay}
+              >
+                <span className={styles.secondaryIcon} aria-hidden>
+                  <ImagePlus size={18} strokeWidth={1.75} />
+                </span>
+                <span className={styles.secondaryText}>
+                  <span className={styles.secondaryLabel}>Quick Play</span>
+                  <span className={styles.secondaryDesc}>Pick any image and jump in</span>
+                </span>
+                <ChevronRight size={16} className={styles.secondaryArrow} aria-hidden />
+              </button>
+            </nav>
+          </main>
         </div>
       </div>
-
-      <HelpChoiceModal
-        isOpen={showHelpChoice}
-        onClose={() => setShowHelpChoice(false)}
-        onHowToPlay={() => {
-          setShowHelpChoice(false);
-          setShowHowToPlay(true);
-        }}
-        onKeyboardShortcuts={() => {
-          setShowHelpChoice(false);
-          setShowShortcuts(true);
-        }}
-        onShowAbout={() => {
-          setShowHelpChoice(false);
-          setShowAbout(true);
-        }}
-        onOpenFeedback={() => {
-          setShowHelpChoice(false);
-          setShowFeedbackChoice(true);
-        }}
-        onOpenAdvanced={() => {
-          setShowHelpChoice(false);
-          setShowAdvanced(true);
-        }}
+      <ChoosePuzzleModal
+        isOpen={showChoosePuzzleModal}
+        onClose={() => setShowChoosePuzzleModal(false)}
+      />
+      <PackChoiceModal
+        isOpen={showPackChoiceModal}
+        onClose={() => setShowPackChoiceModal(false)}
       />
       <FeedbackChoiceModal
-        isOpen={showFeedbackChoice}
-        onClose={() => setShowFeedbackChoice(false)}
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
       />
-      <AdvancedModal
-        isOpen={showAdvanced}
-        onClose={() => setShowAdvanced(false)}
-        onClearCache={() => setShowClearCacheConfirm(true)}
-        onResetStats={() => setShowResetStatsConfirm(true)}
-      />
-      <ConfirmModal
-        isOpen={showResetStatsConfirm}
-        onClose={() => setShowResetStatsConfirm(false)}
-        onConfirm={() => {
-          const keysToRemove: string[] = [];
-          for (let i = 0; i < safeLocalStorage.length; i++) {
-            const k = safeLocalStorage.key(i);
-            if (k?.startsWith(BEST_TIME_PREFIX)) keysToRemove.push(k);
-          }
-          keysToRemove.forEach((k) => safeLocalStorage.removeItem(k));
-          setShowResetStatsConfirm(false);
-        }}
-        title="Reset Local Stats?"
-        message="This will clear all local best times. This cannot be undone."
-        confirmText="Reset"
-        cancelText="Cancel"
-        variant="danger"
-      />
-      <ConfirmModal
-        isOpen={showClearCacheConfirm}
-        onClose={() => setShowClearCacheConfirm(false)}
-        onConfirm={() => {
-          clearPuzzleState();
-          const keysToRemove: string[] = [];
-          for (let i = 0; i < safeLocalStorage.length; i++) {
-            const k = safeLocalStorage.key(i);
-            if (
-              k?.startsWith("phuzzle:viewport:") ||
-              k === "phuzzle:puzzleState" ||
-              k === "phuzzle:puzzleStateBackup"
-            ) {
-              keysToRemove.push(k);
-            }
-          }
-          keysToRemove.forEach((k) => safeLocalStorage.removeItem(k));
-          setShowClearCacheConfirm(false);
-          refreshSnapshot();
-        }}
-        title="Clear Cache?"
-        message="This will clear saved puzzle state and viewport settings."
-        confirmText="Clear"
-        cancelText="Cancel"
-        variant="danger"
-      />
-      <TutorialOverlay
-        isOpen={showHowToPlay}
-        onComplete={() => setShowHowToPlay(false)}
-      />
-      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
-      <AboutModal
-        isOpen={showAbout}
-        onClose={() => setShowAbout(false)}
-        onShowWhatsNew={() => {
-          setShowAbout(false);
-          setShowWhatsNew(true);
-        }}
-      />
-      <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
-      <PackChoiceModal isOpen={showPackModal} onClose={() => setShowPackModal(false)} />
-      <ChoosePuzzleModal
-        isOpen={showChoosePhotoModal}
-        onClose={() => setShowChoosePhotoModal(false)}
-      />
-      <DailyDifficultyModal
-        isOpen={showDailyModal}
-        onClose={() => setShowDailyModal(false)}
-      />
-    </div>
+    </>
   );
 }

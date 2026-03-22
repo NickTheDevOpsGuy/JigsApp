@@ -5,7 +5,7 @@
  * Step 3: Puzzle Setup (ONLY place with large preview + difficulty + Start).
  */
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Puzzle, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
@@ -18,6 +18,7 @@ import {
 } from "@/data/packs/packCompletion";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
+import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 import type { PuzzlePack } from "@/data/packs/puzzlePacks";
@@ -37,6 +38,7 @@ type Props = {
 
 export function PackChoiceModal({ isOpen, onClose }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState<Step>("pack");
   const [packsData, setPacksData] = useState<Awaited<
     ReturnType<typeof loadPacksData>
@@ -61,6 +63,19 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
   const [puzzleScrollProgress, setPuzzleScrollProgress] = useState(0);
   const [canScrollPuzzleLeft, setCanScrollPuzzleLeft] = useState(false);
   const [canScrollPuzzleRight, setCanScrollPuzzleRight] = useState(false);
+
+  const getScrollMetrics = useCallback((el: HTMLDivElement) => {
+    const grid = el.firstElementChild as HTMLElement | null;
+    const firstTile = grid?.firstElementChild as HTMLElement | null;
+    if (!firstTile) return null;
+    const styles = window.getComputedStyle(grid ?? el);
+    const gap = Number.parseFloat(styles.columnGap || styles.gap || "0") || 0;
+    const cardWidth = firstTile.getBoundingClientRect().width;
+    const step = Math.max(1, cardWidth + gap);
+    const visibleCount = Math.max(1, Math.floor((el.clientWidth + gap) / step));
+    const maxIndex = Math.max(0, (grid?.children.length ?? 1) - visibleCount);
+    return { step, visibleCount, maxIndex };
+  }, []);
 
   const updatePackScrollState = useCallback(() => {
     const el = packScrollRef.current;
@@ -88,31 +103,45 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     );
   }, []);
 
-  const scrollPackBy = useCallback((direction: 1 | -1) => {
-    const el = packScrollRef.current;
-    if (!el) return;
-    const grid = el.firstElementChild;
-    const firstTile = grid?.firstElementChild as HTMLElement | undefined;
-    const cardWidth = firstTile?.offsetWidth ?? 100;
-    const gap = 8;
-    const stepPx = Math.max(100, cardWidth + gap);
-    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + stepPx * direction));
-    el.scrollTo({ left: target, behavior: "smooth" });
-  }, []);
+  const scrollPackBy = useCallback(
+    (direction: 1 | -1) => {
+      const el = packScrollRef.current;
+      if (!el) return;
+      const metrics = getScrollMetrics(el);
+      if (!metrics) return;
+      const currentIndex = Math.round(el.scrollLeft / metrics.step);
+      const targetIndex = Math.max(
+        0,
+        Math.min(metrics.maxIndex, currentIndex + metrics.visibleCount * direction),
+      );
+      const target = Math.min(
+        Math.max(0, el.scrollWidth - el.clientWidth),
+        targetIndex * metrics.step,
+      );
+      el.scrollTo({ left: target, behavior: "smooth" });
+    },
+    [getScrollMetrics],
+  );
 
-  const scrollPuzzleBy = useCallback((direction: 1 | -1) => {
-    const el = puzzleScrollRef.current;
-    if (!el) return;
-    const grid = el.firstElementChild;
-    const firstTile = grid?.firstElementChild as HTMLElement | undefined;
-    const cardWidth = firstTile?.offsetWidth ?? 100;
-    const gap = 8;
-    const stepPx = Math.max(100, cardWidth + gap);
-    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-    const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + stepPx * direction));
-    el.scrollTo({ left: target, behavior: "smooth" });
-  }, []);
+  const scrollPuzzleBy = useCallback(
+    (direction: 1 | -1) => {
+      const el = puzzleScrollRef.current;
+      if (!el) return;
+      const metrics = getScrollMetrics(el);
+      if (!metrics) return;
+      const currentIndex = Math.round(el.scrollLeft / metrics.step);
+      const targetIndex = Math.max(
+        0,
+        Math.min(metrics.maxIndex, currentIndex + metrics.visibleCount * direction),
+      );
+      const target = Math.min(
+        Math.max(0, el.scrollWidth - el.clientWidth),
+        targetIndex * metrics.step,
+      );
+      el.scrollTo({ left: target, behavior: "smooth" });
+    },
+    [getScrollMetrics],
+  );
 
   useEffect(() => {
     if (isOpen) loadPacksData().then(setPacksData);
@@ -201,7 +230,8 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
     setCurrentPuzzleId(selectedPuzzle.id);
     safeLocalStorage.removeItem("phuzzle:dailyDate");
-    onClose();
+    void loadPlayScreenModule();
+    if (location.pathname === "/play") onClose();
     navigate("/play");
   };
 
@@ -337,7 +367,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                         type="button"
                         role="option"
                         aria-selected={false}
-                        className={styles.puzzleTile}
+                        className={`${styles.puzzleTile} ${localStyles.packTile}`}
                         onClick={() => {
                           setSelectedPack(pack);
                           setSelectedPuzzle(null);
@@ -347,7 +377,9 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                         title={`Select: ${pack.name}`}
                         aria-label={`${pack.name}, ${total} puzzles, ${completedCount} solved`}
                       >
-                        <div className={styles.tileImageWrap}>
+                        <div
+                          className={`${styles.tileImageWrap} ${localStyles.packTileImageWrap}`}
+                        >
                           {hero && !imgError[pack.id] ? (
                             <img
                               src={hero.thumbnail}
@@ -365,7 +397,11 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                             </span>
                           )}
                         </div>
-                        <span className={styles.tileTitle}>{pack.name}</span>
+                        <span
+                          className={`${styles.tileTitle} ${localStyles.packTileTitle}`}
+                        >
+                          {pack.name}
+                        </span>
                         <span className={localStyles.packMeta}>
                           {total} puzzle{total !== 1 ? "s" : ""}
                           {" · "}
@@ -408,7 +444,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       {/* Step 2: Puzzle selection only (no large preview) */}
       {step === "puzzle" && selectedPack && puzzles.length > 0 && (
         <>
-          <p className={styles.railLabel}>Choose a puzzle</p>
+          <p className={styles.railLabel}>{selectedPack.name} — pick a puzzle</p>
           <div className={styles.gridScrollWrap}>
             <button
               type="button"
@@ -517,7 +553,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                 className={localStyles.setupThumbImg}
               />
             </div>
-            <h2 className={localStyles.setupPuzzleName}>{selectedPuzzle.name}</h2>
           </div>
           <div
             className={styles.difficultySelector}

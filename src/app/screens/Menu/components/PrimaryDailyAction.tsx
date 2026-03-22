@@ -7,10 +7,6 @@ type PrimaryDailyActionProps = {
   hasDaily: boolean;
   todayCompleted: boolean;
   hasInProgressDaily: boolean;
-  primaryStatus: string;
-  starIconSrc: string;
-  starImgFailed: boolean;
-  onStarError: () => void;
   onClick: () => void;
 };
 
@@ -18,17 +14,13 @@ export function PrimaryDailyAction({
   hasDaily,
   todayCompleted,
   hasInProgressDaily,
-  primaryStatus,
-  starIconSrc,
-  starImgFailed,
-  onStarError,
   onClick,
 }: PrimaryDailyActionProps) {
   const actionLabel = todayCompleted
-    ? "Play Today’s Puzzle Again"
+    ? "Play Again"
     : hasInProgressDaily
       ? "Continue Daily"
-      : "Play Today’s Puzzle";
+      : "Play Today";
 
   const ariaLabel = todayCompleted
     ? "Play Today's Puzzle again"
@@ -46,24 +38,9 @@ export function PrimaryDailyAction({
       fullWidth
     >
       <span className={styles.primaryActionCopy}>
-        <span className={styles.primaryActionTopline}>
-          {starImgFailed ? (
-            <span className={styles.starFallback} aria-hidden>
-              ★
-            </span>
-          ) : (
-            <img
-              src={starIconSrc}
-              alt=""
-              className={styles.starIcon}
-              onError={onStarError}
-            />
-          )}
-          <span className={styles.actionLabel}>{actionLabel}</span>
-        </span>
-        <span className={styles.primaryActionMeta}>{primaryStatus}</span>
+        <span className={styles.actionLabel}>{actionLabel}</span>
       </span>
-      <ChevronRight size={18} aria-hidden />
+      <ChevronRight size={18} aria-hidden className={styles.primaryActionChevron} />
     </Button>
   );
 }

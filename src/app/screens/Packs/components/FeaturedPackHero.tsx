@@ -1,7 +1,6 @@
 /**
  * Featured Pack – large hero card: pack image, name, short description, progress, Continue Pack or Play Pack.
  */
-import React from "react";
 import styles from "./PuzzlePackModule.module.css";
 
 type FeaturedPackHeroProps = {

@@ -2,7 +2,7 @@
  * DailyReactions – emoji reactions and lightweight comments on daily puzzle.
  * Shown after completion; 280 char limit; report support.
  */
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Flag } from "lucide-react";
 import {
   fetchDailyComments,

@@ -1,7 +1,7 @@
 /**
  * DragPreview – floating piece preview when dragging to tray (DOM overlay).
  */
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { renderTrayPiece } from "@/puzzle/canvas/render/renderTrayPiece";
 import type { Piece } from "@/puzzle/core/types";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";

@@ -2,7 +2,6 @@
  * CoopDebugPanel – dev-only debug info for co-op sessions.
  * Session ID, connected count, last event, channel, DB write latency.
  */
-import React from "react";
 import styles from "@/screens/Play/components/overlay/ProfilerOverlay.module.css";
 
 export function CoopDebugPanel({

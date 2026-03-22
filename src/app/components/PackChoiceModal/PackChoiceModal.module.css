@@ -3,11 +3,23 @@
 /* pack meta line under tile title */
 .packMeta {
   display: block;
-  font-size: 10px;
+  padding: 0 12px 12px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--color-text-secondary);
-  margin-top: 2px;
   line-height: 1.2;
+}
+
+.packTile {
+  min-width: 0;
+}
+
+.packTileImageWrap {
+  aspect-ratio: 16 / 10;
+}
+
+.packTileTitle {
+  padding-bottom: 4px;
 }
 
 .completedBadge {
@@ -28,7 +40,7 @@
 .setupHeader {
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
   margin-bottom: 14px;
   flex-shrink: 0;
 }
@@ -50,22 +62,9 @@
   display: block;
 }
 
-.setupPuzzleName {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 @media (max-width: 640px) {
   .setupThumb {
     width: 56px;
     height: 56px;
-  }
-  .setupPuzzleName {
-    font-size: 1rem;
   }
 }

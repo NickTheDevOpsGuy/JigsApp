@@ -44,6 +44,7 @@ export async function shareOrDownloadCard(args: {
           pieceCount,
           accuracyPercent,
           playUrl,
+          moveCount,
           puzzleName,
         });
 

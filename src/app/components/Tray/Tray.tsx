@@ -1,5 +1,5 @@
 // src/app/components/Tray/Tray.tsx
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Piece } from "@/puzzle/core/types";
 import { renderTrayPiece } from "@/puzzle/canvas/render/renderTrayPiece";
 import { canvasToObjectUrl, revokeObjectUrls, yieldToMainThread } from "@/utils/async";

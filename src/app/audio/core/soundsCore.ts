@@ -15,7 +15,6 @@ import {
 } from "./soundsCorePlayDispatch";
 import {
   ensureReverbForEngine,
-  ensureSfxOutputForEngine,
   updateSfxOutputGainForEngine,
   playToneForEngine,
   playNoiseClickForEngine,
@@ -37,7 +36,6 @@ class SoundEngine {
   private audioContext: AudioContext | null = null;
 
   private enabled = true;
-  private volume = 0.3; // legacy alias for sfxVolume
   private sfxVolume = 0.3;
   private masterVolume = 0.9;
   private hapticsEnabled = true;
@@ -50,7 +48,6 @@ class SoundEngine {
 
   private ambientGain: GainNode | null = null;
   private ambientStops: StopFn[] = [];
-  private ambientTheme: Theme | null = null;
 
   private masterReverb: ConvolverNode | null = null;
   private sfxMasterGain: GainNode | null = null;
@@ -75,7 +72,6 @@ class SoundEngine {
   loadPreferences() {
     const prefs = loadSoundPreferencesFromStorage();
     this.enabled = prefs.enabled;
-    this.volume = prefs.volume;
     this.sfxVolume = prefs.sfxVolume;
     this.masterVolume = prefs.masterVolume;
     this.hapticsEnabled = prefs.hapticsEnabled;
@@ -101,7 +97,6 @@ class SoundEngine {
   }
   setSfxVolume(volume: number) {
     this.sfxVolume = clamp01(volume);
-    this.volume = this.sfxVolume;
     saveSoundPreference("sfxVolume", this.sfxVolume);
     saveSoundPreference("volume", this.sfxVolume);
   }
@@ -231,10 +226,6 @@ class SoundEngine {
     playNoiseClickForEngine(this.getPlaybackState(), ctx, opts);
   }
 
-  private ensureSfxOutput(ctx: AudioContext): GainNode {
-    return ensureSfxOutputForEngine(this.getPlaybackState(), ctx);
-  }
-
   private updateSfxOutputGain() {
     updateSfxOutputGainForEngine(this.getPlaybackState());
   }
@@ -280,7 +271,6 @@ class SoundEngine {
     clearAmbient(this.ambientStops, this.ambientGain);
     this.ambientStops = [];
     this.ambientGain = null;
-    this.ambientTheme = null;
   }
 
   private async startAmbient() {
@@ -293,10 +283,9 @@ class SoundEngine {
       playTone: (ctx, opts) => this.playTone(ctx, opts as never),
       playNoiseClick: (ctx, opts) => this.playNoiseClick(ctx, opts as never),
       stopAmbient: () => this.stopAmbient(),
-      setAmbientState: (g, s, t) => {
+      setAmbientState: (g, s) => {
         this.ambientGain = g;
         this.ambientStops = s;
-        this.ambientTheme = t;
       },
     });
   }

@@ -27,6 +27,7 @@ import {
   getSubMenuItems,
   hasSubMenuItems,
 } from "@/screens/Play/components/headerMenu/headerMenuViewModel";
+import { loadStatsScreenModule } from "@/screens/routeLoaders";
 
 export type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/headerMenuConfig";
 
@@ -227,6 +228,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const handleRootClick = (root: RootMenuId) => {
     if (root === "leaderboard") {
+      void loadStatsScreenModule();
       navigate("/stats");
       setOpen(false);
       return;

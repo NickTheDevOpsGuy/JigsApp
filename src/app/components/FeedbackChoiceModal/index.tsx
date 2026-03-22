@@ -1,7 +1,1 @@
-export function FeedbackChoiceModal(_props: {
-  isOpen?: boolean;
-  onClose?: () => void;
-  [key: string]: unknown;
-}) {
-  return null;
-}
+export { FeedbackChoiceModal } from "./FeedbackChoiceModal";

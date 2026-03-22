@@ -22,6 +22,8 @@ interface CompletionOverlayGateProps {
   isNewBest: boolean;
   /** Path to this puzzle for share link (e.g. /daily or /play?session=xxx). */
   puzzleShareUrl: string;
+  challengeShareReady: boolean;
+  ensureChallengeShareUrl: () => Promise<string>;
   puzzleName?: string;
   share: {
     copied: boolean;
@@ -47,6 +49,7 @@ interface CompletionOverlayGateProps {
   onReplayClick?: () => void;
   /** Next Puzzle: primary CTA to start a new puzzle. */
   onNextPuzzle?: () => void;
+  nextPuzzleLabel?: string;
   /** Ref for focus return when coming back from replay (e.g. close button). */
   focusReturnRef?: React.RefObject<HTMLButtonElement>;
   /** Called after Supabase completion record (e.g. for 7-day streak toast). */
@@ -68,6 +71,8 @@ export function CompletionOverlayGate({
   pieceCutType,
   isNewBest,
   puzzleShareUrl,
+  challengeShareReady,
+  ensureChallengeShareUrl,
   puzzleName,
   share,
   onDownloadImage,
@@ -80,6 +85,7 @@ export function CompletionOverlayGate({
   canReplay = false,
   onReplayClick,
   onNextPuzzle,
+  nextPuzzleLabel,
   focusReturnRef,
   onCompletionRecorded,
   onNewBest,
@@ -129,6 +135,8 @@ export function CompletionOverlayGate({
       isDaily={isDaily}
       cutType={pieceCutType}
       puzzleShareUrl={puzzleShareUrl}
+      challengeShareReady={challengeShareReady}
+      ensureChallengeShareUrl={ensureChallengeShareUrl}
       puzzleName={puzzleName}
       copied={share.copied}
       canNativeShare={share.canNativeShare}
@@ -137,7 +145,11 @@ export function CompletionOverlayGate({
       onCopyProgress={share.handleCopyResults}
       onCopyChallenge={share.handleCopyChallenge}
       shareProgressText={share.getProgressShareTextWithUrl()}
-      shareChallengeText={share.getChallengeShareTextWithUrl()}
+      shareChallengeText={
+        challengeShareReady
+          ? share.getChallengeShareTextWithUrl()
+          : "Preparing an exact challenge link for this puzzle..."
+      }
       onDownloadImage={onDownloadImage}
       onClose={onClose}
       precisionModeEnabled={precisionModeEnabled}
@@ -147,6 +159,7 @@ export function CompletionOverlayGate({
       canReplay={canReplay}
       onReplayClick={onReplayClick}
       onNextPuzzle={onNextPuzzle}
+      nextPuzzleLabel={nextPuzzleLabel}
       focusReturnRef={focusReturnRef}
     />
   );

@@ -2,7 +2,7 @@
  * DailyCountdown – countdown to next daily puzzle unlock (UTC midnight).
  * Server-synced, prominent on leaderboard. Celebration at unlock.
  */
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Clock } from "lucide-react";
 import {
   syncServerTime,

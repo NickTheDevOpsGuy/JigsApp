@@ -95,19 +95,19 @@
 
 @media (min-width: 1400px) {
   .modal[data-variant="choosePuzzle"] {
-    max-width: min(96vw, 640px);
+    max-width: min(96vw, 760px);
   }
 }
 
 @media (min-width: 1025px) and (max-width: 1399px) {
   .modal[data-variant="choosePuzzle"] {
-    max-width: min(96vw, 560px);
+    max-width: min(96vw, 700px);
   }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
   .modal[data-variant="choosePuzzle"] {
-    max-width: min(94vw, 480px);
+    max-width: min(94vw, 620px);
   }
 }
 

@@ -17,7 +17,6 @@ import { CompletionOverlayShareMenu } from "@/screens/Play/components/completion
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { AppModal } from "@/components/AppModal";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { buildChallengePlayUrl } from "@/screens/Play/core/share/shareMessages";
 
 export function CompletionOverlayActions(args: {
   shareMenuOpen: boolean;
@@ -32,6 +31,8 @@ export function CompletionOverlayActions(args: {
   replayNextDropdownPosition: { top: number; left: number; minWidth: number } | null;
   grid?: { rows: number; cols: number };
   puzzleShareUrl: string;
+  challengeShareReady: boolean;
+  ensureChallengeShareUrl?: () => Promise<string>;
   elapsedSeconds: number;
   moveCount?: number;
   accuracyPercent: number;
@@ -47,12 +48,15 @@ export function CompletionOverlayActions(args: {
   canReplay: boolean;
   onReplayClick?: () => void;
   onNextPuzzle?: () => void;
+  nextPuzzleLabel?: string;
   onClose: () => void;
   isDaily?: boolean;
   focusReturnRef?: React.RefObject<HTMLButtonElement | null>;
 }) {
   const {
     puzzleShareUrl,
+    challengeShareReady,
+    ensureChallengeShareUrl,
     elapsedSeconds,
     moveCount,
     accuracyPercent,
@@ -66,6 +70,7 @@ export function CompletionOverlayActions(args: {
     canReplay,
     onReplayClick,
     onNextPuzzle,
+    nextPuzzleLabel = "Next Puzzle",
     onClose: _onClose, // ← FIXED: rename unused variable
     grid,
   } = args;
@@ -109,13 +114,7 @@ export function CompletionOverlayActions(args: {
 
   const handleChallenge = async () => {
     setShareOpen(false);
-
-    const challengeUrl = buildChallengePlayUrl(
-      puzzleShareUrl,
-      elapsedSeconds,
-      moveCount ?? 0,
-    );
-    await onShareChallenge?.(challengeUrl);
+    completionData.setSharePopupOpen(true);
   };
 
   const handleShareResult = () => {
@@ -141,10 +140,10 @@ export function CompletionOverlayActions(args: {
           type="button"
           className={styles.completePrimaryBtn}
           onClick={onNextPuzzle}
-          title="Next Puzzle"
+          title={nextPuzzleLabel}
         >
           <Sparkles size={22} aria-hidden />
-          Next Puzzle
+          {nextPuzzleLabel}
         </button>
       )}
 
@@ -184,7 +183,7 @@ export function CompletionOverlayActions(args: {
                     }}
                   >
                     <ImagePlus size={18} aria-hidden />
-                    New Puzzle
+                    {nextPuzzleLabel}
                   </button>
                 )}
 
@@ -239,11 +238,10 @@ export function CompletionOverlayActions(args: {
                     type="button"
                     role="menuitem"
                     className={styles.completeMenuItem}
-                    onClick={() => void runBusyAction("challenge", handleChallenge)}
-                    disabled={busyAction === "challenge"}
+                    onClick={() => void handleChallenge()}
                   >
                     <Swords size={18} aria-hidden />
-                    {busyAction === "challenge" ? "Opening Share..." : "Challenge Friend"}
+                    Challenge Friend
                   </button>
                 )}
 
@@ -272,6 +270,8 @@ export function CompletionOverlayActions(args: {
         dropdownPosition={args.dropdownPosition}
         grid={grid}
         puzzleShareUrl={puzzleShareUrl}
+        challengeShareReady={challengeShareReady}
+        ensureChallengeShareUrl={ensureChallengeShareUrl}
         elapsedSeconds={elapsedSeconds}
         moveCount={moveCount}
         accuracyPercent={accuracyPercent}
@@ -307,7 +307,7 @@ export function CompletionOverlayActions(args: {
               }}
             >
               <ImagePlus size={18} aria-hidden />
-              New Puzzle
+              {nextPuzzleLabel}
             </button>
           )}
           {canReplay && onReplayClick && (
@@ -342,11 +342,10 @@ export function CompletionOverlayActions(args: {
             <button
               type="button"
               className={styles.completeActionSheetItem}
-              onClick={() => void runBusyAction("challenge", handleChallenge)}
-              disabled={busyAction === "challenge"}
+              onClick={() => void handleChallenge()}
             >
               <Swords size={18} aria-hidden />
-              {busyAction === "challenge" ? "Opening Share..." : "Challenge Friend"}
+              Challenge Friend
             </button>
           )}
           {(onShareProgress || onCopyProgress) && (

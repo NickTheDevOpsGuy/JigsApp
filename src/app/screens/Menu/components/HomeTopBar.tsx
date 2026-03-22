@@ -4,7 +4,7 @@ import styles from "../MenuScreen.module.css";
 
 type HomeTopBarProps = {
   logoSrc: string;
-  menuDate: string;
+  title: string;
   onOpenStats: () => void;
   onOpenHelp: () => void;
   statsIcon: ReactNode;
@@ -12,7 +12,7 @@ type HomeTopBarProps = {
 
 export function HomeTopBar({
   logoSrc,
-  menuDate,
+  title,
   onOpenStats,
   onOpenHelp,
   statsIcon,
@@ -32,10 +32,7 @@ export function HomeTopBar({
         <div className={styles.brandRow}>
           <img className={styles.brandLogo} src={logoSrc} alt="Phuzzle logo" />
           <div className={styles.brandCopy}>
-            <p className={styles.brandTitle}>Phuzzle</p>
-            <p className={styles.brandDate} aria-live="polite">
-              {menuDate}
-            </p>
+            <p className={styles.brandTitle}>{title}</p>
           </div>
         </div>
       </div>

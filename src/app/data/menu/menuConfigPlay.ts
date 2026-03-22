@@ -1,5 +1,5 @@
 /**
- * Play section of the menu tree (New Puzzle, Daily, Packs).
+ * Play section of the menu tree (Daily, Packs).
  */
 import type { MenuNode } from "./menuConfigConstants";
 
@@ -10,11 +10,6 @@ export function getPlayMenuNodes(): MenuNode[] {
       id: "play",
       label: "Play",
       children: [
-        {
-          type: "action",
-          id: "newPuzzle",
-          label: "New Puzzle",
-        },
         {
           type: "folder",
           id: "dailyPuzzle",

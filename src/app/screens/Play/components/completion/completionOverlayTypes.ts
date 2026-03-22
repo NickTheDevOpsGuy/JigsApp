@@ -21,6 +21,8 @@ export interface CompletionOverlayProps {
   isDaily?: boolean;
   cutType?: PieceCutType;
   puzzleShareUrl?: string;
+  challengeShareReady?: boolean;
+  ensureChallengeShareUrl?: () => Promise<string>;
   puzzleName?: string;
   copied?: boolean;
   canNativeShare?: boolean;
@@ -39,6 +41,7 @@ export interface CompletionOverlayProps {
   canReplay?: boolean;
   onReplayClick?: () => void;
   onNextPuzzle?: () => void;
+  nextPuzzleLabel?: string;
   /** Ref for focus return when coming back from replay (e.g. close button). */
   focusReturnRef?: React.RefObject<HTMLButtonElement>;
   /** Called after Supabase completion record (e.g. for streak milestone toast). */
