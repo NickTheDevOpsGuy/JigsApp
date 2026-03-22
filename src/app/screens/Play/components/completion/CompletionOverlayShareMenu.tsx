@@ -68,11 +68,17 @@ export function CompletionOverlayShareMenu(props: {
   };
 
   const progressPreviewLines = shareProgressText
-    ? shareProgressText.split("\n").filter((line) => line.trim().length > 0).slice(0, 4)
+    ? shareProgressText
+        .split("\n")
+        .filter((line) => line.trim().length > 0)
+        .slice(0, 4)
     : [];
   const challengePreviewLines =
     challengeShareReady && shareChallengeText
-      ? shareChallengeText.split("\n").filter((line) => line.trim().length > 0).slice(0, 3)
+      ? shareChallengeText
+          .split("\n")
+          .filter((line) => line.trim().length > 0)
+          .slice(0, 3)
       : [];
 
   return (
@@ -207,9 +213,9 @@ export function CompletionOverlayShareMenu(props: {
                         ? "Opening Share..."
                         : busyAction === "copy"
                           ? "Copying..."
-                        : copied
-                          ? "Copied!"
-                          : canNativeShare
+                          : copied
+                            ? "Copied!"
+                            : canNativeShare
                               ? "Share result"
                               : "Copy link"}
                       <small>Time, moves, turns, and link</small>
@@ -250,7 +256,9 @@ export function CompletionOverlayShareMenu(props: {
               <span className={styles.completeShareGroupLabel}>Challenge</span>
               {challengeShareReady && challengePreviewLines.length > 0 ? (
                 <div className={styles.completeSharePreviewBlock}>
-                  <span className={styles.completeSharePreviewLabel}>Challenge includes</span>
+                  <span className={styles.completeSharePreviewLabel}>
+                    Challenge includes
+                  </span>
                   <div className={styles.completeSharePreviewList}>
                     {challengePreviewLines.map((line) => (
                       <span key={line} className={styles.completeSharePreviewLine}>
@@ -261,7 +269,9 @@ export function CompletionOverlayShareMenu(props: {
                 </div>
               ) : (
                 <div className={styles.completeSharePreviewBlock}>
-                  <span className={styles.completeSharePreviewLabel}>Challenge status</span>
+                  <span className={styles.completeSharePreviewLabel}>
+                    Challenge status
+                  </span>
                   <div className={styles.completeSharePreviewList}>
                     <span className={styles.completeSharePreviewLine}>
                       Preparing an exact challenge link for this puzzle.

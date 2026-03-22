@@ -259,9 +259,7 @@ export function ReplaySolveModalControls({
         </button>
       </div>
 
-      <div
-        className={`${styles.navRow} ${!hasNextPuzzle ? styles.navRowSingle : ""}`}
-      >
+      <div className={`${styles.navRow} ${!hasNextPuzzle ? styles.navRowSingle : ""}`}>
         <button
           type="button"
           className={styles.navBtnSecondary}
