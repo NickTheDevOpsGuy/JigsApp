@@ -58,7 +58,11 @@ export function LeaderboardTabHeader({
   return (
     <div className={styles.leaderboardHeader}>
       <div className={styles.leaderboardControlRow}>
-        <div className={styles.boardModeSwitch} role="tablist" aria-label="Board mode">
+        <div
+          className={`${styles.boardModeSwitch} ${styles.horizontalRail}`}
+          role="tablist"
+          aria-label="Board mode"
+        >
           <button
             type="button"
             className={`${styles.boardModeBtn} ${leaderboardType === "today" ? styles.boardModeBtnActive : ""}`}

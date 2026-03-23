@@ -200,6 +200,7 @@ export function CompletionOverlay({
       surface="bare"
       size="xl"
       tone="celebration"
+      align="center"
       showCloseButton={false}
     >
       <div
@@ -293,13 +294,14 @@ export function CompletionOverlay({
 
 function AchievementCycler({ achievements }: { achievements: string[] }) {
   const [index, setIndex] = useState(0);
+  const ACHIEVEMENT_CYCLE_MS = 2400;
 
   useEffect(() => {
     if (achievements.length <= 1) return;
 
     const id = setInterval(() => {
       setIndex((i) => (i + 1) % achievements.length);
-    }, 1000);
+    }, ACHIEVEMENT_CYCLE_MS);
 
     return () => clearInterval(id);
   }, [achievements.length]);

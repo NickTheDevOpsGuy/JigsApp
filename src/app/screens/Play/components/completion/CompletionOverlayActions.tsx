@@ -3,15 +3,7 @@
  * No X close; no individual action buttons outside the menus.
  */
 import React, { useState, useRef, useEffect } from "react";
-import {
-  ChevronDown,
-  Sparkles,
-  MoreHorizontal,
-  Share2,
-  Swords,
-  Film,
-  ImagePlus,
-} from "lucide-react";
+import { ChevronDown, Sparkles, Share2, Swords, Film, ImagePlus } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { CompletionOverlayShareMenu } from "@/screens/Play/components/completion/CompletionOverlayShareMenu";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
@@ -141,6 +133,7 @@ export function CompletionOverlayActions(args: {
           className={styles.completePrimaryBtn}
           onClick={onNextPuzzle}
           title={nextPuzzleLabel}
+          aria-label={nextPuzzleLabel}
         >
           <Sparkles size={22} aria-hidden />
           {nextPuzzleLabel}
@@ -160,8 +153,8 @@ export function CompletionOverlayActions(args: {
               aria-expanded={moreOpen}
               aria-haspopup={isMobileActions ? "dialog" : "true"}
               aria-label="More options"
+              title="More options"
             >
-              <MoreHorizontal size={18} aria-hidden />
               More Options
               <ChevronDown
                 size={16}
@@ -181,6 +174,7 @@ export function CompletionOverlayActions(args: {
                       setMoreOpen(false);
                       onNextPuzzle();
                     }}
+                    title={nextPuzzleLabel}
                   >
                     <ImagePlus size={18} aria-hidden />
                     {nextPuzzleLabel}
@@ -199,6 +193,7 @@ export function CompletionOverlayActions(args: {
                       })
                     }
                     disabled={busyAction === "replay"}
+                    title={busyAction === "replay" ? "Opening replay" : "Replay solve"}
                   >
                     <Film size={18} aria-hidden />
                     {busyAction === "replay" ? "Opening Replay..." : "Replay Solve"}
@@ -221,6 +216,7 @@ export function CompletionOverlayActions(args: {
               aria-expanded={shareOpen}
               aria-haspopup={isMobileActions ? "dialog" : "true"}
               aria-label="Share results"
+              title="Share results"
             >
               <Share2 size={18} aria-hidden />
               Share Results

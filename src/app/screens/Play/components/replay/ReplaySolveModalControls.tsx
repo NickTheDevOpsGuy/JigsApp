@@ -1,16 +1,8 @@
 /**
- * Seek bar, play/pause/speed controls, and nav (Back to Results | Next Puzzle) for ReplaySolveModal.
+ * Seek bar and playback controls for ReplaySolveModal.
  */
 import React, { useCallback, useRef, useState } from "react";
-import {
-  Play,
-  Pause,
-  ChevronLeft,
-  SkipBack,
-  SkipForward,
-  RotateCcw,
-  RotateCw,
-} from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, RotateCw } from "lucide-react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
@@ -41,9 +33,6 @@ export interface ReplaySolveModalControlsProps {
   totalSeconds: number;
   onSeek?: ReplaySeekCb;
   progressPct: number;
-  onBackToResults?: ReplayVoidCb;
-  onClose: ReplayVoidCb;
-  onNextPuzzle?: ReplayVoidCb;
 }
 
 const SPEEDS = [1, 2, 3] as const;
@@ -68,9 +57,6 @@ export function ReplaySolveModalControls({
   totalSeconds,
   onSeek,
   progressPct,
-  onBackToResults,
-  onClose,
-  onNextPuzzle,
 }: ReplaySolveModalControlsProps) {
   const cycleSpeed = () => {
     const idx = SPEEDS.indexOf(effectiveSpeed as 1 | 2 | 3);
@@ -157,10 +143,12 @@ export function ReplaySolveModalControls({
     }
   };
 
-  const hasNextPuzzle = Boolean(onNextPuzzle);
-
   return (
     <>
+      <div className={styles.dockHeader}>
+        <p className={styles.dockTitle}>Watch replay</p>
+      </div>
+
       <div className={styles.seekRow}>
         <div className={styles.seekBarWrap}>
           <div
@@ -172,6 +160,7 @@ export function ReplaySolveModalControls({
             aria-valuemin={0}
             aria-valuemax={Math.max(0, totalSnapshots - 1)}
             aria-label="Replay progress"
+            aria-valuetext={`${formatTime(elapsedSeconds)} of ${formatTime(totalSeconds)}`}
             onClick={handleSeekBarClick}
             onPointerDown={handleSeekBarPointerDown}
             onKeyDown={handleSeekBarKeyDown}
@@ -182,7 +171,10 @@ export function ReplaySolveModalControls({
           <span className={styles.seekTime} aria-live="polite">
             {formatTime(elapsedSeconds)} / {formatTime(totalSeconds)}
           </span>
-          <span className={styles.speedBadge} aria-hidden="true">
+          <span
+            className={styles.speedBadge}
+            aria-label={`Playback speed ${effectiveSpeed}x`}
+          >
             {effectiveSpeed}x
           </span>
         </div>
@@ -257,36 +249,6 @@ export function ReplaySolveModalControls({
         >
           {effectiveSpeed}x
         </button>
-      </div>
-
-      <div className={`${styles.navRow} ${!hasNextPuzzle ? styles.navRowSingle : ""}`}>
-        <button
-          type="button"
-          className={styles.navBtnSecondary}
-          onClick={() => {
-            if (onBackToResults) invokeMaybeAsync(onBackToResults);
-            else invokeMaybeAsync(onClose);
-          }}
-          onPointerDown={stopProp}
-        >
-          <ChevronLeft size={18} aria-hidden />
-          Back to Results
-        </button>
-        {onNextPuzzle && (
-          <button
-            type="button"
-            className={styles.navBtnPrimary}
-            onClick={() => {
-              void Promise.resolve(onClose())
-                .then(() => invokeMaybeAsync(onNextPuzzle))
-                .catch(() => {});
-            }}
-            onPointerDown={stopProp}
-          >
-            Next Puzzle
-            <Play size={18} fill="currentColor" aria-hidden />
-          </button>
-        )}
       </div>
     </>
   );

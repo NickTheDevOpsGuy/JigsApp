@@ -18,14 +18,19 @@ export function StatsTabBar({
   weeklyAlbumProgress: number;
 }) {
   return (
-    <div className={styles.tabs} role="tablist" aria-label="Stats sections">
+    <div
+      className={`${styles.tabs} ${styles.horizontalRail}`}
+      role="tablist"
+      aria-label="Stats sections"
+    >
       <button
         type="button"
         role="tab"
         aria-selected={activeTab === "profile"}
         className={activeTab === "profile" ? styles.tabActive : ""}
         onClick={() => setActiveTab("profile")}
-        aria-label="Profile"
+        aria-label="Profile stats"
+        title="Profile stats"
       >
         <User size={18} aria-hidden />
         <span>Profile</span>
@@ -36,7 +41,8 @@ export function StatsTabBar({
         aria-selected={activeTab === "leaderboard"}
         className={activeTab === "leaderboard" ? styles.tabActive : ""}
         onClick={() => setActiveTab("leaderboard")}
-        aria-label="Board"
+        aria-label={`Board leaderboard, weekly album progress ${weeklyAlbumProgress} out of 7`}
+        title="Board leaderboard"
       >
         <Trophy size={18} aria-hidden />
         <span className={styles.tabLabel}>Board</span>
@@ -48,7 +54,8 @@ export function StatsTabBar({
         aria-selected={activeTab === "achievements"}
         className={activeTab === "achievements" ? styles.tabActive : ""}
         onClick={() => setActiveTab("achievements")}
-        aria-label="Badges"
+        aria-label="Badges and achievements"
+        title="Badges and achievements"
       >
         <Award size={18} aria-hidden />
         <span>Badges</span>

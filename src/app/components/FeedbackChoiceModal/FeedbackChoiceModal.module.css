@@ -2,25 +2,52 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
 .feedbackChoiceBtn {
   display: block;
   width: 100%;
-  min-height: 48px;
-  padding: 14px 20px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-card);
-  border-radius: var(--radius-btn);
-  font-size: 16px;
-  font-weight: 500;
+  min-height: 60px;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--color-border) 84%, rgba(255, 255, 255, 0.08));
+  background: color-mix(in srgb, var(--color-bg-card) 92%, transparent);
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--color-text-primary);
   cursor: pointer;
-  transition: all 0.15s ease;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .feedbackChoiceBtn:hover {
-  background: var(--color-bg-elevated);
+  background: color-mix(in srgb, var(--color-bg-elevated) 94%, transparent);
   border-color: var(--color-brand-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
+}
+
+.feedbackChoiceBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .feedbackChoice {
+    gap: 10px;
+    padding: 4px 0;
+  }
+
+  .feedbackChoiceBtn {
+    min-height: 56px;
+    padding: 16px 16px;
+    border-radius: 14px;
+    font-size: 0.96rem;
+  }
 }

@@ -25,6 +25,7 @@ vi.mock("react-router-dom", async () => {
   return {
     ...actual,
     useNavigate: () => mocks.navigate,
+    useLocation: () => ({ pathname: "/" }),
   };
 });
 
@@ -206,7 +207,7 @@ describe("dialog parity", () => {
   it("keeps choose puzzle parity across staged flow with persistent arrow controls", async () => {
     render(<ChoosePuzzleModal isOpen onClose={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /^food$/i }));
+    fireEvent.click(screen.getByRole("option", { name: /^food$/i }));
 
     expect(await screen.findByRole("listbox", { name: /choose a puzzle/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /scroll left/i })).toBeTruthy();
@@ -285,6 +286,7 @@ describe("dialog parity", () => {
     fireEvent.click(screen.getByRole("option", { name: /burger/i }));
 
     expect(await screen.findByRole("button", { name: /start puzzle/i })).toBeTruthy();
-    expect(screen.getByText("Burger")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /puzzle setup/i })).toBeTruthy();
+    expect(screen.queryByText("Burger")).toBeNull();
   });
 });

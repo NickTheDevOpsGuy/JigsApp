@@ -11,10 +11,6 @@ export type ShareMessageArgs = {
   puzzleName?: string;
 };
 
-function clampPercent(value: number): number {
-  return Math.max(0, Math.min(100, Math.round(value)));
-}
-
 export function getDifficultyLabel(pieceCount: number): string {
   if (pieceCount <= 9) return "Easy";
   if (pieceCount <= 16) return "Medium";
@@ -43,29 +39,34 @@ export function buildChallengePlayUrl(
   return isAbsolute ? url.toString() : `${url.pathname}${url.search}${url.hash}`;
 }
 
+const SHARE_ORIGIN = "https://phuzzle.vercel.app";
+
+/** Full https URL for pasted / preview text (matches link unfurl targets). */
+export function absShareUrl(pathOrUrl: string): string {
+  const t = pathOrUrl.trim();
+  if (/^https?:\/\//i.test(t)) return t;
+  const path = t.startsWith("/") ? t : `/${t}`;
+  return `${SHARE_ORIGIN}${path}`;
+}
+
 /**
- * Share Result – brag/summary share. Exact message structure per spec.
+ * Share Result – same layout as the challenge card preview, neutral (no challenge line).
  */
 export function buildProgressShareMessage(args: ShareMessageArgs): string {
   const time = formatTime(args.elapsedSeconds);
   const difficulty = getDifficultyLabel(args.pieceCount);
   const pieces = args.pieceCount;
   const moves = args.moveCount ?? 0;
-  const puzzleName = args.puzzleName?.trim() || "Puzzle";
-  const accuracy = clampPercent(args.accuracyPercent ?? 100);
+  const link = absShareUrl(args.playUrl);
   return [
-    "🧩 Phuzzle Complete",
+    "Phuzzle",
     "",
-    puzzleName,
-    `${difficulty} • ${pieces} pieces`,
+    "Puzzle",
+    `Difficulty: ${difficulty} (${pieces} pieces)`,
+    `Time: ${time}`,
+    `Moves: ${moves}`,
     "",
-    `⏱ Time: ${time}`,
-    `🔁 Moves: ${moves}`,
-    `↩️ Turns: ${moves}`,
-    `🎯 Accuracy: ${accuracy}%`,
-    "",
-    "Play this exact puzzle:",
-    args.playUrl,
+    link,
   ].join("\n");
 }
 
@@ -123,26 +124,26 @@ export function getDailyShareCompletionGrid(args: DailyShareGridArgs): string {
 }
 
 /**
- * Beat My Puzzle – challenge share. Per spec: "I solved this puzzle in 1:42 with 31 moves. Think you can beat me?" + puzzle image, difficulty, puzzle link.
+ * Beat My Puzzle – challenge share. Matches share-card / link preview: stats + “Think you can beat me?”
+ * URL includes same puzzle + grid (from playUrl) and ct/cm for the challenge.
  */
 export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const time = formatTime(args.elapsedSeconds);
   const moves = args.moveCount ?? 0;
-  const puzzleName = args.puzzleName?.trim() || "Puzzle";
   const difficulty = getDifficultyLabel(args.pieceCount);
-  const challengeUrl = buildChallengePlayUrl(args.playUrl, args.elapsedSeconds, moves);
+  const pieces = args.pieceCount;
+  const challengePath = buildChallengePlayUrl(args.playUrl, args.elapsedSeconds, moves);
+  const challengeUrl = absShareUrl(challengePath);
   return [
-    "🧩 Phuzzle Challenge",
+    "Phuzzle",
     "",
-    `I finished ${puzzleName} in ${time} with ${moves} moves.`,
-    "Can you best me? Prove it!",
+    "Puzzle",
+    `Difficulty: ${difficulty} (${pieces} pieces)`,
+    `Time: ${time}`,
+    `Moves: ${moves}`,
     "",
-    `${difficulty} • ${args.pieceCount} pieces`,
-    `⏱ Time to beat: ${time}`,
-    `🔁 Moves to beat: ${moves}`,
-    `↩️ Turns to beat: ${moves}`,
+    "Think you can beat me?",
     "",
-    "Play this exact puzzle:",
     challengeUrl,
   ].join("\n");
 }

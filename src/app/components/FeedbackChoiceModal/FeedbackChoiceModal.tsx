@@ -102,6 +102,7 @@ export function FeedbackChoiceModal({
           className={styles.feedbackChoiceBtn}
           onClick={handleReportBug}
           aria-label="Report a bug"
+          title="Report a bug"
         >
           🐛 Report a bug
         </button>
@@ -110,6 +111,7 @@ export function FeedbackChoiceModal({
           className={styles.feedbackChoiceBtn}
           onClick={handleSuggestFeature}
           aria-label="Suggest a feature"
+          title="Suggest a feature"
         >
           💡 Suggest a feature
         </button>

@@ -56,6 +56,15 @@
   max-height: min(150px, 20vh);
 }
 
+/* Replay Solve cutout: nudge board column up so header + puzzle read higher */
+.boardLayoutShell[data-replay-active="true"] .playBody {
+  padding-top: 6px;
+}
+
+.boardLayoutShell[data-replay-active="true"] .playBody .main {
+  padding-top: 4px;
+}
+
 @media (max-width: 600px) {
   .playBody .main {
     max-width: 100%;
@@ -76,6 +85,10 @@
   .playBody .trayArea .tray.trayWrapLarge {
     height: clamp(64px, 8vh, 80px);
     max-height: 80px;
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .playBody .main {
+    padding-top: 6px;
   }
 }
 
@@ -227,8 +240,8 @@
   --progress: 0;
   --progress-color: var(--color-progress-75, #22c55e);
   position: relative;
-  padding: 8px;
-  border-radius: calc(var(--radius-board, 16px) + 8px);
+  padding: 10px;
+  border-radius: calc(var(--radius-board, 16px) + 10px);
   background: conic-gradient(
     from -90deg,
     var(--progress-color) 0deg,
@@ -246,8 +259,8 @@
 }
 
 .boardProgressFrame:not([style]) {
-  padding: 8px;
-  border-radius: calc(var(--radius-board, 16px) + 8px);
+  padding: 10px;
+  border-radius: calc(var(--radius-board, 16px) + 10px);
   background: var(--color-border);
 }
 
@@ -281,13 +294,17 @@
     radial-gradient(circle at 50% 42%, rgba(82, 128, 196, 0.12), transparent 50%),
     linear-gradient(180deg, rgba(13, 24, 43, 0.98), rgba(9, 16, 30, 0.98));
   border-radius: var(--radius-board, 20px);
-  border: 5px solid color-mix(in srgb, var(--color-border) 90%, rgba(255, 255, 255, 0.15));
+  border: 6px solid color-mix(in srgb, var(--color-border) 92%, rgba(255, 255, 255, 0.16));
+  /* Inset rim: same visual weight on all four sides (was top/bottom-heavy) */
   box-shadow:
     0 24px 48px rgba(2, 7, 18, 0.34),
     0 8px 18px rgba(4, 10, 25, 0.24),
+    inset 0 0 0 2px color-mix(in srgb, var(--color-brand-primary) 24%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 4px 16px rgba(0, 0, 0, 0.14),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    inset 1px 0 0 rgba(255, 255, 255, 0.06),
+    inset -1px 0 0 rgba(0, 0, 0, 0.06),
+    inset 0 0 14px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 

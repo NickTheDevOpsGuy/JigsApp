@@ -1,15 +1,25 @@
+let menuScreenPromise: Promise<typeof import("./Menu/MenuScreen")> | null = null;
+let statsScreenPromise: Promise<typeof import("./Stats/StatsScreen")> | null = null;
+let packListScreenPromise: Promise<typeof import("./Packs/PackListScreen")> | null = null;
+let packDetailScreenPromise: Promise<typeof import("./Packs/PackDetailScreen")> | null =
+  null;
+
 export function loadMenuScreenModule() {
-  return import("./Menu/MenuScreen");
+  menuScreenPromise ??= import("./Menu/MenuScreen");
+  return menuScreenPromise;
 }
 
 export function loadStatsScreenModule() {
-  return import("./Stats/StatsScreen");
+  statsScreenPromise ??= import("./Stats/StatsScreen");
+  return statsScreenPromise;
 }
 
 export function loadPackListScreenModule() {
-  return import("./Packs/PackListScreen");
+  packListScreenPromise ??= import("./Packs/PackListScreen");
+  return packListScreenPromise;
 }
 
 export function loadPackDetailScreenModule() {
-  return import("./Packs/PackDetailScreen");
+  packDetailScreenPromise ??= import("./Packs/PackDetailScreen");
+  return packDetailScreenPromise;
 }

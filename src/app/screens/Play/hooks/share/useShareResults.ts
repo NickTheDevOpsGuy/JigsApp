@@ -75,9 +75,10 @@ export function useShareResults(args: {
 
   const getShareText = useCallback(() => {
     const timeStr = formatTime(elapsedSeconds);
+    const moves = moveCount ?? 0;
     const pieceCount = state?.totalCount ?? 0;
-    return `🧩 I completed a ${pieceCount}-piece Phuzzle in ${timeStr}.`;
-  }, [elapsedSeconds, state?.totalCount]);
+    return `Phuzzle — I solved this ${pieceCount}-piece puzzle in ${timeStr} with ${moves} moves.`;
+  }, [elapsedSeconds, moveCount, state?.totalCount]);
 
   const getProgressShareTextWithUrl = useCallback(() => {
     return buildProgressShareMessage({
@@ -196,7 +197,7 @@ export function useShareResults(args: {
       const text = getChallengeShareTextWithUrl(url);
       try {
         await navigator.share({
-          title: "Phuzzle Puzzle Share",
+          title: "Phuzzle",
           text,
           url: url.startsWith("http")
             ? url

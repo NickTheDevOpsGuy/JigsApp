@@ -92,16 +92,6 @@ export function Modal({
     };
   }, [isOpen, handleKeyDown]);
 
-  const handleOverlayKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        onClose();
-      }
-    },
-    [onClose],
-  );
-
   const handleModalKeyDown = useCallback((e: React.KeyboardEvent) => {
     e.stopPropagation();
   }, []);
@@ -113,10 +103,7 @@ export function Modal({
       className={styles.overlay}
       data-variant={variant}
       onClick={onClose}
-      onKeyDown={handleOverlayKeyDown}
-      role="button"
-      tabIndex={0}
-      aria-label="Close modal"
+      role="presentation"
     >
       <div
         className={styles.modal}

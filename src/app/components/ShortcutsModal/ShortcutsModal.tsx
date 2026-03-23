@@ -51,22 +51,8 @@ export function ShortcutsModal({
 
   if (!isOpen) return null;
 
-  const handleOverlayKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onClose();
-    }
-  };
-
   return (
-    <div
-      className={styles.overlay}
-      onClick={onClose}
-      onKeyDown={handleOverlayKeyDown}
-      role="button"
-      tabIndex={0}
-      aria-label="Close"
-    >
+    <div className={styles.overlay} onClick={onClose} role="presentation">
       <div
         className={styles.modal}
         onClick={(e) => e.stopPropagation()}
@@ -78,7 +64,12 @@ export function ShortcutsModal({
             <Keyboard size={22} />
             <h2>Keyboard Shortcuts</h2>
           </div>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
+          <button
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="Close"
+            title="Close"
+          >
             <X size={20} />
           </button>
         </div>

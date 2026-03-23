@@ -26,7 +26,7 @@ describe("ReplaySolveModal", () => {
   it("renders heading and subtitle", () => {
     render(<ReplaySolveModal {...defaultProps} />);
     expect(screen.getByRole("heading", { name: /replay solve/i })).toBeTruthy();
-    expect(screen.getByText(/watch how the puzzle was completed/i)).toBeTruthy();
+    expect(screen.getByText(/watch replay/i)).toBeTruthy();
   });
 
   it("renders play button when paused", () => {
@@ -55,27 +55,8 @@ describe("ReplaySolveModal", () => {
     expect(screen.getByText(/0:12 \/ 0:45/)).toBeTruthy();
   });
 
-  it("Back to Results calls onBackToResults when provided", () => {
-    const onBackToResults = vi.fn();
-    const onClose = vi.fn();
-    render(
-      <ReplaySolveModal
-        {...defaultProps}
-        onClose={onClose}
-        onBackToResults={onBackToResults}
-      />,
-    );
-    const backBtn = screen.getByRole("button", { name: /back to results/i });
-    backBtn.click();
-    expect(onBackToResults).toHaveBeenCalledTimes(1);
-    expect(onClose).not.toHaveBeenCalled();
-  });
-
-  it("Back to Results calls onClose when onBackToResults not provided", () => {
-    const onClose = vi.fn();
-    render(<ReplaySolveModal {...defaultProps} onClose={onClose} />);
-    const backBtn = screen.getByRole("button", { name: /back to results/i });
-    backBtn.click();
-    expect(onClose).toHaveBeenCalledTimes(1);
+  it("does not render a back to results button", () => {
+    render(<ReplaySolveModal {...defaultProps} />);
+    expect(screen.queryByRole("button", { name: /back to results/i })).toBeNull();
   });
 });

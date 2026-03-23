@@ -130,7 +130,7 @@
   }
 
   .header {
-    padding: 3px 6px 4px;
+    padding: 6px 8px 8px;
     gap: 4px;
     font-size: 12px;
   }
@@ -161,7 +161,7 @@
   }
 
   .scroller {
-    padding: 2px 4px 4px;
+    padding: 6px 4px 6px;
     gap: 4px;
   }
 
@@ -175,19 +175,19 @@
   }
 
   .trayCompact .scroller {
-    padding: 2px 4px 4px;
+    padding: 6px 4px 6px;
   }
 
   .trayExtraCompact .scroller {
-    padding: 2px 4px 4px;
+    padding: 6px 4px 6px;
   }
 
   .scrollIndicator {
-    margin: 0 4px 2px;
+    margin: 0 6px 6px;
     height: 3px;
   }
 
   .scrollerWrap {
-    padding: 2px 4px 4px;
+    padding: 6px 4px 8px;
   }
 }

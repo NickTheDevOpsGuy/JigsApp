@@ -29,13 +29,6 @@ const CTA_H = 48;
 const FOOTER_H = 44;
 const GAP = 16;
 
-function truncateText(ctx: CanvasRenderingContext2D, text: string, maxW: number): string {
-  if (ctx.measureText(text).width <= maxW) return text;
-  let s = text;
-  while (s.length > 0 && ctx.measureText(s + "…").width > maxW) s = s.slice(0, -1);
-  return s ? s + "…" : "…";
-}
-
 export function useShareCardImage() {
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -54,7 +47,7 @@ export function useShareCardImage() {
       puzzleShareUrl?: string;
       pieceCount: number;
       puzzleName?: string;
-      /** Challenge = taunt copy. Result = informational only. */
+      /** Challenge = “Think you can beat me?” CTA; result = same stats, no CTA. */
       mode?: "challenge" | "result";
     }) => {
       if (!args.imageUrl || isGenerating) return;
@@ -107,17 +100,14 @@ export function useShareCardImage() {
         strokeRoundedRect(ctx, imageRect, 16, gold, 2);
         y += IMAGE_H + GAP;
 
-        // Stats: puzzle name, difficulty, time, moves/turns
+        // Stats: match link-preview card — “Puzzle” label, difficulty, time, moves (no taunts on result)
         const difficulty = getDifficultyLabel(args.pieceCount);
         const timeStr = formatTime(args.elapsedSeconds);
         const movesStr = String(args.moveCount ?? 0);
-        const puzzleName = (args.puzzleName ?? "").trim() || "Puzzle";
         const lineHeight = 32;
         ctx.font = "500 24px system-ui, -apple-system, sans-serif";
         ctx.fillStyle = "#E2E8F0";
-        const maxNameW = panel.w - PAD * 2;
-        const nameToShow = truncateText(ctx, puzzleName, maxNameW);
-        ctx.fillText(nameToShow, panel.x + panel.w / 2, y + lineHeight / 2);
+        ctx.fillText("Puzzle", panel.x + panel.w / 2, y + lineHeight / 2);
         y += lineHeight + 4;
         ctx.font = "400 22px system-ui, -apple-system, sans-serif";
         ctx.fillStyle = "#CBD5E1";
@@ -125,7 +115,6 @@ export function useShareCardImage() {
           `Difficulty: ${difficulty} (${args.pieceCount} pieces)`,
           `Time: ${timeStr}`,
           `Moves: ${movesStr}`,
-          `Turns: ${movesStr}`,
         ];
         statsLines.forEach((line) => {
           ctx.fillText(line, panel.x + panel.w / 2, y + lineHeight / 2);
@@ -133,15 +122,14 @@ export function useShareCardImage() {
         });
         y += GAP;
 
-        // CTA changes by share mode so result stays informational.
-        ctx.font = "600 26px system-ui, -apple-system, sans-serif";
-        ctx.fillStyle = "#F8FAFC";
-        const ctaText =
-          mode === "challenge"
-            ? "Can you best me? Prove it!"
-            : "Share your finished puzzle";
-        ctx.fillText(ctaText, panel.x + panel.w / 2, y + CTA_H / 2);
-        y += CTA_H + 8;
+        if (mode === "challenge") {
+          ctx.font = "600 26px system-ui, -apple-system, sans-serif";
+          ctx.fillStyle = "#F8FAFC";
+          ctx.fillText("Think you can beat me?", panel.x + panel.w / 2, y + CTA_H / 2);
+          y += CTA_H + 8;
+        } else {
+          y += 8;
+        }
 
         // Footer: phuzzle.app
         ctx.font = "400 20px system-ui, -apple-system, sans-serif";

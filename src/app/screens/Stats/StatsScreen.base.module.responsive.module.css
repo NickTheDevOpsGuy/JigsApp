@@ -138,16 +138,16 @@
 .achievements {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .achievement {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px;
+  gap: 12px;
+  padding: 12px;
   background: var(--color-bg-elevated);
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid var(--color-border);
   opacity: 0.85;
 }
@@ -158,23 +158,35 @@
 }
 
 .achievementIcon {
-  font-size: 32px;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-brand-primary) 10%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 18%, var(--color-border));
 }
 
 .achievementInfo {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .achievementName {
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
 .achievementDesc {
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1.4;
   color: var(--color-text-secondary);
 }
 
@@ -187,27 +199,31 @@
 .achievementMeta {
   display: grid;
   justify-items: end;
-  gap: 4px;
+  gap: 6px;
 }
 
 .achievementStatus {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg-card) 78%, transparent);
 }
 
 .badgesSection {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .badgesHeader {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .badgesTitle {
@@ -221,7 +237,7 @@
   display: inline-flex;
   align-items: baseline;
   gap: 2px;
-  padding: 8px 10px;
+  padding: 7px 9px;
   border-radius: 12px;
   border: 1px solid
     color-mix(in srgb, var(--color-brand-primary) 26%, var(--color-border));

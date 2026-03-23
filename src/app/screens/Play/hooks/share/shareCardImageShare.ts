@@ -50,7 +50,7 @@ export async function shareOrDownloadCard(args: {
 
   if (navigator.share && navigator.canShare?.({ files: [file] })) {
     await navigator.share({
-      title: mode === "challenge" ? "Phuzzle" : "Phuzzle Result",
+      title: "Phuzzle",
       text: shareText,
       files: [file],
     });

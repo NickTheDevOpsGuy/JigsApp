@@ -12,8 +12,6 @@ import { PackChoiceModal } from "@/components/PackChoiceModal";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import { loadStatsScreenModule } from "@/screens/routeLoaders";
-import { STORAGE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
-import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import styles from "./MenuScreen.module.css";
 
 export function MenuScreen() {
@@ -39,12 +37,7 @@ export function MenuScreen() {
   };
 
   const handleQuickPlay = () => {
-    const hasImage = !!safeLocalStorage.getItem(STORAGE_KEY);
-    if (hasImage) {
-      void loadPlayScreenModule();
-      navigate("/play");
-      return;
-    }
+    void loadPlayScreenModule();
     setShowChoosePuzzleModal(true);
   };
 
@@ -114,6 +107,7 @@ export function MenuScreen() {
                   ? "Today's puzzle complete — play again"
                   : "Play today's puzzle"
               }
+              title={isCompleted ? "Play today's puzzle again" : "Play today's puzzle"}
             >
               <div className={styles.primaryBtnInner}>
                 <span className={styles.primaryBtnTitle}>
@@ -183,7 +177,13 @@ export function MenuScreen() {
 
             {/* ─── Secondary actions ─── */}
             <nav className={styles.secondaryNav} aria-label="More options">
-              <button type="button" className={styles.secondaryRow} onClick={handlePacks}>
+              <p className={styles.secondarySectionLabel}>Explore</p>
+              <button
+                type="button"
+                className={styles.secondaryRow}
+                onClick={handlePacks}
+                title="Browse puzzle packs"
+              >
                 <span className={styles.secondaryIcon} aria-hidden>
                   <Package size={18} strokeWidth={1.75} />
                 </span>
@@ -198,6 +198,7 @@ export function MenuScreen() {
                 type="button"
                 className={styles.secondaryRow}
                 onClick={handleQuickPlay}
+                title="Start a quick play puzzle"
               >
                 <span className={styles.secondaryIcon} aria-hidden>
                   <ImagePlus size={18} strokeWidth={1.75} />

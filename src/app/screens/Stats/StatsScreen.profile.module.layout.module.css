@@ -122,7 +122,7 @@
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: 14px;
-  padding: 14px;
+  padding: 12px;
   margin-bottom: 0;
 }
 
@@ -148,44 +148,51 @@
 .leaderboardHeader {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
   align-items: stretch;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .leaderboardControlRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
+  display: flex;
+  gap: 7px;
   align-items: stretch;
+  min-width: 0;
 }
 
-/* Single segmented bar: Today | Week | All-time */
 .boardModeSwitch {
   display: flex;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-bg-card) 78%, transparent);
+  align-items: stretch;
+  gap: 7px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+
+.boardModeSwitch::-webkit-scrollbar {
+  display: none;
 }
 
 .boardModeBtn {
-  flex: 1;
-  padding: 9px 8px;
-  border: none;
-  border-radius: 0;
-  background: transparent;
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--color-bg-card) 78%, transparent);
   color: var(--color-text-secondary);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition:
     background 0.15s,
-    color 0.15s;
-}
-
-.boardModeBtn:not(:last-child) {
-  border-right: 1px solid var(--color-border);
+    color 0.15s,
+    border-color 0.15s;
+  scroll-snap-align: start;
+  white-space: nowrap;
 }
 
 .boardModeBtnActive {
@@ -203,17 +210,19 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  padding: 0 12px;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 11px;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 13px;
   background: color-mix(in srgb, var(--color-bg-card) 78%, transparent);
   color: var(--color-text-primary);
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .sortClusterLabel {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -221,7 +230,7 @@
 }
 
 .sortClusterValue {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -239,12 +248,12 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 9px 11px;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 13px;
   background: color-mix(in srgb, var(--color-bg-card) 78%, transparent);
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   text-align: left;

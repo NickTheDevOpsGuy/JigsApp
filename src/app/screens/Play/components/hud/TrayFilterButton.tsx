@@ -102,6 +102,8 @@ export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButton
                   type="button"
                   role="option"
                   aria-selected={value === opt}
+                  aria-label={`Show ${LABELS[opt]} pieces`}
+                  title={`Show ${LABELS[opt]} pieces`}
                   className={value === opt ? styles.menuItemActive : styles.menuItem}
                   onClick={() => {
                     onChange(opt);

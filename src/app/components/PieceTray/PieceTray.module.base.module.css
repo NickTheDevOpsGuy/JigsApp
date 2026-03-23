@@ -78,7 +78,7 @@
 
 /* Header: Pieces (n) + Filter + Shuffle – compact dock */
 .header {
-  padding: 4px 8px 5px;
+  padding: 8px 10px 10px;
   font-weight: 600;
   font-size: 13px;
   flex-shrink: 0;

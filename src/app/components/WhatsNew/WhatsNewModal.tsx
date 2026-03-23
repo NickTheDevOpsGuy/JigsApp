@@ -29,7 +29,6 @@ export function WhatsNewModal({ isOpen, onClose }: WhatsNewModalProps) {
     >
       <div
         className={styles.content}
-        tabIndex={0}
         role="region"
         aria-label="What's new in this release"
       >

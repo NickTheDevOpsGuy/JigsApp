@@ -2,7 +2,7 @@
   max-height: none;
   overflow: hidden;
   font-size: 1rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
 }
 
 .content:focus-within {
@@ -12,7 +12,7 @@
 }
 
 .section {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.1rem;
 }
 
 .section:last-of-type {
@@ -20,9 +20,9 @@
 }
 
 .sectionTitle {
-  margin: 0 0 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
+  margin: 0 0 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--color-brand-primary);
 }
 
@@ -33,9 +33,9 @@
 }
 
 .item {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.55rem;
   color: var(--color-text-primary);
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.5;
   letter-spacing: 0.01em;
 }
@@ -49,17 +49,17 @@
   .content {
     max-height: none;
     overflow: hidden;
-    padding-bottom: 0.25rem;
-    font-size: 0.9rem;
+    padding-bottom: 0.3rem;
+    font-size: 0.96rem;
   }
 
   .section {
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.8rem;
   }
 
   .sectionTitle {
-    font-size: 0.9rem;
-    margin-bottom: 0.35rem;
+    font-size: 1.02rem;
+    margin-bottom: 0.45rem;
   }
 
   .list {
@@ -67,8 +67,8 @@
   }
 
   .item {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    margin-bottom: 0.35rem;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    margin-bottom: 0.4rem;
   }
 }

@@ -142,6 +142,26 @@ export function PlayScreenOverlays({
     [onPreviewTap],
   );
 
+  const onPreviewKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onPreviewTap(e as unknown as React.MouseEvent<HTMLDivElement>);
+      }
+    },
+    [onPreviewTap],
+  );
+
+  const onImmersivePeekKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onImmersiveReveal();
+      }
+    },
+    [onImmersiveReveal],
+  );
+
   return (
     <>
       {(showPreview || progressiveRevealMode) && previewImage && state && (
@@ -150,9 +170,7 @@ export function PlayScreenOverlays({
           role="button"
           tabIndex={0}
           aria-label="Reference image, tap to reveal region. Drag to move."
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") e.preventDefault();
-          }}
+          onKeyDown={onPreviewKeyDown}
           onClick={onPreviewClick}
           onPointerDown={onPreviewPointerDown}
           onPointerMove={onPreviewPointerMove}
@@ -194,9 +212,10 @@ export function PlayScreenOverlays({
           onPointerEnter={onImmersiveReveal}
           onPointerDown={onImmersiveReveal}
           role="button"
-          tabIndex={-1}
+          tabIndex={0}
           aria-label="Show piece drawer"
           title="Show piece drawer"
+          onKeyDown={onImmersivePeekKeyDown}
         />
       )}
 

@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   gap: 0;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   flex-shrink: 0;
 }
 
@@ -57,10 +57,7 @@ button.stepItem:disabled {
   border: 2px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    color 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
   line-height: 1;
 }
 
@@ -70,9 +67,7 @@ button.stepItem:disabled {
   font-weight: 600;
   color: var(--color-text-secondary);
   opacity: 0.5;
-  transition:
-    color 0.2s,
-    opacity 0.2s;
+  transition: color 0.2s, opacity 0.2s;
   white-space: nowrap;
 }
 
@@ -93,11 +88,7 @@ button.stepItem:disabled {
 
 /* ── Completed step ── */
 .stepItemDone .stepNum {
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 15%,
-    var(--color-bg-elevated)
-  );
+  background: color-mix(in srgb, var(--color-brand-primary) 15%, var(--color-bg-elevated));
   border-color: var(--color-brand-primary);
   color: var(--color-brand-primary);
   font-size: 15px;
@@ -109,11 +100,7 @@ button.stepItem:disabled {
 }
 
 button.stepItemDone:hover .stepNum {
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 25%,
-    var(--color-bg-elevated)
-  );
+  background: color-mix(in srgb, var(--color-brand-primary) 25%, var(--color-bg-elevated));
 }
 
 /* ── Future step ── */
@@ -258,28 +245,40 @@ button.stepItemDone:hover .stepNum {
   text-align: center;
 }
 
+/* Step body: shrink to content (no extra stretch inside choose-puzzle modal) */
+.stepPanel {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.stepPanelCompact {
+  flex-shrink: 0;
+}
+
 .railLabel {
-  margin: 0 0 12px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--color-text-primary);
   flex-shrink: 0;
 }
 
 /* Horizontal scroll wrapper: arrows + scroller; buttons must receive clicks above scroller */
 .gridScrollWrap {
-  --puzzle-rail-gap: 10px;
-  --puzzle-rail-card-width: 180px;
-  --puzzle-rail-visible: 3;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 0;
   min-width: 0;
   position: relative;
   z-index: 1;
+}
+
+.categoryScrollWrap {
+  min-width: 0;
 }
 
 .gridScrollBtn {
@@ -334,19 +333,8 @@ button.stepItemDone:hover .stepNum {
 
 /* Scroller: single horizontal row, left-to-right scroll; start snap = full cards, no half-draw */
 .puzzleGridScroller {
-  flex: 0 1
-    calc(
-      var(--puzzle-rail-visible) * var(--puzzle-rail-card-width) +
-        (var(--puzzle-rail-visible) - 1) * var(--puzzle-rail-gap)
-    );
+  flex: 1;
   min-width: 0;
-  width: min(
-    100%,
-    calc(
-      var(--puzzle-rail-visible) * var(--puzzle-rail-card-width) +
-        (var(--puzzle-rail-visible) - 1) * var(--puzzle-rail-gap)
-    )
-  );
   direction: ltr;
   overflow-x: auto;
   overflow-y: hidden;
@@ -364,66 +352,66 @@ button.stepItemDone:hover .stepNum {
 
 /* Grid: single row LTR horizontal rail (match Pack modal rail); snap = full cards only */
 .puzzleGrid {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: var(--puzzle-rail-card-width);
-  gap: var(--puzzle-rail-gap);
-  padding: 6px 0 10px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  padding: 4px 14px 8px 14px;
   width: max-content;
   box-sizing: border-box;
   direction: ltr;
 }
 
-/* Blue bar underneath: scroll position (match Packs carousel) */
-.gridScrollBar {
-  height: 6px;
-  background: rgba(26, 43, 74, 0.6);
-  border-radius: 999px;
-  overflow: hidden;
-  margin-bottom: 16px;
-  flex-shrink: 0;
+/* Category rail: scroll only the outer scroller (ref + arrows); inner grid must not scroll */
+.categoryScrollWrap .puzzleGridScroller {
+  scroll-snap-type: none;
 }
 
-.gridScrollBarFill {
-  height: 100%;
-  background: var(--color-brand-primary);
-  border-radius: inherit;
-  box-shadow: 0 0 10px rgba(11, 99, 184, 0.4);
-  transition: width 0.15s ease-out;
-}
-
+/* Pack / loading tiles: titled cards. Puzzle pickers use .puzzleTileBare (image-only). */
 .puzzleTile {
   position: relative;
-  width: 100%;
+  flex-shrink: 0;
+  width: 130px;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--color-border);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-border) 80%, transparent),
-    0 14px 32px rgba(4, 10, 24, 0.18);
-  background: linear-gradient(180deg, rgba(17, 27, 44, 0.96), rgba(10, 18, 31, 0.98));
+  background: var(--color-bg-elevated);
   padding: 0;
   cursor: pointer;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s,
-    transform 0.15s;
+  transition: border-color 0.15s;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   text-align: left;
 }
 
+/* Catalog + pack puzzle rail: one rounded square, image fills the card (no inner frame). */
+.puzzleTileBare {
+  width: 130px;
+  aspect-ratio: 1 / 1;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+  background: var(--color-bg-elevated);
+}
+
+.puzzleTileBare .tileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.puzzleTileBare .tilePlaceholder {
+  margin: auto;
+  font-size: 28px;
+}
+
 /* Mobile: shrink grid, arrows, bar and spacing so modal fits */
 @media (max-width: 640px) {
-  .gridScrollWrap {
-    --puzzle-rail-gap: 8px;
-    --puzzle-rail-card-width: 100%;
-    --puzzle-rail-visible: 1;
-  }
-
   .stepIndicator {
     margin-bottom: 10px;
   }
@@ -449,8 +437,8 @@ button.stepItemDone:hover .stepNum {
   }
 
   .gridScrollWrap {
-    gap: 8px;
-    margin-bottom: 6px;
+    gap: 4px;
+    margin-bottom: 0;
   }
 
   .gridScrollBtn {
@@ -461,27 +449,24 @@ button.stepItemDone:hover .stepNum {
   }
 
   .puzzleGrid {
+    gap: 8px;
     padding: 2px 0;
   }
 
-  .gridScrollBar {
-    height: 4px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-  }
-
-  .gridScrollBarFill {
-    border-radius: 3px;
-  }
-
+  /* Mobile: smaller cards, 1 full + partial next to signal horizontal scroll */
   .puzzleTile {
-    border-width: 1px;
-    border-radius: 14px;
+    width: min(42vw, 150px);
+    min-height: 0;
+    border-radius: 12px;
+  }
+
+  .puzzleTileBare {
+    width: min(42vw, 150px);
   }
 
   .puzzleTile .tileTitle {
-    font-size: 12px;
-    padding: 10px 10px 12px;
+    font-size: 11px;
+    padding: 4px 6px 6px;
   }
 
   .tilePlaceholder {
@@ -504,47 +489,14 @@ button.stepItemDone:hover .stepNum {
     max-height: 40px;
   }
 
-  .categoryUploadRow {
-    margin-top: 6px;
-  }
-
-  .uploadCta {
-    padding: 12px 14px;
-    gap: 12px;
-  }
-
-  .uploadCtaIconWrap {
-    width: 44px;
-    height: 44px;
-  }
-
-  .uploadCtaIconWrap svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .uploadCtaTitle {
-    font-size: 13px;
-  }
-
-  .uploadCtaSub {
+  .uploadLinkWrap {
+    margin-top: 8px;
     font-size: 11px;
   }
 }
 
-@media (min-width: 641px) and (max-width: 900px) {
-  .gridScrollWrap {
-    --puzzle-rail-card-width: 164px;
-    --puzzle-rail-visible: 2;
-  }
-}
-
-.puzzleTile:hover {
+.puzzleTile:hover:not(:disabled) {
   border-color: var(--color-brand-primary);
-  transform: translateY(-2px);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 65%, transparent),
-    0 18px 36px rgba(9, 21, 40, 0.28);
 }
 
 .puzzleTile:focus-visible {
@@ -554,53 +506,52 @@ button.stepItemDone:hover .stepNum {
 
 .puzzleTileSelected {
   border-color: var(--color-brand-primary);
-  box-shadow:
-    0 0 0 2px var(--color-brand-primary),
-    0 18px 36px rgba(9, 21, 40, 0.32);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-brand-primary) 16%, #162235),
-    #0d1727
-  );
+  box-shadow: none;
+  background: var(--color-bg-elevated);
 }
 
-.puzzleTile .tileImageWrap {
-  border-color: color-mix(in srgb, var(--color-border) 85%, var(--color-bg-primary));
-}
-
-.puzzleTileSelected .tileImageWrap {
-  border-color: color-mix(in srgb, var(--color-brand-primary) 70%, transparent);
+.puzzleTileBare.puzzleTileSelected {
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 35%, transparent);
 }
 
 .tileImageWrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 0;
   border: none;
-  background: linear-gradient(180deg, rgba(33, 47, 73, 0.95), rgba(13, 21, 35, 0.98));
+  border-radius: 0;
+  background: var(--color-bg-primary);
 }
 
+/* Pack step 1 hero: taller thumbnail area */
+.tileImageWrapPackHero {
+  aspect-ratio: 4 / 5;
+}
+
+/* Pack hero / titled tiles: letterbox so full image shows in non-square region */
 .tileImage {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   object-position: center;
   display: block;
 }
 
 .tileTitle {
   flex-shrink: 0;
-  padding: 10px 12px 12px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 3px 5px 5px;
+  font-size: 10px;
+  font-weight: 500;
   color: var(--color-text-primary);
-  line-height: 1.3;
+  line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -609,26 +560,6 @@ button.stepItemDone:hover .stepNum {
 .tilePlaceholder {
   font-size: 20px;
   color: var(--color-text-secondary);
-}
-
-.tileHoverOverlay {
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  pointer-events: none;
-}
-
-@media (pointer: fine) {
-  .puzzleTile:hover .tileHoverOverlay {
-    background: rgba(62, 120, 255, 0.08);
-  }
-}
-
-.tileSelectedIndicator {
-  position: absolute;
-  inset: 0;
-  box-shadow: inset 0 0 0 2px var(--color-brand-primary);
-  pointer-events: none;
 }
 
 .difficultySelector {
@@ -717,113 +648,46 @@ button.stepItemDone:hover .stepNum {
   outline-offset: 2px;
 }
 
-/* Custom photo upload – card-style CTA (matches category tiles, not a raw link) */
-.categoryUploadRow {
-  grid-column: 1 / -1;
-  margin-top: 6px;
-  flex-shrink: 0;
-}
-
-.uploadCta {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  margin: 0;
-  padding: 14px 16px;
-  box-sizing: border-box;
-  border: 1px solid
-    color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
-  border-radius: 14px;
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 10%,
-    var(--color-bg-elevated)
-  );
-  color: var(--color-text-primary);
-  cursor: pointer;
-  text-align: left;
-  transition:
-    border-color 0.18s ease,
-    background 0.18s ease,
-    box-shadow 0.18s ease,
-    transform 0.12s ease;
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--color-text-primary) 6%, transparent);
-}
-
-.uploadCta:hover {
-  border-color: color-mix(in srgb, var(--color-brand-primary) 55%, var(--color-border));
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 16%,
-    var(--color-bg-elevated)
-  );
-  box-shadow:
-    0 4px 20px color-mix(in srgb, var(--color-brand-primary) 18%, transparent),
-    0 1px 0 color-mix(in srgb, var(--color-text-primary) 8%, transparent);
-  transform: translateY(-1px);
-}
-
-.uploadCta:active {
-  transform: translateY(0);
-}
-
-.uploadCta:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 3px;
-}
-
-.uploadCtaInput {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.uploadCtaIconWrap {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--color-brand-primary) 22%, var(--color-bg-primary));
-  color: var(--color-brand-primary);
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 35%, transparent);
-}
-
-.uploadCtaCopy {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.uploadCtaTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  letter-spacing: -0.01em;
-  line-height: 1.25;
-}
-
-.uploadCtaSub {
+.uploadLinkWrap {
+  margin: 12px 0 0;
   font-size: 12px;
-  font-weight: 500;
   color: var(--color-text-secondary);
-  line-height: 1.35;
-  opacity: 0.92;
+  text-align: center;
+  flex-shrink: 0;
 }
 
-/* ── Category step: inline grid of clickable category cards ── */
+.uploadLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-brand-primary);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.uploadLink:hover {
+  opacity: 0.9;
+}
+
+.uploadLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── Category step: one scroll parent (.puzzleGridScroller); row is max-content wide ── */
 .categoryGrid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  padding: 4px 0 8px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 8px;
+  padding: 4px 14px 8px;
+  width: max-content;
+  max-width: none;
+  box-sizing: border-box;
+  overflow: visible;
+  flex-shrink: 0;
 }
 
 .categoryCard {
@@ -831,29 +695,85 @@ button.stepItemDone:hover .stepNum {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 18px 10px;
-  background: linear-gradient(180deg, rgba(21, 31, 48, 0.98), rgba(14, 22, 35, 0.98));
+  gap: 5px;
+  padding: 10px 12px;
+  background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
-  border-radius: 16px;
+  border-radius: 12px;
   cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s,
-    transform 0.1s,
-    box-shadow 0.15s;
-  min-height: 104px;
-  box-shadow: 0 10px 24px rgba(6, 12, 24, 0.16);
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  min-height: 0;
+  height: 72px;
+  min-width: 76px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.categoryUploadRow {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+}
+
+.uploadCta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  min-width: 76px;
+  height: 72px;
+  padding: 8px 10px;
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.uploadCta:hover {
+  border-color: var(--color-brand-primary);
+  background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-bg-elevated));
+}
+
+.uploadCta:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.uploadCtaIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+}
+
+.uploadCtaCopy {
+  text-align: center;
+}
+
+.uploadCtaTitle {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.uploadCtaInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 0;
 }
 
 .categoryCard:hover {
   border-color: var(--color-brand-primary);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-brand-primary) 12%, #18263a),
-    #111b2b
-  );
-  box-shadow: 0 14px 28px rgba(8, 18, 34, 0.24);
+  background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-bg-elevated));
   transform: translateY(-1px);
 }
 
@@ -862,16 +782,19 @@ button.stepItemDone:hover .stepNum {
 }
 
 .categoryCardEmoji {
-  font-size: 2.2rem;
+  font-size: 1.6rem;
   line-height: 1;
 }
 
 .categoryCardName {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--color-text-primary);
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.1;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 88px;
 }
 
 /* Breadcrumb active step */
@@ -886,51 +809,76 @@ button.stepItemDone:hover .stepNum {
 }
 
 @media (max-width: 640px) {
-  .categoryGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
   .categoryCard {
-    padding: 12px 6px;
-    min-height: 76px;
-    border-radius: 12px;
+    height: 64px;
+    min-width: 64px;
+    padding: 8px 10px;
+    border-radius: 10px;
   }
 
   .categoryCardEmoji {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .categoryCardName {
-    font-size: 11px;
+    font-size: 10px;
+    max-width: 76px;
+  }
+
+  .uploadCta {
+    height: 64px;
+    min-width: 64px;
+    padding: 6px 8px;
+    border-radius: 10px;
   }
 }
 
-/* Setup step: thumbnail + title side by side */
+/* Setup step: same visual as puzzle rail — square image card, no inner frame */
 .setupHeader {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 18px;
+  gap: 14px;
+  margin-bottom: 14px;
   flex-shrink: 0;
 }
 
 .setupThumb {
   flex-shrink: 0;
-  width: 96px;
-  height: 96px;
-  border-radius: 14px;
+  width: 130px;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid var(--color-border);
+  border: 2px solid color-mix(in srgb, var(--color-brand-primary) 45%, var(--color-border));
   background: var(--color-bg-elevated);
-  box-shadow: 0 12px 28px rgba(5, 11, 22, 0.2);
+  box-sizing: border-box;
 }
 
 .setupThumbImg {
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
+}
+
+.setupHeaderText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.setupPuzzleName {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* backToPuzzlesBtn removed */
@@ -938,8 +886,13 @@ button.stepItemDone:hover .stepNum {
 /* stepLinkPlain removed */
 
 @media (max-width: 640px) {
+  /* Same width rule as .puzzleTile on the puzzle rail */
   .setupThumb {
-    width: 56px;
-    height: 56px;
+    width: min(42vw, 150px);
+    aspect-ratio: 1 / 1;
+  }
+
+  .setupPuzzleName {
+    font-size: 1rem;
   }
 }

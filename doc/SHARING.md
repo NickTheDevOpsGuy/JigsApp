@@ -7,9 +7,9 @@ Sharing in Phuzzle: **completion share** (your result), **Daily Share** (Wordle-
 ## 1. Completion share (no Supabase)
 
 - Share your finished puzzle: image, time, moves, link to the same puzzle.
-- **Share Result** — completion summary (time, moves, accuracy); opens share modal with Share Card, copy, native share.
-- **Beat My Puzzle** — challenge link with your time/moves; share card image + message; link includes `ct`/`cm` so friends see a challenge intro.
-- Share card PNG: challenge or result (stats + URL). Download supported.
+- **Share Result** — same preview-style text block as challenge (Phuzzle → Puzzle → Difficulty / Time / Moves → URL) **without** “Think you can beat me?”; share card matches; link is the same puzzle (no `ct`/`cm` on the result URL).
+- **Beat My Puzzle** — same stats block + **“Think you can beat me?”**; link = same puzzle/difficulty (`grid`, `puzzle`, `session`, or `daily` from `ensureChallengeShareUrl`) plus `ct` & `cm` for the challenge.
+- Share card PNG: challenge (with CTA) or result (stats only, no taunt). Download supported.
 - **Key files:** `useShareResults.ts`, `useDownloadImage.ts`, `useShareCardImage.ts`, `CompletionOverlay.tsx`, `shareMessages.ts`.
 
 Triggered from the win overlay after completing a puzzle. Works without any backend.

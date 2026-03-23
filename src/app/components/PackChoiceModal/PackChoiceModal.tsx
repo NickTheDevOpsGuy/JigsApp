@@ -57,10 +57,8 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
   const packScrollRef = useRef<HTMLDivElement>(null);
   const puzzleScrollRef = useRef<HTMLDivElement>(null);
   const startButtonRef = useRef<HTMLButtonElement>(null);
-  const [packScrollProgress, setPackScrollProgress] = useState(0);
   const [canScrollPackLeft, setCanScrollPackLeft] = useState(false);
   const [canScrollPackRight, setCanScrollPackRight] = useState(false);
-  const [puzzleScrollProgress, setPuzzleScrollProgress] = useState(0);
   const [canScrollPuzzleLeft, setCanScrollPuzzleLeft] = useState(false);
   const [canScrollPuzzleRight, setCanScrollPuzzleRight] = useState(false);
 
@@ -85,9 +83,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     const threshold = 2;
     setCanScrollPackLeft(maxScroll > threshold && left > threshold);
     setCanScrollPackRight(maxScroll > threshold && left < maxScroll - threshold);
-    setPackScrollProgress(
-      maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, left / maxScroll)),
-    );
   }, []);
 
   const updatePuzzleScrollState = useCallback(() => {
@@ -98,9 +93,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     const threshold = 2;
     setCanScrollPuzzleLeft(maxScroll > threshold && left > threshold);
     setCanScrollPuzzleRight(maxScroll > threshold && left < maxScroll - threshold);
-    setPuzzleScrollProgress(
-      maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, left / maxScroll)),
-    );
   }, []);
 
   const scrollPackBy = useCallback(
@@ -323,7 +315,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
 
       {/* Step 1: Pack selection only – clean Filter control + optional chips */}
       {step === "pack" && (
-        <>
+        <div className={styles.stepPanel}>
           <p className={styles.railLabel}>Choose a pack</p>
           <div className={styles.gridScrollWrap}>
             <button
@@ -378,7 +370,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                         aria-label={`${pack.name}, ${total} puzzles, ${completedCount} solved`}
                       >
                         <div
-                          className={`${styles.tileImageWrap} ${localStyles.packTileImageWrap}`}
+                          className={`${styles.tileImageWrap} ${styles.tileImageWrapPackHero}`}
                         >
                           {hero && !imgError[pack.id] ? (
                             <img
@@ -407,7 +399,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                           {" · "}
                           {completedCount} / {total} solved
                         </span>
-                        <div className={styles.tileHoverOverlay} aria-hidden />
                       </button>
                     );
                   })
@@ -425,25 +416,12 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
               <ChevronRight size={22} aria-hidden />
             </button>
           </div>
-          <div
-            className={styles.gridScrollBar}
-            role="progressbar"
-            aria-valuenow={Math.round(packScrollProgress * 100)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Scroll position"
-          >
-            <div
-              className={styles.gridScrollBarFill}
-              style={{ width: `${packScrollProgress * 100}%` }}
-            />
-          </div>
-        </>
+        </div>
       )}
 
       {/* Step 2: Puzzle selection only (no large preview) */}
       {step === "puzzle" && selectedPack && puzzles.length > 0 && (
-        <>
+        <div className={styles.stepPanel}>
           <p className={styles.railLabel}>{selectedPack.name} — pick a puzzle</p>
           <div className={styles.gridScrollWrap}>
             <button
@@ -466,13 +444,13 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                 {puzzles.map((puzzle, puzzleIndex) => {
                   const isDone = completed.has(puzzle.id);
                   const eagerLoad = puzzleIndex < 12;
-                  return (
+                    return (
                     <button
                       key={puzzle.id}
                       type="button"
                       role="option"
                       aria-selected={false}
-                      className={styles.puzzleTile}
+                      className={`${styles.puzzleTile} ${styles.puzzleTileBare}`}
                       onClick={() => {
                         setSelectedPuzzle(puzzle);
                         setDifficultyIndex(RECOMMENDED_INDEX);
@@ -481,35 +459,28 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                       title={`Select: ${puzzle.name}${isDone ? " (completed)" : ""}`}
                       aria-label={`${puzzle.name}${isDone ? ", completed" : ""}`}
                     >
-                      <div className={styles.tileImageWrap}>
-                        {imgError[puzzle.id] ? (
-                          <span className={styles.tilePlaceholder}>?</span>
-                        ) : (
-                          <img
-                            src={puzzle.thumbnail}
-                            alt=""
-                            loading={eagerLoad ? "eager" : "lazy"}
-                            decoding="async"
-                            className={styles.tileImage}
-                            onError={() =>
-                              setImgError((prev) => ({
-                                ...prev,
-                                [puzzle.id]: true,
-                              }))
-                            }
-                          />
-                        )}
-                        {isDone && (
-                          <span className={localStyles.completedBadge} aria-hidden>
-                            <Check size={12} />
-                          </span>
-                        )}
-                      </div>
-                      <span className={styles.tileTitle}>
-                        {puzzle.name}
-                        {isDone ? " ✓" : ""}
-                      </span>
-                      <div className={styles.tileHoverOverlay} aria-hidden />
+                      {imgError[puzzle.id] ? (
+                        <span className={styles.tilePlaceholder}>?</span>
+                      ) : (
+                        <img
+                          src={puzzle.thumbnail}
+                          alt=""
+                          loading={eagerLoad ? "eager" : "lazy"}
+                          decoding="async"
+                          className={styles.tileImage}
+                          onError={() =>
+                            setImgError((prev) => ({
+                              ...prev,
+                              [puzzle.id]: true,
+                            }))
+                          }
+                        />
+                      )}
+                      {isDone && (
+                        <span className={localStyles.completedBadge} aria-hidden>
+                          <Check size={12} />
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -526,30 +497,17 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
               <ChevronRight size={22} aria-hidden />
             </button>
           </div>
-          <div
-            className={styles.gridScrollBar}
-            role="progressbar"
-            aria-valuenow={Math.round(puzzleScrollProgress * 100)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Scroll position"
-          >
-            <div
-              className={styles.gridScrollBarFill}
-              style={{ width: `${puzzleScrollProgress * 100}%` }}
-            />
-          </div>
-        </>
+        </div>
       )}
 
       {/* Step 3: Puzzle Setup */}
       {step === "setup" && selectedPuzzle && (
-        <>
+        <div className={`${styles.stepPanel} ${styles.stepPanelCompact}`}>
           <div className={localStyles.setupHeader}>
             <div className={localStyles.setupThumb}>
               <img
                 src={selectedPuzzle.thumbnail}
-                alt=""
+                alt={`${selectedPuzzle.name} preview`}
                 className={localStyles.setupThumbImg}
               />
             </div>
@@ -594,7 +552,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
           >
             Start Puzzle
           </button>
-        </>
+        </div>
       )}
     </Modal>
   );

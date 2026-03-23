@@ -7,12 +7,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   z-index: 1000;
   animation: fadeIn var(--transition-duration-dialog, 200ms)
     var(--ease-out-smooth, ease-out);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: backdrop-filter var(--transition-duration-dialog, 200ms) ease;
 
   -webkit-touch-callout: none;
@@ -42,17 +43,20 @@
 
 .modal {
   background: color-mix(in srgb, var(--color-bg-card) 96%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-lg);
-  max-width: 380px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #ffffff 6%, transparent) inset,
+    0 24px 64px rgba(0, 0, 0, 0.34),
+    var(--shadow-lg);
+  max-width: 432px;
   width: 100%;
-  max-height: 85vh;
+  max-height: min(90vh, 920px);
   overflow: hidden;
   animation: slideUp var(--transition-duration-dialog, 200ms)
     var(--ease-out-smooth, cubic-bezier(0.2, 0.8, 0.2, 1));
-  border: 1px solid var(--color-border);
+  border: 1px solid color-mix(in srgb, var(--color-border) 82%, rgba(255, 255, 255, 0.08));
   display: flex;
   flex-direction: column;
 
@@ -63,15 +67,17 @@
 }
 
 .modalTutorial {
-  max-width: 680px;
+  max-width: 720px;
   box-shadow: var(--shadow-lg);
   background: var(--color-bg-card);
 }
 
 /* Shared by Choose Puzzle, Pack Choice, and Choose Photo for parity */
 .modal[data-variant="choosePuzzle"] {
-  max-width: min(96vw, 760px);
-  max-height: 90vh;
+  max-width: min(96vw, 780px);
+  max-height: min(92vh, 960px);
+  /* Overlay is flex; default stretch would make the shell viewport-tall and flex:1 content leaves a gap */
+  align-self: center;
 }
 
 @keyframes slideUp {

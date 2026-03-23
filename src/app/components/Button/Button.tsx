@@ -28,6 +28,9 @@ export function Button({
   className = "",
   ...rest
 }: ButtonProps) {
+  const title =
+    rest.title ??
+    (typeof rest["aria-label"] === "string" ? rest["aria-label"] : undefined);
   const classNames = [
     styles.button,
     styles[variant],
@@ -39,7 +42,13 @@ export function Button({
     .join(" ");
 
   return (
-    <button type={type} className={classNames} disabled={disabled} {...rest}>
+    <button
+      type={type}
+      className={classNames}
+      disabled={disabled}
+      {...rest}
+      title={title}
+    >
       {children}
     </button>
   );

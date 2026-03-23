@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: "autoUpdate",
-        includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.webp"],
+        includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.png"],
         manifest: {
           name: "Phuzzle",
           short_name: "Phuzzle",
@@ -49,8 +49,6 @@ export default defineConfig(({ mode }) => {
       exclude: ["node_modules", "**/e2e/**"],
       globals: true,
       setupFiles: ["./src/test/setup.ts"],
-      minWorkers: 4,
-      maxWorkers: 4,
     },
     build: {
       // Single CSS bundle avoids "Unable to preload CSS for /assets/..." errors on Vercel.
@@ -61,10 +59,7 @@ export default defineConfig(({ mode }) => {
           manualChunks(id) {
             // Keep storage/time/daily helpers in stable shared chunks to avoid
             // cross-chunk initialization cycles (menu <-> play-setup).
-            if (
-              id.includes("utils/safeLocalStorage") ||
-              id.includes("screens/Play/core/utils/playScreenUtils")
-            ) {
+            if (id.includes("utils/safeLocalStorage")) {
               return "storage";
             }
             if (id.includes("screens/Play/timeMode")) {
@@ -85,11 +80,7 @@ export default defineConfig(({ mode }) => {
             if (id.includes("screens/Packs/PackListScreen")) return "pack-list";
             if (id.includes("screens/Packs/PackDetailScreen")) return "pack-detail";
             if (id.includes("screens/Packs/")) return "pack-list";
-            if (
-              id.includes("components/PackChoiceModal") ||
-              id.includes("components/ChoosePuzzleModal")
-            )
-              return "modals";
+            if (id.includes("components/PackChoiceModal") || id.includes("components/ChoosePuzzleModal")) return "modals";
             // Split vendor chunks to avoid a single >500kB bundle
             if (id.includes("node_modules")) {
               if (id.includes("react-dom") || id.includes("react/")) {

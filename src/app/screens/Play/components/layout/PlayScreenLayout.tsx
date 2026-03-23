@@ -119,8 +119,14 @@ export function PlayScreenLayout({
             className={styles.immersivePeekTop}
             onPointerEnter={onImmersiveReveal}
             onPointerDown={onImmersiveReveal}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onImmersiveReveal();
+              }
+            }}
             role="button"
-            tabIndex={-1}
+            tabIndex={0}
             aria-label="Show menu and controls"
             title="Show menu and controls"
           />
@@ -136,7 +142,11 @@ export function PlayScreenLayout({
           createPortal(<ReplaySolveModal {...replayPortalProps} />, document.body)}
 
         {/* GameplayShell: single layout anchor. TopHUD, PuzzleBoard, TrayHandle, PieceTray share same left edge and width. */}
-        <div className={styles.boardLayoutShell} data-layout="gameplay-shell">
+        <div
+          className={styles.boardLayoutShell}
+          data-layout="gameplay-shell"
+          data-replay-active={replayPortalProps ? "true" : undefined}
+        >
           <PlayScreenTopBar {...topBarProps} hideMenuAndButtons={hideTopBarControls} />
 
           <div className={styles.playBody} data-layout="play-body">

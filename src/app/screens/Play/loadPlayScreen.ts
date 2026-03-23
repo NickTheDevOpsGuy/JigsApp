@@ -1,3 +1,6 @@
+let playScreenPromise: Promise<typeof import("./PlayScreen")> | null = null;
+
 export function loadPlayScreenModule() {
-  return import("./PlayScreen");
+  playScreenPromise ??= import("./PlayScreen");
+  return playScreenPromise;
 }

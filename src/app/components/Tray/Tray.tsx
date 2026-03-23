@@ -107,18 +107,11 @@ export function Tray({
     const size = Math.max(piece.w, piece.h) * TRAY_SCALE + 8;
 
     return (
-      <div
+      <button
         key={piece.id}
+        type="button"
         className={styles.trayPiece}
-        role="button"
-        tabIndex={0}
         onClick={() => onPieceClick(piece.id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onPieceClick(piece.id);
-          }
-        }}
         title={`Piece ${piece.id} - Click to place on board`}
         aria-label={`Place piece ${piece.id} on board`}
       >
@@ -136,7 +129,7 @@ export function Tray({
             style={{ width: size, height: size }}
           />
         )}
-      </div>
+      </button>
     );
   };
 

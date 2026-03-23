@@ -89,10 +89,10 @@ export function getPlayScreenUIStorageInitial(): {
   minimapPosition: "bottom-left" | "bottom-right" | "top-left" | "top-right";
   undoRedoEnabled: boolean;
 } {
-  let snapToleranceOverride = 1;
+  let snapToleranceOverride = 0.9;
   try {
     const raw = safeLocalStorage.getItem(SNAP_TOLERANCE_OVERRIDE_KEY);
-    const parsed = raw != null ? Number(raw) : 1;
+    const parsed = raw != null ? Number(raw) : 0.9;
     if (Number.isFinite(parsed)) {
       snapToleranceOverride = Math.min(1.6, Math.max(0.6, parsed));
     }

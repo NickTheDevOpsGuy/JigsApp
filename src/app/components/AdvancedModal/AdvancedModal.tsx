@@ -29,6 +29,7 @@ export function AdvancedModal({
             onClearCache();
           }}
           aria-label="Clear cache"
+          title="Clear cache"
         >
           Clear Cache
         </button>
@@ -43,6 +44,7 @@ export function AdvancedModal({
             onResetStats();
           }}
           aria-label="Reset local stats"
+          title="Reset local stats"
         >
           Reset Local Stats
         </button>

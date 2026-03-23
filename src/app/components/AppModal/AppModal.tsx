@@ -31,6 +31,10 @@ type AppModalProps = {
   size?: "default" | "xl" | "wide";
   /** "celebration" = gradient border + festive backdrop */
   tone?: "default" | "celebration";
+  /** "top" = align dialog near top of viewport instead of centered */
+  align?: "center" | "top";
+  /** Top padding used when align="top" */
+  topOffsetPx?: number;
   bodyClassName?: string;
   /** Accessible name for the close button (default "Close"). */
   closeLabel?: string;
@@ -46,6 +50,8 @@ export function AppModal({
   surface = "default",
   size = "default",
   tone = "default",
+  align = "center",
+  topOffsetPx = 16,
   bodyClassName,
   closeLabel = "Close",
 }: AppModalProps) {
@@ -175,8 +181,25 @@ export function AppModal({
     .filter(Boolean)
     .join(" ");
 
+  const backdropClass = [
+    styles.backdrop,
+    align === "top" ? styles.backdropTop : "",
+    tone === "celebration" ? styles.backdropSolid : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return createPortal(
-    <div className={styles.backdrop} onClick={onClose} role="presentation">
+    <div
+      className={backdropClass}
+      style={
+        align === "top"
+          ? { paddingTop: `max(${topOffsetPx}px, env(safe-area-inset-top, 0px))` }
+          : undefined
+      }
+      onClick={onClose}
+      role="presentation"
+    >
       <div
         ref={dialogRef}
         className={dialogClass}

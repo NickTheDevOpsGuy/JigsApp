@@ -126,6 +126,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                   className={`${styles.pieceButton} ${highlightedPieceIds?.has(slot.piece.id) ? styles.pieceButtonPulse : ""}`}
                   onClick={() => onPieceClick(slot.piece.id)}
                   aria-label={`Place piece ${slot.piece.id}`}
+                  title={`Place piece ${slot.piece.id}`}
                 >
                   <div
                     className={styles.thumbWrap}

@@ -10,6 +10,8 @@ export type AppModalProps = {
   surface?: "bare" | "card" | "elevated";
   size?: "sm" | "md" | "lg" | "xl" | "full";
   tone?: "default" | "celebration" | "danger";
+  align?: "center" | "top";
+  topOffsetPx?: number;
   showCloseButton?: boolean;
   ariaLabel?: string;
 };
@@ -21,6 +23,8 @@ export function AppModal({
   surface = "card",
   size = "md",
   tone = "default",
+  align = "center",
+  topOffsetPx = 16,
   showCloseButton = true,
   ariaLabel,
 }: AppModalProps) {
@@ -74,13 +78,13 @@ export function AppModal({
         inset: 0,
         zIndex: 1000,
         display: "flex",
-        alignItems: "center",
+        alignItems: align === "top" ? "flex-start" : "center",
         justifyContent: "center",
         background: "rgba(0,0,0,0.6)",
         backdropFilter: "blur(4px)",
         WebkitBackdropFilter: "blur(4px)",
         padding: "16px",
-        paddingTop: "max(16px, env(safe-area-inset-top, 16px))",
+        paddingTop: `max(${topOffsetPx}px, env(safe-area-inset-top, ${topOffsetPx}px))`,
         paddingBottom: "max(16px, env(safe-area-inset-bottom, 16px))",
         ...toneStyles[tone],
       }}

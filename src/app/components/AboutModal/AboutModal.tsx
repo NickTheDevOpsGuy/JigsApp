@@ -38,6 +38,7 @@ export function AboutModal({ isOpen, onClose, onShowWhatsNew }: AboutModalProps)
           className={styles.aboutChoiceBtn}
           onClick={openRepo}
           aria-label="Get Involved"
+          title="Open the project repository"
         >
           🌟 Get Involved
         </button>
@@ -46,6 +47,7 @@ export function AboutModal({ isOpen, onClose, onShowWhatsNew }: AboutModalProps)
           className={styles.aboutChoiceBtn}
           onClick={openContributors}
           aria-label="Meet the Team"
+          title="Open contributors"
         >
           👋 Meet the Team
         </button>
@@ -55,6 +57,7 @@ export function AboutModal({ isOpen, onClose, onShowWhatsNew }: AboutModalProps)
             className={styles.aboutChoiceBtn}
             onClick={showWhatsNew}
             aria-label="What's New"
+            title="Open what’s new"
           >
             ✨ What&apos;s New
           </button>

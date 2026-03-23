@@ -21,9 +21,10 @@ export function PauseOverlay({ onResume }: PauseOverlayProps) {
       onClick={onResume}
       onKeyDown={handleKeyDown}
       aria-label="Resume game"
+      title="Resume game"
     >
       <div className={styles.pauseContent}>
-        <Pause size={64} />
+        <Pause size={64} aria-hidden />
         <h2>Paused</h2>
         <p>Click anywhere or press the Resume button to continue</p>
       </div>

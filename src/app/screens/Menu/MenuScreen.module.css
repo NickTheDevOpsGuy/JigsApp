@@ -46,8 +46,8 @@
 /* On desktop: give the shell a visible phone-frame feel */
 @media (min-width: 500px) {
   .canvas {
-    align-items: center;
-    padding: 32px 0;
+    align-items: flex-start;
+    padding: 20px 0 32px;
   }
 
   .page {
@@ -60,7 +60,8 @@
       0 32px 80px rgba(0, 0, 0, 0.7),
       0 8px 24px rgba(0, 0, 0, 0.4);
     /* Ensure content fills the phone shell naturally */
-    padding-top: 20px;
+    margin-top: 0;
+    padding-top: 18px;
     padding-bottom: 32px;
   }
 }
@@ -88,9 +89,9 @@
 
 .logoText {
   font-family: "Fredoka", system-ui, sans-serif;
-  font-size: 21px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.4px;
   color: var(--color-text-primary, #f1f1f5);
 }
 
@@ -132,32 +133,33 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-top: 20px;
+  padding-top: 12px;
+  gap: 16px;
 }
 
 /* ── Puzzle label ── */
 .puzzleLabel {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  margin-bottom: 14px;
+  gap: 4px;
+  margin-bottom: 2px;
 }
 
 .puzzleLabelTag {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-brand-primary, #6366f1);
   opacity: 0.9;
 }
 
 .puzzleLabelNum {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.6px;
   color: var(--color-text-primary, #f1f1f5);
-  line-height: 1.1;
+  line-height: 1.05;
 }
 
 /* ── Primary CTA ── */
@@ -166,17 +168,19 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 17px 20px;
-  gap: 12px;
-  background: var(--color-brand-primary, #6366f1);
+  padding: 14px 16px;
+  gap: 10px;
+  background:
+    linear-gradient(180deg, rgba(113, 116, 255, 0.88), rgba(73, 148, 255, 0.82)),
+    var(--color-brand-primary, #6366f1);
   color: #fff;
-  border: none;
-  border-radius: 16px;
+  border: 1px solid rgba(173, 198, 255, 0.34);
+  border-radius: 14px;
   cursor: pointer;
   text-align: left;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-    0 4px 20px rgba(99, 102, 241, 0.3);
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+    0 12px 26px rgba(34, 91, 184, 0.24);
   transition:
     opacity 0.15s,
     transform 0.12s,
@@ -186,11 +190,11 @@
 }
 
 .primaryBtn:hover {
-  opacity: 0.92;
+  opacity: 0.96;
   transform: translateY(-1px);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-    0 8px 28px rgba(99, 102, 241, 0.38);
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+    0 14px 28px rgba(34, 91, 184, 0.28);
 }
 
 .primaryBtn:active {
@@ -214,28 +218,30 @@
 .primaryBtnInner {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   flex: 1;
   min-width: 0;
 }
 
 .primaryBtnTitle {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
   line-height: 1.2;
 }
 
 .primaryBtnSub {
   font-size: 12px;
-  font-weight: 500;
-  opacity: 0.68;
+  font-weight: 600;
+  opacity: 0.88;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
 }
 
 .primaryBtnArrow {
   flex-shrink: 0;
-  opacity: 0.75;
+  opacity: 0.7;
   transition: transform 0.15s;
 }
 
@@ -247,19 +253,23 @@
 .streakRow {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 0 0;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 2px 0;
+  margin-top: 0;
 }
 
 .weeklyCard {
-  margin-top: 16px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(99, 102, 241, 0.24);
+  margin-top: 0;
+  padding: 15px 17px;
+  border-radius: 14px;
+  border: 1px solid rgba(120, 139, 255, 0.28);
   background:
-    linear-gradient(180deg, rgba(99, 102, 241, 0.14), rgba(99, 102, 241, 0.04)),
-    rgba(255, 255, 255, 0.03);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+    linear-gradient(180deg, rgba(99, 102, 241, 0.18), rgba(59, 130, 246, 0.08)),
+    rgba(255, 255, 255, 0.035);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+    0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
 .weeklyCardHeader {
@@ -267,28 +277,31 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .weeklyCardTag {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #a5b4fc;
+  color: #c0caff;
 }
 
 .weeklyCardCount {
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 900;
   color: var(--color-text-primary, #f1f1f5);
+  line-height: 1;
 }
 
 .weeklyCardText {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: rgba(241, 241, 245, 0.78);
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: rgba(241, 241, 245, 0.9);
+  text-wrap: balance;
 }
 
 .streakStat {
@@ -309,14 +322,14 @@
 }
 
 .streakVal {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--color-text-primary, #f1f1f5);
   font-variant-numeric: tabular-nums;
 }
 
 .streakUnit {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--color-text-secondary, rgba(255, 255, 255, 0.45));
 }
@@ -325,7 +338,7 @@
 .weekDots {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 9px;
   margin-left: auto;
 }
 
@@ -333,12 +346,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 
 .dot {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--color-border, rgba(255, 255, 255, 0.12));
   transition:
@@ -360,10 +373,10 @@
 }
 
 .dotDay {
-  font-size: 8.5px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--color-text-secondary, rgba(255, 255, 255, 0.35));
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.58));
   text-transform: uppercase;
 }
 
@@ -374,79 +387,106 @@
 /* ── Divider ── */
 .divider {
   height: 1px;
-  background: var(--color-border, rgba(255, 255, 255, 0.08));
-  margin: 22px 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(99, 102, 241, 0.24),
+    rgba(255, 255, 255, 0.04)
+  );
+  margin: 6px 0 2px;
 }
 
 /* ── Secondary nav rows ── */
 .secondaryNav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
+}
+
+.secondarySectionLabel {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(241, 241, 245, 0.56);
 }
 
 .secondaryRow {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
-  padding: 13px 14px;
+  min-height: 0;
+  padding: 13px 2px;
   background: transparent;
   border: none;
-  border-radius: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
   cursor: pointer;
   text-align: left;
   color: var(--color-text-primary, #f1f1f5);
-  transition: background 0.12s;
+  transition:
+    background 0.12s,
+    transform 0.12s,
+    color 0.12s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 
+.secondaryRow:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .secondaryRow:hover {
-  background: var(--color-bg-elevated, rgba(255, 255, 255, 0.05));
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .secondaryRow:active {
-  background: var(--color-bg-card, rgba(255, 255, 255, 0.08));
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .secondaryIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--color-bg-elevated, rgba(255, 255, 255, 0.06));
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
   color: var(--color-brand-primary, #6366f1);
   flex-shrink: 0;
-  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .secondaryText {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  flex: 1;
+  gap: 3px;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
 .secondaryLabel {
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.1px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.15px;
   color: var(--color-text-primary, #f1f1f5);
 }
 
 .secondaryDesc {
   font-size: 12px;
-  font-weight: 400;
-  color: var(--color-text-secondary, rgba(255, 255, 255, 0.42));
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.5));
 }
 
 .secondaryArrow {
   flex-shrink: 0;
-  color: var(--color-text-secondary, rgba(255, 255, 255, 0.3));
+  justify-self: end;
+  align-self: center;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.34));
   transition: transform 0.12s;
 }
 
@@ -457,18 +497,80 @@
 /* ── Short screens ── */
 @media (max-height: 700px) {
   .main {
-    padding-top: 12px;
+    padding-top: 10px;
+    gap: 12px;
   }
   .puzzleLabel {
-    margin-bottom: 10px;
+    margin-bottom: 0;
   }
   .puzzleLabelNum {
-    font-size: 18px;
-  }
-  .streakRow {
-    padding-top: 12px;
+    font-size: 22px;
   }
   .divider {
-    margin: 14px 0;
+    margin: 4px 0 2px;
+  }
+}
+
+@media (max-width: 420px) {
+  .page {
+    padding-top: max(12px, env(safe-area-inset-top, 12px));
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .main {
+    padding-top: 10px;
+    gap: 12px;
+  }
+
+  .puzzleLabelTag {
+    font-size: 11px;
+  }
+
+  .puzzleLabelNum {
+    font-size: 22px;
+  }
+
+  .primaryBtnTitle {
+    font-size: 15px;
+  }
+
+  .primaryBtnSub {
+    font-size: 11px;
+  }
+
+  .weeklyCard {
+    padding: 14px 15px;
+  }
+
+  .weeklyCardTag {
+    font-size: 12px;
+  }
+
+  .weeklyCardCount {
+    font-size: 24px;
+  }
+
+  .weeklyCardText {
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .weekDots {
+    gap: 7px;
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .dotDay {
+    font-size: 10px;
+  }
+
+  .secondaryRow {
+    min-height: 0;
+    padding: 12px 2px;
   }
 }

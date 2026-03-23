@@ -56,9 +56,11 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     [filterCategory],
   );
 
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
   const gridScrollRef = useRef<HTMLDivElement>(null);
   const startButtonRef = useRef<HTMLButtonElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [canScrollCategoryLeft, setCanScrollCategoryLeft] = useState(false);
+  const [canScrollCategoryRight, setCanScrollCategoryRight] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -83,7 +85,16 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     const threshold = 2;
     setCanScrollLeft(maxScroll > threshold && left > threshold);
     setCanScrollRight(maxScroll > threshold && left < maxScroll - threshold);
-    setScrollProgress(maxScroll <= 0 ? 1 : Math.min(1, Math.max(0, left / maxScroll)));
+  }, []);
+
+  const updateCategoryScrollState = useCallback(() => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+    const left = el.scrollLeft;
+    const threshold = 2;
+    setCanScrollCategoryLeft(maxScroll > threshold && left > threshold);
+    setCanScrollCategoryRight(maxScroll > threshold && left < maxScroll - threshold);
   }, []);
 
   useEffect(() => {
@@ -106,6 +117,33 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
       setSelectedPuzzle(null);
     }
   }, [isOpen, filterCategory, filteredPuzzles, selectedPuzzle?.id]);
+
+  useEffect(() => {
+    if (!isOpen || step !== "category") return;
+    const el = categoryScrollRef.current;
+    const runUpdate = () => requestAnimationFrame(updateCategoryScrollState);
+    runUpdate();
+    const t0 = setTimeout(updateCategoryScrollState, 0);
+    const t1 = setTimeout(updateCategoryScrollState, 80);
+    const t2 = setTimeout(updateCategoryScrollState, 250);
+    if (el) {
+      el.addEventListener("scroll", updateCategoryScrollState);
+      const ro = new ResizeObserver(updateCategoryScrollState);
+      ro.observe(el);
+      return () => {
+        el.removeEventListener("scroll", updateCategoryScrollState);
+        ro.disconnect();
+        clearTimeout(t0);
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+    return () => {
+      clearTimeout(t0);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [isOpen, step, updateCategoryScrollState]);
 
   useEffect(() => {
     if (!isOpen || step !== "puzzle") return;
@@ -137,6 +175,26 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   const scrollGridBy = useCallback(
     (direction: 1 | -1) => {
       const el = gridScrollRef.current;
+      if (!el) return;
+      const metrics = getScrollMetrics(el);
+      if (!metrics) return;
+      const currentIndex = Math.round(el.scrollLeft / metrics.step);
+      const targetIndex = Math.max(
+        0,
+        Math.min(metrics.maxIndex, currentIndex + metrics.visibleCount * direction),
+      );
+      const target = Math.min(
+        Math.max(0, el.scrollWidth - el.clientWidth),
+        targetIndex * metrics.step,
+      );
+      el.scrollTo({ left: target, behavior: "smooth" });
+    },
+    [getScrollMetrics],
+  );
+
+  const scrollCategoryBy = useCallback(
+    (direction: 1 | -1) => {
+      const el = categoryScrollRef.current;
       if (!el) return;
       const metrics = getScrollMetrics(el);
       if (!metrics) return;
@@ -294,57 +352,89 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
 
       {/* Step 1: Category grid — click a category to go straight to puzzle rail */}
       {step === "category" && (
-        <div className={styles.categoryGrid}>
-          {CATEGORIES.filter((cat) => cat.id !== "all").map((cat) => (
+        <div className={styles.stepPanel}>
+          <p className={styles.railLabel}>Choose a category</p>
+          <div className={`${styles.gridScrollWrap} ${styles.categoryScrollWrap}`}>
             <button
-              key={cat.id}
               type="button"
-              className={styles.categoryCard}
-              aria-label={cat.name}
-              onClick={() => {
-                setFilterCategory(cat.id);
-                setSelectedPuzzle(null);
-                setStep("puzzle");
-              }}
+              className={styles.gridScrollBtn}
+              onClick={() => scrollCategoryBy(-1)}
+              disabled={!canScrollCategoryLeft}
+              aria-label="Scroll left"
+              title="Scroll left"
             >
-              <span className={styles.categoryCardEmoji}>{cat.label}</span>
-              <span className={styles.categoryCardName}>{cat.name}</span>
+              <ChevronLeft size={22} aria-hidden />
             </button>
-          ))}
-          <div className={styles.categoryUploadRow}>
-            <label
-              className={styles.uploadCta}
-              tabIndex={0}
-              onKeyDown={onUploadCtaKeyDown}
-              aria-label="Use your own photo: upload an image from your device"
-              role="button"
+            <div
+              ref={categoryScrollRef}
+              className={styles.puzzleGridScroller}
+              role="listbox"
+              aria-label="Choose a category"
             >
-              <span className={styles.uploadCtaIconWrap} aria-hidden>
-                <Camera size={22} strokeWidth={2} />
-              </span>
-              <span className={styles.uploadCtaCopy}>
-                <span className={styles.uploadCtaTitle}>Use your own photo</span>
-                <span className={styles.uploadCtaSub}>
-                  Upload any image instead of a pack
-                </span>
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                className={styles.uploadCtaInput}
-                onChange={handleCustomUpload}
-              />
-            </label>
+              <div className={styles.categoryGrid}>
+                {CATEGORIES.filter((cat) => cat.id !== "all").map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    className={styles.categoryCard}
+                    role="option"
+                    aria-label={cat.name}
+                    title={`Choose ${cat.name}`}
+                    onClick={() => {
+                      setFilterCategory(cat.id);
+                      setSelectedPuzzle(null);
+                      setStep("puzzle");
+                    }}
+                  >
+                    <span className={styles.categoryCardEmoji}>{cat.label}</span>
+                    <span className={styles.categoryCardName}>{cat.name}</span>
+                  </button>
+                ))}
+                <div className={styles.categoryUploadRow}>
+                  <label
+                    className={styles.uploadCta}
+                    tabIndex={0}
+                    onKeyDown={onUploadCtaKeyDown}
+                    aria-label="Custom image: upload an image from your device"
+                    title="Choose a custom image"
+                    role="button"
+                  >
+                    <span className={styles.uploadCtaIconWrap} aria-hidden>
+                      <Camera size={22} strokeWidth={2} />
+                    </span>
+                    <span className={styles.uploadCtaCopy}>
+                      <span className={styles.uploadCtaTitle}>Custom image</span>
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className={styles.uploadCtaInput}
+                      onChange={handleCustomUpload}
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              className={styles.gridScrollBtn}
+              onClick={() => scrollCategoryBy(1)}
+              disabled={!canScrollCategoryRight}
+              aria-label="Scroll right"
+              title="Scroll right"
+            >
+              <ChevronRight size={22} aria-hidden />
+            </button>
           </div>
         </div>
       )}
 
       {/* Step 2: Puzzle rail */}
       {step === "puzzle" && (
-        <>
+        <div className={styles.stepPanel}>
           <p className={styles.railLabel}>
             {filterCategory !== "all" && categoryMeta
-              ? `${categoryMeta.label ?? ""} ${categoryMeta.name}`.trim()
+              ? categoryMeta.name
               : "All Packs"}{" "}
             — pick a puzzle
           </p>
@@ -399,30 +489,17 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
               <ChevronRight size={22} aria-hidden />
             </button>
           </div>
-          <div
-            className={styles.gridScrollBar}
-            role="progressbar"
-            aria-valuenow={Math.round(scrollProgress * 100)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Scroll position"
-          >
-            <div
-              className={styles.gridScrollBarFill}
-              style={{ width: `${scrollProgress * 100}%` }}
-            />
-          </div>
-        </>
+        </div>
       )}
 
       {/* Step 3: Setup — thumbnail + difficulty + Start */}
       {step === "setup" && selectedPuzzle && (
-        <>
+        <div className={`${styles.stepPanel} ${styles.stepPanelCompact}`}>
           <div className={styles.setupHeader}>
             <div className={styles.setupThumb}>
               <img
                 src={selectedPuzzle.thumbnail}
-                alt=""
+                alt={`${selectedPuzzle.name} preview`}
                 className={styles.setupThumbImg}
               />
             </div>
@@ -468,7 +545,7 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
           >
             Start Puzzle
           </button>
-        </>
+        </div>
       )}
     </Modal>
   );
@@ -496,28 +573,23 @@ function PuzzleTile({
       type="button"
       role="option"
       aria-selected={selected}
-      className={`${styles.puzzleTile} ${selected ? styles.puzzleTileSelected : ""}`}
+      className={`${styles.puzzleTile} ${styles.puzzleTileBare} ${selected ? styles.puzzleTileSelected : ""}`}
       onClick={onSelect}
       title={`Select: ${puzzle.name}`}
       aria-label={`Select ${puzzle.name}`}
     >
-      <div className={styles.tileImageWrap}>
-        {imgError ? (
-          <span className={styles.tilePlaceholder}>?</span>
-        ) : (
-          <img
-            src={puzzle.thumbnail}
-            alt=""
-            loading={eagerLoad ? "eager" : "lazy"}
-            decoding="async"
-            className={styles.tileImage}
-            onError={onImgError}
-          />
-        )}
-      </div>
-      <span className={styles.tileTitle}>{puzzle.name}</span>
-      <div className={styles.tileHoverOverlay} aria-hidden />
-      {selected && <div className={styles.tileSelectedIndicator} aria-hidden />}
+      {imgError ? (
+        <span className={styles.tilePlaceholder}>?</span>
+      ) : (
+        <img
+          src={puzzle.thumbnail}
+          alt=""
+          loading={eagerLoad ? "eager" : "lazy"}
+          decoding="async"
+          className={styles.tileImage}
+          onError={onImgError}
+        />
+      )}
     </button>
   );
 }

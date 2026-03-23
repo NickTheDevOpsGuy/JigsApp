@@ -19,7 +19,8 @@ export function useTimeModeConfig() {
 
   const [countdownMinutes, setCountdownMinutesState] = useState(() => {
     const v = safeLocalStorage.getItem(COUNTDOWN_MINUTES_KEY);
-    return v ? parseInt(v, 10) : DEFAULT_COUNTDOWN_MINUTES;
+    const parsed = v ? parseInt(v, 10) : NaN;
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_COUNTDOWN_MINUTES;
   });
 
   useEffect(() => {

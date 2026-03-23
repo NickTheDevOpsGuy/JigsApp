@@ -85,7 +85,7 @@
 
 .card {
   width: 100%;
-  max-width: 420px;
+  max-width: 392px;
   min-width: 0;
   flex: 0 1 auto;
   max-height: 100%;
@@ -95,7 +95,7 @@
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
-  padding: 10px 12px 8px;
+  padding: 9px 10px 8px;
   box-shadow: var(--shadow-lg);
   position: relative;
   overflow-y: hidden;
@@ -115,8 +115,8 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin-bottom: 8px;
   flex-shrink: 0;
 }
 
@@ -130,7 +130,7 @@
 
 .headerEyebrow {
   margin: 0;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -139,19 +139,19 @@
 
 .title {
   margin: 0;
-  font-size: 21px;
+  font-size: 19px;
   color: var(--color-brand-primary);
   min-width: 0;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .titleProgress {
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1;
   color: var(--color-text-primary);
-  padding: 4px 8px;
+  padding: 4px 7px;
   border-radius: 999px;
   border: 1px solid
     color-mix(in srgb, var(--color-brand-primary) 38%, var(--color-border));
@@ -176,14 +176,14 @@
 .headerActions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .headerIconBtn {
-  min-width: 36px;
-  width: 36px;
-  height: 36px;
+  min-width: 34px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   display: inline-flex;
   align-items: center;

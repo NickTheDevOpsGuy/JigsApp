@@ -126,6 +126,33 @@ export function App() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    const warmCommonRoutes = () => {
+      void loadPlayScreenModule();
+      void loadStatsScreenModule();
+      void loadPackListScreenModule();
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(
+        () => {
+          warmCommonRoutes();
+        },
+        { timeout: 1200 },
+      );
+      return () => {
+        if (typeof window.cancelIdleCallback === "function") {
+          window.cancelIdleCallback(idleId);
+        }
+      };
+    }
+
+    const timeoutId = window.setTimeout(warmCommonRoutes, 350);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     const isTouchDevice =
       window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0;
     if (!isTouchDevice) return;
