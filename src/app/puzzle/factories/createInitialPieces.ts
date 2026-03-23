@@ -8,7 +8,7 @@ import { buildPiecePath } from "@/puzzle/core/shape";
 const CUT_DEPTH_PCT: Record<PieceCutType, number> = {
   classic: 0.26,
   irregular: 0.28,
-  hard: 0.20,
+  hard: 0.2,
 };
 
 type CreateInitialPiecesArgs = {

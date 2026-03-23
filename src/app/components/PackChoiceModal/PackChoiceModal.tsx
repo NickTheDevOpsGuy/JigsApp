@@ -444,7 +444,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                 {puzzles.map((puzzle, puzzleIndex) => {
                   const isDone = completed.has(puzzle.id);
                   const eagerLoad = puzzleIndex < 12;
-                    return (
+                  return (
                     <button
                       key={puzzle.id}
                       type="button"

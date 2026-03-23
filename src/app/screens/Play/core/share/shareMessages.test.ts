@@ -10,7 +10,9 @@ import {
 
 describe("shareMessages", () => {
   it("absShareUrl prefixes origin for paths", () => {
-    expect(absShareUrl("/play?grid=4x4")).toBe("https://phuzzle.vercel.app/play?grid=4x4");
+    expect(absShareUrl("/play?grid=4x4")).toBe(
+      "https://phuzzle.vercel.app/play?grid=4x4",
+    );
     expect(absShareUrl("https://phuzzle.app/x")).toBe("https://phuzzle.app/x");
   });
 
