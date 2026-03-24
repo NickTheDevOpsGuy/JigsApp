@@ -59,8 +59,13 @@ export function usePlayScreenInteractions(ctx: any) {
   const activeDailySession = isDailySession || activeDailySessionRef.current;
 
   const handleNewGame = useCallback(() => {
+    // Dismiss win overlay first — its AppModal (z-index 1200) sits above ChoosePuzzleModal.
+    scene.setCompletionDismissed(true);
+    scene.setShowWinOverlay?.(false);
+    scene.setCompletionImageUrl(undefined);
+    scene.viewport.reset();
     ui.setShowChoosePuzzleModal?.(true);
-  }, [ui]);
+  }, [scene, ui]);
 
   const {
     handlePointerDown,
@@ -132,7 +137,7 @@ export function usePlayScreenInteractions(ctx: any) {
     replayBarOpen: scene.replayBarOpen,
   });
 
-  const { puzzleShareUrl, challengeShareReady, ensureChallengeShareUrl } =
+  const { puzzleShareUrl, ensureChallengeShareUrl } =
     usePlayScreenShareSession({
       isComplete: state?.isComplete ?? false,
       isDailySession: activeDailySession,
@@ -174,6 +179,7 @@ export function usePlayScreenInteractions(ctx: any) {
     challengeShareUrl: puzzleShareUrl,
     accuracyPercent: shareAccuracyPercent,
     moveCount: scene.moveCountRef.current,
+    rotationCount: scene.rotationCountRef.current,
     maxGroupSize: scene.maxGroupSizeRef.current,
     puzzleName: puzzleName || undefined,
   });
@@ -269,7 +275,6 @@ export function usePlayScreenInteractions(ctx: any) {
     handleTrayPieceClick,
     puzzleShareUrl,
     share,
-    challengeShareReady,
     ensureChallengeShareUrl,
     handleSharePuzzle,
     handleDownloadImage,

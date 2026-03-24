@@ -24,6 +24,7 @@ export function useShareResults(args: {
   challengeShareUrl?: string;
   accuracyPercent?: number;
   moveCount?: number;
+  rotationCount?: number;
   maxGroupSize?: number;
   puzzleName?: string;
 }) {
@@ -34,6 +35,7 @@ export function useShareResults(args: {
     challengeShareUrl = "/",
     accuracyPercent = 100,
     moveCount,
+    rotationCount = 0,
     maxGroupSize,
     puzzleName,
   } = args;
@@ -87,6 +89,7 @@ export function useShareResults(args: {
       accuracyPercent,
       playUrl: fullProgressUrl,
       moveCount,
+      rotationCount,
       puzzleName,
     });
   }, [
@@ -95,6 +98,7 @@ export function useShareResults(args: {
     accuracyPercent,
     fullProgressUrl,
     moveCount,
+    rotationCount,
     puzzleName,
   ]);
 
@@ -110,6 +114,7 @@ export function useShareResults(args: {
         pieceCount: state?.totalCount ?? 0,
         playUrl: url,
         moveCount,
+        rotationCount,
         maxGroupSize,
         puzzleName,
       });
@@ -119,6 +124,7 @@ export function useShareResults(args: {
       state?.totalCount,
       fullChallengeUrl,
       moveCount,
+      rotationCount,
       maxGroupSize,
       puzzleName,
     ],

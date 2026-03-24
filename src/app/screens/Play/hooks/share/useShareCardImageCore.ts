@@ -25,9 +25,28 @@ const CARD_RADIUS = 24;
 const PAD = 40;
 const HEADER_H = 56;
 const IMAGE_H = 800;
-const CTA_H = 48;
-const FOOTER_H = 44;
+const CTA_H = 52;
+const FOOTER_H = 40;
 const GAP = 16;
+const URL_FONT = "400 20px system-ui, -apple-system, sans-serif";
+
+/** Break a long string into lines that fit maxWidth (px). */
+function wrapStringToLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const lines: string[] = [];
+  let current = "";
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const test = current + ch;
+    if (ctx.measureText(test).width > maxWidth && current.length > 0) {
+      lines.push(current);
+      current = ch;
+    } else {
+      current = test;
+    }
+  }
+  if (current.length > 0) lines.push(current);
+  return lines.length > 0 ? lines : [text];
+}
 
 export function useShareCardImage() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -39,6 +58,7 @@ export function useShareCardImage() {
       imageUrl?: string;
       elapsedSeconds: number;
       moveCount: number;
+      rotationCount?: number;
       piecesPerMin?: number;
       maxGroupSize?: number;
       accuracyPercent: number;
@@ -47,7 +67,7 @@ export function useShareCardImage() {
       puzzleShareUrl?: string;
       pieceCount: number;
       puzzleName?: string;
-      /** Challenge = “Think you can beat me?” CTA; result = same stats, no CTA. */
+      /** Challenge = full stats + “Can you beat my time?” + URL on card; result = no CTA. */
       mode?: "challenge" | "result";
     }) => {
       if (!args.imageUrl || isGenerating) return;
@@ -92,30 +112,41 @@ export function useShareCardImage() {
         ctx.fillText("Phuzzle", panel.x + panel.w / 2, y + HEADER_H / 2);
         y += HEADER_H + GAP;
 
-        // Puzzle image (largest element)
+        // Puzzle image — slightly shorter on challenge cards to fit URL + extra stats
+        const imageH = mode === "challenge" ? 680 : IMAGE_H;
         const imgW = panel.w - PAD * 2;
-        const imageRect: Rect = { x: panel.x + PAD, y: y, w: imgW, h: IMAGE_H };
+        const imageRect: Rect = { x: panel.x + PAD, y: y, w: imgW, h: imageH };
         fillRoundedRect(ctx, imageRect, 16, "rgba(0,0,0,0.3)");
         drawCoverImage(ctx, img, imageRect, 16);
         strokeRoundedRect(ctx, imageRect, 16, gold, 2);
-        y += IMAGE_H + GAP;
+        y += imageH + GAP;
 
-        // Stats: match link-preview card — “Puzzle” label, difficulty, time, moves (no taunts on result)
+        // Stats: difficulty, time, moves, rotations (challenge always shows rotations)
         const difficulty = getDifficultyLabel(args.pieceCount);
         const timeStr = formatTime(args.elapsedSeconds);
         const movesStr = String(args.moveCount ?? 0);
-        const lineHeight = 32;
+        const rotStr = String(args.rotationCount ?? 0);
+        const lineHeight = 30;
         ctx.font = "500 24px system-ui, -apple-system, sans-serif";
         ctx.fillStyle = "#E2E8F0";
         ctx.fillText("Puzzle", panel.x + panel.w / 2, y + lineHeight / 2);
         y += lineHeight + 4;
         ctx.font = "400 22px system-ui, -apple-system, sans-serif";
         ctx.fillStyle = "#CBD5E1";
-        const statsLines = [
-          `Difficulty: ${difficulty} (${args.pieceCount} pieces)`,
-          `Time: ${timeStr}`,
-          `Moves: ${movesStr}`,
-        ];
+        const statsLines =
+          mode === "challenge"
+            ? [
+                `Difficulty: ${difficulty} (${args.pieceCount} pieces)`,
+                `Time: ${timeStr}`,
+                `Moves: ${movesStr}`,
+                `Rotations: ${rotStr}`,
+              ]
+            : [
+                `Difficulty: ${difficulty} (${args.pieceCount} pieces)`,
+                `Time: ${timeStr}`,
+                `Moves: ${movesStr}`,
+                ...(Number(rotStr) > 0 ? [`Rotations: ${rotStr}`] : []),
+              ];
         statsLines.forEach((line) => {
           ctx.fillText(line, panel.x + panel.w / 2, y + lineHeight / 2);
           y += lineHeight;
@@ -125,14 +156,35 @@ export function useShareCardImage() {
         if (mode === "challenge") {
           ctx.font = "600 26px system-ui, -apple-system, sans-serif";
           ctx.fillStyle = "#F8FAFC";
-          ctx.fillText("Think you can beat me?", panel.x + panel.w / 2, y + CTA_H / 2);
-          y += CTA_H + 8;
+          ctx.fillText("Can you beat my time?", panel.x + panel.w / 2, y + CTA_H / 2);
+          y += CTA_H + 10;
+
+          ctx.font = URL_FONT;
+          ctx.fillStyle = "#7DD3FC";
+          const urlMaxW = panel.w - PAD * 2;
+          const maxUrlLines = 12;
+          const allUrlLines = wrapStringToLines(ctx, playUrl, urlMaxW);
+          const urlLines = allUrlLines.slice(0, maxUrlLines);
+          if (allUrlLines.length > maxUrlLines && urlLines.length > 0) {
+            let last = urlLines[urlLines.length - 1];
+            const suffix = "…";
+            while (last.length > 0 && ctx.measureText(last + suffix).width > urlMaxW) {
+              last = last.slice(0, -1);
+            }
+            urlLines[urlLines.length - 1] = last + suffix;
+          }
+          const urlLineH = 24;
+          urlLines.forEach((line) => {
+            ctx.fillText(line, panel.x + panel.w / 2, y + urlLineH / 2);
+            y += urlLineH;
+          });
+          y += 8;
         } else {
           y += 8;
         }
 
         // Footer: phuzzle.app
-        ctx.font = "400 20px system-ui, -apple-system, sans-serif";
+        ctx.font = "400 18px system-ui, -apple-system, sans-serif";
         ctx.fillStyle = "#94A3B8";
         ctx.fillText("phuzzle.app", panel.x + panel.w / 2, y + FOOTER_H / 2);
 
@@ -170,6 +222,7 @@ export function useShareCardImage() {
           accuracyPercent: args.accuracyPercent,
           playUrl,
           moveCount: args.moveCount,
+          rotationCount: args.rotationCount,
           maxGroupSize: args.maxGroupSize,
           puzzleName: args.puzzleName,
         });

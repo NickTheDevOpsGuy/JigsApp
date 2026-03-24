@@ -22,7 +22,6 @@ interface CompletionOverlayGateProps {
   isNewBest: boolean;
   /** Path to this puzzle for share link (e.g. /daily or /play?session=xxx). */
   puzzleShareUrl: string;
-  challengeShareReady: boolean;
   ensureChallengeShareUrl: () => Promise<string>;
   puzzleName?: string;
   share: {
@@ -71,7 +70,6 @@ export function CompletionOverlayGate({
   pieceCutType,
   isNewBest,
   puzzleShareUrl,
-  challengeShareReady,
   ensureChallengeShareUrl,
   puzzleName,
   share,
@@ -135,7 +133,6 @@ export function CompletionOverlayGate({
       isDaily={isDaily}
       cutType={pieceCutType}
       puzzleShareUrl={puzzleShareUrl}
-      challengeShareReady={challengeShareReady}
       ensureChallengeShareUrl={ensureChallengeShareUrl}
       puzzleName={puzzleName}
       copied={share.copied}
@@ -145,11 +142,7 @@ export function CompletionOverlayGate({
       onCopyProgress={share.handleCopyResults}
       onCopyChallenge={share.handleCopyChallenge}
       shareProgressText={share.getProgressShareTextWithUrl()}
-      shareChallengeText={
-        challengeShareReady
-          ? share.getChallengeShareTextWithUrl()
-          : "Preparing an exact challenge link for this puzzle..."
-      }
+      shareChallengeText={share.getChallengeShareTextWithUrl()}
       onDownloadImage={onDownloadImage}
       onClose={onClose}
       precisionModeEnabled={precisionModeEnabled}

@@ -11,6 +11,7 @@ export async function shareOrDownloadCard(args: {
   accuracyPercent: number;
   playUrl: string;
   moveCount?: number;
+  rotationCount?: number;
   maxGroupSize?: number;
   puzzleName?: string;
 }) {
@@ -22,6 +23,7 @@ export async function shareOrDownloadCard(args: {
     accuracyPercent,
     playUrl,
     moveCount,
+    rotationCount,
     maxGroupSize,
     puzzleName,
   } = args;
@@ -36,6 +38,7 @@ export async function shareOrDownloadCard(args: {
           pieceCount,
           playUrl,
           moveCount,
+          rotationCount,
           maxGroupSize,
           puzzleName,
         })
@@ -45,6 +48,7 @@ export async function shareOrDownloadCard(args: {
           accuracyPercent,
           playUrl,
           moveCount,
+          rotationCount,
           puzzleName,
         });
 

@@ -21,7 +21,6 @@ export interface CompletionOverlayProps {
   isDaily?: boolean;
   cutType?: PieceCutType;
   puzzleShareUrl?: string;
-  challengeShareReady?: boolean;
   ensureChallengeShareUrl?: () => Promise<string>;
   puzzleName?: string;
   copied?: boolean;

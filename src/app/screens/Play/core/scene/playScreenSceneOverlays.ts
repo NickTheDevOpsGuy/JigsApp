@@ -49,7 +49,6 @@ export function buildCompletionProps(args: {
   pieceCutType: PieceCutType;
   isNewBest: boolean;
   puzzleShareUrl: string;
-  challengeShareReady: boolean;
   ensureChallengeShareUrl: () => Promise<string>;
   puzzleName?: string;
   share: {
@@ -94,7 +93,6 @@ export function buildCompletionProps(args: {
     pieceCutType,
     isNewBest,
     puzzleShareUrl,
-    challengeShareReady,
     ensureChallengeShareUrl,
     puzzleName,
     share,
@@ -134,7 +132,6 @@ export function buildCompletionProps(args: {
     pieceCutType,
     isNewBest,
     puzzleShareUrl,
-    challengeShareReady,
     ensureChallengeShareUrl,
     puzzleName,
     share,

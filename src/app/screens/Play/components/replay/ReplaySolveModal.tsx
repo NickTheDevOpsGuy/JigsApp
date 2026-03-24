@@ -189,20 +189,11 @@ export function ReplaySolveModal({
     const bottom = top + height;
     const cutoutRadius = 20;
     const viewportWidth = typeof window !== "undefined" ? window.innerWidth : width + 24;
-    const viewportHeight =
-      typeof window !== "undefined" ? window.innerHeight : bottom + 220;
     const dockInsetPx = 8;
     const shellWidth = Math.min(viewportWidth - 24, width + dockInsetPx * 2);
     const shellLeft = Math.min(
       viewportWidth - shellWidth - 12,
       Math.max(12, left - dockInsetPx),
-    );
-    /* Tight gap under board chrome; dock has its own inner padding */
-    const controlsGapPx = 3;
-    const controlsTopPx = bottom + controlsGapPx;
-    const controlsMaxHeight = Math.max(
-      120,
-      viewportHeight - controlsTopPx - 12 - Number.parseFloat("0"),
     );
     return (
       <div
@@ -276,7 +267,7 @@ export function ReplaySolveModal({
             top,
             left,
             width,
-            transform: "translateY(calc(-100% - 10px))",
+            transform: "translateY(calc(-100% - 20px))",
           }}
           onPointerDown={stopProp}
         >
@@ -288,12 +279,10 @@ export function ReplaySolveModal({
           onPointerDown={stopProp}
         />
         <div
-          className={styles.controlDock}
+          className={`${styles.controlDock} ${styles.controlDockBottomAnchored}`}
           style={{
             left: shellLeft,
             width: shellWidth,
-            top: controlsTopPx,
-            maxHeight: `calc(${controlsMaxHeight}px - env(safe-area-inset-bottom, 0px))`,
           }}
           onPointerDown={stopProp}
         >

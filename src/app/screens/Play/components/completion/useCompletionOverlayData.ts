@@ -31,6 +31,7 @@ export type UseCompletionOverlayDataParams = {
   grid?: { rows: number; cols: number };
   imageUrl?: string;
   moveCount: number;
+  rotationCount?: number;
   piecesPerMin?: number;
   maxGroupSize?: number;
   accuracyPercent: number;
@@ -54,6 +55,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     grid,
     imageUrl,
     moveCount,
+    rotationCount = 0,
     piecesPerMin = 0,
     maxGroupSize = 0,
     accuracyPercent,
@@ -71,6 +73,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
   const PLAY_BASE = "https://phuzzle.vercel.app";
 
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
+  const [sharePopupMode, setSharePopupMode] = useState<"result" | "challenge" | null>(null);
   const [dailyCopied, setDailyCopied] = useState(false);
   const [dailyStreak, setDailyStreak] = useState<number>(0);
   const [masteryStreak, setMasteryStreak] = useState<number>(0);
@@ -218,6 +221,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       imageUrl,
       elapsedSeconds,
       moveCount,
+      rotationCount,
       piecesPerMin,
       maxGroupSize,
       accuracyPercent,
@@ -233,6 +237,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     imageUrl,
     elapsedSeconds,
     moveCount,
+    rotationCount,
     piecesPerMin,
     maxGroupSize,
     accuracyPercent,
@@ -248,6 +253,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       imageUrl,
       elapsedSeconds,
       moveCount,
+      rotationCount,
       piecesPerMin,
       maxGroupSize,
       accuracyPercent,
@@ -263,6 +269,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     imageUrl,
     elapsedSeconds,
     moveCount,
+    rotationCount,
     piecesPerMin,
     maxGroupSize,
     accuracyPercent,
@@ -278,6 +285,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       imageUrl,
       elapsedSeconds,
       moveCount,
+      rotationCount,
       piecesPerMin,
       maxGroupSize,
       accuracyPercent,
@@ -293,6 +301,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     imageUrl,
     elapsedSeconds,
     moveCount,
+    rotationCount,
     piecesPerMin,
     maxGroupSize,
     accuracyPercent,
@@ -365,9 +374,21 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     }
   }, [getDailyShareText, puzzleShareUrl, handleCopyDailyShare]);
 
+  const openSharePopup = useCallback((mode: "result" | "challenge") => {
+    setSharePopupMode(mode);
+    setSharePopupOpen(true);
+  }, []);
+
+  const closeSharePopup = useCallback(() => {
+    setSharePopupOpen(false);
+    setSharePopupMode(null);
+  }, []);
+
   return {
     sharePopupOpen,
-    setSharePopupOpen,
+    sharePopupMode,
+    openSharePopup,
+    closeSharePopup,
     useSeasonalFrame,
     setUseSeasonalFrame,
     percentile,

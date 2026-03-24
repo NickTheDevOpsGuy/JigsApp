@@ -107,13 +107,5 @@ export function usePlayScreenShareSession({
     shareSessionId,
   ]);
 
-  const challengeShareReady = useMemo(() => {
-    if (shareSessionId) return true;
-    if (isDailySession && grid) return true;
-    if (sessionId) return true;
-    const puzzleId = safeLocalStorage.getItem(PUZZLE_ID_KEY);
-    return Boolean(puzzleId && grid);
-  }, [grid, isDailySession, sessionId, shareSessionId]);
-
-  return { shareSessionId, puzzleShareUrl, challengeShareReady, ensureChallengeShareUrl };
+  return { shareSessionId, puzzleShareUrl, ensureChallengeShareUrl };
 }

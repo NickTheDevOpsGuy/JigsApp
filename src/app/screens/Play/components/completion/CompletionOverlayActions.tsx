@@ -3,7 +3,7 @@
  * No X close; no individual action buttons outside the menus.
  */
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, Sparkles, Share2, Swords, Film, ImagePlus } from "lucide-react";
+import { ChevronDown, Share2, Swords, Film, ImagePlus } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
 import { CompletionOverlayShareMenu } from "@/screens/Play/components/completion/CompletionOverlayShareMenu";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
@@ -23,7 +23,6 @@ export function CompletionOverlayActions(args: {
   replayNextDropdownPosition: { top: number; left: number; minWidth: number } | null;
   grid?: { rows: number; cols: number };
   puzzleShareUrl: string;
-  challengeShareReady: boolean;
   ensureChallengeShareUrl?: () => Promise<string>;
   elapsedSeconds: number;
   moveCount?: number;
@@ -47,7 +46,6 @@ export function CompletionOverlayActions(args: {
 }) {
   const {
     puzzleShareUrl,
-    challengeShareReady,
     ensureChallengeShareUrl,
     elapsedSeconds,
     moveCount,
@@ -104,14 +102,14 @@ export function CompletionOverlayActions(args: {
     }
   };
 
-  const handleChallenge = async () => {
+  const handleChallenge = () => {
     setShareOpen(false);
-    completionData.setSharePopupOpen(true);
+    completionData.openSharePopup("challenge");
   };
 
   const handleShareResult = () => {
     setShareOpen(false);
-    completionData.setSharePopupOpen(true);
+    completionData.openSharePopup("result");
   };
 
   const hasMoreOptions = !!onNextPuzzle || (canReplay && onReplayClick);
@@ -126,24 +124,11 @@ export function CompletionOverlayActions(args: {
 
   return (
     <section className={styles.completeActionsPhased} aria-label="Actions">
-      {onNextPuzzle && (
-        <button
-          ref={args.focusReturnRef as React.RefObject<HTMLButtonElement>}
-          type="button"
-          className={styles.completePrimaryBtn}
-          onClick={onNextPuzzle}
-          title={nextPuzzleLabel}
-          aria-label={nextPuzzleLabel}
-        >
-          <Sparkles size={22} aria-hidden />
-          {nextPuzzleLabel}
-        </button>
-      )}
-
       <div className={styles.completeMenusRow}>
         {hasMoreOptions && (
           <div className={styles.completeMenuWrap} ref={moreRef}>
             <button
+              ref={args.focusReturnRef as React.RefObject<HTMLButtonElement>}
               type="button"
               className={styles.completeMenuTrigger}
               onClick={() => {
@@ -152,10 +137,10 @@ export function CompletionOverlayActions(args: {
               }}
               aria-expanded={moreOpen}
               aria-haspopup={isMobileActions ? "dialog" : "true"}
-              aria-label="More options"
-              title="More options"
+              aria-label="Options"
+              title="Options"
             >
-              More Options
+              Options
               <ChevronDown
                 size={16}
                 className={moreOpen ? styles.completeMenuChevronOpen : ""}
@@ -207,6 +192,11 @@ export function CompletionOverlayActions(args: {
         {hasShareOptions && (
           <div className={styles.completeMenuWrap} ref={shareRef}>
             <button
+              ref={
+                !hasMoreOptions
+                  ? (args.focusReturnRef as React.RefObject<HTMLButtonElement>)
+                  : undefined
+              }
               type="button"
               className={styles.completeMenuTrigger}
               onClick={() => {
@@ -266,7 +256,6 @@ export function CompletionOverlayActions(args: {
         dropdownPosition={args.dropdownPosition}
         grid={grid}
         puzzleShareUrl={puzzleShareUrl}
-        challengeShareReady={challengeShareReady}
         ensureChallengeShareUrl={ensureChallengeShareUrl}
         elapsedSeconds={elapsedSeconds}
         moveCount={moveCount}
@@ -287,7 +276,7 @@ export function CompletionOverlayActions(args: {
       <AppModal
         isOpen={moreDialogOpen}
         onClose={() => setMoreOpen(false)}
-        title="More Options"
+        title="Options"
         subtitle="Keep going or review this solve."
         size="wide"
         bodyClassName={styles.completeActionSheetBody}

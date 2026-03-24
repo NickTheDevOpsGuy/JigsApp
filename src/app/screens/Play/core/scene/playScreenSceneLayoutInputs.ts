@@ -67,7 +67,6 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     handleDownloadImage,
     handleNewGame,
     puzzleShareUrl,
-    challengeShareReady,
     ensureChallengeShareUrl,
     puzzleName,
     share,
@@ -123,7 +122,6 @@ export function usePlayScreenLayoutInputs(ctx: any) {
       state?.grid != null &&
       (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds),
     puzzleShareUrl,
-    challengeShareReady,
     ensureChallengeShareUrl,
     puzzleName,
     share: {

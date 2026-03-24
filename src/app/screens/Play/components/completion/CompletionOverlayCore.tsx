@@ -47,7 +47,6 @@ export function CompletionOverlay({
   precisionBonusPoints: _precisionBonusPoints,
   uiTone: _uiTone,
   puzzleShareUrl = "/",
-  challengeShareReady = true,
   ensureChallengeShareUrl,
   puzzleName,
   canReplay = false,
@@ -70,6 +69,7 @@ export function CompletionOverlay({
     grid,
     imageUrl,
     moveCount,
+    rotationCount,
     piecesPerMin: piecesPerMin ?? 0,
     maxGroupSize: maxGroupSize ?? 0,
     accuracyPercent,
@@ -200,7 +200,8 @@ export function CompletionOverlay({
       surface="bare"
       size="xl"
       tone="celebration"
-      align="center"
+      align="top"
+      topOffsetPx={24}
       showCloseButton={false}
     >
       <div
@@ -265,7 +266,6 @@ export function CompletionOverlay({
           replayNextDropdownPosition={replayNextDropdownPosition}
           grid={grid}
           puzzleShareUrl={puzzleShareUrl}
-          challengeShareReady={challengeShareReady}
           ensureChallengeShareUrl={ensureChallengeShareUrl}
           elapsedSeconds={elapsedSeconds}
           moveCount={moveCount}
@@ -294,7 +294,7 @@ export function CompletionOverlay({
 
 function AchievementCycler({ achievements }: { achievements: string[] }) {
   const [index, setIndex] = useState(0);
-  const ACHIEVEMENT_CYCLE_MS = 2400;
+  const ACHIEVEMENT_CYCLE_MS = 12000;
 
   useEffect(() => {
     if (achievements.length <= 1) return;

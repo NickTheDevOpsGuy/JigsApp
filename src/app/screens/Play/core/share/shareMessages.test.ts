@@ -31,7 +31,7 @@ describe("shareMessages", () => {
     expect(text).toContain("Difficulty: Easy (9 pieces)");
     expect(text).toContain("Time: 1:42");
     expect(text).toContain("Moves: 25");
-    expect(text).not.toContain("Think you can beat me?");
+    expect(text).not.toContain("Can you beat my time?");
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc");
   });
 
@@ -48,12 +48,13 @@ describe("shareMessages", () => {
     expect(text).toContain("https://phuzzle.vercel.app/play?grid=4x4");
   });
 
-  it("buildChallengeShareMessage matches preview card with Think you can beat me?", () => {
+  it("buildChallengeShareMessage includes stats, rotations, and challenge line", () => {
     const text = buildChallengeShareMessage({
       elapsedSeconds: 102,
       pieceCount: 16,
       playUrl: "https://phuzzle.vercel.app/play?session=abc",
       moveCount: 42,
+      rotationCount: 3,
       puzzleName: "Forest Path",
     });
 
@@ -62,7 +63,8 @@ describe("shareMessages", () => {
     expect(text).toContain("Difficulty: Medium (16 pieces)");
     expect(text).toContain("Time: 1:42");
     expect(text).toContain("Moves: 42");
-    expect(text).toContain("Think you can beat me?");
+    expect(text).toContain("Rotations: 3");
+    expect(text).toContain("Can you beat my time?");
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc&ct=102&cm=42");
   });
 
@@ -74,7 +76,8 @@ describe("shareMessages", () => {
       moveCount: 19,
     });
     expect(text).toContain("Difficulty: Easy (9 pieces)");
-    expect(text).toContain("Think you can beat me?");
+    expect(text).toContain("Rotations: 0");
+    expect(text).toContain("Can you beat my time?");
     expect(text).toContain("https://phuzzle.vercel.app/play?grid=3x3&ct=36&cm=19");
   });
 

@@ -6,6 +6,8 @@ export type ShareMessageArgs = {
   playUrl: string;
   accuracyPercent?: number;
   moveCount?: number;
+  /** Rotations/turns performed during solve. */
+  rotationCount?: number;
   maxGroupSize?: number;
   /** Display name of the puzzle (e.g. from win screen data). */
   puzzleName?: string;
@@ -57,17 +59,21 @@ export function buildProgressShareMessage(args: ShareMessageArgs): string {
   const difficulty = getDifficultyLabel(args.pieceCount);
   const pieces = args.pieceCount;
   const moves = args.moveCount ?? 0;
+  const rotations = args.rotationCount ?? 0;
   const link = absShareUrl(args.playUrl);
-  return [
+  const lines = [
     "Phuzzle",
     "",
     "Puzzle",
     `Difficulty: ${difficulty} (${pieces} pieces)`,
     `Time: ${time}`,
     `Moves: ${moves}`,
-    "",
-    link,
-  ].join("\n");
+  ];
+  if (rotations > 0) {
+    lines.push(`Rotations: ${rotations}`);
+  }
+  lines.push("", link);
+  return lines.join("\n");
 }
 
 /** Daily Share – Wordle-style compact format. Only for Daily Puzzle. */
@@ -124,26 +130,26 @@ export function getDailyShareCompletionGrid(args: DailyShareGridArgs): string {
 }
 
 /**
- * Beat My Puzzle – challenge share. Matches share-card / link preview: stats + “Think you can beat me?”
+ * Beat My Puzzle – challenge share: stats (incl. rotations), “Can you beat my time?”, challenge URL.
  * URL includes same puzzle + grid (from playUrl) and ct/cm for the challenge.
  */
 export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const time = formatTime(args.elapsedSeconds);
   const moves = args.moveCount ?? 0;
+  const rotations = args.rotationCount ?? 0;
   const difficulty = getDifficultyLabel(args.pieceCount);
   const pieces = args.pieceCount;
   const challengePath = buildChallengePlayUrl(args.playUrl, args.elapsedSeconds, moves);
   const challengeUrl = absShareUrl(challengePath);
-  return [
+  const lines = [
     "Phuzzle",
     "",
     "Puzzle",
     `Difficulty: ${difficulty} (${pieces} pieces)`,
     `Time: ${time}`,
     `Moves: ${moves}`,
-    "",
-    "Think you can beat me?",
-    "",
-    challengeUrl,
-  ].join("\n");
+  ];
+  lines.push(`Rotations: ${rotations}`);
+  lines.push("", "Can you beat my time?", "", challengeUrl);
+  return lines.join("\n");
 }
