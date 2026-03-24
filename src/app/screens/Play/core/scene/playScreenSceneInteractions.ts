@@ -137,17 +137,16 @@ export function usePlayScreenInteractions(ctx: any) {
     replayBarOpen: scene.replayBarOpen,
   });
 
-  const { puzzleShareUrl, ensureChallengeShareUrl } =
-    usePlayScreenShareSession({
-      isComplete: state?.isComplete ?? false,
-      isDailySession: activeDailySession,
-      sessionId,
-      grid,
-      storageKey: STORAGE_KEY,
-      sessionIdParam: SESSION_ID_PARAM,
-      dailyParam: DAILY_PARAM,
-      gridParam: GRID_PARAM,
-    });
+  const { puzzleShareUrl, ensureChallengeShareUrl } = usePlayScreenShareSession({
+    isComplete: state?.isComplete ?? false,
+    isDailySession: activeDailySession,
+    sessionId,
+    grid,
+    storageKey: STORAGE_KEY,
+    sessionIdParam: SESSION_ID_PARAM,
+    dailyParam: DAILY_PARAM,
+    gridParam: GRID_PARAM,
+  });
 
   const completedElapsedRef = React.useRef<number | null>(null);
   React.useEffect(() => {

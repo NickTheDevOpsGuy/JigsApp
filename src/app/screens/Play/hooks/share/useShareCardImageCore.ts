@@ -31,7 +31,11 @@ const GAP = 16;
 const URL_FONT = "400 20px system-ui, -apple-system, sans-serif";
 
 /** Break a long string into lines that fit maxWidth (px). */
-function wrapStringToLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+function wrapStringToLines(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+): string[] {
   const lines: string[] = [];
   let current = "";
   for (let i = 0; i < text.length; i++) {

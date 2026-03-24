@@ -73,7 +73,9 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
   const PLAY_BASE = "https://phuzzle.vercel.app";
 
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
-  const [sharePopupMode, setSharePopupMode] = useState<"result" | "challenge" | null>(null);
+  const [sharePopupMode, setSharePopupMode] = useState<"result" | "challenge" | null>(
+    null,
+  );
   const [dailyCopied, setDailyCopied] = useState(false);
   const [dailyStreak, setDailyStreak] = useState<number>(0);
   const [masteryStreak, setMasteryStreak] = useState<number>(0);
