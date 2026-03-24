@@ -152,10 +152,7 @@ export function CompletionOverlayActions(args: {
 
   const hasGameActions = Boolean(onNextPuzzle || (canReplay && onReplayClick));
   const hasShareOptions = Boolean(
-    onShareChallenge ||
-      onCopyChallenge ||
-      onShareProgress ||
-      onCopyProgress,
+    onShareChallenge || onCopyChallenge || onShareProgress || onCopyProgress,
   );
   const hasAnyOptions = hasGameActions || hasShareOptions;
   const showShareHeading = hasShareOptions && hasGameActions;

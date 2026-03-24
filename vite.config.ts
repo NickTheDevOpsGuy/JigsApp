@@ -76,7 +76,10 @@ export default defineConfig(({ mode }) => {
             if (id.includes("screens/Play/loadPlayScreen")) {
               return "play-shared";
             }
-            if (id.includes("screens/Play/core/utils/playScreenUtils") && !id.includes(".test")) {
+            if (
+              id.includes("screens/Play/core/utils/playScreenUtils") &&
+              !id.includes(".test")
+            ) {
               return "play-shared";
             }
             // Screen chunks: use short names to avoid CSS preload failures.

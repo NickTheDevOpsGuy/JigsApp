@@ -297,9 +297,7 @@
   width: 100%;
   max-width: min(
     720px,
-    calc(
-      100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 24px
-    )
+    calc(100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 24px)
   );
   display: flex;
   flex-direction: column;
