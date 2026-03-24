@@ -115,20 +115,22 @@ export function CompletionOverlay({
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
+      if (e.key !== "Escape") return;
+      /* Share / challenge popup is its own AppModal; let it handle Escape first. */
+      if (completionData.sharePopupOpen) return;
 
-        if (onNextPuzzle) {
-          onNextPuzzle();
-        } else {
-          onClose();
-        }
+      e.preventDefault();
+
+      if (onNextPuzzle) {
+        onNextPuzzle();
+      } else {
+        onClose();
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose, onNextPuzzle]);
+  }, [onClose, onNextPuzzle, completionData.sharePopupOpen]);
 
   const pieceCount = grid ? grid.rows * grid.cols : 0;
   const cleanSolve = undoCount === 0 && !usedHint;
@@ -203,6 +205,9 @@ export function CompletionOverlay({
       align="top"
       topOffsetPx={24}
       showCloseButton={false}
+      backdropClassName={styles.completeWinBackdrop}
+      dialogClassName={styles.completeWinDialog}
+      bodyClassName={styles.completeWinModalBody}
     >
       <div
         className={styles.completePanelPhased}
@@ -294,7 +299,7 @@ export function CompletionOverlay({
 
 function AchievementCycler({ achievements }: { achievements: string[] }) {
   const [index, setIndex] = useState(0);
-  const ACHIEVEMENT_CYCLE_MS = 12000;
+  const ACHIEVEMENT_CYCLE_MS = 20000;
 
   useEffect(() => {
     if (achievements.length <= 1) return;

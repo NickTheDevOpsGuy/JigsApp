@@ -71,6 +71,14 @@ export default defineConfig(({ mode }) => {
             if (id.includes("samplePuzzles") || id.includes("puzzlePacks")) {
               return "puzzles";
             }
+            // Play helpers imported by Choose/Pack modals must not live in play-setup, or Rollup
+            // reports a circular chunk: play-setup -> modals -> play-setup.
+            if (id.includes("screens/Play/loadPlayScreen")) {
+              return "play-shared";
+            }
+            if (id.includes("screens/Play/core/utils/playScreenUtils") && !id.includes(".test")) {
+              return "play-shared";
+            }
             // Screen chunks: use short names to avoid CSS preload failures.
             // Play + Menu in one chunk to avoid circular chunk warnings (e.g. play-setup <-> menu).
             if (id.includes("screens/Play") || id.includes("screens/Menu")) {
@@ -80,11 +88,14 @@ export default defineConfig(({ mode }) => {
             if (id.includes("screens/Packs/PackListScreen")) return "pack-list";
             if (id.includes("screens/Packs/PackDetailScreen")) return "pack-detail";
             if (id.includes("screens/Packs/")) return "pack-list";
+            // Same chunk as Play/Menu: these modals are only used from there and share
+            // deps with Play; a separate "modals" chunk caused Rollup circular chunk warnings.
             if (
               id.includes("components/PackChoiceModal") ||
               id.includes("components/ChoosePuzzleModal")
-            )
-              return "modals";
+            ) {
+              return "play-setup";
+            }
             // Split vendor chunks to avoid a single >500kB bundle
             if (id.includes("node_modules")) {
               if (id.includes("react-dom") || id.includes("react/")) {

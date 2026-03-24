@@ -9,6 +9,10 @@ import styles from "./AppModal.module.css";
 
 const BODY_SCROLL_LOCK_ATTR = "data-app-modal-lock-count";
 const BODY_SCROLL_Y_ATTR = "data-app-modal-scroll-y";
+
+/** Only the topmost open AppModal handles Escape + Tab trap (nested modals e.g. share on win screen). */
+const modalStack: Array<React.RefObject<HTMLDivElement | null>> = [];
+
 const FOCUSABLE_SELECTOR = [
   "button:not([disabled])",
   "[href]",
@@ -36,6 +40,10 @@ type AppModalProps = {
   /** Top padding used when align="top" */
   topOffsetPx?: number;
   bodyClassName?: string;
+  /** Extra classes on the backdrop (e.g. overflow: hidden for fit-to-viewport overlays). */
+  backdropClassName?: string;
+  /** Extra classes on the dialog shell (e.g. overflow: hidden). */
+  dialogClassName?: string;
   /** Accessible name for the close button (default "Close"). */
   closeLabel?: string;
 };
@@ -53,6 +61,8 @@ export function AppModal({
   align = "center",
   topOffsetPx = 16,
   bodyClassName,
+  backdropClassName,
+  dialogClassName,
   closeLabel = "Close",
 }: AppModalProps) {
   const titleId = useId();
@@ -60,46 +70,59 @@ export function AppModal({
   const restoreFocusRef = useRef<HTMLElement | null>(null);
   const accessibleName = useMemo(() => title ?? "Dialog", [title]);
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    },
-    [onClose],
+  const isTopModal = useCallback(
+    () => modalStack.length > 0 && modalStack[modalStack.length - 1] === dialogRef,
+    [],
   );
 
-  const trapFocus = useCallback((e: KeyboardEvent) => {
-    if (e.key !== "Tab" || !dialogRef.current) return;
-
-    const focusable = Array.from(
-      dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-    ).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
-
-    if (focusable.length === 0) {
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (!isTopModal()) return;
       e.preventDefault();
-      dialogRef.current.focus();
-      return;
-    }
+      onClose();
+    },
+    [onClose, isTopModal],
+  );
 
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    const active = document.activeElement as HTMLElement | null;
+  const trapFocus = useCallback(
+    (e: KeyboardEvent) => {
+      if (!isTopModal()) return;
+      if (e.key !== "Tab" || !dialogRef.current) return;
 
-    if (e.shiftKey) {
-      if (!active || active === first || !dialogRef.current.contains(active)) {
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
+
+      if (focusable.length === 0) {
         e.preventDefault();
-        last.focus();
+        dialogRef.current.focus();
+        return;
       }
-      return;
-    }
 
-    if (!active || active === last || !dialogRef.current.contains(active)) {
-      e.preventDefault();
-      first.focus();
-    }
-  }, []);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+
+      if (e.shiftKey) {
+        if (!active || active === first || !dialogRef.current.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+        return;
+      }
+
+      if (!active || active === last || !dialogRef.current.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
+    },
+    [isTopModal],
+  );
 
   useEffect(() => {
     if (!isOpen) return;
+    modalStack.push(dialogRef);
     restoreFocusRef.current = document.activeElement as HTMLElement | null;
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keydown", trapFocus);
@@ -131,6 +154,7 @@ export function AppModal({
     }
 
     const focusTarget = window.requestAnimationFrame(() => {
+      if (!isTopModal()) return;
       const dialogEl = dialogRef.current;
       if (!dialogEl) return;
       const firstFocusable = dialogEl.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
@@ -139,6 +163,8 @@ export function AppModal({
 
     return () => {
       window.cancelAnimationFrame(focusTarget);
+      const idx = modalStack.lastIndexOf(dialogRef);
+      if (idx >= 0) modalStack.splice(idx, 1);
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keydown", trapFocus);
 
@@ -168,7 +194,7 @@ export function AppModal({
         });
       }
     };
-  }, [isOpen, handleKeyDown, trapFocus]);
+  }, [isOpen, handleKeyDown, trapFocus, isTopModal]);
 
   if (!isOpen) return null;
 
@@ -177,6 +203,7 @@ export function AppModal({
     size === "xl" ? styles.sizeXl : size === "wide" ? styles.sizeWide : "",
     surface === "bare" ? styles.surfaceBare : "",
     tone === "celebration" ? styles.toneCelebration : "",
+    dialogClassName,
   ]
     .filter(Boolean)
     .join(" ");
@@ -185,6 +212,7 @@ export function AppModal({
     styles.backdrop,
     align === "top" ? styles.backdropTop : "",
     tone === "celebration" ? styles.backdropSolid : "",
+    backdropClassName,
   ]
     .filter(Boolean)
     .join(" ");

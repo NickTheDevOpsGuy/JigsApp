@@ -1,7 +1,8 @@
 /* src/app/screens/Play/PlayScreen.module.css - Dark Mode Support */
 
 .page {
-  --play-board-tray-width: min(98vw, 760px);
+  /* Use % of layout width — 100vw/98vw can exceed the paintable area on mobile (iOS) and cause horizontal drift */
+  --play-board-tray-width: min(100%, 760px);
   box-sizing: border-box;
   min-height: var(--app-vh-stable, 100dvh);
   height: 100%;

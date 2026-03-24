@@ -37,8 +37,9 @@
     flex: 1;
     overflow: hidden;
     padding: 0;
-    padding-left: 6px;
-    padding-right: 6px;
+    /* .page already applies horizontal safe-area insets — avoid extra inset so the board uses full width */
+    padding-left: 0;
+    padding-right: 0;
     padding-bottom: max(4px, env(safe-area-inset-bottom, 0));
     display: flex;
     flex-direction: column;
@@ -337,6 +338,19 @@
     width: 20px;
     height: 20px;
     font-size: 16px;
+  }
+
+  /* Replay: hide play HUD — modal supplies chrome; gives the board the full column */
+  .boardLayoutShell[data-replay-active="true"] .topBarWrap {
+    display: none;
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .playBody {
+    padding-top: 2px;
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .playBody .main {
+    padding-top: 4px;
   }
 
   /* iPhone/Android landscape: keep controls reachable and respect notch/home areas */

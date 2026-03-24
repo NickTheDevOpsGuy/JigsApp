@@ -97,6 +97,8 @@ export type UsePlayScreenTopBarPropsParams = {
   piecesLeft: number;
   totalPieces: number;
   isComplete: boolean;
+  /** Win celebration modal is visible — hide HUD with tray/board chrome, not on the last-snap delay. */
+  winCelebrationModalVisible: boolean;
   grid: { rows: number; cols: number } | null;
   quadrantTimes: Record<0 | 1 | 2 | 3, number | null>;
   bestTimeSeconds: number | null;

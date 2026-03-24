@@ -37,6 +37,8 @@ type PlayScreenLayoutProps = {
     puzzleKey: number | null;
     state: PuzzleState | null;
     isComplete: boolean;
+    /** Solid “solved” frame + no conic ring; false during last-snap delay before win modal. */
+    boardFrameCompletePhase: boolean;
     isLoading: boolean;
     elapsedLabel: string;
     movesLabel: string;
@@ -158,9 +160,9 @@ export function PlayScreenLayout({
               <div className={styles.boardWrapper}>
                 <div
                   className={styles.boardProgressFrame}
-                  data-complete={board.isComplete ? "true" : undefined}
+                  data-complete={board.boardFrameCompletePhase ? "true" : undefined}
                   style={
-                    board.state?.totalCount && !board.isComplete
+                    board.state?.totalCount && !board.boardFrameCompletePhase
                       ? {
                           ["--progress" as string]:
                             board.state.placedCount / board.state.totalCount,
@@ -175,7 +177,7 @@ export function PlayScreenLayout({
                     ref={board.boardRef as React.RefObject<HTMLDivElement>}
                     data-testid="play-board"
                   >
-                    {board.isComplete && !replayPortalProps && (
+                    {board.boardFrameCompletePhase && !replayPortalProps && (
                       <div
                         className={styles.boardCompleteMessage}
                         role="status"

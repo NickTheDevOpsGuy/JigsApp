@@ -53,6 +53,8 @@ export type PlayScreenOverlaysProps = {
   lastEventTimestamp: number | null;
   lastDbWriteMs: number | null;
   channelName: string | null;
+  /** When true (e.g. replay overlay open), hide engagement / onboarding toasts. */
+  suppressPlayToasts?: boolean;
 };
 
 export function PlayScreenOverlays({
@@ -87,6 +89,7 @@ export function PlayScreenOverlays({
   lastEventTimestamp,
   lastDbWriteMs,
   channelName,
+  suppressPlayToasts = false,
 }: PlayScreenOverlaysProps) {
   const [previewPosition, setPreviewPosition] = useState<{ x: number; y: number } | null>(
     null,
@@ -255,24 +258,26 @@ export function PlayScreenOverlays({
         />
       )}
 
-      <PlayToasts
-        isComplete={isComplete}
-        onboarding={onboarding}
-        showFirstSnapToast={onboarding.showFirstSnapToast}
-        showStreakToast={showStreakToast}
-        milestoneMessage={milestoneMessage}
-        announcerLine={announcerLine}
-        shareToast={shareToast}
-        classNames={{
-          engagementToast: styles.engagementToast,
-          announcerToast: styles.announcerToast,
-          toastDismiss: styles.toastDismiss,
-          onboardingOverlay: styles.onboardingOverlay,
-          onboardingOverlayTray: styles.onboardingOverlayTray,
-          streakToast: styles.streakToast,
-          streakFlame: styles.streakFlame,
-        }}
-      />
+      {!suppressPlayToasts && (
+        <PlayToasts
+          isComplete={isComplete}
+          onboarding={onboarding}
+          showFirstSnapToast={onboarding.showFirstSnapToast}
+          showStreakToast={showStreakToast}
+          milestoneMessage={milestoneMessage}
+          announcerLine={announcerLine}
+          shareToast={shareToast}
+          classNames={{
+            engagementToast: styles.engagementToast,
+            announcerToast: styles.announcerToast,
+            toastDismiss: styles.toastDismiss,
+            onboardingOverlay: styles.onboardingOverlay,
+            onboardingOverlayTray: styles.onboardingOverlayTray,
+            streakToast: styles.streakToast,
+            streakFlame: styles.streakFlame,
+          }}
+        />
+      )}
 
       {showProfiler && (
         <ProfilerOverlay statsRef={perfStatsRef} visible={profilerVisible} />

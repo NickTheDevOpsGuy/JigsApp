@@ -264,6 +264,10 @@ button.stepItemDone:hover .stepNum {
   flex-direction: column;
   flex: 0 0 auto;
   min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
   align-items: stretch;
 }
 
@@ -351,7 +355,7 @@ button.stepItemDone:hover .stepNum {
   direction: ltr;
   overflow-x: auto;
   overflow-y: hidden;
-  overscroll-behavior-x: none;
+  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;

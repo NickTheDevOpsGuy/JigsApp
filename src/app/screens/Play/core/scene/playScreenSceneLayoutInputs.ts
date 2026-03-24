@@ -80,7 +80,12 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     handleTrayPieceClick,
   } = interactions;
 
-  const topBarProps = usePlayScreenTopBarPropsFromCtx(ctx);
+  /** Win modal + share popups are open; until then keep playing chrome so the board frame / tray do not jump on the last snap. */
+  const winCelebrationModalVisible =
+    (isComplete && scene.showWinOverlay && !scene.completionDismissed) ||
+    showE2ECompletion;
+
+  const topBarProps = usePlayScreenTopBarPropsFromCtx(ctx, winCelebrationModalVisible);
 
   const { pageClassName, pageStyle } = buildPlayScreenPageVisuals({
     zenModeEnabled: ui.zenModeEnabled,
@@ -152,6 +157,8 @@ export function usePlayScreenLayoutInputs(ctx: any) {
       scene.setCompletionDismissed(true);
       scene.setShowWinOverlay?.(false);
       scene.setReplayBarOpen(true);
+      scene.setShowStreakToast(false);
+      scene.setShareToast(null);
     },
     onNextPuzzle: handleNewGame,
     nextPuzzleLabel,
@@ -272,6 +279,7 @@ export function usePlayScreenLayoutInputs(ctx: any) {
     canvasRef,
     puzzleKey,
     isComplete,
+    winCelebrationModalVisible,
     isLoading: setup.managerResult.isLoading,
     elapsedSeconds,
     moveCount: scene.moveCountRef.current,

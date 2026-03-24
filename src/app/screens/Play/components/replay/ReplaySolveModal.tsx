@@ -2,7 +2,7 @@
  * Replay Solve modal – focused replay overlay with one board stage,
  * one attached control dock, and a single clear dismiss action.
  */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { Trophy, X } from "lucide-react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
@@ -80,6 +80,24 @@ export function ReplaySolveModal({
   useEffect(() => {
     closeBtnRef.current?.focus({ preventScroll: true });
   }, []);
+
+  const [, bumpViewportLayout] = useReducer((n: number) => n + 1, 0);
+
+  useEffect(() => {
+    if (!useCutout) return;
+    const onLayout = () => {
+      bumpViewportLayout();
+    };
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", onLayout);
+    vv?.addEventListener("scroll", onLayout);
+    window.addEventListener("resize", onLayout);
+    return () => {
+      vv?.removeEventListener("resize", onLayout);
+      vv?.removeEventListener("scroll", onLayout);
+      window.removeEventListener("resize", onLayout);
+    };
+  }, [useCutout]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -188,12 +206,17 @@ export function ReplaySolveModal({
     const right = left + width;
     const bottom = top + height;
     const cutoutRadius = 20;
-    const viewportWidth = typeof window !== "undefined" ? window.innerWidth : width + 24;
     const dockInsetPx = 8;
-    const shellWidth = Math.min(viewportWidth - 24, width + dockInsetPx * 2);
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    const viewLeft = vv?.offsetLeft ?? 0;
+    const viewWidth =
+      vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : width + 24);
+    const edgePad = 12;
+    const maxShell = Math.max(0, viewWidth - 2 * edgePad);
+    const shellWidth = Math.min(maxShell, width + dockInsetPx * 2);
     const shellLeft = Math.min(
-      viewportWidth - shellWidth - 12,
-      Math.max(12, left - dockInsetPx),
+      viewLeft + viewWidth - shellWidth - edgePad,
+      Math.max(viewLeft + edgePad, left - dockInsetPx),
     );
     return (
       <div

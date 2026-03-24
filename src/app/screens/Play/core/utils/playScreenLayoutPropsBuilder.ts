@@ -47,6 +47,8 @@ interface PlayScreenLayoutArgs {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   puzzleKey: number | null;
   isComplete: boolean;
+  /** Win modal visible or results dismissed to inline CTA — “finished” board chrome (ring, tray). */
+  winCelebrationModalVisible: boolean;
   isLoading: boolean;
   elapsedSeconds: number;
   moveCount: number;
@@ -107,6 +109,9 @@ interface PlayScreenLayoutArgs {
 export function createPlayScreenLayoutProps(
   args: PlayScreenLayoutArgs,
 ): React.ComponentProps<typeof PlayScreenLayout> {
+  const boardFrameCompletePhase =
+    args.winCelebrationModalVisible || Boolean(args.postCompletionCta);
+
   return {
     coopViewProps: {
       isHost: args.isHost,
@@ -127,7 +132,7 @@ export function createPlayScreenLayoutProps(
       sessionId: args.topBarProps.sessionId,
       realtimeStatus: args.topBarProps.realtimeStatus,
       connectedCount: args.topBarProps.connectedCount,
-      showHud: args.topBarProps.showHud,
+      showHud: args.replayBarOpen ? false : args.topBarProps.showHud,
       hudProps: args.topBarProps.hudProps,
       topBarButtonsProps: args.topBarProps.topBarButtonsProps,
       immersiveMode: args.topBarProps.immersiveMode,
@@ -174,6 +179,7 @@ export function createPlayScreenLayoutProps(
       puzzleKey: args.puzzleKey,
       state: args.state,
       isComplete: args.isComplete,
+      boardFrameCompletePhase,
       postCompletionCta: args.postCompletionCta,
       isLoading: args.isLoading,
       elapsedLabel: `Solved in ${formatTime(args.elapsedSeconds)}!`,
@@ -197,7 +203,7 @@ export function createPlayScreenLayoutProps(
       onResume: () => args.setIsPaused(false),
     },
     tray: {
-      show: !args.isComplete && !args.replayBarOpen,
+      show: !args.replayBarOpen && (!args.isComplete || !boardFrameCompletePhase),
       immersiveMode: args.immersiveMode,
       showImmersiveUi: args.showImmersiveUi,
       onPointerLeave: args.immersiveMode ? args.scheduleImmersiveHide : undefined,
@@ -258,6 +264,7 @@ export function createPlayScreenLayoutProps(
       lastEventTimestamp: args.lastEventTimestamp,
       lastDbWriteMs: args.lastDbWriteMs,
       channelName: args.channelName,
+      suppressPlayToasts: args.replayBarOpen,
     },
   } as unknown as React.ComponentProps<typeof PlayScreenLayout>;
 }

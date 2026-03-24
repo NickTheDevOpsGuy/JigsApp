@@ -121,35 +121,89 @@
   outline-offset: 2px;
 }
 
-@media (max-width: 420px) {
+@media (max-width: 600px) {
+  /* Title duplicates modal chrome; seek row shows time + speed control */
   .dockHeader {
-    padding-bottom: 12px;
+    display: none;
   }
 
-  .dockTitle {
-    font-size: 0.86rem;
+  .speedBadge {
+    display: none;
+  }
+
+  .seekRow {
+    padding: 0 0 8px;
+  }
+
+  .seekBarWrap {
+    gap: 6px 8px;
+  }
+
+  .seekTime {
+    font-size: 0.72rem;
   }
 
   .controlRow {
-    gap: 8px;
-    row-gap: 10px;
-    padding-top: 12px;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 6px;
+    row-gap: 0;
+    padding-top: 8px;
   }
 
   .controlBtn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .controlBtn svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .controlBtnPlay {
+    width: 36px;
+    height: 36px;
+  }
+
+  .controlBtnPlay svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .speedTrigger {
+    min-width: 34px;
+    min-height: 32px;
+    padding: 0 6px;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .controlRow {
+    gap: 5px;
+    padding-top: 6px;
+  }
+
+  .controlBtn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .controlBtn svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .controlBtnPlay {
     width: 34px;
     height: 34px;
   }
 
-  .controlBtnPlay {
-    width: 38px;
-    height: 38px;
-  }
-
   .speedTrigger {
-    min-width: 36px;
-    min-height: 34px;
-    padding: 0 8px;
-    font-size: 0.78rem;
+    min-width: 32px;
+    min-height: 30px;
+    padding: 0 5px;
+    font-size: 0.68rem;
   }
 }

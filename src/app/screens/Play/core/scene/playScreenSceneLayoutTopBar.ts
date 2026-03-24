@@ -5,7 +5,10 @@ import { usePlayScreenTopBarProps } from "@/screens/Play/hooks/topBar/usePlayScr
 import { SHOW_DEBUG } from "@/screens/Play/core/utils/playScreenUtils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ctx shape is large and shared
-export function usePlayScreenTopBarPropsFromCtx(ctx: any) {
+export function usePlayScreenTopBarPropsFromCtx(
+  ctx: any,
+  winCelebrationModalVisible: boolean,
+) {
   const { setup, behavior, interactions } = ctx;
   const {
     ui,
@@ -124,6 +127,7 @@ export function usePlayScreenTopBarPropsFromCtx(ctx: any) {
     piecesLeft: left,
     totalPieces: total,
     isComplete,
+    winCelebrationModalVisible,
     grid,
     quadrantTimes: scene.quadrantTimes,
     bestTimeSeconds,
