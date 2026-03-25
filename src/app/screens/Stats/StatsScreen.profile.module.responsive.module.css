@@ -229,6 +229,40 @@
     padding: 12px;
   }
 
+  .profileSummaryTop {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+  }
+
+  .profileSummaryStatRail {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .profileAvatar {
+    grid-row: 1;
+  }
+
+  .profileSummaryIdentity {
+    grid-row: 1;
+  }
+
+  .profileMiniStat {
+    flex: 1 1 calc(33.333% - 6px);
+    min-width: 72px;
+  }
+
+  .profileSpotlightGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .profileToolbar > * {
+    flex: 1 1 calc(50% - 4px);
+  }
+
   .profileHeroHeader {
     flex-direction: column;
   }

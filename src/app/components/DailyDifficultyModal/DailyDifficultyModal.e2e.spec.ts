@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { dismissWhatsNewModalIfOpen } from "../../test/e2e/helpers";
+import { dismissWhatsNewModalIfOpen } from "@/e2e/helpers";
 
 test.describe("Today's Puzzle modal", () => {
   test.beforeEach(async ({ page }) => {

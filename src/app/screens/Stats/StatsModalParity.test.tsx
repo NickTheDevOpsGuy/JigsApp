@@ -85,6 +85,7 @@ describe("Stats modal parity", () => {
         profileSaving={false}
         loadData={vi.fn(async () => undefined)}
         onNavigateToBoard={vi.fn()}
+        onNavigateToAchievements={vi.fn()}
         onSeeRankingFor4x4={vi.fn()}
       />,
     );
@@ -92,14 +93,15 @@ describe("Stats modal parity", () => {
     expect(screen.getByText("Player")).toBeTruthy();
     expect(screen.getByText("Stats")).toBeTruthy();
     expect(screen.getByText("Daily Mastery")).toBeTruthy();
-    expect(screen.getByText("Settings")).toBeTruthy();
+    expect(screen.getByText("Profile & privacy")).toBeTruthy();
     expect(screen.getByRole("button", { name: /see ranking/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /edit profile/i })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /account settings/i }));
 
     expect(screen.getByLabelText(/display name/i)).toBeTruthy();
     expect(screen.getByLabelText(/show my name on leaderboards/i)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: /^save$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
     expect(onSave).toHaveBeenCalledTimes(1);
   });
 

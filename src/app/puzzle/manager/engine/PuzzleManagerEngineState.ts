@@ -102,7 +102,7 @@ export class PuzzleManagerState {
     this.rotationStepDeg = rotationStepDeg;
 
     const cutType = options.cutType ?? "classic";
-    const depthPct = cutType === "irregular" ? 0.3 : cutType === "hard" ? 0.2 : 0.28;
+    const depthPct = cutType === "irregular" ? 0.28 : cutType === "hard" ? 0.2 : 0.26;
     const minPad = Math.ceil(Math.min(pieceWidth, pieceHeight) * depthPct);
     this.pad = Math.max(pad, minPad);
     this.tileW = pieceWidth;

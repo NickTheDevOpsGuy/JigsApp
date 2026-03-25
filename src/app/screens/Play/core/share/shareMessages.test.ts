@@ -26,12 +26,12 @@ describe("shareMessages", () => {
       puzzleName: "Sunset Beach",
     });
 
-    expect(text.startsWith("Phuzzle")).toBe(true);
-    expect(text).toContain("Puzzle");
-    expect(text).toContain("Difficulty: Easy (9 pieces)");
-    expect(text).toContain("Time: 1:42");
-    expect(text).toContain("Moves: 25");
-    expect(text).not.toContain("Can you beat my time?");
+    expect(text).toContain("Phuzzle");
+    expect(text).toContain("Easy");
+    expect(text).toContain("9 pieces");
+    expect(text).toContain("1:42");
+    expect(text).toContain("25 moves");
+    expect(text).not.toContain("Prove you");
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc");
   });
 
@@ -42,9 +42,9 @@ describe("shareMessages", () => {
       playUrl: "/play?grid=4x4",
       moveCount: 0,
     });
-    expect(text).toContain("Difficulty: Medium (16 pieces)");
-    expect(text).toContain("Time: 1:00");
-    expect(text).toContain("Moves: 0");
+    expect(text).toContain("Medium");
+    expect(text).toContain("16 pieces");
+    expect(text).toContain("1:00");
     expect(text).toContain("https://phuzzle.vercel.app/play?grid=4x4");
   });
 
@@ -58,13 +58,11 @@ describe("shareMessages", () => {
       puzzleName: "Forest Path",
     });
 
-    expect(text.startsWith("Phuzzle")).toBe(true);
-    expect(text).toContain("Puzzle");
-    expect(text).toContain("Difficulty: Medium (16 pieces)");
-    expect(text).toContain("Time: 1:42");
-    expect(text).toContain("Moves: 42");
-    expect(text).toContain("Rotations: 3");
-    expect(text).toContain("Can you beat my time?");
+    expect(text).toContain("16 pieces");
+    expect(text).toContain("1:42");
+    expect(text).toContain("42 moves");
+    expect(text).toContain("3 rotations");
+    expect(text).toContain("Prove you");
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc&ct=102&cm=42");
   });
 
@@ -75,9 +73,9 @@ describe("shareMessages", () => {
       playUrl: "/play?grid=3x3",
       moveCount: 19,
     });
-    expect(text).toContain("Difficulty: Easy (9 pieces)");
-    expect(text).toContain("Rotations: 0");
-    expect(text).toContain("Can you beat my time?");
+    expect(text).toContain("Easy");
+    expect(text).toContain("9 pieces");
+    expect(text).toContain("Prove you");
     expect(text).toContain("https://phuzzle.vercel.app/play?grid=3x3&ct=36&cm=19");
   });
 

@@ -6,11 +6,12 @@ export type ShareMessageArgs = {
   playUrl: string;
   accuracyPercent?: number;
   moveCount?: number;
-  /** Rotations/turns performed during solve. */
   rotationCount?: number;
   maxGroupSize?: number;
-  /** Display name of the puzzle (e.g. from win screen data). */
   puzzleName?: string;
+  /** 0 = clean solve. */
+  undoCount?: number;
+  usedHint?: boolean;
 };
 
 export function getDifficultyLabel(pieceCount: number): string {
@@ -60,20 +61,17 @@ export function buildProgressShareMessage(args: ShareMessageArgs): string {
   const pieces = args.pieceCount;
   const moves = args.moveCount ?? 0;
   const rotations = args.rotationCount ?? 0;
+  const cleanSolve = (args.undoCount ?? 0) === 0 && !args.usedHint;
   const link = absShareUrl(args.playUrl);
-  const lines = [
-    "Phuzzle",
-    "",
-    "Puzzle",
-    `Difficulty: ${difficulty} (${pieces} pieces)`,
-    `Time: ${time}`,
-    `Moves: ${moves}`,
-  ];
-  if (rotations > 0) {
-    lines.push(`Rotations: ${rotations}`);
-  }
-  lines.push("", link);
-  return lines.join("\n");
+  const namePart = args.puzzleName ? `"${args.puzzleName}" · ` : "";
+  const statsLine =
+    rotations > 0
+      ? `⏱ ${time}  ·  ${moves} moves  ·  ${rotations} rotations`
+      : `⏱ ${time}  ·  ${moves} moves`;
+  const result = [`🧩 Phuzzle — ${namePart}${difficulty} · ${pieces} pieces`, statsLine];
+  if (cleanSolve) result.push("⭐ Clean solve!");
+  result.push("", link);
+  return result.join("\n");
 }
 
 /** Daily Share – Wordle-style compact format. Only for Daily Puzzle. */
@@ -139,17 +137,26 @@ export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const rotations = args.rotationCount ?? 0;
   const difficulty = getDifficultyLabel(args.pieceCount);
   const pieces = args.pieceCount;
+  const cleanSolve = (args.undoCount ?? 0) === 0 && !args.usedHint;
   const challengePath = buildChallengePlayUrl(args.playUrl, args.elapsedSeconds, moves);
   const challengeUrl = absShareUrl(challengePath);
-  const lines = [
-    "Phuzzle",
-    "",
-    "Puzzle",
-    `Difficulty: ${difficulty} (${pieces} pieces)`,
-    `Time: ${time}`,
-    `Moves: ${moves}`,
-  ];
-  lines.push(`Rotations: ${rotations}`);
-  lines.push("", "Can you beat my time?", "", challengeUrl);
-  return lines.join("\n");
+
+  const secsPerPiece = args.elapsedSeconds / Math.max(1, pieces);
+  const taunt =
+    secsPerPiece < 4
+      ? "🔥 I destroyed this puzzle. Can you even come close?"
+      : secsPerPiece < 8
+        ? "🧩 Just solved this. Think you can beat my time?"
+        : "🧠 Took my time and crushed it. Beat me if you can.";
+
+  const namePart = args.puzzleName ? `"${args.puzzleName}" · ` : "";
+  const statsLine =
+    rotations > 0
+      ? `⏱ ${time}  ·  ${moves} moves  ·  ${rotations} rotations`
+      : `⏱ ${time}  ·  ${moves} moves`;
+
+  const result = [taunt, "", `${namePart}${difficulty} · ${pieces} pieces`, statsLine];
+  if (cleanSolve) result.push("⭐ Clean solve — no undos, no hints!");
+  result.push("", "👇 Prove you're faster:", challengeUrl);
+  return result.join("\n");
 }

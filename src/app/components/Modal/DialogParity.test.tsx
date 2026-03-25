@@ -1,5 +1,5 @@
 /**
- * Dialog parity coverage for shared shell, async loading, and staged puzzle flows.
+ * Dialog parity coverage for shared shell (Modal), async loading, and staged puzzle flows.
  * @vitest-environment happy-dom
  */
 import { act, fireEvent, render, screen } from "@testing-library/react";
@@ -286,7 +286,7 @@ describe("dialog parity", () => {
     fireEvent.click(screen.getByRole("option", { name: /burger/i }));
 
     expect(await screen.findByRole("button", { name: /start puzzle/i })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: /puzzle setup/i })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /^food$/i })).toBeTruthy();
     expect(screen.queryByText("Burger")).toBeNull();
   });
 });

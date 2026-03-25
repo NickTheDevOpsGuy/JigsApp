@@ -4,6 +4,7 @@
  */
 import React from "react";
 import posthog from "posthog-js";
+import type { NavigateFunction } from "react-router-dom";
 import type { PuzzleSession } from "@/services/session/puzzleSessionService";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 
@@ -14,7 +15,7 @@ export type PlayScreenCoopViewProps = {
   session: PuzzleSession | null;
   joinError: Error | null;
   retryJoin: () => void;
-  navigate: (to: string) => void;
+  navigate: NavigateFunction;
   children: React.ReactNode;
 };
 

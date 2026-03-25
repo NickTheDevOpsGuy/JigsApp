@@ -12,12 +12,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Share2, Check, Flame, Timer } from "lucide-react";
 import {
-  syncServerTime,
-  getSyncedNow,
-  getSecondsUntilNextUtcMidnight,
-} from "@/services/player/serverTimeService";
-import { isSupabaseConfigured } from "@/supabase/client";
-import {
   getCurrentStreak,
   getDailyPuzzleNumber,
   getTodayDateString,
@@ -42,46 +36,30 @@ type Props = {
   onShared?: () => void;
 };
 
-/** Same rule as DailyCountdown: UTC midnight + server offset when Supabase is configured. */
 function useNextPuzzleCountdown() {
   const [label, setLabel] = useState("");
-  const [synced, setSynced] = useState(false);
-
-  const tick = useCallback(() => {
-    const now = getSyncedNow();
-    const secs = getSecondsUntilNextUtcMidnight(now);
-    const h = Math.floor(secs / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    const s = secs % 60;
-    setLabel(`${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`);
-  }, []);
-
   useEffect(() => {
-    if (isSupabaseConfigured()) {
-      void syncServerTime().then(() => {
-        setSynced(true);
-        tick();
-      });
-    } else {
-      setSynced(true);
-      tick();
-    }
-  }, [tick]);
-
-  useEffect(() => {
-    if (!synced) return;
+    const tick = () => {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight.getTime() - now.getTime();
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setLabel(`${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`);
+    };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [synced, tick]);
-
+  }, []);
   return label;
 }
 
 function buildEmojiGrid(
   pieceCount: number,
   elapsedSeconds: number,
-  _moveCount: number,
+  moveCount: number,
   usedHint: boolean,
   undoCount: number,
 ): string {

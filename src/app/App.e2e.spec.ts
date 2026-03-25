@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { dismissWhatsNewModalIfOpen } from "./test/e2e/helpers";
+import { dismissWhatsNewModalIfOpen } from "@/e2e/helpers";
 
 test.describe("Routes, feedback, and pack deep links", () => {
   test.beforeEach(async ({ page }) => {

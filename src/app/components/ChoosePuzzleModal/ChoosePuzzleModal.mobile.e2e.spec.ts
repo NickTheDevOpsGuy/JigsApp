@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { dismissWhatsNewModalIfOpen } from "../../test/e2e/helpers";
+import { dismissWhatsNewModalIfOpen } from "@/e2e/helpers";
 
 const MOBILE_VIEWPORTS = [
   { width: 390, height: 844 },

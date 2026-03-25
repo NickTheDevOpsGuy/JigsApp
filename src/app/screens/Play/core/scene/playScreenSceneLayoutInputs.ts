@@ -10,9 +10,9 @@ import {
   getCompletionImageFallback,
 } from "@/screens/Play/core/scene/playScreenSceneOverlays";
 import { usePlayScreenTopBarPropsFromCtx } from "./playScreenSceneLayoutTopBar";
+import type { PlayScreenSceneLayoutContext } from "./playScreenSceneLayoutContext.types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- ctx shape is large and shared
-export function usePlayScreenLayoutInputs(ctx: any) {
+export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
   const { setup, behavior, interactions } = ctx;
   const {
     ui,

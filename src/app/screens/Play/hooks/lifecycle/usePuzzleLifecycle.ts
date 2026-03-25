@@ -6,9 +6,9 @@ import {
   loadPuzzleState,
   clearPuzzleState,
 } from "@/puzzle/storage/puzzleStorage";
-import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { soundManager } from "@/audio/core/sounds";
 import { logger } from "@/utils/logger";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
 const STORAGE_KEY = "phuzzle:imageDataUrl";
 const GRID_KEY = "phuzzle:gridSize";

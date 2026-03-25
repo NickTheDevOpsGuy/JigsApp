@@ -1,10 +1,7 @@
 /**
- * ChoosePuzzleModal – Strict 4-step flow (same model as Puzzle Packs).
- * Step 1: Choose Source Category (categories only; no preview, no difficulty).
- * Step 2: Choose Puzzle (puzzle rail only; thumbnail + title; no large preview).
- * Step 3: Puzzle Setup (ONLY place with large preview + difficulty + Start).
- * Step 4: Start (action: Start Puzzle button on Setup step).
- * Breadcrumb: Category → Puzzle → Setup → Start.
+ * ChoosePuzzleModal – 2-step flow (matches PackChoiceModal parity).
+ * Step 1: Choose Category.
+ * Step 2: Choose Puzzle + difficulty + Start (all on one screen).
  */
 import {
   useState,
@@ -29,7 +26,7 @@ import styles from "./ChoosePuzzleModal.module.css";
 const PRIMARY_DIFFICULTIES = GRID_OPTIONS.slice(0, 4);
 const DIFFICULTY_NAMES = ["Easy", "Medium", "Hard", "Expert"] as const;
 
-type Step = "category" | "puzzle" | "setup";
+type Step = "category" | "puzzle";
 
 type Props = {
   isOpen: boolean;
@@ -101,22 +98,15 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     if (!isOpen) return;
     setDifficultyIndex(1);
     setFilterCategory("all");
-    const filtered = filterPuzzles(SAMPLE_PUZZLES, "all");
-    const firstPuzzle = filtered[0] ?? null;
-    setSelectedPuzzle(firstPuzzle);
+    setSelectedPuzzle(null);
     setStep("category");
   }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
-    const inList =
-      selectedPuzzle && filteredPuzzles.some((p) => p.id === selectedPuzzle.id);
-    if (!inList && filteredPuzzles.length > 0) {
-      setSelectedPuzzle(filteredPuzzles[0]);
-    } else if (!inList) {
-      setSelectedPuzzle(null);
-    }
-  }, [isOpen, filterCategory, filteredPuzzles, selectedPuzzle?.id]);
+    // Clear selection when category changes so user must pick intentionally
+    setSelectedPuzzle(null);
+  }, [isOpen, filterCategory]);
 
   useEffect(() => {
     if (!isOpen || step !== "category") return;
@@ -262,8 +252,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
     if (target === "category") {
       setFilterCategory("all");
       setSelectedPuzzle(null);
-    } else if (target === "puzzle") {
-      setSelectedPuzzle(null);
     }
   };
 
@@ -272,11 +260,9 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   const categoryMeta = CATEGORIES.find((c) => c.id === filterCategory);
 
   const modalTitle =
-    step === "category"
-      ? "Choose Category"
-      : step === "puzzle"
-        ? "Choose Puzzle"
-        : "Puzzle Setup";
+    step === "category" ? "Choose a Puzzle" : (categoryMeta?.name ?? "Choose Puzzle");
+
+  const stepNumber = step === "category" ? 1 : 2;
 
   return (
     <Modal
@@ -286,69 +272,25 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
       showCloseButton
       variant="choosePuzzle"
     >
-      {/* Step indicator */}
-      <nav
-        className={styles.stepIndicator}
-        role="navigation"
-        aria-label="Steps: Category, Puzzle, Setup"
-      >
-        {/* Step 1: Category */}
-        <button
-          type="button"
-          className={[
-            styles.stepItem,
-            step === "category" ? styles.stepItemActive : "",
-            step !== "category" ? styles.stepItemDone : "",
-          ].join(" ")}
-          onClick={() => goToStep("category")}
-          aria-current={step === "category" ? "step" : undefined}
-          title="Back to category selection"
-        >
-          <span className={styles.stepNum} aria-hidden>
-            {step !== "category" ? "✓" : "1"}
-          </span>
-          <span className={styles.stepLabel}>Category</span>
-        </button>
-
-        <span className={styles.stepConnector} aria-hidden />
-
-        {/* Step 2: Puzzle */}
-        <button
-          type="button"
-          className={[
-            styles.stepItem,
-            step === "puzzle" ? styles.stepItemActive : "",
-            step === "setup" ? styles.stepItemDone : "",
-            step === "category" ? styles.stepItemFuture : "",
-          ].join(" ")}
-          onClick={() => step !== "category" && goToStep("puzzle")}
-          disabled={step === "category"}
-          aria-current={step === "puzzle" ? "step" : undefined}
-          title={step !== "category" ? "Back to puzzle selection" : undefined}
-        >
-          <span className={styles.stepNum} aria-hidden>
-            {step === "setup" ? "✓" : "2"}
-          </span>
-          <span className={styles.stepLabel}>Puzzle</span>
-        </button>
-
-        <span className={styles.stepConnector} aria-hidden />
-
-        {/* Step 3: Setup */}
-        <span
-          className={[
-            styles.stepItem,
-            step === "setup" ? styles.stepItemActive : "",
-            step !== "setup" ? styles.stepItemFuture : "",
-          ].join(" ")}
-          aria-current={step === "setup" ? "step" : undefined}
-        >
-          <span className={styles.stepNum} aria-hidden>
-            3
-          </span>
-          <span className={styles.stepLabel}>Setup</span>
-        </span>
-      </nav>
+      {/* Compact step label */}
+      <p className={styles.stepCompactLabel} aria-label={`Step ${stepNumber} of 2`}>
+        {step === "category" ? (
+          <span>Step 1 of 2</span>
+        ) : (
+          <>
+            <button
+              type="button"
+              className={styles.stepBackLink}
+              onClick={() => goToStep("category")}
+              title="Back to category selection"
+            >
+              ← Step 1
+            </button>
+            <span className={styles.stepCompactSep}>·</span>
+            <strong>Step 2 of 2</strong>
+          </>
+        )}
+      </p>
 
       {/* Step 1: Category grid — click a category to go straight to puzzle rail */}
       {step === "category" && (
@@ -429,12 +371,12 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
         </div>
       )}
 
-      {/* Step 2: Puzzle rail */}
+      {/* Step 2: Puzzle rail + difficulty + start */}
       {step === "puzzle" && (
-        <div className={styles.stepPanel}>
+        <div className={`${styles.stepPanel} ${styles.stepPanelCompact}`}>
           <p className={styles.railLabel}>
-            {filterCategory !== "all" && categoryMeta ? categoryMeta.name : "All Packs"} —
-            pick a puzzle
+            {filterCategory !== "all" && categoryMeta ? categoryMeta.name : "All puzzles"}{" "}
+            — pick a puzzle
           </p>
           <div className={styles.gridScrollWrap}>
             <button
@@ -464,8 +406,6 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
                     onSelect={() => {
                       setSelectedPuzzle(puzzle);
                       setDifficultyIndex(1);
-                      setStep("setup");
-                      // Start preloading image immediately when puzzle is selected
                       const preloadOnSelect = new Image();
                       preloadOnSelect.src = puzzle.fullImage;
                     }}
@@ -487,62 +427,52 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
               <ChevronRight size={22} aria-hidden />
             </button>
           </div>
-        </div>
-      )}
 
-      {/* Step 3: Setup — thumbnail + difficulty + Start */}
-      {step === "setup" && selectedPuzzle && (
-        <div className={`${styles.stepPanel} ${styles.stepPanelCompact}`}>
-          <div className={styles.setupHeader}>
-            <div className={styles.setupThumb}>
-              <img
-                src={selectedPuzzle.thumbnail}
-                alt={`${selectedPuzzle.name} preview`}
-                className={styles.setupThumbImg}
-              />
-            </div>
-          </div>
-          <div
-            className={styles.difficultySelector}
-            role="group"
-            aria-label="Choose difficulty"
-          >
-            {PRIMARY_DIFFICULTIES.map((opt, i) => {
-              const name = DIFFICULTY_NAMES[i] ?? opt.label.split(" ")[0];
-              const pieces = opt.rows * opt.cols;
-              const active = difficultyIndex === i;
-              return (
-                <button
-                  key={`${opt.rows}x${opt.cols}`}
-                  type="button"
-                  className={`${styles.difficultyBtn} ${active ? styles.difficultyBtnActive : ""}`}
-                  onClick={() => setDifficultyIndex(i)}
-                  aria-pressed={active}
-                  aria-label={`${name}, ${pieces} pieces`}
-                  title={`Select ${name}: ${pieces} pieces`}
-                >
-                  <Puzzle size={16} aria-hidden />
-                  <span>
-                    {name} – {pieces} pieces
-                  </span>
-                  {active && (
-                    <Check size={16} className={styles.difficultyCheck} aria-hidden />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          <button
-            ref={startButtonRef}
-            type="button"
-            className={styles.startPuzzleButton}
-            onClick={handleStart}
-            disabled={!canStart}
-            title="Start puzzle with selected image and difficulty"
-            aria-label="Start puzzle"
-          >
-            Start Puzzle
-          </button>
+          {selectedPuzzle && (
+            <>
+              <div
+                className={styles.difficultySelector}
+                role="group"
+                aria-label="Choose difficulty"
+              >
+                {PRIMARY_DIFFICULTIES.map((opt, i) => {
+                  const name = DIFFICULTY_NAMES[i] ?? opt.label.split(" ")[0];
+                  const pieces = opt.rows * opt.cols;
+                  const active = difficultyIndex === i;
+                  return (
+                    <button
+                      key={`${opt.rows}x${opt.cols}`}
+                      type="button"
+                      className={`${styles.difficultyBtn} ${active ? styles.difficultyBtnActive : ""}`}
+                      onClick={() => setDifficultyIndex(i)}
+                      aria-pressed={active}
+                      aria-label={`${name}, ${pieces} pieces`}
+                      title={`Select ${name}: ${pieces} pieces`}
+                    >
+                      <Puzzle size={16} aria-hidden />
+                      <span>
+                        {name} – {pieces} pieces
+                      </span>
+                      {active && (
+                        <Check size={16} className={styles.difficultyCheck} aria-hidden />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                ref={startButtonRef}
+                type="button"
+                className={styles.startPuzzleButton}
+                onClick={handleStart}
+                disabled={!canStart}
+                title="Start puzzle with selected image and difficulty"
+                aria-label="Start puzzle"
+              >
+                Start Puzzle
+              </button>
+            </>
+          )}
         </div>
       )}
     </Modal>

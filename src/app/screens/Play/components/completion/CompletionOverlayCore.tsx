@@ -86,18 +86,8 @@ export function CompletionOverlay({
       : undefined,
   });
 
-  const {
-    shareMenuOpen,
-    setShareMenuOpen,
-    shareRef,
-    shareTriggerRef,
-    dropdownPosition,
-    replayNextMenuOpen,
-    setReplayNextMenuOpen,
-    replayNextRef,
-    replayNextTriggerRef,
-    replayNextDropdownPosition,
-  } = useCompletionOverlayMenus();
+  const { shareMenuOpen, setShareMenuOpen, shareRef, shareTriggerRef, dropdownPosition } =
+    useCompletionOverlayMenus();
 
   useEffect(() => {
     setImageError(false);
@@ -264,11 +254,6 @@ export function CompletionOverlay({
           shareRef={shareRef}
           shareTriggerRef={shareTriggerRef}
           dropdownPosition={dropdownPosition}
-          replayNextMenuOpen={replayNextMenuOpen}
-          setReplayNextMenuOpen={setReplayNextMenuOpen}
-          replayNextRef={replayNextRef}
-          replayNextTriggerRef={replayNextTriggerRef}
-          replayNextDropdownPosition={replayNextDropdownPosition}
           grid={grid}
           puzzleShareUrl={puzzleShareUrl}
           ensureChallengeShareUrl={ensureChallengeShareUrl}

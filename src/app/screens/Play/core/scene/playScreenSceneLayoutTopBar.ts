@@ -4,12 +4,13 @@
 import { usePlayScreenTopBarProps } from "@/screens/Play/hooks/topBar/usePlayScreenTopBarProps";
 import { SHOW_DEBUG } from "@/screens/Play/core/utils/playScreenUtils";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- ctx shape is large and shared
+import type { PlayScreenSceneLayoutContext } from "./playScreenSceneLayoutContext.types";
+
 export function usePlayScreenTopBarPropsFromCtx(
-  ctx: any,
+  ctx: PlayScreenSceneLayoutContext,
   winCelebrationModalVisible: boolean,
 ) {
-  const { setup, behavior, interactions } = ctx;
+  const { setup, behavior, interactions, soundPlay } = ctx;
   const {
     ui,
     scene,
@@ -18,34 +19,18 @@ export function usePlayScreenTopBarPropsFromCtx(
     countdownMinutes,
     setCountdownMinutes,
     grid,
+    sessionResult,
   } = setup;
-  const {
-    manager,
-    state,
-    setState,
-    puzzleKey: _puzzleKey,
-    boardRef: _boardRef,
-    elapsedSeconds: _elapsedSeconds,
-    snapCombo: _snapCombo,
-    announcerLine: _announcerLine,
-    imgRef: _imgRef,
-  } = behavior;
+  const { manager, state, setState } = behavior;
   const {
     displayElapsedSeconds,
     left,
     total,
     isComplete,
-    dailyVisualModifier: _dailyVisualModifier,
-    fogStrength: _fogStrength,
     immersive,
     bestTimeSeconds,
     handleSharePuzzle,
-    handleNewGame: _handleNewGame,
-    puzzleShareUrl: _puzzleShareUrl,
-    share: _share,
-    handleTrayPieceClick: _handleTrayPieceClick,
   } = interactions;
-  const { sessionResult } = setup;
 
   return usePlayScreenTopBarProps({
     theme: scene.theme,
@@ -104,7 +89,7 @@ export function usePlayScreenTopBarPropsFromCtx(
     setState,
     isPaused: ui.isPaused,
     setIsPaused: ui.setIsPaused,
-    playUndo: ctx.soundPlay,
+    playUndo: soundPlay,
     undoCountRef: scene.undoCountRef,
     undoSnapBackRef: interactions.undoSnapBackRef,
     viewport: scene.viewport,

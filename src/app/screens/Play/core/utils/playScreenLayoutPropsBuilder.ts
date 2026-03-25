@@ -1,4 +1,5 @@
 import React from "react";
+import type { NavigateFunction } from "react-router-dom";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import { PlayScreenLayout } from "@/screens/Play/components";
 
@@ -7,9 +8,9 @@ interface PlayScreenLayoutArgs {
   sessionIdFromUrl: string | null;
   sessionLoading: boolean;
   session: unknown;
-  joinError: string | null;
+  joinError: Error | null;
   retryJoin: () => void;
-  navigate: (to: string, opts?: unknown) => void;
+  navigate: NavigateFunction;
   pageClassName: string;
   pageStyle?: React.CSSProperties;
   pageRef: React.RefObject<HTMLDivElement>;
@@ -32,6 +33,8 @@ interface PlayScreenLayoutArgs {
   hapticsEnabled: boolean;
   showNewGameModal: boolean;
   setShowNewGameModal: (show: boolean) => void;
+  showChoosePuzzleModal: boolean;
+  setShowChoosePuzzleModal: (show: boolean) => void;
   handleNewGame: () => void;
   showResetStatsConfirm: boolean;
   setShowResetStatsConfirm: (show: boolean) => void;
@@ -82,7 +85,7 @@ interface PlayScreenLayoutArgs {
   mysteryModeEnabled: boolean;
   progressiveRevealMode: boolean;
   imgRef: React.RefObject<HTMLImageElement>;
-  onPreviewTap: () => void;
+  onPreviewTap: React.MouseEventHandler<HTMLDivElement>;
   showTutorial: boolean;
   showHowToPlay: boolean;
   dismissTutorial: () => void;
@@ -157,6 +160,8 @@ export function createPlayScreenLayoutProps(
       hapticsEnabled: args.hapticsEnabled,
       showNewGameModal: args.showNewGameModal,
       setShowNewGameModal: args.setShowNewGameModal,
+      showChoosePuzzleModal: args.showChoosePuzzleModal,
+      setShowChoosePuzzleModal: args.setShowChoosePuzzleModal,
       onConfirmNewGame: args.handleNewGame,
       showResetStatsConfirm: args.showResetStatsConfirm,
       setShowResetStatsConfirm: args.setShowResetStatsConfirm,

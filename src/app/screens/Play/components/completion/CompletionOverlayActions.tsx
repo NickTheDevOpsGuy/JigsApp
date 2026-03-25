@@ -16,11 +16,6 @@ export function CompletionOverlayActions(args: {
   shareRef: React.RefObject<HTMLDivElement>;
   shareTriggerRef: React.RefObject<HTMLButtonElement>;
   dropdownPosition: { top: number; left: number; minWidth: number } | null;
-  replayNextMenuOpen: boolean;
-  setReplayNextMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  replayNextRef: React.RefObject<HTMLDivElement>;
-  replayNextTriggerRef: React.RefObject<HTMLButtonElement>;
-  replayNextDropdownPosition: { top: number; left: number; minWidth: number } | null;
   grid?: { rows: number; cols: number };
   puzzleShareUrl: string;
   ensureChallengeShareUrl?: () => Promise<string>;

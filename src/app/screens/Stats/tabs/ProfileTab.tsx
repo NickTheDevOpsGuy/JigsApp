@@ -1,7 +1,7 @@
 /**
  * ProfileTab – identity, streak, tier, stats, finished puzzles grid, daily mastery, settings.
  */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/Button/Button";
 import { getBestTime } from "@/screens/Play/core/time/timeMode";
@@ -23,6 +23,20 @@ function levelToTier(level: number): string {
   const rank = ((level - 1) % 3) + 1;
   const roman = rank === 1 ? "I" : rank === 2 ? "II" : "III";
   return `${tiers[tierIndex]} ${roman}`;
+}
+
+function displayHandleFromName(name: string): string {
+  const s = name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return `@${(s || "puzzler").slice(0, 20)}`;
+}
+
+function avatarInitial(name: string): string {
+  const c = name.trim().charAt(0);
+  return c && /[a-zA-Z0-9]/.test(c) ? c.toUpperCase() : "?";
 }
 
 interface ProfileTabProps {
@@ -54,6 +68,9 @@ interface ProfileTabProps {
   profileSaving: boolean;
   loadData: () => Promise<void>;
   onNavigateToBoard?: () => void;
+  onNavigateToAchievements?: () => void;
+  /** Defaults to home / play when portfolio is empty */
+  onNavigateHome?: () => void;
 }
 
 export function ProfileTab({
@@ -69,14 +86,19 @@ export function ProfileTab({
   profileSaving,
   loadData,
   onNavigateToBoard,
+  onNavigateToAchievements,
   onSeeRankingFor4x4,
+  onNavigateHome,
 }: ProfileTabProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const displayNameInputRef = useRef<HTMLInputElement>(null);
+
   const displayName = (
     displayNameInput.trim() ||
     profile?.displayName ||
     "Puzzler"
   ).slice(0, 32);
+  const handle = displayHandleFromName(displayName);
   const streak = stats?.dailyStreak ?? 0;
   const bestStreak = stats?.bestDailyStreak ?? 0;
   const level = stats?.level ?? 1;
@@ -88,35 +110,58 @@ export function ProfileTab({
   const totalTime = formatDuration(stats?.totalPlayTimeSeconds ?? 0);
   const masteryCount = Math.min(7, weeklyAlbumProgress);
 
+  useEffect(() => {
+    if (settingsOpen && displayNameInputRef.current) {
+      const id = window.requestAnimationFrame(() => {
+        displayNameInputRef.current?.focus();
+      });
+      return () => window.cancelAnimationFrame(id);
+    }
+  }, [settingsOpen]);
+
   return (
-    <div className={styles.profileLayout}>
-      <section className={`${styles.profileBlock} ${styles.profileHeroBlock}`}>
-        <div className={styles.profileHeroHeader}>
-          <div>
+    <div className={styles.profilePageShell}>
+      <section className={`${styles.profileBlock} ${styles.profileSummaryBlock}`}>
+        <div className={styles.profileSummaryTop}>
+          <div className={styles.profileAvatar} aria-hidden>
+            {avatarInitial(displayName)}
+          </div>
+          <div className={styles.profileSummaryIdentity}>
             <p className={styles.profileSectionEyebrow}>Player</p>
             <p className={styles.profileIdentity}>
               <strong>{displayName}</strong>
             </p>
-            <p className={styles.profileTier}>{tier}</p>
-          </div>
-          <div className={styles.profileHeroMeta}>
-            <div className={styles.profileMetaBadge}>
-              <span className={styles.profileMetaLabel}>Streak</span>
-              <strong>{streak}d</strong>
+            <p className={styles.profileHandle}>{handle}</p>
+            <div className={styles.profileIdentityChips} aria-label="Player highlights">
+              <span className={styles.profileChip}>{tier}</span>
+              <span className={styles.profileChip}>{puzzles} puzzles</span>
+              {streak > 0 ? (
+                <span className={styles.profileChip}>{streak}d streak</span>
+              ) : null}
             </div>
-            <div className={styles.profileMetaBadge}>
-              <span className={styles.profileMetaLabel}>Level</span>
-              <strong>{level}</strong>
+          </div>
+          <div className={styles.profileSummaryStatRail}>
+            <div className={styles.profileMiniStat}>
+              <span className={styles.profileMiniStatLabel}>Streak</span>
+              <strong className={styles.profileMiniStatValue}>{streak}d</strong>
+            </div>
+            <div className={styles.profileMiniStat}>
+              <span className={styles.profileMiniStatLabel}>Level</span>
+              <strong className={styles.profileMiniStatValue}>{level}</strong>
+            </div>
+            <div className={styles.profileMiniStat}>
+              <span className={styles.profileMiniStatLabel}>Puzzles</span>
+              <strong className={styles.profileMiniStatValue}>{puzzles}</strong>
             </div>
           </div>
         </div>
-        {bestStreak > 0 && bestStreak !== streak && (
+        {bestStreak > 0 && bestStreak !== streak ? (
           <p className={styles.profileStatMuted}>Best streak: {bestStreak} days</p>
-        )}
-      </section>
+        ) : null}
 
-      <section className={`${styles.profileBlock} ${styles.profileStatsBlock}`}>
-        <div className={styles.profileBlockHeader}>
+        <div className={styles.profileSummaryDivider} />
+
+        <div className={styles.profileSummaryStatsHeader}>
           <div>
             <p className={styles.profileSectionEyebrow}>Progress</p>
             <h2 className={styles.profileBlockTitle}>Stats</h2>
@@ -149,54 +194,179 @@ export function ProfileTab({
             <strong className={styles.profileStatTileValue}>{totalTime}</strong>
           </div>
         </div>
+
+        <div className={styles.profileToolbar}>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setSettingsOpen(true)}
+            aria-expanded={settingsOpen}
+            aria-controls="profile-settings-panel"
+          >
+            Edit profile
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            onClick={() => onNavigateToBoard?.()}
+            disabled={!onNavigateToBoard}
+          >
+            Board
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            onClick={() => onNavigateToAchievements?.()}
+            disabled={!onNavigateToAchievements}
+          >
+            Badges
+          </Button>
+        </div>
       </section>
 
-      {puzzles > 0 && (
-        <section className={styles.profileBlock}>
-          <div className={styles.profileBlockHeader}>
-            <div>
-              <p className={styles.profileSectionEyebrow}>Collection</p>
-              <h2 className={styles.profileBlockTitle}>Finished Puzzles</h2>
+      <section className={styles.profileSpotlightSection} aria-label="Shortcuts">
+        <div className={styles.profileSpotlightHeader}>
+          <p className={styles.profileSectionEyebrow}>Explore</p>
+          <h2 className={styles.profileBlockTitle}>Links</h2>
+        </div>
+        <div className={styles.profileSpotlightGrid}>
+          <div className={styles.profileSpotlightCard}>
+            <p className={styles.profileSpotlightCardTitle}>Board & rankings</p>
+            <p className={styles.profileSpotlightCardText}>
+              Compare times, browse filters, and see where you land on the leaderboards.
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              fullWidth
+              onClick={() => onNavigateToBoard?.()}
+              disabled={!onNavigateToBoard}
+            >
+              Open board
+            </Button>
+          </div>
+          <div className={styles.profileSpotlightCard}>
+            <p className={styles.profileSpotlightCardTitle}>Badges & milestones</p>
+            <p className={styles.profileSpotlightCardText}>
+              Track streaks, unlocks, and long-term goals as you keep playing.
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              fullWidth
+              onClick={() => onNavigateToAchievements?.()}
+              disabled={!onNavigateToAchievements}
+            >
+              View badges
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.profileBlock}>
+        <div className={styles.profileBlockHeader}>
+          <div>
+            <p className={styles.profileSectionEyebrow}>Collection</p>
+            <h2 className={styles.profileBlockTitle}>Portfolio</h2>
+          </div>
+          {puzzles > 0 && onNavigateToBoard && (
+            <button
+              type="button"
+              className={styles.profileViewAll}
+              onClick={onNavigateToBoard}
+            >
+              View board
+            </button>
+          )}
+        </div>
+        {puzzles > 0 ? (
+          <>
+            <p className={styles.profileSectionLead}>
+              Recent finishes fill your weekly album thumbnails below.
+            </p>
+            <div className={styles.profilePuzzleGrid}>
+              {Array.from({ length: 7 }, (_, i) => {
+                const slot = weeklyAlbumSlots[i];
+                const filled = slot?.completed ?? false;
+                return (
+                  <div
+                    key={slot?.date ?? i}
+                    className={`${styles.profilePuzzleSlot} ${filled ? styles.profilePuzzleSlotFilled : ""}`}
+                    aria-hidden
+                  >
+                    {filled && slot?.imageUrl ? (
+                      <img
+                        src={slot.imageUrl}
+                        alt=""
+                        className={styles.profilePuzzleThumb}
+                        loading={i < 7 ? "eager" : "lazy"}
+                        decoding="async"
+                      />
+                    ) : filled ? (
+                      <span className={styles.profilePuzzlePlaceholder} aria-hidden>
+                        ✓
+                      </span>
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
-            {onNavigateToBoard && (
-              <button
-                type="button"
-                className={styles.profileViewAll}
-                onClick={onNavigateToBoard}
-              >
-                View board
-              </button>
-            )}
-          </div>
-          <div className={styles.profilePuzzleGrid}>
-            {Array.from({ length: 7 }, (_, i) => {
-              const slot = weeklyAlbumSlots[i];
-              const filled = slot?.completed ?? false;
-              return (
-                <div
-                  key={slot?.date ?? i}
-                  className={`${styles.profilePuzzleSlot} ${filled ? styles.profilePuzzleSlotFilled : ""}`}
-                  aria-hidden
+          </>
+        ) : (
+          <div className={styles.profilePortfolioEmpty}>
+            <p className={styles.profilePortfolioEmptyTitle}>
+              Nothing in your showcase yet
+            </p>
+            <p className={styles.profilePortfolioEmptyText}>
+              Your album and highlights appear here as you complete puzzles. Start with a
+              quick round, then check the board to see how you stack up.
+            </p>
+            <ul className={styles.profilePortfolioEmptyActions}>
+              <li>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="primary"
+                  fullWidth
+                  onClick={() => onNavigateHome?.()}
+                  disabled={!onNavigateHome}
                 >
-                  {filled && slot?.imageUrl ? (
-                    <img
-                      src={slot.imageUrl}
-                      alt=""
-                      className={styles.profilePuzzleThumb}
-                      loading={i < 7 ? "eager" : "lazy"}
-                      decoding="async"
-                    />
-                  ) : filled ? (
-                    <span className={styles.profilePuzzlePlaceholder} aria-hidden>
-                      ✓
-                    </span>
-                  ) : null}
-                </div>
-              );
-            })}
+                  Play a puzzle
+                </Button>
+              </li>
+              <li>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  fullWidth
+                  onClick={() => onNavigateToBoard?.()}
+                  disabled={!onNavigateToBoard}
+                >
+                  Open board
+                </Button>
+              </li>
+              <li>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  fullWidth
+                  onClick={() => onNavigateToAchievements?.()}
+                  disabled={!onNavigateToAchievements}
+                >
+                  Browse badges
+                </Button>
+              </li>
+            </ul>
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       <section className={`${styles.profileBlock} ${styles.profileBlockMastery}`}>
         <div className={styles.profileBlockHeader}>
@@ -206,6 +376,9 @@ export function ProfileTab({
           </div>
           <strong className={styles.profileMasteryCount}>{masteryCount}/7</strong>
         </div>
+        <p className={styles.profileSectionLead}>
+          Complete the daily puzzle each day this week to fill the bar.
+        </p>
         <div
           className={styles.profileMasteryBar}
           aria-label={`Daily mastery ${masteryCount} out of 7`}
@@ -217,26 +390,34 @@ export function ProfileTab({
         </div>
       </section>
 
-      <section className={styles.profileBlock}>
+      <section className={styles.profileBlock} id="profile-settings-section">
         <button
           type="button"
           className={styles.profileSettingsToggle}
           onClick={() => setSettingsOpen((o) => !o)}
           aria-expanded={settingsOpen}
+          aria-controls="profile-settings-panel"
+          aria-label="Account settings"
         >
           <span>
             <span className={styles.profileSectionEyebrow}>Account</span>
-            <span className={styles.profileSettingsTitle}>Settings</span>
+            <span className={styles.profileSettingsTitle}>Profile & privacy</span>
           </span>
           {settingsOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </button>
         {settingsOpen && (
-          <div className={styles.profileSettingsContent}>
+          <div
+            className={styles.profileSettingsContent}
+            id="profile-settings-panel"
+            role="region"
+            aria-label="Profile and privacy settings"
+          >
             <div className={styles.profileSettingsField}>
               <label className={styles.profileSettingsLabel} htmlFor="stats-display-name">
                 Display name
               </label>
               <input
+                ref={displayNameInputRef}
                 id="stats-display-name"
                 type="text"
                 className={styles.displayNameInput}
@@ -247,6 +428,9 @@ export function ProfileTab({
                 aria-label="Display name"
               />
             </div>
+            <p className={styles.profileSettingsHint}>
+              This name appears on leaderboards when enabled below.
+            </p>
             <label className={styles.checkboxLabel}>
               <input
                 type="checkbox"
@@ -261,7 +445,7 @@ export function ProfileTab({
               <span>Show my name on leaderboards</span>
             </label>
             <Button onClick={onSave} disabled={profileSaving} className={styles.saveBtn}>
-              {profileSaving ? "Saving…" : "Save"}
+              {profileSaving ? "Saving…" : "Save changes"}
             </Button>
             {stats && (stats.level ?? 1) >= 5 && (
               <div className={styles.profilePrestigeBox}>

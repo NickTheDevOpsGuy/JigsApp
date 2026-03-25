@@ -12,7 +12,6 @@ export function CompletionOverlayReplayNextMenu(props: {
   canReplay: boolean;
   onReplayClick?: () => void;
   onNextPuzzle?: () => void;
-  nextPuzzleLabel?: string;
 }) {
   const {
     replayNextMenuOpen,
@@ -23,7 +22,6 @@ export function CompletionOverlayReplayNextMenu(props: {
     canReplay,
     onReplayClick,
     onNextPuzzle,
-    nextPuzzleLabel = "Next Puzzle",
   } = props;
 
   return (
@@ -88,7 +86,7 @@ export function CompletionOverlayReplayNextMenu(props: {
                 }}
               >
                 <Trophy size={16} className={styles.completeNextPuzzleIcon} aria-hidden />
-                <span>{nextPuzzleLabel}</span>
+                <span>Next Puzzle</span>
               </button>
             )}
           </div>,

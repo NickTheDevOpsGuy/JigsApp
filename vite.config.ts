@@ -110,7 +110,7 @@ export default defineConfig(({ mode }) => {
               if (id.includes("@supabase")) {
                 return "supabase";
               }
-              // Other node_modules (lucide-react, canvas-confetti, etc.)
+              // Other node_modules (lucide-react, posthog-js, etc.)
               return "vendor";
             }
           },

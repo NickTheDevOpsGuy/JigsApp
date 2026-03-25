@@ -102,13 +102,6 @@
   border-top-left-radius: 20px;
 }
 
-.overlayChrome {
-  position: fixed;
-  inset: 0;
-  z-index: 2102;
-  pointer-events: none;
-}
-
 /* Fixed to top edge of board rect; parent uses translateY(-100% - gap) to sit above canvas */
 .cutoutBoardHeaderWrap {
   position: fixed;

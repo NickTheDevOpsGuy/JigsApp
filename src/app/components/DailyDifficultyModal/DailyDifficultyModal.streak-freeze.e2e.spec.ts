@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { dismissWhatsNewModalIfOpen } from "../../test/e2e/helpers";
+import { dismissWhatsNewModalIfOpen } from "@/e2e/helpers";
 
 const FIXED_TODAY = new Date("2025-02-16T12:00:00Z");
 

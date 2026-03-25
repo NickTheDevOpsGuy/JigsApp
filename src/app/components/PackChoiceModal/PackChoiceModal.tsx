@@ -1,8 +1,7 @@
 /**
- * PackChoiceModal – Strict 3-step flow with breadcrumbs.
- * Step 1: Choose Pack (packs only; cover, name, count, progress).
- * Step 2: Choose Puzzle (puzzles in pack; thumbnail, name, completion). No preview.
- * Step 3: Puzzle Setup (ONLY place with large preview + difficulty + Start).
+ * PackChoiceModal – 2-step flow with breadcrumbs.
+ * Step 1: Choose Pack (cover, name, count, progress).
+ * Step 2: Choose Puzzle (thumbnail rail + difficulty + Start on the same screen).
  */
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -29,7 +28,7 @@ const PRIMARY_DIFFICULTIES = GRID_OPTIONS.slice(0, 4);
 const DIFFICULTY_NAMES = ["Easy", "Medium", "Hard", "Expert"] as const;
 const RECOMMENDED_INDEX = 1;
 
-type Step = "pack" | "puzzle" | "setup";
+type Step = "pack" | "puzzle";
 
 type Props = {
   isOpen: boolean;
@@ -237,14 +236,12 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
     }
   };
 
+  const canStart = selectedPuzzle != null;
+
   if (!isOpen) return null;
 
   const modalTitle =
-    step === "pack"
-      ? "Choose Pack"
-      : step === "puzzle"
-        ? (selectedPack?.name ?? "Choose Puzzle")
-        : "Puzzle Setup";
+    step === "pack" ? "Choose Pack" : (selectedPack?.name ?? "Choose Puzzle");
 
   return (
     <Modal
@@ -254,64 +251,28 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       showCloseButton
       variant="choosePuzzle"
     >
-      {/* Step indicator: numbered circles */}
-      <nav
-        className={styles.stepIndicator}
-        role="navigation"
-        aria-label="Steps: Pack, Puzzle, Setup"
+      {/* Compact step label */}
+      <p
+        className={styles.stepCompactLabel}
+        aria-label={`Step ${step === "pack" ? 1 : 2} of 2`}
       >
-        <button
-          type="button"
-          className={[
-            styles.stepItem,
-            step === "pack" ? styles.stepItemActive : styles.stepItemDone,
-          ].join(" ")}
-          onClick={() => goToStep("pack")}
-          aria-current={step === "pack" ? "step" : undefined}
-          title="Back to pack selection"
-        >
-          <span className={styles.stepNum} aria-hidden>
-            {step === "pack" ? "1" : "✓"}
-          </span>
-          <span className={styles.stepLabel}>Pack</span>
-        </button>
-
-        <span className={styles.stepConnector} aria-hidden />
-
-        <button
-          type="button"
-          className={[
-            styles.stepItem,
-            step === "puzzle" ? styles.stepItemActive : "",
-            step === "setup" ? styles.stepItemDone : "",
-            step === "pack" ? styles.stepItemFuture : "",
-          ].join(" ")}
-          onClick={() => step !== "pack" && goToStep("puzzle")}
-          disabled={step === "pack"}
-          aria-current={step === "puzzle" ? "step" : undefined}
-          title={step !== "pack" ? "Back to puzzle selection" : undefined}
-        >
-          <span className={styles.stepNum} aria-hidden>
-            {step === "setup" ? "✓" : "2"}
-          </span>
-          <span className={styles.stepLabel}>Puzzle</span>
-        </button>
-
-        <span className={styles.stepConnector} aria-hidden />
-
-        <span
-          className={[
-            styles.stepItem,
-            step === "setup" ? styles.stepItemActive : styles.stepItemFuture,
-          ].join(" ")}
-          aria-current={step === "setup" ? "step" : undefined}
-        >
-          <span className={styles.stepNum} aria-hidden>
-            3
-          </span>
-          <span className={styles.stepLabel}>Setup</span>
-        </span>
-      </nav>
+        {step === "pack" ? (
+          <span>Step 1 of 2</span>
+        ) : (
+          <>
+            <button
+              type="button"
+              className={styles.stepBackLink}
+              onClick={() => goToStep("pack")}
+              title="Back to pack selection"
+            >
+              ← Step 1
+            </button>
+            <span className={styles.stepCompactSep}>·</span>
+            <strong>Step 2 of 2</strong>
+          </>
+        )}
+      </p>
 
       {/* Step 1: Pack selection only – clean Filter control + optional chips */}
       {step === "pack" && (
@@ -358,8 +319,8 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                         key={pack.id}
                         type="button"
                         role="option"
-                        aria-selected={false}
-                        className={`${styles.puzzleTile} ${localStyles.packTile}`}
+                        aria-selected={selectedPack?.id === pack.id}
+                        className={`${styles.puzzleTile} ${localStyles.packTile} ${selectedPack?.id === pack.id ? localStyles.packTileSelected : ""}`}
                         onClick={() => {
                           setSelectedPack(pack);
                           setSelectedPuzzle(null);
@@ -395,9 +356,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                           {pack.name}
                         </span>
                         <span className={localStyles.packMeta}>
-                          {total} puzzle{total !== 1 ? "s" : ""}
-                          {" · "}
-                          {completedCount} / {total} solved
+                          {completedCount}/{total} solved
                         </span>
                       </button>
                     );
@@ -419,9 +378,9 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
         </div>
       )}
 
-      {/* Step 2: Puzzle selection only (no large preview) */}
+      {/* Step 2: Puzzle rail + difficulty + start */}
       {step === "puzzle" && selectedPack && puzzles.length > 0 && (
-        <div className={styles.stepPanel}>
+        <div className={`${styles.stepPanel} ${styles.stepPanelCompact}`}>
           <p className={styles.railLabel}>{selectedPack.name} — pick a puzzle</p>
           <div className={styles.gridScrollWrap}>
             <button
@@ -449,13 +408,9 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                       key={puzzle.id}
                       type="button"
                       role="option"
-                      aria-selected={false}
-                      className={`${styles.puzzleTile} ${styles.puzzleTileBare}`}
-                      onClick={() => {
-                        setSelectedPuzzle(puzzle);
-                        setDifficultyIndex(RECOMMENDED_INDEX);
-                        setStep("setup");
-                      }}
+                      aria-selected={selectedPuzzle?.id === puzzle.id}
+                      className={`${styles.puzzleTile} ${styles.puzzleTileBare} ${selectedPuzzle?.id === puzzle.id ? styles.puzzleTileSelected : ""}`}
+                      onClick={() => setSelectedPuzzle(puzzle)}
                       title={`Select: ${puzzle.name}${isDone ? " (completed)" : ""}`}
                       aria-label={`${puzzle.name}${isDone ? ", completed" : ""}`}
                     >
@@ -497,61 +452,52 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
               <ChevronRight size={22} aria-hidden />
             </button>
           </div>
-        </div>
-      )}
 
-      {/* Step 3: Puzzle Setup */}
-      {step === "setup" && selectedPuzzle && (
-        <div className={`${styles.stepPanel} ${styles.stepPanelCompact}`}>
-          <div className={localStyles.setupHeader}>
-            <div className={localStyles.setupThumb}>
-              <img
-                src={selectedPuzzle.thumbnail}
-                alt={`${selectedPuzzle.name} preview`}
-                className={localStyles.setupThumbImg}
-              />
-            </div>
-          </div>
-          <div
-            className={styles.difficultySelector}
-            role="group"
-            aria-label="Choose difficulty"
-          >
-            {PRIMARY_DIFFICULTIES.map((opt, i) => {
-              const name = DIFFICULTY_NAMES[i] ?? opt.label.split(" ")[0];
-              const pieces = opt.rows * opt.cols;
-              const active = difficultyIndex === i;
-              return (
-                <button
-                  key={`${opt.rows}x${opt.cols}`}
-                  type="button"
-                  className={`${styles.difficultyBtn} ${active ? styles.difficultyBtnActive : ""}`}
-                  onClick={() => setDifficultyIndex(i)}
-                  aria-pressed={active}
-                  aria-label={`${name}, ${pieces} pieces`}
-                  title={`Select ${name}: ${pieces} pieces`}
-                >
-                  <Puzzle size={16} aria-hidden />
-                  <span>
-                    {name} – {pieces} pieces
-                  </span>
-                  {active && (
-                    <Check size={16} className={styles.difficultyCheck} aria-hidden />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          <button
-            ref={startButtonRef}
-            type="button"
-            className={styles.startPuzzleButton}
-            onClick={handleStart}
-            title="Start puzzle with selected difficulty"
-            aria-label="Start puzzle"
-          >
-            Start Puzzle
-          </button>
+          {selectedPuzzle && (
+            <>
+              <div
+                className={styles.difficultySelector}
+                role="group"
+                aria-label="Choose difficulty"
+              >
+                {PRIMARY_DIFFICULTIES.map((opt, i) => {
+                  const name = DIFFICULTY_NAMES[i] ?? opt.label.split(" ")[0];
+                  const pieces = opt.rows * opt.cols;
+                  const active = difficultyIndex === i;
+                  return (
+                    <button
+                      key={`${opt.rows}x${opt.cols}`}
+                      type="button"
+                      className={`${styles.difficultyBtn} ${active ? styles.difficultyBtnActive : ""}`}
+                      onClick={() => setDifficultyIndex(i)}
+                      aria-pressed={active}
+                      aria-label={`${name}, ${pieces} pieces`}
+                      title={`Select ${name}: ${pieces} pieces`}
+                    >
+                      <Puzzle size={16} aria-hidden />
+                      <span>
+                        {name} – {pieces} pieces
+                      </span>
+                      {active && (
+                        <Check size={16} className={styles.difficultyCheck} aria-hidden />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                ref={startButtonRef}
+                type="button"
+                className={styles.startPuzzleButton}
+                onClick={handleStart}
+                disabled={!canStart}
+                title="Start puzzle with selected difficulty"
+                aria-label="Start puzzle"
+              >
+                Start Puzzle
+              </button>
+            </>
+          )}
         </div>
       )}
     </Modal>

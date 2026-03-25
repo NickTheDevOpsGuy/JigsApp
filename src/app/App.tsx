@@ -5,6 +5,7 @@ import { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { initStreakFreeze } from "@/daily/dailyPuzzleCore";
+import { preloadPacksData, preloadPuzzleCatalog } from "@/data/packs/loadPacksData";
 import { ensureSignedIn } from "@/supabase/auth";
 import { OfflineIndicator } from "@/components/OfflineIndicator/OfflineIndicator";
 import { ErrorBoundary } from "@/components/ErrorBoundary/ErrorBoundary";
@@ -65,6 +66,8 @@ export function App() {
   useEffect(() => {
     ensureSignedIn();
     initStreakFreeze();
+    preloadPacksData();
+    preloadPuzzleCatalog();
   }, []);
 
   useEffect(() => {

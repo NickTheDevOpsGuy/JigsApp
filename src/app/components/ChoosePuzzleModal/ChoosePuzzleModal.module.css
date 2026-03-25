@@ -1,261 +1,49 @@
 /* ChoosePuzzleModal – layout only. Style lock: keep Phuzzle colors, radius, fonts. */
 
-.stepIndicator {
+/* Compact step label replaces the old full stepper */
+.stepCompactLabel {
   display: flex;
   align-items: center;
-  gap: 0;
-  margin-bottom: 12px;
-  flex-shrink: 0;
-}
-
-/* Connecting line between steps */
-.stepConnector {
-  flex: 1;
-  height: 2px;
-  background: var(--color-border);
-  transition: background 0.2s;
-}
-
-/* Base step item */
-.stepItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  background: none;
-  border: none;
-  padding: 0 4px;
-  cursor: default;
-  flex-shrink: 0;
-  font: inherit;
-}
-
-button.stepItem {
-  cursor: pointer;
-}
-
-button.stepItem:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 3px;
-  border-radius: 6px;
-}
-
-button.stepItem:disabled {
-  cursor: default;
-}
-
-/* Step circle */
-.stepNum {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  border: 2px solid var(--color-border);
-  background: var(--color-bg-elevated);
-  color: var(--color-text-secondary);
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    color 0.2s;
-  line-height: 1;
-}
-
-/* Step label */
-.stepLabel {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  opacity: 0.5;
-  transition:
-    color 0.2s,
-    opacity 0.2s;
-  white-space: nowrap;
-}
-
-/* ── Active step ── */
-.stepItemActive .stepNum {
-  background: var(--color-brand-primary);
-  border-color: var(--color-brand-primary);
-  color: #fff;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
-}
-
-.stepItemActive .stepLabel {
-  color: var(--color-brand-primary);
-  opacity: 1;
-  font-weight: 800;
+  gap: 6px;
+  margin: 0 0 12px;
   font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
 }
 
-/* ── Completed step ── */
-.stepItemDone .stepNum {
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 15%,
-    var(--color-bg-elevated)
-  );
-  border-color: var(--color-brand-primary);
-  color: var(--color-brand-primary);
-  font-size: 15px;
+.stepCompactLabel strong {
+  color: var(--color-text-primary);
+  font-weight: 700;
 }
 
-.stepItemDone .stepLabel {
-  color: var(--color-brand-primary);
-  opacity: 0.75;
-}
-
-button.stepItemDone:hover .stepNum {
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 25%,
-    var(--color-bg-elevated)
-  );
-}
-
-/* ── Future step ── */
-.stepItemFuture .stepNum {
+.stepCompactSep {
   opacity: 0.4;
 }
 
-.stepItemFuture .stepLabel {
-  opacity: 0.35;
-}
-
-.filterBar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
-  flex-shrink: 0;
-  pointer-events: auto;
-}
-
-.filterChip {
-  appearance: none;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-elevated);
-  color: var(--color-text-primary);
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 13px;
+.stepBackLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
   font-weight: 500;
+  color: var(--color-brand-primary);
   cursor: pointer;
-  pointer-events: auto;
-  transition:
-    border-color 0.15s,
-    background 0.15s;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.15s;
 }
 
-.filterChip:hover {
-  border-color: var(--color-brand-primary);
+.stepBackLink:hover {
+  opacity: 1;
+  text-decoration: underline;
 }
 
-.filterChip:focus-visible {
+.stepBackLink:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
-}
-
-.filterChipActive {
-  border-color: var(--color-brand-primary);
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 18%,
-    var(--color-bg-elevated)
-  );
-}
-
-/* Single Filter (and optional Sort) control – shared with PackChoiceModal */
-.filterControlRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-  flex-shrink: 0;
-}
-
-.filterTriggerBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-btn);
-  background: var(--color-bg-elevated);
-  color: var(--color-text-primary);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s;
-}
-
-.filterTriggerBtn:hover {
-  border-color: var(--color-brand-primary);
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 10%,
-    var(--color-bg-elevated)
-  );
-}
-
-.activeChipsRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
-  flex-shrink: 0;
-}
-
-.activeChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px 4px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--color-brand-primary);
-  background: color-mix(
-    in srgb,
-    var(--color-brand-primary) 14%,
-    var(--color-bg-elevated)
-  );
-  color: var(--color-text-primary);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.activeChipRemove {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
-  color: var(--color-text-primary);
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.activeChipRemove:hover {
-  background: color-mix(in srgb, var(--color-text-primary) 35%, transparent);
-}
-
-.setupPuzzleName {
-  margin: 0 0 12px;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  text-align: center;
+  border-radius: 3px;
 }
 
 /* Step body: shrink to content (no extra stretch inside choose-puzzle modal) */
@@ -321,7 +109,7 @@ button.stepItemDone:hover .stepNum {
     var(--color-brand-primary)
   );
   color: var(--color-text-primary);
-  box-shadow: 0 4px 16px rgba(11, 99, 184, 0.18);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   transition:
     background 0.2s ease,
     box-shadow 0.2s ease,
@@ -397,7 +185,10 @@ button.stepItemDone:hover .stepNum {
   background: var(--color-bg-elevated);
   padding: 0;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition:
+    border-color 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   text-align: left;
@@ -429,28 +220,9 @@ button.stepItemDone:hover .stepNum {
 
 /* Mobile: shrink grid, arrows, bar and spacing so modal fits */
 @media (max-width: 640px) {
-  .stepIndicator {
-    margin-bottom: 10px;
-  }
-
-  .stepNum {
-    width: 26px;
-    height: 26px;
-    font-size: 12px;
-  }
-
-  .stepLabel {
-    font-size: 10px;
-  }
-
-  .filterBar {
-    gap: 6px;
+  .stepCompactLabel {
     margin-bottom: 8px;
-  }
-
-  .filterChip {
-    padding: 5px 10px;
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .gridScrollWrap {
@@ -505,11 +277,6 @@ button.stepItemDone:hover .stepNum {
     font-size: 14px;
     max-height: 40px;
   }
-
-  .uploadLinkWrap {
-    margin-top: 8px;
-    font-size: 11px;
-  }
 }
 
 .puzzleTile:hover:not(:disabled) {
@@ -529,7 +296,9 @@ button.stepItemDone:hover .stepNum {
 
 .puzzleTileBare.puzzleTileSelected {
   border-color: var(--color-brand-primary);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 35%, transparent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--color-brand-primary) 40%, transparent),
+    0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .tileImageWrap {
@@ -548,7 +317,7 @@ button.stepItemDone:hover .stepNum {
 
 /* Pack step 1 hero: taller thumbnail area */
 .tileImageWrapPackHero {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
 }
 
 /* Pack hero / titled tiles: letterbox so full image shows in non-square region */
@@ -583,6 +352,7 @@ button.stepItemDone:hover .stepNum {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 14px;
   margin-bottom: 12px;
   flex-shrink: 0;
   pointer-events: auto;
@@ -661,33 +431,6 @@ button.stepItemDone:hover .stepNum {
 }
 
 .startPuzzleButton:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
-}
-
-.uploadLinkWrap {
-  margin: 12px 0 0;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.uploadLink {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--color-brand-primary);
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.uploadLink:hover {
-  opacity: 0.9;
-}
-
-.uploadLink:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
@@ -819,17 +562,6 @@ button.stepItemDone:hover .stepNum {
   max-width: 88px;
 }
 
-/* Breadcrumb active step */
-.stepCurrent {
-  color: var(--color-brand-primary);
-  font-weight: 800;
-  font-size: 15px;
-  background: color-mix(in srgb, var(--color-brand-primary) 15%, transparent);
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 35%, transparent);
-}
-
 @media (max-width: 640px) {
   .categoryCard {
     height: 64px;
@@ -861,7 +593,8 @@ button.stepItemDone:hover .stepNum {
   align-items: center;
   justify-content: center;
   gap: 14px;
-  margin-bottom: 14px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   flex-shrink: 0;
 }
 
@@ -887,23 +620,6 @@ button.stepItemDone:hover .stepNum {
   display: block;
 }
 
-.setupHeaderText {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.setupPuzzleName {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* backToPuzzlesBtn removed */
 
 /* stepLinkPlain removed */
@@ -913,9 +629,5 @@ button.stepItemDone:hover .stepNum {
   .setupThumb {
     width: min(42vw, 150px);
     aspect-ratio: 1 / 1;
-  }
-
-  .setupPuzzleName {
-    font-size: 1rem;
   }
 }

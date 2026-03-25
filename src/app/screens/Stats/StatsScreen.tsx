@@ -97,6 +97,8 @@ export function StatsScreen() {
                   profileSaving={state.profileSaving}
                   loadData={loadData}
                   onNavigateToBoard={() => state.setActiveTab("leaderboard")}
+                  onNavigateToAchievements={() => state.setActiveTab("achievements")}
+                  onNavigateHome={() => nav("/")}
                   onSeeRankingFor4x4={() => {
                     state.setActiveTab("leaderboard");
                     state.setLeaderboardType("alltime");

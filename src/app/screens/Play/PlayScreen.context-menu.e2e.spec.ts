@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { dismissWhatsNewModalIfOpen } from "../../test/e2e/helpers";
+import { dismissWhatsNewModalIfOpen } from "@/e2e/helpers";
 
 const TINY_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
