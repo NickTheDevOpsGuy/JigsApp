@@ -375,8 +375,8 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
       {step === "puzzle" && (
         <div className={`${styles.stepPanel} ${styles.stepPanelCompact}`}>
           <p className={styles.railLabel}>
-            {filterCategory !== "all" && categoryMeta ? categoryMeta.name : "All puzzles"}{" "}
-            — pick a puzzle
+            {filterCategory !== "all" && categoryMeta ? categoryMeta.name : "All puzzles"} —
+            pick a puzzle
           </p>
           <div className={styles.gridScrollWrap}>
             <button
