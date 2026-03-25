@@ -252,7 +252,10 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       variant="choosePuzzle"
     >
       {/* Compact step label */}
-      <p className={styles.stepCompactLabel} aria-label={`Step ${step === "pack" ? 1 : 2} of 2`}>
+      <p
+        className={styles.stepCompactLabel}
+        aria-label={`Step ${step === "pack" ? 1 : 2} of 2`}
+      >
         {step === "pack" ? (
           <span>Step 1 of 2</span>
         ) : (

@@ -159,7 +159,9 @@
   font-weight: 600;
   color: var(--color-text-primary);
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
   white-space: nowrap;
 }
 
@@ -331,7 +333,9 @@
   color: var(--color-text-primary);
   cursor: pointer;
   text-align: left;
-  transition: background 0.1s, border-color 0.1s;
+  transition:
+    background 0.1s,
+    border-color 0.1s;
 }
 
 .completeShareDropdownItem:hover {
@@ -361,7 +365,9 @@
   font-weight: 600;
   color: var(--color-text-primary);
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
 }
 
 .completeShareTrigger:hover {
@@ -503,7 +509,9 @@
   font-weight: 600;
   color: var(--color-text-primary);
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
   white-space: nowrap;
   box-sizing: border-box;
 }
@@ -590,7 +598,9 @@
   color: var(--color-text-primary);
   cursor: pointer;
   text-align: left;
-  transition: background 0.12s, border-color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
   box-sizing: border-box;
 }
 
