@@ -53,7 +53,7 @@ export function absShareUrl(pathOrUrl: string): string {
 }
 
 /**
- * Share Result – same layout as the challenge card preview, neutral (no challenge line).
+ * Share Result – same block layout as the challenge preview card, without the taunt line.
  */
 export function buildProgressShareMessage(args: ShareMessageArgs): string {
   const time = formatTime(args.elapsedSeconds);
@@ -63,15 +63,21 @@ export function buildProgressShareMessage(args: ShareMessageArgs): string {
   const rotations = args.rotationCount ?? 0;
   const cleanSolve = (args.undoCount ?? 0) === 0 && !args.usedHint;
   const link = absShareUrl(args.playUrl);
-  const namePart = args.puzzleName ? `"${args.puzzleName}" · ` : "";
-  const statsLine =
-    rotations > 0
-      ? `⏱ ${time}  ·  ${moves} moves  ·  ${rotations} rotations`
-      : `⏱ ${time}  ·  ${moves} moves`;
-  const result = [`🧩 Phuzzle — ${namePart}${difficulty} · ${pieces} pieces`, statsLine];
-  if (cleanSolve) result.push("⭐ Clean solve!");
-  result.push("", link);
-  return result.join("\n");
+
+  const lines: string[] = ["Phuzzle"];
+  if (args.puzzleName) lines.push(`"${args.puzzleName}"`);
+  lines.push(
+    "",
+    "Puzzle",
+    `Difficulty: ${difficulty} (${pieces} pieces)`,
+    `Time: ${time}`,
+    `Moves: ${moves}`,
+  );
+  if (rotations > 0) lines.push(`Rotations: ${rotations}`);
+  lines.push("");
+  if (cleanSolve) lines.push("⭐ Clean solve!");
+  lines.push(link);
+  return lines.join("\n");
 }
 
 /** Daily Share – Wordle-style compact format. Only for Daily Puzzle. */
@@ -128,8 +134,7 @@ export function getDailyShareCompletionGrid(args: DailyShareGridArgs): string {
 }
 
 /**
- * Beat My Puzzle – challenge share: stats (incl. rotations), “Can you beat my time?”, challenge URL.
- * URL includes same puzzle + grid (from playUrl) and ct/cm for the challenge.
+ * Beat My Puzzle – challenge share: opening taunt, same stats block as the card, challenge URL (ct/cm).
  */
 export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const time = formatTime(args.elapsedSeconds);
@@ -141,22 +146,22 @@ export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const challengePath = buildChallengePlayUrl(args.playUrl, args.elapsedSeconds, moves);
   const challengeUrl = absShareUrl(challengePath);
 
-  const secsPerPiece = args.elapsedSeconds / Math.max(1, pieces);
-  const taunt =
-    secsPerPiece < 4
-      ? "🔥 I destroyed this puzzle. Can you even come close?"
-      : secsPerPiece < 8
-        ? "🧩 Just solved this. Think you can beat my time?"
-        : "🧠 Took my time and crushed it. Beat me if you can.";
-
-  const namePart = args.puzzleName ? `"${args.puzzleName}" · ` : "";
-  const statsLine =
-    rotations > 0
-      ? `⏱ ${time}  ·  ${moves} moves  ·  ${rotations} rotations`
-      : `⏱ ${time}  ·  ${moves} moves`;
-
-  const result = [taunt, "", `${namePart}${difficulty} · ${pieces} pieces`, statsLine];
-  if (cleanSolve) result.push("⭐ Clean solve — no undos, no hints!");
-  result.push("", "👇 Prove you're faster:", challengeUrl);
-  return result.join("\n");
+  const lines: string[] = [
+    `I solved this puzzle in ${time} with ${moves} moves. Think you can beat me?`,
+    "",
+    "Phuzzle",
+  ];
+  if (args.puzzleName) lines.push(`"${args.puzzleName}"`);
+  lines.push(
+    "",
+    "Puzzle",
+    `Difficulty: ${difficulty} (${pieces} pieces)`,
+    `Time: ${time}`,
+    `Moves: ${moves}`,
+  );
+  if (rotations > 0) lines.push(`Rotations: ${rotations}`);
+  lines.push("");
+  if (cleanSolve) lines.push("⭐ Clean solve — no undos, no hints!");
+  lines.push(challengeUrl);
+  return lines.join("\n");
 }

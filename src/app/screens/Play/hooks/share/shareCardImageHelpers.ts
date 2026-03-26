@@ -106,6 +106,20 @@ export function drawOgStyleCardBackground(
   ctx.fill();
 }
 
+/** Near-black card (iMessage-style rich link preview). */
+export function drawMessagingShareCardBackground(
+  ctx: CanvasRenderingContext2D,
+  rect: Rect,
+  radius: number,
+) {
+  const g = ctx.createLinearGradient(rect.x, rect.y, rect.x, rect.y + rect.h);
+  g.addColorStop(0, "#0c0c0c");
+  g.addColorStop(1, "#161616");
+  ctx.fillStyle = g;
+  roundedRectPath(ctx, rect, radius);
+  ctx.fill();
+}
+
 export function drawPuzzleIcon(
   ctx: CanvasRenderingContext2D,
   x: number,

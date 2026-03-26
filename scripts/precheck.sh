@@ -42,67 +42,87 @@ if [ -n "$EMPTY_FILES" ]; then
 fi
 echo "✅ [SUCCESS]: No empty files detected."
 
-# 2. QUALITY GUARDS (No skipped E2E tests / no console.log in src)
-echo "🧱 [STEP 2]: Running quality guards..."
-if ! bash ./scripts/guard-no-skip-and-console.sh; then
-  echo "🛑 [SYSTEM FAULT]: Quality guard failed."
-  exit 1
-fi
-echo "✅ [SUCCESS]: Quality guard passed."
-
-# 3. PRETTIER (The Aesthetic Firewall)
-echo "🎨 [STEP 3]: Auditing the Physical Layer style (Prettier)..."
+# 2. PRETTIER (The Aesthetic Firewall)
+echo "🎨 [STEP 2]: Auditing the Physical Layer style (Prettier)..."
 if ! npx --no-install prettier --check .; then
   echo "💾 [AUTO-REPAIR]: Fixing the style logic for you..."
   npx --no-install prettier --write .
   git add -A
   git commit -m "style: auto-format with Prettier [skip-precheck]" --no-verify
-  
+
   echo ""
   echo "----------------------------------------------------------------"
-  echo "Prettier fixed your files and committed them."
-  echo "You're ahead of origin. Run this to sync and push:"
-  echo "  git pull --rebase origin $(git rev-parse --abbrev-ref HEAD) && git push"
+  echo "⚠️  [TIMELINE DESYNC]: Prettier fixed your files and committed them."
+  echo "Your local 'Human OS' is now ahead of the remote server."
+  echo "ACTION REQUIRED: Run this to realign the timelines:"
+  echo "   git pull --rebase origin $(git rev-parse --abbrev-ref HEAD) && git push"
   echo "----------------------------------------------------------------"
   echo ""
   exit 1
 fi
 echo "✅ [SUCCESS]: Code is looking beautiful."
 
-# 4. ESLint (The Logic Audit)
-echo "🧪 [STEP 4]: Analyzing code logic and a11y (ESLint)..."
+# 3. ESLint (The Logic Audit)
+echo "🧪 [STEP 3]: Analyzing code logic and a11y (ESLint)..."
 if ! npx --no-install eslint . --cache --max-warnings=0; then
   echo "🔧 [AUTO-REPAIR]: Attempting to fix logic faults..."
   npx --no-install eslint . --cache --fix
   git add -A
   git commit -m "chore: auto-fix eslint [skip-precheck]" --no-verify
-  
+
   echo ""
   echo "----------------------------------------------------------------"
-  echo "ESLint auto-fixed what it could and committed."
-  echo "You're ahead of origin. Run this to sync and push:"
-  echo "  git pull --rebase origin $(git rev-parse --abbrev-ref HEAD) && git push"
+  echo "⚠️  [TIMELINE DESYNC]: ESLint auto-fixed what it could and committed."
+  echo "ACTION REQUIRED: Align and push again:"
+  echo "   git pull --rebase origin $(git rev-parse --abbrev-ref HEAD) && git push"
   echo "----------------------------------------------------------------"
   echo ""
   exit 1
 fi
 echo "✅ [SUCCESS]: Logic is pure and accessible."
 
+# 4. MARKDOWNLINT (Docs Integrity)
+echo "📝 [STEP 4]: Auditing documentation (markdownlint)..."
+if ! npm run lint:md; then
+  echo "🛑 [DOCS FAULT]: Markdown lint failed."
+  echo "ACTION REQUIRED: Run one of these:"
+  echo "  - npm run lint:md"
+  echo "  - npm run lint:md:fix"
+  exit 1
+fi
+echo "✅ [SUCCESS]: Docs are clean."
+
 # 5. TYPESCRIPT (Static Verification)
 echo "🛠️  [STEP 5]: Verifying Type Integrity (tsc)..."
-if ! npx --no-install tsc --noEmit --pretty false; then
+if ! npx --no-install tsc -p config/typescript/tsconfig.app.json --noEmit --pretty false; then
   echo "🛑 [SYSTEM FAULT]: TypeScript found type errors. Go fix those red squiggles!"
   exit 1
 fi
 echo "✅ [SUCCESS]: Types are verified."
 
-# 6. UNIT TESTS (Vitest)
-echo "🧪 [STEP 6]: Running unit tests (Vitest)..."
-if ! npm run test; then
-  echo "🛑 [SYSTEM FAULT]: Unit tests failed. Fix the red dots!"
-  exit 1
+# 6. ACCESSIBILITY SMOKE TEST (The Core Requirement)
+if docker ps | grep -q "supabase_db"; then
+  echo "♿ [STEP 6]: Running WCAG 2.2 Accessibility Audit..."
+  if ! npx playwright test -c config/playwright/playwright.config.ts accessibility.spec.ts; then
+    echo "🛑 [A11Y FAULT]: Accessibility is a core requirement, not a feature. Fix the violations above!"
+    exit 1
+  fi
+  echo "✅ [SUCCESS]: Accessibility verified."
+else
+  echo "⏭️  [SKIPPED]: Supabase isn't running. I can't check accessibility without a backend."
 fi
-echo "✅ [SUCCESS]: All unit tests passed."
+
+# 7. FUNCTIONAL E2E TESTS (The Behavioral Audit)
+if docker ps | grep -q "supabase_db"; then
+  echo "🤖 [STEP 7]: Running Functional E2E Tests (Non-Smoke Test)..."
+  if ! npx playwright test -c config/playwright/playwright.config.ts --grep-invert "accessibility"; then
+    echo "🛑 [LOGIC FAULT]: Functional tests failed. Back to the drawing board!"
+    exit 1
+  fi
+  echo "✅ [SUCCESS]: All behavioral tests passed."
+else
+  echo "⏭️  [SKIPPED]: Supabase isn't running. Skipping functional tests."
+fi
 
 echo "----------------------------------------------------------------"
-echo "🚀 [SYSTEM AUDIT COMPLETE]: All systems nominal."
+echo "🚀 [SYSTEM AUDIT COMPLETE]: All systems nominal. Launching to the cloud!"

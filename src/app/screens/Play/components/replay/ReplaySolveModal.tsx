@@ -2,7 +2,7 @@
  * Replay Solve modal – focused replay overlay with one board stage,
  * one attached control dock, and a single clear dismiss action.
  */
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
 import { Trophy, X } from "lucide-react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
@@ -75,7 +75,9 @@ export function ReplaySolveModal({
   const useCutout = Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
   /* Same rhythm as desktop; slightly tighter on narrow viewports only */
   const dockGapBelowBoard = isMobilePortraitReplay ? 12 : 16;
-  const headerGapAboveBoard = isMobilePortraitReplay ? 4 : 6;
+  const headerGapAboveBoard = 8;
+  const headerWrapRef = useRef<HTMLDivElement>(null);
+  const [headerBlockHeight, setHeaderBlockHeight] = useState(110);
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;
   const effectiveSpeed = speedExplicitlyChosen ? speed : 1;
@@ -103,6 +105,17 @@ export function ReplaySolveModal({
       window.removeEventListener("resize", onLayout);
     };
   }, [useCutout]);
+
+  useLayoutEffect(() => {
+    if (!useCutout) return;
+    const el = headerWrapRef.current;
+    if (!el) return;
+    const measure = () => setHeaderBlockHeight(Math.max(72, el.offsetHeight || 110));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [useCutout, moveCount, totalSeconds, packRemainingLabel, isMobilePortraitReplay]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -225,6 +238,9 @@ export function ReplaySolveModal({
       viewLeft + viewWidth - shellWidth - edgePad,
       Math.max(viewLeft + edgePad, left - dockInsetPx),
     );
+    const viewTop = vv?.offsetTop ?? 0;
+    const minHeaderAnchorTop = viewTop + edgePad + headerBlockHeight + headerGapAboveBoard;
+    const headerAnchorTop = Math.max(top, minHeaderAnchorTop);
     return (
       <div
         className={styles.backdropCutout}
@@ -292,9 +308,10 @@ export function ReplaySolveModal({
         />
         {/* Title + stats sit above the board (not on the canvas) with a small gap */}
         <div
+          ref={headerWrapRef}
           className={styles.cutoutBoardHeaderWrap}
           style={{
-            top,
+            top: headerAnchorTop,
             left,
             width,
             transform: `translateY(calc(-100% - ${headerGapAboveBoard}px))`,

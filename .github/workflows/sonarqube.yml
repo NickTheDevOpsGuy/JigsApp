@@ -1,0 +1,74 @@
+name: 🔎 SonarQube
+
+on:
+    push:
+        branches:
+            - main
+            - develop
+    pull_request:
+        branches:
+            - main
+            - develop
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pull-requests: read
+
+concurrency:
+    group: sonarqube-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    sonarqube:
+        name: SonarQube Scan
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: ⬇️ Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: ☕ Setup Java
+              uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: 17
+
+            - name: 🟢 Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+
+            - name: 📦 Install dependencies
+              run: npm ci
+
+            - name: ✅ Run tests with coverage
+              run: npm run test:run -- --coverage
+
+            - name: 🔍 SonarQube Scan
+              uses: SonarSource/sonarqube-scan-action@v4
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+              with:
+                  args: >
+                      -Dsonar.projectKey=wrdlnkdn
+                      -Dsonar.projectName=WRDLNKDN
+                      -Dsonar.sources=src,backend
+                      -Dsonar.tests=src/tests
+                      -Dsonar.test.inclusions=src/tests/**/*.test.ts,src/tests/**/*.spec.ts,src/tests/**/*.test.tsx,src/tests/**/*.spec.tsx
+                      -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/playwright-report/**,**/test-results/**,**/*.config.*,public/**,supabase/**
+                      -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                      -Dsonar.typescript.tsconfigPaths=config/typescript/tsconfig.app.json
+                      -Dsonar.sourceEncoding=UTF-8
+
+            - name: 🚦 SonarQube Quality Gate check
+              uses: SonarSource/sonarqube-quality-gate-action@master
+              with:
+                  pollingTimeoutSec: 600
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

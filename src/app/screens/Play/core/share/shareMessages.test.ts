@@ -30,8 +30,8 @@ describe("shareMessages", () => {
     expect(text).toContain("Easy");
     expect(text).toContain("9 pieces");
     expect(text).toContain("1:42");
-    expect(text).toContain("25 moves");
-    expect(text).not.toContain("Prove you");
+    expect(text).toContain("Moves: 25");
+    expect(text).not.toContain("Think you can beat me?");
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc");
   });
 
@@ -60,9 +60,9 @@ describe("shareMessages", () => {
 
     expect(text).toContain("16 pieces");
     expect(text).toContain("1:42");
-    expect(text).toContain("42 moves");
-    expect(text).toContain("3 rotations");
-    expect(text).toContain("Prove you");
+    expect(text).toContain("Moves: 42");
+    expect(text).toContain("Rotations: 3");
+    expect(text).toContain("Think you can beat me?");
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc&ct=102&cm=42");
   });
 
@@ -75,7 +75,7 @@ describe("shareMessages", () => {
     });
     expect(text).toContain("Easy");
     expect(text).toContain("9 pieces");
-    expect(text).toContain("Prove you");
+    expect(text).toContain("Think you can beat me?");
     expect(text).toContain("https://phuzzle.vercel.app/play?grid=3x3&ct=36&cm=19");
   });
 
