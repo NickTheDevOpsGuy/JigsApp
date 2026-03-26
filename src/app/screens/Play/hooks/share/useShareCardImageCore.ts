@@ -130,13 +130,7 @@ export function useShareCardImage() {
         const statsHeadH = 36;
         const statsBodyH = statsBodyLines * 34 + GAP;
         const belowImage =
-          GAP +
-          statsHeadH +
-          statsBodyH +
-          ctaBlock +
-          urlBlockEst +
-          footerBlock +
-          8;
+          GAP + statsHeadH + statsBodyH + ctaBlock + urlBlockEst + footerBlock + 8;
 
         const maxSquare = panel.y + panel.h - PAD - y - belowImage;
         const imageSide = Math.max(240, Math.min(contentW, Math.max(240, maxSquare)));

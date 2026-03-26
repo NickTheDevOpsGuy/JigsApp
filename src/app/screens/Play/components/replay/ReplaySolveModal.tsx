@@ -239,7 +239,8 @@ export function ReplaySolveModal({
       Math.max(viewLeft + edgePad, left - dockInsetPx),
     );
     const viewTop = vv?.offsetTop ?? 0;
-    const minHeaderAnchorTop = viewTop + edgePad + headerBlockHeight + headerGapAboveBoard;
+    const minHeaderAnchorTop =
+      viewTop + edgePad + headerBlockHeight + headerGapAboveBoard;
     const headerAnchorTop = Math.max(top, minHeaderAnchorTop);
     return (
       <div
