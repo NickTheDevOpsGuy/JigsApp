@@ -81,24 +81,25 @@ export function CompletionOverlayActions(args: {
       if (!btn) return;
       const r = btn.getBoundingClientRect();
       const gap = 8;
-      const maxH = isMobileActions
-        ? Math.min(window.innerHeight * 0.45, 280)
-        : Math.min(window.innerHeight * 0.62, 340);
-      if (isMobileActions) {
-        setMenuPlacement({
-          mode: "below",
-          top: r.bottom + gap,
-          left: r.left,
-          width: r.width,
-          maxHeight: maxH,
-        });
-      } else {
+      const maxH = Math.min(window.innerHeight * 0.5, 320);
+      const spaceAbove = r.top;
+      const spaceBelow = window.innerHeight - r.bottom;
+      // Prefer above; fall back to below if not enough room
+      if (spaceAbove >= 120 || spaceAbove >= spaceBelow) {
         setMenuPlacement({
           mode: "above",
           bottom: window.innerHeight - r.top + gap,
           left: r.left,
           width: r.width,
-          maxHeight: maxH,
+          maxHeight: Math.min(maxH, spaceAbove - gap),
+        });
+      } else {
+        setMenuPlacement({
+          mode: "below",
+          top: r.bottom + gap,
+          left: r.left,
+          width: r.width,
+          maxHeight: Math.min(maxH, spaceBelow - gap),
         });
       }
     };

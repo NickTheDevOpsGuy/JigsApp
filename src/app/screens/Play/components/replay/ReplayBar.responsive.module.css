@@ -98,37 +98,48 @@
     padding-right: 0;
   }
 
-  .replayBarTitle {
-    font-size: 0.93rem;
+  /* Hide heading on small screens to save vertical space */
+  .replayBarHeading {
+    display: none;
   }
 
-  .replayBarSubtitle {
-    font-size: 0.74rem;
-  }
-
+  /* Keep controls on one row: shrink buttons, use flex instead of grid */
   .replayBarRow {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .replayBarGroup {
+    gap: 2px;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Smaller buttons on narrow screens so they all fit */
+  .replayBarBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .replayBarTimeGroup {
+    padding: 8px 8px;
+    flex: 1;
+    min-width: 0;
   }
 
   .replayBarTime {
-    font-size: 0.88rem;
+    font-size: 0.82rem;
   }
 
-  .replayBarProgressSection {
-    gap: 8px;
-  }
-
-  .replayBarProgressBar {
-    height: 8px;
-    border-radius: 999px;
-  }
-
-  .replayBarProgressFill {
-    border-radius: 999px;
+  .replayBarStepBtn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 6px;
   }
 
   .replayBarStepRow {
-    gap: 10px;
+    gap: 6px;
   }
 }
