@@ -71,6 +71,32 @@ export function HeaderMenuControlsSection({
 }: BaseSectionProps) {
   return (
     <>
+      {hasSubMenuItems("manualControls") && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => setActiveSubMenu("manualControls")}
+          aria-label="Controls"
+          title={SUBMENU_DESCRIPTIONS.manualControls}
+        >
+          {SUB_MENU_LABELS.manualControls}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
+      )}
+      {hasSubMenuItems("modes") && (
+        <button
+          type="button"
+          className={styles.headerMenuSubmenuTrigger}
+          role="menuitem"
+          onClick={() => setActiveSubMenu("modes")}
+          aria-label="Modes"
+          title={SUBMENU_DESCRIPTIONS.modes}
+        >
+          {SUB_MENU_LABELS.modes}
+          <ChevronRight size={16} className={styles.headerMenuChevron} />
+        </button>
+      )}
       {hasSubMenuItems("moves") && (
         <button
           type="button"
@@ -94,32 +120,6 @@ export function HeaderMenuControlsSection({
           title="Applies to next puzzle"
         >
           {SUB_MENU_LABELS.pieceShape}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
-      {hasSubMenuItems("modes") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("modes")}
-          aria-label="Modes"
-          title={SUBMENU_DESCRIPTIONS.modes}
-        >
-          {SUB_MENU_LABELS.modes}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
-      {hasSubMenuItems("manualControls") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("manualControls")}
-          aria-label="Controls"
-          title={SUBMENU_DESCRIPTIONS.manualControls}
-        >
-          {SUB_MENU_LABELS.manualControls}
           <ChevronRight size={16} className={styles.headerMenuChevron} />
         </button>
       )}

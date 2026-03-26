@@ -1,5 +1,5 @@
 /**
- * Tab bar for Stats screen: 3 tabs – Profile, Board, Badges.
+ * Tab bar for Stats screen: Badges, Board, Profile (alphabetical).
  */
 import { Trophy, User, Award } from "lucide-react";
 import styles from "../StatsScreen.module.css";
@@ -26,14 +26,14 @@ export function StatsTabBar({
       <button
         type="button"
         role="tab"
-        aria-selected={activeTab === "profile"}
-        className={activeTab === "profile" ? styles.tabActive : ""}
-        onClick={() => setActiveTab("profile")}
-        aria-label="Profile stats"
-        title="Profile stats"
+        aria-selected={activeTab === "achievements"}
+        className={activeTab === "achievements" ? styles.tabActive : ""}
+        onClick={() => setActiveTab("achievements")}
+        aria-label="Badges and achievements"
+        title="Badges and achievements"
       >
-        <User size={18} aria-hidden />
-        <span>Profile</span>
+        <Award size={18} aria-hidden />
+        <span>Badges</span>
       </button>
       <button
         type="button"
@@ -51,14 +51,14 @@ export function StatsTabBar({
       <button
         type="button"
         role="tab"
-        aria-selected={activeTab === "achievements"}
-        className={activeTab === "achievements" ? styles.tabActive : ""}
-        onClick={() => setActiveTab("achievements")}
-        aria-label="Badges and achievements"
-        title="Badges and achievements"
+        aria-selected={activeTab === "profile"}
+        className={activeTab === "profile" ? styles.tabActive : ""}
+        onClick={() => setActiveTab("profile")}
+        aria-label="Profile stats"
+        title="Profile stats"
       >
-        <Award size={18} aria-hidden />
-        <span>Badges</span>
+        <User size={18} aria-hidden />
+        <span>Profile</span>
       </button>
     </div>
   );

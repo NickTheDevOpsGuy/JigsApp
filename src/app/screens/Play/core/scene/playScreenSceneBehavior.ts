@@ -58,6 +58,12 @@ export function usePlayScreenBehavior(setup: any) {
     scene.replayStateRef,
     state?.isComplete ?? false,
   );
+  const replayViewportBeforeOpenRef = useRef<{
+    scale: number;
+    panX: number;
+    panY: number;
+  } | null>(null);
+  const wasReplayOpenRef = useRef(false);
   const zoomOnCompleteRunRef = useRef(false);
   const completionCapturedRef = useRef(false);
   const onFireCapturedRef = useRef(false);
@@ -143,6 +149,28 @@ export function usePlayScreenBehavior(setup: any) {
   useEffect(() => {
     scene.viewport.reset();
   }, [puzzleKey, scene.viewport.reset]);
+
+  useEffect(() => {
+    const isReplayOpen = scene.replayBarOpen;
+
+    if (isReplayOpen && !wasReplayOpenRef.current) {
+      replayViewportBeforeOpenRef.current = { ...scene.viewport.viewport };
+      scene.viewport.reset();
+    } else if (!isReplayOpen && wasReplayOpenRef.current) {
+      const previousViewport = replayViewportBeforeOpenRef.current;
+      if (previousViewport) {
+        scene.viewport.setViewport(previousViewport);
+        replayViewportBeforeOpenRef.current = null;
+      }
+    }
+
+    wasReplayOpenRef.current = isReplayOpen;
+  }, [
+    scene.replayBarOpen,
+    scene.viewport.viewport,
+    scene.viewport.reset,
+    scene.viewport.setViewport,
+  ]);
 
   const getSelectable = useCallback(
     () =>

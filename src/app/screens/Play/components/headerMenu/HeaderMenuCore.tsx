@@ -1,5 +1,5 @@
 /**
- * HeaderMenu – root: Play, Leaderboard, Co-op, Settings, About. Settings contains Gameplay, Assistance, Appearance, Audio, Advanced.
+ * HeaderMenu – root: About, Leaderboard, Play, Settings (alpha). Settings submenus ordered by label in headerMenuConstants.
  */
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -224,7 +224,11 @@ export function HeaderMenu(props: HeaderMenuProps) {
     ...groups.helpItems,
     ...groups.aboutItems,
     ...groups.contributeItems,
-  ];
+  ].sort((a, b) =>
+    (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
+      sensitivity: "base",
+    }),
+  );
 
   const handleRootClick = (root: RootMenuId) => {
     if (root === "leaderboard") {

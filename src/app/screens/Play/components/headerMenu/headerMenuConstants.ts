@@ -77,12 +77,12 @@ export const ROOT_MENU_LABELS: Record<
   settings: "Settings",
 };
 
-/** Settings submenus: Advanced, Assistance, Audio, Appearance, Gameplay, Move (Undo/Redo). */
+/** Settings submenus: alphabetical by visible label (SUB_MENU_LABELS). */
 export const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
   "advanced",
+  "display",
   "assistance",
   "audio",
-  "display",
   "gameplay",
   "moves",
 ];

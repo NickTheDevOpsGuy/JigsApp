@@ -75,7 +75,7 @@ export function ReplaySolveModal({
   const useCutout = Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
   /* Same rhythm as desktop; slightly tighter on narrow viewports only */
   const dockGapBelowBoard = isMobilePortraitReplay ? 12 : 16;
-  const headerGapAboveBoard = isMobilePortraitReplay ? 10 : 12;
+  const headerGapAboveBoard = isMobilePortraitReplay ? 4 : 6;
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;
   const effectiveSpeed = speedExplicitlyChosen ? speed : 1;
