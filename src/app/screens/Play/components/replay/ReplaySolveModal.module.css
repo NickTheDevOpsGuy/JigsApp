@@ -1,5 +1,25 @@
 /* Unified replay overlay: one stage, one attached dock, one dismiss action. */
 
+/* Modal (non-cutout) path: one scroll container (.modalSurface), not backdrop + dialog + body + dock */
+.replayModalBackdrop {
+  overflow: hidden;
+}
+
+.replayModalDialog {
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.replayModalBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden !important;
+  overscroll-behavior: contain;
+}
+
 .backdropCutout {
   position: fixed;
   inset: 0;
@@ -285,6 +305,24 @@
 .controlDockInnerCutout {
   padding-top: 18px;
   padding-bottom: 24px;
+  /* --replay-dock-top set on .controlDock (px). Short viewports: clip + scroll, don’t run under the home bar. */
+  /* --replay-vvh from visualViewport.height (inline); falls back to 100dvh if unset */
+  max-height: calc(
+    var(--replay-vvh, 100dvh) - var(--replay-dock-top, 0px) -
+      env(safe-area-inset-bottom, 0px) - 8px
+  );
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.controlDockInnerCutout::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .modalSurface {
@@ -296,6 +334,20 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.modalSurface::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .modalStageStack {
@@ -459,38 +511,82 @@
     font-size: 0.72rem;
   }
 
-  /* Tighter gap above cutout so the board gets more vertical space */
-  .cutoutBoardHeaderWrap {
-    transform: translateY(calc(-100% - 6px)) !important;
-  }
-
-  /* dock is top-positioned from boardRect in cutout mode; no bottom override needed */
+  /* Header gap above board is set inline from ReplaySolveModal (mobile vs desktop). */
 
   .controlDockInner {
-    padding: 12px 10px 14px;
-    border-radius: 16px;
+    padding: 10px 10px max(12px, env(safe-area-inset-bottom, 0px));
+    border-radius: 14px;
   }
 
   .controlDockInnerCutout {
-    padding-top: 12px;
-    padding-bottom: 14px;
+    padding-top: 8px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+    border-radius: 14px 14px 18px 18px;
   }
 
   .modalSurface {
     max-width: calc(
       100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 12px
     );
-    gap: 12px;
+    gap: 8px;
   }
 
-  /* Non-cutout modal path: cap the puzzle area so controls stay visible */
+  /* Non-cutout modal path: shorter stage, controls stay reachable */
   .modalStageStack {
-    gap: 12px;
+    gap: 6px;
+  }
+
+  .modalStageFrame {
+    border-radius: 18px;
   }
 
   .puzzleArea {
     aspect-ratio: unset;
-    height: min(50dvh, 55vw);
-    max-height: 340px;
+    height: min(40dvh, 50vw);
+    max-height: 260px;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .puzzleImage {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .puzzlePlaceholder {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .seekRow {
+    padding: 0 0 6px;
+  }
+
+  .seekBarWrap {
+    gap: 4px 8px;
+  }
+
+  .seekBar {
+    height: 8px;
+  }
+
+  .seekHandle {
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+  }
+
+  .seekTime {
+    font-size: 0.7rem;
+  }
+
+  .stageFrame {
+    border-radius: 18px;
   }
 }

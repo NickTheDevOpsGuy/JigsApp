@@ -349,8 +349,25 @@
     padding-top: 2px;
   }
 
+  /* Replay: don't let .main flex-grow into empty vertical space; stage stays content-sized */
   .boardLayoutShell[data-replay-active="true"] .playBody .main {
+    flex: 0 0 auto;
+    flex-grow: 0;
     padding-top: 4px;
+    min-height: 0;
+  }
+
+  /*
+   * Bounded square stage: cap side by viewport height so header + cutout + dock fit on portrait phones.
+   * Cutout rect follows this box; canvas scales inside the same frame.
+   */
+  .boardLayoutShell[data-replay-active="true"] .boardWrapper {
+    width: min(100%, min(94vw, 44dvh));
+    max-width: min(100%, min(94vw, 44dvh));
+    max-height: min(100%, min(94vw, 44dvh));
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   /* iPhone/Android landscape: keep controls reachable and respect notch/home areas */
@@ -368,6 +385,16 @@
 
     .playBody .trayArea .tray {
       padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
+    }
+
+    /*
+     * Replay in landscape: 44dvh is tiny when the short axis is height — size the stage from
+     * the larger of vw / dvh so the board stays usable and the cutout still fits the shell.
+     */
+    .boardLayoutShell[data-replay-active="true"] .boardWrapper {
+      width: min(100%, min(78vw, 72dvh));
+      max-width: min(100%, min(78vw, 72dvh));
+      max-height: min(100%, min(78vw, 72dvh));
     }
   }
 }

@@ -132,43 +132,43 @@
   }
 
   .seekRow {
-    padding: 0 0 8px;
+    padding: 0 0 4px;
   }
 
   .seekBarWrap {
-    gap: 6px 8px;
+    gap: 4px 6px;
   }
 
   .seekTime {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
   }
 
   .controlRow {
     flex-wrap: nowrap;
     justify-content: center;
-    gap: 6px;
+    gap: 5px;
     row-gap: 0;
-    padding-top: 8px;
+    padding-top: 6px;
   }
 
   .controlBtn {
-    width: 32px;
-    height: 32px;
-  }
-
-  .controlBtn svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  .controlBtnPlay {
     width: 36px;
     height: 36px;
   }
 
-  .controlBtnPlay svg {
+  .controlBtn svg {
     width: 18px;
     height: 18px;
+  }
+
+  .controlBtnPlay {
+    width: 42px;
+    height: 42px;
+  }
+
+  .controlBtnPlay svg {
+    width: 19px;
+    height: 19px;
   }
 
   .speedTrigger {
@@ -181,29 +181,29 @@
 
 @media (max-width: 420px) {
   .controlRow {
-    gap: 5px;
-    padding-top: 6px;
+    gap: 4px;
+    padding-top: 5px;
   }
 
   .controlBtn {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
   }
 
   .controlBtn svg {
-    width: 15px;
-    height: 15px;
+    width: 17px;
+    height: 17px;
   }
 
   .controlBtnPlay {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
   }
 
   .speedTrigger {
     min-width: 32px;
     min-height: 30px;
     padding: 0 5px;
-    font-size: 0.68rem;
+    font-size: 0.66rem;
   }
 }
