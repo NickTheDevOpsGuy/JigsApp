@@ -83,7 +83,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       });
       setTimeout(() => {
         measure();
-      }, 220);
+      }, 320);
     };
     window.addEventListener("orientationchange", onOrientationOrResize);
     return () => {

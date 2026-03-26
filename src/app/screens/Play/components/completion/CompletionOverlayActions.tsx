@@ -138,12 +138,27 @@ export function CompletionOverlayActions(args: {
 
   const handleChallenge = () => {
     setMenuOpen(false);
-    completionData.openSharePopup("challenge");
+    void runBusyAction("challenge", async () => {
+      const baseChallengeUrl = args.ensureChallengeShareUrl
+        ? await args.ensureChallengeShareUrl()
+        : args.puzzleShareUrl;
+      if (canNativeShare && onShareChallenge) {
+        await onShareChallenge(baseChallengeUrl);
+      } else if (onCopyChallenge) {
+        await onCopyChallenge(baseChallengeUrl);
+      }
+    });
   };
 
   const handleShareResult = () => {
     setMenuOpen(false);
-    completionData.openSharePopup("result");
+    void runBusyAction("challenge", async () => {
+      if (canNativeShare && onShareProgress) {
+        await onShareProgress();
+      } else if (onCopyProgress) {
+        await onCopyProgress();
+      }
+    });
   };
 
   const hasGameActions = Boolean(onNextPuzzle || (canReplay && onReplayClick));

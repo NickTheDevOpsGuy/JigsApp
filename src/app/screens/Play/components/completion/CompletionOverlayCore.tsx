@@ -192,8 +192,7 @@ export function CompletionOverlay({
       surface="bare"
       size="xl"
       tone="celebration"
-      align="top"
-      topOffsetPx={24}
+      align="center"
       showCloseButton={false}
       backdropClassName={styles.completeWinBackdrop}
       dialogClassName={styles.completeWinDialog}
@@ -284,19 +283,21 @@ export function CompletionOverlay({
 
 function AchievementCycler({ achievements }: { achievements: string[] }) {
   const [index, setIndex] = useState(0);
-  const ACHIEVEMENT_CYCLE_MS = 20000;
+  // Cap to 2 messages max and cycle slowly so each is readable
+  const capped = achievements.slice(0, 2);
+  const ACHIEVEMENT_CYCLE_MS = 6000;
 
   useEffect(() => {
-    if (achievements.length <= 1) return;
+    if (capped.length <= 1) return;
 
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % achievements.length);
+      setIndex((i) => (i + 1) % capped.length);
     }, ACHIEVEMENT_CYCLE_MS);
 
     return () => clearInterval(id);
-  }, [achievements.length]);
+  }, [capped.length]);
 
-  const text = achievements[index] ?? achievements[0];
+  const text = capped[index] ?? capped[0];
 
   return (
     <p className={styles.completeAchievementPhased} role="status" aria-live="polite">

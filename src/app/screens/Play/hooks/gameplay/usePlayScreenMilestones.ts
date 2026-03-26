@@ -61,9 +61,11 @@ export function usePlayScreenMilestones(
   }, [milestoneMessage]);
 
   useEffect(() => {
-    if (!state) return;
-    if (state.placedCount === 0) lastMilestoneRef.current = 0;
-  }, [state?.placedCount, puzzleKey]);
+    // Reset milestones whenever a new puzzle key is set (new game), not just when placedCount hits 0.
+    // This prevents milestones from a restored save bleeding into a fresh puzzle.
+    lastMilestoneRef.current = 0;
+    setMilestoneMessage(null);
+  }, [puzzleKey]);
 
   return milestoneMessage;
 }

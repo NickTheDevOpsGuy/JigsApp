@@ -12,9 +12,9 @@
   left: 0;
   margin-top: 4px;
   min-width: 200px;
-  max-height: min(95dvh, 600px);
-  overflow-y: hidden;
-  overflow-x: visible;
+  max-height: min(80dvh, 520px);
+  overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);

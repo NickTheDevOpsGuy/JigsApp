@@ -16,6 +16,14 @@ export function usePlayScreenShortcutsFromSetup(
 ) {
   const { ui, scene } = setup;
   const { manager, state, setState } = setup.managerResult;
+  const anyModalOpen =
+    ui.showThemeModal ||
+    ui.showShortcuts ||
+    ui.showHelpChoice ||
+    ui.showChoosePuzzleModal ||
+    ui.showNewGameModal ||
+    false;
+
   usePlayScreenShortcuts({
     manager,
     state,
@@ -25,7 +33,7 @@ export function usePlayScreenShortcutsFromSetup(
     showShortcuts: ui.showShortcuts,
     showHelpChoice: ui.showHelpChoice,
     showNewGameModal: ui.showChoosePuzzleModal,
-    showTutorial: opts.showTutorial,
+    showTutorial: opts.showTutorial || anyModalOpen,
     selectedPieceId: ui.selectedPieceId,
     setSelectedPieceId: ui.setSelectedPieceId,
     setShowShortcuts: ui.setShowShortcuts,

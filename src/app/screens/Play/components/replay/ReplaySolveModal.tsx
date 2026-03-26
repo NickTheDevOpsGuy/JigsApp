@@ -290,7 +290,7 @@ export function ReplaySolveModal({
             top,
             left,
             width,
-            transform: "translateY(calc(-100% - 20px))",
+            transform: "translateY(calc(-100% - 12px))",
           }}
           onPointerDown={stopProp}
         >
@@ -302,10 +302,11 @@ export function ReplaySolveModal({
           onPointerDown={stopProp}
         />
         <div
-          className={`${styles.controlDock} ${styles.controlDockBottomAnchored}`}
+          className={styles.controlDock}
           style={{
             left: shellLeft,
             width: shellWidth,
+            top: bottom + 16,
           }}
           onPointerDown={stopProp}
         >

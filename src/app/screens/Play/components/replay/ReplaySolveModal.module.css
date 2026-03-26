@@ -258,6 +258,7 @@
   pointer-events: auto;
 }
 
+/* controlDockBottomAnchored kept for legacy; dock now positioned via inline top from boardRect */
 .controlDockBottomAnchored {
   top: auto;
   bottom: max(32px, env(safe-area-inset-bottom, 32px));
@@ -460,12 +461,10 @@
 
   /* Tighter gap above cutout so the board gets more vertical space */
   .cutoutBoardHeaderWrap {
-    transform: translateY(calc(-100% - 8px)) !important;
+    transform: translateY(calc(-100% - 6px)) !important;
   }
 
-  .controlDockBottomAnchored {
-    bottom: max(10px, env(safe-area-inset-bottom, 0px));
-  }
+  /* dock is top-positioned from boardRect in cutout mode; no bottom override needed */
 
   .controlDockInner {
     padding: 12px 10px 14px;
@@ -481,6 +480,17 @@
     max-width: calc(
       100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 12px
     );
-    gap: 20px;
+    gap: 12px;
+  }
+
+  /* Non-cutout modal path: cap the puzzle area so controls stay visible */
+  .modalStageStack {
+    gap: 12px;
+  }
+
+  .puzzleArea {
+    aspect-ratio: unset;
+    height: min(50dvh, 55vw);
+    max-height: 340px;
   }
 }

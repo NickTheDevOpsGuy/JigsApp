@@ -12,6 +12,7 @@ import type { PuzzleSessionState } from "@/services/session/puzzleSessionService
 
 const SAVE_DEBOUNCE_MS = 500;
 const SAVE_EVERY_N_MOVES = 3;
+const SAVE_EVERY_N_MOVES_SMALL = 1; // small grids (≤16 pieces) save every snap
 
 export type UsePlayScreenPersistenceParams = {
   state: PuzzleState | null;
@@ -58,8 +59,10 @@ export function usePlayScreenPersistence({
     const url = safeLocalStorage.getItem(STORAGE_KEY) || "";
     if (!url) return;
     const placed = state.placedCount ?? 0;
+    const total = (state.grid?.rows ?? 4) * (state.grid?.cols ?? 4);
+    const threshold = total <= 16 ? SAVE_EVERY_N_MOVES_SMALL : SAVE_EVERY_N_MOVES;
     const movesSinceSave = placed - lastSavedPlacedCountRef.current;
-    if (movesSinceSave >= SAVE_EVERY_N_MOVES) {
+    if (movesSinceSave >= threshold) {
       savePuzzleState(url, state.grid, state.pieces, elapsedSeconds);
       lastSavedPlacedCountRef.current = placed;
       return;

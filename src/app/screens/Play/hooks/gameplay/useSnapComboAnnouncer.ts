@@ -10,10 +10,12 @@ export function useSnapComboAnnouncer(
   placementTimesRef: MutableRefObject<number[]>,
   snapCombo: number,
   setSnapCombo: (value: number | ((prev: number) => number)) => void,
+  isComplete = false,
 ) {
   const [announcerLine, setAnnouncerLine] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isComplete) return;
     const id = setInterval(() => {
       const now = performance.now();
       const comboCutoff = now - SNAP_COMBO_IDLE_MS;
@@ -24,7 +26,7 @@ export function useSnapComboAnnouncer(
       });
     }, 400);
     return () => clearInterval(id);
-  }, [placementTimesRef, setSnapCombo]);
+  }, [placementTimesRef, setSnapCombo, isComplete]);
 
   useEffect(() => {
     const line =

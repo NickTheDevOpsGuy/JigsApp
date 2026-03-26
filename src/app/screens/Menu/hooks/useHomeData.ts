@@ -2,7 +2,7 @@
  * useHomeData – all data the home screen needs in one place.
  * Reads from localStorage via daily puzzle helpers; no network calls.
  */
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   getCurrentStreak,
   getStreakFreezeCount,
@@ -44,29 +44,39 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export function useHomeData() {
-  return useMemo(() => {
-    const streak = getCurrentStreak();
-    const freezes = getStreakFreezeCount();
-    const puzzleNumber = getDailyPuzzleNumber();
-    const diffIndex = getDailyPreferredDifficultyIndex() ?? 1;
-    const grid = GRID_OPTIONS[Math.min(diffIndex, GRID_OPTIONS.length - 1)];
-    const isCompleted = isTodayDailyCompleted();
-    const todayTime = getTodayDailyTime();
-    const weekDots: WeekDot[] = getWeekDots();
-    const weeklyCompleted = weekDots.filter((dot) => dot.done).length;
-    const weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
+function computeHomeData() {
+  const streak = getCurrentStreak();
+  const freezes = getStreakFreezeCount();
+  const puzzleNumber = getDailyPuzzleNumber();
+  const diffIndex = getDailyPreferredDifficultyIndex() ?? 1;
+  const grid = GRID_OPTIONS[Math.min(diffIndex, GRID_OPTIONS.length - 1)];
+  const isCompleted = isTodayDailyCompleted();
+  const todayTime = getTodayDailyTime();
+  const weekDots: WeekDot[] = getWeekDots();
+  const weeklyCompleted = weekDots.filter((dot) => dot.done).length;
+  const weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
 
-    return {
-      streak,
-      freezes,
-      puzzleNumber,
-      gridLabel: grid ? `${grid.rows}×${grid.cols} · ${grid.pieces} pieces` : "Daily",
-      isCompleted,
-      todayTimeLabel: todayTime ? formatTime(todayTime) : null,
-      weekDots,
-      weeklyCompleted,
-      weeklyRemaining,
-    };
+  return {
+    streak,
+    freezes,
+    puzzleNumber,
+    gridLabel: grid ? `${grid.rows}×${grid.cols} · ${grid.pieces} pieces` : "Daily",
+    isCompleted,
+    todayTimeLabel: todayTime ? formatTime(todayTime) : null,
+    weekDots,
+    weeklyCompleted,
+    weeklyRemaining,
+  };
+}
+
+export function useHomeData() {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const handler = () => setTick((t) => t + 1);
+    window.addEventListener("phuzzle:menuRefresh", handler);
+    return () => window.removeEventListener("phuzzle:menuRefresh", handler);
   }, []);
+
+  return useMemo(() => computeHomeData(), [tick]);
 }

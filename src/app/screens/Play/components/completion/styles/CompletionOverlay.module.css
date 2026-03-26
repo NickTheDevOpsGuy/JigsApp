@@ -9,6 +9,35 @@
   gap: 0;
 }
 
+/* Smooth entrance: dialog fades + scales up from board center */
+.completeWinDialog {
+  animation: completeWinEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes completeWinEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.93) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.completeWinBackdrop {
+  animation: completeBackdropEnter 0.3s ease both;
+}
+
+@keyframes completeBackdropEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* ── Stats bar (phase 2) ── */
 .completeStatsBar {
   display: flex;

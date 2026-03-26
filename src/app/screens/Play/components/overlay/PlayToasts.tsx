@@ -35,8 +35,8 @@ function getSingleToast(
   shareToast: string | null,
 ): { content: React.ReactNode; isStreak: boolean } | null {
   if (showFirstSnapToast) return { content: "First piece! ✨", isStreak: false };
+  if (showStreakToast) return { content: null, isStreak: true }; // "On fire!" + flame — higher priority than combo
   if (announcerLine) return { content: announcerLine, isStreak: false };
-  if (showStreakToast) return { content: null, isStreak: true }; // "On fire!" + flame
   if (milestoneMessage) return { content: milestoneMessage, isStreak: false };
   if (shareToast) return { content: shareToast, isStreak: false };
   return null;
