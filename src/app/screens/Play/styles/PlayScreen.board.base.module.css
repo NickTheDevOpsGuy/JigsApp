@@ -42,18 +42,18 @@
   padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
 }
 
-/* PieceTray: minimal height; piece size 44–56px; board remains dominant */
+/* PieceTray: taller strip for easier piece picking; board still primary */
 .playBody .trayArea .tray {
   flex: 0 0 auto;
   min-width: 0;
-  height: clamp(110px, 14vh, 150px);
-  max-height: min(150px, 20vh);
-  min-height: 80px;
+  height: clamp(132px, 17vh, 190px);
+  max-height: min(190px, 26vh);
+  min-height: 96px;
 }
 
 .playBody .trayArea .tray.trayWrapLarge {
-  height: clamp(110px, 14vh, 150px);
-  max-height: min(150px, 20vh);
+  height: clamp(132px, 17vh, 190px);
+  max-height: min(190px, 26vh);
 }
 
 /* Replay Solve cutout: nudge board column up so header + puzzle read higher */
@@ -78,13 +78,15 @@
   }
 
   .playBody .trayArea .tray {
-    height: clamp(64px, 8vh, 80px);
-    max-height: 80px;
+    height: clamp(88px, 13vh, 118px);
+    max-height: min(118px, 22vh);
+    min-height: 76px;
   }
 
   .playBody .trayArea .tray.trayWrapLarge {
-    height: clamp(64px, 8vh, 80px);
-    max-height: 80px;
+    height: clamp(88px, 13vh, 118px);
+    max-height: min(118px, 22vh);
+    min-height: 76px;
   }
 
   .boardLayoutShell[data-replay-active="true"] .playBody .main {

@@ -121,68 +121,40 @@
   outline-offset: 2px;
 }
 
+/*
+ * Narrow viewports: same layout hierarchy as desktop (title, seek+time+badge, controls),
+ * uniformly ~90% scale — not a different UI.
+ */
 @media (max-width: 600px) {
-  /* Title duplicates modal chrome; seek row shows time + speed control */
   .dockHeader {
-    display: none;
+    padding: 0 0 14px;
+  }
+
+  .dockTitle {
+    font-size: 0.82rem;
   }
 
   .speedBadge {
-    display: none;
+    font-size: 0.7rem;
+    padding: 2px 7px;
   }
 
   .seekRow {
-    padding: 0 0 4px;
+    padding: 0 0 14px;
   }
 
   .seekBarWrap {
-    gap: 4px 6px;
+    gap: 6px 10px;
   }
 
   .seekTime {
-    font-size: 0.68rem;
+    font-size: 0.74rem;
   }
 
   .controlRow {
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 5px;
-    row-gap: 0;
-    padding-top: 6px;
-  }
-
-  .controlBtn {
-    width: 36px;
-    height: 36px;
-  }
-
-  .controlBtn svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .controlBtnPlay {
-    width: 42px;
-    height: 42px;
-  }
-
-  .controlBtnPlay svg {
-    width: 19px;
-    height: 19px;
-  }
-
-  .speedTrigger {
-    min-width: 34px;
-    min-height: 32px;
-    padding: 0 6px;
-    font-size: 0.72rem;
-  }
-}
-
-@media (max-width: 420px) {
-  .controlRow {
-    gap: 4px;
-    padding-top: 5px;
+    gap: 8px;
+    row-gap: 10px;
+    padding-top: 14px;
   }
 
   .controlBtn {
@@ -190,20 +162,15 @@
     height: 34px;
   }
 
-  .controlBtn svg {
-    width: 17px;
-    height: 17px;
-  }
-
   .controlBtnPlay {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
   }
 
   .speedTrigger {
-    min-width: 32px;
-    min-height: 30px;
-    padding: 0 5px;
-    font-size: 0.66rem;
+    min-width: 36px;
+    min-height: 34px;
+    padding: 0 8px;
+    font-size: 0.76rem;
   }
 }

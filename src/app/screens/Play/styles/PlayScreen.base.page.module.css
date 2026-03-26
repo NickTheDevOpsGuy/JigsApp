@@ -249,7 +249,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  max-height: 320px;
+  max-height: 360px;
   transition:
     max-height 0.25s ease,
     opacity 0.2s ease;
@@ -257,7 +257,7 @@
 }
 
 .trayAreaSheet {
-  --tray-sheet-height: 224px;
+  --tray-sheet-height: 256px;
 }
 
 .trayBottomBar {

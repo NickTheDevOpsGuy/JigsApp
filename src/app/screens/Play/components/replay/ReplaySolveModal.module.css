@@ -470,123 +470,116 @@
 }
 
 @media (max-width: 600px) {
+  /* Mirror desktop chrome; ~90% padding/type scale */
   .boardHeader {
-    gap: 8px;
-    padding: 10px 12px;
-    border-radius: 12px;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 13px;
   }
 
   .boardHeaderMain {
-    gap: 6px;
+    gap: 8px;
   }
 
   .headerTitle {
-    font-size: 0.82rem;
-    line-height: 1.15;
+    font-size: 0.9rem;
+    line-height: 1.12;
   }
 
   .resultHeader {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4px 10px;
+    gap: 4px 8px;
   }
 
   .resultTime {
-    font-size: 0.74rem;
+    font-size: 0.76rem;
   }
 
   .resultMoves {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
   }
 
   .boardCloseBtn {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
   }
 
   .packRemainingLabel {
-    max-width: 120px;
-    font-size: 0.72rem;
+    max-width: 140px;
+    font-size: 0.76rem;
   }
 
-  /* Header gap above board is set inline from ReplaySolveModal (mobile vs desktop). */
-
   .controlDockInner {
-    padding: 10px 10px max(12px, env(safe-area-inset-bottom, 0px));
-    border-radius: 14px;
+    padding: 16px 14px max(18px, env(safe-area-inset-bottom, 0px));
+    border-radius: 16px;
   }
 
   .controlDockInnerCutout {
-    padding-top: 8px;
-    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
-    border-radius: 14px 14px 18px 18px;
+    padding-top: 14px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    border-radius: 16px 16px 18px 18px;
   }
 
   .modalSurface {
     max-width: calc(
       100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 12px
     );
-    gap: 8px;
+    gap: 18px;
   }
 
-  /* Non-cutout modal path: shorter stage, controls stay reachable */
   .modalStageStack {
-    gap: 6px;
+    gap: 18px;
   }
 
   .modalStageFrame {
-    border-radius: 18px;
+    border-radius: 20px;
   }
 
+  /* Same square stage as desktop; width drives size (modal is already narrow) */
   .puzzleArea {
-    aspect-ratio: unset;
-    height: min(40dvh, 50vw);
-    max-height: 260px;
+    aspect-ratio: 1 / 1;
+    width: 100%;
     min-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .puzzleImage {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     object-position: center;
   }
 
   .puzzlePlaceholder {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
   }
 
   .seekRow {
-    padding: 0 0 6px;
+    padding: 0 0 14px;
   }
 
   .seekBarWrap {
-    gap: 4px 8px;
+    gap: 6px 10px;
   }
 
   .seekBar {
-    height: 8px;
+    height: 10px;
   }
 
   .seekHandle {
-    width: 12px;
-    height: 12px;
-    margin-left: -6px;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
   }
 
   .seekTime {
-    font-size: 0.7rem;
+    font-size: 0.74rem;
   }
 
   .stageFrame {
-    border-radius: 18px;
+    border-radius: 20px;
   }
 }

@@ -12,6 +12,8 @@
 /* Smooth entrance: dialog fades + scales up from board center */
 .completeWinDialog {
   animation: completeWinEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* Backdrop uses touch-action: none; dialog restores scrolling/taps on the card */
+  touch-action: auto;
 }
 
 @keyframes completeWinEnter {
@@ -27,6 +29,10 @@
 
 .completeWinBackdrop {
   animation: completeBackdropEnter 0.3s ease both;
+  /* Don’t scroll or rubber-band the page behind the win card; accidental taps already ignored via AppModal */
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 @keyframes completeBackdropEnter {

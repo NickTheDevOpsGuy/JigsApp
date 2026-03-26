@@ -46,6 +46,11 @@ type AppModalProps = {
   dialogClassName?: string;
   /** Accessible name for the close button (default "Close"). */
   closeLabel?: string;
+  /**
+   * When false, tapping the dimmed backdrop does not call onClose (win screen, etc.).
+   * Default true for standard dismissible modals.
+   */
+  closeOnBackdropClick?: boolean;
 };
 
 export function AppModal({
@@ -64,6 +69,7 @@ export function AppModal({
   backdropClassName,
   dialogClassName,
   closeLabel = "Close",
+  closeOnBackdropClick = true,
 }: AppModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -225,7 +231,13 @@ export function AppModal({
           ? { paddingTop: `max(${topOffsetPx}px, env(safe-area-inset-top, 0px))` }
           : undefined
       }
-      onClick={onClose}
+      onClick={
+        closeOnBackdropClick
+          ? (e: React.MouseEvent<HTMLDivElement>) => {
+              if (e.target === e.currentTarget) onClose();
+            }
+          : undefined
+      }
       role="presentation"
     >
       <div

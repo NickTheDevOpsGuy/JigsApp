@@ -194,6 +194,7 @@ export function CompletionOverlay({
       tone="celebration"
       align="center"
       showCloseButton={false}
+      closeOnBackdropClick={false}
       backdropClassName={styles.completeWinBackdrop}
       dialogClassName={styles.completeWinDialog}
       bodyClassName={styles.completeWinModalBody}
