@@ -1,8 +1,8 @@
 /**
- * CompletionOverlayGate – renders CompletionOverlay when puzzle is complete and not dismissed.
- * Keeps PlayScreen.tsx shorter by encapsulating the overlay props.
+ * CompletionOverlayGate renders the win overlay only when the solved puzzle should
+ * still be visible, so the main Play screen can treat it as one derived overlay prop.
  */
-import type { Piece, PuzzleState } from "@/puzzle/core/types";
+import type { PuzzleState } from "@/puzzle/core/types";
 import { CompletionOverlay } from "@/screens/Play/components/completion/CompletionOverlay";
 
 export type VisualModifier = "none" | "fog" | "night" | "sepia";
@@ -31,18 +31,10 @@ interface CompletionOverlayGateProps {
     handleNativeShare: () => void;
     handleCopyChallenge: () => void;
     handleNativeChallengeShare: (challengeUrl?: string) => void;
-    getProgressShareTextWithUrl: () => string;
-    getChallengeShareTextWithUrl: (challengeUrl?: string) => string;
   };
-  onDownloadImage: () => void;
   onClose: () => void;
   usedHint: boolean;
   isDaily: boolean;
-  /** Precision Mode: show snap precision and bonus rank points */
-  precisionModeEnabled?: boolean;
-  precisionSnaps?: number[];
-  /** Adaptive Personality: derive UI tone from pace for microcopy */
-  adaptivePersonalityEnabled?: boolean;
   /** Replay: show Replay button; on click dismiss overlay and start playback. */
   canReplay?: boolean;
   onReplayClick?: () => void;
@@ -73,13 +65,9 @@ export function CompletionOverlayGate({
   ensureChallengeShareUrl,
   puzzleName,
   share,
-  onDownloadImage,
   onClose,
   usedHint,
   isDaily,
-  precisionModeEnabled,
-  precisionSnaps = [],
-  adaptivePersonalityEnabled,
   canReplay = false,
   onReplayClick,
   onNextPuzzle,
@@ -90,34 +78,17 @@ export function CompletionOverlayGate({
 }: CompletionOverlayGateProps) {
   if (!show || !state) return null;
 
-  const movesPerMin = moveCount / Math.max(0.1, elapsedSeconds / 60);
-  const uiTone =
-    adaptivePersonalityEnabled && elapsedSeconds >= 5
-      ? movesPerMin >= 6
-        ? ("competitive" as const)
-        : ("calm" as const)
-      : undefined;
-
-  const precisionCount = precisionSnaps.length;
-  const avgPrecisionPx =
-    precisionCount > 0
-      ? precisionSnaps.reduce((a, b) => a + b, 0) / precisionCount
-      : null;
-  const precisionBonusPoints =
-    precisionModeEnabled && avgPrecisionPx != null
-      ? Math.max(0, Math.round(30 - avgPrecisionPx))
-      : null;
-
   const accuracyPercent =
     state.totalCount && state.totalCount > 0
       ? Math.round((state.totalCount / Math.max(moveCount, state.totalCount)) * 100)
       : 100;
 
+  const movesPerMin = moveCount / Math.max(0.1, elapsedSeconds / 60);
+
   return (
     <CompletionOverlay
       elapsedSeconds={elapsedSeconds}
       grid={state.grid}
-      pieces={(state.pieces ?? []) as Piece[]}
       imageUrl={imageUrl}
       undoCount={undoCount}
       moveCount={moveCount}
@@ -141,14 +112,7 @@ export function CompletionOverlayGate({
       onShareChallenge={share.handleNativeChallengeShare}
       onCopyProgress={share.handleCopyResults}
       onCopyChallenge={share.handleCopyChallenge}
-      shareProgressText={share.getProgressShareTextWithUrl()}
-      shareChallengeText={share.getChallengeShareTextWithUrl()}
-      onDownloadImage={onDownloadImage}
       onClose={onClose}
-      precisionModeEnabled={precisionModeEnabled}
-      avgPrecisionPx={avgPrecisionPx}
-      precisionBonusPoints={precisionBonusPoints}
-      uiTone={uiTone}
       canReplay={canReplay}
       onReplayClick={onReplayClick}
       onNextPuzzle={onNextPuzzle}

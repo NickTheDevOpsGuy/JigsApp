@@ -2,6 +2,8 @@
 
 Developer documentation for Phuzzle. For project overview and setup, see the [main README](../README.md).
 
+This `docs/` directory is the canonical documentation home for the repo.
+
 ---
 
 ## Setup

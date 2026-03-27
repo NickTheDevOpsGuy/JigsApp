@@ -11,11 +11,6 @@ import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/c
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export function CompletionOverlayActions(args: {
-  shareMenuOpen: boolean;
-  setShareMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  shareRef: React.RefObject<HTMLDivElement>;
-  shareTriggerRef: React.RefObject<HTMLButtonElement>;
-  dropdownPosition: { top: number; left: number; minWidth: number } | null;
   grid?: { rows: number; cols: number };
   puzzleShareUrl: string;
   ensureChallengeShareUrl?: () => Promise<string>;
@@ -28,14 +23,11 @@ export function CompletionOverlayActions(args: {
   onCopyProgress?: () => void;
   onShareChallenge?: (challengeUrl?: string) => void;
   onCopyChallenge?: (challengeUrl?: string) => void;
-  shareProgressText?: string;
-  shareChallengeText?: string;
   completionData: UseCompletionOverlayDataResult;
   canReplay: boolean;
   onReplayClick?: () => void;
   onNextPuzzle?: () => void;
   nextPuzzleLabel?: string;
-  onClose: () => void;
   isDaily?: boolean;
   focusReturnRef?: React.RefObject<HTMLButtonElement | null>;
 }) {
@@ -56,7 +48,6 @@ export function CompletionOverlayActions(args: {
     onReplayClick,
     onNextPuzzle,
     nextPuzzleLabel = "Next Puzzle",
-    onClose: _onClose,
     grid,
   } = args;
 
@@ -84,22 +75,23 @@ export function CompletionOverlayActions(args: {
       const maxH = Math.min(window.innerHeight * 0.5, 320);
       const spaceAbove = r.top;
       const spaceBelow = window.innerHeight - r.bottom;
-      // Prefer above; fall back to below if not enough room
-      if (spaceAbove >= 120 || spaceAbove >= spaceBelow) {
-        setMenuPlacement({
-          mode: "above",
-          bottom: window.innerHeight - r.top + gap,
-          left: r.left,
-          width: r.width,
-          maxHeight: Math.min(maxH, spaceAbove - gap),
-        });
-      } else {
+      const minComfortableMenuSpace = 160;
+      // Prefer below so the dropdown clearly belongs to the Options trigger.
+      if (spaceBelow >= minComfortableMenuSpace || spaceBelow >= spaceAbove) {
         setMenuPlacement({
           mode: "below",
           top: r.bottom + gap,
           left: r.left,
           width: r.width,
           maxHeight: Math.min(maxH, spaceBelow - gap),
+        });
+      } else {
+        setMenuPlacement({
+          mode: "above",
+          bottom: window.innerHeight - r.top + gap,
+          left: r.left,
+          width: r.width,
+          maxHeight: Math.min(maxH, spaceAbove - gap),
         });
       }
     };
@@ -138,27 +130,12 @@ export function CompletionOverlayActions(args: {
 
   const handleChallenge = () => {
     setMenuOpen(false);
-    void runBusyAction("challenge", async () => {
-      const baseChallengeUrl = args.ensureChallengeShareUrl
-        ? await args.ensureChallengeShareUrl()
-        : args.puzzleShareUrl;
-      if (canNativeShare && onShareChallenge) {
-        await onShareChallenge(baseChallengeUrl);
-      } else if (onCopyChallenge) {
-        await onCopyChallenge(baseChallengeUrl);
-      }
-    });
+    completionData.openSharePopup("challenge");
   };
 
   const handleShareResult = () => {
     setMenuOpen(false);
-    void runBusyAction("challenge", async () => {
-      if (canNativeShare && onShareProgress) {
-        await onShareProgress();
-      } else if (onCopyProgress) {
-        await onCopyProgress();
-      }
-    });
+    completionData.openSharePopup("result");
   };
 
   const hasGameActions = Boolean(onNextPuzzle || (canReplay && onReplayClick));
@@ -270,11 +247,6 @@ export function CompletionOverlayActions(args: {
     return (
       <section className={styles.completeActionsPhased} aria-label="Actions">
         <CompletionOverlayShareMenu
-          shareMenuOpen={args.shareMenuOpen}
-          setShareMenuOpen={args.setShareMenuOpen}
-          shareRef={args.shareRef}
-          shareTriggerRef={args.shareTriggerRef}
-          dropdownPosition={args.dropdownPosition}
           grid={grid}
           puzzleShareUrl={puzzleShareUrl}
           ensureChallengeShareUrl={ensureChallengeShareUrl}
@@ -287,8 +259,6 @@ export function CompletionOverlayActions(args: {
           onCopyProgress={onCopyProgress}
           onShareChallenge={onShareChallenge}
           onCopyChallenge={onCopyChallenge}
-          shareProgressText={args.shareProgressText}
-          shareChallengeText={args.shareChallengeText}
           completionData={completionData}
           isDaily={args.isDaily}
           hideTrigger
@@ -326,11 +296,6 @@ export function CompletionOverlayActions(args: {
       {optionsMenuPortal}
 
       <CompletionOverlayShareMenu
-        shareMenuOpen={args.shareMenuOpen}
-        setShareMenuOpen={args.setShareMenuOpen}
-        shareRef={args.shareRef}
-        shareTriggerRef={args.shareTriggerRef}
-        dropdownPosition={args.dropdownPosition}
         grid={grid}
         puzzleShareUrl={puzzleShareUrl}
         ensureChallengeShareUrl={ensureChallengeShareUrl}
@@ -343,8 +308,6 @@ export function CompletionOverlayActions(args: {
         onCopyProgress={onCopyProgress}
         onShareChallenge={onShareChallenge}
         onCopyChallenge={onCopyChallenge}
-        shareProgressText={args.shareProgressText}
-        shareChallengeText={args.shareChallengeText}
         completionData={completionData}
         isDaily={args.isDaily}
         hideTrigger

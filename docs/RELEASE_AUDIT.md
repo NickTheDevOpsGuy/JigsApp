@@ -9,13 +9,13 @@ Formal audit of `phuzzle` behavior, coverage, and release readiness as of 2026-0
 This audit covered:
 
 - documented product behavior in:
-  - `doc/FEATURES_IMPLEMENTED.md`
-  - `doc/CHANGES.md`
-  - `doc/SHARING.md`
-  - `doc/STREAK-FREEZE.md`
-  - `doc/BUG_REPORT.md`
-  - `doc/MOBILE_QA.md`
-  - `doc/STATS_UI_QA.md`
+  - `docs/FEATURES_IMPLEMENTED.md`
+  - `docs/CHANGES.md`
+  - `docs/SHARING.md`
+  - `docs/STREAK-FREEZE.md`
+  - `docs/BUG_REPORT.md`
+  - `docs/MOBILE_QA.md`
+  - `docs/STATS_UI_QA.md`
 - shipped routes in `src/app/App.tsx`
 - automated coverage in `e2e/` and Vitest
 - targeted cross-browser/browser-project verification
@@ -34,7 +34,7 @@ What is in good shape:
 
 What is still not fully closed:
 
-- true **real-device coverage** is still manual, per `doc/MOBILE_QA.md`
+- true **real-device coverage** is still manual, per `docs/MOBILE_QA.md`
 - some documented features still rely more on manual QA than direct end-to-end coverage
 
 ---
@@ -164,10 +164,10 @@ Impact:
 ### Implemented/documented but not exhaustively covered end-to-end
 
 - **Co-op share / play with friend**
-  - documented in `doc/SHARING.md`
+  - documented in `docs/SHARING.md`
   - I did not find a dedicated E2E spec for creating/joining a session
 - **Daily Share (Wordle-style text share)**
-  - documented in `doc/SHARING.md`
+  - documented in `docs/SHARING.md`
   - not obviously covered by a dedicated E2E
 - **Feedback end-to-end mail client launch**
   - modal path is now covered
@@ -175,7 +175,7 @@ Impact:
 
 ### Coverage that remains manual by design
 
-Per `doc/MOBILE_QA.md` and `doc/STATS_UI_QA.md`, the following still require real-device/manual verification:
+Per `docs/MOBILE_QA.md` and `docs/STATS_UI_QA.md`, the following still require real-device/manual verification:
 
 - iPhone SE Safari
 - iPhone 13/14/15-class Safari

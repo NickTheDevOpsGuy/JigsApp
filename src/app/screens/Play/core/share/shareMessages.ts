@@ -14,6 +14,13 @@ export type ShareMessageArgs = {
   usedHint?: boolean;
 };
 
+const CHALLENGE_TAUNTS = [
+  "I destroyed this puzzle. Can you even come close?",
+  "Puzzle demolished. Think you can top this?",
+  "Another one down. Beat this run if you can.",
+  "I crushed this one. Your turn to prove it.",
+] as const;
+
 export function getDifficultyLabel(pieceCount: number): string {
   if (pieceCount <= 9) return "Easy";
   if (pieceCount <= 16) return "Medium";
@@ -50,6 +57,17 @@ export function absShareUrl(pathOrUrl: string): string {
   if (/^https?:\/\//i.test(t)) return t;
   const path = t.startsWith("/") ? t : `/${t}`;
   return `${SHARE_ORIGIN}${path}`;
+}
+
+export function pickChallengeTaunt(randomValue = Math.random()): string {
+  const index = Math.max(
+    0,
+    Math.min(
+      CHALLENGE_TAUNTS.length - 1,
+      Math.floor(randomValue * CHALLENGE_TAUNTS.length),
+    ),
+  );
+  return CHALLENGE_TAUNTS[index];
 }
 
 /**
@@ -146,11 +164,7 @@ export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const challengePath = buildChallengePlayUrl(args.playUrl, args.elapsedSeconds, moves);
   const challengeUrl = absShareUrl(challengePath);
 
-  const lines: string[] = [
-    `I solved this puzzle in ${time} with ${moves} moves. Think you can beat me?`,
-    "",
-    "Phuzzle",
-  ];
+  const lines: string[] = [pickChallengeTaunt(), "", "Phuzzle"];
   if (args.puzzleName) lines.push(`"${args.puzzleName}"`);
   lines.push(
     "",

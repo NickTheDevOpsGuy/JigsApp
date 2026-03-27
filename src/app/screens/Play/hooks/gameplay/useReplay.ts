@@ -4,7 +4,6 @@
 import { useCallback, useRef, useState, useEffect } from "react";
 import type { PuzzleManager } from "@/puzzle/manager/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/core/types";
-import type { SavedPiece } from "@/puzzle/storage/puzzleStorage";
 import { piecesToSaved } from "@/puzzle/manager/undoManager";
 
 const MAX_SNAPSHOTS = 400;
@@ -15,24 +14,10 @@ function getIntervalMs(speed: number): number {
   return Math.max(8, Math.floor(TICK_MS / speed));
 }
 
-function buildBlankReplaySnapshot(first: ReplaySnapshot): ReplaySnapshot {
-  return {
-    elapsedSeconds: 0,
-    moveCount: 0,
-    savedPieces: first.savedPieces.map((piece) => ({
-      ...piece,
-      isPlaced: false,
-      locked: false,
-      inTray: true,
-      groupId: piece.id,
-    })),
-  };
-}
-
 export type ReplaySnapshot = {
   elapsedSeconds: number;
   moveCount: number;
-  savedPieces: SavedPiece[];
+  savedPieces: ReturnType<typeof piecesToSaved>;
 };
 
 export type ReplayStateRef = {
@@ -78,9 +63,7 @@ export function useReplay(
   }, [manager, replayStateRef]);
 
   const getReplayList = useCallback((): ReplaySnapshot[] => {
-    const list = snapshotsRef.current;
-    if (list.length === 0) return [];
-    return [buildBlankReplaySnapshot(list[0]), ...list];
+    return snapshotsRef.current;
   }, []);
 
   const stopReplay = useCallback(() => {

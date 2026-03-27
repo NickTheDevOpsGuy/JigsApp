@@ -116,6 +116,33 @@ The app has a **skip link** (“Skip to main content”) that is hidden until fo
 
 ---
 
+## Latest local audit
+
+Latest local desktop Lighthouse collect run on 2026-03-26 using Playwright Chromium:
+
+- Run 1: Performance `100`, Accessibility `100`, Best Practices `100`, SEO `100`
+- Run 2: Performance `100`, Accessibility `100`, Best Practices `100`, SEO `100`
+
+Representative timings:
+
+- FCP: `0.7s`
+- LCP: `0.7s`
+- TBT: `0ms`
+- CLS: `0`
+
+Largest remaining opportunities from the report:
+
+- Reduce unused JavaScript: about `180-200ms`
+- Eliminate render-blocking resources: about `35-90ms`
+- Reduce unused CSS: about `40ms`
+
+Current takeaway:
+
+- The app is already comfortably fast on the measured desktop baseline.
+- The biggest remaining performance lever is bundle trimming in the Play setup chunk, not interaction stutter.
+
+---
+
 ## Image budget
 
 Use these as the project guardrails when adding new assets:

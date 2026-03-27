@@ -147,7 +147,7 @@ describe("useReplay", () => {
       result.current.goToEnd();
     });
 
-    expect(result.current.replayIndex).toBe(2);
+    expect(result.current.replayIndex).toBe(1);
     expect(result.current.isReplayPaused).toBe(true);
 
     act(() => {
@@ -157,5 +157,43 @@ describe("useReplay", () => {
     expect(result.current.replayIndex).toBe(0);
     expect(result.current.isReplaying).toBe(true);
     expect(result.current.isReplayPaused).toBe(false);
+  });
+
+  it("starts replay from the first recorded snapshot instead of a synthetic blank frame", () => {
+    const state = makeState([makePiece("p1", { inTray: false, x: 24, y: 36 })]);
+    const setState = vi.fn();
+    const replayStateRef = {
+      current: {
+        getState: () => state,
+        elapsedSeconds: 12,
+        moveCount: 3,
+      } as ReplayStateRef,
+    };
+    const manager = {
+      restoreFromSaved: vi.fn(),
+      getState: () => state,
+    } as unknown as PuzzleManager;
+
+    const { result } = renderHook(() =>
+      useReplay(manager, setState, replayStateRef, false),
+    );
+
+    act(() => {
+      result.current.recordSnapshot();
+      result.current.startReplay();
+    });
+
+    expect(result.current.replayIndex).toBe(0);
+    expect(result.current.replaySnapshots).toHaveLength(1);
+    expect(result.current.replayElapsedSeconds).toBe(12);
+    expect(result.current.replayMoveCount).toBe(3);
+    expect(manager.restoreFromSaved).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "p1",
+          inTray: false,
+        }),
+      ]),
+    );
   });
 });

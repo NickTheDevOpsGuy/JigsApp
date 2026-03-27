@@ -280,20 +280,6 @@ export function usePlayScreenBehavior(setup: any) {
   });
 
   useEffect(() => {
-    if (!state?.isComplete || scene.completionDismissed || !state) return;
-    const id = requestAnimationFrame(() => {
-      const canvas = canvasRef.current;
-      if (!canvas || canvas.width <= 0 || canvas.height <= 0) return;
-      try {
-        scene.setCompletionImageUrl(canvas.toDataURL("image/png"));
-      } catch {
-        // no-op fallback
-      }
-    });
-    return () => cancelAnimationFrame(id);
-  }, [state?.isComplete, scene.completionDismissed, state, canvasRef, scene]);
-
-  useEffect(() => {
     return () => {
       if (scene.stateRef.current && !scene.stateRef.current.isComplete) {
         posthog.capture("exit_before_completion");

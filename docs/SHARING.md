@@ -7,9 +7,12 @@ Sharing in Phuzzle: **completion share** (your result), **Daily Share** (Wordle-
 ## 1. Completion share (no Supabase)
 
 - Share your finished puzzle: image, time, moves, link to the same puzzle.
+- **All completion share entry points are image-first now.** The main win-screen actions (**Share Result** and **Challenge Friend**) open the same share popup used by the dedicated Share button, so the default path is always the puzzle-image card instead of a text-only share.
 - **Share Result** — same preview-style text block as challenge (Phuzzle → Puzzle → Difficulty / Time / Moves → URL) **without** “Think you can beat me?”; share card matches; link is the same puzzle (no `ct`/`cm` on the result URL).
 - **Beat My Puzzle** — same stats block + **“Think you can beat me?”**; link = same puzzle/difficulty (`grid`, `puzzle`, `session`, or `daily` from `ensureChallengeShareUrl`) plus `ct` & `cm` for the challenge.
 - Share card PNG: challenge (with CTA) or result (stats only, no taunt). Download supported.
+- If the platform cannot share image files, the popup still offers copy/share text fallback so the user is never blocked.
+- Completion image capture uses the async canvas blob/object URL path instead of synchronous `toDataURL()` so the win transition stays smoother on mobile hardware.
 - **Key files:** `useShareResults.ts`, `useDownloadImage.ts`, `useShareCardImage.ts`, `CompletionOverlay.tsx`, `shareMessages.ts`.
 
 Triggered from the win overlay after completing a puzzle. Works without any backend.

@@ -58,16 +58,10 @@ export function buildCompletionProps(args: {
     handleNativeShare: () => Promise<void> | void;
     handleCopyChallenge: () => void;
     handleNativeChallengeShare: (challengeUrl?: string) => Promise<void> | void;
-    getProgressShareTextWithUrl: () => string;
-    getChallengeShareTextWithUrl: (challengeUrl?: string) => string;
   };
-  onDownloadImage: () => Promise<void> | void;
   onClose: () => void;
   usedHint: boolean;
   isDaily: boolean;
-  precisionModeEnabled: boolean;
-  precisionSnaps: number[];
-  adaptivePersonalityEnabled: boolean;
   canReplay: boolean;
   onReplayClick: () => void;
   onNextPuzzle: () => void;
@@ -96,12 +90,8 @@ export function buildCompletionProps(args: {
     ensureChallengeShareUrl,
     puzzleName,
     share,
-    onDownloadImage,
     onClose,
     usedHint,
-    precisionModeEnabled,
-    precisionSnaps,
-    adaptivePersonalityEnabled,
     canReplay,
     onReplayClick,
     onNextPuzzle,
@@ -135,13 +125,9 @@ export function buildCompletionProps(args: {
     ensureChallengeShareUrl,
     puzzleName,
     share,
-    onDownloadImage,
     onClose,
     usedHint,
     isDaily: args.isDaily,
-    precisionModeEnabled,
-    precisionSnaps,
-    adaptivePersonalityEnabled,
     canReplay,
     onReplayClick,
     onNextPuzzle,

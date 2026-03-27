@@ -56,13 +56,13 @@
   max-height: min(190px, 26vh);
 }
 
-/* Replay Solve cutout: nudge board column up so header + puzzle read higher */
+/* Replay Solve cutout: reserve space above the board for the floating replay header. */
 .boardLayoutShell[data-replay-active="true"] .playBody {
-  padding-top: 6px;
+  padding-top: 88px;
 }
 
 .boardLayoutShell[data-replay-active="true"] .playBody .main {
-  padding-top: 4px;
+  padding-top: 0;
 }
 
 @media (max-width: 600px) {
@@ -90,7 +90,7 @@
   }
 
   .boardLayoutShell[data-replay-active="true"] .playBody .main {
-    padding-top: 6px;
+    padding-top: 0;
   }
 }
 

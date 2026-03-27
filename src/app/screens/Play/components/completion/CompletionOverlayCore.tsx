@@ -1,7 +1,7 @@
 /**
  * CompletionOverlay – phased celebration win screen: Phase 1 image + pulse/ripple,
  * Phase 2 stats bar slide down, Phase 3 achievement text. One primary Next Puzzle;
- * secondary actions in More Options and Share Results dropdowns. No confetti, no X close.
+ * secondary actions in the Options menu and share modal. No confetti, no X close.
  */
 import { useEffect, useMemo, useState } from "react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
@@ -9,7 +9,6 @@ import { AppModal } from "@/components/AppModal";
 import { useCompletionOverlayData } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { CompletionOverlayActions } from "@/screens/Play/components/completion/CompletionOverlayActions";
 import { CompletionOverlayStats } from "@/screens/Play/components/completion/CompletionOverlayStats";
-import { useCompletionOverlayMenus } from "@/screens/Play/components/completion/useCompletionOverlayMenus";
 import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
 import type { CompletionOverlayProps } from "@/screens/Play/components/completion/completionOverlayTypes";
 
@@ -20,7 +19,6 @@ export function CompletionOverlay({
   elapsedSeconds,
   grid,
   imageUrl,
-  pieces: _pieces,
   moveCount = 0,
   piecesPerMin = 0,
   rotationCount = 0,
@@ -38,14 +36,7 @@ export function CompletionOverlay({
   onShareChallenge,
   onCopyProgress,
   onCopyChallenge,
-  shareProgressText,
-  shareChallengeText,
-  onDownloadImage: _onDownloadImage,
   onClose,
-  precisionModeEnabled: _precisionModeEnabled,
-  avgPrecisionPx: _avgPrecisionPx,
-  precisionBonusPoints: _precisionBonusPoints,
-  uiTone: _uiTone,
   puzzleShareUrl = "/",
   ensureChallengeShareUrl,
   puzzleName,
@@ -85,9 +76,6 @@ export function CompletionOverlay({
       ? (stats) => onCompletionRecorded({ dailyStreak: stats.dailyStreak })
       : undefined,
   });
-
-  const { shareMenuOpen, setShareMenuOpen, shareRef, shareTriggerRef, dropdownPosition } =
-    useCompletionOverlayMenus();
 
   useEffect(() => {
     setImageError(false);
@@ -249,11 +237,6 @@ export function CompletionOverlay({
         </div>
 
         <CompletionOverlayActions
-          shareMenuOpen={shareMenuOpen}
-          setShareMenuOpen={setShareMenuOpen}
-          shareRef={shareRef}
-          shareTriggerRef={shareTriggerRef}
-          dropdownPosition={dropdownPosition}
           grid={grid}
           puzzleShareUrl={puzzleShareUrl}
           ensureChallengeShareUrl={ensureChallengeShareUrl}
@@ -266,14 +249,11 @@ export function CompletionOverlay({
           onCopyProgress={onCopyProgress}
           onShareChallenge={onShareChallenge}
           onCopyChallenge={onCopyChallenge}
-          shareProgressText={shareProgressText}
-          shareChallengeText={shareChallengeText}
           completionData={completionData}
           canReplay={canReplay}
           onReplayClick={onReplayClick}
           onNextPuzzle={onNextPuzzle}
           nextPuzzleLabel={nextPuzzleLabel}
-          onClose={onClose}
           isDaily={isDaily}
           focusReturnRef={focusReturnRef}
         />
@@ -284,9 +264,9 @@ export function CompletionOverlay({
 
 function AchievementCycler({ achievements }: { achievements: string[] }) {
   const [index, setIndex] = useState(0);
-  // Cap to 2 messages max and cycle slowly so each is readable
+  // Cap to 2 messages max and keep each message on screen long enough to read.
   const capped = achievements.slice(0, 2);
-  const ACHIEVEMENT_CYCLE_MS = 6000;
+  const ACHIEVEMENT_CYCLE_MS = 20000;
 
   useEffect(() => {
     if (capped.length <= 1) return;

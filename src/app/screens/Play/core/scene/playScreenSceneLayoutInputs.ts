@@ -64,7 +64,6 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     handleUndo,
     handleRedo,
     handleSharePuzzle: _handleSharePuzzle,
-    handleDownloadImage,
     handleNewGame,
     puzzleShareUrl,
     ensureChallengeShareUrl,
@@ -136,10 +135,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       handleNativeShare: share.handleNativeShare,
       handleCopyChallenge: share.handleCopyChallenge,
       handleNativeChallengeShare: share.handleNativeChallengeShare,
-      getProgressShareTextWithUrl: share.getProgressShareTextWithUrl,
-      getChallengeShareTextWithUrl: share.getChallengeShareTextWithUrl,
     },
-    onDownloadImage: handleDownloadImage,
     onClose: () => {
       scene.setCompletionDismissed(true);
       scene.setShowWinOverlay?.(false);
@@ -148,9 +144,6 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     },
     usedHint: scene.usedHintRef.current,
     isDaily: completionIsDaily,
-    precisionModeEnabled: ui.precisionModeEnabled,
-    precisionSnaps: scene.precisionSnapsRef.current,
-    adaptivePersonalityEnabled: ui.adaptivePersonalityEnabled,
     canReplay: behavior.replay.canReplay,
     onReplayClick: () => {
       behavior.replay.startReplay();
@@ -201,7 +194,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     onClose: () => {
       behavior.replay.stopReplay();
       scene.setReplayBarOpen(false);
-      scene.setCompletionDismissed(false);
+      scene.setCompletionDismissed(true);
     },
   });
 

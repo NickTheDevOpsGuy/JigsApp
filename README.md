@@ -15,16 +15,18 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the catalog or pa
 
 ## Table of Contents
 
-- [Preview](#preview)
-- [Features](#features)
-- [Documentation](#documentation)
-- [Roadmap](#roadmap)
-- [Accessibility](#accessibility)
-- [Tech](#tech)
-- [Get started](#get-started)
-- [Contributing](#contributing)
-- [Team](#team)
-- [License](#license)
+- [Phuzzle](#phuzzle)
+  - [Table of Contents](#table-of-contents)
+  - [Preview](#preview)
+  - [Features](#features)
+  - [Documentation](#documentation)
+  - [Roadmap](#roadmap)
+  - [Accessibility](#accessibility)
+  - [Tech](#tech)
+  - [Get started](#get-started)
+  - [Contributing](#contributing)
+  - [Team](#team)
+  - [License](#license)
 
 ---
 
@@ -44,28 +46,28 @@ A cozy jigsaw puzzle game built with React. Pick a puzzle from the catalog or pa
 - **Social:** Stats, profile, leaderboards (Today, Week, All-time, Efficiency). Share result, share card, Beat My Puzzle challenge links, Daily Share (Wordle-style for daily only), replay viewer. Co-op play with shareable links. Home also surfaces a resume card when you have saved progress and refreshes automatically when daily or save data changes.
 - **Quality:** Bug report with optional screenshots. Mobile layouts: touch drag on the board (pieces follow your finger; page scroll is disabled over the board so drag works), tappable tray and carousel buttons (48px hit areas). PWA install.
 
-In-app **What's New** (changelog) uses a single bullet per item; source: `src/app/data/content/changelog.ts`.  
-Details: [doc/CHANGES.md](doc/CHANGES.md).
+In-app **What's New** (changelog) uses a single bullet per item; source: `src/app/data/content/changelog.ts`.
+Details: [docs/CHANGES.md](docs/CHANGES.md).
 
 ---
 
 ## Documentation
 
-All project docs live in **[doc/](doc/)**. Full index: [doc/README.md](doc/README.md).
+All project docs live in **[docs/](docs/)**. Full index: [docs/README.md](docs/README.md).
 
-| Doc                                                        | Description                                                |
-| ---------------------------------------------------------- | ---------------------------------------------------------- |
-| [doc/CHANGES.md](doc/CHANGES.md)                           | Feature list and recent changes                            |
-| [doc/FEATURES_IMPLEMENTED.md](doc/FEATURES_IMPLEMENTED.md) | Implemented features and where they live in code           |
-| [doc/FUTURE.md](doc/FUTURE.md)                             | Ideas and possible future features                         |
-| [doc/SHARING.md](doc/SHARING.md)                           | Completion share, Daily Share (Wordle-style), co-op share  |
-| [doc/STREAK-FREEZE.md](doc/STREAK-FREEZE.md)               | Streak freeze (streak shield): earn it, when it applies    |
-| [doc/BUG_REPORT.md](doc/BUG_REPORT.md)                     | In-app bug report: where it is, what it does               |
-| [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md)             | Supabase: leaderboards, stats, co-op, env vars, migrations |
-| [doc/LIGHTHOUSE.md](doc/LIGHTHOUSE.md)                     | Lighthouse CI, reports, "GitHub token not set" warning     |
-| [doc/MOBILE_QA.md](doc/MOBILE_QA.md)                       | Mobile release checklist and regression commands           |
-| [doc/STATS_UI_QA.md](doc/STATS_UI_QA.md)                   | Stats modal QA: Profile, Board, Badges                     |
-| [doc/SESSION_SUMMARY.md](doc/SESSION_SUMMARY.md)           | Session notes (layout, piece drawer, leaderboards, etc.)   |
+| Doc                                                          | Description                                                |
+| ------------------------------------------------------------ | ---------------------------------------------------------- |
+| [docs/CHANGES.md](docs/CHANGES.md)                           | Feature list and recent changes                            |
+| [docs/FEATURES_IMPLEMENTED.md](docs/FEATURES_IMPLEMENTED.md) | Implemented features and where they live in code           |
+| [docs/FUTURE.md](docs/FUTURE.md)                             | Ideas and possible future features                         |
+| [docs/SHARING.md](docs/SHARING.md)                           | Completion share, Daily Share (Wordle-style), co-op share  |
+| [docs/STREAK-FREEZE.md](docs/STREAK-FREEZE.md)               | Streak freeze (streak shield): earn it, when it applies    |
+| [docs/BUG_REPORT.md](docs/BUG_REPORT.md)                     | In-app bug report: where it is, what it does               |
+| [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md)             | Supabase: leaderboards, stats, co-op, env vars, migrations |
+| [docs/LIGHTHOUSE.md](docs/LIGHTHOUSE.md)                     | Lighthouse CI, reports, "GitHub token not set" warning     |
+| [docs/MOBILE_QA.md](docs/MOBILE_QA.md)                       | Mobile release checklist and regression commands           |
+| [docs/STATS_UI_QA.md](docs/STATS_UI_QA.md)                   | Stats modal QA: Profile, Board, Badges                     |
+| [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md)           | Session notes (layout, piece drawer, leaderboards, etc.)   |
 
 ---
 
@@ -84,9 +86,9 @@ All project docs live in **[doc/](doc/)**. Full index: [doc/README.md](doc/READM
 
 ## Tech
 
-**Frontend:** React, TypeScript, HTML Canvas  
-**Build:** Vite, vite-plugin-pwa  
-**Test:** Vitest, Playwright  
+**Frontend:** React, TypeScript, HTML Canvas
+**Build:** Vite, vite-plugin-pwa
+**Test:** Vitest, Playwright
 **Deploy:** GitHub Actions, Vercel. Optional Supabase for leaderboards, stats, co-op, comments.
 
 ---
@@ -138,7 +140,7 @@ Built by:
 | Vinay Gajjar   | [vinaygajjar](https://www.linkedin.com/in/vinaygajjar)           | [@v-gajjar](https://github.com/v-gajjar)                 |
 | Hannah Olbrich | [hannaholbrich](https://www.linkedin.com/in/hannaholbrich)       | [@hannahro15](https://github.com/hannahro15)             |
 
-With help from the wider community ❤️  
+With help from the wider community ❤️
 See all contributors here → **[CONTRIBUTORS.md](./CONTRIBUTORS.md)**
 
 Different strengths, shared ownership, great teamwork.

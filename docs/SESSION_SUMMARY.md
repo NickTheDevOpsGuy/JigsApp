@@ -56,7 +56,7 @@ Summary of work on layout, piece drawer, input, leaderboards, co-op, packs, onbo
 
 ## Share & co-op
 
-- Share via Menu → Share → “Play with friend?”. Puzzle sessions + Realtime. Verification steps in `doc/SUPABASE_SETUP.md`.
+- Share via Menu → Share → “Play with friend?”. Puzzle sessions + Realtime. Verification steps in `docs/SUPABASE_SETUP.md`.
 
 ---
 
@@ -86,7 +86,7 @@ Summary of work on layout, piece drawer, input, leaderboards, co-op, packs, onbo
 
 ## PWA & docs
 
-- Installable; manifest; service worker (autoUpdate). Doc index in `doc/README.md`; Supabase and session notes. Realtime in migrations.
+- Installable; manifest; service worker (autoUpdate). Doc index in `docs/README.md`; Supabase and session notes. Realtime in migrations.
 
 ---
 
@@ -98,4 +98,4 @@ Summary of work on layout, piece drawer, input, leaderboards, co-op, packs, onbo
 
 ## Files (representative)
 
-Play screen, PieceTray, pointer handlers, image picker, PuzzleManager, CompletionOverlay, HeaderMenu, modals, packs, sessions, onboarding, Stats, time modes, doc/ and README.
+Play screen, PieceTray, pointer handlers, image picker, PuzzleManager, CompletionOverlay, HeaderMenu, modals, packs, sessions, onboarding, Stats, time modes, docs/ and README.

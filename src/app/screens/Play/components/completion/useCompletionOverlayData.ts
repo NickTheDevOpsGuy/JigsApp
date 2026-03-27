@@ -1,6 +1,8 @@
 /**
- * Completion overlay: percentile, recordCompletion, daily/best-time effects, share state.
- * No logic change – extracted from CompletionOverlay.
+ * Completion overlay state:
+ * - records completion stats and achievements
+ * - derives leaderboard summaries
+ * - powers the image-first share modal
  */
 import { useEffect, useState, useCallback, useRef } from "react";
 import { setBestTime } from "@/screens/Play/core/time/timeMode";
@@ -21,7 +23,6 @@ import { recordCompletion } from "@/services/player/statsService";
 import type { PlayerStatsData } from "@/services/player/statsService";
 import { checkAndUnlockAchievements } from "@/services/player/achievementsService";
 import { getPercentileRank } from "@/services/leaderboard/leaderboardService";
-import { useShareCardImage } from "@/screens/Play/hooks/share/useShareCardImage";
 
 type VisualModifier = "none" | "fog" | "night" | "sepia";
 type PieceCutType = "classic" | "irregular" | "hard";
@@ -70,6 +71,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     onCompletionRecorded,
   } = params;
 
+  // Keep share links absolute when the overlay is opened from routes like /daily.
   const PLAY_BASE = "https://phuzzle.vercel.app";
 
   const [sharePopupOpen, setSharePopupOpen] = useState(false);
@@ -88,7 +90,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
   const [completionRecorded, setCompletionRecorded] = useState(false);
   const copyResetTimeoutRef = useRef<number | null>(null);
 
-  const { shareCard, isGenerating } = useShareCardImage();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (isNewBest && grid) {
@@ -218,9 +220,35 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
             : null
       : null;
 
-  const handleShareCard = useCallback(async () => {
-    await shareCard({
+  const runShareCard = useCallback(
+    async (mode: "result" | "challenge") => {
+      if (!imageUrl || isGenerating) return;
+      setIsGenerating(true);
+      try {
+        const { generateAndShareCard } =
+          await import("@/screens/Play/hooks/share/useShareCardImageCore");
+        await generateAndShareCard({
+          imageUrl,
+          elapsedSeconds,
+          moveCount,
+          rotationCount,
+          piecesPerMin,
+          maxGroupSize,
+          accuracyPercent,
+          percentile,
+          useSeasonalFrame,
+          puzzleShareUrl,
+          pieceCount: grid ? grid.rows * grid.cols : 0,
+          puzzleName,
+          mode,
+        });
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [
       imageUrl,
+      isGenerating,
       elapsedSeconds,
       moveCount,
       rotationCount,
@@ -230,89 +258,18 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       percentile,
       useSeasonalFrame,
       puzzleShareUrl,
-      pieceCount: grid ? grid.rows * grid.cols : 0,
+      grid,
       puzzleName,
-      mode: "result",
-    });
-  }, [
-    shareCard,
-    imageUrl,
-    elapsedSeconds,
-    moveCount,
-    rotationCount,
-    piecesPerMin,
-    maxGroupSize,
-    accuracyPercent,
-    percentile,
-    useSeasonalFrame,
-    puzzleShareUrl,
-    grid,
-    puzzleName,
-  ]);
+    ],
+  );
 
   const handleShareResultCard = useCallback(async () => {
-    await shareCard({
-      imageUrl,
-      elapsedSeconds,
-      moveCount,
-      rotationCount,
-      piecesPerMin,
-      maxGroupSize,
-      accuracyPercent,
-      percentile,
-      useSeasonalFrame,
-      puzzleShareUrl,
-      pieceCount: grid ? grid.rows * grid.cols : 0,
-      puzzleName,
-      mode: "result",
-    });
-  }, [
-    shareCard,
-    imageUrl,
-    elapsedSeconds,
-    moveCount,
-    rotationCount,
-    piecesPerMin,
-    maxGroupSize,
-    accuracyPercent,
-    percentile,
-    useSeasonalFrame,
-    puzzleShareUrl,
-    grid,
-    puzzleName,
-  ]);
+    await runShareCard("result");
+  }, [runShareCard]);
 
   const handleShareChallengeCard = useCallback(async () => {
-    await shareCard({
-      imageUrl,
-      elapsedSeconds,
-      moveCount,
-      rotationCount,
-      piecesPerMin,
-      maxGroupSize,
-      accuracyPercent,
-      percentile,
-      useSeasonalFrame,
-      puzzleShareUrl,
-      pieceCount: grid ? grid.rows * grid.cols : 0,
-      puzzleName,
-      mode: "challenge",
-    });
-  }, [
-    shareCard,
-    imageUrl,
-    elapsedSeconds,
-    moveCount,
-    rotationCount,
-    piecesPerMin,
-    maxGroupSize,
-    accuracyPercent,
-    percentile,
-    useSeasonalFrame,
-    puzzleShareUrl,
-    grid,
-    puzzleName,
-  ]);
+    await runShareCard("challenge");
+  }, [runShareCard]);
 
   const getDailyShareText = useCallback((): string => {
     if (!grid || !isDaily) return "";
@@ -400,9 +357,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     rankPosition,
     percentileBadgeTier,
     newlyUnlocked,
-    shareCard,
     isGenerating,
-    handleShareCard,
     handleShareResultCard,
     handleShareChallengeCard,
     getDailyShareText,
