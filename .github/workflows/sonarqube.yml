@@ -62,7 +62,7 @@ jobs:
             -Dsonar.test.inclusions=src/tests/**/*.test.ts,src/tests/**/*.spec.ts,src/tests/**/*.test.tsx,src/tests/**/*.spec.tsx
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/playwright-report/**,**/test-results/**,**/*.config.*,public/**,supabase/**
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.typescript.tsconfigPaths=config/typescript/tsconfig.app.json
+            -Dsonar.typescript.tsconfigPaths=tsconfig.app.json
             -Dsonar.sourceEncoding=UTF-8
 
       - name: 🚦 SonarQube Quality Gate check

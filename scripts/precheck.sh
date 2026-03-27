@@ -94,7 +94,7 @@ echo "✅ [SUCCESS]: Docs are clean."
 
 # 5. TYPESCRIPT (Static Verification)
 echo "🛠️  [STEP 5]: Verifying Type Integrity (tsc)..."
-if ! npx --no-install tsc -p config/typescript/tsconfig.app.json --noEmit --pretty false; then
+if ! npx --no-install tsc -p tsconfig.app.json --noEmit --pretty false; then
   echo "🛑 [SYSTEM FAULT]: TypeScript found type errors. Go fix those red squiggles!"
   exit 1
 fi
@@ -103,7 +103,7 @@ echo "✅ [SUCCESS]: Types are verified."
 # 6. ACCESSIBILITY SMOKE TEST (The Core Requirement)
 if docker ps | grep -q "supabase_db"; then
   echo "♿ [STEP 6]: Running WCAG 2.2 Accessibility Audit..."
-  if ! npx playwright test -c config/playwright/playwright.config.ts accessibility.spec.ts; then
+  if ! npx playwright test -c playwright.config.ts accessibility.spec.ts; then
     echo "🛑 [A11Y FAULT]: Accessibility is a core requirement, not a feature. Fix the violations above!"
     exit 1
   fi
