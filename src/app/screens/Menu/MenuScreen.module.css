@@ -47,11 +47,11 @@
 @media (min-width: 500px) {
   .canvas {
     align-items: flex-start;
-    padding: 20px 0 32px;
+    padding: 28px 0 40px;
   }
 
   .page {
-    min-height: 0; /* natural height, not viewport */
+    min-height: 0;
     height: auto;
     border-radius: 40px;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -59,10 +59,16 @@
       0 0 0 1px rgba(255, 255, 255, 0.04) inset,
       0 32px 80px rgba(0, 0, 0, 0.7),
       0 8px 24px rgba(0, 0, 0, 0.4);
-    /* Ensure content fills the phone shell naturally */
     margin-top: 0;
     padding-top: 18px;
     padding-bottom: 32px;
+  }
+}
+
+/* On wider desktops give the shell a bit more room */
+@media (min-width: 768px) {
+  .page {
+    max-width: 480px;
   }
 }
 

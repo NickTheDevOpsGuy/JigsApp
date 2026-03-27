@@ -135,6 +135,8 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       handleNativeShare: share.handleNativeShare,
       handleCopyChallenge: share.handleCopyChallenge,
       handleNativeChallengeShare: share.handleNativeChallengeShare,
+      getProgressShareTextWithUrl: share.getProgressShareTextWithUrl,
+      getChallengeShareTextWithUrl: share.getChallengeShareTextWithUrl,
     },
     onClose: () => {
       scene.setCompletionDismissed(true);
@@ -194,7 +196,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     onClose: () => {
       behavior.replay.stopReplay();
       scene.setReplayBarOpen(false);
-      scene.setCompletionDismissed(true);
+      scene.setCompletionDismissed(false);
     },
   });
 
@@ -202,7 +204,11 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     baseReplayProps != null
       ? {
           ...baseReplayProps,
-          completionImageUrl: scene.completionImageUrl ?? undefined,
+          completionImageUrl:
+            scene.completionImageUrl ??
+            behavior.imgRef.current?.src ??
+            getCompletionImageFallback() ??
+            undefined,
           moveCount: scene.moveCountRef.current,
           onBackToResults: () => {
             behavior.replay.stopReplay();

@@ -2,14 +2,13 @@
  * Replay Solve modal – focused replay overlay with one board stage,
  * one attached control dock, and a single clear dismiss action.
  */
-import React, { useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { Trophy, X } from "lucide-react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import { ReplaySolveModalControls } from "./ReplaySolveModalControls";
 import { AppModal } from "@/components/AppModal";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   invokeMaybeAsync,
   invokeMaybeAsyncIndex,
@@ -71,13 +70,7 @@ export function ReplaySolveModal({
   moveCount,
   packRemainingLabel,
 }: ReplaySolveModalProps) {
-  const isMobilePortraitReplay = useMediaQuery("(max-width: 600px)");
   const useCutout = Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
-  /* Same rhythm as desktop; slightly tighter on narrow viewports only */
-  const dockGapBelowBoard = isMobilePortraitReplay ? 12 : 16;
-  const headerGapAboveBoard = 8;
-  const headerWrapRef = useRef<HTMLDivElement>(null);
-  const [headerBlockHeight, setHeaderBlockHeight] = useState(110);
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;
   const effectiveSpeed = speedExplicitlyChosen ? speed : 1;
@@ -105,17 +98,6 @@ export function ReplaySolveModal({
       window.removeEventListener("resize", onLayout);
     };
   }, [useCutout]);
-
-  useLayoutEffect(() => {
-    if (!useCutout) return;
-    const el = headerWrapRef.current;
-    if (!el) return;
-    const measure = () => setHeaderBlockHeight(Math.max(72, el.offsetHeight || 110));
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [useCutout, moveCount, totalSeconds, packRemainingLabel, isMobilePortraitReplay]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -229,8 +211,6 @@ export function ReplaySolveModal({
     const viewLeft = vv?.offsetLeft ?? 0;
     const viewWidth =
       vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : width + 24);
-    const viewHeight =
-      vv?.height ?? (typeof window !== "undefined" ? window.innerHeight : height + 200);
     const edgePad = 12;
     const maxShell = Math.max(0, viewWidth - 2 * edgePad);
     const shellWidth = Math.min(maxShell, width + dockInsetPx * 2);
@@ -238,10 +218,6 @@ export function ReplaySolveModal({
       viewLeft + viewWidth - shellWidth - edgePad,
       Math.max(viewLeft + edgePad, left - dockInsetPx),
     );
-    const viewTop = vv?.offsetTop ?? 0;
-    const minHeaderAnchorTop =
-      viewTop + edgePad + headerBlockHeight + headerGapAboveBoard;
-    const headerAnchorTop = Math.max(top, minHeaderAnchorTop);
     return (
       <div
         className={styles.backdropCutout}
@@ -309,13 +285,12 @@ export function ReplaySolveModal({
         />
         {/* Title + stats sit above the board (not on the canvas) with a small gap */}
         <div
-          ref={headerWrapRef}
           className={styles.cutoutBoardHeaderWrap}
           style={{
-            top: headerAnchorTop,
+            top,
             left,
             width,
-            transform: `translateY(calc(-100% - ${headerGapAboveBoard}px))`,
+            transform: "translateY(calc(-100% - 12px))",
           }}
           onPointerDown={stopProp}
         >
@@ -328,15 +303,11 @@ export function ReplaySolveModal({
         />
         <div
           className={styles.controlDock}
-          style={
-            {
-              left: shellLeft,
-              width: shellWidth,
-              top: bottom + dockGapBelowBoard,
-              "--replay-dock-top": `${bottom + dockGapBelowBoard}px`,
-              "--replay-vvh": `${viewHeight}px`,
-            } as React.CSSProperties
-          }
+          style={{
+            left: shellLeft,
+            width: shellWidth,
+            top: bottom + 16,
+          }}
           onPointerDown={stopProp}
         >
           <div className={`${styles.controlDockInner} ${styles.controlDockInnerCutout}`}>
@@ -348,16 +319,7 @@ export function ReplaySolveModal({
   }
 
   return (
-    <AppModal
-      isOpen
-      onClose={onClose}
-      surface="bare"
-      size="xl"
-      showCloseButton={false}
-      backdropClassName={styles.replayModalBackdrop}
-      dialogClassName={styles.replayModalDialog}
-      bodyClassName={styles.replayModalBody}
-    >
+    <AppModal isOpen onClose={onClose} surface="bare" size="xl" showCloseButton={false}>
       <div className={styles.modalSurface} onPointerDown={stopProp}>
         <div className={styles.modalStageStack}>
           <div className={styles.modalStageFrame}>

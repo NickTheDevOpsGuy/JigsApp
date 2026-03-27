@@ -1,25 +1,5 @@
 /* Unified replay overlay: one stage, one attached dock, one dismiss action. */
 
-/* Modal (non-cutout) path: one scroll container (.modalSurface), not backdrop + dialog + body + dock */
-.replayModalBackdrop {
-  overflow: hidden;
-}
-
-.replayModalDialog {
-  overflow: hidden !important;
-  display: flex;
-  flex-direction: column;
-}
-
-.replayModalBody {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden !important;
-  overscroll-behavior: contain;
-}
-
 .backdropCutout {
   position: fixed;
   inset: 0;
@@ -305,24 +285,6 @@
 .controlDockInnerCutout {
   padding-top: 18px;
   padding-bottom: 24px;
-  /* --replay-dock-top set on .controlDock (px). Short viewports: clip + scroll, don’t run under the home bar. */
-  /* --replay-vvh from visualViewport.height (inline); falls back to 100dvh if unset */
-  max-height: calc(
-    var(--replay-vvh, 100dvh) - var(--replay-dock-top, 0px) -
-      env(safe-area-inset-bottom, 0px) - 8px
-  );
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.controlDockInnerCutout::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
 }
 
 .modalSurface {
@@ -334,20 +296,6 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.modalSurface::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
 }
 
 .modalStageStack {
@@ -376,7 +324,7 @@
 
 .puzzleArea {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--color-bg-primary);
   position: relative;
@@ -470,116 +418,79 @@
 }
 
 @media (max-width: 600px) {
-  /* Mirror desktop chrome; ~90% padding/type scale */
   .boardHeader {
-    gap: 12px;
-    padding: 14px 16px;
-    border-radius: 13px;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
   }
 
   .boardHeaderMain {
-    gap: 8px;
+    gap: 6px;
   }
 
   .headerTitle {
-    font-size: 0.9rem;
-    line-height: 1.12;
+    font-size: 0.82rem;
+    line-height: 1.15;
   }
 
   .resultHeader {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4px 8px;
+    gap: 4px 10px;
   }
 
   .resultTime {
-    font-size: 0.76rem;
+    font-size: 0.74rem;
   }
 
   .resultMoves {
-    font-size: 0.68rem;
+    font-size: 0.7rem;
   }
 
   .boardCloseBtn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
   }
 
   .packRemainingLabel {
-    max-width: 140px;
-    font-size: 0.76rem;
+    max-width: 120px;
+    font-size: 0.72rem;
   }
 
+  /* Tighter gap above cutout so the board gets more vertical space */
+  .cutoutBoardHeaderWrap {
+    transform: translateY(calc(-100% - 6px)) !important;
+  }
+
+  /* dock is top-positioned from boardRect in cutout mode; no bottom override needed */
+
   .controlDockInner {
-    padding: 16px 14px max(18px, env(safe-area-inset-bottom, 0px));
+    padding: 12px 10px 14px;
     border-radius: 16px;
   }
 
   .controlDockInnerCutout {
-    padding-top: 14px;
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
-    border-radius: 16px 16px 18px 18px;
+    padding-top: 12px;
+    padding-bottom: 14px;
   }
 
   .modalSurface {
     max-width: calc(
       100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 12px
     );
-    gap: 18px;
+    gap: 12px;
   }
 
+  /* Non-cutout modal path: cap the puzzle area so controls stay visible */
   .modalStageStack {
-    gap: 18px;
+    gap: 12px;
   }
 
-  .modalStageFrame {
-    border-radius: 20px;
-  }
-
-  /* Same square stage as desktop; width drives size (modal is already narrow) */
   .puzzleArea {
-    aspect-ratio: 1 / 1;
-    width: 100%;
-    min-height: 0;
-  }
-
-  .puzzleImage {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-
-  .puzzlePlaceholder {
-    width: 100%;
-    height: 100%;
-  }
-
-  .seekRow {
-    padding: 0 0 14px;
-  }
-
-  .seekBarWrap {
-    gap: 6px 10px;
-  }
-
-  .seekBar {
-    height: 10px;
-  }
-
-  .seekHandle {
-    width: 14px;
-    height: 14px;
-    margin-left: -7px;
-  }
-
-  .seekTime {
-    font-size: 0.74rem;
-  }
-
-  .stageFrame {
-    border-radius: 20px;
+    aspect-ratio: 4 / 3;
+    height: auto;
+    max-height: min(45dvh, 300px);
   }
 }

@@ -1,7 +1,7 @@
 /**
  * CompletionOverlay – phased celebration win screen: Phase 1 image + pulse/ripple,
  * Phase 2 stats bar slide down, Phase 3 achievement text. One primary Next Puzzle;
- * secondary actions in the Options menu and share modal. No confetti, no X close.
+ * secondary actions in More Options and Share Results dropdowns. No confetti, no X close.
  */
 import { useEffect, useMemo, useState } from "react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
@@ -182,7 +182,6 @@ export function CompletionOverlay({
       tone="celebration"
       align="center"
       showCloseButton={false}
-      closeOnBackdropClick={false}
       backdropClassName={styles.completeWinBackdrop}
       dialogClassName={styles.completeWinDialog}
       bodyClassName={styles.completeWinModalBody}
@@ -263,22 +262,9 @@ export function CompletionOverlay({
 }
 
 function AchievementCycler({ achievements }: { achievements: string[] }) {
-  const [index, setIndex] = useState(0);
-  // Cap to 2 messages max and keep each message on screen long enough to read.
-  const capped = achievements.slice(0, 2);
-  const ACHIEVEMENT_CYCLE_MS = 20000;
-
-  useEffect(() => {
-    if (capped.length <= 1) return;
-
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % capped.length);
-    }, ACHIEVEMENT_CYCLE_MS);
-
-    return () => clearInterval(id);
-  }, [capped.length]);
-
-  const text = capped[index] ?? capped[0];
+  // Show the single best message — no cycling, no timer, always readable.
+  // Priority: first skill message (index 0) as it's the most specific to this solve.
+  const text = achievements[0];
 
   return (
     <p className={styles.completeAchievementPhased} role="status" aria-live="polite">

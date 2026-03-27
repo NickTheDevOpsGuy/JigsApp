@@ -20,6 +20,9 @@ export function PauseOverlay({ onResume }: PauseOverlayProps) {
       tabIndex={0}
       onClick={onResume}
       onKeyDown={handleKeyDown}
+      onPointerDown={(e) => e.stopPropagation()}
+      onPointerUp={(e) => e.stopPropagation()}
+      onPointerMove={(e) => e.stopPropagation()}
       aria-label="Resume game"
       title="Resume game"
     >

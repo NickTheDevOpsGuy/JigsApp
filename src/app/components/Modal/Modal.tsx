@@ -1,10 +1,19 @@
 //
 // src/app/components/Modal/Modal.tsx
-import React, { useEffect, useCallback, useId } from "react";
+import React, { useEffect, useCallback, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import styles from "./Modal.module.css";
 import { Button } from "@/components/Button/Button";
+
+const FOCUSABLE = [
+  "button:not([disabled])",
+  "[href]",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
 
 const BODY_SCROLL_LOCK_ATTR = "data-modal-lock-count";
 const BODY_SCROLL_Y_ATTR = "data-modal-scroll-y";
@@ -27,11 +36,37 @@ export function Modal({
   variant,
 }: ModalProps) {
   const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-  // Close on escape key
+  // Close on escape key + trap focus inside modal
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE),
+      ).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (!active || active === first || !dialogRef.current.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (!active || active === last || !dialogRef.current.contains(active)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     },
     [onClose],
   );
@@ -106,12 +141,14 @@ export function Modal({
       role="presentation"
     >
       <div
+        ref={dialogRef}
         className={styles.modal}
         data-variant={variant}
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
         aria-label={title ? undefined : "Dialog"}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleModalKeyDown}
       >

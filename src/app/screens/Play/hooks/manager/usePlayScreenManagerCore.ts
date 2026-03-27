@@ -72,7 +72,12 @@ export function usePlayScreenManager(
   const [state, setState] = useState<PuzzleState | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [snapCombo, setSnapCombo] = useState(0);
-  const announcerLine = useSnapComboAnnouncer(placementTimesRef, snapCombo, setSnapCombo);
+  const announcerLine = useSnapComboAnnouncer(
+    placementTimesRef,
+    snapCombo,
+    setSnapCombo,
+    state?.isComplete ?? false,
+  );
   const [awaitingResumeChoice, setAwaitingResumeChoice] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [puzzleKey, setPuzzleKey] = useState(0);

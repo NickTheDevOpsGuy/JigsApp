@@ -199,16 +199,18 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     }
   }, [state?.isComplete, setShowStreakToast, setShareToast]);
 
-  /** After completion, run brief animation (glow/pulse) then show win overlay. */
+  /** After completion, run brief animation (glow/pulse) then show win overlay.
+   * Guard: never re-show the win overlay while replay is active — restoring the
+   * final completed state at the end of replay would otherwise re-trigger this. */
   const COMPLETION_ANIMATION_MS = 600;
   useEffect(() => {
-    if (!state?.isComplete) {
+    if (!state?.isComplete || replayBarOpen) {
       setShowWinOverlay?.(false);
       return;
     }
     const t = setTimeout(() => setShowWinOverlay?.(true), COMPLETION_ANIMATION_MS);
     return () => clearTimeout(t);
-  }, [state?.isComplete, setShowWinOverlay]);
+  }, [state?.isComplete, replayBarOpen, setShowWinOverlay]);
 
   useEffect(() => {
     audioManager.setPaused(isPaused);
