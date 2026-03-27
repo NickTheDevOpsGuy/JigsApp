@@ -362,9 +362,9 @@
    * Cutout rect follows this box; canvas scales inside the same frame.
    */
   .boardLayoutShell[data-replay-active="true"] .boardWrapper {
-    width: min(100%, min(94vw, 44dvh));
-    max-width: min(100%, min(94vw, 44dvh));
-    max-height: min(100%, min(94vw, 44dvh));
+    width: min(100%, var(--play-replay-stage-size, 94vw));
+    max-width: min(100%, var(--play-replay-stage-size, 94vw));
+    max-height: min(100%, var(--play-replay-stage-size, 94vw));
     flex: 0 0 auto;
     margin-left: auto;
     margin-right: auto;
@@ -392,9 +392,9 @@
      * the larger of vw / dvh so the board stays usable and the cutout still fits the shell.
      */
     .boardLayoutShell[data-replay-active="true"] .boardWrapper {
-      width: min(100%, min(78vw, 72dvh));
-      max-width: min(100%, min(78vw, 72dvh));
-      max-height: min(100%, min(78vw, 72dvh));
+      width: min(100%, var(--play-replay-stage-size, min(78vw, 72dvh)));
+      max-width: min(100%, var(--play-replay-stage-size, min(78vw, 72dvh)));
+      max-height: min(100%, var(--play-replay-stage-size, min(78vw, 72dvh)));
     }
 
     .boardLayoutShell[data-replay-active="true"] .playBody {

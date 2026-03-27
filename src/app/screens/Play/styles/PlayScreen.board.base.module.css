@@ -57,15 +57,39 @@
 }
 
 /* Replay Solve cutout: reserve space above the board for the floating replay header. */
+.boardLayoutShell[data-replay-active="true"] {
+  /*
+   * Replay stage must leave room for the floating header and the control dock.
+   * Size from viewport height first so short mobile/desktop windows keep controls reachable.
+   */
+  --play-replay-stage-size: clamp(
+    220px,
+    calc(var(--app-vh-stable, 100dvh) - 336px),
+    var(--play-board-tray-width, min(100%, 760px))
+  );
+}
+
 .boardLayoutShell[data-replay-active="true"] .playBody {
   padding-top: 88px;
 }
 
 .boardLayoutShell[data-replay-active="true"] .playBody .main {
+  height: auto;
+  max-height: none;
   padding-top: 0;
 }
 
+.boardLayoutShell[data-replay-active="true"] .boardWrapper {
+  width: min(100%, var(--play-replay-stage-size));
+  max-width: min(100%, var(--play-replay-stage-size));
+  max-height: min(100%, var(--play-replay-stage-size));
+}
+
 @media (max-width: 600px) {
+  .boardLayoutShell[data-replay-active="true"] {
+    --play-replay-stage-size: clamp(180px, calc(100dvh - 352px), 94vw);
+  }
+
   .playBody .main {
     max-width: 100%;
     min-height: 0;
