@@ -12,6 +12,7 @@ import { usePlayScreenShareSession } from "@/screens/Play/hooks/share/usePlayScr
 import { useShareResults } from "@/screens/Play/hooks/share/useShareResults";
 import { usePlayScreenSharePuzzle } from "@/screens/Play/hooks/share/usePlayScreenSharePuzzle";
 import { useDownloadImage } from "@/screens/Play/hooks/share/useDownloadImage";
+import { usePlacementAssistViewport } from "@/screens/Play/hooks/viewport/usePlacementAssistViewport";
 import { usePlayScreenTrayPieces } from "@/screens/Play/hooks/gameplay/usePlayScreenTrayPieces";
 import { usePlayScreenImmersiveControls } from "@/screens/Play/hooks/gameplay/usePlayScreenImmersiveControls";
 import { getBestTime } from "@/screens/Play/core/time/timeMode";
@@ -88,6 +89,7 @@ export function usePlayScreenInteractions(ctx: any) {
     canvasRef,
     trayRef,
     selectedIdRef: ui.selectedIdRef,
+    hoverPreviewPieceIdRef: ui.hoverPreviewPieceIdRef,
     setSelectedPieceId: ui.setSelectedPieceId,
     bump: ui.bump,
     clearHighlight: behavior.clearHighlight,
@@ -103,6 +105,23 @@ export function usePlayScreenInteractions(ctx: any) {
     popMapRef,
   });
 
+  const getViewportBounds = useCallback(
+    () => scene.viewportBoundsRef.current?.() ?? null,
+    [scene.viewportBoundsRef],
+  );
+
+  usePlacementAssistViewport({
+    enabled: !ui.zenModeEnabled,
+    manager,
+    state: state ?? null,
+    boardRef,
+    viewportApi: scene.viewport,
+    getBounds: getViewportBounds,
+    isDraggingBoard,
+    isPaused: ui.isPaused,
+    replayBarOpen: scene.replayBarOpen,
+  });
+
   usePlayScreenAnimation({
     manager,
     setState,
@@ -112,6 +131,7 @@ export function usePlayScreenInteractions(ctx: any) {
     popMapRef,
     lockMapRef: behavior.lockMapRef,
     selectedIdRef: ui.selectedIdRef,
+    hoverPreviewPieceIdRef: ui.hoverPreviewPieceIdRef,
     dragPreviewPieceIdRef,
     snapParticlesRef: behavior.snapParticlesRef,
     debug: ui.debug,
@@ -131,13 +151,15 @@ export function usePlayScreenInteractions(ctx: any) {
     onUndoSnapBackComplete: () => {
       undoSnapBackRef.current = null;
     },
+    isPaused: ui.isPaused,
     dailyVisualModifier: activeDailySession
       ? getDailyVisualModifier()
       : (ui.dailyPreferredModifier ?? getDailyPreferredModifier()),
     replayBarOpen: scene.replayBarOpen,
+    isCoarsePointer: scene.isCoarsePointer,
   });
 
-  const { puzzleShareUrl, ensureChallengeShareUrl } = usePlayScreenShareSession({
+  const { puzzleShareUrl } = usePlayScreenShareSession({
     isComplete: state?.isComplete ?? false,
     isDailySession: activeDailySession,
     sessionId,
@@ -274,7 +296,6 @@ export function usePlayScreenInteractions(ctx: any) {
     handleTrayPieceClick,
     puzzleShareUrl,
     share,
-    ensureChallengeShareUrl,
     handleSharePuzzle,
     handleDownloadImage,
     trayPieces,

@@ -8,7 +8,7 @@ import type { Piece } from "@/puzzle/core/types";
 import type { PuzzleManagerEvents } from "@/puzzle/manager/PuzzleManager";
 import type { SnapParticle } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { soundManager } from "@/audio/core/sounds";
-import { getQuadrant } from "@/screens/Play/core/time/timeMode";
+import { getFullyCompletedQuadrants } from "@/puzzle/manager/state/quadrantCompletion";
 
 const PLACEMENT_STREAK_MS = 3000;
 const STREAK_COOLDOWN_MS = 5000;
@@ -37,6 +37,7 @@ export type PlayScreenManagerEventsDeps = {
         onPrecisionSnap?: (precisionPx: number) => void;
         /** Replay: record a progress snapshot (called after place/snap). */
         onRecordReplaySnapshot?: () => void;
+        quadrantCompleteSeenRef?: MutableRefObject<Set<0 | 1 | 2 | 3>>;
       }
     | undefined
   >;
@@ -49,6 +50,25 @@ export type PlayScreenManagerEventsDeps = {
   setSnapCombo: (value: number | ((prev: number) => number)) => void;
   getManager: () => { getState(): { pieces: Piece[] } } | null;
 };
+
+function tryRecordQuadrantCompletions(
+  getManager: PlayScreenManagerEventsDeps["getManager"],
+  grid: { rows: number; cols: number },
+  opts: PlayScreenManagerEventsDeps["optionsRef"]["current"],
+  elapsed: number,
+) {
+  if (!opts?.onQuadrantPlaced || !opts.quadrantCompleteSeenRef) return;
+  const manager = getManager();
+  if (!manager) return;
+  const pieces = manager.getState().pieces;
+  const completed = getFullyCompletedQuadrants(pieces, grid);
+  const seen = opts.quadrantCompleteSeenRef.current;
+  for (const q of completed) {
+    if (seen.has(q)) continue;
+    seen.add(q);
+    opts.onQuadrantPlaced(q, elapsed);
+  }
+}
 
 export function createPlayScreenManagerEvents(
   deps: PlayScreenManagerEventsDeps,
@@ -99,8 +119,7 @@ export function createPlayScreenManagerEvents(
       soundManager.play("place");
       opts?.haptic?.("place");
       const elapsed = opts?.elapsedSecondsRef?.current ?? 0;
-      const q = getQuadrant(p.row, p.col, grid.rows, grid.cols);
-      opts?.onQuadrantPlaced?.(q, elapsed);
+      tryRecordQuadrantCompletions(getManager, grid, opts, elapsed);
       // Count every board placement toward combo (including groups),
       // so 2x/3x reflects actual rapid successful snaps.
       placementTimesRef.current.push(now);
@@ -145,6 +164,8 @@ export function createPlayScreenManagerEvents(
         const maxAge = 500;
         snapParticlesRef.current = particles.filter((p) => now - p.t0 < maxAge);
       }
+      const elapsedSnap = opts?.elapsedSecondsRef?.current ?? 0;
+      tryRecordQuadrantCompletions(getManager, grid, opts, elapsedSnap);
       opts?.onRecordReplaySnapshot?.();
     },
     onPieceLocked: (ids) => {
@@ -154,6 +175,9 @@ export function createPlayScreenManagerEvents(
         soundManager.play("lock", { groupSize: ids.length });
         optionsRef.current?.haptic?.("lock");
       }
+      const opts = optionsRef.current;
+      const elapsedLock = opts?.elapsedSecondsRef?.current ?? 0;
+      tryRecordQuadrantCompletions(getManager, grid, opts, elapsedLock);
     },
     onSnapCheck: () => optionsRef.current?.onSnapCheck?.(),
     onWrongRotationHint: (groupId, pieceIds) => {
@@ -169,6 +193,9 @@ export function createPlayScreenManagerEvents(
       setSnapCombo(0);
       const now = performance.now();
       const manager = getManager();
+      const opts = optionsRef.current;
+      const elapsedComplete = opts?.elapsedSecondsRef?.current ?? 0;
+      tryRecordQuadrantCompletions(getManager, grid, opts, elapsedComplete);
       if (manager) {
         const state = manager.getState();
         for (const p of state.pieces) {

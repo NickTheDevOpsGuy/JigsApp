@@ -55,17 +55,10 @@ test.describe("Daily Share", () => {
       timeout: 20000,
     });
 
-    await page.getByRole("button", { name: /share results/i }).click();
-    await page.getByRole("menuitem", { name: /share result/i }).click();
-
-    const dialog = page.getByRole("dialog", { name: /share your solve/i });
-    await expect(dialog).toBeVisible();
-
-    const dailyShare = dialog.getByRole("menuitem", { name: /daily share/i });
+    await page.getByRole("button", { name: /options/i }).click();
+    const dailyShare = page.getByRole("menuitem", { name: /^Daily Share$/i });
     await expect(dailyShare).toBeVisible();
     await dailyShare.click();
-
-    await expect(dialog.getByRole("menuitem", { name: /copied!/i })).toBeVisible();
 
     const copiedText = await page.evaluate(
       () =>

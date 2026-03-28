@@ -2,7 +2,14 @@
  * usePieceTrayDisplay – filter state, shuffle, and sorted/filtered piece list for the tray.
  * Supports dominant-color clustering for visual grouping on mobile and desktop.
  */
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import type { Piece } from "@/puzzle/core/types";
 import { getAverageColor } from "@/puzzle/core/colorUtils";
 import type { TrayFilter } from "@/screens/Play/components/hud/TrayFilterButton";
@@ -17,6 +24,29 @@ function getHueBucket(hue: number): number {
     NUM_HUE_BUCKETS - 1,
     Math.floor(((hue + HUE_BUCKET_OFFSET) % 360) / HUE_BUCKET_DEG),
   );
+}
+
+function hashTrayPieceIds(ids: string): number {
+  let h = 0;
+  for (let i = 0; i < ids.length; i++) {
+    h = (Math.imul(31, h) + ids.charCodeAt(i)) | 0;
+  }
+  return h >>> 0;
+}
+
+/** Deterministic shuffle so tray order stays stable across re-renders until shuffleKey or pieces change. */
+function seededShufflePieces(pieces: Piece[], seed: number): Piece[] {
+  const out = [...pieces];
+  let state = seed >>> 0;
+  const nextRand = () => {
+    state = (Math.imul(1664525, state) + 1013904223) >>> 0;
+    return state / 0xffffffff;
+  };
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(nextRand() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
 }
 
 /** Group pieces by dominant color (hue buckets with wraparound), then sort by grid within each cluster. */
@@ -62,8 +92,9 @@ export function usePieceTrayDisplay(
 ) {
   const [filter, setFilter] = useState<TrayFilter>("all");
   const hasAutoSelectedClustersRef = useRef(false);
-  /* Start with shuffle so tray order is randomized from the beginning */
+  /** 0 = filter order only (clean). Greater than 0 = seeded shuffle; user shuffle increments. */
   const [shuffleKey, setShuffleKey] = useState(1);
+  const prevTrayLenRef = useRef<number | null>(null);
 
   /* Edge priority: at puzzle start show edge pieces first. */
   useEffect(() => {
@@ -71,6 +102,15 @@ export function usePieceTrayDisplay(
     hasAutoSelectedClustersRef.current = true;
     setFilter("arranged");
   }, [image]);
+
+  /* After a piece leaves the tray (placed on board), snap to tidy filter order. */
+  useLayoutEffect(() => {
+    const n = pieces.length;
+    if (prevTrayLenRef.current != null && n < prevTrayLenRef.current) {
+      setShuffleKey(0);
+    }
+    prevTrayLenRef.current = n;
+  }, [pieces.length]);
 
   const hueById = useMemo(() => {
     const m = new Map<string, number>();
@@ -98,14 +138,14 @@ export function usePieceTrayDisplay(
     [hueById, byGrid],
   );
 
-  const shuffleArray = useCallback(<T>(arr: T[]): T[] => {
-    const out = [...arr];
-    for (let i = out.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [out[i], out[j]] = [out[j], out[i]];
-    }
-    return out;
-  }, []);
+  const trayIdKey = useMemo(
+    () =>
+      pieces
+        .map((p) => p.id)
+        .sort()
+        .join(","),
+    [pieces],
+  );
 
   const displayed = useMemo(() => {
     const corners = pieces.filter((p) => isCorner(p, grid));
@@ -149,8 +189,10 @@ export function usePieceTrayDisplay(
       default:
         result = allByGrid;
     }
-    return shuffleKey > 0 ? shuffleArray(result) : result;
-  }, [pieces, grid, filter, image, hueById, shuffleKey, shuffleArray, byGrid, byHue]);
+    if (shuffleKey === 0) return result;
+    const seed = (shuffleKey * 0x9e3779b1) ^ hashTrayPieceIds(trayIdKey);
+    return seededShufflePieces(result, seed);
+  }, [pieces, grid, filter, image, hueById, shuffleKey, trayIdKey, byGrid, byHue]);
 
   const onShuffle = useCallback(() => setShuffleKey((k) => k + 1), []);
 

@@ -3,6 +3,7 @@ import posthog from "posthog-js";
 import type { Piece } from "@/puzzle/core/types";
 import type { UsePlayScreenLifecycleEffectsArgs } from "./usePlayScreenLifecycleEffectsTypes";
 import { canvasToObjectUrl, revokeObjectUrl } from "@/utils/async";
+import { subscribeViewportLayoutChanges } from "@/utils/layoutViewport";
 
 export type { UsePlayScreenLifecycleEffectsArgs } from "./usePlayScreenLifecycleEffectsTypes";
 
@@ -26,6 +27,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     showGhostHint,
     showGhostWhenIdle,
     setQuadrantTimes,
+    quadrantCompleteSeenRef,
     setCompletionDismissed,
     setShowWinOverlay,
     setCompletionImageUrl,
@@ -103,6 +105,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     if (!el) return;
     // Anchor replay controls to the board progress frame (outer visual edge), not the inner board.
     const anchor = el.parentElement instanceof HTMLElement ? el.parentElement : el;
+    let raf = 0;
     const measure = () => {
       const r = anchor.getBoundingClientRect();
       const reserve = REPLAY_BOTTOM_BAR_RESERVE_PX;
@@ -114,10 +117,19 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
         height,
       });
     };
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
     measure();
-    const ro = new ResizeObserver(measure);
+    const ro = new ResizeObserver(schedule);
     ro.observe(anchor);
-    return () => ro.disconnect();
+    const unsubViewport = subscribeViewportLayoutChanges(schedule);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      unsubViewport();
+    };
   }, [
     replayBarOpen,
     boardRef,
@@ -135,6 +147,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     abandonCapturedRef.current = false;
     usedHintRef.current = showGhostHint || showGhostWhenIdle;
     setQuadrantTimes({ 0: null, 1: null, 2: null, 3: null });
+    quadrantCompleteSeenRef.current.clear();
     setCompletionDismissed(false);
     setShowWinOverlay?.(false);
     setCompletionImageUrl(undefined);
@@ -151,6 +164,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     abandonCapturedRef,
     usedHintRef,
     setQuadrantTimes,
+    quadrantCompleteSeenRef,
     setCompletionDismissed,
     setCompletionImageUrl,
     setLives,
@@ -201,16 +215,22 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
 
   /** After completion, run brief animation (glow/pulse) then show win overlay.
    * Guard: never re-show the win overlay while replay is active — restoring the
-   * final completed state at the end of replay would otherwise re-trigger this. */
+   * final completed state at the end of replay would otherwise re-trigger this.
+   * Guard: if the player already dismissed the win UI, do not schedule a timer that
+   * would flip `showWinOverlay` back on (fixes flicker / overlay popping back). */
   const COMPLETION_ANIMATION_MS = 600;
   useEffect(() => {
     if (!state?.isComplete || replayBarOpen) {
       setShowWinOverlay?.(false);
       return;
     }
+    if (completionDismissed) {
+      setShowWinOverlay?.(false);
+      return;
+    }
     const t = setTimeout(() => setShowWinOverlay?.(true), COMPLETION_ANIMATION_MS);
     return () => clearTimeout(t);
-  }, [state?.isComplete, replayBarOpen, setShowWinOverlay]);
+  }, [state?.isComplete, replayBarOpen, completionDismissed, setShowWinOverlay]);
 
   useEffect(() => {
     audioManager.setPaused(isPaused);

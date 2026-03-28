@@ -58,6 +58,26 @@ export function drawSnapGlow(
   ctx.restore();
 }
 
+/** Soft rose / coral radial — near slot or magnet zone but release will not snap (reject hint). */
+export function drawRejectSnapGlow(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  radius: number,
+  alpha: number,
+): void {
+  if (alpha <= 0) return;
+  ctx.save();
+  const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+  gradient.addColorStop(0, `rgba(255, 175, 175, ${alpha * 0.85})`);
+  gradient.addColorStop(0.38, `rgba(255, 150, 155, ${alpha * 0.42})`);
+  gradient.addColorStop(0.68, `rgba(240, 120, 130, ${alpha * 0.16})`);
+  gradient.addColorStop(1, "rgba(220, 100, 110, 0)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+  ctx.restore();
+}
+
 /** Draw a soft orb at (cx, cy): bright core, tight falloff. Use when really close to snap. */
 export function drawTargetSlotOrb(
   ctx: CanvasRenderingContext2D,

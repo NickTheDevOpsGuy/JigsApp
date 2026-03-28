@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { GridSize } from "@/puzzle/core/types";
 import { createPuzzleSession } from "@/services/session/puzzleSessionService";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
@@ -26,42 +26,6 @@ export function usePlayScreenShareSession({
   gridParam,
 }: UsePlayScreenShareSessionArgs) {
   const [shareSessionId, setShareSessionId] = useState<string | null>(null);
-
-  const ensureChallengeShareUrl = useCallback(async (): Promise<string> => {
-    if (shareSessionId) return `/play?${sessionIdParam}=${shareSessionId}`;
-    if (isDailySession && grid) {
-      return `/play?${dailyParam}=1&${gridParam}=${grid.rows}x${grid.cols}`;
-    }
-    if (sessionId) return `/play?${sessionIdParam}=${sessionId}`;
-    const puzzleId = safeLocalStorage.getItem(PUZZLE_ID_KEY);
-    if (puzzleId && grid) {
-      return `/play?puzzle=${encodeURIComponent(puzzleId)}&${gridParam}=${grid.rows}x${grid.cols}`;
-    }
-    if (!grid) return "/";
-
-    const imageUrl = safeLocalStorage.getItem(storageKey) ?? "";
-    if (!imageUrl) return `/play?${gridParam}=${grid.rows}x${grid.cols}`;
-
-    const result = await createPuzzleSession(imageUrl, grid, {
-      pieces: [],
-      elapsedSeconds: 0,
-      isComplete: false,
-    });
-    if (!("error" in result)) {
-      setShareSessionId(result.sessionId);
-      return `/play?${sessionIdParam}=${result.sessionId}`;
-    }
-    return `/play?${gridParam}=${grid.rows}x${grid.cols}`;
-  }, [
-    dailyParam,
-    grid,
-    gridParam,
-    isDailySession,
-    sessionId,
-    sessionIdParam,
-    shareSessionId,
-    storageKey,
-  ]);
 
   useEffect(() => {
     if (
@@ -107,5 +71,5 @@ export function usePlayScreenShareSession({
     shareSessionId,
   ]);
 
-  return { shareSessionId, puzzleShareUrl, ensureChallengeShareUrl };
+  return { shareSessionId, puzzleShareUrl };
 }

@@ -16,6 +16,7 @@ import {
   snapGlowAlpha,
   snapGlowPulse,
   drawSnapGlow,
+  drawRejectSnapGlow,
   SNAP_GLOW_MS,
   computeImageSourceRect,
   DRAG_LIFT_PX,
@@ -26,6 +27,7 @@ import {
   wrongRotationShakeOffset,
   drawWrongRotationIcon,
   drawLockGlow,
+  drawIdleCorrectPulse,
 } from "./renderBoardDrawOverlays";
 import {
   drawSilhouetteShadow,
@@ -74,6 +76,9 @@ export function drawPiece(
       ? 0.98 + 0.02 * Math.sin((popElapsedMs / 150) * Math.PI)
       : 1;
 
+  const idleCorrectPulseNowMs =
+    animState?.idleCorrectPulsePieceId === p.id ? nowMs : undefined;
+
   if (snapGlowEnabled && start != null && popElapsedMs < SNAP_GLOW_MS) {
     const cx = p.x + p.w / 2;
     const cy = p.y + p.h / 2;
@@ -83,10 +88,22 @@ export function drawPiece(
   }
 
   const preview = animState?.snapPreview;
+  const rejectBoard = animState?.snapRejectPreview;
+  const nearMissReject =
+    preview &&
+    !preview.inSnapRange &&
+    (preview.nearSnap || preview.proximity > 0) &&
+    preview.proximity > 0.12;
+  const rejectProximity = Math.max(
+    rejectBoard?.proximity ?? 0,
+    nearMissReject ? preview.proximity : 0,
+  );
+
   if (
     snapGlowEnabled &&
     isDragging &&
     preview &&
+    preview.inSnapRange &&
     (preview.nearSnap || preview.inSnapRange)
   ) {
     const cx = p.x + p.w / 2;
@@ -117,6 +134,17 @@ export function drawPiece(
     const pulse = 0.92 + 0.08 * Math.sin(nowMs * 0.003);
     alpha *= pulse;
     drawSnapGlow(ctx, cx, cy, radius, alpha);
+  } else if (snapGlowEnabled && isDragging && rejectProximity > 0.16) {
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const proximityEased = 1 - (1 - rejectProximity) ** 2;
+    const size = Math.max(p.w, p.h);
+    const radius = size * (preview?.kind === "neighbor" ? 0.72 : 0.8);
+    const baseAlpha = preview?.kind === "neighbor" ? 0.22 : 0.2;
+    let alpha = Math.min(0.48, baseAlpha * (0.35 + 0.65 * proximityEased));
+    const pulse = 0.94 + 0.06 * Math.sin(nowMs * 0.0045);
+    alpha *= pulse;
+    drawRejectSnapGlow(ctx, cx, cy, radius, alpha);
   }
 
   let path: Path2D | null = null;
@@ -197,6 +225,7 @@ export function drawPiece(
       shakeElapsedMs,
       animState?.showClusterOutline,
       piecePulseAlpha,
+      idleCorrectPulseNowMs,
     );
     return;
   }
@@ -241,6 +270,7 @@ export function drawPiece(
       shakeElapsedMs,
       animState?.showClusterOutline,
       piecePulseAlpha,
+      idleCorrectPulseNowMs,
     );
     return;
   }
@@ -282,21 +312,44 @@ export function drawPiece(
   ) {
     ctx.save();
     const proximityEased = 1 - (1 - preview.proximity) ** 2;
-    /* Outline strength increases with proximity for snap confidence */
-    const outlineAlpha = preview.inSnapRange
-      ? 0.28 + 0.62 * proximityEased
-      : 0.14 + 0.52 * proximityEased;
-    ctx.strokeStyle =
-      preview.kind === "neighbor"
-        ? `rgba(162, 214, 255, ${Math.min(0.82, outlineAlpha)})`
-        : `rgba(255, 220, 130, ${Math.min(0.9, outlineAlpha)})`;
-    ctx.lineWidth = preview.inSnapRange ? 6 : 5;
+    if (preview.inSnapRange) {
+      /* Outline strength increases with proximity for snap confidence */
+      const outlineAlpha = 0.28 + 0.62 * proximityEased;
+      ctx.strokeStyle =
+        preview.kind === "neighbor"
+          ? `rgba(162, 214, 255, ${Math.min(0.82, outlineAlpha)})`
+          : `rgba(255, 220, 130, ${Math.min(0.9, outlineAlpha)})`;
+      ctx.lineWidth = 6;
+    } else {
+      const outlineAlpha = 0.1 + 0.42 * proximityEased;
+      ctx.strokeStyle = `rgba(255, 140, 150, ${Math.min(0.5, outlineAlpha)})`;
+      ctx.lineWidth = 4.5;
+    }
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.stroke(path);
+    ctx.restore();
+  } else if (
+    snapGlowEnabled &&
+    isDragging &&
+    rejectBoard &&
+    rejectBoard.proximity > 0.2 &&
+    (!preview || !preview.inSnapRange)
+  ) {
+    ctx.save();
+    const proximityEased = 1 - (1 - rejectBoard.proximity) ** 2;
+    const outlineAlpha = 0.12 + 0.4 * proximityEased;
+    ctx.strokeStyle = `rgba(255, 130, 145, ${Math.min(0.48, outlineAlpha)})`;
+    ctx.lineWidth = 4.25;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.stroke(path);
     ctx.restore();
   }
   if (showLockGlow) drawLockGlow(ctx, path, lockElapsedMs);
+  if (idleCorrectPulseNowMs != null) {
+    drawIdleCorrectPulse(ctx, path, idleCorrectPulseNowMs);
+  }
   if (debug.showBounds) {
     ctx.strokeStyle = "rgba(255,0,0,0.35)";
     ctx.lineWidth = 1;

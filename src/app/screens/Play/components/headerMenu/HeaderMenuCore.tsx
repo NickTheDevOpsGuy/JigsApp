@@ -1,7 +1,7 @@
 /**
  * HeaderMenu – root: About, Leaderboard, Play, Settings (alpha). Settings submenus ordered by label in headerMenuConstants.
  */
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Menu, ChevronRight, ChevronLeft, Check } from "lucide-react";
@@ -15,7 +15,7 @@ import {
 } from "@/screens/Play/components/headerMenu/headerMenuConfig";
 import {
   SUB_MENU_LABELS,
-  SETTINGS_SUBMENU_ORDER,
+  getSettingsSubmenuIdsAlphabetical,
   ROOT_MENU_ORDER,
   ROOT_MENU_LABELS,
   getSubmenuDescription,
@@ -28,6 +28,10 @@ import {
   hasSubMenuItems,
 } from "@/screens/Play/components/headerMenu/headerMenuViewModel";
 import { loadStatsScreenModule } from "@/screens/routeLoaders";
+import {
+  getLayoutViewportSize,
+  subscribeViewportResizeOnly,
+} from "@/utils/layoutViewport";
 
 export type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/headerMenuConfig";
 
@@ -48,6 +52,21 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const items = buildMenuItems(props, setOpen, (path) => navigate(path));
 
+  const measurePanelPlacement = useCallback(() => {
+    const el = triggerWrapRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const gap = 6;
+    const { width: vw } = getLayoutViewportSize();
+    const maxWidth = Math.min(360, vw - 16);
+    const left = Math.min(Math.max(8, rect.left), vw - maxWidth - 8);
+    setMenuRect({
+      top: rect.bottom + gap,
+      left,
+      minWidth: Math.min(rect.width, maxWidth),
+    });
+  }, []);
+
   useEffect(() => {
     if (!open) {
       setActiveRoot(null);
@@ -61,19 +80,22 @@ export function HeaderMenu(props: HeaderMenuProps) {
       setMenuRect(null);
       return;
     }
+    measurePanelPlacement();
+  }, [open, activeRoot, activeSubMenu, measurePanelPlacement]);
 
-    const rect = triggerWrapRef.current.getBoundingClientRect();
-    const gap = 6;
-
-    const maxWidth = Math.min(360, window.innerWidth - 16);
-    const left = Math.min(Math.max(8, rect.left), window.innerWidth - maxWidth - 8);
-
-    setMenuRect({
-      top: rect.bottom + gap,
-      left,
-      minWidth: Math.min(rect.width, maxWidth),
-    });
-  }, [open, activeRoot, activeSubMenu]);
+  useEffect(() => {
+    if (!open) return;
+    let raf = 0;
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measurePanelPlacement);
+    };
+    const unsub = subscribeViewportResizeOnly(schedule);
+    return () => {
+      cancelAnimationFrame(raf);
+      unsub();
+    };
+  }, [open, activeRoot, activeSubMenu, measurePanelPlacement]);
 
   useEffect(() => {
     if (!open) return;
@@ -206,8 +228,8 @@ export function HeaderMenu(props: HeaderMenuProps) {
     );
   };
 
-  const settingsSubmenus = SETTINGS_SUBMENU_ORDER.filter((id) =>
-    hasSubMenuItems(id, groups),
+  const settingsSubmenus = getSettingsSubmenuIdsAlphabetical(groups.settingsItems).filter(
+    (id) => hasSubMenuItems(id, groups),
   );
   const hasSubMenu = (id: SubMenuId) => hasSubMenuItems(id, groups);
 

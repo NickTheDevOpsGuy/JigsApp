@@ -65,6 +65,7 @@ type PlayScreenLayoutProps = {
       onPointerCancel: React.PointerEventHandler<HTMLCanvasElement>;
       onLostPointerCapture: React.PointerEventHandler<HTMLCanvasElement>;
       onContextMenu: React.MouseEventHandler<HTMLCanvasElement>;
+      onPointerLeave: React.PointerEventHandler<HTMLCanvasElement>;
     };
     isPaused: boolean;
     onResume: () => void;
@@ -224,6 +225,7 @@ export function PlayScreenLayout({
                       onPointerCancel={board.handlers.onPointerCancel}
                       onLostPointerCapture={board.handlers.onLostPointerCapture}
                       onContextMenu={board.handlers.onContextMenu}
+                      onPointerLeave={board.handlers.onPointerLeave}
                       onWheel={(e) =>
                         board.viewport.handleWheel(e, board.boardRef.current)
                       }
@@ -268,6 +270,7 @@ export function PlayScreenLayout({
                     image={overlaysProps.previewImage}
                     grid={tray.trayGrid}
                     onPieceClick={tray.onTrayPieceClick}
+                    onTrayPieceHover={tray.onTrayPieceHover}
                     highlightedPieceIds={tray.highlightedPieceIds}
                     className={tray.isLargeTray ? styles.trayWrapLarge : undefined}
                   />

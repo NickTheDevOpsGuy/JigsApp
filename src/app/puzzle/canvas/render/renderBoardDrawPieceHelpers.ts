@@ -5,7 +5,11 @@
 import type { Piece } from "@/puzzle/core/types";
 import type { ImageSourceRect } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import { DRAG_LIFT_PX } from "@/puzzle/canvas/utils/renderBoardHelpers";
-import { drawWrongRotationIcon, drawLockGlow } from "./renderBoardDrawOverlays";
+import {
+  drawWrongRotationIcon,
+  drawLockGlow,
+  drawIdleCorrectPulse,
+} from "./renderBoardDrawOverlays";
 
 /** Outer stroke: crisp silhouette without heavy inner bleed on curves. */
 const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.38)";
@@ -182,6 +186,8 @@ export function drawCachedPiece(
   showClusterOutline?: boolean,
   /** Soft pulse alpha (0.98–1) when piece just snapped; 1 = no pulse */
   snapPulseAlpha: number = 1,
+  /** When set, draw idle hint pulse (piece-local path space). */
+  idleCorrectPulseNowMs?: number,
 ): void {
   ctx.save();
   let cx = p.x + p.w / 2 + shakeX;
@@ -221,6 +227,9 @@ export function drawCachedPiece(
     showClusterOutline,
   );
   if (showLockGlow) drawLockGlow(ctx, path, lockElapsedMs);
+  if (idleCorrectPulseNowMs != null) {
+    drawIdleCorrectPulse(ctx, path, idleCorrectPulseNowMs);
+  }
   if (showWrongRotationHint) {
     drawWrongRotationIcon(
       ctx,

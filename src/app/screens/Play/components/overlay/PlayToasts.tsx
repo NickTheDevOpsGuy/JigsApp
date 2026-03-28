@@ -2,6 +2,7 @@
  * PlayToasts – engagement and onboarding toast overlays.
  * Renders at most ONE engagement toast at a time (first in priority order) so toasts
  * don’t stack; tray and zoom onboarding tips are separate overlays.
+ * Border-frame milestone sits after announcer / combo lines, before percent milestones.
  */
 import type React from "react";
 import { OnboardingTooltip } from "@/components/OnboardingTooltip";
@@ -13,6 +14,7 @@ type Props = {
   showFirstSnapToast: boolean;
   showStreakToast: boolean;
   milestoneMessage: string | null;
+  borderFrameMessage: string | null;
   announcerLine: string | null;
   shareToast: string | null;
   classNames: {
@@ -31,12 +33,14 @@ function getSingleToast(
   showFirstSnapToast: boolean,
   announcerLine: string | null,
   showStreakToast: boolean,
+  borderFrameMessage: string | null,
   milestoneMessage: string | null,
   shareToast: string | null,
 ): { content: React.ReactNode; isStreak: boolean } | null {
   if (showFirstSnapToast) return { content: "First piece! ✨", isStreak: false };
   if (showStreakToast) return { content: null, isStreak: true }; // "On fire!" + flame — higher priority than combo
   if (announcerLine) return { content: announcerLine, isStreak: false };
+  if (borderFrameMessage) return { content: borderFrameMessage, isStreak: false };
   if (milestoneMessage) return { content: milestoneMessage, isStreak: false };
   if (shareToast) return { content: shareToast, isStreak: false };
   return null;
@@ -47,6 +51,7 @@ export function PlayToasts({
   onboarding,
   showFirstSnapToast,
   showStreakToast,
+  borderFrameMessage,
   milestoneMessage,
   announcerLine,
   shareToast,
@@ -58,6 +63,7 @@ export function PlayToasts({
         showFirstSnapToast,
         announcerLine,
         showStreakToast,
+        borderFrameMessage,
         milestoneMessage,
         shareToast,
       );

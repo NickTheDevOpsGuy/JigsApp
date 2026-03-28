@@ -15,6 +15,10 @@ import {
 } from "@/daily/dailyPuzzleCore";
 import { GRID_OPTIONS } from "@/daily/dailyGridOptions";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import {
+  dailyStreakXpMultiplier,
+  formatStreakXpMultiplierLabel,
+} from "@/services/player/dailyStreakXp";
 
 const DAILY_PREFIX = "phuzzle:daily:";
 
@@ -55,6 +59,9 @@ function computeHomeData() {
   const weekDots: WeekDot[] = getWeekDots();
   const weeklyCompleted = weekDots.filter((dot) => dot.done).length;
   const weeklyRemaining = Math.max(0, 7 - weeklyCompleted);
+  /** Multiplier for XP on the next daily completion (streak after that solve = current + 1). */
+  const nextDailyXpMultiplier = dailyStreakXpMultiplier(streak + 1);
+  const nextDailyXpMultiplierLabel = formatStreakXpMultiplierLabel(nextDailyXpMultiplier);
 
   return {
     streak,
@@ -66,11 +73,40 @@ function computeHomeData() {
     weekDots,
     weeklyCompleted,
     weeklyRemaining,
+    nextDailyXpMultiplier,
+    nextDailyXpMultiplierLabel,
   };
 }
 
+export type DailySpotlightHome = {
+  /** One line: theme + featured puzzle name */
+  line: string;
+  /** Accessible / longer description */
+  description: string;
+} | null;
+
 export function useHomeData() {
   const [tick, setTick] = useState(0);
+  const [dailySpotlight, setDailySpotlight] = useState<DailySpotlightHome>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void import("@/daily/dailyPuzzle").then((m) => {
+      if (cancelled) return;
+      const s = m.getTodayDailySpotlight();
+      if (!s) {
+        setDailySpotlight(null);
+        return;
+      }
+      setDailySpotlight({
+        line: `${s.categoryEmoji} ${s.categoryName} · ${s.puzzleName}`,
+        description: `Each day highlights a category and a featured puzzle. Today: ${s.categoryName} — ${s.puzzleName}.`,
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [tick]);
 
   useEffect(() => {
     const handler = () => setTick((t) => t + 1);
@@ -78,5 +114,11 @@ export function useHomeData() {
     return () => window.removeEventListener("phuzzle:menuRefresh", handler);
   }, []);
 
-  return useMemo(() => computeHomeData(), [tick]);
+  return useMemo(
+    () => ({
+      ...computeHomeData(),
+      dailySpotlight,
+    }),
+    [tick, dailySpotlight],
+  );
 }

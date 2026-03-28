@@ -31,6 +31,11 @@ type Step = "category" | "puzzle";
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  /**
+   * Fires only when the user dismisses via backdrop, X, or Escape — not when they
+   * start a puzzle (that path calls `onClose` directly without going through Modal).
+   */
+  onDismissWithoutStart?: () => void;
 };
 
 function filterPuzzles(puzzles: SamplePuzzle[], categoryId: string): SamplePuzzle[] {
@@ -39,7 +44,7 @@ function filterPuzzles(puzzles: SamplePuzzle[], categoryId: string): SamplePuzzl
     : puzzles.filter((p) => p.category === categoryId);
 }
 
-export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
+export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const [step, setStep] = useState<Step>("category");
@@ -267,7 +272,10 @@ export function ChoosePuzzleModal({ isOpen, onClose }: Props) {
   return (
     <Modal
       isOpen
-      onClose={onClose}
+      onClose={() => {
+        onDismissWithoutStart?.();
+        onClose();
+      }}
       title={modalTitle}
       showCloseButton
       variant="choosePuzzle"

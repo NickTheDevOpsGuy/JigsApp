@@ -38,6 +38,9 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,ico,svg,png,woff2}"],
+          // Maps are not needed offline; skipping them shrinks precache and install cost.
+          globIgnores: ["**/*.map"],
+          cleanupOutdatedCaches: true,
           // Allow puzzle images up to ~50 MB (default 2 MiB fails on large sample images)
           maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
         },

@@ -1,10 +1,14 @@
+import React from "react";
 import { ChevronRight } from "lucide-react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import {
   SUB_MENU_LABELS,
   SUBMENU_DESCRIPTIONS,
 } from "@/screens/Play/components/headerMenu/headerMenuConstants";
-import type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/headerMenuConfig";
+import type {
+  HeaderMenuProps,
+  MenuItemConfig,
+} from "@/screens/Play/components/headerMenu/headerMenuConfig";
 
 interface BaseSectionProps {
   hasSubMenuItems: (
@@ -33,96 +37,89 @@ export function HeaderMenuAboutSection({
   hasSubMenuItems,
   setActiveSubMenu,
 }: BaseSectionProps) {
-  return (
-    <>
-      {hasSubMenuItems("contribute") && (
+  type Row = { key: string; label: string; node: React.ReactNode };
+  const rows: Row[] = [];
+  if (hasSubMenuItems("contribute")) {
+    rows.push({
+      key: "contribute",
+      label: SUB_MENU_LABELS.contribute,
+      node: (
         <button
           type="button"
           className={styles.headerMenuSubmenuTrigger}
           role="menuitem"
           onClick={() => setActiveSubMenu("contribute")}
-          aria-label="About"
+          aria-label={SUB_MENU_LABELS.contribute}
           title="Get involved and meet contributors"
         >
           {SUB_MENU_LABELS.contribute}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
+          <ChevronRight size={16} className={styles.headerMenuChevron} aria-hidden />
         </button>
-      )}
-      {hasSubMenuItems("help") && (
+      ),
+    });
+  }
+  if (hasSubMenuItems("help")) {
+    rows.push({
+      key: "help",
+      label: SUB_MENU_LABELS.help,
+      node: (
         <button
           type="button"
           className={styles.headerMenuSubmenuTrigger}
           role="menuitem"
           onClick={() => setActiveSubMenu("help")}
-          aria-label="Help"
+          aria-label={SUB_MENU_LABELS.help}
           title="How to play and keyboard shortcuts"
         >
           {SUB_MENU_LABELS.help}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
+          <ChevronRight size={16} className={styles.headerMenuChevron} aria-hidden />
         </button>
-      )}
+      ),
+    });
+  }
+  rows.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
+  return (
+    <>
+      {rows.map((r) => (
+        <React.Fragment key={r.key}>{r.node}</React.Fragment>
+      ))}
     </>
   );
 }
+
+const CONTROLS_SUBMENU_IDS = ["manualControls", "modes", "moves", "pieceShape"] as const;
 
 export function HeaderMenuControlsSection({
   hasSubMenuItems,
   setActiveSubMenu,
 }: BaseSectionProps) {
+  const orderedIds = CONTROLS_SUBMENU_IDS.filter((id) => hasSubMenuItems(id)).sort(
+    (a, b) =>
+      SUB_MENU_LABELS[a].localeCompare(SUB_MENU_LABELS[b], undefined, {
+        sensitivity: "base",
+      }),
+  );
+
   return (
     <>
-      {hasSubMenuItems("manualControls") && (
+      {orderedIds.map((id) => (
         <button
+          key={id}
           type="button"
           className={styles.headerMenuSubmenuTrigger}
           role="menuitem"
-          onClick={() => setActiveSubMenu("manualControls")}
-          aria-label="Controls"
-          title={SUBMENU_DESCRIPTIONS.manualControls}
+          onClick={() => setActiveSubMenu(id)}
+          aria-label={SUB_MENU_LABELS[id]}
+          title={
+            id === "pieceShape"
+              ? "Applies to next puzzle"
+              : SUBMENU_DESCRIPTIONS[id as keyof typeof SUBMENU_DESCRIPTIONS]
+          }
         >
-          {SUB_MENU_LABELS.manualControls}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
+          {SUB_MENU_LABELS[id]}
+          <ChevronRight size={16} className={styles.headerMenuChevron} aria-hidden />
         </button>
-      )}
-      {hasSubMenuItems("modes") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("modes")}
-          aria-label="Modes"
-          title={SUBMENU_DESCRIPTIONS.modes}
-        >
-          {SUB_MENU_LABELS.modes}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
-      {hasSubMenuItems("moves") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("moves")}
-          aria-label="Moves"
-          title={SUBMENU_DESCRIPTIONS.moves}
-        >
-          {SUB_MENU_LABELS.moves}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
-      {hasSubMenuItems("pieceShape") && (
-        <button
-          type="button"
-          className={styles.headerMenuSubmenuTrigger}
-          role="menuitem"
-          onClick={() => setActiveSubMenu("pieceShape")}
-          aria-label="Piece Shape"
-          title="Applies to next puzzle"
-        >
-          {SUB_MENU_LABELS.pieceShape}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
-        </button>
-      )}
+      ))}
     </>
   );
 }
@@ -158,29 +155,52 @@ export function HeaderMenuModesRange({
   );
 }
 
-export function HeaderMenuDisplaySection({
+/**
+ * Appearance submenu: toggles + Effects + Theme drill-ins, single A–Z list by label.
+ */
+export function HeaderMenuDisplaySubmenuMerged({
+  subMenuItems,
+  renderItem,
   hasSubMenuItems,
   setActiveSubMenu,
   onOpenThemeModal,
   setOpen,
 }: BaseSectionProps &
-  Pick<HeaderMenuProps, "onOpenThemeModal"> & { setOpen: (open: boolean) => void }) {
-  return (
-    <>
-      {hasSubMenuItems("effects") && (
+  Pick<HeaderMenuProps, "onOpenThemeModal"> & {
+    subMenuItems: MenuItemConfig[];
+    renderItem: (item: MenuItemConfig) => React.ReactNode;
+    setOpen: (open: boolean) => void;
+  }) {
+  type Row = { key: string; label: string; node: React.ReactNode };
+  const rows: Row[] = subMenuItems.map((item) => ({
+    key: item.id,
+    label: item.sortKey ?? item.label,
+    node: renderItem(item),
+  }));
+  if (hasSubMenuItems("effects")) {
+    rows.push({
+      key: "effects",
+      label: SUB_MENU_LABELS.effects,
+      node: (
         <button
           type="button"
           className={styles.headerMenuSubmenuTrigger}
           role="menuitem"
           onClick={() => setActiveSubMenu("effects")}
-          aria-label="Effects"
+          aria-label={SUB_MENU_LABELS.effects}
           title={SUBMENU_DESCRIPTIONS.effects}
         >
           {SUB_MENU_LABELS.effects}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
+          <ChevronRight size={16} className={styles.headerMenuChevron} aria-hidden />
         </button>
-      )}
-      {onOpenThemeModal && (
+      ),
+    });
+  }
+  if (onOpenThemeModal) {
+    rows.push({
+      key: "theme",
+      label: SUB_MENU_LABELS.theme,
+      node: (
         <button
           type="button"
           className={styles.headerMenuSubmenuTrigger}
@@ -189,14 +209,22 @@ export function HeaderMenuDisplaySection({
             setOpen(false);
             onOpenThemeModal();
           }}
-          aria-label="Theme"
+          aria-label={SUB_MENU_LABELS.theme}
           title="Change color theme"
           data-testid="open-theme-modal"
         >
           {SUB_MENU_LABELS.theme}
-          <ChevronRight size={16} className={styles.headerMenuChevron} />
+          <ChevronRight size={16} className={styles.headerMenuChevron} aria-hidden />
         </button>
-      )}
+      ),
+    });
+  }
+  rows.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
+  return (
+    <>
+      {rows.map((row) => (
+        <React.Fragment key={row.key}>{row.node}</React.Fragment>
+      ))}
     </>
   );
 }

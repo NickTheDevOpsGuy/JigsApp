@@ -1,6 +1,8 @@
 /**
  * samplePuzzles – puzzle catalog; auto-discovers from src/app/assets/puzzles/.
  */
+import { CATEGORY_ORDER, getCategorySpotlight } from "@/data/packs/categoryDisplay";
+
 export type SamplePuzzle = {
   id: string;
   name: string;
@@ -23,45 +25,6 @@ const CATEGORY_ALIAS: Record<string, string> = {
   seasonal: "seasonal",
   holidays: "holidays",
 };
-
-const CATEGORY_LABELS: Record<string, string> = {
-  nature: "🌿",
-  animals: "🐾",
-  food: "🍕",
-  music: "🎵",
-  space: "🪐",
-  retro: "📼",
-  art: "🎨",
-  gaming: "🎮",
-  seasonal: "🍂",
-  holidays: "🎄",
-};
-
-const CATEGORY_NAMES: Record<string, string> = {
-  nature: "Nature",
-  animals: "Animals",
-  food: "Food",
-  music: "Music",
-  space: "Space",
-  retro: "Retro",
-  art: "Art",
-  gaming: "Gaming",
-  seasonal: "Seasonal",
-  holidays: "Holidays",
-};
-
-const CATEGORY_ORDER = [
-  "nature",
-  "animals",
-  "food",
-  "music",
-  "space",
-  "retro",
-  "art",
-  "gaming",
-  "seasonal",
-  "holidays",
-] as const;
 
 /**
  * Auto-discover puzzle images from src/app/assets/puzzles/
@@ -115,16 +78,25 @@ const discoveredCategories = [...new Set(SAMPLE_PUZZLES.map((p) => p.category))]
 
 export const CATEGORIES = [
   { id: "all", label: "All", name: "All" },
-  ...CATEGORY_ORDER.map((cat) => ({
-    id: cat,
-    label: CATEGORY_LABELS[cat] ?? kebabToTitle(cat),
-    name: CATEGORY_NAMES[cat] ?? kebabToTitle(cat),
-  })),
+  ...CATEGORY_ORDER.map((cat) => {
+    const v = getCategorySpotlight(cat);
+    return { id: cat, label: v.emoji, name: v.name };
+  }),
   ...discoveredCategories
     .filter((cat) => !CATEGORY_ORDER.includes(cat as (typeof CATEGORY_ORDER)[number]))
-    .map((cat) => ({
-      id: cat,
-      label: CATEGORY_LABELS[cat] ?? kebabToTitle(cat),
-      name: CATEGORY_NAMES[cat] ?? kebabToTitle(cat),
-    })),
+    .map((cat) => {
+      const v = getCategorySpotlight(cat);
+      return { id: cat, label: v.emoji, name: v.name };
+    }),
 ];
+
+/** Categories used for daily rotation (known order; only ids that have at least one puzzle). */
+export function getDailyRotationCategoryIds(): string[] {
+  const ordered = CATEGORY_ORDER.filter((id) =>
+    SAMPLE_PUZZLES.some((p) => p.category === id),
+  );
+  if (ordered.length > 0) return [...ordered];
+  return [...new Set(SAMPLE_PUZZLES.map((p) => p.category))].sort();
+}
+
+export { getCategorySpotlight } from "@/data/packs/categoryDisplay";

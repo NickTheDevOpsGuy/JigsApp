@@ -81,6 +81,7 @@ export function usePlayScreenManager(
   const [awaitingResumeChoice, setAwaitingResumeChoice] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [puzzleKey, setPuzzleKey] = useState(0);
+  const prevRestartSamePuzzleKeyRef = useRef(0);
   const refsReady = useBoardRefsReady(mainRef, boardRef);
 
   // Eagerly start loading the puzzle image as soon as possible (before refs are ready)
@@ -101,6 +102,11 @@ export function usePlayScreenManager(
     if (!mainEl || !boardEl) {
       return;
     }
+
+    const restartKey = restartSamePuzzleKey ?? 0;
+    const prevRestartKey = prevRestartSamePuzzleKeyRef.current;
+    const triggeredByRestart = restartKey > 0 && restartKey !== prevRestartKey;
+    prevRestartSamePuzzleKeyRef.current = restartKey;
 
     const imageUrl = safeLocalStorage.getItem(STORAGE_KEY) || "";
     if (!imageUrl) {
@@ -128,8 +134,9 @@ export function usePlayScreenManager(
       const didRunRef = { current: false };
       const runSizing = () => {
         if (didRunRef.current || !mainEl || !boardEl) return;
-        // Never tear down when puzzle is complete (prevents win bounce-back when effect re-runs)
-        if (stateRef?.current?.isComplete) return;
+        // Never tear down when puzzle is complete (prevents win bounce-back when effect re-runs),
+        // unless the player explicitly restarted the same puzzle (restartSamePuzzleKey bump).
+        if (stateRef?.current?.isComplete && !triggeredByRestart) return;
         const rect = boardEl.getBoundingClientRect();
         const rectW = Math.floor(rect.width);
         const rectH = Math.floor(rect.height);

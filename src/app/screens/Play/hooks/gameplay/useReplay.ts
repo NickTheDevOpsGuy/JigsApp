@@ -175,6 +175,24 @@ export function useReplay(
     setReplayIndex(0);
   }, []);
 
+  /** New PuzzleManager instance (e.g. same-image restart) — drop old replay buffers. */
+  useEffect(() => {
+    if (!manager) return;
+    clearSnapshots();
+    setIsReplaying(false);
+    setIsReplayPaused(false);
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    return () => {
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [manager, clearSnapshots]);
+
   const goToStart = useCallback(() => {
     const list = getReplayList();
     if (!manager || list.length === 0) return;

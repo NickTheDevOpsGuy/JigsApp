@@ -3,7 +3,7 @@ name: 🤖 Renovate Lockfile Gatekeeper
 on:
   pull_request_target:
     types: [opened, synchronize, labeled, reopened, ready_for_review]
-    branches: [main]
+    branches: [develop]
   workflow_dispatch:
 
 permissions:

@@ -76,6 +76,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
   }, [showFreezeOffer]);
 
   const puzzle = dailyModule ? dailyModule.getTodayDailyPuzzle() : null;
+  const spotlight = dailyModule ? dailyModule.getTodayDailySpotlight() : null;
 
   if (!isOpen) return null;
   if (!dailyModule)
@@ -139,7 +140,19 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     >
       <div className={styles.headerCustom}>
         <Puzzle size={24} className={styles.headerIcon} />
-        <p className={styles.subtitle}>Same puzzle for everyone</p>
+        <p className={styles.subtitle}>
+          {spotlight ? (
+            <>
+              <span className={styles.spotlightLead}>
+                {spotlight.categoryEmoji} {spotlight.categoryName} ·{" "}
+                {spotlight.puzzleName}
+              </span>
+              <span className={styles.spotlightSub}>Same puzzle for everyone today</span>
+            </>
+          ) : (
+            "Same puzzle for everyone"
+          )}
+        </p>
       </div>
 
       <div className={styles.puzzleImageWrap}>

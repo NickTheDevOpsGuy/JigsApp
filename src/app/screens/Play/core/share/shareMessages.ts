@@ -24,11 +24,6 @@ export function getDifficultyLabel(pieceCount: number): string {
   return "Extreme";
 }
 
-export function getPiecesLine(pieceCount: number): string {
-  if (pieceCount <= 0) return "Custom Puzzle";
-  return `${pieceCount} Pieces • ${getDifficultyLabel(pieceCount)}`;
-}
-
 export function buildChallengePlayUrl(
   playUrl: string,
   elapsedSeconds: number,
@@ -43,12 +38,6 @@ export function buildChallengePlayUrl(
 }
 
 const SHARE_ORIGIN = "https://phuzzle.vercel.app";
-const CHALLENGE_TAUNTS = [
-  "I destroyed this puzzle. Can you even come close?",
-  "Puzzle demolished. Think you can top this?",
-  "Another one down. Beat this run if you can.",
-  "I crushed this one. Your turn to prove it.",
-] as const;
 
 /** Full https URL for pasted / preview text (matches link unfurl targets). */
 export function absShareUrl(pathOrUrl: string): string {
@@ -56,20 +45,6 @@ export function absShareUrl(pathOrUrl: string): string {
   if (/^https?:\/\//i.test(t)) return t;
   const path = t.startsWith("/") ? t : `/${t}`;
   return `${SHARE_ORIGIN}${path}`;
-}
-
-export function pickChallengeTaunt(
-  randomValue: number,
-): (typeof CHALLENGE_TAUNTS)[number] {
-  const normalized = Number.isFinite(randomValue) ? randomValue : 0;
-  const index = Math.max(
-    0,
-    Math.min(
-      CHALLENGE_TAUNTS.length - 1,
-      Math.floor(normalized * CHALLENGE_TAUNTS.length),
-    ),
-  );
-  return CHALLENGE_TAUNTS[index];
 }
 
 /**
@@ -84,20 +59,14 @@ export function buildProgressShareMessage(args: ShareMessageArgs): string {
   const cleanSolve = (args.undoCount ?? 0) === 0 && !args.usedHint;
   const link = absShareUrl(args.playUrl);
 
-  const result = [
-    `I solved this puzzle in ${time} with ${moves} moves.`,
+  const lines = [
+    `Phuzzle — solved in ${time} · ${moves} moves`,
+    `${difficulty} (${pieces} pieces)${rotations > 0 ? ` · ${rotations} rotations` : ""}`,
+    ...(cleanSolve ? ["Clean solve (no undos, no hints)"] : []),
     "",
-    "Phuzzle",
-    "",
-    "Puzzle",
-    `Difficulty: ${difficulty} (${pieces} pieces)`,
-    `Time: ${time}`,
-    `Moves: ${moves}`,
+    link,
   ];
-  if (rotations > 0) result.push(`Rotations: ${rotations}`);
-  if (cleanSolve) result.push("", "⭐ Clean solve — no undos, no hints!");
-  result.push("", link);
-  return result.join("\n");
+  return lines.join("\n");
 }
 
 /** Daily Share – Wordle-style compact format. Only for Daily Puzzle. */
@@ -166,20 +135,13 @@ export function buildChallengeShareMessage(args: ShareMessageArgs): string {
   const cleanSolve = (args.undoCount ?? 0) === 0 && !args.usedHint;
   const challengePath = buildChallengePlayUrl(args.playUrl, args.elapsedSeconds, moves);
   const challengeUrl = absShareUrl(challengePath);
-  const taunt = pickChallengeTaunt(Math.random());
 
-  const result = [
-    taunt,
+  const lines = [
+    "Can you beat my time on this puzzle?",
+    `Phuzzle — ${difficulty} (${pieces} pieces) · ${time} · ${moves} moves${rotations > 0 ? ` · ${rotations} rotations` : ""}`,
+    ...(cleanSolve ? ["Clean solve (no undos, no hints)"] : []),
     "",
-    "Phuzzle",
-    "",
-    "Puzzle",
-    `Difficulty: ${difficulty} (${pieces} pieces)`,
-    `Time: ${time}`,
-    `Moves: ${moves}`,
+    challengeUrl,
   ];
-  if (rotations > 0) result.push(`Rotations: ${rotations}`);
-  if (cleanSolve) result.push("", "⭐ Clean solve — no undos, no hints!");
-  result.push("", challengeUrl);
-  return result.join("\n");
+  return lines.join("\n");
 }

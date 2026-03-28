@@ -101,12 +101,21 @@ export function usePlayScreenSceneState(grid: { rows: number; cols: number } | n
   const [quadrantTimes, setQuadrantTimes] = React.useState<
     Record<0 | 1 | 2 | 3, number | null>
   >({ 0: null, 1: null, 2: null, 3: null });
+  const quadrantCompleteSeenRef = React.useRef<Set<0 | 1 | 2 | 3>>(new Set());
   const completionFocusRef = React.useRef<HTMLButtonElement>(null);
 
   const startThisPuzzleOver = React.useCallback(() => {
     clearPuzzleState();
+    setResumeChoice("fresh");
+    setReplayBarOpen(false);
+    setCompletionDismissed(false);
+    setShowWinOverlay(false);
+    setCompletionImageUrl(undefined);
+    setShowStreakToast(false);
+    setShareToast(null);
+    viewport.reset();
     setRestartSamePuzzleKey((k) => k + 1);
-  }, []);
+  }, [viewport.reset]);
 
   return {
     lastInteractionRef,
@@ -167,6 +176,7 @@ export function usePlayScreenSceneState(grid: { rows: number; cols: number } | n
     initialSnapshotRecordedRef,
     quadrantTimes,
     setQuadrantTimes,
+    quadrantCompleteSeenRef,
     completionFocusRef,
   };
 }

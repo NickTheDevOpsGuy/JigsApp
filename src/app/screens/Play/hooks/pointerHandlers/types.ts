@@ -57,6 +57,8 @@ export type PointerHandlersContext = {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   trayRef: React.RefObject<HTMLDivElement | null>;
   selectedIdRef: React.MutableRefObject<PieceId | null>;
+  /** Board hover + tray hover — faint target preview on canvas (desktop); coarse devices use selection instead. */
+  hoverPreviewPieceIdRef: React.MutableRefObject<PieceId | null>;
   setSelectedPieceId: (id: PieceId | null) => void;
   bump: () => void;
   didDragRef: React.MutableRefObject<boolean>;

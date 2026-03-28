@@ -27,10 +27,11 @@ export function getNavControlsModesItems(
     {
       id: "startOver",
       section: "settings",
-      visible: !!props.onStartThisPuzzleOver && !props.isComplete,
-      label: "Start over",
-      sortKey: "Start over",
-      title: "Restart this puzzle from the beginning (same image and difficulty)",
+      visible: !!props.onStartThisPuzzleOver,
+      label: "Restart puzzle",
+      sortKey: "Restart puzzle",
+      title:
+        "Shuffle and start again with the same image and grid (stays on this screen)",
       onClick: c(props.onStartThisPuzzleOver ?? (() => {})),
       subMenu: "navigation",
     },

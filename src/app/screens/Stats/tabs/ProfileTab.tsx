@@ -7,6 +7,10 @@ import { Button } from "@/components/Button/Button";
 import { getBestTime } from "@/screens/Play/core/time/timeMode";
 import { formatDuration } from "../statsFormatting";
 import { prestigeReset } from "@/services/player/prestigeService";
+import {
+  dailyStreakXpMultiplier,
+  formatStreakXpMultiplierLabel,
+} from "@/services/player/dailyStreakXp";
 import styles from "../StatsScreen.module.css";
 
 function formatBestTime(seconds: number): string {
@@ -109,6 +113,7 @@ export function ProfileTab({
   const bestStr = hasBest ? formatBestTime(bestSeconds) : "—";
   const totalTime = formatDuration(stats?.totalPlayTimeSeconds ?? 0);
   const masteryCount = Math.min(7, weeklyAlbumProgress);
+  const nextDailyXpMult = dailyStreakXpMultiplier(streak + 1);
 
   useEffect(() => {
     if (settingsOpen && displayNameInputRef.current) {
@@ -158,6 +163,19 @@ export function ProfileTab({
         {bestStreak > 0 && bestStreak !== streak ? (
           <p className={styles.profileStatMuted}>Best streak: {bestStreak} days</p>
         ) : null}
+        <p className={styles.profileStatMuted}>
+          {nextDailyXpMult > 1.02 ? (
+            <>
+              Next daily solve earns {formatStreakXpMultiplierLabel(nextDailyXpMult)} XP
+              toward level (streak bonus, max 2×).
+            </>
+          ) : (
+            <>
+              Consecutive daily solves multiply XP (up to 2×), so streaks level you up
+              faster.
+            </>
+          )}
+        </p>
 
         <div className={styles.profileSummaryDivider} />
 

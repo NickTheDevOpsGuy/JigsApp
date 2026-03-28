@@ -25,6 +25,8 @@ export type PlayScreenModalsProps = {
   onConfirmNewGame: () => void;
   showChoosePuzzleModal: boolean;
   setShowChoosePuzzleModal: (show: boolean) => void;
+  /** After a solved puzzle, closing the picker without starting sends the user home (avoids the board CTA loop). */
+  onChoosePuzzleDismissWithoutStart?: () => void;
   showResetStatsConfirm: boolean;
   setShowResetStatsConfirm: (show: boolean) => void;
   showClearCacheConfirm: boolean;
@@ -50,6 +52,7 @@ export function PlayScreenModals({
   onConfirmNewGame,
   showChoosePuzzleModal,
   setShowChoosePuzzleModal,
+  onChoosePuzzleDismissWithoutStart,
   showResetStatsConfirm,
   setShowResetStatsConfirm,
   showClearCacheConfirm,
@@ -62,6 +65,7 @@ export function PlayScreenModals({
     <>
       <ChoosePuzzleModal
         isOpen={showChoosePuzzleModal}
+        onDismissWithoutStart={onChoosePuzzleDismissWithoutStart}
         onClose={() => setShowChoosePuzzleModal(false)}
       />
 

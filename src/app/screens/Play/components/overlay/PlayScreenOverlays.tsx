@@ -37,6 +37,7 @@ export type PlayScreenOverlaysProps = {
   onboarding: OnboardingState;
   showStreakToast: boolean;
   milestoneMessage: string | null;
+  borderFrameMessage: string | null;
   announcerLine: string | null;
   shareToast: string | null;
   showProfiler: boolean;
@@ -79,6 +80,7 @@ export function PlayScreenOverlays({
   onboarding,
   showStreakToast,
   milestoneMessage,
+  borderFrameMessage,
   announcerLine,
   shareToast,
   showProfiler,
@@ -265,6 +267,7 @@ export function PlayScreenOverlays({
           showFirstSnapToast={onboarding.showFirstSnapToast}
           showStreakToast={showStreakToast}
           milestoneMessage={milestoneMessage}
+          borderFrameMessage={borderFrameMessage}
           announcerLine={announcerLine}
           shareToast={shareToast}
           classNames={{

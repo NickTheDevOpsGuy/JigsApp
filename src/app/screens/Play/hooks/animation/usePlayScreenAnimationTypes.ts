@@ -16,6 +16,7 @@ export interface UsePlayScreenAnimationArgs {
   popMapRef: RefObject<Map<string, number>>;
   lockMapRef: RefObject<Map<string, number>>;
   selectedIdRef: RefObject<string | null>;
+  hoverPreviewPieceIdRef: RefObject<string | null>;
   dragPreviewPieceIdRef: RefObject<string | null>;
   snapParticlesRef?: RefObject<SnapParticle[]>;
   debug: DebugFlags;
@@ -43,4 +44,8 @@ export interface UsePlayScreenAnimationArgs {
   dailyVisualModifier?: "none" | "fog" | "night" | "sepia";
   /** When true, do not idle-throttle RAF — replay scrub/playback must redraw every tick. */
   replayBarOpen?: boolean;
+  /** When true, skip idle hint pulse (game paused / menu). */
+  isPaused?: boolean;
+  /** Touch-first devices: use selected piece for target preview (no hover). */
+  isCoarsePointer?: boolean;
 }

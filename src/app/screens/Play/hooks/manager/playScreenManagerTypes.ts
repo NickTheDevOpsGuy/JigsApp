@@ -24,6 +24,8 @@ export type PlayScreenManagerOptions = {
   relaxedModeEnabled?: boolean;
   elapsedSecondsRef?: MutableRefObject<number>;
   onQuadrantPlaced?: (quadrant: 0 | 1 | 2 | 3, elapsedSeconds: number) => void;
+  /** Cleared each puzzle; avoids double-firing quadrant completion. */
+  quadrantCompleteSeenRef?: MutableRefObject<Set<0 | 1 | 2 | 3>>;
   onPrecisionSnap?: (precisionPx: number) => void;
   dynamicDifficultyMultiplierRef?: MutableRefObject<number>;
   onRecordReplaySnapshot?: () => void;

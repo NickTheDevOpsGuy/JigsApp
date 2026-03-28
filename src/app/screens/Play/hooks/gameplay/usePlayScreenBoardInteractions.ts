@@ -16,6 +16,7 @@ type UsePlayScreenBoardInteractionsArgs = {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   trayRef: RefObject<HTMLDivElement | null>;
   selectedIdRef: MutableRefObject<string | null>;
+  hoverPreviewPieceIdRef: MutableRefObject<string | null>;
   setSelectedPieceId: (id: string | null) => void;
   bump: () => void;
   clearHighlight: () => void;
@@ -39,6 +40,7 @@ export function usePlayScreenBoardInteractions({
   canvasRef,
   trayRef,
   selectedIdRef,
+  hoverPreviewPieceIdRef,
   setSelectedPieceId,
   bump,
   clearHighlight,
@@ -116,6 +118,7 @@ export function usePlayScreenBoardInteractions({
     selectCycle,
     setSelectedPieceId,
     selectedIdRef,
+    hoverPreviewPieceIdRef,
     bump,
     didDragRef,
     haptic: hapticsVibrate,

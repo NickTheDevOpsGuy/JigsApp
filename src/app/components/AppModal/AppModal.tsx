@@ -2,10 +2,22 @@
  * AppModal – richer modal used for win screen and share menus.
  * Supports surface, size, tone, subtitle, bodyClassName props.
  */
-import React, { useEffect, useCallback, useId, useMemo, useRef } from "react";
+import React, {
+  useEffect,
+  useCallback,
+  useId,
+  useMemo,
+  useRef,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import styles from "./AppModal.module.css";
+import {
+  getLayoutViewportSize,
+  subscribeViewportLayoutChanges,
+} from "@/utils/layoutViewport";
 
 const BODY_SCROLL_LOCK_ATTR = "data-app-modal-lock-count";
 const BODY_SCROLL_Y_ATTR = "data-app-modal-scroll-y";
@@ -51,6 +63,11 @@ type AppModalProps = {
    * Default true for standard dismissible modals.
    */
   closeOnBackdropClick?: boolean;
+  /**
+   * When set, the dialog is centered on this element’s bounding rect (async layout via
+   * rAF + ResizeObserver) so it lines up with e.g. the puzzle board; still uses a full-screen backdrop.
+   */
+  anchorRef?: React.RefObject<HTMLElement | null>;
 };
 
 export function AppModal({
@@ -70,10 +87,17 @@ export function AppModal({
   dialogClassName,
   closeLabel = "Close",
   closeOnBackdropClick = true,
+  anchorRef,
 }: AppModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const [anchorPosition, setAnchorPosition] = useState<{
+    top: number;
+    left: number;
+    maxWidthPx: number;
+    maxHeightPx: number;
+  } | null>(null);
   const accessibleName = useMemo(() => title ?? "Dialog", [title]);
 
   const isTopModal = useCallback(
@@ -202,13 +226,66 @@ export function AppModal({
     };
   }, [isOpen, handleKeyDown, trapFocus, isTopModal]);
 
+  useLayoutEffect(() => {
+    if (!isOpen || anchorRef == null) {
+      setAnchorPosition(null);
+      return;
+    }
+    const el = anchorRef.current;
+    if (!el) {
+      setAnchorPosition(null);
+      return;
+    }
+
+    let raf = 0;
+    const apply = () => {
+      if (!el.isConnected) return;
+      const r = el.getBoundingClientRect();
+      const { width: vw, height: vh } = getLayoutViewportSize();
+      const margin = 12;
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const maxWidthPx = Math.min(
+        640,
+        Math.max(280, Math.round(r.width) + 24),
+        Math.round(vw - 2 * margin),
+      );
+      const maxHeightPx = Math.max(240, Math.round(vh - margin * 2));
+      setAnchorPosition({
+        top: Math.min(vh - margin, Math.max(margin, cy)),
+        left: Math.min(vw - margin, Math.max(margin, cx)),
+        maxWidthPx,
+        maxHeightPx,
+      });
+    };
+
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(apply);
+    };
+
+    apply();
+    const unobserveViewport = subscribeViewportLayoutChanges(schedule);
+    const ro = new ResizeObserver(schedule);
+    ro.observe(el);
+    return () => {
+      cancelAnimationFrame(raf);
+      unobserveViewport();
+      ro.disconnect();
+      setAnchorPosition(null);
+    };
+  }, [isOpen, anchorRef]);
+
   if (!isOpen) return null;
+
+  const useAnchor = anchorRef != null && anchorPosition != null;
 
   const dialogClass = [
     styles.dialog,
     size === "xl" ? styles.sizeXl : size === "wide" ? styles.sizeWide : "",
     surface === "bare" ? styles.surfaceBare : "",
     tone === "celebration" ? styles.toneCelebration : "",
+    useAnchor ? styles.dialogAnchored : "",
     dialogClassName,
   ]
     .filter(Boolean)
@@ -250,6 +327,18 @@ export function AppModal({
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
+        style={
+          useAnchor && anchorPosition
+            ? {
+                position: "fixed",
+                top: anchorPosition.top,
+                left: anchorPosition.left,
+                transform: "translate(-50%, -50%)",
+                width: `min(${anchorPosition.maxWidthPx}px, calc(100vw - 24px))`,
+                maxHeight: `min(${anchorPosition.maxHeightPx}px, 90dvh)`,
+              }
+            : undefined
+        }
       >
         {showCloseButton && (
           <button

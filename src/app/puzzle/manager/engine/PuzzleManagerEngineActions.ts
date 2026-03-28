@@ -15,6 +15,7 @@ import {
 } from "@/puzzle/manager/ops/puzzleManagerRestore";
 import { lockDebug } from "@/puzzle/debug/puzzleLockDebug";
 import { PuzzleManagerState } from "@/puzzle/manager/engine/PuzzleManagerEngineState";
+import { computeBoardWrongRotationProximity } from "@/puzzle/snap/puzzleSnap";
 
 export class PuzzleManagerActions extends PuzzleManagerState {
   protected shiftGroup(groupId: string, dx: number, dy: number) {
@@ -43,6 +44,23 @@ export class PuzzleManagerActions extends PuzzleManagerState {
       inSnapRange: preview.inSnapRange,
       proximity: preview.proximity,
     };
+  }
+
+  /** Near home translation but not snap-valid (e.g. wrong rotation); soft rejection halo. */
+  getSnapRejectPreviewState(): { proximity: number } | null {
+    const activeId = this.drag.activeId;
+    if (!activeId) return null;
+    const preview = this.drag.preview ?? this.computeSnapPreview();
+    if (preview?.inSnapRange) return null;
+    /* Neighbor magnet uses snap preview only — avoid stacking two reject cues. */
+    if (preview?.kind === "neighbor") return null;
+
+    const overlapEpsilonPx = this.isMobile ? 5 : 2;
+    return computeBoardWrongRotationProximity(
+      this.state.pieces,
+      activeId,
+      overlapEpsilonPx,
+    );
   }
 
   protected getEffectiveBoardSnapTolerance(multiplier = 1): number {

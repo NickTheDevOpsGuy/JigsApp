@@ -37,12 +37,19 @@ export type AnimationState = {
     inSnapRange: boolean;
     proximity: number;
   } | null;
+  /** Wrong rotation near home (board context); pairs with soft reject glow. */
+  snapRejectPreview?: { proximity: number } | null;
   snapGlowEnabled?: boolean;
   showAlignmentGrid?: boolean;
   /** Fog modifier: alpha for unplaced pieces (0 = clear, 0.5 = foggy). Placed pieces stay clear. */
   fogAlphaForUnplaced?: number;
   /** When hovering a piece: empty (row,col) slots adjacent to placed pieces – potential snap targets. */
   hoverSnapTargetSlots?: { row: number; col: number }[];
+  /** After idle: soft pulse on this piece id (must be drawn in piece-local path space). */
+  idleCorrectPulsePieceId?: string | null;
+  /** Hovered/selected piece id: draw faint ghosts at target for that group (when global ghost hint off). */
+  placementPreviewPieceId?: string | null;
+  placementPreviewAlpha?: number;
 };
 
 export type PieceCache = Map<string, HTMLCanvasElement>;

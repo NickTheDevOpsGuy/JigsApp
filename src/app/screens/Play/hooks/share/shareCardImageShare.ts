@@ -3,6 +3,13 @@ import {
   buildChallengeShareMessage,
 } from "@/screens/Play/core/share/shareMessages";
 
+export function isShareCancelledError(e: unknown): boolean {
+  if (e instanceof DOMException && e.name === "AbortError") return true;
+  return (
+    typeof e === "object" && e !== null && (e as { name?: string }).name === "AbortError"
+  );
+}
+
 export async function shareOrDownloadCard(args: {
   blob: Blob;
   mode: "challenge" | "result";
@@ -53,12 +60,20 @@ export async function shareOrDownloadCard(args: {
         });
 
   if (navigator.share && navigator.canShare?.({ files: [file] })) {
-    await navigator.share({
-      title: "Phuzzle",
-      text: shareText,
-      files: [file],
-    });
-    return;
+    try {
+      await navigator.share({
+        title: "Phuzzle",
+        text: shareText,
+        files: [file],
+      });
+      return;
+    } catch (e) {
+      if (isShareCancelledError(e)) {
+        /* User dismissed the sheet — still offer a download below. */
+      } else {
+        throw e;
+      }
+    }
   }
 
   const url = URL.createObjectURL(blob);

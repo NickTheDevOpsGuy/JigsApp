@@ -92,6 +92,8 @@ export function usePlayScreenUI() {
 
   const pageRef = useRef<HTMLDivElement>(null);
   const selectedIdRef = useRef<string | null>(null);
+  /** Desktop: piece under cursor on board; tray: piece under pointer. Drives faint target preview on canvas. */
+  const hoverPreviewPieceIdRef = useRef<string | null>(null);
   const [, forceRerender] = useState(0);
   const bump = () => forceRerender((n) => n + 1);
   const {
@@ -300,6 +302,7 @@ export function usePlayScreenUI() {
     setSelectedPieceId,
     pageRef,
     selectedIdRef,
+    hoverPreviewPieceIdRef,
     bump,
     toggleFullscreen,
     toggleSound,

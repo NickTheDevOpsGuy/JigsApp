@@ -4,6 +4,7 @@
 import { supabase, isSupabaseConfigured } from "@/supabase/client";
 import { ensureSignedIn } from "@/supabase/auth";
 import { getTodayDateString, getYesterdayDateString } from "@/daily/dailyPuzzleCore";
+import { dailyStreakXpMultiplier } from "@/services/player/dailyStreakXp";
 
 export type PlayerStatsData = {
   puzzlesCompleted: number;
@@ -17,6 +18,12 @@ export type PlayerStatsData = {
   level?: number;
   prestigeCount?: number;
   challengeWins?: number;
+  /** XP granted for this completion only (includes daily streak multiplier when applicable). */
+  lastXpGained?: number;
+  /** Multiplier applied to base XP for this completion (1 if none). */
+  dailyStreakXpMultiplier?: number;
+  /** Flat XP added for completing the border frame this session. */
+  borderFrameXpBonus?: number;
 };
 
 /** XP thresholds: level 1 = 0, level 2 = 100, level 3 = 250, then +150 per level. */
@@ -64,6 +71,9 @@ async function maybeAwardChallengeWin(
 export type PieceCutType = "classic" | "irregular" | "hard";
 export type VisualModifier = "none" | "fog" | "night" | "sepia";
 
+/** XP granted when the full perimeter was solved earlier this session (see useBorderFrameMilestone). */
+export const BORDER_FRAME_XP_BONUS = 15;
+
 /** Source of the puzzle: daily, from a pack, or custom/upload. */
 export type CompletionSource = "daily" | "pack" | "custom";
 
@@ -83,6 +93,8 @@ export async function recordCompletion(args: {
   undoCount?: number;
   /** daily | pack | custom for breakdowns and analytics. */
   completionSource?: CompletionSource;
+  /** Perimeter frame completed this session before win (small XP bonus). */
+  borderFrameBonus?: boolean;
 }): Promise<PlayerStatsData | null> {
   if (!isSupabaseConfigured()) return null;
 
@@ -164,7 +176,10 @@ export async function recordCompletion(args: {
   const XP_PER_PIECE = 10;
   const XP_COMPLETION_BONUS = 5;
   const pieceCount = args.grid.rows * args.grid.cols;
-  const xpGain = pieceCount * XP_PER_PIECE + XP_COMPLETION_BONUS;
+  const baseXpGain = pieceCount * XP_PER_PIECE + XP_COMPLETION_BONUS;
+  const streakMult = args.isDaily ? dailyStreakXpMultiplier(args.dailyStreak) : 1;
+  const borderXp = args.borderFrameBonus ? BORDER_FRAME_XP_BONUS : 0;
+  const xpGain = Math.round(baseXpGain * streakMult) + borderXp;
   const existingXp = (existing as { xp?: number } | null)?.xp ?? 0;
   const newXp = existingXp + xpGain;
   const newLevel = xpToLevel(newXp);
@@ -209,6 +224,9 @@ export async function recordCompletion(args: {
     masteryStreak: updates.mastery_streak,
     bestMasteryStreak: updates.best_mastery_streak,
     lastPlayedAt: updates.last_played_at,
+    lastXpGained: xpGain,
+    dailyStreakXpMultiplier: args.isDaily ? streakMult : 1,
+    borderFrameXpBonus: borderXp > 0 ? borderXp : undefined,
   };
 }
 

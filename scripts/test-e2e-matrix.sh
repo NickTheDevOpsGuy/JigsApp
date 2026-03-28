@@ -11,6 +11,7 @@ projects=(
   chromium-tz-auckland
   firefox
   webkit
+  msedge
 )
 
 for project in "${projects[@]}"; do

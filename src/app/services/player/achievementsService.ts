@@ -18,6 +18,8 @@ export async function checkAndUnlockAchievements(args: {
   bestDailyStreak: number;
   lastCompletion?: { elapsedSeconds: number; grid: { rows: number; cols: number } };
   undoCount?: number;
+  /** 100% placement accuracy (no wasted moves vs piece count). */
+  placementAccuracyPerfect?: boolean;
 }): Promise<string[]> {
   if (!isSupabaseConfigured()) return [];
 
@@ -42,6 +44,7 @@ export async function checkAndUnlockAchievements(args: {
   const expertGrid = r === 6 && c === 6;
   const quick4x4 = r === 4 && c === 4 && time < 120;
   const flawless = args.undoCount === 0;
+  const perfectPlacements = args.placementAccuracyPerfect === true;
 
   const toCheck: { id: string; condition: boolean }[] = [
     { id: "first_puzzle", condition: args.puzzlesCompleted >= 1 },
@@ -66,6 +69,7 @@ export async function checkAndUnlockAchievements(args: {
     { id: "grid_8x8", condition: r === 8 && c === 8 },
     { id: "grid_9x9", condition: r === 9 && c === 9 },
     { id: "flawless", condition: flawless },
+    { id: "perfect_placements", condition: perfectPlacements },
   ];
 
   for (const { id, condition } of toCheck) {

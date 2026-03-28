@@ -27,6 +27,13 @@
   }
 }
 
+/* AppModal body hook: flex child can shrink inside xl dialog */
+.completeWinModalBody {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .completeWinBackdrop {
   animation: completeBackdropEnter 0.3s ease both;
   /* Don’t scroll or rubber-band the page behind the win card; accidental taps already ignored via AppModal */
@@ -75,6 +82,69 @@
   color: var(--color-text-secondary);
 }
 
+/* ── Area pace (quarters finished, slowest first) ── */
+.completeAreaPace {
+  width: 100%;
+  padding: 0 20px 10px;
+  margin: 0;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+  flex-shrink: 0;
+}
+
+.completeAreaPaceVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.completeAreaPaceTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin: 0 0 8px;
+}
+
+.completeAreaPaceList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.completeAreaPaceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.completeAreaPaceLabel {
+  color: var(--color-text-secondary);
+}
+
+.completeAreaPaceTime {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.completeAreaPaceCaption {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
 /* ── Celebration block ── */
 .completeCelebrationBlock {
   display: flex;
@@ -93,6 +163,131 @@
   letter-spacing: -0.02em;
   text-align: center;
   line-height: 1.1;
+}
+
+/* ── Daily streak (continuing: 2+ days) — subtle motion on win screen ── */
+.completeStreakIndicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  isolation: isolate;
+  background: color-mix(in srgb, var(--color-brand-primary) 10%, var(--color-bg-card));
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 32%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f45 18%, transparent);
+  opacity: 0;
+  transform: translateY(6px) scale(0.98);
+  transition:
+    opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.completeStreakIndicatorVisible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.completeStreakShimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 40%,
+    color-mix(in srgb, #ffb86c 22%, transparent) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 220% 100%;
+  animation: completeStreakShimmerMove 3.2s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.completeStreakFlame {
+  position: relative;
+  z-index: 1;
+  font-size: 15px;
+  line-height: 1;
+  display: inline-flex;
+  animation: completeStreakFlamePulse 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, #ff8c42 55%, transparent));
+}
+
+.completeStreakLabel {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+}
+
+.completeStreakCount {
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--color-brand-primary) 92%, var(--color-text-primary));
+  animation: completeStreakCountGlow 2.4s ease-in-out infinite;
+}
+
+.completeStreakSuffix {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  text-transform: lowercase;
+}
+
+@keyframes completeStreakShimmerMove {
+  0%,
+  100% {
+    background-position: 180% 0;
+  }
+  50% {
+    background-position: -80% 0;
+  }
+}
+
+@keyframes completeStreakFlamePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.92;
+  }
+  50% {
+    transform: scale(1.07);
+    opacity: 1;
+  }
+}
+
+@keyframes completeStreakCountGlow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.82;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeStreakShimmer,
+  .completeStreakFlame,
+  .completeStreakCount {
+    animation: none !important;
+  }
+
+  .completeStreakShimmer {
+    opacity: 0.35;
+    background-position: 50% 0;
+  }
 }
 
 /* ── Puzzle image ── */
@@ -118,12 +313,13 @@
 /* ── Achievement cycler (phase 3) ── */
 .completeAchievementPhased {
   margin: 0;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--color-brand-primary);
   text-align: center;
   letter-spacing: 0.01em;
-  min-height: 22px;
+  line-height: 1.35;
+  min-height: 24px;
 }
 
 /* ── Actions section ── */
@@ -246,103 +442,6 @@
 
 .completeMenuItem + .completeMenuItem {
   border-top: 1px solid var(--color-border);
-}
-
-/* ── Share menu ── */
-.completeShareWrap {
-  position: relative;
-}
-
-.completeActionBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: background 0.12s;
-}
-
-.completeActionBtn:hover {
-  background: var(--color-bg-elevated);
-}
-
-.completeActionLead {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Share modal body */
-.shareModalBody {
-  padding: 0 !important;
-}
-
-.completeShareSheet {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.completeShareSummaryCard {
-  padding: 16px 20px;
-  background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-bg-card));
-  border-bottom: 1px solid var(--color-border);
-}
-
-.completeSharePreviewHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.completeSharePreviewBrand {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--color-brand-primary);
-  letter-spacing: -0.01em;
-}
-
-.completeSharePreviewTag {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.completeSharePreviewStats {
-  display: flex;
-  gap: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  flex-wrap: wrap;
-}
-
-.completeShareActionsGroup {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.completeShareActionsGroup:last-child {
-  border-bottom: none;
-}
-
-.completeShareGroupLabel {
-  display: block;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-text-secondary);
-  margin-bottom: 10px;
 }
 
 .completeShareDropdown {
@@ -524,11 +623,6 @@
     font-size: 12px;
     gap: 4px;
   }
-
-  .completeSharePreviewStats {
-    gap: 8px;
-    font-size: 12px;
-  }
 }
 
 /* ── Options trigger button (full-width, styled like completeMenuTrigger) ── */
@@ -597,92 +691,4 @@
   margin: 4px 0;
   border: none;
   border-top: 1px solid var(--color-border);
-}
-
-/* ── Share popup modal ── */
-.sharePopupBackdropFit {
-  /* default backdrop is fine */
-}
-
-.sharePopupDialogFit {
-  max-width: 420px;
-  width: 100%;
-}
-
-.sharePopupCompact {
-  padding: 0 !important;
-}
-
-.sharePopupPanel {
-  padding: 12px 16px 16px;
-}
-
-.sharePopupActions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.sharePopupAction {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
-  width: 100%;
-  padding: 12px 14px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  text-align: left;
-  transition:
-    background 0.12s,
-    border-color 0.12s;
-  box-sizing: border-box;
-}
-
-.sharePopupAction > svg {
-  margin-bottom: 2px;
-  color: var(--color-brand-primary);
-  flex-shrink: 0;
-}
-
-/* icon + label on one row */
-.sharePopupAction {
-  flex-direction: row;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.sharePopupAction > span {
-  flex: 1;
-  min-width: 0;
-}
-
-.sharePopupAction > small {
-  width: 100%;
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--color-text-secondary);
-  line-height: 1.3;
-  padding-left: 26px;
-}
-
-.sharePopupAction:hover:not(:disabled) {
-  background: var(--color-bg-elevated);
-  border-color: var(--color-brand-primary);
-}
-
-.sharePopupAction:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.sharePopupAction:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
 }

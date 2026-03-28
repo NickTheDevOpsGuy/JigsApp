@@ -1,24 +1,20 @@
 /**
- * Win screen: one full-width Options button; popover menu on desktop (opens upward)
- * and mobile (opens downward) with Next, Replay, then Share actions.
+ * Win screen: one full-width Options button; portalled menu positions below the trigger
+ * when there is room, otherwise above (viewport + safe layout).
  */
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, Share2, Swords, Film, ImagePlus } from "lucide-react";
+import { Calendar, ChevronDown, Share2, Swords, Film, ImagePlus } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
-import { CompletionOverlayShareMenu } from "@/screens/Play/components/completion/CompletionOverlayShareMenu";
 import type { UseCompletionOverlayDataResult } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import {
+  getLayoutViewportSize,
+  getSafeAreaInsetsHorizontal,
+  subscribeViewportLayoutChanges,
+} from "@/utils/layoutViewport";
 
 export function CompletionOverlayActions(args: {
-  grid?: { rows: number; cols: number };
-  puzzleShareUrl: string;
-  ensureChallengeShareUrl?: () => Promise<string>;
-  elapsedSeconds: number;
-  moveCount?: number;
-  accuracyPercent: number;
-  copied: boolean;
-  canNativeShare: boolean;
   onShareProgress?: () => void;
   onCopyProgress?: () => void;
   onShareChallenge?: (challengeUrl?: string) => void;
@@ -32,13 +28,6 @@ export function CompletionOverlayActions(args: {
   focusReturnRef?: React.RefObject<HTMLButtonElement | null>;
 }) {
   const {
-    puzzleShareUrl,
-    ensureChallengeShareUrl,
-    elapsedSeconds,
-    moveCount,
-    accuracyPercent,
-    copied,
-    canNativeShare,
     onShareProgress,
     onCopyProgress,
     onShareChallenge,
@@ -48,11 +37,12 @@ export function CompletionOverlayActions(args: {
     onReplayClick,
     onNextPuzzle,
     nextPuzzleLabel = "Next Puzzle",
-    grid,
   } = args;
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [busyAction, setBusyAction] = useState<"challenge" | "replay" | null>(null);
+  const [busyAction, setBusyAction] = useState<
+    "challenge" | "shareResult" | "dailyShare" | "replay" | null
+  >(null);
   const menuWrapRef = useRef<HTMLDivElement>(null);
   const [menuPlacement, setMenuPlacement] = useState<
     | { mode: "below"; top: number; left: number; width: number; maxHeight: number }
@@ -66,41 +56,63 @@ export function CompletionOverlayActions(args: {
       setMenuPlacement(null);
       return;
     }
+
+    let raf = 0;
     const measure = () => {
-      const wrap = menuWrapRef.current;
-      const btn = wrap?.querySelector("button");
-      if (!btn) return;
-      const r = btn.getBoundingClientRect();
-      const gap = 8;
-      const maxH = Math.min(window.innerHeight * 0.5, 320);
-      const spaceAbove = r.top;
-      const spaceBelow = window.innerHeight - r.bottom;
-      const minComfortableMenuSpace = 160;
-      // Prefer below so the dropdown clearly belongs to the Options trigger.
-      if (spaceBelow >= minComfortableMenuSpace || spaceBelow >= spaceAbove) {
-        setMenuPlacement({
-          mode: "below",
-          top: r.bottom + gap,
-          left: r.left,
-          width: r.width,
-          maxHeight: Math.min(maxH, spaceBelow - gap),
-        });
-      } else {
-        setMenuPlacement({
-          mode: "above",
-          bottom: window.innerHeight - r.top + gap,
-          left: r.left,
-          width: r.width,
-          maxHeight: Math.min(maxH, spaceAbove - gap),
-        });
-      }
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const wrap = menuWrapRef.current;
+        const btn = wrap?.querySelector("button");
+        if (!btn) return;
+        const r = btn.getBoundingClientRect();
+        const gap = 8;
+        const edgePad = 8;
+        const { width: vw, height: vh } = getLayoutViewportSize();
+        const { left: safeL, right: safeR } = getSafeAreaInsetsHorizontal();
+        const maxMenuW = Math.min(
+          r.width,
+          Math.max(120, vw - safeL - safeR - edgePad * 2),
+        );
+        let left = r.left;
+        const minLeft = safeL + edgePad;
+        const maxLeft = vw - safeR - edgePad - maxMenuW;
+        if (maxLeft >= minLeft) {
+          left = Math.min(Math.max(left, minLeft), maxLeft);
+        }
+        const maxH = Math.min(vh * 0.5, 320);
+        const spaceAbove = r.top;
+        const spaceBelow = vh - r.bottom;
+        const minComfortableMenuSpace = 160;
+        if (spaceBelow >= minComfortableMenuSpace || spaceBelow >= spaceAbove) {
+          setMenuPlacement({
+            mode: "below",
+            top: r.bottom + gap,
+            left,
+            width: maxMenuW,
+            maxHeight: Math.min(maxH, spaceBelow - gap),
+          });
+        } else {
+          setMenuPlacement({
+            mode: "above",
+            bottom: vh - r.top + gap,
+            left,
+            width: maxMenuW,
+            maxHeight: Math.min(maxH, spaceAbove - gap),
+          });
+        }
+      });
     };
+
     measure();
-    window.addEventListener("scroll", measure, true);
-    window.addEventListener("resize", measure);
+    const unsubViewport = subscribeViewportLayoutChanges(measure);
+    const wrap = menuWrapRef.current;
+    const ro = wrap ? new ResizeObserver(measure) : null;
+    if (wrap && ro) ro.observe(wrap);
+
     return () => {
-      window.removeEventListener("scroll", measure, true);
-      window.removeEventListener("resize", measure);
+      cancelAnimationFrame(raf);
+      unsubViewport();
+      ro?.disconnect();
     };
   }, [menuOpen, isMobileActions]);
 
@@ -116,8 +128,21 @@ export function CompletionOverlayActions(args: {
     return () => document.removeEventListener("pointerdown", close);
   }, [menuOpen]);
 
+  /** Close menu on Escape first; win overlay listens on bubble — capture runs first. */
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      e.stopPropagation();
+      setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [menuOpen]);
+
   const runBusyAction = async (
-    kind: "challenge" | "replay",
+    kind: "challenge" | "shareResult" | "dailyShare" | "replay",
     action: () => Promise<void> | void,
   ) => {
     setBusyAction(kind);
@@ -128,14 +153,31 @@ export function CompletionOverlayActions(args: {
     }
   };
 
+  const shareMenuBusy =
+    completionData.isGenerating ||
+    busyAction === "challenge" ||
+    busyAction === "shareResult" ||
+    busyAction === "dailyShare";
+
   const handleChallenge = () => {
     setMenuOpen(false);
-    completionData.openSharePopup("challenge");
+    void runBusyAction("challenge", async () => {
+      await completionData.handleShareChallengeCard();
+    });
   };
 
   const handleShareResult = () => {
     setMenuOpen(false);
-    completionData.openSharePopup("result");
+    void runBusyAction("shareResult", async () => {
+      await completionData.handleShareResultCard();
+    });
+  };
+
+  const handleDailyShare = () => {
+    setMenuOpen(false);
+    void runBusyAction("dailyShare", async () => {
+      await completionData.handleNativeDailyShare();
+    });
   };
 
   const hasGameActions = Boolean(onNextPuzzle || (canReplay && onReplayClick));
@@ -196,8 +238,14 @@ export function CompletionOverlayActions(args: {
                 await onReplayClick();
               })
             }
-            disabled={busyAction === "replay"}
-            title={busyAction === "replay" ? "Opening replay" : "Replay solve"}
+            disabled={busyAction === "replay" || completionData.isGenerating}
+            title={
+              completionData.isGenerating
+                ? "Wait for share to finish"
+                : busyAction === "replay"
+                  ? "Opening replay"
+                  : "Replay solve"
+            }
           >
             <Film size={18} aria-hidden />
             {busyAction === "replay"
@@ -222,9 +270,21 @@ export function CompletionOverlayActions(args: {
             role="menuitem"
             className={styles.completeMenuItem}
             onClick={() => void handleChallenge()}
+            disabled={shareMenuBusy || busyAction === "replay"}
+            title={
+              busyAction === "challenge"
+                ? "Preparing share…"
+                : completionData.isGenerating
+                  ? "Preparing share…"
+                  : "Challenge a friend"
+            }
           >
             <Swords size={18} aria-hidden />
-            {isMobileActions ? "Challenge a friend" : "Challenge Friend"}
+            {busyAction === "challenge"
+              ? "Sharing…"
+              : isMobileActions
+                ? "Challenge a friend"
+                : "Challenge Friend"}
           </button>
         )}
 
@@ -233,10 +293,38 @@ export function CompletionOverlayActions(args: {
             type="button"
             role="menuitem"
             className={styles.completeMenuItem}
-            onClick={handleShareResult}
+            onClick={() => void handleShareResult()}
+            disabled={shareMenuBusy || busyAction === "replay"}
+            title={
+              busyAction === "shareResult"
+                ? "Preparing share…"
+                : completionData.isGenerating
+                  ? "Preparing share…"
+                  : "Share your result"
+            }
           >
             <Share2 size={18} aria-hidden />
-            {isMobileActions ? "Share your result" : "Share Result"}
+            {busyAction === "shareResult"
+              ? "Sharing…"
+              : isMobileActions
+                ? "Share your result"
+                : "Share Result"}
+          </button>
+        )}
+
+        {args.isDaily && (
+          <button
+            type="button"
+            role="menuitem"
+            className={styles.completeMenuItem}
+            onClick={() => void handleDailyShare()}
+            disabled={shareMenuBusy || busyAction === "replay"}
+            title={
+              busyAction === "dailyShare" ? "Sharing…" : "Wordle-style daily summary"
+            }
+          >
+            <Calendar size={18} aria-hidden />
+            {busyAction === "dailyShare" ? "Sharing…" : "Daily Share"}
           </button>
         )}
       </div>,
@@ -244,27 +332,7 @@ export function CompletionOverlayActions(args: {
     );
 
   if (!hasAnyOptions) {
-    return (
-      <section className={styles.completeActionsPhased} aria-label="Actions">
-        <CompletionOverlayShareMenu
-          grid={grid}
-          puzzleShareUrl={puzzleShareUrl}
-          ensureChallengeShareUrl={ensureChallengeShareUrl}
-          elapsedSeconds={elapsedSeconds}
-          moveCount={moveCount}
-          accuracyPercent={accuracyPercent}
-          copied={copied}
-          canNativeShare={canNativeShare}
-          onShareProgress={onShareProgress}
-          onCopyProgress={onCopyProgress}
-          onShareChallenge={onShareChallenge}
-          onCopyChallenge={onCopyChallenge}
-          completionData={completionData}
-          isDaily={args.isDaily}
-          hideTrigger
-        />
-      </section>
-    );
+    return <section className={styles.completeActionsPhased} aria-label="Actions" />;
   }
 
   return (
@@ -294,24 +362,6 @@ export function CompletionOverlayActions(args: {
       </div>
 
       {optionsMenuPortal}
-
-      <CompletionOverlayShareMenu
-        grid={grid}
-        puzzleShareUrl={puzzleShareUrl}
-        ensureChallengeShareUrl={ensureChallengeShareUrl}
-        elapsedSeconds={elapsedSeconds}
-        moveCount={moveCount}
-        accuracyPercent={accuracyPercent}
-        copied={copied}
-        canNativeShare={canNativeShare}
-        onShareProgress={onShareProgress}
-        onCopyProgress={onCopyProgress}
-        onShareChallenge={onShareChallenge}
-        onCopyChallenge={onCopyChallenge}
-        completionData={completionData}
-        isDaily={args.isDaily}
-        hideTrigger
-      />
     </section>
   );
 }

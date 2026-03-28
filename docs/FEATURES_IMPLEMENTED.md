@@ -76,15 +76,15 @@ XP on completion (per piece + bonus); levels. At level 5+, prestige reset to Lv1
 - **Share** — Result and “Challenge a friend”; share card with URL.
 - **Mastery** — No hints/undo recorded as mastery; weekly album shows ⚡.
 
-**Files:** `LeaderboardTab.tsx`, `renderBoard.ts`, `usePlayScreenAnimation.ts`, `PlayToasts.tsx`, `CompletionSharePopup.tsx`, `useShareCardImage.ts`, `statsService.ts`, `leaderboardFetchersShared.ts`.
+**Files:** `LeaderboardTab.tsx`, `renderBoard.ts`, `usePlayScreenAnimation.ts`, `PlayToasts.tsx`, `useShareCardImageCore.ts`, `shareCardImageShare.ts`, `statsService.ts`, `leaderboardFetchersShared.ts`.
 
 ---
 
 ## Start page and win screen
 
 Start: compact top bar (Stats, Phuzzle, Help); one primary `Play Today’s Puzzle` CTA that switches to `Continue Daily` when today is already in progress; momentum strip with streak, freezes, and 7-day history; optional resume card with clearer daily context; secondary actions for Puzzle Packs and Quick Play; Feedback as a lightweight action.  
-Win: drop-up for Continue/Play again; cycling message; “New best time!” or performance badge; Share Result / Share with People; URL on share card only.  
-**Files:** `MenuScreen.tsx`, `DailyCountdown.tsx`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompletionSharePopup.tsx`, `useShareCardImage.ts`, `completionMessages.ts`.
+Win: drop-up for Continue/Play again; one celebration line; “New best time!” or performance badge; **Options** menu with **Share Result**, **Challenge Friend**, daily **Daily Share**, replay, next puzzle; URL on share card.  
+**Files:** `MenuScreen.tsx`, `DailyCountdown.tsx`, `CompletionOverlay.tsx`, `CompletionOverlayActions.tsx`, `CompletionOverlayCore.tsx`, `useCompletionOverlayData.ts`, `useShareCardImageCore.ts`, `shareCardImageShare.ts`, `completionMessages.ts`.
 
 ---
 

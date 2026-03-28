@@ -32,6 +32,7 @@ export function usePointerHandlers(args: {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   trayRef: React.RefObject<HTMLDivElement | null>;
   selectedIdRef: React.MutableRefObject<PieceId | null>;
+  hoverPreviewPieceIdRef: React.MutableRefObject<PieceId | null>;
   setSelectedPieceId: (id: PieceId | null) => void;
   bump: () => void;
   didDragRef: React.MutableRefObject<boolean>;
@@ -69,6 +70,7 @@ export function usePointerHandlers(args: {
     canvasRef,
     trayRef,
     selectedIdRef,
+    hoverPreviewPieceIdRef,
     setSelectedPieceId,
     bump,
     didDragRef,
@@ -118,6 +120,7 @@ export function usePointerHandlers(args: {
     canvasRef,
     trayRef,
     selectedIdRef,
+    hoverPreviewPieceIdRef,
     setSelectedPieceId,
     bump,
     didDragRef,
@@ -170,6 +173,7 @@ export function usePointerHandlers(args: {
       canvasRef,
       trayRef,
       selectedIdRef,
+      hoverPreviewPieceIdRef,
       setSelectedPieceId,
       bump,
       didDragRef,

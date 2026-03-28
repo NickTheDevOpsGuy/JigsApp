@@ -1,0 +1,57 @@
+# Auto-approve Renovate patch PRs and enable GitHub auto-merge (squash) so they
+# merge when CI passes — no manual approval needed for safe point releases.
+name: 🤖 Renovate patch auto-merge
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+    branches: [develop]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  approve-and-automerge:
+    name: ✅ Approve & enable auto-merge (patch only)
+    if: >
+      github.actor == 'renovate[bot]' &&
+      github.event.pull_request.draft == false &&
+      contains(join(github.event.pull_request.labels.*.name, ' '), 'patch-update') &&
+      !contains(join(github.event.pull_request.labels.*.name, ' '), 'lockfile-maintenance')
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+    steps:
+      - name: ✅ Auto-approve
+        uses: hmarr/auto-approve-action@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔁 Enable squash auto-merge
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            try {
+              await github.graphql(
+                `mutation ($id: ID!) {
+                  enablePullRequestAutoMerge(input: {
+                    pullRequestId: $id,
+                    mergeMethod: SQUASH
+                  }) {
+                    pullRequest { autoMergeRequest { enabled } }
+                  }
+                }`,
+                { id: pr.node_id },
+              );
+              core.info("Auto-merge enabled (squash).");
+            } catch (e) {
+              if (String(e?.message || e).includes("already enabled")) {
+                core.info("Auto-merge already enabled.");
+                return;
+              }
+              throw e;
+            }

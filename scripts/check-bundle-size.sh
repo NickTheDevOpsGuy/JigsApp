@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Check gzip'd JS bundle size vs baseline. Fails CI if over limit.
+# Bump when the gzip sum of dist/assets/*.js grows (e.g. new features, Workbox chunk).
 set -e
-BASELINE_KB=${BASELINE_KB:-280}
+BASELINE_KB=${BASELINE_KB:-320}
 cd "$(dirname "$0")/.."
 npm run build --silent 2>/dev/null
 TOTAL=0

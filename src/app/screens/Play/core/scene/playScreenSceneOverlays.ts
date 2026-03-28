@@ -49,17 +49,13 @@ export function buildCompletionProps(args: {
   pieceCutType: PieceCutType;
   isNewBest: boolean;
   puzzleShareUrl: string;
-  ensureChallengeShareUrl: () => Promise<string>;
   puzzleName?: string;
   share: {
-    copied: boolean;
-    canNativeShare: boolean;
     handleCopyResults: () => void;
     handleNativeShare: () => Promise<void> | void;
     handleCopyChallenge: () => void;
     handleNativeChallengeShare: (challengeUrl?: string) => Promise<void> | void;
-    getProgressShareTextWithUrl: () => string;
-    getChallengeShareTextWithUrl: (challengeUrl?: string) => string;
+    setShareToast: (message: string | null) => void;
   };
   onClose: () => void;
   usedHint: boolean;
@@ -71,6 +67,11 @@ export function buildCompletionProps(args: {
   focusReturnRef?: React.RefObject<HTMLButtonElement>;
   onCompletionRecorded?: (stats: { dailyStreak: number }) => void;
   onNewBest?: () => void;
+  boardAnchorRef?: React.RefObject<HTMLElement | null>;
+  /** Full border completed this session; small XP bonus at record time. */
+  borderFrameBonus: boolean;
+  /** Elapsed seconds when each board quarter was fully completed (for area-pace summary). */
+  quadrantTimes?: Record<0 | 1 | 2 | 3, number | null>;
 }): CompletionProps {
   const {
     showCompletionOverlay,
@@ -89,7 +90,6 @@ export function buildCompletionProps(args: {
     pieceCutType,
     isNewBest,
     puzzleShareUrl,
-    ensureChallengeShareUrl,
     puzzleName,
     share,
     onClose,
@@ -100,9 +100,13 @@ export function buildCompletionProps(args: {
     nextPuzzleLabel,
     onCompletionRecorded,
     onNewBest,
+    boardAnchorRef,
+    borderFrameBonus,
+    quadrantTimes,
   } = args;
 
   const focusReturnRefProp = focusReturnRef != null ? { focusReturnRef } : undefined;
+  const boardAnchorRefProp = boardAnchorRef != null ? { boardAnchorRef } : undefined;
 
   if (!showCompletionOverlay || completionDismissed) return null;
   if (!state) return null;
@@ -124,7 +128,6 @@ export function buildCompletionProps(args: {
     pieceCutType,
     isNewBest,
     puzzleShareUrl,
-    ensureChallengeShareUrl,
     puzzleName,
     share,
     onClose,
@@ -137,6 +140,9 @@ export function buildCompletionProps(args: {
     onCompletionRecorded,
     onNewBest,
     ...focusReturnRefProp,
+    ...boardAnchorRefProp,
+    borderFrameBonus,
+    ...(quadrantTimes != null ? { quadrantTimes } : {}),
   };
 }
 

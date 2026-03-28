@@ -8,7 +8,9 @@ import {
   LOCK_LERP_MS,
   getHighPieceCountThreshold,
   IDLE_GHOST_MS,
+  IDLE_CORRECT_PIECE_PULSE_MS,
 } from "@/screens/Play/hooks/animation/usePlayScreenAnimationConstants";
+import { pickIdleCorrectPulsePieceId } from "@/screens/Play/hooks/animation/pickIdleCorrectPulsePiece";
 import { useAutoBatterySaver } from "@/screens/Play/hooks/system/useAutoBatterySaver";
 import { useDevFrameSampler } from "@/screens/Play/hooks/system/useDevFrameSampler";
 import { useReducedMotionRef } from "@/screens/Play/hooks/system/useReducedMotionRef";
@@ -36,6 +38,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     popMapRef,
     lockMapRef,
     selectedIdRef,
+    hoverPreviewPieceIdRef,
     dragPreviewPieceIdRef,
     snapParticlesRef,
     debug,
@@ -55,6 +58,8 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     onUndoSnapBackComplete: _onUndoSnapBackComplete,
     dailyVisualModifier = "none",
     replayBarOpen = false,
+    isPaused = false,
+    isCoarsePointer = false,
   } = args;
   const autoBatterySaverMode = useAutoBatterySaver();
   const effectiveBatterySaverMode = batterySaverMode || autoBatterySaverMode;
@@ -215,6 +220,14 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
       const snapPreview =
         dragState.activeId && manager ? manager.getSnapPreviewState() : null;
+      const snapRejectPreview =
+        snapGlowEnabled &&
+        isDragging &&
+        dragState.activeId &&
+        manager &&
+        !snapPreview?.inSnapRange
+          ? manager.getSnapRejectPreviewState()
+          : null;
       const inNearSnap =
         !!snapPreview &&
         (snapPreview.inSnapRange || snapPreview.nearSnap) &&
@@ -230,6 +243,15 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       const effectiveShowGhost =
         showGhostHint ||
         (!!showGhostWhenIdle && idleMs >= IDLE_GHOST_MS && !st.isComplete);
+      const idleCorrectPulsePieceId =
+        !st.isComplete &&
+        !isDragging &&
+        !replayBarOpen &&
+        !isPaused &&
+        idleMs >= IDLE_CORRECT_PIECE_PULSE_MS &&
+        !reducedMotion
+          ? pickIdleCorrectPulsePieceId(st.pieces)
+          : null;
       const ghostAlpha = showGhostHint ? 0.35 : 0.2;
       const totalPieces = st.pieces.filter((p) => !p.inTray).length;
       const placedCount = st.pieces.filter((p) => !p.inTray && p.isPlaced).length;
@@ -242,6 +264,11 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
         hoveredId && !isDragging && !st.isComplete
           ? getHoverSnapTargetSlots(st)
           : undefined;
+      const hoverPreviewId = hoverPreviewPieceIdRef.current;
+      const placementPreviewPieceId =
+        !st.isComplete && !isDragging && !replayBarOpen && !isPaused
+          ? (hoverPreviewId ?? (isCoarsePointer ? selectedIdRef.current : null))
+          : null;
       renderBoard(
         ctx,
         st,
@@ -269,9 +296,12 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
           lockLerpOverrides,
           wrongRotationHint,
           snapPreview,
+          snapRejectPreview,
           snapGlowEnabled,
           fogAlphaForUnplaced: fogAlphaForUnplaced > 0 ? fogAlphaForUnplaced : undefined,
           hoverSnapTargetSlots,
+          idleCorrectPulsePieceId,
+          placementPreviewPieceId,
         },
         pieceCache,
         pathCacheRef.current,
@@ -333,5 +363,9 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     autoBatterySaverMode,
     dailyVisualModifier,
     replayBarOpen,
+    isPaused,
+    isCoarsePointer,
+    hoverPreviewPieceIdRef,
+    selectedIdRef,
   ]);
 }

@@ -82,6 +82,7 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
       onDragPreview?.(null);
       selectedIdRef.current = null;
       setSelectedPieceId(null);
+      ctx.hoverPreviewPieceIdRef.current = null;
       manager.pointerUp();
       setState(manager.getState());
       viewport.endPan();
@@ -130,6 +131,7 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
     if (!pieceId) {
       selectedIdRef.current = null;
       setSelectedPieceId(null);
+      ctx.hoverPreviewPieceIdRef.current = null;
       if (viewport && e.pointerType === "touch" && viewport.isZoomedOrPanned?.()) {
         e.preventDefault();
         viewport.startPan(e.clientX, e.clientY);
@@ -210,6 +212,7 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
         onDragPreview?.(null);
         selectedIdRef.current = null;
         setSelectedPieceId(null);
+        ctx.hoverPreviewPieceIdRef.current = null;
         manager?.pointerUp();
         if (manager) setState(manager.getState());
         viewport.endPan();

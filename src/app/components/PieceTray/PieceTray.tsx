@@ -34,6 +34,8 @@ type Props = {
   image: HTMLImageElement | null;
   grid: { rows: number; cols: number };
   onPieceClick: (pieceId: string) => void;
+  /** Desktop hover / stylus: drive faint target preview on the board canvas. */
+  onTrayPieceHover?: (pieceId: string | null) => void;
   highlightedPieceIds?: Set<string>;
   /** Optional class from layout (e.g. large tray variant) */
   className?: string;
@@ -48,7 +50,7 @@ export function buildTraySlots(displayed: Piece[], totalSlots: number): TraySlot
 }
 
 export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
-  { pieces, image, grid, onPieceClick, highlightedPieceIds, className },
+  { pieces, image, grid, onPieceClick, onTrayPieceHover, highlightedPieceIds, className },
   ref,
 ) {
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -125,6 +127,12 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                   type="button"
                   className={`${styles.pieceButton} ${highlightedPieceIds?.has(slot.piece.id) ? styles.pieceButtonPulse : ""}`}
                   onClick={() => onPieceClick(slot.piece.id)}
+                  onPointerEnter={
+                    onTrayPieceHover ? () => onTrayPieceHover(slot.piece.id) : undefined
+                  }
+                  onPointerLeave={
+                    onTrayPieceHover ? () => onTrayPieceHover(null) : undefined
+                  }
                   aria-label={`Place piece ${slot.piece.id}`}
                   title={`Place piece ${slot.piece.id}`}
                 >

@@ -6,7 +6,6 @@ import {
   buildChallengeShareMessage,
   buildDailyShareMessage,
   getDailyShareCompletionGrid,
-  pickChallengeTaunt,
 } from "@/screens/Play/core/share/shareMessages";
 
 describe("shareMessages", () => {
@@ -31,8 +30,8 @@ describe("shareMessages", () => {
     expect(text).toContain("Easy");
     expect(text).toContain("9 pieces");
     expect(text).toContain("1:42");
-    expect(text).toContain("Moves: 25");
-    expect(text).not.toContain("Think you can beat me?");
+    expect(text).toContain("25 moves");
+    expect(text).not.toContain("Can you beat my time");
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc");
   });
 
@@ -61,16 +60,9 @@ describe("shareMessages", () => {
 
     expect(text).toContain("16 pieces");
     expect(text).toContain("1:42");
-    expect(text).toContain("Moves: 42");
-    expect(text).toContain("Rotations: 3");
-    expect(
-      [
-        "I destroyed this puzzle. Can you even come close?",
-        "Puzzle demolished. Think you can top this?",
-        "Another one down. Beat this run if you can.",
-        "I crushed this one. Your turn to prove it.",
-      ].some((line) => text.includes(line)),
-    ).toBe(true);
+    expect(text).toContain("42 moves");
+    expect(text).toContain("3 rotations");
+    expect(text).toContain("Can you beat my time on this puzzle?");
     expect(text).toContain("https://phuzzle.vercel.app/play?session=abc&ct=102&cm=42");
   });
 
@@ -84,13 +76,6 @@ describe("shareMessages", () => {
     expect(text).toContain("Easy");
     expect(text).toContain("9 pieces");
     expect(text).toContain("https://phuzzle.vercel.app/play?grid=3x3&ct=36&cm=19");
-  });
-
-  it("pickChallengeTaunt chooses from the supported taunt set", () => {
-    expect(pickChallengeTaunt(0)).toBe(
-      "I destroyed this puzzle. Can you even come close?",
-    );
-    expect(pickChallengeTaunt(0.99)).toBe("I crushed this one. Your turn to prove it.");
   });
 
   it("buildChallengePlayUrl preserves existing puzzle params and rewrites challenge stats", () => {

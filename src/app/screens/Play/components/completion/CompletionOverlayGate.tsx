@@ -2,6 +2,7 @@
  * CompletionOverlayGate renders the win overlay only when the solved puzzle should
  * still be visible, so the main Play screen can treat it as one derived overlay prop.
  */
+import type React from "react";
 import type { PuzzleState } from "@/puzzle/core/types";
 import { CompletionOverlay } from "@/screens/Play/components/completion/CompletionOverlay";
 
@@ -22,15 +23,13 @@ interface CompletionOverlayGateProps {
   isNewBest: boolean;
   /** Path to this puzzle for share link (e.g. /daily or /play?session=xxx). */
   puzzleShareUrl: string;
-  ensureChallengeShareUrl: () => Promise<string>;
   puzzleName?: string;
   share: {
-    copied: boolean;
-    canNativeShare: boolean;
     handleCopyResults: () => void;
     handleNativeShare: () => void;
     handleCopyChallenge: () => void;
     handleNativeChallengeShare: (challengeUrl?: string) => void;
+    setShareToast: (message: string | null) => void;
   };
   onClose: () => void;
   usedHint: boolean;
@@ -47,6 +46,10 @@ interface CompletionOverlayGateProps {
   onCompletionRecorded?: (stats: { dailyStreak: number }) => void;
   /** Called once when overlay is shown with a new personal best (e.g. haptic). */
   onNewBest?: () => void;
+  /** Center the win dialog on the puzzle board (viewport-fixed, measured async). */
+  boardAnchorRef?: React.RefObject<HTMLElement | null>;
+  borderFrameBonus?: boolean;
+  quadrantTimes?: Record<0 | 1 | 2 | 3, number | null>;
 }
 
 export function CompletionOverlayGate({
@@ -62,7 +65,6 @@ export function CompletionOverlayGate({
   pieceCutType,
   isNewBest,
   puzzleShareUrl,
-  ensureChallengeShareUrl,
   puzzleName,
   share,
   onClose,
@@ -75,6 +77,9 @@ export function CompletionOverlayGate({
   focusReturnRef,
   onCompletionRecorded,
   onNewBest,
+  boardAnchorRef,
+  borderFrameBonus = false,
+  quadrantTimes,
 }: CompletionOverlayGateProps) {
   if (!show || !state) return null;
 
@@ -104,20 +109,21 @@ export function CompletionOverlayGate({
       isDaily={isDaily}
       cutType={pieceCutType}
       puzzleShareUrl={puzzleShareUrl}
-      ensureChallengeShareUrl={ensureChallengeShareUrl}
       puzzleName={puzzleName}
-      copied={share.copied}
-      canNativeShare={share.canNativeShare}
       onShareProgress={share.handleNativeShare}
       onShareChallenge={share.handleNativeChallengeShare}
       onCopyProgress={share.handleCopyResults}
       onCopyChallenge={share.handleCopyChallenge}
+      setShareToast={share.setShareToast}
       onClose={onClose}
       canReplay={canReplay}
       onReplayClick={onReplayClick}
       onNextPuzzle={onNextPuzzle}
       nextPuzzleLabel={nextPuzzleLabel}
       focusReturnRef={focusReturnRef}
+      boardAnchorRef={boardAnchorRef}
+      borderFrameBonus={borderFrameBonus}
+      quadrantTimes={quadrantTimes}
     />
   );
 }

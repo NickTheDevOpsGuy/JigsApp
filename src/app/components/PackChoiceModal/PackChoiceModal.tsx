@@ -8,7 +8,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Puzzle, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
-import { PACK_METADATA, type PackMetadata } from "@/data/packs/packMetadata";
 import { loadPacksData } from "@/data/packs/loadPacksData";
 import {
   getCompletedPuzzleIds,
@@ -305,9 +304,6 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                   </div>
                 ) : (
                   filteredPacks.map((pack, packIndex) => {
-                    const meta = PACK_METADATA.find(
-                      (p: PackMetadata) => p.id === pack.id,
-                    );
                     const puzzleList = packsData.getPuzzlesForPack(pack);
                     const hero = puzzleList[0];
                     const { completed: completedCount, total } = getPackProgress(
@@ -345,9 +341,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                               }
                             />
                           ) : (
-                            <span className={styles.tilePlaceholder}>
-                              {meta?.emoji ?? "🧩"}
-                            </span>
+                            <span className={styles.tilePlaceholder}>{pack.emoji}</span>
                           )}
                         </div>
                         <span

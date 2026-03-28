@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   computeBoardMagnetPreview,
+  computeBoardWrongRotationProximity,
   computeNeighborMagnetPreview,
   computeBoardSnapResult,
   computeNeighborSnapResult,
@@ -225,5 +226,60 @@ describe("magnet previews", () => {
     expect(preview?.kind).toBe("neighbor");
     expect(preview?.intoGroupId).toBe("gR");
     expect(preview?.magnetStrength).toBeGreaterThan(0);
+  });
+});
+
+describe("computeBoardWrongRotationProximity", () => {
+  it("returns null when group is aligned to 0°", () => {
+    const p = makePiece({
+      id: "a",
+      row: 0,
+      col: 0,
+      x: 0,
+      y: 0,
+      pad: 10,
+      targetX: 10,
+      targetY: 10,
+      rotation: 0,
+      tileW: 40,
+      tileH: 40,
+    });
+    expect(computeBoardWrongRotationProximity([p], "a", 0)).toBeNull();
+  });
+
+  it("returns proximity when rotated but translated near home", () => {
+    const p = makePiece({
+      id: "a",
+      row: 0,
+      col: 0,
+      x: 0,
+      y: 0,
+      pad: 10,
+      targetX: 10,
+      targetY: 10,
+      rotation: 90,
+      tileW: 40,
+      tileH: 40,
+    });
+    const r = computeBoardWrongRotationProximity([p], "a", 0);
+    expect(r).not.toBeNull();
+    expect(r!.proximity).toBeGreaterThan(0.5);
+  });
+
+  it("returns null when too far from home", () => {
+    const p = makePiece({
+      id: "a",
+      row: 0,
+      col: 0,
+      x: 80,
+      y: 0,
+      pad: 10,
+      targetX: 10,
+      targetY: 10,
+      rotation: 90,
+      tileW: 40,
+      tileH: 40,
+    });
+    expect(computeBoardWrongRotationProximity([p], "a", 0)).toBeNull();
   });
 });

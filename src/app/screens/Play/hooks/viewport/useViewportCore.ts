@@ -285,6 +285,7 @@ export function useViewport(
     zoomIn,
     zoomOut,
     zoomOutOnComplete,
+    animateTo,
     handleWheel,
     startPan,
     handlePanMove,

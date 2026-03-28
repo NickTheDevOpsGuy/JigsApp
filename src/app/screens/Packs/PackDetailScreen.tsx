@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PackDetailScreen.module.css";
 import { ArrowLeft, Check, Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/Button/Button";
-import { PACK_METADATA } from "@/data/packs/packMetadata";
 import { loadPacksData } from "@/data/packs/loadPacksData";
 import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packs/packCompletion";
@@ -48,7 +47,6 @@ export function PackDetailScreen() {
     setScrollProgress(maxScroll <= 0 ? 0 : scrollLeft / maxScroll);
   }, []);
 
-  const packMeta = PACK_METADATA.find((p) => p.id === packId);
   const pack = packsData?.PUZZLE_PACKS.find((p) => p.id === packId);
   const puzzles: SamplePuzzle[] =
     pack && packsData ? packsData.getPuzzlesForPack(pack) : [];
@@ -100,22 +98,22 @@ export function PackDetailScreen() {
     };
   }, [packId, packsData, updateScrollState]);
 
-  if (!packMeta) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.card}>
-          <p>Pack not found</p>
-          <Button onClick={() => nav("/packs")}>Back to Packs</Button>
-        </div>
-      </div>
-    );
-  }
-
   if (!packsData) {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
           <p className={styles.loading}>Loading…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!pack) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.card}>
+          <p>Pack not found</p>
+          <Button onClick={() => nav("/packs")}>Back to Packs</Button>
         </div>
       </div>
     );
@@ -140,8 +138,8 @@ export function PackDetailScreen() {
           <div className={styles.packHeaderRow}>
             <div className={styles.packHeader}>
               <PuzzlePackDetail
-                title={packMeta.name}
-                description={packMeta.description}
+                title={pack.name}
+                description={pack.description}
                 completed={completedCount}
                 total={puzzles.length}
                 nextLabel={nextPuzzle?.name ?? null}

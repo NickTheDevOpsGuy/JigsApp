@@ -21,6 +21,7 @@ export function buildPlayScreenManagerConfig(args: {
   relaxedModeEnabled: boolean;
   elapsedSecondsRef: MutableRefObject<number>;
   onQuadrantPlaced?: (q: 0 | 1 | 2 | 3, sec: number) => void;
+  quadrantCompleteSeenRef?: MutableRefObject<Set<0 | 1 | 2 | 3>>;
   onPieceSnappedAnalytics: (timeToSnapMs: number) => void;
   onPrecisionSnap?: (precisionPx: number) => void;
   dynamicDifficultyMultiplierRef?: MutableRefObject<number>;
@@ -41,6 +42,7 @@ export function buildPlayScreenManagerConfig(args: {
     relaxedModeEnabled,
     elapsedSecondsRef,
     onQuadrantPlaced,
+    quadrantCompleteSeenRef,
     onPieceSnappedAnalytics,
     onPrecisionSnap,
     dynamicDifficultyMultiplierRef,
@@ -61,6 +63,7 @@ export function buildPlayScreenManagerConfig(args: {
     relaxedModeEnabled,
     elapsedSecondsRef,
     onQuadrantPlaced,
+    quadrantCompleteSeenRef,
     onPieceSnappedAnalytics,
     onPrecisionSnap,
     dynamicDifficultyMultiplierRef,

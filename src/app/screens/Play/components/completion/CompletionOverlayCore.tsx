@@ -1,7 +1,7 @@
 /**
  * CompletionOverlay – phased celebration win screen: Phase 1 image + pulse/ripple,
  * Phase 2 stats bar slide down, Phase 3 achievement text. One primary Next Puzzle;
- * secondary actions in More Options and Share Results dropdowns. No confetti, no X close.
+ * secondary actions in the Options menu. No confetti, no X close.
  */
 import { useEffect, useMemo, useState } from "react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
@@ -11,9 +11,25 @@ import { CompletionOverlayActions } from "@/screens/Play/components/completion/C
 import { CompletionOverlayStats } from "@/screens/Play/components/completion/CompletionOverlayStats";
 import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
 import type { CompletionOverlayProps } from "@/screens/Play/components/completion/completionOverlayTypes";
+import { ACHIEVEMENT_DEFS } from "@/data/content/achievements";
+import {
+  QUADRANT_SHORT_LABELS,
+  rankQuadrantsSlowestFirst,
+} from "@/screens/Play/core/time/quadrantPace";
+import { formatTime } from "@/screens/Play/core/utils/playUtils";
+import { BORDER_FRAME_XP_BONUS } from "@/services/player/statsService";
 
 const PHASE2_MS = 600;
 const PHASE3_MS = 1200;
+
+function formatDailyStreakXpChip(gained: number, streakMultiplier: number): string {
+  if (streakMultiplier <= 1.01) return `+${gained} XP`;
+  const rounded = Math.round(streakMultiplier * 100) / 100;
+  const multLabel = Number.isInteger(rounded)
+    ? `${rounded}`
+    : `${rounded}`.replace(/\.?0+$/, "");
+  return `+${gained} XP · ${multLabel}× daily streak`;
+}
 
 export function CompletionOverlay({
   elapsedSeconds,
@@ -30,15 +46,13 @@ export function CompletionOverlay({
   isDaily = false,
   cutType = "classic",
   undoCount = 0,
-  copied = false,
-  canNativeShare = false,
   onShareProgress,
   onShareChallenge,
   onCopyProgress,
   onCopyChallenge,
+  setShareToast,
   onClose,
   puzzleShareUrl = "/",
-  ensureChallengeShareUrl,
   puzzleName,
   canReplay = false,
   onReplayClick,
@@ -47,6 +61,9 @@ export function CompletionOverlay({
   focusReturnRef,
   onCompletionRecorded,
   onNewBest,
+  boardAnchorRef,
+  borderFrameBonus = false,
+  quadrantTimes,
 }: CompletionOverlayProps) {
   const [phase, setPhase] = useState<1 | 2 | 3>(1);
   const [imageError, setImageError] = useState(false);
@@ -61,7 +78,6 @@ export function CompletionOverlay({
     imageUrl,
     moveCount,
     rotationCount,
-    piecesPerMin: piecesPerMin ?? 0,
     maxGroupSize: maxGroupSize ?? 0,
     accuracyPercent,
     usedHint,
@@ -75,6 +91,8 @@ export function CompletionOverlay({
     onCompletionRecorded: onCompletionRecorded
       ? (stats) => onCompletionRecorded({ dailyStreak: stats.dailyStreak })
       : undefined,
+    borderFrameBonus,
+    setShareToast,
   });
 
   useEffect(() => {
@@ -94,8 +112,6 @@ export function CompletionOverlay({
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      /* Share / challenge popup is its own AppModal; let it handle Escape first. */
-      if (completionData.sharePopupOpen) return;
 
       e.preventDefault();
 
@@ -108,70 +124,46 @@ export function CompletionOverlay({
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose, onNextPuzzle, completionData.sharePopupOpen]);
+  }, [onClose, onNextPuzzle]);
 
   const pieceCount = grid ? grid.rows * grid.cols : 0;
-  const cleanSolve = undoCount === 0 && !usedHint;
-  const achievements: string[] = [];
-  const summaryChips: string[] = [];
 
-  if (cleanSolve) achievements.push("⭐ Clean Solve");
-  if (isNewBest) achievements.push("🏆 New Personal Best");
-  if (isDaily && completionData.newlyUnlocked?.length === 0 && !isNewBest) {
-    achievements.push("🔥 Streak Progress");
-  }
+  const areaPaceRanked = useMemo(() => {
+    if (!quadrantTimes) return [];
+    return rankQuadrantsSlowestFirst(quadrantTimes);
+  }, [quadrantTimes]);
+  const summaryChips: string[] = [];
 
   if (completionData.percentileBadgeTier) {
     summaryChips.push(completionData.percentileBadgeTier);
   }
-  if (isDaily && completionData.dailyStreak > 0) {
-    summaryChips.push(`${completionData.dailyStreak}-day daily streak`);
+  if (isDaily && completionData.dailyStreak >= 1) {
+    const d = completionData.dailyStreak;
+    summaryChips.push(`${d}-day daily streak`);
+  }
+  if (isDaily && completionData.lastXpReward) {
+    summaryChips.push(
+      formatDailyStreakXpChip(
+        completionData.lastXpReward.gained,
+        completionData.lastXpReward.streakMultiplier,
+      ),
+    );
+  }
+  if (borderFrameBonus) {
+    summaryChips.push(`Frame +${BORDER_FRAME_XP_BONUS} XP`);
   }
   if (completionData.masteryStreak > 0) {
     summaryChips.push(`Mastery ${completionData.masteryStreak}`);
   }
-  if (completionData.newlyUnlocked.length > 0) {
-    summaryChips.push(
-      `${completionData.newlyUnlocked.length} achievement${
-        completionData.newlyUnlocked.length === 1 ? "" : "s"
-      } unlocked`,
-    );
+  for (const achId of completionData.newlyUnlocked) {
+    const def = ACHIEVEMENT_DEFS.find((a) => a.id === achId);
+    summaryChips.push(def ? `${def.icon} ${def.name}` : `Badge: ${achId}`);
   }
 
-  const celebrationMessages = useMemo(() => {
-    const skillMessages: string[] = [
-      pickCompletionPhrase(elapsedSeconds, moveCount, undoCount),
-    ];
-
-    if (accuracyPercent >= 95) {
-      skillMessages.push("Precision game. Your piece placement was sharp.");
-    }
-    if (piecesPerMin >= 6) {
-      skillMessages.push("Fast hands, sharp eyes. That was a quick solve.");
-    }
-    if (maxGroupSize >= Math.max(4, Math.ceil(pieceCount * 0.45))) {
-      skillMessages.push("Great pattern recognition. You built big sections smoothly.");
-    }
-    if (cleanSolve) {
-      skillMessages.push("Clean decisions all the way through. Nice control.");
-    }
-    if (isNewBest) {
-      skillMessages.push("That pace was real skill. You just raised your own bar.");
-    }
-
-    return [...new Set([...skillMessages, ...achievements])];
-  }, [
-    accuracyPercent,
-    achievements,
-    cleanSolve,
-    elapsedSeconds,
-    isNewBest,
-    maxGroupSize,
-    moveCount,
-    pieceCount,
-    piecesPerMin,
-    undoCount,
-  ]);
+  const celebrationMessage = useMemo(
+    () => pickCompletionPhrase(elapsedSeconds, moveCount, undoCount),
+    [elapsedSeconds, moveCount, undoCount],
+  );
 
   return (
     <AppModal
@@ -185,6 +177,7 @@ export function CompletionOverlay({
       backdropClassName={styles.completeWinBackdrop}
       dialogClassName={styles.completeWinDialog}
       bodyClassName={styles.completeWinModalBody}
+      anchorRef={boardAnchorRef}
     >
       <div
         className={styles.completePanelPhased}
@@ -203,8 +196,51 @@ export function CompletionOverlay({
           phase={phase}
         />
 
+        {areaPaceRanked.length > 0 && (
+          <div
+            className={`${styles.completeAreaPace} ${phase >= 2 ? styles.completeAreaPaceVisible : ""}`}
+            aria-label="Board areas by finish time, slowest first"
+          >
+            <div className={styles.completeAreaPaceTitle}>Where time went</div>
+            <ul className={styles.completeAreaPaceList}>
+              {areaPaceRanked.map(({ q, sec }) => (
+                <li key={q} className={styles.completeAreaPaceRow}>
+                  <span className={styles.completeAreaPaceLabel}>
+                    {QUADRANT_SHORT_LABELS[q]}
+                  </span>
+                  <span className={styles.completeAreaPaceTime}>{formatTime(sec)}</span>
+                </li>
+              ))}
+            </ul>
+            <p className={styles.completeAreaPaceCaption}>
+              Time is when that quarter was fully finished (later = you cleared it later
+              in the solve).
+            </p>
+          </div>
+        )}
+
         <div className={styles.completeCelebrationBlock}>
           <h2 className={styles.completePhasedTitle}>Puzzle Complete</h2>
+
+          {isDaily && completionData.dailyStreak >= 2 && (
+            <div
+              className={`${styles.completeStreakIndicator} ${phase >= 2 ? styles.completeStreakIndicatorVisible : ""}`}
+              role="status"
+              aria-live="polite"
+              aria-label={`${completionData.dailyStreak} day daily streak`}
+            >
+              <span className={styles.completeStreakShimmer} aria-hidden />
+              <span className={styles.completeStreakFlame} aria-hidden>
+                🔥
+              </span>
+              <span className={styles.completeStreakLabel}>
+                <span className={styles.completeStreakCount}>
+                  {completionData.dailyStreak}
+                </span>
+                <span className={styles.completeStreakSuffix}>day streak</span>
+              </span>
+            </div>
+          )}
 
           {summaryChips.length > 0 && (
             <div
@@ -230,20 +266,18 @@ export function CompletionOverlay({
             </div>
           )}
 
-          {phase >= 3 && celebrationMessages.length > 0 && (
-            <AchievementCycler achievements={celebrationMessages} />
+          {phase >= 3 && celebrationMessage && (
+            <p
+              className={styles.completeAchievementPhased}
+              role="status"
+              aria-live="polite"
+            >
+              {celebrationMessage}
+            </p>
           )}
         </div>
 
         <CompletionOverlayActions
-          grid={grid}
-          puzzleShareUrl={puzzleShareUrl}
-          ensureChallengeShareUrl={ensureChallengeShareUrl}
-          elapsedSeconds={elapsedSeconds}
-          moveCount={moveCount}
-          accuracyPercent={accuracyPercent}
-          copied={copied}
-          canNativeShare={canNativeShare}
           onShareProgress={onShareProgress}
           onCopyProgress={onCopyProgress}
           onShareChallenge={onShareChallenge}
@@ -258,17 +292,5 @@ export function CompletionOverlay({
         />
       </div>
     </AppModal>
-  );
-}
-
-function AchievementCycler({ achievements }: { achievements: string[] }) {
-  // Show the single best message — no cycling, no timer, always readable.
-  // Priority: first skill message (index 0) as it's the most specific to this solve.
-  const text = achievements[0];
-
-  return (
-    <p className={styles.completeAchievementPhased} role="status" aria-live="polite">
-      {text}
-    </p>
   );
 }

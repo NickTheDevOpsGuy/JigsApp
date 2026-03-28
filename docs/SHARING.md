@@ -6,14 +6,14 @@ Sharing in Phuzzle: **completion share** (your result), **Daily Share** (Wordle-
 
 ## 1. Completion share (no Supabase)
 
-- Share your finished puzzle: image, time, moves, link to the same puzzle.
-- **All completion share entry points are image-first now.** The main win-screen actions (**Share Result** and **Challenge Friend**) open the same share popup used by the dedicated Share button, so the default path is always the puzzle-image card instead of a text-only share.
-- **Share Result** — same preview-style text block as challenge (Phuzzle → Puzzle → Difficulty / Time / Moves → URL) **without** “Think you can beat me?”; share card matches; link is the same puzzle (no `ct`/`cm` on the result URL).
-- **Beat My Puzzle** — same stats block + **“Think you can beat me?”**; link = same puzzle/difficulty (`grid`, `puzzle`, `session`, or `daily` from `ensureChallengeShareUrl`) plus `ct` & `cm` for the challenge.
-- Share card PNG: challenge (with CTA) or result (stats only, no taunt). Download supported.
-- If the platform cannot share image files, the popup still offers copy/share text fallback so the user is never blocked.
-- Completion image capture uses the async canvas blob/object URL path instead of synchronous `toDataURL()` so the win transition stays smoother on mobile hardware.
-- **Key files:** `useShareResults.ts`, `useDownloadImage.ts`, `useShareCardImage.ts`, `CompletionOverlay.tsx`, `shareMessages.ts`.
+- Share your finished puzzle: **PNG share card** (stats + link) plus companion **share text** when the platform supports it.
+- On the win screen, **Options** opens a menu. **Challenge Friend** and **Share Result** **start share immediately** (native share sheet when available, otherwise **PNG download**). There is **no** nested share modal or duplicate preview step.
+- **Share Result** — concise text from `shareMessages` (puzzle context, time, moves, URL) **without** the challenge line; share card is the **result** variant; link has **no** `ct`/`cm`.
+- **Challenge Friend** — adds a short challenge line; URL includes `ct` & `cm`. The playable link comes from **`puzzleShareUrl`** on the play screen; when a co-op **session** exists, `usePlayScreenShareSession` keeps **`shareSessionId`** in sync so the URL can include `session=…` when appropriate.
+- Share card PNG: **challenge** (with CTA) or **result** (stats band, no taunt). If the user **dismisses** the native share UI (`AbortError`), the app **falls through to download** so the image is not lost.
+- Errors use **toasts** (`setShareToast`), not a blocking dialog.
+- Completion capture uses async canvas **blob / object URL** (not synchronous `toDataURL()`) to keep the win transition smooth on mobile.
+- **Key files:** `useCompletionOverlayData.ts`, `CompletionOverlayActions.tsx`, `CompletionOverlayCore.tsx`, `usePlayScreenShareSession.ts`, `useShareCardImageCore.ts`, `shareCardImageShare.ts`, `shareMessages.ts`, `useShareResults.ts`, `useDownloadImage.ts`.
 
 Triggered from the win overlay after completing a puzzle. Works without any backend.
 
@@ -21,7 +21,7 @@ Triggered from the win overlay after completing a puzzle. Works without any back
 
 ## 1b. Daily Share (Wordle-style, daily only)
 
-- **When:** Only after completing the **Daily Puzzle**. A **Daily Share** button appears on the win screen (with Next Puzzle, Share Result, Beat My Puzzle, Review Solve).
+- **When:** Only after completing the **Daily Puzzle**. **Daily Share** appears in the win-screen **Options** menu (calendar icon), alongside items like next puzzle, replay, **Challenge Friend**, and **Share Result**.
 - **What:** A compact, copyable text block similar to Wordle shares:
   - `Phuzzle Daily #N` (N = deterministic daily number)
   - Difficulty • piece count

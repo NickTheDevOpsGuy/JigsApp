@@ -22,6 +22,7 @@ export interface UsePlayScreenLifecycleEffectsArgs {
   showGhostHint: boolean;
   showGhostWhenIdle: boolean;
   setQuadrantTimes: Dispatch<SetStateAction<Record<0 | 1 | 2 | 3, number | null>>>;
+  quadrantCompleteSeenRef: MutableRefObject<Set<0 | 1 | 2 | 3>>;
   setCompletionDismissed: (v: boolean) => void;
   setShowWinOverlay?: (v: boolean) => void;
   setCompletionImageUrl: (url: string | undefined) => void;

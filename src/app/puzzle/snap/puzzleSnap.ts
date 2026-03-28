@@ -318,6 +318,32 @@ export function computeBoardMagnetPreview(
   };
 }
 
+/**
+ * Group is translated near its home slot but rotations are not aligned (board snap blocked).
+ * Same distance window as board magnet; used for soft rejection glow while dragging.
+ */
+export function computeBoardWrongRotationProximity(
+  pieces: Piece[],
+  activeId: string,
+  overlapEpsilonPx: number = 0,
+): { proximity: number } | null {
+  const active = pieces.find((p) => p.id === activeId);
+  if (!active || active.isPlaced || active.locked) return null;
+
+  const gid = active.groupId;
+  const groupPieces = getGroupPieces(pieces, gid);
+  if (groupPieces.every((p) => p.rotation === 0)) return null;
+
+  const activeTile = getTilePos(active);
+  const dx = active.targetX - activeTile.x;
+  const dy = active.targetY - activeTile.y;
+  const distancePx = Math.hypot(dx, dy);
+  if (distancePx > BOARD_MAGNET_RADIUS_PX) return null;
+  if (wouldOverlapAnyOtherGroup(pieces, gid, dx, dy, overlapEpsilonPx)) return null;
+
+  return { proximity: Math.max(0, 1 - distancePx / BOARD_MAGNET_RADIUS_PX) };
+}
+
 export function computeNeighborMagnetPreview(
   pieces: Piece[],
   activeId: string,

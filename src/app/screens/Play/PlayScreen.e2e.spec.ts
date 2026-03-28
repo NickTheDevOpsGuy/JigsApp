@@ -54,11 +54,11 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
       timeout: 20000,
     });
-    const shareTrigger = page.getByRole("button", { name: /share results/i });
-    await expect(shareTrigger).toBeVisible({
+    const optionsTrigger = page.getByRole("button", { name: /options/i });
+    await expect(optionsTrigger).toBeVisible({
       timeout: 10000,
     });
-    await shareTrigger.click();
+    await optionsTrigger.click();
     await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
       timeout: 10000,
     });
@@ -75,18 +75,12 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
       timeout: 20000,
     });
-    const shareTrigger = page.getByRole("button", { name: /share results/i });
-    await expect(shareTrigger).toBeVisible({
+    const optionsTrigger = page.getByRole("button", { name: /options/i });
+    await expect(optionsTrigger).toBeVisible({
       timeout: 10000,
     });
-    await shareTrigger.click();
-    const shareDialog = page.getByRole("dialog", { name: /share results/i });
-    await expect(shareDialog).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(
-      shareDialog.getByRole("button", { name: /^Share Result$/i }),
-    ).toBeVisible({
+    await optionsTrigger.click();
+    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
       timeout: 10000,
     });
 
@@ -119,24 +113,22 @@ test.describe("Play screen", () => {
     expect(cardBounds!.y).toBeGreaterThan(0);
   });
 
-  test("mobile completion actions open as dialogs", async ({ page }) => {
+  test("mobile completion options menu lists share actions", async ({ page }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /share results/i }).click();
-    await expect(page.getByRole("dialog", { name: /share results/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /challenge friend/i })).toBeVisible();
+    await page.getByRole("button", { name: /options/i }).click();
+    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: /challenge friend/i })).toBeVisible();
   });
 
-  test("share modal challenge action remains available on desktop", async ({ page }) => {
+  test("desktop completion options menu lists share actions", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /share results/i }).click();
-    await page.getByRole("menuitem", { name: /share result/i }).click();
-
-    await expect(page.getByRole("dialog", { name: /share your solve/i })).toBeVisible();
+    await page.getByRole("button", { name: /options/i }).click();
+    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible();
     await expect(page.getByRole("menuitem", { name: /challenge friend/i })).toBeVisible();
   });
 });

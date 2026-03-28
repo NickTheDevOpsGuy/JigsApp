@@ -35,6 +35,7 @@ interface PlayScreenLayoutArgs {
   setShowNewGameModal: (show: boolean) => void;
   showChoosePuzzleModal: boolean;
   setShowChoosePuzzleModal: (show: boolean) => void;
+  onChoosePuzzleDismissWithoutStart?: () => void;
   handleNewGame: () => void;
   showResetStatsConfirm: boolean;
   setShowResetStatsConfirm: (show: boolean) => void;
@@ -70,6 +71,7 @@ interface PlayScreenLayoutArgs {
   handlePointerCancel: React.PointerEventHandler<HTMLCanvasElement>;
   handleLostPointerCapture: React.PointerEventHandler<HTMLCanvasElement>;
   handleContextMenu: React.MouseEventHandler<HTMLCanvasElement>;
+  handleCanvasPointerLeave: React.PointerEventHandler<HTMLCanvasElement>;
   isPaused: boolean;
   setIsPaused: (next: boolean) => void;
   scheduleImmersiveHide: () => void;
@@ -78,6 +80,7 @@ interface PlayScreenLayoutArgs {
   trayPieces: import("@/puzzle/core/types").Piece[];
   grid: { rows: number; cols: number } | null;
   handleTrayPieceClick: (pieceId: string) => void;
+  onTrayPieceHover: (pieceId: string | null) => void;
   highlightedPieceIds: Set<string>;
   handleUndo: () => void;
   handleRedo: () => void;
@@ -94,6 +97,7 @@ interface PlayScreenLayoutArgs {
   onboarding: Record<string, unknown>;
   showStreakToast: boolean;
   milestoneMessage: string | null;
+  borderFrameMessage: string | null;
   announcerLine: string;
   shareToast: string | null;
   searchParams: URLSearchParams;
@@ -162,6 +166,7 @@ export function createPlayScreenLayoutProps(
       setShowNewGameModal: args.setShowNewGameModal,
       showChoosePuzzleModal: args.showChoosePuzzleModal,
       setShowChoosePuzzleModal: args.setShowChoosePuzzleModal,
+      onChoosePuzzleDismissWithoutStart: args.onChoosePuzzleDismissWithoutStart,
       onConfirmNewGame: args.handleNewGame,
       showResetStatsConfirm: args.showResetStatsConfirm,
       setShowResetStatsConfirm: args.setShowResetStatsConfirm,
@@ -203,6 +208,7 @@ export function createPlayScreenLayoutProps(
         onPointerCancel: args.handlePointerCancel,
         onLostPointerCapture: args.handleLostPointerCapture,
         onContextMenu: args.handleContextMenu,
+        onPointerLeave: args.handleCanvasPointerLeave,
       },
       isPaused: args.isPaused,
       onResume: () => args.setIsPaused(false),
@@ -226,6 +232,7 @@ export function createPlayScreenLayoutProps(
       trayPieces: args.trayPieces,
       trayGrid: args.state?.grid ?? args.grid ?? { rows: 3, cols: 3 },
       onTrayPieceClick: args.handleTrayPieceClick,
+      onTrayPieceHover: args.onTrayPieceHover,
       highlightedPieceIds:
         args.highlightedPieceIds.size > 0 ? args.highlightedPieceIds : undefined,
       isLargeTray: (args.state?.grid?.rows ?? 0) * (args.state?.grid?.cols ?? 0) >= 49,
@@ -252,6 +259,7 @@ export function createPlayScreenLayoutProps(
       onboarding: args.onboarding,
       showStreakToast: args.showStreakToast,
       milestoneMessage: args.milestoneMessage,
+      borderFrameMessage: args.borderFrameMessage,
       announcerLine: args.announcerLine,
       shareToast: args.shareToast,
       showProfiler:

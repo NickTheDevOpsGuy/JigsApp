@@ -168,6 +168,23 @@
   line-height: 1.05;
 }
 
+.dailySpotlightLine {
+  margin: -4px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-secondary, #c4c4d4);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.dailySpotlightHint {
+  margin: -8px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-secondary, #a1a1b5);
+  opacity: 0.92;
+}
+
 /* ── Primary CTA ── */
 .primaryBtn {
   display: flex;
@@ -263,6 +280,15 @@
   gap: 12px;
   padding: 2px 0;
   margin-top: 0;
+}
+
+.streakXpHint {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 500;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.5));
+  text-wrap: balance;
 }
 
 .weeklyCard {

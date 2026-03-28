@@ -27,6 +27,20 @@
   margin-top: 2px;
 }
 
+.spotlightLead {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.spotlightSub {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.88;
+}
+
 .freezeOffer {
   flex-shrink: 0;
   margin-bottom: 10px;

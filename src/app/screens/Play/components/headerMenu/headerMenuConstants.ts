@@ -1,7 +1,10 @@
 /**
  * Header menu submenu labels, descriptions, and ordering.
  */
-import type { SubMenuId } from "@/screens/Play/components/headerMenu/headerMenuConfigTypes";
+import type {
+  MenuItemConfig,
+  SubMenuId,
+} from "@/screens/Play/components/headerMenu/headerMenuConfigTypes";
 
 export const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   about: "About",
@@ -12,7 +15,7 @@ export const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   controls: "Gameplay",
   display: "Appearance",
   effects: "Effects",
-  gameplay: "Gameplay",
+  gameplay: "Snapping",
   help: "Help",
   manualControls: "Controls",
   modes: "Modes",
@@ -42,7 +45,7 @@ export const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
   contribute: "About Phuzzle and how to get involved",
   controls: "Piece shape, modes, and manual controls",
   display: "Preview, effects, immersive mode, and theme",
-  gameplay: "Magnetic Snap, Progressive Reveal, Snap Glow, Unlock Pieces, Undo, Redo",
+  gameplay: "Magnetic snap, snap glow, progressive reveal, unlock pieces",
   help: "How to play and keyboard shortcuts",
   manualControls: "Undo, redo, reset view, zoom",
   modes: "Drift, relaxed, deliberate detach, timer",
@@ -77,12 +80,23 @@ export const ROOT_MENU_LABELS: Record<
   settings: "Settings",
 };
 
-/** Settings submenus: alphabetical by visible label (SUB_MENU_LABELS). */
-export const SETTINGS_SUBMENU_ORDER: SubMenuId[] = [
-  "advanced",
-  "display",
-  "assistance",
-  "audio",
-  "gameplay",
-  "moves",
-];
+/** Submenus that belong in the Play panel, not the Settings submenu list. */
+const SETTINGS_SUBMENU_EXCLUDE_FROM_LIST: SubMenuId[] = ["navigation", "share"];
+
+/** All settings-area submenus that have at least one item, sorted A–Z by visible label. */
+export function getSettingsSubmenuIdsAlphabetical(
+  settingsItems: MenuItemConfig[],
+): SubMenuId[] {
+  const ids = new Set<SubMenuId>();
+  for (const item of settingsItems) {
+    if (!item.subMenu) continue;
+    if (SETTINGS_SUBMENU_EXCLUDE_FROM_LIST.includes(item.subMenu)) continue;
+    ids.add(item.subMenu);
+  }
+  return Array.from(ids).sort((a, b) => {
+    const cmp = SUB_MENU_LABELS[a].localeCompare(SUB_MENU_LABELS[b], undefined, {
+      sensitivity: "base",
+    });
+    return cmp !== 0 ? cmp : a.localeCompare(b);
+  });
+}

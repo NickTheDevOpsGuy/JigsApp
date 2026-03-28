@@ -17,7 +17,7 @@ import type { HeaderMenuProps } from "@/screens/Play/components/headerMenu/heade
 import {
   HeaderMenuAboutSection,
   HeaderMenuControlsSection,
-  HeaderMenuDisplaySection,
+  HeaderMenuDisplaySubmenuMerged,
   HeaderMenuModesRange,
 } from "@/screens/Play/components/headerMenu/HeaderMenuSubmenuSections";
 
@@ -91,7 +91,18 @@ export function HeaderMenuSubmenuPanel({
           setActiveSubMenu={(id) => setActiveSubMenu(id)}
         />
       )}
+      {activeSubMenu === "display" && (
+        <HeaderMenuDisplaySubmenuMerged
+          subMenuItems={subMenuItems}
+          renderItem={renderItem}
+          hasSubMenuItems={hasSubMenuItems}
+          setActiveSubMenu={(id) => setActiveSubMenu(id)}
+          onOpenThemeModal={props.onOpenThemeModal}
+          setOpen={setOpen}
+        />
+      )}
       {activeSubMenu !== "controls" &&
+        activeSubMenu !== "display" &&
         subMenuItems.map((item) => (
           <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
         ))}
@@ -99,14 +110,6 @@ export function HeaderMenuSubmenuPanel({
         <HeaderMenuModesRange
           snapToleranceOverride={props.snapToleranceOverride}
           onSnapToleranceOverrideChange={props.onSnapToleranceOverrideChange}
-        />
-      )}
-      {activeSubMenu === "display" && (
-        <HeaderMenuDisplaySection
-          hasSubMenuItems={hasSubMenuItems}
-          setActiveSubMenu={(id) => setActiveSubMenu(id)}
-          onOpenThemeModal={props.onOpenThemeModal}
-          setOpen={setOpen}
         />
       )}
     </>

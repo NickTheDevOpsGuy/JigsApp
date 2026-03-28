@@ -30,3 +30,6 @@ export function getHighPieceCountThreshold(batterySaverMode: boolean): number {
 
 /** Idle time (ms) before showing "ghost when idle" hint. */
 export const IDLE_GHOST_MS = 4000;
+
+/** Idle time (ms) before a subtle pulse on one already-correct board piece (nudge when stuck). */
+export const IDLE_CORRECT_PIECE_PULSE_MS = 5200;

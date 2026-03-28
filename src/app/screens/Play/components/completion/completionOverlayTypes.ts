@@ -19,14 +19,13 @@ export interface CompletionOverlayProps {
   isDaily?: boolean;
   cutType?: PieceCutType;
   puzzleShareUrl?: string;
-  ensureChallengeShareUrl?: () => Promise<string>;
   puzzleName?: string;
-  copied?: boolean;
-  canNativeShare?: boolean;
   onShareProgress?: () => void;
   onShareChallenge?: (challengeUrl?: string) => void;
   onCopyProgress?: () => void;
   onCopyChallenge?: (challengeUrl?: string) => void;
+  /** Toast line for share failures (Play screen `shareToast`). */
+  setShareToast?: (message: string | null) => void;
   onClose: () => void;
   canReplay?: boolean;
   onReplayClick?: () => void;
@@ -38,4 +37,9 @@ export interface CompletionOverlayProps {
   onCompletionRecorded?: (stats: { dailyStreak: number }) => void;
   /** Called once when overlay is shown with a new personal best (e.g. haptic). */
   onNewBest?: () => void;
+  boardAnchorRef?: React.RefObject<HTMLElement | null>;
+  /** Perimeter frame completed this session (XP bonus + summary chip). */
+  borderFrameBonus?: boolean;
+  /** When each quarter of the board was fully finished (slowest-first summary on win). */
+  quadrantTimes?: Record<0 | 1 | 2 | 3, number | null>;
 }

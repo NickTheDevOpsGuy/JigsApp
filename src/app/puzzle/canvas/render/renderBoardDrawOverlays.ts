@@ -59,3 +59,20 @@ export function drawLockGlow(
   ctx.stroke(path);
   ctx.restore();
 }
+
+/** Gentle breathing outline on an already-snapped piece after the player has been idle. */
+export function drawIdleCorrectPulse(
+  ctx: CanvasRenderingContext2D,
+  path: Path2D,
+  nowMs: number,
+) {
+  const breathe = 0.5 + 0.5 * Math.sin(nowMs * 0.0028);
+  const alpha = 0.1 + 0.14 * breathe;
+  ctx.save();
+  ctx.strokeStyle = `rgba(120, 190, 255, ${alpha})`;
+  ctx.lineWidth = 1.35 + 0.85 * breathe;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke(path);
+  ctx.restore();
+}

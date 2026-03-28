@@ -4,6 +4,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, Filter } from "lucide-react";
+import {
+  getLayoutViewportSize,
+  subscribeViewportResizeOnly,
+} from "@/utils/layoutViewport";
 import styles from "./TrayFilterButton.module.css";
 
 // Keep filter values stable so users don't "lose" options between sessions/updates.
@@ -38,13 +42,33 @@ export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButton
       setMenuRect(null);
       return;
     }
-    const rect = wrapRef.current.getBoundingClientRect();
-    const gap = 4;
-    setMenuRect({
-      bottom: window.innerHeight - (rect.top - gap),
-      left: rect.left,
-      minWidth: rect.width,
-    });
+    const wrap = wrapRef.current;
+    let raf = 0;
+    const measure = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const el = wrapRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const gap = 4;
+        const { height: vh } = getLayoutViewportSize();
+        setMenuRect({
+          bottom: vh - (rect.top - gap),
+          left: rect.left,
+          minWidth: rect.width,
+        });
+      });
+    };
+
+    measure();
+    const unsubResize = subscribeViewportResizeOnly(measure);
+    const ro = new ResizeObserver(measure);
+    ro.observe(wrap);
+    return () => {
+      cancelAnimationFrame(raf);
+      unsubResize();
+      ro.disconnect();
+    };
   }, [open]);
 
   useEffect(() => {

@@ -43,6 +43,11 @@ export default defineConfig({
     },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
+    /** Microsoft Edge (Chromium). Install: `npx playwright install msedge` */
+    {
+      name: "msedge",
+      use: { ...devices["Desktop Edge"], channel: "msedge" },
+    },
   ],
   webServer: {
     command: useDevServer

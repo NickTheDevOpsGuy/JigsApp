@@ -48,7 +48,14 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     snapCombo,
     announcerLine,
     imgRef,
+    borderFrameBonusEarnedRef,
   } = behavior;
+  const onChoosePuzzleDismissWithoutStart = React.useCallback(() => {
+    if (state?.isComplete && scene.completionDismissed) {
+      navigate("/", { replace: true });
+    }
+  }, [state?.isComplete, scene.completionDismissed, navigate]);
+
   const {
     displayElapsedSeconds,
     left: _left,
@@ -66,7 +73,6 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     handleSharePuzzle: _handleSharePuzzle,
     handleNewGame,
     puzzleShareUrl,
-    ensureChallengeShareUrl,
     puzzleName,
     share,
     handlePointerDown,
@@ -78,6 +84,17 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     isDraggingBoard,
     handleTrayPieceClick,
   } = interactions;
+
+  const hoverPreviewPieceIdRef = ui.hoverPreviewPieceIdRef;
+  const handleCanvasPointerLeave = React.useCallback(() => {
+    hoverPreviewPieceIdRef.current = null;
+  }, [hoverPreviewPieceIdRef]);
+  const onTrayPieceHover = React.useCallback(
+    (pieceId: string | null) => {
+      hoverPreviewPieceIdRef.current = pieceId;
+    },
+    [hoverPreviewPieceIdRef],
+  );
 
   /** Win modal + share popups are open; until then keep playing chrome so the board frame / tray do not jump on the last snap. */
   const winCelebrationModalVisible =
@@ -126,17 +143,13 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       state?.grid != null &&
       (bestTimeSeconds == null || elapsedSeconds < bestTimeSeconds),
     puzzleShareUrl,
-    ensureChallengeShareUrl,
     puzzleName,
     share: {
-      copied: share.copied,
-      canNativeShare: share.canNativeShare,
       handleCopyResults: share.handleCopyResults,
       handleNativeShare: share.handleNativeShare,
       handleCopyChallenge: share.handleCopyChallenge,
       handleNativeChallengeShare: share.handleNativeChallengeShare,
-      getProgressShareTextWithUrl: share.getProgressShareTextWithUrl,
-      getChallengeShareTextWithUrl: share.getChallengeShareTextWithUrl,
+      setShareToast: scene.setShareToast,
     },
     onClose: () => {
       scene.setCompletionDismissed(true);
@@ -170,6 +183,9 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
         navigator.vibrate([20, 30, 20]);
       }
     },
+    boardAnchorRef: boardRef,
+    borderFrameBonus: borderFrameBonusEarnedRef.current,
+    quadrantTimes: scene.quadrantTimes,
   });
 
   const baseReplayProps = buildReplayPortalProps({
@@ -257,6 +273,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     setShowNewGameModal: ui.setShowNewGameModal,
     showChoosePuzzleModal: ui.showChoosePuzzleModal,
     setShowChoosePuzzleModal: ui.setShowChoosePuzzleModal,
+    onChoosePuzzleDismissWithoutStart,
     handleNewGame,
     showResetStatsConfirm: scene.showResetStatsConfirm,
     setShowResetStatsConfirm: scene.setShowResetStatsConfirm,
@@ -295,6 +312,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     handlePointerCancel,
     handleLostPointerCapture,
     handleContextMenu,
+    handleCanvasPointerLeave,
     isPaused: ui.isPaused,
     setIsPaused: (next: boolean) => ui.setIsPaused(next),
     scheduleImmersiveHide: immersive.scheduleImmersiveHide,
@@ -304,6 +322,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     grid,
     handleTrayPieceClick,
     highlightedPieceIds: behavior.highlightedPieceIds,
+    onTrayPieceHover,
     handleUndo,
     handleRedo,
     showPreview: ui.showPreview,
@@ -319,6 +338,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     onboarding: behavior.onboarding,
     showStreakToast: scene.showStreakToast,
     milestoneMessage: behavior.milestoneMessage,
+    borderFrameMessage: behavior.borderFrameMessage,
     announcerLine,
     shareToast: scene.shareToast,
     searchParams,

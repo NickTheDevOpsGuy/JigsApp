@@ -141,4 +141,11 @@ export const ACHIEVEMENT_DEFS: AchievementDef[] = [
     description: "Complete a puzzle with no undos",
     icon: "🎯",
   },
+  {
+    id: "perfect_placements",
+    name: "Sure Hands",
+    description:
+      "Complete a puzzle with no incorrect placements (100% placement accuracy)",
+    icon: "✋",
+  },
 ];

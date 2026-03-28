@@ -18,6 +18,7 @@ import {
 } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import {
   drawGhostHints,
+  drawHoverPlacementPreviewGhosts,
   drawPiece,
   drawEdgePieceHighlight,
   drawCompletionGlow,
@@ -151,6 +152,22 @@ export function renderBoard(
       cols,
       rows,
       animState.ghostAlpha ?? 0.35,
+      pathCache,
+    );
+  }
+
+  const placementPreviewId = animState?.placementPreviewPieceId ?? null;
+  const skipHoverPlacementPreview =
+    state.isComplete || dragState?.activeId != null || animState?.showGhostHint;
+  if (placementPreviewId && !skipHoverPlacementPreview) {
+    drawHoverPlacementPreviewGhosts(
+      ctx,
+      state.pieces,
+      img,
+      cols,
+      rows,
+      placementPreviewId,
+      animState?.placementPreviewAlpha ?? 0.26,
       pathCache,
     );
   }

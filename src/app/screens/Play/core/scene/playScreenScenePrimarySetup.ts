@@ -124,18 +124,20 @@ export function usePlayScreenPrimarySetup() {
     batterySaverMode: scene.batterySaverMode,
     relaxedModeEnabled: ui.relaxedModeEnabled,
     elapsedSecondsRef: scene.elapsedSecondsRef,
-    onQuadrantPlaced:
-      timeMode === "speedrun" && grid
-        ? (q, sec) => {
-            scene.setQuadrantTimes((prev) => {
-              if (prev[q] != null) return prev;
-              const next = { ...prev, [q]: sec };
+    quadrantCompleteSeenRef: scene.quadrantCompleteSeenRef,
+    onQuadrantPlaced: grid
+      ? (q, sec) => {
+          scene.setQuadrantTimes((prev) => {
+            if (prev[q] != null) return prev;
+            const next = { ...prev, [q]: sec };
+            if (timeMode === "speedrun") {
               const pb = getQuadrantPb(grid.rows, grid.cols, q);
               if (pb == null || sec < pb) setQuadrantPb(grid.rows, grid.cols, q, sec);
-              return next;
-            });
-          }
-        : undefined,
+            }
+            return next;
+          });
+        }
+      : undefined,
     onPieceSnappedAnalytics: (timeToSnapMs) => {
       const g = scene.stateRef.current?.grid;
       const gridSize = g ? `${g.rows}x${g.cols}` : "unknown";

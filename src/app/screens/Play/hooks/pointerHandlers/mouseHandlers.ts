@@ -3,6 +3,7 @@
  */
 import type React from "react";
 import { soundManager } from "@/audio/core/sounds";
+import { pickPieceId } from "@/puzzle/canvas/utils/pickPiece";
 import type { CanvasWithTouch, ScreenToBoard } from "./types";
 import type { PointerHandlersContext } from "./types";
 import { autoScrollTrayAtPointer, finishDragWithTrayCheck } from "./shared";
@@ -77,8 +78,46 @@ export function handleMouseMove(
   ctx: PointerHandlersContext,
   screenToBoard?: ScreenToBoard,
 ): void {
-  const { manager, boardRef, didDragRef, onDragPreview, onPieceInteraction } = ctx;
+  const {
+    manager,
+    boardRef,
+    canvasRef,
+    didDragRef,
+    onDragPreview,
+    onPieceInteraction,
+    hoverPreviewPieceIdRef,
+  } = ctx;
   if (!manager || !boardRef.current) return;
+
+  const activeDragId = manager.getDragState().activeId;
+  const skipMouseLikeHoverProbe =
+    e.pointerType === "mouse" &&
+    typeof window !== "undefined" &&
+    (window.matchMedia?.("(pointer: coarse)")?.matches ?? false);
+  if (
+    !activeDragId &&
+    hoverPreviewPieceIdRef &&
+    screenToBoard &&
+    !skipMouseLikeHoverProbe
+  ) {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx2d = canvas.getContext("2d");
+      if (ctx2d) {
+        const boardRect = boardRef.current.getBoundingClientRect();
+        const { x: pickX, y: pickY } = screenToBoard(e.clientX, e.clientY, boardRect);
+        ctx2d.setTransform(1, 0, 0, 1, 0, 0);
+        const st = manager.getState();
+        const boardPieces = st.pieces.filter((p) => !p.inTray);
+        const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY, { hitSlopPx: 2 });
+        hoverPreviewPieceIdRef.current = pieceId ?? null;
+      }
+    }
+  } else if (hoverPreviewPieceIdRef && activeDragId) {
+    hoverPreviewPieceIdRef.current = null;
+  }
+
+  if (!activeDragId) return;
 
   didDragRef.current = true;
   onPieceInteraction?.();

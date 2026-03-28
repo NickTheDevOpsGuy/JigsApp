@@ -4,7 +4,8 @@
  * Load via dynamic import when user opens daily modal to avoid pulling samplePuzzles
  * into initial bundle.
  */
-import { SAMPLE_PUZZLES } from "@/data/packs/samplePuzzles";
+import { getCategorySpotlight } from "@/data/packs/categoryDisplay";
+import { SAMPLE_PUZZLES, getDailyRotationCategoryIds } from "@/data/packs/samplePuzzles";
 import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
@@ -60,15 +61,55 @@ function hashString(s: string): number {
   return h >>> 0;
 }
 
-/** Get the puzzle for a given date (deterministic, good distribution). Same date = same puzzle for everyone. */
+/**
+ * Featured category for a calendar day (rotates through categories that have puzzles).
+ * Same date ⇒ same category for everyone.
+ */
+export function getDailyFeaturedCategoryIdForDate(dateStr: string): string | null {
+  const ids = getDailyRotationCategoryIds();
+  if (ids.length === 0) return null;
+  const seed = hashString(`phuzzle-daily-category-${dateStr}`);
+  const rng = mulberry32(seed);
+  const idx = Math.floor(rng() * ids.length);
+  return ids[idx] ?? null;
+}
+
+/**
+ * Deterministic daily puzzle: picked from that day’s featured category so each day
+ * highlights variety and gives players a reason to check back.
+ */
 export function getDailyPuzzleForDate(dateStr: string): SamplePuzzle | null {
   const puzzles = SAMPLE_PUZZLES;
   if (puzzles.length === 0) return null;
 
-  const seed = hashString(`phuzzle-daily-${dateStr}`);
+  const catId = getDailyFeaturedCategoryIdForDate(dateStr);
+  const pool = catId ? puzzles.filter((p) => p.category === catId) : puzzles;
+  const usePool = pool.length > 0 ? pool : puzzles;
+
+  const seed = hashString(`phuzzle-daily-puzzle-${dateStr}-${catId ?? "all"}`);
   const rng = mulberry32(seed);
-  const puzzleIndex = Math.floor(rng() * puzzles.length);
-  return puzzles[puzzleIndex];
+  const puzzleIndex = Math.floor(rng() * usePool.length);
+  return usePool[puzzleIndex] ?? null;
+}
+
+/** Today’s spotlight copy for menu / marketing (dynamic import from home to avoid eager puzzle assets). */
+export function getTodayDailySpotlight(): {
+  categoryId: string;
+  categoryName: string;
+  categoryEmoji: string;
+  puzzleName: string;
+} | null {
+  const dateStr = getTodayDateString();
+  const puzzle = getDailyPuzzleForDate(dateStr);
+  const catId = getDailyFeaturedCategoryIdForDate(dateStr);
+  if (!puzzle || !catId) return null;
+  const meta = getCategorySpotlight(catId);
+  return {
+    categoryId: catId,
+    categoryName: meta.name,
+    categoryEmoji: meta.emoji,
+    puzzleName: puzzle.name,
+  };
 }
 
 /** Get today's daily puzzle (image only). User picks difficulty. */

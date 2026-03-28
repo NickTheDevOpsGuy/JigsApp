@@ -29,6 +29,9 @@ export function MenuScreen() {
     weekDots,
     weeklyCompleted,
     weeklyRemaining,
+    dailySpotlight,
+    nextDailyXpMultiplier,
+    nextDailyXpMultiplierLabel,
   } = useHomeData();
 
   const handleDailyPlay = () => {
@@ -97,6 +100,16 @@ export function MenuScreen() {
               <span className={styles.puzzleLabelNum}>Daily #{puzzleNumber}</span>
             </div>
 
+            {dailySpotlight && (
+              <p className={styles.dailySpotlightLine} title={dailySpotlight.description}>
+                {dailySpotlight.line}
+              </p>
+            )}
+            <p className={styles.dailySpotlightHint}>
+              Each day highlights a different category with a featured puzzle to encourage
+              variety and return visits.
+            </p>
+
             {/* Primary CTA */}
             <button
               type="button"
@@ -157,6 +170,18 @@ export function MenuScreen() {
                 ))}
               </div>
             </div>
+            {nextDailyXpMultiplier > 1.01 ? (
+              <p
+                className={styles.streakXpHint}
+                title="Signed-in daily completes earn XP; streak multiplies that XP up to 2×, raising level and tier faster."
+              >
+                Next daily solve · {nextDailyXpMultiplierLabel} XP (streak bonus)
+              </p>
+            ) : (
+              <p className={styles.streakXpHint}>
+                Daily streaks multiply XP on each solve (up to 2×) for faster levels.
+              </p>
+            )}
 
             <section className={styles.weeklyCard} aria-label="Weekly progress">
               <div className={styles.weeklyCardHeader}>

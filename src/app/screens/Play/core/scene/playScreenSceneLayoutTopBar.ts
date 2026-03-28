@@ -1,6 +1,7 @@
 /**
  * Build top bar props for play screen from layout context. Split out to keep playScreenSceneLayout under 300 lines.
  */
+import React from "react";
 import { usePlayScreenTopBarProps } from "@/screens/Play/hooks/topBar/usePlayScreenTopBarProps";
 import { SHOW_DEBUG } from "@/screens/Play/core/utils/playScreenUtils";
 
@@ -31,6 +32,11 @@ export function usePlayScreenTopBarPropsFromCtx(
     bestTimeSeconds,
     handleSharePuzzle,
   } = interactions;
+
+  const onStartThisPuzzleOver = React.useCallback(() => {
+    ui.setIsPaused(false);
+    scene.startThisPuzzleOver();
+  }, [ui.setIsPaused, scene.startThisPuzzleOver]);
 
   return usePlayScreenTopBarProps({
     theme: scene.theme,
@@ -78,7 +84,7 @@ export function usePlayScreenTopBarPropsFromCtx(
     showDebug: SHOW_DEBUG,
     debug: ui.debug,
     setShowNewGameModal: ui.setShowChoosePuzzleModal,
-    onStartThisPuzzleOver: scene.startThisPuzzleOver,
+    onStartThisPuzzleOver,
     setShowShortcuts: ui.setShowShortcuts,
     setShowHowToPlay: ui.setShowHowToPlay,
     setShowThemeModal: ui.setShowThemeModal,

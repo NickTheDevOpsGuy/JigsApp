@@ -7,6 +7,7 @@ import { usePlayScreenLifecycleEffects } from "@/screens/Play/hooks/lifecycle/us
 import { useReferenceTapHighlight } from "@/screens/Play/hooks/gameplay/useReferenceTapHighlight";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { usePlayScreenMilestones } from "@/screens/Play/hooks/gameplay/usePlayScreenMilestones";
+import { useBorderFrameMilestone } from "@/screens/Play/hooks/gameplay/useBorderFrameMilestone";
 import { useAutoClearSelection } from "@/screens/Play/hooks/gameplay/useAutoClearSelection";
 import { useShouldShowTutorial } from "@/components/HowToPlay";
 import { usePlayScreenShortcutsFromSetup } from "./playScreenSceneBehaviorShortcuts";
@@ -87,6 +88,7 @@ export function usePlayScreenBehavior(setup: any) {
     showGhostHint: ui.showGhostHint,
     showGhostWhenIdle: ui.showGhostWhenIdle,
     setQuadrantTimes: scene.setQuadrantTimes,
+    quadrantCompleteSeenRef: scene.quadrantCompleteSeenRef,
     setCompletionDismissed: scene.setCompletionDismissed,
     setShowWinOverlay: scene.setShowWinOverlay,
     setCompletionImageUrl: scene.setCompletionImageUrl,
@@ -129,11 +131,19 @@ export function usePlayScreenBehavior(setup: any) {
   }, [scene.viewport.viewport.scale, onboarding.needsZoomTip, onboarding.dismissZoomTip]);
 
   scene.elapsedSecondsRef.current = elapsedSeconds;
+  const borderFrameBonusEarnedRef = React.useRef(false);
   const milestoneMessage = usePlayScreenMilestones(
     state,
     puzzleKey,
     scene.isCoarsePointer,
     timeMode,
+  );
+  const borderFrameMessage = useBorderFrameMilestone(
+    state,
+    puzzleKey,
+    scene.isCoarsePointer,
+    timeMode,
+    borderFrameBonusEarnedRef,
   );
 
   const [selectionExtendTrigger, setSelectionExtendTrigger] = React.useState(0);
@@ -308,6 +318,8 @@ export function usePlayScreenBehavior(setup: any) {
     clearHighlight,
     onboarding,
     milestoneMessage,
+    borderFrameMessage,
+    borderFrameBonusEarnedRef,
     showTutorial,
     dismissTutorial,
     setSelectionExtendTrigger,

@@ -2,9 +2,9 @@
  * Completion overlay state:
  * - records completion stats and achievements
  * - derives leaderboard summaries
- * - powers the image-first share modal
+ * - share-card generation (Options menu)
  */
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { setBestTime } from "@/screens/Play/core/time/timeMode";
 import {
   recordDailyCompletion,
@@ -23,6 +23,7 @@ import { recordCompletion } from "@/services/player/statsService";
 import type { PlayerStatsData } from "@/services/player/statsService";
 import { checkAndUnlockAchievements } from "@/services/player/achievementsService";
 import { getPercentileRank } from "@/services/leaderboard/leaderboardService";
+import { isShareCancelledError } from "@/screens/Play/hooks/share/shareCardImageShare";
 
 type VisualModifier = "none" | "fog" | "night" | "sepia";
 type PieceCutType = "classic" | "irregular" | "hard";
@@ -33,7 +34,6 @@ export type UseCompletionOverlayDataParams = {
   imageUrl?: string;
   moveCount: number;
   rotationCount?: number;
-  piecesPerMin?: number;
   maxGroupSize?: number;
   accuracyPercent: number;
   usedHint: boolean;
@@ -46,6 +46,9 @@ export type UseCompletionOverlayDataParams = {
   puzzleName?: string;
   /** Called after Supabase record with updated stats (e.g. for 7-day streak toast). */
   onCompletionRecorded?: (stats: PlayerStatsData) => void;
+  borderFrameBonus?: boolean;
+  /** Play screen engagement toast (share errors, streak, etc.). */
+  setShareToast?: (message: string | null) => void;
 };
 
 export type UseCompletionOverlayDataResult = ReturnType<typeof useCompletionOverlayData>;
@@ -57,7 +60,6 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     imageUrl,
     moveCount,
     rotationCount = 0,
-    piecesPerMin = 0,
     maxGroupSize = 0,
     accuracyPercent,
     usedHint,
@@ -69,16 +71,13 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     puzzleShareUrl = "/",
     puzzleName,
     onCompletionRecorded,
+    borderFrameBonus = false,
+    setShareToast,
   } = params;
 
   // Keep share links absolute when the overlay is opened from routes like /daily.
   const PLAY_BASE = "https://phuzzle.vercel.app";
 
-  const [sharePopupOpen, setSharePopupOpen] = useState(false);
-  const [sharePopupMode, setSharePopupMode] = useState<"result" | "challenge" | null>(
-    null,
-  );
-  const [dailyCopied, setDailyCopied] = useState(false);
   const [dailyStreak, setDailyStreak] = useState<number>(0);
   const [masteryStreak, setMasteryStreak] = useState<number>(0);
   const [newlyUnlocked, setNewlyUnlocked] = useState<string[]>([]);
@@ -86,10 +85,11 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     topPercent: number;
     totalPlayers: number;
   } | null>(null);
-  const [useSeasonalFrame, setUseSeasonalFrame] = useState(true);
   const [completionRecorded, setCompletionRecorded] = useState(false);
-  const copyResetTimeoutRef = useRef<number | null>(null);
-
+  const [lastXpReward, setLastXpReward] = useState<{
+    gained: number;
+    streakMultiplier: number;
+  } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
@@ -147,12 +147,22 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
           moveCount,
           undoCount,
           completionSource: isDaily ? "daily" : "custom",
+          borderFrameBonus,
         });
         if (!stats || cancelled) return;
 
         setMasteryStreak(stats.masteryStreak ?? 0);
+        if (stats.lastXpGained != null && stats.dailyStreakXpMultiplier != null) {
+          setLastXpReward({
+            gained: stats.lastXpGained,
+            streakMultiplier: stats.dailyStreakXpMultiplier,
+          });
+        }
         setCompletionRecorded(true);
         onCompletionRecorded?.(stats);
+
+        const placementAccuracyPerfect =
+          accuracyPercent >= 100 && grid.rows * grid.cols > 0;
 
         const unlocked = await checkAndUnlockAchievements({
           puzzlesCompleted: stats.puzzlesCompleted,
@@ -160,6 +170,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
           bestDailyStreak: stats.bestDailyStreak,
           lastCompletion: { elapsedSeconds, grid },
           undoCount,
+          placementAccuracyPerfect,
         });
 
         if (!cancelled && unlocked.length > 0) {
@@ -168,6 +179,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       } catch {
         if (!cancelled) {
           setCompletionRecorded(false);
+          setLastXpReward(null);
         }
       }
     };
@@ -186,28 +198,9 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     usedHint,
     visualModifier,
     onCompletionRecorded,
+    borderFrameBonus,
+    accuracyPercent,
   ]);
-
-  useEffect(() => {
-    return () => {
-      if (copyResetTimeoutRef.current != null) {
-        window.clearTimeout(copyResetTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const rankPosition =
-    percentile && percentile.totalPlayers >= 1
-      ? Math.max(
-          1,
-          Math.min(
-            percentile.totalPlayers,
-            percentile.totalPlayers -
-              Math.round((percentile.topPercent / 100) * percentile.totalPlayers) +
-              1,
-          ),
-        )
-      : null;
 
   const percentileBadgeTier =
     percentile && percentile.totalPlayers >= 1
@@ -227,21 +220,25 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       try {
         const { generateAndShareCard } =
           await import("@/screens/Play/hooks/share/useShareCardImageCore");
-        await generateAndShareCard({
+        const ok = await generateAndShareCard({
           imageUrl,
           elapsedSeconds,
           moveCount,
           rotationCount,
-          piecesPerMin,
           maxGroupSize,
           accuracyPercent,
-          percentile,
-          useSeasonalFrame,
           puzzleShareUrl,
           pieceCount: grid ? grid.rows * grid.cols : 0,
           puzzleName,
           mode,
         });
+        if (!ok) {
+          setShareToast?.("Could not build share image.");
+        }
+      } catch (e) {
+        if (!isShareCancelledError(e)) {
+          setShareToast?.("Couldn't share the card. Check downloads or try again.");
+        }
       } finally {
         setIsGenerating(false);
       }
@@ -252,14 +249,12 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       elapsedSeconds,
       moveCount,
       rotationCount,
-      piecesPerMin,
       maxGroupSize,
       accuracyPercent,
-      percentile,
-      useSeasonalFrame,
       puzzleShareUrl,
       grid,
       puzzleName,
+      setShareToast,
     ],
   );
 
@@ -299,18 +294,11 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
-      setDailyCopied(true);
-      if (copyResetTimeoutRef.current != null) {
-        window.clearTimeout(copyResetTimeoutRef.current);
-      }
-      copyResetTimeoutRef.current = window.setTimeout(() => {
-        setDailyCopied(false);
-        copyResetTimeoutRef.current = null;
-      }, 2000);
+      setShareToast?.("Copied!");
     } catch {
-      /* ignore */
+      setShareToast?.("Couldn't copy daily summary.");
     }
-  }, [getDailyShareText]);
+  }, [getDailyShareText, setShareToast]);
 
   const handleNativeDailyShare = useCallback(async () => {
     const text = getDailyShareText();
@@ -325,7 +313,8 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
           text,
           url: dailyLink,
         });
-      } catch {
+      } catch (e) {
+        if (isShareCancelledError(e)) return;
         await handleCopyDailyShare();
       }
     } else {
@@ -333,36 +322,17 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     }
   }, [getDailyShareText, puzzleShareUrl, handleCopyDailyShare]);
 
-  const openSharePopup = useCallback((mode: "result" | "challenge") => {
-    setSharePopupMode(mode);
-    setSharePopupOpen(true);
-  }, []);
-
-  const closeSharePopup = useCallback(() => {
-    setSharePopupOpen(false);
-    setSharePopupMode(null);
-  }, []);
-
   return {
-    sharePopupOpen,
-    sharePopupMode,
-    openSharePopup,
-    closeSharePopup,
-    useSeasonalFrame,
-    setUseSeasonalFrame,
     percentile,
     dailyStreak,
     masteryStreak,
     completionRecorded,
-    rankPosition,
     percentileBadgeTier,
     newlyUnlocked,
     isGenerating,
     handleShareResultCard,
     handleShareChallengeCard,
-    getDailyShareText,
-    handleCopyDailyShare,
     handleNativeDailyShare,
-    dailyCopied,
+    lastXpReward,
   };
 }

@@ -22,7 +22,7 @@ High-level feature list and recent changes. For project overview see [README](..
 - **Lighthouse workflow** — Added `npm run check:images` to surface the heaviest image assets and estimate WebP savings locally before a Lighthouse pass.
 - **Asset optimization** — Replaced the largest shipped social image and several oversized puzzle PNGs with WebP versions to reduce production payload without changing gameplay.
 - **Leaderboards** — Week has same filters as Today (shape, modifier, source); All-time also has grid size. No share button in leaderboard header.
-- **Share** — Challenge card image-only; result card has time, moves, accuracy, URL. Share message uses a random taunt phrase. [SHARING.md](SHARING.md)
+- **Share** — Win-screen **Options** runs **Challenge Friend** / **Share Result** straight into native share or PNG download; challenge and result cards differ; share text is tightened in `shareMessages` (no rotating taunts). [SHARING.md](SHARING.md)
 - **Replay** — Watch Replay from win screen; board cutout, seek bar, play/pause, speed, Back to Results. Snap feedback: target glow, proximity glow, lock glow, snap particles.
 - **Packs** — 10 packs with emojis (Nature, Animals, Food, Cozy, Space, Retro, Art, Gaming, Seasonal, Cute). One folder per pack; Season’s pick when pack has a season.
 - **Modes** — Zen (no timer/rankings), Mystery (progressive reveal), Precision (snap precision stats), Dynamic Difficulty, Adaptive Personality (competitive/calm tone). Magnetic Snap and Snap Glow toggles in Settings.
@@ -36,7 +36,7 @@ High-level feature list and recent changes. For project overview see [README](..
 - Tray: full width, horizontal scroll, Undo/Redo on the right. Filters (All, Edges, Color). Zoom/pan (scroll or pinch); viewport persists.
 - Timer modes: elapsed, countdown, relaxed, best time. Percentile badges; completion badges (Speed Demon, Chill Mode, etc.).
 - Piece shapes: Classic, Irregular, Hard (Settings). Optional piece locking, ghost hints, reference preview (full or progressive).
-- Completion: image, stats, cycling message, Share Result / Share with People, Watch Replay. Six themes; battery-saver and reduced-motion support.
+- Completion: image, stats, single celebration line, **Options** (Share Result, Challenge Friend, Daily Share when daily, replay, next puzzle). Six themes; battery-saver and reduced-motion support.
 
 ---
 
@@ -50,7 +50,7 @@ High-level feature list and recent changes. For project overview see [README](..
 
 ## Social and progress
 
-- Daily puzzle and streak; streak freeze ([STREAK-FREEZE.md](STREAK-FREEZE.md)). **Daily Share** — Wordle-style result block for the daily only (daily #, stats, emoji grid, play link); copy or native share. Weekly album (7 days, mastery badge). Share result, Beat My Puzzle challenge, or co-op link ([SHARING.md](SHARING.md)).
+- Daily puzzle and streak; streak freeze ([STREAK-FREEZE.md](STREAK-FREEZE.md)). **Daily Share** — Wordle-style result block for the daily only (daily #, stats, emoji grid, play link); copy or native share. Weekly album (7 days, mastery badge). Share result, **Challenge Friend**, or co-op link ([SHARING.md](SHARING.md)).
 - Daily comments and reactions after completion. Co-op: share link, real-time sync (Supabase).
 - Leaderboards and live completion counter; percentile ranking on completion overlay.
 
@@ -62,4 +62,4 @@ High-level feature list and recent changes. For project overview see [README](..
 - **Puzzle** — `PuzzleManager` + split modules (`*Ops`, engine, runtime). Snap/restore in `puzzleSnap.ts`, `puzzleManagerRestore.ts`. Shape in `puzzle/core/shape.ts`; piece draw in `renderBoardDrawPieceCore.ts`, `renderBoardDrawPieceHelpers.ts`.
 - **Puzzle selection** — `ChoosePuzzleModal` (catalog) and `PackChoiceModal` (packs); staged flows only. The former full-page Setup screen is no longer used; `/new` redirects to `/`.
 - **Stats** — `StatsScreen`; state and data hooks; tabs for Profile, Board, Badges. Leaderboard fetchers and weekly album.
-- **Completion** — `CompletionOverlay`, share popup, share card image, replay modal. Tray: `PieceTray`, scroll and thumbs hooks.
+- **Completion** — `CompletionOverlay`, Options-menu share (card + toasts), replay modal. Tray: `PieceTray`, scroll and thumbs hooks.
