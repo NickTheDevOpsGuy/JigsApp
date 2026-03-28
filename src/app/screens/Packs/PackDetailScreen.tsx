@@ -71,7 +71,8 @@ export function PackDetailScreen() {
     if (!el) return;
     const first = grid?.firstElementChild as HTMLElement | null;
     const cardWidth = first?.offsetWidth ?? 160;
-    const gap = 8;
+    const gridStyles = grid ? window.getComputedStyle(grid) : null;
+    const gap = Number.parseFloat(gridStyles?.columnGap || gridStyles?.gap || "0") || 8;
     const stepPx = Math.max(120, cardWidth + gap);
     const step = stepPx * direction;
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);

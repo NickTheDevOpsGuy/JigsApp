@@ -207,11 +207,17 @@
   direction: ltr;
   overflow-x: auto;
   overflow-y: hidden;
+  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: 20px;
+  scroll-padding-inline: var(--pack-rail-pad);
   scrollbar-width: none;
+  container-type: inline-size;
+  container-name: packCarousel;
+  /* pad + card + gap flush to viewport width → full cards only, no peek */
+  --pack-rail-pad: 20px;
+  --pack-rail-gap: 22px;
 }
 
 .packScrollViewport::-webkit-scrollbar {
@@ -241,8 +247,8 @@
 .carousel {
   display: flex;
   flex-wrap: nowrap;
-  gap: 22px;
-  padding: 8px 20px 12px;
+  gap: var(--pack-rail-gap);
+  padding: 8px var(--pack-rail-pad) 12px;
   width: max-content;
   min-height: 0;
   box-sizing: border-box;
@@ -257,9 +263,11 @@
   position: relative;
   display: grid;
   gap: 8px;
-  width: min(260px, 82vw);
-  min-width: 220px;
-  max-width: 280px;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 260px;
+  width: calc(100cqi - var(--pack-rail-pad) - var(--pack-rail-gap));
+  min-width: 0;
   padding: 10px 12px;
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--color-border) 86%, transparent);
@@ -274,7 +282,6 @@
     border-color 120ms ease;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  flex-shrink: 0;
 }
 
 .packCard:hover {
@@ -470,23 +477,10 @@
   }
 }
 
-/* Mobile: narrower card so next card peeks */
-@media (max-width: 540px) {
-  .packCard {
-    width: min(260px, 72vw);
-    min-width: 200px;
-  }
-}
-
-/* Desktop: show 3–4 cards; tablet ~2; mobile 1 + peek handled by card width above */
 @media (min-width: 900px) {
   .packScrollViewport {
-    scroll-padding-inline: 24px;
-  }
-
-  .carousel {
-    gap: 24px;
-    padding: 8px 24px 12px;
+    --pack-rail-pad: 24px;
+    --pack-rail-gap: 24px;
   }
 }
 

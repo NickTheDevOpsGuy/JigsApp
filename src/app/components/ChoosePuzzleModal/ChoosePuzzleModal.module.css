@@ -149,6 +149,11 @@
   scroll-snap-type: x mandatory;
   scroll-padding-inline: 14px;
   scrollbar-width: none;
+  container-type: inline-size;
+  container-name: chooseRail;
+  /* pad (14) + card + gap (10) flush to viewport → no partial next card */
+  --choose-rail-pad: 14px;
+  --choose-rail-gap: 10px;
 }
 
 .puzzleGridScroller::-webkit-scrollbar {
@@ -159,7 +164,7 @@
 .puzzleGrid {
   display: flex;
   flex-wrap: nowrap;
-  gap: 10px;
+  gap: var(--choose-rail-gap);
   padding: 4px 14px 8px 14px;
   width: max-content;
   box-sizing: border-box;
@@ -174,8 +179,10 @@
 /* Pack / loading tiles: titled cards. Puzzle pickers use .puzzleTileBare (image-only). */
 .puzzleTile {
   position: relative;
-  flex-shrink: 0;
-  width: 130px;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 240px;
+  width: calc(100cqi - var(--choose-rail-pad) - var(--choose-rail-gap));
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -196,7 +203,8 @@
 
 /* Catalog + pack puzzle rail: one rounded square, image fills the card (no inner frame). */
 .puzzleTileBare {
-  width: 130px;
+  width: 240px;
+  width: calc(100cqi - var(--choose-rail-pad) - var(--choose-rail-gap));
   aspect-ratio: 1 / 1;
   flex-direction: row;
   align-items: stretch;
@@ -238,19 +246,8 @@
   }
 
   .puzzleGrid {
-    gap: 8px;
-    padding: 2px 0;
-  }
-
-  /* Mobile: smaller cards, 1 full + partial next to signal horizontal scroll */
-  .puzzleTile {
-    width: min(42vw, 150px);
-    min-height: 0;
-    border-radius: 12px;
-  }
-
-  .puzzleTileBare {
-    width: min(42vw, 150px);
+    gap: var(--choose-rail-gap);
+    padding: 2px 14px 8px;
   }
 
   .puzzleTile .tileTitle {

@@ -175,10 +175,14 @@
   overflow-y: hidden;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: 14px;
+  scroll-padding-inline: var(--detail-rail-pad);
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   padding: 10px 0 14px;
+  container-type: inline-size;
+  container-name: packDetailRail;
+  --detail-rail-pad: 14px;
+  --detail-rail-gap: 8px;
 }
 
 .scrollViewport::-webkit-scrollbar {

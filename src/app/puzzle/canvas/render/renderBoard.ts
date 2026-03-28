@@ -18,11 +18,11 @@ import {
 } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import {
   drawGhostHints,
-  drawHoverPlacementPreviewGhosts,
   drawPiece,
   drawEdgePieceHighlight,
   drawCompletionGlow,
 } from "./renderBoardDraw";
+import { drawHoverPlacementPreviewGhosts } from "./renderBoardGhostHints";
 import { sortPiecesForDraw } from "@/puzzle/canvas/utils/pieceDrawOrder";
 import type {
   PopMap,

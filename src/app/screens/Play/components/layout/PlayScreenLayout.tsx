@@ -86,6 +86,7 @@ type PlayScreenLayoutProps = {
     trayPieces: Piece[];
     trayGrid: { rows: number; cols: number };
     onTrayPieceClick: (pieceId: string) => void;
+    onTrayPieceHover?: (pieceId: string | null) => void;
     highlightedPieceIds?: Set<string>;
     isLargeTray: boolean;
   };

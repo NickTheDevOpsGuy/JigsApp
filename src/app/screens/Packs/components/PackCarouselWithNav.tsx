@@ -59,7 +59,9 @@ export function PackCarouselWithNav({ children }: PackCarouselWithNavProps) {
     if (!el) return;
     const firstCard = track?.firstElementChild as HTMLElement | null;
     const cardWidth = firstCard?.offsetWidth ?? 280;
-    const gap = 22;
+    const trackStyles = track ? window.getComputedStyle(track) : null;
+    const gap =
+      Number.parseFloat(trackStyles?.columnGap || trackStyles?.gap || "0") || 22;
     const stepPx = Math.max(180, cardWidth + gap);
     const step = stepPx * direction;
     const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);

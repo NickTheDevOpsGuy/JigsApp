@@ -3,7 +3,7 @@
   display: inline-flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: var(--detail-rail-gap);
   padding: 4px 14px 8px;
   align-items: stretch;
   min-width: min-content;
@@ -13,7 +13,9 @@
 
 .puzzleCard {
   flex: 0 0 auto;
-  width: clamp(170px, 46vw, 220px);
+  box-sizing: border-box;
+  width: 220px;
+  width: calc(100cqi - var(--detail-rail-pad) - var(--detail-rail-gap));
   min-width: 0;
   display: flex;
   flex-direction: column;
