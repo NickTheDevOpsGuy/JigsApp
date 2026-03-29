@@ -52,6 +52,8 @@
   max-width: min(92vw, var(--modal-max-w-md));
   max-height: calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter));
   overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow:
     0 0 0 1px color-mix(in srgb, #ffffff 6%, transparent) inset,
     0 24px 64px rgba(0, 0, 0, 0.4),
@@ -181,11 +183,12 @@
   outline-offset: 2px;
 }
 
-/* Mobile */
+/* ── Mobile phones (portrait & landscape, Android + iPhone) ── */
 @media (max-width: 600px) {
   .backdrop {
     align-items: center;
     justify-content: center;
+    /* Respect notch / home-indicator on all mobile OSes */
     padding: max(var(--modal-gutter), env(safe-area-inset-top, 0))
       max(var(--modal-gutter), env(safe-area-inset-right, 0))
       max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
@@ -195,13 +198,16 @@
   .dialog {
     max-width: calc(100vw - 2 * var(--modal-gutter));
     width: 100%;
-    border-radius: 22px;
+    border-radius: 20px;
+    /* Full safe-area-aware height cap */
     max-height: calc(
       var(--app-vh-stable, 100dvh) -
         max(var(--modal-gutter), env(safe-area-inset-top, 0)) -
         max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
     );
     min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .header {
@@ -212,26 +218,74 @@
     padding: 14px 16px 16px;
   }
 
-  /* Board-anchored win card: inline width/maxHeight win over .dialog 100% width */
+  /*
+   * Board-anchored win card: JS now centres in viewport on narrow screens.
+   * Give it explicit width/height so the inline style doesn't override into
+   * an off-screen position. overflow-y: auto lets the content scroll if
+   * the phone is short (e.g. landscape mode on Android).
+   */
   .dialog.dialogAnchored {
-    width: auto;
-    max-width: none;
+    width: min(100%, calc(100vw - 2 * var(--modal-gutter)));
+    max-width: min(92vw, 40rem);
+    max-height: calc(
+      var(--app-vh-stable, 100dvh) -
+        max(var(--modal-gutter), env(safe-area-inset-top, 0)) -
+        max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
+    );
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .toneCelebration {
     align-self: center;
-    width: min(100%, 92vw, 40rem);
-    border-radius: 24px;
+    width: min(100%, 92vw);
+    max-width: 40rem;
+    border-radius: 22px;
   }
 
   .toneCelebration.dialogAnchored {
-    width: auto;
-    max-width: none;
+    width: min(100%, calc(100vw - 2 * var(--modal-gutter)));
+    max-width: min(92vw, 40rem);
   }
 }
 
-/* Very small phones: further reduce padding and button sizes */
-@media (max-width: 420px) {
+/* ── Tablets (Android tablets, iPad portrait & landscape) ── */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .dialog {
+    border-radius: 22px;
+    /* Tablets have plenty of height; cap conservatively */
+    max-height: min(85dvh, calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter)));
+  }
+
+  /* Win dialog on tablet: use up to 480px so the image and stats breathe */
+  .sizeXl {
+    max-width: min(88vw, 30rem);
+  }
+
+  /* Anchored win card: JS centres in viewport (vw ≥ 640 branch uses board centre,
+     which is usually fine on tablets in landscape; portrait is covered by mobile path) */
+  .dialog.dialogAnchored {
+    max-height: min(88dvh, calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter)));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .toneCelebration.dialogAnchored {
+    max-width: min(88vw, 30rem);
+  }
+}
+
+/* ── Desktop (≥ 1025px) ── */
+@media (min-width: 1025px) {
+  .dialog.dialogAnchored {
+    /* Hard cap so a very tall win card on a short monitor never clips */
+    max-height: min(90dvh, calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter)));
+    overflow-y: auto;
+  }
+}
+
+/* ── Very small phones (≤ 390px — compact Androids, iPhone SE) ── */
+@media (max-width: 390px) {
   .header {
     padding: 12px 14px 0;
   }
@@ -246,5 +300,24 @@
 
   .subtitle {
     font-size: 12px;
+  }
+}
+
+/* ── Landscape phones (short viewport, wide aspect ratio) ── */
+@media (max-height: 500px) and (max-width: 900px) {
+  .dialog {
+    /* In landscape the viewport is short — let dialog scroll freely */
+    max-height: calc(
+      var(--app-vh-stable, 100dvh) - max(8px, env(safe-area-inset-top, 0)) -
+        max(8px, env(safe-area-inset-bottom, 0))
+    );
+    border-radius: 16px;
+  }
+
+  .dialog.dialogAnchored {
+    max-height: calc(
+      var(--app-vh-stable, 100dvh) - max(8px, env(safe-area-inset-top, 0)) -
+        max(8px, env(safe-area-inset-bottom, 0))
+    );
   }
 }

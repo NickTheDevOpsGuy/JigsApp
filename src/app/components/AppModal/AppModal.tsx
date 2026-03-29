@@ -243,6 +243,22 @@ export function AppModal({
       const r = el.getBoundingClientRect();
       const { width: vw, height: vh } = getLayoutViewportSize();
       const margin = 12;
+
+      /* On narrow viewports (mobile) the board anchor can be off-centre or
+         partially off-screen. Skip anchor math entirely and just centre in
+         the viewport so the win dialog is always fully visible. */
+      if (vw < 640) {
+        const maxWidthPx = Math.round(vw - 2 * margin);
+        const maxHeightPx = Math.round(vh - 2 * margin);
+        setAnchorPosition({
+          top: Math.round(vh / 2),
+          left: Math.round(vw / 2),
+          maxWidthPx,
+          maxHeightPx,
+        });
+        return;
+      }
+
       let cx = r.left + r.width / 2;
       let cy = r.top + r.height / 2;
       const maxWidthPx = Math.min(

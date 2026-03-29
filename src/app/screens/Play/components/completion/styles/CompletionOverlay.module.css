@@ -14,6 +14,9 @@
   animation: completeWinEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   /* Backdrop uses touch-action: none; dialog restores scrolling/taps on the card */
   touch-action: auto;
+  /* Allow the card itself to scroll if it's taller than the capped height */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @keyframes completeWinEnter {
@@ -32,6 +35,9 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .completeWinBackdrop {
@@ -578,7 +584,7 @@
   font-weight: 600;
 }
 
-/* ── Mobile ── */
+/* ── Mobile phones ≤ 600px (Android + iPhone portrait) ── */
 @media (max-width: 600px) {
   .completeCelebrationBlock {
     padding: 20px 16px 12px;
@@ -586,7 +592,7 @@
   }
 
   .completePhasedTitle {
-    font-size: 1.35rem;
+    font-size: 1.3rem;
   }
 
   .completeActionsPhased {
@@ -597,23 +603,43 @@
   .completePrimaryBtn {
     padding: 14px 16px;
     font-size: 15px;
+    border-radius: 12px;
   }
 
   .completeMenuTrigger {
     font-size: 12px;
-    padding: 10px 10px;
+    padding: 10px;
     gap: 5px;
   }
 
   .completeStatsBar {
     gap: 12px;
     padding: 12px 16px;
+    /* Wrap stat chips on narrow screens so nothing clips */
     flex-wrap: wrap;
+    justify-content: space-evenly;
   }
 
   .completeStatsBarItem {
     font-size: 12px;
     gap: 4px;
+  }
+
+  .completeAreaPace {
+    padding: 0 16px 8px;
+  }
+
+  /* Image: reduce aspect ratio so actions remain visible */
+  .completeImageWrapPhased {
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+  }
+
+  .completeOptionsTrigger {
+    min-height: 48px;
+    font-size: 14px;
+    padding: 11px 14px;
+    border-radius: 10px;
   }
 }
 
@@ -683,4 +709,173 @@
   margin: 4px 0;
   border: none;
   border-top: 1px solid var(--color-border);
+}
+
+/* ── Desktop: ensure the anchored dialog can't exceed the viewport ── */
+@media (min-width: 641px) {
+  .completeWinDialog {
+    max-height: min(90dvh, calc(var(--app-vh-stable, 100dvh) - 24px));
+  }
+}
+
+/* ── Tablets (Android tablets, iPad portrait & landscape 601–1024px) ── */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .completeCelebrationBlock {
+    padding: 28px 24px 18px;
+    gap: 14px;
+  }
+
+  .completePhasedTitle {
+    font-size: 1.7rem;
+  }
+
+  .completeActionsPhased {
+    padding: 18px 24px 28px;
+    gap: 8px;
+  }
+
+  .completePrimaryBtn {
+    padding: 17px 24px;
+    font-size: 16px;
+    border-radius: 14px;
+  }
+
+  .completeStatsBar {
+    gap: 20px;
+    padding: 16px 24px;
+  }
+
+  .completeStatsBarItem {
+    font-size: 14px;
+  }
+
+  .completeImageWrapPhased {
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+  }
+
+  .completeAreaPace {
+    padding: 0 24px 12px;
+  }
+
+  .completeOptionsTrigger {
+    min-height: 54px;
+    font-size: 15px;
+    padding: 13px 18px;
+  }
+}
+
+/* ── Desktop / large screens (≥ 1025px) ── */
+@media (min-width: 1025px) {
+  .completePhasedTitle {
+    font-size: 1.75rem;
+  }
+
+  .completeStatsBar {
+    gap: 24px;
+    padding: 16px 24px;
+  }
+
+  .completeCelebrationBlock {
+    padding: 28px 24px 18px;
+    gap: 14px;
+  }
+
+  .completeActionsPhased {
+    padding: 18px 24px 28px;
+  }
+}
+
+/* ── Very small phones ≤ 390px (compact Androids, iPhone SE) ── */
+@media (max-width: 390px) {
+  .completePhasedTitle {
+    font-size: 1.15rem;
+  }
+
+  .completeCelebrationBlock {
+    padding: 16px 12px 10px;
+    gap: 8px;
+  }
+
+  .completeActionsPhased {
+    padding: 12px 12px 16px;
+    gap: 6px;
+  }
+
+  .completePrimaryBtn {
+    padding: 12px 12px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  .completeMenuTrigger {
+    font-size: 11px;
+    padding: 9px 8px;
+  }
+
+  .completeStatsBar {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .completeStatsBarItem {
+    font-size: 11px;
+  }
+
+  .completeAreaPace {
+    padding: 0 12px 6px;
+  }
+
+  .completeOptionsTrigger {
+    min-height: 44px;
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .completeImageWrapPhased {
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+  }
+}
+
+/* ── Landscape phones (short viewport — Android & iPhone rotated) ── */
+@media (max-height: 500px) and (max-width: 900px) {
+  .completePhasedTitle {
+    font-size: 1.1rem;
+  }
+
+  .completeCelebrationBlock {
+    padding: 12px 16px 8px;
+    gap: 6px;
+  }
+
+  .completeActionsPhased {
+    padding: 10px 16px 14px;
+    gap: 6px;
+  }
+
+  .completePrimaryBtn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .completeStatsBar {
+    padding: 8px 16px;
+    gap: 12px;
+  }
+
+  /* Hide puzzle image and area-pace in landscape — screen height is too precious */
+  .completeImageWrapPhased {
+    display: none;
+  }
+
+  .completeAreaPace {
+    display: none;
+  }
+
+  .completeOptionsTrigger {
+    min-height: 42px;
+    font-size: 13px;
+    padding: 9px 12px;
+  }
 }
