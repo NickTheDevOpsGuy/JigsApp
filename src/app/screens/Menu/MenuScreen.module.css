@@ -346,7 +346,8 @@
   margin-top: 0;
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--color-brand-primary) 14%, var(--color-bg-card)),

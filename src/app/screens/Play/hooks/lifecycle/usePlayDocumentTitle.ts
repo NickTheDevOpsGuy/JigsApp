@@ -30,7 +30,9 @@ export function usePlayDocumentTitle(state: PuzzleState | null, isDaily: boolean
     }
 
     if (state.isComplete) {
-      document.title = isDaily ? `${BASE_TITLE} — Daily complete` : `${BASE_TITLE} — Puzzle complete`;
+      document.title = isDaily
+        ? `${BASE_TITLE} — Daily complete`
+        : `${BASE_TITLE} — Puzzle complete`;
       return;
     }
 

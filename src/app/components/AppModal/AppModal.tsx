@@ -331,55 +331,55 @@ export function AppModal({
         role="presentation"
         tabIndex={-1}
       >
-      <div
-        ref={dialogRef}
-        className={dialogClass}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={title ? titleId : undefined}
-        aria-label={title ? undefined : accessibleName}
-        tabIndex={-1}
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-        style={
-          useAnchor && anchorPosition
-            ? {
-                position: "fixed",
-                top: anchorPosition.top,
-                left: anchorPosition.left,
-                transform: "translate(-50%, -50%)",
-                width: `min(${anchorPosition.maxWidthPx}px, calc(100vw - 24px))`,
-                maxHeight: `min(${anchorPosition.maxHeightPx}px, 90dvh)`,
-              }
-            : undefined
-        }
-      >
-        {showCloseButton && (
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label={closeLabel}
-            title={closeLabel}
-          >
-            <X size={20} aria-hidden />
-          </button>
-        )}
-        {(title || subtitle) && surface !== "bare" && (
-          <div className={styles.header}>
-            {title && (
-              <h2 id={titleId} className={styles.title}>
-                {title}
-              </h2>
-            )}
-            {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        <div
+          ref={dialogRef}
+          className={dialogClass}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={title ? titleId : undefined}
+          aria-label={title ? undefined : accessibleName}
+          tabIndex={-1}
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+          style={
+            useAnchor && anchorPosition
+              ? {
+                  position: "fixed",
+                  top: anchorPosition.top,
+                  left: anchorPosition.left,
+                  transform: "translate(-50%, -50%)",
+                  width: `min(${anchorPosition.maxWidthPx}px, calc(100vw - 24px))`,
+                  maxHeight: `min(${anchorPosition.maxHeightPx}px, 90dvh)`,
+                }
+              : undefined
+          }
+        >
+          {showCloseButton && (
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label={closeLabel}
+              title={closeLabel}
+            >
+              <X size={20} aria-hidden />
+            </button>
+          )}
+          {(title || subtitle) && surface !== "bare" && (
+            <div className={styles.header}>
+              {title && (
+                <h2 id={titleId} className={styles.title}>
+                  {title}
+                </h2>
+              )}
+              {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+            </div>
+          )}
+          <div className={[styles.body, bodyClassName].filter(Boolean).join(" ")}>
+            {children}
           </div>
-        )}
-        <div className={[styles.body, bodyClassName].filter(Boolean).join(" ")}>
-          {children}
         </div>
       </div>
-    </div>
     </>,
     document.body,
   );

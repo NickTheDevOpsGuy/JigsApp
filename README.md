@@ -55,20 +55,20 @@ Details: [docs/CHANGES.md](docs/CHANGES.md).
 
 All project docs live in **[docs/](docs/)**. Full index: [docs/README.md](docs/README.md).
 
-| Doc                                                          | Description                                                |
-| ------------------------------------------------------------ | ---------------------------------------------------------- |
-| [docs/CHANGES.md](docs/CHANGES.md)                           | Feature list and recent changes                            |
-| [docs/FEATURES_IMPLEMENTED.md](docs/FEATURES_IMPLEMENTED.md) | Implemented features and where they live in code           |
-| [docs/FUTURE.md](docs/FUTURE.md)                             | Ideas and possible future features                         |
-| [docs/SHARING.md](docs/SHARING.md)                           | Completion share, Daily Share (Wordle-style), co-op share  |
-| [docs/STREAK-FREEZE.md](docs/STREAK-FREEZE.md)               | Streak freeze (streak shield): earn it, when it applies    |
-| [docs/BUG_REPORT.md](docs/BUG_REPORT.md)                     | In-app bug report: where it is, what it does               |
-| [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md)             | Supabase: leaderboards, stats, co-op, env vars, migrations |
-| [docs/LIGHTHOUSE.md](docs/LIGHTHOUSE.md)                     | Lighthouse CI, reports, "GitHub token not set" warning     |
+| Doc                                                          | Description                                                     |
+| ------------------------------------------------------------ | --------------------------------------------------------------- |
+| [docs/CHANGES.md](docs/CHANGES.md)                           | Feature list and recent changes                                 |
+| [docs/FEATURES_IMPLEMENTED.md](docs/FEATURES_IMPLEMENTED.md) | Implemented features and where they live in code                |
+| [docs/FUTURE.md](docs/FUTURE.md)                             | Ideas and possible future features                              |
+| [docs/SHARING.md](docs/SHARING.md)                           | Completion share, Daily Share (Wordle-style), co-op share       |
+| [docs/STREAK-FREEZE.md](docs/STREAK-FREEZE.md)               | Streak freeze (streak shield): earn it, when it applies         |
+| [docs/BUG_REPORT.md](docs/BUG_REPORT.md)                     | In-app bug report: where it is, what it does                    |
+| [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md)             | Supabase: leaderboards, stats, co-op, env vars, migrations      |
+| [docs/LIGHTHOUSE.md](docs/LIGHTHOUSE.md)                     | Lighthouse CI, reports, "GitHub token not set" warning          |
 | [docs/GAMES_SURFACE.md](docs/GAMES_SURFACE.md)               | Games surface: launch URLs, manifest, acceptance & QA checklist |
-| [docs/MOBILE_QA.md](docs/MOBILE_QA.md)                       | Mobile release checklist and regression commands           |
-| [docs/STATS_UI_QA.md](docs/STATS_UI_QA.md)                   | Stats modal QA: Profile, Board, Badges                     |
-| [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md)           | Session notes (layout, piece drawer, leaderboards, etc.)   |
+| [docs/MOBILE_QA.md](docs/MOBILE_QA.md)                       | Mobile release checklist and regression commands                |
+| [docs/STATS_UI_QA.md](docs/STATS_UI_QA.md)                   | Stats modal QA: Profile, Board, Badges                          |
+| [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md)           | Session notes (layout, piece drawer, leaderboards, etc.)        |
 
 ---
 

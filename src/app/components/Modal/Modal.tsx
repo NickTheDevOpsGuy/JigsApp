@@ -40,7 +40,9 @@ export function Modal({
     const focusRaf = window.requestAnimationFrame(() => {
       const dialogEl = dialogRef.current;
       if (!dialogEl) return;
-      const firstFocusable = dialogEl.querySelector<HTMLElement>(DIALOG_FOCUSABLE_SELECTOR);
+      const firstFocusable = dialogEl.querySelector<HTMLElement>(
+        DIALOG_FOCUSABLE_SELECTOR,
+      );
       (firstFocusable ?? dialogEl).focus({ preventScroll: true });
     });
 
@@ -48,7 +50,11 @@ export function Modal({
       window.cancelAnimationFrame(focusRaf);
 
       const prevFocus = restoreFocusRef.current;
-      if (prevFocus && typeof prevFocus.focus === "function" && document.contains(prevFocus)) {
+      if (
+        prevFocus &&
+        typeof prevFocus.focus === "function" &&
+        document.contains(prevFocus)
+      ) {
         window.requestAnimationFrame(() => {
           prevFocus.focus({ preventScroll: true });
         });
@@ -73,41 +79,41 @@ export function Modal({
         role="presentation"
         tabIndex={-1}
       >
-      <div
-        ref={dialogRef}
-        className={styles.modal}
-        data-variant={variant}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={title ? titleId : undefined}
-        aria-label={title ? undefined : "Dialog"}
-        tabIndex={-1}
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        {(title || showCloseButton) && (
-          <div className={styles.header}>
-            {title && (
-              <h2 id={titleId} className={styles.title}>
-                {title}
-              </h2>
-            )}
-            {showCloseButton && (
-              <button
-                type="button"
-                className={styles.closeBtn}
-                onClick={onClose}
-                aria-label="Close"
-                title="Close"
-              >
-                <X size={20} aria-hidden />
-              </button>
-            )}
-          </div>
-        )}
-        <div className={styles.content}>{children}</div>
+        <div
+          ref={dialogRef}
+          className={styles.modal}
+          data-variant={variant}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={title ? titleId : undefined}
+          aria-label={title ? undefined : "Dialog"}
+          tabIndex={-1}
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
+          {(title || showCloseButton) && (
+            <div className={styles.header}>
+              {title && (
+                <h2 id={titleId} className={styles.title}>
+                  {title}
+                </h2>
+              )}
+              {showCloseButton && (
+                <button
+                  type="button"
+                  className={styles.closeBtn}
+                  onClick={onClose}
+                  aria-label="Close"
+                  title="Close"
+                >
+                  <X size={20} aria-hidden />
+                </button>
+              )}
+            </div>
+          )}
+          <div className={styles.content}>{children}</div>
+        </div>
       </div>
-    </div>
     </>,
     document.body,
   );

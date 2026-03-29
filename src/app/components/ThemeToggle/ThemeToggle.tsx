@@ -125,7 +125,12 @@ export function ThemeToggle({
       </button>
 
       {isOpen && (
-        <div className={styles.dropdown} id={listId} role="menu" aria-label="Choose theme">
+        <div
+          className={styles.dropdown}
+          id={listId}
+          role="menu"
+          aria-label="Choose theme"
+        >
           {THEMES.map((t) => (
             <button
               key={t}

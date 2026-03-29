@@ -15,11 +15,7 @@ import {
   drawGridOverlay,
   drawAlignmentGrid,
 } from "@/puzzle/canvas/utils/renderBoardHelpers";
-import {
-  drawPiece,
-  drawEdgePieceHighlight,
-  drawCompletionGlow,
-} from "./renderBoardDraw";
+import { drawPiece, drawEdgePieceHighlight, drawCompletionGlow } from "./renderBoardDraw";
 import { sortPiecesForDraw } from "@/puzzle/canvas/utils/pieceDrawOrder";
 import type {
   PopMap,

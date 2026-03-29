@@ -32,7 +32,7 @@ This `docs/` directory is the canonical documentation home for the repo.
 
 | Doc                                  | What it covers                                                                     |
 | ------------------------------------ | ---------------------------------------------------------------------------------- |
-| [GAMES_SURFACE.md](GAMES_SURFACE.md)   | Games catalog registration (UAT/Prod URLs), acceptance criteria, QA script, embed. |
+| [GAMES_SURFACE.md](GAMES_SURFACE.md) | Games catalog registration (UAT/Prod URLs), acceptance criteria, QA script, embed. |
 | [MOBILE_QA.md](MOBILE_QA.md)         | Mobile release checklist: devices, core flows, safe areas, regression commands.    |
 | [RELEASE_AUDIT.md](RELEASE_AUDIT.md) | Formal release audit: coverage, findings, feature-vs-spec review, release verdict. |
 | [STATS_UI_QA.md](STATS_UI_QA.md)     | Stats modal QA: Profile, Board, Badges on mobile and desktop.                      |

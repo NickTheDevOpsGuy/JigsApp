@@ -96,146 +96,150 @@ export function ShortcutsModal({
         role="presentation"
         tabIndex={-1}
       >
-      <div
-        ref={dialogRef}
-        className={styles.modal}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        aria-describedby={descId}
-        tabIndex={-1}
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <div className={styles.header}>
-          <div className={styles.titleRow}>
-            <Keyboard size={22} aria-hidden />
-            <h2 id={titleId}>Keyboard Shortcuts</h2>
-          </div>
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="Close"
-            title="Close"
-          >
-            <X size={20} aria-hidden />
-          </button>
-        </div>
-
-        <p id={descId} className={styles.srOnly}>
-          Reference of keyboard shortcuts and pointer controls. Use the search field to
-          filter. Press Escape to close.
-        </p>
-
-        <div className={styles.searchWrap}>
-          <input
-            ref={searchInputRef}
-            type="search"
-            className={styles.searchInput}
-            placeholder="Search shortcuts…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search shortcuts"
-            title="Search shortcuts"
-          />
-        </div>
-
-        <div className={styles.content}>
-          <div className={styles.grid}>
-            {filteredGroups.map((group) => {
-              const Icon = SECTION_ICONS[group.id];
-              return (
-                <section
-                  key={group.id}
-                  className={styles.section}
-                  data-group={group.id}
-                  aria-label={group.title}
-                >
-                  <h3 className={styles.sectionTitle}>
-                    {Icon && <Icon size={14} className={styles.sectionIcon} aria-hidden />}
-                    {group.title}
-                  </h3>
-                  <table className={styles.table}>
-                    <caption className={styles.srOnly}>
-                      {group.title} shortcuts: key combinations and actions
-                    </caption>
-                    <tbody>
-                      {group.shortcuts.map((shortcut, i) => {
-                        const disabled = disabledActions.includes(shortcut.action);
-                        return (
-                          <tr
-                            key={`${group.id}-${i}`}
-                            className={disabled ? styles.rowDisabled : undefined}
-                          >
-                            <th scope="row" className={styles.keys}>
-                              {shortcut.keys.map((key, j) => (
-                                <React.Fragment key={j}>
-                                  {j > 0 && <span className={styles.separator}>or</span>}
-                                  <kbd className={styles.key}>{formatKey(key)}</kbd>
-                                </React.Fragment>
-                              ))}
-                            </th>
-                            <td className={styles.action}>{shortcut.action}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </section>
-              );
-            })}
-
-            <section
-              className={`${styles.section} ${styles.sectionInputRef}`}
-              aria-label="Input reference"
+        <div
+          ref={dialogRef}
+          className={styles.modal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          aria-describedby={descId}
+          tabIndex={-1}
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
+          <div className={styles.header}>
+            <div className={styles.titleRow}>
+              <Keyboard size={22} aria-hidden />
+              <h2 id={titleId}>Keyboard Shortcuts</h2>
+            </div>
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="Close"
+              title="Close"
             >
-              <h3 className={styles.sectionTitleInput}>
-                <Mouse size={14} className={styles.sectionIcon} aria-hidden />
-                Input Reference
-              </h3>
-              <table className={styles.table}>
-                <caption className={styles.srOnly}>
-                  Mouse and touch controls for moving and rotating pieces
-                </caption>
-                <tbody>
-                  <tr>
-                    <th scope="row" className={styles.keys}>
-                      <kbd className={styles.key}>Click</kbd> + Drag
-                    </th>
-                    <td className={styles.action}>Move piece</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" className={styles.keys}>
-                      <kbd className={styles.key}>Right Click</kbd>
-                    </th>
-                    <td className={styles.action}>Rotate piece</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" className={styles.keys}>
-                      <kbd className={styles.key}>Drag</kbd> to drawer
-                    </th>
-                    <td className={styles.action}>Store piece</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" className={styles.keys}>
-                      <kbd className={styles.key}>Tap</kbd>
-                    </th>
-                    <td className={styles.action}>Rotate (touch)</td>
-                  </tr>
-                </tbody>
-              </table>
-            </section>
+              <X size={20} aria-hidden />
+            </button>
           </div>
-        </div>
 
-        <div className={styles.footer}>
-          <span className={styles.hint}>
-            Press <kbd className={styles.key}>?</kbd> anytime
-          </span>
+          <p id={descId} className={styles.srOnly}>
+            Reference of keyboard shortcuts and pointer controls. Use the search field to
+            filter. Press Escape to close.
+          </p>
+
+          <div className={styles.searchWrap}>
+            <input
+              ref={searchInputRef}
+              type="search"
+              className={styles.searchInput}
+              placeholder="Search shortcuts…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search shortcuts"
+              title="Search shortcuts"
+            />
+          </div>
+
+          <div className={styles.content}>
+            <div className={styles.grid}>
+              {filteredGroups.map((group) => {
+                const Icon = SECTION_ICONS[group.id];
+                return (
+                  <section
+                    key={group.id}
+                    className={styles.section}
+                    data-group={group.id}
+                    aria-label={group.title}
+                  >
+                    <h3 className={styles.sectionTitle}>
+                      {Icon && (
+                        <Icon size={14} className={styles.sectionIcon} aria-hidden />
+                      )}
+                      {group.title}
+                    </h3>
+                    <table className={styles.table}>
+                      <caption className={styles.srOnly}>
+                        {group.title} shortcuts: key combinations and actions
+                      </caption>
+                      <tbody>
+                        {group.shortcuts.map((shortcut, i) => {
+                          const disabled = disabledActions.includes(shortcut.action);
+                          return (
+                            <tr
+                              key={`${group.id}-${i}`}
+                              className={disabled ? styles.rowDisabled : undefined}
+                            >
+                              <th scope="row" className={styles.keys}>
+                                {shortcut.keys.map((key, j) => (
+                                  <React.Fragment key={j}>
+                                    {j > 0 && (
+                                      <span className={styles.separator}>or</span>
+                                    )}
+                                    <kbd className={styles.key}>{formatKey(key)}</kbd>
+                                  </React.Fragment>
+                                ))}
+                              </th>
+                              <td className={styles.action}>{shortcut.action}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </section>
+                );
+              })}
+
+              <section
+                className={`${styles.section} ${styles.sectionInputRef}`}
+                aria-label="Input reference"
+              >
+                <h3 className={styles.sectionTitleInput}>
+                  <Mouse size={14} className={styles.sectionIcon} aria-hidden />
+                  Input Reference
+                </h3>
+                <table className={styles.table}>
+                  <caption className={styles.srOnly}>
+                    Mouse and touch controls for moving and rotating pieces
+                  </caption>
+                  <tbody>
+                    <tr>
+                      <th scope="row" className={styles.keys}>
+                        <kbd className={styles.key}>Click</kbd> + Drag
+                      </th>
+                      <td className={styles.action}>Move piece</td>
+                    </tr>
+                    <tr>
+                      <th scope="row" className={styles.keys}>
+                        <kbd className={styles.key}>Right Click</kbd>
+                      </th>
+                      <td className={styles.action}>Rotate piece</td>
+                    </tr>
+                    <tr>
+                      <th scope="row" className={styles.keys}>
+                        <kbd className={styles.key}>Drag</kbd> to drawer
+                      </th>
+                      <td className={styles.action}>Store piece</td>
+                    </tr>
+                    <tr>
+                      <th scope="row" className={styles.keys}>
+                        <kbd className={styles.key}>Tap</kbd>
+                      </th>
+                      <td className={styles.action}>Rotate (touch)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+            </div>
+          </div>
+
+          <div className={styles.footer}>
+            <span className={styles.hint}>
+              Press <kbd className={styles.key}>?</kbd> anytime
+            </span>
+          </div>
         </div>
       </div>
-    </div>
     </>,
     document.body,
   );

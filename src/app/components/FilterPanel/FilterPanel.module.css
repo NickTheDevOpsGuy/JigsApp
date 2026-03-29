@@ -40,7 +40,10 @@
   transform: translate(-50%, -50%);
   z-index: calc(var(--z-modal-overlay, 10050) + 1);
   width: min(360px, calc(100vw - 32px));
-  max-height: min(80dvh, calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 32px));
+  max-height: min(
+    80dvh,
+    calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 32px)
+  );
   display: flex;
   flex-direction: column;
   background: var(--color-bg-card);

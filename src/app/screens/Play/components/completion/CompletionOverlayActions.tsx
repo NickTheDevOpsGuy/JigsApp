@@ -342,7 +342,9 @@ export function CompletionOverlayActions(args: {
             onClick={() => void handleDailyShare()}
             disabled={shareMenuBusy || busyAction === "replay"}
             aria-label={
-              busyAction === "dailyShare" ? "Sharing daily summary" : "Daily share summary"
+              busyAction === "dailyShare"
+                ? "Sharing daily summary"
+                : "Daily share summary"
             }
             title={
               busyAction === "dailyShare" ? "Sharing…" : "Wordle-style daily summary"
