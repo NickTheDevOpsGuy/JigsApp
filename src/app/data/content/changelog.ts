@@ -1,13 +1,17 @@
 /** Changelog for What's New popup. Bump CHANGELOG_VERSION when adding entries. */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "51";
+export const CHANGELOG_VERSION = "52";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
+      "📐 Modal parity – Choose puzzle, packs, and daily dialogs use shared max sizes and safe-area padding so they fit phones and desktops without clipping.",
+      "🖼️ Matching previews – Rail thumbnails and pack detail cards use one fixed square size everywhere for a calmer picker.",
+      "📜 Hidden scrollbars – Scrollbars stay out of the way; you can still scroll with touch, trackpad, or keyboard.",
+      "🧩 Fair play – Board no longer shows ghost targets, hover “home” previews, or glowing snap slots; magnetic snap and sounds are unchanged.",
       "Completion flow – Win screen always appears after the last piece locks; brief board glow then overlay.",
       "Piece seams – Placed pieces no longer show outline or edge strokes so adjacent pieces meet with no visible gaps.",
       "Jigsaw look – Unplaced pieces keep crisp outline and depth; placed pieces blend into one continuous image.",

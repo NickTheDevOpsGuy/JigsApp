@@ -1,12 +1,28 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
+  "lockFileMaintenance": { "enabled": false },
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
   "packageRules": [
     {
-      "description": "Non-0.x patch bumps: label for CI, then auto-merge after checks (exclude 0.x)",
-      "matchUpdateTypes": ["patch"],
-      "matchCurrentVersion": "!/^0/",
-      "addLabels": ["patch-update"],
+      "description": "No GitHub Actions bump PRs; bump pinned actions manually when needed",
+      "matchManagers": ["github-actions"],
+      "enabled": false
+    },
+    {
+      "description": "Ignore routine npm semver bumps (patch/minor/major); CVE PRs are excluded via excludeVulnerabilityAlerts",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch", "minor", "major", "pin", "digest"],
+      "excludeVulnerabilityAlerts": true,
+      "enabled": false
+    },
+    {
+      "description": "GitHub Security / Dependabot vulnerability fixes only: stable versions, auto-merge after CI",
+      "matchVulnerabilityAlerts": true,
+      "labels": ["security", "cve-fix"],
+      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/",
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": true

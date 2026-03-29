@@ -102,7 +102,8 @@ export function DailyReactions({ puzzleDate }: DailyReactionsProps) {
             onClick={() => handleReaction(r.emoji)}
             disabled={posting}
             aria-pressed={r.userReacted}
-            aria-label={`${r.emoji} ${r.count}`}
+            aria-label={`React with ${r.emoji}, ${r.count} reactions`}
+            title={`React with ${r.emoji} (${r.count})`}
           >
             <span className={styles.emoji}>{r.emoji}</span>
             {r.count > 0 && <span className={styles.count}>{r.count}</span>}
@@ -120,6 +121,7 @@ export function DailyReactions({ puzzleDate }: DailyReactionsProps) {
             rows={2}
             className={styles.textarea}
             disabled={posting}
+            aria-label="Daily puzzle comment"
           />
           <div className={styles.commentActions}>
             <span
@@ -140,6 +142,8 @@ export function DailyReactions({ puzzleDate }: DailyReactionsProps) {
               className={styles.postBtn}
               onClick={handlePostComment}
               disabled={!commentText.trim() || posting}
+              aria-label="Post comment"
+              title="Post comment"
             >
               Post
             </button>
@@ -157,7 +161,7 @@ export function DailyReactions({ puzzleDate }: DailyReactionsProps) {
                 aria-label="Report"
                 title="Report comment"
               >
-                <Flag size={12} />
+                <Flag size={12} aria-hidden />
               </button>
             </li>
           ))}

@@ -176,6 +176,8 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
               type="button"
               className={styles.freezeBtn}
               onClick={handleUseFreeze}
+              aria-label="Use streak freeze for yesterday"
+              title="Use streak freeze"
             >
               🧊 Use Freeze
             </button>
@@ -186,6 +188,8 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
                 setFreezeUsed(true);
                 dismissFreezeOfferToday();
               }}
+              aria-label="Decline streak freeze"
+              title="No thanks"
             >
               No thanks
             </button>
@@ -212,6 +216,10 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
           className={styles.moreOptionsBtn}
           onClick={() => setShowMore((v) => !v)}
           aria-expanded={showMore}
+          aria-label={
+            showMore ? "Hide extra difficulty options" : "Show more difficulty options"
+          }
+          title={showMore ? "Hide extra difficulties" : "More difficulty options"}
         >
           More Options
           {showMore ? (
@@ -240,7 +248,13 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
         )}
       </div>
 
-      <button type="button" className={styles.startBtn} onClick={handleStart}>
+      <button
+        type="button"
+        className={styles.startBtn}
+        onClick={handleStart}
+        aria-label="Start today’s puzzle"
+        title="Start today’s puzzle"
+      >
         Start Puzzle
         <span className={styles.startBtnArrow}>→</span>
       </button>
@@ -279,6 +293,8 @@ function DifficultyCard({
       className={`${styles.difficultyCard} ${selected ? styles.difficultyCardSelected : ""}`}
       onClick={onSelect}
       style={{ "--difficulty-accent": color } as React.CSSProperties}
+      aria-label={displayLabel}
+      title={displayLabel}
     >
       <span className={styles.difficultyCardLine}>
         <span className={styles.difficultyCardLabel}>{displayLabel}</span>

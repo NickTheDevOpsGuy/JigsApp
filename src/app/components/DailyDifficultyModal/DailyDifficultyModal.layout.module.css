@@ -1,15 +1,19 @@
 .puzzleImageWrap {
-  margin-bottom: 10px;
+  margin: 0 auto 10px;
+  width: var(--choose-preview-size);
+  height: var(--choose-preview-size);
   border-radius: var(--radius-card);
   overflow: hidden;
   border: 1px solid var(--color-border);
   background: var(--color-bg-secondary);
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .puzzleImage {
   display: block;
   width: 100%;
-  max-height: 130px;
+  height: 100%;
   object-fit: cover;
   object-position: center;
 }
@@ -19,18 +23,8 @@
     margin-bottom: 8px;
   }
 
-  .puzzleImage {
-    max-height: 100px;
-  }
-
   .difficultyCardLabel {
     font-size: 12px;
-  }
-}
-
-@media (max-width: 600px) and (max-height: 700px) {
-  .puzzleImage {
-    max-height: 72px;
   }
 }
 

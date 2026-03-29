@@ -125,9 +125,15 @@
   border-bottom: none;
 }
 
+.table th,
 .table td {
   padding: 6px 0;
   vertical-align: middle;
+}
+
+.table th {
+  font-weight: inherit;
+  text-align: left;
 }
 
 .keys {

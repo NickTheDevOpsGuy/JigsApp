@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "phuzzle",
+  "name": "Phuzzle",
+  "shortName": "Phuzzle",
+  "category": "games",
+  "genre": "puzzle",
+  "mechanicSummary": "Visual arrangement: jigsaw puzzle — drag, drop, and snap pieces on a board; optional daily challenge and themed packs.",
+  "description": "Solo puzzle game: short-session jigsaw play with clear completion (all pieces placed). Daily puzzle, quick play catalog, and puzzle packs. Progress for in-flight games can resume after refresh; completed runs are recorded with time, moves, and related stats.",
+  "launchUrls": {
+    "production": "https://phuzzle.vercel.app/",
+    "uat": "REPLACE_WITH_UAT_BASE_URL"
+  },
+  "manifestUrl": "https://phuzzle.vercel.app/manifest.webmanifest",
+  "icons": {
+    "192": "/icon-192.png",
+    "512": "/icon-512.png"
+  },
+  "pwa": {
+    "startPath": "/",
+    "scope": "/",
+    "displayModes": ["standalone", "minimal-ui", "browser"]
+  },
+  "persistence": {
+    "inProgressPuzzle": "Resumable — play state is stored locally (and optionally synced for signed-in features). Refreshing or re-opening the app can restore an active puzzle from the play screen or resume prompts where implemented.",
+    "sessionOnlyModes": "None required for core jigsaw flow; treat a 'session' as one puzzle until complete or abandoned.",
+    "completion": "Completion is detected when all pieces are placed correctly; win UI confirms solve. Metrics (e.g. time, moves) are recorded for the run; daily completions additionally feed streak/album logic when applicable."
+  },
+  "completionMetrics": [
+    "elapsedTime",
+    "moveCount",
+    "pieceCount",
+    "gridSize",
+    "dailyNumber",
+    "streakAndWeeklyProgress"
+  ],
+  "browserSupport": "Modern evergreen browsers (Chrome, Edge, Firefox, Safari) on desktop and mobile; touch and pointer input.",
+  "embedNotes": "If the Games host loads Phuzzle in an iframe, the deployment must allow that origin via Content-Security-Policy frame-ancestors (or equivalent). Coordinate the parent origin with the hosting team; see docs/GAMES_SURFACE.md."
+}

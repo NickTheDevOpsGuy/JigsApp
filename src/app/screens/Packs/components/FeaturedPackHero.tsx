@@ -30,7 +30,13 @@ export function FeaturedPackHero({
 
   return (
     <section className={styles.featuredHero} aria-label="Featured pack">
-      <button type="button" className={styles.featuredHeroCard} onClick={onClick}>
+      <button
+        type="button"
+        className={styles.featuredHeroCard}
+        onClick={onClick}
+        aria-label={`${buttonLabel}: ${name}`}
+        title={`${buttonLabel}: ${name}`}
+      >
         <div className={styles.featuredHeroCover}>
           {coverImageUrl ? (
             <img

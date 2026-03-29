@@ -29,10 +29,12 @@
   box-shadow: 0 22px 42px rgba(5, 12, 24, 0.34);
 }
 
+/* Square preview: same visual language as choose-puzzle / pack-detail rails (--choose-preview-size). */
 .featuredHeroCover {
   position: relative;
-  aspect-ratio: 16 / 10;
-  max-height: 180px;
+  width: min(100%, calc(var(--choose-preview-size) * 2.15));
+  aspect-ratio: 1 / 1;
+  margin-inline: auto;
   overflow: hidden;
   border-radius: 14px;
   border: 1px solid rgba(130, 163, 218, 0.18);

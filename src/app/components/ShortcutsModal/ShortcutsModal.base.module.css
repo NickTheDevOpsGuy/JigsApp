@@ -9,7 +9,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  padding: max(var(--modal-gutter), env(safe-area-inset-top))
+    max(var(--modal-gutter), env(safe-area-inset-right))
+    max(var(--modal-gutter), env(safe-area-inset-bottom))
+    max(var(--modal-gutter), env(safe-area-inset-left));
+  box-sizing: border-box;
+  z-index: var(--z-modal-overlay, 10050);
   animation: fadeIn 0.2s ease-out;
 
   -webkit-touch-callout: none;
@@ -32,9 +37,9 @@
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
-  max-width: 720px;
-  width: 90%;
-  max-height: min(90dvh, 560px);
+  max-width: min(92vw, var(--modal-max-w-kb));
+  width: 100%;
+  max-height: min(86dvh, 560px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -79,6 +84,19 @@
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--color-text-primary);
+}
+
+/* Visually hidden: captions + dialog description for screen readers */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 .titleRow svg {

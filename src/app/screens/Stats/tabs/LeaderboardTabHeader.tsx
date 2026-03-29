@@ -67,6 +67,7 @@ export function LeaderboardTabHeader({
             type="button"
             className={`${styles.boardModeBtn} ${leaderboardType === "today" ? styles.boardModeBtnActive : ""}`}
             onClick={() => setLeaderboardType("today")}
+            title="Today’s leaderboard"
           >
             Today
           </button>
@@ -74,6 +75,7 @@ export function LeaderboardTabHeader({
             type="button"
             className={`${styles.boardModeBtn} ${leaderboardType === "week" ? styles.boardModeBtnActive : ""}`}
             onClick={() => setLeaderboardType("week")}
+            title="This week’s leaderboard"
           >
             Week
           </button>
@@ -81,6 +83,7 @@ export function LeaderboardTabHeader({
             type="button"
             className={`${styles.boardModeBtn} ${leaderboardType === "alltime" ? styles.boardModeBtnActive : ""}`}
             onClick={() => setLeaderboardType("alltime")}
+            title="All-time leaderboard"
           >
             All-time
           </button>
@@ -88,6 +91,7 @@ export function LeaderboardTabHeader({
             type="button"
             className={`${styles.boardModeBtn} ${leaderboardType === "efficiency" ? styles.boardModeBtnActive : ""}`}
             onClick={() => setLeaderboardType("efficiency")}
+            title="Efficiency leaderboard"
           >
             Efficiency
           </button>
@@ -103,6 +107,7 @@ export function LeaderboardTabHeader({
                 setLeaderboardMetric(e.target.value as LeaderboardSortMetric)
               }
               aria-label="Sort by"
+              title="Sort leaderboard"
             >
               <option value="time">Fastest</option>
               <option value="moves">Least moves</option>
@@ -118,6 +123,7 @@ export function LeaderboardTabHeader({
         onClick={() => setFiltersOpen((o) => !o)}
         aria-expanded={filtersOpen}
         aria-label="Filters"
+        title={filtersOpen ? "Hide filters" : "Show filters"}
       >
         <Filter size={18} />
         <span className={styles.filtersBarTitle}>Filters</span>
@@ -138,6 +144,7 @@ export function LeaderboardTabHeader({
               value={cutTypeFilter}
               onChange={(e) => setCutTypeFilter(e.target.value as PieceCutType)}
               aria-label="Filter by shape"
+              title="Filter by piece shape"
             >
               <option value="all">All Shapes</option>
               <option value="classic">Classic Shape</option>
@@ -155,6 +162,7 @@ export function LeaderboardTabHeader({
               value={modifierFilter}
               onChange={(e) => setModifierFilter(e.target.value as VisualModifierFilter)}
               aria-label="Filter by modifier"
+              title="Filter by visual modifier"
             >
               <option value="all">All Modifiers</option>
               <option value="none">No Modifier</option>
@@ -173,6 +181,7 @@ export function LeaderboardTabHeader({
               value={sourceFilter}
               onChange={(e) => setSourceFilter(e.target.value as CompletionSourceFilter)}
               aria-label="Filter by source"
+              title="Filter by puzzle source"
             >
               <option value="all">All Sources</option>
               <option value="daily">Daily</option>
@@ -193,6 +202,7 @@ export function LeaderboardTabHeader({
                   setAllTimeGrid(e.target.value as "3x3" | "4x4" | "5x5" | "6x6")
                 }
                 aria-label="Filter all-time by grid size"
+                title="All-time grid size"
               >
                 <option value="3x3">3x3 Grid</option>
                 <option value="4x4">4x4 Grid</option>

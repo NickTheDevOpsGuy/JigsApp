@@ -154,8 +154,8 @@ export function AppModal({
     if (!isOpen) return;
     modalStack.push(dialogRef);
     restoreFocusRef.current = document.activeElement as HTMLElement | null;
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("keydown", trapFocus);
+    document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("keydown", trapFocus, true);
 
     const body = document.body;
     const root = document.documentElement;
@@ -195,8 +195,8 @@ export function AppModal({
       window.cancelAnimationFrame(focusTarget);
       const idx = modalStack.lastIndexOf(dialogRef);
       if (idx >= 0) modalStack.splice(idx, 1);
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("keydown", trapFocus);
+      document.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener("keydown", trapFocus, true);
 
       const currentLockCount = Number(body.getAttribute(BODY_SCROLL_LOCK_ATTR) ?? "1");
       const remainingLockCount = Math.max(0, currentLockCount - 1);
@@ -243,17 +243,23 @@ export function AppModal({
       const r = el.getBoundingClientRect();
       const { width: vw, height: vh } = getLayoutViewportSize();
       const margin = 12;
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
+      let cx = r.left + r.width / 2;
+      let cy = r.top + r.height / 2;
       const maxWidthPx = Math.min(
         640,
         Math.max(280, Math.round(r.width) + 24),
         Math.round(vw - 2 * margin),
       );
       const maxHeightPx = Math.max(240, Math.round(vh - margin * 2));
+      /* translate(-50%,-50%) uses this point as the dialog center — clamp so the box stays in view */
+      const effW = Math.min(maxWidthPx, vw - 2 * margin);
+      const halfW = effW / 2;
+      const halfH = maxHeightPx / 2;
+      cx = Math.min(vw - margin - halfW, Math.max(margin + halfW, cx));
+      cy = Math.min(vh - margin - halfH, Math.max(margin + halfH, cy));
       setAnchorPosition({
-        top: Math.min(vh - margin, Math.max(margin, cy)),
-        left: Math.min(vw - margin, Math.max(margin, cx)),
+        top: cy,
+        left: cx,
         maxWidthPx,
         maxHeightPx,
       });
@@ -301,22 +307,30 @@ export function AppModal({
     .join(" ");
 
   return createPortal(
-    <div
-      className={backdropClass}
-      style={
-        align === "top"
-          ? { paddingTop: `max(${topOffsetPx}px, env(safe-area-inset-top, 0px))` }
-          : undefined
-      }
-      onClick={
-        closeOnBackdropClick
-          ? (e: React.MouseEvent<HTMLDivElement>) => {
-              if (e.target === e.currentTarget) onClose();
-            }
-          : undefined
-      }
-      role="presentation"
-    >
+    <>
+      <div
+        className={backdropClass}
+        style={
+          align === "top"
+            ? { paddingTop: `max(${topOffsetPx}px, env(safe-area-inset-top, 0px))` }
+            : undefined
+        }
+        onClick={
+          closeOnBackdropClick
+            ? (e: React.MouseEvent<HTMLDivElement>) => {
+                if (e.target === e.currentTarget) onClose();
+              }
+            : undefined
+        }
+        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            onClose();
+          }
+        }}
+        role="presentation"
+        tabIndex={-1}
+      >
       <div
         ref={dialogRef}
         className={dialogClass}
@@ -365,7 +379,8 @@ export function AppModal({
           {children}
         </div>
       </div>
-    </div>,
+    </div>
+    </>,
     document.body,
   );
 }

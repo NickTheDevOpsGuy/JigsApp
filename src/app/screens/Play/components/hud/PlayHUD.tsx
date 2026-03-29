@@ -131,7 +131,7 @@ export function PlayHUD({
       )}
       {showLeft && showTimer && (isSpeedrun || isTimeAttack) && (
         <div className={styles.hudPillTimer} title="Elapsed time (speedrun)">
-          <Clock size={16} />
+          <Clock size={16} aria-hidden />
           <span className={styles.timerText}>{formatTime(elapsedSeconds)}</span>
         </div>
       )}

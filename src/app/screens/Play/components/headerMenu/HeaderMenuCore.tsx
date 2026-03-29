@@ -333,7 +333,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
                         ? "View leaderboards"
                         : id === "settings"
                           ? "Gameplay, assistance, appearance, audio, advanced"
-                          : undefined
+                          : ROOT_MENU_LABELS[id]
                     }
                   >
                     {ROOT_MENU_LABELS[id]}

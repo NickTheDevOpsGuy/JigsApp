@@ -36,6 +36,7 @@ export function HelpChoiceModal({
             onHowToPlay();
           }}
           aria-label="How to Play"
+          title="How to Play"
         >
           📖 How to Play
         </button>
@@ -47,6 +48,7 @@ export function HelpChoiceModal({
             onKeyboardShortcuts();
           }}
           aria-label="Keyboard and Controls"
+          title="Keyboard and Controls"
         >
           ⌨️ Keyboard & Controls
         </button>
@@ -59,6 +61,7 @@ export function HelpChoiceModal({
               onShowAbout();
             }}
             aria-label="About"
+            title="About"
           >
             ℹ️ About
           </button>
@@ -72,6 +75,7 @@ export function HelpChoiceModal({
               onOpenFeedback();
             }}
             aria-label="Feedback"
+            title="Feedback"
           >
             📣 Feedback
           </button>
@@ -85,6 +89,7 @@ export function HelpChoiceModal({
               onOpenAdvanced();
             }}
             aria-label="Advanced"
+            title="Advanced"
           >
             ⚙️ Advanced
           </button>
@@ -98,6 +103,7 @@ export function HelpChoiceModal({
               onOpenTheme();
             }}
             aria-label="Theme"
+            title="Theme"
           >
             🎨 Theme
           </button>

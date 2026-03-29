@@ -43,9 +43,18 @@
     gap: 8px;
     min-height: 0;
     flex: 1 1 auto;
-    overflow-y: hidden;
+    /* Allow vertical scroll inside the card when the list is tall; hide scrollbar (touch still scrolls). */
+    overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+  }
+
+  .cardScroll::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   .packScrollViewport {

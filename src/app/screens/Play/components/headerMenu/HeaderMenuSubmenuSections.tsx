@@ -147,6 +147,7 @@ export function HeaderMenuModesRange({
         onChange={(e) => onSnapToleranceOverrideChange(Number(e.target.value) / 100)}
         className={styles.headerMenuRange}
         aria-label="Snap tolerance override"
+        title="Adjust how forgiving piece snapping is (60%–160%)"
       />
       <p className={styles.headerMenuRangeHint}>
         Lower = tighter snaps, higher = more forgiving.

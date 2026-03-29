@@ -2,10 +2,12 @@
  * FilterPanel – clean filter sheet/popover for Puzzle Packs and Pick a Puzzle.
  * Mobile: bottom sheet. Desktop: compact modal panel.
  */
-import React from "react";
+import React, { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useModalBodyScrollLock } from "@/hooks/useModalBodyScrollLock";
+import { useDialogKeyboard } from "@/hooks/useDialogKeyboard";
 import styles from "./FilterPanel.module.css";
 
 export type FilterOption = { id: string; name: string; label?: string };
@@ -66,8 +68,33 @@ export function FilterPanel({
   onApply,
   onReset,
   autoApplyOnSelect = false,
+  anchorRef: _anchorRef,
 }: FilterPanelProps) {
   const isMobile = useMediaQuery("(max-width: 600px)");
+  const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+
+  useModalBodyScrollLock(isOpen);
+  useDialogKeyboard(isOpen, panelRef, onClose);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    restoreFocusRef.current = document.activeElement as HTMLElement | null;
+    const raf = window.requestAnimationFrame(() => {
+      const root = panelRef.current;
+      if (!root) return;
+      const closeBtn = root.querySelector<HTMLElement>('button[aria-label="Close"]');
+      (closeBtn ?? root).focus({ preventScroll: true });
+    });
+    return () => {
+      window.cancelAnimationFrame(raf);
+      const prev = restoreFocusRef.current;
+      if (prev && typeof prev.focus === "function" && document.contains(prev)) {
+        window.requestAnimationFrame(() => prev.focus({ preventScroll: true }));
+      }
+    };
+  }, [isOpen]);
 
   const handleApply = () => {
     onApply();
@@ -90,18 +117,23 @@ export function FilterPanel({
 
   const content = (
     <div
+      ref={panelRef}
       className={isMobile ? styles.sheet : styles.popover}
       role="dialog"
       aria-modal="true"
-      aria-label={title}
+      aria-labelledby={titleId}
+      tabIndex={-1}
     >
       <div className={styles.header}>
-        <h3 className={styles.title}>{title}</h3>
+        <h3 id={titleId} className={styles.title}>
+          {title}
+        </h3>
         <button
           type="button"
           className={styles.closeBtn}
           onClick={onClose}
           aria-label="Close"
+          title="Close"
         >
           <X size={20} aria-hidden />
         </button>
@@ -167,11 +199,23 @@ export function FilterPanel({
         )}
       </div>
       <div className={styles.footer}>
-        <button type="button" className={styles.resetBtn} onClick={handleReset}>
+        <button
+          type="button"
+          className={styles.resetBtn}
+          onClick={handleReset}
+          aria-label="Reset filters"
+          title="Reset filters"
+        >
           Reset
         </button>
         {!autoApplyOnSelect && (
-          <button type="button" className={styles.applyBtn} onClick={handleApply}>
+          <button
+            type="button"
+            className={styles.applyBtn}
+            onClick={handleApply}
+            aria-label="Apply filters"
+            title="Apply filters"
+          >
             Apply
           </button>
         )}

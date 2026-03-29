@@ -34,7 +34,9 @@ export function OfflineIndicator() {
       aria-live="polite"
       aria-label="You are offline"
     >
-      <span className={styles.icon}>📡</span>
+      <span className={styles.icon} aria-hidden>
+        📡
+      </span>
       <span>
         You&apos;re offline. Puzzles work; leaderboards and co-op need internet.
       </span>

@@ -2,6 +2,40 @@
 
 .container {
   position: relative;
+  z-index: 2;
+}
+
+.compact .toggle {
+  width: 36px;
+  height: 36px;
+  box-shadow: var(--shadow-sm);
+  border-radius: 10px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Very small phones: make theme toggle fit in header with other buttons */
+@media (max-width: 420px) {
+  .compact .toggle {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .compact .dropdown {
+    min-width: 140px;
+  }
+}
+
+.compact .toggle:hover {
+  transform: translateY(-1px);
+}
+
+.compact .dropdown {
+  top: calc(100% + 6px);
+  padding: 4px;
 }
 
 .container.floating {
@@ -47,7 +81,12 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
+  z-index: 200;
   min-width: 160px;
+  max-height: min(320px, 55dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -155,6 +194,11 @@
   .toggle {
     width: 44px;
     height: 44px;
+  }
+
+  .compact .toggle {
+    width: 36px;
+    height: 36px;
   }
 
   .dropdown {

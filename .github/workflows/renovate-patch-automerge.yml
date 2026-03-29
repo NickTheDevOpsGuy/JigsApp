@@ -1,6 +1,6 @@
-# Auto-approve Renovate patch PRs and enable GitHub auto-merge (squash) so they
-# merge when CI passes — no manual approval needed for safe point releases.
-name: 🤖 Renovate patch auto-merge
+# Auto-approve Renovate CVE / vulnerability PRs and enable GitHub auto-merge (squash)
+# so they merge when CI passes. Routine dependency bumps are disabled in renovate.json.
+name: 🤖 Renovate security auto-merge
 
 on:
   pull_request_target:
@@ -13,11 +13,11 @@ permissions:
 
 jobs:
   approve-and-automerge:
-    name: ✅ Approve & enable auto-merge (patch only)
+    name: ✅ Approve & enable auto-merge (CVE fixes only)
     if: >
       github.actor == 'renovate[bot]' &&
       github.event.pull_request.draft == false &&
-      contains(join(github.event.pull_request.labels.*.name, ' '), 'patch-update') &&
+      contains(join(github.event.pull_request.labels.*.name, ' '), 'cve-fix') &&
       !contains(join(github.event.pull_request.labels.*.name, ' '), 'lockfile-maintenance')
     runs-on: ubuntu-latest
     env:

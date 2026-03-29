@@ -220,6 +220,7 @@ export function CompletionOverlayActions(args: {
               setMenuOpen(false);
               onNextPuzzle();
             }}
+            aria-label={isMobileActions ? "Next puzzle" : nextPuzzleLabel}
             title={nextPuzzleLabel}
           >
             <ImagePlus size={18} aria-hidden />
@@ -239,6 +240,13 @@ export function CompletionOverlayActions(args: {
               })
             }
             disabled={busyAction === "replay" || completionData.isGenerating}
+            aria-label={
+              completionData.isGenerating
+                ? "Wait for share to finish"
+                : busyAction === "replay"
+                  ? "Opening replay"
+                  : "Replay solve"
+            }
             title={
               completionData.isGenerating
                 ? "Wait for share to finish"
@@ -271,6 +279,13 @@ export function CompletionOverlayActions(args: {
             className={styles.completeMenuItem}
             onClick={() => void handleChallenge()}
             disabled={shareMenuBusy || busyAction === "replay"}
+            aria-label={
+              busyAction === "challenge"
+                ? "Preparing share"
+                : completionData.isGenerating
+                  ? "Preparing share"
+                  : "Challenge a friend"
+            }
             title={
               busyAction === "challenge"
                 ? "Preparing share…"
@@ -295,6 +310,13 @@ export function CompletionOverlayActions(args: {
             className={styles.completeMenuItem}
             onClick={() => void handleShareResult()}
             disabled={shareMenuBusy || busyAction === "replay"}
+            aria-label={
+              busyAction === "shareResult"
+                ? "Preparing share"
+                : completionData.isGenerating
+                  ? "Preparing share"
+                  : "Share your result"
+            }
             title={
               busyAction === "shareResult"
                 ? "Preparing share…"
@@ -319,6 +341,9 @@ export function CompletionOverlayActions(args: {
             className={styles.completeMenuItem}
             onClick={() => void handleDailyShare()}
             disabled={shareMenuBusy || busyAction === "replay"}
+            aria-label={
+              busyAction === "dailyShare" ? "Sharing daily summary" : "Daily share summary"
+            }
             title={
               busyAction === "dailyShare" ? "Sharing…" : "Wordle-style daily summary"
             }

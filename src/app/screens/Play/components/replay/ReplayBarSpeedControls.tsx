@@ -47,7 +47,8 @@ export function ReplayBarSpeedControls({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        title="Playback speed"
+        aria-label={`Playback speed ${effectiveSpeed}x`}
+        title={`Playback speed: ${effectiveSpeed}x`}
       >
         <span className={styles.replayBarSpeedLabel}>Speed</span>
         <span className={styles.replayBarSpeedValue}>{effectiveSpeed}x</span>
@@ -78,6 +79,7 @@ export function ReplayBarSpeedControls({
                   onSpeedChange(s);
                   setOpen(false);
                 }}
+                aria-label={`${s}x playback speed`}
                 title={`${s}x speed`}
               >
                 <span>{s}x</span>

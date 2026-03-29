@@ -228,7 +228,12 @@ export function TutorialOverlay({
             {showSkipLink ? "Start Puzzling!" : "Got it!"}
           </Button>
           {showSkipLink && (
-            <button className={styles.skipLink} onClick={handleDismiss}>
+            <button
+              type="button"
+              className={styles.skipLink}
+              onClick={handleDismiss}
+              aria-label="Dismiss tutorial and do not show again"
+            >
               Don&apos;t show this again
             </button>
           )}

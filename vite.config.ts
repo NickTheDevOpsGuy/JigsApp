@@ -7,9 +7,27 @@ import path from "path";
 export default defineConfig(({ mode }) => {
   // Load env from .env files AND process.env (Vercel injects here)
   const env = loadEnv(mode, process.cwd(), "");
+  const supabaseOrigin = (() => {
+    const raw = env.VITE_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "";
+    try {
+      return raw.trim() ? new URL(raw.trim()).origin : "";
+    } catch {
+      return "";
+    }
+  })();
+
   return {
     plugins: [
       react(),
+      {
+        name: "phuzzle-preconnect-supabase",
+        transformIndexHtml(html) {
+          if (!supabaseOrigin) return html;
+          const links = `    <link rel="preconnect" href="${supabaseOrigin}" crossorigin />
+    <link rel="dns-prefetch" href="${supabaseOrigin}" />`;
+          return html.replace("</head>", `${links}\n  </head>`);
+        },
+      },
       VitePWA({
         registerType: "autoUpdate",
         includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.png"],

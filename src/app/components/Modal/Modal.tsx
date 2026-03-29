@@ -1,22 +1,12 @@
 //
 // src/app/components/Modal/Modal.tsx
-import React, { useEffect, useCallback, useId, useRef } from "react";
+import React, { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import styles from "./Modal.module.css";
 import { Button } from "@/components/Button/Button";
-
-const FOCUSABLE = [
-  "button:not([disabled])",
-  "[href]",
-  "input:not([disabled])",
-  "select:not([disabled])",
-  "textarea:not([disabled])",
-  "[tabindex]:not([tabindex='-1'])",
-].join(",");
-
-const BODY_SCROLL_LOCK_ATTR = "data-modal-lock-count";
-const BODY_SCROLL_Y_ATTR = "data-modal-scroll-y";
+import { useModalBodyScrollLock } from "@/hooks/useModalBodyScrollLock";
+import { useDialogKeyboard, DIALOG_FOCUSABLE_SELECTOR } from "@/hooks/useDialogKeyboard";
 
 type ModalProps = {
   isOpen: boolean;
@@ -37,109 +27,52 @@ export function Modal({
 }: ModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
 
-  // Close on escape key + trap focus inside modal
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (e.key !== "Tab" || !dialogRef.current) return;
-      const focusable = Array.from(
-        dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE),
-      ).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
-      if (focusable.length === 0) {
-        e.preventDefault();
-        return;
-      }
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const active = document.activeElement as HTMLElement | null;
-      if (e.shiftKey) {
-        if (!active || active === first || !dialogRef.current.contains(active)) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (!active || active === last || !dialogRef.current.contains(active)) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    },
-    [onClose],
-  );
+  useModalBodyScrollLock(isOpen);
+  useDialogKeyboard(isOpen, dialogRef, onClose);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    document.addEventListener("keydown", handleKeyDown);
+    restoreFocusRef.current = document.activeElement as HTMLElement | null;
 
-    const body = document.body;
-    const root = document.documentElement;
-    const prevBodyOverflow = body.style.overflow;
-    const prevBodyPosition = body.style.position;
-    const prevBodyTop = body.style.top;
-    const prevBodyWidth = body.style.width;
-    const prevBodyHeight = body.style.height;
-    const prevBodyInset = body.style.inset;
-    const prevRootOverflow = root.style.overflow;
-    const prevRootHeight = root.style.height;
-    const existingLockCount = Number(body.getAttribute(BODY_SCROLL_LOCK_ATTR) ?? "0");
-    const nextLockCount = existingLockCount + 1;
-
-    body.setAttribute(BODY_SCROLL_LOCK_ATTR, String(nextLockCount));
-    if (existingLockCount === 0) {
-      const scrollY = window.scrollY;
-      body.setAttribute(BODY_SCROLL_Y_ATTR, String(scrollY));
-      body.style.overflow = "hidden";
-      body.style.position = "fixed";
-      body.style.top = `-${scrollY}px`;
-      body.style.inset = "0";
-      body.style.width = "100%";
-      body.style.height = "100dvh";
-      root.style.overflow = "hidden";
-      root.style.height = "100dvh";
-    }
+    const focusRaf = window.requestAnimationFrame(() => {
+      const dialogEl = dialogRef.current;
+      if (!dialogEl) return;
+      const firstFocusable = dialogEl.querySelector<HTMLElement>(DIALOG_FOCUSABLE_SELECTOR);
+      (firstFocusable ?? dialogEl).focus({ preventScroll: true });
+    });
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      window.cancelAnimationFrame(focusRaf);
 
-      const currentLockCount = Number(body.getAttribute(BODY_SCROLL_LOCK_ATTR) ?? "1");
-      const remainingLockCount = Math.max(0, currentLockCount - 1);
-      if (remainingLockCount === 0) {
-        body.style.overflow = prevBodyOverflow;
-        body.style.position = prevBodyPosition;
-        body.style.top = prevBodyTop;
-        body.style.width = prevBodyWidth;
-        body.style.height = prevBodyHeight;
-        body.style.inset = prevBodyInset;
-        root.style.overflow = prevRootOverflow;
-        root.style.height = prevRootHeight;
-        body.removeAttribute(BODY_SCROLL_LOCK_ATTR);
-        const scrollY = Number(body.getAttribute(BODY_SCROLL_Y_ATTR) ?? "0");
-        body.removeAttribute(BODY_SCROLL_Y_ATTR);
-        window.scrollTo(0, scrollY);
-      } else {
-        body.setAttribute(BODY_SCROLL_LOCK_ATTR, String(remainingLockCount));
+      const prevFocus = restoreFocusRef.current;
+      if (prevFocus && typeof prevFocus.focus === "function" && document.contains(prevFocus)) {
+        window.requestAnimationFrame(() => {
+          prevFocus.focus({ preventScroll: true });
+        });
       }
     };
-  }, [isOpen, handleKeyDown]);
-
-  const handleModalKeyDown = useCallback((e: React.KeyboardEvent) => {
-    e.stopPropagation();
-  }, []);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return createPortal(
-    <div
-      className={styles.overlay}
-      data-variant={variant}
-      onClick={onClose}
-      role="presentation"
-    >
+    <>
+      <div
+        className={styles.overlay}
+        data-variant={variant}
+        onClick={onClose}
+        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            onClose();
+          }
+        }}
+        role="presentation"
+        tabIndex={-1}
+      >
       <div
         ref={dialogRef}
         className={styles.modal}
@@ -150,7 +83,7 @@ export function Modal({
         aria-label={title ? undefined : "Dialog"}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        onKeyDown={handleModalKeyDown}
+        onKeyDown={(e) => e.stopPropagation()}
       >
         {(title || showCloseButton) && (
           <div className={styles.header}>
@@ -174,7 +107,8 @@ export function Modal({
         )}
         <div className={styles.content}>{children}</div>
       </div>
-    </div>,
+    </div>
+    </>,
     document.body,
   );
 }
@@ -207,12 +141,15 @@ export function ConfirmModal({
   primaryOnlyConfirm = false,
   closeOnConfirm = true,
 }: ConfirmModalProps) {
+  const messageId = useId();
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} showCloseButton>
-      <p className={styles.message}>{message}</p>
+      <p id={messageId} className={styles.message}>
+        {message}
+      </p>
       <div className={styles.actions}>
         {!primaryOnlyConfirm && (
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={onClose} aria-describedby={messageId}>
             {cancelText}
           </Button>
         )}
@@ -223,6 +160,7 @@ export function ConfirmModal({
             if (closeOnConfirm) onClose();
           }}
           className={variant === "danger" ? styles.dangerBtn : ""}
+          aria-describedby={messageId}
         >
           {confirmText}
         </Button>

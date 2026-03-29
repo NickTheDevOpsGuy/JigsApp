@@ -10,19 +10,16 @@
 import type { PuzzleState, DragState } from "@/puzzle/core/types";
 import {
   drawSnapParticles,
-  drawTargetSlotGlow,
   type SnapParticle,
   drawDebugBackdrop,
   drawGridOverlay,
   drawAlignmentGrid,
 } from "@/puzzle/canvas/utils/renderBoardHelpers";
 import {
-  drawGhostHints,
   drawPiece,
   drawEdgePieceHighlight,
   drawCompletionGlow,
 } from "./renderBoardDraw";
-import { drawHoverPlacementPreviewGhosts } from "./renderBoardGhostHints";
 import { sortPiecesForDraw } from "@/puzzle/canvas/utils/pieceDrawOrder";
 import type {
   PopMap,
@@ -34,6 +31,8 @@ import type {
   PathCache,
 } from "@/puzzle/canvas/utils/renderBoardTypes";
 
+const LOCK_GLOW_MS = 580;
+
 export type {
   PopMap,
   LockMap,
@@ -43,8 +42,6 @@ export type {
   PieceCache,
   PathCache,
 } from "@/puzzle/canvas/utils/renderBoardTypes";
-
-const LOCK_GLOW_MS = 580;
 
 export function renderBoard(
   ctx: CanvasRenderingContext2D,
@@ -142,87 +139,6 @@ export function renderBoard(
     const tileW = assembledW / cols;
     const tileH = assembledH / rows;
     drawAlignmentGrid(ctx, cols, rows, tileW, tileH);
-  }
-
-  if (animState?.showGhostHint && !state.isComplete) {
-    drawGhostHints(
-      ctx,
-      state.pieces,
-      img,
-      cols,
-      rows,
-      animState.ghostAlpha ?? 0.35,
-      pathCache,
-    );
-  }
-
-  const placementPreviewId = animState?.placementPreviewPieceId ?? null;
-  const skipHoverPlacementPreview =
-    state.isComplete || dragState?.activeId != null || animState?.showGhostHint;
-  if (placementPreviewId && !skipHoverPlacementPreview) {
-    drawHoverPlacementPreviewGhosts(
-      ctx,
-      state.pieces,
-      img,
-      cols,
-      rows,
-      placementPreviewId,
-      animState?.placementPreviewAlpha ?? 0.26,
-      pathCache,
-    );
-  }
-
-  const snapPreview = animState?.snapPreview;
-  const showTargetSlotGlow =
-    animState?.snapGlowEnabled !== false &&
-    dragState?.activeId != null &&
-    snapPreview &&
-    (snapPreview.nearSnap || snapPreview.inSnapRange);
-  if (showTargetSlotGlow) {
-    const active = state.pieces.find((p) => p.id === dragState!.activeId);
-    if (active && !active.inTray) {
-      const cx = active.targetX - active.pad + active.w / 2;
-      const cy = active.targetY - active.pad + active.h / 2;
-      const radius = Math.max(active.w, active.h) * 0.58;
-      const proximity = Math.max(0, snapPreview.proximity ?? 0);
-      const proximityEased = 1 - (1 - proximity) ** 3;
-      const inRange = snapPreview.inSnapRange === true;
-      const veryCloseBoost = proximity > 0.82 ? ((proximity - 0.82) / 0.18) * 0.5 : 0;
-      /* Faint highlight where piece will snap; stronger when in range for confidence */
-      const alpha = inRange
-        ? Math.min(1, 0.1 + 0.42 * proximityEased + veryCloseBoost)
-        : Math.min(0.55, 0.06 + 0.28 * proximityEased);
-      drawTargetSlotGlow(ctx, cx, cy, radius, alpha, nowMs);
-    }
-  }
-
-  /* Fade highlight once placed: brief glow at just-snapped position */
-  const PLACED_GLOW_MS = 280;
-  for (const p of state.pieces) {
-    if (p.inTray) continue;
-    const lockAt = lockMap.get(p.id);
-    if (lockAt == null) continue;
-    const elapsed = nowMs - lockAt;
-    if (elapsed >= PLACED_GLOW_MS) continue;
-    const cx = p.x + p.w / 2;
-    const cy = p.y + p.h / 2;
-    const radius = Math.max(p.w, p.h) * 0.55;
-    const alpha = 0.26 * (1 - elapsed / PLACED_GLOW_MS);
-    drawTargetSlotGlow(ctx, cx, cy, radius, alpha, nowMs);
-  }
-
-  /* Hover: edge highlight glow on potential snap targets (empty slots adjacent to placed). */
-  const hoverSlots = animState?.hoverSnapTargetSlots;
-  if (hoverSlots?.length && !dragState?.activeId) {
-    const tileW = assembledW / cols;
-    const tileH = assembledH / rows;
-    const radius = Math.max(tileW, tileH) * 0.52;
-    const alpha = 0.18;
-    for (const slot of hoverSlots) {
-      const cx = (slot.col + 0.5) * tileW;
-      const cy = (slot.row + 0.5) * tileH;
-      drawTargetSlotGlow(ctx, cx, cy, radius, alpha, nowMs);
-    }
   }
 
   const draggedGroupId = dragState?.activeId

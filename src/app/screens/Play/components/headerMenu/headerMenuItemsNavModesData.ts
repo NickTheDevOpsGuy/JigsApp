@@ -52,7 +52,7 @@ export function getModeItems(
     {
       id: "snapGlow",
       section: "settings",
-      visible: !!props.onToggleSnapGlow,
+      visible: false,
       label: "Snap Glow",
       sortKey: "Snap Glow",
       title: "Highlights pieces as they approach a valid snap position",

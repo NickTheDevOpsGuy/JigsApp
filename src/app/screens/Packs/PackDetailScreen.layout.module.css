@@ -14,14 +14,13 @@
 .puzzleCard {
   flex: 0 0 auto;
   box-sizing: border-box;
-  width: 220px;
-  width: calc(100cqi - var(--detail-rail-pad) - var(--detail-rail-gap));
+  width: var(--choose-preview-size);
   min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 14px 12px;
+  gap: 6px;
+  padding: 6px 4px 8px;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: 14px;
@@ -93,17 +92,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 20px;
   color: var(--color-text-secondary);
   background: var(--color-bg-elevated);
 }
 
 .completedBadge {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 24px;
-  height: 24px;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;

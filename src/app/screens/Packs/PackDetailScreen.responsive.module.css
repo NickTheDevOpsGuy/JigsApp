@@ -110,8 +110,8 @@
   }
 
   .puzzleCard {
-    width: calc(100cqi - var(--detail-rail-pad) - var(--detail-rail-gap));
-    padding: 10px 8px;
+    width: var(--choose-preview-size);
+    padding: 6px 4px 8px;
     gap: 6px;
   }
 

@@ -26,7 +26,13 @@ export function PuzzlePackCard({
   onCoverError,
 }: PuzzlePackCardProps) {
   return (
-    <button type="button" className={styles.packCard} onClick={onClick}>
+    <button
+      type="button"
+      className={styles.packCard}
+      onClick={onClick}
+      aria-label={`Open pack: ${name}`}
+      title={`Open pack: ${name}`}
+    >
       <div className={styles.packCover}>
         {coverImageUrl ? (
           <img

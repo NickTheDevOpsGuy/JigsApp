@@ -5,7 +5,6 @@ import { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { initStreakFreeze } from "@/daily/dailyPuzzleCore";
-import { preloadPacksData, preloadPuzzleCatalog } from "@/data/packs/loadPacksData";
 import { ensureSignedIn } from "@/supabase/auth";
 import { OfflineIndicator } from "@/components/OfflineIndicator/OfflineIndicator";
 import { ErrorBoundary } from "@/components/ErrorBoundary/ErrorBoundary";
@@ -44,6 +43,9 @@ const PackDetailScreen = lazy(() =>
 function PageFallback() {
   return (
     <div
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
       style={{
         display: "flex",
         alignItems: "center",
@@ -52,9 +54,13 @@ function PageFallback() {
         minHeight: "var(--app-vh-stable, 100dvh)",
         maxHeight: "100dvh",
         overflow: "hidden",
-        paddingTop: "env(safe-area-inset-top)",
-        paddingBottom: "env(safe-area-inset-bottom)",
+        paddingTop: "max(12px, env(safe-area-inset-top, 0px))",
+        paddingBottom: "max(12px, env(safe-area-inset-bottom, 0px))",
+        paddingLeft: "max(16px, env(safe-area-inset-left, 0px))",
+        paddingRight: "max(16px, env(safe-area-inset-right, 0px))",
         fontFamily: "system-ui, sans-serif",
+        color: "var(--color-text-secondary)",
+        background: "var(--color-bg-primary)",
       }}
     >
       Loading…
@@ -66,8 +72,6 @@ export function App() {
   useEffect(() => {
     ensureSignedIn();
     initStreakFreeze();
-    preloadPacksData();
-    preloadPuzzleCatalog();
   }, []);
 
   useEffect(() => {

@@ -13,8 +13,12 @@
   transition: left 0.15s ease;
 }
 
+/* Reveal on any focus (mouse or keyboard); high-contrast ring only for keyboard (:focus-visible) */
 .skipLink:focus {
   left: 0;
+}
+
+.skipLink:focus-visible {
   outline: 2px solid white;
   outline-offset: 2px;
 }

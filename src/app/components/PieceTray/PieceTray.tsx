@@ -110,7 +110,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
           aria-label="Scroll left"
           title="Scroll left"
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={20} aria-hidden />
         </button>
         <div
           className={`${styles.scroller} ${traySlots.length > 0 ? styles.scrollerSnap : ""}`}
@@ -164,7 +164,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
           aria-label="Scroll right"
           title="Scroll right"
         >
-          <ChevronRight size={20} />
+          <ChevronRight size={20} aria-hidden />
         </button>
       </div>
     </div>

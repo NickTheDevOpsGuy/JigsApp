@@ -149,8 +149,6 @@
   scroll-snap-type: x mandatory;
   scroll-padding-inline: 14px;
   scrollbar-width: none;
-  container-type: inline-size;
-  container-name: chooseRail;
   /* pad (14) + card + gap (10) flush to viewport → no partial next card */
   --choose-rail-pad: 14px;
   --choose-rail-gap: 10px;
@@ -158,6 +156,8 @@
 
 .puzzleGridScroller::-webkit-scrollbar {
   display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Grid: single row LTR horizontal rail (match Pack modal rail); snap = full cards only */
@@ -181,8 +181,8 @@
   position: relative;
   flex: 0 0 auto;
   box-sizing: border-box;
-  width: 240px;
-  width: calc(100cqi - var(--choose-rail-pad) - var(--choose-rail-gap));
+  width: var(--choose-preview-size);
+  max-width: var(--choose-preview-size);
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -203,8 +203,9 @@
 
 /* Catalog + pack puzzle rail: one rounded square, image fills the card (no inner frame). */
 .puzzleTileBare {
-  width: 240px;
-  width: calc(100cqi - var(--choose-rail-pad) - var(--choose-rail-gap));
+  width: var(--choose-preview-size);
+  max-width: var(--choose-preview-size);
+  flex: 0 0 var(--choose-preview-size);
   aspect-ratio: 1 / 1;
   flex-direction: row;
   align-items: stretch;
@@ -223,11 +224,11 @@
 
 .puzzleTileBare .tilePlaceholder {
   margin: auto;
-  font-size: 28px;
+  font-size: 22px;
 }
 
 /* Mobile: shrink grid, arrows, bar and spacing so modal fits */
-@media (max-width: 640px) {
+@media (max-width: 600px) {
   .stepCompactLabel {
     margin-bottom: 8px;
     font-size: 11px;
@@ -312,9 +313,21 @@
   background: var(--color-bg-primary);
 }
 
-/* Pack step 1 hero: taller thumbnail area */
+/* Pack picker hero: same square size as puzzle bare tiles (parity every step). */
 .tileImageWrapPackHero {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
+  width: var(--choose-preview-size);
+  height: var(--choose-preview-size);
+  max-width: var(--choose-preview-size);
+  max-height: var(--choose-preview-size);
+  margin-inline: auto;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.puzzleTilePack {
+  width: var(--choose-preview-size);
+  max-width: var(--choose-preview-size);
 }
 
 /* Pack hero / titled tiles: letterbox so full image shows in non-square region */
@@ -559,7 +572,7 @@
   max-width: 88px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 600px) {
   .categoryCard {
     height: 64px;
     min-width: 64px;
@@ -597,7 +610,8 @@
 
 .setupThumb {
   flex-shrink: 0;
-  width: 130px;
+  width: var(--choose-preview-size);
+  height: var(--choose-preview-size);
   aspect-ratio: 1 / 1;
   border-radius: 12px;
   overflow: hidden;
@@ -621,10 +635,3 @@
 
 /* stepLinkPlain removed */
 
-@media (max-width: 640px) {
-  /* Same width rule as .puzzleTile on the puzzle rail */
-  .setupThumb {
-    width: min(42vw, 150px);
-    aspect-ratio: 1 / 1;
-  }
-}

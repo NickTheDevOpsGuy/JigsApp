@@ -113,6 +113,7 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
             checked={colorblindFriendly}
             onChange={(e) => setColorblindFriendly(e.target.checked)}
             aria-label="Color blind friendly"
+            title="Color blind friendly palette"
           />
           <span>Color blind friendly</span>
         </label>
@@ -134,6 +135,7 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
               className={`${styles.option} ${theme === t ? styles.optionActive : ""}`}
               onClick={() => handleSelect(t)}
               aria-label={`${THEME_LABELS[t]}${theme === t ? ", selected" : ""}`}
+              title={THEME_LABELS[t]}
             >
               <span className={styles.optionIcon} style={{ color: THEME_COLORS[t] }}>
                 {THEME_EMOJIS[t]}
@@ -158,6 +160,7 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
                   navigator.vibrate(10);
               }}
               aria-label={`${opt.label}${snapSound === opt.value ? ", selected" : ""}`}
+              title={opt.label}
             >
               <span>{opt.label}</span>
               {snapSound === opt.value && (
@@ -187,6 +190,8 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
               setMasterVolume(next);
               soundManager.setMasterVolume(next);
             }}
+            aria-label="Master volume"
+            title="Master volume"
           />
         </div>
         <div className={styles.sliderGroup}>
@@ -207,6 +212,8 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
               setSfxVolume(next);
               soundManager.setSfxVolume(next);
             }}
+            aria-label="Sound effects volume"
+            title="Sound effects volume"
           />
         </div>
         <div className={styles.sliderGroup}>
@@ -227,6 +234,8 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
               setAmbientVolume(next);
               audioManager.setMusicVolume(next);
             }}
+            aria-label="Ambient music volume"
+            title="Ambient music volume"
           />
         </div>
       </div>
@@ -243,6 +252,7 @@ export function ThemeModal({ isOpen, onClose, hapticsEnabled = false }: ThemeMod
                 soundManager.setAudioProfile(opt.value);
               }}
               aria-label={`${opt.label}${audioProfile === opt.value ? ", selected" : ""}`}
+              title={opt.label}
             >
               <span className={styles.optionTextBlock}>
                 <span>{opt.label}</span>

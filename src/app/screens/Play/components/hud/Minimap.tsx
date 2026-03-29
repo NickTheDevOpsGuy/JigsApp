@@ -152,6 +152,7 @@ export function Minimap({
         onPointerDown={handlePointerDown}
         role="img"
         aria-label="Board minimap - tap to pan"
+        title="Board minimap — tap or drag to pan"
       />
       {onCyclePosition && (
         <button

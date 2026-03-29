@@ -1,7 +1,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 2000;
+  z-index: var(--z-modal-overlay, 10050);
   background: color-mix(in srgb, var(--color-overlay) 60%, transparent);
 }
 
@@ -11,8 +11,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 2001;
-  max-height: 70dvh;
+  z-index: calc(var(--z-modal-overlay, 10050) + 1);
+  max-height: min(70dvh, calc(100dvh - env(safe-area-inset-bottom, 0px) - 24px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   display: flex;
   flex-direction: column;
   background: var(--color-bg-card);
@@ -37,9 +38,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2001;
+  z-index: calc(var(--z-modal-overlay, 10050) + 1);
   width: min(360px, calc(100vw - 32px));
-  max-height: 80vh;
+  max-height: min(80dvh, calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 32px));
   display: flex;
   flex-direction: column;
   background: var(--color-bg-card);

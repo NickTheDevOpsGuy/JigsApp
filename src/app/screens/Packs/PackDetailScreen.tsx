@@ -134,7 +134,7 @@ export function PackDetailScreen() {
             aria-label="Back to packs"
             title="Back to packs"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} aria-hidden />
           </button>
           <div className={styles.packHeaderRow}>
             <div className={styles.packHeader}>
@@ -159,6 +159,7 @@ export function PackDetailScreen() {
                   void loadPackListScreenModule();
                   nav("/packs");
                 }}
+                aria-label="Back to packs"
                 title="Back to packs"
               >
                 <span className={styles.stepNum} aria-hidden>

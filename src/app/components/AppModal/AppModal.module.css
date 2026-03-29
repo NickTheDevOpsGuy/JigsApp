@@ -3,15 +3,17 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  z-index: var(--z-modal-overlay, 10050);
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: max(16px, env(safe-area-inset-top, 0)) max(16px, env(safe-area-inset-right, 0))
-    max(16px, env(safe-area-inset-bottom, 0)) max(16px, env(safe-area-inset-left, 0));
+  padding: max(var(--modal-gutter), env(safe-area-inset-top, 0))
+    max(var(--modal-gutter), env(safe-area-inset-right, 0))
+    max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
+    max(var(--modal-gutter), env(safe-area-inset-left, 0));
   box-sizing: border-box;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
@@ -27,6 +29,12 @@
   background: var(--color-bg-primary);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  /* Tall win UI on small viewports: scroll the backdrop if the card exceeds the screen */
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Win / anchored dialogs: fixed center on a measured element (board); overrides flex backdrop centering */
@@ -41,9 +49,9 @@
   border: 1px solid color-mix(in srgb, var(--color-border) 82%, rgba(255, 255, 255, 0.08));
   border-radius: 24px;
   width: 100%;
-  max-width: 520px;
-  max-height: calc(100dvh - 32px);
-  overflow-y: visible;
+  max-width: min(92vw, var(--modal-max-w-md));
+  max-height: calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter));
+  overflow: hidden;
   box-shadow:
     0 0 0 1px color-mix(in srgb, #ffffff 6%, transparent) inset,
     0 24px 64px rgba(0, 0, 0, 0.4),
@@ -56,11 +64,11 @@
 
 /* Size variants */
 .sizeXl {
-  max-width: 640px;
+  max-width: min(92vw, 40rem);
 }
 
 .sizeWide {
-  max-width: 580px;
+  max-width: min(92vw, 36.25rem);
 }
 
 /* Surface: bare = content fills top, no header padding */
@@ -111,6 +119,29 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.body::-webkit-scrollbar {
+  display: block !important;
+  width: 10px;
+  height: 10px;
+}
+
+.body::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+.body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 1px solid var(--scrollbar-border);
+}
+
+.body::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Close button */
@@ -155,19 +186,29 @@
   .backdrop {
     align-items: center;
     justify-content: center;
-    padding: max(12px, env(safe-area-inset-top, 0))
-      max(12px, env(safe-area-inset-right, 0)) max(12px, env(safe-area-inset-bottom, 0))
-      max(12px, env(safe-area-inset-left, 0));
+    padding: max(var(--modal-gutter), env(safe-area-inset-top, 0))
+      max(var(--modal-gutter), env(safe-area-inset-right, 0))
+      max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
+      max(var(--modal-gutter), env(safe-area-inset-left, 0));
   }
 
   .dialog {
-    max-width: 100%;
+    max-width: calc(100vw - 2 * var(--modal-gutter));
     width: 100%;
     border-radius: 22px;
     max-height: calc(
-      100dvh - max(12px, env(safe-area-inset-top, 0)) -
-        max(12px, env(safe-area-inset-bottom, 0))
+      var(--app-vh-stable, 100dvh) - max(var(--modal-gutter), env(safe-area-inset-top, 0)) -
+        max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
     );
+    min-height: 0;
+  }
+
+  .header {
+    padding: 14px 16px 0;
+  }
+
+  .body {
+    padding: 14px 16px 16px;
   }
 
   /* Board-anchored win card: inline width/maxHeight win over .dialog 100% width */
@@ -178,12 +219,31 @@
 
   .toneCelebration {
     align-self: center;
-    width: min(100%, 640px);
+    width: min(100%, 92vw, 40rem);
     border-radius: 24px;
   }
 
   .toneCelebration.dialogAnchored {
     width: auto;
     max-width: none;
+  }
+}
+
+/* Very small phones: further reduce padding and button sizes */
+@media (max-width: 420px) {
+  .header {
+    padding: 12px 14px 0;
+  }
+
+  .body {
+    padding: 12px 14px 14px;
+  }
+
+  .title {
+    font-size: 1.04rem;
+  }
+
+  .subtitle {
+    font-size: 12px;
   }
 }

@@ -10,6 +10,7 @@ import type { WeekDot } from "./hooks/useHomeData";
 import { ChoosePuzzleModal } from "@/components/ChoosePuzzleModal";
 import { PackChoiceModal } from "@/components/PackChoiceModal";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
+import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import { loadStatsScreenModule } from "@/screens/routeLoaders";
 import styles from "./MenuScreen.module.css";
@@ -89,11 +90,12 @@ export function MenuScreen() {
               >
                 <Trophy size={18} aria-hidden />
               </button>
+              <ThemeToggle size="compact" />
             </div>
           </header>
 
-          {/* ─── Main content ─── */}
-          <main className={styles.main}>
+          {/* ─── Primary content (app shell provides <main id="main">) ─── */}
+          <div className={styles.main}>
             {/* Daily puzzle label */}
             <div className={styles.puzzleLabel}>
               <span className={styles.puzzleLabelTag}>TODAY'S PUZZLE</span>
@@ -109,6 +111,13 @@ export function MenuScreen() {
               Each day highlights a different category with a featured puzzle to encourage
               variety and return visits.
             </p>
+
+            {isCompleted && (
+              <p className={styles.dailyComebackHint}>
+                A new daily drops every day — come back tomorrow to grow your streak and
+                fill the weekly album.
+              </p>
+            )}
 
             {/* Primary CTA */}
             <button
@@ -136,11 +145,13 @@ export function MenuScreen() {
 
             {/* ─── Streak strip ─── */}
             <div className={styles.streakRow}>
-              <div className={styles.streakStat}>
-                <Flame size={14} className={styles.streakIcon} aria-hidden />
-                <span className={styles.streakVal}>{streak}</span>
-                <span className={styles.streakUnit}>streak</span>
-              </div>
+              {streak > 0 && (
+                <div className={styles.streakStat}>
+                  <Flame size={14} className={styles.streakIcon} aria-hidden />
+                  <span className={styles.streakVal}>{streak}</span>
+                  <span className={styles.streakUnit}>streak</span>
+                </div>
+              )}
               {freezes > 0 && (
                 <div className={styles.streakStat}>
                   <Snowflake size={13} className={styles.freezeIcon} aria-hidden />
@@ -151,23 +162,44 @@ export function MenuScreen() {
                 </div>
               )}
               <div className={styles.weekDots} role="list" aria-label="This week">
-                {weekDots.map(({ day, done, isToday }: WeekDot, i: number) => (
-                  <div
-                    key={i}
-                    className={styles.dotWrap}
-                    role="listitem"
-                    title={`${day}${done ? " — done" : ""}${isToday ? " (today)" : ""}`}
-                  >
+                {weekDots.map(({ day, done, isToday, isFuture }: WeekDot, i: number) => {
+                  const missed = !done && !isToday && !isFuture;
+                  const dotClass = [
+                    styles.dot,
+                    done && styles.dotDone,
+                    isToday && styles.dotToday,
+                    !done && isFuture && styles.dotFuture,
+                    missed && styles.dotMissed,
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
+                  const wrapClass = [
+                    styles.dotWrap,
+                    !done && isFuture && styles.dotWrapFuture,
+                    missed && styles.dotWrapMissed,
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
+                  const dayLabelClass = [
+                    styles.dotDay,
+                    isToday && styles.dotDayToday,
+                    !done && isFuture && styles.dotDayFuture,
+                    missed && styles.dotDayMissed,
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
+                  return (
                     <div
-                      className={`${styles.dot} ${done ? styles.dotDone : ""} ${isToday ? styles.dotToday : ""}`}
-                    />
-                    <span
-                      className={`${styles.dotDay} ${isToday ? styles.dotDayToday : ""}`}
+                      key={i}
+                      className={wrapClass}
+                      role="listitem"
+                      title={`${day}${done ? " — done" : ""}${isToday ? " (today)" : ""}${isFuture ? " (upcoming)" : ""}`}
                     >
-                      {day}
-                    </span>
-                  </div>
-                ))}
+                      <div className={dotClass} />
+                      <span className={dayLabelClass}>{day}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             {nextDailyXpMultiplier > 1.01 ? (
@@ -207,6 +239,7 @@ export function MenuScreen() {
                 type="button"
                 className={styles.secondaryRow}
                 onClick={handlePacks}
+                aria-label="Puzzle packs — browse themed collections"
                 title="Browse puzzle packs"
               >
                 <span className={styles.secondaryIcon} aria-hidden>
@@ -223,6 +256,7 @@ export function MenuScreen() {
                 type="button"
                 className={styles.secondaryRow}
                 onClick={handleQuickPlay}
+                aria-label="Quick play — pick any image"
                 title="Start a quick play puzzle"
               >
                 <span className={styles.secondaryIcon} aria-hidden>
@@ -235,7 +269,7 @@ export function MenuScreen() {
                 <ChevronRight size={16} className={styles.secondaryArrow} aria-hidden />
               </button>
             </nav>
-          </main>
+          </div>
         </div>
       </div>
       <ChoosePuzzleModal

@@ -209,15 +209,19 @@
   background: linear-gradient(to top, rgba(0, 0, 0, 0.08), transparent);
 }
 
-[data-theme="dark"] .immersivePeekTop,
-[data-theme="ocean"] .immersivePeekTop,
-[data-theme="forest"] .immersivePeekTop {
+html.theme-dark .immersivePeekTop,
+html.theme-space .immersivePeekTop,
+html.theme-ocean .immersivePeekTop,
+html.theme-forest .immersivePeekTop,
+html.theme-sunset .immersivePeekTop {
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.06), transparent);
 }
 
-[data-theme="dark"] .immersivePeekBottom,
-[data-theme="ocean"] .immersivePeekBottom,
-[data-theme="forest"] .immersivePeekBottom {
+html.theme-dark .immersivePeekBottom,
+html.theme-space .immersivePeekBottom,
+html.theme-ocean .immersivePeekBottom,
+html.theme-forest .immersivePeekBottom,
+html.theme-sunset .immersivePeekBottom {
   background: linear-gradient(to top, rgba(255, 255, 255, 0.06), transparent);
 }
 

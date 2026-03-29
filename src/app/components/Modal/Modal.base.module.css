@@ -7,9 +7,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-  z-index: 1000;
+  padding: max(var(--modal-gutter), env(safe-area-inset-top))
+    max(var(--modal-gutter), env(safe-area-inset-right))
+    max(var(--modal-gutter), env(safe-area-inset-bottom))
+    max(var(--modal-gutter), env(safe-area-inset-left));
+  z-index: var(--z-modal-overlay, 10050);
   animation: fadeIn var(--transition-duration-dialog, 200ms)
     var(--ease-out-smooth, ease-out);
   backdrop-filter: blur(10px);
@@ -20,11 +22,6 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-}
-
-/* When opened from completion overlay (variant=compact), show above completion (2000) */
-.overlay[data-variant="compact"] {
-  z-index: 2500;
 }
 
 .overlayTutorial {
@@ -50,9 +47,9 @@
     0 0 0 1px color-mix(in srgb, #ffffff 6%, transparent) inset,
     0 24px 64px rgba(0, 0, 0, 0.34),
     var(--shadow-lg);
-  max-width: 432px;
+  max-width: min(92vw, var(--modal-max-w-sm));
   width: 100%;
-  max-height: min(90vh, 920px);
+  max-height: min(calc(var(--app-vh-stable, 100dvh) * 0.88), 920px);
   overflow: hidden;
   animation: slideUp var(--transition-duration-dialog, 200ms)
     var(--ease-out-smooth, cubic-bezier(0.2, 0.8, 0.2, 1));
@@ -67,15 +64,16 @@
 }
 
 .modalTutorial {
-  max-width: 720px;
+  max-width: min(92vw, var(--modal-max-w-kb));
+  max-height: min(calc(var(--app-vh-stable, 100dvh) * 0.88), 640px);
   box-shadow: var(--shadow-lg);
   background: var(--color-bg-card);
 }
 
-/* Shared by Choose Puzzle, Pack Choice, and Choose Photo for parity */
+/* Shared by Choose Puzzle, Pack Choice, Daily difficulty, and Choose Photo */
 .modal[data-variant="choosePuzzle"] {
-  max-width: min(96vw, 780px);
-  max-height: min(92vh, 960px);
+  max-width: min(calc(100vw - 2 * var(--modal-gutter)), var(--modal-max-w-rail));
+  max-height: min(calc(var(--app-vh-stable, 100dvh) * 0.86), 680px);
   /* Overlay is flex; default stretch would make the shell viewport-tall and flex:1 content leaves a gap */
   align-self: center;
 }

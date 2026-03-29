@@ -14,6 +14,7 @@ import { usePlayScreenShortcutsFromSetup } from "./playScreenSceneBehaviorShortc
 import { usePlayScreenTimer } from "@/screens/Play/hooks/gameplay/usePlayScreenTimer";
 import { audioManager } from "@/audio/manager/audioManager";
 import { usePlayScreenPersistence } from "@/screens/Play/hooks/lifecycle/usePlayScreenPersistence";
+import { usePlayDocumentTitle } from "@/screens/Play/hooks/lifecycle/usePlayDocumentTitle";
 import { useFirstPieceCelebration } from "@/screens/Play/hooks/animation/useFirstPieceCelebration";
 import { usePlayScreenSecondaryEffects } from "@/screens/Play/hooks/lifecycle/usePlayScreenSecondaryEffects";
 
@@ -33,6 +34,7 @@ export function usePlayScreenBehavior(setup: any) {
     pushState,
     remoteState,
     clearRemoteState,
+    isDailySession,
   } = setup;
 
   const {
@@ -252,6 +254,7 @@ export function usePlayScreenBehavior(setup: any) {
     undoCountRef: scene.undoCountRef,
     abandonCapturedRef: scene.abandonCapturedRef,
   });
+  usePlayDocumentTitle(state, Boolean(isDailySession));
   useFirstPieceCelebration(state?.placedCount ?? 0, puzzleKey);
 
   const firstSnapCapturedRef = useRef(false);

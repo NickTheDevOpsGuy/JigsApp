@@ -63,10 +63,10 @@
 }
 
 /* Mobile */
-@media (max-width: 640px) {
+@media (max-width: 600px) {
   .modal {
-    max-width: 95%;
-    max-height: min(calc(100dvh - 24px), 500px);
+    max-width: calc(100vw - 2 * var(--modal-gutter));
+    max-height: min(calc(100dvh - 2 * var(--modal-gutter)), 520px);
     border-radius: var(--radius-card);
   }
 
@@ -123,9 +123,9 @@
   }
 }
 
-@media (max-width: 640px) and (max-height: 760px) {
+@media (max-width: 600px) and (max-height: 760px) {
   .modal {
-    max-height: calc(100dvh - 16px);
+    max-height: calc(100dvh - var(--modal-gutter));
   }
 
   .header {

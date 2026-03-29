@@ -400,6 +400,7 @@ export function ProfileTab({
         <div
           className={styles.profileMasteryBar}
           aria-label={`Daily mastery ${masteryCount} out of 7`}
+          title={`Daily mastery: ${masteryCount} of 7 this week`}
         >
           <div
             className={styles.profileMasteryFill}
@@ -416,6 +417,7 @@ export function ProfileTab({
           aria-expanded={settingsOpen}
           aria-controls="profile-settings-panel"
           aria-label="Account settings"
+          title="Account settings"
         >
           <span>
             <span className={styles.profileSectionEyebrow}>Account</span>
@@ -444,6 +446,7 @@ export function ProfileTab({
                 placeholder="Puzzler"
                 maxLength={32}
                 aria-label="Display name"
+                title="Display name on leaderboards"
               />
             </div>
             <p className={styles.profileSettingsHint}>

@@ -193,8 +193,11 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
+textarea:focus-visible,
 [role="button"]:focus-visible,
-[role="menuitem"]:focus-visible {
+[role="menuitem"]:focus-visible,
+[role="dialog"]:focus-visible,
+[role="slider"]:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }

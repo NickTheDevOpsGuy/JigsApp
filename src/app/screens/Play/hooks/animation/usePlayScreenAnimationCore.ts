@@ -7,10 +7,7 @@ import {
   LARGE_PUZZLE_PIECE_COUNT,
   LOCK_LERP_MS,
   getHighPieceCountThreshold,
-  IDLE_GHOST_MS,
-  IDLE_CORRECT_PIECE_PULSE_MS,
 } from "@/screens/Play/hooks/animation/usePlayScreenAnimationConstants";
-import { pickIdleCorrectPulsePieceId } from "@/screens/Play/hooks/animation/pickIdleCorrectPulsePiece";
 import { useAutoBatterySaver } from "@/screens/Play/hooks/system/useAutoBatterySaver";
 import { useDevFrameSampler } from "@/screens/Play/hooks/system/useDevFrameSampler";
 import { useReducedMotionRef } from "@/screens/Play/hooks/system/useReducedMotionRef";
@@ -23,7 +20,6 @@ import {
   updateDebugFps,
   shouldPublishState,
   prepareCanvasForRender,
-  getHoverSnapTargetSlots,
 } from "@/screens/Play/hooks/animation/usePlayScreenAnimationHelpers";
 import { soundManager } from "@/audio/core/sounds";
 import type { UsePlayScreenAnimationArgs } from "./usePlayScreenAnimationTypes";
@@ -38,15 +34,15 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     popMapRef,
     lockMapRef,
     selectedIdRef,
-    hoverPreviewPieceIdRef,
+    hoverPreviewPieceIdRef: _hoverPreviewPieceIdRef,
     dragPreviewPieceIdRef,
     snapParticlesRef,
     debug,
     magneticSnapEnabled,
-    snapGlowEnabled,
-    showGhostHint,
+    snapGlowEnabled: _snapGlowEnabled,
+    showGhostHint: _showGhostHint,
     showAlignmentGrid,
-    showGhostWhenIdle,
+    showGhostWhenIdle: _showGhostWhenIdle,
     showEdgeHighlight,
     showClusterOutline,
     lastInteractionRef,
@@ -59,7 +55,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     dailyVisualModifier = "none",
     replayBarOpen = false,
     isPaused = false,
-    isCoarsePointer = false,
+    isCoarsePointer: _isCoarsePointer = false,
   } = args;
   const autoBatterySaverMode = useAutoBatterySaver();
   const effectiveBatterySaverMode = batterySaverMode || autoBatterySaverMode;
@@ -220,14 +216,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
       const snapPreview =
         dragState.activeId && manager ? manager.getSnapPreviewState() : null;
-      const snapRejectPreview =
-        snapGlowEnabled &&
-        isDragging &&
-        dragState.activeId &&
-        manager &&
-        !snapPreview?.inSnapRange
-          ? manager.getSnapRejectPreviewState()
-          : null;
+      const snapRejectPreview = null;
       const inNearSnap =
         !!snapPreview &&
         (snapPreview.inSnapRange || snapPreview.nearSnap) &&
@@ -238,21 +227,6 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       } else if (!isDragging || !inNearSnap) {
         nearSnapPlayedRef.current = false;
       }
-      const idleMs =
-        lastInteractionRef?.current != null ? now - lastInteractionRef.current : 0;
-      const effectiveShowGhost =
-        showGhostHint ||
-        (!!showGhostWhenIdle && idleMs >= IDLE_GHOST_MS && !st.isComplete);
-      const idleCorrectPulsePieceId =
-        !st.isComplete &&
-        !isDragging &&
-        !replayBarOpen &&
-        !isPaused &&
-        idleMs >= IDLE_CORRECT_PIECE_PULSE_MS &&
-        !reducedMotion
-          ? pickIdleCorrectPulsePieceId(st.pieces)
-          : null;
-      const ghostAlpha = showGhostHint ? 0.35 : 0.2;
       const totalPieces = st.pieces.filter((p) => !p.inTray).length;
       const placedCount = st.pieces.filter((p) => !p.inTray && p.isPlaced).length;
       const fogAlphaForUnplaced =
@@ -260,15 +234,6 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
           ? Math.max(0.15, 0.6 * (1 - placedCount / totalPieces))
           : 0;
       const hoveredId = selectedIdRef.current;
-      const hoverSnapTargetSlots =
-        hoveredId && !isDragging && !st.isComplete
-          ? getHoverSnapTargetSlots(st)
-          : undefined;
-      const hoverPreviewId = hoverPreviewPieceIdRef.current;
-      const placementPreviewPieceId =
-        !st.isComplete && !isDragging && !replayBarOpen && !isPaused
-          ? (hoverPreviewId ?? (isCoarsePointer ? selectedIdRef.current : null))
-          : null;
       renderBoard(
         ctx,
         st,
@@ -286,8 +251,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
           selectedPieceId: hoveredId,
           isComplete: st.isComplete,
           completedAtMs: completedAtRef.current,
-          showGhostHint: effectiveShowGhost,
-          ghostAlpha,
+          showGhostHint: false,
           showEdgeHighlight,
           showClusterOutline,
           showAlignmentGrid,
@@ -297,11 +261,8 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
           wrongRotationHint,
           snapPreview,
           snapRejectPreview,
-          snapGlowEnabled,
+          snapGlowEnabled: false,
           fogAlphaForUnplaced: fogAlphaForUnplaced > 0 ? fogAlphaForUnplaced : undefined,
-          hoverSnapTargetSlots,
-          idleCorrectPulsePieceId,
-          placementPreviewPieceId,
         },
         pieceCache,
         pathCacheRef.current,
@@ -347,9 +308,6 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     undoSnapBackRef,
     debug,
     magneticSnapEnabled,
-    snapGlowEnabled,
-    showGhostHint,
-    showGhostWhenIdle,
     showEdgeHighlight,
     showClusterOutline,
     showAlignmentGrid,
@@ -364,8 +322,6 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     dailyVisualModifier,
     replayBarOpen,
     isPaused,
-    isCoarsePointer,
-    hoverPreviewPieceIdRef,
     selectedIdRef,
   ]);
 }

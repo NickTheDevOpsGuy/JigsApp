@@ -60,7 +60,7 @@ export function HeaderMenuSubmenuPanel({
         aria-label={backLabel ? `Back to ${backLabel}` : "Back"}
         title={backLabel ? `Back to ${backLabel}` : "Back to main menu"}
       >
-        <ChevronLeft size={16} />
+        <ChevronLeft size={16} aria-hidden />
         Back
       </button>
       <div className={styles.headerMenuDivider} />

@@ -40,7 +40,7 @@ export const SUBMENU_PARENT: Partial<Record<SubMenuId, SubMenuId>> = {
 export const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
   about: "About Phuzzle and how to get involved",
   advanced: "Clear cache, performance overlay, reset local stats",
-  assistance: "Visual hints: alignment grid, edge highlight, ghost hints",
+  assistance: "Visual hints: alignment grid, edge highlight, cluster outlines",
   audio: "Sound effects and haptic feedback",
   contribute: "About Phuzzle and how to get involved",
   controls: "Piece shape, modes, and manual controls",

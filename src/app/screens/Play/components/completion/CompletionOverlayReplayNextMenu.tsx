@@ -56,7 +56,7 @@ export function CompletionOverlayReplayNextMenu(props: {
               top: replayNextDropdownPosition.top,
               left: replayNextDropdownPosition.left,
               minWidth: replayNextDropdownPosition.minWidth,
-              zIndex: 3000,
+              zIndex: "calc(var(--z-modal-overlay, 10050) + 20)",
             }}
           >
             {canReplay && onReplayClick && (
@@ -64,6 +64,7 @@ export function CompletionOverlayReplayNextMenu(props: {
                 type="button"
                 role="menuitem"
                 className={styles.completeShareDropdownItem}
+                aria-label="Review solve replay"
                 title="Review your solve"
                 onClick={() => {
                   setReplayNextMenuOpen(false);
@@ -79,6 +80,7 @@ export function CompletionOverlayReplayNextMenu(props: {
                 type="button"
                 role="menuitem"
                 className={styles.completeShareDropdownItem}
+                aria-label="Next puzzle"
                 title="Play another puzzle"
                 onClick={() => {
                   setReplayNextMenuOpen(false);

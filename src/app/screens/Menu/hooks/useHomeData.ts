@@ -22,7 +22,7 @@ import {
 
 const DAILY_PREFIX = "phuzzle:daily:";
 
-export type WeekDot = { day: string; done: boolean; isToday: boolean };
+export type WeekDot = { day: string; done: boolean; isToday: boolean; isFuture: boolean };
 
 function getWeekDots(): WeekDot[] {
   const today = getTodayDateString();
@@ -38,7 +38,9 @@ function getWeekDots(): WeekDot[] {
     const dateStr = `${yy}-${mm}-${dd}`;
     const done =
       safeLocalStorage.getItem(`${DAILY_PREFIX}${dateStr}:completed`) === "true";
-    return { day: label, done, isToday: dateStr === today };
+    const isToday = dateStr === today;
+    const isFuture = dateStr > today;
+    return { day: label, done, isToday, isFuture };
   });
 }
 
@@ -112,6 +114,17 @@ export function useHomeData() {
     const handler = () => setTick((t) => t + 1);
     window.addEventListener("phuzzle:menuRefresh", handler);
     return () => window.removeEventListener("phuzzle:menuRefresh", handler);
+  }, []);
+
+  /** Re-read streak / daily completion when the tab becomes visible (new calendar day, another tab, etc.). */
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        setTick((t) => t + 1);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, []);
 
   return useMemo(

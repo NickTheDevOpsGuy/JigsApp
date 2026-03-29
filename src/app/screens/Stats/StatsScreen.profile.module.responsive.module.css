@@ -201,10 +201,11 @@
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.5);
-  color: rgba(255, 255, 255, 0.95);
+  background: var(--color-overlay);
+  color: var(--color-text-on-brand);
   font-size: 12px;
   font-weight: 600;
+  text-shadow: 0 1px 2px color-mix(in srgb, #000 45%, transparent);
 }
 
 .weekAlbumSlotThumb .weekAlbumThumbWrap {

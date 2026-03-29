@@ -3,7 +3,7 @@
 .backdropCutout {
   position: fixed;
   inset: 0;
-  z-index: 2100;
+  z-index: var(--z-modal-overlay, 10050);
   display: block;
   padding: 0;
   pointer-events: none;
@@ -65,7 +65,7 @@
 
 .cutoutCornerMask {
   position: fixed;
-  z-index: 2100;
+  z-index: var(--z-modal-overlay, 10050);
   pointer-events: none;
   background:
     radial-gradient(
@@ -105,7 +105,7 @@
 /* Fixed to top edge of board rect; parent uses translateY(-100% - gap) to sit above canvas */
 .cutoutBoardHeaderWrap {
   position: fixed;
-  z-index: 2104;
+  z-index: calc(var(--z-modal-overlay, 10050) + 4);
   pointer-events: auto;
   box-sizing: border-box;
 }
@@ -198,7 +198,7 @@
 
 .stageFrame {
   position: fixed;
-  z-index: 2103;
+  z-index: calc(var(--z-modal-overlay, 10050) + 3);
   pointer-events: auto;
   border-radius: 24px;
   box-shadow:
@@ -254,7 +254,7 @@
 
 .controlDock {
   position: fixed;
-  z-index: 2103;
+  z-index: calc(var(--z-modal-overlay, 10050) + 3);
   pointer-events: auto;
 }
 

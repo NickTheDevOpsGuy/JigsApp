@@ -65,13 +65,26 @@ export function PlayScreenCoopView({
                 posthog.capture("coop_join_opened", { retry: true });
                 retryJoin();
               }}
+              aria-label="Try joining the session again"
+              title="Try again"
             >
               Try again
             </button>
-            <button type="button" onClick={() => navigate("/")}>
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              aria-label="Back to menu"
+              title="Back to menu"
+            >
               Back to menu
             </button>
-            <button type="button" className={styles.secondaryButton} onClick={copyDebug}>
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={copyDebug}
+              aria-label="Copy debug information to clipboard"
+              title="Copy debug info"
+            >
               Copy debug info
             </button>
           </div>

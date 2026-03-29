@@ -290,6 +290,7 @@ export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Pr
               type="button"
               className={styles.stepBackLink}
               onClick={() => goToStep("category")}
+              aria-label="Back to category selection"
               title="Back to category selection"
             >
               ← Step 1

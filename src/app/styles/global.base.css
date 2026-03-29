@@ -41,6 +41,16 @@
   /* iPhone 16 (6.1") logical portrait: 393×852; use for max dimensions where needed */
   --vp-mobile-width: 393px;
   --vp-mobile-height: 852px;
+  /* Stacked modals / sheets portaled to document.body — above play HUD (9999) */
+  --z-modal-overlay: 10050;
+  /* Dialogs portaled to body + shared Modal – same gutter and caps on mobile/desktop */
+  --modal-gutter: 16px;
+  --modal-max-w-sm: 27rem; /* 432px – confirm, help, compact */
+  --modal-max-w-md: 32.5rem; /* 520px – AppModal default */
+  --modal-max-w-rail: 36rem; /* 576px – choose puzzle / pack / daily difficulty */
+  --modal-max-w-kb: 45rem; /* 720px – shortcuts reference */
+  /* Choose puzzle / pack rails, pack detail, daily preview — same square, mobile + desktop */
+  --choose-preview-size: 112px;
 
   /* Light theme colors */
   --color-bg-primary: #f3f7ff;
@@ -251,4 +261,10 @@ html.theme-space {
   --replay-backdrop-glow-a: rgba(167, 139, 250, 0.18);
   --replay-backdrop-glow-b: rgba(80, 60, 120, 0.1);
   --replay-star: rgba(232, 228, 255, 0.9);
+  /* Surfaces / scrollbars: was inheriting light :root values */
+  --color-bg-tertiary: #2a2448;
+  --scrollbar-track: rgba(18, 14, 36, 0.88);
+  --scrollbar-thumb: rgba(140, 120, 210, 0.88);
+  --scrollbar-thumb-hover: rgba(175, 155, 235, 0.94);
+  --scrollbar-border: rgba(28, 22, 48, 0.92);
 }

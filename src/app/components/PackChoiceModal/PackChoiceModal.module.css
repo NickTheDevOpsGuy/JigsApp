@@ -3,7 +3,7 @@
 /* pack meta line under tile title */
 .packMeta {
   display: block;
-  padding: 0 12px 10px;
+  padding: 0 4px 6px;
   font-size: 11px;
   font-weight: 600;
   color: var(--color-text-secondary);
@@ -57,7 +57,8 @@
 
 .setupThumb {
   flex-shrink: 0;
-  width: 130px;
+  width: var(--choose-preview-size);
+  height: var(--choose-preview-size);
   aspect-ratio: 1 / 1;
   border-radius: 12px;
   overflow: hidden;
@@ -77,9 +78,3 @@
   display: block;
 }
 
-@media (max-width: 640px) {
-  .setupThumb {
-    width: min(42vw, 150px);
-    aspect-ratio: 1 / 1;
-  }
-}

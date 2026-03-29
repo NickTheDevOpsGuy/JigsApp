@@ -19,7 +19,12 @@ export function OnboardingTooltip({ message, onDismiss, showButton = false }: Pr
     <div className={styles.tooltip} role="status" aria-live="polite">
       <span className={styles.message}>{message}</span>
       {showButton ? (
-        <button type="button" className={styles.dismissBtn} onClick={onDismiss}>
+        <button
+          type="button"
+          className={styles.dismissBtn}
+          onClick={onDismiss}
+          title="Dismiss"
+        >
           Got it
         </button>
       ) : (
@@ -28,6 +33,7 @@ export function OnboardingTooltip({ message, onDismiss, showButton = false }: Pr
           className={styles.dismissIcon}
           onClick={onDismiss}
           aria-label="Dismiss"
+          title="Dismiss"
         >
           ×
         </button>

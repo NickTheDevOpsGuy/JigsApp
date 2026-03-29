@@ -141,7 +141,7 @@ export function getDisplayItems(
     {
       id: "ghostHint",
       section: "settings",
-      visible: true,
+      visible: false,
       label: "Ghost Hint",
       sortKey: "Ghost Hint",
       title: "Show ghost placement when dragging a piece",
@@ -153,7 +153,7 @@ export function getDisplayItems(
     {
       id: "ghostWhenIdle",
       section: "settings",
-      visible: true,
+      visible: false,
       label: "Ghost When Idle",
       sortKey: "Ghost When Idle",
       title: "Show ghost after a moment of idleness",

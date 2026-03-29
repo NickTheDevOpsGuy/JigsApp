@@ -51,7 +51,7 @@ export function StatsScreen() {
               Local: add to .env.development and restart dev server. Vercel: add in
               project Settings → Environment Variables, then redeploy.
             </p>
-            <Button onClick={() => nav("/")}>
+            <Button aria-label="Back to menu" onClick={() => nav("/")}>
               <ArrowLeft size={18} />
               Back
             </Button>

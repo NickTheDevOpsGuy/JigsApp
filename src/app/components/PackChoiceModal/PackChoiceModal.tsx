@@ -263,6 +263,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
               type="button"
               className={styles.stepBackLink}
               onClick={() => goToStep("pack")}
+              aria-label="Back to pack selection"
               title="Back to pack selection"
             >
               ← Step 1
@@ -296,7 +297,10 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
             >
               <div className={styles.puzzleGrid}>
                 {!packsData ? (
-                  <div className={styles.puzzleTile} style={{ pointerEvents: "none" }}>
+                  <div
+                    className={`${styles.puzzleTile} ${styles.puzzleTilePack}`}
+                    style={{ pointerEvents: "none" }}
+                  >
                     <div className={styles.tileImageWrap}>
                       <span className={styles.tilePlaceholder}>…</span>
                     </div>
@@ -316,7 +320,7 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
                         type="button"
                         role="option"
                         aria-selected={selectedPack?.id === pack.id}
-                        className={`${styles.puzzleTile} ${localStyles.packTile} ${selectedPack?.id === pack.id ? localStyles.packTileSelected : ""}`}
+                        className={`${styles.puzzleTile} ${styles.puzzleTilePack} ${localStyles.packTile} ${selectedPack?.id === pack.id ? localStyles.packTileSelected : ""}`}
                         onClick={() => {
                           setSelectedPack(pack);
                           setSelectedPuzzle(null);

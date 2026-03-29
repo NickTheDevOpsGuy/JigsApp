@@ -166,6 +166,7 @@ export function ReplayBar({
             aria-valuemin={0}
             aria-valuemax={Math.max(0, totalSnapshots - 1)}
             aria-label="Replay progress"
+            title="Replay progress"
           >
             <div
               className={styles.replayBarProgressFill}

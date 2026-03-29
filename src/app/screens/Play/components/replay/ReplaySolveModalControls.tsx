@@ -161,6 +161,7 @@ export function ReplaySolveModalControls({
             aria-valuemax={Math.max(0, totalSnapshots - 1)}
             aria-label="Replay progress"
             aria-valuetext={`${formatTime(elapsedSeconds)} of ${formatTime(totalSeconds)}`}
+            title="Scrub replay — click, drag, or arrow keys"
             onClick={handleSeekBarClick}
             onPointerDown={handleSeekBarPointerDown}
             onKeyDown={handleSeekBarKeyDown}
@@ -174,6 +175,7 @@ export function ReplaySolveModalControls({
           <span
             className={styles.speedBadge}
             aria-label={`Playback speed ${effectiveSpeed}x`}
+            title={`Playback speed ${effectiveSpeed}x`}
           >
             {effectiveSpeed}x
           </span>

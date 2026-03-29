@@ -68,7 +68,7 @@ export function PackListScreen() {
             aria-label="Back to menu"
             title="Back to menu"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} aria-hidden />
           </button>
           <div className={styles.headerTitleRow}>
             <h1 className={styles.title}>Puzzle Packs</h1>
