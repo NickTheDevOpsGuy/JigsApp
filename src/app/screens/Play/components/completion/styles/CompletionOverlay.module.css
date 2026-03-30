@@ -30,6 +30,20 @@
   }
 }
 
+/* Anchored win dialog uses inline translate(-50%,-50%); never animate transform or centering breaks. */
+.completeWinDialogAnchored {
+  animation: completeWinEnterAnchored 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes completeWinEnterAnchored {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* AppModal body hook: flex child can shrink inside xl dialog */
 .completeWinModalBody {
   min-height: 0;
@@ -711,11 +725,14 @@
   border-top: 1px solid var(--color-border);
 }
 
-/* ── Desktop: ensure the anchored dialog can't exceed the viewport ── */
-@media (min-width: 641px) {
-  .completeWinDialog {
-    max-height: min(90dvh, calc(var(--app-vh-stable, 100dvh) - 24px));
-  }
+/* Cap win dialog height on all viewports (mobile was missing this; content + image can overflow). */
+.completeWinDialog {
+  max-height: min(
+    90dvh,
+    calc(
+      var(--app-vh-stable, 100dvh) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px
+    )
+  );
 }
 
 /* ── Tablets (Android tablets, iPad portrait & landscape 601–1024px) ── */

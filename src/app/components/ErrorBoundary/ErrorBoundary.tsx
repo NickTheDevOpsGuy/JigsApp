@@ -45,8 +45,8 @@ export class ErrorBoundary extends React.Component<
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            height: "var(--app-vh-stable, 100dvh)",
-            minHeight: "var(--app-vh-stable, 100dvh)",
+            height: "var(--app-vh-fill)",
+            minHeight: "var(--app-vh-fill)",
             maxHeight: "100dvh",
             overflow: "hidden",
             padding:

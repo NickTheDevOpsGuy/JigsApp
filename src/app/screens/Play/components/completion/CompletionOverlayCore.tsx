@@ -28,7 +28,7 @@ function formatDailyStreakXpChip(gained: number, streakMultiplier: number): stri
   const multLabel = Number.isInteger(rounded)
     ? `${rounded}`
     : `${rounded}`.replace(/\.?0+$/, "");
-  return `+${gained} XP · ${multLabel}× daily streak`;
+  return `+${gained} XP · ${multLabel}×`;
 }
 
 export function CompletionOverlay({
@@ -139,7 +139,7 @@ export function CompletionOverlay({
   }
   if (isDaily && completionData.dailyStreak >= 1) {
     const d = completionData.dailyStreak;
-    summaryChips.push(`${d}-day daily streak`);
+    summaryChips.push(`${d}-day streak`);
   }
   if (isDaily && completionData.lastXpReward) {
     summaryChips.push(
@@ -175,7 +175,12 @@ export function CompletionOverlay({
       align="center"
       showCloseButton={false}
       backdropClassName={styles.completeWinBackdrop}
-      dialogClassName={styles.completeWinDialog}
+      dialogClassName={[
+        styles.completeWinDialog,
+        boardAnchorRef ? styles.completeWinDialogAnchored : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       bodyClassName={styles.completeWinModalBody}
       anchorRef={boardAnchorRef}
     >
@@ -201,7 +206,7 @@ export function CompletionOverlay({
             className={`${styles.completeAreaPace} ${phase >= 2 ? styles.completeAreaPaceVisible : ""}`}
             aria-label="Board areas by finish time, slowest first"
           >
-            <div className={styles.completeAreaPaceTitle}>Where time went</div>
+            <div className={styles.completeAreaPaceTitle}>Time by area</div>
             <ul className={styles.completeAreaPaceList}>
               {areaPaceRanked.map(({ q, sec }) => (
                 <li key={q} className={styles.completeAreaPaceRow}>
@@ -213,8 +218,7 @@ export function CompletionOverlay({
               ))}
             </ul>
             <p className={styles.completeAreaPaceCaption}>
-              Time is when that quarter was fully finished (later = you cleared it later
-              in the solve).
+              Top = last quarter you cleared.
             </p>
           </div>
         )}

@@ -9,7 +9,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  min-height: var(--app-vh-stable, 100dvh);
+  min-height: var(--app-vh-fill);
   background: var(--color-bg-secondary);
   /* desktop gets a subtle vignette so the shell lifts off */
   background-image: radial-gradient(
@@ -25,7 +25,7 @@
   flex-direction: column;
   width: 100%;
   max-width: 430px; /* iPhone 14 Pro max width */
-  min-height: var(--app-vh-stable, 100dvh);
+  min-height: var(--app-vh-fill);
 
   /* On real mobile this is the screen background */
   background: var(--color-bg-primary);
@@ -437,7 +437,7 @@
 }
 
 .dotWrapFuture {
-  opacity: 0.48;
+  opacity: 0.78;
 }
 
 .dotWrapMissed {
@@ -489,19 +489,20 @@
   transform: scale(1.14);
 }
 
-/* Upcoming day: faint outline only (wrap opacity handles weight) */
+/* Upcoming day: soft fill so every slot reads as a real circle */
 .dotFuture {
-  background: transparent;
+  background: color-mix(in srgb, var(--color-text-muted) 22%, var(--color-bg-card));
   border-width: 2px;
-  border-color: color-mix(in srgb, var(--color-brand-primary) 48%, var(--color-border));
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--color-brand-primary) 42%, var(--color-border));
 }
 
-/* Past day, not completed: muted dashed ring */
+/* Past day, not completed: filled + dashed ring (distinct from future) */
 .dotMissed {
-  background: transparent;
+  background: color-mix(in srgb, var(--color-text-muted) 16%, var(--color-bg-card));
   border-width: 2px;
   border-style: dashed;
-  border-color: color-mix(in srgb, var(--color-text-muted) 75%, transparent);
+  border-color: color-mix(in srgb, var(--color-text-muted) 72%, transparent);
 }
 
 .dotDay {

@@ -38,6 +38,8 @@
   /* Mobile viewport: 100dvh = dynamic viewport (iPhone 16 portrait ~393×852 logical). No document scroll. */
   --app-vh-dynamic: 100dvh;
   --app-vh-stable: 100svh;
+  /* min(stable, dynamic): keeps height/min-height from exceeding the live viewport when stable lags a shrink (keyboard, toolbars). */
+  --app-vh-fill: min(var(--app-vh-stable, 100dvh), var(--app-vh-dynamic, 100dvh));
   /* iPhone 16 (6.1") logical portrait: 393×852; use for max dimensions where needed */
   --vp-mobile-width: 393px;
   --vp-mobile-height: 852px;
@@ -109,6 +111,7 @@
 @supports not (height: 100dvh) {
   :root {
     --app-vh-dynamic: 100vh;
+    --app-vh-fill: min(var(--app-vh-stable, 100vh), var(--app-vh-dynamic, 100vh));
   }
 }
 

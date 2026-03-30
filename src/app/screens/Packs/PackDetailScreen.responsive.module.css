@@ -34,8 +34,8 @@
 
 @media (max-width: 600px) {
   .page {
-    height: var(--app-vh-stable, 100dvh);
-    min-height: var(--app-vh-stable, 100dvh);
+    height: var(--app-vh-fill);
+    min-height: var(--app-vh-fill);
     max-height: 100dvh;
     padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right))
       max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
