@@ -202,6 +202,25 @@ textarea:focus-visible,
   outline-offset: 2px;
 }
 
+/* Short viewports: shrink puzzle/pack rail tiles so chooser modals fit without inner scroll */
+@media (max-height: 720px) {
+  :root {
+    --choose-preview-size: 100px;
+  }
+}
+
+@media (max-height: 600px) {
+  :root {
+    --choose-preview-size: 88px;
+  }
+}
+
+@media (max-height: 500px) {
+  :root {
+    --choose-preview-size: 76px;
+  }
+}
+
 /* Respect user's reduced motion preference – disable CSS animations/transitions.
    JS-driven effects (e.g. confetti, completion overlay) also check this preference
    before running (see CompletionOverlay, usePlayScreenManager). */

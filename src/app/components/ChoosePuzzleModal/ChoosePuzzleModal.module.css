@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   font-size: 12px;
   font-weight: 500;
   color: var(--color-text-secondary);
@@ -64,7 +64,7 @@
 }
 
 .railLabel {
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
@@ -75,7 +75,7 @@
 .gridScrollWrap {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 0;
   min-width: 0;
   position: relative;
@@ -89,11 +89,11 @@
 .gridScrollBtn {
   flex-shrink: 0;
   appearance: none;
-  border: none;
-  min-width: 48px;
-  min-height: 48px;
-  width: 48px;
-  height: 48px;
+  border: 1px solid var(--color-border);
+  min-width: 32px;
+  min-height: 32px;
+  width: 32px;
+  height: 64px;
   touch-action: manipulation;
   position: relative;
   z-index: 2;
@@ -102,38 +102,50 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: color-mix(
-    in srgb,
-    var(--color-bg-elevated) 98%,
-    var(--color-brand-primary)
-  );
-  color: var(--color-text-primary);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  box-shadow: none;
   transition:
-    background 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .gridScrollBtn:hover:not(:disabled) {
   background: color-mix(
     in srgb,
-    var(--color-brand-primary) 22%,
+    var(--color-brand-primary) 12%,
     var(--color-bg-elevated)
   );
+  border-color: var(--color-brand-primary);
   color: var(--color-brand-primary);
-  box-shadow: 0 6px 20px rgba(11, 99, 184, 0.28);
+}
+
+.gridScrollBtn:active:not(:disabled) {
+  background: color-mix(
+    in srgb,
+    var(--color-brand-primary) 20%,
+    var(--color-bg-elevated)
+  );
 }
 
 .gridScrollBtn:disabled {
-  opacity: 0.35;
+  opacity: 0.2;
   cursor: not-allowed;
+  border-color: transparent;
 }
 
 .gridScrollBtn:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
+}
+
+.gridScrollBtn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 /* Scroller: single horizontal row, left-to-right scroll; start snap = full cards, no half-draw */
@@ -149,23 +161,18 @@
   scroll-snap-type: x mandatory;
   scroll-padding-inline: 14px;
   scrollbar-width: none;
-  /* pad (14) + card + gap (10) flush to viewport → no partial next card */
-  --choose-rail-pad: 14px;
-  --choose-rail-gap: 10px;
 }
 
 .puzzleGridScroller::-webkit-scrollbar {
   display: none;
-  width: 0;
-  height: 0;
 }
 
 /* Grid: single row LTR horizontal rail (match Pack modal rail); snap = full cards only */
 .puzzleGrid {
   display: flex;
   flex-wrap: nowrap;
-  gap: var(--choose-rail-gap);
-  padding: 4px 14px 8px 14px;
+  gap: 10px;
+  padding: 4px 8px 6px 8px;
   width: max-content;
   box-sizing: border-box;
   direction: ltr;
@@ -179,10 +186,8 @@
 /* Pack / loading tiles: titled cards. Puzzle pickers use .puzzleTileBare (image-only). */
 .puzzleTile {
   position: relative;
-  flex: 0 0 auto;
-  box-sizing: border-box;
-  width: var(--choose-preview-size);
-  max-width: var(--choose-preview-size);
+  flex-shrink: 0;
+  width: 100px;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -203,9 +208,7 @@
 
 /* Catalog + pack puzzle rail: one rounded square, image fills the card (no inner frame). */
 .puzzleTileBare {
-  width: var(--choose-preview-size);
-  max-width: var(--choose-preview-size);
-  flex: 0 0 var(--choose-preview-size);
+  width: 100px;
   aspect-ratio: 1 / 1;
   flex-direction: row;
   align-items: stretch;
@@ -224,11 +227,11 @@
 
 .puzzleTileBare .tilePlaceholder {
   margin: auto;
-  font-size: 22px;
+  font-size: 28px;
 }
 
 /* Mobile: shrink grid, arrows, bar and spacing so modal fits */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .stepCompactLabel {
     margin-bottom: 8px;
     font-size: 11px;
@@ -240,15 +243,28 @@
   }
 
   .gridScrollBtn {
-    min-width: 48px;
-    min-height: 48px;
+    width: 28px;
+    min-width: 28px;
+    height: 56px;
+    min-height: 56px;
     padding: 0;
-    border-radius: 8px;
+    border-radius: 6px;
   }
 
   .puzzleGrid {
-    gap: var(--choose-rail-gap);
-    padding: 2px 14px 8px;
+    gap: 8px;
+    padding: 2px 0;
+  }
+
+  /* Mobile: smaller cards, 1 full + partial next to signal horizontal scroll */
+  .puzzleTile {
+    width: min(38vw, 120px);
+    min-height: 0;
+    border-radius: 10px;
+  }
+
+  .puzzleTileBare {
+    width: min(38vw, 120px);
   }
 
   .puzzleTile .tileTitle {
@@ -261,19 +277,19 @@
   }
 
   .difficultySelector {
-    gap: 6px;
-    margin-bottom: 8px;
+    gap: 4px;
+    margin-bottom: 6px;
   }
 
   .difficultyBtn {
-    padding: 6px 10px;
-    font-size: 12px;
+    padding: 5px 8px;
+    font-size: 11px;
   }
 
   .startPuzzleButton {
-    padding: 10px 12px;
-    font-size: 14px;
-    max-height: 40px;
+    padding: 8px 12px;
+    font-size: 13px;
+    max-height: 36px;
   }
 }
 
@@ -313,21 +329,9 @@
   background: var(--color-bg-primary);
 }
 
-/* Pack picker hero: same square size as puzzle bare tiles (parity every step). */
+/* Pack step 1 hero: taller thumbnail area */
 .tileImageWrapPackHero {
-  aspect-ratio: 1 / 1;
-  width: var(--choose-preview-size);
-  height: var(--choose-preview-size);
-  max-width: var(--choose-preview-size);
-  max-height: var(--choose-preview-size);
-  margin-inline: auto;
-  box-sizing: border-box;
-  flex-shrink: 0;
-}
-
-.puzzleTilePack {
-  width: var(--choose-preview-size);
-  max-width: var(--choose-preview-size);
+  aspect-ratio: 4 / 5;
 }
 
 /* Pack hero / titled tiles: letterbox so full image shows in non-square region */
@@ -362,8 +366,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 14px;
-  margin-bottom: 12px;
+  margin-top: 8px;
+  margin-bottom: 8px;
   flex-shrink: 0;
   pointer-events: auto;
 }
@@ -377,11 +381,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 7px 12px;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -418,8 +422,8 @@
 
 .startPuzzleButton {
   width: 100%;
-  padding: 12px 16px;
-  max-height: 44px;
+  padding: 9px 14px;
+  max-height: 38px;
   background: var(--color-brand-primary);
   color: var(--color-text-on-brand, #fff);
   border: none;
@@ -476,8 +480,8 @@
     background 0.15s,
     transform 0.1s;
   min-height: 0;
-  height: 72px;
-  min-width: 76px;
+  height: 64px;
+  min-width: 72px;
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -572,7 +576,7 @@
   max-width: 88px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .categoryCard {
     height: 64px;
     min-width: 64px;
@@ -603,15 +607,14 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 0;
+  margin-bottom: 0;
   flex-shrink: 0;
 }
 
 .setupThumb {
   flex-shrink: 0;
-  width: var(--choose-preview-size);
-  height: var(--choose-preview-size);
+  width: 100px;
   aspect-ratio: 1 / 1;
   border-radius: 12px;
   overflow: hidden;
@@ -634,3 +637,11 @@
 /* backToPuzzlesBtn removed */
 
 /* stepLinkPlain removed */
+
+@media (max-width: 640px) {
+  /* Same width rule as .puzzleTile on the puzzle rail */
+  .setupThumb {
+    width: min(42vw, 150px);
+    aspect-ratio: 1 / 1;
+  }
+}

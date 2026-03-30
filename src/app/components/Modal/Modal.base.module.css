@@ -49,7 +49,7 @@
     var(--shadow-lg);
   max-width: min(92vw, var(--modal-max-w-sm));
   width: 100%;
-  max-height: min(calc(var(--app-vh-stable, 100dvh) * 0.88), 920px);
+  max-height: min(calc(var(--app-vh-stable, 100dvh) * 0.94), 960px);
   overflow: hidden;
   animation: slideUp var(--transition-duration-dialog, 200ms)
     var(--ease-out-smooth, cubic-bezier(0.2, 0.8, 0.2, 1));
@@ -65,7 +65,7 @@
 
 .modalTutorial {
   max-width: min(92vw, var(--modal-max-w-kb));
-  max-height: min(calc(var(--app-vh-stable, 100dvh) * 0.88), 640px);
+  max-height: min(calc(var(--app-vh-stable, 100dvh) * 0.94), 680px);
   box-shadow: var(--shadow-lg);
   background: var(--color-bg-card);
 }
@@ -73,7 +73,7 @@
 /* Shared by Choose Puzzle, Pack Choice, Daily difficulty, and Choose Photo */
 .modal[data-variant="choosePuzzle"] {
   max-width: min(calc(100vw - 2 * var(--modal-gutter)), var(--modal-max-w-rail));
-  max-height: min(calc(var(--app-vh-stable, 100dvh) * 0.86), 680px);
+  max-height: min(calc(var(--app-vh-stable, 100dvh) * 0.94), 740px);
   /* Overlay is flex; default stretch would make the shell viewport-tall and flex:1 content leaves a gap */
   align-self: center;
 }

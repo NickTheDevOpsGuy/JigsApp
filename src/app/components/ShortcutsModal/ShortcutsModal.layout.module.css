@@ -152,3 +152,32 @@
   padding-left: 8px;
   vertical-align: top;
 }
+
+@media (max-height: 680px) {
+  .content {
+    padding: 12px 14px;
+  }
+
+  .section {
+    padding: 10px 14px;
+  }
+
+  .sectionTitle,
+  .sectionTitleInput {
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+
+  .table th,
+  .table td {
+    padding: 4px 0;
+  }
+
+  .keys {
+    font-size: 0.8rem;
+  }
+
+  .action {
+    font-size: 0.8rem;
+  }
+}

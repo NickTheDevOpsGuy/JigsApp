@@ -117,3 +117,34 @@
   color: var(--color-text-secondary);
   line-height: 1.4;
 }
+
+@media (max-height: 720px) {
+  .section {
+    margin-bottom: 14px;
+  }
+
+  .sectionTitle {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .options {
+    gap: 6px;
+    padding: 4px 0;
+  }
+
+  .option {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .toggleRow {
+    font-size: 14px;
+    padding: 6px 0;
+  }
+
+  .sliderGroup {
+    gap: 6px;
+    padding: 6px 0;
+  }
+}

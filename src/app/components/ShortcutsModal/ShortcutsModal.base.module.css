@@ -39,7 +39,7 @@
   border: 1px solid var(--color-border);
   max-width: min(92vw, var(--modal-max-w-kb));
   width: 100%;
-  max-height: min(86dvh, 560px);
+  max-height: min(94dvh, 620px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
