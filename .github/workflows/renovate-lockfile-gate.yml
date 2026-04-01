@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: hmarr/auto-approve-action@v3
         with:
-          github-token: ${{ github.token }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   enable-automerge:
     name: 🔁 Enable GitHub Auto-Merge (SQUASH)

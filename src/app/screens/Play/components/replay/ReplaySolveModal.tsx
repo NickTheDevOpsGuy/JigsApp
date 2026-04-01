@@ -127,8 +127,8 @@ export function ReplaySolveModal({
         }
       }
     };
-    document.addEventListener("keydown", onKeyDown, true);
-    return () => document.removeEventListener("keydown", onKeyDown, true);
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, [onClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
 
   const stopProp = (e: React.PointerEvent) => e.stopPropagation();
@@ -146,19 +146,14 @@ export function ReplaySolveModal({
     <div className={styles.boardHeader}>
       <div className={styles.boardHeaderMain}>
         <div className={styles.boardHeaderText}>
-          <h2 id="replay-solve-title" className={styles.headerTitle}>
-            Replay Solve
-          </h2>
           {totalSeconds >= 0 && (
             <div id="replay-solve-subtitle" className={styles.resultHeader}>
               <span className={styles.resultTime}>
-                <Trophy size={16} className={styles.resultTimeIcon} aria-hidden />
-                Solved in {formatTime(totalSeconds)}
+                <Trophy size={14} className={styles.resultTimeIcon} aria-hidden />
+                {formatTime(totalSeconds)}
               </span>
               {typeof moveCount === "number" && (
-                <span className={styles.resultMoves}>
-                  {moveCount} {moveCount === 1 ? "move" : "moves"}
-                </span>
+                <span className={styles.resultMoves}>· {moveCount} moves</span>
               )}
             </div>
           )}

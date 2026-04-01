@@ -3,7 +3,7 @@
 .backdropCutout {
   position: fixed;
   inset: 0;
-  z-index: var(--z-modal-overlay, 10050);
+  z-index: 2100;
   display: block;
   padding: 0;
   pointer-events: none;
@@ -63,49 +63,22 @@
   pointer-events: none;
 }
 
+/* Corner masks removed — clean board edge */
 .cutoutCornerMask {
-  position: fixed;
-  z-index: var(--z-modal-overlay, 10050);
-  pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 120% 80% at 50% 20%,
-      var(--replay-backdrop-glow-a) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      ellipse 100% 100% at 80% 80%,
-      var(--replay-backdrop-glow-b) 0%,
-      transparent 45%
-    ),
-    linear-gradient(
-      180deg,
-      var(--replay-backdrop-top) 0%,
-      var(--replay-backdrop-mid) 40%,
-      var(--replay-backdrop-bottom) 100%
-    );
+  display: none;
 }
 
-.cutoutCornerMaskTopLeft {
-  border-bottom-right-radius: 20px;
-}
-
-.cutoutCornerMaskTopRight {
-  border-bottom-left-radius: 20px;
-}
-
-.cutoutCornerMaskBottomLeft {
-  border-top-right-radius: 20px;
-}
-
+.cutoutCornerMaskTopLeft,
+.cutoutCornerMaskTopRight,
+.cutoutCornerMaskBottomLeft,
 .cutoutCornerMaskBottomRight {
-  border-top-left-radius: 20px;
+  display: none;
 }
 
 /* Fixed to top edge of board rect; parent uses translateY(-100% - gap) to sit above canvas */
 .cutoutBoardHeaderWrap {
   position: fixed;
-  z-index: calc(var(--z-modal-overlay, 10050) + 4);
+  z-index: 2104;
   pointer-events: auto;
   box-sizing: border-box;
 }
@@ -116,11 +89,11 @@
   width: 100%;
   box-sizing: border-box;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px;
-  border-radius: 14px;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--color-bg-card) 94%, transparent);
   border: 1px solid
     color-mix(in srgb, var(--color-brand-primary) 34%, var(--color-border));
@@ -198,7 +171,7 @@
 
 .stageFrame {
   position: fixed;
-  z-index: calc(var(--z-modal-overlay, 10050) + 3);
+  z-index: 2103;
   pointer-events: auto;
   border-radius: 24px;
   box-shadow:
@@ -254,7 +227,7 @@
 
 .controlDock {
   position: fixed;
-  z-index: calc(var(--z-modal-overlay, 10050) + 3);
+  z-index: 2103;
   pointer-events: auto;
 }
 
@@ -269,8 +242,8 @@
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  padding: 20px 18px 24px;
-  border-radius: 18px;
+  padding: 14px 16px 18px;
+  border-radius: 16px;
   background: color-mix(in srgb, var(--color-bg-card) 96%, transparent);
   border: 1px solid
     color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
@@ -295,19 +268,13 @@
   );
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
   gap: 24px;
 }
 
 .modalStageStack {
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  gap: 24px;
+  gap: 12px;
 }
 
 .modalStageFrame {
@@ -330,10 +297,7 @@
 
 .puzzleArea {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  flex: 0 1 auto;
-  min-height: 0;
-  max-height: min(52dvh, 420px);
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   background: var(--color-bg-primary);
   position: relative;
@@ -349,7 +313,8 @@
 .puzzleImage {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
   display: block;
 }
 
@@ -476,8 +441,8 @@
   /* dock is top-positioned from boardRect in cutout mode; no bottom override needed */
 
   .controlDockInner {
-    padding: 12px 10px 14px;
-    border-radius: 16px;
+    padding: 10px 12px 12px;
+    border-radius: 14px;
   }
 
   .controlDockInnerCutout {
@@ -498,7 +463,7 @@
   }
 
   .puzzleArea {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     height: auto;
     max-height: min(45dvh, 300px);
   }
