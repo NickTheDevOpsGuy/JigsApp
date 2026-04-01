@@ -64,6 +64,11 @@ type AppModalProps = {
    */
   closeOnBackdropClick?: boolean;
   /**
+   * When false, Escape does not dismiss the modal.
+   * Useful for locked completion flows that should only advance via visible actions.
+   */
+  closeOnEscape?: boolean;
+  /**
    * When set, the dialog is centered on this element’s bounding rect (async layout via
    * rAF + ResizeObserver) so it lines up with e.g. the puzzle board; still uses a full-screen backdrop.
    */
@@ -87,6 +92,7 @@ export function AppModal({
   dialogClassName,
   closeLabel = "Close",
   closeOnBackdropClick = true,
+  closeOnEscape = true,
   anchorRef,
 }: AppModalProps) {
   const titleId = useId();
@@ -109,10 +115,11 @@ export function AppModal({
     (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (!isTopModal()) return;
+      if (!closeOnEscape) return;
       e.preventDefault();
       onClose();
     },
-    [onClose, isTopModal],
+    [onClose, isTopModal, closeOnEscape],
   );
 
   const trapFocus = useCallback(
@@ -339,7 +346,7 @@ export function AppModal({
             : undefined
         }
         onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Escape") {
+          if (closeOnEscape && e.key === "Escape") {
             e.preventDefault();
             onClose();
           }

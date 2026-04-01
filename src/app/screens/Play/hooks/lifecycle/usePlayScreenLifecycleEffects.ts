@@ -93,9 +93,6 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     };
   }, [boardRef, setBoardSize, viewport]);
 
-  /** Reserve space for replay cutout bottom bar so the board hole is not covered on mobile */
-  const REPLAY_BOTTOM_BAR_RESERVE_PX = 130;
-
   useLayoutEffect(() => {
     if (!replayBarOpen) {
       setReplayBarBoardRect(null);
@@ -108,13 +105,11 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     let raf = 0;
     const measure = () => {
       const r = anchor.getBoundingClientRect();
-      const reserve = REPLAY_BOTTOM_BAR_RESERVE_PX;
-      const height = Math.max(0, r.height - reserve);
       setReplayBarBoardRect({
         top: r.top,
         left: r.left,
         width: r.width,
-        height,
+        height: r.height,
       });
     };
     const schedule = () => {

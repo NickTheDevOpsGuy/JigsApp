@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 
 const TINY_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+const COMPLETE_HEADING = /^complete$/i;
+const DAILY_SHARE_MENU_ITEM = /daily share/i;
 
 test.describe("Daily Share", () => {
   test.beforeEach(async ({ page }) => {
@@ -51,12 +53,12 @@ test.describe("Daily Share", () => {
   }) => {
     await page.goto("/play?e2eCompletion=1");
 
-    await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
       timeout: 20000,
     });
 
     await page.getByRole("button", { name: /options/i }).click();
-    const dailyShare = page.getByRole("menuitem", { name: /^Daily Share$/i });
+    const dailyShare = page.getByRole("menuitem", { name: DAILY_SHARE_MENU_ITEM });
     await expect(dailyShare).toBeVisible();
     await dailyShare.click();
 

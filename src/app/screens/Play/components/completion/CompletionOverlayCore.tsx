@@ -109,23 +109,6 @@ export function CompletionOverlay({
     };
   }, []);
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-
-      e.preventDefault();
-
-      if (onNextPuzzle) {
-        onNextPuzzle();
-      } else {
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose, onNextPuzzle]);
-
   const pieceCount = grid ? grid.rows * grid.cols : 0;
 
   const areaPaceRanked = useMemo(() => {
@@ -150,7 +133,7 @@ export function CompletionOverlay({
     );
   }
   if (borderFrameBonus) {
-    summaryChips.push(`Frame +${BORDER_FRAME_XP_BONUS} XP`);
+    summaryChips.push(`+${BORDER_FRAME_XP_BONUS} XP`);
   }
   if (completionData.masteryStreak > 0) {
     summaryChips.push(`Mastery ${completionData.masteryStreak}`);
@@ -174,6 +157,8 @@ export function CompletionOverlay({
       tone="celebration"
       align="center"
       showCloseButton={false}
+      closeOnBackdropClick={false}
+      closeOnEscape={false}
       backdropClassName={styles.completeWinBackdrop}
       dialogClassName={[
         styles.completeWinDialog,
@@ -206,7 +191,7 @@ export function CompletionOverlay({
             className={`${styles.completeAreaPace} ${phase >= 2 ? styles.completeAreaPaceVisible : ""}`}
             aria-label="Board areas by finish time, slowest first"
           >
-            <div className={styles.completeAreaPaceTitle}>Time by area</div>
+            <div className={styles.completeAreaPaceTitle}>Area times</div>
             <ul className={styles.completeAreaPaceList}>
               {areaPaceRanked.map(({ q, sec }) => (
                 <li key={q} className={styles.completeAreaPaceRow}>
@@ -217,14 +202,12 @@ export function CompletionOverlay({
                 </li>
               ))}
             </ul>
-            <p className={styles.completeAreaPaceCaption}>
-              Top = last quarter you cleared.
-            </p>
+            <p className={styles.completeAreaPaceCaption}>Top cleared last.</p>
           </div>
         )}
 
         <div className={styles.completeCelebrationBlock}>
-          <h2 className={styles.completePhasedTitle}>Puzzle Complete</h2>
+          <h2 className={styles.completePhasedTitle}>Complete</h2>
 
           {isDaily && completionData.dailyStreak >= 2 && (
             <div

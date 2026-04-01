@@ -2,6 +2,9 @@ import { test, expect } from "@playwright/test";
 
 const TINY_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+const COMPLETE_HEADING = /^complete$/i;
+const SHARE_RESULT_MENU_ITEM = /share your result/i;
+const CHALLENGE_MENU_ITEM = /challenge a friend/i;
 
 test.describe("Play screen", () => {
   test.beforeEach(async ({ page }) => {
@@ -51,7 +54,7 @@ test.describe("Play screen", () => {
     test.setTimeout(60000);
     await page.goto("/play?e2eCompletion=1");
 
-    await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
       timeout: 20000,
     });
     const optionsTrigger = page.getByRole("button", { name: /options/i });
@@ -59,10 +62,10 @@ test.describe("Play screen", () => {
       timeout: 10000,
     });
     await optionsTrigger.click();
-    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
+    await expect(page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM })).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByRole("menuitem", { name: /challenge friend/i })).toBeVisible({
+    await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible({
       timeout: 10000,
     });
   });
@@ -72,7 +75,7 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/play?e2eCompletion=1");
 
-    await expect(page.getByRole("heading", { name: /puzzle complete/i })).toBeVisible({
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
       timeout: 20000,
     });
     const optionsTrigger = page.getByRole("button", { name: /options/i });
@@ -80,7 +83,7 @@ test.describe("Play screen", () => {
       timeout: 10000,
     });
     await optionsTrigger.click();
-    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible({
+    await expect(page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM })).toBeVisible({
       timeout: 10000,
     });
 
@@ -119,8 +122,8 @@ test.describe("Play screen", () => {
     await page.goto("/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
-    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible();
-    await expect(page.getByRole("menuitem", { name: /challenge friend/i })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
   });
 
   test("desktop completion options menu lists share actions", async ({ page }) => {
@@ -128,7 +131,7 @@ test.describe("Play screen", () => {
     await page.goto("/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
-    await expect(page.getByRole("menuitem", { name: /share result/i })).toBeVisible();
-    await expect(page.getByRole("menuitem", { name: /challenge friend/i })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
   });
 });

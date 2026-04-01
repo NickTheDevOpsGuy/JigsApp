@@ -146,6 +146,9 @@ export function ReplaySolveModal({
     <div className={styles.boardHeader}>
       <div className={styles.boardHeaderMain}>
         <div className={styles.boardHeaderText}>
+          <h2 id="replay-solve-title" className={styles.headerTitle}>
+            Replay Solve
+          </h2>
           {totalSeconds >= 0 && (
             <div id="replay-solve-subtitle" className={styles.resultHeader}>
               <span className={styles.resultTime}>
