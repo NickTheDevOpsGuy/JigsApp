@@ -10,7 +10,12 @@ describe("AppModal", () => {
     const onClose = vi.fn();
 
     render(
-      <AppModal isOpen onClose={onClose} title="Locked modal" closeOnBackdropClick={false}>
+      <AppModal
+        isOpen
+        onClose={onClose}
+        title="Locked modal"
+        closeOnBackdropClick={false}
+      >
         <div>Content</div>
       </AppModal>,
     );

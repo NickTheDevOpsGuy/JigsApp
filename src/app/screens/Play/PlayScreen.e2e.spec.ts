@@ -62,7 +62,9 @@ test.describe("Play screen", () => {
       timeout: 10000,
     });
     await optionsTrigger.click();
-    await expect(page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM })).toBeVisible({
+    await expect(
+      page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM }),
+    ).toBeVisible({
       timeout: 10000,
     });
     await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible({
@@ -83,7 +85,9 @@ test.describe("Play screen", () => {
       timeout: 10000,
     });
     await optionsTrigger.click();
-    await expect(page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM })).toBeVisible({
+    await expect(
+      page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM }),
+    ).toBeVisible({
       timeout: 10000,
     });
 
@@ -122,7 +126,9 @@ test.describe("Play screen", () => {
     await page.goto("/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
-    await expect(page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM })).toBeVisible();
+    await expect(
+      page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM }),
+    ).toBeVisible();
     await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
   });
 
@@ -131,7 +137,9 @@ test.describe("Play screen", () => {
     await page.goto("/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
-    await expect(page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM })).toBeVisible();
+    await expect(
+      page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM }),
+    ).toBeVisible();
     await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
   });
 });

@@ -96,9 +96,11 @@ test.describe("Completion Options menu — daily row", () => {
     });
 
     await page.getByRole("button", { name: /options/i }).click();
-    await expect(page.getByRole("menuitem", { name: DAILY_SHARE_MENU_ITEM })).toBeVisible({
-      timeout: 10000,
-    });
+    await expect(page.getByRole("menuitem", { name: DAILY_SHARE_MENU_ITEM })).toBeVisible(
+      {
+        timeout: 10000,
+      },
+    );
   });
 });
 
