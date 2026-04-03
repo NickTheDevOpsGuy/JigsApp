@@ -58,7 +58,6 @@ export function CompletionOverlay({
   onNewBest,
   boardAnchorRef,
   borderFrameBonus = false,
-  quadrantTimes,
 }: CompletionOverlayProps) {
   const [phase, setPhase] = useState<1 | 2 | 3>(1);
   const [imageError, setImageError] = useState(false);
