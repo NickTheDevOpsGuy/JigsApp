@@ -9,12 +9,12 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  min-height: var(--app-vh-fill);
-  background: var(--color-bg-secondary);
+  min-height: var(--app-vh-stable, 100dvh);
+  background: #080810;
   /* desktop gets a subtle vignette so the shell lifts off */
   background-image: radial-gradient(
     ellipse 70% 55% at 50% 0%,
-    color-mix(in srgb, var(--color-brand-primary) 10%, transparent) 0%,
+    rgba(99, 102, 241, 0.07) 0%,
     transparent 65%
   );
 }
@@ -25,18 +25,18 @@
   flex-direction: column;
   width: 100%;
   max-width: 430px; /* iPhone 14 Pro max width */
-  min-height: var(--app-vh-fill);
+  min-height: var(--app-vh-stable, 100dvh);
 
   /* On real mobile this is the screen background */
-  background: var(--color-bg-primary);
+  background: var(--color-bg-primary, #0f0f17);
   background-image: radial-gradient(
     ellipse 80% 30% at 50% -2%,
-    color-mix(in srgb, var(--color-brand-primary) 14%, transparent) 0%,
+    rgba(99, 102, 241, 0.13) 0%,
     transparent 65%
   );
 
-  padding-top: max(10px, env(safe-area-inset-top, 10px));
-  padding-bottom: max(18px, env(safe-area-inset-bottom, 18px));
+  padding-top: max(14px, env(safe-area-inset-top, 14px));
+  padding-bottom: max(28px, env(safe-area-inset-bottom, 28px));
   padding-left: 22px;
   padding-right: 22px;
   box-sizing: border-box;
@@ -51,15 +51,14 @@
   }
 
   .page {
-    /* Keep a sensible phone-frame height on large displays so the shell does not feel like a floating strip */
-    min-height: min(720px, calc(100dvh - 48px));
+    min-height: 0;
     height: auto;
     border-radius: 40px;
-    border: 1px solid var(--color-border);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--color-border) 40%, transparent) inset,
-      0 32px 80px color-mix(in srgb, #000 55%, transparent),
-      0 8px 24px color-mix(in srgb, #000 35%, transparent);
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+      0 32px 80px rgba(0, 0, 0, 0.7),
+      0 8px 24px rgba(0, 0, 0, 0.4);
     margin-top: 0;
     padding-top: 18px;
     padding-bottom: 32px;
@@ -80,15 +79,7 @@
   justify-content: space-between;
   height: 48px;
   flex-shrink: 0;
-  margin-bottom: 2px;
-  gap: 6px;
-}
-
-@media (max-width: 420px) {
-  .header {
-    height: 44px;
-    gap: 4px;
-  }
+  margin-bottom: 4px;
 }
 
 .logo {
@@ -114,14 +105,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 1;
-  min-width: 0;
-}
-
-@media (max-width: 420px) {
-  .headerActions {
-    gap: 4px;
-  }
 }
 
 .iconBtn {
@@ -139,16 +122,6 @@
   transition:
     background 0.15s,
     color 0.15s;
-  flex-shrink: 0;
-}
-
-@media (max-width: 420px) {
-  .iconBtn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    font-size: 14px;
-  }
 }
 
 .iconBtn:hover {
@@ -161,28 +134,21 @@
   line-height: 1;
 }
 
-@media (max-width: 420px) {
-  .feedbackEmoji {
-    font-size: 14px;
-  }
-}
-
 /* ── Main content ── */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  padding-top: 6px;
-  gap: 10px;
+  padding-top: 12px;
+  gap: 16px;
 }
 
 /* ── Puzzle label ── */
 .puzzleLabel {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  margin-bottom: 0;
+  gap: 4px;
+  margin-bottom: 2px;
 }
 
 .puzzleLabelTag {
@@ -195,38 +161,11 @@
 }
 
 .puzzleLabelNum {
-  font-size: 25px;
+  font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.6px;
   color: var(--color-text-primary, #f1f1f5);
   line-height: 1.05;
-}
-
-.dailySpotlightLine {
-  margin: -2px 0 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-text-secondary, #c4c4d4);
-  line-height: 1.35;
-  letter-spacing: -0.02em;
-}
-
-.dailySpotlightHint {
-  margin: -4px 0 0;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--color-text-secondary, #a1a1b5);
-  opacity: 0.88;
-}
-
-/* Shown after today's daily is completed — light retention nudge */
-.dailyComebackHint {
-  margin: -6px 0 0;
-  font-size: 13px;
-  line-height: 1.45;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  text-wrap: balance;
 }
 
 /* ── Primary CTA ── */
@@ -235,21 +174,19 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 11px 16px;
+  padding: 14px 16px;
   gap: 10px;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-brand-primary) 82%, #ffffff 18%),
-    color-mix(in srgb, var(--color-brand-primary) 72%, #0f172a 28%)
-  );
-  color: var(--color-text-on-brand);
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 42%, #ffffff 58%);
+  background:
+    linear-gradient(180deg, rgba(113, 116, 255, 0.88), rgba(73, 148, 255, 0.82)),
+    var(--color-brand-primary, #6366f1);
+  color: #fff;
+  border: 1px solid rgba(173, 198, 255, 0.34);
   border-radius: 14px;
   cursor: pointer;
   text-align: left;
   box-shadow:
-    0 0 0 1px color-mix(in srgb, #ffffff 14%, transparent) inset,
-    0 12px 26px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+    0 12px 26px rgba(34, 91, 184, 0.24);
   transition:
     opacity 0.15s,
     transform 0.12s,
@@ -262,14 +199,14 @@
   opacity: 0.96;
   transform: translateY(-1px);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, #ffffff 16%, transparent) inset,
-    0 14px 28px color-mix(in srgb, var(--color-brand-primary) 34%, transparent);
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+    0 14px 28px rgba(34, 91, 184, 0.28);
 }
 
 .primaryBtn:active {
   transform: scale(0.985);
   opacity: 1;
-  box-shadow: 0 2px 10px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
 }
 
 .primaryBtnDone {
@@ -284,14 +221,10 @@
   box-shadow: none;
 }
 
-.primaryBtnDone .primaryBtnSub {
-  opacity: 0.62;
-}
-
 .primaryBtnInner {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   flex: 1;
   min-width: 0;
 }
@@ -301,13 +234,12 @@
   font-weight: 800;
   letter-spacing: -0.2px;
   line-height: 1.2;
-  opacity: 1;
 }
 
 .primaryBtnSub {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  opacity: 0.68;
+  opacity: 0.88;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
@@ -328,42 +260,30 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px 10px;
-  padding: 0;
+  gap: 12px;
+  padding: 2px 0;
   margin-top: 0;
-}
-
-.streakXpHint {
-  margin: 2px 0 0;
-  font-size: 12px;
-  line-height: 1.45;
-  font-weight: 500;
-  color: var(--color-text-secondary, rgba(255, 255, 255, 0.5));
-  text-wrap: balance;
 }
 
 .weeklyCard {
   margin-top: 0;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid
-    color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-brand-primary) 14%, var(--color-bg-card)),
-    color-mix(in srgb, var(--color-brand-primary) 6%, var(--color-bg-card))
-  );
+  padding: 15px 17px;
+  border-radius: 14px;
+  border: 1px solid rgba(120, 139, 255, 0.28);
+  background:
+    linear-gradient(180deg, rgba(99, 102, 241, 0.18), rgba(59, 130, 246, 0.08)),
+    rgba(255, 255, 255, 0.035);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-border) 50%, transparent) inset,
-    0 6px 18px color-mix(in srgb, #000 18%, transparent);
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+    0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
 .weeklyCardHeader {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 5px;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .weeklyCardTag {
@@ -371,7 +291,7 @@
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-brand-primary);
+  color: #c0caff;
 }
 
 .weeklyCardCount {
@@ -383,10 +303,10 @@
 
 .weeklyCardText {
   margin: 0;
-  font-size: 16px;
-  line-height: 1.45;
+  font-size: 17px;
+  line-height: 1.5;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: rgba(241, 241, 245, 0.9);
   text-wrap: balance;
 }
 
@@ -420,11 +340,11 @@
   color: var(--color-text-secondary, rgba(255, 255, 255, 0.45));
 }
 
-/* Week dots — right-aligned; states: done / today / future / missed */
+/* Week dots — right-aligned */
 .weekDots {
   display: flex;
-  align-items: flex-end;
-  gap: 6px;
+  align-items: center;
+  gap: 9px;
   margin-left: auto;
 }
 
@@ -432,101 +352,57 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  min-width: 0;
-}
-
-.dotWrapFuture {
-  opacity: 0.78;
-}
-
-.dotWrapMissed {
-  opacity: 0.78;
+  gap: 4px;
 }
 
 .dot {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  box-sizing: border-box;
-  border: 2px solid color-mix(in srgb, var(--color-text-muted) 40%, transparent);
-  background: transparent;
-  flex-shrink: 0;
+  /* Not yet reached — very faint */
+  background: rgba(255, 255, 255, 0.12);
   transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.15s ease,
-    opacity 0.2s ease;
+    background 0.2s,
+    box-shadow 0.2s,
+    transform 0.15s;
 }
 
-/* Completed day (past): solid accent */
+/* Completed day — solid brand blue */
 .dotDone {
-  background: var(--color-brand-primary);
-  border-color: color-mix(in srgb, var(--color-brand-primary) 55%, #000);
-  border-width: 2px;
+  background: var(--color-brand-primary, #6366f1);
 }
 
-/* Today, not completed: open ring — clear “your turn” */
+/* Today — larger, white outline ring so it pops */
 .dotToday {
-  transform: scale(1.22);
-  border-width: 3px;
-  border-color: var(--color-brand-primary);
-  background: transparent;
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 35%, transparent),
-    0 2px 8px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+  width: 13px;
+  height: 13px;
+  box-shadow: 0 0 0 2.5px rgba(255, 255, 255, 0.9);
+  transform: none;
 }
 
-/* Today + completed: filled + double ring (distinct from other completed) */
+/* Today + done — filled blue with white ring */
 .dotToday.dotDone {
-  background: var(--color-brand-primary);
-  border-width: 2px;
-  border-color: color-mix(in srgb, var(--color-brand-primary) 50%, #000);
-  box-shadow:
-    0 0 0 2px var(--color-bg-primary),
-    0 0 0 4px var(--color-brand-primary);
-  transform: scale(1.14);
+  background: var(--color-brand-primary, #6366f1);
+  box-shadow: 0 0 0 2.5px rgba(255, 255, 255, 0.9);
 }
 
-/* Upcoming day: soft fill so every slot reads as a real circle */
-.dotFuture {
-  background: color-mix(in srgb, var(--color-text-muted) 22%, var(--color-bg-card));
-  border-width: 2px;
-  border-style: solid;
-  border-color: color-mix(in srgb, var(--color-brand-primary) 42%, var(--color-border));
-}
-
-/* Past day, not completed: filled + dashed ring (distinct from future) */
-.dotMissed {
-  background: color-mix(in srgb, var(--color-text-muted) 16%, var(--color-bg-card));
-  border-width: 2px;
-  border-style: dashed;
-  border-color: color-mix(in srgb, var(--color-text-muted) 72%, transparent);
+/* Today + not done — show brand ring with faint fill */
+.dotToday:not(.dotDone) {
+  background: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 0 2.5px var(--color-brand-primary, #6366f1);
 }
 
 .dotDay {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.58));
   text-transform: uppercase;
-  line-height: 1;
 }
 
 .dotDayToday {
-  color: var(--color-brand-primary);
-  font-weight: 900;
-}
-
-.dotDayFuture {
-  color: var(--color-text-muted);
-  font-weight: 600;
-}
-
-.dotDayMissed {
-  color: var(--color-text-muted);
-  font-weight: 600;
+  color: var(--color-brand-primary, #6366f1);
+  font-weight: 800;
 }
 
 /* ── Divider ── */
@@ -534,11 +410,11 @@
   height: 1px;
   background: linear-gradient(
     90deg,
-    transparent,
-    color-mix(in srgb, var(--color-brand-primary) 22%, var(--color-border)),
-    transparent
+    rgba(255, 255, 255, 0.04),
+    rgba(99, 102, 241, 0.24),
+    rgba(255, 255, 255, 0.04)
   );
-  margin: 3px 0 1px;
+  margin: 6px 0 2px;
 }
 
 /* ── Secondary nav rows ── */
@@ -554,7 +430,7 @@
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: rgba(241, 241, 245, 0.56);
 }
 
 .secondaryRow {
@@ -567,7 +443,7 @@
   padding: 13px 2px;
   background: transparent;
   border: none;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0;
   cursor: pointer;
   text-align: left;
@@ -581,15 +457,15 @@
 }
 
 .secondaryRow:last-child {
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .secondaryRow:hover {
-  background: var(--color-action-hover);
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .secondaryRow:active {
-  background: color-mix(in srgb, var(--color-action-hover) 85%, var(--color-bg-card));
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .secondaryIcon {
@@ -599,10 +475,10 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: var(--color-bg-tertiary);
-  color: var(--color-brand-primary);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--color-brand-primary, #6366f1);
   flex-shrink: 0;
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .secondaryText {
@@ -642,8 +518,8 @@
 /* ── Short screens ── */
 @media (max-height: 700px) {
   .main {
-    padding-top: 4px;
-    gap: 8px;
+    padding-top: 10px;
+    gap: 12px;
   }
   .puzzleLabel {
     margin-bottom: 0;
@@ -652,20 +528,20 @@
     font-size: 22px;
   }
   .divider {
-    margin: 2px 0 0;
+    margin: 4px 0 2px;
   }
 }
 
 @media (max-width: 420px) {
   .page {
-    padding-top: max(10px, env(safe-area-inset-top, 10px));
+    padding-top: max(12px, env(safe-area-inset-top, 12px));
     padding-left: 18px;
     padding-right: 18px;
   }
 
   .main {
-    padding-top: 4px;
-    gap: 8px;
+    padding-top: 10px;
+    gap: 12px;
   }
 
   .puzzleLabelTag {
@@ -685,7 +561,7 @@
   }
 
   .weeklyCard {
-    padding: 11px 12px;
+    padding: 14px 15px;
   }
 
   .weeklyCardTag {
@@ -698,28 +574,25 @@
 
   .weeklyCardText {
     font-size: 15px;
-    line-height: 1.42;
+    line-height: 1.45;
   }
 
   .weekDots {
-    gap: 4px;
+    gap: 7px;
   }
 
   .dot {
-    width: 11px;
-    height: 11px;
+    width: 10px;
+    height: 10px;
   }
 
   .dotToday {
-    transform: scale(1.18);
-  }
-
-  .dotToday.dotDone {
-    transform: scale(1.1);
+    width: 12px;
+    height: 12px;
   }
 
   .dotDay {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .secondaryRow {

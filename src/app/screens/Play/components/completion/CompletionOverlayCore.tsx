@@ -12,11 +12,6 @@ import { CompletionOverlayStats } from "@/screens/Play/components/completion/Com
 import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
 import type { CompletionOverlayProps } from "@/screens/Play/components/completion/completionOverlayTypes";
 import { ACHIEVEMENT_DEFS } from "@/data/content/achievements";
-import {
-  QUADRANT_SHORT_LABELS,
-  rankQuadrantsSlowestFirst,
-} from "@/screens/Play/core/time/quadrantPace";
-import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import { BORDER_FRAME_XP_BONUS } from "@/services/player/statsService";
 
 const PHASE2_MS = 600;
@@ -111,10 +106,6 @@ export function CompletionOverlay({
 
   const pieceCount = grid ? grid.rows * grid.cols : 0;
 
-  const areaPaceRanked = useMemo(() => {
-    if (!quadrantTimes) return [];
-    return rankQuadrantsSlowestFirst(quadrantTimes);
-  }, [quadrantTimes]);
   const summaryChips: string[] = [];
 
   if (completionData.percentileBadgeTier) {
@@ -185,26 +176,6 @@ export function CompletionOverlay({
           maxGroupSize={maxGroupSize}
           phase={phase}
         />
-
-        {areaPaceRanked.length > 0 && (
-          <div
-            className={`${styles.completeAreaPace} ${phase >= 2 ? styles.completeAreaPaceVisible : ""}`}
-            aria-label="Board areas by finish time, slowest first"
-          >
-            <div className={styles.completeAreaPaceTitle}>Area times</div>
-            <ul className={styles.completeAreaPaceList}>
-              {areaPaceRanked.map(({ q, sec }) => (
-                <li key={q} className={styles.completeAreaPaceRow}>
-                  <span className={styles.completeAreaPaceLabel}>
-                    {QUADRANT_SHORT_LABELS[q]}
-                  </span>
-                  <span className={styles.completeAreaPaceTime}>{formatTime(sec)}</span>
-                </li>
-              ))}
-            </ul>
-            <p className={styles.completeAreaPaceCaption}>Top cleared last.</p>
-          </div>
-        )}
 
         <div className={styles.completeCelebrationBlock}>
           <h2 className={styles.completePhasedTitle}>Complete</h2>

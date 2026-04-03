@@ -98,22 +98,9 @@
 }
 
 /* ── Area pace (quarters finished, slowest first) ── */
-.completeAreaPace {
-  width: 100%;
-  padding: 0 20px 10px;
-  margin: 0;
-  box-sizing: border-box;
-  opacity: 0;
-  transform: translateY(-6px);
-  transition:
-    opacity 0.35s ease,
-    transform 0.35s ease;
-  flex-shrink: 0;
-}
-
+.completeAreaPace,
 .completeAreaPaceVisible {
-  opacity: 1;
-  transform: translateY(0);
+  display: none;
 }
 
 .completeAreaPaceTitle {
@@ -165,8 +152,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 24px 20px 16px;
+  gap: 8px;
+  padding: 10px 20px 12px;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
@@ -174,7 +161,7 @@
 
 .completePhasedTitle {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.25rem;
   font-weight: 900;
   color: var(--color-text-primary);
   letter-spacing: -0.02em;
