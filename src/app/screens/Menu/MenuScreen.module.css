@@ -24,10 +24,11 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 430px; /* iPhone 14 Pro max width */
-  min-height: var(--app-vh-stable, 100dvh);
+  max-width: 430px;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
 
-  /* On real mobile this is the screen background */
   background: var(--color-bg-primary, #0f0f17);
   background-image: radial-gradient(
     ellipse 80% 30% at 50% -2%,
@@ -35,10 +36,10 @@
     transparent 65%
   );
 
-  padding-top: max(14px, env(safe-area-inset-top, 14px));
-  padding-bottom: max(28px, env(safe-area-inset-bottom, 28px));
-  padding-left: 22px;
-  padding-right: 22px;
+  padding-top: max(12px, env(safe-area-inset-top, 12px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+  padding-left: 20px;
+  padding-right: 20px;
   box-sizing: border-box;
   overscroll-behavior: none;
 }
@@ -139,16 +140,18 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-top: 12px;
-  gap: 16px;
+  padding-top: 8px;
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* ── Puzzle label ── */
 .puzzleLabel {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 2px;
+  gap: 2px;
+  margin-bottom: 0;
 }
 
 .puzzleLabelTag {
@@ -161,7 +164,7 @@
 }
 
 .puzzleLabelNum {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.6px;
   color: var(--color-text-primary, #f1f1f5);
@@ -174,7 +177,7 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 14px 16px;
+  padding: 10px 14px;
   gap: 10px;
   background:
     linear-gradient(180deg, rgba(113, 116, 255, 0.88), rgba(73, 148, 255, 0.82)),
@@ -230,7 +233,7 @@
 }
 
 .primaryBtnTitle {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.2px;
   line-height: 1.2;
@@ -260,15 +263,15 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 2px 0;
+  gap: 8px;
+  padding: 0;
   margin-top: 0;
 }
 
 .weeklyCard {
   margin-top: 0;
-  padding: 15px 17px;
-  border-radius: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
   border: 1px solid rgba(120, 139, 255, 0.28);
   background:
     linear-gradient(180deg, rgba(99, 102, 241, 0.18), rgba(59, 130, 246, 0.08)),
@@ -287,7 +290,7 @@
 }
 
 .weeklyCardTag {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -295,7 +298,7 @@
 }
 
 .weeklyCardCount {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 900;
   color: var(--color-text-primary, #f1f1f5);
   line-height: 1;
@@ -303,8 +306,8 @@
 
 .weeklyCardText {
   margin: 0;
-  font-size: 17px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.4;
   font-weight: 600;
   color: rgba(241, 241, 245, 0.9);
   text-wrap: balance;
@@ -414,7 +417,7 @@
     rgba(99, 102, 241, 0.24),
     rgba(255, 255, 255, 0.04)
   );
-  margin: 6px 0 2px;
+  margin: 2px 0 0;
 }
 
 /* ── Secondary nav rows ── */
@@ -440,7 +443,7 @@
   gap: 12px;
   width: 100%;
   min-height: 0;
-  padding: 13px 2px;
+  padding: 9px 2px;
   background: transparent;
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -518,17 +521,29 @@
 /* ── Short screens ── */
 @media (max-height: 700px) {
   .main {
-    padding-top: 10px;
-    gap: 12px;
+    padding-top: 4px;
+    gap: 6px;
   }
   .puzzleLabel {
     margin-bottom: 0;
   }
   .puzzleLabelNum {
-    font-size: 22px;
+    font-size: 18px;
+  }
+  .primaryBtn {
+    padding: 8px 12px;
+  }
+  .weeklyCard {
+    padding: 8px 12px;
+  }
+  .weeklyCardText {
+    font-size: 12px;
   }
   .divider {
-    margin: 4px 0 2px;
+    margin: 0;
+  }
+  .secondaryRow {
+    padding: 7px 2px;
   }
 }
 
@@ -599,4 +614,51 @@
     min-height: 0;
     padding: 12px 2px;
   }
+}
+
+/* Daily spotlight line */
+.dailySpotlightLine {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary, #f1f1f5);
+  line-height: 1.3;
+}
+
+/* Hint text below spotlight */
+.dailySpotlightHint {
+  display: none;
+}
+
+/* Come back hint when completed */
+.dailyComebackHint {
+  display: none;
+}
+
+/* Streak XP hint */
+.streakXpHint {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.45));
+  line-height: 1.35;
+}
+
+/* Future/missed dot variants */
+.dotFuture {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dotMissed {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dotWrapFuture,
+.dotWrapMissed {
+  opacity: 0.5;
+}
+
+.dotDayFuture,
+.dotDayMissed {
+  opacity: 0.4;
 }
