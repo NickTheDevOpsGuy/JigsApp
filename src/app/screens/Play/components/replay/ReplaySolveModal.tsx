@@ -127,8 +127,8 @@ export function ReplaySolveModal({
         }
       }
     };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
   }, [onClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
 
   const stopProp = (e: React.PointerEvent) => e.stopPropagation();
@@ -145,13 +145,22 @@ export function ReplaySolveModal({
   const boardHeader = (
     <div className={styles.boardHeader}>
       <div className={styles.boardHeaderMain}>
-        <div className={styles.resultHeader}>
-          <span className={styles.resultTime}>
-            <Trophy size={14} className={styles.resultTimeIcon} aria-hidden />
-            {formatTime(totalSeconds)}
-          </span>
-          {typeof moveCount === "number" && moveCount > 0 && (
-            <span className={styles.resultMoves}>· {moveCount} moves</span>
+        <div className={styles.boardHeaderText}>
+          <h2 id="replay-solve-title" className={styles.headerTitle}>
+            Replay Solve
+          </h2>
+          {totalSeconds >= 0 && (
+            <div id="replay-solve-subtitle" className={styles.resultHeader}>
+              <span className={styles.resultTime}>
+                <Trophy size={16} className={styles.resultTimeIcon} aria-hidden />
+                Solved in {formatTime(totalSeconds)}
+              </span>
+              {typeof moveCount === "number" && (
+                <span className={styles.resultMoves}>
+                  {moveCount} {moveCount === 1 ? "move" : "moves"}
+                </span>
+              )}
+            </div>
           )}
         </div>
         {packRemainingLabel && (
@@ -196,19 +205,37 @@ export function ReplaySolveModal({
     const { top, left, width, height } = boardRect;
     const right = left + width;
     const bottom = top + height;
-    const cutoutRadius = 20;
-    const dockInsetPx = 8;
+
+    // Use the visual viewport dimensions so position:fixed elements align correctly
+    // on Android Chrome (where the layout viewport != visual viewport during scroll/zoom).
     const vv = typeof window !== "undefined" ? window.visualViewport : null;
     const viewLeft = vv?.offsetLeft ?? 0;
+    const viewTop = vv?.offsetTop ?? 0;
     const viewWidth =
-      vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : width + 24);
-    const edgePad = 12;
-    const maxShell = Math.max(0, viewWidth - 2 * edgePad);
+      vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : 375);
+    const viewHeight =
+      vv?.height ?? (typeof window !== "undefined" ? window.innerHeight : 667);
+
+    // Corner radius should match the board's actual CSS radius (16px mobile, 20px desktop).
+    const isMobileVw = viewWidth < 640;
+    const cutoutRadius = isMobileVw ? 16 : 20;
+
+    // Dock: hug the board width, clamp to viewport with safe-area padding.
+    const safeEdge = isMobileVw ? 8 : 12;
+    const dockInsetPx = isMobileVw ? 0 : 8;
+    const maxShell = Math.max(0, viewWidth - 2 * safeEdge);
     const shellWidth = Math.min(maxShell, width + dockInsetPx * 2);
     const shellLeft = Math.min(
-      viewLeft + viewWidth - shellWidth - edgePad,
-      Math.max(viewLeft + edgePad, left - dockInsetPx),
+      viewLeft + viewWidth - shellWidth - safeEdge,
+      Math.max(viewLeft + safeEdge, left - dockInsetPx),
     );
+
+    // Header gap above the board: tighter on mobile.
+    const headerGap = isMobileVw ? 6 : 12;
+
+    // Bottom panel: covers from bottom of board to bottom of visual viewport.
+    const panelBottom = viewTop + viewHeight;
+
     return (
       <div
         className={styles.backdropCutout}
@@ -219,14 +246,15 @@ export function ReplaySolveModal({
         tabIndex={-1}
         onKeyDown={handleBackdropKeyDown}
       >
+        {/* Four panels that fill the screen around the board cutout */}
         <div
           data-cutout-panel
-          style={{ top: 0, left: 0, right: 0, height: top }}
+          style={{ top: 0, left: 0, right: 0, height: Math.max(0, top) }}
           onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
-          style={{ top, left: 0, width: left, height }}
+          style={{ top, left: 0, width: Math.max(0, left), height }}
           onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
@@ -236,9 +264,17 @@ export function ReplaySolveModal({
         />
         <div
           data-cutout-panel
-          style={{ top: bottom, left: 0, right: 0, bottom: 0 }}
+          style={{
+            top: bottom,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            minHeight: panelBottom - bottom,
+          }}
           onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
+
+        {/* Corner masks round the cutout edges to match the board border-radius */}
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskTopLeft}`}
           style={{ top, left, width: cutoutRadius, height: cutoutRadius }}
@@ -274,30 +310,41 @@ export function ReplaySolveModal({
           }}
           aria-hidden="true"
         />
-        {/* Title + stats sit above the board (not on the canvas) with a small gap */}
+
+        {/* Title + stats card above the board */}
         <div
           className={styles.cutoutBoardHeaderWrap}
           style={{
             top,
             left,
             width,
-            transform: "translateY(calc(-100% - 12px))",
+            transform: `translateY(calc(-100% - ${headerGap}px))`,
           }}
           onPointerDown={stopProp}
         >
           {boardHeader}
         </div>
+
+        {/* Glowing frame that sits exactly over the board */}
         <div
           className={styles.stageFrame}
-          style={{ top, left, width, height }}
+          style={{
+            top,
+            left,
+            width,
+            height,
+            borderRadius: cutoutRadius,
+          }}
           onPointerDown={stopProp}
         />
+
+        {/* Controls dock below the board */}
         <div
           className={styles.controlDock}
           style={{
             left: shellLeft,
             width: shellWidth,
-            top: bottom + 16,
+            top: bottom + (isMobileVw ? 10 : 16),
           }}
           onPointerDown={stopProp}
         >

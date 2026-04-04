@@ -4,18 +4,19 @@
 .completePanelPhased {
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
   min-height: 0;
   width: 100%;
   gap: 0;
-  overflow: hidden;
 }
 
 /* Smooth entrance: dialog fades + scales up from board center */
 .completeWinDialog {
   animation: completeWinEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* Backdrop uses touch-action: none; dialog restores scrolling/taps on the card */
   touch-action: auto;
-  overflow: hidden;
+  /* Allow the card itself to scroll if it's taller than the capped height */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @keyframes completeWinEnter {
@@ -29,27 +30,13 @@
   }
 }
 
-/* Anchored win dialog uses inline translate(-50%,-50%); never animate transform or centering breaks. */
-.completeWinDialogAnchored {
-  animation: completeWinEnterAnchored 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes completeWinEnterAnchored {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 /* AppModal body hook: flex child can shrink inside xl dialog */
 .completeWinModalBody {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
-  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
 
@@ -98,9 +85,22 @@
 }
 
 /* ── Area pace (quarters finished, slowest first) ── */
-.completeAreaPace,
+.completeAreaPace {
+  width: 100%;
+  padding: 0 20px 10px;
+  margin: 0;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+  flex-shrink: 0;
+}
+
 .completeAreaPaceVisible {
-  display: none;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .completeAreaPaceTitle {
@@ -152,22 +152,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px 12px;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
+  gap: 12px;
+  padding: 24px 20px 16px;
+  flex-shrink: 0;
 }
 
 .completePhasedTitle {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.6rem;
   font-weight: 900;
   color: var(--color-text-primary);
   letter-spacing: -0.02em;
   text-align: center;
   line-height: 1.1;
-  flex-shrink: 0;
 }
 
 /* ── Daily streak (continuing: 2+ days) — subtle motion on win screen ── */
@@ -176,7 +173,6 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
   padding: 7px 14px 7px 12px;
   border-radius: 999px;
   overflow: hidden;
@@ -299,10 +295,6 @@
 /* ── Puzzle image ── */
 .completeImageWrapPhased {
   width: 100%;
-  max-width: 100%;
-  max-height: min(36dvh, 240px);
-  flex: 0 1 auto;
-  min-height: 0;
   border-radius: 14px;
   overflow: hidden;
   border: 2px solid color-mix(in srgb, var(--color-brand-primary) 40%, transparent);
@@ -330,7 +322,6 @@
   letter-spacing: 0.01em;
   line-height: 1.35;
   min-height: 24px;
-  flex-shrink: 0;
 }
 
 /* ── Actions section ── */
@@ -638,11 +629,10 @@
     padding: 0 16px 8px;
   }
 
-  /* Image: shorter box so actions remain visible without scrolling */
+  /* Image: reduce aspect ratio so actions remain visible */
   .completeImageWrapPhased {
     aspect-ratio: 16 / 9;
     border-radius: 10px;
-    max-height: min(26dvh, 168px);
   }
 
   .completeOptionsTrigger {
@@ -721,15 +711,11 @@
   border-top: 1px solid var(--color-border);
 }
 
-/* Cap win dialog height on all viewports (mobile was missing this; content + image can overflow). */
-.completeWinDialog {
-  max-height: min(
-    90dvh,
-    calc(
-      var(--app-vh-stable, 100dvh) - env(safe-area-inset-top, 0px) -
-        env(safe-area-inset-bottom, 0px) - 24px
-    )
-  );
+/* ── Desktop: ensure the anchored dialog can't exceed the viewport ── */
+@media (min-width: 641px) {
+  .completeWinDialog {
+    max-height: min(90dvh, calc(var(--app-vh-stable, 100dvh) - 24px));
+  }
 }
 
 /* ── Tablets (Android tablets, iPad portrait & landscape 601–1024px) ── */
@@ -766,7 +752,6 @@
   .completeImageWrapPhased {
     aspect-ratio: 4 / 3;
     border-radius: 12px;
-    max-height: min(34dvh, 220px);
   }
 
   .completeAreaPace {

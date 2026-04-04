@@ -273,10 +273,16 @@
   background: var(--color-border);
   /* No blur glow — a large blur made the frame look thicker as more of the ring turned green. */
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border) 75%, transparent);
-  transition: --progress 380ms cubic-bezier(0.22, 0.84, 0.3, 1);
+  transition:
+    --progress 380ms cubic-bezier(0.22, 0.84, 0.3, 1),
+    background 300ms ease,
+    box-shadow 300ms ease;
 }
 
-/* Fixed-width ring: conic only in the padding band (mask), so progress never changes rim width. */
+/* Fixed-width ring: conic only in the padding band (mask), so progress never changes rim width.
+   Clamp --progress to 0.97 max: near 1.0 the conic anti-aliasing at the seam causes the ring
+   to visually "jump" or morph shape before the complete state fires. The 0.97 ceiling keeps
+   it visually clean; the win overlay fires immediately after the last snap anyway. */
 .boardProgressFrame:not([data-complete="true"])::before {
   content: "";
   position: absolute;
@@ -287,8 +293,8 @@
   background: conic-gradient(
     from -90deg,
     var(--progress-color) 0deg,
-    var(--progress-color) calc(var(--progress) * 360deg),
-    var(--color-border) calc(var(--progress) * 360deg),
+    var(--progress-color) calc(clamp(0, var(--progress), 0.97) * 360deg),
+    var(--color-border) calc(clamp(0, var(--progress), 0.97) * 360deg),
     var(--color-border) 360deg
   );
   -webkit-mask:

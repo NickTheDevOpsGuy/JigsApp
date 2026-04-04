@@ -3,7 +3,7 @@
 .backdropCutout {
   position: fixed;
   inset: 0;
-  z-index: 2100;
+  z-index: var(--z-modal-overlay, 10050);
   display: block;
   padding: 0;
   pointer-events: none;
@@ -63,22 +63,49 @@
   pointer-events: none;
 }
 
-/* Corner masks removed — clean board edge */
 .cutoutCornerMask {
-  display: none;
+  position: fixed;
+  z-index: var(--z-modal-overlay, 10050);
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 120% 80% at 50% 20%,
+      var(--replay-backdrop-glow-a) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 100% 100% at 80% 80%,
+      var(--replay-backdrop-glow-b) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      var(--replay-backdrop-top) 0%,
+      var(--replay-backdrop-mid) 40%,
+      var(--replay-backdrop-bottom) 100%
+    );
 }
 
-.cutoutCornerMaskTopLeft,
-.cutoutCornerMaskTopRight,
-.cutoutCornerMaskBottomLeft,
+.cutoutCornerMaskTopLeft {
+  border-bottom-right-radius: 20px;
+}
+
+.cutoutCornerMaskTopRight {
+  border-bottom-left-radius: 20px;
+}
+
+.cutoutCornerMaskBottomLeft {
+  border-top-right-radius: 20px;
+}
+
 .cutoutCornerMaskBottomRight {
-  display: none;
+  border-top-left-radius: 20px;
 }
 
 /* Fixed to top edge of board rect; parent uses translateY(-100% - gap) to sit above canvas */
 .cutoutBoardHeaderWrap {
   position: fixed;
-  z-index: 2104;
+  z-index: calc(var(--z-modal-overlay, 10050) + 4);
   pointer-events: auto;
   box-sizing: border-box;
 }
@@ -89,14 +116,17 @@
   width: 100%;
   box-sizing: border-box;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--color-bg-card) 96%, transparent);
-  border: 1px solid var(--color-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-bg-card) 94%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 34%, var(--color-border));
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.22),
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 16%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -168,16 +198,24 @@
 
 .stageFrame {
   position: fixed;
-  z-index: 2103;
+  z-index: calc(var(--z-modal-overlay, 10050) + 3);
   pointer-events: auto;
-  border-radius: 18px;
+  /* border-radius set via inline style from JS to match board CSS exactly per breakpoint */
   box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--color-brand-primary) 55%, transparent),
-    0 8px 24px rgba(0, 0, 0, 0.3);
+    0 0 0 4px color-mix(in srgb, var(--color-brand-primary) 68%, transparent),
+    0 0 0 10px rgba(8, 14, 28, 0.26),
+    0 20px 44px rgba(0, 0, 0, 0.3);
 }
 
 .stageFrame::after {
-  display: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, #ffffff 12%, transparent),
+    inset 0 0 0 6px color-mix(in srgb, var(--color-brand-primary) 24%, transparent);
 }
 
 .boardCloseBtn {
@@ -216,7 +254,7 @@
 
 .controlDock {
   position: fixed;
-  z-index: 2103;
+  z-index: calc(var(--z-modal-overlay, 10050) + 3);
   pointer-events: auto;
 }
 
@@ -231,8 +269,8 @@
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  padding: 10px 14px 14px;
-  border-radius: 14px;
+  padding: 20px 18px 24px;
+  border-radius: 18px;
   background: color-mix(in srgb, var(--color-bg-card) 96%, transparent);
   border: 1px solid
     color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
@@ -257,13 +295,13 @@
   );
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 24px;
 }
 
 .modalStageStack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 24px;
 }
 
 .modalStageFrame {
@@ -286,7 +324,7 @@
 
 .puzzleArea {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--color-bg-primary);
   position: relative;
@@ -302,8 +340,7 @@
 .puzzleImage {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center;
+  object-fit: contain;
   display: block;
 }
 
@@ -380,6 +417,7 @@
   color: var(--color-text-secondary);
 }
 
+/* ── Mobile phones ≤ 600px ── */
 @media (max-width: 600px) {
   .boardHeader {
     gap: 8px;
@@ -412,8 +450,9 @@
   }
 
   .boardCloseBtn {
-    width: 30px;
-    height: 30px;
+    /* Larger tap target on mobile */
+    width: 36px;
+    height: 36px;
     border-radius: 8px;
   }
 
@@ -422,21 +461,19 @@
     font-size: 0.72rem;
   }
 
-  /* Tighter gap above cutout so the board gets more vertical space */
-  .cutoutBoardHeaderWrap {
-    transform: translateY(calc(-100% - 6px)) !important;
-  }
-
-  /* dock is top-positioned from boardRect in cutout mode; no bottom override needed */
+  /*
+   * Header gap is now set via inline transform in JS (headerGap variable).
+   * Remove the !important override — JS value wins.
+   */
 
   .controlDockInner {
-    padding: 10px 12px 12px;
+    padding: 12px 12px 16px;
     border-radius: 14px;
   }
 
   .controlDockInnerCutout {
     padding-top: 12px;
-    padding-bottom: 14px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
   }
 
   .modalSurface {
@@ -446,14 +483,75 @@
     gap: 12px;
   }
 
-  /* Non-cutout modal path: cap the puzzle area so controls stay visible */
   .modalStageStack {
     gap: 12px;
   }
 
   .puzzleArea {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
     height: auto;
     max-height: min(45dvh, 300px);
+  }
+}
+
+/* ── Tablets 601–1024px ── */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .boardHeader {
+    padding: 14px 16px;
+    border-radius: 13px;
+  }
+
+  .controlDockInner {
+    padding: 16px 16px 20px;
+    border-radius: 16px;
+  }
+
+  .controlDockInnerCutout {
+    padding-top: 14px;
+    padding-bottom: 20px;
+  }
+
+  .modalSurface {
+    max-width: min(640px, calc(100dvw - 32px));
+    gap: 20px;
+  }
+}
+
+/* ── Landscape phones: tight vertical space ── */
+@media (max-height: 500px) and (max-width: 900px) {
+  .boardHeader {
+    padding: 8px 12px;
+    border-radius: 10px;
+  }
+
+  .headerTitle {
+    font-size: 0.78rem;
+  }
+
+  .resultHeader {
+    gap: 2px 8px;
+  }
+
+  .resultTime {
+    font-size: 0.7rem;
+  }
+
+  .boardCloseBtn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .controlDockInner {
+    padding: 8px 10px 10px;
+    border-radius: 12px;
+  }
+
+  .controlDockInnerCutout {
+    padding-top: 8px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+  }
+
+  .puzzleArea {
+    max-height: min(38dvh, 240px);
   }
 }

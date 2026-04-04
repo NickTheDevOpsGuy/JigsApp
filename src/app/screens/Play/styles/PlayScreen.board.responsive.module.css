@@ -345,11 +345,24 @@
     display: none;
   }
 
+  /*
+   * Replay portrait layout on mobile:
+   *   - header card above board  ≈ 72px  (boardHeader padding + font)
+   *   - header → board gap       ≈ 6px
+   *   - board                    = stage size (CSS var, default 94vw)
+   *   - board → dock gap         ≈ 10px
+   *   - dock                     ≈ 130px
+   *   - bottom safe area         ≈ 0–34px
+   *
+   * padding-top pushes the board down so the header card has room above it.
+   * Using --play-replay-header-h lets JS override if it can measure the real height.
+   * Default 80px is generous enough for 2-line headers + gap.
+   */
   .boardLayoutShell[data-replay-active="true"] .playBody {
-    padding-top: 96px;
+    padding-top: var(--play-replay-header-h, 80px);
   }
 
-  /* Replay: don't let .main flex-grow into empty vertical space; stage stays content-sized */
+  /* Don't let .main flex-grow into empty vertical space — stage stays content-sized */
   .boardLayoutShell[data-replay-active="true"] .playBody .main {
     flex: 0 0 auto;
     flex-grow: 0;
@@ -358,13 +371,33 @@
   }
 
   /*
-   * Bounded square stage: cap side by viewport height so header + cutout + dock fit on portrait phones.
-   * Cutout rect follows this box; canvas scales inside the same frame.
+   * Stage size: the board must fit between header (above) and dock (below).
+   * Default 94vw for portrait — limited further by available height so the dock
+   * always has room.  Formula: viewport height minus header (80px) minus dock
+   * reserve (148px) minus safe areas.  Take the min of vw and that height cap.
    */
   .boardLayoutShell[data-replay-active="true"] .boardWrapper {
-    width: min(100%, var(--play-replay-stage-size, 94vw));
-    max-width: min(100%, var(--play-replay-stage-size, 94vw));
-    max-height: min(100%, var(--play-replay-stage-size, 94vw));
+    width: min(
+      100%,
+      var(
+        --play-replay-stage-size,
+        min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px)))
+      )
+    );
+    max-width: min(
+      100%,
+      var(
+        --play-replay-stage-size,
+        min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px)))
+      )
+    );
+    max-height: min(
+      100%,
+      var(
+        --play-replay-stage-size,
+        min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px)))
+      )
+    );
     flex: 0 0 auto;
     margin-left: auto;
     margin-right: auto;
@@ -388,17 +421,35 @@
     }
 
     /*
-     * Replay in landscape: 44dvh is tiny when the short axis is height — size the stage from
-     * the larger of vw / dvh so the board stays usable and the cutout still fits the shell.
+     * Replay in landscape: height is tiny — size from the short axis (dvh),
+     * leaving room for the header above (60px) and dock below (110px).
      */
     .boardLayoutShell[data-replay-active="true"] .boardWrapper {
-      width: min(100%, var(--play-replay-stage-size, min(78vw, 72dvh)));
-      max-width: min(100%, var(--play-replay-stage-size, min(78vw, 72dvh)));
-      max-height: min(100%, var(--play-replay-stage-size, min(78vw, 72dvh)));
+      width: min(
+        100%,
+        var(
+          --play-replay-stage-size,
+          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
+        )
+      );
+      max-width: min(
+        100%,
+        var(
+          --play-replay-stage-size,
+          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
+        )
+      );
+      max-height: min(
+        100%,
+        var(
+          --play-replay-stage-size,
+          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
+        )
+      );
     }
 
     .boardLayoutShell[data-replay-active="true"] .playBody {
-      padding-top: 68px;
+      padding-top: var(--play-replay-header-h, 62px);
     }
   }
 }

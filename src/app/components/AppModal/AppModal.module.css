@@ -3,17 +3,21 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  z-index: var(--z-modal-overlay, 10050);
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: max(16px, env(safe-area-inset-top, 0)) max(16px, env(safe-area-inset-right, 0))
-    max(16px, env(safe-area-inset-bottom, 0)) max(16px, env(safe-area-inset-left, 0));
+  padding: max(var(--modal-gutter), env(safe-area-inset-top, 0))
+    max(var(--modal-gutter), env(safe-area-inset-right, 0))
+    max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
+    max(var(--modal-gutter), env(safe-area-inset-left, 0));
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .backdropTop {
@@ -25,6 +29,18 @@
   background: var(--color-bg-primary);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  /* Tall win UI on small viewports: scroll the backdrop if the card exceeds the screen */
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Win / anchored dialogs: fixed center on a measured element (board); overrides flex backdrop centering */
+.dialogAnchored {
+  flex-shrink: 0;
+  margin: 0;
 }
 
 .dialog {
@@ -33,9 +49,11 @@
   border: 1px solid color-mix(in srgb, var(--color-border) 82%, rgba(255, 255, 255, 0.08));
   border-radius: 24px;
   width: 100%;
-  max-width: 520px;
-  max-height: calc(100dvh - 32px);
-  overflow-y: visible;
+  max-width: min(92vw, var(--modal-max-w-md));
+  max-height: calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter));
+  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow:
     0 0 0 1px color-mix(in srgb, #ffffff 6%, transparent) inset,
     0 24px 64px rgba(0, 0, 0, 0.4),
@@ -48,11 +66,11 @@
 
 /* Size variants */
 .sizeXl {
-  max-width: 640px;
+  max-width: min(92vw, 40rem);
 }
 
 .sizeWide {
-  max-width: 580px;
+  max-width: min(92vw, 36.25rem);
 }
 
 /* Surface: bare = content fills top, no header padding */
@@ -100,7 +118,32 @@
   flex: 1;
   min-height: 0;
   padding: 20px 24px 24px;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.body::-webkit-scrollbar {
+  display: block !important;
+  width: 10px;
+  height: 10px;
+}
+
+.body::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+.body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 1px solid var(--scrollbar-border);
+}
+
+.body::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Close button */
@@ -140,30 +183,141 @@
   outline-offset: 2px;
 }
 
-/* Mobile */
+/* ── Mobile phones (portrait & landscape, Android + iPhone) ── */
 @media (max-width: 600px) {
   .backdrop {
     align-items: center;
     justify-content: center;
-    padding: max(12px, env(safe-area-inset-top, 0))
-      max(12px, env(safe-area-inset-right, 0)) max(12px, env(safe-area-inset-bottom, 0))
-      max(12px, env(safe-area-inset-left, 0));
+    /* Respect notch / home-indicator on all mobile OSes */
+    padding: max(var(--modal-gutter), env(safe-area-inset-top, 0))
+      max(var(--modal-gutter), env(safe-area-inset-right, 0))
+      max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
+      max(var(--modal-gutter), env(safe-area-inset-left, 0));
   }
 
   .dialog {
-    max-width: 100%;
+    max-width: calc(100vw - 2 * var(--modal-gutter));
     width: 100%;
-    border-radius: 22px;
+    border-radius: 20px;
+    /* Full safe-area-aware height cap */
     max-height: calc(
-      100dvh - max(12px, env(safe-area-inset-top, 0)) -
-        max(12px, env(safe-area-inset-bottom, 0))
+      var(--app-vh-stable, 100dvh) -
+        max(var(--modal-gutter), env(safe-area-inset-top, 0)) -
+        max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
     );
-    overflow: hidden;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .header {
+    padding: 14px 16px 0;
+  }
+
+  .body {
+    padding: 14px 16px 16px;
+  }
+
+  /*
+   * Board-anchored win card: JS now centres in viewport on narrow screens.
+   * Give it explicit width/height so the inline style doesn't override into
+   * an off-screen position. overflow-y: auto lets the content scroll if
+   * the phone is short (e.g. landscape mode on Android).
+   */
+  .dialog.dialogAnchored {
+    width: min(100%, calc(100vw - 2 * var(--modal-gutter)));
+    max-width: min(92vw, 40rem);
+    max-height: calc(
+      var(--app-vh-stable, 100dvh) -
+        max(var(--modal-gutter), env(safe-area-inset-top, 0)) -
+        max(var(--modal-gutter), env(safe-area-inset-bottom, 0))
+    );
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .toneCelebration {
     align-self: center;
-    width: min(100%, 640px);
-    border-radius: 24px;
+    width: min(100%, 92vw);
+    max-width: 40rem;
+    border-radius: 22px;
+  }
+
+  .toneCelebration.dialogAnchored {
+    width: min(100%, calc(100vw - 2 * var(--modal-gutter)));
+    max-width: min(92vw, 40rem);
+  }
+}
+
+/* ── Tablets (Android tablets, iPad portrait & landscape) ── */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .dialog {
+    border-radius: 22px;
+    /* Tablets have plenty of height; cap conservatively */
+    max-height: min(85dvh, calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter)));
+  }
+
+  /* Win dialog on tablet: use up to 480px so the image and stats breathe */
+  .sizeXl {
+    max-width: min(88vw, 30rem);
+  }
+
+  /* Anchored win card: JS centres in viewport (vw ≥ 640 branch uses board centre,
+     which is usually fine on tablets in landscape; portrait is covered by mobile path) */
+  .dialog.dialogAnchored {
+    max-height: min(88dvh, calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter)));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .toneCelebration.dialogAnchored {
+    max-width: min(88vw, 30rem);
+  }
+}
+
+/* ── Desktop (≥ 1025px) ── */
+@media (min-width: 1025px) {
+  .dialog.dialogAnchored {
+    /* Hard cap so a very tall win card on a short monitor never clips */
+    max-height: min(90dvh, calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter)));
+    overflow-y: auto;
+  }
+}
+
+/* ── Very small phones (≤ 390px — compact Androids, iPhone SE) ── */
+@media (max-width: 390px) {
+  .header {
+    padding: 12px 14px 0;
+  }
+
+  .body {
+    padding: 12px 14px 14px;
+  }
+
+  .title {
+    font-size: 1.04rem;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+}
+
+/* ── Landscape phones (short viewport, wide aspect ratio) ── */
+@media (max-height: 500px) and (max-width: 900px) {
+  .dialog {
+    /* In landscape the viewport is short — let dialog scroll freely */
+    max-height: calc(
+      var(--app-vh-stable, 100dvh) - max(8px, env(safe-area-inset-top, 0)) -
+        max(8px, env(safe-area-inset-bottom, 0))
+    );
+    border-radius: 16px;
+  }
+
+  .dialog.dialogAnchored {
+    max-height: calc(
+      var(--app-vh-stable, 100dvh) - max(8px, env(safe-area-inset-top, 0)) -
+        max(8px, env(safe-area-inset-bottom, 0))
+    );
   }
 }

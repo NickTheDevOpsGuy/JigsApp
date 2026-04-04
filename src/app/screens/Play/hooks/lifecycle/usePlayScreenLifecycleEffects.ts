@@ -93,6 +93,11 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     };
   }, [boardRef, setBoardSize, viewport]);
 
+  /** Reserve space for replay cutout bottom bar so the board hole is not covered on mobile.
+   *  On mobile the dock is ~140px (controls + padding); on desktop it can be taller.
+   *  Use 148px so there's a small safety gap above the dock. */
+  const REPLAY_BOTTOM_BAR_RESERVE_PX = 148;
+
   useLayoutEffect(() => {
     if (!replayBarOpen) {
       setReplayBarBoardRect(null);
@@ -105,11 +110,19 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     let raf = 0;
     const measure = () => {
       const r = anchor.getBoundingClientRect();
+      // On mobile (Android Chrome especially) getBoundingClientRect is relative to the
+      // layout viewport, but position:fixed elements are relative to the visual viewport.
+      // Account for the visual viewport offset so the cutout hole aligns with the canvas.
+      const vv = typeof window !== "undefined" ? window.visualViewport : null;
+      const vvTop = vv ? vv.offsetTop : 0;
+      const vvLeft = vv ? vv.offsetLeft : 0;
+      const reserve = REPLAY_BOTTOM_BAR_RESERVE_PX;
+      const height = Math.max(0, r.height - reserve);
       setReplayBarBoardRect({
-        top: r.top,
-        left: r.left,
+        top: r.top - vvTop,
+        left: r.left - vvLeft,
         width: r.width,
-        height: r.height,
+        height,
       });
     };
     const schedule = () => {
@@ -119,10 +132,16 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     measure();
     const ro = new ResizeObserver(schedule);
     ro.observe(anchor);
+    // Also re-measure on visual viewport changes (pinch zoom, keyboard, Android address bar)
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    vv?.addEventListener("resize", schedule);
+    vv?.addEventListener("scroll", schedule);
     const unsubViewport = subscribeViewportLayoutChanges(schedule);
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
+      vv?.removeEventListener("resize", schedule);
+      vv?.removeEventListener("scroll", schedule);
       unsubViewport();
     };
   }, [
