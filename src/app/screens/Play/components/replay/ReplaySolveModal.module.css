@@ -368,13 +368,20 @@
   min-width: 0;
   max-width: 100%;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seekMetaRow {
+  display: flex;
   align-items: center;
-  gap: 8px 12px;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
 }
 
 .seekBar {
-  flex: 1;
+  width: 100%;
   height: 10px;
   background: rgba(26, 43, 74, 0.6);
   border: none;
@@ -491,6 +498,14 @@
     aspect-ratio: 4 / 3;
     height: auto;
     max-height: min(45dvh, 300px);
+  }
+
+  .seekBarWrap {
+    gap: 8px;
+  }
+
+  .seekMetaRow {
+    gap: 6px;
   }
 }
 

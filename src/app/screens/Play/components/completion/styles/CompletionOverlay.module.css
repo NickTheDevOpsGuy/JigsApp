@@ -19,6 +19,10 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.completeWinDialogAnchored {
+  animation: none;
+}
+
 @keyframes completeWinEnter {
   from {
     opacity: 0;
@@ -835,6 +839,75 @@
   .completeImageWrapPhased {
     aspect-ratio: 16 / 9;
     border-radius: 8px;
+  }
+}
+
+/* ── Short mobile viewports: keep the win actions on-screen without extra scrolling ── */
+@media (max-width: 600px) and (max-height: 760px) {
+  .completeStatsBar {
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .completeStatsBarItem {
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .completeCelebrationBlock {
+    padding: 16px 14px 10px;
+    gap: 8px;
+  }
+
+  .completePhasedTitle {
+    font-size: 1.18rem;
+  }
+
+  .completeImageWrapPhased {
+    aspect-ratio: 16 / 10;
+    border-radius: 10px;
+  }
+
+  .completeAchievementPhased {
+    font-size: 15px;
+    min-height: 20px;
+  }
+
+  .completeActionsPhased {
+    padding: 12px 14px 16px;
+    gap: 6px;
+  }
+
+  .completeOptionsTrigger {
+    min-height: 46px;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 600px) and (max-height: 680px) {
+  .completeStatsBar {
+    padding: 8px 12px;
+  }
+
+  .completeCelebrationBlock {
+    padding: 14px 12px 8px;
+    gap: 6px;
+  }
+
+  .completePhasedTitle {
+    font-size: 1.08rem;
+  }
+
+  .completeImageWrapPhased {
+    aspect-ratio: 16 / 9;
+  }
+
+  .completeAchievementPhased {
+    font-size: 14px;
+  }
+
+  .completeActionsPhased {
+    padding: 10px 12px 14px;
   }
 }
 

@@ -47,7 +47,16 @@ Manual pass on real devices before release.
 
 - Share buttons visible and tappable.
 - No clipping near bottom safe area.
+- Completion dialog stays fully on-screen on short phones (for example 360×480 and iPhone SE class).
+- Replay Solve masks the full board; no solved-board leak outside the replay cutout.
+- Replay controls fit on one compact mobile layout without wrapping off-screen.
+- Opening Replay from the win screen works on mobile, and closing it returns to play without the completion overlay flashing back in.
 - “Challenge” link opens the expected route.
+
+**Dialogs / overlays**
+
+- Non-dismissible overlays ignore `Escape` and accidental backdrop-key dismiss paths.
+- Dismissible dialogs still close with `Escape`.
 
 ---
 

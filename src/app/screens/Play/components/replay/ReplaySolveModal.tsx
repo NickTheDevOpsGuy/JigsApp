@@ -209,8 +209,6 @@ export function ReplaySolveModal({
     // Use the visual viewport dimensions so position:fixed elements align correctly
     // on Android Chrome (where the layout viewport != visual viewport during scroll/zoom).
     const vv = typeof window !== "undefined" ? window.visualViewport : null;
-    const viewLeft = vv?.offsetLeft ?? 0;
-    const viewTop = vv?.offsetTop ?? 0;
     const viewWidth =
       vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : 375);
     const viewHeight =
@@ -226,15 +224,15 @@ export function ReplaySolveModal({
     const maxShell = Math.max(0, viewWidth - 2 * safeEdge);
     const shellWidth = Math.min(maxShell, width + dockInsetPx * 2);
     const shellLeft = Math.min(
-      viewLeft + viewWidth - shellWidth - safeEdge,
-      Math.max(viewLeft + safeEdge, left - dockInsetPx),
+      viewWidth - shellWidth - safeEdge,
+      Math.max(safeEdge, left - dockInsetPx),
     );
 
     // Header gap above the board: tighter on mobile.
     const headerGap = isMobileVw ? 6 : 12;
 
     // Bottom panel: covers from bottom of board to bottom of visual viewport.
-    const panelBottom = viewTop + viewHeight;
+    const panelBottom = viewHeight;
 
     return (
       <div
@@ -269,7 +267,7 @@ export function ReplaySolveModal({
             left: 0,
             right: 0,
             bottom: 0,
-            minHeight: panelBottom - bottom,
+            minHeight: Math.max(0, panelBottom - bottom),
           }}
           onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />

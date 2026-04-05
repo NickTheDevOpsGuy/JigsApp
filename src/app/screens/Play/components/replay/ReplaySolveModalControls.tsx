@@ -169,16 +169,18 @@ export function ReplaySolveModalControls({
             <div className={styles.seekFill} style={{ width: `${progressPct}%` }} />
             <div className={styles.seekHandle} style={{ left: `${progressPct}%` }} />
           </div>
-          <span className={styles.seekTime} aria-live="polite">
-            {formatTime(elapsedSeconds)} / {formatTime(totalSeconds)}
-          </span>
-          <span
-            className={styles.speedBadge}
-            aria-label={`Playback speed ${effectiveSpeed}x`}
-            title={`Playback speed ${effectiveSpeed}x`}
-          >
-            {effectiveSpeed}x
-          </span>
+          <div className={styles.seekMetaRow}>
+            <span className={styles.seekTime} aria-live="polite">
+              {formatTime(elapsedSeconds)} / {formatTime(totalSeconds)}
+            </span>
+            <span
+              className={styles.speedBadge}
+              aria-label={`Playback speed ${effectiveSpeed}x`}
+              title={`Playback speed ${effectiveSpeed}x`}
+            >
+              {effectiveSpeed}x
+            </span>
+          </div>
         </div>
       </div>
 

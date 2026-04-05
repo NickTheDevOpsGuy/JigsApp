@@ -132,6 +132,48 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
   });
 
+  test("short mobile completion overlay keeps the card on-screen", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 360, height: 480 });
+    await page.goto("/play?e2eCompletion=1");
+
+    const dialog = page.getByRole("dialog", { name: /dialog/i });
+    await expect(dialog).toBeVisible({ timeout: 20000 });
+    await expect(dialog).toBeInViewport();
+    await expect(page.getByRole("button", { name: /options/i })).toBeVisible();
+  });
+
+  test("mobile replay opens from completion options and stays dismissed after close", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    const replayItem = page.getByRole("menuitem", { name: /replay solve/i });
+    await expect(replayItem).toBeVisible({ timeout: 10000 });
+    await replayItem.click();
+
+    const replayHeading = page.getByRole("heading", { name: /replay solve/i });
+    const replayClose = page.getByRole("button", { name: /close replay/i });
+    const replayProgress = page.getByRole("slider", { name: /replay progress/i });
+
+    await expect(replayHeading).toBeVisible({ timeout: 10000 });
+    await expect(replayClose).toBeInViewport();
+    await expect(replayProgress).toBeInViewport();
+    await expect(page.locator("[data-cutout-panel]")).toHaveCount(4);
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeHidden();
+
+    await replayClose.click();
+
+    await expect(replayHeading).toBeHidden({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeHidden();
+    await expect(
+      page.getByRole("status", { name: /pieces placed/i }).first(),
+    ).toBeVisible();
+  });
+
   test("desktop completion options menu lists share actions", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/play?e2eCompletion=1");

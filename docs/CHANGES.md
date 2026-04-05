@@ -2,12 +2,14 @@
 
 High-level feature list and recent changes. For project overview see [README](../README.md). For where features live in code see [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md).
 
-**In-app changelog:** What's New is driven by `src/app/data/content/changelog.ts`. Each item is shown with a single bullet (no duplicate bullets); list items in the source file are plain text (no leading bullet character).
+**In-app changelog:** What's New is driven by `src/app/data/content/changelog.ts`, but it is intentionally kept to the latest release bullets only. Full historical notes stay in this document. List items in the source file are plain text (no leading bullet character).
 
 ---
 
 ## Recent (high level)
 
+- **Mobile completion & replay fit** — Short-phone completion dialogs now stay fully on-screen, replay controls use a tighter mobile layout, replay covers the full board so the finished puzzle does not leak around the cutout, and closing replay no longer flashes the results card back in unexpectedly.
+- **Completion dialog guardrails** — Shared `AppModal` now respects `closeOnEscape={false}` through both the dialog and backdrop handlers, and board-anchored win dialogs keep the action row in view on desktop instead of drifting off-screen.
 - **Completion flow & piece polish** — Win screen always appears after the last piece locks (brief board glow then overlay). Placed pieces no longer show outline or edge strokes so adjacent pieces meet with no visible gaps; unplaced pieces keep a crisp jigsaw look. Lock tolerance tightened for exact placement.
 - **Single puzzle flow** — New puzzle uses only the staged modals: **Quick Play** (catalog: category → puzzle → setup) and **Puzzle Packs** (pack → puzzle → setup). The full-page setup screen was removed; `/new` redirects to home. Pack detail “Play” starts the puzzle directly (storage + `/play`). “Upload your own image” links were removed from both modals.
 - **Daily Share (Wordle-style)** — After completing the Daily Puzzle, a **Daily Share** button appears on the win screen (only for daily). It generates a compact, copyable text block: `Phuzzle Daily #N`, difficulty • pieces, ⏱ time, 🔁 moves, a 4-cell emoji grid (🟦/⬜ for completed, good time, efficient moves, clean solve), and a play link. Copy to clipboard or native share on mobile. See [SHARING.md](SHARING.md).

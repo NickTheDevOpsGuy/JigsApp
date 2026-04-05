@@ -59,4 +59,31 @@ describe("ReplaySolveModal", () => {
     render(<ReplaySolveModal {...defaultProps} />);
     expect(screen.queryByRole("button", { name: /back to results/i })).toBeNull();
   });
+
+  it("keeps cutout panels aligned to the visible viewport when visualViewport is offset", () => {
+    Object.defineProperty(window, "visualViewport", {
+      configurable: true,
+      value: {
+        width: 360,
+        height: 480,
+        offsetLeft: 24,
+        offsetTop: 36,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      },
+    });
+
+    render(
+      <ReplaySolveModal
+        {...defaultProps}
+        boardRect={{ top: 10, left: 20, width: 220, height: 180 }}
+      />,
+    );
+
+    const panels = Array.from(document.querySelectorAll("[data-cutout-panel]"));
+    expect(panels).toHaveLength(4);
+    expect((panels[0] as HTMLElement).style.top).toBe("0px");
+    expect((panels[1] as HTMLElement).style.width).toBe("20px");
+    expect((panels[3] as HTMLElement).style.minHeight).toBe("290px");
+  });
 });

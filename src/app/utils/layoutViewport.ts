@@ -6,7 +6,7 @@
 export function getLayoutViewportSize(): { width: number; height: number } {
   if (typeof window === "undefined") return { width: 0, height: 0 };
   const vv = window.visualViewport;
-  if (vv) {
+  if (vv && vv.width > 1 && vv.height > 1) {
     return { width: vv.width, height: vv.height };
   }
   return { width: window.innerWidth, height: window.innerHeight };

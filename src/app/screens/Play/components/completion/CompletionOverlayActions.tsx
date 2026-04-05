@@ -2,7 +2,7 @@
  * Win screen: one full-width Options button; portalled menu positions below the trigger
  * when there is room, otherwise above (viewport + safe layout).
  */
-import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Calendar, ChevronDown, Share2, Swords, Film, ImagePlus } from "lucide-react";
 import styles from "@/screens/Play/components/completion/styles/CompletionOverlay.module.css";
@@ -13,6 +13,10 @@ import {
   getSafeAreaInsetsHorizontal,
   subscribeViewportLayoutChanges,
 } from "@/utils/layoutViewport";
+
+type MenuPlacement =
+  | { mode: "below"; top: number; left: number; width: number; maxHeight: number }
+  | { mode: "above"; bottom: number; left: number; width: number; maxHeight: number };
 
 export function CompletionOverlayActions(args: {
   onShareProgress?: () => void;
@@ -44,12 +48,61 @@ export function CompletionOverlayActions(args: {
     "challenge" | "shareResult" | "dailyShare" | "replay" | null
   >(null);
   const menuWrapRef = useRef<HTMLDivElement>(null);
-  const [menuPlacement, setMenuPlacement] = useState<
-    | { mode: "below"; top: number; left: number; width: number; maxHeight: number }
-    | { mode: "above"; bottom: number; left: number; width: number; maxHeight: number }
-    | null
-  >(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const [menuPlacement, setMenuPlacement] = useState<MenuPlacement | null>(null);
   const isMobileActions = useMediaQuery("(max-width: 600px)");
+
+  const measureMenuPlacement = useCallback((triggerEl?: HTMLElement | null): boolean => {
+    const btn =
+      triggerEl ??
+      triggerRef.current ??
+      menuWrapRef.current?.querySelector<HTMLButtonElement>("button") ??
+      null;
+    if (!btn) return false;
+
+    const r = btn.getBoundingClientRect();
+    const gap = 8;
+    const edgePad = 8;
+    const { width: vw, height: vh } = getLayoutViewportSize();
+    if (vw <= 0 || vh <= 0) return false;
+
+    const { left: safeL, right: safeR } = getSafeAreaInsetsHorizontal();
+    const availableWidth = Math.max(120, vw - safeL - safeR - edgePad * 2);
+    const maxMenuW = Math.min(r.width > 1 ? r.width : 240, availableWidth);
+    let left = r.left;
+    const minLeft = safeL + edgePad;
+    const maxLeft = vw - safeR - edgePad - maxMenuW;
+    if (maxLeft >= minLeft) {
+      left = Math.min(Math.max(left, minLeft), maxLeft);
+    } else {
+      left = minLeft;
+    }
+
+    const maxH = Math.min(vh * 0.5, 320);
+    const fallbackMaxHeight = Math.max(120, Math.min(maxH, vh - edgePad * 2));
+    const spaceAbove = r.top;
+    const spaceBelow = vh - r.bottom;
+    const minComfortableMenuSpace = 160;
+    if (spaceBelow >= minComfortableMenuSpace || spaceBelow >= spaceAbove) {
+      setMenuPlacement({
+        mode: "below",
+        top: r.bottom + gap,
+        left,
+        width: maxMenuW,
+        maxHeight: Math.max(120, Math.min(maxH, spaceBelow - gap, fallbackMaxHeight)),
+      });
+    } else {
+      setMenuPlacement({
+        mode: "above",
+        bottom: vh - r.top + gap,
+        left,
+        width: maxMenuW,
+        maxHeight: Math.max(120, Math.min(maxH, spaceAbove - gap, fallbackMaxHeight)),
+      });
+    }
+
+    return true;
+  }, []);
 
   useLayoutEffect(() => {
     if (!menuOpen) {
@@ -61,48 +114,11 @@ export function CompletionOverlayActions(args: {
     const measure = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        const wrap = menuWrapRef.current;
-        const btn = wrap?.querySelector("button");
-        if (!btn) return;
-        const r = btn.getBoundingClientRect();
-        const gap = 8;
-        const edgePad = 8;
-        const { width: vw, height: vh } = getLayoutViewportSize();
-        const { left: safeL, right: safeR } = getSafeAreaInsetsHorizontal();
-        const maxMenuW = Math.min(
-          r.width,
-          Math.max(120, vw - safeL - safeR - edgePad * 2),
-        );
-        let left = r.left;
-        const minLeft = safeL + edgePad;
-        const maxLeft = vw - safeR - edgePad - maxMenuW;
-        if (maxLeft >= minLeft) {
-          left = Math.min(Math.max(left, minLeft), maxLeft);
-        }
-        const maxH = Math.min(vh * 0.5, 320);
-        const spaceAbove = r.top;
-        const spaceBelow = vh - r.bottom;
-        const minComfortableMenuSpace = 160;
-        if (spaceBelow >= minComfortableMenuSpace || spaceBelow >= spaceAbove) {
-          setMenuPlacement({
-            mode: "below",
-            top: r.bottom + gap,
-            left,
-            width: maxMenuW,
-            maxHeight: Math.min(maxH, spaceBelow - gap),
-          });
-        } else {
-          setMenuPlacement({
-            mode: "above",
-            bottom: vh - r.top + gap,
-            left,
-            width: maxMenuW,
-            maxHeight: Math.min(maxH, spaceAbove - gap),
-          });
-        }
+        measureMenuPlacement();
       });
     };
 
+    measureMenuPlacement();
     measure();
     const unsubViewport = subscribeViewportLayoutChanges(measure);
     const wrap = menuWrapRef.current;
@@ -114,7 +130,7 @@ export function CompletionOverlayActions(args: {
       unsubViewport();
       ro?.disconnect();
     };
-  }, [menuOpen, isMobileActions]);
+  }, [menuOpen, isMobileActions, measureMenuPlacement]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -367,10 +383,25 @@ export function CompletionOverlayActions(args: {
       <div className={styles.completeMenusRow}>
         <div className={styles.completeMenuWrap} ref={menuWrapRef}>
           <button
-            ref={args.focusReturnRef as React.RefObject<HTMLButtonElement>}
+            ref={(el) => {
+              triggerRef.current = el;
+              if (args.focusReturnRef) {
+                (
+                  args.focusReturnRef as React.MutableRefObject<HTMLButtonElement | null>
+                ).current = el;
+              }
+            }}
             type="button"
             className={styles.completeOptionsTrigger}
-            onClick={() => setMenuOpen((o) => !o)}
+            onClick={(e) => {
+              const nextOpen = !menuOpen;
+              if (nextOpen) {
+                measureMenuPlacement(e.currentTarget);
+              } else {
+                setMenuPlacement(null);
+              }
+              setMenuOpen(nextOpen);
+            }}
             aria-expanded={menuOpen}
             aria-haspopup="menu"
             aria-label="Options: next puzzle, replay, share"

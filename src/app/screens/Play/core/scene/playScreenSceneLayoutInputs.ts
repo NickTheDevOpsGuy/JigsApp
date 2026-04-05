@@ -159,7 +159,10 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     },
     usedHint: scene.usedHintRef.current,
     isDaily: completionIsDaily,
-    canReplay: behavior.replay.canReplay,
+    // E2E completion mode does not play through a full solve, so it only has the
+    // seeded initial snapshot. Still expose the replay shell there so browser tests
+    // can verify the mobile replay overlay/cutout path without solving a puzzle first.
+    canReplay: behavior.replay.canReplay || showE2ECompletion,
     onReplayClick: () => {
       behavior.replay.startReplay();
       scene.setCompletionDismissed(true);
