@@ -3,10 +3,10 @@ import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import type { PuzzleState, PieceCutType } from "@/puzzle/core/types";
 import { STORAGE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import { CompletionOverlayGate, ReplayBar } from "@/screens/Play/components";
+import { CompletionOverlayGate, ReplaySolveModal } from "@/screens/Play/components";
 
 type CompletionProps = React.ComponentProps<typeof CompletionOverlayGate> | null;
-type ReplayPortalProps = React.ComponentProps<typeof ReplayBar> | null;
+type ReplayPortalProps = React.ComponentProps<typeof ReplaySolveModal> | null;
 
 export function buildPlayScreenPageVisuals(args: {
   zenModeEnabled: boolean;
@@ -165,6 +165,7 @@ export function buildReplayPortalProps(args: {
   boardRect?: { top: number; left: number; width: number; height: number };
   speedExplicitlyChosen: boolean;
   onClose: () => void;
+  onPrepareClose?: () => void;
 }): ReplayPortalProps {
   const {
     replayBarOpen,
@@ -185,6 +186,7 @@ export function buildReplayPortalProps(args: {
     boardRect,
     speedExplicitlyChosen,
     onClose,
+    onPrepareClose,
   } = args;
 
   if (!replayBarOpen) return null;
@@ -207,6 +209,7 @@ export function buildReplayPortalProps(args: {
     boardRect,
     speedExplicitlyChosen,
     onClose,
+    onPrepareClose,
   };
 }
 

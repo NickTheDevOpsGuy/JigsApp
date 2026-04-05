@@ -251,6 +251,31 @@
   text-transform: lowercase;
 }
 
+.completeSummaryChips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.completeSummaryChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, var(--color-bg-card));
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
 @keyframes completeStreakShimmerMove {
   0%,
   100% {
@@ -639,6 +664,16 @@
     border-radius: 10px;
   }
 
+  .completeSummaryChips {
+    gap: 6px;
+  }
+
+  .completeSummaryChip {
+    min-height: 26px;
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
   .completeOptionsTrigger {
     min-height: 48px;
     font-size: 14px;
@@ -719,6 +754,31 @@
 @media (min-width: 641px) {
   .completeWinDialog {
     max-height: min(90dvh, calc(var(--app-vh-stable, 100dvh) - 24px));
+  }
+}
+
+@media (max-height: 720px) {
+  .completeCelebrationBlock {
+    padding: 16px 14px 10px;
+    gap: 8px;
+  }
+
+  .completePhasedTitle {
+    font-size: 1.18rem;
+  }
+
+  .completeImageWrapPhased {
+    aspect-ratio: 16 / 9;
+    max-height: min(23dvh, 168px);
+  }
+
+  .completeAchievementPhased {
+    font-size: 15px;
+    min-height: 20px;
+  }
+
+  .completeActionsPhased {
+    padding: 12px 14px 16px;
   }
 }
 

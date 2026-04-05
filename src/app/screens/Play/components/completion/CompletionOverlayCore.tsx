@@ -13,6 +13,7 @@ import { pickCompletionPhrase } from "@/screens/Play/components/completion/compl
 import type { CompletionOverlayProps } from "@/screens/Play/components/completion/completionOverlayTypes";
 import { ACHIEVEMENT_DEFS } from "@/data/content/achievements";
 import { BORDER_FRAME_XP_BONUS } from "@/services/player/statsService";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const PHASE2_MS = 600;
 const PHASE3_MS = 1200;
@@ -61,6 +62,9 @@ export function CompletionOverlay({
 }: CompletionOverlayProps) {
   const [phase, setPhase] = useState<1 | 2 | 3>(1);
   const [imageError, setImageError] = useState(false);
+  const useCompactMobileWinLayout = useMediaQuery(
+    "(max-width: 640px), (max-height: 720px)",
+  );
 
   useEffect(() => {
     if (isNewBest && onNewBest) onNewBest();
@@ -137,6 +141,7 @@ export function CompletionOverlay({
     () => pickCompletionPhrase(elapsedSeconds, moveCount, undoCount),
     [elapsedSeconds, moveCount, undoCount],
   );
+  const modalBoardAnchorRef = useCompactMobileWinLayout ? undefined : boardAnchorRef;
 
   return (
     <AppModal
@@ -152,12 +157,12 @@ export function CompletionOverlay({
       backdropClassName={styles.completeWinBackdrop}
       dialogClassName={[
         styles.completeWinDialog,
-        boardAnchorRef ? styles.completeWinDialogAnchored : "",
+        modalBoardAnchorRef ? styles.completeWinDialogAnchored : "",
       ]
         .filter(Boolean)
         .join(" ")}
       bodyClassName={styles.completeWinModalBody}
-      anchorRef={boardAnchorRef}
+      anchorRef={modalBoardAnchorRef}
     >
       <div
         className={styles.completePanelPhased}

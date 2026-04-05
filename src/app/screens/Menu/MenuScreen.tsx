@@ -8,6 +8,7 @@ import { Package, ImagePlus, ChevronRight, Flame, Snowflake, Trophy } from "luci
 import { useHomeData } from "./hooks/useHomeData";
 import type { WeekDot } from "./hooks/useHomeData";
 import { ChoosePuzzleModal } from "@/components/ChoosePuzzleModal";
+import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { PackChoiceModal } from "@/components/PackChoiceModal";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
@@ -17,6 +18,7 @@ import styles from "./MenuScreen.module.css";
 
 export function MenuScreen() {
   const navigate = useNavigate();
+  const [showDailyDifficultyModal, setShowDailyDifficultyModal] = useState(false);
   const [showChoosePuzzleModal, setShowChoosePuzzleModal] = useState(false);
   const [showPackChoiceModal, setShowPackChoiceModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -37,7 +39,7 @@ export function MenuScreen() {
 
   const handleDailyPlay = () => {
     void loadPlayScreenModule();
-    navigate("/play?daily=1");
+    setShowDailyDifficultyModal(true);
   };
 
   const handleQuickPlay = () => {
@@ -275,6 +277,10 @@ export function MenuScreen() {
       <ChoosePuzzleModal
         isOpen={showChoosePuzzleModal}
         onClose={() => setShowChoosePuzzleModal(false)}
+      />
+      <DailyDifficultyModal
+        isOpen={showDailyDifficultyModal}
+        onClose={() => setShowDailyDifficultyModal(false)}
       />
       <PackChoiceModal
         isOpen={showPackChoiceModal}

@@ -174,6 +174,26 @@ test.describe("Play screen", () => {
     ).toBeVisible();
   });
 
+  test("short mobile replay keeps header and controls inside the viewport", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 360, height: 640 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+
+    await expect(page.getByRole("heading", { name: /replay solve/i })).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.getByRole("button", { name: /close replay/i })).toBeInViewport();
+    await expect(page.getByRole("slider", { name: /replay progress/i })).toBeInViewport();
+    await expect(
+      page.getByRole("button", { name: "Play", exact: true }),
+    ).toBeInViewport();
+  });
+
   test("desktop completion options menu lists share actions", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/play?e2eCompletion=1");

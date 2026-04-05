@@ -219,6 +219,9 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       behavior.replay.stopReplay();
       scene.setReplayBarOpen(false);
     },
+    onPrepareClose: () => {
+      behavior.replay.goToEnd();
+    },
   });
 
   const replayPortalProps =

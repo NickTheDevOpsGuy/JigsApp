@@ -10,6 +10,24 @@
   touch-action: manipulation;
 }
 
+.backdropCutout > [data-cutout-panel],
+.cutoutCornerMask,
+.cutoutBoardHeaderWrap,
+.stageFrame,
+.controlDock {
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.backdropCutoutClosing > [data-cutout-panel],
+.backdropCutoutClosing .cutoutCornerMask,
+.backdropCutoutClosing .cutoutBoardHeaderWrap,
+.backdropCutoutClosing .stageFrame,
+.backdropCutoutClosing .controlDock {
+  opacity: 0;
+}
+
 .backdropCutout > [data-cutout-panel] {
   position: fixed;
   pointer-events: auto;
@@ -287,6 +305,28 @@
   padding-bottom: 24px;
 }
 
+.controlDockInnerCompact {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.controlDockHeader {
+  flex-shrink: 0;
+}
+
+.controlDockHeader .boardHeader {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-bg-card) 90%, transparent);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
+}
+
 .modalSurface {
   width: 100%;
   max-width: min(
@@ -483,6 +523,15 @@
     padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
   }
 
+  .controlDockInnerCompact {
+    gap: 12px;
+  }
+
+  .controlDockHeader .boardHeader {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
   .modalSurface {
     max-width: calc(
       100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 12px
@@ -506,6 +555,17 @@
 
   .seekMetaRow {
     gap: 6px;
+  }
+}
+
+@media (max-height: 720px) {
+  .controlDockInnerCutout {
+    padding-top: 10px;
+    padding-bottom: max(14px, env(safe-area-inset-bottom, 14px));
+  }
+
+  .controlDockHeader .boardHeader {
+    padding: 9px 11px;
   }
 }
 

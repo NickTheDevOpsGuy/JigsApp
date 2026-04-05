@@ -216,10 +216,8 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
           className={styles.moreOptionsBtn}
           onClick={() => setShowMore((v) => !v)}
           aria-expanded={showMore}
-          aria-label={
-            showMore ? "Hide extra difficulty options" : "Show more difficulty options"
-          }
-          title={showMore ? "Hide extra difficulties" : "More difficulty options"}
+          aria-label={showMore ? "Hide more options" : "More options"}
+          title={showMore ? "Hide more options" : "More options"}
         >
           More Options
           {showMore ? (
@@ -252,8 +250,8 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
         type="button"
         className={styles.startBtn}
         onClick={handleStart}
-        aria-label="Start today’s puzzle"
-        title="Start today’s puzzle"
+        aria-label="Start puzzle"
+        title="Start puzzle"
       >
         Start Puzzle
         <span className={styles.startBtnArrow}>→</span>
