@@ -43,6 +43,8 @@ interface PlayScreenLayoutArgs {
   setShowClearCacheConfirm: (show: boolean) => void;
   showFeedbackChoice: boolean;
   state: import("@/puzzle/core/types").PuzzleState | null;
+  /** Used with post-completion inline CTA so the solved board frame stays correct when that CTA is suppressed after replay. */
+  completionDismissed: boolean;
   completionProps: unknown;
   postCompletionCta: { label: string; onNext: () => void } | null;
   replayPortalProps: unknown;
@@ -117,7 +119,9 @@ export function createPlayScreenLayoutProps(
   args: PlayScreenLayoutArgs,
 ): React.ComponentProps<typeof PlayScreenLayout> {
   const boardFrameCompletePhase =
-    args.winCelebrationModalVisible || Boolean(args.postCompletionCta);
+    args.winCelebrationModalVisible ||
+    Boolean(args.postCompletionCta) ||
+    (args.isComplete && args.completionDismissed);
 
   return {
     coopViewProps: {

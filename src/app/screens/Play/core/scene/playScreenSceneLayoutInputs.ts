@@ -218,6 +218,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       // overlay will flash back on screen.
       behavior.replay.stopReplay();
       scene.setReplayBarOpen(false);
+      scene.setSuppressBoardCompleteBannerAfterReplay(true);
     },
     onPrepareClose: () => {
       behavior.replay.goToEnd();
@@ -239,6 +240,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
             // dismissal so the overlay becomes visible again.
             behavior.replay.stopReplay();
             scene.setReplayBarOpen(false);
+            scene.setSuppressBoardCompleteBannerAfterReplay(false);
             scene.setCompletionDismissed(false);
             requestAnimationFrame(() => {
               scene.completionFocusRef.current?.focus();
@@ -252,6 +254,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       : null;
 
   return {
+    completionDismissed: scene.completionDismissed,
     isHost,
     sessionIdFromUrl,
     sessionLoading,
@@ -293,7 +296,9 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     state,
     completionProps,
     postCompletionCta:
-      scene.completionDismissed && state?.isComplete
+      scene.completionDismissed &&
+      state?.isComplete &&
+      !scene.suppressBoardCompleteBannerAfterReplay
         ? {
             label: nextPuzzleLabel,
             onNext: handleNewGame,

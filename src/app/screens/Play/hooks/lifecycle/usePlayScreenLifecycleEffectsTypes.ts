@@ -38,6 +38,7 @@ export interface UsePlayScreenLifecycleEffectsArgs {
   isCoarsePointer: boolean;
   setShowStreakToast: Dispatch<SetStateAction<boolean>>;
   setShareToast: Dispatch<SetStateAction<string | null>>;
+  setSuppressBoardCompleteBannerAfterReplay?: (v: boolean) => void;
   isPaused: boolean;
   audioManager: {
     setPaused: (p: boolean) => void;

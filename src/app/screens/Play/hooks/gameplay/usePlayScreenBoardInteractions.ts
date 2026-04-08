@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import type { MutableRefObject, RefObject } from "react";
 import posthog from "posthog-js";
+import { computeBoardFitScale } from "@/puzzle/canvas/utils/boardFitScale";
 import { usePointerHandlers } from "@/screens/Play/hooks/input/usePointerHandlers";
 import type { Piece, PuzzleState } from "@/puzzle/core/types";
 import type { PuzzleManager } from "@/puzzle/manager/PuzzleManager";
@@ -86,7 +87,9 @@ export function usePlayScreenBoardInteractions({
       const contentW = assembledW + 2 * pad;
       const contentH = assembledH + 2 * pad;
       const fitScale =
-        contentW > 0 && contentH > 0 ? Math.min(1, cssW / contentW, cssH / contentH) : 1;
+        contentW > 0 && contentH > 0
+          ? computeBoardFitScale(cssW, cssH, contentW, contentH)
+          : 1;
       const drawW = contentW * fitScale;
       const drawH = contentH * fitScale;
       const fitOffsetX = (cssW - drawW) / 2;

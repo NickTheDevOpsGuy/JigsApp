@@ -121,40 +121,39 @@
 
 @media (max-width: 600px) {
   .dockHeader {
-    display: none;
+    padding: 0 0 8px;
   }
 
-  .speedBadge {
-    display: none;
+  .dockTitle {
+    font-size: 0.82rem;
   }
 
   .seekRow {
-    padding: 0 0 6px;
+    padding: 0 0 10px;
   }
 
   .seekTime {
-    font-size: 0.72rem;
+    font-size: 0.76rem;
     flex-shrink: 0;
   }
 
-  /* Single tight row — all 5 buttons + speed, no wrap */
   .controlRow {
     flex-wrap: nowrap;
     justify-content: center;
-    gap: 4px;
-    padding-top: 6px;
+    gap: 8px;
+    padding-top: 10px;
   }
 
   .controlBtn {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     flex-shrink: 0;
-    border-radius: 12px;
+    border-radius: 50%;
   }
 
   .controlBtn svg {
-    width: 18px;
-    height: 18px;
+    width: 19px;
+    height: 19px;
   }
 
   .controlBtnPlay {
@@ -163,16 +162,16 @@
   }
 
   .controlBtnPlay svg {
-    width: 20px;
-    height: 20px;
+    width: 21px;
+    height: 21px;
   }
 
   .speedTrigger {
-    min-width: 42px;
-    min-height: 38px;
-    padding: 0 8px;
-    font-size: 0.78rem;
+    min-width: 44px;
+    min-height: 40px;
+    padding: 0 10px;
+    font-size: 0.8rem;
     flex-shrink: 0;
-    border-radius: 12px;
+    border-radius: 999px;
   }
 }

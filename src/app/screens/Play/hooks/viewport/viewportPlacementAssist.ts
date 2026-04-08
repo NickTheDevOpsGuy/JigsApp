@@ -1,4 +1,5 @@
 import type { Piece } from "@/puzzle/core/types";
+import { computeBoardFitScale } from "@/puzzle/canvas/utils/boardFitScale";
 import {
   clampPan,
   type ViewportBounds,
@@ -34,7 +35,7 @@ export function boardPointToBoardLocalCss(
   const contentH = assembledH + 2 * pad;
   const fitScale =
     contentW > 0 && contentH > 0
-      ? Math.min(1, boardCssW / contentW, boardCssH / contentH)
+      ? computeBoardFitScale(boardCssW, boardCssH, contentW, contentH)
       : 1;
   const drawW = contentW * fitScale;
   const drawH = contentH * fitScale;

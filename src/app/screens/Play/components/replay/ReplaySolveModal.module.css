@@ -309,9 +309,9 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-y: hidden;
   overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
 }
 
 .controlDockHeader {
@@ -363,8 +363,10 @@
 }
 
 .puzzleArea {
+  --replay-img-max-h: min(52dvh, 480px);
   width: 100%;
-  aspect-ratio: 4 / 3;
+  min-height: 200px;
+  max-height: var(--replay-img-max-h);
   overflow: hidden;
   background: var(--color-bg-primary);
   position: relative;
@@ -378,15 +380,18 @@
 }
 
 .puzzleImage {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
   display: block;
+  max-width: 100%;
+  max-height: var(--replay-img-max-h);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
 }
 
 .puzzlePlaceholder {
+  min-height: 180px;
   width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -544,9 +549,8 @@
   }
 
   .puzzleArea {
-    aspect-ratio: 4 / 3;
-    height: auto;
-    max-height: min(45dvh, 300px);
+    --replay-img-max-h: min(50dvh, 400px);
+    min-height: 180px;
   }
 
   .seekBarWrap {
@@ -627,6 +631,7 @@
   }
 
   .puzzleArea {
-    max-height: min(38dvh, 240px);
+    --replay-img-max-h: min(36dvh, 220px);
+    min-height: 140px;
   }
 }

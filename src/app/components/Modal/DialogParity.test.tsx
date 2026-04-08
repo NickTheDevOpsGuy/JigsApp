@@ -195,16 +195,12 @@ describe("dialog parity", () => {
 
     expect(screen.getByText(/loading/i)).toBeTruthy();
     expect(await screen.findByText(/same puzzle for everyone/i)).toBeTruthy();
-    expect(
-      screen.getByRole("button", { name: /show more difficulty options/i }),
-    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: /more options/i })).toBeTruthy();
 
-    fireEvent.click(
-      screen.getByRole("button", { name: /show more difficulty options/i }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: /more options/i }));
     expect(screen.getByRole("button", { name: /master - 49 pieces/i })).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("button", { name: /start today.?s puzzle/i }));
+    fireEvent.click(screen.getByRole("button", { name: /start puzzle/i }));
     expect(mocks.startDailyPuzzle).toHaveBeenCalledTimes(1);
     expect(mocks.navigate).toHaveBeenCalledWith("/play");
   });

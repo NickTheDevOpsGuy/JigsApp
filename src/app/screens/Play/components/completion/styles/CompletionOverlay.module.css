@@ -321,24 +321,33 @@
   }
 }
 
-/* ── Puzzle image ── */
+/* ── Puzzle image (full photo visible — no forced wide frame or cover crop) ── */
 .completeImageWrapPhased {
+  --complete-img-max-h: min(44dvh, 280px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
+  max-height: var(--complete-img-max-h);
+  min-height: 96px;
+  box-sizing: border-box;
   border-radius: 14px;
   overflow: hidden;
   border: 2px solid color-mix(in srgb, var(--color-brand-primary) 40%, transparent);
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.25),
     0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 20%, transparent);
-  aspect-ratio: 4 / 3;
   background: var(--color-bg-card);
 }
 
 .completeImagePhased {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   display: block;
+  max-width: 100%;
+  max-height: var(--complete-img-max-h);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
 }
 
 /* ── Achievement cycler (phase 3) ── */
@@ -658,9 +667,8 @@
     padding: 0 16px 8px;
   }
 
-  /* Image: reduce aspect ratio so actions remain visible */
   .completeImageWrapPhased {
-    aspect-ratio: 16 / 9;
+    --complete-img-max-h: min(40dvh, 240px);
     border-radius: 10px;
   }
 
@@ -768,8 +776,7 @@
   }
 
   .completeImageWrapPhased {
-    aspect-ratio: 16 / 9;
-    max-height: min(23dvh, 168px);
+    --complete-img-max-h: min(22dvh, 160px);
   }
 
   .completeAchievementPhased {
@@ -814,7 +821,7 @@
   }
 
   .completeImageWrapPhased {
-    aspect-ratio: 4 / 3;
+    --complete-img-max-h: min(46dvh, 300px);
     border-radius: 12px;
   }
 
@@ -897,7 +904,7 @@
   }
 
   .completeImageWrapPhased {
-    aspect-ratio: 16 / 9;
+    --complete-img-max-h: min(36dvh, 220px);
     border-radius: 8px;
   }
 }
@@ -924,7 +931,7 @@
   }
 
   .completeImageWrapPhased {
-    aspect-ratio: 16 / 10;
+    --complete-img-max-h: min(30dvh, 200px);
     border-radius: 10px;
   }
 
@@ -959,7 +966,7 @@
   }
 
   .completeImageWrapPhased {
-    aspect-ratio: 16 / 9;
+    --complete-img-max-h: min(26dvh, 180px);
   }
 
   .completeAchievementPhased {

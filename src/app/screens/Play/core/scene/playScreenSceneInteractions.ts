@@ -64,6 +64,7 @@ export function usePlayScreenInteractions(ctx: any) {
     scene.setCompletionDismissed(true);
     scene.setShowWinOverlay?.(false);
     scene.setCompletionImageUrl(undefined);
+    scene.setSuppressBoardCompleteBannerAfterReplay(false);
     scene.viewport.reset();
     ui.setShowChoosePuzzleModal?.(true);
   }, [scene, ui]);

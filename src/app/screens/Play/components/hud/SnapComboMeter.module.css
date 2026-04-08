@@ -43,3 +43,20 @@
   font-size: 24px;
   line-height: 1;
 }
+
+@media (max-width: 600px) {
+  .comboMeter {
+    padding: 6px 12px;
+    gap: 1px;
+    border-radius: 10px;
+    border-width: 1px;
+  }
+
+  .comboLabel {
+    font-size: 10px;
+  }
+
+  .comboValue {
+    font-size: 19px;
+  }
+}

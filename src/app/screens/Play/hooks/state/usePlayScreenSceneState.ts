@@ -42,6 +42,11 @@ export function usePlayScreenSceneState(grid: { rows: number; cols: number } | n
   /** True after completion animation (glow/pulse) has played; then win overlay is shown. */
   const [showWinOverlay, setShowWinOverlay] = React.useState(false);
   const [replayBarOpen, setReplayBarOpen] = React.useState(false);
+  /** After closing replay, hide the inline solved banner/CTA so the view matches replay and avoid ghost-taps on "New puzzle". */
+  const [
+    suppressBoardCompleteBannerAfterReplay,
+    setSuppressBoardCompleteBannerAfterReplay,
+  ] = React.useState(false);
   const [replayBarBoardRect, setReplayBarBoardRect] = React.useState<{
     top: number;
     left: number;
@@ -108,6 +113,7 @@ export function usePlayScreenSceneState(grid: { rows: number; cols: number } | n
     clearPuzzleState();
     setResumeChoice("fresh");
     setReplayBarOpen(false);
+    setSuppressBoardCompleteBannerAfterReplay(false);
     setCompletionDismissed(false);
     setShowWinOverlay(false);
     setCompletionImageUrl(undefined);
@@ -146,6 +152,8 @@ export function usePlayScreenSceneState(grid: { rows: number; cols: number } | n
     setShowWinOverlay,
     replayBarOpen,
     setReplayBarOpen,
+    suppressBoardCompleteBannerAfterReplay,
+    setSuppressBoardCompleteBannerAfterReplay,
     replayBarBoardRect,
     setReplayBarBoardRect,
     completionImageUrl,

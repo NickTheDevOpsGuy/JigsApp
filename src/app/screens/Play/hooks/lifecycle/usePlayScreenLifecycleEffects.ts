@@ -43,6 +43,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     isCoarsePointer,
     setShowStreakToast,
     setShareToast,
+    setSuppressBoardCompleteBannerAfterReplay,
     isPaused,
     audioManager,
     manager,
@@ -219,6 +220,12 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       setShareToast(null);
     }
   }, [state?.isComplete, setShowStreakToast, setShareToast]);
+
+  useEffect(() => {
+    if (!state?.isComplete) {
+      setSuppressBoardCompleteBannerAfterReplay?.(false);
+    }
+  }, [state?.isComplete, setSuppressBoardCompleteBannerAfterReplay]);
 
   /** After completion, run brief animation (glow/pulse) then show win overlay.
    * Guard: never re-show the win overlay while replay is active — restoring the

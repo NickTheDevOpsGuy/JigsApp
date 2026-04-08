@@ -106,6 +106,8 @@ export function usePlayScreenBehavior(setup: any) {
     isCoarsePointer: scene.isCoarsePointer,
     setShowStreakToast: scene.setShowStreakToast,
     setShareToast: scene.setShareToast,
+    setSuppressBoardCompleteBannerAfterReplay:
+      scene.setSuppressBoardCompleteBannerAfterReplay,
     isPaused: ui.isPaused,
     audioManager,
     manager,

@@ -15,6 +15,7 @@ import {
   drawGridOverlay,
   drawAlignmentGrid,
 } from "@/puzzle/canvas/utils/renderBoardHelpers";
+import { computeBoardFitScale } from "@/puzzle/canvas/utils/boardFitScale";
 import { drawPiece, drawEdgePieceHighlight, drawCompletionGlow } from "./renderBoardDraw";
 import { sortPiecesForDraw } from "@/puzzle/canvas/utils/pieceDrawOrder";
 import type {
@@ -102,7 +103,7 @@ export function renderBoard(
   if (assembledW > 0 && assembledH > 0) {
     const contentW = assembledW + 2 * pad;
     const contentH = assembledH + 2 * pad;
-    const fitScale = Math.min(1, cssW / contentW, cssH / contentH);
+    const fitScale = computeBoardFitScale(cssW, cssH, contentW, contentH);
     const drawW = contentW * fitScale;
     const drawH = contentH * fitScale;
     const offsetX = (cssW - drawW) / 2;
