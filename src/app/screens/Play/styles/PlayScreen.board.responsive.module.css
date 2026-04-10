@@ -379,15 +379,24 @@
   .boardLayoutShell[data-replay-active="true"] .boardWrapper {
     width: min(
       100%,
-      var(--play-replay-stage-size, min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px))))
+      var(
+        --play-replay-stage-size,
+        min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px)))
+      )
     );
     max-width: min(
       100%,
-      var(--play-replay-stage-size, min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px))))
+      var(
+        --play-replay-stage-size,
+        min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px)))
+      )
     );
     max-height: min(
       100%,
-      var(--play-replay-stage-size, min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px))))
+      var(
+        --play-replay-stage-size,
+        min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px)))
+      )
     );
     flex: 0 0 auto;
     margin-left: auto;
@@ -418,15 +427,24 @@
     .boardLayoutShell[data-replay-active="true"] .boardWrapper {
       width: min(
         100%,
-        var(--play-replay-stage-size, min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px))))
+        var(
+          --play-replay-stage-size,
+          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
+        )
       );
       max-width: min(
         100%,
-        var(--play-replay-stage-size, min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px))))
+        var(
+          --play-replay-stage-size,
+          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
+        )
       );
       max-height: min(
         100%,
-        var(--play-replay-stage-size, min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px))))
+        var(
+          --play-replay-stage-size,
+          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
+        )
       );
     }
 

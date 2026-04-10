@@ -89,7 +89,8 @@ export function ReplaySolveModal({
   }, []);
 
   // Only use cutout on desktop where the board is large and the UI has room
-  const useCutout = !isMobileVw && Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
+  const useCutout =
+    !isMobileVw && Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
 
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;
@@ -105,7 +106,9 @@ export function ReplaySolveModal({
 
   useEffect(() => {
     if (!useCutout) return;
-    const onLayout = () => { bumpViewportLayout(); };
+    const onLayout = () => {
+      bumpViewportLayout();
+    };
     const vv = window.visualViewport;
     vv?.addEventListener("resize", onLayout);
     vv?.addEventListener("scroll", onLayout);
@@ -243,9 +246,7 @@ export function ReplaySolveModal({
           )}
 
           {/* ── Controls ── */}
-          <div className={styles.mobileControls}>
-            {seekAndControls}
-          </div>
+          <div className={styles.mobileControls}>{seekAndControls}</div>
         </div>
       </AppModal>
     );
@@ -260,8 +261,10 @@ export function ReplaySolveModal({
     const vv = typeof window !== "undefined" ? window.visualViewport : null;
     const viewLeft = vv?.offsetLeft ?? 0;
     const viewTop = vv?.offsetTop ?? 0;
-    const viewWidth = vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : 1024);
-    const viewHeight = vv?.height ?? (typeof window !== "undefined" ? window.innerHeight : 768);
+    const viewWidth =
+      vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : 1024);
+    const viewHeight =
+      vv?.height ?? (typeof window !== "undefined" ? window.innerHeight : 768);
 
     const cutoutRadius = 20;
     const safeEdge = 12;
@@ -341,7 +344,13 @@ export function ReplaySolveModal({
         />
         <div
           data-cutout-panel
-          style={{ top: bottom, left: 0, right: 0, bottom: 0, minHeight: panelBottom - bottom }}
+          style={{
+            top: bottom,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            minHeight: panelBottom - bottom,
+          }}
           onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
 
@@ -352,12 +361,22 @@ export function ReplaySolveModal({
         />
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskTopRight}`}
-          style={{ top, left: right - cutoutRadius, width: cutoutRadius, height: cutoutRadius }}
+          style={{
+            top,
+            left: right - cutoutRadius,
+            width: cutoutRadius,
+            height: cutoutRadius,
+          }}
           aria-hidden="true"
         />
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskBottomLeft}`}
-          style={{ top: bottom - cutoutRadius, left, width: cutoutRadius, height: cutoutRadius }}
+          style={{
+            top: bottom - cutoutRadius,
+            left,
+            width: cutoutRadius,
+            height: cutoutRadius,
+          }}
           aria-hidden="true"
         />
         <div
