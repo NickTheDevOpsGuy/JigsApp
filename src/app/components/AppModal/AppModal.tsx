@@ -18,6 +18,10 @@ import {
   getLayoutViewportSize,
   subscribeViewportLayoutChanges,
 } from "@/utils/layoutViewport";
+import {
+  LAYOUT_ANCHORED_DIALOG_MAX_WIDTH_PX,
+  LAYOUT_PHONE_MAX_PX,
+} from "@/constants/layoutBreakpoints";
 
 const BODY_SCROLL_LOCK_ATTR = "data-app-modal-lock-count";
 const BODY_SCROLL_Y_ATTR = "data-app-modal-scroll-y";
@@ -254,7 +258,7 @@ export function AppModal({
       /* On narrow viewports (mobile) the board anchor can be off-centre or
          partially off-screen. Skip anchor math entirely and just centre in
          the viewport so the win dialog is always fully visible. */
-      if (vw < 640) {
+      if (vw <= LAYOUT_PHONE_MAX_PX) {
         const maxWidthPx = Math.round(vw - 2 * margin);
         const maxHeightPx = Math.round(vh - 2 * margin);
         setAnchorPosition({
@@ -269,7 +273,7 @@ export function AppModal({
       let cx = r.left + r.width / 2;
       let cy = r.top + r.height / 2;
       const maxWidthPx = Math.min(
-        640,
+        LAYOUT_ANCHORED_DIALOG_MAX_WIDTH_PX,
         Math.max(280, Math.round(r.width) + 24),
         Math.round(vw - 2 * margin),
       );
@@ -345,12 +349,6 @@ export function AppModal({
               }
             : undefined
         }
-        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Escape") {
-            e.preventDefault();
-            onClose();
-          }
-        }}
         role="presentation"
         tabIndex={-1}
       >

@@ -454,6 +454,24 @@
   }
 }
 
+/* Tablet (601–1024px): roomier tray than default desktop clamp without phone stack */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .playBody .main {
+    padding-top: 12px;
+  }
+
+  .playBody .trayArea .tray {
+    height: clamp(120px, 16vh, 180px);
+    max-height: min(180px, 25vh);
+    min-height: 100px;
+  }
+
+  .playBody .trayArea .tray.trayWrapLarge {
+    height: clamp(120px, 16vh, 180px);
+    max-height: min(180px, 25vh);
+  }
+}
+
 /* Touch hint */
 .touchHint {
   position: absolute;

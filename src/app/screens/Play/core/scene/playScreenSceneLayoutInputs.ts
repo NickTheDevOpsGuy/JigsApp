@@ -246,6 +246,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       : null;
 
   return {
+    completionDismissed: scene.completionDismissed,
     isHost,
     sessionIdFromUrl,
     sessionLoading,

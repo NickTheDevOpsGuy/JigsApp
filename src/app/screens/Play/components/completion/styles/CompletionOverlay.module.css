@@ -712,7 +712,7 @@
 }
 
 /* ── Desktop: ensure the anchored dialog can't exceed the viewport ── */
-@media (min-width: 641px) {
+@media (min-width: 601px) {
   .completeWinDialog {
     max-height: min(90dvh, calc(var(--app-vh-stable, 100dvh) - 24px));
   }

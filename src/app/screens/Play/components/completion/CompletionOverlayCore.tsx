@@ -14,6 +14,7 @@ import type { CompletionOverlayProps } from "@/screens/Play/components/completio
 import { ACHIEVEMENT_DEFS } from "@/data/content/achievements";
 import { BORDER_FRAME_XP_BONUS } from "@/services/player/statsService";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { layoutPhoneOrShortWinMediaQuery } from "@/constants/layoutBreakpoints";
 
 const PHASE2_MS = 600;
 const PHASE3_MS = 1200;
@@ -62,9 +63,7 @@ export function CompletionOverlay({
 }: CompletionOverlayProps) {
   const [phase, setPhase] = useState<1 | 2 | 3>(1);
   const [imageError, setImageError] = useState(false);
-  const useCompactMobileWinLayout = useMediaQuery(
-    "(max-width: 640px), (max-height: 720px)",
-  );
+  const useCompactMobileWinLayout = useMediaQuery(layoutPhoneOrShortWinMediaQuery);
 
   useEffect(() => {
     if (isNewBest && onNewBest) onNewBest();

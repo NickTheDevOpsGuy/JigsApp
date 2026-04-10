@@ -231,7 +231,7 @@
 }
 
 /* Mobile: shrink grid, arrows, bar and spacing so modal fits */
-@media (max-width: 640px) {
+@media (max-width: 600px) {
   .stepCompactLabel {
     margin-bottom: 8px;
     font-size: 11px;
@@ -576,7 +576,7 @@
   max-width: 88px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 600px) {
   .categoryCard {
     height: 64px;
     min-width: 64px;
@@ -638,7 +638,7 @@
 
 /* stepLinkPlain removed */
 
-@media (max-width: 640px) {
+@media (max-width: 600px) {
   /* Same width rule as .puzzleTile on the puzzle rail */
   .setupThumb {
     width: min(42vw, 150px);
