@@ -63,7 +63,12 @@ describe("ReplaySolveModal", () => {
   it("calls onSeek once when the seek slider is focused and ArrowRight is pressed", () => {
     const onSeek = vi.fn();
     render(
-      <ReplaySolveModal {...defaultProps} onSeek={onSeek} currentIndex={0} totalSnapshots={10} />,
+      <ReplaySolveModal
+        {...defaultProps}
+        onSeek={onSeek}
+        currentIndex={0}
+        totalSnapshots={10}
+      />,
     );
     const slider = screen.getByRole("slider", { name: /replay progress/i });
     slider.focus();
