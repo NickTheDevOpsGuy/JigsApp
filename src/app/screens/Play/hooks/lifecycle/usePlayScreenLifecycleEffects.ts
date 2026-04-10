@@ -313,7 +313,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     };
   }, [replayStateRef, manager, elapsedSeconds, moveCountRef]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     recordSnapshotRef.current = replay.recordSnapshot;
   }, [recordSnapshotRef, replay.recordSnapshot]);
 
@@ -331,11 +331,9 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
         if (max > maxGroupSizeRef.current) maxGroupSizeRef.current = max;
       }
     }
-    if (
-      state?.placedCount === 0 &&
-      (state?.pieces?.length ?? 0) > 0 &&
-      !initialSnapshotRecordedRef.current
-    ) {
+    /* First board state for this puzzle (fresh or resumed) — must not require placedCount===0
+     * or resumed games never get a baseline snapshot and replay stays disabled / empty. */
+    if ((state?.pieces?.length ?? 0) > 0 && !initialSnapshotRecordedRef.current) {
       initialSnapshotRecordedRef.current = true;
       replay.recordSnapshot();
     }
@@ -348,7 +346,6 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       replay.recordSnapshot();
     }
   }, [
-    state?.placedCount,
     state?.pieces,
     state?.isComplete,
     replay.recordSnapshot,

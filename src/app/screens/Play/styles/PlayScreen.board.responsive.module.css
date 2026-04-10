@@ -45,7 +45,8 @@
     /* .page already applies horizontal safe-area insets — avoid extra inset so the board uses full width */
     padding-left: 0;
     padding-right: 0;
-    padding-bottom: max(4px, env(safe-area-inset-bottom, 0));
+    /* Bottom inset in line with page horizontal safe-area gutter */
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
     display: flex;
     flex-direction: column;
     align-items: stretch;

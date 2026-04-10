@@ -23,10 +23,13 @@ jobs:
   sonarqube:
     name: SonarQube Scan
     runs-on: ubuntu-latest
+    env:
+      # Sonar scan action v7+ runs on Node 24 (see SonarSource/sonarqube-scan-action)
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: ⬇️ Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -37,36 +40,38 @@ jobs:
           java-version: 17
 
       - name: 🟢 Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: "22"
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: 📦 Install dependencies
         run: npm ci
 
+      # Supports either `npm run test:coverage` or `npm run test:run -- --coverage` (CI / Sonar docs)
       - name: ✅ Run tests with coverage
         run: npm run test:run -- --coverage
 
       - name: 🔍 SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v4
+        uses: SonarSource/sonarqube-scan-action@v7.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
-            -Dsonar.projectKey=wrdlnkdn
-            -Dsonar.projectName=WRDLNKDN
-            -Dsonar.sources=src,backend
-            -Dsonar.tests=src/tests
-            -Dsonar.test.inclusions=src/tests/**/*.test.ts,src/tests/**/*.spec.ts,src/tests/**/*.test.tsx,src/tests/**/*.spec.tsx
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/playwright-report/**,**/test-results/**,**/*.config.*,public/**,supabase/**
+            -Dsonar.projectKey=phuzzle
+            -Dsonar.projectName=Phuzzle
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/playwright-report/**,**/test-results/**,**/*.config.*,public/**,supabase/migrations/**,**/*.test.ts,**/*.test.tsx,**/*.e2e.spec.ts
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.typescript.tsconfigPaths=tsconfig.app.json
             -Dsonar.sourceEncoding=UTF-8
 
       - name: 🚦 SonarQube Quality Gate check
-        uses: SonarSource/sonarqube-quality-gate-action@master
+        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
         with:
           pollingTimeoutSec: 600
         env:

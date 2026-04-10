@@ -46,10 +46,12 @@
     rgba(0, 0, 0, 0.35) 70%,
     transparent 100%
   );
-  padding: 12px 20px 20px;
+  /* Match horizontal inset to bottom so the strip aligns with the progress ring margin */
+  padding: 12px max(12px, var(--progress-ring, 10px)) max(12px, var(--progress-ring, 10px));
   display: flex;
   flex-direction: column;
   gap: 2px;
+  box-sizing: border-box;
 }
 
 .boardCompleteBannerLine {
@@ -70,9 +72,11 @@
 
 .boardCompleteNextCta {
   pointer-events: auto;
-  padding: 10px 20px 18px;
+  padding: max(12px, var(--progress-ring, 10px)) max(12px, var(--progress-ring, 10px))
+    max(14px, var(--progress-ring, 10px));
   display: flex;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .boardCompleteNextCtaBtn {

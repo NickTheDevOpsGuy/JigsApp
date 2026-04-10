@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "dev": "npm run lint && npm run build && vite",
@@ -23,6 +23,8 @@
     "prepare": "husky",
     "postinstall": "patch-package",
     "test": "vitest run",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:e2e": "bash ./scripts/test-e2e-matrix.sh",
@@ -67,6 +69,7 @@
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^4.1.4",
     "deep-is": "^0.1.4",
     "eslint": "^9.8.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",

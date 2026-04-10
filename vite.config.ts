@@ -70,6 +70,18 @@ export default defineConfig(({ mode }) => {
       exclude: ["node_modules", "**/e2e/**"],
       globals: true,
       setupFiles: ["./src/test/setup.ts"],
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "lcov"],
+        reportsDirectory: "./coverage",
+        exclude: [
+          "node_modules/**",
+          "src/test/**",
+          "**/*.e2e.spec.ts",
+          "**/*.config.*",
+          "coverage/**",
+        ],
+      },
     },
     build: {
       // Single CSS bundle avoids "Unable to preload CSS for /assets/..." errors on Vercel.
