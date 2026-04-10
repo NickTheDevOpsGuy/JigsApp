@@ -346,7 +346,7 @@ export function AppModal({
             : undefined
         }
         onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Escape" && closeOnEscape && !e.defaultPrevented) {
+          if (e.key === "Escape") {
             e.preventDefault();
             onClose();
           }
@@ -371,8 +371,8 @@ export function AppModal({
                   top: anchorPosition.top,
                   left: anchorPosition.left,
                   transform: "translate(-50%, -50%)",
-                  width: `min(${anchorPosition.maxWidthPx}px, calc(100dvw - 24px))`,
-                  maxHeight: `min(${anchorPosition.maxHeightPx}px, calc(var(--app-vh-fill, 100dvh) - 24px))`,
+                  width: `min(${anchorPosition.maxWidthPx}px, calc(100vw - 24px))`,
+                  maxHeight: `min(${anchorPosition.maxHeightPx}px, 90dvh)`,
                 }
               : undefined
           }

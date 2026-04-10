@@ -10,24 +10,6 @@
   touch-action: manipulation;
 }
 
-.backdropCutout > [data-cutout-panel],
-.cutoutCornerMask,
-.cutoutBoardHeaderWrap,
-.stageFrame,
-.controlDock {
-  transition:
-    opacity 0.16s ease,
-    transform 0.16s ease;
-}
-
-.backdropCutoutClosing > [data-cutout-panel],
-.backdropCutoutClosing .cutoutCornerMask,
-.backdropCutoutClosing .cutoutBoardHeaderWrap,
-.backdropCutoutClosing .stageFrame,
-.backdropCutoutClosing .controlDock {
-  opacity: 0;
-}
-
 .backdropCutout > [data-cutout-panel] {
   position: fixed;
   pointer-events: auto;
@@ -305,28 +287,6 @@
   padding-bottom: 24px;
 }
 
-.controlDockInnerCompact {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  overscroll-behavior: contain;
-}
-
-.controlDockHeader {
-  flex-shrink: 0;
-}
-
-.controlDockHeader .boardHeader {
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--color-bg-card) 90%, transparent);
-  box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.18),
-    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
-}
-
 .modalSurface {
   width: 100%;
   max-width: min(
@@ -363,10 +323,8 @@
 }
 
 .puzzleArea {
-  --replay-img-max-h: min(52dvh, 480px);
   width: 100%;
-  min-height: 200px;
-  max-height: var(--replay-img-max-h);
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--color-bg-primary);
   position: relative;
@@ -380,18 +338,15 @@
 }
 
 .puzzleImage {
-  display: block;
-  max-width: 100%;
-  max-height: var(--replay-img-max-h);
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  object-position: center;
+  display: block;
 }
 
 .puzzlePlaceholder {
-  min-height: 180px;
   width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -413,20 +368,13 @@
   min-width: 0;
   max-width: 100%;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.seekMetaRow {
-  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 0;
+  gap: 8px 12px;
 }
 
 .seekBar {
-  width: 100%;
+  flex: 1;
   height: 10px;
   background: rgba(26, 43, 74, 0.6);
   border: none;
@@ -528,15 +476,6 @@
     padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
   }
 
-  .controlDockInnerCompact {
-    gap: 12px;
-  }
-
-  .controlDockHeader .boardHeader {
-    padding: 10px 12px;
-    gap: 8px;
-  }
-
   .modalSurface {
     max-width: calc(
       100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 12px
@@ -549,27 +488,9 @@
   }
 
   .puzzleArea {
-    --replay-img-max-h: min(50dvh, 400px);
-    min-height: 180px;
-  }
-
-  .seekBarWrap {
-    gap: 8px;
-  }
-
-  .seekMetaRow {
-    gap: 6px;
-  }
-}
-
-@media (max-height: 720px) {
-  .controlDockInnerCutout {
-    padding-top: 10px;
-    padding-bottom: max(14px, env(safe-area-inset-bottom, 14px));
-  }
-
-  .controlDockHeader .boardHeader {
-    padding: 9px 11px;
+    aspect-ratio: 4 / 3;
+    height: auto;
+    max-height: min(45dvh, 300px);
   }
 }
 
@@ -631,7 +552,186 @@
   }
 
   .puzzleArea {
-    --replay-img-max-h: min(36dvh, 220px);
-    min-height: 140px;
+    max-height: min(38dvh, 240px);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE SHEET — clean full-screen card (no cutout on mobile)
+   ═══════════════════════════════════════════════════════════ */
+
+.mobileSheet {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0;
+}
+
+/* ── Header ── */
+.mobileHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.mobileHeaderInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobileTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+
+.mobileSubtitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.mobileTrophyIcon {
+  color: var(--color-brand-primary);
+  flex-shrink: 0;
+}
+
+.mobileMoves {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.mobilePackLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  align-self: center;
+}
+
+.mobileCloseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.2s;
+}
+
+.mobileCloseBtn:hover {
+  background: var(--color-bg-elevated);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 55%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+}
+
+.mobileCloseBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── Puzzle image with progress bar overlay ── */
+.mobilePuzzleWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-bg-primary);
+  flex-shrink: 0;
+}
+
+.mobilePuzzleImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Thin progress stripe at bottom of image */
+.mobileProgressOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.mobileProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-brand-primary), #60a5fa);
+  border-radius: 0 2px 2px 0;
+  transition: width 0.12s ease-out;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-brand-primary) 55%, transparent);
+}
+
+/* ── Controls panel ── */
+.mobileControls {
+  padding: 16px 18px 20px;
+  flex-shrink: 0;
+}
+
+/* Landscape phone: side-by-side image + controls */
+@media (max-height: 500px) and (max-width: 900px) {
+  .mobileSheet {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .mobileHeader {
+    display: none;
+  }
+
+  .mobilePuzzleWrap {
+    width: 40%;
+    aspect-ratio: auto;
+    flex-shrink: 0;
+  }
+
+  .mobileControls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px 16px;
+    overflow-y: auto;
+  }
+}
+
+/* Tablet: slightly more breathing room */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .mobileHeader {
+    padding: 20px 22px 16px;
+  }
+
+  .mobileTitle {
+    font-size: 1.08rem;
+  }
+
+  .mobileControls {
+    padding: 18px 22px 24px;
   }
 }

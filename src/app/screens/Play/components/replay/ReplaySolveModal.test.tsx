@@ -84,6 +84,8 @@ describe("ReplaySolveModal", () => {
     expect(panels).toHaveLength(4);
     expect((panels[0] as HTMLElement).style.top).toBe("0px");
     expect((panels[1] as HTMLElement).style.width).toBe("20px");
-    expect((panels[3] as HTMLElement).style.minHeight).toBe("290px");
+    // Bottom panel uses visual viewport coordinates (offsetTop + height) so it
+    // still covers the visible area when the viewport is shifted.
+    expect((panels[3] as HTMLElement).style.minHeight).toBe("326px");
   });
 });

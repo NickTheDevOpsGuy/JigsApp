@@ -159,10 +159,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     },
     usedHint: scene.usedHintRef.current,
     isDaily: completionIsDaily,
-    // E2E completion mode does not play through a full solve, so it only has the
-    // seeded initial snapshot. Still expose the replay shell there so browser tests
-    // can verify the mobile replay overlay/cutout path without solving a puzzle first.
-    canReplay: behavior.replay.canReplay || showE2ECompletion,
+    canReplay: behavior.replay.canReplay,
     onReplayClick: () => {
       behavior.replay.startReplay();
       scene.setCompletionDismissed(true);
@@ -218,10 +215,6 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       // overlay will flash back on screen.
       behavior.replay.stopReplay();
       scene.setReplayBarOpen(false);
-      scene.setSuppressBoardCompleteBannerAfterReplay(true);
-    },
-    onPrepareClose: () => {
-      behavior.replay.goToEnd();
     },
   });
 
@@ -240,7 +233,6 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
             // dismissal so the overlay becomes visible again.
             behavior.replay.stopReplay();
             scene.setReplayBarOpen(false);
-            scene.setSuppressBoardCompleteBannerAfterReplay(false);
             scene.setCompletionDismissed(false);
             requestAnimationFrame(() => {
               scene.completionFocusRef.current?.focus();
@@ -254,7 +246,6 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       : null;
 
   return {
-    completionDismissed: scene.completionDismissed,
     isHost,
     sessionIdFromUrl,
     sessionLoading,
@@ -296,9 +287,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     state,
     completionProps,
     postCompletionCta:
-      scene.completionDismissed &&
-      state?.isComplete &&
-      !scene.suppressBoardCompleteBannerAfterReplay
+      scene.completionDismissed && state?.isComplete
         ? {
             label: nextPuzzleLabel,
             onNext: handleNewGame,

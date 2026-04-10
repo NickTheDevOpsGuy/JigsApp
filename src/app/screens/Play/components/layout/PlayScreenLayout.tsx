@@ -257,11 +257,20 @@ export function PlayScreenLayout({
                 </div>
               </div>
             </div>
-            {tray.show && (
+            {/* Tray is always mounted when not in replay so it acts as a size-preserving
+                spacer — the board must not resize when the puzzle completes and tray content
+                is hidden. visibility:hidden keeps the element in layout flow but invisible.
+                We check replayPortalProps (not tray.show) so it stays mounted on complete. */}
+            {!replayPortalProps && (
               <div
                 className={`${styles.trayArea} ${isMobile ? styles.trayAreaSheet : ""} ${tray.immersiveMode && !tray.showImmersiveUi ? styles.immersiveHidden : ""}`}
                 data-layout="tray-dock"
                 onPointerLeave={tray.onPointerLeave}
+                style={
+                  board.boardFrameCompletePhase
+                    ? { visibility: "hidden", pointerEvents: "none" }
+                    : undefined
+                }
               >
                 <div data-layout="piece-tray" style={{ width: "100%", minWidth: 0 }}>
                   <PieceTray

@@ -85,21 +85,20 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         onShuffle={onShuffle}
       />
 
-      {traySlots.length > 0 && (
+      <div
+        className={styles.scrollIndicator}
+        role="progressbar"
+        aria-valuenow={Math.round(scrollProgress * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Scroll position"
+        style={traySlots.length > 0 ? undefined : { visibility: "hidden" }}
+      >
         <div
-          className={styles.scrollIndicator}
-          role="progressbar"
-          aria-valuenow={Math.round(scrollProgress * 100)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label="Scroll position"
-        >
-          <div
-            className={styles.scrollIndicatorFill}
-            style={{ width: `${scrollProgress * 100}%` }}
-          />
-        </div>
-      )}
+          className={styles.scrollIndicatorFill}
+          style={{ width: `${scrollProgress * 100}%` }}
+        />
+      </div>
 
       <div className={styles.scrollerWrap}>
         <button

@@ -1,8 +1,13 @@
 /**
  * Replay Solve modal – focused replay overlay with one board stage,
  * one attached control dock, and a single clear dismiss action.
+ *
+ * On desktop: cutout mode — the live canvas shows through a hole in the backdrop.
+ * On mobile (< 640px): full-screen modal — clean card with completion image + controls.
+ * The canvas is still playing back behind the modal on mobile; we just show the image
+ * as a poster so the UI looks polished rather than showing a dark empty board.
  */
-import React, { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { Trophy, X } from "lucide-react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
@@ -36,7 +41,6 @@ export interface ReplaySolveModalProps {
   totalSeconds: number;
   onSeek?: ReplaySeekCb;
   onClose: ReplayVoidCb;
-  onPrepareClose?: ReplayVoidCb;
   /** Optional completion/snapshot image when no board cutout (fallback only) */
   completionImageUrl?: string | null;
   /** When set, backdrop has a cutout so the live canvas shows through for playback */
@@ -66,56 +70,42 @@ export function ReplaySolveModal({
   totalSeconds,
   onSeek,
   onClose,
-  onPrepareClose,
   completionImageUrl,
   boardRect,
   moveCount,
   packRemainingLabel,
 }: ReplaySolveModalProps) {
-  const useCutout = Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
+  // On mobile (< 640px) always use the modal path — the cutout looks terrible on small screens.
+  const [isMobileVw, setIsMobileVw] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < 640 : false,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const handler = (e: MediaQueryListEvent) => setIsMobileVw(e.matches);
+    setIsMobileVw(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  // Only use cutout on desktop where the board is large and the UI has room
+  const useCutout = !isMobileVw && Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
+
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;
   const effectiveSpeed = speedExplicitlyChosen ? speed : 1;
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const [imageError, setImageError] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
-  const closeTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     closeBtnRef.current?.focus({ preventScroll: true });
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (closeTimerRef.current != null) {
-        window.clearTimeout(closeTimerRef.current);
-      }
-    };
-  }, []);
-
-  const handleRequestClose = useCallback(() => {
-    if (isClosing) return;
-    setIsClosing(true);
-    void Promise.resolve(onPrepareClose?.())
-      .catch(() => {})
-      .finally(() => {
-        closeTimerRef.current = window.setTimeout(
-          () => {
-            closeTimerRef.current = null;
-            invokeMaybeAsync(onClose);
-          },
-          useCutout ? 160 : 120,
-        );
-      });
-  }, [isClosing, onClose, onPrepareClose, useCutout]);
-
   const [, bumpViewportLayout] = useReducer((n: number) => n + 1, 0);
 
   useEffect(() => {
     if (!useCutout) return;
-    const onLayout = () => {
-      bumpViewportLayout();
-    };
+    const onLayout = () => { bumpViewportLayout(); };
     const vv = window.visualViewport;
     vv?.addEventListener("resize", onLayout);
     vv?.addEventListener("scroll", onLayout);
@@ -131,7 +121,7 @@ export function ReplaySolveModal({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        handleRequestClose();
+        invokeMaybeAsync(onClose);
       }
       if (e.key === " ") {
         e.preventDefault();
@@ -157,65 +147,16 @@ export function ReplaySolveModal({
     };
     document.addEventListener("keydown", onKeyDown, true);
     return () => document.removeEventListener("keydown", onKeyDown, true);
-  }, [
-    handleRequestClose,
-    isPaused,
-    onPlay,
-    onPause,
-    onSeek,
-    totalSnapshots,
-    currentIndex,
-  ]);
+  }, [onClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
 
   const stopProp = (e: React.PointerEvent) => e.stopPropagation();
-
-  const showPuzzleImage = !useCutout && completionImageUrl && !imageError;
 
   const handleBackdropKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      if (e.target === e.currentTarget) handleRequestClose();
+      if (e.target === e.currentTarget) invokeMaybeAsync(onClose);
     }
   };
-
-  const boardHeader = (
-    <div className={styles.boardHeader}>
-      <div className={styles.boardHeaderMain}>
-        <div className={styles.boardHeaderText}>
-          <h2 id="replay-solve-title" className={styles.headerTitle}>
-            Replay Solve
-          </h2>
-          {totalSeconds >= 0 && (
-            <div id="replay-solve-subtitle" className={styles.resultHeader}>
-              <span className={styles.resultTime}>
-                <Trophy size={16} className={styles.resultTimeIcon} aria-hidden />
-                Solved in {formatTime(totalSeconds)}
-              </span>
-              {typeof moveCount === "number" && (
-                <span className={styles.resultMoves}>
-                  {moveCount} {moveCount === 1 ? "move" : "moves"}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-        {packRemainingLabel && (
-          <span className={styles.packRemainingLabel}>{packRemainingLabel}</span>
-        )}
-      </div>
-      <button
-        ref={closeBtnRef}
-        type="button"
-        className={styles.boardCloseBtn}
-        onClick={handleRequestClose}
-        onPointerDown={stopProp}
-        aria-label="Close replay (Esc)"
-        title="Close (Esc)"
-      >
-        <X size={18} aria-hidden />
-      </button>
-    </div>
-  );
 
   const seekAndControls = (
     <ReplaySolveModalControls
@@ -237,43 +178,145 @@ export function ReplaySolveModal({
     />
   );
 
+  // ─── Mobile: clean full-screen modal ────────────────────────────────────────
+  if (!useCutout) {
+    const showImage = Boolean(completionImageUrl && !imageError);
+    return (
+      <AppModal
+        isOpen
+        onClose={onClose}
+        surface="bare"
+        size="xl"
+        showCloseButton={false}
+        closeOnEscape={false}
+      >
+        <div className={styles.mobileSheet} onPointerDown={stopProp}>
+          {/* ── Header ── */}
+          <div className={styles.mobileHeader}>
+            <div className={styles.mobileHeaderInfo}>
+              <h2 className={styles.mobileTitle}>Replay Solve</h2>
+              <div className={styles.mobileSubtitle}>
+                <Trophy size={14} className={styles.mobileTrophyIcon} aria-hidden />
+                <span>Solved in {formatTime(totalSeconds)}</span>
+                {typeof moveCount === "number" && (
+                  <span className={styles.mobileMoves}>{moveCount} moves</span>
+                )}
+              </div>
+            </div>
+            {packRemainingLabel && (
+              <span className={styles.mobilePackLabel}>{packRemainingLabel}</span>
+            )}
+            <button
+              ref={closeBtnRef}
+              type="button"
+              className={styles.mobileCloseBtn}
+              onClick={() => invokeMaybeAsync(onClose)}
+              onPointerDown={stopProp}
+              aria-label="Close replay"
+              title="Close"
+            >
+              <X size={18} aria-hidden />
+            </button>
+          </div>
+
+          {/* ── Puzzle image ── */}
+          {showImage && (
+            <div className={styles.mobilePuzzleWrap}>
+              <img
+                src={completionImageUrl ?? ""}
+                alt="Completed puzzle"
+                className={styles.mobilePuzzleImg}
+                onError={() => setImageError(true)}
+                draggable={false}
+              />
+              {/* Progress overlay on the image */}
+              <div
+                className={styles.mobileProgressOverlay}
+                aria-label={`${Math.round(progressPct)}% through replay`}
+              >
+                <div
+                  className={styles.mobileProgressFill}
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ── Controls ── */}
+          <div className={styles.mobileControls}>
+            {seekAndControls}
+          </div>
+        </div>
+      </AppModal>
+    );
+  }
+
+  // ─── Desktop: cutout mode ────────────────────────────────────────────────────
   if (useCutout && boardRect) {
     const { top, left, width, height } = boardRect;
     const right = left + width;
     const bottom = top + height;
 
-    // Use the visual viewport dimensions so position:fixed elements align correctly
-    // on Android Chrome (where the layout viewport != visual viewport during scroll/zoom).
     const vv = typeof window !== "undefined" ? window.visualViewport : null;
-    const viewWidth =
-      vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : 375);
-    const viewHeight =
-      vv?.height ?? (typeof window !== "undefined" ? window.innerHeight : 667);
+    const viewLeft = vv?.offsetLeft ?? 0;
+    const viewTop = vv?.offsetTop ?? 0;
+    const viewWidth = vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : 1024);
+    const viewHeight = vv?.height ?? (typeof window !== "undefined" ? window.innerHeight : 768);
 
-    // Corner radius should match the board's actual CSS radius (16px mobile, 20px desktop).
-    const isMobileVw = viewWidth < 640;
-    const cutoutRadius = isMobileVw ? 16 : 20;
-    const compactCutoutLayout = isMobileVw || viewHeight < 760 || top < 96;
-
-    // Dock: hug the board width, clamp to viewport with safe-area padding.
-    const safeEdge = isMobileVw ? 8 : 12;
-    const dockInsetPx = isMobileVw ? 0 : 8;
+    const cutoutRadius = 20;
+    const safeEdge = 12;
+    const dockInsetPx = 8;
     const maxShell = Math.max(0, viewWidth - 2 * safeEdge);
     const shellWidth = Math.min(maxShell, width + dockInsetPx * 2);
     const shellLeft = Math.min(
-      viewWidth - shellWidth - safeEdge,
-      Math.max(safeEdge, left - dockInsetPx),
+      viewLeft + viewWidth - shellWidth - safeEdge,
+      Math.max(viewLeft + safeEdge, left - dockInsetPx),
     );
+    const headerGap = 12;
+    const panelBottom = viewTop + viewHeight;
 
-    // Header gap above the board: tighter on mobile.
-    const headerGap = isMobileVw ? 6 : 12;
-    const dockGap = compactCutoutLayout ? 8 : isMobileVw ? 10 : 16;
-    const dockTop = bottom + dockGap;
-    const dockMaxHeight = Math.max(120, viewHeight - dockTop - safeEdge);
+    const boardHeader = (
+      <div className={styles.boardHeader}>
+        <div className={styles.boardHeaderMain}>
+          <div className={styles.boardHeaderText}>
+            <h2 id="replay-solve-title" className={styles.headerTitle}>
+              Replay Solve
+            </h2>
+            {totalSeconds >= 0 && (
+              <div id="replay-solve-subtitle" className={styles.resultHeader}>
+                <span className={styles.resultTime}>
+                  <Trophy size={16} className={styles.resultTimeIcon} aria-hidden />
+                  Solved in {formatTime(totalSeconds)}
+                </span>
+                {typeof moveCount === "number" && (
+                  <span className={styles.resultMoves}>
+                    {moveCount} {moveCount === 1 ? "move" : "moves"}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+          {packRemainingLabel && (
+            <span className={styles.packRemainingLabel}>{packRemainingLabel}</span>
+          )}
+        </div>
+        <button
+          ref={closeBtnRef}
+          type="button"
+          className={styles.boardCloseBtn}
+          onClick={() => invokeMaybeAsync(onClose)}
+          onPointerDown={stopProp}
+          aria-label="Close replay (Esc)"
+          title="Close (Esc)"
+        >
+          <X size={18} aria-hidden />
+        </button>
+      </div>
+    );
 
     return (
       <div
-        className={`${styles.backdropCutout} ${isClosing ? styles.backdropCutoutClosing : ""}`}
+        className={styles.backdropCutout}
         role="dialog"
         aria-modal="true"
         aria-labelledby="replay-solve-title"
@@ -281,35 +324,27 @@ export function ReplaySolveModal({
         tabIndex={-1}
         onKeyDown={handleBackdropKeyDown}
       >
-        {/* Four panels that fill the screen around the board cutout */}
         <div
           data-cutout-panel
           style={{ top: 0, left: 0, right: 0, height: Math.max(0, top) }}
-          onPointerDown={(e) => e.target === e.currentTarget && handleRequestClose()}
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
           style={{ top, left: 0, width: Math.max(0, left), height }}
-          onPointerDown={(e) => e.target === e.currentTarget && handleRequestClose()}
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
           style={{ top, left: right, right: 0, height }}
-          onPointerDown={(e) => e.target === e.currentTarget && handleRequestClose()}
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
-          style={{
-            top: bottom,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            minHeight: Math.max(0, viewHeight - bottom),
-          }}
-          onPointerDown={(e) => e.target === e.currentTarget && handleRequestClose()}
+          style={{ top: bottom, left: 0, right: 0, bottom: 0, minHeight: panelBottom - bottom }}
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
 
-        {/* Corner masks round the cutout edges to match the board border-radius */}
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskTopLeft}`}
           style={{ top, left, width: cutoutRadius, height: cutoutRadius }}
@@ -317,22 +352,12 @@ export function ReplaySolveModal({
         />
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskTopRight}`}
-          style={{
-            top,
-            left: right - cutoutRadius,
-            width: cutoutRadius,
-            height: cutoutRadius,
-          }}
+          style={{ top, left: right - cutoutRadius, width: cutoutRadius, height: cutoutRadius }}
           aria-hidden="true"
         />
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskBottomLeft}`}
-          style={{
-            top: bottom - cutoutRadius,
-            left,
-            width: cutoutRadius,
-            height: cutoutRadius,
-          }}
+          style={{ top: bottom - cutoutRadius, left, width: cutoutRadius, height: cutoutRadius }}
           aria-hidden="true"
         />
         <div
@@ -346,58 +371,31 @@ export function ReplaySolveModal({
           aria-hidden="true"
         />
 
-        {/* Title + stats card above the board */}
-        {!compactCutoutLayout && (
-          <div
-            className={styles.cutoutBoardHeaderWrap}
-            style={{
-              top,
-              left,
-              width,
-              transform: `translateY(calc(-100% - ${headerGap}px))`,
-            }}
-            onPointerDown={stopProp}
-          >
-            {boardHeader}
-          </div>
-        )}
-
-        {/* Glowing frame that sits exactly over the board */}
         <div
-          className={styles.stageFrame}
+          className={styles.cutoutBoardHeaderWrap}
           style={{
             top,
             left,
             width,
-            height,
-            borderRadius: cutoutRadius,
-          }}
-          onPointerDown={stopProp}
-        />
-
-        {/* Controls dock below the board */}
-        <div
-          className={styles.controlDock}
-          style={{
-            left: shellLeft,
-            width: shellWidth,
-            top: dockTop,
-            maxHeight: dockMaxHeight,
+            transform: `translateY(calc(-100% - ${headerGap}px))`,
           }}
           onPointerDown={stopProp}
         >
-          <div
-            className={[
-              styles.controlDockInner,
-              styles.controlDockInnerCutout,
-              compactCutoutLayout ? styles.controlDockInnerCompact : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {compactCutoutLayout && (
-              <div className={styles.controlDockHeader}>{boardHeader}</div>
-            )}
+          {boardHeader}
+        </div>
+
+        <div
+          className={styles.stageFrame}
+          style={{ top, left, width, height, borderRadius: cutoutRadius }}
+          onPointerDown={stopProp}
+        />
+
+        <div
+          className={styles.controlDock}
+          style={{ left: shellLeft, width: shellWidth, top: bottom + 16 }}
+          onPointerDown={stopProp}
+        >
+          <div className={`${styles.controlDockInner} ${styles.controlDockInnerCutout}`}>
             {seekAndControls}
           </div>
         </div>
@@ -405,34 +403,5 @@ export function ReplaySolveModal({
     );
   }
 
-  return (
-    <AppModal
-      isOpen
-      onClose={handleRequestClose}
-      surface="bare"
-      size="xl"
-      showCloseButton={false}
-    >
-      <div className={styles.modalSurface} onPointerDown={stopProp}>
-        <div className={styles.modalStageStack}>
-          <div className={styles.modalStageFrame}>
-            {boardHeader}
-            <div className={styles.puzzleArea}>
-              {showPuzzleImage ? (
-                <img
-                  src={completionImageUrl ?? ""}
-                  alt="Puzzle completion"
-                  className={styles.puzzleImage}
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className={styles.puzzlePlaceholder}>Puzzle view</div>
-              )}
-            </div>
-          </div>
-          <div className={styles.controlDockInner}>{seekAndControls}</div>
-        </div>
-      </div>
-    </AppModal>
-  );
+  return null;
 }

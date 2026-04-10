@@ -8,9 +8,9 @@ import { Package, ImagePlus, ChevronRight, Flame, Snowflake, Trophy } from "luci
 import { useHomeData } from "./hooks/useHomeData";
 import type { WeekDot } from "./hooks/useHomeData";
 import { ChoosePuzzleModal } from "@/components/ChoosePuzzleModal";
-import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { PackChoiceModal } from "@/components/PackChoiceModal";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
+import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import { loadStatsScreenModule } from "@/screens/routeLoaders";
@@ -18,10 +18,10 @@ import styles from "./MenuScreen.module.css";
 
 export function MenuScreen() {
   const navigate = useNavigate();
-  const [showDailyDifficultyModal, setShowDailyDifficultyModal] = useState(false);
   const [showChoosePuzzleModal, setShowChoosePuzzleModal] = useState(false);
   const [showPackChoiceModal, setShowPackChoiceModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showDailyDifficultyModal, setShowDailyDifficultyModal] = useState(false);
   const {
     streak,
     freezes,
@@ -278,10 +278,6 @@ export function MenuScreen() {
         isOpen={showChoosePuzzleModal}
         onClose={() => setShowChoosePuzzleModal(false)}
       />
-      <DailyDifficultyModal
-        isOpen={showDailyDifficultyModal}
-        onClose={() => setShowDailyDifficultyModal(false)}
-      />
       <PackChoiceModal
         isOpen={showPackChoiceModal}
         onClose={() => setShowPackChoiceModal(false)}
@@ -289,6 +285,10 @@ export function MenuScreen() {
       <FeedbackChoiceModal
         isOpen={showFeedbackModal}
         onClose={() => setShowFeedbackModal(false)}
+      />
+      <DailyDifficultyModal
+        isOpen={showDailyDifficultyModal}
+        onClose={() => setShowDailyDifficultyModal(false)}
       />
     </>
   );
