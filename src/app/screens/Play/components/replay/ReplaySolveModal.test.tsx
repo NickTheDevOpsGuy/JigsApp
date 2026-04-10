@@ -3,7 +3,7 @@
  * @vitest-environment happy-dom
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { ReplaySolveModal } from "./ReplaySolveModal";
 
 const defaultProps = {
@@ -58,6 +58,36 @@ describe("ReplaySolveModal", () => {
   it("does not render a back to results button", () => {
     render(<ReplaySolveModal {...defaultProps} />);
     expect(screen.queryByRole("button", { name: /back to results/i })).toBeNull();
+  });
+
+  it("calls onSeek once when the seek slider is focused and ArrowRight is pressed", () => {
+    const onSeek = vi.fn();
+    render(
+      <ReplaySolveModal {...defaultProps} onSeek={onSeek} currentIndex={0} totalSnapshots={10} />,
+    );
+    const slider = screen.getByRole("slider", { name: /replay progress/i });
+    slider.focus();
+    fireEvent.keyDown(slider, { key: "ArrowRight" });
+    expect(onSeek).toHaveBeenCalledTimes(1);
+    expect(onSeek).toHaveBeenCalledWith(1);
+  });
+
+  it("does not toggle play/pause when Space is pressed while Close is focused", () => {
+    const onPlay = vi.fn();
+    const onPause = vi.fn();
+    render(
+      <ReplaySolveModal
+        {...defaultProps}
+        onPlay={onPlay}
+        onPause={onPause}
+        isPaused={true}
+      />,
+    );
+    const closeBtn = screen.getByRole("button", { name: /close replay/i });
+    closeBtn.focus();
+    fireEvent.keyDown(closeBtn, { key: " " });
+    expect(onPlay).not.toHaveBeenCalled();
+    expect(onPause).not.toHaveBeenCalled();
   });
 
   it("keeps cutout panels aligned to the visible viewport when visualViewport is offset", () => {

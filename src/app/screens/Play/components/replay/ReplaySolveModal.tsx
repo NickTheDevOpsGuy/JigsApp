@@ -26,6 +26,26 @@ import {
 
 const styles = { ...baseStyles, ...controlStyles };
 
+/** Matches `ReplaySolveModalControls` seek bar — skip global seek shortcuts so we don't double-fire. */
+function eventTargetInsideReplaySeekSlider(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLElement &&
+    Boolean(target.closest('[role="slider"][aria-label="Replay progress"]'))
+  );
+}
+
+/** Don't steal Space from focused buttons/links/fields (e.g. Close must activate with Space). */
+function keyboardTargetShouldReceiveSpaceFirst(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  const tag = target.tagName;
+  if (tag === "BUTTON" || tag === "A" || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
+    return true;
+  }
+  const role = target.getAttribute("role");
+  return role === "button" || role === "link";
+}
+
 export interface ReplaySolveModalProps {
   isPaused: boolean;
   onPlay: ReplayVoidCb;
@@ -127,14 +147,23 @@ export function ReplaySolveModal({
       if (e.key === "Escape") {
         e.preventDefault();
         requestClose();
+        return;
       }
       if (e.key === " ") {
+        if (keyboardTargetShouldReceiveSpaceFirst(e.target)) return;
         e.preventDefault();
         if (isPaused) invokeMaybeAsync(onPlay);
         else invokeMaybeAsync(onPause);
+        return;
       }
       if (onSeek && totalSnapshots > 1) {
         const maxIdx = totalSnapshots - 1;
+        const isDocumentSeekKey =
+          e.key === "ArrowLeft" ||
+          e.key === "ArrowRight" ||
+          e.key === "Home" ||
+          e.key === "End";
+        if (isDocumentSeekKey && eventTargetInsideReplaySeekSlider(e.target)) return;
         if (e.key === "ArrowLeft") {
           e.preventDefault();
           invokeMaybeAsyncIndex(onSeek, Math.max(0, currentIndex - 1));

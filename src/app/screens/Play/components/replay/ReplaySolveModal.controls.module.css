@@ -19,7 +19,8 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-text-secondary);
-  padding: 2px 8px;
+  padding: 4px 12px;
+  margin-left: auto;
   border-radius: 999px;
   background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
@@ -36,8 +37,8 @@
   flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 0 0;
+  gap: 10px;
+  padding: 16px 4px 0;
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -92,9 +93,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
+  min-width: 44px;
   min-height: 38px;
-  padding: 0 10px;
+  padding: 0 12px;
   border: 1px solid var(--color-border);
   border-radius: 999px;
   background: color-mix(in srgb, var(--color-bg-elevated) 94%, transparent);
@@ -129,7 +130,7 @@
   }
 
   .seekRow {
-    padding: 0 0 10px;
+    padding: 0 0 12px;
   }
 
   .seekTime {
@@ -137,11 +138,15 @@
     flex-shrink: 0;
   }
 
+  .speedBadge {
+    padding: 5px 12px;
+  }
+
   .controlRow {
     flex-wrap: nowrap;
     justify-content: center;
-    gap: 8px;
-    padding-top: 10px;
+    gap: 10px;
+    padding: 14px 6px 0;
   }
 
   .controlBtn {
