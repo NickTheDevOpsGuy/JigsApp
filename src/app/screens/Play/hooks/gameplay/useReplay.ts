@@ -11,7 +11,8 @@ const DEFAULT_SPEED = 1; // 1x – no speed shown as "on" until user picks
 const TICK_MS = 80;
 
 function getIntervalMs(speed: number): number {
-  return Math.max(8, Math.floor(TICK_MS / speed));
+  const s = Number.isFinite(speed) && speed > 0 ? speed : 1;
+  return Math.max(8, Math.floor(TICK_MS / s));
 }
 
 export type ReplaySnapshot = {
@@ -83,6 +84,7 @@ export function useReplay(
   const startReplay = useCallback(() => {
     const list = getReplayList();
     if (!manager || list.length === 0) return;
+    hasAdvancedThisResumeRef.current = false;
     setReplayIndex(0);
     manager.restoreFromSaved(list[0].savedPieces);
     setState(manager.getState());

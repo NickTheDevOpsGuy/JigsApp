@@ -35,6 +35,13 @@
   overflow: hidden;
   /* Ensure shell itself is centered in page */
   align-self: center;
+  /* Breathing room between top HUD strip and play area (mobile + desktop) */
+  gap: 12px;
+}
+
+.boardLayoutShell[data-replay-active="true"] {
+  /* Replay already adds large playBody padding-top for the floating header */
+  gap: 6px;
 }
 
 /* Zen Ambient: no pressure, subtle animated background, soft transitions */

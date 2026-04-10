@@ -117,7 +117,8 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       const vvTop = vv ? vv.offsetTop : 0;
       const vvLeft = vv ? vv.offsetLeft : 0;
       const reserve = REPLAY_BOTTOM_BAR_RESERVE_PX;
-      const height = Math.max(0, r.height - reserve);
+      /* Never report 0 height: desktop cutout + modal layout require a positive hole or replay UI/RAF can misbehave */
+      const height = Math.max(1, r.height - reserve);
       setReplayBarBoardRect({
         top: r.top - vvTop,
         left: r.left - vvLeft,
