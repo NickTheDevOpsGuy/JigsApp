@@ -47,7 +47,8 @@
     transparent 100%
   );
   /* Match horizontal inset to bottom so the strip aligns with the progress ring margin */
-  padding: 12px max(12px, var(--progress-ring, 10px)) max(12px, var(--progress-ring, 10px));
+  padding: 12px max(12px, var(--progress-ring, 10px))
+    max(12px, var(--progress-ring, 10px));
   display: flex;
   flex-direction: column;
   gap: 2px;
