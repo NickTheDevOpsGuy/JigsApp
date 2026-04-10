@@ -4,7 +4,16 @@ A single post summarizing all recent updates: UX polish, leaderboards, performan
 
 ---
 
-## 🧩 Latest (completion flow, piece seams, single puzzle flow)
+## 🧩 Latest (layout breakpoints, tray stability, replay, pre-push E2E)
+
+- **Breakpoint alignment** — Shared constants in `src/app/constants/layoutBreakpoints.ts` (600px phone, 1024px tablet cap). Replay (`ReplaySolveModal`), completion overlay (`CompletionOverlayCore`), anchored win dialog (`AppModal`), choose-puzzle modal CSS, and play tray CSS use the same bands; tablet play gets a slightly taller tray (`PlayScreen.board.responsive.module.css`).
+- **Tray height near completion** — `PieceTray` always renders the scroll-indicator row (hidden when empty) so tray height doesn’t change when the last pieces leave the tray.
+- **TypeScript / modal** — `completionDismissed` passed into layout props; `ReplaySolveModal` supports `onPrepareClose`; `AppModal` backdrop no longer double-fires Escape.
+- **Pre-push Playwright** — `scripts/precheck.sh` step 7 uses root `playwright.config.ts` (removed stale `config/playwright/playwright.config.ts` path). In-app changelog version **54**.
+
+---
+
+## 🧩 Earlier (completion flow, piece seams, single puzzle flow)
 
 - **Completion flow** — Win screen always appears after the last piece locks; brief completion animation (glow/pulse) then overlay. No skip.
 - **Piece seams & jigsaw look** — Placed pieces no longer draw outline or edge strokes so adjacent pieces meet with no visible gaps. Unplaced pieces keep crisp outline and depth. Slight increase in seam bleed for high-DPR.

@@ -115,7 +115,7 @@ fi
 # 7. FUNCTIONAL E2E TESTS (The Behavioral Audit)
 if docker ps | grep -q "supabase_db"; then
   echo "🤖 [STEP 7]: Running Functional E2E Tests (Non-Smoke Test)..."
-  if ! npx playwright test -c config/playwright/playwright.config.ts --grep-invert "accessibility"; then
+  if ! npx playwright test -c playwright.config.ts --grep-invert "accessibility"; then
     echo "🛑 [LOGIC FAULT]: Functional tests failed. Back to the drawing board!"
     exit 1
   fi

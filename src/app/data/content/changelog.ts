@@ -4,15 +4,17 @@
  */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "53";
+export const CHANGELOG_VERSION = "54";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      "Mobile completion & replay fit – Short-phone win screens stay fully on-screen, replay controls are tighter on mobile, the replay cutout covers the full board, and closing replay no longer lets results flash back unexpectedly.",
-      "Completion dialog guardrails – Board-anchored win dialogs keep the action row in view on desktop, and shared modals now respect locked Escape behavior through both dialog and backdrop handlers.",
+      "Stable board near the finish — the piece tray keeps the same vertical space when the scroll strip hides, so the board doesn’t jump as you place the last pieces.",
+      "Consistent phone & tablet widths — play, replay, and the win screen all use the same 600px phone breakpoint; tablets (601–1024px) get a slightly roomier tray under the board.",
+      "Mobile replay polish — more room for the board and cleaner control spacing on small screens.",
+      "Closing replay stays on your solved board — no surprise jump to another flow; Escape on modals is handled once (no double-dismiss quirks).",
     ],
   },
 ];

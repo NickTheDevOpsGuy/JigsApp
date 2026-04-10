@@ -8,6 +8,7 @@ High-level feature list and recent changes. For project overview see [README](..
 
 ## Recent (high level)
 
+- **Layout breakpoints (v54)** — Single source of truth in `src/app/constants/layoutBreakpoints.ts` (600px phone, 1024px tablet band). Replay, completion overlay, anchored `AppModal`, choose-puzzle modal CSS, and play layout agree on those widths; tablet play gets a slightly roomier piece tray. `PieceTray` keeps the scroll-indicator row mounted (visually hidden when empty) so the board does not jump when the tray empties. Pre-push `precheck.sh` runs Playwright with root `playwright.config.ts`.
 - **Mobile completion & replay fit** — Short-phone completion dialogs now stay fully on-screen, replay controls use a tighter mobile layout, replay covers the full board so the finished puzzle does not leak around the cutout, and closing replay no longer flashes the results card back in unexpectedly.
 - **Completion dialog guardrails** — Shared `AppModal` now respects `closeOnEscape={false}` through both the dialog and backdrop handlers, and board-anchored win dialogs keep the action row in view on desktop instead of drifting off-screen.
 - **Completion flow & piece polish** — Win screen always appears after the last piece locks (brief board glow then overlay). Placed pieces no longer show outline or edge strokes so adjacent pieces meet with no visible gaps; unplaced pieces keep a crisp jigsaw look. Lock tolerance tightened for exact placement.
