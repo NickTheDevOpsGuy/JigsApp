@@ -36,7 +36,13 @@ function keyboardTargetShouldReceiveSpaceFirst(target: EventTarget | null): bool
   if (!(target instanceof HTMLElement)) return false;
   if (target.isContentEditable) return true;
   const tag = target.tagName;
-  if (tag === "BUTTON" || tag === "A" || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
+  if (
+    tag === "BUTTON" ||
+    tag === "A" ||
+    tag === "INPUT" ||
+    tag === "TEXTAREA" ||
+    tag === "SELECT"
+  ) {
     return true;
   }
   const role = target.getAttribute("role");
