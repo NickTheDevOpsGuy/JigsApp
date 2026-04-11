@@ -161,7 +161,9 @@ export function useStatsScreenData(
         setCurrentUserId(null);
       }
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [configured, setRaccoonName, setCurrentUserId]);
 
   useEffect(() => {
@@ -233,7 +235,9 @@ export function useStatsScreenData(
       }
     };
     loadLb();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [
     configured,
     activeTab,

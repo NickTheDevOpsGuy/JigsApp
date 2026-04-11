@@ -290,13 +290,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       cancelled = true;
       cancelAnimationFrame(id);
     };
-  }, [
-    state?.isComplete,
-    completionDismissed,
-    state,
-    canvasRef,
-    setCompletionImageUrl,
-  ]);
+  }, [state?.isComplete, completionDismissed, state, canvasRef, setCompletionImageUrl]);
 
   // Revoke object URL on unmount or when it changes.
   useEffect(() => {

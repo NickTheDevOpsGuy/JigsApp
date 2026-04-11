@@ -556,7 +556,6 @@
   }
 }
 
-
 /* ═══════════════════════════════════════════════════════════
    MOBILE SHEET — clean full-screen card (no cutout on mobile)
    ═══════════════════════════════════════════════════════════ */
@@ -639,7 +638,10 @@
   background: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
   color: var(--color-text-primary);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.2s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.2s;
 }
 
 .mobileCloseBtn:hover {
