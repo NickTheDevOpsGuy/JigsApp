@@ -667,21 +667,28 @@
   outline-offset: 2px;
 }
 
-/* ── Puzzle image with progress bar overlay ── */
+/* ── Puzzle image with progress bar overlay (contain = full image, no crop) ── */
 .mobilePuzzleWrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  min-height: 140px;
+  max-height: min(52dvh, 420px);
   overflow: hidden;
   background: var(--color-bg-primary);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .mobilePuzzleImg {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: min(52dvh, 420px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
 }
 
 /* Thin progress stripe at bottom of image */

@@ -11,7 +11,9 @@ const DEFAULT_SPEED = 1; // 1x – no speed shown as "on" until user picks
 const TICK_MS = 80;
 
 function getIntervalMs(speed: number): number {
-  return Math.max(8, Math.floor(TICK_MS / speed));
+  const s =
+    Number.isFinite(speed) && speed > 0 ? speed : DEFAULT_SPEED;
+  return Math.max(8, Math.floor(TICK_MS / s));
 }
 
 export type ReplaySnapshot = {
@@ -204,6 +206,7 @@ export function useReplay(
     manager.restoreFromSaved(list[0].savedPieces);
     setState(manager.getState());
     setIsReplayPaused(true);
+    setIsReplaying(true);
   }, [getReplayList, manager, setState]);
 
   const goToEnd = useCallback(() => {
@@ -234,6 +237,8 @@ export function useReplay(
       manager.restoreFromSaved(list[clamped].savedPieces);
       setState(manager.getState());
       setIsReplayPaused(true);
+      /* Stay in replay mode after scrubbing (e.g. after goToEnd left isReplaying false). */
+      setIsReplaying(true);
     },
     [getReplayList, manager, setState],
   );
