@@ -211,13 +211,15 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     boardRect: scene.replayBarBoardRect ?? undefined,
     speedExplicitlyChosen: behavior.replay.speedExplicitlyChosen,
     onClose: () => {
-      // Plain dismiss (X button): the user already closed the win screen to start
-      // replay, so keep completionDismissed=true — do NOT reset it or the win
-      // overlay will flash back on screen.
+      // Dismiss replay (X): return to the same win/results experience as “Back to results”.
       behavior.replay.stopReplay();
       scene.setReplayBarOpen(false);
-      /* Prevents the inline “Solved in …” strip from popping back over the board (odd empty chrome). */
-      scene.setSuppressBoardCompleteBannerAfterReplay(true);
+      scene.setSuppressBoardCompleteBannerAfterReplay(false);
+      scene.setCompletionDismissed(false);
+      scene.setShowWinOverlay?.(true);
+      requestAnimationFrame(() => {
+        scene.completionFocusRef.current?.focus();
+      });
     },
   });
 

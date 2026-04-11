@@ -38,6 +38,9 @@ export function useReplay(
   const [isReplaying, setIsReplaying] = useState(false);
   const [isReplayPaused, setIsReplayPaused] = useState(false);
   const [replayIndex, setReplayIndex] = useState(0);
+  /** Committed index for RAF tick — must not rely on `setReplayIndex` updaters for side effects (Strict Mode). */
+  const replayIndexRef = useRef(0);
+  replayIndexRef.current = replayIndex;
   const [replaySpeed, setReplaySpeed] = useState(DEFAULT_SPEED);
   const [speedExplicitlyChosen, setSpeedExplicitlyChosen] = useState(false);
   const rafRef = useRef<number | null>(null);
@@ -84,6 +87,7 @@ export function useReplay(
   const startReplay = useCallback(() => {
     const list = getReplayList();
     if (!manager || list.length === 0) return;
+    replayIndexRef.current = 0;
     setReplayIndex(0);
     manager.restoreFromSaved(list[0].savedPieces);
     setState(manager.getState());
@@ -105,6 +109,7 @@ export function useReplay(
     hasAdvancedThisResumeRef.current = false;
     // If user resumes from the end, restart from frame 0 so Play always replays.
     if (replayIndex >= list.length - 1) {
+      replayIndexRef.current = 0;
       setReplayIndex(0);
       manager.restoreFromSaved(list[0].savedPieces);
       setState(manager.getState());
@@ -115,36 +120,47 @@ export function useReplay(
 
   useEffect(() => {
     if (!isReplaying || isReplayPaused || !manager) return;
-    const list = getReplayList();
-    if (list.length === 0) return;
+    if (snapshotsRef.current.length === 0) return;
 
     const intervalMs = getIntervalMs(replaySpeed);
     lastTickRef.current = performance.now();
 
     const tick = (now: number) => {
+      const listNow = snapshotsRef.current;
+      if (listNow.length === 0) return;
+
       const elapsed = now - lastTickRef.current;
       const shouldAdvance =
-        elapsed >= intervalMs || (!hasAdvancedThisResumeRef.current && list.length > 1);
+        elapsed >= intervalMs ||
+        (!hasAdvancedThisResumeRef.current && listNow.length > 1);
+
       if (shouldAdvance) {
         hasAdvancedThisResumeRef.current = true;
         lastTickRef.current = now;
-        setReplayIndex((i) => {
-          const next = i + 1;
-          if (next >= list.length) {
-            if (rafRef.current != null) {
-              cancelAnimationFrame(rafRef.current);
-              rafRef.current = null;
-            }
-            setIsReplaying(false);
-            manager.restoreFromSaved(list[list.length - 1].savedPieces);
-            setState(manager.getState());
-            return list.length - 1;
+
+        const i = replayIndexRef.current;
+        const next = i + 1;
+
+        if (next >= listNow.length) {
+          if (rafRef.current != null) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = null;
           }
-          manager.restoreFromSaved(list[next].savedPieces);
+          setIsReplaying(false);
+          manager.restoreFromSaved(listNow[listNow.length - 1].savedPieces);
           setState(manager.getState());
-          return next;
-        });
+          const last = listNow.length - 1;
+          replayIndexRef.current = last;
+          setReplayIndex(last);
+          return;
+        }
+
+        manager.restoreFromSaved(listNow[next].savedPieces);
+        setState(manager.getState());
+        replayIndexRef.current = next;
+        setReplayIndex(next);
       }
+
       rafRef.current = requestAnimationFrame(tick);
     };
 
@@ -156,7 +172,7 @@ export function useReplay(
         rafRef.current = null;
       }
     };
-  }, [getReplayList, isReplaying, isReplayPaused, manager, setState, replaySpeed]);
+  }, [isReplaying, isReplayPaused, manager, setState, replaySpeed]);
 
   const replaySnapshots = getReplayList();
   const currentSnapshot = replaySnapshots[replayIndex] ?? null;
@@ -173,6 +189,7 @@ export function useReplay(
   const clearSnapshots = useCallback(() => {
     snapshotsRef.current = [];
     setSnapshots([]);
+    replayIndexRef.current = 0;
     setReplayIndex(0);
   }, []);
 
@@ -201,6 +218,7 @@ export function useReplay(
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
+    replayIndexRef.current = 0;
     setReplayIndex(0);
     manager.restoreFromSaved(list[0].savedPieces);
     setState(manager.getState());
@@ -216,6 +234,7 @@ export function useReplay(
       rafRef.current = null;
     }
     const lastIdx = list.length - 1;
+    replayIndexRef.current = lastIdx;
     setReplayIndex(lastIdx);
     manager.restoreFromSaved(list[lastIdx].savedPieces);
     setState(manager.getState());
@@ -232,6 +251,7 @@ export function useReplay(
         rafRef.current = null;
       }
       const clamped = Math.max(0, Math.min(list.length - 1, index));
+      replayIndexRef.current = clamped;
       setReplayIndex(clamped);
       manager.restoreFromSaved(list[clamped].savedPieces);
       setState(manager.getState());
