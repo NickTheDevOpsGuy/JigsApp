@@ -45,6 +45,8 @@ interface PlayScreenLayoutArgs {
   state: import("@/puzzle/core/types").PuzzleState | null;
   /** Used with post-completion inline CTA so the solved board frame stays correct when that CTA is suppressed after replay. */
   completionDismissed: boolean;
+  /** After closing replay (X), hide inline solved banner so it doesn’t flash over the board. */
+  suppressBoardCompleteBannerAfterReplay: boolean;
   completionProps: unknown;
   postCompletionCta: { label: string; onNext: () => void } | null;
   replayPortalProps: unknown;
@@ -123,6 +125,11 @@ export function createPlayScreenLayoutProps(
     Boolean(args.postCompletionCta) ||
     (args.isComplete && args.completionDismissed);
 
+  const showInlineBoardCompleteChrome =
+    boardFrameCompletePhase &&
+    !args.replayBarOpen &&
+    !args.suppressBoardCompleteBannerAfterReplay;
+
   return {
     coopViewProps: {
       isHost: args.isHost,
@@ -194,6 +201,7 @@ export function createPlayScreenLayoutProps(
       state: args.state,
       isComplete: args.isComplete,
       boardFrameCompletePhase,
+      showInlineBoardCompleteChrome,
       postCompletionCta: args.postCompletionCta,
       isLoading: args.isLoading,
       elapsedLabel: `Solved in ${formatTime(args.elapsedSeconds)}!`,

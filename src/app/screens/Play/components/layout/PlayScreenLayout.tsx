@@ -39,6 +39,8 @@ type PlayScreenLayoutProps = {
     isComplete: boolean;
     /** Solid “solved” frame + no conic ring; false during last-snap delay before win modal. */
     boardFrameCompletePhase: boolean;
+    /** Inline “Solved in …” on the board — false during replay and after closing replay (X). */
+    showInlineBoardCompleteChrome: boolean;
     isLoading: boolean;
     elapsedLabel: string;
     movesLabel: string;
@@ -179,7 +181,7 @@ export function PlayScreenLayout({
                     ref={board.boardRef as React.RefObject<HTMLDivElement>}
                     data-testid="play-board"
                   >
-                    {board.boardFrameCompletePhase && !replayPortalProps && (
+                    {board.showInlineBoardCompleteChrome && (
                       <div
                         className={styles.boardCompleteMessage}
                         role="status"

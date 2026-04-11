@@ -164,6 +164,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       behavior.replay.startReplay();
       scene.setCompletionDismissed(true);
       scene.setShowWinOverlay?.(false);
+      scene.setSuppressBoardCompleteBannerAfterReplay(false);
       scene.setReplayBarOpen(true);
       scene.setShowStreakToast(false);
       scene.setShareToast(null);
@@ -200,7 +201,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     speed: behavior.replay.replaySpeed,
     onSpeedChange: behavior.replay.setReplaySpeed,
     currentIndex: behavior.replay.replayIndex,
-    totalSnapshots: behavior.replay.replaySnapshots.length,
+    totalSnapshots: behavior.replay.snapshots.length,
     elapsedSeconds: behavior.replay.replayElapsedSeconds,
     totalSeconds:
       behavior.replay.snapshots.length > 0
@@ -215,6 +216,8 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       // overlay will flash back on screen.
       behavior.replay.stopReplay();
       scene.setReplayBarOpen(false);
+      /* Prevents the inline “Solved in …” strip from popping back over the board (odd empty chrome). */
+      scene.setSuppressBoardCompleteBannerAfterReplay(true);
     },
   });
 
@@ -233,6 +236,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
             // dismissal so the overlay becomes visible again.
             behavior.replay.stopReplay();
             scene.setReplayBarOpen(false);
+            scene.setSuppressBoardCompleteBannerAfterReplay(false);
             scene.setCompletionDismissed(false);
             requestAnimationFrame(() => {
               scene.completionFocusRef.current?.focus();
@@ -286,6 +290,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     showFeedbackChoice: ui.showFeedbackChoice,
     state,
     completionDismissed: scene.completionDismissed,
+    suppressBoardCompleteBannerAfterReplay: scene.suppressBoardCompleteBannerAfterReplay,
     completionProps,
     postCompletionCta:
       scene.completionDismissed && state?.isComplete
