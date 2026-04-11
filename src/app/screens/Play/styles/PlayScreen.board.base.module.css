@@ -1,6 +1,8 @@
-/* GameplayShell body: board expands to fill; tray docked below with 8–12px gap */
+/* GameplayShell body: board expands to fill; tray docked below.
+   Same gap below board as left/right gutter so spacing feels even on all sides. */
 .playBody {
   --play-board-tray-width: min(100%, 760px);
+  --play-board-tray-gap: 12px;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -8,9 +10,10 @@
   align-items: stretch;
   justify-content: flex-start;
   gap: 0;
-  padding-top: 16px;
+  padding: 16px var(--play-board-tray-gap) 0;
   position: relative;
   width: 100%;
+  box-sizing: border-box;
 }
 
 /* PuzzleBoard container: expands to fill space between TopHUD and tray; extra top space so board isn't squished */
@@ -27,7 +30,7 @@
   padding-top: 10px;
 }
 
-/* Tray dock: small gap below board; tray slightly darker so board remains primary focus */
+/* Tray dock: gap below board matches horizontal inset (--play-board-tray-gap) */
 .playBody .trayArea {
   width: 100%;
   max-width: 100%;
@@ -38,8 +41,8 @@
   flex-shrink: 0;
   background: color-mix(in srgb, var(--color-bg-primary) 85%, rgba(0, 0, 0, 0.06));
   border-radius: var(--radius-board, 20px);
-  margin-top: 8px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+  margin-top: var(--play-board-tray-gap);
+  padding-bottom: max(var(--play-board-tray-gap), env(safe-area-inset-bottom, 0));
 }
 
 /* PieceTray: taller strip for easier piece picking; board still primary */
@@ -98,7 +101,7 @@
   }
 
   .playBody .trayArea {
-    margin-top: 6px;
+    margin-top: var(--play-board-tray-gap);
   }
 
   .playBody .trayArea .tray {
