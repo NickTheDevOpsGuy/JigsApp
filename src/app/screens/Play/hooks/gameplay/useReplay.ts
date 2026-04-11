@@ -11,8 +11,7 @@ const DEFAULT_SPEED = 1; // 1x – no speed shown as "on" until user picks
 const TICK_MS = 80;
 
 function getIntervalMs(speed: number): number {
-  const s =
-    Number.isFinite(speed) && speed > 0 ? speed : DEFAULT_SPEED;
+  const s = Number.isFinite(speed) && speed > 0 ? speed : DEFAULT_SPEED;
   return Math.max(8, Math.floor(TICK_MS / s));
 }
 
