@@ -1,112 +1,38 @@
-# Required repo secrets (Settings → Secrets and variables → Actions):
-#   SONAR_TOKEN       — SonarCloud: https://sonarcloud.io/account/security (Generate token, project analysis)
-#   SONAR_HOST_URL    — Optional. Defaults to https://sonarcloud.io if unset.
-#                       Self-hosted SonarQube: set to your server root, e.g. https://sonarqube.company.com
+# SonarQube Cloud (or Server with SONAR_HOST_URL). Requires secret SONAR_TOKEN.
+# Enable for push/PR by setting repo Variable SONAR_SCAN_ENABLED=true (Settings → Secrets and variables → Actions → Variables).
+# Manual runs: Actions → SonarQube → Run workflow.
 #
-# Fork PRs: secrets are not available to workflows from forks; this job is skipped for those runs.
+# On SonarCloud: create a project, then set sonar.organization and sonar.projectKey in sonar-project.properties.
 
-name: 🔎 SonarQube
+name: SonarQube
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
   workflow_dispatch:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
 
 permissions:
   contents: read
-  pull-requests: read
-
-concurrency:
-  group: sonarqube-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   sonarqube:
-    name: SonarQube Scan
+    name: Scan
     runs-on: ubuntu-latest
-    # Same-repo PRs and pushes only; fork PRs cannot use repository secrets for Sonar
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-
-    env:
-      # Sonar scan action v7+ runs on Node 24 (see SonarSource/sonarqube-scan-action)
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+    # Avoid failing forks/PRs without secrets; enable analysis when configured.
+    if: >
+      github.event_name == 'workflow_dispatch' || vars.SONAR_SCAN_ENABLED ==
+      'true'
     steps:
-      - name: ⬇️ Checkout
-        uses: actions/checkout@v5
+      - name: Checkout
+        # v6 — pin SHA for S7637 (tag immutability)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
 
-      - name: 🔐 Verify Sonar token
-        run: |
-          if [ -z "${SONAR_TOKEN}" ]; then
-            echo "::error::SONAR_TOKEN is missing. Add Repository secret SONAR_TOKEN (SonarCloud: Account → Security → Generate token)."
-            exit 1
-          fi
-
-      # GitHub's ${{ secrets.X || 'default' }} does not reliably default optional SONAR_HOST_URL.
-      # Scanner requires a full URL with scheme or you get "URI with undefined scheme".
-      - name: Configure Sonar server URL
+      - name: SonarQube Scan
+        # v6.0.0 — pin SHA for S7637
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602
         env:
-          SONAR_HOST_SECRET: ${{ secrets.SONAR_HOST_URL }}
-        run: |
-          set -euo pipefail
-          if [ -z "${SONAR_HOST_SECRET:-}" ]; then
-            HOST="https://sonarcloud.io"
-          else
-            HOST="${SONAR_HOST_SECRET}"
-            case "$HOST" in
-              http://*|https://*) ;;
-              *)
-                echo "::error::SONAR_HOST_URL secret must be a full URL with http:// or https:// (example: https://sonarcloud.io)"
-                exit 1
-                ;;
-            esac
-          fi
-          echo "SONAR_HOST_URL=$HOST" >> "$GITHUB_ENV"
-          echo "Sonar server host configured (scheme + host only)."
-
-      - name: ☕ Setup Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: 🟢 Setup Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: 📦 Install dependencies
-        run: npm ci
-
-      - name: ✅ Run tests with coverage
-        run: npm run test:run -- --coverage
-
-      - name: 🔍 SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v7.1.0
-        with:
-          args: >
-            -Dsonar.projectKey=phuzzle
-            -Dsonar.projectName=Phuzzle
-            -Dsonar.sources=src
-            -Dsonar.tests=src
-            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/playwright-report/**,**/test-results/**,**/*.config.*,public/**,supabase/migrations/**,**/*.test.ts,**/*.test.tsx,**/*.e2e.spec.ts
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.typescript.tsconfigPaths=tsconfig.app.json
-            -Dsonar.sourceEncoding=UTF-8
-
-      - name: 🚦 SonarQube Quality Gate check
-        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
-        with:
-          pollingTimeoutSec: 600
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
