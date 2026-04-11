@@ -36,8 +36,6 @@ jobs:
     env:
       # Sonar scan action v7+ runs on Node 24 (see SonarSource/sonarqube-scan-action)
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      # Empty SONAR_HOST_URL causes "URI with undefined scheme" — default to SonarCloud
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonarcloud.io' }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
@@ -52,6 +50,28 @@ jobs:
             echo "::error::SONAR_TOKEN is missing. Add Repository secret SONAR_TOKEN (SonarCloud: Account → Security → Generate token)."
             exit 1
           fi
+
+      # GitHub's ${{ secrets.X || 'default' }} does not reliably default optional SONAR_HOST_URL.
+      # Scanner requires a full URL with scheme or you get "URI with undefined scheme".
+      - name: Configure Sonar server URL
+        env:
+          SONAR_HOST_SECRET: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SONAR_HOST_SECRET:-}" ]; then
+            HOST="https://sonarcloud.io"
+          else
+            HOST="${SONAR_HOST_SECRET}"
+            case "$HOST" in
+              http://*|https://*) ;;
+              *)
+                echo "::error::SONAR_HOST_URL secret must be a full URL with http:// or https:// (example: https://sonarcloud.io)"
+                exit 1
+                ;;
+            esac
+          fi
+          echo "SONAR_HOST_URL=$HOST" >> "$GITHUB_ENV"
+          echo "Sonar server host configured (scheme + host only)."
 
       - name: ☕ Setup Java
         uses: actions/setup-java@v4
