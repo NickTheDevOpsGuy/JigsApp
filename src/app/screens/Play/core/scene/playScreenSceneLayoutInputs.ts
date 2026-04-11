@@ -210,13 +210,11 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     boardRect: scene.replayBarBoardRect ?? undefined,
     speedExplicitlyChosen: behavior.replay.speedExplicitlyChosen,
     onClose: () => {
+      // Plain dismiss (X button): the user already closed the win screen to start
+      // replay, so keep completionDismissed=true — do NOT reset it or the win
+      // overlay will flash back on screen.
       behavior.replay.stopReplay();
       scene.setReplayBarOpen(false);
-      scene.setCompletionDismissed(false);
-      scene.setShowWinOverlay?.(true);
-      requestAnimationFrame(() => {
-        scene.completionFocusRef.current?.focus();
-      });
     },
   });
 
@@ -231,10 +229,11 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
             undefined,
           moveCount: scene.moveCountRef.current,
           onBackToResults: () => {
+            // "Back to results" explicitly navigates back to the win screen — reset
+            // dismissal so the overlay becomes visible again.
             behavior.replay.stopReplay();
             scene.setReplayBarOpen(false);
             scene.setCompletionDismissed(false);
-            scene.setShowWinOverlay?.(true);
             requestAnimationFrame(() => {
               scene.completionFocusRef.current?.focus();
             });
@@ -247,7 +246,6 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
       : null;
 
   return {
-    completionDismissed: scene.completionDismissed,
     isHost,
     sessionIdFromUrl,
     sessionLoading,

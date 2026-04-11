@@ -1,3 +1,10 @@
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   SONAR_TOKEN       — SonarCloud: https://sonarcloud.io/account/security (Generate token, project analysis)
+#   SONAR_HOST_URL    — Optional. Defaults to https://sonarcloud.io if unset.
+#                       Self-hosted SonarQube: set to your server root, e.g. https://sonarqube.company.com
+#
+# Fork PRs: secrets are not available to workflows from forks; this job is skipped for those runs.
+
 name: 🔎 SonarQube
 
 on:
@@ -23,15 +30,28 @@ jobs:
   sonarqube:
     name: SonarQube Scan
     runs-on: ubuntu-latest
+    # Same-repo PRs and pushes only; fork PRs cannot use repository secrets for Sonar
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
     env:
       # Sonar scan action v7+ runs on Node 24 (see SonarSource/sonarqube-scan-action)
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      # Empty SONAR_HOST_URL causes "URI with undefined scheme" — default to SonarCloud
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonarcloud.io' }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+
+      - name: 🔐 Verify Sonar token
+        run: |
+          if [ -z "${SONAR_TOKEN}" ]; then
+            echo "::error::SONAR_TOKEN is missing. Add Repository secret SONAR_TOKEN (SonarCloud: Account → Security → Generate token)."
+            exit 1
+          fi
 
       - name: ☕ Setup Java
         uses: actions/setup-java@v4
@@ -49,15 +69,11 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci
 
-      # Supports either `npm run test:coverage` or `npm run test:run -- --coverage` (CI / Sonar docs)
       - name: ✅ Run tests with coverage
         run: npm run test:run -- --coverage
 
       - name: 🔍 SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v7.1.0
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
             -Dsonar.projectKey=phuzzle
@@ -74,6 +90,3 @@ jobs:
         uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
         with:
           pollingTimeoutSec: 600
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

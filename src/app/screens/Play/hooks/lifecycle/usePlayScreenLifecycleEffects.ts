@@ -117,8 +117,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       const vvTop = vv ? vv.offsetTop : 0;
       const vvLeft = vv ? vv.offsetLeft : 0;
       const reserve = REPLAY_BOTTOM_BAR_RESERVE_PX;
-      /* Never report 0 height: desktop cutout + modal layout require a positive hole or replay UI/RAF can misbehave */
-      const height = Math.max(1, r.height - reserve);
+      const height = Math.max(0, r.height - reserve);
       setReplayBarBoardRect({
         top: r.top - vvTop,
         left: r.left - vvLeft,
@@ -258,8 +257,15 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     };
   }, [audioManager]);
 
+  // Track the most-recently-captured URL in a ref so the capture effect can
+  // revoke the previous blob URL without listing completionImageUrl as a dep
+  // (which would cause an infinite loop: capture → set state → re-run → capture…).
+  const capturedUrlRef = useRef<string | undefined>(undefined);
+
   useEffect(() => {
     if (!state?.isComplete || completionDismissed || !state) return;
+    // Only capture once per completion — if we already have a URL, skip.
+    if (capturedUrlRef.current) return;
     let cancelled = false;
     const id = requestAnimationFrame(() => {
       void (async () => {
@@ -271,7 +277,9 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
             revokeObjectUrl(url);
             return;
           }
-          revokeObjectUrl(completionImageUrl);
+          // Revoke previous via ref — does NOT trigger this effect to re-run.
+          revokeObjectUrl(capturedUrlRef.current);
+          capturedUrlRef.current = url;
           setCompletionImageUrl(url);
         } catch {
           // ignore snapshot failures
@@ -288,12 +296,13 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     state,
     canvasRef,
     setCompletionImageUrl,
-    completionImageUrl,
   ]);
 
+  // Revoke object URL on unmount or when it changes.
   useEffect(() => {
+    const url = capturedUrlRef.current;
     return () => {
-      revokeObjectUrl(completionImageUrl);
+      if (url) revokeObjectUrl(url);
     };
   }, [completionImageUrl]);
 
@@ -313,7 +322,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     };
   }, [replayStateRef, manager, elapsedSeconds, moveCountRef]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     recordSnapshotRef.current = replay.recordSnapshot;
   }, [recordSnapshotRef, replay.recordSnapshot]);
 
@@ -331,9 +340,11 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
         if (max > maxGroupSizeRef.current) maxGroupSizeRef.current = max;
       }
     }
-    /* First board state for this puzzle (fresh or resumed) — must not require placedCount===0
-     * or resumed games never get a baseline snapshot and replay stays disabled / empty. */
-    if ((state?.pieces?.length ?? 0) > 0 && !initialSnapshotRecordedRef.current) {
+    if (
+      state?.placedCount === 0 &&
+      (state?.pieces?.length ?? 0) > 0 &&
+      !initialSnapshotRecordedRef.current
+    ) {
       initialSnapshotRecordedRef.current = true;
       replay.recordSnapshot();
     }
@@ -346,6 +357,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       replay.recordSnapshot();
     }
   }, [
+    state?.placedCount,
     state?.pieces,
     state?.isComplete,
     replay.recordSnapshot,

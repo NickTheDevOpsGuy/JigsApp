@@ -262,7 +262,7 @@
     max-width: min(88vw, 30rem);
   }
 
-  /* Anchored win card: JS centres in viewport (vw > 600 branch uses board centre,
+  /* Anchored win card: JS centres in viewport (vw ≥ 640 branch uses board centre,
      which is usually fine on tablets in landscape; portrait is covered by mobile path) */
   .dialog.dialogAnchored {
     max-height: min(88dvh, calc(var(--app-vh-stable, 100dvh) - 2 * var(--modal-gutter)));
@@ -308,7 +308,8 @@
   .dialog {
     /* In landscape the viewport is short — let dialog scroll freely */
     max-height: calc(
-      var(--app-vh-stable, 100dvh) - max(8px, env(safe-area-inset-top, 0)) -
+      var(--app-vh-stable, 100dvh) -
+        max(8px, env(safe-area-inset-top, 0)) -
         max(8px, env(safe-area-inset-bottom, 0))
     );
     border-radius: 16px;
@@ -316,7 +317,8 @@
 
   .dialog.dialogAnchored {
     max-height: calc(
-      var(--app-vh-stable, 100dvh) - max(8px, env(safe-area-inset-top, 0)) -
+      var(--app-vh-stable, 100dvh) -
+        max(8px, env(safe-area-inset-top, 0)) -
         max(8px, env(safe-area-inset-bottom, 0))
     );
   }

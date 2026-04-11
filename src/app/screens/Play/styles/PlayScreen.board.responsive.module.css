@@ -18,11 +18,6 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    gap: 12px;
-  }
-
-  .boardLayoutShell[data-replay-active="true"] {
-    gap: 6px;
   }
 
   @media (max-height: 500px) {
@@ -45,8 +40,7 @@
     /* .page already applies horizontal safe-area insets — avoid extra inset so the board uses full width */
     padding-left: 0;
     padding-right: 0;
-    /* Bottom inset in line with page horizontal safe-area gutter */
-    padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
+    padding-bottom: max(4px, env(safe-area-inset-bottom, 0));
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -70,7 +64,7 @@
     width: 100%;
     max-width: 100%;
     flex-shrink: 0;
-    margin-top: 12px;
+    margin-top: 4px;
   }
 
   .playBody .trayArea .tray {
@@ -385,24 +379,15 @@
   .boardLayoutShell[data-replay-active="true"] .boardWrapper {
     width: min(
       100%,
-      var(
-        --play-replay-stage-size,
-        min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px)))
-      )
+      var(--play-replay-stage-size, min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px))))
     );
     max-width: min(
       100%,
-      var(
-        --play-replay-stage-size,
-        min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px)))
-      )
+      var(--play-replay-stage-size, min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px))))
     );
     max-height: min(
       100%,
-      var(
-        --play-replay-stage-size,
-        min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px)))
-      )
+      var(--play-replay-stage-size, min(94vw, calc(100dvh - 80px - 148px - env(safe-area-inset-bottom, 0px))))
     );
     flex: 0 0 auto;
     margin-left: auto;
@@ -433,48 +418,21 @@
     .boardLayoutShell[data-replay-active="true"] .boardWrapper {
       width: min(
         100%,
-        var(
-          --play-replay-stage-size,
-          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
-        )
+        var(--play-replay-stage-size, min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px))))
       );
       max-width: min(
         100%,
-        var(
-          --play-replay-stage-size,
-          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
-        )
+        var(--play-replay-stage-size, min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px))))
       );
       max-height: min(
         100%,
-        var(
-          --play-replay-stage-size,
-          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
-        )
+        var(--play-replay-stage-size, min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px))))
       );
     }
 
     .boardLayoutShell[data-replay-active="true"] .playBody {
       padding-top: var(--play-replay-header-h, 62px);
     }
-  }
-}
-
-/* Tablet (601–1024px): roomier tray than default desktop clamp without phone stack */
-@media (min-width: 601px) and (max-width: 1024px) {
-  .playBody .main {
-    padding-top: 12px;
-  }
-
-  .playBody .trayArea .tray {
-    height: clamp(120px, 16vh, 180px);
-    max-height: min(180px, 25vh);
-    min-height: 100px;
-  }
-
-  .playBody .trayArea .tray.trayWrapLarge {
-    height: clamp(120px, 16vh, 180px);
-    max-height: min(180px, 25vh);
   }
 }
 

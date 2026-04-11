@@ -151,7 +151,9 @@ export function useStatsScreenData(
 
   useEffect(() => {
     if (!configured) return;
+    let cancelled = false;
     getUserId().then((uid) => {
+      if (cancelled) return;
       if (uid) {
         setRaccoonName(getAnonymousDisplayName(uid));
         setCurrentUserId(uid);
@@ -159,6 +161,7 @@ export function useStatsScreenData(
         setCurrentUserId(null);
       }
     });
+    return () => { cancelled = true; };
   }, [configured, setRaccoonName, setCurrentUserId]);
 
   useEffect(() => {
@@ -181,6 +184,7 @@ export function useStatsScreenData(
 
   useEffect(() => {
     if (!configured || activeTab !== "leaderboard") return;
+    let cancelled = false;
     const loadLb = async () => {
       const today = getTodayDateString();
       const cutType = cutTypeFilter === "all" ? "all" : cutTypeFilter;
@@ -193,6 +197,7 @@ export function useStatsScreenData(
               ? getDailyLeaderboardCleanest
               : getDailyLeaderboard;
         const lb = await fetcher(today, 10, cutType, visualModifier, sourceFilter);
+        if (cancelled) return;
         setLeaderboard(lb);
         setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "week") {
@@ -200,6 +205,7 @@ export function useStatsScreenData(
           getWeeklyTotalsLeaderboard(10, cutType, visualModifier, sourceFilter),
           loadWeeklyAlbum(),
         ]);
+        if (cancelled) return;
         setWeeklyTotalsLeaderboard(wklb);
         setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "alltime") {
@@ -211,6 +217,7 @@ export function useStatsScreenData(
               ? getAllTimeBestCleanest
               : getAllTimeBestLeaderboard;
         const lb = await fetcher(r, c, 10, cutType, visualModifier, sourceFilter);
+        if (cancelled) return;
         setLeaderboard(lb);
         setRowAnimEpoch((n) => n + 1);
       } else if (leaderboardType === "efficiency") {
@@ -220,11 +227,13 @@ export function useStatsScreenData(
           visualModifier,
           sourceFilter,
         );
+        if (cancelled) return;
         setEfficiencyLeaderboard(eff);
         setRowAnimEpoch((n) => n + 1);
       }
     };
     loadLb();
+    return () => { cancelled = true; };
   }, [
     configured,
     activeTab,

@@ -3,13 +3,11 @@
  * one attached control dock, and a single clear dismiss action.
  *
  * On desktop: cutout mode — the live canvas shows through a hole in the backdrop.
- * On mobile (≤600px, same as play CSS): full-screen modal — completion image + controls.
+ * On mobile (< 640px): full-screen modal — clean card with completion image + controls.
  * The canvas is still playing back behind the modal on mobile; we just show the image
  * as a poster so the UI looks polished rather than showing a dark empty board.
  */
-import React, { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { layoutPhoneMediaQuery } from "@/constants/layoutBreakpoints";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { Trophy, X } from "lucide-react";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
@@ -25,32 +23,6 @@ import {
 } from "@/screens/Play/components/replay/replayInvoke";
 
 const styles = { ...baseStyles, ...controlStyles };
-
-/** Matches `ReplaySolveModalControls` seek bar — skip global seek shortcuts so we don't double-fire. */
-function eventTargetInsideReplaySeekSlider(target: EventTarget | null): boolean {
-  return (
-    target instanceof HTMLElement &&
-    Boolean(target.closest('[role="slider"][aria-label="Replay progress"]'))
-  );
-}
-
-/** Don't steal Space from focused buttons/links/fields (e.g. Close must activate with Space). */
-function keyboardTargetShouldReceiveSpaceFirst(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  if (target.isContentEditable) return true;
-  const tag = target.tagName;
-  if (
-    tag === "BUTTON" ||
-    tag === "A" ||
-    tag === "INPUT" ||
-    tag === "TEXTAREA" ||
-    tag === "SELECT"
-  ) {
-    return true;
-  }
-  const role = target.getAttribute("role");
-  return role === "button" || role === "link";
-}
 
 export interface ReplaySolveModalProps {
   isPaused: boolean;
@@ -69,8 +41,6 @@ export interface ReplaySolveModalProps {
   totalSeconds: number;
   onSeek?: ReplaySeekCb;
   onClose: ReplayVoidCb;
-  /** Run before closing (e.g. seek replay to end so the board matches the dismissed state). */
-  onPrepareClose?: ReplayVoidCb;
   /** Optional completion/snapshot image when no board cutout (fallback only) */
   completionImageUrl?: string | null;
   /** When set, backdrop has a cutout so the live canvas shows through for playback */
@@ -100,31 +70,32 @@ export function ReplaySolveModal({
   totalSeconds,
   onSeek,
   onClose,
-  onPrepareClose,
   completionImageUrl,
   boardRect,
   moveCount,
   packRemainingLabel,
 }: ReplaySolveModalProps) {
-  const isPhoneLayout = useMediaQuery(layoutPhoneMediaQuery);
+  // On mobile (< 640px) always use the modal path — the cutout looks terrible on small screens.
+  const [isMobileVw, setIsMobileVw] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < 640 : false,
+  );
 
-  // Only use cutout on wider viewports — cutout is cramped on phones.
-  const useCutout =
-    !isPhoneLayout && Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const handler = (e: MediaQueryListEvent) => setIsMobileVw(e.matches);
+    setIsMobileVw(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  // Only use cutout on desktop where the board is large and the UI has room
+  const useCutout = !isMobileVw && Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
 
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;
   const effectiveSpeed = speedExplicitlyChosen ? speed : 1;
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const [imageError, setImageError] = useState(false);
-
-  const requestClose = useCallback(() => {
-    void Promise.resolve(onPrepareClose?.())
-      .catch(() => {})
-      .finally(() => {
-        invokeMaybeAsync(onClose);
-      });
-  }, [onPrepareClose, onClose]);
 
   useEffect(() => {
     closeBtnRef.current?.focus({ preventScroll: true });
@@ -134,9 +105,7 @@ export function ReplaySolveModal({
 
   useEffect(() => {
     if (!useCutout) return;
-    const onLayout = () => {
-      bumpViewportLayout();
-    };
+    const onLayout = () => { bumpViewportLayout(); };
     const vv = window.visualViewport;
     vv?.addEventListener("resize", onLayout);
     vv?.addEventListener("scroll", onLayout);
@@ -152,24 +121,15 @@ export function ReplaySolveModal({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        requestClose();
-        return;
+        invokeMaybeAsync(onClose);
       }
       if (e.key === " ") {
-        if (keyboardTargetShouldReceiveSpaceFirst(e.target)) return;
         e.preventDefault();
         if (isPaused) invokeMaybeAsync(onPlay);
         else invokeMaybeAsync(onPause);
-        return;
       }
       if (onSeek && totalSnapshots > 1) {
         const maxIdx = totalSnapshots - 1;
-        const isDocumentSeekKey =
-          e.key === "ArrowLeft" ||
-          e.key === "ArrowRight" ||
-          e.key === "Home" ||
-          e.key === "End";
-        if (isDocumentSeekKey && eventTargetInsideReplaySeekSlider(e.target)) return;
         if (e.key === "ArrowLeft") {
           e.preventDefault();
           invokeMaybeAsyncIndex(onSeek, Math.max(0, currentIndex - 1));
@@ -187,14 +147,14 @@ export function ReplaySolveModal({
     };
     document.addEventListener("keydown", onKeyDown, true);
     return () => document.removeEventListener("keydown", onKeyDown, true);
-  }, [requestClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
+  }, [onClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
 
   const stopProp = (e: React.PointerEvent) => e.stopPropagation();
 
   const handleBackdropKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      if (e.target === e.currentTarget) requestClose();
+      if (e.target === e.currentTarget) invokeMaybeAsync(onClose);
     }
   };
 
@@ -224,7 +184,7 @@ export function ReplaySolveModal({
     return (
       <AppModal
         isOpen
-        onClose={requestClose}
+        onClose={onClose}
         surface="bare"
         size="xl"
         showCloseButton={false}
@@ -250,7 +210,7 @@ export function ReplaySolveModal({
               ref={closeBtnRef}
               type="button"
               className={styles.mobileCloseBtn}
-              onClick={() => requestClose()}
+              onClick={() => invokeMaybeAsync(onClose)}
               onPointerDown={stopProp}
               aria-label="Close replay"
               title="Close"
@@ -283,7 +243,9 @@ export function ReplaySolveModal({
           )}
 
           {/* ── Controls ── */}
-          <div className={styles.mobileControls}>{seekAndControls}</div>
+          <div className={styles.mobileControls}>
+            {seekAndControls}
+          </div>
         </div>
       </AppModal>
     );
@@ -298,10 +260,8 @@ export function ReplaySolveModal({
     const vv = typeof window !== "undefined" ? window.visualViewport : null;
     const viewLeft = vv?.offsetLeft ?? 0;
     const viewTop = vv?.offsetTop ?? 0;
-    const viewWidth =
-      vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : 1024);
-    const viewHeight =
-      vv?.height ?? (typeof window !== "undefined" ? window.innerHeight : 768);
+    const viewWidth = vv?.width ?? (typeof window !== "undefined" ? window.innerWidth : 1024);
+    const viewHeight = vv?.height ?? (typeof window !== "undefined" ? window.innerHeight : 768);
 
     const cutoutRadius = 20;
     const safeEdge = 12;
@@ -344,7 +304,7 @@ export function ReplaySolveModal({
           ref={closeBtnRef}
           type="button"
           className={styles.boardCloseBtn}
-          onClick={() => requestClose()}
+          onClick={() => invokeMaybeAsync(onClose)}
           onPointerDown={stopProp}
           aria-label="Close replay (Esc)"
           title="Close (Esc)"
@@ -367,28 +327,22 @@ export function ReplaySolveModal({
         <div
           data-cutout-panel
           style={{ top: 0, left: 0, right: 0, height: Math.max(0, top) }}
-          onPointerDown={(e) => e.target === e.currentTarget && requestClose()}
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
           style={{ top, left: 0, width: Math.max(0, left), height }}
-          onPointerDown={(e) => e.target === e.currentTarget && requestClose()}
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
           style={{ top, left: right, right: 0, height }}
-          onPointerDown={(e) => e.target === e.currentTarget && requestClose()}
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
         <div
           data-cutout-panel
-          style={{
-            top: bottom,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            minHeight: panelBottom - bottom,
-          }}
-          onPointerDown={(e) => e.target === e.currentTarget && requestClose()}
+          style={{ top: bottom, left: 0, right: 0, bottom: 0, minHeight: panelBottom - bottom }}
+          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
         />
 
         <div
@@ -398,22 +352,12 @@ export function ReplaySolveModal({
         />
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskTopRight}`}
-          style={{
-            top,
-            left: right - cutoutRadius,
-            width: cutoutRadius,
-            height: cutoutRadius,
-          }}
+          style={{ top, left: right - cutoutRadius, width: cutoutRadius, height: cutoutRadius }}
           aria-hidden="true"
         />
         <div
           className={`${styles.cutoutCornerMask} ${styles.cutoutCornerMaskBottomLeft}`}
-          style={{
-            top: bottom - cutoutRadius,
-            left,
-            width: cutoutRadius,
-            height: cutoutRadius,
-          }}
+          style={{ top: bottom - cutoutRadius, left, width: cutoutRadius, height: cutoutRadius }}
           aria-hidden="true"
         />
         <div

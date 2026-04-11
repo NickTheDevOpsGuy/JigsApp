@@ -1,4 +1,4 @@
-/* GameplayShell body: board expands to fill; tray docked below with comfortable gap */
+/* GameplayShell body: board expands to fill; tray docked below with 8–12px gap */
 .playBody {
   --play-board-tray-width: min(100%, 760px);
   flex: 1;
@@ -8,7 +8,7 @@
   align-items: stretch;
   justify-content: flex-start;
   gap: 0;
-  padding-top: 12px;
+  padding-top: 16px;
   position: relative;
   width: 100%;
 }
@@ -27,7 +27,7 @@
   padding-top: 10px;
 }
 
-/* Tray dock: gap below board; tray slightly darker so board remains primary focus */
+/* Tray dock: small gap below board; tray slightly darker so board remains primary focus */
 .playBody .trayArea {
   width: 100%;
   max-width: 100%;
@@ -38,7 +38,7 @@
   flex-shrink: 0;
   background: color-mix(in srgb, var(--color-bg-primary) 85%, rgba(0, 0, 0, 0.06));
   border-radius: var(--radius-board, 20px);
-  margin-top: 14px;
+  margin-top: 8px;
   padding-bottom: max(12px, env(safe-area-inset-bottom, 0));
 }
 
