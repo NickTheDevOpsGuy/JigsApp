@@ -285,6 +285,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     setShowClearCacheConfirm: scene.setShowClearCacheConfirm,
     showFeedbackChoice: ui.showFeedbackChoice,
     state,
+    completionDismissed: scene.completionDismissed,
     completionProps,
     postCompletionCta:
       scene.completionDismissed && state?.isComplete

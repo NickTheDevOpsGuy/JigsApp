@@ -165,7 +165,6 @@ export function buildReplayPortalProps(args: {
   boardRect?: { top: number; left: number; width: number; height: number };
   speedExplicitlyChosen: boolean;
   onClose: () => void;
-  onPrepareClose?: () => void;
 }): ReplayPortalProps {
   const {
     replayBarOpen,
@@ -186,7 +185,6 @@ export function buildReplayPortalProps(args: {
     boardRect,
     speedExplicitlyChosen,
     onClose,
-    onPrepareClose,
   } = args;
 
   if (!replayBarOpen) return null;
@@ -209,7 +207,6 @@ export function buildReplayPortalProps(args: {
     boardRect,
     speedExplicitlyChosen,
     onClose,
-    onPrepareClose,
   };
 }
 
