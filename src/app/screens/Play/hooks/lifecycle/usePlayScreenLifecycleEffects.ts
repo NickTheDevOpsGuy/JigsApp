@@ -334,11 +334,8 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
         if (max > maxGroupSizeRef.current) maxGroupSizeRef.current = max;
       }
     }
-    if (
-      state?.placedCount === 0 &&
-      (state?.pieces?.length ?? 0) > 0 &&
-      !initialSnapshotRecordedRef.current
-    ) {
+    /* Baseline for replay: first time we have a real board (includes resumed games where placedCount > 0). */
+    if ((state?.pieces?.length ?? 0) > 0 && !initialSnapshotRecordedRef.current) {
       initialSnapshotRecordedRef.current = true;
       replay.recordSnapshot();
     }

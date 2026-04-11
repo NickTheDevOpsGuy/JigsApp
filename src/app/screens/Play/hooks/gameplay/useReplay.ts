@@ -1,7 +1,7 @@
 /**
  * useReplay – record puzzle progress snapshots and replay the solve in accelerated playback.
  */
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useRef, useState, useEffect, useLayoutEffect } from "react";
 import type { PuzzleManager } from "@/puzzle/manager/PuzzleManager";
 import type { PuzzleState } from "@/puzzle/core/types";
 import { piecesToSaved } from "@/puzzle/manager/undoManager";
@@ -40,7 +40,9 @@ export function useReplay(
   const [replayIndex, setReplayIndex] = useState(0);
   /** Committed index for RAF tick — must not rely on `setReplayIndex` updaters for side effects (Strict Mode). */
   const replayIndexRef = useRef(0);
-  replayIndexRef.current = replayIndex;
+  useLayoutEffect(() => {
+    replayIndexRef.current = replayIndex;
+  }, [replayIndex]);
   const [replaySpeed, setReplaySpeed] = useState(DEFAULT_SPEED);
   const [speedExplicitlyChosen, setSpeedExplicitlyChosen] = useState(false);
   const rafRef = useRef<number | null>(null);

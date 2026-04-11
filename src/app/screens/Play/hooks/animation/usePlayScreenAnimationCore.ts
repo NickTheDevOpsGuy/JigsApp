@@ -54,6 +54,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     onUndoSnapBackComplete: _onUndoSnapBackComplete,
     dailyVisualModifier = "none",
     replayBarOpen = false,
+    replayPlaybackActive = false,
     isPaused = false,
     isCoarsePointer: _isCoarsePointer = false,
   } = args;
@@ -275,7 +276,12 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
         performance.measure("render-frame", "render-frame-start", "render-frame-end");
       }
 
-      if (shouldPublishState(st, lastCompleteRef, lastPieceCountRef)) {
+      /* During replay playback, consecutive snapshots can share placedCount / completion flags;
+       * still publish so React (tray, etc.) matches the canvas every frame. */
+      if (
+        replayPlaybackActive ||
+        shouldPublishState(st, lastCompleteRef, lastPieceCountRef)
+      ) {
         setState(st);
       }
 
@@ -321,6 +327,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     autoBatterySaverMode,
     dailyVisualModifier,
     replayBarOpen,
+    replayPlaybackActive,
     isPaused,
     selectedIdRef,
   ]);

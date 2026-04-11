@@ -157,6 +157,8 @@ export function usePlayScreenInteractions(ctx: any) {
       ? getDailyVisualModifier()
       : (ui.dailyPreferredModifier ?? getDailyPreferredModifier()),
     replayBarOpen: scene.replayBarOpen,
+    replayPlaybackActive:
+      scene.replayBarOpen && replay.isReplaying && !replay.isReplayPaused,
     isCoarsePointer: scene.isCoarsePointer,
   });
 

@@ -44,6 +44,8 @@ export interface UsePlayScreenAnimationArgs {
   dailyVisualModifier?: "none" | "fog" | "night" | "sepia";
   /** When true, do not idle-throttle RAF — replay scrub/playback must redraw every tick. */
   replayBarOpen?: boolean;
+  /** When true, publish `manager.getState()` every RAF frame (replay frames can move pieces without changing placedCount). */
+  replayPlaybackActive?: boolean;
   /** When true, skip idle hint pulse (game paused / menu). */
   isPaused?: boolean;
   /** Touch-first devices: use selected piece for target preview (no hover). */
