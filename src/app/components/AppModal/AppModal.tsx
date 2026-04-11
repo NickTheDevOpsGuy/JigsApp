@@ -345,12 +345,6 @@ export function AppModal({
               }
             : undefined
         }
-        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Escape" && closeOnEscape) {
-            e.preventDefault();
-            onClose();
-          }
-        }}
         role="presentation"
         tabIndex={-1}
       >

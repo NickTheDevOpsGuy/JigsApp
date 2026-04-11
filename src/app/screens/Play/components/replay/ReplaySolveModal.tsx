@@ -24,6 +24,25 @@ import {
 
 const styles = { ...baseStyles, ...controlStyles };
 
+function eventTargetInsideReplaySeekSlider(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLElement &&
+    Boolean(target.closest('[role="slider"][aria-label="Replay progress"]'))
+  );
+}
+
+/** Space should activate the focused control (e.g. Close) instead of global play/pause. */
+function keyboardTargetShouldReceiveSpaceFirst(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  const tag = target.tagName;
+  if (tag === "BUTTON" || tag === "A" || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
+    return true;
+  }
+  const role = target.getAttribute("role");
+  return role === "button" || role === "link";
+}
+
 export interface ReplaySolveModalProps {
   isPaused: boolean;
   onPlay: ReplayVoidCb;
@@ -125,13 +144,22 @@ export function ReplaySolveModal({
       if (e.key === "Escape") {
         e.preventDefault();
         invokeMaybeAsync(onClose);
+        return;
       }
       if (e.key === " ") {
+        if (keyboardTargetShouldReceiveSpaceFirst(e.target)) return;
         e.preventDefault();
         if (isPaused) invokeMaybeAsync(onPlay);
         else invokeMaybeAsync(onPause);
+        return;
       }
       if (onSeek && totalSnapshots > 1) {
+        const isSeekKey =
+          e.key === "ArrowLeft" ||
+          e.key === "ArrowRight" ||
+          e.key === "Home" ||
+          e.key === "End";
+        if (isSeekKey && eventTargetInsideReplaySeekSlider(e.target)) return;
         const maxIdx = totalSnapshots - 1;
         if (e.key === "ArrowLeft") {
           e.preventDefault();
