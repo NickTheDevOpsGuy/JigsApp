@@ -45,18 +45,27 @@
     box-sizing: border-box;
   }
 
-  .main {
+  /*
+   * overflow:hidden on a rectangular main clips the progress ring’s bottom curve flat
+   * (top looked round due to padding-top). Use a rounded bottom clip matching
+   * .boardProgressFrame: calc(var(--radius-board) + 10px progress ring).
+   * Selector .playBody .main beats a plain .main so these aren’t overridden by base.
+   */
+  .playBody .main {
     width: 100%;
     max-width: 100%;
     min-width: 0;
     padding: 0;
-    padding-top: 6px;
+    padding-top: 14px;
+    padding-bottom: 14px;
     gap: 0;
     align-items: center;
     justify-content: center;
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
+    border-bottom-right-radius: calc(var(--radius-board, 20px) + 10px);
   }
 
   .playBody .trayArea {

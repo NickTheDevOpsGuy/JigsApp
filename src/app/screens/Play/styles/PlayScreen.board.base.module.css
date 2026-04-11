@@ -21,13 +21,26 @@
   flex: 0 0 auto;
   width: 100%;
   max-width: 100%;
-  /* Height = board width + progress frame padding (16px) + top padding (6px) */
-  height: calc(var(--play-board-tray-width, min(100%, 760px)) + 36px);
-  max-height: calc(var(--play-board-tray-width, min(100%, 760px)) + 36px);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding-top: 10px;
+}
+
+/*
+ * Desktop / tablet: fixed column height + rounded bottom overflow clip so the progress
+ * ring matches .boardProgressFrame (same issue as mobile: ancestors with overflow:hidden
+ * otherwise flatten bottom corners). +46px = board + ring + top/bottom padding inside .main.
+ */
+@media (min-width: 601px) {
+  .playBody .main {
+    height: calc(var(--play-board-tray-width, min(100%, 760px)) + 46px);
+    max-height: calc(var(--play-board-tray-width, min(100%, 760px)) + 46px);
+    padding-bottom: 10px;
+    overflow: hidden;
+    border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
+    border-bottom-right-radius: calc(var(--radius-board, 20px) + 10px);
+  }
 }
 
 /* Tray dock: gap below board matches horizontal inset (--play-board-tray-gap) */
@@ -91,13 +104,6 @@
 @media (max-width: 600px) {
   .boardLayoutShell[data-replay-active="true"] {
     --play-replay-stage-size: clamp(180px, calc(100dvh - 352px), 94vw);
-  }
-
-  .playBody .main {
-    max-width: 100%;
-    min-height: 0;
-    flex: 1;
-    padding-top: 14px;
   }
 
   .playBody .trayArea {
