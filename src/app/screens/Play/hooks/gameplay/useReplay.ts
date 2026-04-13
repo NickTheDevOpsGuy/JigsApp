@@ -49,7 +49,6 @@ export function useReplay(
   const lastTickRef = useRef<number>(0);
   const lastSnapshotCountRef = useRef(0);
   const isReplayingRef = useRef(false);
-  const hasAdvancedThisResumeRef = useRef(false);
   isReplayingRef.current = isReplaying;
 
   const recordSnapshot = useCallback(() => {
@@ -108,7 +107,6 @@ export function useReplay(
   const resumeReplay = useCallback(() => {
     const list = getReplayList();
     if (!manager || list.length === 0) return;
-    hasAdvancedThisResumeRef.current = false;
     // If user resumes from the end, restart from frame 0 so Play always replays.
     if (replayIndex >= list.length - 1) {
       replayIndexRef.current = 0;
@@ -132,12 +130,9 @@ export function useReplay(
       if (listNow.length === 0) return;
 
       const elapsed = now - lastTickRef.current;
-      const shouldAdvance =
-        elapsed >= intervalMs ||
-        (!hasAdvancedThisResumeRef.current && listNow.length > 1);
+      const shouldAdvance = elapsed >= intervalMs;
 
       if (shouldAdvance) {
-        hasAdvancedThisResumeRef.current = true;
         lastTickRef.current = now;
 
         const i = replayIndexRef.current;
@@ -271,7 +266,8 @@ export function useReplay(
       // from deps. getReplayList was previously listed but never called here (stale dep).
       const list = snapshotsRef.current;
       if (!manager || list.length === 0) return;
-      const current = list[replayIndex]?.elapsedSeconds ?? 0;
+      const idx = replayIndexRef.current;
+      const current = list[idx]?.elapsedSeconds ?? 0;
       const targetSeconds = Math.max(0, current + deltaSeconds);
       let bestIdx = 0;
       let bestDiff = Math.abs((list[0]?.elapsedSeconds ?? 0) - targetSeconds);
@@ -284,7 +280,7 @@ export function useReplay(
       }
       seekToIndex(bestIdx);
     },
-    [manager, replayIndex, seekToIndex],
+    [manager, seekToIndex],
   );
 
   const setReplaySpeedWithChoice = useCallback((speed: number) => {

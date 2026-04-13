@@ -266,6 +266,7 @@ export function usePlayScreenInteractions(ctx: any) {
     soundManager.play.bind(soundManager),
     () => {
       scene.undoCountRef.current += 1;
+      scene.recordSnapshotRef.current?.();
     },
     (fromPositions) => {
       undoSnapBackRef.current = { fromPositions, startMs: performance.now() };
@@ -278,7 +279,9 @@ export function usePlayScreenInteractions(ctx: any) {
     setState,
     () => Boolean(manager?.canRedo() && !ui.isPaused && !state?.isComplete),
     soundManager.play.bind(soundManager),
-    undefined,
+    () => {
+      scene.recordSnapshotRef.current?.();
+    },
     (fromPositions) => {
       undoSnapBackRef.current = { fromPositions, startMs: performance.now() };
     },

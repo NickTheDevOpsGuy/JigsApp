@@ -93,10 +93,9 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     };
   }, [boardRef, setBoardSize, viewport]);
 
-  /** Reserve space for replay cutout bottom bar so the board hole is not covered on mobile.
-   *  On mobile the dock is ~140px (controls + padding); on desktop it can be taller.
-   *  Use 148px so there's a small safety gap above the dock. */
-  const REPLAY_BOTTOM_BAR_RESERVE_PX = 148;
+  /** Reserve space below the cutout so the control dock does not cover the live canvas.
+   *  Touch layouts use a slightly shorter dock estimate; desktop cutout uses a taller reserve. */
+  const replayBottomReservePx = isCoarsePointer ? 152 : 198;
 
   useLayoutEffect(() => {
     if (!replayBarOpen) {
@@ -116,7 +115,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       const vv = typeof window !== "undefined" ? window.visualViewport : null;
       const vvTop = vv ? vv.offsetTop : 0;
       const vvLeft = vv ? vv.offsetLeft : 0;
-      const reserve = REPLAY_BOTTOM_BAR_RESERVE_PX;
+      const reserve = replayBottomReservePx;
       const height = Math.max(0, r.height - reserve);
       setReplayBarBoardRect({
         top: r.top - vvTop,
@@ -150,6 +149,7 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     setReplayBarBoardRect,
     args.boardSize?.w,
     args.boardSize?.h,
+    isCoarsePointer,
   ]);
 
   useEffect(() => {

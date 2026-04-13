@@ -2,10 +2,10 @@
  * Replay Solve modal – focused replay overlay with one board stage,
  * one attached control dock, and a single clear dismiss action.
  *
- * On desktop: cutout mode — the live canvas shows through a hole in the backdrop.
- * On mobile (< 640px): full-screen modal — clean card with completion image + controls.
- * The canvas is still playing back behind the modal on mobile; we just show the image
- * as a poster so the UI looks polished rather than showing a dark empty board.
+ * On desktop (wide viewport + fine pointer + hover): cutout mode — the live canvas shows
+ * through a hole in the backdrop.
+ * On phones, tablets, and touch-first layouts: full-screen modal — completion image + controls.
+ * The canvas still plays back behind the modal; the image is a poster for a polished layout.
  */
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import { Trophy, X } from "lucide-react";
@@ -23,6 +23,21 @@ import {
 } from "@/screens/Play/components/replay/replayInvoke";
 
 const styles = { ...baseStyles, ...controlStyles };
+
+/** Cutout chrome only for mouse-first desktop layouts — touch-primary devices use the modal sheet. */
+function replayChromeUsesDesktopCutout(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    if (window.matchMedia("(pointer: coarse)").matches) return false;
+    return (
+      window.matchMedia("(min-width: 1024px)").matches &&
+      window.matchMedia("(pointer: fine)").matches &&
+      window.matchMedia("(hover: hover)").matches
+    );
+  } catch {
+    return false;
+  }
+}
 
 function eventTargetInsideReplaySeekSlider(target: EventTarget | null): boolean {
   return (
@@ -100,22 +115,32 @@ export function ReplaySolveModal({
   moveCount,
   packRemainingLabel,
 }: ReplaySolveModalProps) {
-  // On mobile (< 640px) always use the modal path — the cutout looks terrible on small screens.
-  const [isMobileVw, setIsMobileVw] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth < 640 : false,
+  const [prefersDesktopCutout, setPrefersDesktopCutout] = useState(
+    replayChromeUsesDesktopCutout,
   );
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 639px)");
-    const handler = (e: MediaQueryListEvent) => setIsMobileVw(e.matches);
-    setIsMobileVw(mq.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
+    const mqCoarse = window.matchMedia("(pointer: coarse)");
+    const mqWide = window.matchMedia("(min-width: 1024px)");
+    const mqFine = window.matchMedia("(pointer: fine)");
+    const mqHover = window.matchMedia("(hover: hover)");
+    const sync = () => setPrefersDesktopCutout(replayChromeUsesDesktopCutout());
+    sync();
+    mqCoarse.addEventListener("change", sync);
+    mqWide.addEventListener("change", sync);
+    mqFine.addEventListener("change", sync);
+    mqHover.addEventListener("change", sync);
+    return () => {
+      mqCoarse.removeEventListener("change", sync);
+      mqWide.removeEventListener("change", sync);
+      mqFine.removeEventListener("change", sync);
+      mqHover.removeEventListener("change", sync);
+    };
   }, []);
 
-  // Only use cutout on desktop where the board is large and the UI has room
   const useCutout =
-    !isMobileVw && Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
+    prefersDesktopCutout &&
+    Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
 
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;

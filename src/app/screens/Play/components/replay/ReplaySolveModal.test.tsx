@@ -96,31 +96,70 @@ describe("ReplaySolveModal", () => {
   });
 
   it("keeps cutout panels aligned to the visible viewport when visualViewport is offset", () => {
-    Object.defineProperty(window, "visualViewport", {
-      configurable: true,
-      value: {
-        width: 360,
-        height: 480,
-        offsetLeft: 24,
-        offsetTop: 36,
+    const mql = () =>
+      ({
+        matches: true,
+        media: "",
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
-      },
+        dispatchEvent: vi.fn(),
+      }) as unknown as MediaQueryList;
+
+    vi.spyOn(window, "matchMedia").mockImplementation((query: string) => {
+      if (query.includes("(pointer: coarse)")) {
+        return {
+          matches: false,
+          media: query,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        } as unknown as MediaQueryList;
+      }
+      if (
+        query.includes("min-width: 1024px") ||
+        query.includes("pointer: fine") ||
+        query.includes("hover: hover")
+      ) {
+        return mql();
+      }
+      return {
+        matches: false,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      } as unknown as MediaQueryList;
     });
 
-    render(
-      <ReplaySolveModal
-        {...defaultProps}
-        boardRect={{ top: 10, left: 20, width: 220, height: 180 }}
-      />,
-    );
+    try {
+      Object.defineProperty(window, "visualViewport", {
+        configurable: true,
+        value: {
+          width: 1280,
+          height: 480,
+          offsetLeft: 24,
+          offsetTop: 36,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        },
+      });
 
-    const panels = Array.from(document.querySelectorAll("[data-cutout-panel]"));
-    expect(panels).toHaveLength(4);
-    expect((panels[0] as HTMLElement).style.top).toBe("0px");
-    expect((panels[1] as HTMLElement).style.width).toBe("20px");
-    // Bottom panel uses visual viewport coordinates (offsetTop + height) so it
-    // still covers the visible area when the viewport is shifted.
-    expect((panels[3] as HTMLElement).style.minHeight).toBe("326px");
+      render(
+        <ReplaySolveModal
+          {...defaultProps}
+          boardRect={{ top: 10, left: 20, width: 220, height: 180 }}
+        />,
+      );
+
+      const panels = Array.from(document.querySelectorAll("[data-cutout-panel]"));
+      expect(panels).toHaveLength(4);
+      expect((panels[0] as HTMLElement).style.top).toBe("0px");
+      expect((panels[1] as HTMLElement).style.width).toBe("20px");
+      // Bottom panel uses visual viewport coordinates (offsetTop + height) so it
+      // still covers the visible area when the viewport is shifted.
+      expect((panels[3] as HTMLElement).style.minHeight).toBe("326px");
+    } finally {
+      vi.restoreAllMocks();
+    }
   });
 });
