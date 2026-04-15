@@ -265,7 +265,11 @@ export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Pr
   const categoryMeta = CATEGORIES.find((c) => c.id === filterCategory);
 
   const modalTitle =
-    step === "category" ? "Choose a Puzzle" : (categoryMeta?.name ?? "Choose Puzzle");
+    step === "category"
+      ? "Choose category"
+      : selectedPuzzle
+        ? "Puzzle setup"
+        : "Choose puzzle";
 
   const stepNumber = step === "category" ? 1 : 2;
 
@@ -319,7 +323,7 @@ export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Pr
             <div
               ref={categoryScrollRef}
               className={styles.puzzleGridScroller}
-              role="listbox"
+              role="group"
               aria-label="Choose a category"
             >
               <div className={styles.categoryGrid}>
@@ -328,7 +332,6 @@ export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Pr
                     key={cat.id}
                     type="button"
                     className={styles.categoryCard}
-                    role="option"
                     aria-label={cat.name}
                     title={`Choose ${cat.name}`}
                     onClick={() => {

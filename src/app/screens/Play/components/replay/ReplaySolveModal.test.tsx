@@ -95,6 +95,32 @@ describe("ReplaySolveModal", () => {
     expect(onPause).not.toHaveBeenCalled();
   });
 
+  it("uses the live board cutout on coarse-pointer mobile when boardRect is available", () => {
+    vi.spyOn(window, "matchMedia").mockImplementation((query: string) => {
+      return {
+        matches: query.includes("(pointer: coarse)"),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      } as unknown as MediaQueryList;
+    });
+
+    try {
+      render(
+        <ReplaySolveModal
+          {...defaultProps}
+          boardRect={{ top: 96, left: 12, width: 336, height: 336 }}
+        />,
+      );
+
+      expect(document.querySelectorAll("[data-cutout-panel]")).toHaveLength(4);
+      expect(screen.queryByAltText(/completed puzzle/i)).toBeNull();
+    } finally {
+      vi.restoreAllMocks();
+    }
+  });
+
   it("keeps cutout panels aligned to the visible viewport when visualViewport is offset", () => {
     const mql = () =>
       ({

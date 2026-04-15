@@ -159,7 +159,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     },
     usedHint: scene.usedHintRef.current,
     isDaily: completionIsDaily,
-    canReplay: behavior.replay.canReplay,
+    canReplay: behavior.replay.canReplay || showE2ECompletion,
     onReplayClick: () => {
       behavior.replay.startReplay();
       scene.setCompletionDismissed(true);
@@ -211,12 +211,12 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     boardRect: scene.replayBarBoardRect ?? undefined,
     speedExplicitlyChosen: behavior.replay.speedExplicitlyChosen,
     onClose: () => {
-      // Dismiss replay (X): return to the same win/results experience as “Back to results”.
+      // Dismiss replay (X): return to the solved board without flashing the win dialog.
       behavior.replay.stopReplay();
       scene.setReplayBarOpen(false);
-      scene.setSuppressBoardCompleteBannerAfterReplay(false);
-      scene.setCompletionDismissed(false);
-      scene.setShowWinOverlay?.(true);
+      scene.setSuppressBoardCompleteBannerAfterReplay(true);
+      scene.setCompletionDismissed(true);
+      scene.setShowWinOverlay?.(false);
       requestAnimationFrame(() => {
         scene.completionFocusRef.current?.focus();
       });
