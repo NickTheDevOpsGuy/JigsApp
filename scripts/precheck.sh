@@ -23,6 +23,18 @@ require_node_module() {
   fi
 }
 
+has_cmd() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+list_functional_e2e_specs() {
+  if has_cmd rg; then
+    rg --files src/app -g "*.e2e.spec.ts" -g "!accessibility.e2e.spec.ts" | sort
+  else
+    find src/app -type f -name "*.e2e.spec.ts" ! -name "accessibility.e2e.spec.ts" | sort
+  fi
+}
+
 # --- The "Anti-Efficiency Trap" skip logic ---
 LAST_COMMIT_MSG="$(git log -1 --pretty=%B || true)"
 if echo "$LAST_COMMIT_MSG" | grep -qi '\[skip-precheck\]'; then
@@ -38,11 +50,15 @@ require_cmd node "Install Node.js 22+ and rerun \`npm run doctor\`."
 require_cmd npm "Install npm and rerun \`npm run doctor\`."
 require_cmd npx "Install npm/npx and rerun \`npm run doctor\`."
 require_cmd git "Install git and rerun \`npm run doctor\`."
-require_cmd rg "Install ripgrep (\`rg\`) and rerun \`npm run doctor\`."
 require_node_module "prettier/package.json" "Run \`npm install\` to restore local dependencies."
 require_node_module "eslint/package.json" "Run \`npm install\` to restore local dependencies."
 require_node_module "typescript/package.json" "Run \`npm install\` to restore local dependencies."
 require_node_module "@playwright/test/package.json" "Run \`npm install\` to restore local dependencies."
+if has_cmd rg; then
+  echo "✅ [SUCCESS]: Found \`rg\` for fast local searches."
+else
+  echo "⚠️  [DEGRADED MODE]: ripgrep (\`rg\`) is missing. Falling back to POSIX search tools."
+fi
 echo "✅ [SUCCESS]: Tooling looks ready."
 
 # 1. EMPTY FILE CHECK (The Anti-Bloat Protocol)
@@ -149,7 +165,7 @@ fi
 if docker ps | grep -q "supabase_db"; then
   echo "🤖 [STEP 7]: Running Functional E2E Tests (Non-Smoke Test)..."
   mapfile -t FUNCTIONAL_E2E_SPECS < <(
-    rg --files src/app -g "*.e2e.spec.ts" -g "!accessibility.e2e.spec.ts" | sort
+    list_functional_e2e_specs
   )
   if [ "${#FUNCTIONAL_E2E_SPECS[@]}" -eq 0 ]; then
     echo "⏭️  [SKIPPED]: No functional E2E specs found outside the accessibility smoke."

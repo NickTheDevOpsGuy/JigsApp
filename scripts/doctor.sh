@@ -31,6 +31,17 @@ require_cmd() {
   fi
 }
 
+check_optional_cmd() {
+  local cmd="$1"
+  local present_message="$2"
+  local missing_message="$3"
+  if command -v "$cmd" >/dev/null 2>&1; then
+    pass "$present_message"
+  else
+    warn "$missing_message"
+  fi
+}
+
 require_node_module() {
   local module_name="$1"
   local hint="$2"
@@ -48,7 +59,10 @@ require_cmd node "Install Node.js 22+ and try again."
 require_cmd npm "Install npm and try again."
 require_cmd npx "Install npm/npx and try again."
 require_cmd git "Install git and try again."
-require_cmd rg "Install ripgrep (\`rg\`) for local scripts."
+check_optional_cmd \
+  rg \
+  "Found \`rg\` for fast local searches" \
+  "ripgrep (\`rg\`) is not installed. Local scripts will fall back to slower POSIX tools."
 
 NODE_MAJOR="$(node -p 'process.versions.node.split(`.`)[0]')"
 if [ "$NODE_MAJOR" -lt 22 ]; then
