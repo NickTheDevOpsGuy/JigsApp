@@ -13,24 +13,35 @@ Thanks for your interest in contributing. This doc covers how to get set up, run
 git clone <repo-url>
 cd phuzzle
 npm install
+npm run doctor
 ```
 
-Copy [.env.example](.env.example) to `.env` and fill in any required keys (e.g. Supabase, PostHog). See [doc/SUPABASE_SETUP.md](doc/SUPABASE_SETUP.md) for backend setup.
+Copy [.env.example](.env.example) to `.env` and fill in any required keys (e.g. Supabase, PostHog). See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for backend setup.
+
+`npm run doctor` is the quickest way to catch the common local setup issues before you burn time on a failing push. It checks:
+
+- Node version and required CLI tools
+- whether `node_modules` and key packages are installed
+- Playwright CLI/browser availability
+- Docker/Supabase reachability for backend-dependent E2E work
+- whether port `4173` is already occupied by a local preview server
 
 ## Before committing / submitting a PR
 
 Run these locally before you commit; CI will run them on the PR as well.
 
-| Command             | Description                    |
-| ------------------- | ------------------------------ |
-| `npm run lint`      | ESLint (TypeScript + jsx-a11y) |
-| `npm run typecheck` | TypeScript (no emit)           |
-| `npm run test`      | Unit tests (Vitest, 4 workers) |
-| `npm run build`     | Production build               |
+| Command             | Description                     |
+| ------------------- | ------------------------------- |
+| `npm run lint`      | ESLint (TypeScript + jsx-a11y)  |
+| `npm run typecheck` | TypeScript (no emit)            |
+| `npm run test`      | Unit tests (Vitest, 4 workers)  |
+| `npm run build`     | Production build                |
+| `npm run precheck`  | Matches the local pre-push gate |
 
 Optional:
 
-- `npm run test:e2e` — Playwright E2E tests with 4 workers (run `npx playwright install` once; ensure port 5173 is free or app is not already running).
+- `npm run test:e2e:smoke` — Fast Chromium smoke suite for the highest-signal flows.
+- `npm run test:e2e` — Full Playwright E2E matrix (run `npx playwright install` once; local runs reuse an existing Phuzzle server on port `4173` when available).
 - `npm run format:check` — Prettier; use `npm run format` to fix.
 
 Running the same commands before each commit helps catch issues early.
@@ -55,7 +66,7 @@ Running the same commands before each commit helps catch issues early.
 ## Docs and structure
 
 - [README.md](README.md) — Overview, features, getting started, testing, PWA.
-- [doc/](doc/) — CHANGES, LIGHTHOUSE, SUPABASE_SETUP, SHARING, STREAK-FREEZE, FUTURE, etc.
+- [docs/](docs/) — CHANGES, LIGHTHOUSE, SUPABASE_SETUP, SHARING, STREAK-FREEZE, FUTURE, etc.
 - [CONTRIBUTORS.md](CONTRIBUTORS.md) — List of contributors.
 
 If you have questions, DM the maintainers or drop a note in the Discord (see README).

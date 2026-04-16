@@ -54,6 +54,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   ref,
 ) {
   const isMobile = useMediaQuery("(max-width: 600px)");
+  const isCoarsePointer = useMediaQuery("(pointer: coarse)");
 
   const totalSlots = grid.rows * grid.cols;
   const compact = totalSlots >= 25;
@@ -101,16 +102,18 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
       </div>
 
       <div className={styles.scrollerWrap}>
-        <button
-          type="button"
-          className={styles.scrollBtn}
-          onClick={() => scrollByOnePiece(-1)}
-          disabled={!canScrollLeft}
-          aria-label="Scroll left"
-          title="Scroll left"
-        >
-          <ChevronLeft size={20} aria-hidden />
-        </button>
+        {!isCoarsePointer && (
+          <button
+            type="button"
+            className={styles.scrollBtn}
+            onClick={() => scrollByOnePiece(-1)}
+            disabled={!canScrollLeft}
+            aria-label="Scroll left"
+            title="Scroll left"
+          >
+            <ChevronLeft size={20} aria-hidden />
+          </button>
+        )}
         <div
           className={`${styles.scroller} ${traySlots.length > 0 ? styles.scrollerSnap : ""}`}
           ref={scrollerRef}
@@ -155,16 +158,18 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
             </div>
           )}
         </div>
-        <button
-          type="button"
-          className={styles.scrollBtn}
-          onClick={() => scrollByOnePiece(1)}
-          disabled={!canScrollRight}
-          aria-label="Scroll right"
-          title="Scroll right"
-        >
-          <ChevronRight size={20} aria-hidden />
-        </button>
+        {!isCoarsePointer && (
+          <button
+            type="button"
+            className={styles.scrollBtn}
+            onClick={() => scrollByOnePiece(1)}
+            disabled={!canScrollRight}
+            aria-label="Scroll right"
+            title="Scroll right"
+          >
+            <ChevronRight size={20} aria-hidden />
+          </button>
+        )}
       </div>
     </div>
   );

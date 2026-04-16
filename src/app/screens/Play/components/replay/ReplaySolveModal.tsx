@@ -98,7 +98,16 @@ export function ReplaySolveModal({
   moveCount,
   packRemainingLabel,
 }: ReplaySolveModalProps) {
-  const useCutout = Boolean(boardRect && boardRect.width > 0 && boardRect.height > 0);
+  const prefersSheetOnShortTouchViewport =
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: coarse)").matches &&
+    window.matchMedia("(max-height: 500px)").matches;
+  const useCutout = Boolean(
+    boardRect &&
+      boardRect.width > 0 &&
+      boardRect.height > 0 &&
+      !prefersSheetOnShortTouchViewport,
+  );
 
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;

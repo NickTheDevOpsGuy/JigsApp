@@ -1,5 +1,12 @@
 {
-  "globs": ["**/*.md", "!node_modules/**", "!.git/**", "!dist/**", "!coverage/**"],
+  "globs": [
+    "**/*.md",
+    "!node_modules/**",
+    "!.git/**",
+    "!dist/**",
+    "!coverage/**",
+    "!test-results/**"
+  ],
   "config": {
     "default": true,
     "MD013": false,

@@ -80,6 +80,33 @@
   scroll-snap-align: start;
 }
 
+@media (min-width: 601px) and (max-width: 1024px) {
+  .header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .title {
+    flex-wrap: wrap;
+  }
+
+  .titleProgress {
+    white-space: nowrap;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+@media (max-width: 900px) {
+  .tabs button {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
 .tabLabel {
   min-width: 0;
 }

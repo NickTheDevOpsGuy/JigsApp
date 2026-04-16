@@ -48,6 +48,27 @@ export default defineConfig({
       name: "msedge",
       use: { ...devices["Desktop Edge"], channel: "msedge" },
     },
+    {
+      name: "webkit-iphone-responsive",
+      testMatch: "**/*.responsive.e2e.spec.ts",
+      use: { ...devices["iPhone 13"], browserName: "webkit" },
+    },
+    {
+      name: "webkit-ipad-responsive",
+      testMatch: "**/*.responsive.e2e.spec.ts",
+      use: { ...devices["iPad Pro 11"], browserName: "webkit" },
+    },
+    {
+      name: "chromium-android-tablet-responsive",
+      testMatch: "**/*.responsive.e2e.spec.ts",
+      use: {
+        browserName: "chromium",
+        ...localChromiumUse,
+        viewport: { width: 820, height: 1180 },
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
   ],
   webServer: {
     command: useDevServer

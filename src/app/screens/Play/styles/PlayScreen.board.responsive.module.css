@@ -430,35 +430,157 @@
 
     /*
      * Replay in landscape: height is tiny — size from the short axis (dvh),
-     * leaving room for the header above (60px) and dock below (110px).
+     * leaving room for the header above (58px) and dock below (146px).
      */
     .boardLayoutShell[data-replay-active="true"] .boardWrapper {
       width: min(
         100%,
         var(
           --play-replay-stage-size,
-          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
+          min(74vw, calc(100dvh - 58px - 146px - env(safe-area-inset-bottom, 0px)))
         )
       );
       max-width: min(
         100%,
         var(
           --play-replay-stage-size,
-          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
+          min(74vw, calc(100dvh - 58px - 146px - env(safe-area-inset-bottom, 0px)))
         )
       );
       max-height: min(
         100%,
         var(
           --play-replay-stage-size,
-          min(78vw, calc(100dvh - 60px - 110px - env(safe-area-inset-bottom, 0px)))
+          min(74vw, calc(100dvh - 58px - 146px - env(safe-area-inset-bottom, 0px)))
         )
       );
     }
 
     .boardLayoutShell[data-replay-active="true"] .playBody {
-      padding-top: var(--play-replay-header-h, 62px);
+      padding-top: var(--play-replay-header-h, 58px);
     }
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) and (pointer: coarse) {
+  .page {
+    --play-board-tray-width: min(100%, 680px);
+  }
+
+  .boardLayoutShell {
+    max-width: min(100%, 720px);
+    gap: 10px;
+  }
+
+  .boardLayoutShell .topBarWrap {
+    max-height: 68px;
+  }
+
+  .topBar {
+    min-height: 64px;
+    max-height: none;
+    padding:
+      calc(8px + env(safe-area-inset-top, 0))
+      max(12px, env(safe-area-inset-right, 0))
+      8px
+      max(12px, env(safe-area-inset-left, 0));
+  }
+
+  .topBarInner {
+    gap: 8px;
+    padding-inline: 10px 8px;
+  }
+
+  .topBarLeft {
+    gap: 6px;
+  }
+
+  .hud {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .hudPill,
+  .hudPillTimer,
+  .hudMoveCount,
+  .hudPlacedTotal {
+    min-height: 34px;
+    font-size: 13px;
+    padding: 0 10px;
+  }
+
+  .hudPillPause {
+    min-width: 34px;
+    min-height: 34px;
+  }
+
+  .timerSuffix {
+    font-size: 11px;
+  }
+
+  .headerMenuTrigger {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+@media (max-height: 500px) and (pointer: coarse) {
+  .topBar {
+    height: 44px;
+    min-height: 44px;
+    padding-left: max(8px, env(safe-area-inset-left, 0));
+    padding-right: max(8px, env(safe-area-inset-right, 0));
+  }
+
+  .playBody {
+    padding-left: max(var(--play-board-tray-gap, 12px), env(safe-area-inset-left, 0));
+    padding-right: max(var(--play-board-tray-gap, 12px), env(safe-area-inset-right, 0));
+  }
+
+  .playBody .trayArea .tray {
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .topBarWrap {
+    display: none;
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .playBody {
+    padding-top: var(--play-replay-header-h, 54px);
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .playBody .main {
+    flex: 0 0 auto;
+    flex-grow: 0;
+    padding-top: 0;
+    min-height: 0;
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .boardWrapper {
+    width: min(
+      100%,
+      var(
+        --play-replay-stage-size,
+        min(68vw, calc(100dvh - 54px - 186px - env(safe-area-inset-bottom, 0px)))
+      )
+    );
+    max-width: min(
+      100%,
+      var(
+        --play-replay-stage-size,
+        min(68vw, calc(100dvh - 54px - 186px - env(safe-area-inset-bottom, 0px)))
+      )
+    );
+    max-height: min(
+      100%,
+      var(
+        --play-replay-stage-size,
+        min(68vw, calc(100dvh - 54px - 186px - env(safe-area-inset-bottom, 0px)))
+      )
+    );
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 

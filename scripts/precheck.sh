@@ -3,6 +3,26 @@ set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
+require_cmd() {
+  local cmd="$1"
+  local hint="$2"
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "🛑 [ENV FAULT]: Missing required command \`$cmd\`."
+    echo "ACTION REQUIRED: ${hint}"
+    exit 1
+  fi
+}
+
+require_node_module() {
+  local module_name="$1"
+  local hint="$2"
+  if ! node -e "require.resolve(process.argv[1])" "$module_name" >/dev/null 2>&1; then
+    echo "🛑 [ENV FAULT]: Missing required dependency \`$module_name\`."
+    echo "ACTION REQUIRED: ${hint}"
+    exit 1
+  fi
+}
+
 # --- The "Anti-Efficiency Trap" skip logic ---
 LAST_COMMIT_MSG="$(git log -1 --pretty=%B || true)"
 if echo "$LAST_COMMIT_MSG" | grep -qi '\[skip-precheck\]'; then
@@ -12,6 +32,18 @@ fi
 
 echo "🛡️  [SYSTEM AUDIT]: Initializing Pre-Push Quality Gate..."
 echo "----------------------------------------------------------------"
+
+echo "🧭 [BOOT]: Verifying local tooling before the audit..."
+require_cmd node "Install Node.js 22+ and rerun \`npm run doctor\`."
+require_cmd npm "Install npm and rerun \`npm run doctor\`."
+require_cmd npx "Install npm/npx and rerun \`npm run doctor\`."
+require_cmd git "Install git and rerun \`npm run doctor\`."
+require_cmd rg "Install ripgrep (\`rg\`) and rerun \`npm run doctor\`."
+require_node_module "prettier/package.json" "Run \`npm install\` to restore local dependencies."
+require_node_module "eslint/package.json" "Run \`npm install\` to restore local dependencies."
+require_node_module "typescript/package.json" "Run \`npm install\` to restore local dependencies."
+require_node_module "@playwright/test/package.json" "Run \`npm install\` to restore local dependencies."
+echo "✅ [SUCCESS]: Tooling looks ready."
 
 # 1. EMPTY FILE CHECK (The Anti-Bloat Protocol)
 echo "📂 [STEP 1]: Scanning for ghost files (empty ones)..."
@@ -103,6 +135,7 @@ echo "✅ [SUCCESS]: Types are verified."
 # 6. ACCESSIBILITY SMOKE TEST (The Core Requirement)
 if docker ps | grep -q "supabase_db"; then
   echo "♿ [STEP 6]: Running WCAG 2.2 Accessibility Audit..."
+  require_node_module "@axe-core/playwright" "Run \`npm install\` or \`npm run doctor\` before the accessibility smoke."
   if ! npx playwright test -c playwright.config.ts src/app/accessibility.e2e.spec.ts --project=chromium; then
     echo "🛑 [A11Y FAULT]: Accessibility is a core requirement, not a feature. Fix the violations above!"
     exit 1

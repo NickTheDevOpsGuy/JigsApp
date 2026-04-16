@@ -734,25 +734,35 @@
 @media (max-height: 500px) and (max-width: 900px) {
   .mobileSheet {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: stretch;
   }
 
   .mobileHeader {
-    display: none;
+    order: 2;
+    width: 60%;
+    box-sizing: border-box;
+    padding: 12px 14px 8px;
+    border-bottom: none;
+    align-items: center;
   }
 
   .mobilePuzzleWrap {
+    order: 1;
     width: 40%;
     aspect-ratio: auto;
     flex-shrink: 0;
+    max-height: 100%;
   }
 
   .mobileControls {
-    flex: 1;
+    order: 3;
+    width: 60%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 14px 16px;
+    padding: 6px 14px 12px;
     overflow-y: auto;
   }
 }

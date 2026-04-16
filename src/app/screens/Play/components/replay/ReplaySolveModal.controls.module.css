@@ -185,3 +185,59 @@
     border-radius: 999px;
   }
 }
+
+@media (max-height: 500px) and (max-width: 900px) {
+  .dockHeader {
+    padding: 0 0 6px;
+  }
+
+  .dockTitle {
+    font-size: 0.78rem;
+  }
+
+  .seekRow {
+    padding: 0 0 8px;
+  }
+
+  .seekTime {
+    font-size: 0.72rem;
+  }
+
+  .speedBadge {
+    min-height: 28px;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+
+  .controlRow {
+    gap: 8px;
+    padding: 10px 0 0;
+  }
+
+  .controlBtn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .controlBtn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .controlBtnPlay {
+    width: 38px;
+    height: 38px;
+  }
+
+  .controlBtnPlay svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .speedTrigger {
+    min-width: 40px;
+    min-height: 34px;
+    padding: 0 8px;
+    font-size: 0.74rem;
+  }
+}

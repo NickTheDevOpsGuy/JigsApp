@@ -22,6 +22,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .title {
@@ -92,9 +93,7 @@
   color: var(--color-text-primary);
   font-size: 0.96rem;
   font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .meta {
@@ -146,5 +145,15 @@
   .metric,
   .secondaryMetric {
     text-align: left;
+  }
+}
+
+@media (max-width: 960px) {
+  .row {
+    gap: 10px;
+  }
+
+  .name {
+    white-space: normal;
   }
 }

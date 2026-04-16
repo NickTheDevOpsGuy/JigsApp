@@ -100,10 +100,18 @@ All project docs live in **[docs/](docs/)**. Full index: [docs/README.md](docs/R
 git clone https://github.com/NickTheDevOpsGuy/phuzzle.git
 cd phuzzle
 npm install
+npm run doctor
 npm run dev
 ```
 
-Useful scripts: `npm run build`, `npm run preview`, `npm run test`, `npm run test:e2e`, `npm run lighthouse`, `npm run check:images` (Vitest and Playwright use 4 workers; run `npx playwright install` once). The image audit is useful before shipping large social or puzzle assets.
+Useful scripts: `npm run doctor`, `npm run build`, `npm run preview`, `npm run test`, `npm run test:e2e:smoke`, `npm run test:e2e`, `npm run lighthouse`, `npm run check:images` (Vitest and Playwright use 4 workers; run `npx playwright install` once). The image audit is useful before shipping large social or puzzle assets.
+
+Local quality workflow:
+
+- `npm run doctor` checks Node version, local dependencies, Playwright availability, Supabase/Docker reachability, and whether port `4173` is already in use.
+- `npm run precheck` matches the pre-push gate locally.
+- `npm run test:e2e:smoke` runs a fast Chromium smoke suite for the highest-signal flows.
+- `npm run test:e2e` runs the broader multi-browser matrix.
 
 Image budget quick rule:
 

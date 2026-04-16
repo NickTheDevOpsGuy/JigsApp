@@ -34,12 +34,46 @@
  */
 @media (min-width: 601px) {
   .playBody .main {
-    height: calc(var(--play-board-tray-width, min(100%, 760px)) + 46px);
-    max-height: calc(var(--play-board-tray-width, min(100%, 760px)) + 46px);
+    height: min(
+      calc(var(--play-board-tray-width, min(100%, 760px)) + 46px),
+      calc(var(--app-vh-stable, 100dvh) - 292px)
+    );
+    max-height: min(
+      calc(var(--play-board-tray-width, min(100%, 760px)) + 46px),
+      calc(var(--app-vh-stable, 100dvh) - 292px)
+    );
     padding-bottom: 10px;
     overflow: hidden;
     border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
     border-bottom-right-radius: calc(var(--radius-board, 20px) + 10px);
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) and (pointer: coarse) {
+  .playBody {
+    --play-board-tray-width: min(100%, 680px);
+    --play-board-tray-gap: 14px;
+    padding-top: 12px;
+  }
+
+  .playBody .main {
+    height: min(
+      calc(var(--play-board-tray-width, min(100%, 680px)) + 34px),
+      calc(var(--app-vh-stable, 100dvh) - 292px)
+    );
+    max-height: min(
+      calc(var(--play-board-tray-width, min(100%, 680px)) + 34px),
+      calc(var(--app-vh-stable, 100dvh) - 292px)
+    );
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .playBody .trayArea .tray,
+  .playBody .trayArea .tray.trayWrapLarge {
+    height: clamp(112px, 15vh, 156px);
+    max-height: min(156px, 20vh);
+    min-height: 96px;
   }
 }
 

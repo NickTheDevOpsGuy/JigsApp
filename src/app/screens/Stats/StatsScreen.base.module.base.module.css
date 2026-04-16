@@ -103,6 +103,42 @@
   overflow-x: hidden;
 }
 
+@media (min-width: 601px) and (max-width: 1024px) {
+  .page {
+    padding: 16px;
+  }
+
+  .card {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .page {
+    padding: 20px 24px 24px;
+  }
+
+  .card {
+    max-width: 960px;
+    padding: 16px 18px 14px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}
+
+@media (min-width: 601px) and (max-height: 760px) {
+  .page {
+    padding: 8px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+}
+
 .cardContent {
   flex: 1 1 auto;
   min-height: 0;

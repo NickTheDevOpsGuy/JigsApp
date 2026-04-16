@@ -219,6 +219,22 @@
   gap: 10px;
 }
 
+@media (min-width: 900px) {
+  .achievements {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .achievement {
+    min-height: 100%;
+    align-items: flex-start;
+  }
+
+  .achievementMeta {
+    align-self: stretch;
+  }
+}
+
 .badgesHeader {
   display: flex;
   align-items: flex-end;

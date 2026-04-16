@@ -11,7 +11,7 @@ test.describe("Home / Menu", () => {
   test("loads the app and shows the menu", async ({ page }) => {
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
-    await expect(page.getByAltText("Phuzzle logo")).toBeVisible();
+    await expect(page.getByText("Phuzzle")).toBeVisible();
   });
 
   test("shows main action buttons", async ({ page }) => {
@@ -23,7 +23,7 @@ test.describe("Home / Menu", () => {
     await expect(page.getByRole("button", { name: /quick play/i })).toBeVisible();
   });
 
-  test("corner buttons: Stats on left, Help on right", async ({ page }) => {
+  test("header stats button opens stats route", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
@@ -32,16 +32,14 @@ test.describe("Home / Menu", () => {
         timeout: 15000,
       },
     );
-    const statsBtn = page.getByTestId("menu-stats");
-    const helpBtn = page.getByTestId("menu-help");
+    const statsBtn = page.getByRole("button", { name: /view stats/i });
     await expect(statsBtn).toBeVisible({ timeout: 10000 });
-    await expect(helpBtn).toBeVisible({ timeout: 10000 });
 
     await statsBtn.click();
     await expect(page).toHaveURL(/\/stats/, { timeout: 15000 });
   });
 
-  test("help button opens help modal", async ({ page }) => {
+  test("feedback button opens feedback modal", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/");
     await dismissWhatsNewModalIfOpen(page);
@@ -50,9 +48,14 @@ test.describe("Home / Menu", () => {
         timeout: 15000,
       },
     );
-    await page.getByTestId("menu-help").click();
-    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 15000 });
-    await expect(page.getByRole("button", { name: /how to play/i })).toBeVisible({
+    await page.getByRole("button", { name: /feedback/i }).click();
+    await expect(page.getByRole("dialog", { name: /feedback/i })).toBeVisible({
+      timeout: 15000,
+    });
+    await expect(page.getByRole("button", { name: /report a bug/i })).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.getByRole("button", { name: /suggest a feature/i })).toBeVisible({
       timeout: 10000,
     });
   });

@@ -9,6 +9,9 @@ Manual pass on real devices before release.
 - iPhone SE (or smallest supported iPhone), Safari
 - iPhone 13/14/15 class, Safari
 - Pixel-class Android, Chrome
+- iPad portrait, Safari
+- iPad landscape, Safari
+- Android tablet portrait or landscape, Chrome
 
 ---
 
@@ -38,10 +41,13 @@ Manual pass on real devices before release.
 
 - Board in viewport on load.
 - Tray visible and usable on small screens.
+- Tray remains reachable on tablets; no clipping below the fold in portrait.
 - Drag/snap smooth; no stuck or hidden pieces.
 - Piece locking reliable.
 - Long-press on board does not open context menu.
 - Minimap does not block interaction while dragging.
+- Board stays square on phone, tablet, and desktop widths.
+- Touch-first tray flow feels natural on phones/tablets; swipe works without depending on side arrows.
 
 **Win / Share**
 
@@ -79,10 +85,12 @@ Manual pass on real devices before release.
 ## Before merge
 
 ```bash
+npm run doctor
 npm run guard:quality
 npm run lint
 npm run typecheck
 npm run test
+npm run test:e2e:smoke
 npm run test:e2e
 ```
 
