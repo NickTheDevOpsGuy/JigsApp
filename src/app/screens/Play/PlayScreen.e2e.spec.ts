@@ -192,6 +192,13 @@ test.describe("Play screen", () => {
     await expect(
       page.getByRole("button", { name: "Play", exact: true }),
     ).toBeInViewport();
+
+    const liveBoard = page.getByTestId("play-board");
+    const liveBoardBox = await liveBoard.boundingBox();
+    expect(liveBoardBox).not.toBeNull();
+    expect(
+      Math.abs((liveBoardBox?.width ?? 0) - (liveBoardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
   });
 
   test("desktop completion options menu lists share actions", async ({ page }) => {

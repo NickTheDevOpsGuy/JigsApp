@@ -93,10 +93,6 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     };
   }, [boardRef, setBoardSize, viewport]);
 
-  /** Reserve space below the cutout so the control dock does not cover the live canvas.
-   *  Touch layouts use a slightly shorter dock estimate; desktop cutout uses a taller reserve. */
-  const replayBottomReservePx = isCoarsePointer ? 152 : 198;
-
   useLayoutEffect(() => {
     if (!replayBarOpen) {
       setReplayBarBoardRect(null);
@@ -115,13 +111,11 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
       const vv = typeof window !== "undefined" ? window.visualViewport : null;
       const vvTop = vv ? vv.offsetTop : 0;
       const vvLeft = vv ? vv.offsetLeft : 0;
-      const reserve = replayBottomReservePx;
-      const height = Math.max(0, r.height - reserve);
       setReplayBarBoardRect({
         top: r.top - vvTop,
         left: r.left - vvLeft,
         width: r.width,
-        height,
+        height: r.height,
       });
     };
     const schedule = () => {
@@ -149,7 +143,6 @@ export function usePlayScreenLifecycleEffects(args: UsePlayScreenLifecycleEffect
     setReplayBarBoardRect,
     args.boardSize?.w,
     args.boardSize?.h,
-    isCoarsePointer,
   ]);
 
   useEffect(() => {
