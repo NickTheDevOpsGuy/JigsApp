@@ -65,11 +65,11 @@ test.describe("Responsive smoke", () => {
     expect(boardBox).not.toBeNull();
     expect(trayBox).not.toBeNull();
     expect(viewport).not.toBeNull();
-    expect(Math.abs((boardBox?.width ?? 0) - (boardBox?.height ?? 0))).toBeLessThanOrEqual(
-      2,
-    );
-    expect((trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0)).toBeLessThan(
-      (viewport?.height ?? 0) + 1,
-    );
+    expect(
+      Math.abs((boardBox?.width ?? 0) - (boardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
+    expect(
+      (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
+    ).toBeLessThan((viewport?.height ?? 0) + 1);
   });
 });

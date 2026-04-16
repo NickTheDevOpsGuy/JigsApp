@@ -104,9 +104,9 @@ export function ReplaySolveModal({
     window.matchMedia("(max-height: 500px)").matches;
   const useCutout = Boolean(
     boardRect &&
-      boardRect.width > 0 &&
-      boardRect.height > 0 &&
-      !prefersSheetOnShortTouchViewport,
+    boardRect.width > 0 &&
+    boardRect.height > 0 &&
+    !prefersSheetOnShortTouchViewport,
   );
 
   const progressPct =

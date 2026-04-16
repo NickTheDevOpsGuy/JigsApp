@@ -106,7 +106,10 @@ export function MenuScreen() {
               </div>
 
               {dailySpotlight && (
-                <p className={styles.dailySpotlightLine} title={dailySpotlight.description}>
+                <p
+                  className={styles.dailySpotlightLine}
+                  title={dailySpotlight.description}
+                >
                   {dailySpotlight.line}
                 </p>
               )}
@@ -165,44 +168,46 @@ export function MenuScreen() {
                   </div>
                 )}
                 <div className={styles.weekDots} role="list" aria-label="This week">
-                  {weekDots.map(({ day, done, isToday, isFuture }: WeekDot, i: number) => {
-                    const missed = !done && !isToday && !isFuture;
-                    const dotClass = [
-                      styles.dot,
-                      done && styles.dotDone,
-                      isToday && styles.dotToday,
-                      !done && isFuture && styles.dotFuture,
-                      missed && styles.dotMissed,
-                    ]
-                      .filter(Boolean)
-                      .join(" ");
-                    const wrapClass = [
-                      styles.dotWrap,
-                      !done && isFuture && styles.dotWrapFuture,
-                      missed && styles.dotWrapMissed,
-                    ]
-                      .filter(Boolean)
-                      .join(" ");
-                    const dayLabelClass = [
-                      styles.dotDay,
-                      isToday && styles.dotDayToday,
-                      !done && isFuture && styles.dotDayFuture,
-                      missed && styles.dotDayMissed,
-                    ]
-                      .filter(Boolean)
-                      .join(" ");
-                    return (
-                      <div
-                        key={i}
-                        className={wrapClass}
-                        role="listitem"
-                        title={`${day}${done ? " — done" : ""}${isToday ? " (today)" : ""}${isFuture ? " (upcoming)" : ""}`}
-                      >
-                        <div className={dotClass} />
-                        <span className={dayLabelClass}>{day}</span>
-                      </div>
-                    );
-                  })}
+                  {weekDots.map(
+                    ({ day, done, isToday, isFuture }: WeekDot, i: number) => {
+                      const missed = !done && !isToday && !isFuture;
+                      const dotClass = [
+                        styles.dot,
+                        done && styles.dotDone,
+                        isToday && styles.dotToday,
+                        !done && isFuture && styles.dotFuture,
+                        missed && styles.dotMissed,
+                      ]
+                        .filter(Boolean)
+                        .join(" ");
+                      const wrapClass = [
+                        styles.dotWrap,
+                        !done && isFuture && styles.dotWrapFuture,
+                        missed && styles.dotWrapMissed,
+                      ]
+                        .filter(Boolean)
+                        .join(" ");
+                      const dayLabelClass = [
+                        styles.dotDay,
+                        isToday && styles.dotDayToday,
+                        !done && isFuture && styles.dotDayFuture,
+                        missed && styles.dotDayMissed,
+                      ]
+                        .filter(Boolean)
+                        .join(" ");
+                      return (
+                        <div
+                          key={i}
+                          className={wrapClass}
+                          role="listitem"
+                          title={`${day}${done ? " — done" : ""}${isToday ? " (today)" : ""}${isFuture ? " (upcoming)" : ""}`}
+                        >
+                          <div className={dotClass} />
+                          <span className={dayLabelClass}>{day}</span>
+                        </div>
+                      );
+                    },
+                  )}
                 </div>
               </div>
               {nextDailyXpMultiplier > 1.01 ? (
@@ -252,7 +257,9 @@ export function MenuScreen() {
                   </span>
                   <span className={styles.secondaryText}>
                     <span className={styles.secondaryLabel}>Puzzle Packs</span>
-                    <span className={styles.secondaryDesc}>Hand-picked themed puzzles</span>
+                    <span className={styles.secondaryDesc}>
+                      Hand-picked themed puzzles
+                    </span>
                   </span>
                   <ChevronRight size={16} className={styles.secondaryArrow} aria-hidden />
                 </button>
@@ -269,7 +276,9 @@ export function MenuScreen() {
                   </span>
                   <span className={styles.secondaryText}>
                     <span className={styles.secondaryLabel}>Quick Play</span>
-                    <span className={styles.secondaryDesc}>Pick any image and jump in</span>
+                    <span className={styles.secondaryDesc}>
+                      Pick any image and jump in
+                    </span>
                   </span>
                   <ChevronRight size={16} className={styles.secondaryArrow} aria-hidden />
                 </button>

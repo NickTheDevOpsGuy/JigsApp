@@ -479,11 +479,8 @@
   .topBar {
     min-height: 64px;
     max-height: none;
-    padding:
-      calc(8px + env(safe-area-inset-top, 0))
-      max(12px, env(safe-area-inset-right, 0))
-      8px
-      max(12px, env(safe-area-inset-left, 0));
+    padding: calc(8px + env(safe-area-inset-top, 0))
+      max(12px, env(safe-area-inset-right, 0)) 8px max(12px, env(safe-area-inset-left, 0));
   }
 
   .topBarInner {

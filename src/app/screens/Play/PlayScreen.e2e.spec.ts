@@ -242,9 +242,9 @@ test.describe("Play screen tablet touch", () => {
 
     const trayBox = await page.getByRole("list").boundingBox();
     expect(trayBox).not.toBeNull();
-    expect((trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0)).toBeLessThan(
-      1024,
-    );
+    expect(
+      (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
+    ).toBeLessThan(1024);
   });
 
   test("tablet replay keeps live board square and controls visible", async ({ page }) => {

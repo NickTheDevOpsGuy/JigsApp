@@ -5,7 +5,7 @@
     "!.git/**",
     "!dist/**",
     "!coverage/**",
-    "!test-results/**"
+    "!test-results/**",
   ],
   "config": {
     "default": true,
