@@ -292,7 +292,13 @@ export function ReplaySolveModal({
       viewLeft + viewWidth - shellWidth - safeEdge,
       Math.max(viewLeft + safeEdge, left - dockInsetPx),
     );
-    const headerGap = 12;
+    const isNarrowViewport = viewWidth <= 600;
+    const headerGap = isNarrowViewport ? 10 : 12;
+    const estimatedHeaderHeight = isNarrowViewport ? 62 : 82;
+    const headerTop = Math.max(
+      viewTop + safeEdge,
+      top - estimatedHeaderHeight - headerGap,
+    );
     const panelBottom = viewTop + viewHeight;
 
     const boardHeader = (
@@ -410,10 +416,9 @@ export function ReplaySolveModal({
         <div
           className={styles.cutoutBoardHeaderWrap}
           style={{
-            top,
+            top: headerTop,
             left,
             width,
-            transform: `translateY(calc(-100% - ${headerGap}px))`,
           }}
           onPointerDown={stopProp}
         >

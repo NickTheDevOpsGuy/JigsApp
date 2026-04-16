@@ -355,8 +355,8 @@
 
   /*
    * Replay portrait layout on mobile:
-   *   - header card above board  ≈ 72px  (boardHeader padding + font)
-   *   - header → board gap       ≈ 6px
+   *   - compact header above board ≈ 62px (boardHeader padding + font)
+   *   - header → board gap         ≈ 10px
    *   - board                    = stage size (CSS var, default 94vw)
    *   - board → dock gap         ≈ 10px
    *   - dock                     ≈ 130px
@@ -364,10 +364,10 @@
    *
    * padding-top pushes the board down so the header card has room above it.
    * Using --play-replay-header-h lets JS override if it can measure the real height.
-   * Default 80px is generous enough for 2-line headers + gap.
+   * Default 96px leaves the floating header fully inside the mobile safe area.
    */
   .boardLayoutShell[data-replay-active="true"] .playBody {
-    padding-top: var(--play-replay-header-h, 80px);
+    padding-top: var(--play-replay-header-h, 96px);
   }
 
   /* Don't let .main flex-grow into empty vertical space — stage stays content-sized */

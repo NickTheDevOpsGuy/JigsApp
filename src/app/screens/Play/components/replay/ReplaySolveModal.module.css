@@ -433,45 +433,59 @@
 /* ── Mobile phones ≤ 600px ── */
 @media (max-width: 600px) {
   .boardHeader {
+    align-items: center;
     gap: 8px;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border-radius: 12px;
   }
 
   .boardHeaderMain {
+    align-items: center;
     gap: 6px;
   }
 
+  .boardHeaderText {
+    gap: 3px;
+  }
+
   .headerTitle {
-    font-size: 0.82rem;
-    line-height: 1.15;
+    font-size: 0.8rem;
+    line-height: 1.05;
   }
 
   .resultHeader {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4px 10px;
+    gap: 2px 8px;
   }
 
   .resultTime {
-    font-size: 0.74rem;
+    gap: 4px;
+    font-size: 0.68rem;
+    line-height: 1.05;
+  }
+
+  .resultTimeIcon {
+    width: 13px;
+    height: 13px;
   }
 
   .resultMoves {
-    font-size: 0.7rem;
+    font-size: 0.66rem;
+    line-height: 1.05;
   }
 
   .boardCloseBtn {
     /* Larger tap target on mobile */
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
   }
 
   .packRemainingLabel {
-    max-width: 120px;
-    font-size: 0.72rem;
+    max-width: 96px;
+    font-size: 0.66rem;
   }
 
   /*
