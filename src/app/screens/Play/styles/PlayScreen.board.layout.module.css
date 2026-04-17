@@ -146,7 +146,7 @@
 
 .previewPanel {
   position: fixed;
-  top: calc(56px + 8px + env(safe-area-inset-top, 0));
+  top: calc(var(--play-top-bar-outer-h, 56px) + 8px);
   right: max(10px, env(safe-area-inset-right, 0));
   background: var(--color-bg-elevated);
   border-radius: var(--radius-btn);

@@ -3,6 +3,7 @@
 .page {
   /* Use % of layout width — 100vw/98vw can exceed the paintable area on mobile (iOS) and cause horizontal drift */
   --play-board-tray-width: min(100%, 760px);
+  --play-top-bar-outer-h: calc(56px + env(safe-area-inset-top, 0px));
   box-sizing: border-box;
   min-height: var(--app-vh-fill);
   height: 100%;
@@ -113,8 +114,9 @@
 
 /* HUD bar: aligned with board width; slightly increased height for breathing room; Undo/Redo only in menu */
 .topBar {
-  height: 56px;
-  max-height: 56px;
+  min-height: 56px;
+  height: auto;
+  max-height: none;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
@@ -165,7 +167,7 @@
   flex-shrink: 0;
   overflow-x: hidden;
   overflow-y: visible;
-  max-height: 56px;
+  max-height: var(--play-top-bar-outer-h);
   transition: max-height 0.25s ease;
   position: relative;
   z-index: 200;

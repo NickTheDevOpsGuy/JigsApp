@@ -822,3 +822,131 @@
 .dotDayMissed {
   opacity: 0.4;
 }
+
+/* Desktop and tablet adaptation must come after the mobile-first base rules,
+   otherwise the base .page/.main declarations overwrite the wider layout. */
+@media (min-width: 768px) {
+  .canvas {
+    align-items: flex-start;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+
+  .page {
+    width: min(100%, 900px);
+    max-width: 900px;
+    min-height: min(760px, calc(var(--app-vh-stable, 100dvh) - 56px));
+    max-height: calc(var(--app-vh-stable, 100dvh) - 24px);
+    height: auto;
+    padding: 22px 22px 26px;
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+      0 32px 80px rgba(0, 0, 0, 0.7),
+      0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .header {
+    margin-bottom: 8px;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+    gap: 18px;
+    align-items: start;
+    padding-top: 10px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .heroSection,
+  .supportSection {
+    padding: 18px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+      0 18px 42px rgba(0, 0, 0, 0.22);
+  }
+
+  .heroSection {
+    background:
+      radial-gradient(circle at top left, rgba(99, 102, 241, 0.14), transparent 44%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02));
+  }
+
+  .supportSection {
+    align-content: start;
+    background:
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 38%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.015));
+  }
+
+  .dailySpotlightHint,
+  .dailyComebackHint {
+    display: block;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(241, 241, 245, 0.72);
+  }
+
+  .puzzleLabelNum {
+    font-size: 30px;
+  }
+
+  .primaryBtn {
+    padding: 14px 18px;
+    border-radius: 18px;
+  }
+
+  .primaryBtnTitle {
+    font-size: 18px;
+  }
+
+  .primaryBtnSub {
+    font-size: 13px;
+  }
+
+  .weeklyCard {
+    padding: 14px 16px;
+  }
+
+  .weeklyCardText {
+    font-size: 14px;
+  }
+
+  .secondaryNav {
+    gap: 2px;
+  }
+
+  .secondaryRow {
+    padding: 12px 4px;
+  }
+
+  .secondaryLabel {
+    font-size: 15px;
+  }
+
+  .secondaryDesc {
+    font-size: 13px;
+  }
+
+  .divider {
+    margin: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page {
+    width: min(100%, 940px);
+    max-width: 940px;
+  }
+
+  .main {
+    grid-template-columns: minmax(0, 1.14fr) minmax(320px, 0.9fr);
+    gap: 20px;
+  }
+}

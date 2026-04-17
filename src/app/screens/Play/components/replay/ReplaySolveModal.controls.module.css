@@ -126,6 +126,8 @@
 
 @media (max-width: 600px) {
   .dockHeader {
+    width: min(100%, 360px);
+    margin: 0 auto;
     padding: 0 0 8px;
   }
 
@@ -134,6 +136,8 @@
   }
 
   .seekRow {
+    width: min(100%, 360px);
+    margin: 0 auto;
     padding: 0 0 12px;
   }
 
@@ -143,12 +147,14 @@
   }
 
   .speedBadge {
-    padding: 6px 14px;
-    min-height: 32px;
+    padding: 5px 12px;
+    min-height: 30px;
   }
 
   .controlRow {
-    flex-wrap: nowrap;
+    width: min(100%, 360px);
+    margin: 0 auto;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
     padding: 14px 0 0;
@@ -177,7 +183,7 @@
   }
 
   .speedTrigger {
-    min-width: 44px;
+    min-width: 48px;
     min-height: 40px;
     padding: 0 10px;
     font-size: 0.8rem;
