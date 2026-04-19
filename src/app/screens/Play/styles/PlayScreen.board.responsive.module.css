@@ -523,6 +523,66 @@
   }
 }
 
+@media (min-width: 820px) and (max-width: 1180px) and (pointer: coarse) and (orientation: landscape) {
+  .page {
+    --play-board-tray-width: min(100%, 980px);
+  }
+
+  .boardLayoutShell {
+    max-width: min(100%, 980px);
+    gap: 8px;
+  }
+
+  .playBody {
+    --play-board-tray-gap: 14px;
+    --play-tablet-side-tray-w: clamp(248px, 29vw, 320px);
+    --play-board-stage-size: min(
+      calc(var(--app-vh-fill, 100dvh) - 148px),
+      calc(100vw - var(--play-tablet-side-tray-w) - 72px)
+    );
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    gap: var(--play-board-tray-gap);
+    padding: 12px 14px 0;
+  }
+
+  .playBody .main {
+    flex: 0 1 auto;
+    width: min(100%, calc(var(--play-board-stage-size) + 28px));
+    height: auto;
+    max-height: none;
+    padding-top: 0;
+    padding-bottom: 0;
+    align-items: center;
+    overflow: visible;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .playBody .trayArea {
+    width: var(--play-tablet-side-tray-w);
+    min-width: 0;
+    margin-top: 0;
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+    border-radius: 18px;
+    align-self: stretch;
+    justify-content: stretch;
+  }
+
+  .playBody .trayArea .tray,
+  .playBody .trayArea .tray.trayWrapLarge {
+    flex: 1 1 auto;
+    height: 100%;
+    max-height: none;
+    min-height: 0;
+  }
+
+  .playBody .trayArea .scrollerWrap {
+    min-height: 0;
+  }
+}
+
 @media (max-height: 500px) and (pointer: coarse) {
   .topBar {
     height: 44px;

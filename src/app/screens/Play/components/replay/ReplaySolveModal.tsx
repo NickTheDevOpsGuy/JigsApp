@@ -313,6 +313,8 @@ export function ReplaySolveModal({
     const cutoutRadius = 20;
     const safeEdge = 12;
     const dockInsetPx = 8;
+    const estimatedDockHeight = 214;
+    const minSideDockWidth = 288;
     const maxShell = Math.max(0, viewWidth - 2 * safeEdge);
     const shellWidth = Math.min(maxShell, width + dockInsetPx * 2);
     const shellLeft = Math.min(
@@ -327,6 +329,45 @@ export function ReplaySolveModal({
       top - estimatedHeaderHeight - headerGap,
     );
     const panelBottom = viewTop + viewHeight;
+    const availableBelow = panelBottom - (bottom + 16) - safeEdge;
+    const availableLeft = left - (viewLeft + safeEdge) - 12;
+    const availableRight = viewLeft + viewWidth - right - safeEdge - 12;
+    const preferredSideDockWidth = Math.min(
+      360,
+      Math.max(minSideDockWidth, Math.round(viewWidth * 0.28)),
+    );
+    const canUseSideDock =
+      availableBelow < estimatedDockHeight &&
+      viewWidth >= 900 &&
+      Math.max(availableLeft, availableRight) >= minSideDockWidth;
+    const useRightSideDock = availableRight >= Math.max(availableLeft, minSideDockWidth);
+    const useSideDock =
+      canUseSideDock && (useRightSideDock || availableLeft >= minSideDockWidth);
+    const sideDockWidth = Math.min(
+      preferredSideDockWidth,
+      Math.max(0, useRightSideDock ? availableRight : availableLeft),
+    );
+    const compactDock =
+      availableBelow < estimatedDockHeight + 28 ||
+      (viewHeight <= 820 && viewWidth <= 1180);
+    const dockTop = useSideDock
+      ? Math.min(
+          panelBottom - estimatedDockHeight - safeEdge,
+          Math.max(
+            viewTop + safeEdge,
+            top + Math.max(12, (height - estimatedDockHeight) / 2),
+          ),
+        )
+      : Math.min(
+          panelBottom - estimatedDockHeight - safeEdge,
+          Math.max(viewTop + safeEdge, bottom + 16),
+        );
+    const dockLeft = useSideDock
+      ? useRightSideDock
+        ? right + 12
+        : left - sideDockWidth - 12
+      : shellLeft;
+    const dockWidth = useSideDock ? sideDockWidth : shellWidth;
 
     const boardHeader = (
       <div className={styles.boardHeader}>
@@ -460,7 +501,10 @@ export function ReplaySolveModal({
 
         <div
           className={styles.controlDock}
-          style={{ left: shellLeft, width: shellWidth, top: bottom + 16 }}
+          data-replay-dock="true"
+          data-dock-placement={useSideDock ? "side" : "bottom"}
+          data-dock-compact={compactDock ? "true" : "false"}
+          style={{ left: dockLeft, width: dockWidth, top: dockTop }}
           onPointerDown={stopProp}
         >
           <div className={`${styles.controlDockInner} ${styles.controlDockInnerCutout}`}>

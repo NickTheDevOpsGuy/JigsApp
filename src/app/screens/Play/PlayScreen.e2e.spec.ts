@@ -252,6 +252,72 @@ test.describe("Play screen", () => {
     expect((playBox?.y ?? 0) - (optionsBox?.y ?? 0)).toBeGreaterThan(24);
   });
 
+  test("tablet landscape replay keeps the dock on-screen and attached to the board", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+
+    const replayHeading = page.getByRole("heading", { name: /replay solve/i });
+    const replayClose = page.getByRole("button", { name: /close replay/i });
+    const replayProgress = page.getByRole("slider", { name: /replay progress/i });
+    const dock = page.locator('[data-replay-dock="true"]');
+
+    await expect(replayHeading).toBeVisible({ timeout: 10000 });
+    await expect(replayClose).toBeInViewport();
+    await expect(replayProgress).toBeInViewport();
+    await expect(dock).toBeInViewport();
+
+    const viewport = page.viewportSize();
+    const dockBox = await dock.boundingBox();
+    const boardBox = await page.getByTestId("play-board").boundingBox();
+
+    expect(viewport).not.toBeNull();
+    expect(dockBox).not.toBeNull();
+    expect(boardBox).not.toBeNull();
+    expect((dockBox?.x ?? 0) + (dockBox?.width ?? 0)).toBeLessThanOrEqual(
+      (viewport?.width ?? 0) + 1,
+    );
+    expect((dockBox?.y ?? 0) + (dockBox?.height ?? 0)).toBeLessThanOrEqual(
+      (viewport?.height ?? 0) + 1,
+    );
+    expect(Math.abs((dockBox?.x ?? 0) - (boardBox?.x ?? 0))).toBeLessThanOrEqual(
+      (boardBox?.width ?? 0) + 32,
+    );
+  });
+
+  test("short desktop replay keeps header, slider, and controls reachable", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+
+    const replayClose = page.getByRole("button", { name: /close replay/i });
+    const replayProgress = page.getByRole("slider", { name: /replay progress/i });
+    const playButton = page.getByRole("button", { name: "Play", exact: true });
+    const optionsButton = page.getByRole("button", {
+      name: /replay and playback options/i,
+    });
+    const dock = page.locator('[data-replay-dock="true"]');
+
+    await expect(replayClose).toBeInViewport();
+    await expect(replayProgress).toBeInViewport();
+    await expect(playButton).toBeInViewport();
+    await expect(optionsButton).toBeInViewport();
+    await expect(dock).toBeInViewport();
+
+    const dockCompact = await dock.getAttribute("data-dock-compact");
+    expect(dockCompact).toBe("true");
+  });
+
   test("desktop completion options menu lists share actions", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/play?e2eCompletion=1");
@@ -356,6 +422,56 @@ test.describe("Play screen tablet touch", () => {
     expect(liveBoardBox).not.toBeNull();
     expect(
       Math.abs((liveBoardBox?.width ?? 0) - (liveBoardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
+  });
+
+  test("tablet landscape keeps the tray dock beside the board without clipping", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto("/play");
+
+    const liveBoard = page.getByTestId("play-board");
+    const tray = page.getByRole("list");
+    await expect(liveBoard).toBeVisible({ timeout: 15000 });
+    await expect(tray).toBeVisible({ timeout: 5000 });
+
+    const liveBoardBox = await liveBoard.boundingBox();
+    const trayBox = await tray.boundingBox();
+    expect(liveBoardBox).not.toBeNull();
+    expect(trayBox).not.toBeNull();
+    expect(trayBox?.x ?? 0).toBeGreaterThan(
+      (liveBoardBox?.x ?? 0) + (liveBoardBox?.width ?? 0) - 40,
+    );
+    expect((trayBox?.y ?? 0) + (trayBox?.height ?? 0)).toBeLessThanOrEqual(768);
+  });
+
+  test("tablet rotate keeps the board square and tray visible", async ({ page }) => {
+    await page.goto("/play");
+
+    const liveBoard = page.getByTestId("play-board");
+    const tray = page.getByRole("list");
+    await expect(liveBoard).toBeVisible({ timeout: 15000 });
+    await expect(tray).toBeVisible({ timeout: 5000 });
+
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await expect(liveBoard).toBeVisible();
+    await expect(tray).toBeVisible();
+
+    const landscapeBoardBox = await liveBoard.boundingBox();
+    expect(landscapeBoardBox).not.toBeNull();
+    expect(
+      Math.abs((landscapeBoardBox?.width ?? 0) - (landscapeBoardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
+
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await expect(liveBoard).toBeVisible();
+    await expect(tray).toBeVisible();
+
+    const portraitBoardBox = await liveBoard.boundingBox();
+    expect(portraitBoardBox).not.toBeNull();
+    expect(
+      Math.abs((portraitBoardBox?.width ?? 0) - (portraitBoardBox?.height ?? 0)),
     ).toBeLessThanOrEqual(2);
   });
 });

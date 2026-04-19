@@ -259,6 +259,81 @@
   pointer-events: auto;
 }
 
+.controlDock[data-dock-placement="side"] .controlDockInner {
+  min-height: 0;
+}
+
+.controlDock[data-dock-placement="side"][data-dock-compact="false"] .controlDockInner {
+  padding: 16px;
+}
+
+.controlDock[data-dock-placement="side"] .seekRow {
+  padding-bottom: 12px;
+}
+
+.controlDock[data-dock-placement="side"] .seekMetaRow {
+  align-items: flex-start;
+}
+
+.controlDock[data-dock-placement="side"] .controlRow {
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.controlDock[data-dock-placement="side"] .controlBtn {
+  width: 34px;
+  height: 34px;
+}
+
+.controlDock[data-dock-placement="side"] .controlBtnPlay {
+  width: 34px;
+  height: 34px;
+}
+
+.controlDock[data-dock-placement="side"] .controlBtn svg,
+.controlDock[data-dock-placement="side"] .controlBtnPlay svg {
+  width: 18px;
+  height: 18px;
+}
+
+.controlDock[data-dock-compact="true"] .controlDockInner {
+  padding: 12px;
+  border-radius: 14px;
+}
+
+.controlDock[data-dock-compact="true"] .seekRow {
+  padding-bottom: 10px;
+}
+
+.controlDock[data-dock-compact="true"] .seekMetaRow {
+  gap: 8px 10px;
+}
+
+.controlDock[data-dock-compact="true"] .seekTime {
+  font-size: 0.74rem;
+}
+
+.controlDock[data-dock-compact="true"] .controlRow {
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.controlDock[data-dock-compact="true"] .controlBtn {
+  width: 34px;
+  height: 34px;
+}
+
+.controlDock[data-dock-compact="true"] .controlBtnPlay {
+  width: 34px;
+  height: 34px;
+}
+
+.controlDock[data-dock-compact="true"] .controlBtn svg,
+.controlDock[data-dock-compact="true"] .controlBtnPlay svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* controlDockBottomAnchored kept for legacy; dock now positioned via inline top from boardRect */
 .controlDockBottomAnchored {
   top: auto;

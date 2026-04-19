@@ -4,17 +4,17 @@
  */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "54";
+export const CHANGELOG_VERSION = "56";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      "Stable board near the finish — the piece tray keeps the same vertical space when the scroll strip hides, so the board doesn’t jump as you place the last pieces.",
-      "Consistent phone & tablet widths — play, replay, and the win screen all use the same 600px phone breakpoint; tablets (601–1024px) get a slightly roomier tray under the board.",
-      "Mobile replay polish — more room for the board and cleaner control spacing on small screens.",
-      "Closing replay stays on your solved board — no surprise jump to another flow; Escape on modals is handled once (no double-dismiss quirks).",
+      "Tablet landscape play feels more intentional — the board and tray now compose better side by side instead of feeling like a stretched phone layout.",
+      "Touch tray upgrades — quick filters and hold-to-preview make it easier to find and inspect pieces on phones and tablets.",
+      "Rotate confidence is stronger — tablet portrait, tablet landscape, and replay flows now have better viewport coverage and fewer clipping risks.",
+      "Replay still returns cleanly to your completed puzzle — no surprise jump to another flow.",
     ],
   },
 ];

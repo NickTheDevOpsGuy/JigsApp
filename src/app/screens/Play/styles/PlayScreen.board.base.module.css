@@ -56,7 +56,7 @@
     --play-board-tray-gap: 14px;
     --play-board-stage-size: min(
       var(--play-board-tray-width, min(100%, 680px)),
-      calc(var(--app-vh-fill, 100dvh) - 326px)
+      calc(var(--app-vh-fill, 100dvh) - 384px)
     );
     padding-top: 12px;
   }
@@ -70,9 +70,9 @@
 
   .playBody .trayArea .tray,
   .playBody .trayArea .tray.trayWrapLarge {
-    height: clamp(112px, 15vh, 156px);
-    max-height: min(156px, 20vh);
-    min-height: 96px;
+    height: clamp(104px, 13vh, 138px);
+    max-height: min(138px, 18vh);
+    min-height: 92px;
   }
 }
 

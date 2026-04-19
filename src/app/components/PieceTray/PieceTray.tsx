@@ -55,6 +55,10 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
 ) {
   const isMobile = useMediaQuery("(max-width: 600px)");
   const isCoarsePointer = useMediaQuery("(pointer: coarse)");
+  const [previewPieceId, setPreviewPieceId] = React.useState<string | null>(null);
+  const longPressTimerRef = React.useRef<number | null>(null);
+  const longPressStartRef = React.useRef<{ x: number; y: number } | null>(null);
+  const suppressNextClickRef = React.useRef(false);
 
   const totalSlots = grid.rows * grid.cols;
   const compact = totalSlots >= 25;
@@ -70,6 +74,21 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   const { scrollerRef, scrollProgress, canScrollLeft, canScrollRight, scrollByOnePiece } =
     usePieceTrayScroll(traySlots.length);
   const thumbsById = usePieceTrayThumbs(displayed, image, grid, thumbSize, compact);
+
+  const clearLongPressTimer = React.useCallback(() => {
+    if (longPressTimerRef.current != null) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  const clearTouchPreview = React.useCallback(() => {
+    clearLongPressTimer();
+    longPressStartRef.current = null;
+    setPreviewPieceId(null);
+  }, [clearLongPressTimer]);
+
+  React.useEffect(() => () => clearTouchPreview(), [clearTouchPreview]);
 
   const emptyText = "Drag pieces here to store them";
 
@@ -127,13 +146,43 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
                 <button
                   key={slot.piece.id}
                   type="button"
-                  className={`${styles.pieceButton} ${highlightedPieceIds?.has(slot.piece.id) ? styles.pieceButtonPulse : ""}`}
-                  onClick={() => onPieceClick(slot.piece.id)}
+                  className={`${styles.pieceButton} ${highlightedPieceIds?.has(slot.piece.id) ? styles.pieceButtonPulse : ""} ${previewPieceId === slot.piece.id ? styles.pieceButtonPreviewing : ""}`}
+                  onClick={() => {
+                    if (suppressNextClickRef.current) {
+                      suppressNextClickRef.current = false;
+                      return;
+                    }
+                    onPieceClick(slot.piece.id);
+                  }}
+                  onPointerDown={(e) => {
+                    if (!isCoarsePointer || e.pointerType === "mouse") return;
+                    clearLongPressTimer();
+                    longPressStartRef.current = { x: e.clientX, y: e.clientY };
+                    longPressTimerRef.current = window.setTimeout(() => {
+                      setPreviewPieceId(slot.piece.id);
+                      suppressNextClickRef.current = true;
+                    }, 220);
+                  }}
+                  onPointerMove={(e) => {
+                    if (!longPressStartRef.current) return;
+                    const dx = e.clientX - longPressStartRef.current.x;
+                    const dy = e.clientY - longPressStartRef.current.y;
+                    if (Math.hypot(dx, dy) > 10) {
+                      clearLongPressTimer();
+                    }
+                  }}
+                  onPointerUp={clearTouchPreview}
+                  onPointerCancel={clearTouchPreview}
                   onPointerEnter={
                     onTrayPieceHover ? () => onTrayPieceHover(slot.piece.id) : undefined
                   }
                   onPointerLeave={
-                    onTrayPieceHover ? () => onTrayPieceHover(null) : undefined
+                    onTrayPieceHover
+                      ? () => {
+                          onTrayPieceHover(null);
+                          clearTouchPreview();
+                        }
+                      : clearTouchPreview
                   }
                   aria-label={`Place piece ${slot.piece.id}`}
                   title={`Place piece ${slot.piece.id}`}
@@ -169,6 +218,16 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
           >
             <ChevronRight size={20} aria-hidden />
           </button>
+        )}
+        {previewPieceId && thumbsById.has(previewPieceId) && (
+          <div className={styles.touchPreviewOverlay} aria-hidden="true">
+            <div className={styles.touchPreviewCard}>
+              <div className={styles.touchPreviewThumb}>
+                <img src={thumbsById.get(previewPieceId)} alt="" draggable={false} />
+              </div>
+              <div className={styles.touchPreviewLabel}>Hold to preview piece</div>
+            </div>
+          </div>
         )}
       </div>
     </div>
