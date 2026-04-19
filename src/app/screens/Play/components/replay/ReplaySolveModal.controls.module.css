@@ -30,7 +30,8 @@
   height: 38px;
   padding: 0;
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 38%, var(--color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 38%, var(--color-border));
   background: linear-gradient(
     145deg,
     color-mix(in srgb, var(--color-bg-elevated) 96%, transparent),
@@ -70,7 +71,8 @@
   padding: 12px 10px 10px;
   border-radius: 14px;
   background: color-mix(in srgb, var(--color-bg-card) 98%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 32%, var(--color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 32%, var(--color-border));
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.28),
     0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 14%, transparent);
@@ -146,7 +148,9 @@
   font-weight: 700;
   text-align: left;
   cursor: pointer;
-  transition: background 0.12s ease, opacity 0.12s ease;
+  transition:
+    background 0.12s ease,
+    opacity 0.12s ease;
 }
 
 .playbackMenuRowBtn:hover:not(:disabled) {

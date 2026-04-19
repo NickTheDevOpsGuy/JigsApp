@@ -108,11 +108,7 @@ export function ReplayPlaybackMenu({
   const canExport = Boolean(replayExport && replayExport.snapshots.length > 1);
 
   return (
-    <div
-      className={styles.playbackMenuRoot}
-      ref={rootRef}
-      onPointerDown={stopProp}
-    >
+    <div className={styles.playbackMenuRoot} ref={rootRef} onPointerDown={stopProp}>
       <button
         type="button"
         className={styles.playbackMenuTrigger}
