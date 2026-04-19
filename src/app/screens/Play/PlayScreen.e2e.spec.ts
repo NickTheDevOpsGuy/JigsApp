@@ -190,9 +190,9 @@ test.describe("Play screen", () => {
 
     expect(restartBox).not.toBeNull();
     expect(playBox).not.toBeNull();
-    expect(Math.abs((playBox?.width ?? 0) - (restartBox?.width ?? 0))).toBeLessThanOrEqual(
-      2,
-    );
+    expect(
+      Math.abs((playBox?.width ?? 0) - (restartBox?.width ?? 0)),
+    ).toBeLessThanOrEqual(2);
     expect(
       Math.abs((playBox?.height ?? 0) - (restartBox?.height ?? 0)),
     ).toBeLessThanOrEqual(2);
