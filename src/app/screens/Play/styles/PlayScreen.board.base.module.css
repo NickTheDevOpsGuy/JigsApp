@@ -33,15 +33,16 @@
  * otherwise flatten bottom corners). +46px = board + ring + top/bottom padding inside .main.
  */
 @media (min-width: 601px) {
+  .playBody {
+    --play-board-stage-size: min(
+      var(--play-board-tray-width, min(100%, 760px)),
+      calc(var(--app-vh-fill, 100dvh) - 338px)
+    );
+  }
+
   .playBody .main {
-    height: min(
-      calc(var(--play-board-tray-width, min(100%, 760px)) + 46px),
-      calc(var(--app-vh-stable, 100dvh) - 292px)
-    );
-    max-height: min(
-      calc(var(--play-board-tray-width, min(100%, 760px)) + 46px),
-      calc(var(--app-vh-stable, 100dvh) - 292px)
-    );
+    height: calc(var(--play-board-stage-size) + 46px);
+    max-height: calc(var(--play-board-stage-size) + 46px);
     padding-bottom: 10px;
     overflow: hidden;
     border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
@@ -53,18 +54,16 @@
   .playBody {
     --play-board-tray-width: min(100%, 680px);
     --play-board-tray-gap: 14px;
+    --play-board-stage-size: min(
+      var(--play-board-tray-width, min(100%, 680px)),
+      calc(var(--app-vh-fill, 100dvh) - 326px)
+    );
     padding-top: 12px;
   }
 
   .playBody .main {
-    height: min(
-      calc(var(--play-board-tray-width, min(100%, 680px)) + 34px),
-      calc(var(--app-vh-stable, 100dvh) - 292px)
-    );
-    max-height: min(
-      calc(var(--play-board-tray-width, min(100%, 680px)) + 34px),
-      calc(var(--app-vh-stable, 100dvh) - 292px)
-    );
+    height: calc(var(--play-board-stage-size) + 34px);
+    max-height: calc(var(--play-board-stage-size) + 34px);
     padding-top: 8px;
     padding-bottom: 8px;
   }
@@ -272,8 +271,14 @@
 
 /* Depth (47): Board layer – dominant; pieces render on canvas inside */
 .boardWrapper {
-  width: var(--play-board-tray-width, min(100%, 760px));
-  max-width: 100%;
+  width: min(
+    100%,
+    var(--play-board-stage-size, var(--play-board-tray-width, min(100%, 760px)))
+  );
+  max-width: min(
+    100%,
+    var(--play-board-stage-size, var(--play-board-tray-width, min(100%, 760px)))
+  );
   aspect-ratio: 1 / 1;
   max-height: 100%;
   margin: 0 auto;

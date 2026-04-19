@@ -2,8 +2,10 @@ import { defineConfig, devices } from "@playwright/test";
 
 const isCI = !!process.env.CI;
 const useDevServer = process.env.PW_USE_DEV_SERVER === "1";
-const localChromiumUse =
+const chromeChannelUse =
   !isCI && process.env.PW_USE_CHROME === "1" ? { channel: "chrome" as const } : {};
+const edgeChannelUse =
+  !isCI && process.env.PW_USE_EDGE === "1" ? { channel: "msedge" as const } : {};
 
 /**
  * Playwright config for Phuzzle E2E tests.
@@ -24,46 +26,46 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"], ...localChromiumUse } },
+    { name: "chrome", use: { ...devices["Desktop Chrome"], ...chromeChannelUse } },
     {
-      name: "chromium-tz-la",
+      name: "chrome-tz-la",
       use: {
         ...devices["Desktop Chrome"],
-        ...localChromiumUse,
+        ...chromeChannelUse,
         timezoneId: "America/Los_Angeles",
       },
     },
     {
-      name: "chromium-tz-auckland",
+      name: "chrome-tz-auckland",
       use: {
         ...devices["Desktop Chrome"],
-        ...localChromiumUse,
+        ...chromeChannelUse,
         timezoneId: "Pacific/Auckland",
       },
     },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-    { name: "webkit", use: { ...devices["Desktop Safari"] } },
-    /** Microsoft Edge (Chromium). Install: `npx playwright install msedge` */
+    { name: "safari", use: { ...devices["Desktop Safari"] } },
+    /** Microsoft Edge-compatible desktop coverage. Set PW_USE_EDGE=1 to force the local Edge channel. */
     {
-      name: "msedge",
-      use: { ...devices["Desktop Edge"], channel: "msedge" },
+      name: "edge",
+      use: { ...devices["Desktop Edge"], ...edgeChannelUse },
     },
     {
-      name: "webkit-iphone-responsive",
+      name: "safari-iphone-responsive",
       testMatch: "**/*.responsive.e2e.spec.ts",
       use: { ...devices["iPhone 13"], browserName: "webkit" },
     },
     {
-      name: "webkit-ipad-responsive",
+      name: "safari-ipad-responsive",
       testMatch: "**/*.responsive.e2e.spec.ts",
       use: { ...devices["iPad Pro 11"], browserName: "webkit" },
     },
     {
-      name: "chromium-android-tablet-responsive",
+      name: "chrome-android-tablet-responsive",
       testMatch: "**/*.responsive.e2e.spec.ts",
       use: {
         browserName: "chromium",
-        ...localChromiumUse,
+        ...chromeChannelUse,
         viewport: { width: 820, height: 1180 },
         hasTouch: true,
         isMobile: true,

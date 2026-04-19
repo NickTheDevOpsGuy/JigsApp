@@ -11,7 +11,11 @@ import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
 import { getCompletedPuzzleIds, setCurrentPuzzleId } from "@/data/packs/packCompletion";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
-import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
+import {
+  STORAGE_KEY,
+  GRID_KEY,
+  GRID_ONCE_KEY,
+} from "@/screens/Play/core/utils/playScreenUtils";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import { loadPackListScreenModule } from "@/screens/routeLoaders";
@@ -60,6 +64,7 @@ export function PackDetailScreen() {
     const grid = GRID_OPTIONS[DEFAULT_GRID_INDEX] ?? GRID_OPTIONS[0];
     clearPuzzleState();
     safeLocalStorage.setItem(STORAGE_KEY, puzzle.fullImage);
+    safeLocalStorage.setItem(GRID_KEY, `${grid.rows}x${grid.cols}`);
     safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
     void loadPlayScreenModule();
     nav("/play");

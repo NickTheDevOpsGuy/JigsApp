@@ -6,10 +6,11 @@ import { Play, Pause, SkipBack, SkipForward, RotateCcw, RotateCw } from "lucide-
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module.css";
+import { ReplayPlaybackMenu } from "@/screens/Play/components/replay/ReplayPlaybackMenu";
+import type { ReplaySnapshot } from "@/screens/Play/hooks/gameplay/useReplay";
 import {
   invokeMaybeAsync,
   invokeMaybeAsyncIndex,
-  invokeMaybeAsyncSpeed,
   type ReplaySeekCb,
   type ReplaySpeedCb,
   type ReplayVoidCb,
@@ -25,7 +26,8 @@ export interface ReplaySolveModalControlsProps {
   onFastForward: ReplayVoidCb;
   onSkipBack15?: ReplayVoidCb;
   onSkipForward15?: ReplayVoidCb;
-  effectiveSpeed: number;
+  speed: number;
+  speedExplicitlyChosen: boolean;
   onSpeedChange: ReplaySpeedCb;
   currentIndex: number;
   totalSnapshots: number;
@@ -33,9 +35,14 @@ export interface ReplaySolveModalControlsProps {
   totalSeconds: number;
   onSeek?: ReplaySeekCb;
   progressPct: number;
+  replayExport: {
+    snapshots: ReplaySnapshot[];
+    puzzleKey: number | null;
+    puzzleName?: string;
+    totalSeconds: number;
+  } | null;
+  onExportFeedback?: (message: string) => void;
 }
-
-const SPEEDS = [1, 2, 3] as const;
 
 function stopProp(e: React.PointerEvent) {
   e.stopPropagation();
@@ -49,7 +56,8 @@ export function ReplaySolveModalControls({
   onFastForward,
   onSkipBack15,
   onSkipForward15,
-  effectiveSpeed,
+  speed,
+  speedExplicitlyChosen,
   onSpeedChange,
   currentIndex,
   totalSnapshots,
@@ -57,13 +65,9 @@ export function ReplaySolveModalControls({
   totalSeconds,
   onSeek,
   progressPct,
+  replayExport,
+  onExportFeedback,
 }: ReplaySolveModalControlsProps) {
-  const cycleSpeed = () => {
-    const idx = SPEEDS.indexOf(effectiveSpeed as 1 | 2 | 3);
-    const next = SPEEDS[(idx + 1) % SPEEDS.length];
-    invokeMaybeAsyncSpeed(onSpeedChange, next);
-  };
-
   const handlePlayPause = () => {
     if (isPaused) invokeMaybeAsync(onPlay);
     else invokeMaybeAsync(onPause);
@@ -173,13 +177,13 @@ export function ReplaySolveModalControls({
             <span className={styles.seekTime} aria-live="polite">
               {formatTime(elapsedSeconds)} / {formatTime(totalSeconds)}
             </span>
-            <span
-              className={styles.speedBadge}
-              aria-label={`Playback speed ${effectiveSpeed}x`}
-              title={`Playback speed ${effectiveSpeed}x`}
-            >
-              {effectiveSpeed}x
-            </span>
+            <ReplayPlaybackMenu
+              speed={speed}
+              speedExplicitlyChosen={speedExplicitlyChosen}
+              onSpeedChange={onSpeedChange}
+              replayExport={replayExport}
+              onExportFeedback={onExportFeedback}
+            />
           </div>
         </div>
       </div>
@@ -242,16 +246,6 @@ export function ReplaySolveModalControls({
           title="End"
         >
           <RotateCw size={20} aria-hidden />
-        </button>
-        <button
-          type="button"
-          className={styles.speedTrigger}
-          onClick={cycleSpeed}
-          onPointerDown={stopProp}
-          aria-label={`Playback speed ${effectiveSpeed}x. Click to change.`}
-          title="Speed"
-        >
-          {effectiveSpeed}x
         </button>
       </div>
     </>

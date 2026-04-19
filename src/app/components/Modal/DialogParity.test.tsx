@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   getTodayDailyPuzzle: vi.fn(),
   startDailyPuzzle: vi.fn(),
   markChangelogSeen: vi.fn(),
+  setCurrentPuzzleId: vi.fn(),
 }));
 
 vi.mock("react-router-dom", async () => {
@@ -61,7 +62,7 @@ vi.mock("@/data/packs/loadPacksData", () => ({
 vi.mock("@/data/packs/packCompletion", () => ({
   getCompletedPuzzleIds: vi.fn(() => new Set(["charcuterie-board"])),
   getPackProgress: vi.fn(() => ({ completed: 1, total: 2 })),
-  setCurrentPuzzleId: vi.fn(),
+  setCurrentPuzzleId: (...args: unknown[]) => mocks.setCurrentPuzzleId(...args),
 }));
 
 vi.mock("@/data/content/changelog", () => ({
@@ -85,6 +86,7 @@ beforeEach(() => {
   mocks.getTodayDailyPuzzle.mockReset();
   mocks.startDailyPuzzle.mockReset();
   mocks.markChangelogSeen.mockReset();
+  mocks.setCurrentPuzzleId.mockReset();
   mocks.getTodayDailyPuzzle.mockReturnValue({
     id: "daily-food",
     name: "Daily Food",
@@ -201,6 +203,7 @@ describe("dialog parity", () => {
     expect(screen.getByRole("button", { name: /master - 49 pieces/i })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /start puzzle/i }));
+    expect(mocks.setCurrentPuzzleId).toHaveBeenCalledWith(null);
     expect(mocks.startDailyPuzzle).toHaveBeenCalledTimes(1);
     expect(mocks.navigate).toHaveBeenCalledWith("/play");
   });
@@ -208,7 +211,7 @@ describe("dialog parity", () => {
   it("keeps choose puzzle parity across staged flow with persistent arrow controls", async () => {
     render(<ChoosePuzzleModal isOpen onClose={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole("option", { name: /^food$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^food$/i }));
 
     expect(await screen.findByRole("listbox", { name: /choose a puzzle/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /scroll left/i })).toBeTruthy();
@@ -218,6 +221,9 @@ describe("dialog parity", () => {
 
     expect(await screen.findByRole("button", { name: /start puzzle/i })).toBeTruthy();
     expect(screen.getAllByText(/pieces/i).length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole("button", { name: /start puzzle/i }));
+    expect(mocks.setCurrentPuzzleId).toHaveBeenCalledWith(null);
   });
 
   it("keeps pack choice async-safe from loading state through setup", async () => {

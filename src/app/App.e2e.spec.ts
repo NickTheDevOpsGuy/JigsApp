@@ -43,7 +43,9 @@ test.describe("Routes, feedback, and pack deep links", () => {
   test("pack detail deep link loads and can launch play", async ({ page }) => {
     await page.goto("/packs/nature");
 
-    await expect(page.getByRole("button", { name: /back to packs/i })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /back to packs/i }).first(),
+    ).toBeVisible();
     await expect(page.getByText("Nature")).toBeVisible();
     await expect(page.getByRole("list", { name: /puzzle list/i })).toBeVisible();
 

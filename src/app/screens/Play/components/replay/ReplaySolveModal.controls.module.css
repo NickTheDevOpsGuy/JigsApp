@@ -2,32 +2,168 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 0 0 10px;
+  padding: 0 0 12px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 22%, var(--color-border));
 }
 
 .dockTitle {
   margin: 0;
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.88rem;
+  font-weight: 800;
   color: var(--color-text-primary);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 
-/* Speed badge next to timeline — symmetric padding; row uses space-between for alignment */
-.speedBadge {
+/* ── Cog menu: speed + save/share (replaces inline speed badge + bottom speed chip) ── */
+.playbackMenuRoot {
+  position: relative;
   flex-shrink: 0;
+}
+
+.playbackMenuTrigger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 38%, var(--color-border));
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-bg-elevated) 96%, transparent),
+    color-mix(in srgb, var(--color-brand-primary) 10%, transparent)
+  );
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 0 0 1px color-mix(in srgb, #ffffff 8%, transparent);
+}
+
+.playbackMenuTrigger:hover {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 55%, transparent);
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--color-brand-primary) 28%, transparent),
+    0 2px 10px rgba(0, 0, 0, 0.14);
+  transform: translateY(-1px);
+}
+
+.playbackMenuTrigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.playbackMenuPopover {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 5;
+  min-width: 220px;
+  max-width: min(92vw, 280px);
+  padding: 12px 10px 10px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-bg-card) 98%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 32%, var(--color-border));
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.28),
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 14%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: playbackMenuIn 0.16s ease-out;
+}
+
+@keyframes playbackMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.playbackMenuSectionLabel {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding: 2px 6px 6px;
+}
+
+.playbackMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  margin: 0 0 2px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 0.88rem;
   font-weight: 700;
-  color: var(--color-text-secondary);
-  padding: 6px 14px;
-  min-height: 30px;
-  box-sizing: border-box;
-  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.playbackMenuItem:hover {
   background: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
+}
+
+.playbackMenuItemActive {
+  background: color-mix(in srgb, var(--color-brand-primary) 16%, transparent);
+}
+
+.playbackMenuDivider {
+  height: 1px;
+  margin: 8px 4px 10px;
+  background: color-mix(in srgb, var(--color-border) 88%, transparent);
+}
+
+.playbackMenuRowBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 10px;
+  margin: 0 0 4px;
+  border: none;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 88%, transparent);
+  color: var(--color-text-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease, opacity 0.12s ease;
+}
+
+.playbackMenuRowBtn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-brand-primary) 18%, transparent);
+}
+
+.playbackMenuRowBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.playbackMenuHint {
+  margin: 8px 4px 0;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  font-weight: 500;
+  color: var(--color-text-muted);
 }
 
 .seekBarDragging {
@@ -93,40 +229,9 @@
   box-shadow: 0 0 14px color-mix(in srgb, var(--color-brand-primary) 28%, transparent);
 }
 
-.speedTrigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 38px;
-  padding: 0 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-bg-elevated) 94%, transparent);
-  color: var(--color-text-primary);
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.15s ease;
-}
-
-.speedTrigger:hover {
-  border-color: color-mix(in srgb, var(--color-brand-primary) 50%, transparent);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
-  transform: translateY(-1px);
-}
-
-.speedTrigger:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
-}
-
 @media (max-width: 600px) {
   .dockHeader {
-    width: min(100%, 360px);
+    width: min(100%, 420px);
     margin: 0 auto;
     padding: 0 0 8px;
   }
@@ -136,7 +241,7 @@
   }
 
   .seekRow {
-    width: min(100%, 360px);
+    width: min(100%, 420px);
     margin: 0 auto;
     padding: 0 0 12px;
   }
@@ -146,49 +251,71 @@
     flex-shrink: 0;
   }
 
-  .speedBadge {
-    padding: 5px 12px;
-    min-height: 30px;
-  }
-
   .controlRow {
-    width: min(100%, 360px);
+    width: min(100%, 420px);
     margin: 0 auto;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: stretch;
     gap: 10px;
     padding: 14px 0 0;
   }
 
   .controlBtn {
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-    border-radius: 50%;
+    width: 100%;
+    min-width: 0;
+    height: 48px;
+    border-radius: 16px;
   }
 
   .controlBtn svg {
-    width: 19px;
-    height: 19px;
+    width: 20px;
+    height: 20px;
   }
 
   .controlBtnPlay {
-    width: 44px;
-    height: 44px;
+    height: 54px;
+    border-radius: 18px;
   }
 
   .controlBtnPlay svg {
-    width: 21px;
-    height: 21px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .dockHeader,
+  .seekRow,
+  .controlRow {
+    width: min(100%, 520px);
+    margin: 0 auto;
   }
 
-  .speedTrigger {
-    min-width: 48px;
-    min-height: 40px;
-    padding: 0 10px;
-    font-size: 0.8rem;
-    flex-shrink: 0;
-    border-radius: 999px;
+  .controlRow {
+    gap: 12px;
+  }
+
+  .controlBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .controlBtnPlay {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+  }
+
+  .controlBtn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .controlBtnPlay svg {
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -207,12 +334,6 @@
 
   .seekTime {
     font-size: 0.72rem;
-  }
-
-  .speedBadge {
-    min-height: 28px;
-    padding: 4px 10px;
-    font-size: 0.7rem;
   }
 
   .controlRow {
@@ -238,12 +359,5 @@
   .controlBtnPlay svg {
     width: 18px;
     height: 18px;
-  }
-
-  .speedTrigger {
-    min-width: 40px;
-    min-height: 34px;
-    padding: 0 8px;
-    font-size: 0.74rem;
   }
 }

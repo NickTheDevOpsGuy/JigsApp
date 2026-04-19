@@ -201,6 +201,33 @@ test.describe("Play screen", () => {
     ).toBeLessThanOrEqual(2);
   });
 
+  test("mobile replay puts playback options (cog) in the timeline row, not under transport", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+
+    const playButton = page.getByRole("button", { name: "Play", exact: true });
+    const optionsButton = page.getByRole("button", {
+      name: /replay and playback options/i,
+    });
+
+    await expect(playButton).toBeInViewport();
+    await expect(optionsButton).toBeInViewport();
+
+    const playBox = await playButton.boundingBox();
+    const optionsBox = await optionsButton.boundingBox();
+
+    expect(playBox).not.toBeNull();
+    expect(optionsBox).not.toBeNull();
+    /* Cog sits in the seek meta row above the transport strip — higher on screen than Play */
+    expect((playBox?.y ?? 0) - (optionsBox?.y ?? 0)).toBeGreaterThan(24);
+  });
+
   test("desktop completion options menu lists share actions", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/play?e2eCompletion=1");
@@ -210,6 +237,47 @@ test.describe("Play screen", () => {
       page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM }),
     ).toBeVisible();
     await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
+  });
+
+  test("starting a new puzzle from play applies the newly selected grid", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.goto("/play?e2eCompletion=1");
+
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
+      timeout: 20000,
+    });
+
+    await page
+      .getByRole("button", { name: /options: next puzzle, replay, share/i })
+      .click();
+    await page.getByRole("menuitem", { name: /new puzzle/i }).click();
+
+    await expect(page.getByRole("dialog", { name: /choose category/i })).toBeVisible({
+      timeout: 15000,
+    });
+
+    await page.getByRole("button", { name: /nature/i }).click();
+    await expect(page.getByRole("dialog", { name: /choose puzzle/i })).toBeVisible();
+
+    await page
+      .getByRole("option", { name: /select /i })
+      .first()
+      .click();
+    await expect(page.getByRole("dialog", { name: /puzzle setup/i })).toBeVisible();
+    await page.getByRole("button", { name: /hard, 25 pieces/i }).click();
+    await page.getByRole("button", { name: /start puzzle/i }).click();
+
+    await expect(
+      page.getByRole("status", { name: /pieces placed/i }).first(),
+    ).toBeVisible({
+      timeout: 15000,
+    });
+
+    await expect
+      .poll(async () => page.evaluate(() => localStorage.getItem("phuzzle:gridSize")))
+      .toBe("5x5");
   });
 });
 

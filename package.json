@@ -30,6 +30,7 @@
     "test:ui": "vitest --ui",
     "test:e2e": "bash ./scripts/test-e2e-matrix.sh",
     "test:e2e:smoke": "bash ./scripts/test-e2e-smoke.sh",
+    "test:e2e:install": "npx playwright install chromium firefox webkit",
     "test:e2e:ui": "playwright test --ui",
     "check:bundle": "bash ./scripts/check-bundle-size.sh",
     "check:images": "bash ./scripts/audit-image-assets.sh",
@@ -50,18 +51,12 @@
     "husky": "^9.1.7",
     "jiti": "^2.6.1",
     "lucide-react": "^0.563.0",
-    "posthog-js": "^1.347.1",
+    "posthog-js": "^1.369.3",
     "prettier": "^3.7.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.12.0",
     "typescript-eslint": "^8.53.0"
-  },
-  "overrides": {
-    "tmp": ">=0.2.4",
-    "minimatch": "^9.0.5",
-    "serialize-javascript": "^7.0.3",
-    "yauzl": ">=3.2.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
@@ -78,16 +73,50 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "fast-levenshtein": "^3.0.0",
-    "happy-dom": "^20.6.1",
+    "happy-dom": "^20.9.0",
     "levn": "^0.4.1",
     "markdownlint-cli2": "^0.22.0",
     "patch-package": "^8.0.1",
     "prelude-ls": "^1.2.1",
     "type-check": "^0.4.0",
     "typescript": "^5.5.4",
-    "vite": "^7.3.1",
+    "vite": "^7.3.2",
     "vite-plugin-pwa": "^1.2.0",
-    "vitest": "^4.0.18",
+    "vitest": "^4.1.4",
     "word-wrap": "^1.2.5"
+  },
+  "overrides": {
+    "tmp": ">=0.2.4",
+    "minimatch": "^9.0.5",
+    "serialize-javascript": "7.0.5",
+    "yauzl": ">=3.2.1",
+    "basic-ftp": "5.3.0",
+    "brace-expansion": "2.0.3",
+    "dompurify": "3.4.0",
+    "lodash": "4.18.1",
+    "lodash-es": "4.18.1",
+    "path-to-regexp": "0.1.13",
+    "protobufjs": "7.5.5",
+    "smol-toml": "1.6.1",
+    "@rollup/pluginutils": {
+      "picomatch": "2.3.2"
+    },
+    "vite-plugin-pwa": {
+      "workbox-build": "7.0.0"
+    },
+    "workbox-build": {
+      "@rollup/plugin-terser": "0.4.3",
+      "picomatch": "2.3.2",
+      "lodash": "4.18.1"
+    },
+    "vite": {
+      "picomatch": "4.0.4"
+    },
+    "vitest": {
+      "picomatch": "4.0.4"
+    },
+    "tinyglobby": {
+      "picomatch": "4.0.4"
+    }
   }
 }

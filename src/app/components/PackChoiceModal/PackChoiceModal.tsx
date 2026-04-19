@@ -15,7 +15,11 @@ import {
   setCurrentPuzzleId,
 } from "@/data/packs/packCompletion";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
-import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
+import {
+  STORAGE_KEY,
+  GRID_KEY,
+  GRID_ONCE_KEY,
+} from "@/screens/Play/core/utils/playScreenUtils";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
@@ -51,6 +55,15 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
   const puzzles: SamplePuzzle[] =
     selectedPack && packsData ? packsData.getPuzzlesForPack(selectedPack) : [];
   const completed = getCompletedPuzzleIds();
+
+  const navigateToPlay = useCallback(
+    (grid: { rows: number; cols: number }) => {
+      const playUrl =
+        location.pathname === "/play" ? `/play?grid=${grid.rows}x${grid.cols}` : "/play";
+      navigate(playUrl, { replace: location.pathname === "/play" });
+    },
+    [location.pathname, navigate],
+  );
 
   const packScrollRef = useRef<HTMLDivElement>(null);
   const puzzleScrollRef = useRef<HTMLDivElement>(null);
@@ -217,12 +230,13 @@ export function PackChoiceModal({ isOpen, onClose }: Props) {
       PRIMARY_DIFFICULTIES[difficultyIndex] ?? PRIMARY_DIFFICULTIES[RECOMMENDED_INDEX];
     clearPuzzleState();
     safeLocalStorage.setItem(STORAGE_KEY, selectedPuzzle.fullImage);
+    safeLocalStorage.setItem(GRID_KEY, `${grid.rows}x${grid.cols}`);
     safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
     setCurrentPuzzleId(selectedPuzzle.id);
     safeLocalStorage.removeItem("phuzzle:dailyDate");
     void loadPlayScreenModule();
     if (location.pathname === "/play") onClose();
-    navigate("/play");
+    navigateToPlay(grid);
   };
 
   const goToStep = (target: Step) => {

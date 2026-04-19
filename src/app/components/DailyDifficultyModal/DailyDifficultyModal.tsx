@@ -17,6 +17,7 @@ import {
   getDailyPreferredDifficultyIndex,
   setDailyPreferredDifficultyIndex,
 } from "@/daily/dailyPuzzleCore";
+import { setCurrentPuzzleId } from "@/data/packs/packCompletion";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import styles from "./DailyDifficultyModal.module.css";
@@ -110,6 +111,7 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
 
   const handleStart = () => {
     clearPuzzleState();
+    setCurrentPuzzleId(null);
     const grid = GRID_OPTIONS[selectedIndex] ?? GRID_OPTIONS[RECOMMENDED_INDEX];
     const modifier = getDailyPreferredModifier();
     const result = dailyModule.startDailyPuzzle(

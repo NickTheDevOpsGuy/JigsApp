@@ -56,6 +56,10 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     }
   }, [state?.isComplete, scene.completionDismissed, navigate]);
 
+  const onChoosePuzzleStart = React.useCallback(() => {
+    scene.startThisPuzzleOver();
+  }, [scene]);
+
   const {
     displayElapsedSeconds,
     left: _left,
@@ -223,6 +227,11 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     },
   });
 
+  const replayTotalSeconds =
+    behavior.replay.snapshots.length > 0
+      ? behavior.replay.snapshots[behavior.replay.snapshots.length - 1]!.elapsedSeconds
+      : 0;
+
   const replayPortalProps =
     baseReplayProps != null
       ? {
@@ -233,6 +242,15 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
             getCompletionImageFallback() ??
             undefined,
           moveCount: scene.moveCountRef.current,
+          replayExport: {
+            snapshots: behavior.replay.snapshots,
+            puzzleKey,
+            puzzleName,
+            totalSeconds: replayTotalSeconds,
+          },
+          onReplayExportFeedback: (msg: string) => {
+            scene.setShareToast(msg);
+          },
           onBackToResults: () => {
             // "Back to results" explicitly navigates back to the win screen — reset
             // dismissal so the overlay becomes visible again.
@@ -283,6 +301,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     setShowNewGameModal: ui.setShowNewGameModal,
     showChoosePuzzleModal: ui.showChoosePuzzleModal,
     setShowChoosePuzzleModal: ui.setShowChoosePuzzleModal,
+    onChoosePuzzleStart,
     onChoosePuzzleDismissWithoutStart,
     handleNewGame,
     showResetStatsConfirm: scene.showResetStatsConfirm,

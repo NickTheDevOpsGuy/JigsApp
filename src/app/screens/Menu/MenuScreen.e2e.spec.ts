@@ -59,4 +59,48 @@ test.describe("Home / Menu", () => {
       timeout: 10000,
     });
   });
+
+  test("what's new button opens the changelog modal from the header", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.goto("/");
+    await dismissWhatsNewModalIfOpen(page);
+    await expect(page.getByRole("button", { name: /play today'?s puzzle/i })).toBeVisible(
+      {
+        timeout: 15000,
+      },
+    );
+
+    await page.getByRole("button", { name: /what's new/i }).click();
+    await expect(page.getByRole("dialog", { name: /what's new/i })).toBeVisible({
+      timeout: 15000,
+    });
+    await expect(page.getByText(/stable board near the finish/i)).toBeVisible();
+  });
+
+  test("tablet home uses a roomy shell instead of a phone-width widget", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 744, height: 1133 });
+    await page.goto("/");
+    await dismissWhatsNewModalIfOpen(page);
+
+    const shell = page.getByTestId("menu-shell");
+    await expect(shell).toBeVisible();
+
+    const metrics = await shell.boundingBox();
+    expect(metrics).not.toBeNull();
+    expect(metrics?.width ?? 0).toBeGreaterThan(600);
+
+    const docMetrics = await page.evaluate(() => {
+      const scroller = document.scrollingElement ?? document.documentElement;
+      return {
+        scrollHeight: scroller.scrollHeight,
+        clientHeight: scroller.clientHeight,
+      };
+    });
+
+    expect(docMetrics.scrollHeight - docMetrics.clientHeight).toBeLessThanOrEqual(2);
+  });
 });

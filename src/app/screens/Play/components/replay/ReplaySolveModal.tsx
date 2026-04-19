@@ -12,6 +12,7 @@ import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import { ReplaySolveModalControls } from "./ReplaySolveModalControls";
 import { AppModal } from "@/components/AppModal";
+import type { ReplaySnapshot } from "@/screens/Play/hooks/gameplay/useReplay";
 import {
   invokeMaybeAsync,
   invokeMaybeAsyncIndex,
@@ -74,6 +75,15 @@ export interface ReplaySolveModalProps {
   moveCount?: number;
   /** Shown in top-right of cutout bar when in pack flow, e.g. "One more from this pack" */
   packRemainingLabel?: string | null;
+  /** Data for saving / sharing replay as a JSON file */
+  replayExport?: {
+    snapshots: ReplaySnapshot[];
+    puzzleKey: number | null;
+    puzzleName?: string;
+    totalSeconds: number;
+  } | null;
+  /** Toast / inline feedback after save or share */
+  onReplayExportFeedback?: (message: string) => void;
 }
 
 export function ReplaySolveModal({
@@ -97,6 +107,8 @@ export function ReplaySolveModal({
   boardRect,
   moveCount,
   packRemainingLabel,
+  replayExport = null,
+  onReplayExportFeedback,
 }: ReplaySolveModalProps) {
   const prefersSheetOnShortTouchViewport =
     typeof window !== "undefined" &&
@@ -111,7 +123,6 @@ export function ReplaySolveModal({
 
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;
-  const effectiveSpeed = speedExplicitlyChosen ? speed : 1;
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const [imageError, setImageError] = useState(false);
 
@@ -196,7 +207,8 @@ export function ReplaySolveModal({
       onFastForward={onFastForward}
       onSkipBack15={onSkipBack15}
       onSkipForward15={onSkipForward15}
-      effectiveSpeed={effectiveSpeed}
+      speed={speed}
+      speedExplicitlyChosen={speedExplicitlyChosen}
       onSpeedChange={onSpeedChange}
       currentIndex={currentIndex}
       totalSnapshots={totalSnapshots}
@@ -204,6 +216,8 @@ export function ReplaySolveModal({
       totalSeconds={totalSeconds}
       onSeek={onSeek}
       progressPct={progressPct}
+      replayExport={replayExport}
+      onExportFeedback={onReplayExportFeedback}
     />
   );
 
