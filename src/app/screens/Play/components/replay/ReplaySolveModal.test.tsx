@@ -44,6 +44,23 @@ describe("ReplaySolveModal", () => {
     expect(screen.getByRole("button", { name: /close replay/i })).toBeTruthy();
   });
 
+  it("uses back-to-results for close actions when provided", () => {
+    const onClose = vi.fn();
+    const onBackToResults = vi.fn();
+    render(
+      <ReplaySolveModal
+        {...defaultProps}
+        onClose={onClose}
+        onBackToResults={onBackToResults}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /close replay/i }));
+
+    expect(onBackToResults).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it("renders restart and go to end controls", () => {
     render(<ReplaySolveModal {...defaultProps} />);
     expect(screen.getByRole("button", { name: /restart/i })).toBeTruthy();

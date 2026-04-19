@@ -220,9 +220,9 @@ export function ReplaySolveModalControls({
           title={isPaused ? "Play" : "Pause"}
         >
           {isPaused ? (
-            <Play size={22} fill="currentColor" aria-hidden />
+            <Play size={20} fill="currentColor" aria-hidden />
           ) : (
-            <Pause size={22} aria-hidden />
+            <Pause size={20} aria-hidden />
           )}
         </button>
         {onSkipForward15 && (

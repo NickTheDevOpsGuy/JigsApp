@@ -258,6 +258,7 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
             scene.setReplayBarOpen(false);
             scene.setSuppressBoardCompleteBannerAfterReplay(false);
             scene.setCompletionDismissed(false);
+            scene.setShowWinOverlay?.(true);
             requestAnimationFrame(() => {
               scene.completionFocusRef.current?.focus();
             });

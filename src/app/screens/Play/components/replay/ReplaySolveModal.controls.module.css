@@ -219,8 +219,8 @@
 }
 
 .controlBtnPlay {
-  width: 40px;
-  height: 40px;
+  /* Keep Play aligned with the rest of the transport buttons. */
+  flex-shrink: 0;
 }
 
 .controlBtnActive {
@@ -278,13 +278,13 @@
   }
 
   .controlBtnPlay {
-    height: 54px;
-    border-radius: 18px;
+    height: 48px;
+    border-radius: 16px;
   }
 
   .controlBtnPlay svg {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -307,9 +307,9 @@
   }
 
   .controlBtnPlay {
-    width: 52px;
-    height: 52px;
-    border-radius: 18px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
   }
 
   .controlBtn svg {
@@ -318,8 +318,8 @@
   }
 
   .controlBtnPlay svg {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -356,12 +356,12 @@
   }
 
   .controlBtnPlay {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
   }
 
   .controlBtnPlay svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
 }

@@ -143,7 +143,7 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("button", { name: /options/i })).toBeVisible();
   });
 
-  test("mobile replay opens from completion options and stays dismissed after close", async ({
+  test("mobile replay returns to the current completion overlay after close", async ({
     page,
   }) => {
     test.setTimeout(60000);
@@ -168,10 +168,34 @@ test.describe("Play screen", () => {
     await replayClose.click();
 
     await expect(replayHeading).toBeHidden({ timeout: 10000 });
-    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeHidden();
-    await expect(
-      page.getByRole("status", { name: /pieces placed/i }).first(),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible();
+  });
+
+  test("mobile replay transport buttons keep a consistent size", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+
+    const restartButton = page.getByRole("button", { name: /restart/i });
+    const playButton = page.getByRole("button", { name: "Play", exact: true });
+
+    await expect(restartButton).toBeInViewport();
+    await expect(playButton).toBeInViewport();
+
+    const restartBox = await restartButton.boundingBox();
+    const playBox = await playButton.boundingBox();
+
+    expect(restartBox).not.toBeNull();
+    expect(playBox).not.toBeNull();
+    expect(Math.abs((playBox?.width ?? 0) - (restartBox?.width ?? 0))).toBeLessThanOrEqual(
+      2,
+    );
+    expect(
+      Math.abs((playBox?.height ?? 0) - (restartBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
   });
 
   test("short mobile replay keeps header and controls inside the viewport", async ({

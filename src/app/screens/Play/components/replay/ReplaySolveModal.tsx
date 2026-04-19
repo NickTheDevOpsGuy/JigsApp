@@ -103,6 +103,7 @@ export function ReplaySolveModal({
   totalSeconds,
   onSeek,
   onClose,
+  onBackToResults,
   completionImageUrl,
   boardRect,
   moveCount,
@@ -110,6 +111,9 @@ export function ReplaySolveModal({
   replayExport = null,
   onReplayExportFeedback,
 }: ReplaySolveModalProps) {
+  const handleClose = React.useCallback(() => {
+    invokeMaybeAsync(onBackToResults ?? onClose);
+  }, [onBackToResults, onClose]);
   const prefersSheetOnShortTouchViewport =
     typeof window !== "undefined" &&
     window.matchMedia("(pointer: coarse)").matches &&
@@ -152,7 +156,7 @@ export function ReplaySolveModal({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        invokeMaybeAsync(onClose);
+        handleClose();
         return;
       }
       if (e.key === " ") {
@@ -187,14 +191,14 @@ export function ReplaySolveModal({
     };
     document.addEventListener("keydown", onKeyDown, true);
     return () => document.removeEventListener("keydown", onKeyDown, true);
-  }, [onClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
+  }, [handleClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
 
   const stopProp = (e: React.PointerEvent) => e.stopPropagation();
 
   const handleBackdropKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      if (e.target === e.currentTarget) invokeMaybeAsync(onClose);
+      if (e.target === e.currentTarget) handleClose();
     }
   };
 
@@ -227,7 +231,7 @@ export function ReplaySolveModal({
     return (
       <AppModal
         isOpen
-        onClose={onClose}
+        onClose={handleClose}
         surface="bare"
         size="xl"
         showCloseButton={false}
@@ -253,7 +257,7 @@ export function ReplaySolveModal({
               ref={closeBtnRef}
               type="button"
               className={styles.mobileCloseBtn}
-              onClick={() => invokeMaybeAsync(onClose)}
+              onClick={handleClose}
               onPointerDown={stopProp}
               aria-label="Close replay"
               title="Close"
@@ -353,7 +357,7 @@ export function ReplaySolveModal({
           ref={closeBtnRef}
           type="button"
           className={styles.boardCloseBtn}
-          onClick={() => invokeMaybeAsync(onClose)}
+          onClick={handleClose}
           onPointerDown={stopProp}
           aria-label="Close replay (Esc)"
           title="Close (Esc)"
@@ -376,17 +380,17 @@ export function ReplaySolveModal({
         <div
           data-cutout-panel
           style={{ top: 0, left: 0, right: 0, height: Math.max(0, top) }}
-          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
+          onPointerDown={(e) => e.target === e.currentTarget && handleClose()}
         />
         <div
           data-cutout-panel
           style={{ top, left: 0, width: Math.max(0, left), height }}
-          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
+          onPointerDown={(e) => e.target === e.currentTarget && handleClose()}
         />
         <div
           data-cutout-panel
           style={{ top, left: right, right: 0, height }}
-          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
+          onPointerDown={(e) => e.target === e.currentTarget && handleClose()}
         />
         <div
           data-cutout-panel
@@ -397,7 +401,7 @@ export function ReplaySolveModal({
             bottom: 0,
             minHeight: panelBottom - bottom,
           }}
-          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
+          onPointerDown={(e) => e.target === e.currentTarget && handleClose()}
         />
 
         <div
