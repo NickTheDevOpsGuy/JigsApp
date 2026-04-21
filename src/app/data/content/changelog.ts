@@ -4,16 +4,16 @@
  */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "56";
+export const CHANGELOG_VERSION = "57";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      "Tablet landscape play feels more intentional — the board and tray now compose better side by side instead of feeling like a stretched phone layout.",
-      "Touch tray upgrades — quick filters and hold-to-preview make it easier to find and inspect pieces on phones and tablets.",
-      "Rotate confidence is stronger — tablet portrait, tablet landscape, and replay flows now have better viewport coverage and fewer clipping risks.",
+      "Stats and leaderboard screens scale better on larger devices — desktop gets a roomier card, stronger row spacing, and a cleaner control layout.",
+      "iPad and tablet stats polish — leaderboard controls wrap more gracefully and keep the board view readable without feeling squeezed.",
+      "Touch tray upgrades remain in — quick filters and hold-to-preview make it easier to find and inspect pieces on phones and tablets.",
       "Replay still returns cleanly to your completed puzzle — no surprise jump to another flow.",
     ],
   },

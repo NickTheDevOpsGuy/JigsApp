@@ -324,3 +324,31 @@
     margin-bottom: 10px;
   }
 }
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .leaderboardCard {
+    padding: 14px 15px 16px;
+  }
+
+  .leaderboardHeader {
+    gap: 10px;
+  }
+
+  .leaderboardControlRow {
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  .boardModeSwitch {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .boardModeBtn {
+    min-height: 38px;
+  }
+
+  .filtersPanel {
+    gap: 12px;
+  }
+}

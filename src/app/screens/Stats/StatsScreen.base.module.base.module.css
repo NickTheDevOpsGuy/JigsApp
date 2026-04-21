@@ -105,27 +105,32 @@
 
 @media (min-width: 601px) and (max-width: 1024px) {
   .page {
-    padding: 16px;
+    padding: 18px 20px 22px;
   }
 
   .card {
-    max-width: 720px;
+    max-width: 920px;
+    padding: 14px 16px 12px;
   }
 }
 
 @media (min-width: 1025px) {
   .page {
-    padding: 20px 24px 24px;
+    padding: 28px 32px 32px;
   }
 
   .card {
-    max-width: 960px;
-    padding: 16px 18px 14px;
+    max-width: 1280px;
+    padding: 20px 22px 18px;
   }
 
   .tabs {
     flex-wrap: wrap;
     overflow: visible;
+  }
+
+  .cardContent {
+    padding-right: 4px;
   }
 }
 

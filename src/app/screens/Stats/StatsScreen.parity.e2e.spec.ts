@@ -85,6 +85,11 @@ test.describe("Stats modal parity", () => {
     }
 
     await assertConfiguredStatsFlow(page);
+    const cardBounds = await page
+      .locator('[data-testid="stats-card-content"]')
+      .boundingBox();
+    expect(cardBounds).not.toBeNull();
+    expect(cardBounds?.width ?? 0).toBeGreaterThanOrEqual(900);
     await expectVisibleHeight(
       page,
       page

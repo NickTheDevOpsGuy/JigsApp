@@ -292,3 +292,56 @@
   display: flex;
   gap: 8px;
 }
+
+@media (min-width: 1025px) {
+  .leaderboardCard {
+    padding: 16px 18px 18px;
+    border-radius: 18px;
+  }
+
+  .leaderboardHeader {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px 14px;
+  }
+
+  .leaderboardControlRow {
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .boardModeSwitch {
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 8px;
+  }
+
+  .boardModeBtn {
+    min-height: 40px;
+    padding: 9px 13px;
+    font-size: 12px;
+  }
+
+  .sortCluster {
+    min-height: 40px;
+    padding: 0 13px;
+  }
+
+  .filtersBar {
+    grid-column: 1 / -1;
+    padding: 11px 13px;
+  }
+
+  .filtersPanel {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .weekProgressStrip {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
