@@ -917,28 +917,32 @@
   }
 
   .page {
-    width: min(100%, 900px);
-    max-width: 900px;
-    min-height: min(760px, calc(var(--app-vh-stable, 100dvh) - 56px));
+    width: min(100%, 980px);
+    max-width: 980px;
+    min-height: min(820px, calc(var(--app-vh-stable, 100dvh) - 56px));
     max-height: calc(var(--app-vh-stable, 100dvh) - 24px);
     height: auto;
-    padding: 22px 22px 26px;
-    border-radius: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 24px 24px 28px;
+    border-radius: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    background-image:
+      radial-gradient(circle at top left, rgba(99, 102, 241, 0.2), transparent 38%),
+      radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.12), transparent 34%),
+      linear-gradient(180deg, rgba(13, 18, 32, 0.98), rgba(9, 13, 24, 0.96));
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-      0 32px 80px rgba(0, 0, 0, 0.7),
-      0 8px 24px rgba(0, 0, 0, 0.4);
+      0 36px 90px rgba(0, 0, 0, 0.7),
+      0 12px 30px rgba(0, 0, 0, 0.42);
   }
 
   .header {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
 
   .main {
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
-    gap: 18px;
+    grid-template-columns: 1fr;
+    gap: 16px;
     align-items: start;
     padding-top: 10px;
     overflow-y: auto;
@@ -947,8 +951,8 @@
 
   .heroSection,
   .supportSection {
-    padding: 18px;
-    border-radius: 24px;
+    padding: 20px;
+    border-radius: 26px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.03) inset,
@@ -1023,14 +1027,43 @@
   }
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
   .page {
-    width: min(100%, 940px);
-    max-width: 940px;
+    width: min(100%, 1180px);
+    max-width: 1180px;
+    min-height: min(840px, calc(var(--app-vh-stable, 100dvh) - 56px));
+    padding: 26px 26px 30px;
   }
 
   .main {
-    grid-template-columns: minmax(0, 1.14fr) minmax(320px, 0.9fr);
-    gap: 20px;
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.92fr);
+    gap: 22px;
+  }
+
+  .heroSection,
+  .supportSection {
+    padding: 22px;
+    border-radius: 28px;
+  }
+
+  .supportSection {
+    position: sticky;
+    top: 0;
+  }
+
+  .puzzleLabelNum {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page {
+    width: min(100%, 1240px);
+    max-width: 1240px;
+  }
+
+  .main {
+    grid-template-columns: minmax(0, 1.5fr) minmax(340px, 0.9fr);
+    gap: 24px;
   }
 }

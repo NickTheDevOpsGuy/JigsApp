@@ -76,7 +76,9 @@ test.describe("Home / Menu", () => {
     await expect(page.getByRole("dialog", { name: /what's new/i })).toBeVisible({
       timeout: 15000,
     });
-    await expect(page.getByText(/stable board near the finish/i)).toBeVisible();
+    await expect(
+      page.getByText(/stats and leaderboard screens scale better/i),
+    ).toBeVisible();
   });
 
   test("tablet home uses a roomy shell instead of a phone-width widget", async ({
@@ -101,6 +103,34 @@ test.describe("Home / Menu", () => {
       };
     });
 
+    expect(docMetrics.scrollHeight - docMetrics.clientHeight).toBeLessThanOrEqual(2);
+  });
+
+  test("desktop home uses a wide split layout without falling back to a phone shell", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 960 });
+    await page.goto("/");
+    await dismissWhatsNewModalIfOpen(page);
+
+    const shell = page.getByTestId("menu-shell");
+    await expect(shell).toBeVisible();
+
+    const metrics = await shell.boundingBox();
+    expect(metrics).not.toBeNull();
+    expect(metrics?.width ?? 0).toBeGreaterThan(1000);
+
+    const docMetrics = await page.evaluate(() => {
+      const scroller = document.scrollingElement ?? document.documentElement;
+      return {
+        scrollWidth: scroller.scrollWidth,
+        clientWidth: scroller.clientWidth,
+        scrollHeight: scroller.scrollHeight,
+        clientHeight: scroller.clientHeight,
+      };
+    });
+
+    expect(docMetrics.scrollWidth - docMetrics.clientWidth).toBeLessThanOrEqual(1);
     expect(docMetrics.scrollHeight - docMetrics.clientHeight).toBeLessThanOrEqual(2);
   });
 });

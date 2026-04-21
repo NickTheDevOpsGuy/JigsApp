@@ -58,12 +58,15 @@ test.describe("Packs screens responsive", () => {
     await page.goto("/packs");
 
     const firstPack = page.getByRole("button", { name: /open pack: /i }).first();
+    const shell = page.locator("[class*='card']").first();
 
     await expect(page.getByRole("heading", { name: /puzzle packs/i })).toBeVisible({
       timeout: 15000,
     });
     await expect(firstPack).toBeVisible();
-    await expectWithinViewport(page, firstPack);
+    const bounds = await shell.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds?.width ?? 0).toBeGreaterThan(700);
     await expectNoDocumentOverflow(page);
   });
 
@@ -101,6 +104,43 @@ test.describe("Packs screens responsive", () => {
     });
     await expect(puzzleList).toBeVisible();
     await expect(nextButton).toBeVisible();
+    await expectNoDocumentOverflow(page);
+  });
+
+  test("pack list uses a roomy desktop shell instead of a narrow modal card", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 960 });
+    await page.goto("/packs");
+
+    const shell = page.locator("[class*='card']").first();
+    await expect(page.getByRole("heading", { name: /puzzle packs/i })).toBeVisible({
+      timeout: 15000,
+    });
+
+    const bounds = await shell.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds?.width ?? 0).toBeGreaterThan(1000);
+    await expectNoDocumentOverflow(page);
+  });
+
+  test("pack detail stays roomy and keeps rail actions reachable on desktop", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 960 });
+    await page.goto("/packs/nature");
+
+    const backButton = page.getByRole("button", { name: /back to packs/i }).first();
+    const nextButton = page.getByRole("button", { name: /next puzzles/i });
+
+    await expect(backButton).toBeVisible({ timeout: 15000 });
+    await expect(nextButton).toBeVisible();
+
+    const shell = page.locator("[class*='card']").first();
+    const bounds = await shell.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds?.width ?? 0).toBeGreaterThan(1000);
+    await expectWithinViewport(page, nextButton);
     await expectNoDocumentOverflow(page);
   });
 });

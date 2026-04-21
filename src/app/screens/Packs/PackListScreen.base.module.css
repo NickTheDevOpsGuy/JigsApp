@@ -8,7 +8,9 @@
   box-sizing: border-box;
   padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
     max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
-  background: var(--color-bg-primary);
+  background:
+    radial-gradient(circle at top, rgba(80, 137, 255, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(7, 11, 20, 0.98), rgba(10, 15, 26, 0.98));
   overflow: hidden;
   overscroll-behavior: none;
   display: flex;
@@ -22,7 +24,7 @@
 
 .card {
   width: 100%;
-  max-width: min(420px, 94vw);
+  max-width: min(440px, 94vw);
   min-width: 0;
   margin: 0 auto;
   flex: 0 1 auto;
@@ -30,11 +32,15 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
+  background:
+    radial-gradient(circle at top left, rgba(91, 145, 255, 0.1), transparent 34%),
+    linear-gradient(180deg, rgba(14, 22, 38, 0.98), rgba(9, 16, 28, 0.96));
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
   border-radius: var(--radius-card);
   padding: var(--space-2) var(--space-3);
-  box-shadow: var(--shadow-md);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+    0 24px 54px rgba(0, 0, 0, 0.36);
   overflow: hidden;
   overflow-x: hidden;
   box-sizing: border-box;
@@ -49,8 +55,8 @@
   overflow-y: auto;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
-  padding: 16px 0 20px;
-  gap: 12px;
+  padding: 16px 0 22px;
+  gap: 14px;
   scrollbar-width: none;
 }
 
@@ -99,7 +105,7 @@
 
 .title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.55rem;
   font-weight: 600;
   color: var(--color-text-primary);
   min-width: 0;

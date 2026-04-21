@@ -116,12 +116,19 @@
 
 @media (min-width: 1025px) {
   .page {
-    padding: 28px 32px 32px;
+    padding: 30px 34px 36px;
   }
 
   .card {
-    max-width: 1280px;
-    padding: 20px 22px 18px;
+    max-width: 1380px;
+    padding: 22px 24px 20px;
+    border-radius: calc(var(--radius-card) + 4px);
+    background:
+      radial-gradient(circle at top left, rgba(91, 145, 255, 0.1), transparent 32%),
+      linear-gradient(180deg, rgba(16, 27, 45, 0.98), rgba(10, 19, 31, 0.97));
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+      0 28px 64px rgba(0, 0, 0, 0.34);
   }
 
   .tabs {
@@ -130,7 +137,7 @@
   }
 
   .cardContent {
-    padding-right: 4px;
+    padding-right: 10px;
   }
 }
 

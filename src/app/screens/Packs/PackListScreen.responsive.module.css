@@ -123,3 +123,87 @@
 .stepLabel {
   font-size: 9px;
 }
+
+@media (min-width: 601px) and (max-width: 1023px) {
+  .page {
+    padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right))
+      max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  }
+
+  .card {
+    max-width: min(940px, 100%);
+    padding: 14px 18px 16px;
+    border-radius: 28px;
+  }
+
+  .cardScroll {
+    gap: 16px;
+    padding: 16px 0 24px;
+  }
+
+  .packGrid {
+    gap: 18px;
+    padding: 0 16px 6px;
+  }
+
+  .packCard {
+    min-width: 256px;
+    max-width: 300px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: 28px 32px 32px;
+  }
+
+  .card {
+    max-width: min(1280px, 100%);
+    padding: 20px 22px 20px;
+    border-radius: 32px;
+  }
+
+  .header {
+    margin-bottom: 8px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    max-width: 72ch;
+  }
+
+  .cardScroll {
+    gap: 18px;
+    padding: 18px 0 28px;
+  }
+
+  .packRow {
+    gap: 18px;
+  }
+
+  .packGrid {
+    gap: 20px;
+    padding: 0 18px 10px;
+  }
+
+  .packCard {
+    min-width: 280px;
+    max-width: 324px;
+    min-height: 312px;
+    padding: 16px;
+  }
+
+  .packName {
+    font-size: 17px;
+  }
+
+  .packDesc,
+  .packProgress {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+}
