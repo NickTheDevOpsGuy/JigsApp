@@ -372,7 +372,7 @@ test.describe("Play screen", () => {
 });
 
 test.describe("Play screen tablet touch", () => {
-  test.use({ viewport: { width: 768, height: 1024 }, hasTouch: true, isMobile: true });
+  test.use({ viewport: { width: 768, height: 1024 }, hasTouch: true });
 
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(
@@ -477,7 +477,7 @@ test.describe("Play screen tablet touch", () => {
 });
 
 test.describe("Play screen landscape phone", () => {
-  test.use({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
+  test.use({ viewport: { width: 844, height: 390 }, hasTouch: true });
 
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(

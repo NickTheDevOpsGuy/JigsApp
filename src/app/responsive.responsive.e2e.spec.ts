@@ -1,8 +1,39 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { dismissWhatsNewModalIfOpen } from "@/e2e/helpers";
 
 const TINY_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
+async function expectNoDocumentOverflow(page: Page) {
+  const metrics = await page.evaluate(() => {
+    const scroller = document.scrollingElement ?? document.documentElement;
+    return {
+      scrollWidth: scroller.scrollWidth,
+      clientWidth: scroller.clientWidth,
+      scrollHeight: scroller.scrollHeight,
+      clientHeight: scroller.clientHeight,
+    };
+  });
+
+  expect(metrics.scrollWidth - metrics.clientWidth).toBeLessThanOrEqual(1);
+  expect(metrics.scrollHeight - metrics.clientHeight).toBeLessThanOrEqual(2);
+}
+
+async function expectWithinViewport(page: Page, locator: Locator) {
+  const box = await locator.boundingBox();
+  const viewport = page.viewportSize();
+
+  expect(box).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(box?.x ?? 0).toBeGreaterThanOrEqual(-1);
+  expect(box?.y ?? 0).toBeGreaterThanOrEqual(-1);
+  expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
+    (viewport?.width ?? 0) + 1,
+  );
+  expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(
+    (viewport?.height ?? 0) + 1,
+  );
+}
 
 test.describe("Responsive smoke", () => {
   test.beforeEach(async ({ page }) => {
@@ -26,15 +57,23 @@ test.describe("Responsive smoke", () => {
     await expect(page.getByRole("button", { name: /puzzle packs/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /quick play/i })).toBeVisible();
 
-    const metrics = await page.evaluate(() => {
-      const scroller = document.scrollingElement ?? document.documentElement;
-      return {
-        scrollHeight: scroller.scrollHeight,
-        clientHeight: scroller.clientHeight,
-      };
-    });
+    await expectNoDocumentOverflow(page);
+  });
 
-    expect(metrics.scrollHeight - metrics.clientHeight).toBeLessThanOrEqual(2);
+  test("quick-play modal keeps staged chooser controls reachable", async ({ page }) => {
+    await page.goto("/");
+    await dismissWhatsNewModalIfOpen(page);
+
+    await page.getByRole("button", { name: /quick play/i }).click();
+
+    const dialog = page.getByRole("dialog", { name: /choose category/i });
+    const categoryList = dialog.getByRole("group", { name: /choose a category/i });
+
+    await expect(dialog).toBeVisible({ timeout: 15000 });
+    await expect(categoryList).toBeVisible();
+    await expect(dialog.getByRole("button", { name: /nature/i })).toBeVisible();
+    await expectWithinViewport(page, dialog);
+    await expectNoDocumentOverflow(page);
   });
 
   test("stats route keeps header and content visible", async ({ page }) => {
@@ -47,6 +86,38 @@ test.describe("Responsive smoke", () => {
         .first(),
     ).toBeVisible();
     await expect(page.getByTestId("stats-card-content")).toBeVisible();
+    await expectNoDocumentOverflow(page);
+  });
+
+  test("pack list route keeps cards and actions in the device viewport", async ({
+    page,
+  }) => {
+    await page.goto("/packs");
+
+    const backButton = page.getByRole("button", { name: /back to menu/i });
+    const firstPack = page.getByRole("button", { name: /open pack: /i }).first();
+
+    await expect(backButton).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /puzzle packs/i })).toBeVisible();
+    await expect(firstPack).toBeVisible();
+    await expectWithinViewport(page, backButton);
+    await expectNoDocumentOverflow(page);
+  });
+
+  test("pack detail route keeps puzzle rail controls reachable", async ({ page }) => {
+    await page.goto("/packs/nature");
+
+    const backButton = page.getByRole("button", { name: /back to packs/i }).first();
+    const puzzleList = page.getByRole("list", { name: /puzzle list/i });
+    const firstSolve = page.getByRole("button", { name: /solve /i }).first();
+
+    await expect(backButton).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText("Nature")).toBeVisible();
+    await expect(puzzleList).toBeVisible();
+    await expect(firstSolve).toBeVisible();
+    await expectWithinViewport(page, backButton);
+    await expectWithinViewport(page, firstSolve);
+    await expectNoDocumentOverflow(page);
   });
 
   test("play keeps board square and tray reachable", async ({ page }) => {
@@ -71,5 +142,6 @@ test.describe("Responsive smoke", () => {
     expect(
       (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
     ).toBeLessThan((viewport?.height ?? 0) + 1);
+    await expectNoDocumentOverflow(page);
   });
 });

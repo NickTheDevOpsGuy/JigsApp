@@ -14,14 +14,19 @@ export const LOCK_LIFT_MAX_PX = 7;
 /** Magnetic snap: fraction of snap delta per frame; lower = gentler slide toward slot. */
 export const MAGNETIC_PULL_STRENGTH = 0.11;
 
-/** When idle: throttle redraw to this FPS for 50+ piece puzzles. */
-export const IDLE_TARGET_FPS = 30;
+/** When idle: throttle redraw to this FPS to keep static boards cool. */
+export const IDLE_TARGET_FPS = 24;
 export const IDLE_MIN_INTERVAL_MS = 1000 / IDLE_TARGET_FPS;
 
 /** When idle and 64+ pieces: throttle more aggressively to reduce CPU. */
 export const LARGE_PUZZLE_PIECE_COUNT = 64;
-export const IDLE_TARGET_FPS_LARGE = 18;
+export const IDLE_TARGET_FPS_LARGE = 14;
 export const IDLE_MIN_INTERVAL_MS_LARGE = 1000 / IDLE_TARGET_FPS_LARGE;
+
+/** After the board has been still for a moment, redraw rarely; the canvas is static. */
+export const QUIET_IDLE_AFTER_MS = 1200;
+export const QUIET_IDLE_TARGET_FPS = 8;
+export const QUIET_IDLE_MIN_INTERVAL_MS = 1000 / QUIET_IDLE_TARGET_FPS;
 
 /** Piece count above which we throttle idle redraws. Lower when battery saver is on. */
 export function getHighPieceCountThreshold(batterySaverMode: boolean): number {

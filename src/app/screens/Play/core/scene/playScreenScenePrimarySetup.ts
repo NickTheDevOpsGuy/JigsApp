@@ -167,6 +167,7 @@ export function usePlayScreenPrimarySetup() {
     grid,
     ui.pieceLockingEnabled,
     ui.autoRotateOnSnap,
+    ui.magneticSnapEnabled,
     timeMode,
     countdownMinutes,
     scene.lastInteractionRef,

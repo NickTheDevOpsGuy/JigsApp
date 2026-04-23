@@ -6,6 +6,8 @@ import {
   IDLE_MIN_INTERVAL_MS_LARGE,
   LARGE_PUZZLE_PIECE_COUNT,
   LOCK_LERP_MS,
+  QUIET_IDLE_AFTER_MS,
+  QUIET_IDLE_MIN_INTERVAL_MS,
   getHighPieceCountThreshold,
 } from "@/screens/Play/hooks/animation/usePlayScreenAnimationConstants";
 import { useAutoBatterySaver } from "@/screens/Play/hooks/system/useAutoBatterySaver";
@@ -20,6 +22,7 @@ import {
   updateDebugFps,
   shouldPublishState,
   prepareCanvasForRender,
+  prunePieceCacheForCurrentFrame,
 } from "@/screens/Play/hooks/animation/usePlayScreenAnimationHelpers";
 import { soundManager } from "@/audio/core/sounds";
 import type { UsePlayScreenAnimationArgs } from "./usePlayScreenAnimationTypes";
@@ -39,7 +42,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     snapParticlesRef,
     debug,
     magneticSnapEnabled,
-    snapGlowEnabled: _snapGlowEnabled,
+    snapGlowEnabled,
     showGhostHint: _showGhostHint,
     showAlignmentGrid,
     showGhostWhenIdle: _showGhostWhenIdle,
@@ -120,16 +123,20 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       );
       const throttleIdle =
         !replayBarOpen &&
-        pieceCount >= HIGH_PIECE_COUNT_THRESHOLD &&
         !isDragging &&
         !inCompletionFlourish &&
         !hasActiveLockLerp &&
         !hasActiveSnapParticles;
+      const idleForMs =
+        lastInteractionRef?.current != null ? now - lastInteractionRef.current : 0;
+      const quietIdle = throttleIdle && (isPaused || idleForMs >= QUIET_IDLE_AFTER_MS);
       const useLargePuzzleInterval =
         throttleIdle && pieceCount >= LARGE_PUZZLE_PIECE_COUNT;
       const minFrameIntervalMs = reducedMotion
-        ? Math.max(IDLE_MIN_INTERVAL_MS, 28)
-        : useLargePuzzleInterval
+        ? Math.max(QUIET_IDLE_MIN_INTERVAL_MS, 28)
+        : quietIdle
+          ? QUIET_IDLE_MIN_INTERVAL_MS
+          : useLargePuzzleInterval
           ? IDLE_MIN_INTERVAL_MS_LARGE
           : IDLE_MIN_INTERVAL_MS;
       if (throttleIdle && now - lastFrameTimeRef.current < minFrameIntervalMs) {
@@ -169,13 +176,15 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
         effectiveBatterySaverMode ||
         reducedMotion ||
         devRollbackQuality ||
+        quietIdle ||
         (isDragging && pieceCount >= HIGH_PIECE_COUNT_THRESHOLD);
       const canvasReady = prepareCanvasForRender(canvas, boardEl, reducedQuality);
       if (!canvasReady) {
         rafRef.current = requestAnimationFrame(tick);
         return;
       }
-      const { ctx } = canvasReady;
+      const { ctx, dpr } = canvasReady;
+      prunePieceCacheForCurrentFrame(st, pieceCacheRef.current, dpr);
       const assembledW = st.grid.cols * firstPiece.tileW;
       const assembledH = st.grid.rows * firstPiece.tileH;
       if (st.isComplete && !completedAtRef.current) completedAtRef.current = now;
@@ -216,7 +225,9 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       const hint = wrongRotationHintRef?.current;
       const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
       const snapPreview =
-        dragState.activeId && manager ? manager.getSnapPreviewState() : null;
+        magneticSnapEnabled && dragState.activeId && manager
+          ? manager.getSnapPreviewState()
+          : null;
       const snapRejectPreview = null;
       const inNearSnap =
         !!snapPreview &&
@@ -262,7 +273,8 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
           wrongRotationHint,
           snapPreview,
           snapRejectPreview,
-          snapGlowEnabled: false,
+          snapGlowEnabled: snapGlowEnabled && !reducedQuality,
+          reducedQuality,
           fogAlphaForUnplaced: fogAlphaForUnplaced > 0 ? fogAlphaForUnplaced : undefined,
         },
         pieceCache,
@@ -274,6 +286,9 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       if (SHOW_DEBUG) {
         performance.mark("render-frame-end");
         performance.measure("render-frame", "render-frame-start", "render-frame-end");
+        performance.clearMarks("render-frame-start");
+        performance.clearMarks("render-frame-end");
+        performance.clearMeasures("render-frame");
       }
 
       /* During replay playback, consecutive snapshots can share placedCount / completion flags;
@@ -314,6 +329,7 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     undoSnapBackRef,
     debug,
     magneticSnapEnabled,
+    snapGlowEnabled,
     showEdgeHighlight,
     showClusterOutline,
     showAlignmentGrid,

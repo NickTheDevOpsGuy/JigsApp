@@ -1,3 +1,4 @@
+import type { DragState } from "@/puzzle/core/types";
 import type { SavedPiece } from "@/puzzle/storage/puzzleStorage";
 import {
   pointerDownBoardSpaceOp,
@@ -41,8 +42,38 @@ export class PuzzleManagerInteractions extends PuzzleManagerActions {
   /** Min position delta (px) before recomputing snap preview; reduces collision checks on large puzzles. */
   private static readonly SNAP_PREVIEW_THROTTLE_PX = 2.5;
 
+  private computeThrottledSnapPreview(prevPreview: DragState["preview"]) {
+    const active = this.findPiece(this.drag.activeId ?? "");
+    if (!active) return null;
+    if (
+      this.lastSnapPreviewPiecePosition &&
+      Math.hypot(
+        active.x - this.lastSnapPreviewPiecePosition.x,
+        active.y - this.lastSnapPreviewPiecePosition.y,
+      ) < PuzzleManagerInteractions.SNAP_PREVIEW_THROTTLE_PX
+    ) {
+      return prevPreview ? { ...prevPreview, magnetStrength: 0 } : null;
+    }
+    this.lastSnapPreviewPiecePosition = { x: active.x, y: active.y };
+    return this.computeSnapPreview();
+  }
+
   pointerMove(clientX: number, clientY: number, boardRect: DOMRect) {
     const prevPreview = this.drag.preview;
+    if (!this.magneticSnapEnabled) {
+      this.drag = pointerMoveOp({
+        clientX,
+        clientY,
+        boardRect,
+        drag: this.drag,
+        findPiece: this.findPiece.bind(this),
+        shiftGroup: this.shiftGroup.bind(this),
+        computeSnapPreview: () => null,
+        magneticSnapEnabled: false,
+      });
+      this.lastSnapPreviewPiecePosition = null;
+      return;
+    }
     const newDrag = pointerMoveOp({
       clientX,
       clientY,
@@ -50,22 +81,10 @@ export class PuzzleManagerInteractions extends PuzzleManagerActions {
       drag: this.drag,
       findPiece: this.findPiece.bind(this),
       shiftGroup: this.shiftGroup.bind(this),
-      computeSnapPreview: this.computeSnapPreview.bind(this),
+      computeSnapPreview: () => this.computeThrottledSnapPreview(prevPreview),
+      magneticSnapEnabled: this.magneticSnapEnabled,
     });
-    const active = this.findPiece(newDrag.activeId ?? "");
-    if (
-      active &&
-      this.lastSnapPreviewPiecePosition &&
-      Math.hypot(
-        active.x - this.lastSnapPreviewPiecePosition.x,
-        active.y - this.lastSnapPreviewPiecePosition.y,
-      ) < PuzzleManagerInteractions.SNAP_PREVIEW_THROTTLE_PX
-    ) {
-      this.drag = { ...newDrag, preview: prevPreview ?? newDrag.preview };
-    } else {
-      if (active) this.lastSnapPreviewPiecePosition = { x: active.x, y: active.y };
-      this.drag = newDrag;
-    }
+    this.drag = newDrag;
   }
 
   pointerDownBoardSpace(pieceId: string, boardX: number, boardY: number) {
@@ -85,28 +104,29 @@ export class PuzzleManagerInteractions extends PuzzleManagerActions {
 
   pointerMoveBoardSpace(boardX: number, boardY: number) {
     const prevPreview = this.drag.preview;
+    if (!this.magneticSnapEnabled) {
+      this.drag = pointerMoveBoardSpaceOp({
+        boardX,
+        boardY,
+        drag: this.drag,
+        findPiece: this.findPiece.bind(this),
+        shiftGroup: this.shiftGroup.bind(this),
+        computeSnapPreview: () => null,
+        magneticSnapEnabled: false,
+      });
+      this.lastSnapPreviewPiecePosition = null;
+      return;
+    }
     const newDrag = pointerMoveBoardSpaceOp({
       boardX,
       boardY,
       drag: this.drag,
       findPiece: this.findPiece.bind(this),
       shiftGroup: this.shiftGroup.bind(this),
-      computeSnapPreview: this.computeSnapPreview.bind(this),
+      computeSnapPreview: () => this.computeThrottledSnapPreview(prevPreview),
+      magneticSnapEnabled: this.magneticSnapEnabled,
     });
-    const active = this.findPiece(newDrag.activeId ?? "");
-    if (
-      active &&
-      this.lastSnapPreviewPiecePosition &&
-      Math.hypot(
-        active.x - this.lastSnapPreviewPiecePosition.x,
-        active.y - this.lastSnapPreviewPiecePosition.y,
-      ) < PuzzleManagerInteractions.SNAP_PREVIEW_THROTTLE_PX
-    ) {
-      this.drag = { ...newDrag, preview: prevPreview ?? newDrag.preview };
-    } else {
-      if (active) this.lastSnapPreviewPiecePosition = { x: active.x, y: active.y };
-      this.drag = newDrag;
-    }
+    this.drag = newDrag;
   }
 
   pointerUp() {

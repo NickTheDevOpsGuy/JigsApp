@@ -104,14 +104,16 @@ npm run doctor
 npm run dev
 ```
 
-Useful scripts: `npm run doctor`, `npm run build`, `npm run preview`, `npm run test`, `npm run test:e2e:smoke`, `npm run test:e2e`, `npm run lighthouse`, `npm run check:images` (Vitest and Playwright use 4 workers; run `npx playwright install` once). The image audit is useful before shipping large social or puzzle assets.
+Useful scripts: `npm run doctor`, `npm run build`, `npm run preview`, `npm run test`, `npm run test:browsers:smoke`, `npm run test:browsers`, `npm run test:e2e:layouts`, `npm run lighthouse`, `npm run check:images` (Vitest and Playwright use 4 workers; run `npm run test:e2e:install` once, plus `npm run test:e2e:install:channels` if you want real Chrome/Edge channels locally). The image audit is useful before shipping large social or puzzle assets.
 
 Local quality workflow:
 
 - `npm run doctor` checks Node version, local dependencies, Playwright availability, Supabase/Docker reachability, and whether port `4173` is already in use.
 - `npm run precheck` matches the pre-push gate locally.
-- `npm run test:e2e:smoke` runs a fast Chromium smoke suite for the highest-signal flows.
-- `npm run test:e2e` runs the broader multi-browser matrix.
+- `npm run test:browsers:smoke` runs Vitest, then a fast smoke E2E suite across Chrome, Firefox, Safari/WebKit, and Edge-compatible Chromium.
+- `npm run test:browsers` runs Vitest, then the broader multi-browser E2E matrix.
+- `npm run test:e2e:layouts` runs the responsive layout suite across desktop Chrome/Firefox/Safari/Edge plus iPhone, iPad, Android phone, and Android tablet emulation.
+- `npm run test:e2e:{chrome,firefox,safari,edge}` runs one browser project. Use `npm run test:e2e:chrome:channel` or `npm run test:e2e:edge:channel` to force installed Chrome/Edge channels locally.
 
 Image budget quick rule:
 

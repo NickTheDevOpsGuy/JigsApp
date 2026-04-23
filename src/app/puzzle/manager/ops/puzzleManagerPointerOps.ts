@@ -18,18 +18,25 @@ function applyMagneticDragDelta(
   desiredDx: number,
   desiredDy: number,
   computeSnapPreview: ComputeSnapPreview,
-): void {
+  magneticSnapEnabled: boolean,
+): DragState["preview"] {
+  if (!magneticSnapEnabled) {
+    shiftGroup(groupId, desiredDx, desiredDy);
+    return null;
+  }
+
   const moveDx = Math.abs(desiredDx) < 0.35 ? desiredDx : desiredDx * DRAG_LERP_FACTOR;
   const moveDy = Math.abs(desiredDy) < 0.35 ? desiredDy : desiredDy * DRAG_LERP_FACTOR;
   shiftGroup(groupId, moveDx, moveDy);
 
   const preview = computeSnapPreview();
-  if (!preview || preview.magnetStrength <= 0) return;
+  if (!preview || preview.magnetStrength <= 0) return preview;
 
   const magnetDx = preview.dx * preview.magnetStrength;
   const magnetDy = preview.dy * preview.magnetStrength;
-  if (Math.abs(magnetDx) < 0.1 && Math.abs(magnetDy) < 0.1) return;
+  if (Math.abs(magnetDx) < 0.1 && Math.abs(magnetDy) < 0.1) return preview;
   shiftGroup(groupId, magnetDx, magnetDy);
+  return preview;
 }
 
 export function pointerDownOp(params: {
@@ -78,6 +85,7 @@ export function pointerMoveOp(params: {
   findPiece: FindPiece;
   shiftGroup: ShiftGroup;
   computeSnapPreview: ComputeSnapPreview;
+  magneticSnapEnabled: boolean;
 }): DragState {
   const { drag } = params;
   const activeId = drag.activeId;
@@ -89,15 +97,19 @@ export function pointerMoveOp(params: {
   const newY = params.clientY - params.boardRect.top - drag.offsetY;
   const desiredDx = newX - piece.x;
   const desiredDy = newY - piece.y;
-  applyMagneticDragDelta(
+  const preview = applyMagneticDragDelta(
     params.shiftGroup,
     piece.groupId,
     desiredDx,
     desiredDy,
     params.computeSnapPreview,
+    params.magneticSnapEnabled,
   );
 
-  return { ...drag, preview: params.computeSnapPreview() };
+  return {
+    ...drag,
+    preview,
+  };
 }
 
 export function pointerDownBoardSpaceOp(params: {
@@ -141,6 +153,7 @@ export function pointerMoveBoardSpaceOp(params: {
   findPiece: FindPiece;
   shiftGroup: ShiftGroup;
   computeSnapPreview: ComputeSnapPreview;
+  magneticSnapEnabled: boolean;
 }): DragState {
   const { drag } = params;
   const activeId = drag.activeId;
@@ -152,15 +165,19 @@ export function pointerMoveBoardSpaceOp(params: {
   const newY = params.boardY - drag.offsetY;
   const desiredDx = newX - piece.x;
   const desiredDy = newY - piece.y;
-  applyMagneticDragDelta(
+  const preview = applyMagneticDragDelta(
     params.shiftGroup,
     piece.groupId,
     desiredDx,
     desiredDy,
     params.computeSnapPreview,
+    params.magneticSnapEnabled,
   );
 
-  return { ...drag, preview: params.computeSnapPreview() };
+  return {
+    ...drag,
+    preview,
+  };
 }
 
 export function pointerUpOp(params: {
@@ -173,15 +190,8 @@ export function pointerUpOp(params: {
 }): DragState {
   if (!params.drag.activeId) return params.drag;
 
-  performance.mark("snap-neighbor-start");
   params.trySnapActiveGroupToNeighbor();
-  performance.mark("snap-neighbor-end");
-  performance.measure("snap-neighbor", "snap-neighbor-start", "snap-neighbor-end");
-
-  performance.mark("snap-board-start");
   params.trySnapActiveGroupToBoard();
-  performance.mark("snap-board-end");
-  performance.measure("snap-board", "snap-board-start", "snap-board-end");
 
   /* No nudge: only actual snaps move pieces to correct position; dragging near target does not. */
 

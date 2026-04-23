@@ -1,5 +1,5 @@
 /**
- * pickPiece – hit test by isPointInPath; returns topmost piece at (x,y).
+ * pickPiece – fast topmost hit test for board pieces.
  */
 import type { Piece } from "@/puzzle/core/types";
 import { sortPiecesForHitTest } from "./pieceDrawOrder";
@@ -7,43 +7,36 @@ import { sortPiecesForHitTest } from "./pieceDrawOrder";
 /**
  * pickPieceId
  *
- * Hit test by rendering into an offscreen path and using isPointInPath.
+ * Hit test against the rotated piece container. This preserves the previous
+ * fallback behavior while avoiding per-pointer Path2D rebuilds on hot paths.
  * Assumes the same transform pipeline as renderBoard:
  * - ctx is already set so 1 unit equals 1 CSS pixel.
  */
 export function pickPieceId(
-  ctx: CanvasRenderingContext2D,
+  _ctx: CanvasRenderingContext2D,
   pieces: Piece[],
   x: number,
   y: number,
   options?: { hitSlopPx?: number },
 ): string | null {
   const hitSlopPx = Math.max(0, options?.hitSlopPx ?? 2);
+  const candidates: Piece[] = [];
+  for (const p of pieces) {
+    if (p.inTray) continue;
+    const centerX = p.x + p.w / 2;
+    const centerY = p.y + p.h / 2;
+    const radius = Math.hypot(p.w, p.h) / 2 + hitSlopPx;
+    if (Math.abs(x - centerX) > radius || Math.abs(y - centerY) > radius) continue;
+    candidates.push(p);
+  }
+  if (candidates.length === 0) return null;
+
   // Topmost first in the exact inverse of draw order.
-  const sorted = sortPiecesForHitTest(pieces);
+  const sorted = sortPiecesForHitTest(candidates);
 
   for (const p of sorted) {
-    // Skip pieces in tray
-    if (p.inTray) continue;
-
-    let path: Path2D | null = null;
-    try {
-      if (p.shapePath && p.shapePath.length > 0) {
-        path = new Path2D(p.shapePath);
-      }
-    } catch {
-      path = null;
-    }
-
-    ctx.save();
-
-    // Match renderBoard transforms exactly
-    ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
-    ctx.rotate((p.rotation * Math.PI) / 180);
-    ctx.translate(-p.w / 2, -p.h / 2);
-
     // Transform screen point into piece-local coordinates once so we can
-    // fall back to rect hit testing when a complex path misses on some devices.
+    // test the same rotated container used by the previous fallback path.
     const localX = x - (p.x + p.w / 2);
     const localY = y - (p.y + p.h / 2);
     const angle = -(p.rotation * Math.PI) / 180;
@@ -54,35 +47,12 @@ export function pickPieceId(
     const pieceLocalX = rotX + p.w / 2;
     const pieceLocalY = rotY + p.h / 2;
 
-    let hit = false;
-
-    if (path) {
-      // Use isPointInPath with the transformed context
-      // The point (x, y) is in canvas space, but isPointInPath
-      // tests against the path in the current transform.
-      // We need to transform the point INTO the local space.
-      hit = ctx.isPointInPath(path, x, y);
-      if (!hit) {
-        // Tolerate tiny path precision misses on mobile browsers.
-        const tolerance = hitSlopPx;
-        hit =
-          pieceLocalX >= -tolerance &&
-          pieceLocalX <= p.w + tolerance &&
-          pieceLocalY >= -tolerance &&
-          pieceLocalY <= p.h + tolerance;
-      }
-    } else {
-      // Fallback to rect hit test
-      hit =
-        pieceLocalX >= -hitSlopPx &&
-        pieceLocalX <= p.w + hitSlopPx &&
-        pieceLocalY >= -hitSlopPx &&
-        pieceLocalY <= p.h + hitSlopPx;
-    }
-
-    ctx.restore();
-
-    if (hit) {
+    if (
+      pieceLocalX >= -hitSlopPx &&
+      pieceLocalX <= p.w + hitSlopPx &&
+      pieceLocalY >= -hitSlopPx &&
+      pieceLocalY <= p.h + hitSlopPx
+    ) {
       return p.id;
     }
   }

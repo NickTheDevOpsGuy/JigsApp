@@ -77,7 +77,7 @@ test.describe("Home / Menu", () => {
       timeout: 15000,
     });
     await expect(
-      page.getByText(/stats and leaderboard screens scale better/i),
+      page.getByText(/desktop home, packs, and stats now use roomier shells/i),
     ).toBeVisible();
   });
 

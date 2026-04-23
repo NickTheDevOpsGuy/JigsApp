@@ -195,14 +195,15 @@ export function drawPiece(
     return;
   }
 
-  const cacheKey = `${p.id}_r${p.rotation}_d${dpr}`;
+  const placedOrLocked = p.isPlaced || p.locked;
+  const cacheKey = `${p.id}_r${p.rotation}_d${dpr}_solid${placedOrLocked ? 1 : 0}`;
   const rot90 = p.rotation === 90 || p.rotation === 270;
   const cacheW = rot90 ? Math.ceil(p.h) : Math.ceil(p.w);
   const cacheH = rot90 ? Math.ceil(p.w) : Math.ceil(p.h);
   const cachePxW = Math.ceil(cacheW * dpr);
   const cachePxH = Math.ceil(cacheH * dpr);
   const cached = pieceCache?.get(cacheKey);
-  const useCache = !(p.isPlaced || p.locked);
+  const useCache = true;
   if (cached && cached.width === cachePxW && cached.height === cachePxH && useCache) {
     drawCachedPiece(
       ctx,
@@ -226,6 +227,7 @@ export function drawPiece(
       animState?.showClusterOutline,
       piecePulseAlpha,
       idleCorrectPulseNowMs,
+      animState?.reducedQuality,
     );
     return;
   }
@@ -271,6 +273,7 @@ export function drawPiece(
       animState?.showClusterOutline,
       piecePulseAlpha,
       idleCorrectPulseNowMs,
+      animState?.reducedQuality,
     );
     return;
   }
@@ -287,7 +290,9 @@ export function drawPiece(
   ctx.scale(scale, scale);
   ctx.translate(-p.w / 2, -p.h / 2);
 
-  drawSilhouetteShadow(ctx, path, isDragging, p.isPlaced);
+  drawSilhouetteShadow(ctx, path, isDragging, p.isPlaced, {
+    reducedQuality: animState?.reducedQuality,
+  });
   if (piecePulseAlpha < 1) {
     ctx.save();
     ctx.globalAlpha *= piecePulseAlpha;

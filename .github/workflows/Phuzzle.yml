@@ -62,12 +62,19 @@ jobs:
         run: npm run test
 
       - name: 📦 Install Playwright browsers
-        run: npx playwright install --with-deps chromium msedge
+        run: npx playwright install --with-deps chromium firefox webkit chrome msedge
 
       - name: 🎭 E2E tests (Playwright)
-        run: |
-          npx playwright test --project=chromium --project=chromium-tz-la --project=chromium-tz-auckland
-          npx playwright test --project=msedge src/app/screens/Play/PlayScreen.completion-menu-edge.e2e.spec.ts
+        env:
+          PW_USE_CHROME: "1"
+          PW_USE_EDGE: "1"
+        run: npm run test:e2e:smoke
+
+      - name: 📱 Responsive layout matrix
+        env:
+          PW_USE_CHROME: "1"
+          PW_USE_EDGE: "1"
+        run: npm run test:e2e:layouts
 
       - name: 🔦 Lighthouse CI (perf, a11y)
         env:
