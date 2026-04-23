@@ -115,7 +115,9 @@
   --fx-streak-shimmer-animation: completeStreakShimmerMove 3.2s ease-in-out infinite;
   --fx-streak-flame-animation: completeStreakFlamePulse 2.4s ease-in-out infinite;
   --fx-streak-count-animation: completeStreakCountGlow 2.4s ease-in-out infinite;
-  --fx-streak-flame-filter: drop-shadow(0 0 6px color-mix(in srgb, #ff8c42 55%, transparent));
+  --fx-streak-flame-filter: drop-shadow(
+    0 0 6px color-mix(in srgb, #ff8c42 55%, transparent)
+  );
 }
 
 @supports not (height: 100dvh) {

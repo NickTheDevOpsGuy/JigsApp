@@ -129,19 +129,16 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
         !hasActiveLockLerp &&
         !hasActiveSnapParticles;
       const throttleFirefoxIdle =
-        firefoxIdleMode &&
-        throttleIdle &&
-        !replayPlaybackActive &&
-        !showAlignmentGrid;
+        firefoxIdleMode && throttleIdle && !replayPlaybackActive && !showAlignmentGrid;
       const useLargePuzzleInterval =
         throttleIdle && pieceCount >= LARGE_PUZZLE_PIECE_COUNT;
       const minFrameIntervalMs = reducedMotion
         ? Math.max(IDLE_MIN_INTERVAL_MS, 28)
         : throttleFirefoxIdle
           ? IDLE_MIN_INTERVAL_MS_FIREFOX
-        : useLargePuzzleInterval
-          ? IDLE_MIN_INTERVAL_MS_LARGE
-          : IDLE_MIN_INTERVAL_MS;
+          : useLargePuzzleInterval
+            ? IDLE_MIN_INTERVAL_MS_LARGE
+            : IDLE_MIN_INTERVAL_MS;
       if (
         (throttleIdle || throttleFirefoxIdle) &&
         now - lastFrameTimeRef.current < minFrameIntervalMs

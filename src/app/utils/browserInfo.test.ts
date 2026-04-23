@@ -32,4 +32,3 @@ describe("isFirefoxBrowser", () => {
     expect(isFirefoxBrowser(null)).toBe(false);
   });
 });
-
