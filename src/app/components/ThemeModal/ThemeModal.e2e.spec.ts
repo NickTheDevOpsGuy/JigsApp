@@ -25,7 +25,9 @@ test.describe("Theme", () => {
     await page.getByRole("button", { name: /open menu/i }).click();
     await page.getByRole("menuitem", { name: /^settings$/i }).click();
     await page.getByRole("menuitem", { name: /appearance|display/i }).click();
-    await page.getByTestId("open-theme-modal").click();
+    const openThemeModal = page.getByTestId("open-theme-modal");
+    await expect(openThemeModal).toBeVisible();
+    await openThemeModal.click({ force: true });
 
     const dialog = page.getByRole("dialog", { name: /theme.*sounds/i });
     await expect(dialog).toBeVisible({ timeout: 5000 });

@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { dismissWhatsNewModalIfOpen } from "@/e2e/helpers";
 
+const TINY_PNG_BASE64 =
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
 test.describe("Setup → Play flow", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(async () => {
@@ -18,7 +21,9 @@ test.describe("Setup → Play flow", () => {
     await expect(dialog).toBeVisible({ timeout: 15000 });
     await expect(dialog.getByRole("button", { name: /nature/i })).toBeVisible();
     await expect(
-      dialog.getByLabel(/use your own photo: upload an image from your device/i),
+      dialog.getByRole("button", {
+        name: /use your own photo: upload an image from your device/i,
+      }),
     ).toBeVisible();
   });
 
@@ -56,5 +61,31 @@ test.describe("Setup → Play flow", () => {
     await expect(
       page.getByRole("button", { name: /extreme - 81 pieces/i }),
     ).toBeVisible();
+  });
+
+  test("custom image upload starts play with the selected difficulty", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await dismissWhatsNewModalIfOpen(page);
+    await page.getByRole("button", { name: /quick play/i }).click();
+
+    const uploadInput = page.locator('input[type="file"]').first();
+
+    await uploadInput.setInputFiles({
+      name: "tiny.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(TINY_PNG_BASE64, "base64"),
+    });
+
+    await expect(page).toHaveURL(/\/play/);
+    await expect(
+      page.getByRole("status", { name: /pieces placed/i }).first(),
+    ).toBeVisible({
+      timeout: 15000,
+    });
+    await expect
+      .poll(async () => page.evaluate(() => localStorage.getItem("phuzzle:gridSize")))
+      .toBe("4x4");
   });
 });

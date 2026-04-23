@@ -11,7 +11,15 @@ import {
 import styles from "./TrayFilterButton.module.css";
 
 // Keep filter values stable so users don't "lose" options between sessions/updates.
-export type TrayFilter = "all" | "clusters" | "corners" | "edges" | "colors" | "arranged";
+export type TrayFilter =
+  | "all"
+  | "clusters"
+  | "corners"
+  | "edges"
+  | "colors"
+  | "arranged"
+  | "recent"
+  | "grouped";
 
 const LABELS: Record<TrayFilter, string> = {
   all: "All",
@@ -20,6 +28,8 @@ const LABELS: Record<TrayFilter, string> = {
   edges: "Sides",
   colors: "Color",
   arranged: "Arrange",
+  recent: "Recent",
+  grouped: "Grouped",
 };
 
 interface TrayFilterButtonProps {
@@ -119,31 +129,40 @@ export function TrayFilterButton({ value, onChange, hasImage }: TrayFilterButton
               minWidth: menuRect.minWidth,
             }}
           >
-            {(["all", "clusters", "arranged", "corners", "edges", "colors"] as const).map(
-              (opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  role="option"
-                  aria-selected={value === opt}
-                  aria-label={`Show ${LABELS[opt]} pieces`}
-                  title={`Show ${LABELS[opt]} pieces`}
-                  className={value === opt ? styles.menuItemActive : styles.menuItem}
-                  onClick={() => {
-                    onChange(opt);
-                    setOpen(false);
-                  }}
-                  disabled={(opt === "colors" || opt === "clusters") && !hasImage}
-                >
-                  <span className={styles.checkSlot}>
-                    {value === opt && (
-                      <Check size={14} className={styles.checkIcon} aria-hidden />
-                    )}
-                  </span>
-                  {LABELS[opt]}
-                </button>
-              ),
-            )}
+            {(
+              [
+                "all",
+                "clusters",
+                "arranged",
+                "corners",
+                "edges",
+                "recent",
+                "grouped",
+                "colors",
+              ] as const
+            ).map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                role="option"
+                aria-selected={value === opt}
+                aria-label={`Show ${LABELS[opt]} pieces`}
+                title={`Show ${LABELS[opt]} pieces`}
+                className={value === opt ? styles.menuItemActive : styles.menuItem}
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+                disabled={(opt === "colors" || opt === "clusters") && !hasImage}
+              >
+                <span className={styles.checkSlot}>
+                  {value === opt && (
+                    <Check size={14} className={styles.checkIcon} aria-hidden />
+                  )}
+                </span>
+                {LABELS[opt]}
+              </button>
+            ))}
           </div>,
           document.body,
         )}

@@ -116,6 +116,10 @@
 
 /* Mobile: shrink tray to fit viewport */
 @media (max-width: 600px) {
+  .headerBlock {
+    gap: 6px;
+  }
+
   .tray,
   .trayLarge,
   .trayCollapsed,
@@ -133,6 +137,17 @@
     padding: 6px 8px 8px;
     gap: 4px;
     font-size: 12px;
+  }
+
+  .quickFilters {
+    padding: 0 8px 6px;
+    gap: 5px;
+  }
+
+  .quickFilterBtn {
+    min-height: 34px;
+    padding: 6px 9px;
+    font-size: 11px;
   }
 
   .randomBtn {

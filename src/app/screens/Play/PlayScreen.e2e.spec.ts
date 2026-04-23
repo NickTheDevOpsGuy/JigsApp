@@ -143,7 +143,7 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("button", { name: /options/i })).toBeVisible();
   });
 
-  test("mobile replay opens from completion options and stays dismissed after close", async ({
+  test("mobile replay returns to the current completion overlay after close", async ({
     page,
   }) => {
     test.setTimeout(60000);
@@ -168,10 +168,34 @@ test.describe("Play screen", () => {
     await replayClose.click();
 
     await expect(replayHeading).toBeHidden({ timeout: 10000 });
-    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeHidden();
-    await expect(
-      page.getByRole("status", { name: /pieces placed/i }).first(),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible();
+  });
+
+  test("mobile replay transport buttons keep a consistent size", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+
+    const restartButton = page.getByRole("button", { name: /restart/i });
+    const playButton = page.getByRole("button", { name: "Play", exact: true });
+
+    await expect(restartButton).toBeInViewport();
+    await expect(playButton).toBeInViewport();
+
+    const restartBox = await restartButton.boundingBox();
+    const playBox = await playButton.boundingBox();
+
+    expect(restartBox).not.toBeNull();
+    expect(playBox).not.toBeNull();
+    expect(
+      Math.abs((playBox?.width ?? 0) - (restartBox?.width ?? 0)),
+    ).toBeLessThanOrEqual(2);
+    expect(
+      Math.abs((playBox?.height ?? 0) - (restartBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
   });
 
   test("short mobile replay keeps header and controls inside the viewport", async ({
@@ -201,6 +225,99 @@ test.describe("Play screen", () => {
     ).toBeLessThanOrEqual(2);
   });
 
+  test("mobile replay puts playback options (cog) in the timeline row, not under transport", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+
+    const playButton = page.getByRole("button", { name: "Play", exact: true });
+    const optionsButton = page.getByRole("button", {
+      name: /replay and playback options/i,
+    });
+
+    await expect(playButton).toBeInViewport();
+    await expect(optionsButton).toBeInViewport();
+
+    const playBox = await playButton.boundingBox();
+    const optionsBox = await optionsButton.boundingBox();
+
+    expect(playBox).not.toBeNull();
+    expect(optionsBox).not.toBeNull();
+    /* Cog sits in the seek meta row above the transport strip — higher on screen than Play */
+    expect((playBox?.y ?? 0) - (optionsBox?.y ?? 0)).toBeGreaterThan(24);
+  });
+
+  test("tablet landscape replay keeps the dock on-screen and attached to the board", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+
+    const replayHeading = page.getByRole("heading", { name: /replay solve/i });
+    const replayClose = page.getByRole("button", { name: /close replay/i });
+    const replayProgress = page.getByRole("slider", { name: /replay progress/i });
+    const dock = page.locator('[data-replay-dock="true"]');
+
+    await expect(replayHeading).toBeVisible({ timeout: 10000 });
+    await expect(replayClose).toBeInViewport();
+    await expect(replayProgress).toBeInViewport();
+    await expect(dock).toBeInViewport();
+
+    const viewport = page.viewportSize();
+    const dockBox = await dock.boundingBox();
+    const boardBox = await page.getByTestId("play-board").boundingBox();
+
+    expect(viewport).not.toBeNull();
+    expect(dockBox).not.toBeNull();
+    expect(boardBox).not.toBeNull();
+    expect((dockBox?.x ?? 0) + (dockBox?.width ?? 0)).toBeLessThanOrEqual(
+      (viewport?.width ?? 0) + 1,
+    );
+    expect((dockBox?.y ?? 0) + (dockBox?.height ?? 0)).toBeLessThanOrEqual(
+      (viewport?.height ?? 0) + 1,
+    );
+    expect(Math.abs((dockBox?.x ?? 0) - (boardBox?.x ?? 0))).toBeLessThanOrEqual(
+      (boardBox?.width ?? 0) + 32,
+    );
+  });
+
+  test("short desktop replay keeps header, slider, and controls reachable", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/play?e2eCompletion=1");
+
+    await page.getByRole("button", { name: /options/i }).click();
+    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+
+    const replayClose = page.getByRole("button", { name: /close replay/i });
+    const replayProgress = page.getByRole("slider", { name: /replay progress/i });
+    const playButton = page.getByRole("button", { name: "Play", exact: true });
+    const optionsButton = page.getByRole("button", {
+      name: /replay and playback options/i,
+    });
+    const dock = page.locator('[data-replay-dock="true"]');
+
+    await expect(replayClose).toBeInViewport();
+    await expect(replayProgress).toBeInViewport();
+    await expect(playButton).toBeInViewport();
+    await expect(optionsButton).toBeInViewport();
+    await expect(dock).toBeInViewport();
+
+    const dockCompact = await dock.getAttribute("data-dock-compact");
+    expect(dockCompact).toBe("true");
+  });
+
   test("desktop completion options menu lists share actions", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/play?e2eCompletion=1");
@@ -223,6 +340,47 @@ test.describe("Play screen", () => {
     await expect(dialog).toBeVisible({ timeout: 20000 });
     await expect(dialog).toBeInViewport();
     await expect(options).toBeInViewport();
+  });
+
+  test("starting a new puzzle from play applies the newly selected grid", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.goto("/play?e2eCompletion=1");
+
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
+      timeout: 20000,
+    });
+
+    await page
+      .getByRole("button", { name: /options: next puzzle, replay, share/i })
+      .click();
+    await page.getByRole("menuitem", { name: /new puzzle/i }).click();
+
+    await expect(page.getByRole("dialog", { name: /choose category/i })).toBeVisible({
+      timeout: 15000,
+    });
+
+    await page.getByRole("button", { name: /nature/i }).click();
+    await expect(page.getByRole("dialog", { name: /choose puzzle/i })).toBeVisible();
+
+    await page
+      .getByRole("option", { name: /select /i })
+      .first()
+      .click();
+    await expect(page.getByRole("dialog", { name: /puzzle setup/i })).toBeVisible();
+    await page.getByRole("button", { name: /hard, 25 pieces/i }).click();
+    await page.getByRole("button", { name: /start puzzle/i }).click();
+
+    await expect(
+      page.getByRole("status", { name: /pieces placed/i }).first(),
+    ).toBeVisible({
+      timeout: 15000,
+    });
+
+    await expect
+      .poll(async () => page.evaluate(() => localStorage.getItem("phuzzle:gridSize")))
+      .toBe("5x5");
   });
 });
 
@@ -277,6 +435,56 @@ test.describe("Play screen tablet touch", () => {
     expect(liveBoardBox).not.toBeNull();
     expect(
       Math.abs((liveBoardBox?.width ?? 0) - (liveBoardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
+  });
+
+  test("tablet landscape keeps the tray dock beside the board without clipping", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto("/play");
+
+    const liveBoard = page.getByTestId("play-board");
+    const tray = page.getByRole("list");
+    await expect(liveBoard).toBeVisible({ timeout: 15000 });
+    await expect(tray).toBeVisible({ timeout: 5000 });
+
+    const liveBoardBox = await liveBoard.boundingBox();
+    const trayBox = await tray.boundingBox();
+    expect(liveBoardBox).not.toBeNull();
+    expect(trayBox).not.toBeNull();
+    expect(trayBox?.x ?? 0).toBeGreaterThan(
+      (liveBoardBox?.x ?? 0) + (liveBoardBox?.width ?? 0) - 40,
+    );
+    expect((trayBox?.y ?? 0) + (trayBox?.height ?? 0)).toBeLessThanOrEqual(768);
+  });
+
+  test("tablet rotate keeps the board square and tray visible", async ({ page }) => {
+    await page.goto("/play");
+
+    const liveBoard = page.getByTestId("play-board");
+    const tray = page.getByRole("list");
+    await expect(liveBoard).toBeVisible({ timeout: 15000 });
+    await expect(tray).toBeVisible({ timeout: 5000 });
+
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await expect(liveBoard).toBeVisible();
+    await expect(tray).toBeVisible();
+
+    const landscapeBoardBox = await liveBoard.boundingBox();
+    expect(landscapeBoardBox).not.toBeNull();
+    expect(
+      Math.abs((landscapeBoardBox?.width ?? 0) - (landscapeBoardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
+
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await expect(liveBoard).toBeVisible();
+    await expect(tray).toBeVisible();
+
+    const portraitBoardBox = await liveBoard.boundingBox();
+    expect(portraitBoardBox).not.toBeNull();
+    expect(
+      Math.abs((portraitBoardBox?.width ?? 0) - (portraitBoardBox?.height ?? 0)),
     ).toBeLessThanOrEqual(2);
   });
 });

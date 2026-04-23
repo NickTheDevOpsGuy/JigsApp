@@ -36,6 +36,7 @@ export function usePlayScreenPrimarySetup() {
   const [isDailySession, setIsDailySession] = React.useState(
     () => searchParams.get(DAILY_PARAM) === "1" || isDailyPuzzleSession(),
   );
+  const searchParamsKey = searchParams.toString();
   const gridParamFromUrl = searchParams.get(GRID_PARAM);
   const localGrid = useMemo(() => {
     // Read GRID_ONCE_KEY atomically: consume it immediately so StrictMode double-render
@@ -47,10 +48,10 @@ export function usePlayScreenPrimarySetup() {
     const fromUrl = parseGrid(gridParamFromUrl ?? null);
     if (fromUrl) return fromUrl;
     return parseGrid(null);
-  }, [dailyLinkApplied, gridParamFromUrl]);
+  }, [dailyLinkApplied, gridParamFromUrl, searchParamsKey]);
   const localImageUrl = useMemo(
     () => safeLocalStorage.getItem(STORAGE_KEY) ?? "",
-    [dailyLinkApplied],
+    [dailyLinkApplied, searchParamsKey],
   );
 
   useLayoutEffect(() => {

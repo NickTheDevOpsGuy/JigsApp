@@ -6,12 +6,12 @@ if [ "$#" -gt 0 ]; then
 fi
 
 projects=(
-  chromium
-  chromium-tz-la
-  chromium-tz-auckland
+  chrome
+  chrome-tz-la
+  chrome-tz-auckland
   firefox
-  webkit
-  msedge
+  safari
+  edge
 )
 
 for project in "${projects[@]}"; do

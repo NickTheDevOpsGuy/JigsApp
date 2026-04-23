@@ -12,6 +12,7 @@ import baseStyles from "@/screens/Play/components/replay/ReplaySolveModal.module
 import controlStyles from "@/screens/Play/components/replay/ReplaySolveModal.controls.module.css";
 import { ReplaySolveModalControls } from "./ReplaySolveModalControls";
 import { AppModal } from "@/components/AppModal";
+import type { ReplaySnapshot } from "@/screens/Play/hooks/gameplay/useReplay";
 import {
   invokeMaybeAsync,
   invokeMaybeAsyncIndex,
@@ -74,6 +75,15 @@ export interface ReplaySolveModalProps {
   moveCount?: number;
   /** Shown in top-right of cutout bar when in pack flow, e.g. "One more from this pack" */
   packRemainingLabel?: string | null;
+  /** Data for saving / sharing replay as a JSON file */
+  replayExport?: {
+    snapshots: ReplaySnapshot[];
+    puzzleKey: number | null;
+    puzzleName?: string;
+    totalSeconds: number;
+  } | null;
+  /** Toast / inline feedback after save or share */
+  onReplayExportFeedback?: (message: string) => void;
 }
 
 export function ReplaySolveModal({
@@ -93,11 +103,17 @@ export function ReplaySolveModal({
   totalSeconds,
   onSeek,
   onClose,
+  onBackToResults,
   completionImageUrl,
   boardRect,
   moveCount,
   packRemainingLabel,
+  replayExport = null,
+  onReplayExportFeedback,
 }: ReplaySolveModalProps) {
+  const handleClose = React.useCallback(() => {
+    invokeMaybeAsync(onBackToResults ?? onClose);
+  }, [onBackToResults, onClose]);
   const prefersSheetOnShortTouchViewport =
     typeof window !== "undefined" &&
     window.matchMedia("(pointer: coarse)").matches &&
@@ -111,7 +127,6 @@ export function ReplaySolveModal({
 
   const progressPct =
     totalSnapshots > 1 ? (currentIndex / Math.max(1, totalSnapshots - 1)) * 100 : 0;
-  const effectiveSpeed = speedExplicitlyChosen ? speed : 1;
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const [imageError, setImageError] = useState(false);
 
@@ -141,7 +156,7 @@ export function ReplaySolveModal({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        invokeMaybeAsync(onClose);
+        handleClose();
         return;
       }
       if (e.key === " ") {
@@ -176,14 +191,14 @@ export function ReplaySolveModal({
     };
     document.addEventListener("keydown", onKeyDown, true);
     return () => document.removeEventListener("keydown", onKeyDown, true);
-  }, [onClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
+  }, [handleClose, isPaused, onPlay, onPause, onSeek, totalSnapshots, currentIndex]);
 
   const stopProp = (e: React.PointerEvent) => e.stopPropagation();
 
   const handleBackdropKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      if (e.target === e.currentTarget) invokeMaybeAsync(onClose);
+      if (e.target === e.currentTarget) handleClose();
     }
   };
 
@@ -196,7 +211,8 @@ export function ReplaySolveModal({
       onFastForward={onFastForward}
       onSkipBack15={onSkipBack15}
       onSkipForward15={onSkipForward15}
-      effectiveSpeed={effectiveSpeed}
+      speed={speed}
+      speedExplicitlyChosen={speedExplicitlyChosen}
       onSpeedChange={onSpeedChange}
       currentIndex={currentIndex}
       totalSnapshots={totalSnapshots}
@@ -204,6 +220,8 @@ export function ReplaySolveModal({
       totalSeconds={totalSeconds}
       onSeek={onSeek}
       progressPct={progressPct}
+      replayExport={replayExport}
+      onExportFeedback={onReplayExportFeedback}
     />
   );
 
@@ -213,7 +231,7 @@ export function ReplaySolveModal({
     return (
       <AppModal
         isOpen
-        onClose={onClose}
+        onClose={handleClose}
         surface="bare"
         size="xl"
         showCloseButton={false}
@@ -239,7 +257,7 @@ export function ReplaySolveModal({
               ref={closeBtnRef}
               type="button"
               className={styles.mobileCloseBtn}
-              onClick={() => invokeMaybeAsync(onClose)}
+              onClick={handleClose}
               onPointerDown={stopProp}
               aria-label="Close replay"
               title="Close"
@@ -295,6 +313,8 @@ export function ReplaySolveModal({
     const cutoutRadius = 20;
     const safeEdge = 12;
     const dockInsetPx = 8;
+    const estimatedDockHeight = 214;
+    const minSideDockWidth = 288;
     const maxShell = Math.max(0, viewWidth - 2 * safeEdge);
     const shellWidth = Math.min(maxShell, width + dockInsetPx * 2);
     const shellLeft = Math.min(
@@ -309,6 +329,45 @@ export function ReplaySolveModal({
       top - estimatedHeaderHeight - headerGap,
     );
     const panelBottom = viewTop + viewHeight;
+    const availableBelow = panelBottom - (bottom + 16) - safeEdge;
+    const availableLeft = left - (viewLeft + safeEdge) - 12;
+    const availableRight = viewLeft + viewWidth - right - safeEdge - 12;
+    const preferredSideDockWidth = Math.min(
+      360,
+      Math.max(minSideDockWidth, Math.round(viewWidth * 0.28)),
+    );
+    const canUseSideDock =
+      availableBelow < estimatedDockHeight &&
+      viewWidth >= 900 &&
+      Math.max(availableLeft, availableRight) >= minSideDockWidth;
+    const useRightSideDock = availableRight >= Math.max(availableLeft, minSideDockWidth);
+    const useSideDock =
+      canUseSideDock && (useRightSideDock || availableLeft >= minSideDockWidth);
+    const sideDockWidth = Math.min(
+      preferredSideDockWidth,
+      Math.max(0, useRightSideDock ? availableRight : availableLeft),
+    );
+    const compactDock =
+      availableBelow < estimatedDockHeight + 28 ||
+      (viewHeight <= 820 && viewWidth <= 1180);
+    const dockTop = useSideDock
+      ? Math.min(
+          panelBottom - estimatedDockHeight - safeEdge,
+          Math.max(
+            viewTop + safeEdge,
+            top + Math.max(12, (height - estimatedDockHeight) / 2),
+          ),
+        )
+      : Math.min(
+          panelBottom - estimatedDockHeight - safeEdge,
+          Math.max(viewTop + safeEdge, bottom + 16),
+        );
+    const dockLeft = useSideDock
+      ? useRightSideDock
+        ? right + 12
+        : left - sideDockWidth - 12
+      : shellLeft;
+    const dockWidth = useSideDock ? sideDockWidth : shellWidth;
 
     const boardHeader = (
       <div className={styles.boardHeader}>
@@ -339,7 +398,7 @@ export function ReplaySolveModal({
           ref={closeBtnRef}
           type="button"
           className={styles.boardCloseBtn}
-          onClick={() => invokeMaybeAsync(onClose)}
+          onClick={handleClose}
           onPointerDown={stopProp}
           aria-label="Close replay (Esc)"
           title="Close (Esc)"
@@ -362,17 +421,17 @@ export function ReplaySolveModal({
         <div
           data-cutout-panel
           style={{ top: 0, left: 0, right: 0, height: Math.max(0, top) }}
-          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
+          onPointerDown={(e) => e.target === e.currentTarget && handleClose()}
         />
         <div
           data-cutout-panel
           style={{ top, left: 0, width: Math.max(0, left), height }}
-          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
+          onPointerDown={(e) => e.target === e.currentTarget && handleClose()}
         />
         <div
           data-cutout-panel
           style={{ top, left: right, right: 0, height }}
-          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
+          onPointerDown={(e) => e.target === e.currentTarget && handleClose()}
         />
         <div
           data-cutout-panel
@@ -383,7 +442,7 @@ export function ReplaySolveModal({
             bottom: 0,
             minHeight: panelBottom - bottom,
           }}
-          onPointerDown={(e) => e.target === e.currentTarget && invokeMaybeAsync(onClose)}
+          onPointerDown={(e) => e.target === e.currentTarget && handleClose()}
         />
 
         <div
@@ -442,7 +501,10 @@ export function ReplaySolveModal({
 
         <div
           className={styles.controlDock}
-          style={{ left: shellLeft, width: shellWidth, top: bottom + 16 }}
+          data-replay-dock="true"
+          data-dock-placement={useSideDock ? "side" : "bottom"}
+          data-dock-compact={compactDock ? "true" : "false"}
+          style={{ left: dockLeft, width: dockWidth, top: dockTop }}
           onPointerDown={stopProp}
         >
           <div className={`${styles.controlDockInner} ${styles.controlDockInnerCutout}`}>

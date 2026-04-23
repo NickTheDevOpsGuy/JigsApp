@@ -105,27 +105,39 @@
 
 @media (min-width: 601px) and (max-width: 1024px) {
   .page {
-    padding: 16px;
+    padding: 18px 20px 22px;
   }
 
   .card {
-    max-width: 720px;
+    max-width: 920px;
+    padding: 14px 16px 12px;
   }
 }
 
 @media (min-width: 1025px) {
   .page {
-    padding: 20px 24px 24px;
+    padding: 30px 34px 36px;
   }
 
   .card {
-    max-width: 960px;
-    padding: 16px 18px 14px;
+    max-width: 1380px;
+    padding: 22px 24px 20px;
+    border-radius: calc(var(--radius-card) + 4px);
+    background:
+      radial-gradient(circle at top left, rgba(91, 145, 255, 0.1), transparent 32%),
+      linear-gradient(180deg, rgba(16, 27, 45, 0.98), rgba(10, 19, 31, 0.97));
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+      0 28px 64px rgba(0, 0, 0, 0.34);
   }
 
   .tabs {
     flex-wrap: wrap;
     overflow: visible;
+  }
+
+  .cardContent {
+    padding-right: 10px;
   }
 }
 

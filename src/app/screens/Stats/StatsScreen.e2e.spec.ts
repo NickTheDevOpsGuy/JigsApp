@@ -53,4 +53,32 @@ test.describe("Packs and Stats", () => {
       page.getByRole("tab", { name: /profile/i }).or(page.getByText(/connect supabase/i)),
     ).toBeVisible({ timeout: 5000 });
   });
+
+  test("Stats screen stays usable on tablet portrait", async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto("/stats");
+
+    await expect(page).toHaveURL(/\/stats/);
+    await expect(
+      page
+        .getByRole("button", { name: /back/i })
+        .or(page.getByRole("button", { name: /close/i }))
+        .first(),
+    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("stats-card-content")).toBeVisible({ timeout: 10000 });
+  });
+
+  test("Stats screen stays readable on landscape phone", async ({ page }) => {
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto("/stats");
+
+    await expect(page).toHaveURL(/\/stats/);
+    await expect(
+      page
+        .getByRole("button", { name: /back/i })
+        .or(page.getByRole("button", { name: /close/i }))
+        .first(),
+    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("stats-card-content")).toBeVisible({ timeout: 10000 });
+  });
 });

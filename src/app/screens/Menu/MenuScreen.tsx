@@ -2,7 +2,7 @@
  * MenuScreen – full-bleed mobile home. Fills the screen, no floating card.
  * Primary: Play Today. Secondary: Packs + Quick Play as rows. Tertiary: Feedback link.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Package, ImagePlus, ChevronRight, Flame, Snowflake, Trophy } from "lucide-react";
 import { useHomeData } from "./hooks/useHomeData";
@@ -12,6 +12,8 @@ import { PackChoiceModal } from "@/components/PackChoiceModal";
 import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
 import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
+import { WhatsNewModal } from "@/components/WhatsNew";
+import { shouldShowChangelog } from "@/data/content/changelog";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import { loadPackListScreenModule, loadStatsScreenModule } from "@/screens/routeLoaders";
 import styles from "./MenuScreen.module.css";
@@ -22,6 +24,8 @@ export function MenuScreen() {
   const [showPackChoiceModal, setShowPackChoiceModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showDailyDifficultyModal, setShowDailyDifficultyModal] = useState(false);
+  const [showWhatsNewModal, setShowWhatsNewModal] = useState(false);
+  const [hasUnreadWhatsNew, setHasUnreadWhatsNew] = useState(() => shouldShowChangelog());
   const {
     streak,
     freezes,
@@ -57,11 +61,22 @@ export function MenuScreen() {
   };
 
   const handleFeedback = () => setShowFeedbackModal(true);
+  const handleWhatsNew = () => setShowWhatsNewModal(true);
+
+  useEffect(() => {
+    if (!hasUnreadWhatsNew) return;
+    setShowWhatsNewModal(true);
+  }, [hasUnreadWhatsNew]);
+
+  const handleCloseWhatsNew = () => {
+    setShowWhatsNewModal(false);
+    setHasUnreadWhatsNew(false);
+  };
 
   return (
     <>
       <div className={styles.canvas}>
-        <div className={styles.page}>
+        <div className={styles.page} data-testid="menu-shell">
           {/* ─── Header ─── */}
           <header className={styles.header}>
             <div className={styles.logo}>
@@ -71,6 +86,21 @@ export function MenuScreen() {
               <span className={styles.logoText}>Phuzzle</span>
             </div>
             <div className={styles.headerActions}>
+              <button
+                type="button"
+                className={`${styles.iconBtn} ${styles.whatsNewBtn}`}
+                onClick={handleWhatsNew}
+                aria-label="What's new"
+                title="What's New"
+                data-testid="menu-whats-new-action"
+              >
+                <span className={styles.whatsNewEmoji} aria-hidden>
+                  ✨
+                </span>
+                {hasUnreadWhatsNew ? (
+                  <span className={styles.iconUnreadDot} aria-hidden />
+                ) : null}
+              </button>
               <button
                 type="button"
                 className={styles.iconBtn}
@@ -303,6 +333,7 @@ export function MenuScreen() {
         isOpen={showDailyDifficultyModal}
         onClose={() => setShowDailyDifficultyModal(false)}
       />
+      <WhatsNewModal isOpen={showWhatsNewModal} onClose={handleCloseWhatsNew} />
     </>
   );
 }

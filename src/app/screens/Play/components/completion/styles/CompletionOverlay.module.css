@@ -652,6 +652,10 @@
     padding: 11px 14px;
     border-radius: 10px;
   }
+
+  .completeOptionsTriggerHint {
+    font-size: 11px;
+  }
 }
 
 /* ── Options trigger button (full-width, styled like completeMenuTrigger) ── */
@@ -692,7 +696,27 @@
 }
 
 .completeOptionsTriggerLabel {
+  display: block;
+  font-size: inherit;
+  font-weight: 800;
+  text-align: left;
+}
+
+.completeOptionsTriggerCopy {
   flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.completeOptionsTriggerHint {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-secondary);
   text-align: left;
 }
 
@@ -777,6 +801,10 @@
     min-height: 54px;
     font-size: 15px;
     padding: 13px 18px;
+  }
+
+  .completeOptionsTriggerHint {
+    font-size: 11px;
   }
 }
 
@@ -866,6 +894,10 @@
     padding: 10px 12px;
   }
 
+  .completeOptionsTriggerHint {
+    font-size: 10px;
+  }
+
   .completeImageWrapPhased {
     max-height: min(38vh, 280px);
     border-radius: 8px;
@@ -915,5 +947,9 @@
     min-height: 42px;
     font-size: 13px;
     padding: 9px 12px;
+  }
+
+  .completeOptionsTriggerHint {
+    font-size: 10px;
   }
 }

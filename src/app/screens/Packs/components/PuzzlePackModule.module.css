@@ -110,6 +110,32 @@
   transform: scale(0.98);
 }
 
+@media (min-width: 601px) and (max-width: 1023px) {
+  .featuredHeroCard {
+    grid-template-columns: minmax(200px, 232px) minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+  }
+
+  .featuredHeroCover {
+    width: 100%;
+    margin-inline: 0;
+  }
+
+  .featuredHeroBody {
+    gap: 6px;
+  }
+
+  .featuredHeroDesc {
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .featuredHeroCta {
+    margin-top: 4px;
+  }
+}
+
 .moduleShell {
   display: grid;
   gap: 16px;

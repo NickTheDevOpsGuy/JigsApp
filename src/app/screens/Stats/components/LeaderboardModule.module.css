@@ -61,6 +61,11 @@
   box-shadow: 0 12px 26px rgba(4, 10, 21, 0.14);
 }
 
+.row:hover {
+  border-color: color-mix(in srgb, var(--color-brand-primary) 24%, var(--color-border));
+  box-shadow: 0 16px 30px rgba(4, 10, 21, 0.18);
+}
+
 .rowPodium {
   border-color: color-mix(in srgb, var(--color-brand-primary) 42%, transparent);
 }
@@ -155,5 +160,85 @@
 
   .name {
     white-space: normal;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1024px) {
+  .moduleCard {
+    gap: 18px;
+  }
+
+  .row {
+    grid-template-columns: 44px minmax(220px, 1.4fr) minmax(110px, 0.72fr) minmax(
+        148px,
+        0.9fr
+      );
+    gap: 14px;
+    padding: 15px 16px;
+  }
+
+  .name {
+    font-size: 0.98rem;
+  }
+
+  .meta,
+  .secondaryMetric {
+    font-size: 0.82rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .moduleCard {
+    gap: 20px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    max-width: 72ch;
+    font-size: 1rem;
+  }
+
+  .list {
+    gap: 14px;
+  }
+
+  .row {
+    grid-template-columns: 52px minmax(260px, 1.6fr) minmax(140px, 0.72fr) minmax(
+        180px,
+        0.95fr
+      );
+    gap: 18px;
+    padding: 18px 20px;
+    border-radius: 22px;
+  }
+
+  .rank {
+    min-width: 44px;
+    font-size: 1.08rem;
+  }
+
+  .playerCol {
+    gap: 5px;
+  }
+
+  .name {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .meta {
+    font-size: 0.84rem;
+  }
+
+  .metric {
+    font-size: 1.08rem;
+  }
+
+  .secondaryMetric {
+    font-size: 0.86rem;
+    line-height: 1.35;
   }
 }

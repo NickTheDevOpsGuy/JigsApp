@@ -16,4 +16,14 @@ smoke_specs=(
 )
 
 echo "Running Phuzzle smoke E2E suite on Chromium..."
-npx playwright test --project=chromium "${smoke_specs[@]}"
+projects=(
+  chrome
+  firefox
+  safari
+  edge
+)
+
+for project in "${projects[@]}"; do
+  echo "Running Phuzzle smoke E2E suite on ${project}..."
+  npx playwright test --project="${project}" "${smoke_specs[@]}"
+done

@@ -259,6 +259,81 @@
   pointer-events: auto;
 }
 
+.controlDock[data-dock-placement="side"] .controlDockInner {
+  min-height: 0;
+}
+
+.controlDock[data-dock-placement="side"][data-dock-compact="false"] .controlDockInner {
+  padding: 16px;
+}
+
+.controlDock[data-dock-placement="side"] .seekRow {
+  padding-bottom: 12px;
+}
+
+.controlDock[data-dock-placement="side"] .seekMetaRow {
+  align-items: flex-start;
+}
+
+.controlDock[data-dock-placement="side"] .controlRow {
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.controlDock[data-dock-placement="side"] .controlBtn {
+  width: 34px;
+  height: 34px;
+}
+
+.controlDock[data-dock-placement="side"] .controlBtnPlay {
+  width: 34px;
+  height: 34px;
+}
+
+.controlDock[data-dock-placement="side"] .controlBtn svg,
+.controlDock[data-dock-placement="side"] .controlBtnPlay svg {
+  width: 18px;
+  height: 18px;
+}
+
+.controlDock[data-dock-compact="true"] .controlDockInner {
+  padding: 12px;
+  border-radius: 14px;
+}
+
+.controlDock[data-dock-compact="true"] .seekRow {
+  padding-bottom: 10px;
+}
+
+.controlDock[data-dock-compact="true"] .seekMetaRow {
+  gap: 8px 10px;
+}
+
+.controlDock[data-dock-compact="true"] .seekTime {
+  font-size: 0.74rem;
+}
+
+.controlDock[data-dock-compact="true"] .controlRow {
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.controlDock[data-dock-compact="true"] .controlBtn {
+  width: 34px;
+  height: 34px;
+}
+
+.controlDock[data-dock-compact="true"] .controlBtnPlay {
+  width: 34px;
+  height: 34px;
+}
+
+.controlDock[data-dock-compact="true"] .controlBtn svg,
+.controlDock[data-dock-compact="true"] .controlBtnPlay svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* controlDockBottomAnchored kept for legacy; dock now positioned via inline top from boardRect */
 .controlDockBottomAnchored {
   top: auto;
@@ -593,6 +668,19 @@
   max-width: 100%;
   min-height: 0;
   gap: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-bg-card) 98%, transparent),
+      transparent
+    ),
+    var(--color-bg-primary);
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 22%, transparent);
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.24),
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 10%, transparent);
 }
 
 /* ── Header ── */
@@ -601,8 +689,13 @@
   align-items: flex-start;
   gap: 10px;
   padding: 18px 18px 14px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
   flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-bg-elevated) 94%, transparent),
+    color-mix(in srgb, var(--color-bg-card) 92%, transparent)
+  );
 }
 
 .mobileHeaderInfo {
@@ -691,11 +784,24 @@
   min-height: 140px;
   max-height: min(44dvh, 360px);
   overflow: hidden;
-  background: var(--color-bg-primary);
+  margin: 0 16px;
+  width: calc(100% - 32px);
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 24%, transparent);
+  background:
+    radial-gradient(
+      circle at top,
+      color-mix(in srgb, var(--color-brand-primary) 10%, transparent),
+      transparent 52%
+    ),
+    var(--color-bg-primary);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #ffffff 8%, transparent),
+    0 12px 24px rgba(0, 0, 0, 0.14);
 }
 
 .mobilePuzzleImg {
@@ -726,9 +832,14 @@
 
 /* ── Controls panel ── */
 .mobileControls {
-  padding: 16px 18px 18px;
+  padding: 18px 18px 20px;
   padding-bottom: max(18px, env(safe-area-inset-bottom, 18px));
   flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-bg-card) 96%, transparent),
+    color-mix(in srgb, var(--color-bg-primary) 98%, transparent)
+  );
 }
 
 /* Landscape phone: side-by-side image + controls */
@@ -751,8 +862,13 @@
   .mobilePuzzleWrap {
     order: 1;
     width: 40%;
+    margin: 0;
     flex-shrink: 0;
     max-height: 100%;
+    border-radius: 0;
+    border-left: none;
+    border-top: none;
+    border-bottom: none;
   }
 
   .mobileControls {
@@ -769,12 +885,23 @@
 
 /* Tablet: slightly more breathing room */
 @media (min-width: 601px) and (max-width: 1024px) {
+  .mobileSheet {
+    max-width: min(100%, 860px);
+    margin: 0 auto;
+  }
+
   .mobileHeader {
     padding: 20px 22px 16px;
   }
 
   .mobileTitle {
     font-size: 1.08rem;
+  }
+
+  .mobilePuzzleWrap {
+    margin: 0 22px;
+    width: calc(100% - 44px);
+    max-height: min(42dvh, 420px);
   }
 
   .mobileControls {

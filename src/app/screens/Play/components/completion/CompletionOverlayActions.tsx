@@ -408,7 +408,12 @@ export function CompletionOverlayActions(args: {
             title="Options"
           >
             <span className={styles.completeOptionsTriggerSpacer} aria-hidden />
-            <span className={styles.completeOptionsTriggerLabel}>Options</span>
+            <span className={styles.completeOptionsTriggerCopy}>
+              <span className={styles.completeOptionsTriggerLabel}>Options</span>
+              <span className={styles.completeOptionsTriggerHint}>
+                Replay, share, or jump into another puzzle
+              </span>
+            </span>
             <span className={styles.completeOptionsTriggerChevronWrap} aria-hidden>
               <ChevronDown
                 size={18}

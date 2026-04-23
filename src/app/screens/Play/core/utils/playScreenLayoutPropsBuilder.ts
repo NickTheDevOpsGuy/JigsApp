@@ -35,6 +35,7 @@ interface PlayScreenLayoutArgs {
   setShowNewGameModal: (show: boolean) => void;
   showChoosePuzzleModal: boolean;
   setShowChoosePuzzleModal: (show: boolean) => void;
+  onChoosePuzzleStart?: () => void;
   onChoosePuzzleDismissWithoutStart?: () => void;
   handleNewGame: () => void;
   showResetStatsConfirm: boolean;
@@ -177,6 +178,7 @@ export function createPlayScreenLayoutProps(
       setShowNewGameModal: args.setShowNewGameModal,
       showChoosePuzzleModal: args.showChoosePuzzleModal,
       setShowChoosePuzzleModal: args.setShowChoosePuzzleModal,
+      onChoosePuzzleStart: args.onChoosePuzzleStart,
       onChoosePuzzleDismissWithoutStart: args.onChoosePuzzleDismissWithoutStart,
       onConfirmNewGame: args.handleNewGame,
       showResetStatsConfirm: args.showResetStatsConfirm,

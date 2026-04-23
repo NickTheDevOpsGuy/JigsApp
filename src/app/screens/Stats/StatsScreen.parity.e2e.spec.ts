@@ -85,6 +85,11 @@ test.describe("Stats modal parity", () => {
     }
 
     await assertConfiguredStatsFlow(page);
+    const cardBounds = await page
+      .locator('[data-testid="stats-card-content"]')
+      .boundingBox();
+    expect(cardBounds).not.toBeNull();
+    expect(cardBounds?.width ?? 0).toBeGreaterThanOrEqual(1040);
     await expectVisibleHeight(
       page,
       page
@@ -127,6 +132,27 @@ test.describe("Stats modal parity", () => {
 
     await page.getByRole("tab", { name: /badges/i }).click();
     await expect(page.getByRole("heading", { name: /badges/i })).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("tablet portrait leaderboard keeps filters readable without horizontal squeeze", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 834, height: 1194 });
+    await openStats(page);
+
+    if (await isSupabaseFallback(page)) {
+      await assertFallbackFlow(page);
+      await expectNoHorizontalOverflow(page);
+      return;
+    }
+
+    await page.getByRole("tab", { name: /board/i }).click();
+    await expect(page.getByRole("button", { name: /filters/i })).toBeVisible();
+    await page.getByRole("button", { name: /filters/i }).click();
+    await expect(page.getByLabel(/filter by shape/i)).toBeVisible();
+    await expect(page.getByLabel(/filter by modifier/i)).toBeVisible();
+    await expect(page.getByLabel(/filter by source/i)).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 });

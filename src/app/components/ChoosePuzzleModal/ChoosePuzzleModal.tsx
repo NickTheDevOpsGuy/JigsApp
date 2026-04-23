@@ -3,22 +3,20 @@
  * Step 1: Choose Category.
  * Step 2: Choose Puzzle + difficulty + Start (all on one screen).
  */
-import {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  useCallback,
-  type KeyboardEvent,
-} from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Puzzle, Check, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 import { Modal } from "@/components/Modal/Modal";
 import { GRID_OPTIONS } from "@/daily/dailyPuzzleCore";
 import { SAMPLE_PUZZLES, CATEGORIES } from "@/data/packs/samplePuzzles";
 import type { SamplePuzzle } from "@/data/packs/samplePuzzles";
+import { setCurrentPuzzleId } from "@/data/packs/packCompletion";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
-import { STORAGE_KEY, GRID_ONCE_KEY } from "@/screens/Play/core/utils/playScreenUtils";
+import {
+  STORAGE_KEY,
+  GRID_KEY,
+  GRID_ONCE_KEY,
+} from "@/screens/Play/core/utils/playScreenUtils";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import styles from "./ChoosePuzzleModal.module.css";
@@ -31,6 +29,7 @@ type Step = "category" | "puzzle";
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  onStartPuzzle?: () => void;
   /**
    * Fires only when the user dismisses via backdrop, X, or Escape — not when they
    * start a puzzle (that path calls `onClose` directly without going through Modal).
@@ -44,7 +43,12 @@ function filterPuzzles(puzzles: SamplePuzzle[], categoryId: string): SamplePuzzl
     : puzzles.filter((p) => p.category === categoryId);
 }
 
-export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Props) {
+export function ChoosePuzzleModal({
+  isOpen,
+  onClose,
+  onStartPuzzle,
+  onDismissWithoutStart,
+}: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const [step, setStep] = useState<Step>("category");
@@ -58,9 +62,19 @@ export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Pr
     [filterCategory],
   );
 
+  const navigateToPlay = useCallback(
+    (grid: { rows: number; cols: number }) => {
+      const playUrl =
+        location.pathname === "/play" ? `/play?grid=${grid.rows}x${grid.cols}` : "/play";
+      navigate(playUrl, { replace: location.pathname === "/play" });
+    },
+    [location.pathname, navigate],
+  );
+
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const gridScrollRef = useRef<HTMLDivElement>(null);
   const startButtonRef = useRef<HTMLButtonElement>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
   const [canScrollCategoryLeft, setCanScrollCategoryLeft] = useState(false);
   const [canScrollCategoryRight, setCanScrollCategoryRight] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -211,15 +225,18 @@ export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Pr
     if (!selectedPuzzle) return;
     const grid = PRIMARY_DIFFICULTIES[difficultyIndex] ?? PRIMARY_DIFFICULTIES[1];
     clearPuzzleState();
+    setCurrentPuzzleId(null);
     safeLocalStorage.setItem(STORAGE_KEY, selectedPuzzle.fullImage);
+    safeLocalStorage.setItem(GRID_KEY, `${grid.rows}x${grid.cols}`);
     safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
     safeLocalStorage.removeItem("phuzzle:dailyDate");
     // Preload image into browser cache before navigating so play screen starts instantly
     const preload = new Image();
     preload.src = selectedPuzzle.fullImage;
     void loadPlayScreenModule();
+    onStartPuzzle?.();
     if (location.pathname === "/play") onClose();
-    navigate("/play");
+    navigateToPlay(grid);
   };
 
   const canStart = selectedPuzzle != null;
@@ -234,22 +251,19 @@ export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Pr
       if (!dataUrl) return;
       const grid = PRIMARY_DIFFICULTIES[difficultyIndex] ?? PRIMARY_DIFFICULTIES[1];
       clearPuzzleState();
+      setCurrentPuzzleId(null);
       safeLocalStorage.setItem(STORAGE_KEY, dataUrl);
+      safeLocalStorage.setItem(GRID_KEY, `${grid.rows}x${grid.cols}`);
       safeLocalStorage.setItem(GRID_ONCE_KEY, `${grid.rows}x${grid.cols}`);
       safeLocalStorage.removeItem("phuzzle:dailyDate");
       void loadPlayScreenModule();
+      onStartPuzzle?.();
       if (location.pathname === "/play") onClose();
-      navigate("/play");
+      navigateToPlay(grid);
     };
     reader.readAsDataURL(file);
     // Reset input so same file can be re-selected
     e.target.value = "";
-  };
-
-  const onUploadCtaKeyDown = (e: KeyboardEvent<HTMLLabelElement>) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    e.preventDefault();
-    e.currentTarget.querySelector<HTMLInputElement>('input[type="file"]')?.click();
   };
 
   const goToStep = (target: Step) => {
@@ -345,13 +359,12 @@ export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Pr
                   </button>
                 ))}
                 <div className={styles.categoryUploadRow}>
-                  <label
+                  <button
+                    type="button"
                     className={styles.uploadCta}
-                    tabIndex={0}
-                    onKeyDown={onUploadCtaKeyDown}
-                    aria-label="Custom image: upload an image from your device"
+                    onClick={() => uploadInputRef.current?.click()}
+                    aria-label="Use your own photo: upload an image from your device"
                     title="Choose a custom image"
-                    role="button"
                   >
                     <span className={styles.uploadCtaIconWrap} aria-hidden>
                       <Camera size={22} strokeWidth={2} />
@@ -359,13 +372,16 @@ export function ChoosePuzzleModal({ isOpen, onClose, onDismissWithoutStart }: Pr
                     <span className={styles.uploadCtaCopy}>
                       <span className={styles.uploadCtaTitle}>Custom image</span>
                     </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className={styles.uploadCtaInput}
-                      onChange={handleCustomUpload}
-                    />
-                  </label>
+                  </button>
+                  <input
+                    ref={uploadInputRef}
+                    type="file"
+                    accept="image/*"
+                    className={styles.uploadCtaInput}
+                    onChange={handleCustomUpload}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                  />
                 </div>
               </div>
             </div>

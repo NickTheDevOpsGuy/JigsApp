@@ -85,6 +85,86 @@ export function isEdge(p: Piece, grid: { rows: number; cols: number }) {
   return p.row === 0 || p.row === lastRow || p.col === 0 || p.col === lastCol;
 }
 
+function buildGroupSizeMap(pieces: Piece[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const piece of pieces) {
+    counts.set(piece.groupId, (counts.get(piece.groupId) ?? 0) + 1);
+  }
+  return counts;
+}
+
+export function sortTrayPiecesForFilter(
+  pieces: Piece[],
+  grid: { rows: number; cols: number },
+  filter: TrayFilter,
+  opts: {
+    imageAvailable?: boolean;
+    hueById?: Map<string, number>;
+  } = {},
+): Piece[] {
+  const { imageAvailable = false, hueById = new Map<string, number>() } = opts;
+  const byGrid = (a: Piece, b: Piece) =>
+    a.row - b.row || a.col - b.col || a.id.localeCompare(b.id);
+  const byHue = (a: Piece, b: Piece) => {
+    const ha = hueById.get(a.id);
+    const hb = hueById.get(b.id);
+    if (ha == null && hb == null) return byGrid(a, b);
+    if (ha == null) return 1;
+    if (hb == null) return -1;
+    return ha - hb || byGrid(a, b);
+  };
+  const corners = pieces.filter((p) => isCorner(p, grid));
+  const edges = pieces.filter((p) => isEdge(p, grid));
+  const interior = pieces.filter((p) => !isCorner(p, grid) && !isEdge(p, grid));
+  const allByGrid = [...pieces].sort(byGrid);
+  const allByHue = imageAvailable ? [...pieces].sort(byHue) : allByGrid;
+  const groupSizeById = buildGroupSizeMap(pieces);
+  const byGroupStrength = (a: Piece, b: Piece) => {
+    const groupDelta =
+      (groupSizeById.get(b.groupId) ?? 1) - (groupSizeById.get(a.groupId) ?? 1);
+    if (groupDelta !== 0) return groupDelta;
+    const dragDelta = (b.dragCount ?? 0) - (a.dragCount ?? 0);
+    if (dragDelta !== 0) return dragDelta;
+    return byGrid(a, b);
+  };
+  const byRecentTouch = (a: Piece, b: Piece) => {
+    const dragDelta = (b.dragCount ?? 0) - (a.dragCount ?? 0);
+    if (dragDelta !== 0) return dragDelta;
+    const groupDelta =
+      (groupSizeById.get(b.groupId) ?? 1) - (groupSizeById.get(a.groupId) ?? 1);
+    if (groupDelta !== 0) return groupDelta;
+    return byGrid(a, b);
+  };
+
+  switch (filter) {
+    case "clusters":
+      return imageAvailable
+        ? clusterPiecesByDominantColor(pieces, hueById, byGrid)
+        : allByGrid;
+    case "arranged": {
+      const cornersSorted = [...corners].sort(byGrid);
+      const edgesSorted = [...edges].sort(byGrid);
+      if (!imageAvailable || interior.length === 0) {
+        return [...cornersSorted, ...edgesSorted, ...[...interior].sort(byGroupStrength)];
+      }
+      const interiorClustered = clusterPiecesByDominantColor(interior, hueById, byGrid);
+      return [...cornersSorted, ...edgesSorted, ...interiorClustered];
+    }
+    case "corners":
+      return [...corners].sort(byGrid);
+    case "edges":
+      return [...edges].sort(byGrid);
+    case "colors":
+      return allByHue;
+    case "recent":
+      return [...pieces].sort(byRecentTouch);
+    case "grouped":
+      return [...pieces].sort(byGroupStrength);
+    default:
+      return allByGrid;
+  }
+}
+
 export function usePieceTrayDisplay(
   pieces: Piece[],
   image: HTMLImageElement | null,
@@ -122,22 +202,6 @@ export function usePieceTrayDisplay(
     return m;
   }, [image, pieces, grid]);
 
-  const byGrid = useCallback(
-    (a: Piece, b: Piece) => a.row - b.row || a.col - b.col || a.id.localeCompare(b.id),
-    [],
-  );
-  const byHue = useCallback(
-    (a: Piece, b: Piece) => {
-      const ha = hueById.get(a.id);
-      const hb = hueById.get(b.id);
-      if (ha == null && hb == null) return byGrid(a, b);
-      if (ha == null) return 1;
-      if (hb == null) return -1;
-      return ha - hb || byGrid(a, b);
-    },
-    [hueById, byGrid],
-  );
-
   const trayIdKey = useMemo(
     () =>
       pieces
@@ -148,51 +212,14 @@ export function usePieceTrayDisplay(
   );
 
   const displayed = useMemo(() => {
-    const corners = pieces.filter((p) => isCorner(p, grid));
-    const edges = pieces.filter((p) => isEdge(p, grid));
-    const interior = pieces.filter((p) => !isCorner(p, grid) && !isEdge(p, grid));
-    const allByGrid = [...pieces].sort(byGrid);
-    const allByHue = image ? [...pieces].sort(byHue) : allByGrid;
-
-    let result: Piece[];
-    switch (filter) {
-      case "clusters": {
-        result = image
-          ? clusterPiecesByDominantColor(pieces, hueById, byGrid)
-          : allByGrid;
-        break;
-      }
-      case "arranged": {
-        const cornersSorted = [...corners].sort(byGrid);
-        const edgesSorted = [...edges].sort(byGrid);
-        if (!image || interior.length === 0) {
-          result = [...cornersSorted, ...edgesSorted];
-        } else {
-          const interiorClustered = clusterPiecesByDominantColor(
-            interior,
-            hueById,
-            byGrid,
-          );
-          result = [...cornersSorted, ...edgesSorted, ...interiorClustered];
-        }
-        break;
-      }
-      case "corners":
-        result = [...corners].sort(byGrid);
-        break;
-      case "edges":
-        result = [...edges].sort(byGrid);
-        break;
-      case "colors":
-        result = allByHue;
-        break;
-      default:
-        result = allByGrid;
-    }
+    const result = sortTrayPiecesForFilter(pieces, grid, filter, {
+      imageAvailable: Boolean(image),
+      hueById,
+    });
     if (shuffleKey === 0) return result;
     const seed = (shuffleKey * 0x9e3779b1) ^ hashTrayPieceIds(trayIdKey);
     return seededShufflePieces(result, seed);
-  }, [pieces, grid, filter, image, hueById, shuffleKey, trayIdKey, byGrid, byHue]);
+  }, [pieces, grid, filter, image, hueById, shuffleKey, trayIdKey]);
 
   const onShuffle = useCallback(() => setShuffleKey((k) => k + 1), []);
 
