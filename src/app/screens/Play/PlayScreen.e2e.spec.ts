@@ -211,6 +211,19 @@ test.describe("Play screen", () => {
     ).toBeVisible();
     await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
   });
+
+  test("short desktop completion overlay stays on-screen", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 1280, height: 760 });
+    await page.goto("/play?e2eCompletion=1");
+
+    const dialog = page.getByRole("dialog", { name: /dialog/i });
+    const options = page.getByRole("button", { name: /options/i });
+
+    await expect(dialog).toBeVisible({ timeout: 20000 });
+    await expect(dialog).toBeInViewport();
+    await expect(options).toBeInViewport();
+  });
 });
 
 test.describe("Play screen tablet touch", () => {
@@ -302,5 +315,41 @@ test.describe("Play screen landscape phone", () => {
     await expect(
       page.getByRole("button", { name: "Play", exact: true }),
     ).toBeInViewport();
+  });
+});
+
+test.describe("Play screen tablet landscape touch", () => {
+  test.use({ viewport: { width: 1194, height: 834 }, hasTouch: true, isMobile: true });
+
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(
+      async ({ img, grid }) => {
+        localStorage.setItem("phuzzle:lastSeenChangelog", "25");
+        localStorage.setItem("phuzzle:imageDataUrl", img);
+        localStorage.setItem("phuzzle:gridSize", grid);
+      },
+      { img: TINY_IMAGE, grid: "4x4" },
+    );
+  });
+
+  test("tablet landscape keeps board square and tray visible", async ({ page }) => {
+    await page.goto("/play");
+
+    const liveBoard = page.getByTestId("play-board");
+    const tray = page.getByRole("list");
+
+    await expect(liveBoard).toBeVisible({ timeout: 15000 });
+    await expect(tray).toBeVisible({ timeout: 5000 });
+
+    const liveBoardBox = await liveBoard.boundingBox();
+    const trayBox = await tray.boundingBox();
+    expect(liveBoardBox).not.toBeNull();
+    expect(trayBox).not.toBeNull();
+    expect(
+      Math.abs((liveBoardBox?.width ?? 0) - (liveBoardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
+    expect(
+      (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
+    ).toBeLessThanOrEqual(834);
   });
 });

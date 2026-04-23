@@ -77,6 +77,39 @@
   }
 }
 
+@media (min-width: 601px) and (max-width: 1366px) and (pointer: coarse) and (orientation: landscape) {
+  .playBody {
+    --play-board-tray-width: min(100%, 560px);
+    --play-board-tray-gap: 12px;
+    padding-top: 8px;
+  }
+
+  .playBody .main {
+    height: min(
+      calc(var(--play-board-tray-width, min(100%, 560px)) + 20px),
+      calc(var(--app-vh-stable, 100dvh) - 182px)
+    );
+    max-height: min(
+      calc(var(--play-board-tray-width, min(100%, 560px)) + 20px),
+      calc(var(--app-vh-stable, 100dvh) - 182px)
+    );
+    padding-top: 4px;
+    padding-bottom: 6px;
+  }
+
+  .boardWrapper {
+    width: min(100%, var(--play-board-tray-width));
+    max-width: min(100%, var(--play-board-tray-width));
+  }
+
+  .playBody .trayArea .tray,
+  .playBody .trayArea .tray.trayWrapLarge {
+    height: clamp(88px, 12vh, 112px);
+    max-height: min(112px, 14vh);
+    min-height: 82px;
+  }
+}
+
 /* Tray dock: gap below board matches horizontal inset (--play-board-tray-gap) */
 .playBody .trayArea {
   width: 100%;

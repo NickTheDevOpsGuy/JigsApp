@@ -1,0 +1,60 @@
+{
+  "issues": [
+    {
+      "title": "Add localization foundation for UI strings and language switching",
+      "body": "## Summary\nPhuzzle already has enough depth that localization is worth doing right. Add an i18n foundation so UI copy can be translated without touching gameplay logic.\n\n## Why this matters\n- Opens the door for more players and contributors.\n- Makes future feature work easier to ship in multiple languages.\n- Helps remove hard-coded UI text from components.\n\n## Scope\n- Introduce a translation layer for app UI copy.\n- Add a language preference in settings.\n- Persist the selected language locally.\n- Default to English if a key is missing.\n\n## Acceptance Criteria\n- Core navigation and home/play/stats UI copy is sourced through a translation system.\n- Players can change language in-app without refreshing.\n- The app falls back safely to English for missing strings.\n- Existing tests continue to pass, with at least one localization-focused test added.\n\n## Notes\nStart with a narrow, stable surface area rather than trying to translate every string in one pass."
+    },
+    {
+      "title": "Ship first non-English language pack for UI copy",
+      "body": "## Summary\nOnce localization infrastructure exists, add the first translated language so the feature is real and testable.\n\n## Suggested target\nSpanish is a strong first candidate because it has broad reach and is practical for early validation.\n\n## Scope\n- Translate the highest-traffic UI strings.\n- Verify modal layouts and button sizes with longer translated copy.\n- Catch any hard-coded English strings still leaking into the UI.\n\n## Acceptance Criteria\n- One complete non-English language is available from settings.\n- Home, puzzle selection, play HUD, completion, and stats have translated copy.\n- Mobile layout still fits translated strings without clipping.\n- Missing translation keys are identified and cleaned up.\n\n## Notes\nThis should be treated as a polish + correctness pass, not just a string dump."
+    },
+    {
+      "title": "Add import-from-image URL flow for custom puzzles",
+      "body": "## Summary\nThe roadmap already calls out puzzle import from URL. Bring that back as a polished flow so players can create puzzles from images they find online.\n\n## Why this matters\n- Huge replay value.\n- Lets players bring their own content into the app.\n- Creates strong shareability and creator energy.\n\n## Scope\n- Add a guided URL import flow with validation.\n- Show a preview before starting the puzzle.\n- Handle invalid URLs and failed image loads gracefully.\n- Keep the existing staged modal flow feeling intentional.\n\n## Acceptance Criteria\n- A player can paste an image URL and start a puzzle from it.\n- Broken URLs and unsupported images show helpful errors.\n- The imported puzzle works with existing play modes and completion flows.\n- The flow feels mobile-friendly and does not require a desktop-only interaction."
+    },
+    {
+      "title": "Strengthen offline-first behavior for puzzle images and active saves",
+      "body": "## Summary\nPhuzzle already has good resume behavior, but the app would feel far stronger if puzzle assets and active sessions held up better offline.\n\n## Why this matters\n- Makes the app feel premium and dependable.\n- Helps mobile users who lose connection mid-session.\n- Supports PWA expectations better.\n\n## Scope\n- Cache recently played puzzle assets more aggressively.\n- Preserve active puzzle state across flaky connectivity.\n- Make offline availability visible in a calm, user-friendly way.\n\n## Acceptance Criteria\n- Recently played puzzles can reopen offline.\n- Active local progress remains recoverable after a connectivity drop.\n- The app shows a clear but lightweight offline state when needed.\n- No regression to normal online startup performance."
+    },
+    {
+      "title": "Create weekly event puzzles with rotating modifiers and rewards",
+      "body": "## Summary\nDaily gives good momentum, but a weekly event layer could add a stronger reason to return and compete.\n\n## Example concept\nA weekly featured puzzle or pack with a rotating modifier such as fog, night, precision, or speedrun scoring.\n\n## Scope\n- Add one weekly event surface on the home screen.\n- Rotate a modifier and featured puzzle automatically.\n- Track completion and best performance for the event window.\n- Reuse existing stats and leaderboard patterns where possible.\n\n## Acceptance Criteria\n- A weekly event is visible and easy to start from home.\n- The event has a distinct ruleset or modifier from normal play.\n- Players can see whether they already completed it.\n- Event results feel connected to the rest of the game rather than bolted on."
+    },
+    {
+      "title": "Add unlockable cosmetic rewards tied to streaks and milestones",
+      "body": "## Summary\nPhuzzle has good stats and streak mechanics, but it needs more delightful long-term rewards players can show off.\n\n## Reward ideas\n- Theme variants\n- Tray skins\n- Piece glow styles\n- Badge frames\n- Seasonal cosmetic unlocks\n\n## Scope\n- Define a first small reward set.\n- Hook unlocks into existing stats, streak, or achievement events.\n- Add a lightweight place for players to see what they have earned.\n\n## Acceptance Criteria\n- Players can unlock at least one visible cosmetic reward through normal play.\n- Reward unlocks are persisted and shown in the UI.\n- The reward system feels celebratory but not noisy.\n- Locked versus unlocked states are easy to understand."
+    },
+    {
+      "title": "Add a puzzle-of-the-week community voting flow",
+      "body": "## Summary\nA community vote would make Phuzzle feel more alive and social, even for players who are not using co-op.\n\n## Scope\n- Let players vote on a small set of candidate puzzles or themes for the next featured puzzle.\n- Surface results and winning entry in a simple, fun way.\n- Keep the flow lightweight so it does not overwhelm the home screen.\n\n## Acceptance Criteria\n- Players can cast one vote during an active voting window.\n- The UI clearly shows the candidate options and current state.\n- The winning puzzle or theme is reflected in a later featured experience.\n- The design works on mobile without becoming cramped."
+    },
+    {
+      "title": "Improve share cards with more personality and player identity",
+      "body": "## Summary\nThe app already supports result sharing well, but the share output could feel more memorable and more distinctly Phuzzle.\n\n## Ideas\n- Show selected theme or mode on the share card.\n- Add cosmetic identity elements tied to player profile or unlocks.\n- Offer a few share card visual styles.\n\n## Scope\n- Extend current share card generation without slowing down the happy path.\n- Preserve the fast native-share-or-download behavior.\n- Keep daily share and regular result share aligned where it makes sense.\n\n## Acceptance Criteria\n- Share cards gain at least one new visual customization axis.\n- The output still feels clean and readable on mobile.\n- Share creation stays reliable and fast.\n- Existing share flows do not regress."
+    },
+    {
+      "title": "Add post-game challenge prompts that create friend rivalry loops",
+      "body": "## Summary\nPhuzzle already has challenge sharing, but it could do more to turn a finished puzzle into the next social action.\n\n## Ideas\n- \"Beat my time\"\n- \"Same puzzle, fewer moves\"\n- \"Try my exact settings\"\n- \"Daily revenge\" after a friend posts a better result\n\n## Scope\n- Add a few focused challenge prompts on completion.\n- Reuse existing share and challenge infrastructure where possible.\n- Make each prompt feel playful rather than spammy.\n\n## Acceptance Criteria\n- Completion UI offers at least two concrete social challenge options.\n- Shared challenge links preserve enough context to recreate the challenge.\n- The prompts are optional and easy to ignore.\n- Copy feels fun and on-brand."
+    },
+    {
+      "title": "Add a guided onboarding track for first-time players",
+      "body": "## Summary\nThe app has depth now. A new player should be able to discover core mechanics and fun features without bouncing.\n\n## Scope\n- Create a first-session onboarding flow that teaches the basics.\n- Highlight one or two standout Phuzzle features such as daily, packs, replay, or challenge sharing.\n- Avoid blocking experienced players or repeat visitors.\n\n## Acceptance Criteria\n- First-time players get a lightweight guided path into their first puzzle.\n- The onboarding teaches drag, snap, tray usage, and one higher-level feature.\n- Returning players can skip or never see redundant onboarding.\n- The experience feels cozy and intentional, not corporate."
+    },
+    {
+      "title": "Add a creator spotlight pack series with guest-curated puzzle sets",
+      "body": "## Summary\nA rotating creator spotlight could make the app feel like a living place instead of a static catalog.\n\n## Scope\n- Define a metadata model for guest-curated or featured packs.\n- Add one UI treatment for spotlight content.\n- Make the feature work with the existing packs experience.\n\n## Acceptance Criteria\n- The app can mark a pack as spotlighted and render it differently.\n- Spotlight content appears naturally in the existing pack flow.\n- The data model supports title, creator name, and short pack description.\n- Spotlight content does not break existing pack completion behavior."
+    },
+    {
+      "title": "Add accessibility option for larger UI scale and stronger readability",
+      "body": "## Summary\nPhuzzle already cares about accessibility, but players with low vision would benefit from a stronger readability mode beyond current theme and color-friendly settings.\n\n## Scope\n- Add an accessibility toggle for larger interface scale and stronger text readability.\n- Tune critical screens such as home, setup modals, play HUD, completion, and stats.\n- Keep the mobile layout stable even with larger text.\n\n## Acceptance Criteria\n- Players can enable a readability-focused UI mode from settings.\n- Text, buttons, and critical HUD elements become easier to read without clipping.\n- The mode works on mobile and desktop.\n- At least one accessibility regression test is added."
+    },
+    {
+      "title": "Add playful ambient soundscapes tied to packs and themes",
+      "body": "## Summary\nSnap sounds are a nice start, but ambient soundscapes could make Phuzzle feel much more premium and memorable.\n\n## Ideas\n- Rain or fireplace for Cozy\n- Forest ambience for Nature\n- Arcade synth for Retro\n- Light space ambience for Space\n\n## Scope\n- Add an optional ambient audio layer with clear settings control.\n- Respect reduced-motion and reduced-distraction expectations.\n- Make sure it behaves well on mobile autoplay restrictions.\n\n## Acceptance Criteria\n- Players can enable or disable ambient soundscapes.\n- At least one pack or theme has a matching ambient track.\n- Audio never auto-blasts unexpectedly and respects browser/device rules.\n- The experience feels calm and additive, not distracting."
+    },
+    {
+      "title": "Build a replay share flow so finished solves can be watched from a link",
+      "body": "## Summary\nReplay is already a cool feature. Turning it into a shareable artifact would make Phuzzle much more compelling to show off.\n\n## Scope\n- Add a way to publish or share a replay link after completion.\n- Let another player watch the replay without needing the full original session context exposed.\n- Keep performance reasonable for longer solves.\n\n## Acceptance Criteria\n- A completed puzzle can generate a replay link or replay share artifact.\n- Another user can open the replay and watch the solve progression.\n- The replay experience works on mobile.\n- Privacy and payload size tradeoffs are documented and handled intentionally."
+    }
+  ]
+}

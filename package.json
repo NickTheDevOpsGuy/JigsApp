@@ -20,6 +20,7 @@
     "typecheck": "tsc --noEmit",
     "guard:quality": "bash ./scripts/guard-no-skip-and-console.sh",
     "doctor": "bash ./scripts/doctor.sh",
+    "gh:issues:import": "bash ./scripts/import-github-issues.sh",
     "precheck": "bash ./scripts/precheck.sh",
     "prepare": "husky",
     "postinstall": "patch-package",

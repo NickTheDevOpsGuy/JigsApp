@@ -780,6 +780,25 @@
   }
 }
 
+@media (max-height: 840px) {
+  .completeCelebrationBlock {
+    padding: 18px 20px 12px;
+    gap: 10px;
+  }
+
+  .completeImageWrapPhased {
+    max-height: min(34vh, 300px);
+  }
+
+  .completeImagePhased {
+    max-height: min(34vh, 300px);
+  }
+
+  .completeActionsPhased {
+    padding: 14px 20px 18px;
+  }
+}
+
 /* ── Desktop / large screens (≥ 1025px) ── */
 @media (min-width: 1025px) {
   .completePhasedTitle {

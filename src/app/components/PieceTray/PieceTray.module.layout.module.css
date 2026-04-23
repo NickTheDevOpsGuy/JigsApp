@@ -99,27 +99,14 @@
   justify-content: center;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .scroller::-webkit-scrollbar {
-  height: 8px;
-}
-
-.scroller::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-  border-radius: 999px;
-}
-
-.scroller::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 999px;
-  border: 1px solid var(--scrollbar-border);
-}
-
-.scroller::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Snap so pieces align cleanly; no partially visible pieces when scroll stops */

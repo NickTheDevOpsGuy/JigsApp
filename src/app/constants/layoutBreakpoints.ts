@@ -11,8 +11,8 @@ export const layoutPhoneMediaQuery = `(max-width: ${LAYOUT_PHONE_MAX_PX}px)`;
 /** Tablet / small laptop — not phone, not wide desktop */
 export const layoutTabletOnlyMediaQuery = `(min-width: ${LAYOUT_PHONE_MAX_PX + 1}px) and (max-width: ${LAYOUT_TABLET_MAX_PX}px)`;
 
-/** Win overlay: compact when phone-width or vertically short */
-export const layoutPhoneOrShortWinMediaQuery = `${layoutPhoneMediaQuery}, (max-height: 720px)`;
+/** Win overlay: compact when phone-width or on shorter desktop/tablet windows */
+export const layoutPhoneOrShortWinMediaQuery = `${layoutPhoneMediaQuery}, (max-height: 840px)`;
 
 /** Anchored celebration dialog max width on wider viewports (px) */
 export const LAYOUT_ANCHORED_DIALOG_MAX_WIDTH_PX = 600;
