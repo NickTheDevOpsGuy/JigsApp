@@ -14,8 +14,8 @@
   z-index: var(--z-modal-overlay, 10050);
   animation: fadeIn var(--transition-duration-dialog, 200ms)
     var(--ease-out-smooth, ease-out);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(var(--fx-overlay-blur, 10px));
+  -webkit-backdrop-filter: blur(var(--fx-overlay-blur, 10px));
   transition: backdrop-filter var(--transition-duration-dialog, 200ms) ease;
 
   -webkit-touch-callout: none;
@@ -25,8 +25,8 @@
 }
 
 .overlayTutorial {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--fx-overlay-blur-soft, 8px));
+  -webkit-backdrop-filter: blur(var(--fx-overlay-blur-soft, 8px));
 }
 
 @keyframes fadeIn {
@@ -40,8 +40,8 @@
 
 .modal {
   background: color-mix(in srgb, var(--color-bg-card) 96%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(var(--fx-surface-blur-strong, 14px));
+  -webkit-backdrop-filter: blur(var(--fx-surface-blur-strong, 14px));
   border-radius: 24px;
   box-shadow:
     0 0 0 1px color-mix(in srgb, #ffffff 6%, transparent) inset,

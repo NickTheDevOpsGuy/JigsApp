@@ -2,6 +2,7 @@
 set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
+. "${PWD}/scripts/playwright-env.sh"
 
 if [ "$#" -gt 0 ]; then
   exec npx playwright test "$@"
@@ -22,6 +23,8 @@ projects=(
   safari
   edge
 )
+
+maybe_enable_edge_channel
 
 for project in "${projects[@]}"; do
   echo "Running Phuzzle smoke E2E suite on ${project}..."

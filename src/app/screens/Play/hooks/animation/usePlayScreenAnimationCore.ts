@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { renderBoard } from "@/puzzle/canvas/render/renderBoard";
 import { SHOW_DEBUG } from "@/screens/Play/core/utils/playScreenUtils";
 import {
+  IDLE_MIN_INTERVAL_MS_FIREFOX,
   IDLE_MIN_INTERVAL_MS,
   IDLE_MIN_INTERVAL_MS_LARGE,
   LARGE_PUZZLE_PIECE_COUNT,
@@ -22,6 +23,7 @@ import {
   prepareCanvasForRender,
 } from "@/screens/Play/hooks/animation/usePlayScreenAnimationHelpers";
 import { soundManager } from "@/audio/core/sounds";
+import { isFirefoxBrowser } from "@/utils/browserInfo";
 import type { UsePlayScreenAnimationArgs } from "./usePlayScreenAnimationTypes";
 
 export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
@@ -83,6 +85,8 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
     effectiveBatterySaverMode,
   );
   const nearSnapPlayedRef = useRef(false);
+  const firefoxIdleMode =
+    typeof navigator !== "undefined" && isFirefoxBrowser(navigator.userAgent);
 
   useEffect(() => {
     if (!manager) return;
@@ -120,19 +124,28 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       );
       const throttleIdle =
         !replayBarOpen &&
-        pieceCount >= HIGH_PIECE_COUNT_THRESHOLD &&
         !isDragging &&
         !inCompletionFlourish &&
         !hasActiveLockLerp &&
         !hasActiveSnapParticles;
+      const throttleFirefoxIdle =
+        firefoxIdleMode &&
+        throttleIdle &&
+        !replayPlaybackActive &&
+        !showAlignmentGrid;
       const useLargePuzzleInterval =
         throttleIdle && pieceCount >= LARGE_PUZZLE_PIECE_COUNT;
       const minFrameIntervalMs = reducedMotion
         ? Math.max(IDLE_MIN_INTERVAL_MS, 28)
+        : throttleFirefoxIdle
+          ? IDLE_MIN_INTERVAL_MS_FIREFOX
         : useLargePuzzleInterval
           ? IDLE_MIN_INTERVAL_MS_LARGE
           : IDLE_MIN_INTERVAL_MS;
-      if (throttleIdle && now - lastFrameTimeRef.current < minFrameIntervalMs) {
+      if (
+        (throttleIdle || throttleFirefoxIdle) &&
+        now - lastFrameTimeRef.current < minFrameIntervalMs
+      ) {
         rafRef.current = requestAnimationFrame(tick);
         return;
       }

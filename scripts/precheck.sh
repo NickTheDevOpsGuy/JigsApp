@@ -152,7 +152,7 @@ echo "✅ [SUCCESS]: Types are verified."
 if docker ps | grep -q "supabase_db"; then
   echo "♿ [STEP 6]: Running WCAG 2.2 Accessibility Audit..."
   require_node_module "@axe-core/playwright" "Run \`npm install\` or \`npm run doctor\` before the accessibility smoke."
-  if ! npx playwright test -c playwright.config.ts src/app/accessibility.e2e.spec.ts --project=chromium; then
+  if ! npx playwright test -c playwright.config.ts src/app/accessibility.e2e.spec.ts --project=chrome; then
     echo "🛑 [A11Y FAULT]: Accessibility is a core requirement, not a feature. Fix the violations above!"
     exit 1
   fi

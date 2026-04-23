@@ -98,3 +98,10 @@ Notes:
 
 - `npm run test` uses Vitest with 4 workers.
 - `npm run test:e2e` uses Playwright with 4 workers.
+- Add focused responsive browser checks when working on tray, touch, or viewport behavior:
+
+```bash
+npx playwright test src/app/responsive.responsive.e2e.spec.ts --project=safari-iphone-responsive --workers=1
+npx playwright test src/app/responsive.responsive.e2e.spec.ts --project=safari-ipad-responsive --workers=1
+npx playwright test src/app/responsive.responsive.e2e.spec.ts --project=chrome-android-tablet-responsive --workers=1
+```

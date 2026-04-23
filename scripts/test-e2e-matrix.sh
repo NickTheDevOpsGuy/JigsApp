@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+. "$(git rev-parse --show-toplevel)/scripts/playwright-env.sh"
+
 if [ "$#" -gt 0 ]; then
   exec npx playwright test "$@"
 fi
@@ -13,6 +15,8 @@ projects=(
   safari
   edge
 )
+
+maybe_enable_edge_channel
 
 for project in "${projects[@]}"; do
   echo

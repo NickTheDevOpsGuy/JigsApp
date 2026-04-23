@@ -127,8 +127,8 @@
   box-shadow:
     0 8px 18px rgba(0, 0, 0, 0.22),
     0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 16%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--fx-surface-blur-medium, 12px));
+  -webkit-backdrop-filter: blur(var(--fx-surface-blur-medium, 12px));
 }
 
 .boardHeaderMain {

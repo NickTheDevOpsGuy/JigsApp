@@ -106,6 +106,16 @@
   --replay-backdrop-glow-a: rgba(11, 99, 184, 0.12);
   --replay-backdrop-glow-b: rgba(80, 100, 160, 0.06);
   --replay-star: rgba(11, 99, 184, 0.5);
+  --fx-overlay-blur: 8px;
+  --fx-overlay-blur-soft: 6px;
+  --fx-surface-blur-medium: 8px;
+  --fx-surface-blur-strong: 10px;
+  --fx-zen-ambient-animation: zenAmbient 12s ease-in-out infinite;
+  --fx-tray-scroll-behavior: smooth;
+  --fx-streak-shimmer-animation: completeStreakShimmerMove 3.2s ease-in-out infinite;
+  --fx-streak-flame-animation: completeStreakFlamePulse 2.4s ease-in-out infinite;
+  --fx-streak-count-animation: completeStreakCountGlow 2.4s ease-in-out infinite;
+  --fx-streak-flame-filter: drop-shadow(0 0 6px color-mix(in srgb, #ff8c42 55%, transparent));
 }
 
 @supports not (height: 100dvh) {
@@ -218,6 +228,19 @@ html.theme-dark {
   --replay-backdrop-glow-a: rgba(74, 159, 245, 0.14);
   --replay-backdrop-glow-b: rgba(60, 90, 140, 0.08);
   --replay-star: rgba(230, 240, 255, 0.88);
+}
+
+html[data-browser="firefox"] {
+  --fx-overlay-blur: 0px;
+  --fx-overlay-blur-soft: 0px;
+  --fx-surface-blur-medium: 0px;
+  --fx-surface-blur-strong: 0px;
+  --fx-zen-ambient-animation: none;
+  --fx-tray-scroll-behavior: auto;
+  --fx-streak-shimmer-animation: none;
+  --fx-streak-flame-animation: none;
+  --fx-streak-count-animation: none;
+  --fx-streak-flame-filter: none;
 }
 
 /* Space theme - deep cosmos, purple/blue accents */

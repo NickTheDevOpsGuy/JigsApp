@@ -570,7 +570,7 @@
   }
 }
 
-@media (min-width: 820px) and (max-width: 1180px) and (pointer: coarse) and (orientation: landscape) {
+@media (min-width: 820px) and (max-width: 1224px) and (pointer: coarse) and (orientation: landscape) {
   .page {
     --play-board-tray-width: min(100%, 980px);
   }

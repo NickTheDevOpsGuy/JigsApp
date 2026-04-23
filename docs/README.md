@@ -8,10 +8,9 @@ This `docs/` directory is the canonical documentation home for the repo.
 
 ## Setup
 
-| Doc                                    | What it covers                                                                        |
-| -------------------------------------- | ------------------------------------------------------------------------------------- |
-| [SUPABASE_SETUP.md](SUPABASE_SETUP.md) | Supabase: leaderboards, stats, co-op. Create project, env vars, migrations, Realtime. |
-| [LIGHTHOUSE.md](LIGHTHOUSE.md)         | Lighthouse CI, where reports go, GitHub token note, and local Chrome setup tips.      |
+- [DEVELOPER_SETUP.md](DEVELOPER_SETUP.md): Local setup, Playwright browsers, daily dev commands, Firefox test flow, troubleshooting.
+- [SUPABASE_SETUP.md](SUPABASE_SETUP.md): Supabase: leaderboards, stats, co-op. Create project, env vars, migrations, Realtime.
+- [LIGHTHOUSE.md](LIGHTHOUSE.md): Lighthouse CI, where reports go, GitHub token note, and local Chrome setup tips.
 
 ---
 
