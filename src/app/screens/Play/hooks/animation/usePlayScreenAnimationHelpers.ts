@@ -76,7 +76,9 @@ export function updateDragDisplayOverrides(args: {
     const groupPieces = st.pieces.filter(
       (p) => !p.inTray && p.groupId === draggedGroupId,
     );
-    const snapPreview = magneticSnapEnabled ? (manager?.getSnapPreviewState() ?? null) : null;
+    const snapPreview = magneticSnapEnabled
+      ? (manager?.getSnapPreviewState() ?? null)
+      : null;
     let groupDeltaX = 0;
     let groupDeltaY = 0;
     let magneticProximity = 0;

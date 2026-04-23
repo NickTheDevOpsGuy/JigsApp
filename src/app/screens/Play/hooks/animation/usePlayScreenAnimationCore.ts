@@ -137,8 +137,8 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
         : quietIdle
           ? QUIET_IDLE_MIN_INTERVAL_MS
           : useLargePuzzleInterval
-          ? IDLE_MIN_INTERVAL_MS_LARGE
-          : IDLE_MIN_INTERVAL_MS;
+            ? IDLE_MIN_INTERVAL_MS_LARGE
+            : IDLE_MIN_INTERVAL_MS;
       if (throttleIdle && now - lastFrameTimeRef.current < minFrameIntervalMs) {
         rafRef.current = requestAnimationFrame(tick);
         return;

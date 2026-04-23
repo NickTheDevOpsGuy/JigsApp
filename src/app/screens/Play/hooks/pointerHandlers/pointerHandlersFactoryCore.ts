@@ -6,11 +6,7 @@ import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/utils/pickPiece";
 import type { CanvasWithTouch, PointerHandlerFactoryDeps } from "./types";
 import { handleTouchDown, handleTouchMove, resetTouchState } from "./touchHandlers";
-import {
-  handleMouseDown,
-  handleMouseMove,
-  type HoverProbeState,
-} from "./mouseHandlers";
+import { handleMouseDown, handleMouseMove, type HoverProbeState } from "./mouseHandlers";
 import { createPointerEndHandlers } from "./pointerHandlersEnd";
 import { createPointerMoveRafQueue } from "./pointerMoveRafQueue";
 
@@ -50,21 +46,19 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
     lastClientX: Number.NaN,
     lastClientY: Number.NaN,
   };
-  const mouseMoveQueue = createPointerMoveRafQueue(
-    (clientX, clientY, pointerType) => {
-      if (!manager) return;
-      handleMouseMove(
-        {
-          clientX,
-          clientY,
-          pointerType,
-        } as React.PointerEvent<HTMLCanvasElement>,
-        ctx,
-        screenToBoard,
-        hoverProbeState,
-      );
-    },
-  );
+  const mouseMoveQueue = createPointerMoveRafQueue((clientX, clientY, pointerType) => {
+    if (!manager) return;
+    handleMouseMove(
+      {
+        clientX,
+        clientY,
+        pointerType,
+      } as React.PointerEvent<HTMLCanvasElement>,
+      ctx,
+      screenToBoard,
+      hoverProbeState,
+    );
+  });
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>): void {
     if (!manager || !canvasRef.current || !boardRef.current) return;

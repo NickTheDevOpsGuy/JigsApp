@@ -66,9 +66,7 @@ function getPieceLockingInitial(): boolean {
 
 function getMagneticSnapInitial(): boolean {
   try {
-    const migrated = safeLocalStorage.getItem(
-      MAGNETIC_SNAP_DEFAULT_OFF_MIGRATION_KEY,
-    );
+    const migrated = safeLocalStorage.getItem(MAGNETIC_SNAP_DEFAULT_OFF_MIGRATION_KEY);
     if (migrated == null) {
       safeLocalStorage.setItem(MAGNETIC_SNAP_KEY, "false");
       safeLocalStorage.setItem(MAGNETIC_SNAP_DEFAULT_OFF_MIGRATION_KEY, "true");
