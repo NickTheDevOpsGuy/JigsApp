@@ -131,37 +131,23 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
         !inCompletionFlourish &&
         !hasActiveLockLerp &&
         !hasActiveSnapParticles;
-<<<<<<< HEAD
       const idleForMs =
         lastInteractionRef?.current != null ? now - lastInteractionRef.current : 0;
       const quietIdle = throttleIdle && (isPaused || idleForMs >= QUIET_IDLE_AFTER_MS);
+      const throttleFirefoxIdle =
+        firefoxIdleMode && throttleIdle && !replayPlaybackActive && !showAlignmentGrid;
       const useLargePuzzleInterval =
         throttleIdle && pieceCount >= LARGE_PUZZLE_PIECE_COUNT;
       const minFrameIntervalMs = reducedMotion
         ? Math.max(QUIET_IDLE_MIN_INTERVAL_MS, 28)
         : quietIdle
           ? QUIET_IDLE_MIN_INTERVAL_MS
-          : useLargePuzzleInterval
-            ? IDLE_MIN_INTERVAL_MS_LARGE
-            : IDLE_MIN_INTERVAL_MS;
+          : throttleFirefoxIdle
+            ? IDLE_MIN_INTERVAL_MS_FIREFOX
+            : useLargePuzzleInterval
+              ? IDLE_MIN_INTERVAL_MS_LARGE
+              : IDLE_MIN_INTERVAL_MS;
       if (throttleIdle && now - lastFrameTimeRef.current < minFrameIntervalMs) {
-=======
-      const throttleFirefoxIdle =
-        firefoxIdleMode && throttleIdle && !replayPlaybackActive && !showAlignmentGrid;
-      const useLargePuzzleInterval =
-        throttleIdle && pieceCount >= LARGE_PUZZLE_PIECE_COUNT;
-      const minFrameIntervalMs = reducedMotion
-        ? Math.max(IDLE_MIN_INTERVAL_MS, 28)
-        : throttleFirefoxIdle
-          ? IDLE_MIN_INTERVAL_MS_FIREFOX
-          : useLargePuzzleInterval
-            ? IDLE_MIN_INTERVAL_MS_LARGE
-            : IDLE_MIN_INTERVAL_MS;
-      if (
-        (throttleIdle || throttleFirefoxIdle) &&
-        now - lastFrameTimeRef.current < minFrameIntervalMs
-      ) {
->>>>>>> a993bc024c51cda3263b81d4dc23a1edfb3bf8bf
         rafRef.current = requestAnimationFrame(tick);
         return;
       }

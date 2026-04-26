@@ -523,9 +523,6 @@
   }
 }
 
-<<<<<<< HEAD
-@media (min-width: 820px) and (max-width: 1366px) and (min-height: 650px) and (pointer: coarse) and (orientation: landscape) {
-=======
 @media (min-width: 601px) and (max-width: 1366px) and (pointer: coarse) and (orientation: landscape) {
   .page {
     --play-board-tray-width: min(100%, 560px);
@@ -573,8 +570,7 @@
   }
 }
 
-@media (min-width: 820px) and (max-width: 1224px) and (pointer: coarse) and (orientation: landscape) {
->>>>>>> a993bc024c51cda3263b81d4dc23a1edfb3bf8bf
+@media (min-width: 820px) and (max-width: 1366px) and (min-height: 650px) and (pointer: coarse) and (orientation: landscape) {
   .page {
     --play-board-tray-width: min(100%, 860px);
   }

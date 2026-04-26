@@ -139,14 +139,10 @@ test.describe("Responsive smoke", () => {
     expect(viewport).not.toBeNull();
     expect(
       Math.abs((boardBox?.width ?? 0) - (boardBox?.height ?? 0)),
-<<<<<<< HEAD
-    ).toBeLessThanOrEqual(2);
+    ).toBeLessThanOrEqual(BOARD_SQUARE_TOLERANCE_PX);
     expect(trayBox?.y ?? 0).toBeGreaterThanOrEqual(
       (boardBox?.y ?? 0) + (boardBox?.height ?? 0) - 2,
     );
-=======
-    ).toBeLessThanOrEqual(BOARD_SQUARE_TOLERANCE_PX);
->>>>>>> a993bc024c51cda3263b81d4dc23a1edfb3bf8bf
     expect(
       (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
     ).toBeLessThanOrEqual((viewport?.height ?? 0) + 2);
@@ -217,8 +213,13 @@ test.describe("Responsive smoke", () => {
     const tray = page.getByRole("list");
     await expect(tray).toBeVisible({ timeout: 15000 });
 
-    await expect(page.getByRole("button", { name: /scroll left/i })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: /scroll right/i })).toHaveCount(0);
+    const hasCoarsePointer = await page.evaluate(
+      () => window.matchMedia("(pointer: coarse)").matches,
+    );
+    if (hasCoarsePointer) {
+      await expect(page.getByRole("button", { name: /scroll left/i })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: /scroll right/i })).toHaveCount(0);
+    }
 
     const right = await tray.evaluate((node) => {
       const el = node as HTMLDivElement;

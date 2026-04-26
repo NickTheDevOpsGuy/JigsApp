@@ -24,12 +24,10 @@ projects=(
   edge
 )
 
-<<<<<<< HEAD
-failed_projects=()
-=======
 maybe_enable_edge_channel
 
->>>>>>> a993bc024c51cda3263b81d4dc23a1edfb3bf8bf
+failed_projects=()
+
 for project in "${projects[@]}"; do
   echo "Running Phuzzle smoke E2E suite on ${project}..."
   if ! npx playwright test --project="${project}" "${smoke_specs[@]}"; then
