@@ -147,6 +147,76 @@
   margin-right: 24px;
 }
 
+.archiveSection {
+  margin-top: 12px;
+  min-width: 0;
+}
+
+.archiveHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.archiveTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.archiveHint {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  text-align: right;
+}
+
+.archiveRail {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-bottom: 2px;
+}
+
+.archiveItem {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border-radius: 10px;
+  padding: 6px;
+  min-width: 76px;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+
+.archiveItem:hover {
+  border-color: var(--color-brand-primary);
+  background: var(--color-bg-card);
+}
+
+.archiveThumb {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 7px;
+}
+
+.archiveDate,
+.archiveDone {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.archiveDone {
+  color: var(--color-brand-primary);
+}
+
 .challengeModeSection {
   margin: 16px 0 14px;
   min-width: 0;

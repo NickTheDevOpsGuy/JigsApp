@@ -59,6 +59,38 @@ export default defineConfig(({ mode }) => {
           // Maps are not needed offline; skipping them shrinks precache and install cost.
           globIgnores: ["**/*.map"],
           cleanupOutdatedCaches: true,
+          navigationPreload: true,
+          runtimeCaching: [
+            {
+              urlPattern: ({ request, sameOrigin }) =>
+                sameOrigin && request.destination === "image",
+              handler: "CacheFirst",
+              options: {
+                cacheName: "phuzzle-images-v1",
+                expiration: {
+                  maxEntries: 120,
+                  maxAgeSeconds: 60 * 60 * 24 * 30,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: ({ request }) => request.destination === "font",
+              handler: "CacheFirst",
+              options: {
+                cacheName: "phuzzle-fonts-v1",
+                expiration: {
+                  maxEntries: 16,
+                  maxAgeSeconds: 60 * 60 * 24 * 365,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+          ],
           // Allow puzzle images up to ~50 MB (default 2 MiB fails on large sample images)
           maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
         },

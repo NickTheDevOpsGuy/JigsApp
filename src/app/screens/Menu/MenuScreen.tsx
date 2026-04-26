@@ -14,9 +14,39 @@ import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { WhatsNewModal } from "@/components/WhatsNew";
 import { shouldShowChangelog } from "@/data/content/changelog";
+import { DAILY_DATE_KEY, DAILY_MODIFIER_KEY } from "@/daily/dailyPuzzleCore";
+import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
+import {
+  GRID_KEY,
+  GRID_ONCE_KEY,
+  PUZZLE_ID_KEY,
+  PUZZLE_NAME_KEY,
+  STORAGE_KEY,
+} from "@/screens/Play/core/utils/playScreenUtils";
 import { loadPackListScreenModule, loadStatsScreenModule } from "@/screens/routeLoaders";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import styles from "./MenuScreen.module.css";
+
+const FIRST_FAST_START_KEY = "phuzzle:firstFastStart";
+
+function shouldShowFastStart(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    if (safeLocalStorage.getItem(FIRST_FAST_START_KEY) === "true") return false;
+    if (safeLocalStorage.getItem("phuzzle:completedPuzzles")) return false;
+    if (safeLocalStorage.getItem("phuzzle:completionHistory")) return false;
+    for (let i = 0; i < window.localStorage.length; i += 1) {
+      const key = window.localStorage.key(i) ?? "";
+      if (key.startsWith("phuzzle:daily:") && key.endsWith(":completed")) {
+        return false;
+      }
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function MenuScreen() {
   const navigate = useNavigate();
@@ -26,6 +56,7 @@ export function MenuScreen() {
   const [showDailyDifficultyModal, setShowDailyDifficultyModal] = useState(false);
   const [showWhatsNewModal, setShowWhatsNewModal] = useState(false);
   const [hasUnreadWhatsNew, setHasUnreadWhatsNew] = useState(() => shouldShowChangelog());
+  const [showFastStart, setShowFastStart] = useState(() => shouldShowFastStart());
   const {
     streak,
     freezes,
@@ -49,6 +80,27 @@ export function MenuScreen() {
   const handleQuickPlay = () => {
     void loadPlayScreenModule();
     setShowChoosePuzzleModal(true);
+  };
+
+  const handleFastStart = async () => {
+    const { SAMPLE_PUZZLES } = await import("@/data/packs/samplePuzzles");
+    const puzzle = SAMPLE_PUZZLES[0];
+    if (!puzzle) {
+      handleQuickPlay();
+      return;
+    }
+    clearPuzzleState();
+    safeLocalStorage.setItem(FIRST_FAST_START_KEY, "true");
+    safeLocalStorage.setItem(STORAGE_KEY, puzzle.fullImage);
+    safeLocalStorage.setItem(GRID_KEY, "3x3");
+    safeLocalStorage.setItem(GRID_ONCE_KEY, "3x3");
+    safeLocalStorage.setItem(PUZZLE_ID_KEY, puzzle.id);
+    safeLocalStorage.setItem(PUZZLE_NAME_KEY, puzzle.name);
+    safeLocalStorage.removeItem(DAILY_DATE_KEY);
+    safeLocalStorage.removeItem(DAILY_MODIFIER_KEY);
+    setShowFastStart(false);
+    void loadPlayScreenModule();
+    navigate("/play");
   };
 
   const handlePacks = () => {
@@ -178,6 +230,23 @@ export function MenuScreen() {
                 </div>
                 <ChevronRight size={20} className={styles.primaryBtnArrow} aria-hidden />
               </button>
+
+              {showFastStart ? (
+                <button
+                  type="button"
+                  className={styles.fastStartBtn}
+                  onClick={() => void handleFastStart()}
+                  aria-label="Start fast 3 by 3 puzzle"
+                >
+                  <span className={styles.fastStartCopy}>
+                    <span className={styles.fastStartTitle}>Start fast 3×3</span>
+                    <span className={styles.fastStartSub}>
+                      Tiny puzzle. Quick win. Then chase a better run.
+                    </span>
+                  </span>
+                  <ChevronRight size={18} className={styles.fastStartArrow} aria-hidden />
+                </button>
+              ) : null}
 
               {/* ─── Streak strip ─── */}
               <div className={styles.streakRow}>

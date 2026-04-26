@@ -78,6 +78,10 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
 
   const puzzle = dailyModule ? dailyModule.getTodayDailyPuzzle() : null;
   const spotlight = dailyModule ? dailyModule.getTodayDailySpotlight() : null;
+  const archiveItems =
+    dailyModule && "getDailyArchiveItems" in dailyModule
+      ? dailyModule.getDailyArchiveItems(5)
+      : [];
 
   if (!isOpen) return null;
   if (!dailyModule)
@@ -123,6 +127,21 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
     );
     if (result) {
       setDailyPreferredDifficultyIndex(selectedIndex);
+      void loadPlayScreenModule();
+      onClose();
+      navigate("/play");
+    }
+  };
+
+  const handleStartArchive = (dateStr: string) => {
+    clearPuzzleState();
+    setCurrentPuzzleId(null);
+    const grid = GRID_OPTIONS[selectedIndex] ?? GRID_OPTIONS[RECOMMENDED_INDEX];
+    const result = dailyModule.startDailyArchivePuzzle(dateStr, {
+      rows: grid.rows,
+      cols: grid.cols,
+    });
+    if (result) {
       void loadPlayScreenModule();
       onClose();
       navigate("/play");
@@ -258,6 +277,36 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
         Start Puzzle
         <span className={styles.startBtnArrow}>→</span>
       </button>
+
+      {archiveItems.length > 0 && (
+        <section className={styles.archiveSection} aria-label="Daily archive">
+          <div className={styles.archiveHeader}>
+            <span className={styles.archiveTitle}>Daily archive</span>
+            <span className={styles.archiveHint}>Past dailies do not affect streaks</span>
+          </div>
+          <div className={styles.archiveRail}>
+            {archiveItems.map((item) => (
+              <button
+                key={item.dateStr}
+                type="button"
+                className={styles.archiveItem}
+                onClick={() => handleStartArchive(item.dateStr)}
+                aria-label={`Play archived daily ${item.dateStr}`}
+                title={`Play archived daily ${item.dateStr}`}
+              >
+                <img
+                  src={item.puzzle.fullImage}
+                  alt=""
+                  className={styles.archiveThumb}
+                  aria-hidden
+                />
+                <span className={styles.archiveDate}>{item.dateStr.slice(5)}</span>
+                {item.completed && <span className={styles.archiveDone}>Done</span>}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
     </Modal>
   );
 }

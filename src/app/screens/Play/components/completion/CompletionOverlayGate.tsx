@@ -50,6 +50,11 @@ interface CompletionOverlayGateProps {
   boardAnchorRef?: React.RefObject<HTMLElement | null>;
   borderFrameBonus?: boolean;
   quadrantTimes?: Record<0 | 1 | 2 | 3, number | null>;
+  challengeTarget?: {
+    elapsedSeconds: number;
+    moveCount: number | null;
+  } | null;
+  isPackPuzzle?: boolean;
 }
 
 export function CompletionOverlayGate({
@@ -80,6 +85,8 @@ export function CompletionOverlayGate({
   boardAnchorRef,
   borderFrameBonus = false,
   quadrantTimes,
+  challengeTarget,
+  isPackPuzzle = false,
 }: CompletionOverlayGateProps) {
   if (!show || !state) return null;
 
@@ -124,6 +131,8 @@ export function CompletionOverlayGate({
       boardAnchorRef={boardAnchorRef}
       borderFrameBonus={borderFrameBonus}
       quadrantTimes={quadrantTimes}
+      challengeTarget={challengeTarget}
+      isPackPuzzle={isPackPuzzle}
     />
   );
 }

@@ -12,6 +12,7 @@ import { CompletionOverlayStats } from "@/screens/Play/components/completion/Com
 import { DailyResultCard } from "@/screens/Play/components/completion/DailyResultCard";
 import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
 import type { CompletionOverlayProps } from "@/screens/Play/components/completion/completionOverlayTypes";
+import { buildNextGoal } from "@/screens/Play/core/retention/playRetention";
 import { ACHIEVEMENT_DEFS } from "@/data/content/achievements";
 import { BORDER_FRAME_XP_BONUS } from "@/services/player/statsService";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -61,6 +62,8 @@ export function CompletionOverlay({
   onNewBest,
   boardAnchorRef,
   borderFrameBonus = false,
+  challengeTarget = null,
+  isPackPuzzle = false,
 }: CompletionOverlayProps) {
   const [phase, setPhase] = useState<1 | 2 | 3>(1);
   const [imageError, setImageError] = useState(false);
@@ -142,6 +145,16 @@ export function CompletionOverlay({
     [elapsedSeconds, moveCount, undoCount],
   );
   const modalBoardAnchorRef = useCompactMobileWinLayout ? undefined : boardAnchorRef;
+  const nextGoal = buildNextGoal({
+    isDaily,
+    isPackPuzzle,
+    dailyStreak: completionData.dailyStreak,
+    puzzlesCompleted: completionData.puzzlesCompleted,
+    pieceCount,
+    elapsedSeconds,
+    moveCount,
+    challengeTarget,
+  });
 
   return (
     <AppModal
@@ -253,6 +266,18 @@ export function CompletionOverlay({
               }
               onShare={completionData.handleNativeDailyShare}
             />
+          </div>
+        )}
+
+        {phase >= 2 && (
+          <div
+            className={styles.completeNextGoal}
+            data-tone={nextGoal.tone}
+            aria-label="Next goal"
+          >
+            <span className={styles.completeNextGoalEyebrow}>{nextGoal.eyebrow}</span>
+            <strong className={styles.completeNextGoalTitle}>{nextGoal.title}</strong>
+            <span className={styles.completeNextGoalBody}>{nextGoal.body}</span>
           </div>
         )}
 

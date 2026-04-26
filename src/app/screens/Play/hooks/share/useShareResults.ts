@@ -7,6 +7,7 @@ import {
   buildChallengeShareMessage,
   buildProgressShareMessage,
 } from "@/screens/Play/core/share/shareMessages";
+import type { ChallengeTarget } from "@/screens/Play/core/retention/playRetention";
 
 const PLAY_BASE = "https://phuzzle.vercel.app";
 
@@ -27,6 +28,9 @@ export function useShareResults(args: {
   rotationCount?: number;
   maxGroupSize?: number;
   puzzleName?: string;
+  undoCount?: number;
+  usedHint?: boolean;
+  challengeTarget?: ChallengeTarget | null;
 }) {
   const {
     elapsedSeconds,
@@ -38,6 +42,9 @@ export function useShareResults(args: {
     rotationCount = 0,
     maxGroupSize,
     puzzleName,
+    undoCount,
+    usedHint,
+    challengeTarget,
   } = args;
   const [copied, setCopied] = useState(false);
   const copyResetTimeoutRef = useRef<number | null>(null);
@@ -91,6 +98,9 @@ export function useShareResults(args: {
       moveCount,
       rotationCount,
       puzzleName,
+      undoCount,
+      usedHint,
+      challengeTarget,
     });
   }, [
     elapsedSeconds,
@@ -100,6 +110,9 @@ export function useShareResults(args: {
     moveCount,
     rotationCount,
     puzzleName,
+    undoCount,
+    usedHint,
+    challengeTarget,
   ]);
 
   const getChallengeShareTextWithUrl = useCallback(
@@ -117,6 +130,9 @@ export function useShareResults(args: {
         rotationCount,
         maxGroupSize,
         puzzleName,
+        undoCount,
+        usedHint,
+        challengeTarget,
       });
     },
     [
@@ -127,6 +143,9 @@ export function useShareResults(args: {
       rotationCount,
       maxGroupSize,
       puzzleName,
+      undoCount,
+      usedHint,
+      challengeTarget,
     ],
   );
 

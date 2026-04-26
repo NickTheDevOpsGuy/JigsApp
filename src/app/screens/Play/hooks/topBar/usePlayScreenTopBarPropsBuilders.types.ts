@@ -126,6 +126,7 @@ export type BuildHudPropsArgs = {
   lives: number;
   setIsPaused: (fn: (p: boolean) => boolean) => void;
   zenModeEnabled: boolean;
+  challengeTargetLabel?: string | null;
 };
 
 export type BuildTopBarButtonsPropsArgs = {

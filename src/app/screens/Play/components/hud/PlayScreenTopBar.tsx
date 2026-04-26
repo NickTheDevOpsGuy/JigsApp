@@ -33,6 +33,7 @@ export type PlayScreenTopBarProps = {
     onTogglePause: () => void;
     zenModeEnabled?: boolean;
     uiTone?: "competitive" | "calm";
+    challengeTargetLabel?: string | null;
   };
   topBarButtonsProps: {
     showPreview: boolean;

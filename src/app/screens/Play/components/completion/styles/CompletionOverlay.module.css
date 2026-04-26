@@ -351,6 +351,49 @@
   flex-shrink: 0;
 }
 
+.completeNextGoal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: calc(100% - 40px);
+  margin: 0 20px 16px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-bg-card));
+}
+
+.completeNextGoal[data-tone="win"] {
+  border-color: color-mix(in srgb, #22c55e 42%, var(--color-border));
+  background: color-mix(in srgb, #22c55e 10%, var(--color-bg-card));
+}
+
+.completeNextGoal[data-tone="daily"] {
+  border-color: color-mix(in srgb, #f97316 36%, var(--color-border));
+  background: color-mix(in srgb, #f97316 8%, var(--color-bg-card));
+}
+
+.completeNextGoalEyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-brand-primary);
+}
+
+.completeNextGoalTitle {
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.completeNextGoalBody {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
 /* ── Actions section ── */
 .completeActionsPhased {
   display: flex;

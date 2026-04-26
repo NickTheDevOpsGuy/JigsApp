@@ -2,7 +2,9 @@
 
 Developer documentation for Phuzzle. For project overview and setup, see the [main README](../README.md).
 
-This `docs/` directory is the canonical documentation home for the repo.
+This `docs/` directory is the canonical documentation home for the repo. Its
+`README.md` acts as the folder index; GitHub shows it when you open `docs/`, but
+it does not automatically create side navigation for every subfolder.
 
 ---
 
@@ -21,7 +23,7 @@ This `docs/` directory is the canonical documentation home for the repo.
 | [CHANGES.md](CHANGES.md)                           | Feature list and recent changes.                                                                       |
 | [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md) | Implemented features (daily countdown, streak freeze, piece shapes, etc.) and where they live in code. |
 | [FUTURE.md](FUTURE.md)                             | Ideas and possible future features.                                                                    |
-| [SHARING.md](SHARING.md)                           | Completion share (image + result) and co-op share ("Play with friend").                                |
+| [SHARING.md](SHARING.md)                           | Completion share, challenge targets, Daily Share, daily archive, and co-op share.                      |
 | [STREAK-FREEZE.md](STREAK-FREEZE.md)               | Streak freeze (streak shield): how you earn it, when it applies, storage keys.                         |
 | [BUG_REPORT.md](BUG_REPORT.md)                     | In-app bug report: where it is, what it does, main files.                                              |
 

@@ -86,6 +86,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     totalPlayers: number;
   } | null>(null);
   const [completionRecorded, setCompletionRecorded] = useState(false);
+  const [puzzlesCompleted, setPuzzlesCompleted] = useState<number | null>(null);
   const [lastXpReward, setLastXpReward] = useState<{
     gained: number;
     streakMultiplier: number;
@@ -159,6 +160,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
           });
         }
         setCompletionRecorded(true);
+        setPuzzlesCompleted(stats.puzzlesCompleted);
         onCompletionRecorded?.(stats);
 
         const placementAccuracyPerfect =
@@ -180,6 +182,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
         if (!cancelled) {
           setCompletionRecorded(false);
           setLastXpReward(null);
+          setPuzzlesCompleted(null);
         }
       }
     };
@@ -230,6 +233,8 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
           puzzleShareUrl,
           pieceCount: grid ? grid.rows * grid.cols : 0,
           puzzleName,
+          undoCount,
+          usedHint,
           mode,
         });
         if (!ok) {
@@ -254,6 +259,8 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       puzzleShareUrl,
       grid,
       puzzleName,
+      undoCount,
+      usedHint,
       setShareToast,
     ],
   );
@@ -286,8 +293,18 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
       moveCount,
       dailyLink,
       completionGrid,
+      dailyStreak,
     });
-  }, [grid, isDaily, puzzleShareUrl, elapsedSeconds, moveCount, usedHint, undoCount]);
+  }, [
+    grid,
+    isDaily,
+    puzzleShareUrl,
+    elapsedSeconds,
+    moveCount,
+    usedHint,
+    undoCount,
+    dailyStreak,
+  ]);
 
   const handleCopyDailyShare = useCallback(async () => {
     const text = getDailyShareText();
@@ -327,6 +344,7 @@ export function useCompletionOverlayData(params: UseCompletionOverlayDataParams)
     dailyStreak,
     masteryStreak,
     completionRecorded,
+    puzzlesCompleted,
     percentileBadgeTier,
     newlyUnlocked,
     isGenerating,

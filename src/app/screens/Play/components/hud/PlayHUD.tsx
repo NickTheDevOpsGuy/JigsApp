@@ -2,7 +2,7 @@
  * PlayHUD – timer, move count, placed/total with puzzle icon (top bar center).
  * Pause button toggles game pause. Speedrun: quadrant timers; Time Attack: lives.
  */
-import { Clock, Heart, Pause, Play, Puzzle, AlertTriangle } from "lucide-react";
+import { Clock, Heart, Pause, Play, Puzzle, AlertTriangle, Trophy } from "lucide-react";
 import styles from "@/screens/Play/styles/PlayScreen.module.css";
 import { formatTime } from "@/screens/Play/core/utils/playUtils";
 import type { TimeMode } from "@/screens/Play/core/time/timeMode";
@@ -25,6 +25,7 @@ interface PlayHUDProps {
   zenModeEnabled?: boolean;
   /** Adaptive Personality: competitive = snappier copy; calm = softer copy */
   uiTone?: "competitive" | "calm";
+  challengeTargetLabel?: string | null;
   /** Layout slot: left = timer, pause, moves, pieces */
   slot?: "left";
 }
@@ -54,6 +55,7 @@ export function PlayHUD({
   onTogglePause,
   zenModeEnabled,
   uiTone,
+  challengeTargetLabel,
   slot,
 }: PlayHUDProps) {
   const placedCount = Math.max(0, totalPieces - piecesLeft);
@@ -145,6 +147,17 @@ export function PlayHUD({
         >
           {isPaused ? <Play size={18} aria-hidden /> : <Pause size={18} aria-hidden />}
         </button>
+      )}
+      {showLeft && challengeTargetLabel && !isComplete && (
+        <div
+          className={styles.hudChallengeTarget}
+          aria-label={`Challenge target: ${challengeTargetLabel}`}
+          title={`Challenge target: ${challengeTargetLabel}`}
+          role="status"
+        >
+          <Trophy size={16} aria-hidden />
+          <span className={styles.hudChallengeTargetText}>{challengeTargetLabel}</span>
+        </div>
       )}
       {showLeft && !isSpeedrun && !isTimeAttack && (
         <>

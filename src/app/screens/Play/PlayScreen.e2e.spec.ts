@@ -57,6 +57,14 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("list")).toBeVisible({ timeout: 5000 });
   });
 
+  test("challenge link shows the target while playing", async ({ page }) => {
+    await gotoPlay(page, "/play?ct=42&cm=17");
+
+    await expect(
+      page.getByRole("status", { name: /challenge target: beat 0:42 \/ 17 moves/i }),
+    ).toBeVisible({ timeout: 15000 });
+  });
+
   test("completion overlay shows expected UI when visible", async ({ page }) => {
     test.setTimeout(60000);
     await gotoPlay(page, "/play?e2eCompletion=1");
@@ -77,6 +85,17 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible({
       timeout: 10000,
     });
+  });
+
+  test("challenge completion calls out a won challenge", async ({ page }) => {
+    test.setTimeout(60000);
+    await gotoPlay(page, "/play?e2eCompletion=1&ct=999&cm=999");
+
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
+      timeout: 20000,
+    });
+    await expect(page.getByText(/challenge won/i)).toBeVisible();
+    await expect(page.getByText(/send the win back/i)).toBeVisible();
   });
 
   test("completion overlay fits on mobile without body scroll", async ({ page }) => {

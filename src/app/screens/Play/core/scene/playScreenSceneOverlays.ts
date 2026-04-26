@@ -72,6 +72,11 @@ export function buildCompletionProps(args: {
   borderFrameBonus: boolean;
   /** Elapsed seconds when each board quarter was fully completed (for area-pace summary). */
   quadrantTimes?: Record<0 | 1 | 2 | 3, number | null>;
+  challengeTarget?: {
+    elapsedSeconds: number;
+    moveCount: number | null;
+  } | null;
+  isPackPuzzle?: boolean;
 }): CompletionProps {
   const {
     showCompletionOverlay,
@@ -103,6 +108,8 @@ export function buildCompletionProps(args: {
     boardAnchorRef,
     borderFrameBonus,
     quadrantTimes,
+    challengeTarget,
+    isPackPuzzle,
   } = args;
 
   const focusReturnRefProp = focusReturnRef != null ? { focusReturnRef } : undefined;
@@ -143,6 +150,8 @@ export function buildCompletionProps(args: {
     ...boardAnchorRefProp,
     borderFrameBonus,
     ...(quadrantTimes != null ? { quadrantTimes } : {}),
+    ...(challengeTarget != null ? { challengeTarget } : {}),
+    isPackPuzzle,
   };
 }
 

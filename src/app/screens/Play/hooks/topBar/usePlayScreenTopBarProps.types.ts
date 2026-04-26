@@ -122,6 +122,7 @@ export type UsePlayScreenTopBarPropsParams = {
   toggleMinimap: () => void;
   undoRedoEnabled: boolean;
   onToggleUndoRedo: () => void;
+  challengeTargetLabel?: string | null;
 };
 
 export type PlayScreenTopBarPropsResult = {
@@ -141,6 +142,7 @@ export type PlayScreenTopBarPropsResult = {
     lives?: number;
     onTogglePause: () => void;
     uiTone?: "competitive" | "calm";
+    challengeTargetLabel?: string | null;
   };
   topBarButtonsProps: {
     showPreview: boolean;

@@ -511,7 +511,8 @@
   .hudPill,
   .hudPillTimer,
   .hudMoveCount,
-  .hudPlacedTotal {
+  .hudPlacedTotal,
+  .hudChallengeTarget {
     min-height: 34px;
     font-size: 13px;
     padding: 0 10px;
@@ -566,7 +567,8 @@
   .hudPill,
   .hudPillTimer,
   .hudMoveCount,
-  .hudPlacedTotal {
+  .hudPlacedTotal,
+  .hudChallengeTarget {
     min-height: 32px;
     padding: 0 10px;
     font-size: 13px;
