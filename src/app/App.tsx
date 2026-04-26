@@ -15,6 +15,7 @@ import {
   loadPackListScreenModule,
   loadStatsScreenModule,
 } from "@/screens/routeLoaders";
+import { isFirefoxBrowser } from "@/utils/browserInfo";
 import styles from "./App.module.css";
 
 // Route-level code splitting: load screens on demand to keep initial chunk smaller
@@ -72,6 +73,21 @@ export function App() {
   useEffect(() => {
     ensureSignedIn();
     initStreakFreeze();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const root = document.documentElement;
+    if (isFirefoxBrowser(navigator.userAgent)) {
+      root.dataset.browser = "firefox";
+    } else {
+      delete root.dataset.browser;
+    }
+
+    return () => {
+      delete root.dataset.browser;
+    };
   }, []);
 
   useEffect(() => {

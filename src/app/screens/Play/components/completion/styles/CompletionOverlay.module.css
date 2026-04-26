@@ -205,7 +205,10 @@
     transparent 100%
   );
   background-size: 220% 100%;
-  animation: completeStreakShimmerMove 3.2s ease-in-out infinite;
+  animation: var(
+    --fx-streak-shimmer-animation,
+    completeStreakShimmerMove 3.2s ease-in-out infinite
+  );
   pointer-events: none;
   opacity: 0.85;
 }
@@ -216,8 +219,14 @@
   font-size: 15px;
   line-height: 1;
   display: inline-flex;
-  animation: completeStreakFlamePulse 2.4s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px color-mix(in srgb, #ff8c42 55%, transparent));
+  animation: var(
+    --fx-streak-flame-animation,
+    completeStreakFlamePulse 2.4s ease-in-out infinite
+  );
+  filter: var(
+    --fx-streak-flame-filter,
+    drop-shadow(0 0 6px color-mix(in srgb, #ff8c42 55%, transparent))
+  );
 }
 
 .completeStreakLabel {
@@ -237,7 +246,10 @@
   font-size: 15px;
   font-weight: 800;
   color: color-mix(in srgb, var(--color-brand-primary) 92%, var(--color-text-primary));
-  animation: completeStreakCountGlow 2.4s ease-in-out infinite;
+  animation: var(
+    --fx-streak-count-animation,
+    completeStreakCountGlow 2.4s ease-in-out infinite
+  );
 }
 
 .completeStreakSuffix {
@@ -805,6 +817,25 @@
 
   .completeOptionsTriggerHint {
     font-size: 11px;
+  }
+}
+
+@media (max-height: 840px) {
+  .completeCelebrationBlock {
+    padding: 18px 20px 12px;
+    gap: 10px;
+  }
+
+  .completeImageWrapPhased {
+    max-height: min(34vh, 300px);
+  }
+
+  .completeImagePhased {
+    max-height: min(34vh, 300px);
+  }
+
+  .completeActionsPhased {
+    padding: 14px 20px 18px;
   }
 }
 

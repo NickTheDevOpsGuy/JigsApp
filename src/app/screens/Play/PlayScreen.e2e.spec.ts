@@ -6,6 +6,13 @@ const COMPLETE_HEADING = /^complete$/i;
 const SHARE_RESULT_MENU_ITEM = /share your result/i;
 const CHALLENGE_MENU_ITEM = /challenge a friend/i;
 
+async function gotoPlay(
+  page: Parameters<Parameters<typeof test>[1]>[0]["page"],
+  path = "/play",
+) {
+  await page.goto(path, { waitUntil: "domcontentloaded" });
+}
+
 test.describe("Play screen", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(
@@ -19,7 +26,7 @@ test.describe("Play screen", () => {
   });
 
   test("loads play screen with puzzle", async ({ page }) => {
-    await page.goto("/play");
+    await gotoPlay(page);
 
     await expect(
       page.getByRole("status", { name: /pieces placed/i }).first(),
@@ -32,14 +39,14 @@ test.describe("Play screen", () => {
   });
 
   test("shows piece tray", async ({ page }) => {
-    await page.goto("/play");
+    await gotoPlay(page);
 
     await expect(page.getByRole("list")).toBeVisible({ timeout: 15000 });
   });
 
   test("tray visible on mobile (board on top, tray below)", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto("/play");
+    await gotoPlay(page);
 
     await expect(
       page.getByRole("status", { name: /pieces placed/i }).first(),
@@ -52,7 +59,7 @@ test.describe("Play screen", () => {
 
   test("completion overlay shows expected UI when visible", async ({ page }) => {
     test.setTimeout(60000);
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
       timeout: 20000,
@@ -75,7 +82,7 @@ test.describe("Play screen", () => {
   test("completion overlay fits on mobile without body scroll", async ({ page }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
       timeout: 20000,
@@ -123,7 +130,7 @@ test.describe("Play screen", () => {
   test("mobile completion options menu lists share actions", async ({ page }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     await expect(
@@ -135,7 +142,7 @@ test.describe("Play screen", () => {
   test("short mobile completion overlay keeps the card on-screen", async ({ page }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 360, height: 480 });
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     const dialog = page.getByRole("dialog", { name: /dialog/i });
     await expect(dialog).toBeVisible({ timeout: 20000 });
@@ -148,7 +155,7 @@ test.describe("Play screen", () => {
   }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     const replayItem = page.getByRole("menuitem", { name: /replay solve/i });
@@ -174,7 +181,7 @@ test.describe("Play screen", () => {
   test("mobile replay transport buttons keep a consistent size", async ({ page }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     await page.getByRole("menuitem", { name: /replay solve/i }).click();
@@ -203,7 +210,7 @@ test.describe("Play screen", () => {
   }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 360, height: 640 });
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     await page.getByRole("menuitem", { name: /replay solve/i }).click();
@@ -230,7 +237,7 @@ test.describe("Play screen", () => {
   }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     await page.getByRole("menuitem", { name: /replay solve/i }).click();
@@ -257,7 +264,7 @@ test.describe("Play screen", () => {
   }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 1024, height: 768 });
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     await page.getByRole("menuitem", { name: /replay solve/i }).click();
@@ -295,7 +302,7 @@ test.describe("Play screen", () => {
   }) => {
     test.setTimeout(60000);
     await page.setViewportSize({ width: 1280, height: 720 });
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     await page.getByRole("menuitem", { name: /replay solve/i }).click();
@@ -320,7 +327,7 @@ test.describe("Play screen", () => {
 
   test("desktop completion options menu lists share actions", async ({ page }) => {
     test.setTimeout(60000);
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     await expect(
@@ -329,11 +336,24 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
   });
 
+  test("short desktop completion overlay stays on-screen", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 1280, height: 760 });
+    await gotoPlay(page, "/play?e2eCompletion=1");
+
+    const dialog = page.getByRole("dialog", { name: /dialog/i });
+    const options = page.getByRole("button", { name: /options/i });
+
+    await expect(dialog).toBeVisible({ timeout: 20000 });
+    await expect(dialog).toBeInViewport();
+    await expect(options).toBeInViewport();
+  });
+
   test("starting a new puzzle from play applies the newly selected grid", async ({
     page,
   }) => {
     test.setTimeout(60000);
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
       timeout: 20000,
@@ -386,7 +406,7 @@ test.describe("Play screen tablet touch", () => {
   });
 
   test("tablet gameplay keeps board square and tray reachable", async ({ page }) => {
-    await page.goto("/play");
+    await gotoPlay(page);
 
     const liveBoard = page.getByTestId("play-board");
     await expect(liveBoard).toBeVisible({ timeout: 15000 });
@@ -406,7 +426,7 @@ test.describe("Play screen tablet touch", () => {
   });
 
   test("tablet replay keeps live board square and controls visible", async ({ page }) => {
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     await page.getByRole("menuitem", { name: /replay solve/i }).click();
@@ -429,7 +449,7 @@ test.describe("Play screen tablet touch", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1024, height: 768 });
-    await page.goto("/play");
+    await gotoPlay(page);
 
     const liveBoard = page.getByTestId("play-board");
     const tray = page.getByRole("list");
@@ -447,7 +467,7 @@ test.describe("Play screen tablet touch", () => {
   });
 
   test("tablet rotate keeps the board square and tray visible", async ({ page }) => {
-    await page.goto("/play");
+    await gotoPlay(page);
 
     const liveBoard = page.getByTestId("play-board");
     const tray = page.getByRole("list");
@@ -496,7 +516,7 @@ test.describe("Play screen landscape phone", () => {
   });
 
   test("landscape completion card stays on-screen", async ({ page }) => {
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     const dialog = page.getByRole("dialog", { name: /dialog/i });
     await expect(dialog).toBeVisible({ timeout: 20000 });
@@ -527,7 +547,7 @@ test.describe("Play screen landscape phone", () => {
   });
 
   test("landscape replay keeps controls visible", async ({ page }) => {
-    await page.goto("/play?e2eCompletion=1");
+    await gotoPlay(page, "/play?e2eCompletion=1");
 
     await page.getByRole("button", { name: /options/i }).click();
     await page.getByRole("menuitem", { name: /replay solve/i }).click();
@@ -537,5 +557,41 @@ test.describe("Play screen landscape phone", () => {
     await expect(
       page.getByRole("button", { name: "Play", exact: true }),
     ).toBeInViewport();
+  });
+});
+
+test.describe("Play screen tablet landscape touch", () => {
+  test.use({ viewport: { width: 1194, height: 834 }, hasTouch: true });
+
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(
+      async ({ img, grid }) => {
+        localStorage.setItem("phuzzle:lastSeenChangelog", "25");
+        localStorage.setItem("phuzzle:imageDataUrl", img);
+        localStorage.setItem("phuzzle:gridSize", grid);
+      },
+      { img: TINY_IMAGE, grid: "4x4" },
+    );
+  });
+
+  test("tablet landscape keeps board square and tray visible", async ({ page }) => {
+    await gotoPlay(page);
+
+    const liveBoard = page.getByTestId("play-board");
+    const tray = page.getByRole("list");
+
+    await expect(liveBoard).toBeVisible({ timeout: 15000 });
+    await expect(tray).toBeVisible({ timeout: 5000 });
+
+    const liveBoardBox = await liveBoard.boundingBox();
+    const trayBox = await tray.boundingBox();
+    expect(liveBoardBox).not.toBeNull();
+    expect(trayBox).not.toBeNull();
+    expect(
+      Math.abs((liveBoardBox?.width ?? 0) - (liveBoardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
+    expect(
+      (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
+    ).toBeLessThanOrEqual(834);
   });
 });

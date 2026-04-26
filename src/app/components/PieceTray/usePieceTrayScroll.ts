@@ -28,6 +28,17 @@ function getTraySnapPitchPx(el: HTMLDivElement): number {
   return first.offsetWidth || 64;
 }
 
+function getProgrammaticScrollBehavior(el: HTMLDivElement): ScrollBehavior {
+  if (typeof window !== "undefined") {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (prefersReducedMotion.matches) {
+      return "auto";
+    }
+  }
+
+  return getComputedStyle(el).scrollBehavior === "smooth" ? "smooth" : "auto";
+}
+
 export function usePieceTrayScroll(displayedLength: number) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -57,7 +68,7 @@ export function usePieceTrayScroll(displayedLength: number) {
     if (!el) return;
     const { maxScroll } = getHorizontalScrollMetrics(el);
     const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + delta));
-    el.scrollTo({ left: target, behavior: "smooth" });
+    el.scrollTo({ left: target, behavior: getProgrammaticScrollBehavior(el) });
   }, []);
 
   /** Scroll by one piece (snap pitch) so scroll stops align with full pieces. */
@@ -69,7 +80,7 @@ export function usePieceTrayScroll(displayedLength: number) {
     const step = stepPx * direction;
     const { maxScroll } = getHorizontalScrollMetrics(el);
     const target = Math.max(0, Math.min(maxScroll, el.scrollLeft + step));
-    el.scrollTo({ left: target, behavior: "smooth" });
+    el.scrollTo({ left: target, behavior: getProgrammaticScrollBehavior(el) });
   }, []);
 
   useEffect(() => {
@@ -110,7 +121,7 @@ export function usePieceTrayScroll(displayedLength: number) {
           Math.min(maxScroll, Math.round(el.scrollLeft / stepPx) * stepPx),
         );
         requestAnimationFrame(() => {
-          el.scrollTo({ left: aligned, behavior: "smooth" });
+          el.scrollTo({ left: aligned, behavior: getProgrammaticScrollBehavior(el) });
         });
       }
       run();

@@ -523,7 +523,58 @@
   }
 }
 
+<<<<<<< HEAD
 @media (min-width: 820px) and (max-width: 1366px) and (min-height: 650px) and (pointer: coarse) and (orientation: landscape) {
+=======
+@media (min-width: 601px) and (max-width: 1366px) and (pointer: coarse) and (orientation: landscape) {
+  .page {
+    --play-board-tray-width: min(100%, 560px);
+    --play-top-bar-outer-h: calc(60px + env(safe-area-inset-top, 0px));
+  }
+
+  .boardLayoutShell {
+    max-width: min(100%, 860px);
+    gap: 8px;
+  }
+
+  .boardLayoutShell .topBarWrap {
+    max-height: var(--play-top-bar-outer-h);
+  }
+
+  .topBar {
+    min-height: 60px;
+    padding: calc(6px + env(safe-area-inset-top, 0))
+      max(12px, env(safe-area-inset-right, 0)) 6px max(12px, env(safe-area-inset-left, 0));
+  }
+
+  .topBarInner {
+    gap: 8px;
+    padding-inline: 10px 8px;
+  }
+
+  .hud {
+    gap: 6px;
+    flex-wrap: nowrap;
+  }
+
+  .hudPill,
+  .hudPillTimer,
+  .hudMoveCount,
+  .hudPlacedTotal {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
+  .hudPillPause,
+  .headerMenuTrigger {
+    min-width: 38px;
+    min-height: 38px;
+  }
+}
+
+@media (min-width: 820px) and (max-width: 1224px) and (pointer: coarse) and (orientation: landscape) {
+>>>>>>> a993bc024c51cda3263b81d4dc23a1edfb3bf8bf
   .page {
     --play-board-tray-width: min(100%, 860px);
   }

@@ -1,0 +1,16 @@
+{
+  "issues": [
+    {
+      "title": "Mobile HUD clips the bottom action row on short screens",
+      "body": "## Summary\nThe play screen action row can clip on short mobile viewports.\n\n## Acceptance Criteria\n- The action row remains visible on mobile Safari.\n- No controls overlap the puzzle board.\n- Existing desktop layout remains unchanged.",
+      "labels": ["bug", "ui", "mobile"],
+      "assignees": []
+    },
+    {
+      "title": "Add keyboard shortcut help to the pause menu",
+      "body": "## Summary\nPlayers should be able to discover keyboard shortcuts from inside the pause menu.\n\n## Acceptance Criteria\n- Shortcut help is visible from the pause menu.\n- Copy is concise and matches the current control scheme.",
+      "labels": ["enhancement", "ux"],
+      "assignees": []
+    }
+  ]
+}

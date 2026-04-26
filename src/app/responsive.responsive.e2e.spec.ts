@@ -3,6 +3,7 @@ import { dismissWhatsNewModalIfOpen } from "@/e2e/helpers";
 
 const TINY_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+const BOARD_SQUARE_TOLERANCE_PX = 4;
 
 async function expectNoDocumentOverflow(page: Page) {
   const metrics = await page.evaluate(() => {
@@ -138,10 +139,14 @@ test.describe("Responsive smoke", () => {
     expect(viewport).not.toBeNull();
     expect(
       Math.abs((boardBox?.width ?? 0) - (boardBox?.height ?? 0)),
+<<<<<<< HEAD
     ).toBeLessThanOrEqual(2);
     expect(trayBox?.y ?? 0).toBeGreaterThanOrEqual(
       (boardBox?.y ?? 0) + (boardBox?.height ?? 0) - 2,
     );
+=======
+    ).toBeLessThanOrEqual(BOARD_SQUARE_TOLERANCE_PX);
+>>>>>>> a993bc024c51cda3263b81d4dc23a1edfb3bf8bf
     expect(
       (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
     ).toBeLessThanOrEqual((viewport?.height ?? 0) + 2);
@@ -201,5 +206,54 @@ test.describe("Responsive smoke", () => {
       (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
     ).toBeLessThanOrEqual((viewport?.height ?? 0) + 2);
     await expectNoDocumentOverflow(page);
+  });
+
+  test("play keeps touch-first tray flow and clamps tray scroll at both edges", async ({
+    page,
+    browserName,
+  }) => {
+    await page.goto("/play");
+
+    const tray = page.getByRole("list");
+    await expect(tray).toBeVisible({ timeout: 15000 });
+
+    await expect(page.getByRole("button", { name: /scroll left/i })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /scroll right/i })).toHaveCount(0);
+
+    const right = await tray.evaluate((node) => {
+      const el = node as HTMLDivElement;
+      const paddingStart = 12;
+      const paddingEnd = 12;
+      const row = el.firstElementChild as HTMLElement | null;
+      const contentWidth =
+        row && row.offsetWidth > 0
+          ? paddingStart + row.offsetWidth + paddingEnd
+          : el.scrollWidth;
+      const max = Math.max(0, contentWidth - el.clientWidth);
+      const before = el.scrollLeft;
+      el.scrollTo({ left: max });
+      el.scrollBy({ left: 2000 });
+      return {
+        before,
+        max,
+        after: el.scrollLeft,
+      };
+    });
+
+    expect(right.max).toBeGreaterThan(0);
+    expect(right.after).toBeGreaterThanOrEqual(right.before);
+    expect(right.after).toBeLessThanOrEqual(right.max + 1);
+
+    const left = await tray.evaluate(async (node) => {
+      const el = node as HTMLDivElement;
+      el.scrollLeft = 0;
+      el.scrollBy({ left: -2000 });
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      return el.scrollLeft;
+    });
+
+    const minLeft = browserName === "webkit" ? -4 : 0;
+    expect(left).toBeGreaterThanOrEqual(minLeft);
   });
 });

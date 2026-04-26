@@ -73,8 +73,14 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
     grid,
   );
   const traySlots = buildTraySlots(displayed, totalSlots);
-  const { scrollerRef, scrollProgress, canScrollLeft, canScrollRight, scrollByOnePiece } =
-    usePieceTrayScroll(traySlots.length);
+  const {
+    scrollerRef,
+    scrollProgress,
+    canScroll,
+    canScrollLeft,
+    canScrollRight,
+    scrollByOnePiece,
+  } = usePieceTrayScroll(traySlots.length);
   const thumbsById = usePieceTrayThumbs(displayed, image, grid, thumbSize, compact);
 
   const clearLongPressTimer = React.useCallback(() => {
@@ -114,7 +120,7 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label="Scroll position"
-        style={traySlots.length > 0 ? undefined : { visibility: "hidden" }}
+        style={canScroll ? undefined : { visibility: "hidden" }}
       >
         <div
           className={styles.scrollIndicatorFill}

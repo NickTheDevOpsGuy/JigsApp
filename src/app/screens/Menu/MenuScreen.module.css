@@ -1067,3 +1067,137 @@
     gap: 24px;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1024px) and (pointer: coarse) {
+  .canvas {
+    padding: 18px;
+    align-items: stretch;
+  }
+
+  .page {
+    width: min(100%, 860px);
+    max-width: 860px;
+    min-height: calc(var(--app-vh-stable, 100dvh) - 36px);
+    max-height: calc(var(--app-vh-stable, 100dvh) - 20px);
+    padding: 24px 24px 28px;
+  }
+
+  .main {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    align-content: start;
+  }
+
+  .heroSection,
+  .supportSection {
+    padding: 20px;
+    border-radius: 26px;
+    align-content: start;
+  }
+
+  .heroSection {
+    gap: 14px;
+  }
+
+  .supportSection {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px 18px;
+    align-items: start;
+  }
+
+  .weeklyCard {
+    grid-column: 1 / -1;
+  }
+
+  .divider {
+    display: none;
+  }
+
+  .secondaryNav {
+    grid-column: 1 / -1;
+    padding: 4px 0 0;
+  }
+
+  .dailySpotlightHint,
+  .dailyComebackHint {
+    font-size: 14px;
+  }
+
+  .primaryBtn {
+    min-height: 78px;
+  }
+
+  .weeklyCardText,
+  .secondaryDesc {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1366px) and (pointer: coarse) {
+  .page {
+    width: min(100%, 1080px);
+    max-width: 1080px;
+    min-height: min(720px, calc(var(--app-vh-stable, 100dvh) - 64px));
+    max-height: calc(var(--app-vh-stable, 100dvh) - 28px);
+    height: auto;
+    padding: 22px 22px 24px;
+  }
+
+  .main {
+    grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.92fr);
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .heroSection,
+  .supportSection {
+    align-content: start;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1366px) and (pointer: coarse) and (orientation: landscape) {
+  .canvas {
+    align-items: flex-start;
+    padding: 22px;
+  }
+
+  .page {
+    min-height: 0;
+    max-height: min(760px, calc(var(--app-vh-stable, 100dvh) - 44px));
+    height: auto;
+  }
+
+  .main {
+    grid-template-columns: minmax(0, 1.22fr) minmax(340px, 0.88fr);
+    gap: 18px;
+  }
+
+  .heroSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: flex-start;
+    min-height: 0;
+  }
+
+  .supportSection {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    justify-content: flex-start;
+    min-height: 0;
+  }
+
+  .weeklyCard {
+    margin-bottom: 4px;
+  }
+
+  .secondaryNav {
+    padding-top: 0;
+  }
+
+  .secondaryRow {
+    padding: 14px 2px;
+  }
+}

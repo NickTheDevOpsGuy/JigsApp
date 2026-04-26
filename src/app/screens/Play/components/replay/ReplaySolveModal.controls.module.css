@@ -76,8 +76,8 @@
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.28),
     0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 14%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--fx-surface-blur-medium, 12px));
+  -webkit-backdrop-filter: blur(var(--fx-surface-blur-medium, 12px));
   animation: playbackMenuIn 0.16s ease-out;
 }
 
