@@ -23,9 +23,7 @@ test.describe("Home / Menu", () => {
     await expect(page.getByRole("button", { name: /quick play/i })).toBeVisible();
   });
 
-  test("fresh players can jump straight into a fast starter puzzle", async ({
-    page,
-  }) => {
+  test("fresh players can jump straight into a fast starter puzzle", async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.removeItem("phuzzle:firstFastStart");
       localStorage.removeItem("phuzzle:completedPuzzles");
@@ -43,7 +41,9 @@ test.describe("Home / Menu", () => {
       .poll(async () => page.evaluate(() => localStorage.getItem("phuzzle:gridSize")))
       .toBe("3x3");
     await expect
-      .poll(async () => page.evaluate(() => localStorage.getItem("phuzzle:firstFastStart")))
+      .poll(async () =>
+        page.evaluate(() => localStorage.getItem("phuzzle:firstFastStart")),
+      )
       .toBe("true");
   });
 

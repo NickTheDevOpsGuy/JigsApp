@@ -359,7 +359,8 @@
   margin: 0 20px 16px;
   padding: 12px 14px;
   box-sizing: border-box;
-  border: 1px solid color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
   border-radius: 12px;
   background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-bg-card));
 }
