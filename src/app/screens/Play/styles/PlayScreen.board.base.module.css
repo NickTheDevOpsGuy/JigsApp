@@ -68,8 +68,8 @@
     padding-bottom: 8px;
   }
 
-  .playBody .trayArea .tray,
-  .playBody .trayArea .tray.trayWrapLarge {
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
     height: clamp(104px, 13vh, 138px);
     max-height: min(138px, 18vh);
     min-height: 92px;
@@ -92,7 +92,7 @@
 }
 
 /* PieceTray: taller strip for easier piece picking; board still primary */
-.playBody .trayArea .tray {
+.playBody .trayArea .trayInDock {
   flex: 0 0 auto;
   min-width: 0;
   height: clamp(132px, 17vh, 190px);
@@ -100,7 +100,7 @@
   min-height: 96px;
 }
 
-.playBody .trayArea .tray.trayWrapLarge {
+.playBody .trayArea .trayInDock.trayWrapLarge {
   height: clamp(132px, 17vh, 190px);
   max-height: min(190px, 26vh);
 }
@@ -143,13 +143,13 @@
     margin-top: var(--play-board-tray-gap);
   }
 
-  .playBody .trayArea .tray {
+  .playBody .trayArea .trayInDock {
     height: clamp(88px, 13vh, 118px);
     max-height: min(118px, 22vh);
     min-height: 76px;
   }
 
-  .playBody .trayArea .tray.trayWrapLarge {
+  .playBody .trayArea .trayInDock.trayWrapLarge {
     height: clamp(88px, 13vh, 118px);
     max-height: min(118px, 22vh);
     min-height: 76px;

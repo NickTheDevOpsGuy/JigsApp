@@ -63,7 +63,7 @@
 
 .zenMode .topBar,
 .zenMode .hud,
-.zenMode .trayArea .tray {
+.zenMode .trayArea .trayInDock {
   transition:
     opacity 0.4s ease,
     transform 0.4s ease;
@@ -258,7 +258,7 @@ html.theme-sunset .immersivePeekBottom {
 }
 
 /* Tray (PieceTray root) – single card; layout in board.base, transitions here */
-.trayArea .tray {
+.trayArea .trayInDock {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -306,7 +306,7 @@ html.theme-sunset .immersivePeekBottom {
   .topBar,
   .topBarWrap,
   .trayArea,
-  .trayArea .tray,
+  .trayArea .trayInDock,
   .immersivePeekTop,
   .immersivePeekBottom {
     transition: none !important;

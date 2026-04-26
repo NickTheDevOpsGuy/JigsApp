@@ -1,6 +1,7 @@
 .moduleCard {
   display: grid;
-  gap: 16px;
+  gap: 14px;
+  min-width: 0;
 }
 
 .header {
@@ -18,18 +19,17 @@
 }
 
 .titleRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
   gap: 12px;
-  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .title {
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 1.35rem;
+  font-size: 1.28rem;
   font-weight: 700;
+  line-height: 1.18;
 }
 
 .subtitle {
@@ -41,51 +41,74 @@
 
 .list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
+  min-width: 0;
 }
 
 .row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  gap: 14px;
+  grid-template-columns: 44px minmax(0, 1fr) minmax(86px, auto) minmax(86px, auto);
+  gap: 10px 14px;
   align-items: center;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
-  background:
-    radial-gradient(circle at top, rgba(73, 130, 229, 0.08), transparent 56%),
-    linear-gradient(180deg, rgba(17, 30, 53, 0.9), rgba(10, 18, 31, 0.94));
-  box-shadow: 0 12px 26px rgba(4, 10, 21, 0.14);
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg-elevated) 94%, transparent);
+  box-shadow: 0 1px 2px rgba(4, 10, 21, 0.06);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .row:hover {
-  border-color: color-mix(in srgb, var(--color-brand-primary) 24%, var(--color-border));
-  box-shadow: 0 16px 30px rgba(4, 10, 21, 0.18);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
+  background: color-mix(
+    in srgb,
+    var(--color-bg-elevated) 88%,
+    var(--color-brand-primary) 4%
+  );
+  box-shadow: 0 6px 14px rgba(4, 10, 21, 0.09);
 }
 
 .rowPodium {
-  border-color: color-mix(in srgb, var(--color-brand-primary) 42%, transparent);
+  border-color: color-mix(in srgb, var(--color-brand-primary) 34%, var(--color-border));
+  background: color-mix(
+    in srgb,
+    var(--color-bg-elevated) 88%,
+    var(--color-brand-primary) 7%
+  );
 }
 
 .rowCurrent {
-  border-color: rgba(121, 188, 255, 0.78);
-  background:
-    radial-gradient(circle at top, rgba(82, 156, 255, 0.16), transparent 56%),
-    linear-gradient(180deg, rgba(22, 40, 71, 0.94), rgba(12, 22, 38, 0.96));
+  border-color: color-mix(in srgb, var(--color-brand-primary) 62%, var(--color-border));
+  background: color-mix(
+    in srgb,
+    var(--color-bg-elevated) 82%,
+    var(--color-brand-primary) 12%
+  );
   box-shadow:
-    0 0 0 1px rgba(121, 188, 255, 0.18),
-    0 18px 34px rgba(6, 17, 36, 0.22);
+    0 0 0 1px color-mix(in srgb, var(--color-brand-primary) 18%, transparent),
+    0 8px 18px rgba(4, 10, 21, 0.1);
 }
 
 .rank {
-  min-width: 38px;
+  width: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-grid;
+  place-items: center;
   color: var(--color-text-primary);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   text-align: center;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-bg-card) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
 }
 
 .playerCol {
@@ -98,6 +121,7 @@
   color: var(--color-text-primary);
   font-size: 0.96rem;
   font-weight: 700;
+  line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
@@ -110,14 +134,17 @@
 .metric {
   color: var(--color-text-primary);
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 800;
   text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .secondaryMetric {
   color: var(--color-text-secondary);
   font-size: 0.78rem;
   text-align: right;
+  line-height: 1.3;
 }
 
 .empty {
@@ -143,12 +170,96 @@
 }
 
 @media (max-width: 720px) {
+  .moduleCard {
+    gap: 12px;
+  }
+
+  .titleRow {
+    gap: 10px;
+  }
+
+  .title {
+    font-size: 1.08rem;
+  }
+
+  .subtitle {
+    font-size: 0.84rem;
+  }
+
+  .list {
+    gap: 8px;
+  }
+
   .row {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 4px 10px;
+    padding: 10px 11px;
+    border-radius: 10px;
+  }
+
+  .rank {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 0.86rem;
+  }
+
+  .playerCol {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    gap: 2px;
+  }
+
+  .metric {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: end;
+    font-size: 0.9rem;
+  }
+
+  .secondaryMetric {
+    grid-column: 3;
+    grid-row: 2;
+    align-self: start;
+    max-width: 8.5rem;
+    font-size: 0.72rem;
   }
 
   .metric,
   .secondaryMetric {
+    text-align: right;
+  }
+}
+
+@media (max-width: 380px) {
+  .row {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .rank {
+    grid-row: 1 / span 3;
+  }
+
+  .playerCol {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .metric {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    text-align: left;
+  }
+
+  .secondaryMetric {
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: start;
+    max-width: 100%;
     text-align: left;
   }
 }
@@ -169,12 +280,12 @@
   }
 
   .row {
-    grid-template-columns: 44px minmax(220px, 1.4fr) minmax(110px, 0.72fr) minmax(
-        148px,
-        0.9fr
+    grid-template-columns: 44px minmax(0, 1.4fr) minmax(100px, 0.58fr) minmax(
+        116px,
+        0.72fr
       );
-    gap: 14px;
-    padding: 15px 16px;
+    gap: 12px;
+    padding: 13px 14px;
   }
 
   .name {
@@ -189,11 +300,11 @@
 
 @media (min-width: 1025px) {
   .moduleCard {
-    gap: 20px;
+    gap: 18px;
   }
 
   .title {
-    font-size: 1.6rem;
+    font-size: 1.42rem;
   }
 
   .subtitle {
@@ -202,21 +313,23 @@
   }
 
   .list {
-    gap: 14px;
+    gap: 10px;
   }
 
   .row {
-    grid-template-columns: 52px minmax(260px, 1.6fr) minmax(140px, 0.72fr) minmax(
-        180px,
-        0.95fr
+    grid-template-columns: 52px minmax(0, 1.6fr) minmax(128px, 0.66fr) minmax(
+        150px,
+        0.78fr
       );
-    gap: 18px;
-    padding: 18px 20px;
-    border-radius: 22px;
+    gap: 16px;
+    padding: 15px 16px;
+    border-radius: 14px;
   }
 
   .rank {
-    min-width: 44px;
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
     font-size: 1.08rem;
   }
 

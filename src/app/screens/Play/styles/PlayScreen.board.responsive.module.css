@@ -76,7 +76,7 @@
     margin-top: var(--play-board-tray-gap);
   }
 
-  .playBody .trayArea .tray {
+  .playBody .trayArea .trayInDock {
     max-width: 100%;
   }
 
@@ -280,7 +280,7 @@
     align-items: stretch;
   }
 
-  .trayAreaSheet .tray,
+  .trayAreaSheet .trayInDock,
   .trayAreaSheet .trayBottomBar {
     pointer-events: auto;
   }
@@ -298,7 +298,7 @@
     background: transparent;
   }
 
-  .trayAreaSheet .tray {
+  .trayAreaSheet .trayInDock {
     width: 100%;
     max-width: 100%;
     align-self: stretch;
@@ -425,7 +425,7 @@
       padding-right: max(var(--play-board-tray-gap, 12px), env(safe-area-inset-right, 0));
     }
 
-    .playBody .trayArea .tray {
+    .playBody .trayArea .trayInDock {
       padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
     }
 
@@ -523,67 +523,69 @@
   }
 }
 
-@media (min-width: 820px) and (max-width: 1180px) and (pointer: coarse) and (orientation: landscape) {
+@media (min-width: 820px) and (max-width: 1366px) and (min-height: 650px) and (pointer: coarse) and (orientation: landscape) {
   .page {
-    --play-board-tray-width: min(100%, 980px);
+    --play-board-tray-width: min(100%, 860px);
   }
 
   .boardLayoutShell {
-    max-width: min(100%, 980px);
+    max-width: min(100%, 900px);
     gap: 8px;
   }
 
   .playBody {
     --play-board-tray-gap: 14px;
-    --play-tablet-side-tray-w: clamp(248px, 29vw, 320px);
     --play-board-stage-size: min(
-      calc(var(--app-vh-fill, 100dvh) - 148px),
-      calc(100vw - var(--play-tablet-side-tray-w) - 72px)
+      var(--play-board-tray-width, min(100%, 860px)),
+      calc(var(--app-vh-fill, 100dvh) - 330px)
     );
-    flex-direction: row;
+    flex-direction: column;
     align-items: stretch;
     justify-content: center;
-    gap: var(--play-board-tray-gap);
-    padding: 12px 14px 0;
+    gap: 0;
+    padding: 10px 14px 0;
   }
 
   .playBody .main {
     flex: 0 1 auto;
-    width: min(100%, calc(var(--play-board-stage-size) + 28px));
-    height: auto;
-    max-height: none;
-    padding-top: 0;
-    padding-bottom: 0;
+    width: 100%;
+    height: calc(var(--play-board-stage-size) + 28px);
+    max-height: calc(var(--play-board-stage-size) + 28px);
+    padding-top: 6px;
+    padding-bottom: 6px;
     align-items: center;
-    overflow: visible;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    overflow: hidden;
+    border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
+    border-bottom-right-radius: calc(var(--radius-board, 20px) + 10px);
   }
 
   .playBody .trayArea {
-    width: var(--play-tablet-side-tray-w);
+    width: 100%;
     min-width: 0;
-    margin-top: 0;
-    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+    margin-top: var(--play-board-tray-gap);
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
     border-radius: 18px;
-    align-self: stretch;
-    justify-content: stretch;
   }
 
-  .playBody .trayArea .tray,
-  .playBody .trayArea .tray.trayWrapLarge {
-    flex: 1 1 auto;
-    height: 100%;
-    max-height: none;
-    min-height: 0;
-  }
-
-  .playBody .trayArea .scrollerWrap {
-    min-height: 0;
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
+    flex: 0 0 auto;
+    height: clamp(104px, 14vh, 132px);
+    max-height: min(132px, 18vh);
+    min-height: 92px;
   }
 }
 
 @media (max-height: 500px) and (pointer: coarse) {
+  .boardLayoutShell {
+    gap: 6px;
+  }
+
+  .boardLayoutShell .topBarWrap {
+    max-height: 44px;
+    min-height: 44px;
+  }
+
   .topBar {
     height: 44px;
     min-height: 44px;
@@ -592,12 +594,34 @@
   }
 
   .playBody {
+    --play-board-tray-gap: 8px;
+    --play-board-stage-size: min(
+      calc(var(--app-vh-fill, 100dvh) - 210px),
+      calc(100vw - 28px)
+    );
+    padding-top: 4px;
     padding-left: max(var(--play-board-tray-gap, 12px), env(safe-area-inset-left, 0));
     padding-right: max(var(--play-board-tray-gap, 12px), env(safe-area-inset-right, 0));
   }
 
-  .playBody .trayArea .tray {
-    padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
+  .playBody .main {
+    height: calc(var(--play-board-stage-size) + 20px);
+    max-height: calc(var(--play-board-stage-size) + 20px);
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .playBody .trayArea {
+    margin-top: var(--play-board-tray-gap);
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+  }
+
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
+    height: clamp(68px, 18vh, 78px);
+    max-height: min(78px, 22vh);
+    min-height: 68px;
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
   }
 
   .boardLayoutShell[data-replay-active="true"] .topBarWrap {

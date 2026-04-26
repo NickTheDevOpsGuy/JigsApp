@@ -139,9 +139,67 @@ test.describe("Responsive smoke", () => {
     expect(
       Math.abs((boardBox?.width ?? 0) - (boardBox?.height ?? 0)),
     ).toBeLessThanOrEqual(2);
+    expect(trayBox?.y ?? 0).toBeGreaterThanOrEqual(
+      (boardBox?.y ?? 0) + (boardBox?.height ?? 0) - 2,
+    );
     expect(
       (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
-    ).toBeLessThan((viewport?.height ?? 0) + 1);
+    ).toBeLessThanOrEqual((viewport?.height ?? 0) + 2);
+    await expectNoDocumentOverflow(page);
+  });
+
+  test("tablet landscape keeps tray below the board", async ({ page }) => {
+    await page.setViewportSize({ width: 1180, height: 820 });
+    await page.goto("/play");
+
+    const board = page.getByTestId("play-board");
+    const tray = page.getByRole("list");
+
+    await expect(board).toBeVisible({ timeout: 15000 });
+    await expect(tray).toBeVisible({ timeout: 5000 });
+
+    const boardBox = await board.boundingBox();
+    const trayBox = await tray.boundingBox();
+
+    expect(boardBox).not.toBeNull();
+    expect(trayBox).not.toBeNull();
+    expect(trayBox?.y ?? 0).toBeGreaterThanOrEqual(
+      (boardBox?.y ?? 0) + (boardBox?.height ?? 0) - 2,
+    );
+    await expectNoDocumentOverflow(page);
+  });
+
+  test("phone landscape keeps play board usable", async ({ page }) => {
+    await page.setViewportSize({ width: 852, height: 393 });
+    const hasCoarsePointer = await page.evaluate(
+      () => window.matchMedia("(pointer: coarse)").matches,
+    );
+    test.skip(!hasCoarsePointer, "short-landscape compact layout is touch-only");
+    await page.goto("/play");
+
+    const board = page.getByTestId("play-board");
+    const tray = page.getByRole("list");
+
+    await expect(board).toBeVisible({ timeout: 15000 });
+    await expect(tray).toBeVisible({ timeout: 5000 });
+
+    const boardBox = await board.boundingBox();
+    const trayBox = await tray.boundingBox();
+    const viewport = page.viewportSize();
+
+    expect(boardBox).not.toBeNull();
+    expect(trayBox).not.toBeNull();
+    expect(viewport).not.toBeNull();
+    expect(boardBox?.width ?? 0).toBeGreaterThanOrEqual(160);
+    expect(
+      Math.abs((boardBox?.width ?? 0) - (boardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
+    expect(trayBox?.y ?? 0).toBeGreaterThanOrEqual(
+      (boardBox?.y ?? 0) + (boardBox?.height ?? 0) - 2,
+    );
+    expect(
+      (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
+    ).toBeLessThanOrEqual((viewport?.height ?? 0) + 2);
     await expectNoDocumentOverflow(page);
   });
 });
