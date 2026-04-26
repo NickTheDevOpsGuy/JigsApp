@@ -56,6 +56,10 @@ test.describe("Daily Share", () => {
     await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
       timeout: 20000,
     });
+    await expect(page.getByText(/Phuzzle #/i)).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByRole("button", { name: /share daily result|copy daily result/i }),
+    ).toBeVisible();
 
     await page.getByRole("button", { name: /options/i }).click();
     const dailyShare = page.getByRole("menuitem", { name: DAILY_SHARE_MENU_ITEM });

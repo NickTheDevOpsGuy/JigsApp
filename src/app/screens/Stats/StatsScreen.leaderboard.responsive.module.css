@@ -46,3 +46,190 @@
   padding: 2px 8px;
   border-radius: 6px;
 }
+
+/* Mobile polish: keep stats/leaderboard surfaces inside the viewport and make dense
+   sections swipe horizontally instead of growing into a long vertical stack. */
+@media (max-width: 600px) {
+  .page {
+    height: var(--app-vh-fill, 100dvh);
+    min-height: var(--app-vh-fill, 100dvh);
+    max-height: var(--app-vh-fill, 100dvh);
+    padding: max(6px, env(safe-area-inset-top, 0))
+      max(8px, env(safe-area-inset-right, 0)) max(6px, env(safe-area-inset-bottom, 0))
+      max(8px, env(safe-area-inset-left, 0));
+  }
+
+  .card {
+    width: 100%;
+    max-width: min(100%, 392px);
+    padding: 8px 10px 7px;
+    box-sizing: border-box;
+  }
+
+  .header {
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .headerIconBtn {
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+  }
+
+  .tabs {
+    gap: 6px;
+    margin-bottom: 7px;
+    padding-bottom: 4px;
+  }
+
+  .tabs button {
+    min-width: auto;
+    min-height: 42px;
+    padding: 7px 11px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+
+  .leaderboardHeader,
+  .leaderboardControlRow {
+    min-width: 0;
+  }
+
+  .leaderboardControlRow {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .leaderboardControlRow::-webkit-scrollbar {
+    display: none;
+  }
+
+  .boardModeSwitch {
+    flex: 0 0 min(78vw, 300px);
+    width: auto;
+    min-width: 0;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .boardModeBtn {
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 7px 10px;
+  }
+
+  .sortCluster {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 44px;
+  }
+
+  .filtersBar {
+    min-height: 38px;
+    padding: 8px 10px;
+  }
+
+  .filtersSummary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .badgesSection {
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .badgesHeader {
+    align-items: center;
+  }
+
+  .badgesTitle {
+    font-size: 0.95rem;
+  }
+
+  .badgesProgress {
+    padding: 6px 8px;
+    border-radius: 11px;
+  }
+
+  .achievements {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 2px 6px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .achievements::-webkit-scrollbar {
+    display: none;
+  }
+
+  .achievement {
+    flex: 0 0 min(84vw, 320px);
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    align-items: center;
+    gap: 8px 12px;
+    min-height: 126px;
+    padding: 12px;
+    border-radius: 14px;
+    scroll-snap-align: start;
+  }
+
+  .achievementIcon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    font-size: 25px;
+    border-radius: 11px;
+  }
+
+  .achievementName {
+    font-size: 0.95rem;
+    line-height: 1.2;
+  }
+
+  .achievementDesc {
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  .achievementMeta {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    justify-items: stretch;
+    gap: 10px;
+  }
+
+  .achievementStatus {
+    font-size: 0.66rem;
+    padding: 3px 8px;
+  }
+
+  .achievementBadge {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+}
+
+@media (max-width: 400px) {
+  .achievement {
+    flex-basis: min(86vw, 308px);
+    min-height: 118px;
+  }
+}

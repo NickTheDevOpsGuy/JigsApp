@@ -54,8 +54,8 @@ export interface ReplaySolveModalProps {
   onPause: ReplayVoidCb;
   onRewind: ReplayVoidCb;
   onFastForward: ReplayVoidCb;
-  onSkipBack15?: ReplayVoidCb;
-  onSkipForward15?: ReplayVoidCb;
+  onSkipBack5?: ReplayVoidCb;
+  onSkipForward5?: ReplayVoidCb;
   speed: number;
   onSpeedChange: ReplaySpeedCb;
   speedExplicitlyChosen?: boolean;
@@ -92,8 +92,8 @@ export function ReplaySolveModal({
   onPause,
   onRewind,
   onFastForward,
-  onSkipBack15,
-  onSkipForward15,
+  onSkipBack5,
+  onSkipForward5,
   speed,
   onSpeedChange,
   speedExplicitlyChosen = false,
@@ -209,8 +209,8 @@ export function ReplaySolveModal({
       onPause={onPause}
       onRewind={onRewind}
       onFastForward={onFastForward}
-      onSkipBack15={onSkipBack15}
-      onSkipForward15={onSkipForward15}
+      onSkipBack5={onSkipBack5}
+      onSkipForward5={onSkipForward5}
       speed={speed}
       speedExplicitlyChosen={speedExplicitlyChosen}
       onSpeedChange={onSpeedChange}

@@ -19,5 +19,4 @@ export { UndoRedoButtons } from "@/screens/Play/components/hud/UndoRedoButtons";
 export { TrayFilterButton } from "@/screens/Play/components/hud/TrayFilterButton";
 export { Minimap } from "@/screens/Play/components/hud/Minimap";
 export { PlayConfirmModals } from "@/screens/Play/components/overlay/PlayConfirmModals";
-export { ReplayBar } from "@/screens/Play/components/replay/ReplayBar";
 export { ReplaySolveModal } from "@/screens/Play/components/replay/ReplaySolveModal";

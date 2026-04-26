@@ -24,8 +24,8 @@ export interface ReplaySolveModalControlsProps {
   onPause: ReplayVoidCb;
   onRewind: ReplayVoidCb;
   onFastForward: ReplayVoidCb;
-  onSkipBack15?: ReplayVoidCb;
-  onSkipForward15?: ReplayVoidCb;
+  onSkipBack5?: ReplayVoidCb;
+  onSkipForward5?: ReplayVoidCb;
   speed: number;
   speedExplicitlyChosen: boolean;
   onSpeedChange: ReplaySpeedCb;
@@ -54,8 +54,8 @@ export function ReplaySolveModalControls({
   onPause,
   onRewind,
   onFastForward,
-  onSkipBack15,
-  onSkipForward15,
+  onSkipBack5,
+  onSkipForward5,
   speed,
   speedExplicitlyChosen,
   onSpeedChange,
@@ -81,6 +81,7 @@ export function ReplaySolveModalControls({
       const el = seekBarRef.current;
       if (!el) return currentIndex;
       const rect = el.getBoundingClientRect();
+      if (!Number.isFinite(rect.width) || rect.width <= 0) return currentIndex;
       const x = (clientX - rect.left) / rect.width;
       return Math.min(
         totalSnapshots - 1,
@@ -199,11 +200,11 @@ export function ReplaySolveModalControls({
         >
           <RotateCcw size={20} aria-hidden />
         </button>
-        {onSkipBack15 && (
+        {onSkipBack5 && (
           <button
             type="button"
             className={styles.controlBtn}
-            onClick={() => invokeMaybeAsync(onSkipBack15)}
+            onClick={() => invokeMaybeAsync(onSkipBack5)}
             onPointerDown={stopProp}
             aria-label="Back 5 seconds"
             title="Back 5s"
@@ -225,11 +226,11 @@ export function ReplaySolveModalControls({
             <Pause size={20} aria-hidden />
           )}
         </button>
-        {onSkipForward15 && (
+        {onSkipForward5 && (
           <button
             type="button"
             className={styles.controlBtn}
-            onClick={() => invokeMaybeAsync(onSkipForward15)}
+            onClick={() => invokeMaybeAsync(onSkipForward5)}
             onPointerDown={stopProp}
             aria-label="Forward 5 seconds"
             title="Forward 5s"

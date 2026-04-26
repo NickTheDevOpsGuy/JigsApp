@@ -359,10 +359,7 @@ test.describe("Play screen", () => {
       timeout: 20000,
     });
 
-    await page
-      .getByRole("button", { name: /options: next puzzle, replay, share/i })
-      .click();
-    await page.getByRole("menuitem", { name: /new puzzle/i }).click();
+    await page.getByRole("button", { name: /new puzzle/i }).click();
 
     await expect(page.getByRole("dialog", { name: /choose category/i })).toBeVisible({
       timeout: 15000,

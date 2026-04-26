@@ -94,6 +94,35 @@ describe("ReplaySolveModal", () => {
     expect(onSeek).toHaveBeenCalledWith(1);
   });
 
+  it("keeps scrubbing at the current frame when the seek bar has no measurable width", () => {
+    const onSeek = vi.fn();
+    render(
+      <ReplaySolveModal
+        {...defaultProps}
+        onSeek={onSeek}
+        currentIndex={4}
+        totalSnapshots={10}
+      />,
+    );
+    const slider = screen.getByRole("slider", { name: /replay progress/i });
+    vi.spyOn(slider, "getBoundingClientRect").mockReturnValue({
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: 0,
+      height: 12,
+      toJSON: () => ({}),
+    } as DOMRect);
+
+    fireEvent.click(slider, { clientX: 100 });
+
+    expect(onSeek).toHaveBeenCalledTimes(1);
+    expect(onSeek).toHaveBeenCalledWith(4);
+  });
+
   it("does not toggle play/pause when Space is pressed while Close is focused", () => {
     const onPlay = vi.fn();
     const onPause = vi.fn();

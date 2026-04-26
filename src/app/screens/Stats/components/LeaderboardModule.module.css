@@ -172,6 +172,7 @@
 @media (max-width: 720px) {
   .moduleCard {
     gap: 12px;
+    overflow: hidden;
   }
 
   .titleRow {
@@ -187,15 +188,29 @@
   }
 
   .list {
-    gap: 8px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 2px 6px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .list::-webkit-scrollbar {
+    display: none;
   }
 
   .row {
+    flex: 0 0 min(84vw, 320px);
     grid-template-columns: 38px minmax(0, 1fr) auto;
     grid-template-rows: auto auto;
     gap: 4px 10px;
-    padding: 10px 11px;
+    min-height: 86px;
+    padding: 11px 12px;
     border-radius: 10px;
+    scroll-snap-align: start;
   }
 
   .rank {
@@ -270,7 +285,9 @@
   }
 
   .name {
+    font-size: 0.9rem;
     white-space: normal;
+    overflow-wrap: anywhere;
   }
 }
 

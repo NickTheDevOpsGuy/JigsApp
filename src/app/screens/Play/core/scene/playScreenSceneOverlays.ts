@@ -153,8 +153,8 @@ export function buildReplayPortalProps(args: {
   onPause: () => void;
   onRewind: () => void;
   onFastForward: () => void;
-  onSkipBack15: () => void;
-  onSkipForward15: () => void;
+  onSkipBack5: () => void;
+  onSkipForward5: () => void;
   speed: number;
   onSpeedChange: (speed: number) => void;
   currentIndex: number;
@@ -173,8 +173,8 @@ export function buildReplayPortalProps(args: {
     onPause,
     onRewind,
     onFastForward,
-    onSkipBack15,
-    onSkipForward15,
+    onSkipBack5,
+    onSkipForward5,
     speed,
     onSpeedChange,
     currentIndex,
@@ -195,8 +195,8 @@ export function buildReplayPortalProps(args: {
     onPause,
     onRewind,
     onFastForward,
-    onSkipBack15,
-    onSkipForward15,
+    onSkipBack5,
+    onSkipForward5,
     speed,
     onSpeedChange,
     currentIndex,

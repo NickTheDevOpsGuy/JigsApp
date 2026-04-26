@@ -33,13 +33,13 @@
 
   .playBody {
     --play-board-tray-width: 100%;
-    --play-board-tray-gap: 12px;
+    --play-board-tray-gap: 8px;
     gap: 0;
     min-height: 0;
     flex: 1;
     overflow: hidden;
     /* Same horizontal inset as board→tray gap; .page still adds outer safe-area */
-    padding: 0 var(--play-board-tray-gap) max(4px, env(safe-area-inset-bottom, 0));
+    padding: 0 var(--play-board-tray-gap) max(6px, env(safe-area-inset-bottom, 0));
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -56,13 +56,18 @@
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    height: min(calc(100vw - 16px + 28px), calc(var(--app-vh-fill, 100dvh) - 190px));
+    max-height: min(
+      calc(100vw - 16px + 28px),
+      calc(var(--app-vh-fill, 100dvh) - 190px)
+    );
     padding: 0;
-    padding-top: 14px;
-    padding-bottom: 14px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     gap: 0;
     align-items: center;
     justify-content: center;
-    flex: 1;
+    flex: 0 1 auto;
     min-height: 0;
     overflow: hidden;
     border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
@@ -80,10 +85,17 @@
     max-width: 100%;
   }
 
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
+    height: clamp(88px, 13vh, 112px);
+    max-height: min(112px, 20vh);
+    min-height: 82px;
+  }
+
   .boardWrapper {
-    width: 100%;
-    max-width: 100%;
-    flex: 1;
+    width: min(100%, calc(var(--app-vh-fill, 100dvh) - 210px));
+    max-width: min(100%, calc(var(--app-vh-fill, 100dvh) - 210px));
+    flex: 0 1 auto;
     min-height: 0;
     max-height: 100%;
     display: flex;
@@ -93,7 +105,7 @@
   }
 
   .boardWrapper .boardProgressFrame {
-    flex: 1;
+    flex: 0 1 auto;
     min-height: 0;
     min-width: 0;
     width: 100%;
@@ -620,6 +632,31 @@
     height: clamp(104px, 14vh, 132px);
     max-height: min(132px, 18vh);
     min-height: 92px;
+  }
+}
+
+@media (min-width: 820px) and (max-width: 1366px) and (min-height: 650px) and (max-height: 860px) and (pointer: coarse) and (orientation: landscape) {
+  .playBody {
+    --play-board-tray-gap: 10px;
+    --play-board-stage-size: min(
+      var(--play-board-tray-width, min(100%, 860px)),
+      calc(var(--app-vh-fill, 100dvh) - 382px)
+    );
+    padding-top: 8px;
+  }
+
+  .playBody .main {
+    height: calc(var(--play-board-stage-size) + 24px);
+    max-height: calc(var(--play-board-stage-size) + 24px);
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
+    height: clamp(84px, 12vh, 108px);
+    max-height: min(108px, 16vh);
+    min-height: 80px;
   }
 }
 

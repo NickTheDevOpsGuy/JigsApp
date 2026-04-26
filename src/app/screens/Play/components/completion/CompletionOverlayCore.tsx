@@ -9,6 +9,7 @@ import { AppModal } from "@/components/AppModal";
 import { useCompletionOverlayData } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { CompletionOverlayActions } from "@/screens/Play/components/completion/CompletionOverlayActions";
 import { CompletionOverlayStats } from "@/screens/Play/components/completion/CompletionOverlayStats";
+import { DailyResultCard } from "@/screens/Play/components/completion/DailyResultCard";
 import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
 import type { CompletionOverlayProps } from "@/screens/Play/components/completion/completionOverlayTypes";
 import { ACHIEVEMENT_DEFS } from "@/data/content/achievements";
@@ -237,6 +238,23 @@ export function CompletionOverlay({
             </p>
           )}
         </div>
+
+        {isDaily && phase >= 2 && (
+          <div className={styles.completeDailyResultWrap}>
+            <DailyResultCard
+              elapsedSeconds={elapsedSeconds}
+              moveCount={moveCount}
+              undoCount={undoCount}
+              usedHint={usedHint}
+              grid={grid}
+              dailyStreak={completionData.dailyStreak}
+              canNativeShare={
+                typeof navigator !== "undefined" && typeof navigator.share === "function"
+              }
+              onShare={completionData.handleNativeDailyShare}
+            />
+          </div>
+        )}
 
         <CompletionOverlayActions
           onShareProgress={onShareProgress}

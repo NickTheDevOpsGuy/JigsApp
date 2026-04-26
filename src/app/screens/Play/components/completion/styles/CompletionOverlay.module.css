@@ -344,6 +344,13 @@
   min-height: 24px;
 }
 
+.completeDailyResultWrap {
+  width: 100%;
+  padding: 0 20px 16px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
 /* ── Actions section ── */
 .completeActionsPhased {
   display: flex;
@@ -606,18 +613,23 @@
 
 /* ── Mobile phones ≤ 600px (Android + iPhone portrait) ── */
 @media (max-width: 600px) {
+  .completeWinDialog {
+    max-width: min(360px, calc(100vw - 20px));
+    border-radius: 18px;
+  }
+
   .completeCelebrationBlock {
-    padding: 20px 16px 12px;
-    gap: 10px;
+    padding: 16px 14px 10px;
+    gap: 8px;
   }
 
   .completePhasedTitle {
-    font-size: 1.3rem;
+    font-size: 1.22rem;
   }
 
   .completeActionsPhased {
-    padding: 14px 16px 20px;
-    gap: 8px;
+    padding: 12px 14px 14px;
+    gap: 7px;
   }
 
   .completePrimaryBtn {
@@ -633,8 +645,8 @@
   }
 
   .completeStatsBar {
-    gap: 12px;
-    padding: 12px 16px;
+    gap: 8px 10px;
+    padding: 10px 12px;
     /* Wrap stat chips on narrow screens so nothing clips */
     flex-wrap: wrap;
     justify-content: space-evenly;
@@ -650,18 +662,18 @@
   }
 
   .completeImageWrapPhased {
-    max-height: min(42vh, 360px);
+    max-height: min(32vh, 300px);
     border-radius: 10px;
   }
 
   .completeImagePhased {
-    max-height: min(42vh, 360px);
+    max-height: min(32vh, 300px);
   }
 
   .completeOptionsTrigger {
-    min-height: 48px;
-    font-size: 14px;
-    padding: 11px 14px;
+    min-height: 46px;
+    font-size: 13px;
+    padding: 10px 12px;
     border-radius: 10px;
   }
 
@@ -827,11 +839,11 @@
   }
 
   .completeImageWrapPhased {
-    max-height: min(34vh, 300px);
+    max-height: min(30vh, 280px);
   }
 
   .completeImagePhased {
-    max-height: min(34vh, 300px);
+    max-height: min(30vh, 280px);
   }
 
   .completeActionsPhased {
