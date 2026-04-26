@@ -112,9 +112,7 @@ test.describe("Packs and Stats", () => {
     });
     expect(badgeRailLayout.flexDirection).toBe("row");
     expect(["auto", "scroll", "hidden"]).toContain(badgeRailLayout.overflowX);
-    expect(badgeRailLayout.right).toBeLessThanOrEqual(
-      badgeRailLayout.viewportWidth + 1,
-    );
+    expect(badgeRailLayout.right).toBeLessThanOrEqual(badgeRailLayout.viewportWidth + 1);
 
     await page.getByRole("tab", { name: /board leaderboard/i }).click();
     const boardModeRail = page.locator('[class*="boardModeSwitch"]').first();
@@ -132,8 +130,6 @@ test.describe("Packs and Stats", () => {
     });
     expect(boardModeLayout.flexWrap).toBe("nowrap");
     expect(["auto", "scroll", "hidden"]).toContain(boardModeLayout.overflowX);
-    expect(boardModeLayout.right).toBeLessThanOrEqual(
-      boardModeLayout.viewportWidth + 1,
-    );
+    expect(boardModeLayout.right).toBeLessThanOrEqual(boardModeLayout.viewportWidth + 1);
   });
 });
