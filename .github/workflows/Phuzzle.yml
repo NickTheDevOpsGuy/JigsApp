@@ -29,6 +29,8 @@ jobs:
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v5
@@ -56,6 +58,8 @@ jobs:
         run: npm run build
 
       - name: 📦 Bundle size check
+        env:
+          BASELINE_REF: origin/${{ github.base_ref }}
         run: npm run check:bundle
 
       - name: 🧪 Unit tests (Vitest)
