@@ -314,7 +314,7 @@ export function ReplaySolveModal({
     const safeEdge = 12;
     const dockInsetPx = 8;
     const estimatedDockHeight = 214;
-    const minSideDockWidth = 288;
+    const minSideDockWidth = 252;
     const maxShell = Math.max(0, viewWidth - 2 * safeEdge);
     const shellWidth = Math.min(maxShell, width + dockInsetPx * 2);
     const shellLeft = Math.min(
@@ -333,8 +333,8 @@ export function ReplaySolveModal({
     const availableLeft = left - (viewLeft + safeEdge) - 12;
     const availableRight = viewLeft + viewWidth - right - safeEdge - 12;
     const preferredSideDockWidth = Math.min(
-      360,
-      Math.max(minSideDockWidth, Math.round(viewWidth * 0.28)),
+      340,
+      Math.max(minSideDockWidth, Math.round(viewWidth * 0.26)),
     );
     const canUseSideDock =
       availableBelow < estimatedDockHeight &&
