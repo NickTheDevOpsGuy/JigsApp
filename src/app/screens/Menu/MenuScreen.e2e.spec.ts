@@ -76,9 +76,7 @@ test.describe("Home / Menu", () => {
     await expect(page.getByRole("dialog", { name: /what's new/i })).toBeVisible({
       timeout: 15000,
     });
-    await expect(
-      page.getByText(/stats and leaderboard screens scale better/i),
-    ).toBeVisible();
+    await expect(page.getByText(/desktop home, packs, and stats/i)).toBeVisible();
   });
 
   test("tablet home uses a roomy shell instead of a phone-width widget", async ({

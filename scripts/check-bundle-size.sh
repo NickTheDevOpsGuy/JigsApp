@@ -41,7 +41,14 @@ baseline_from_ref() {
   )
 }
 
-npm run build --silent 2>/dev/null
+if [ "${CHECK_BUNDLE_USE_EXISTING_DIST:-}" = "1" ]; then
+  if [ ! -d dist/assets ]; then
+    echo "ERROR: CHECK_BUNDLE_USE_EXISTING_DIST=1 but dist/assets does not exist"
+    exit 1
+  fi
+else
+  npm run build --silent 2>/dev/null
+fi
 TOTAL_KB=$(bundle_size_kb "$(bundle_size_bytes)")
 
 if [ -n "${BASELINE_KB:-}" ]; then

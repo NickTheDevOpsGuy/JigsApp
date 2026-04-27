@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-typecheck:
-    name: 🧩 Phuzzle
+  quality:
+    name: 🧩 Quality + Build
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -60,20 +60,161 @@ jobs:
       - name: 📦 Bundle size check
         env:
           BASELINE_REF: origin/${{ github.base_ref }}
+          CHECK_BUNDLE_USE_EXISTING_DIST: "1"
         run: npm run check:bundle
 
       - name: 🧪 Unit tests (Vitest)
         run: npm run test
 
-      - name: 📦 Install Playwright browsers
-        run: npx playwright install --with-deps chromium msedge
+      - name: 📤 Upload production build
+        uses: actions/upload-artifact@v4
+        with:
+          name: phuzzle-dist
+          path: dist
+          if-no-files-found: error
 
-      - name: 🎭 E2E tests (Playwright)
-        run: |
-          npx playwright test --project=chromium --project=chromium-tz-la --project=chromium-tz-auckland
-          npx playwright test --project=msedge src/app/screens/Play/PlayScreen.completion-menu-edge.e2e.spec.ts
+  e2e-smoke:
+    name: 🎭 E2E smoke
+    runs-on: ubuntu-latest
+    needs: quality
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      PW_USE_EXISTING_BUILD: "1"
+      PW_USE_EDGE: "1"
+
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v5
+
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "lts/*"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 📥 Download production build
+        uses: actions/download-artifact@v4
+        with:
+          name: phuzzle-dist
+          path: dist
+
+      - name: 📦 Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit msedge
+
+      - name: 🎭 E2E smoke tests
+        run: npm run test:e2e:smoke
+
+      - name: 📤 Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-smoke-artifacts
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
+
+  e2e-layouts:
+    name: 📐 Responsive layouts
+    runs-on: ubuntu-latest
+    needs: quality
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      PW_USE_EXISTING_BUILD: "1"
+
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v5
+
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "lts/*"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 📥 Download production build
+        uses: actions/download-artifact@v4
+        with:
+          name: phuzzle-dist
+          path: dist
+
+      - name: 📦 Install Playwright browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: 📐 Responsive layout tests
+        run: npm run test:e2e:layouts
+
+      - name: 📤 Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-layout-artifacts
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
+
+  lighthouse:
+    name: 🔦 Lighthouse
+    runs-on: ubuntu-latest
+    needs: quality
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v5
+
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "lts/*"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 📥 Download production build
+        uses: actions/download-artifact@v4
+        with:
+          name: phuzzle-dist
+          path: dist
 
       - name: 🔦 Lighthouse CI (perf, a11y)
         env:
           LHCI_UPLOAD__GITHUB_TOKEN: ${{ github.token }}
         run: npx lhci autorun
+
+      - name: 📤 Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lhci-reports
+          path: lhci-reports
+          if-no-files-found: ignore

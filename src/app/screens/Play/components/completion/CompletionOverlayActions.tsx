@@ -255,21 +255,9 @@ export function CompletionOverlayActions(args: {
                 await onReplayClick();
               })
             }
-            disabled={busyAction === "replay" || completionData.isGenerating}
-            aria-label={
-              completionData.isGenerating
-                ? "Wait for share to finish"
-                : busyAction === "replay"
-                  ? "Opening replay"
-                  : "Replay solve"
-            }
-            title={
-              completionData.isGenerating
-                ? "Wait for share to finish"
-                : busyAction === "replay"
-                  ? "Opening replay"
-                  : "Replay solve"
-            }
+            disabled={busyAction === "replay"}
+            aria-label="Replay solve"
+            title={busyAction === "replay" ? "Opening replay" : "Replay solve"}
           >
             <Film size={18} aria-hidden />
             {busyAction === "replay"

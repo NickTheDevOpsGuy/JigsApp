@@ -2,10 +2,11 @@ import { defineConfig, devices } from "@playwright/test";
 
 const isCI = !!process.env.CI;
 const useDevServer = process.env.PW_USE_DEV_SERVER === "1";
+const useExistingBuild = process.env.PW_USE_EXISTING_BUILD === "1";
 const chromeChannelUse =
   !isCI && process.env.PW_USE_CHROME === "1" ? { channel: "chrome" as const } : {};
 const edgeChannelUse =
-  !isCI && process.env.PW_USE_EDGE === "1" ? { channel: "msedge" as const } : {};
+  process.env.PW_USE_EDGE === "1" ? { channel: "msedge" as const } : {};
 
 /**
  * Playwright config for Phuzzle E2E tests.
@@ -75,7 +76,9 @@ export default defineConfig({
   webServer: {
     command: useDevServer
       ? "npm run dev -- --host 127.0.0.1 --port 4173 --strictPort"
-      : "npm run build && npm run preview -- --host 127.0.0.1 --port 4173 --strictPort",
+      : useExistingBuild
+        ? "npm run preview -- --host 127.0.0.1 --port 4173 --strictPort"
+        : "npm run build && npm run preview -- --host 127.0.0.1 --port 4173 --strictPort",
     url: "http://127.0.0.1:4173",
     // In local development, reuse an already running Phuzzle server if one exists
     // so Playwright can still run while we iterate in parallel. CI still launches

@@ -92,9 +92,10 @@ If your cached Playwright revision differs, adjust the `chromium-####` segment t
 ## Where output goes
 
 - **Local:** `./lhci-reports`
-- **CI:** Reports are uploaded as artifacts if the workflow is configured for it.
+- **CI:** Reports are uploaded as the `lhci-reports` artifact.
 
 The local `npm run lighthouse` and `npm run lhci` scripts both build the app first, then run `lhci autorun`.
+The GitHub Actions workflow builds once in the quality job and reuses the uploaded `dist` artifact for Lighthouse.
 
 ---
 
