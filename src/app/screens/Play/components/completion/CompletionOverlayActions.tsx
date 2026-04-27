@@ -267,13 +267,7 @@ export function CompletionOverlayActions(args: {
             className={styles.completeMenuItem}
             onClick={() => void handleChallenge()}
             disabled={shareMenuBusy || busyAction === "replay"}
-            aria-label={
-              busyAction === "challenge"
-                ? "Preparing share"
-                : completionData.isGenerating
-                  ? "Preparing share"
-                  : "Challenge a friend"
-            }
+            aria-label="Challenge a friend"
             title={
               busyAction === "challenge"
                 ? "Preparing share…"
@@ -298,13 +292,7 @@ export function CompletionOverlayActions(args: {
             className={styles.completeMenuItem}
             onClick={() => void handleShareResult()}
             disabled={shareMenuBusy || busyAction === "replay"}
-            aria-label={
-              busyAction === "shareResult"
-                ? "Preparing share"
-                : completionData.isGenerating
-                  ? "Preparing share"
-                  : "Share your result"
-            }
+            aria-label="Share your result"
             title={
               busyAction === "shareResult"
                 ? "Preparing share…"
