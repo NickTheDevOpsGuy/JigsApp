@@ -32,7 +32,6 @@
     "test:browsers": "npm run test:run && npm run test:e2e",
     "test:browsers:smoke": "npm run test:run && npm run test:e2e:smoke",
     "test:e2e": "bash ./scripts/test-e2e-matrix.sh",
-    "test:e2e:layouts": "bash ./scripts/test-e2e-layouts.sh",
     "test:e2e:chrome": "playwright test --project=chrome",
     "test:e2e:chrome:channel": "PW_USE_CHROME=1 playwright test --project=chrome",
     "test:e2e:firefox": "playwright test --project=firefox",
