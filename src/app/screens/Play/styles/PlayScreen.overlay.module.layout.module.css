@@ -83,7 +83,7 @@
     padding-left: max(10px, var(--play-board-tray-gap, 12px));
     padding-right: max(10px, var(--play-board-tray-gap, 12px));
   }
-  .playBody .trayArea .tray {
+  .playBody .trayArea .trayInDock {
     padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
   }
   .undoRedoBtn {

@@ -284,7 +284,7 @@ export function PlayScreenLayout({
                     onPieceClick={tray.onTrayPieceClick}
                     onTrayPieceHover={tray.onTrayPieceHover}
                     highlightedPieceIds={tray.highlightedPieceIds}
-                    className={tray.isLargeTray ? styles.trayWrapLarge : undefined}
+                    className={`${styles.trayInDock} ${tray.isLargeTray ? styles.trayWrapLarge : ""}`.trim()}
                   />
                 </div>
               </div>

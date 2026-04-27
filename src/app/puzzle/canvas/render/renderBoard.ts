@@ -59,7 +59,10 @@ export function renderBoard(
 ) {
   const canvas = ctx.canvas;
 
-  if (pathCache && state.pieces.length > 0) {
+  const expectedPathCount = pathCache
+    ? state.pieces.reduce((count, p) => count + (p.shapePath ? 1 : 0), 0)
+    : 0;
+  if (pathCache && expectedPathCount > 0 && pathCache.size < expectedPathCount) {
     for (const p of state.pieces) {
       if (p.shapePath && p.shapePath.length > 0 && !pathCache.has(p.id)) {
         try {

@@ -127,6 +127,15 @@ export class PuzzleManagerActions extends PuzzleManagerState {
     return this.autoRotateOnSnap;
   }
 
+  setMagneticSnapEnabled(enabled: boolean): void {
+    this.magneticSnapEnabled = enabled;
+    if (!enabled) this.drag = { ...this.drag, preview: null };
+  }
+
+  getMagneticSnapEnabled(): boolean {
+    return this.magneticSnapEnabled;
+  }
+
   getDragState(): DragState {
     return this.drag;
   }

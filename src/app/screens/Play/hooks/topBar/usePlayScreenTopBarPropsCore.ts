@@ -122,6 +122,7 @@ export function usePlayScreenTopBarProps(
     onToggleUndoRedo,
     autoRotateOnSnap,
     setAutoRotateOnSnap,
+    challengeTargetLabel,
   } = params;
 
   const headerMenuProps: HeaderMenuProps = buildHeaderMenuProps({
@@ -234,6 +235,7 @@ export function usePlayScreenTopBarProps(
     lives,
     setIsPaused,
     zenModeEnabled,
+    challengeTargetLabel,
   });
 
   const topBarButtonsProps = buildTopBarButtonsProps({

@@ -8,8 +8,8 @@ Sharing in Phuzzle: **completion share** (your result), **Daily Share** (Wordle-
 
 - Share your finished puzzle: **PNG share card** (stats + link) plus companion **share text** when the platform supports it.
 - On the win screen, **Options** opens a menu. **Challenge Friend** and **Share Result** **start share immediately** (native share sheet when available, otherwise **PNG download**). There is **no** nested share modal or duplicate preview step.
-- **Share Result** — concise text from `shareMessages` (puzzle context, time, moves, URL) **without** the challenge line; share card is the **result** variant; link has **no** `ct`/`cm`.
-- **Challenge Friend** — adds a short challenge line; URL includes `ct` & `cm`. The playable link comes from **`puzzleShareUrl`** on the play screen; when a co-op **session** exists, `usePlayScreenShareSession` keeps **`shareSessionId`** in sync so the URL can include `session=…` when appropriate.
+- **Share Result** — concise text from `shareMessages` (puzzle context, time, moves, URL) **without** the challenge invite line; share card is the **result** variant; link has **no new** `ct`/`cm`. If the player opened a challenge link, result text can still mention the target or win.
+- **Challenge Friend** — adds a short challenge line; URL includes `ct` & `cm`. The playable link comes from **`puzzleShareUrl`** on the play screen; when a co-op **session** exists, `usePlayScreenShareSession` keeps **`shareSessionId`** in sync so the URL can include `session=…` when appropriate. Incoming challenge links show a HUD target and the win overlay calls out wins or runbacks.
 - Share card PNG: **challenge** (with CTA) or **result** (stats band, no taunt). If the user **dismisses** the native share UI (`AbortError`), the app **falls through to download** so the image is not lost.
 - Errors use **toasts** (`setShareToast`), not a blocking dialog.
 - Completion capture uses async canvas **blob / object URL** (not synchronous `toDataURL()`) to keep the win transition smooth on mobile.
@@ -26,8 +26,10 @@ Triggered from the win overlay after completing a puzzle. Works without any back
   - `Phuzzle Daily #N` (N = deterministic daily number)
   - Difficulty • piece count
   - ⏱ time, 🔁 moves
+  - Optional streak line when the daily streak is active
   - A 4-cell emoji grid (🟦 = hit, ⬜ = miss): completed, good time, efficient moves, clean solve (no hint/undo)
   - Play link (opens the same daily)
+- **Daily archive:** The daily picker can launch recent archived dailies for extra play. Archived runs do not mark today's daily complete or advance today's streak.
 - **How:** Copy to clipboard or native share (mobile). No image required; the text is self-contained.
 - **Key files:** `shareMessages.ts` (`buildDailyShareMessage`, `getDailyShareCompletionGrid`), `dailyPuzzleCoreImpl.ts` (`getDailyPuzzleNumber`), `useCompletionOverlayData.ts` (daily share handlers), `CompletionOverlayActions.tsx` (Daily Share button when `isDaily`).
 

@@ -1,5 +1,6 @@
 import type { PuzzleState } from "@/puzzle/core/types";
 import type { PuzzleManager } from "@/puzzle/manager/PuzzleManager";
+import type { PieceCache } from "@/puzzle/canvas/utils/renderBoardTypes";
 import type { PerfStats } from "@/screens/Play/components/overlay/ProfilerOverlay";
 import type { MutableRefObject, RefObject } from "react";
 import {
@@ -75,7 +76,9 @@ export function updateDragDisplayOverrides(args: {
     const groupPieces = st.pieces.filter(
       (p) => !p.inTray && p.groupId === draggedGroupId,
     );
-    const snapPreview = manager?.getSnapPreviewState() ?? null;
+    const snapPreview = magneticSnapEnabled
+      ? (manager?.getSnapPreviewState() ?? null)
+      : null;
     let groupDeltaX = 0;
     let groupDeltaY = 0;
     let magneticProximity = 0;
@@ -280,6 +283,30 @@ export function prepareCanvasForRender(
   ctx.imageSmoothingQuality = reducedQuality ? "medium" : "high";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   return { ctx, cssW, cssH, dpr };
+}
+
+function getPieceCacheKeyForCurrentFrame(
+  piece: PuzzleState["pieces"][number],
+  dpr: number,
+): string {
+  const placedOrLocked = piece.isPlaced || piece.locked;
+  return `${piece.id}_r${piece.rotation}_d${dpr}_solid${placedOrLocked ? 1 : 0}`;
+}
+
+export function prunePieceCacheForCurrentFrame(
+  state: PuzzleState,
+  pieceCache: PieceCache,
+  dpr: number,
+): void {
+  if (pieceCache.size === 0) return;
+  const validKeys = new Set<string>();
+  for (const piece of state.pieces) {
+    if (piece.inTray) continue;
+    validKeys.add(getPieceCacheKeyForCurrentFrame(piece, dpr));
+  }
+  for (const key of pieceCache.keys()) {
+    if (!validKeys.has(key)) pieceCache.delete(key);
+  }
 }
 
 /** Empty (row,col) slots adjacent to at least one placed piece – potential snap targets when hovering. */

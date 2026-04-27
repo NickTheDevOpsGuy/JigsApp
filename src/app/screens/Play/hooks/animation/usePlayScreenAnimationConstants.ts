@@ -20,8 +20,13 @@ export const IDLE_MIN_INTERVAL_MS = 1000 / IDLE_TARGET_FPS;
 
 /** When idle and 64+ pieces: throttle more aggressively to reduce CPU. */
 export const LARGE_PUZZLE_PIECE_COUNT = 64;
-export const IDLE_TARGET_FPS_LARGE = 18;
+export const IDLE_TARGET_FPS_LARGE = 14;
 export const IDLE_MIN_INTERVAL_MS_LARGE = 1000 / IDLE_TARGET_FPS_LARGE;
+
+/** After the board has been still for a moment, redraw rarely; the canvas is static. */
+export const QUIET_IDLE_AFTER_MS = 1200;
+export const QUIET_IDLE_TARGET_FPS = 8;
+export const QUIET_IDLE_MIN_INTERVAL_MS = 1000 / QUIET_IDLE_TARGET_FPS;
 
 /** Firefox benefits from a slightly lighter idle redraw cadence on top of the global idle cap. */
 export const IDLE_TARGET_FPS_FIREFOX = 20;

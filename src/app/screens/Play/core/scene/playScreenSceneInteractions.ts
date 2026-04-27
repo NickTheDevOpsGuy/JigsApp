@@ -16,6 +16,7 @@ import { usePlacementAssistViewport } from "@/screens/Play/hooks/viewport/usePla
 import { usePlayScreenTrayPieces } from "@/screens/Play/hooks/gameplay/usePlayScreenTrayPieces";
 import { usePlayScreenImmersiveControls } from "@/screens/Play/hooks/gameplay/usePlayScreenImmersiveControls";
 import { getBestTime } from "@/screens/Play/core/time/timeMode";
+import { parseChallengeTarget } from "@/screens/Play/core/retention/playRetention";
 import { STORAGE_KEY, PUZZLE_NAME_KEY } from "@/screens/Play/core/utils/playScreenUtils";
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { SESSION_ID_PARAM } from "@/screens/Play/hooks/gameplay/usePuzzleSession";
@@ -36,6 +37,7 @@ export function usePlayScreenInteractions(ctx: any) {
     scene,
     sessionResult: _sessionResult,
     isDailySession,
+    searchParams,
   } = setup;
   const {
     manager,
@@ -196,6 +198,10 @@ export function usePlayScreenInteractions(ctx: any) {
         )
       : 100;
   const puzzleName = safeLocalStorage.getItem(PUZZLE_NAME_KEY) ?? undefined;
+  const challengeTarget = React.useMemo(
+    () => parseChallengeTarget(searchParams),
+    [searchParams],
+  );
   const share = useShareResults({
     elapsedSeconds: stableElapsedSeconds,
     state,
@@ -206,6 +212,9 @@ export function usePlayScreenInteractions(ctx: any) {
     rotationCount: scene.rotationCountRef.current,
     maxGroupSize: scene.maxGroupSizeRef.current,
     puzzleName: puzzleName || undefined,
+    undoCount: scene.undoCountRef.current,
+    usedHint: scene.usedHintRef.current,
+    challengeTarget,
   });
 
   const handleSharePuzzle = usePlayScreenSharePuzzle({

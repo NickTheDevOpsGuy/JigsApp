@@ -4,7 +4,7 @@ const isCI = !!process.env.CI;
 const useDevServer = process.env.PW_USE_DEV_SERVER === "1";
 const useExistingBuild = process.env.PW_USE_EXISTING_BUILD === "1";
 const chromeChannelUse =
-  !isCI && process.env.PW_USE_CHROME === "1" ? { channel: "chrome" as const } : {};
+  process.env.PW_USE_CHROME === "1" ? { channel: "chrome" as const } : {};
 const edgeChannelUse =
   process.env.PW_USE_EDGE === "1" ? { channel: "msedge" as const } : {};
 
@@ -60,6 +60,11 @@ export default defineConfig({
       name: "safari-ipad-responsive",
       testMatch: "**/*.responsive.e2e.spec.ts",
       use: { ...devices["iPad Pro 11"], browserName: "webkit" },
+    },
+    {
+      name: "chrome-android-responsive",
+      testMatch: "**/*.responsive.e2e.spec.ts",
+      use: { ...devices["Pixel 7"], ...chromeChannelUse },
     },
     {
       name: "chrome-android-tablet-responsive",

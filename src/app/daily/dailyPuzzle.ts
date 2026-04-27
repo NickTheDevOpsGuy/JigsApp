@@ -117,6 +117,39 @@ export function getTodayDailyPuzzle(): SamplePuzzle | null {
   return getDailyPuzzleForDate(getTodayDateString());
 }
 
+function addLocalDays(dateStr: string, deltaDays: number): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(y || 1970, (m || 1) - 1, d || 1 + deltaDays);
+  if (Number.isFinite(y) && Number.isFinite(m) && Number.isFinite(d)) {
+    date.setDate((d || 1) + deltaDays);
+  }
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+export function getDailyArchiveItems(count = 5): Array<{
+  dateStr: string;
+  puzzle: SamplePuzzle;
+  completed: boolean;
+}> {
+  const today = getTodayDateString();
+  const items: Array<{ dateStr: string; puzzle: SamplePuzzle; completed: boolean }> = [];
+  for (let i = 1; i <= count; i++) {
+    const dateStr = addLocalDays(today, -i);
+    const puzzle = getDailyPuzzleForDate(dateStr);
+    if (!puzzle) continue;
+    items.push({
+      dateStr,
+      puzzle,
+      completed:
+        safeLocalStorage.getItem(`phuzzle:daily:${dateStr}:completed`) === "true",
+    });
+  }
+  return items;
+}
+
 /** Start the daily puzzle with user-chosen grid size */
 export function startDailyPuzzle(
   grid: { rows: number; cols: number },
@@ -134,6 +167,26 @@ export function startDailyPuzzle(
   safeLocalStorage.setItem("phuzzle:gridSize", `${grid.rows}x${grid.cols}`);
   safeLocalStorage.setItem(DAILY_DATE_KEY, dateStr);
   safeLocalStorage.setItem(DAILY_MODIFIER_KEY, modifier);
+
+  return { imageUrl: puzzle.fullImage, grid };
+}
+
+/** Start a past daily as an archive puzzle. Archive plays do not count for today's streak. */
+export function startDailyArchivePuzzle(
+  dateStr: string,
+  grid: { rows: number; cols: number },
+): {
+  imageUrl: string;
+  grid: { rows: number; cols: number };
+} | null {
+  const puzzle = getDailyPuzzleForDate(dateStr);
+  if (!puzzle) return null;
+
+  safeLocalStorage.setItem("phuzzle:imageDataUrl", puzzle.fullImage);
+  safeLocalStorage.setItem("phuzzle:gridSize", `${grid.rows}x${grid.cols}`);
+  safeLocalStorage.setItem("phuzzle:puzzleName", puzzle.name);
+  safeLocalStorage.removeItem(DAILY_DATE_KEY);
+  safeLocalStorage.removeItem(DAILY_MODIFIER_KEY);
 
   return { imageUrl: puzzle.fullImage, grid };
 }

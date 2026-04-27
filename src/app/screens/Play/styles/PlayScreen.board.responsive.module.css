@@ -33,13 +33,13 @@
 
   .playBody {
     --play-board-tray-width: 100%;
-    --play-board-tray-gap: 12px;
+    --play-board-tray-gap: 8px;
     gap: 0;
     min-height: 0;
     flex: 1;
     overflow: hidden;
     /* Same horizontal inset as board→tray gap; .page still adds outer safe-area */
-    padding: 0 var(--play-board-tray-gap) max(4px, env(safe-area-inset-bottom, 0));
+    padding: 0 var(--play-board-tray-gap) max(6px, env(safe-area-inset-bottom, 0));
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -56,13 +56,15 @@
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    height: min(calc(100vw - 16px + 28px), calc(var(--app-vh-fill, 100dvh) - 190px));
+    max-height: min(calc(100vw - 16px + 28px), calc(var(--app-vh-fill, 100dvh) - 190px));
     padding: 0;
-    padding-top: 14px;
-    padding-bottom: 14px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     gap: 0;
     align-items: center;
     justify-content: center;
-    flex: 1;
+    flex: 0 1 auto;
     min-height: 0;
     overflow: hidden;
     border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
@@ -76,14 +78,21 @@
     margin-top: var(--play-board-tray-gap);
   }
 
-  .playBody .trayArea .tray {
+  .playBody .trayArea .trayInDock {
     max-width: 100%;
   }
 
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
+    height: clamp(88px, 13vh, 112px);
+    max-height: min(112px, 20vh);
+    min-height: 82px;
+  }
+
   .boardWrapper {
-    width: 100%;
-    max-width: 100%;
-    flex: 1;
+    width: min(100%, calc(var(--app-vh-fill, 100dvh) - 210px));
+    max-width: min(100%, calc(var(--app-vh-fill, 100dvh) - 210px));
+    flex: 0 1 auto;
     min-height: 0;
     max-height: 100%;
     display: flex;
@@ -93,7 +102,7 @@
   }
 
   .boardWrapper .boardProgressFrame {
-    flex: 1;
+    flex: 0 1 auto;
     min-height: 0;
     min-width: 0;
     width: 100%;
@@ -280,7 +289,7 @@
     align-items: stretch;
   }
 
-  .trayAreaSheet .tray,
+  .trayAreaSheet .trayInDock,
   .trayAreaSheet .trayBottomBar {
     pointer-events: auto;
   }
@@ -298,7 +307,7 @@
     background: transparent;
   }
 
-  .trayAreaSheet .tray {
+  .trayAreaSheet .trayInDock {
     width: 100%;
     max-width: 100%;
     align-self: stretch;
@@ -425,7 +434,7 @@
       padding-right: max(var(--play-board-tray-gap, 12px), env(safe-area-inset-right, 0));
     }
 
-    .playBody .trayArea .tray {
+    .playBody .trayArea .trayInDock {
       padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
     }
 
@@ -465,13 +474,14 @@
 
 @media (min-width: 601px) and (max-width: 1024px) and (pointer: coarse) {
   .page {
-    --play-board-tray-width: min(100%, 680px);
-    --play-top-bar-outer-h: calc(64px + env(safe-area-inset-top, 0px));
+    --play-board-tray-width: 100%;
+    --play-top-bar-outer-h: calc(60px + env(safe-area-inset-top, 0px));
   }
 
   .boardLayoutShell {
-    max-width: min(100%, 720px);
-    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    gap: 8px;
   }
 
   .boardLayoutShell .topBarWrap {
@@ -479,10 +489,10 @@
   }
 
   .topBar {
-    min-height: 64px;
+    min-height: 60px;
     max-height: none;
-    padding: calc(8px + env(safe-area-inset-top, 0))
-      max(12px, env(safe-area-inset-right, 0)) 8px max(12px, env(safe-area-inset-left, 0));
+    padding: calc(6px + env(safe-area-inset-top, 0))
+      max(10px, env(safe-area-inset-right, 0)) 6px max(10px, env(safe-area-inset-left, 0));
   }
 
   .topBarInner {
@@ -494,6 +504,62 @@
     gap: 6px;
   }
 
+  .playBody {
+    --play-board-tray-width: 100%;
+    --play-board-tray-gap: 12px;
+    --play-board-stage-size: min(
+      calc(
+        100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 40px
+      ),
+      calc(var(--app-vh-fill, 100dvh) - var(--play-top-bar-outer-h, 60px) - 324px)
+    );
+    padding: 10px 12px 0;
+  }
+
+  .playBody .main {
+    height: calc(var(--play-board-stage-size) + 32px);
+    max-height: calc(var(--play-board-stage-size) + 32px);
+    padding-top: 8px;
+    padding-bottom: 8px;
+    align-items: center;
+  }
+
+  .playBody .trayArea {
+    margin-top: var(--play-board-tray-gap);
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
+  }
+
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
+    height: clamp(96px, 12vh, 128px);
+    max-height: min(128px, 16vh);
+    min-height: 88px;
+  }
+
+  .boardWrapper {
+    width: min(100%, var(--play-board-stage-size));
+    max-width: min(100%, var(--play-board-stage-size));
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .playBody {
+    padding-top: var(--play-replay-header-h, 88px);
+  }
+
+  .boardLayoutShell[data-replay-active="true"] {
+    --play-replay-stage-size: min(
+      calc(
+        100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 40px
+      ),
+      calc(100dvh - 300px)
+    );
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .boardWrapper {
+    width: min(100%, var(--play-replay-stage-size));
+    max-width: min(100%, var(--play-replay-stage-size));
+    max-height: min(100%, var(--play-replay-stage-size));
+  }
+
   .hud {
     gap: 6px;
     flex-wrap: wrap;
@@ -502,7 +568,8 @@
   .hudPill,
   .hudPillTimer,
   .hudMoveCount,
-  .hudPlacedTotal {
+  .hudPlacedTotal,
+  .hudChallengeTarget {
     min-height: 34px;
     font-size: 13px;
     padding: 0 10px;
@@ -525,13 +592,14 @@
 
 @media (min-width: 601px) and (max-width: 1366px) and (pointer: coarse) and (orientation: landscape) {
   .page {
-    --play-board-tray-width: min(100%, 560px);
+    --play-board-tray-width: 100%;
     --play-top-bar-outer-h: calc(60px + env(safe-area-inset-top, 0px));
   }
 
   .boardLayoutShell {
-    max-width: min(100%, 860px);
-    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    gap: 6px;
   }
 
   .boardLayoutShell .topBarWrap {
@@ -557,7 +625,8 @@
   .hudPill,
   .hudPillTimer,
   .hudMoveCount,
-  .hudPlacedTotal {
+  .hudPlacedTotal,
+  .hudChallengeTarget {
     min-height: 32px;
     padding: 0 10px;
     font-size: 13px;
@@ -570,67 +639,112 @@
   }
 }
 
-@media (min-width: 820px) and (max-width: 1224px) and (pointer: coarse) and (orientation: landscape) {
+@media (min-width: 820px) and (max-width: 1366px) and (min-height: 650px) and (pointer: coarse) and (orientation: landscape) {
   .page {
-    --play-board-tray-width: min(100%, 980px);
+    --play-board-tray-width: 100%;
   }
 
   .boardLayoutShell {
-    max-width: min(100%, 980px);
-    gap: 8px;
+    max-width: 100%;
+    gap: 6px;
   }
 
   .playBody {
     --play-board-tray-gap: 14px;
-    --play-tablet-side-tray-w: clamp(248px, 29vw, 320px);
     --play-board-stage-size: min(
-      calc(var(--app-vh-fill, 100dvh) - 148px),
-      calc(100vw - var(--play-tablet-side-tray-w) - 72px)
+      calc(
+        100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 32px
+      ),
+      calc(var(--app-vh-fill, 100dvh) - var(--play-top-bar-outer-h, 60px) - 202px)
     );
-    flex-direction: row;
+    flex-direction: column;
     align-items: stretch;
-    justify-content: center;
-    gap: var(--play-board-tray-gap);
-    padding: 12px 14px 0;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 8px 14px 0;
   }
 
   .playBody .main {
     flex: 0 1 auto;
-    width: min(100%, calc(var(--play-board-stage-size) + 28px));
-    height: auto;
-    max-height: none;
-    padding-top: 0;
-    padding-bottom: 0;
+    width: 100%;
+    height: calc(var(--play-board-stage-size) + 24px);
+    max-height: calc(var(--play-board-stage-size) + 24px);
+    padding-top: 6px;
+    padding-bottom: 6px;
     align-items: center;
-    overflow: visible;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    overflow: hidden;
+    border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
+    border-bottom-right-radius: calc(var(--radius-board, 20px) + 10px);
   }
 
   .playBody .trayArea {
-    width: var(--play-tablet-side-tray-w);
+    width: 100%;
     min-width: 0;
-    margin-top: 0;
-    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+    margin-top: var(--play-board-tray-gap);
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
     border-radius: 18px;
-    align-self: stretch;
-    justify-content: stretch;
   }
 
-  .playBody .trayArea .tray,
-  .playBody .trayArea .tray.trayWrapLarge {
-    flex: 1 1 auto;
-    height: 100%;
-    max-height: none;
-    min-height: 0;
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
+    flex: 0 0 auto;
+    height: clamp(96px, 13vh, 124px);
+    max-height: min(124px, 17vh);
+    min-height: 92px;
   }
 
-  .playBody .trayArea .scrollerWrap {
-    min-height: 0;
+  .boardLayoutShell[data-replay-active="true"] .playBody {
+    padding-top: var(--play-replay-header-h, 82px);
+  }
+
+  .boardLayoutShell[data-replay-active="true"] {
+    --play-replay-stage-size: min(620px, calc(100dvw - 552px), calc(100dvh - 136px));
+  }
+
+  .boardLayoutShell[data-replay-active="true"] .boardWrapper {
+    width: min(100%, var(--play-replay-stage-size));
+    max-width: min(100%, var(--play-replay-stage-size));
+    max-height: min(100%, var(--play-replay-stage-size));
+  }
+}
+
+@media (min-width: 820px) and (max-width: 1366px) and (min-height: 650px) and (max-height: 860px) and (pointer: coarse) and (orientation: landscape) {
+  .playBody {
+    --play-board-tray-gap: 10px;
+    --play-board-stage-size: min(
+      calc(
+        100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 28px
+      ),
+      calc(var(--app-vh-fill, 100dvh) - var(--play-top-bar-outer-h, 60px) - 188px)
+    );
+    padding-top: 8px;
+  }
+
+  .playBody .main {
+    height: calc(var(--play-board-stage-size) + 24px);
+    max-height: calc(var(--play-board-stage-size) + 24px);
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
+    height: clamp(88px, 12vh, 112px);
+    max-height: min(112px, 16vh);
+    min-height: 80px;
   }
 }
 
 @media (max-height: 500px) and (pointer: coarse) {
+  .boardLayoutShell {
+    gap: 6px;
+  }
+
+  .boardLayoutShell .topBarWrap {
+    max-height: 44px;
+    min-height: 44px;
+  }
+
   .topBar {
     height: 44px;
     min-height: 44px;
@@ -639,12 +753,34 @@
   }
 
   .playBody {
+    --play-board-tray-gap: 8px;
+    --play-board-stage-size: min(
+      calc(var(--app-vh-fill, 100dvh) - 210px),
+      calc(100vw - 28px)
+    );
+    padding-top: 4px;
     padding-left: max(var(--play-board-tray-gap, 12px), env(safe-area-inset-left, 0));
     padding-right: max(var(--play-board-tray-gap, 12px), env(safe-area-inset-right, 0));
   }
 
-  .playBody .trayArea .tray {
-    padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
+  .playBody .main {
+    height: calc(var(--play-board-stage-size) + 20px);
+    max-height: calc(var(--play-board-stage-size) + 20px);
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .playBody .trayArea {
+    margin-top: var(--play-board-tray-gap);
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0));
+  }
+
+  .playBody .trayArea .trayInDock,
+  .playBody .trayArea .trayInDock.trayWrapLarge {
+    height: clamp(68px, 18vh, 78px);
+    max-height: min(78px, 22vh);
+    min-height: 68px;
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
   }
 
   .boardLayoutShell[data-replay-active="true"] .topBarWrap {

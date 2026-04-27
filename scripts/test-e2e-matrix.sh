@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-. "$(git rev-parse --show-toplevel)/scripts/playwright-env.sh"
+cd "$(git rev-parse --show-toplevel)"
+. "${PWD}/scripts/playwright-env.sh"
 
 if [ "$#" -gt 0 ]; then
   exec npx playwright test "$@"
@@ -18,8 +19,18 @@ projects=(
 
 maybe_enable_edge_channel
 
+failed_projects=()
+
 for project in "${projects[@]}"; do
   echo
   echo "==> Running Playwright project: ${project}"
-  npx playwright test --project="${project}"
+  if ! npx playwright test --project="${project}"; then
+    failed_projects+=("${project}")
+  fi
 done
+
+if [ "${#failed_projects[@]}" -gt 0 ]; then
+  echo
+  echo "Failed Playwright projects: ${failed_projects[*]}"
+  exit 1
+fi

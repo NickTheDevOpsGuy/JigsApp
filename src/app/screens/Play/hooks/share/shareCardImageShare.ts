@@ -21,6 +21,8 @@ export async function shareOrDownloadCard(args: {
   rotationCount?: number;
   maxGroupSize?: number;
   puzzleName?: string;
+  undoCount?: number;
+  usedHint?: boolean;
 }) {
   const {
     blob,
@@ -33,6 +35,8 @@ export async function shareOrDownloadCard(args: {
     rotationCount,
     maxGroupSize,
     puzzleName,
+    undoCount,
+    usedHint,
   } = args;
   const file = new File([blob], "phuzzle-completion-card.png", {
     type: "image/png",
@@ -48,6 +52,8 @@ export async function shareOrDownloadCard(args: {
           rotationCount,
           maxGroupSize,
           puzzleName,
+          undoCount,
+          usedHint,
         })
       : buildProgressShareMessage({
           elapsedSeconds,
@@ -57,6 +63,8 @@ export async function shareOrDownloadCard(args: {
           moveCount,
           rotationCount,
           puzzleName,
+          undoCount,
+          usedHint,
         });
 
   if (navigator.share && navigator.canShare?.({ files: [file] })) {

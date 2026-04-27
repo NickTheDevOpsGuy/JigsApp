@@ -53,6 +53,7 @@ export class PuzzleManagerState {
   protected rotationStepDeg: 90 | 180;
   protected pieceLockingEnabled = true;
   protected autoRotateOnSnap = true;
+  protected magneticSnapEnabled = false;
   protected pad: number;
   protected tileW: number;
   protected tileH: number;
@@ -306,6 +307,8 @@ export class PuzzleManagerState {
     );
   }
   protected computeSnapPreview(): DragPreview {
+    if (!this.magneticSnapEnabled) return null;
+
     const activeId = this.drag.activeId;
     if (!activeId) return null;
 

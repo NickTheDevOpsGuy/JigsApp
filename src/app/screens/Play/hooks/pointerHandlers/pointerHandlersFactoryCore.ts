@@ -6,7 +6,7 @@ import type React from "react";
 import { pickPieceId } from "@/puzzle/canvas/utils/pickPiece";
 import type { CanvasWithTouch, PointerHandlerFactoryDeps } from "./types";
 import { handleTouchDown, handleTouchMove, resetTouchState } from "./touchHandlers";
-import { handleMouseDown, handleMouseMove } from "./mouseHandlers";
+import { handleMouseDown, handleMouseMove, type HoverProbeState } from "./mouseHandlers";
 import { createPointerEndHandlers } from "./pointerHandlersEnd";
 import { createPointerMoveRafQueue } from "./pointerMoveRafQueue";
 
@@ -41,15 +41,22 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
     if (isCoarse) return 10;
     return 8;
   })();
-  const mouseMoveQueue = createPointerMoveRafQueue((clientX, clientY) => {
+  const hoverProbeState: HoverProbeState = {
+    lastAtMs: 0,
+    lastClientX: Number.NaN,
+    lastClientY: Number.NaN,
+  };
+  const mouseMoveQueue = createPointerMoveRafQueue((clientX, clientY, pointerType) => {
     if (!manager) return;
     handleMouseMove(
       {
         clientX,
         clientY,
+        pointerType,
       } as React.PointerEvent<HTMLCanvasElement>,
       ctx,
       screenToBoard,
+      hoverProbeState,
     );
   });
 
@@ -121,10 +128,9 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
 
     ctx2d.setTransform(1, 0, 0, 1, 0, 0);
     const st = manager.getState();
-    const boardPieces = st.pieces.filter((p) => !p.inTray);
     // Always hit-test board pieces; restricting to assembled bounds can miss pieces
     // moved near board edges and make rotate/drag feel randomly broken.
-    const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY, {
+    const pieceId = pickPieceId(ctx2d, st.pieces, pickX, pickY, {
       // Mobile taps benefit from a larger hit target around irregular piece edges.
       hitSlopPx: e.pointerType === "touch" ? 12 : 2,
     });
@@ -263,7 +269,7 @@ export function createPointerHandlers(deps: PointerHandlerFactoryDeps) {
       return;
     }
 
-    mouseMoveQueue.queue(e.clientX, e.clientY);
+    mouseMoveQueue.queue(e.clientX, e.clientY, e.pointerType);
   }
 
   const {

@@ -11,8 +11,9 @@ import {
   useRef,
 } from "react";
 import type { Piece } from "@/puzzle/core/types";
-import { getAverageColor } from "@/puzzle/core/colorUtils";
+import { createAverageColorSampler } from "@/puzzle/core/colorUtils";
 import type { TrayFilter } from "@/screens/Play/components/hud/TrayFilterButton";
+import { yieldToMainThread } from "@/utils/async";
 
 const NUM_HUE_BUCKETS = 6;
 const HUE_BUCKET_DEG = 360 / NUM_HUE_BUCKETS;
@@ -174,6 +175,8 @@ export function usePieceTrayDisplay(
   const hasAutoSelectedClustersRef = useRef(false);
   /** 0 = filter order only (clean). Greater than 0 = seeded shuffle; user shuffle increments. */
   const [shuffleKey, setShuffleKey] = useState(1);
+  const [hueById, setHueById] = useState<Map<string, number>>(new Map());
+  const [imageLoadCount, setImageLoadCount] = useState(0);
   const prevTrayLenRef = useRef<number | null>(null);
 
   /* Edge priority: at puzzle start show edge pieces first. */
@@ -192,16 +195,6 @@ export function usePieceTrayDisplay(
     prevTrayLenRef.current = n;
   }, [pieces.length]);
 
-  const hueById = useMemo(() => {
-    const m = new Map<string, number>();
-    if (!image) return m;
-    for (const p of pieces) {
-      const c = getAverageColor(image, p, grid);
-      m.set(p.id, c.hue);
-    }
-    return m;
-  }, [image, pieces, grid]);
-
   const trayIdKey = useMemo(
     () =>
       pieces
@@ -210,6 +203,35 @@ export function usePieceTrayDisplay(
         .join(","),
     [pieces],
   );
+
+  useEffect(() => {
+    setHueById(new Map());
+    if (!image || pieces.length === 0) return;
+    if (!image.complete || image.naturalWidth === 0) {
+      const onLoad = () => setImageLoadCount((count) => count + 1);
+      image.addEventListener("load", onLoad);
+      return () => image.removeEventListener("load", onLoad);
+    }
+
+    let cancelled = false;
+    const batchSize = pieces.length >= 64 ? 10 : 16;
+    void (async () => {
+      await yieldToMainThread();
+      const sample = createAverageColorSampler(image, grid);
+      const next = new Map<string, number>();
+      for (let i = 0; i < pieces.length; i++) {
+        if (cancelled) return;
+        const piece = pieces[i];
+        next.set(piece.id, sample(piece).hue);
+        if ((i + 1) % batchSize === 0) await yieldToMainThread();
+      }
+      if (!cancelled) setHueById(next);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [image, imageLoadCount, pieces, grid.rows, grid.cols, trayIdKey]);
 
   const displayed = useMemo(() => {
     const result = sortTrayPiecesForFilter(pieces, grid, filter, {

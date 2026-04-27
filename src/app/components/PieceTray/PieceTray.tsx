@@ -53,7 +53,9 @@ export const PieceTray = forwardRef<HTMLDivElement, Props>(function PieceTray(
   { pieces, image, grid, onPieceClick, onTrayPieceHover, highlightedPieceIds, className },
   ref,
 ) {
-  const isMobile = useMediaQuery("(max-width: 600px)");
+  const isMobile = useMediaQuery(
+    "(max-width: 600px), ((max-height: 500px) and (pointer: coarse))",
+  );
   const isCoarsePointer = useMediaQuery("(pointer: coarse)");
   const [previewPieceId, setPreviewPieceId] = React.useState<string | null>(null);
   const longPressTimerRef = React.useRef<number | null>(null);

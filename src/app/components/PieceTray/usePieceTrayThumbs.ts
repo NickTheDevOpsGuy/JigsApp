@@ -8,7 +8,7 @@ import type { Piece } from "@/puzzle/core/types";
 import { renderTrayPiece } from "@/puzzle/canvas/render/renderTrayPiece";
 import { canvasToObjectUrl, revokeObjectUrls, yieldToMainThread } from "@/utils/async";
 
-const BATCH_SIZE = 12;
+const BATCH_SIZE = 8;
 
 /** Stable key: only changes when tray piece set or their rotations change. */
 function trayVisualKey(displayed: Piece[]): string {
@@ -74,59 +74,35 @@ export function usePieceTrayThumbs(
       }
     };
 
-    if (displayed.length < 60) {
-      let cancelled = false;
-      void (async () => {
-        await yieldToMainThread();
-        const entries = await Promise.all(
-          displayed.map(async (p) => [p.id, await renderOne(p)] as const),
-        );
-        const next = new Map<string, string>();
-        for (const [id, url] of entries) {
-          if (url) next.set(id, url);
-        }
-        if (cancelled) {
-          revokeObjectUrls(next.values());
-          return;
-        }
-        revokeObjectUrls(urlsRef.current.values());
-        urlsRef.current = next;
-        setThumbsById(next);
-      })();
-      return () => {
-        cancelled = true;
-      };
-      return;
-    }
-
     revokeObjectUrls(urlsRef.current.values());
     urlsRef.current = new Map();
     setThumbsById(new Map());
     let cancelled = false;
     let index = 0;
+    const batchSize = displayed.length >= 64 ? BATCH_SIZE : 12;
 
     const processBatch = async () => {
       if (cancelled) return;
       const current = displayedRef.current;
-      const next = new Map<string, string>();
-      const end = Math.min(index + BATCH_SIZE, current.length);
+      const nextEntries: Array<readonly [string, string]> = [];
+      const end = Math.min(index + batchSize, current.length);
       await yieldToMainThread();
       for (let i = index; i < end; i++) {
         const p = current[i];
         const data = await renderOne(p);
-        if (data) next.set(p.id, data);
+        if (data) nextEntries.push([p.id, data]);
       }
       if (cancelled) {
-        revokeObjectUrls(next.values());
+        revokeObjectUrls(nextEntries.map(([, url]) => url));
         return;
       }
       setThumbsById((prev) => {
         const merged = new Map(prev);
-        next.forEach((v, k) => merged.set(k, v));
+        for (const [id, url] of nextEntries) merged.set(id, url);
         urlsRef.current = merged;
         return merged;
       });
-      index += BATCH_SIZE;
+      index += batchSize;
       if (index < displayedRef.current.length) {
         requestAnimationFrame(() => {
           void processBatch();

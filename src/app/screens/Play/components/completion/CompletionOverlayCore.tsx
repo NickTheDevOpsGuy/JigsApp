@@ -9,8 +9,10 @@ import { AppModal } from "@/components/AppModal";
 import { useCompletionOverlayData } from "@/screens/Play/components/completion/useCompletionOverlayData";
 import { CompletionOverlayActions } from "@/screens/Play/components/completion/CompletionOverlayActions";
 import { CompletionOverlayStats } from "@/screens/Play/components/completion/CompletionOverlayStats";
+import { DailyResultCard } from "@/screens/Play/components/completion/DailyResultCard";
 import { pickCompletionPhrase } from "@/screens/Play/components/completion/completionOverlayPhrases";
 import type { CompletionOverlayProps } from "@/screens/Play/components/completion/completionOverlayTypes";
+import { buildNextGoal } from "@/screens/Play/core/retention/playRetention";
 import { ACHIEVEMENT_DEFS } from "@/data/content/achievements";
 import { BORDER_FRAME_XP_BONUS } from "@/services/player/statsService";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -60,6 +62,8 @@ export function CompletionOverlay({
   onNewBest,
   boardAnchorRef,
   borderFrameBonus = false,
+  challengeTarget = null,
+  isPackPuzzle = false,
 }: CompletionOverlayProps) {
   const [phase, setPhase] = useState<1 | 2 | 3>(1);
   const [imageError, setImageError] = useState(false);
@@ -141,6 +145,16 @@ export function CompletionOverlay({
     [elapsedSeconds, moveCount, undoCount],
   );
   const modalBoardAnchorRef = useCompactMobileWinLayout ? undefined : boardAnchorRef;
+  const nextGoal = buildNextGoal({
+    isDaily,
+    isPackPuzzle,
+    dailyStreak: completionData.dailyStreak,
+    puzzlesCompleted: completionData.puzzlesCompleted,
+    pieceCount,
+    elapsedSeconds,
+    moveCount,
+    challengeTarget,
+  });
 
   return (
     <AppModal
@@ -237,6 +251,35 @@ export function CompletionOverlay({
             </p>
           )}
         </div>
+
+        {isDaily && phase >= 2 && (
+          <div className={styles.completeDailyResultWrap}>
+            <DailyResultCard
+              elapsedSeconds={elapsedSeconds}
+              moveCount={moveCount}
+              undoCount={undoCount}
+              usedHint={usedHint}
+              grid={grid}
+              dailyStreak={completionData.dailyStreak}
+              canNativeShare={
+                typeof navigator !== "undefined" && typeof navigator.share === "function"
+              }
+              onShare={completionData.handleNativeDailyShare}
+            />
+          </div>
+        )}
+
+        {phase >= 2 && (
+          <div
+            className={styles.completeNextGoal}
+            data-tone={nextGoal.tone}
+            aria-label="Next goal"
+          >
+            <span className={styles.completeNextGoalEyebrow}>{nextGoal.eyebrow}</span>
+            <strong className={styles.completeNextGoalTitle}>{nextGoal.title}</strong>
+            <span className={styles.completeNextGoalBody}>{nextGoal.body}</span>
+          </div>
+        )}
 
         <CompletionOverlayActions
           onShareProgress={onShareProgress}

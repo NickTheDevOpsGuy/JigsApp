@@ -35,6 +35,7 @@ describe("PuzzleManager", () => {
 
   it("exposes board magnet preview when a dragged piece nears its target", () => {
     const manager = createManager();
+    manager.setMagneticSnapEnabled(true);
     const piece = manager.getState().pieces[0];
     manager.movePieceFromTray(piece.id);
     let moved = manager.getState().pieces.find((p) => p.id === piece.id)!;

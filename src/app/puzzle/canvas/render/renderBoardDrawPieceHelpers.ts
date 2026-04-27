@@ -37,7 +37,10 @@ export function drawSilhouetteShadow(
   path: Path2D,
   isDragging: boolean,
   isPlaced: boolean,
+  options: { reducedQuality?: boolean } = {},
 ): void {
+  if (options.reducedQuality && !isDragging) return;
+
   ctx.save();
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
@@ -188,6 +191,7 @@ export function drawCachedPiece(
   snapPulseAlpha: number = 1,
   /** When set, draw idle hint pulse (piece-local path space). */
   idleCorrectPulseNowMs?: number,
+  reducedQuality: boolean = false,
 ): void {
   ctx.save();
   let cx = p.x + p.w / 2 + shakeX;
@@ -207,7 +211,7 @@ export function drawCachedPiece(
 
   ctx.save();
   toPieceSpace(ctx, cacheW, cacheH, p);
-  drawSilhouetteShadow(ctx, path, isDragging, p.isPlaced);
+  drawSilhouetteShadow(ctx, path, isDragging, p.isPlaced, { reducedQuality });
   ctx.restore();
 
   if (snapPulseAlpha < 1) ctx.save();

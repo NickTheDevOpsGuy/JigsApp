@@ -40,6 +40,7 @@ export type AnimationState = {
   /** Wrong rotation near home (board context); pairs with soft reject glow. */
   snapRejectPreview?: { proximity: number } | null;
   snapGlowEnabled?: boolean;
+  reducedQuality?: boolean;
   showAlignmentGrid?: boolean;
   /** Fog modifier: alpha for unplaced pieces (0 = clear, 0.5 = foggy). Placed pieces stay clear. */
   fogAlphaForUnplaced?: number;

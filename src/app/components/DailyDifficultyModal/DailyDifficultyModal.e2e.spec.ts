@@ -22,6 +22,30 @@ test.describe("Today's Puzzle modal", () => {
     await expect(page.getByRole("button", { name: /easy/i })).toBeVisible({
       timeout: 10000,
     });
+    await expect(page.getByRole("region", { name: /daily archive/i })).toBeVisible();
+  });
+
+  test("starts an archived daily without marking it as today's streak daily", async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.goto("/");
+    await dismissWhatsNewModalIfOpen(page);
+    await page.getByRole("button", { name: /today's puzzle/i }).click();
+
+    const archived = page.getByRole("button", { name: /play archived daily/i }).first();
+    await expect(archived).toBeVisible({ timeout: 15000 });
+    await archived.click();
+
+    await expect(page).toHaveURL(/\/play/, { timeout: 15000 });
+    await expect(
+      page.getByRole("status", { name: /pieces placed/i }).first(),
+    ).toBeVisible({
+      timeout: 15000,
+    });
+    await expect
+      .poll(async () => page.evaluate(() => localStorage.getItem("phuzzle:dailyDate")))
+      .toBeNull();
   });
 
   test("shows all difficulty levels including Extreme", async ({ page }) => {

@@ -69,6 +69,20 @@
   flex-shrink: 0;
 }
 
+.hudChallengeTarget {
+  composes: hudPill;
+  border-color: color-mix(in srgb, var(--color-brand-primary) 42%, var(--color-border));
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, var(--color-bg-card));
+  color: var(--color-text-primary);
+  max-width: min(220px, 32vw);
+}
+
+.hudChallengeTargetText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .hudPillProgress {
   min-width: 0;
 }

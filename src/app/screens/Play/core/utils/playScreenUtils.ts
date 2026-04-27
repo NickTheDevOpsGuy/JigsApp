@@ -12,6 +12,8 @@ export const PIECE_LOCKING_KEY = "phuzzle:pieceLocking";
 export const PIECE_LOCKING_EXPLICIT_KEY = "phuzzle:pieceLockingExplicit";
 export const AUTO_ROTATE_ON_SNAP_KEY = "phuzzle:autoRotateOnSnap";
 export const MAGNETIC_SNAP_KEY = "phuzzle:magneticSnap";
+export const MAGNETIC_SNAP_DEFAULT_OFF_MIGRATION_KEY =
+  "phuzzle:magneticSnapDefaultOffMigrated";
 export const SNAP_GLOW_KEY = "phuzzle:snapGlow";
 export const GHOST_HINT_KEY = "phuzzle:ghostHint";
 export const IMMERSIVE_MODE_KEY = "phuzzle:immersiveMode";

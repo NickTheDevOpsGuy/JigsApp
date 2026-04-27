@@ -134,14 +134,13 @@
   }
 
   .header {
-    padding: 6px 8px 8px;
+    padding: 4px 8px 4px;
     gap: 4px;
     font-size: 12px;
   }
 
   .quickFilters {
-    padding: 0 8px 6px;
-    gap: 5px;
+    display: none;
   }
 
   .quickFilterBtn {
@@ -176,7 +175,7 @@
   }
 
   .scroller {
-    padding: 6px 4px 6px;
+    padding: 2px 4px;
     gap: 4px;
   }
 
@@ -190,19 +189,122 @@
   }
 
   .trayCompact .scroller {
-    padding: 6px 4px 6px;
+    padding: 2px 4px;
   }
 
   .trayExtraCompact .scroller {
-    padding: 6px 4px 6px;
+    padding: 2px 4px;
   }
 
   .scrollIndicator {
-    margin: 0 6px 6px;
-    height: 3px;
+    display: none;
   }
 
   .scrollerWrap {
-    padding: 6px 4px 8px;
+    padding: 2px 4px 6px;
+  }
+
+  .pieceButton,
+  .blankSlot {
+    min-width: 52px;
+    min-height: 52px;
+    padding: 2px;
+  }
+}
+
+@media (max-height: 500px) and (pointer: coarse) {
+  .headerBlock {
+    gap: 4px;
+  }
+
+  .header {
+    padding: 3px 8px 3px;
+    gap: 4px;
+    font-size: 12px;
+  }
+
+  .title {
+    font-size: 12px;
+  }
+
+  .quickFilters {
+    display: none;
+  }
+
+  .quickFilterBtn {
+    min-height: 30px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .randomBtn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 4px;
+  }
+
+  .scrollIndicator {
+    display: none;
+  }
+
+  .scrollerWrap {
+    min-height: 42px;
+    padding: 2px 4px 4px;
+  }
+
+  .scroller,
+  .trayCompact .scroller,
+  .trayExtraCompact .scroller {
+    padding: 2px 4px;
+  }
+
+  .scrollBtn {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .trayCompact .thumbWrap {
+    width: 42px;
+    height: 42px;
+  }
+
+  .trayCompact .pieceButton,
+  .trayCompact .blankSlot {
+    min-width: 46px;
+    min-height: 46px;
+  }
+}
+
+@media (min-width: 820px) and (max-width: 1366px) and (min-height: 650px) and (max-height: 860px) and (pointer: coarse) and (orientation: landscape) {
+  .header {
+    padding: 5px 10px;
+    gap: 6px;
+  }
+
+  .quickFilters,
+  .scrollIndicator {
+    display: none;
+  }
+
+  .scrollerWrap {
+    min-height: 62px;
+    padding: 4px 8px 6px;
+  }
+
+  .scroller,
+  .trayCompact .scroller,
+  .trayExtraCompact .scroller {
+    padding: 4px 8px;
+  }
+
+  .trayCompact .thumbWrap {
+    width: 52px;
+    height: 52px;
+  }
+
+  .trayCompact .pieceButton,
+  .trayCompact .blankSlot {
+    min-width: 56px;
+    min-height: 56px;
   }
 }

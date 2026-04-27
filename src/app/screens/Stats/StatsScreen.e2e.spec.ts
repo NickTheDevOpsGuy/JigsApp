@@ -81,4 +81,55 @@ test.describe("Packs and Stats", () => {
     ).toBeVisible({ timeout: 10000 });
     await expect(page.getByTestId("stats-card-content")).toBeVisible({ timeout: 10000 });
   });
+
+  test("Stats dense mobile sections stay horizontal and inside the viewport", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/stats?tab=achievements");
+
+    const connectMessage = page.getByText(/connect supabase/i);
+    const badgesTab = page.getByRole("tab", { name: /badges/i });
+    await expect(badgesTab.or(connectMessage).first()).toBeVisible({ timeout: 10000 });
+    if (await connectMessage.isVisible()) {
+      test.skip(true, "Supabase is not configured in this environment");
+    }
+
+    await badgesTab.click();
+
+    const badgeRail = page.locator('[class*="achievements"]').first();
+    await expect(badgeRail).toBeVisible({ timeout: 10000 });
+    const badgeRailLayout = await badgeRail.evaluate((node) => {
+      const el = node as HTMLElement;
+      const style = window.getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return {
+        flexDirection: style.flexDirection,
+        overflowX: style.overflowX,
+        right: rect.right,
+        viewportWidth: window.innerWidth,
+      };
+    });
+    expect(badgeRailLayout.flexDirection).toBe("row");
+    expect(["auto", "scroll", "hidden"]).toContain(badgeRailLayout.overflowX);
+    expect(badgeRailLayout.right).toBeLessThanOrEqual(badgeRailLayout.viewportWidth + 1);
+
+    await page.getByRole("tab", { name: /board leaderboard/i }).click();
+    const boardModeRail = page.locator('[class*="boardModeSwitch"]').first();
+    await expect(boardModeRail).toBeVisible({ timeout: 10000 });
+    const boardModeLayout = await boardModeRail.evaluate((node) => {
+      const el = node as HTMLElement;
+      const style = window.getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return {
+        flexWrap: style.flexWrap,
+        overflowX: style.overflowX,
+        right: rect.right,
+        viewportWidth: window.innerWidth,
+      };
+    });
+    expect(boardModeLayout.flexWrap).toBe("nowrap");
+    expect(["auto", "scroll", "hidden"]).toContain(boardModeLayout.overflowX);
+    expect(boardModeLayout.right).toBeLessThanOrEqual(boardModeLayout.viewportWidth + 1);
+  });
 });

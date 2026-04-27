@@ -22,6 +22,7 @@ export function buildHudProps(args: BuildHudPropsArgs) {
     lives,
     setIsPaused,
     zenModeEnabled,
+    challengeTargetLabel,
   } = args;
   const movesPerMin = (state?.placedCount ?? 0) / Math.max(0.1, elapsedSeconds / 60);
   const uiTone =
@@ -55,6 +56,7 @@ export function buildHudProps(args: BuildHudPropsArgs) {
     onTogglePause: () => setIsPaused((p) => !p),
     zenModeEnabled,
     uiTone,
+    challengeTargetLabel,
   };
 }
 

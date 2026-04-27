@@ -9,6 +9,15 @@ import type { PointerHandlersContext } from "./types";
 import { autoScrollTrayAtPointer, finishDragWithTrayCheck } from "./shared";
 import { dragLog } from "./dragLog";
 
+export type HoverProbeState = {
+  lastAtMs: number;
+  lastClientX: number;
+  lastClientY: number;
+};
+
+const HOVER_PROBE_MIN_MS = 55;
+const HOVER_PROBE_MIN_MOVE_PX = 4;
+
 export function handleMouseDown(
   e: React.PointerEvent<HTMLCanvasElement>,
   ctx: PointerHandlersContext,
@@ -77,6 +86,7 @@ export function handleMouseMove(
   e: React.PointerEvent<HTMLCanvasElement>,
   ctx: PointerHandlersContext,
   screenToBoard?: ScreenToBoard,
+  hoverProbeState?: HoverProbeState,
 ): void {
   const {
     manager,
@@ -100,6 +110,21 @@ export function handleMouseMove(
     screenToBoard &&
     !skipMouseLikeHoverProbe
   ) {
+    if (hoverProbeState) {
+      const now = performance.now();
+      const dx = e.clientX - hoverProbeState.lastClientX;
+      const dy = e.clientY - hoverProbeState.lastClientY;
+      const moved = Math.hypot(dx, dy);
+      if (
+        now - hoverProbeState.lastAtMs < HOVER_PROBE_MIN_MS &&
+        moved < HOVER_PROBE_MIN_MOVE_PX
+      ) {
+        return;
+      }
+      hoverProbeState.lastAtMs = now;
+      hoverProbeState.lastClientX = e.clientX;
+      hoverProbeState.lastClientY = e.clientY;
+    }
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx2d = canvas.getContext("2d");
@@ -108,8 +133,9 @@ export function handleMouseMove(
         const { x: pickX, y: pickY } = screenToBoard(e.clientX, e.clientY, boardRect);
         ctx2d.setTransform(1, 0, 0, 1, 0, 0);
         const st = manager.getState();
-        const boardPieces = st.pieces.filter((p) => !p.inTray);
-        const pieceId = pickPieceId(ctx2d, boardPieces, pickX, pickY, { hitSlopPx: 2 });
+        const pieceId = pickPieceId(ctx2d, st.pieces, pickX, pickY, {
+          hitSlopPx: 2,
+        });
         hoverPreviewPieceIdRef.current = pieceId ?? null;
       }
     }

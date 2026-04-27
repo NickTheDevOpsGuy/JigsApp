@@ -196,7 +196,8 @@ export function CompletionOverlayActions(args: {
     });
   };
 
-  const hasGameActions = Boolean(onNextPuzzle || (canReplay && onReplayClick));
+  const hasPrimaryNext = Boolean(onNextPuzzle);
+  const hasGameActions = Boolean(canReplay && onReplayClick);
   const hasShareOptions = Boolean(
     onShareChallenge || onCopyChallenge || onShareProgress || onCopyProgress,
   );
@@ -227,23 +228,6 @@ export function CompletionOverlayActions(args: {
         }
         role="menu"
       >
-        {onNextPuzzle && (
-          <button
-            type="button"
-            role="menuitem"
-            className={styles.completeMenuItem}
-            onClick={() => {
-              setMenuOpen(false);
-              onNextPuzzle();
-            }}
-            aria-label={isMobileActions ? "Next puzzle" : nextPuzzleLabel}
-            title={nextPuzzleLabel}
-          >
-            <ImagePlus size={18} aria-hidden />
-            {isMobileActions ? "Next puzzle" : nextPuzzleLabel}
-          </button>
-        )}
-
         {canReplay && onReplayClick && (
           <button
             type="button"
@@ -362,55 +346,70 @@ export function CompletionOverlayActions(args: {
       document.body,
     );
 
-  if (!hasAnyOptions) {
+  if (!hasAnyOptions && !hasPrimaryNext) {
     return <section className={styles.completeActionsPhased} aria-label="Actions" />;
   }
 
   return (
     <section className={styles.completeActionsPhased} aria-label="Actions">
-      <div className={styles.completeMenusRow}>
-        <div className={styles.completeMenuWrap} ref={menuWrapRef}>
-          <button
-            ref={(el) => {
-              triggerRef.current = el;
-              if (args.focusReturnRef) {
-                (
-                  args.focusReturnRef as React.MutableRefObject<HTMLButtonElement | null>
-                ).current = el;
-              }
-            }}
-            type="button"
-            className={styles.completeOptionsTrigger}
-            onClick={(e) => {
-              const nextOpen = !menuOpen;
-              if (nextOpen) {
-                measureMenuPlacement(e.currentTarget);
-              } else {
-                setMenuPlacement(null);
-              }
-              setMenuOpen(nextOpen);
-            }}
-            aria-expanded={menuOpen}
-            aria-haspopup="menu"
-            aria-label="Options: next puzzle, replay, share"
-            title="Options"
-          >
-            <span className={styles.completeOptionsTriggerSpacer} aria-hidden />
-            <span className={styles.completeOptionsTriggerCopy}>
-              <span className={styles.completeOptionsTriggerLabel}>Options</span>
-              <span className={styles.completeOptionsTriggerHint}>
-                Replay, share, or jump into another puzzle
+      {onNextPuzzle && (
+        <button
+          type="button"
+          className={styles.completePrimaryBtn}
+          onClick={onNextPuzzle}
+          aria-label={nextPuzzleLabel}
+          title={nextPuzzleLabel}
+        >
+          <ImagePlus size={18} aria-hidden />
+          {nextPuzzleLabel}
+        </button>
+      )}
+
+      {hasAnyOptions && (
+        <div className={styles.completeMenusRow}>
+          <div className={styles.completeMenuWrap} ref={menuWrapRef}>
+            <button
+              ref={(el) => {
+                triggerRef.current = el;
+                if (args.focusReturnRef) {
+                  (
+                    args.focusReturnRef as React.MutableRefObject<HTMLButtonElement | null>
+                  ).current = el;
+                }
+              }}
+              type="button"
+              className={styles.completeOptionsTrigger}
+              onClick={(e) => {
+                const nextOpen = !menuOpen;
+                if (nextOpen) {
+                  measureMenuPlacement(e.currentTarget);
+                } else {
+                  setMenuPlacement(null);
+                }
+                setMenuOpen(nextOpen);
+              }}
+              aria-expanded={menuOpen}
+              aria-haspopup="menu"
+              aria-label="Options: replay and share"
+              title="Options"
+            >
+              <span className={styles.completeOptionsTriggerSpacer} aria-hidden />
+              <span className={styles.completeOptionsTriggerCopy}>
+                <span className={styles.completeOptionsTriggerLabel}>Options</span>
+                <span className={styles.completeOptionsTriggerHint}>
+                  Replay, share, or challenge a friend
+                </span>
               </span>
-            </span>
-            <span className={styles.completeOptionsTriggerChevronWrap} aria-hidden>
-              <ChevronDown
-                size={18}
-                className={menuOpen ? styles.completeMenuChevronOpen : ""}
-              />
-            </span>
-          </button>
+              <span className={styles.completeOptionsTriggerChevronWrap} aria-hidden>
+                <ChevronDown
+                  size={18}
+                  className={menuOpen ? styles.completeMenuChevronOpen : ""}
+                />
+              </span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {optionsMenuPortal}
     </section>

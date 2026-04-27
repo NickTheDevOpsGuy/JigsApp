@@ -72,6 +72,11 @@ export function buildCompletionProps(args: {
   borderFrameBonus: boolean;
   /** Elapsed seconds when each board quarter was fully completed (for area-pace summary). */
   quadrantTimes?: Record<0 | 1 | 2 | 3, number | null>;
+  challengeTarget?: {
+    elapsedSeconds: number;
+    moveCount: number | null;
+  } | null;
+  isPackPuzzle?: boolean;
 }): CompletionProps {
   const {
     showCompletionOverlay,
@@ -103,6 +108,8 @@ export function buildCompletionProps(args: {
     boardAnchorRef,
     borderFrameBonus,
     quadrantTimes,
+    challengeTarget,
+    isPackPuzzle,
   } = args;
 
   const focusReturnRefProp = focusReturnRef != null ? { focusReturnRef } : undefined;
@@ -143,6 +150,8 @@ export function buildCompletionProps(args: {
     ...boardAnchorRefProp,
     borderFrameBonus,
     ...(quadrantTimes != null ? { quadrantTimes } : {}),
+    ...(challengeTarget != null ? { challengeTarget } : {}),
+    isPackPuzzle,
   };
 }
 
@@ -153,8 +162,8 @@ export function buildReplayPortalProps(args: {
   onPause: () => void;
   onRewind: () => void;
   onFastForward: () => void;
-  onSkipBack15: () => void;
-  onSkipForward15: () => void;
+  onSkipBack5: () => void;
+  onSkipForward5: () => void;
   speed: number;
   onSpeedChange: (speed: number) => void;
   currentIndex: number;
@@ -173,8 +182,8 @@ export function buildReplayPortalProps(args: {
     onPause,
     onRewind,
     onFastForward,
-    onSkipBack15,
-    onSkipForward15,
+    onSkipBack5,
+    onSkipForward5,
     speed,
     onSpeedChange,
     currentIndex,
@@ -195,8 +204,8 @@ export function buildReplayPortalProps(args: {
     onPause,
     onRewind,
     onFastForward,
-    onSkipBack15,
-    onSkipForward15,
+    onSkipBack5,
+    onSkipForward5,
     speed,
     onSpeedChange,
     currentIndex,

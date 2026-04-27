@@ -57,6 +57,14 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("list")).toBeVisible({ timeout: 5000 });
   });
 
+  test("challenge link shows the target while playing", async ({ page }) => {
+    await gotoPlay(page, "/play?ct=42&cm=17");
+
+    await expect(
+      page.getByRole("status", { name: /challenge target: beat 0:42 \/ 17 moves/i }),
+    ).toBeVisible({ timeout: 15000 });
+  });
+
   test("completion overlay shows expected UI when visible", async ({ page }) => {
     test.setTimeout(60000);
     await gotoPlay(page, "/play?e2eCompletion=1");
@@ -77,6 +85,17 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible({
       timeout: 10000,
     });
+  });
+
+  test("challenge completion calls out a won challenge", async ({ page }) => {
+    test.setTimeout(60000);
+    await gotoPlay(page, "/play?e2eCompletion=1&ct=999&cm=999");
+
+    await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
+      timeout: 20000,
+    });
+    await expect(page.getByText(/challenge won/i)).toBeVisible();
+    await expect(page.getByText(/send the win back/i)).toBeVisible();
   });
 
   test("completion overlay fits on mobile without body scroll", async ({ page }) => {
@@ -359,10 +378,7 @@ test.describe("Play screen", () => {
       timeout: 20000,
     });
 
-    await page
-      .getByRole("button", { name: /options: next puzzle, replay, share/i })
-      .click();
-    await page.getByRole("menuitem", { name: /new puzzle/i }).click();
+    await page.getByRole("button", { name: /new puzzle/i }).click();
 
     await expect(page.getByRole("dialog", { name: /choose category/i })).toBeVisible({
       timeout: 15000,
@@ -445,7 +461,7 @@ test.describe("Play screen tablet touch", () => {
     ).toBeLessThanOrEqual(2);
   });
 
-  test("tablet landscape keeps the tray dock beside the board without clipping", async ({
+  test("tablet landscape keeps the tray dock below the board without clipping", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1024, height: 768 });
@@ -460,8 +476,8 @@ test.describe("Play screen tablet touch", () => {
     const trayBox = await tray.boundingBox();
     expect(liveBoardBox).not.toBeNull();
     expect(trayBox).not.toBeNull();
-    expect(trayBox?.x ?? 0).toBeGreaterThan(
-      (liveBoardBox?.x ?? 0) + (liveBoardBox?.width ?? 0) - 40,
+    expect(trayBox?.y ?? 0).toBeGreaterThanOrEqual(
+      (liveBoardBox?.y ?? 0) + (liveBoardBox?.height ?? 0) - 2,
     );
     expect((trayBox?.y ?? 0) + (trayBox?.height ?? 0)).toBeLessThanOrEqual(768);
   });
@@ -479,10 +495,15 @@ test.describe("Play screen tablet touch", () => {
     await expect(tray).toBeVisible();
 
     const landscapeBoardBox = await liveBoard.boundingBox();
+    const landscapeTrayBox = await tray.boundingBox();
     expect(landscapeBoardBox).not.toBeNull();
+    expect(landscapeTrayBox).not.toBeNull();
     expect(
       Math.abs((landscapeBoardBox?.width ?? 0) - (landscapeBoardBox?.height ?? 0)),
     ).toBeLessThanOrEqual(2);
+    expect(landscapeTrayBox?.y ?? 0).toBeGreaterThanOrEqual(
+      (landscapeBoardBox?.y ?? 0) + (landscapeBoardBox?.height ?? 0) - 2,
+    );
 
     await page.setViewportSize({ width: 768, height: 1024 });
     await expect(liveBoard).toBeVisible();
@@ -517,6 +538,28 @@ test.describe("Play screen landscape phone", () => {
     await expect(dialog).toBeVisible({ timeout: 20000 });
     await expect(dialog).toBeInViewport();
     await expect(page.getByRole("button", { name: /options/i })).toBeInViewport();
+  });
+
+  test("landscape gameplay keeps board usable and tray below", async ({ page }) => {
+    await page.goto("/play");
+
+    const liveBoard = page.getByTestId("play-board");
+    const tray = page.getByRole("list");
+    await expect(liveBoard).toBeVisible({ timeout: 15000 });
+    await expect(tray).toBeVisible({ timeout: 5000 });
+
+    const liveBoardBox = await liveBoard.boundingBox();
+    const trayBox = await tray.boundingBox();
+    expect(liveBoardBox).not.toBeNull();
+    expect(trayBox).not.toBeNull();
+    expect(liveBoardBox?.width ?? 0).toBeGreaterThanOrEqual(160);
+    expect(
+      Math.abs((liveBoardBox?.width ?? 0) - (liveBoardBox?.height ?? 0)),
+    ).toBeLessThanOrEqual(2);
+    expect(trayBox?.y ?? 0).toBeGreaterThanOrEqual(
+      (liveBoardBox?.y ?? 0) + (liveBoardBox?.height ?? 0) - 2,
+    );
+    expect((trayBox?.y ?? 0) + (trayBox?.height ?? 0)).toBeLessThanOrEqual(392);
   });
 
   test("landscape replay keeps controls visible", async ({ page }) => {

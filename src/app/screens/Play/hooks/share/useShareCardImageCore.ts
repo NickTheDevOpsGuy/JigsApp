@@ -27,6 +27,8 @@ export type ShareCardArgs = {
   puzzleShareUrl?: string;
   pieceCount: number;
   puzzleName?: string;
+  undoCount?: number;
+  usedHint?: boolean;
   /** Challenge = stats + CTA + URL; result = same card without CTA. */
   mode?: "challenge" | "result";
 };
@@ -230,6 +232,8 @@ export async function generateAndShareCard(args: ShareCardArgs): Promise<boolean
     rotationCount: args.rotationCount,
     maxGroupSize: args.maxGroupSize,
     puzzleName: args.puzzleName,
+    undoCount: args.undoCount,
+    usedHint: args.usedHint,
   });
   return true;
 }

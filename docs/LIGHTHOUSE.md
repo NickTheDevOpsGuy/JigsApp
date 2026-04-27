@@ -110,6 +110,8 @@ The app has a **skip link** (“Skip to main content”) that is hidden until fo
 - Added explicit page `meta description`
 - Added `color-scheme` metadata for light/dark aware browser UI
 - Removed the runtime Google Fonts dependency in favor of local/system font stacks
+- Added Workbox runtime caches for same-origin puzzle images and fonts so repeat play starts from warm browser storage.
+- Added short-lived deployment cache headers for public icons, social images, and generated manifests while keeping HTML and the service worker fresh.
 - Added stable local scripts so Lighthouse can be run without remembering raw `lhci` commands
 - Ignored Lighthouse output folders in ESLint so lint stays reliable after audits
 - Added a repo image-audit script so oversized puzzle and social assets are easy to spot before shipping

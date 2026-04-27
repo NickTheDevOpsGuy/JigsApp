@@ -25,6 +25,7 @@ export function usePlayScreenManager(
   grid: { rows: number; cols: number },
   pieceLockingEnabled: boolean,
   autoRotateOnSnap: boolean,
+  magneticSnapEnabled: boolean,
   timeMode: TimeMode,
   countdownMinutes: number,
   lastInteractionRef: MutableRefObject<number>,
@@ -210,6 +211,7 @@ export function usePlayScreenManager(
 
         next.setPieceLockingEnabled(pieceLockingEnabled);
         next.setAutoRotateOnSnap(autoRotateOnSnap);
+        next.setMagneticSnapEnabled(magneticSnapEnabled);
         didRunRef.current = true;
         ro.disconnect();
         clearTimeout(fallbackId);
@@ -289,6 +291,7 @@ export function usePlayScreenManager(
     grid,
     pieceLockingEnabled,
     autoRotateOnSnap,
+    magneticSnapEnabled,
     timeMode,
     countdownMinutes,
     lastInteractionRef,
@@ -304,6 +307,10 @@ export function usePlayScreenManager(
   useEffect(() => {
     manager?.setAutoRotateOnSnap(autoRotateOnSnap);
   }, [manager, autoRotateOnSnap]);
+
+  useEffect(() => {
+    manager?.setMagneticSnapEnabled(magneticSnapEnabled);
+  }, [manager, magneticSnapEnabled]);
 
   useManagerBoardResize(boardRef, manager, setState);
 

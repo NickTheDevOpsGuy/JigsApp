@@ -23,6 +23,29 @@ export function PlayConfirmModals({
 }: PlayConfirmModalsProps) {
   const navigate = useNavigate();
 
+  const handleClearCache = () => {
+    clearPuzzleState();
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < safeLocalStorage.length; i++) {
+      const k = safeLocalStorage.key(i);
+      if (
+        k?.startsWith("phuzzle:viewport:") ||
+        k === "phuzzle:puzzleState" ||
+        k === "phuzzle:puzzleStateBackup"
+      )
+        keysToRemove.push(k);
+    }
+    keysToRemove.forEach((k) => safeLocalStorage.removeItem(k));
+    setShowClearCacheConfirm(false);
+
+    void (async () => {
+      if (typeof window !== "undefined" && "caches" in window) {
+        const cacheNames = await window.caches.keys();
+        await Promise.all(cacheNames.map((name) => window.caches.delete(name)));
+      }
+    })().finally(() => navigate("/"));
+  };
+
   return (
     <>
       <ConfirmModal
@@ -47,24 +70,9 @@ export function PlayConfirmModals({
       <ConfirmModal
         isOpen={showClearCacheConfirm}
         onClose={() => setShowClearCacheConfirm(false)}
-        onConfirm={() => {
-          clearPuzzleState();
-          const keysToRemove: string[] = [];
-          for (let i = 0; i < safeLocalStorage.length; i++) {
-            const k = safeLocalStorage.key(i);
-            if (
-              k?.startsWith("phuzzle:viewport:") ||
-              k === "phuzzle:puzzleState" ||
-              k === "phuzzle:puzzleStateBackup"
-            )
-              keysToRemove.push(k);
-          }
-          keysToRemove.forEach((k) => safeLocalStorage.removeItem(k));
-          setShowClearCacheConfirm(false);
-          navigate("/");
-        }}
+        onConfirm={handleClearCache}
         title="Clear Cache?"
-        message="This will clear saved puzzle state and viewport settings. You will return to the menu."
+        message="This will clear saved puzzle state, viewport settings, and cached app assets. You will return to the menu."
         confirmText="Clear"
         cancelText="Cancel"
         variant="danger"

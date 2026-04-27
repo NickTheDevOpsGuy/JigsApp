@@ -7,7 +7,7 @@ import { renderHook, act } from "@testing-library/react";
 import type { Piece, PuzzleState } from "@/puzzle/core/types";
 import type { PuzzleManager } from "@/puzzle/manager/PuzzleManager";
 import type { ReplayStateRef } from "./useReplay";
-import { useReplay } from "./useReplay";
+import { getReplayIntervalMs, useReplay } from "./useReplay";
 
 function makePiece(id: string, overrides: Partial<Piece> = {}): Piece {
   return {
@@ -49,6 +49,14 @@ function makeState(pieces: Piece[]): PuzzleState {
 }
 
 describe("useReplay", () => {
+  it("clamps replay interval for invalid and very fast speeds", () => {
+    expect(getReplayIntervalMs(1)).toBe(80);
+    expect(getReplayIntervalMs(2)).toBe(40);
+    expect(getReplayIntervalMs(0)).toBe(80);
+    expect(getReplayIntervalMs(Number.NaN)).toBe(80);
+    expect(getReplayIntervalMs(1000)).toBe(8);
+  });
+
   it("returns canReplay false when manager is null", () => {
     const setState = vi.fn();
     const replayStateRef = { current: null as ReplayStateRef | null };
@@ -195,5 +203,47 @@ describe("useReplay", () => {
         }),
       ]),
     );
+  });
+
+  it("seekBySeconds moves to the nearest recorded elapsed time and clamps at the start", () => {
+    const state = makeState([makePiece("p1")]);
+    const setState = vi.fn();
+    const replayStateRef = {
+      current: {
+        getState: () => state,
+        elapsedSeconds: 0,
+        moveCount: 0,
+      } as ReplayStateRef,
+    };
+    const manager = {
+      restoreFromSaved: vi.fn(),
+      getState: () => state,
+    } as unknown as PuzzleManager;
+
+    const { result } = renderHook(() =>
+      useReplay(manager, setState, replayStateRef, false),
+    );
+
+    act(() => {
+      replayStateRef.current.elapsedSeconds = 0;
+      result.current.recordSnapshot();
+      replayStateRef.current.elapsedSeconds = 10;
+      result.current.recordSnapshot();
+      replayStateRef.current.elapsedSeconds = 20;
+      result.current.recordSnapshot();
+      result.current.startReplay();
+    });
+
+    act(() => {
+      result.current.seekBySeconds(11);
+    });
+    expect(result.current.replayIndex).toBe(1);
+    expect(result.current.replayElapsedSeconds).toBe(10);
+
+    act(() => {
+      result.current.seekBySeconds(-999);
+    });
+    expect(result.current.replayIndex).toBe(0);
+    expect(result.current.replayElapsedSeconds).toBe(0);
   });
 });

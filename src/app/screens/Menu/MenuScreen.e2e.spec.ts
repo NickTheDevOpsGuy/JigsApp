@@ -23,6 +23,30 @@ test.describe("Home / Menu", () => {
     await expect(page.getByRole("button", { name: /quick play/i })).toBeVisible();
   });
 
+  test("fresh players can jump straight into a fast starter puzzle", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("phuzzle:firstFastStart");
+      localStorage.removeItem("phuzzle:completedPuzzles");
+      localStorage.removeItem("phuzzle:completionHistory");
+    });
+    await page.goto("/");
+    await dismissWhatsNewModalIfOpen(page);
+
+    const fastStart = page.getByRole("button", { name: /start fast 3 by 3 puzzle/i });
+    await expect(fastStart).toBeVisible();
+    await fastStart.click();
+
+    await expect(page).toHaveURL(/\/play/, { timeout: 15000 });
+    await expect
+      .poll(async () => page.evaluate(() => localStorage.getItem("phuzzle:gridSize")))
+      .toBe("3x3");
+    await expect
+      .poll(async () =>
+        page.evaluate(() => localStorage.getItem("phuzzle:firstFastStart")),
+      )
+      .toBe("true");
+  });
+
   test("header stats button opens stats route", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto("/");

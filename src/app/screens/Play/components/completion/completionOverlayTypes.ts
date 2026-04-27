@@ -42,4 +42,10 @@ export interface CompletionOverlayProps {
   borderFrameBonus?: boolean;
   /** When each quarter of the board was fully finished (slowest-first summary on win). */
   quadrantTimes?: Record<0 | 1 | 2 | 3, number | null>;
+  /** Challenge target from shared challenge links. */
+  challengeTarget?: {
+    elapsedSeconds: number;
+    moveCount: number | null;
+  } | null;
+  isPackPuzzle?: boolean;
 }

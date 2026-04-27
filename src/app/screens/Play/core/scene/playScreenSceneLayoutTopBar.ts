@@ -4,6 +4,10 @@
 import React from "react";
 import { usePlayScreenTopBarProps } from "@/screens/Play/hooks/topBar/usePlayScreenTopBarProps";
 import { SHOW_DEBUG } from "@/screens/Play/core/utils/playScreenUtils";
+import {
+  getChallengeHudLabel,
+  parseChallengeTarget,
+} from "@/screens/Play/core/retention/playRetention";
 
 import type { PlayScreenSceneLayoutContext } from "./playScreenSceneLayoutContext.types";
 
@@ -21,6 +25,7 @@ export function usePlayScreenTopBarPropsFromCtx(
     setCountdownMinutes,
     grid,
     sessionResult,
+    searchParams,
   } = setup;
   const { manager, state, setState } = behavior;
   const {
@@ -142,5 +147,6 @@ export function usePlayScreenTopBarPropsFromCtx(
     toggleMinimap: ui.toggleMinimap,
     undoRedoEnabled: ui.undoRedoEnabled,
     onToggleUndoRedo: ui.toggleUndoRedo,
+    challengeTargetLabel: getChallengeHudLabel(parseChallengeTarget(searchParams)),
   });
 }

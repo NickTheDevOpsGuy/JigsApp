@@ -11,6 +11,7 @@ import {
 } from "@/screens/Play/core/scene/playScreenSceneOverlays";
 import { usePlayScreenTopBarPropsFromCtx } from "./playScreenSceneLayoutTopBar";
 import type { PlayScreenSceneLayoutContext } from "./playScreenSceneLayoutContext.types";
+import { parseChallengeTarget } from "@/screens/Play/core/retention/playRetention";
 
 export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
   const { setup, behavior, interactions } = ctx;
@@ -120,6 +121,11 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     completionDailyRef.current = false;
   }
   const completionIsDaily = isDailySession || completionDailyRef.current;
+  const challengeTarget = React.useMemo(
+    () => parseChallengeTarget(searchParams ?? null),
+    [searchParams],
+  );
+  const isPackPuzzle = Boolean(searchParams?.get("pack"));
 
   const showCompletionOverlay = (isComplete && scene.showWinOverlay) || showE2ECompletion;
   const nextPuzzleLabel = completionIsDaily
@@ -191,6 +197,8 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     boardAnchorRef: boardRef,
     borderFrameBonus: borderFrameBonusEarnedRef.current,
     quadrantTimes: scene.quadrantTimes,
+    challengeTarget,
+    isPackPuzzle,
   });
 
   const baseReplayProps = buildReplayPortalProps({
@@ -200,8 +208,8 @@ export function usePlayScreenLayoutInputs(ctx: PlayScreenSceneLayoutContext) {
     onPause: behavior.replay.pauseReplay,
     onRewind: behavior.replay.goToStart,
     onFastForward: behavior.replay.goToEnd,
-    onSkipBack15: () => behavior.replay.seekBySeconds(-5),
-    onSkipForward15: () => behavior.replay.seekBySeconds(5),
+    onSkipBack5: () => behavior.replay.seekBySeconds(-5),
+    onSkipForward5: () => behavior.replay.seekBySeconds(5),
     speed: behavior.replay.replaySpeed,
     onSpeedChange: behavior.replay.setReplaySpeed,
     currentIndex: behavior.replay.replayIndex,

@@ -10,7 +10,7 @@ const MAX_SNAPSHOTS = 400;
 const DEFAULT_SPEED = 1; // 1x – no speed shown as "on" until user picks
 const TICK_MS = 80;
 
-function getIntervalMs(speed: number): number {
+export function getReplayIntervalMs(speed: number): number {
   const s = Number.isFinite(speed) && speed > 0 ? speed : DEFAULT_SPEED;
   return Math.max(8, Math.floor(TICK_MS / s));
 }
@@ -122,7 +122,7 @@ export function useReplay(
     if (!isReplaying || isReplayPaused || !manager) return;
     if (snapshotsRef.current.length === 0) return;
 
-    const intervalMs = getIntervalMs(replaySpeed);
+    const intervalMs = getReplayIntervalMs(replaySpeed);
     lastTickRef.current = performance.now();
 
     const tick = (now: number) => {
@@ -259,7 +259,7 @@ export function useReplay(
     [getReplayList, manager, setState],
   );
 
-  /** Seek to the snapshot whose elapsedSeconds is closest to current + deltaSeconds (e.g. ±15s). */
+  /** Seek to the snapshot whose elapsedSeconds is closest to current + deltaSeconds. */
   const seekBySeconds = useCallback(
     (deltaSeconds: number) => {
       // Access snapshotsRef.current directly — it's a ref and intentionally excluded

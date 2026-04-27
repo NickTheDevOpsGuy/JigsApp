@@ -12,6 +12,12 @@ export type ColorInfo = {
   lightness: number;
 };
 
+const DEFAULT_SAMPLE_SIZE = 24;
+
+function fallbackColor(): ColorInfo {
+  return { r: 128, g: 128, b: 128, hue: 0, saturation: 0, lightness: 0.5 };
+}
+
 /**
  * Get the average color of a puzzle piece from the source image.
  * Uses an offscreen canvas to sample the piece's region.
@@ -21,64 +27,72 @@ export function getAverageColor(
   piece: Piece,
   grid: GridSize,
 ): ColorInfo {
-  // Create offscreen canvas for sampling
+  return createAverageColorSampler(img, grid)(piece);
+}
+
+export function createAverageColorSampler(
+  img: HTMLImageElement,
+  grid: GridSize,
+  sampleSize: number = DEFAULT_SAMPLE_SIZE,
+): (piece: Piece) => ColorInfo {
   const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const size = Math.max(8, Math.min(32, Math.floor(sampleSize)));
+  canvas.width = size;
+  canvas.height = size;
 
   if (!ctx || img.naturalWidth === 0 || img.naturalHeight === 0) {
-    return { r: 128, g: 128, b: 128, hue: 0, saturation: 0, lightness: 0.5 };
+    return () => fallbackColor();
   }
 
-  // Calculate the source region for this piece
   const srcTileW = img.naturalWidth / grid.cols;
   const srcTileH = img.naturalHeight / grid.rows;
 
-  const srcX = piece.col * srcTileW;
-  const srcY = piece.row * srcTileH;
+  return (piece: Piece): ColorInfo => {
+    const srcX = piece.col * srcTileW;
+    const srcY = piece.row * srcTileH;
 
-  // Sample at a reasonable resolution (not too large)
-  const sampleSize = 32;
-  canvas.width = sampleSize;
-  canvas.height = sampleSize;
+    let imageData: ImageData;
+    try {
+      ctx.clearRect(0, 0, size, size);
+      ctx.drawImage(img, srcX, srcY, srcTileW, srcTileH, 0, 0, size, size);
+      imageData = ctx.getImageData(0, 0, size, size);
+    } catch {
+      return fallbackColor();
+    }
+    const data = imageData.data;
 
-  // Draw the piece's region scaled down
-  ctx.drawImage(img, srcX, srcY, srcTileW, srcTileH, 0, 0, sampleSize, sampleSize);
+    let totalR = 0;
+    let totalG = 0;
+    let totalB = 0;
+    let count = 0;
 
-  // Get pixel data
-  const imageData = ctx.getImageData(0, 0, sampleSize, sampleSize);
-  const data = imageData.data;
+    // Sample every 4th pixel for performance
+    for (let i = 0; i < data.length; i += 16) {
+      totalR += data[i];
+      totalG += data[i + 1];
+      totalB += data[i + 2];
+      count++;
+    }
 
-  let totalR = 0;
-  let totalG = 0;
-  let totalB = 0;
-  let count = 0;
+    if (count === 0) {
+      return fallbackColor();
+    }
 
-  // Sample every 4th pixel for performance
-  for (let i = 0; i < data.length; i += 16) {
-    totalR += data[i];
-    totalG += data[i + 1];
-    totalB += data[i + 2];
-    count++;
-  }
+    const r = Math.round(totalR / count);
+    const g = Math.round(totalG / count);
+    const b = Math.round(totalB / count);
 
-  if (count === 0) {
-    return { r: 128, g: 128, b: 128, hue: 0, saturation: 0, lightness: 0.5 };
-  }
+    const hsl = rgbToHsl(r, g, b);
 
-  const r = Math.round(totalR / count);
-  const g = Math.round(totalG / count);
-  const b = Math.round(totalB / count);
-
-  // Convert to HSL for sorting
-  const hsl = rgbToHsl(r, g, b);
-
-  return {
-    r,
-    g,
-    b,
-    hue: hsl.h,
-    saturation: hsl.s,
-    lightness: hsl.l,
+    return {
+      r,
+      g,
+      b,
+      hue: hsl.h,
+      saturation: hsl.s,
+      lightness: hsl.l,
+    };
   };
 }
 

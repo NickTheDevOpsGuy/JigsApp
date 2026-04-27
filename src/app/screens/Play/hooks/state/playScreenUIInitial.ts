@@ -8,6 +8,7 @@ import {
   PIECE_LOCKING_EXPLICIT_KEY,
   AUTO_ROTATE_ON_SNAP_KEY,
   MAGNETIC_SNAP_KEY,
+  MAGNETIC_SNAP_DEFAULT_OFF_MIGRATION_KEY,
   SNAP_GLOW_KEY,
   CUT_TYPE_KEY,
   PROGRESSIVE_REVEAL_KEY,
@@ -63,6 +64,20 @@ function getPieceLockingInitial(): boolean {
   }
 }
 
+function getMagneticSnapInitial(): boolean {
+  try {
+    const migrated = safeLocalStorage.getItem(MAGNETIC_SNAP_DEFAULT_OFF_MIGRATION_KEY);
+    if (migrated == null) {
+      safeLocalStorage.setItem(MAGNETIC_SNAP_KEY, "false");
+      safeLocalStorage.setItem(MAGNETIC_SNAP_DEFAULT_OFF_MIGRATION_KEY, "true");
+      return false;
+    }
+    return getBool(MAGNETIC_SNAP_KEY, false);
+  } catch {
+    return false;
+  }
+}
+
 export function getPlayScreenUIStorageInitial(): {
   pieceLockingEnabled: boolean;
   autoRotateOnSnap: boolean;
@@ -111,7 +126,7 @@ export function getPlayScreenUIStorageInitial(): {
   return {
     pieceLockingEnabled: getPieceLockingInitial(),
     autoRotateOnSnap: getBool(AUTO_ROTATE_ON_SNAP_KEY, true),
-    magneticSnapEnabled: getBool(MAGNETIC_SNAP_KEY, true),
+    magneticSnapEnabled: getMagneticSnapInitial(),
     snapGlowEnabled: getBool(SNAP_GLOW_KEY, true),
     showGhostHint: getBool(GHOST_HINT_KEY, false),
     showAlignmentGrid: getBool(ALIGNMENT_GRID_KEY, false),

@@ -344,6 +344,57 @@
   min-height: 24px;
 }
 
+.completeDailyResultWrap {
+  width: 100%;
+  padding: 0 20px 16px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.completeNextGoal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: calc(100% - 40px);
+  margin: 0 20px 16px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border: 1px solid
+    color-mix(in srgb, var(--color-brand-primary) 28%, var(--color-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-bg-card));
+}
+
+.completeNextGoal[data-tone="win"] {
+  border-color: color-mix(in srgb, #22c55e 42%, var(--color-border));
+  background: color-mix(in srgb, #22c55e 10%, var(--color-bg-card));
+}
+
+.completeNextGoal[data-tone="daily"] {
+  border-color: color-mix(in srgb, #f97316 36%, var(--color-border));
+  background: color-mix(in srgb, #f97316 8%, var(--color-bg-card));
+}
+
+.completeNextGoalEyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-brand-primary);
+}
+
+.completeNextGoalTitle {
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.completeNextGoalBody {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
 /* ── Actions section ── */
 .completeActionsPhased {
   display: flex;
@@ -606,18 +657,23 @@
 
 /* ── Mobile phones ≤ 600px (Android + iPhone portrait) ── */
 @media (max-width: 600px) {
+  .completeWinDialog {
+    max-width: min(360px, calc(100vw - 20px));
+    border-radius: 18px;
+  }
+
   .completeCelebrationBlock {
-    padding: 20px 16px 12px;
-    gap: 10px;
+    padding: 16px 14px 10px;
+    gap: 8px;
   }
 
   .completePhasedTitle {
-    font-size: 1.3rem;
+    font-size: 1.22rem;
   }
 
   .completeActionsPhased {
-    padding: 14px 16px 20px;
-    gap: 8px;
+    padding: 12px 14px 14px;
+    gap: 7px;
   }
 
   .completePrimaryBtn {
@@ -633,8 +689,8 @@
   }
 
   .completeStatsBar {
-    gap: 12px;
-    padding: 12px 16px;
+    gap: 8px 10px;
+    padding: 10px 12px;
     /* Wrap stat chips on narrow screens so nothing clips */
     flex-wrap: wrap;
     justify-content: space-evenly;
@@ -650,18 +706,18 @@
   }
 
   .completeImageWrapPhased {
-    max-height: min(42vh, 360px);
+    max-height: min(32vh, 300px);
     border-radius: 10px;
   }
 
   .completeImagePhased {
-    max-height: min(42vh, 360px);
+    max-height: min(32vh, 300px);
   }
 
   .completeOptionsTrigger {
-    min-height: 48px;
-    font-size: 14px;
-    padding: 11px 14px;
+    min-height: 46px;
+    font-size: 13px;
+    padding: 10px 12px;
     border-radius: 10px;
   }
 
@@ -827,11 +883,11 @@
   }
 
   .completeImageWrapPhased {
-    max-height: min(34vh, 300px);
+    max-height: min(30vh, 280px);
   }
 
   .completeImagePhased {
-    max-height: min(34vh, 300px);
+    max-height: min(30vh, 280px);
   }
 
   .completeActionsPhased {

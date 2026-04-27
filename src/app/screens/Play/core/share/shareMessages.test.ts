@@ -48,6 +48,23 @@ describe("shareMessages", () => {
     expect(text).toContain("https://phuzzle.vercel.app/play?grid=4x4");
   });
 
+  it("buildProgressShareMessage calls out clean challenge wins", () => {
+    const text = buildProgressShareMessage({
+      elapsedSeconds: 38,
+      pieceCount: 9,
+      playUrl: "/play?grid=3x3&ct=45&cm=20",
+      moveCount: 17,
+      undoCount: 0,
+      usedHint: false,
+      challengeTarget: { elapsedSeconds: 45, moveCount: 20 },
+    });
+
+    expect(text).toContain("Clean solve");
+    expect(text).toContain("Beat the challenge");
+    expect(text).toContain("0:07 faster");
+    expect(text).toContain("3 fewer moves");
+  });
+
   it("buildChallengeShareMessage includes stats, rotations, and challenge line", () => {
     const text = buildChallengeShareMessage({
       elapsedSeconds: 102,
@@ -56,6 +73,7 @@ describe("shareMessages", () => {
       moveCount: 42,
       rotationCount: 3,
       puzzleName: "Forest Path",
+      undoCount: 1,
     });
 
     expect(text).toContain("16 pieces");
@@ -98,12 +116,14 @@ describe("shareMessages", () => {
         moveCount: 41,
         dailyLink: "https://phuzzle.app/daily",
         completionGrid: "🟦🟦🟦⬜",
+        dailyStreak: 4,
       });
 
       expect(text).toContain("Phuzzle Daily #42");
       expect(text).toContain("Hard • 25 pieces");
       expect(text).toContain("⏱ 1:32");
       expect(text).toContain("🔁 41");
+      expect(text).toContain("🔥 4-day streak");
       expect(text).toContain("🟦🟦🟦⬜");
       expect(text).toContain("Play:");
       expect(text).toContain("https://phuzzle.app/daily");

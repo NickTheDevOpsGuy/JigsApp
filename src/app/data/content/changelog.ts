@@ -4,17 +4,17 @@
  */
 import { safeLocalStorage } from "@/utils/safeLocalStorage";
 
-export const CHANGELOG_VERSION = "58";
+export const CHANGELOG_VERSION = "59";
 const STORAGE_KEY = "phuzzle:lastSeenChangelog";
 
 export const CHANGELOG_ENTRIES: { title: string; items: string[] }[] = [
   {
     title: "What's New",
     items: [
-      "Desktop home, packs, and stats now use roomier shells instead of cramped phone-width cards.",
-      "Leaderboard rows and filter controls scale more cleanly on large screens and iPad-sized layouts.",
-      "Pack browsing is more tablet-friendly — the featured hero compacts better and detail rails breathe on wider screens.",
-      "Touch tray upgrades remain in, and replay still returns cleanly to your completed puzzle.",
+      "Fresh players now get a fast 3×3 starter puzzle so the first win lands immediately.",
+      "Challenge links show a beat-this target in play and call out wins or runbacks after completion.",
+      "Daily Puzzle now has a recent archive, richer daily results, and streak-aware share text.",
+      "Mobile, iPad, leaderboard, tray, replay, completion, and warm-cache loading got another polish pass.",
     ],
   },
 ];
