@@ -73,12 +73,14 @@ The standard matrix already covers the popular desktop browsers:
 
 ```bash
 npm run test:e2e:smoke
+npm run test:e2e:layouts
 npm run test:e2e
 ```
 
 Notes:
 
-- `chrome`, `firefox`, and `safari` run directly from the Playwright config.
+- `test:e2e:smoke` covers Chrome, Firefox, Safari/WebKit, and Edge-compatible Chromium.
+- `test:e2e:layouts` covers iPhone WebKit, iPad WebKit, and Android tablet Chromium.
 - The smoke and full matrix scripts now auto-detect a local Microsoft Edge install and set `PW_USE_EDGE=1` for you when Edge is available.
 - If Edge is not installed, the `edge` project still runs with Edge-compatible Chromium coverage instead of failing.
 
@@ -106,6 +108,17 @@ npm run typecheck
 npm run test
 npm run build
 npm run test:e2e:smoke
+npm run test:e2e:layouts
+```
+
+## Reusing a production build
+
+CI builds once, then reuses `dist` for bundle size, Playwright, and Lighthouse checks. You can use the same shortcuts locally after `npm run build`:
+
+```bash
+CHECK_BUNDLE_USE_EXISTING_DIST=1 npm run check:bundle
+PW_USE_EXISTING_BUILD=1 npm run test:e2e:smoke
+PW_USE_EXISTING_BUILD=1 npm run test:e2e:layouts
 ```
 
 ## Optional Supabase setup

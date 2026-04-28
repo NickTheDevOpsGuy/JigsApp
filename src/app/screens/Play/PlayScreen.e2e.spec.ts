@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 const TINY_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
@@ -11,6 +11,32 @@ async function gotoPlay(
   path = "/play",
 ) {
   await page.goto(path, { waitUntil: "domcontentloaded" });
+}
+
+async function openCompletionOptions(page: Page) {
+  const optionsTrigger = page.getByRole("button", {
+    name: /options: replay and share/i,
+  });
+  await expect(optionsTrigger).toBeVisible({ timeout: 10000 });
+  await optionsTrigger.click();
+}
+
+async function clickReplaySolve(page: Page) {
+  const replayItem = page.getByRole("menuitem", { name: /replay solve/i });
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    await openCompletionOptions(page);
+    try {
+      await expect(replayItem).toBeVisible({ timeout: 10000 });
+      break;
+    } catch (error) {
+      if (attempt === 2) throw error;
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(250);
+    }
+  }
+
+  await replayItem.click();
 }
 
 test.describe("Play screen", () => {
@@ -72,11 +98,7 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
       timeout: 20000,
     });
-    const optionsTrigger = page.getByRole("button", { name: /options/i });
-    await expect(optionsTrigger).toBeVisible({
-      timeout: 10000,
-    });
-    await optionsTrigger.click();
+    await openCompletionOptions(page);
     await expect(
       page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM }),
     ).toBeVisible({
@@ -106,11 +128,7 @@ test.describe("Play screen", () => {
     await expect(page.getByRole("heading", { name: COMPLETE_HEADING })).toBeVisible({
       timeout: 20000,
     });
-    const optionsTrigger = page.getByRole("button", { name: /options/i });
-    await expect(optionsTrigger).toBeVisible({
-      timeout: 10000,
-    });
-    await optionsTrigger.click();
+    await openCompletionOptions(page);
     await expect(
       page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM }),
     ).toBeVisible({
@@ -151,11 +169,13 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
+    await openCompletionOptions(page);
     await expect(
       page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM }),
-    ).toBeVisible();
-    await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("short mobile completion overlay keeps the card on-screen", async ({ page }) => {
@@ -176,10 +196,7 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
-    const replayItem = page.getByRole("menuitem", { name: /replay solve/i });
-    await expect(replayItem).toBeVisible({ timeout: 10000 });
-    await replayItem.click();
+    await clickReplaySolve(page);
 
     const replayHeading = page.getByRole("heading", { name: /replay solve/i });
     const replayClose = page.getByRole("button", { name: /close replay/i });
@@ -202,8 +219,7 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
-    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+    await clickReplaySolve(page);
 
     const restartButton = page.getByRole("button", { name: /restart/i });
     const playButton = page.getByRole("button", { name: "Play", exact: true });
@@ -231,8 +247,7 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 360, height: 640 });
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
-    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+    await clickReplaySolve(page);
 
     await expect(page.getByRole("heading", { name: /replay solve/i })).toBeVisible({
       timeout: 10000,
@@ -258,8 +273,7 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
-    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+    await clickReplaySolve(page);
 
     const playButton = page.getByRole("button", { name: "Play", exact: true });
     const optionsButton = page.getByRole("button", {
@@ -285,8 +299,7 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 1024, height: 768 });
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
-    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+    await clickReplaySolve(page);
 
     const replayHeading = page.getByRole("heading", { name: /replay solve/i });
     const replayClose = page.getByRole("button", { name: /close replay/i });
@@ -323,8 +336,7 @@ test.describe("Play screen", () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
-    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+    await clickReplaySolve(page);
 
     const replayClose = page.getByRole("button", { name: /close replay/i });
     const replayProgress = page.getByRole("slider", { name: /replay progress/i });
@@ -348,11 +360,13 @@ test.describe("Play screen", () => {
     test.setTimeout(60000);
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
+    await openCompletionOptions(page);
     await expect(
       page.getByRole("menuitem", { name: SHARE_RESULT_MENU_ITEM }),
-    ).toBeVisible();
-    await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("menuitem", { name: CHALLENGE_MENU_ITEM })).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("short desktop completion overlay stays on-screen", async ({ page }) => {
@@ -444,8 +458,7 @@ test.describe("Play screen tablet touch", () => {
   test("tablet replay keeps live board square and controls visible", async ({ page }) => {
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
-    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+    await clickReplaySolve(page);
 
     await expect(page.getByRole("heading", { name: /replay solve/i })).toBeVisible({
       timeout: 10000,
@@ -565,8 +578,7 @@ test.describe("Play screen landscape phone", () => {
   test("landscape replay keeps controls visible", async ({ page }) => {
     await gotoPlay(page, "/play?e2eCompletion=1");
 
-    await page.getByRole("button", { name: /options/i }).click();
-    await page.getByRole("menuitem", { name: /replay solve/i }).click();
+    await clickReplaySolve(page);
 
     await expect(page.getByRole("button", { name: /close replay/i })).toBeInViewport();
     await expect(page.getByRole("slider", { name: /replay progress/i })).toBeInViewport();

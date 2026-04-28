@@ -239,21 +239,9 @@ export function CompletionOverlayActions(args: {
                 await onReplayClick();
               })
             }
-            disabled={busyAction === "replay" || completionData.isGenerating}
-            aria-label={
-              completionData.isGenerating
-                ? "Wait for share to finish"
-                : busyAction === "replay"
-                  ? "Opening replay"
-                  : "Replay solve"
-            }
-            title={
-              completionData.isGenerating
-                ? "Wait for share to finish"
-                : busyAction === "replay"
-                  ? "Opening replay"
-                  : "Replay solve"
-            }
+            disabled={busyAction === "replay"}
+            aria-label="Replay solve"
+            title={busyAction === "replay" ? "Opening replay" : "Replay solve"}
           >
             <Film size={18} aria-hidden />
             {busyAction === "replay"
@@ -279,13 +267,7 @@ export function CompletionOverlayActions(args: {
             className={styles.completeMenuItem}
             onClick={() => void handleChallenge()}
             disabled={shareMenuBusy || busyAction === "replay"}
-            aria-label={
-              busyAction === "challenge"
-                ? "Preparing share"
-                : completionData.isGenerating
-                  ? "Preparing share"
-                  : "Challenge a friend"
-            }
+            aria-label="Challenge a friend"
             title={
               busyAction === "challenge"
                 ? "Preparing share…"
@@ -310,13 +292,7 @@ export function CompletionOverlayActions(args: {
             className={styles.completeMenuItem}
             onClick={() => void handleShareResult()}
             disabled={shareMenuBusy || busyAction === "replay"}
-            aria-label={
-              busyAction === "shareResult"
-                ? "Preparing share"
-                : completionData.isGenerating
-                  ? "Preparing share"
-                  : "Share your result"
-            }
+            aria-label="Share your result"
             title={
               busyAction === "shareResult"
                 ? "Preparing share…"
