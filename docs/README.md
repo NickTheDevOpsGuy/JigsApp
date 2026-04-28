@@ -20,10 +20,12 @@ it does not automatically create side navigation for every subfolder.
 
 | Doc                                                | What it covers                                                                                         |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [APP_MAP.md](APP_MAP.md)                           | First-stop map for user paths, menu locations, completion options, stats areas, and source ownership.  |
 | [CHANGES.md](CHANGES.md)                           | Feature list and recent changes.                                                                       |
 | [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md) | Implemented features (daily countdown, streak freeze, piece shapes, etc.) and where they live in code. |
 | [FUTURE.md](FUTURE.md)                             | Ideas and possible future features.                                                                    |
 | [SHARING.md](SHARING.md)                           | Completion share, challenge targets, Daily Share, daily archive, and co-op share.                      |
+| [SETTINGS_MENU.md](SETTINGS_MENU.md)               | Play menu settings map: submenus, toggles, conditional entries, and source files.                      |
 | [STREAK-FREEZE.md](STREAK-FREEZE.md)               | Streak freeze (streak shield): how you earn it, when it applies, storage keys.                         |
 | [BUG_REPORT.md](BUG_REPORT.md)                     | In-app bug report: where it is, what it does, main files.                                              |
 
@@ -51,5 +53,6 @@ it does not automatically create side navigation for every subfolder.
 ## Quick links
 
 - **Main README:** [../README.md](../README.md) — overview, getting started, file structure.
+- **Where is this option?:** [APP_MAP.md](APP_MAP.md) and [SETTINGS_MENU.md](SETTINGS_MENU.md).
 - **Supabase migrations:** `supabase/migrations/`
 - **Markdown lint config:** `/.markdownlint-cli2.jsonc`

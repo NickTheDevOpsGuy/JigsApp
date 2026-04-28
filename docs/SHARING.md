@@ -35,7 +35,7 @@ Triggered from the win overlay after completing a puzzle. Works without any back
 
 ---
 
-## 2. Co-op share (“Play with friend”) — needs Supabase
+## 2. Co-op Share - Needs Supabase
 
 - Create a session; share the URL. Someone else opens it and sees the same puzzle.
 - Moves sync in real time via Supabase Realtime.
@@ -43,7 +43,7 @@ Triggered from the win overlay after completing a puzzle. Works without any back
 **Flow:**
 
 1. Start any puzzle.
-2. Menu → Share → **Play with friend**.
+2. Play menu -> Play -> **Co-op**.
 3. A session is created; you get a share URL.
 4. Friend opens the URL.
 5. Either side moves a piece; the other sees it.

@@ -140,7 +140,7 @@ Impact:
 - **Home / menu**
   - logo, primary CTAs, Stats, Help
 - **Feedback**
-  - home feedback entry point, feedback modal actions, bug/feature mailto formatting
+  - home feedback entry point, feedback modal actions, bug/feature form submission
 - **Daily flow**
   - daily modal, difficulty options, start path
 - **Quick Play staged setup**
@@ -169,9 +169,9 @@ Impact:
 - **Daily Share (Wordle-style text share)**
   - documented in `docs/SHARING.md`
   - not obviously covered by a dedicated E2E
-- **Feedback end-to-end mail client launch**
+- **Feedback end-to-end external form submission**
   - modal path is now covered
-  - actual OS/browser `mailto:` handoff is still better treated as integration/manual behavior than browser E2E
+  - actual third-party form handoff is still better treated as integration/manual behavior than browser E2E
 
 ### Coverage that remains manual by design
 

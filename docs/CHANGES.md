@@ -1,6 +1,6 @@
 # Phuzzle — feature list and changes
 
-High-level feature list and recent changes. For project overview see [README](../README.md). For where features live in code see [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md).
+High-level feature list and recent changes. For project overview see [README](../README.md). For where users find each major option see [APP_MAP.md](APP_MAP.md) and [SETTINGS_MENU.md](SETTINGS_MENU.md). For where features live in code see [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md).
 
 **In-app changelog:** What's New is driven by `src/app/data/content/changelog.ts`, but it is intentionally kept to the latest release bullets only. Full historical notes stay in this document. List items in the source file are plain text (no leading bullet character).
 
@@ -17,7 +17,7 @@ High-level feature list and recent changes. For project overview see [README](..
 - **Daily Share (Wordle-style)** — After completing the Daily Puzzle, a **Daily Share** button appears on the win screen (only for daily). It generates a compact, copyable text block: `Phuzzle Daily #N`, difficulty • pieces, ⏱ time, 🔁 moves, a 4-cell emoji grid (🟦/⬜ for completed, good time, efficient moves, clean solve), and a play link. Copy to clipboard or native share on mobile. See [SHARING.md](SHARING.md).
 - **Puzzle Packs & Choose Puzzle parity** — Puzzle Packs dialog uses the same layout as Quick Play (filters, horizontal rail, difficulty, CTA). Breadcrumbs (Pack → Puzzle → Difficulty → Start) are clickable so you can jump to any step. One reusable modal shell for both flows.
 - **Mobile touch & input** — Touch drag on the board works again: the board area uses `touch-action: none` so the browser doesn’t scroll the page while you drag pieces; pointer capture and pointer events (down/move/up) handle drag. Tray buttons (Filter, Shuffle) and all carousel/rail arrows use 48px minimum hit areas, `touch-action: manipulation`, and correct z-index so they’re tappable on mobile. Dialogs use consistent sizing (e.g. 92% width, 85vh max on mobile).
-- **Play HUD & tray** — Unified pill size for timer, pause, moves, pieces (0/16). Hamburger and HUD in one board-aligned strip. Small gap between board and tray (like HUD–board). Color blind friendly option (Settings → Display or Theme & Sounds).
+- **Play HUD & tray** — Unified pill size for timer, pause, moves, pieces (0/16). Hamburger and HUD in one board-aligned strip. Small gap between board and tray (like HUD–board). Color blind friendly option lives at Play -> Settings -> Appearance.
 - **Puzzle pieces** — Organic bulb-shaped tabs/sockets, smoother silhouettes, subtle depth (shadow, bevel). Drag lift and snap polish; ~120ms snap ease. Save/continue unchanged.
 - **Choose Puzzle** — Horizontal scroll with arrows and blue bar; full-width tray; mobile layout shrunk for small screens.
 - **Play layout** — Bigger board (max 920px). Tray full width; Undo/Redo on the right of the tray. Timer centered in top bar; pause button in HUD. Top bar and HUD larger (52px bar, bigger fonts).
@@ -29,7 +29,7 @@ High-level feature list and recent changes. For project overview see [README](..
 - **Share** — Win-screen **Options** runs **Challenge Friend** / **Share Result** straight into native share or PNG download; challenge and result cards differ; share text is tightened in `shareMessages` (no rotating taunts). [SHARING.md](SHARING.md)
 - **Replay** — Watch Replay from win screen; board cutout, seek bar, play/pause, speed, Back to Results. Snap feedback: target glow, proximity glow, lock glow, snap particles.
 - **Packs** — 10 packs with emojis (Nature, Animals, Food, Cozy, Space, Retro, Art, Gaming, Seasonal, Cute). One folder per pack; Season’s pick when pack has a season.
-- **Modes** — Zen (no timer/rankings), Mystery (progressive reveal), Precision (snap precision stats), Dynamic Difficulty, Adaptive Personality (competitive/calm tone). Magnetic Snap and Snap Glow toggles in Settings.
+- **Modes** — Zen (no timer/rankings), Mystery (progressive reveal), Precision (snap precision stats), Dynamic Difficulty, Adaptive Personality (competitive/calm tone). Mode toggles live at Play -> Settings -> Modes. Magnetic Snap lives at Play -> Settings -> Snapping; Snap Glow is present in config but currently hidden.
 
 ---
 
@@ -39,7 +39,7 @@ High-level feature list and recent changes. For project overview see [README](..
 - Grid sizes 3×3–10×10 presets; custom up to 12×12. Puzzle source: catalog or packs via staged modals (Quick Play, Puzzle Packs) only.
 - Tray: full width, horizontal scroll, Undo/Redo on the right. Filters (All, Edges, Color). Zoom/pan (scroll or pinch); viewport persists.
 - Timer modes: elapsed, countdown, relaxed, best time. Percentile badges; completion badges (Speed Demon, Chill Mode, etc.).
-- Piece shapes: Classic, Irregular, Hard (Settings). Optional piece locking, ghost hints, reference preview (full or progressive).
+- Piece shapes: Classic, Irregular, Hard (Play -> Settings -> Piece Shape). Optional piece locking, ghost hints, reference preview (full or progressive).
 - Completion: image, stats, single celebration line, **Options** (Share Result, Challenge Friend, Daily Share when daily, replay, next puzzle). Six themes; battery-saver and reduced-motion support.
 
 ---

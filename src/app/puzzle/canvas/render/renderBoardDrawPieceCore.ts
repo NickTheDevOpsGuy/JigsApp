@@ -17,6 +17,7 @@ import {
   snapGlowPulse,
   drawSnapGlow,
   drawRejectSnapGlow,
+  drawTargetSlotGlow,
   SNAP_GLOW_MS,
   computeImageSourceRect,
   DRAG_LIFT_PX,
@@ -79,14 +80,6 @@ export function drawPiece(
   const idleCorrectPulseNowMs =
     animState?.idleCorrectPulsePieceId === p.id ? nowMs : undefined;
 
-  if (snapGlowEnabled && start != null && popElapsedMs < SNAP_GLOW_MS) {
-    const cx = p.x + p.w / 2;
-    const cy = p.y + p.h / 2;
-    const radius = Math.max(p.w, p.h) * 0.55;
-    const glowAlpha = snapGlowAlpha(popElapsedMs) * snapGlowPulse(popElapsedMs);
-    drawSnapGlow(ctx, cx, cy, radius, glowAlpha);
-  }
-
   const preview = animState?.snapPreview;
   const rejectBoard = animState?.snapRejectPreview;
   const nearMissReject =
@@ -98,6 +91,76 @@ export function drawPiece(
     rejectBoard?.proximity ?? 0,
     nearMissReject ? preview.proximity : 0,
   );
+
+  let path: Path2D | null = null;
+  if (pathCache && p.shapePath && p.shapePath.length > 0) {
+    path =
+      pathCache.get(p.id) ??
+      (() => {
+        try {
+          const q = new Path2D(p.shapePath);
+          pathCache.set(p.id, q);
+          return q;
+        } catch {
+          return null;
+        }
+      })();
+  } else if (p.shapePath && p.shapePath.length > 0) {
+    try {
+      path = new Path2D(p.shapePath);
+    } catch {
+      path = null;
+    }
+  }
+
+  if (snapGlowEnabled && start != null && popElapsedMs < SNAP_GLOW_MS) {
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const radius = Math.max(p.w, p.h) * 0.55;
+    const glowAlpha = snapGlowAlpha(popElapsedMs) * snapGlowPulse(popElapsedMs);
+    drawSnapGlow(ctx, cx, cy, radius, glowAlpha);
+  }
+
+  if (snapGlowEnabled && isDragging && path && (preview || rejectProximity > 0.16)) {
+    const targetX = p.targetX - p.pad;
+    const targetY = p.targetY - p.pad;
+    const targetCx = targetX + p.w / 2;
+    const targetCy = targetY + p.h / 2;
+    const targetProximity = Math.max(preview?.proximity ?? 0, rejectProximity);
+    const targetAlpha = preview?.inSnapRange
+      ? 0.82
+      : preview?.nearSnap
+        ? Math.min(0.58, 0.24 + targetProximity * 0.42)
+        : Math.min(0.5, 0.18 + targetProximity * 0.36);
+    drawTargetSlotGlow(
+      ctx,
+      targetCx,
+      targetCy,
+      Math.max(p.w, p.h) * (preview?.inSnapRange ? 0.72 : 0.56),
+      targetAlpha,
+      nowMs,
+    );
+    ctx.save();
+    ctx.translate(targetCx, targetCy);
+    ctx.translate(-p.w / 2, -p.h / 2);
+    const fitColor = preview?.inSnapRange
+      ? "rgba(44, 210, 120, 0.92)"
+      : preview?.nearSnap
+        ? "rgba(255, 216, 105, 0.88)"
+        : "rgba(255, 130, 145, 0.78)";
+    ctx.fillStyle = preview?.inSnapRange
+      ? "rgba(44, 210, 120, 0.13)"
+      : preview?.nearSnap
+        ? "rgba(255, 216, 105, 0.1)"
+        : "rgba(255, 130, 145, 0.09)";
+    ctx.strokeStyle = fitColor;
+    ctx.lineWidth = preview?.inSnapRange ? 5.5 : 4.25;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.fill(path);
+    ctx.stroke(path);
+    ctx.restore();
+  }
 
   if (
     snapGlowEnabled &&
@@ -145,27 +208,6 @@ export function drawPiece(
     const pulse = 0.94 + 0.06 * Math.sin(nowMs * 0.0045);
     alpha *= pulse;
     drawRejectSnapGlow(ctx, cx, cy, radius, alpha);
-  }
-
-  let path: Path2D | null = null;
-  if (pathCache && p.shapePath && p.shapePath.length > 0) {
-    path =
-      pathCache.get(p.id) ??
-      (() => {
-        try {
-          const q = new Path2D(p.shapePath);
-          pathCache.set(p.id, q);
-          return q;
-        } catch {
-          return null;
-        }
-      })();
-  } else if (p.shapePath && p.shapePath.length > 0) {
-    try {
-      path = new Path2D(p.shapePath);
-    } catch {
-      path = null;
-    }
   }
 
   if (!path) {

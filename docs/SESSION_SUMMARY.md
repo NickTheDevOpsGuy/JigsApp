@@ -56,7 +56,7 @@ Summary of work on layout, piece drawer, input, leaderboards, co-op, packs, onbo
 
 ## Share & co-op
 
-- Share via Menu → Share → “Play with friend?”. Puzzle sessions + Realtime. Verification steps in `docs/SUPABASE_SETUP.md`.
+- Share via Play menu -> Play -> Co-op. Puzzle sessions + Realtime. Verification steps in `docs/SUPABASE_SETUP.md`.
 
 ---
 

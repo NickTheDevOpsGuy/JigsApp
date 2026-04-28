@@ -233,10 +233,9 @@ export function usePlayScreenAnimation(args: UsePlayScreenAnimationArgs) {
       const hint = wrongRotationHintRef?.current;
       const wrongRotationHint = hint && now - hint.triggeredAt < 700 ? hint : undefined;
       const snapPreview =
-        magneticSnapEnabled && dragState.activeId && manager
-          ? manager.getSnapPreviewState()
-          : null;
-      const snapRejectPreview = null;
+        dragState.activeId && manager ? manager.getSnapPreviewState() : null;
+      const snapRejectPreview =
+        dragState.activeId && manager ? manager.getSnapRejectPreviewState() : null;
       const inNearSnap =
         !!snapPreview &&
         (snapPreview.inSnapRange || snapPreview.nearSnap) &&

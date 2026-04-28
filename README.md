@@ -57,10 +57,12 @@ All project docs live in **[docs/](docs/)**. Full index: [docs/README.md](docs/R
 
 | Doc                                                          | Description                                                     |
 | ------------------------------------------------------------ | --------------------------------------------------------------- |
+| [docs/APP_MAP.md](docs/APP_MAP.md)                           | Where users find features and where those features live in code |
 | [docs/CHANGES.md](docs/CHANGES.md)                           | Feature list and recent changes                                 |
 | [docs/FEATURES_IMPLEMENTED.md](docs/FEATURES_IMPLEMENTED.md) | Implemented features and where they live in code                |
 | [docs/FUTURE.md](docs/FUTURE.md)                             | Ideas and possible future features                              |
 | [docs/SHARING.md](docs/SHARING.md)                           | Completion share, Daily Share (Wordle-style), co-op share       |
+| [docs/SETTINGS_MENU.md](docs/SETTINGS_MENU.md)               | Play menu settings, submenus, and conditional entries           |
 | [docs/STREAK-FREEZE.md](docs/STREAK-FREEZE.md)               | Streak freeze (streak shield): earn it, when it applies         |
 | [docs/BUG_REPORT.md](docs/BUG_REPORT.md)                     | In-app bug report: where it is, what it does                    |
 | [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md)             | Supabase: leaderboards, stats, co-op, env vars, migrations      |
@@ -81,7 +83,7 @@ All project docs live in **[docs/](docs/)**. Full index: [docs/README.md](docs/R
 
 ## Accessibility
 
-- **Color vision:** The UI uses blue as the main brand color (buttons, links, selection), which works well for most color vision types. A **Color blind friendly** option (Settings → Display in Play, or Theme & Sounds from the menu) switches progress, “done,” and success states to blue so red–green is not the only cue; it applies to all screens and all themes. We avoid **color-only** cues: low-time warning shows a warning icon as well as red styling; co-op status shows text and icons (e.g. WifiOff, spinner) with color. Focus rings and sufficient contrast are used for interactive elements.
+- **Color vision:** The UI uses blue as the main brand color (buttons, links, selection), which works well for most color vision types. A **Color blind friendly** option lives at **Play -> Settings -> Appearance** and switches progress, “done,” and success states to blue so red-green is not the only cue; it applies to all screens and all themes. We avoid **color-only** cues: low-time warning shows a warning icon as well as red styling; co-op status shows text and icons (e.g. WifiOff, spinner) with color. Focus rings and sufficient contrast are used for interactive elements.
 
 ---
 
