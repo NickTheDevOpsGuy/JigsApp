@@ -121,6 +121,10 @@ PW_USE_EXISTING_BUILD=1 npm run test:e2e:smoke
 PW_USE_EXISTING_BUILD=1 npm run test:e2e:layouts
 ```
 
+The bundle check compares against the target branch when `BASELINE_REF` is set, with
+a small default gzip allowance for normal build drift. Override it with
+`BUNDLE_TOLERANCE_KB=0` for an exact comparison.
+
 ## Optional Supabase setup
 
 If you need leaderboards, co-op, or database work:
