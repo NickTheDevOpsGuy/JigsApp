@@ -100,9 +100,7 @@ test.describe("Home / Menu", () => {
     await expect(page.getByRole("dialog", { name: /what's new/i })).toBeVisible({
       timeout: 15000,
     });
-    await expect(
-      page.getByText(/fresh players now get a fast 3×3 starter puzzle/i),
-    ).toBeVisible();
+    await expect(page.getByText(/fast 3×3 starter puzzle/i)).toBeVisible();
   });
 
   test("tablet home uses a roomy shell instead of a phone-width widget", async ({

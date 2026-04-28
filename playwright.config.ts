@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const isCI = !!process.env.CI;
 const useDevServer = process.env.PW_USE_DEV_SERVER === "1";
+const useExistingBuild = process.env.PW_USE_EXISTING_BUILD === "1";
 const chromeChannelUse =
   process.env.PW_USE_CHROME === "1" ? { channel: "chrome" as const } : {};
 const edgeChannelUse =
