@@ -7,6 +7,7 @@ import path from "path";
 export default defineConfig(({ mode }) => {
   // Load env from .env files AND process.env (Vercel injects here)
   const env = loadEnv(mode, process.cwd(), "");
+  const disablePwa = process.env.PWA_DISABLE === "1";
   const supabaseOrigin = (() => {
     const raw = env.VITE_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "";
     try {
@@ -28,10 +29,12 @@ export default defineConfig(({ mode }) => {
           return html.replace("</head>", `${links}\n  </head>`);
         },
       },
-      VitePWA({
-        registerType: "autoUpdate",
-        includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.webp"],
-        manifest: {
+      ...(!disablePwa
+        ? [
+            VitePWA({
+              registerType: "autoUpdate",
+              includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.webp"],
+              manifest: {
           name: "Phuzzle",
           short_name: "Phuzzle",
           description:
@@ -53,14 +56,14 @@ export default defineConfig(({ mode }) => {
               purpose: "any maskable",
             },
           ],
-        },
-        workbox: {
-          globPatterns: ["**/*.{js,css,html,ico,svg,png,woff2}"],
-          // Maps are not needed offline; skipping them shrinks precache and install cost.
-          globIgnores: ["**/*.map"],
-          cleanupOutdatedCaches: true,
-          navigationPreload: true,
-          runtimeCaching: [
+              },
+              workbox: {
+                globPatterns: ["**/*.{js,css,html,ico,svg,png,woff2}"],
+                // Maps are not needed offline; skipping them shrinks precache and install cost.
+                globIgnores: ["**/*.map"],
+                cleanupOutdatedCaches: true,
+                navigationPreload: true,
+                runtimeCaching: [
             {
               urlPattern: ({ request, sameOrigin }) =>
                 sameOrigin && request.destination === "image",
@@ -90,11 +93,13 @@ export default defineConfig(({ mode }) => {
                 },
               },
             },
-          ],
-          // Allow puzzle images up to ~50 MB (default 2 MiB fails on large sample images)
-          maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
-        },
-      }),
+                ],
+                // Allow puzzle images up to ~50 MB (default 2 MiB fails on large sample images)
+                maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
+              },
+            }),
+          ]
+        : []),
     ],
     test: {
       environment: "node",

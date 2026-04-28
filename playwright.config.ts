@@ -79,8 +79,8 @@ export default defineConfig({
   ],
   webServer: {
     command: useDevServer
-      ? "npm run dev -- --host 127.0.0.1 --port 4173 --strictPort"
-      : "npm run build && npm run preview -- --host 127.0.0.1 --port 4173 --strictPort",
+      ? "PWA_DISABLE=1 npm run dev -- --host 127.0.0.1 --port 4173 --strictPort"
+      : "PWA_DISABLE=1 npm run build && npm run preview -- --host 127.0.0.1 --port 4173 --strictPort",
     url: "http://127.0.0.1:4173",
     // In local development, reuse an already running Phuzzle server if one exists
     // so Playwright can still run while we iterate in parallel. CI still launches
