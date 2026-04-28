@@ -41,7 +41,7 @@
   justify-content: center;
   gap: 6px;
   min-width: 0;
-  min-height: 80px;
+  min-height: 0;
   overflow: hidden;
   padding: 8px 8px 10px;
   position: relative;
@@ -89,14 +89,14 @@
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  overscroll-behavior-x: contain;
+  overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
   scroll-padding-inline-end: 0;
   padding: 8px 10px;
   padding-inline-end: 10px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   scroll-behavior: var(--fx-tray-scroll-behavior, smooth);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;

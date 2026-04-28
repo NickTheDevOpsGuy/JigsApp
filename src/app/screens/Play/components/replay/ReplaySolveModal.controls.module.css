@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 0 0 12px;
+  padding: 0 0 10px;
   margin-bottom: 2px;
   border-bottom: 1px solid
     color-mix(in srgb, var(--color-brand-primary) 22%, var(--color-border));
@@ -182,7 +182,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 16px 0 0;
+  padding: 12px 0 0;
   max-width: 100%;
   box-sizing: border-box;
 }

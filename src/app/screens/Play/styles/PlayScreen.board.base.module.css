@@ -128,13 +128,13 @@
 .playBody .trayArea .trayInDock {
   flex: 0 0 auto;
   min-width: 0;
-  height: clamp(132px, 17vh, 190px);
+  height: clamp(168px, 19vh, 190px);
   max-height: min(190px, 26vh);
-  min-height: 96px;
+  min-height: 160px;
 }
 
 .playBody .trayArea .trayInDock.trayWrapLarge {
-  height: clamp(132px, 17vh, 190px);
+  height: clamp(168px, 19vh, 190px);
   max-height: min(190px, 26vh);
 }
 
@@ -177,15 +177,15 @@
   }
 
   .playBody .trayArea .trayInDock {
-    height: clamp(88px, 13vh, 118px);
-    max-height: min(118px, 22vh);
-    min-height: 76px;
+    height: clamp(128px, 16vh, 148px);
+    max-height: min(148px, 22vh);
+    min-height: 124px;
   }
 
   .playBody .trayArea .trayInDock.trayWrapLarge {
-    height: clamp(88px, 13vh, 118px);
-    max-height: min(118px, 22vh);
-    min-height: 76px;
+    height: clamp(128px, 16vh, 148px);
+    max-height: min(148px, 22vh);
+    min-height: 124px;
   }
 
   .boardLayoutShell[data-replay-active="true"] .playBody .main {

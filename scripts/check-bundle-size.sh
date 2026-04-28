@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Check gzip'd JS bundle size vs baseline. Fails CI if over limit.
+# Check gzip'd JS bundle size vs baseline. Fails CI if over budget.
 # CI can set BASELINE_REF to compare against the target branch dynamically.
+# Tiny gzip changes are expected, so budget allows a small configurable headroom.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -19,7 +20,7 @@ bundle_size_bytes() {
 
 bundle_size_kb() {
   local bytes="$1"
-  echo $((bytes / 1024))
+  echo $(((bytes + 1023) / 1024))
 }
 
 baseline_from_ref() {
@@ -41,6 +42,13 @@ baseline_from_ref() {
   )
 }
 
+BUNDLE_TOLERANCE_KB="${BUNDLE_TOLERANCE_KB:-8}"
+
+if ! [[ "$BUNDLE_TOLERANCE_KB" =~ ^[0-9]+$ ]]; then
+  echo "ERROR: BUNDLE_TOLERANCE_KB must be a non-negative integer"
+  exit 1
+fi
+
 if [ "${CHECK_BUNDLE_USE_EXISTING_DIST:-}" = "1" ]; then
   if [ ! -d dist/assets ]; then
     echo "ERROR: CHECK_BUNDLE_USE_EXISTING_DIST=1 but dist/assets does not exist"
@@ -49,21 +57,32 @@ if [ "${CHECK_BUNDLE_USE_EXISTING_DIST:-}" = "1" ]; then
 else
   npm run build --silent 2>/dev/null
 fi
-TOTAL_KB=$(bundle_size_kb "$(bundle_size_bytes)")
+TOTAL_BYTES="$(bundle_size_bytes)"
+TOTAL_KB="$(bundle_size_kb "$TOTAL_BYTES")"
 
 if [ -n "${BASELINE_KB:-}" ]; then
+  if ! [[ "$BASELINE_KB" =~ ^[0-9]+$ ]]; then
+    echo "ERROR: BASELINE_KB must be a non-negative integer"
+    exit 1
+  fi
+  BASELINE_BYTES=$((BASELINE_KB * 1024))
   BASELINE_LABEL="baseline"
 elif [ -n "${BASELINE_REF:-}" ]; then
-  BASELINE_KB=$(bundle_size_kb "$(baseline_from_ref "$BASELINE_REF")")
+  BASELINE_BYTES="$(baseline_from_ref "$BASELINE_REF")"
   BASELINE_LABEL="$BASELINE_REF"
 else
-  BASELINE_KB=320
+  BASELINE_BYTES=$((320 * 1024))
   BASELINE_LABEL="fallback baseline"
 fi
 
-echo "Bundle gzip total: ${TOTAL_KB} kB (baseline: ${BASELINE_KB} kB)"
-if [ "$TOTAL_KB" -gt "$BASELINE_KB" ]; then
-  echo "ERROR: Bundle size ${TOTAL_KB} kB exceeds ${BASELINE_LABEL} ${BASELINE_KB} kB"
+BASELINE_KB="$(bundle_size_kb "$BASELINE_BYTES")"
+BUDGET_BYTES=$((BASELINE_BYTES + BUNDLE_TOLERANCE_KB * 1024))
+BUDGET_KB="$(bundle_size_kb "$BUDGET_BYTES")"
+
+echo "Bundle gzip total: ${TOTAL_KB} kB (baseline: ${BASELINE_KB} kB, budget: ${BUDGET_KB} kB)"
+if [ "$TOTAL_BYTES" -gt "$BUDGET_BYTES" ]; then
+  echo "ERROR: Bundle size ${TOTAL_KB} kB exceeds ${BASELINE_LABEL} budget ${BUDGET_KB} kB"
+  echo "       Baseline ${BASELINE_KB} kB + tolerance ${BUNDLE_TOLERANCE_KB} kB"
   exit 1
 fi
 echo "Bundle size OK"

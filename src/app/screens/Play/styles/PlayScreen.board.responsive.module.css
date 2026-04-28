@@ -84,14 +84,14 @@
 
   .playBody .trayArea .trayInDock,
   .playBody .trayArea .trayInDock.trayWrapLarge {
-    height: clamp(88px, 13vh, 112px);
-    max-height: min(112px, 20vh);
-    min-height: 82px;
+    height: clamp(128px, 16vh, 148px);
+    max-height: min(148px, 22vh);
+    min-height: 124px;
   }
 
   .boardWrapper {
-    width: min(100%, calc(var(--app-vh-fill, 100dvh) - 210px));
-    max-width: min(100%, calc(var(--app-vh-fill, 100dvh) - 210px));
+    width: min(100%, calc(var(--app-vh-fill, 100dvh) - 246px));
+    max-width: min(100%, calc(var(--app-vh-fill, 100dvh) - 246px));
     flex: 0 1 auto;
     min-height: 0;
     max-height: 100%;
@@ -531,9 +531,9 @@
 
   .playBody .trayArea .trayInDock,
   .playBody .trayArea .trayInDock.trayWrapLarge {
-    height: clamp(96px, 12vh, 128px);
-    max-height: min(128px, 16vh);
-    min-height: 88px;
+    height: clamp(220px, 22vh, 240px);
+    max-height: min(240px, 26vh);
+    min-height: 220px;
   }
 
   .boardWrapper {
@@ -688,9 +688,9 @@
   .playBody .trayArea .trayInDock,
   .playBody .trayArea .trayInDock.trayWrapLarge {
     flex: 0 0 auto;
-    height: clamp(96px, 13vh, 124px);
-    max-height: min(124px, 17vh);
-    min-height: 92px;
+    height: clamp(136px, 16vh, 156px);
+    max-height: min(156px, 19vh);
+    min-height: 136px;
   }
 
   .boardLayoutShell[data-replay-active="true"] .playBody {
@@ -729,9 +729,9 @@
 
   .playBody .trayArea .trayInDock,
   .playBody .trayArea .trayInDock.trayWrapLarge {
-    height: clamp(88px, 12vh, 112px);
-    max-height: min(112px, 16vh);
-    min-height: 80px;
+    height: clamp(132px, 16vh, 148px);
+    max-height: min(148px, 19vh);
+    min-height: 132px;
   }
 }
 
@@ -777,9 +777,9 @@
 
   .playBody .trayArea .trayInDock,
   .playBody .trayArea .trayInDock.trayWrapLarge {
-    height: clamp(68px, 18vh, 78px);
-    max-height: min(78px, 22vh);
-    min-height: 68px;
+    height: clamp(102px, 26vh, 112px);
+    max-height: min(112px, 30vh);
+    min-height: 102px;
     padding-bottom: max(6px, env(safe-area-inset-bottom, 0));
   }
 

@@ -87,8 +87,9 @@ export function usePieceTrayScroll(displayedLength: number) {
     const el = scrollerRef.current;
     if (!el) return;
     const isIOS =
-      typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
-
+      typeof navigator !== "undefined" &&
+      (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.maxTouchPoints > 0 && "WebKitCSSMatrix" in window));
     let touchLastX: number | null = null;
     const onTouchStart = (event: TouchEvent) => {
       if (event.touches.length === 1) {
@@ -127,6 +128,9 @@ export function usePieceTrayScroll(displayedLength: number) {
       run();
     };
 
+    let scrollClampRaf1 = 0;
+    let scrollClampRaf2 = 0;
+
     const run = () => {
       updateScrollProgress();
       requestAnimationFrame(() => requestAnimationFrame(updateScrollProgress));
@@ -134,8 +138,17 @@ export function usePieceTrayScroll(displayedLength: number) {
       setTimeout(updateScrollProgress, 150);
       setTimeout(updateScrollProgress, 400);
     };
+    const onScroll = () => {
+      updateScrollProgress();
+      if (scrollClampRaf1) cancelAnimationFrame(scrollClampRaf1);
+      if (scrollClampRaf2) cancelAnimationFrame(scrollClampRaf2);
+      scrollClampRaf1 = requestAnimationFrame(() => {
+        updateScrollProgress();
+        scrollClampRaf2 = requestAnimationFrame(updateScrollProgress);
+      });
+    };
     run();
-    el.addEventListener("scroll", updateScrollProgress);
+    el.addEventListener("scroll", onScroll, { passive: true });
     el.addEventListener("scrollend", run);
     el.addEventListener("touchstart", onTouchStart, { passive: true });
     el.addEventListener("touchmove", onTouchMove, { passive: false });
@@ -150,7 +163,9 @@ export function usePieceTrayScroll(displayedLength: number) {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
-      el.removeEventListener("scroll", updateScrollProgress);
+      if (scrollClampRaf1) cancelAnimationFrame(scrollClampRaf1);
+      if (scrollClampRaf2) cancelAnimationFrame(scrollClampRaf2);
+      el.removeEventListener("scroll", onScroll);
       el.removeEventListener("scrollend", run);
       el.removeEventListener("touchstart", onTouchStart);
       el.removeEventListener("touchmove", onTouchMove);
