@@ -146,6 +146,22 @@ test.describe("Responsive smoke", () => {
     expect(
       (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
     ).toBeLessThanOrEqual((viewport?.height ?? 0) + 2);
+
+    const trayClipping = await tray.evaluate((node) => {
+      const scroller = node as HTMLElement;
+      const trayRoot = scroller.parentElement?.parentElement;
+      if (!trayRoot) return null;
+      const scrollerBox = scroller.getBoundingClientRect();
+      const trayRootBox = trayRoot.getBoundingClientRect();
+      return {
+        scrollerBottom: scrollerBox.bottom,
+        trayRootBottom: trayRootBox.bottom,
+      };
+    });
+    expect(trayClipping).not.toBeNull();
+    expect(trayClipping!.scrollerBottom).toBeLessThanOrEqual(
+      trayClipping!.trayRootBottom + 1,
+    );
     await expectNoDocumentOverflow(page);
   });
 

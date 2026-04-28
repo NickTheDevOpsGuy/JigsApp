@@ -895,6 +895,96 @@
   }
 }
 
+@media (max-width: 600px) {
+  .completeWinDialog {
+    max-width: min(370px, calc(100vw - 18px));
+  }
+
+  .completeStatsBar {
+    padding: 8px 10px;
+    gap: 6px 8px;
+  }
+
+  .completeStatsBarItem {
+    font-size: 11px;
+  }
+
+  .completeCelebrationBlock {
+    padding: 12px 12px 8px;
+    gap: 7px;
+  }
+
+  .completePhasedTitle {
+    font-size: 1.16rem;
+  }
+
+  .completeSummaryChips {
+    gap: 5px;
+  }
+
+  .completeSummaryChip {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .completeImageWrapPhased {
+    min-height: 96px;
+    max-height: min(25svh, 210px);
+    border-radius: 10px;
+  }
+
+  .completeImagePhased {
+    max-height: min(25svh, 210px);
+  }
+
+  .completeAchievementPhased {
+    min-height: 20px;
+    font-size: 15px;
+    line-height: 1.2;
+  }
+
+  .completeNextGoal {
+    width: calc(100% - 24px);
+    margin: 0 12px 10px;
+    padding: 9px 11px;
+    gap: 3px;
+  }
+
+  .completeNextGoalEyebrow {
+    font-size: 9px;
+  }
+
+  .completeNextGoalTitle {
+    font-size: 13px;
+  }
+
+  .completeNextGoalBody {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .completeActionsPhased {
+    padding: 10px 12px 12px;
+    gap: 6px;
+  }
+
+  .completePrimaryBtn {
+    min-height: 48px;
+    padding: 12px 14px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .completeOptionsTrigger {
+    min-height: 44px;
+    padding: 9px 11px;
+  }
+
+  .completeOptionsTriggerHint {
+    display: none;
+  }
+}
+
 /* ── Desktop / large screens (≥ 1025px) ── */
 @media (min-width: 1025px) {
   .completePhasedTitle {
@@ -923,8 +1013,8 @@
   }
 
   .completeCelebrationBlock {
-    padding: 16px 12px 10px;
-    gap: 8px;
+    padding: 12px 12px 8px;
+    gap: 7px;
   }
 
   .completeActionsPhased {
@@ -944,8 +1034,8 @@
   }
 
   .completeStatsBar {
-    padding: 10px 12px;
-    gap: 8px;
+    padding: 8px 10px;
+    gap: 6px 8px;
   }
 
   .completeStatsBarItem {
@@ -967,12 +1057,13 @@
   }
 
   .completeImageWrapPhased {
-    max-height: min(38vh, 280px);
+    min-height: 92px;
+    max-height: min(24svh, 190px);
     border-radius: 8px;
   }
 
   .completeImagePhased {
-    max-height: min(38vh, 280px);
+    max-height: min(24svh, 190px);
   }
 }
 
