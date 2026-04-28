@@ -3,8 +3,9 @@ import js from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import type { Linter } from "eslint";
 
-export default [
+const config: Linter.Config[] = [
   // Ignore build output and dependencies
   {
     ignores: [
@@ -78,3 +79,5 @@ export default [
     },
   },
 ];
+
+export default config;

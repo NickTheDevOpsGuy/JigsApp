@@ -9,6 +9,8 @@
     "resolveJsonModule": true,
 
     "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "isolatedModules": true,
     "useDefineForClassFields": true,
     "forceConsistentCasingInFileNames": true,
