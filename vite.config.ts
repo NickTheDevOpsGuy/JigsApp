@@ -7,6 +7,7 @@ import path from "path";
 export default defineConfig(({ mode }) => {
   // Load env from .env files AND process.env (Vercel injects here)
   const env = loadEnv(mode, process.cwd(), "");
+  const disablePwa = process.env.PWA_DISABLE === "1";
   const supabaseOrigin = (() => {
     const raw = env.VITE_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "";
     try {
@@ -28,73 +29,87 @@ export default defineConfig(({ mode }) => {
           return html.replace("</head>", `${links}\n  </head>`);
         },
       },
-      VitePWA({
-        registerType: "autoUpdate",
-        includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.webp"],
-        manifest: {
-          name: "Phuzzle",
-          short_name: "Phuzzle",
-          description:
-            "Solve beautiful jigsaw puzzles in your browser. Relax, race the clock, or play with a friend.",
-          theme_color: "#0b63b8",
-          background_color: "#f3f7ff",
-          display: "standalone",
-          display_override: ["standalone", "minimal-ui", "browser"],
-          start_url: "/",
-          scope: "/",
-          id: "/",
-          categories: ["games", "entertainment"],
-          icons: [
-            { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-            {
-              src: "/icon-512.png",
-              sizes: "512x512",
-              type: "image/png",
-              purpose: "any maskable",
-            },
-          ],
-        },
-        workbox: {
-          globPatterns: ["**/*.{js,css,html,ico,svg,png,woff2}"],
-          // Maps are not needed offline; skipping them shrinks precache and install cost.
-          globIgnores: ["**/*.map"],
-          cleanupOutdatedCaches: true,
-          navigationPreload: true,
-          runtimeCaching: [
-            {
-              urlPattern: ({ request, sameOrigin }) =>
-                sameOrigin && request.destination === "image",
-              handler: "CacheFirst",
-              options: {
-                cacheName: "phuzzle-images-v1",
-                expiration: {
-                  maxEntries: 120,
-                  maxAgeSeconds: 60 * 60 * 24 * 30,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
+      ...(!disablePwa
+        ? [
+            VitePWA({
+              registerType: "autoUpdate",
+              includeAssets: [
+                "favicon.svg",
+                "icon-192.png",
+                "icon-512.png",
+                "og-image.webp",
+              ],
+              manifest: {
+                name: "Phuzzle",
+                short_name: "Phuzzle",
+                description:
+                  "Solve beautiful jigsaw puzzles in your browser. Relax, race the clock, or play with a friend.",
+                theme_color: "#0b63b8",
+                background_color: "#f3f7ff",
+                display: "standalone",
+                display_override: ["standalone", "minimal-ui", "browser"],
+                start_url: "/",
+                scope: "/",
+                id: "/",
+                categories: ["games", "entertainment"],
+                icons: [
+                  {
+                    src: "/icon-192.png",
+                    sizes: "192x192",
+                    type: "image/png",
+                    purpose: "any",
+                  },
+                  {
+                    src: "/icon-512.png",
+                    sizes: "512x512",
+                    type: "image/png",
+                    purpose: "any maskable",
+                  },
+                ],
               },
-            },
-            {
-              urlPattern: ({ request }) => request.destination === "font",
-              handler: "CacheFirst",
-              options: {
-                cacheName: "phuzzle-fonts-v1",
-                expiration: {
-                  maxEntries: 16,
-                  maxAgeSeconds: 60 * 60 * 24 * 365,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
+              workbox: {
+                globPatterns: ["**/*.{js,css,html,ico,svg,png,woff2}"],
+                // Maps are not needed offline; skipping them shrinks precache and install cost.
+                globIgnores: ["**/*.map"],
+                cleanupOutdatedCaches: true,
+                navigationPreload: true,
+                runtimeCaching: [
+                  {
+                    urlPattern: ({ request, sameOrigin }) =>
+                      sameOrigin && request.destination === "image",
+                    handler: "CacheFirst",
+                    options: {
+                      cacheName: "phuzzle-images-v1",
+                      expiration: {
+                        maxEntries: 120,
+                        maxAgeSeconds: 60 * 60 * 24 * 30,
+                      },
+                      cacheableResponse: {
+                        statuses: [0, 200],
+                      },
+                    },
+                  },
+                  {
+                    urlPattern: ({ request }) => request.destination === "font",
+                    handler: "CacheFirst",
+                    options: {
+                      cacheName: "phuzzle-fonts-v1",
+                      expiration: {
+                        maxEntries: 16,
+                        maxAgeSeconds: 60 * 60 * 24 * 365,
+                      },
+                      cacheableResponse: {
+                        statuses: [0, 200],
+                      },
+                    },
+                  },
+                ],
+                // Allow puzzle images up to ~50 MB (default 2 MiB fails on large sample images)
+                maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
               },
-            },
-          ],
-          // Allow puzzle images up to ~50 MB (default 2 MiB fails on large sample images)
-          maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
-        },
-      }),
+            }),
+          ]
+        : []),
     ],
     test: {
       environment: "node",

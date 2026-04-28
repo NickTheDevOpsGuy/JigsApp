@@ -201,7 +201,8 @@
   }
 
   .scrollerWrap {
-    padding: 2px 4px 6px;
+    min-height: 72px;
+    padding: 4px 6px 8px;
   }
 
   .pieceButton,

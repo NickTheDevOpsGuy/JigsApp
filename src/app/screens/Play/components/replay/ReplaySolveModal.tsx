@@ -313,7 +313,7 @@ export function ReplaySolveModal({
     const cutoutRadius = 20;
     const safeEdge = 12;
     const dockInsetPx = 8;
-    const estimatedDockHeight = 214;
+    const estimatedDockHeight = 188;
     const minSideDockWidth = 252;
     const maxShell = Math.max(0, viewWidth - 2 * safeEdge);
     const shellWidth = Math.min(maxShell, width + dockInsetPx * 2);
@@ -322,8 +322,8 @@ export function ReplaySolveModal({
       Math.max(viewLeft + safeEdge, left - dockInsetPx),
     );
     const isNarrowViewport = viewWidth <= 600;
-    const headerGap = isNarrowViewport ? 10 : 12;
-    const estimatedHeaderHeight = isNarrowViewport ? 62 : 82;
+    const headerGap = isNarrowViewport ? 8 : 12;
+    const estimatedHeaderHeight = isNarrowViewport ? 56 : 78;
     const headerTop = Math.max(
       viewTop + safeEdge,
       top - estimatedHeaderHeight - headerGap,
