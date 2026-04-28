@@ -33,29 +33,39 @@ export default defineConfig(({ mode }) => {
         ? [
             VitePWA({
               registerType: "autoUpdate",
-              includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "og-image.webp"],
+              includeAssets: [
+                "favicon.svg",
+                "icon-192.png",
+                "icon-512.png",
+                "og-image.webp",
+              ],
               manifest: {
-          name: "Phuzzle",
-          short_name: "Phuzzle",
-          description:
-            "Solve beautiful jigsaw puzzles in your browser. Relax, race the clock, or play with a friend.",
-          theme_color: "#0b63b8",
-          background_color: "#f3f7ff",
-          display: "standalone",
-          display_override: ["standalone", "minimal-ui", "browser"],
-          start_url: "/",
-          scope: "/",
-          id: "/",
-          categories: ["games", "entertainment"],
-          icons: [
-            { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-            {
-              src: "/icon-512.png",
-              sizes: "512x512",
-              type: "image/png",
-              purpose: "any maskable",
-            },
-          ],
+                name: "Phuzzle",
+                short_name: "Phuzzle",
+                description:
+                  "Solve beautiful jigsaw puzzles in your browser. Relax, race the clock, or play with a friend.",
+                theme_color: "#0b63b8",
+                background_color: "#f3f7ff",
+                display: "standalone",
+                display_override: ["standalone", "minimal-ui", "browser"],
+                start_url: "/",
+                scope: "/",
+                id: "/",
+                categories: ["games", "entertainment"],
+                icons: [
+                  {
+                    src: "/icon-192.png",
+                    sizes: "192x192",
+                    type: "image/png",
+                    purpose: "any",
+                  },
+                  {
+                    src: "/icon-512.png",
+                    sizes: "512x512",
+                    type: "image/png",
+                    purpose: "any maskable",
+                  },
+                ],
               },
               workbox: {
                 globPatterns: ["**/*.{js,css,html,ico,svg,png,woff2}"],
@@ -64,35 +74,35 @@ export default defineConfig(({ mode }) => {
                 cleanupOutdatedCaches: true,
                 navigationPreload: true,
                 runtimeCaching: [
-            {
-              urlPattern: ({ request, sameOrigin }) =>
-                sameOrigin && request.destination === "image",
-              handler: "CacheFirst",
-              options: {
-                cacheName: "phuzzle-images-v1",
-                expiration: {
-                  maxEntries: 120,
-                  maxAgeSeconds: 60 * 60 * 24 * 30,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
-            },
-            {
-              urlPattern: ({ request }) => request.destination === "font",
-              handler: "CacheFirst",
-              options: {
-                cacheName: "phuzzle-fonts-v1",
-                expiration: {
-                  maxEntries: 16,
-                  maxAgeSeconds: 60 * 60 * 24 * 365,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
-            },
+                  {
+                    urlPattern: ({ request, sameOrigin }) =>
+                      sameOrigin && request.destination === "image",
+                    handler: "CacheFirst",
+                    options: {
+                      cacheName: "phuzzle-images-v1",
+                      expiration: {
+                        maxEntries: 120,
+                        maxAgeSeconds: 60 * 60 * 24 * 30,
+                      },
+                      cacheableResponse: {
+                        statuses: [0, 200],
+                      },
+                    },
+                  },
+                  {
+                    urlPattern: ({ request }) => request.destination === "font",
+                    handler: "CacheFirst",
+                    options: {
+                      cacheName: "phuzzle-fonts-v1",
+                      expiration: {
+                        maxEntries: 16,
+                        maxAgeSeconds: 60 * 60 * 24 * 365,
+                      },
+                      cacheableResponse: {
+                        statuses: [0, 200],
+                      },
+                    },
+                  },
                 ],
                 // Allow puzzle images up to ~50 MB (default 2 MiB fails on large sample images)
                 maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
