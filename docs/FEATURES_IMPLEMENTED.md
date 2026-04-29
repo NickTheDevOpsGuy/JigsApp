@@ -20,14 +20,14 @@ Earn one freeze per week after a 5-day streak. Auto-applied when a day is missed
 
 ## Alternate piece shapes
 
-Classic, Irregular, Hard. Settings → Display → Piece shape. Persisted; applies to next puzzle.  
+Classic, Irregular, Hard. Play -> Settings -> Piece Shape. Persisted; applies to next puzzle.  
 **Files:** `puzzle/core/types.ts` (PieceCutType), `puzzle/core/shape.ts`, `createInitialPieces.ts`, header menu config.
 
 ---
 
 ## Progressive reveal
 
-Toggle hides full reference; only correctly placed regions reveal.  
+Toggle at Play -> Settings -> Snapping. It hides the full reference; only correctly placed regions reveal.  
 **Files:** `ProgressivePreviewOverlay.tsx`, `usePlayScreenUI.ts`, `PlayScreen.tsx`.
 
 ---

@@ -12,7 +12,7 @@ Phuzzle uses Supabase for leaderboards, stats, achievements, profiles, and co-op
 | Player stats   | Completions, play time, streaks                               |
 | Achievements   | Badges (first puzzle, streaks, speed runs, etc.)              |
 | Profile        | Display name, anonymous mode (raccoon names on leaderboards)  |
-| Co-op          | “Play with friend” real-time sessions                         |
+| Co-op          | Play menu -> Play -> Co-op real-time sessions                 |
 | Daily comments | Reactions and comments on daily puzzle; report for moderation |
 
 ---
@@ -94,7 +94,7 @@ The tables migration sets `REPLICA IDENTITY FULL` on `puzzle_sessions` for Realt
 ## 6. Verify
 
 1. `npm run dev` and open the app.
-2. Open Leaderboards (Menu → Leaderboards).
+2. Open Leaderboard from the Play menu, or go directly to `/stats`.
 3. Complete a puzzle and confirm stats record.
 
 If you see “Connect Supabase to track your stats…”:
@@ -153,7 +153,7 @@ If leaderboards stay empty after completing puzzles, check that RLS migrations r
 ## Verifying share and co-op
 
 1. Supabase configured (env, migrations, anonymous auth, Realtime).
-2. Start any puzzle → Menu → Share → **Play with friend**.
+2. Start any puzzle -> Play menu -> Play -> **Co-op**.
 3. Copy or share the URL; open in another tab or device.
 4. Move a piece in one tab; it should appear in the other.
 

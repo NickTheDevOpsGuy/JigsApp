@@ -84,6 +84,13 @@ export function TutorialOverlay({
               </p>
             </section>
             <section className={styles.section}>
+              <h4 className={styles.sectionTitle}>Fitting Pieces</h4>
+              <p>
+                Drag pieces onto the board. When a piece is close to the correct spot, the
+                target highlights and shows whether it fits or is almost aligned.
+              </p>
+            </section>
+            <section className={styles.section}>
               <h4 className={styles.sectionTitle}>Rotating Pieces</h4>
               <p>
                 {isTouch
@@ -213,7 +220,7 @@ export function TutorialOverlay({
               <li>Start with edge and corner pieces</li>
               <li>Group pieces by color or pattern</li>
               <li>Use the Preview button to see the full image</li>
-              <li>Pieces snap together when correctly aligned</li>
+              <li>Release when the “Fits here” preview appears to snap into place</li>
               <li>Turn on Ghost hint when stuck</li>
               <li>
                 Stats → Leaderboard → Week → Album shows your 7-day collection with daily

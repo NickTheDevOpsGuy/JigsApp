@@ -43,6 +43,8 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const triggerWrapRef = useRef<HTMLDivElement | null>(null);
+  const triggerButtonRef = useRef<HTMLButtonElement | null>(null);
+  const panelId = "play-header-menu-panel";
 
   const [menuRect, setMenuRect] = useState<{
     top: number;
@@ -57,14 +59,19 @@ export function HeaderMenu(props: HeaderMenuProps) {
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const gap = 6;
-    const { width: vw } = getLayoutViewportSize();
-    const maxWidth = Math.min(360, vw - 16);
+    const { width: vw, height: vh } = getLayoutViewportSize();
+    const maxWidth = Math.min(360, vw - 24);
     const left = Math.min(Math.max(8, rect.left), vw - maxWidth - 8);
     setMenuRect({
-      top: rect.bottom + gap,
+      top: Math.min(rect.bottom + gap, Math.max(12, vh - 24)),
       left,
       minWidth: Math.min(rect.width, maxWidth),
     });
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setOpen(false);
+    window.requestAnimationFrame(() => triggerButtonRef.current?.focus());
   }, []);
 
   useEffect(() => {
@@ -122,7 +129,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
           setActiveRoot(null);
           setActiveSubMenu(null);
         } else {
-          setOpen(false);
+          closeMenu();
         }
         return;
       }
@@ -151,7 +158,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
       }
     };
 
-    const onScroll = () => setOpen(false);
+    const onScroll = () => closeMenu();
 
     window.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("keydown", onKeyDown);
@@ -162,7 +169,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("scroll", onScroll, true);
     };
-  }, [open, activeSubMenu]);
+  }, [open, activeRoot, activeSubMenu, closeMenu]);
 
   const groups = buildHeaderMenuGroups(items);
 
@@ -233,16 +240,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
   );
   const hasSubMenu = (id: SubMenuId) => hasSubMenuItems(id, groups);
 
-  const navItems = groups.settingsItems.filter((i) => i.subMenu === "navigation");
-  const playPanelItems = [
-    ...navItems,
-    ...groups.settingsItems.filter((i) => i.subMenu === "share"),
-  ].sort((a, b) =>
-    (a.sortKey ?? a.label).localeCompare(b.sortKey ?? b.label, undefined, {
-      sensitivity: "base",
-    }),
-  );
-  const aboutPanelItems = [
+  const helpPanelItems = [
     ...groups.helpItems,
     ...groups.aboutItems,
     ...groups.contributeItems,
@@ -251,19 +249,27 @@ export function HeaderMenu(props: HeaderMenuProps) {
       sensitivity: "base",
     }),
   );
-
   const handleRootClick = (root: RootMenuId) => {
+    if (root === "resume") {
+      closeMenu();
+      return;
+    }
+    if (root === "newPuzzle") {
+      props.onNewPuzzle();
+      closeMenu();
+      return;
+    }
     if (root === "leaderboard") {
       void loadStatsScreenModule();
       navigate("/stats");
-      setOpen(false);
+      closeMenu();
       return;
     }
     setActiveRoot(root);
   };
 
   const handleBack = () => {
-    if (activeSubMenu && activeRoot === "settings") {
+    if (activeSubMenu) {
       setActiveSubMenu(null);
     } else {
       setActiveRoot(null);
@@ -273,18 +279,20 @@ export function HeaderMenu(props: HeaderMenuProps) {
 
   const showRootMenu = !activeRoot && !activeSubMenu;
   const showSettingsList = activeRoot === "settings" && !activeSubMenu;
-  const showPlayList = activeRoot === "play";
-  const showAboutList = activeRoot === "about";
-  const showSubPanel = activeRoot === "settings" && activeSubMenu;
+  const showHelpList = activeRoot === "help";
+  const showSubPanel =
+    (activeRoot === "settings" || activeRoot === "help") && activeSubMenu;
 
   return (
     <div className={styles.headerMenuWrap} ref={rootRef}>
       <div className={styles.headerMenuTriggerWrap} ref={triggerWrapRef}>
         <button
+          ref={triggerButtonRef}
           type="button"
           className={styles.headerMenuTrigger}
           aria-haspopup="menu"
           aria-expanded={open}
+          aria-controls={open ? panelId : undefined}
           aria-label={open ? "Close menu" : "Open menu"}
           title={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((s) => !s)}
@@ -298,6 +306,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
         createPortal(
           <div
             data-header-menu-panel="true"
+            id={panelId}
             className={`${styles.headerMenuPanel} ${styles.headerMenuPanelPortal}`}
             role="menu"
             style={{
@@ -316,7 +325,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
                 headerMenuProps={props}
                 setOpen={setOpen}
                 onBack={handleBack}
-                backLabel="Settings"
+                backLabel={activeRoot === "settings" ? "Settings" : "Help"}
               />
             ) : showRootMenu ? (
               <>
@@ -327,23 +336,37 @@ export function HeaderMenu(props: HeaderMenuProps) {
                     className={styles.headerMenuSubmenuTrigger}
                     role="menuitem"
                     onClick={() => handleRootClick(id)}
+                    aria-haspopup={
+                      id === "settings" || id === "help" ? "menu" : undefined
+                    }
+                    aria-expanded={
+                      activeRoot === id && (id === "settings" || id === "help")
+                        ? true
+                        : undefined
+                    }
                     aria-label={ROOT_MENU_LABELS[id]}
                     title={
                       id === "leaderboard"
                         ? "View leaderboards"
                         : id === "settings"
-                          ? "Gameplay, assistance, appearance, audio, advanced"
-                          : ROOT_MENU_LABELS[id]
+                          ? "Gameplay, appearance, audio, and advanced settings"
+                          : id === "newPuzzle"
+                            ? "Choose a different puzzle"
+                            : id === "resume"
+                              ? "Close this menu and resume playing"
+                              : id === "help"
+                                ? "How to play and keyboard shortcuts"
+                                : ROOT_MENU_LABELS[id]
                     }
                   >
                     {ROOT_MENU_LABELS[id]}
-                    {(id === "play" || id === "settings" || id === "about") && (
+                    {(id === "settings" || id === "help") && (
                       <ChevronRight size={16} className={styles.headerMenuChevron} />
                     )}
                   </button>
                 ))}
               </>
-            ) : showSettingsList || showPlayList || showAboutList ? (
+            ) : showSettingsList || showHelpList ? (
               <>
                 <button
                   type="button"
@@ -372,12 +395,8 @@ export function HeaderMenu(props: HeaderMenuProps) {
                       <ChevronRight size={16} className={styles.headerMenuChevron} />
                     </button>
                   ))}
-                {showPlayList &&
-                  playPanelItems.map((item) => (
-                    <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
-                  ))}
-                {showAboutList &&
-                  aboutPanelItems.map((item) => (
+                {showHelpList &&
+                  helpPanelItems.map((item) => (
                     <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
                   ))}
               </>

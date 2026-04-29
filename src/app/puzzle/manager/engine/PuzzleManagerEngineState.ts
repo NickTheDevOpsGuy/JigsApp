@@ -307,8 +307,6 @@ export class PuzzleManagerState {
     );
   }
   protected computeSnapPreview(): DragPreview {
-    if (!this.magneticSnapEnabled) return null;
-
     const activeId = this.drag.activeId;
     if (!activeId) return null;
 

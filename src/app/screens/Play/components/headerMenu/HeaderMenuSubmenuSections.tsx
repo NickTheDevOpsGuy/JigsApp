@@ -15,6 +15,8 @@ interface BaseSectionProps {
     id:
       | "contribute"
       | "help"
+      | "assistance"
+      | "gameplay"
       | "pieceShape"
       | "modes"
       | "manualControls"
@@ -25,6 +27,8 @@ interface BaseSectionProps {
     id:
       | "contribute"
       | "help"
+      | "assistance"
+      | "gameplay"
       | "pieceShape"
       | "modes"
       | "manualControls"
@@ -87,7 +91,14 @@ export function HeaderMenuAboutSection({
   );
 }
 
-const CONTROLS_SUBMENU_IDS = ["manualControls", "modes", "moves", "pieceShape"] as const;
+const CONTROLS_SUBMENU_IDS = [
+  "assistance",
+  "modes",
+  "moves",
+  "pieceShape",
+  "gameplay",
+  "manualControls",
+] as const;
 
 export function HeaderMenuControlsSection({
   hasSubMenuItems,

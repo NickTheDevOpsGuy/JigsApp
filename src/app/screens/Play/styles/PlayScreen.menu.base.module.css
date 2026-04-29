@@ -12,7 +12,9 @@
   left: 0;
   margin-top: 4px;
   min-width: 200px;
-  max-height: min(80dvh, 520px);
+  width: max-content;
+  max-width: min(340px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -26,6 +28,8 @@
   padding: 8px 0;
   z-index: 1100;
   animation: menuFadeIn 0.15s ease;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
 }
 
 .headerMenuPanel::-webkit-scrollbar {
@@ -60,11 +64,19 @@
 }
 
 .headerMenuItem:hover {
-  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, var(--color-bg-card));
 }
 
 .headerMenuItem:active {
   background: var(--color-brand-light);
+}
+
+.headerMenuItem:disabled,
+.headerMenuToggleRow:disabled,
+.headerMenuSubmenuTrigger:disabled {
+  color: var(--color-text-muted);
+  opacity: 0.68;
+  cursor: not-allowed;
 }
 
 .headerMenuDivider {
@@ -116,4 +128,22 @@
   color: var(--color-text-primary);
   cursor: pointer;
   transition: background 0.15s ease;
+}
+
+@media (forced-colors: active) {
+  .headerMenuPanel {
+    border: 1px solid CanvasText;
+    background: Canvas;
+  }
+
+  .headerMenuItem,
+  .headerMenuToggleRow,
+  .headerMenuSubmenuTrigger,
+  .headerMenuBack {
+    color: ButtonText;
+  }
+
+  .headerMenuSwitch {
+    border: 1px solid ButtonText;
+  }
 }

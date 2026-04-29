@@ -43,11 +43,21 @@ Manual pass on real devices before release.
 - Tray visible and usable on small screens.
 - Tray remains reachable on tablets; no clipping below the fold in portrait.
 - Drag/snap smooth; no stuck or hidden pieces.
+- While dragging near the correct spot, the target highlight and non-color
+  text/icon cue are visible in light and dark themes.
+- Dragged/selected pieces have clear outlines and shadows; pieces do not
+  disappear into the board or tray.
 - Piece locking reliable.
 - Long-press on board does not open context menu.
 - Minimap does not block interaction while dragging.
 - Board stays square on phone, tablet, and desktop widths.
 - Touch-first tray flow feels natural on phones/tablets; swipe works without depending on side arrows.
+- Hamburger menu shows only Resume, New Puzzle, Settings, Leaderboard, and Help
+  at the root.
+- Menu panels stay inside the viewport in portrait and landscape; back/close
+  controls remain reachable.
+- Settings uses nested panels/bottom-sheet behavior on touch devices, not
+  hover-only flyouts.
 
 **Win / Share**
 
@@ -56,6 +66,7 @@ Manual pass on real devices before release.
 - Completion dialog stays fully on-screen on short phones (for example 360×480 and iPhone SE class).
 - Replay Solve masks the full board; no solved-board leak outside the replay cutout.
 - Replay controls fit on one compact mobile layout without wrapping off-screen.
+- Replay playback options stay constrained to the viewport.
 - Opening Replay from the win screen works on mobile, and closing it returns to play without the completion overlay flashing back in.
 - “Challenge” link opens the expected route.
 
@@ -79,6 +90,10 @@ Manual pass on real devices before release.
 - Primary tap targets ≥ 44px.
 - Focus visible with keyboard.
 - Text readable at OS text size + one step.
+- Light theme menu, tray, modal, tooltip, snap hint, and selected states remain
+  readable on white surfaces.
+- Color blind mode is checked for snap hints, piece outlines, progress, and
+  success states; no critical state depends on red/green alone.
 
 ---
 

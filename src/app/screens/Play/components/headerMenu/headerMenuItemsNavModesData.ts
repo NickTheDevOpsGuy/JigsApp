@@ -52,10 +52,10 @@ export function getModeItems(
     {
       id: "snapGlow",
       section: "settings",
-      visible: false,
+      visible: true,
       label: "Snap Glow",
       sortKey: "Snap Glow",
-      title: "Highlights pieces as they approach a valid snap position",
+      title: "Show clear fit, near-fit, and rotate cues while dragging pieces",
       onClick: c(props.onToggleSnapGlow ?? (() => {})),
       subMenu: "gameplay",
       isToggle: true,

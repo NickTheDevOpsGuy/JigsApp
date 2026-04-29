@@ -17,6 +17,7 @@ import {
   snapGlowPulse,
   drawSnapGlow,
   drawRejectSnapGlow,
+  drawTargetSlotGlow,
   SNAP_GLOW_MS,
   computeImageSourceRect,
   DRAG_LIFT_PX,
@@ -35,6 +36,84 @@ import {
   strokePieceOutline,
   drawCachedPiece,
 } from "./renderBoardDrawPieceHelpers";
+
+function roundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+function drawFitBadge(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  label: "Fits here" | "Almost",
+  inSnapRange: boolean,
+): void {
+  ctx.save();
+  ctx.font = "700 12px system-ui, -apple-system, sans-serif";
+  ctx.textBaseline = "middle";
+  const iconW = 18;
+  const textW = Math.ceil(ctx.measureText(label).width);
+  const w = iconW + textW + 18;
+  const h = 28;
+  const bx = x - w / 2;
+  const by = y - h - 10;
+  roundedRect(ctx, bx, by, w, h, 10);
+  ctx.fillStyle = inSnapRange ? "rgba(16, 54, 98, 0.92)" : "rgba(92, 58, 10, 0.92)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.86)";
+  ctx.lineWidth = 1.4;
+  ctx.stroke();
+
+  const ix = bx + 12;
+  const iy = by + h / 2;
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 2.2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  if (inSnapRange) {
+    ctx.beginPath();
+    ctx.moveTo(ix, iy);
+    ctx.lineTo(ix + 4, iy + 4);
+    ctx.lineTo(ix + 11, iy - 5);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(ix + 5.5, iy - 7);
+    ctx.lineTo(ix + 11, iy + 4);
+    ctx.lineTo(ix, iy + 4);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(ix + 5.5, iy - 2);
+    ctx.lineTo(ix + 5.5, iy + 1);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(ix + 5.5, iy + 4, 0.7, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+  }
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(label, bx + iconW + 12, iy);
+  ctx.restore();
+}
 export function drawPiece(
   ctx: CanvasRenderingContext2D,
   p: Piece,
@@ -79,14 +158,6 @@ export function drawPiece(
   const idleCorrectPulseNowMs =
     animState?.idleCorrectPulsePieceId === p.id ? nowMs : undefined;
 
-  if (snapGlowEnabled && start != null && popElapsedMs < SNAP_GLOW_MS) {
-    const cx = p.x + p.w / 2;
-    const cy = p.y + p.h / 2;
-    const radius = Math.max(p.w, p.h) * 0.55;
-    const glowAlpha = snapGlowAlpha(popElapsedMs) * snapGlowPulse(popElapsedMs);
-    drawSnapGlow(ctx, cx, cy, radius, glowAlpha);
-  }
-
   const preview = animState?.snapPreview;
   const rejectBoard = animState?.snapRejectPreview;
   const nearMissReject =
@@ -98,6 +169,85 @@ export function drawPiece(
     rejectBoard?.proximity ?? 0,
     nearMissReject ? preview.proximity : 0,
   );
+
+  let path: Path2D | null = null;
+  if (pathCache && p.shapePath && p.shapePath.length > 0) {
+    path =
+      pathCache.get(p.id) ??
+      (() => {
+        try {
+          const q = new Path2D(p.shapePath);
+          pathCache.set(p.id, q);
+          return q;
+        } catch {
+          return null;
+        }
+      })();
+  } else if (p.shapePath && p.shapePath.length > 0) {
+    try {
+      path = new Path2D(p.shapePath);
+    } catch {
+      path = null;
+    }
+  }
+
+  if (snapGlowEnabled && start != null && popElapsedMs < SNAP_GLOW_MS) {
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const radius = Math.max(p.w, p.h) * 0.55;
+    const glowAlpha = snapGlowAlpha(popElapsedMs) * snapGlowPulse(popElapsedMs);
+    drawSnapGlow(ctx, cx, cy, radius, glowAlpha);
+  }
+
+  if (snapGlowEnabled && isDragging && path && (preview || rejectProximity > 0.16)) {
+    const targetX = p.targetX - p.pad;
+    const targetY = p.targetY - p.pad;
+    const targetCx = targetX + p.w / 2;
+    const targetCy = targetY + p.h / 2;
+    const targetProximity = Math.max(preview?.proximity ?? 0, rejectProximity);
+    const targetAlpha = preview?.inSnapRange
+      ? 0.82
+      : preview?.nearSnap
+        ? Math.min(0.58, 0.24 + targetProximity * 0.42)
+        : Math.min(0.5, 0.18 + targetProximity * 0.36);
+    drawTargetSlotGlow(
+      ctx,
+      targetCx,
+      targetCy,
+      Math.max(p.w, p.h) * (preview?.inSnapRange ? 0.72 : 0.56),
+      targetAlpha,
+      nowMs,
+    );
+    ctx.save();
+    ctx.translate(targetCx, targetCy);
+    ctx.translate(-p.w / 2, -p.h / 2);
+    const fitColor = preview?.inSnapRange
+      ? "rgba(44, 210, 120, 0.92)"
+      : preview?.nearSnap
+        ? "rgba(255, 216, 105, 0.88)"
+        : "rgba(255, 130, 145, 0.78)";
+    ctx.fillStyle = preview?.inSnapRange
+      ? "rgba(44, 210, 120, 0.13)"
+      : preview?.nearSnap
+        ? "rgba(255, 216, 105, 0.1)"
+        : "rgba(255, 130, 145, 0.09)";
+    ctx.strokeStyle = fitColor;
+    ctx.lineWidth = preview?.inSnapRange ? 5.5 : 4.25;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.fill(path);
+    ctx.stroke(path);
+    ctx.restore();
+    if (preview?.inSnapRange || preview?.nearSnap) {
+      drawFitBadge(
+        ctx,
+        targetCx,
+        targetCy - Math.max(0, p.h * 0.34),
+        preview.inSnapRange ? "Fits here" : "Almost",
+        preview.inSnapRange,
+      );
+    }
+  }
 
   if (
     snapGlowEnabled &&
@@ -145,27 +295,6 @@ export function drawPiece(
     const pulse = 0.94 + 0.06 * Math.sin(nowMs * 0.0045);
     alpha *= pulse;
     drawRejectSnapGlow(ctx, cx, cy, radius, alpha);
-  }
-
-  let path: Path2D | null = null;
-  if (pathCache && p.shapePath && p.shapePath.length > 0) {
-    path =
-      pathCache.get(p.id) ??
-      (() => {
-        try {
-          const q = new Path2D(p.shapePath);
-          pathCache.set(p.id, q);
-          return q;
-        } catch {
-          return null;
-        }
-      })();
-  } else if (p.shapePath && p.shapePath.length > 0) {
-    try {
-      path = new Path2D(p.shapePath);
-    } catch {
-      path = null;
-    }
   }
 
   if (!path) {

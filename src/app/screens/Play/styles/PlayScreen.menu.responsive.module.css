@@ -21,7 +21,7 @@
 }
 
 .headerMenuSubmenuTrigger:hover {
-  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, var(--color-bg-card));
 }
 
 .headerMenuBack {
@@ -41,7 +41,7 @@
 }
 
 .headerMenuBack:hover {
-  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, var(--color-bg-card));
 }
 
 .headerMenuHelpSubmenu {
@@ -49,11 +49,19 @@
   padding-bottom: 4px;
 }
 
-/* Compact header menu on small screens – fit without scrolling */
+/* Compact header menu on small screens – constrained bottom sheet, no flyouts */
 @media (max-height: 700px), (max-width: 500px) {
   .headerMenuPanel {
-    max-height: min(92dvh, 520px);
+    position: fixed;
+    inset: auto 12px max(12px, env(safe-area-inset-bottom, 0px)) 12px;
+    top: auto !important;
+    left: 12px !important;
+    width: auto;
+    min-width: 0 !important;
+    max-width: none;
+    max-height: min(75dvh, 640px);
     padding: 4px 0;
+    border-radius: 18px;
   }
 
   .headerMenuItem,
@@ -85,7 +93,7 @@
   position: fixed;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%, -50%) scale(1.04);
+  transform: translate(-50%, -50%) scale(1.08);
   will-change: transform;
   transition: transform 0.12s ease-out;
 }
@@ -95,9 +103,16 @@
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.4))
-    drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+    drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35))
+    drop-shadow(0 0 0.8px rgba(255, 255, 255, 0.75));
   image-rendering: auto;
   will-change: transform, filter;
+}
+
+@media (pointer: coarse) {
+  .dragPreview {
+    transform: translate(-50%, -50%) scale(1.16);
+  }
 }
 
 .shareResultPopupRow {
