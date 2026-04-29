@@ -10,7 +10,7 @@
   align-items: stretch;
   justify-content: flex-start;
   gap: 0;
-  padding: 16px var(--play-board-tray-gap) 0;
+  padding: 0 var(--play-board-tray-gap) 0;
   position: relative;
   width: 100%;
   box-sizing: border-box;
@@ -24,7 +24,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 10px;
+  padding-top: 0;
 }
 
 /*
@@ -41,9 +41,9 @@
   }
 
   .playBody .main {
-    height: calc(var(--play-board-stage-size) + 46px);
-    max-height: calc(var(--play-board-stage-size) + 46px);
-    padding-bottom: 10px;
+    height: auto;
+    max-height: none;
+    padding-bottom: 0;
     overflow: hidden;
     border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
     border-bottom-right-radius: calc(var(--radius-board, 20px) + 10px);
@@ -64,8 +64,8 @@
   .playBody .main {
     height: calc(var(--play-board-stage-size) + 34px);
     max-height: calc(var(--play-board-stage-size) + 34px);
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .playBody .trayArea .trayInDock,
@@ -84,16 +84,10 @@
   }
 
   .playBody .main {
-    height: min(
-      calc(var(--play-board-tray-width, min(100%, 560px)) + 20px),
-      calc(var(--app-vh-stable, 100dvh) - 182px)
-    );
-    max-height: min(
-      calc(var(--play-board-tray-width, min(100%, 560px)) + 20px),
-      calc(var(--app-vh-stable, 100dvh) - 182px)
-    );
-    padding-top: 4px;
-    padding-bottom: 6px;
+    height: auto;
+    max-height: none;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .boardWrapper {

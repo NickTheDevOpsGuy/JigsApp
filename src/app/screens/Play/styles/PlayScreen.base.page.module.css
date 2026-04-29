@@ -129,7 +129,11 @@
   background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
   backdrop-filter: blur(var(--fx-surface-blur-medium, 12px));
   -webkit-backdrop-filter: blur(var(--fx-surface-blur-medium, 12px));
-  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 140%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border) 140%, transparent);
+  border-radius: 18px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.18),
+    0 1px 4px rgba(0, 0, 0, 0.08);
   transition:
     transform 0.25s ease,
     opacity 0.2s ease;
@@ -166,7 +170,7 @@
 
 .topBarWrap {
   flex-shrink: 0;
-  overflow-x: hidden;
+  overflow-x: visible;
   overflow-y: visible;
   max-height: var(--play-top-bar-outer-h);
   transition: max-height 0.25s ease;
@@ -174,7 +178,12 @@
   z-index: 200;
   scrollbar-width: none;
   touch-action: pan-y;
-  width: 100%;
+  width: min(
+    100%,
+    var(--play-board-live-width, var(--play-board-stage-size, var(--play-board-tray-width)))
+  );
+  max-width: min(100%, var(--play-board-tray-width));
+  align-self: center;
 }
 
 .topBarWrap::-webkit-scrollbar {

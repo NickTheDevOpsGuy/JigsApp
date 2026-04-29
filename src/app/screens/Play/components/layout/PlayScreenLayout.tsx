@@ -152,6 +152,13 @@ export function PlayScreenLayout({
           className={styles.boardLayoutShell}
           data-layout="gameplay-shell"
           data-replay-active={replayPortalProps ? "true" : undefined}
+          style={
+            board.boardSize.w > 0
+              ? ({
+                  "--play-board-live-width": `${Math.round(board.boardSize.w)}px`,
+                } as React.CSSProperties)
+              : undefined
+          }
         >
           <PlayScreenTopBar {...topBarProps} hideMenuAndButtons={hideTopBarControls} />
 

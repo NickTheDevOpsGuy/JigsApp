@@ -1,20 +1,83 @@
 # Developer Setup
 
-This guide is the quickest way to get a local Phuzzle environment running, verify your toolchain, and debug the common issues that show up while developing the app.
+This guide is the quickest way to get a local Phuzzle environment running,
+verify your toolchain, and debug the common issues that show up while developing
+the app.
 
 ## Prerequisites
 
-- `Node.js 22+`
-- `npm`
+- Node.js `22+`
+- npm, which ships with Node.js
 - Git
 - Optional: Docker Desktop if you want local Supabase workflows
+- Optional: GitHub CLI (`gh`) if you work on GitHub issues, PRs, or Actions
+
+The required Node version is declared in `package.json`:
+
+```json
+"engines": {
+  "node": ">=22.0.0"
+}
+```
 
 Check your version:
 
 ```bash
 node -v
 npm -v
+git --version
 ```
+
+## Install Node.js
+
+Use one of these setup paths. A version manager is preferred because it keeps
+this project isolated from other Node projects on your machine.
+
+### Option A: nvm
+
+macOS/Linux:
+
+```bash
+nvm install 22
+nvm use 22
+nvm alias default 22
+```
+
+Then confirm:
+
+```bash
+node -v
+npm -v
+```
+
+### Option B: fnm
+
+macOS/Linux/Windows:
+
+```bash
+fnm install 22
+fnm use 22
+```
+
+Then confirm:
+
+```bash
+node -v
+npm -v
+```
+
+### Option C: Direct installer
+
+Install Node.js `22+` from the official Node.js installer for your operating
+system. After installation, open a new terminal and run:
+
+```bash
+node -v
+npm -v
+```
+
+If your terminal still shows an older version, restart the terminal and check
+whether another version manager is overriding your PATH.
 
 ## First-time setup
 
@@ -22,15 +85,29 @@ npm -v
 git clone https://github.com/NickTheDevOpsGuy/phuzzle.git
 cd phuzzle
 npm install
-npx playwright install chromium firefox webkit
+npm run test:e2e:install
 npm run doctor
 ```
 
 What each step does:
 
 - `npm install` installs app dependencies and local hooks.
-- `npx playwright install chromium firefox webkit` downloads the browser binaries used by the e2e suite.
-- `npm run doctor` checks Node, dependencies, Playwright availability, Supabase/Docker reachability, and whether preview port `4173` is already in use.
+- `npm run test:e2e:install` downloads the browser binaries used by the e2e
+  suite.
+- `npm run doctor` checks Node, dependencies, Playwright availability,
+  Supabase/Docker reachability, and whether preview port `4173` is already in
+  use.
+
+## Environment Variables
+
+Most frontend development works without local secrets. If you need Supabase,
+copy the example file and fill in the values for your project:
+
+```bash
+cp .env.example .env.local
+```
+
+Do not commit `.env.local` or any secret-bearing env file.
 
 ## Daily development flow
 
@@ -42,6 +119,10 @@ npm run dev
 
 Open the local site shown by Vite, usually `http://127.0.0.1:5173/`.
 
+`npm run dev` intentionally runs lint and build before starting Vite. If that
+feels slow while iterating, fix the reported issue first; the dev command is
+meant to keep the local loop close to the production gate.
+
 Useful local commands:
 
 ```bash
@@ -51,6 +132,17 @@ npm run test
 npm run build
 npm run preview
 ```
+
+What they do:
+
+| Command | Purpose |
+| --- | --- |
+| `npm run lint` | ESLint for TypeScript and React files. |
+| `npm run typecheck` | TypeScript validation without emitting files. |
+| `npm run test` | Vitest unit/component tests. |
+| `npm run build` | Production TypeScript + Vite build. |
+| `npm run preview` | Serve the production build locally. |
+| `npm run precheck` | Local pre-push style gate. |
 
 ## Firefox-specific testing
 
@@ -130,23 +222,55 @@ a small default gzip allowance for normal build drift. Override it with
 If you need leaderboards, co-op, or database work:
 
 - Read [SUPABASE_SETUP.md](SUPABASE_SETUP.md)
-- Use the `supabase:push:*` scripts from `package.json` once your env vars are configured
+- Use the `supabase:push:*` scripts from `package.json` once your env vars are
+  configured
 
 ## Common problems
+
+### Node version is too old
+
+If `npm install`, `npm run doctor`, or `npm run build` reports a Node engine
+problem, switch to Node `22+`:
+
+```bash
+nvm install 22
+nvm use 22
+```
+
+Then reinstall dependencies:
+
+```bash
+npm install
+```
 
 ### Playwright browsers missing
 
 ```bash
-npx playwright install chromium firefox webkit
+npm run test:e2e:install
 ```
 
 ### Preview server port collision
 
-The e2e config uses preview on port `4173`. If that port is already busy, close the old preview process and rerun the test command.
+The e2e config uses preview on port `4173`. If that port is already busy, close
+the old preview process and rerun the test command.
+
+### Dependency install looks stale
+
+If package installation behaves strangely after switching Node versions:
+
+```bash
+rm -rf node_modules
+npm install
+```
+
+Avoid deleting `package-lock.json` unless you intentionally want to update the
+dependency graph.
 
 ### Firefox feels hot or noisy during debugging
 
-Use the Firefox project commands above. The app includes a lighter Firefox performance profile now, but long-running dev tools, traces, and repeated e2e runs can still warm up a laptop during investigation.
+Use the Firefox project commands above. The app includes a lighter Firefox
+performance profile now, but long-running dev tools, traces, and repeated e2e
+runs can still warm up a laptop during investigation.
 
 ### Edge does not use the real browser channel
 
