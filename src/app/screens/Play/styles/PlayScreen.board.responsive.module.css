@@ -56,11 +56,11 @@
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    height: min(calc(100vw - 16px + 28px), calc(var(--app-vh-fill, 100dvh) - 190px));
-    max-height: min(calc(100vw - 16px + 28px), calc(var(--app-vh-fill, 100dvh) - 190px));
+    height: auto;
+    max-height: none;
     padding: 0;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 0;
+    padding-bottom: 0;
     gap: 0;
     align-items: center;
     justify-content: center;
@@ -130,7 +130,13 @@
   }
 
   .boardLayoutShell .topBarWrap {
-    width: 100%;
+    width: min(
+      100%,
+      var(
+        --play-board-live-width,
+        var(--play-board-stage-size, var(--play-board-tray-width))
+      )
+    );
     max-height: var(--play-top-bar-outer-h);
     min-height: var(--play-top-bar-outer-h);
     flex-shrink: 0;
@@ -824,6 +830,17 @@
     margin-left: auto;
     margin-right: auto;
   }
+}
+
+.boardLayoutShell:not([data-replay-active="true"]) .playBody {
+  padding-top: 0;
+}
+
+.boardLayoutShell:not([data-replay-active="true"]) .playBody .main {
+  height: auto;
+  max-height: none;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 /* Touch hint */
