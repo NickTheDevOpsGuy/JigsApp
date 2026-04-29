@@ -6,8 +6,7 @@
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
-  filter:
-    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.28))
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.28))
     drop-shadow(0 0 0.7px rgba(255, 255, 255, 0.78));
 }
 

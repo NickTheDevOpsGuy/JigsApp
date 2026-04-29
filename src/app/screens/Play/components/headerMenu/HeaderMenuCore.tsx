@@ -280,7 +280,8 @@ export function HeaderMenu(props: HeaderMenuProps) {
   const showRootMenu = !activeRoot && !activeSubMenu;
   const showSettingsList = activeRoot === "settings" && !activeSubMenu;
   const showHelpList = activeRoot === "help";
-  const showSubPanel = (activeRoot === "settings" || activeRoot === "help") && activeSubMenu;
+  const showSubPanel =
+    (activeRoot === "settings" || activeRoot === "help") && activeSubMenu;
 
   return (
     <div className={styles.headerMenuWrap} ref={rootRef}>
@@ -355,7 +356,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
                               ? "Close this menu and resume playing"
                               : id === "help"
                                 ? "How to play and keyboard shortcuts"
-                          : ROOT_MENU_LABELS[id]
+                                : ROOT_MENU_LABELS[id]
                     }
                   >
                     {ROOT_MENU_LABELS[id]}

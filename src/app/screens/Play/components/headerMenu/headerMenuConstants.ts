@@ -114,8 +114,10 @@ export function getSettingsSubmenuIdsAlphabetical(
     const ai = SETTINGS_SUBMENU_ORDER.indexOf(a);
     const bi = SETTINGS_SUBMENU_ORDER.indexOf(b);
     if (ai !== -1 || bi !== -1) {
-      return (ai === -1 ? Number.MAX_SAFE_INTEGER : ai) -
-        (bi === -1 ? Number.MAX_SAFE_INTEGER : bi);
+      return (
+        (ai === -1 ? Number.MAX_SAFE_INTEGER : ai) -
+        (bi === -1 ? Number.MAX_SAFE_INTEGER : bi)
+      );
     }
     const cmp = SUB_MENU_LABELS[a].localeCompare(SUB_MENU_LABELS[b], undefined, {
       sensitivity: "base",

@@ -27,11 +27,11 @@ They can be overridden with `VITE_FORMSPREE_BUG_FORM_ID` and
 
 ## Main files
 
-| Path                                                          | Purpose                                            |
-| ------------------------------------------------------------- | -------------------------------------------------- |
-| `src/app/components/FeedbackChoiceModal/`                     | Current Report a bug / Suggest a feature choice    |
-| `src/app/components/FeedbackChoiceModal/feedbackLinks.ts`     | Default and env-configured feedback form targets   |
-| `src/app/components/HelpChoiceModal/HelpChoiceModal.tsx`      | Help menu: report / suggest when handlers provided |
+| Path                                                      | Purpose                                            |
+| --------------------------------------------------------- | -------------------------------------------------- |
+| `src/app/components/FeedbackChoiceModal/`                 | Current Report a bug / Suggest a feature choice    |
+| `src/app/components/FeedbackChoiceModal/feedbackLinks.ts` | Default and env-configured feedback form targets   |
+| `src/app/components/HelpChoiceModal/HelpChoiceModal.tsx`  | Help menu: report / suggest when handlers provided |
 
 Callers can pass an optional `environmentSnippet`, such as puzzle type or grid
 size, to include context in the form submission.
