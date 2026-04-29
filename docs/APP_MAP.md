@@ -30,14 +30,15 @@ inside the staged Quick Play and Puzzle Packs modals.
 
 ## Play Screen Menu
 
-The Play screen hamburger menu has four root tabs:
+The Play screen hamburger menu has five root actions:
 
-| Root tab | What it contains |
+| Root action | What it does |
 | --- | --- |
-| About | Help and Get Involved items. |
+| Resume | Closes the menu and returns to the puzzle. |
+| New Puzzle | Opens the existing new puzzle flow. |
+| Settings | Opens Gameplay, Appearance, Audio, and Advanced groups. Gameplay contains Assistance, Modes, Move behavior, Piece Shape, Snapping, and Controls. |
 | Leaderboard | Direct navigation to `/stats`. |
-| Play | Home, Restart puzzle, and Co-op share when available. |
-| Settings | Appearance, Assistance, Audio, Controls, Effects, Modes, Move, Piece Shape, Snapping, Advanced, and Leaderboard submenus. |
+| Help | How to Play, Keyboard & Controls, and Get Involved items. |
 
 For the full option-by-option map, see [SETTINGS_MENU.md](SETTINGS_MENU.md).
 

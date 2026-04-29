@@ -19,7 +19,7 @@ export const SUB_MENU_LABELS: Record<SubMenuId, string> = {
   help: "Help",
   manualControls: "Controls",
   modes: "Modes",
-  moves: "Move",
+  moves: "Move behavior",
   navigation: "Navigate",
   pieceShape: "Piece Shape",
   share: "Share",
@@ -30,6 +30,8 @@ export const SUB_MENU_LABELS: Record<SubMenuId, string> = {
 export const SUBMENU_PARENT: Partial<Record<SubMenuId, SubMenuId>> = {
   contribute: "about",
   effects: "display",
+  assistance: "controls",
+  gameplay: "controls",
   help: "about",
   manualControls: "controls",
   modes: "controls",
@@ -43,7 +45,7 @@ export const SUBMENU_DESCRIPTIONS: Record<SubMenuId, string> = {
   assistance: "Visual hints: alignment grid, edge highlight, cluster outlines",
   audio: "Sound effects and haptic feedback",
   contribute: "About Phuzzle and how to get involved",
-  controls: "Piece shape, modes, and manual controls",
+  controls: "Assistance, modes, movement, piece shape, and snapping",
   display: "Preview, effects, immersive mode, and theme",
   gameplay: "Magnetic snap, snap glow, progressive reveal, unlock pieces",
   help: "How to play and keyboard shortcuts",
@@ -62,26 +64,41 @@ export function getSubmenuDescription(id: SubMenuId): string {
   return SUBMENU_DESCRIPTIONS[id] ?? SUB_MENU_LABELS[id];
 }
 
-/** Root menu: alpha order. Co-op is under Play. */
+/** Root menu: keep this short so play controls do not feel like a debug menu. */
 export const ROOT_MENU_ORDER: import("./headerMenuConfigTypes").RootMenuId[] = [
-  "about",
-  "leaderboard",
-  "play",
+  "resume",
+  "newPuzzle",
   "settings",
+  "leaderboard",
+  "help",
 ];
 
 export const ROOT_MENU_LABELS: Record<
   import("./headerMenuConfigTypes").RootMenuId,
   string
 > = {
-  about: "About",
+  resume: "Resume",
+  newPuzzle: "New Puzzle",
+  help: "Help",
   leaderboard: "Leaderboard",
-  play: "Play",
   settings: "Settings",
 };
 
-/** Submenus that belong in the Play panel, not the Settings submenu list. */
-const SETTINGS_SUBMENU_EXCLUDE_FROM_LIST: SubMenuId[] = ["navigation", "share"];
+/** Submenus nested inside Settings groups rather than shown at Settings root. */
+const SETTINGS_SUBMENU_EXCLUDE_FROM_LIST: SubMenuId[] = [
+  "navigation",
+  "share",
+  "stats",
+  "assistance",
+  "effects",
+  "gameplay",
+  "manualControls",
+  "modes",
+  "moves",
+  "pieceShape",
+];
+
+const SETTINGS_SUBMENU_ORDER: SubMenuId[] = ["controls", "display", "audio", "advanced"];
 
 /** All settings-area submenus that have at least one item, sorted A–Z by visible label. */
 export function getSettingsSubmenuIdsAlphabetical(
@@ -94,6 +111,12 @@ export function getSettingsSubmenuIdsAlphabetical(
     ids.add(item.subMenu);
   }
   return Array.from(ids).sort((a, b) => {
+    const ai = SETTINGS_SUBMENU_ORDER.indexOf(a);
+    const bi = SETTINGS_SUBMENU_ORDER.indexOf(b);
+    if (ai !== -1 || bi !== -1) {
+      return (ai === -1 ? Number.MAX_SAFE_INTEGER : ai) -
+        (bi === -1 ? Number.MAX_SAFE_INTEGER : bi);
+    }
     const cmp = SUB_MENU_LABELS[a].localeCompare(SUB_MENU_LABELS[b], undefined, {
       sensitivity: "base",
     });

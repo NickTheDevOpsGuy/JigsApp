@@ -14,12 +14,12 @@ import styles from "./PieceTray.module.css";
 /* Tray piece size: minimum 44–56px per spec; compact on mobile, slightly larger on desktop */
 function getThumbSize(pieceCount: number, isMobile: boolean): number {
   if (isMobile) {
-    if (pieceCount >= 64) return 44;
-    if (pieceCount >= 49) return 48;
-    if (pieceCount >= 36) return 50;
-    if (pieceCount >= 25) return 52;
-    if (pieceCount >= 16) return 56;
-    return 56;
+    if (pieceCount >= 64) return 48;
+    if (pieceCount >= 49) return 50;
+    if (pieceCount >= 36) return 52;
+    if (pieceCount >= 25) return 56;
+    if (pieceCount >= 16) return 60;
+    return 60;
   }
   if (pieceCount >= 64) return 56;
   if (pieceCount >= 49) return 58;

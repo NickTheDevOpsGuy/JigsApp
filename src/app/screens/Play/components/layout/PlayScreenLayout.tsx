@@ -221,6 +221,8 @@ export function PlayScreenLayout({
                       key={board.puzzleKey ?? undefined}
                       className={styles.canvas}
                       ref={board.canvasRef as React.RefObject<HTMLCanvasElement>}
+                      role="img"
+                      aria-label="Puzzle board. Drag pieces toward the highlighted target; release when Fits here appears."
                       style={replayPortalProps ? { pointerEvents: "none" } : undefined}
                       onPointerDown={board.handlers.onPointerDown}
                       onPointerMove={board.handlers.onPointerMove}

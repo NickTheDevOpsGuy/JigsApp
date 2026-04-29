@@ -1,5 +1,5 @@
 .headerMenuToggleRow:hover {
-  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--color-brand-primary) 12%, var(--color-bg-card));
 }
 
 .headerMenuToggleLabel {

@@ -6,6 +6,9 @@
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
+  filter:
+    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.28))
+    drop-shadow(0 0 0.7px rgba(255, 255, 255, 0.78));
 }
 
 .empty {
@@ -39,14 +42,14 @@
 
 @media (max-width: 600px) {
   .trayCompact .thumbWrap {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
   }
 
   .trayCompact .pieceButton,
   .trayCompact .blankSlot {
-    min-width: 56px;
-    min-height: 56px;
+    min-width: 60px;
+    min-height: 60px;
   }
 }
 
@@ -79,14 +82,14 @@
 
 @media (max-width: 600px) {
   .trayExtraCompact .thumbWrap {
-    width: 46px;
-    height: 46px;
+    width: 50px;
+    height: 50px;
   }
 
   .trayExtraCompact .pieceButton,
   .trayExtraCompact .blankSlot {
-    min-width: 50px;
-    min-height: 50px;
+    min-width: 54px;
+    min-height: 54px;
   }
 }
 

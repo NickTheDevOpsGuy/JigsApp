@@ -36,6 +36,84 @@ import {
   strokePieceOutline,
   drawCachedPiece,
 } from "./renderBoardDrawPieceHelpers";
+
+function roundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+function drawFitBadge(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  label: "Fits here" | "Almost",
+  inSnapRange: boolean,
+): void {
+  ctx.save();
+  ctx.font = "700 12px system-ui, -apple-system, sans-serif";
+  ctx.textBaseline = "middle";
+  const iconW = 18;
+  const textW = Math.ceil(ctx.measureText(label).width);
+  const w = iconW + textW + 18;
+  const h = 28;
+  const bx = x - w / 2;
+  const by = y - h - 10;
+  roundedRect(ctx, bx, by, w, h, 10);
+  ctx.fillStyle = inSnapRange ? "rgba(16, 54, 98, 0.92)" : "rgba(92, 58, 10, 0.92)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.86)";
+  ctx.lineWidth = 1.4;
+  ctx.stroke();
+
+  const ix = bx + 12;
+  const iy = by + h / 2;
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 2.2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  if (inSnapRange) {
+    ctx.beginPath();
+    ctx.moveTo(ix, iy);
+    ctx.lineTo(ix + 4, iy + 4);
+    ctx.lineTo(ix + 11, iy - 5);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(ix + 5.5, iy - 7);
+    ctx.lineTo(ix + 11, iy + 4);
+    ctx.lineTo(ix, iy + 4);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(ix + 5.5, iy - 2);
+    ctx.lineTo(ix + 5.5, iy + 1);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(ix + 5.5, iy + 4, 0.7, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+  }
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(label, bx + iconW + 12, iy);
+  ctx.restore();
+}
 export function drawPiece(
   ctx: CanvasRenderingContext2D,
   p: Piece,
@@ -160,6 +238,15 @@ export function drawPiece(
     ctx.fill(path);
     ctx.stroke(path);
     ctx.restore();
+    if (preview?.inSnapRange || preview?.nearSnap) {
+      drawFitBadge(
+        ctx,
+        targetCx,
+        targetCy - Math.max(0, p.h * 0.34),
+        preview.inSnapRange ? "Fits here" : "Almost",
+        preview.inSnapRange,
+      );
+    }
   }
 
   if (

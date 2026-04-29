@@ -12,8 +12,8 @@ import {
 } from "./renderBoardDrawOverlays";
 
 /** Outer stroke: crisp silhouette without heavy inner bleed on curves. */
-const OUTLINE_STROKE_STYLE = "rgba(0,0,0,0.38)";
-const OUTLINE_LINE_WIDTH = 1.65;
+const OUTLINE_STROKE_STYLE = "rgba(2, 7, 18, 0.62)";
+const OUTLINE_LINE_WIDTH = 1.9;
 
 function getPieceSurfaceVariation(piece: Piece): {
   brightness: number;
@@ -143,12 +143,21 @@ export function strokePieceOutline(
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   if (isDragging) {
-    ctx.strokeStyle = "rgba(102, 126, 234, 0.6)";
-    ctx.lineWidth = OUTLINE_LINE_WIDTH;
+    ctx.strokeStyle = "rgba(255,255,255,0.9)";
+    ctx.lineWidth = 4.4;
+    ctx.stroke(path);
+    ctx.strokeStyle = "rgba(37, 99, 235, 0.95)";
+    ctx.lineWidth = 2.4;
   } else if (isSelected) {
-    ctx.strokeStyle = "#667eea";
-    ctx.lineWidth = OUTLINE_LINE_WIDTH;
+    ctx.strokeStyle = "rgba(255,255,255,0.88)";
+    ctx.lineWidth = 4;
+    ctx.stroke(path);
+    ctx.strokeStyle = "#2563eb";
+    ctx.lineWidth = 2.2;
   } else {
+    ctx.strokeStyle = "rgba(255,255,255,0.58)";
+    ctx.lineWidth = 3.2;
+    ctx.stroke(path);
     ctx.strokeStyle = OUTLINE_STROKE_STYLE;
     ctx.lineWidth = OUTLINE_LINE_WIDTH;
   }

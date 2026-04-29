@@ -112,8 +112,8 @@ export type HeaderMenuProps = {
   onToggleColorBlindFriendly?: () => void;
 };
 
-/** Root menu: Play, Leaderboard, Settings, About. Co-op lives under Play. */
-export type RootMenuId = "play" | "leaderboard" | "settings" | "about";
+/** Root menu stays intentionally small; detailed controls live under Settings. */
+export type RootMenuId = "resume" | "newPuzzle" | "settings" | "leaderboard" | "help";
 
 export type SubMenuId =
   | "about"
