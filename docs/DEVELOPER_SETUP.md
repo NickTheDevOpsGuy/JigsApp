@@ -135,14 +135,14 @@ npm run preview
 
 What they do:
 
-| Command | Purpose |
-| --- | --- |
-| `npm run lint` | ESLint for TypeScript and React files. |
+| Command             | Purpose                                       |
+| ------------------- | --------------------------------------------- |
+| `npm run lint`      | ESLint for TypeScript and React files.        |
 | `npm run typecheck` | TypeScript validation without emitting files. |
-| `npm run test` | Vitest unit/component tests. |
-| `npm run build` | Production TypeScript + Vite build. |
-| `npm run preview` | Serve the production build locally. |
-| `npm run precheck` | Local pre-push style gate. |
+| `npm run test`      | Vitest unit/component tests.                  |
+| `npm run build`     | Production TypeScript + Vite build.           |
+| `npm run preview`   | Serve the production build locally.           |
+| `npm run precheck`  | Local pre-push style gate.                    |
 
 ## Firefox-specific testing
 

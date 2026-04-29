@@ -180,7 +180,10 @@
   touch-action: pan-y;
   width: min(
     100%,
-    var(--play-board-live-width, var(--play-board-stage-size, var(--play-board-tray-width)))
+    var(
+      --play-board-live-width,
+      var(--play-board-stage-size, var(--play-board-tray-width))
+    )
   );
   max-width: min(100%, var(--play-board-tray-width));
   align-self: center;
