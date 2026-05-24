@@ -658,21 +658,20 @@
   .playBody {
     --play-board-tray-gap: 14px;
     --play-board-stage-size: min(
-      calc(
-        100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 32px
-      ),
-      calc(var(--app-vh-fill, 100dvh) - var(--play-top-bar-outer-h, 60px) - 202px)
+      calc(100vw - 360px - var(--play-board-tray-gap, 14px)),
+      calc(var(--app-vh-fill, 100dvh) - var(--play-top-bar-outer-h, 60px) - 172px)
     );
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
-    justify-content: flex-start;
-    gap: 0;
+    justify-content: center;
+    gap: var(--play-board-tray-gap);
     padding: 8px 14px 0;
   }
 
   .playBody .main {
-    flex: 0 1 auto;
-    width: 100%;
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
     height: calc(var(--play-board-stage-size) + 24px);
     max-height: calc(var(--play-board-stage-size) + 24px);
     padding-top: 6px;
@@ -684,19 +683,20 @@
   }
 
   .playBody .trayArea {
-    width: 100%;
-    min-width: 0;
-    margin-top: var(--play-board-tray-gap);
-    padding-bottom: max(10px, env(safe-area-inset-bottom, 0));
+    width: clamp(280px, 29vw, 360px);
+    min-width: 260px;
+    margin-top: 0;
+    margin-left: var(--play-board-tray-gap);
+    padding-bottom: max(14px, env(safe-area-inset-bottom, 0));
     border-radius: 18px;
   }
 
   .playBody .trayArea .trayInDock,
   .playBody .trayArea .trayInDock.trayWrapLarge {
     flex: 0 0 auto;
-    height: clamp(136px, 16vh, 156px);
-    max-height: min(156px, 19vh);
-    min-height: 136px;
+    height: clamp(150px, 32vh, 220px);
+    max-height: min(220px, 35vh);
+    min-height: 140px;
   }
 
   .boardLayoutShell[data-replay-active="true"] .playBody {
