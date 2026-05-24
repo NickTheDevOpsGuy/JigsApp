@@ -52,10 +52,10 @@
 
 @media (min-width: 601px) and (max-width: 1024px) and (pointer: coarse) {
   .playBody {
-    --play-board-tray-width: min(100%, 680px);
+    --play-board-tray-width: min(100%, 820px);
     --play-board-tray-gap: 14px;
     --play-board-stage-size: min(
-      var(--play-board-tray-width, min(100%, 680px)),
+      var(--play-board-tray-width, min(100%, 820px)),
       calc(var(--app-vh-fill, 100dvh) - 384px)
     );
     padding-top: 12px;
@@ -78,7 +78,7 @@
 
 @media (min-width: 601px) and (max-width: 1366px) and (pointer: coarse) and (orientation: landscape) {
   .playBody {
-    --play-board-tray-width: min(100%, 560px);
+    --play-board-tray-width: min(100%, 760px);
     --play-board-tray-gap: 12px;
     padding-top: 8px;
   }
