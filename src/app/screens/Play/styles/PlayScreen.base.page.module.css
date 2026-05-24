@@ -259,6 +259,21 @@ html.theme-sunset .immersivePeekBottom {
   transition:
     max-height 0.25s ease,
     opacity 0.2s ease;
+  width: min(
+    100%,
+    var(
+      --play-board-live-width,
+      var(--play-board-stage-size, var(--play-board-tray-width))
+    )
+  );
+  max-width: min(
+    100%,
+    var(
+      --play-board-live-width,
+      var(--play-board-stage-size, var(--play-board-tray-width))
+    )
+  );
+  align-self: center;
 }
 
 .trayArea.immersiveHidden {

@@ -14,7 +14,7 @@
   min-width: 200px;
   width: max-content;
   max-width: min(340px, calc(100vw - 24px));
-  max-height: calc(100dvh - 24px);
+  max-height: calc(min(100dvh, 100vh) - 24px);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;

@@ -35,7 +35,7 @@ jobs:
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: "lts/*"
+          node-version: "24"
           cache: npm
           cache-dependency-path: package-lock.json
 
@@ -94,7 +94,7 @@ jobs:
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: "lts/*"
+          node-version: "24"
           cache: npm
           cache-dependency-path: package-lock.json
 
@@ -143,7 +143,7 @@ jobs:
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: "lts/*"
+          node-version: "24"
           cache: npm
           cache-dependency-path: package-lock.json
 
@@ -196,7 +196,7 @@ jobs:
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: "lts/*"
+          node-version: "24"
           cache: npm
           cache-dependency-path: package-lock.json
 
