@@ -455,7 +455,9 @@ test.describe("Play screen tablet touch", () => {
     ).toBeLessThan(1024);
   });
 
-  test("tablet gameplay keeps top HUD aligned to the board and prevents horizontal overflow", async ({ page }) => {
+  test("tablet gameplay keeps top HUD aligned to the board and prevents horizontal overflow", async ({
+    page,
+  }) => {
     await gotoPlay(page);
 
     const boardWrapper = page.locator('[data-layout="puzzle-board"] > div');
