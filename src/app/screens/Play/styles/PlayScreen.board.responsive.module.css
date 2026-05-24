@@ -661,7 +661,7 @@
       calc(
         100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 32px
       ),
-      calc(var(--app-vh-fill, 100dvh) - var(--play-top-bar-outer-h, 60px) - 202px)
+      calc(var(--app-vh-fill, 100dvh) - var(--play-top-bar-outer-h, 60px) - 172px)
     );
     flex-direction: column;
     align-items: stretch;
