@@ -455,6 +455,33 @@ test.describe("Play screen tablet touch", () => {
     ).toBeLessThan(1024);
   });
 
+  test("tablet gameplay keeps top HUD aligned to the board and prevents horizontal overflow", async ({ page }) => {
+    await gotoPlay(page);
+
+    const boardWrapper = page.locator('[data-layout="puzzle-board"] > div');
+    const topHud = page.locator('[data-layout="top-hud"]');
+
+    await expect(boardWrapper).toBeVisible({ timeout: 15000 });
+    await expect(topHud).toBeVisible({ timeout: 15000 });
+
+    const boardWrapperBox = await boardWrapper.boundingBox();
+    const topHudBox = await topHud.boundingBox();
+    expect(boardWrapperBox).not.toBeNull();
+    expect(topHudBox).not.toBeNull();
+
+    const boardLeft = boardWrapperBox?.x ?? 0;
+    const boardRight = (boardWrapperBox?.x ?? 0) + (boardWrapperBox?.width ?? 0);
+    const topHudLeft = topHudBox?.x ?? 0;
+    const topHudRight = (topHudBox?.x ?? 0) + (topHudBox?.width ?? 0);
+
+    expect(topHudLeft).toBeGreaterThanOrEqual(boardLeft - 2);
+    expect(topHudRight).toBeLessThanOrEqual(boardRight + 2);
+
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    const innerWidth = await page.evaluate(() => window.innerWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(innerWidth + 1);
+  });
+
   test("tablet replay keeps live board square and controls visible", async ({ page }) => {
     await gotoPlay(page, "/play?e2eCompletion=1");
 
