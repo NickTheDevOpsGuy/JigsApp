@@ -229,6 +229,9 @@ test.describe("Responsive smoke", () => {
 
     const tray = page.getByRole("list");
     await expect(tray).toBeVisible({ timeout: 15000 });
+    await expect(tray.getByRole("button", { name: /place piece/i }).first()).toBeVisible({
+      timeout: 15000,
+    });
 
     const hasCoarsePointer = await page.evaluate(
       () => window.matchMedia("(pointer: coarse)").matches,
@@ -238,16 +241,20 @@ test.describe("Responsive smoke", () => {
       await expect(page.getByRole("button", { name: /scroll right/i })).toHaveCount(0);
     }
 
+    await expect
+      .poll(
+        async () =>
+          tray.evaluate((node) => {
+            const el = node as HTMLDivElement;
+            return Math.max(0, el.scrollWidth - el.clientWidth);
+          }),
+        { timeout: 15000 },
+      )
+      .toBeGreaterThan(0);
+
     const right = await tray.evaluate((node) => {
       const el = node as HTMLDivElement;
-      const paddingStart = 12;
-      const paddingEnd = 12;
-      const row = el.firstElementChild as HTMLElement | null;
-      const contentWidth =
-        row && row.offsetWidth > 0
-          ? paddingStart + row.offsetWidth + paddingEnd
-          : el.scrollWidth;
-      const max = Math.max(0, contentWidth - el.clientWidth);
+      const max = Math.max(0, el.scrollWidth - el.clientWidth);
       const before = el.scrollLeft;
       el.scrollTo({ left: max });
       el.scrollBy({ left: 2000 });
