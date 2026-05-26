@@ -180,6 +180,7 @@ test.describe("Responsive smoke", () => {
 
     expect(boardBox).not.toBeNull();
     expect(trayBox).not.toBeNull();
+    expect(boardBox?.width ?? 0).toBeGreaterThanOrEqual(560);
     expect(trayBox?.y ?? 0).toBeGreaterThanOrEqual(
       (boardBox?.y ?? 0) + (boardBox?.height ?? 0) - 2,
     );

@@ -27,14 +27,16 @@ export function renderTrayPiece(
   scale: number = 0.5,
   options: RenderTrayPieceOptions = {},
 ): HTMLCanvasElement {
-  const CANVAS_PAD = 4;
-  const maxDim = Math.max(piece.w, piece.h);
-  const scaledSize = Math.ceil(maxDim * scale);
-  const canvasSize = scaledSize + CANVAS_PAD * 2;
+  const OUTLINE_GUTTER = 8;
+  const rot90 = piece.rotation === 90 || piece.rotation === 270;
+  const renderW = rot90 ? piece.h : piece.w;
+  const renderH = rot90 ? piece.w : piece.h;
+  const canvasW = Math.ceil(renderW * scale) + OUTLINE_GUTTER * 2;
+  const canvasH = Math.ceil(renderH * scale) + OUTLINE_GUTTER * 2;
 
   const canvas = document.createElement("canvas");
-  canvas.width = canvasSize;
-  canvas.height = canvasSize;
+  canvas.width = canvasW;
+  canvas.height = canvasH;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
@@ -54,8 +56,8 @@ export function renderTrayPiece(
     return canvas;
   }
 
-  const canvasCenterX = canvasSize / 2;
-  const canvasCenterY = canvasSize / 2;
+  const canvasCenterX = canvasW / 2;
+  const canvasCenterY = canvasH / 2;
   ctx.translate(canvasCenterX, canvasCenterY);
   ctx.scale(scale, scale);
   ctx.rotate((piece.rotation * Math.PI) / 180);
