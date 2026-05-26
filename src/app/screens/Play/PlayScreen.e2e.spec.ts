@@ -647,6 +647,7 @@ test.describe("Play screen tablet landscape touch", () => {
     expect(
       Math.abs((liveBoardBox?.width ?? 0) - (liveBoardBox?.height ?? 0)),
     ).toBeLessThanOrEqual(2);
+    expect(liveBoardBox?.width ?? 0).toBeGreaterThanOrEqual(560);
     expect(
       (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
     ).toBeLessThanOrEqual(834);

@@ -280,8 +280,9 @@
 
 @media (min-width: 820px) and (max-width: 1366px) and (min-height: 650px) and (max-height: 860px) and (pointer: coarse) and (orientation: landscape) {
   .header {
-    padding: 5px 10px;
-    gap: 6px;
+    padding: 3px 8px;
+    gap: 4px;
+    min-height: 34px;
   }
 
   .quickFilters,
@@ -289,25 +290,36 @@
     display: none;
   }
 
+  .randomBtn {
+    min-width: 34px;
+    min-height: 34px;
+    padding: 5px;
+  }
+
+  .segment button {
+    min-height: 34px;
+    padding: 4px 8px;
+  }
+
   .scrollerWrap {
-    min-height: 62px;
-    padding: 4px 8px 6px;
+    min-height: 46px;
+    padding: 2px 8px 4px;
   }
 
   .scroller,
   .trayCompact .scroller,
   .trayExtraCompact .scroller {
-    padding: 4px 8px;
+    padding: 2px 8px;
   }
 
   .trayCompact .thumbWrap {
-    width: 52px;
-    height: 52px;
+    width: 44px;
+    height: 44px;
   }
 
   .trayCompact .pieceButton,
   .trayCompact .blankSlot {
-    min-width: 56px;
-    min-height: 56px;
+    min-width: 48px;
+    min-height: 48px;
   }
 }
