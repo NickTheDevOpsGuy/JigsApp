@@ -17,7 +17,7 @@ jobs:
       false
     runs-on: ubuntu-latest
     env:
-      # Opt into Node.js 24 for JavaScript actions (actions/checkout, actions/setup-node)
+      # Opt into Node.js 24 for JavaScript actions.
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
     steps:
@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0
 
       - name: 🧰 Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: "24"
           cache: "npm"
