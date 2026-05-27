@@ -3,8 +3,10 @@ name: 🧩 Phuzzle
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - develop
+  workflow_dispatch:
 
 concurrency:
   group: Phuzzle-${{ github.ref }}
@@ -59,7 +61,7 @@ jobs:
 
       - name: 📦 Bundle size check
         env:
-          BASELINE_REF: origin/${{ github.base_ref }}
+          BASELINE_REF: origin/${{ github.base_ref || 'develop' }}
           CHECK_BUNDLE_USE_EXISTING_DIST: "1"
         run: npm run check:bundle
 
