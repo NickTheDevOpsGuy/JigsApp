@@ -96,38 +96,32 @@
   }
 
   .leaderboardControlRow {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr;
     align-items: stretch;
     gap: 8px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 4px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .leaderboardControlRow::-webkit-scrollbar {
-    display: none;
+    overflow: visible;
+    padding-bottom: 0;
   }
 
   .boardModeSwitch {
-    flex: 0 0 min(78vw, 300px);
-    width: auto;
+    width: 100%;
     min-width: 0;
     overflow-x: auto;
     flex-wrap: nowrap;
   }
 
   .boardModeBtn {
-    flex: 0 0 auto;
+    flex: 1 0 max-content;
     min-height: 34px;
     padding: 7px 10px;
   }
 
   .sortCluster {
-    flex: 0 0 auto;
-    width: auto;
+    width: 100%;
+    justify-content: space-between;
     min-height: 44px;
+    box-sizing: border-box;
   }
 
   .filtersBar {

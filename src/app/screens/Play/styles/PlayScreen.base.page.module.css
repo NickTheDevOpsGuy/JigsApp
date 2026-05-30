@@ -3,6 +3,7 @@
 .page {
   /* Use % of layout width — 100vw/98vw can exceed the paintable area on mobile (iOS) and cause horizontal drift */
   --play-board-tray-width: min(100%, 760px);
+  --play-board-border: 6px;
   --play-top-bar-outer-h: calc(56px + env(safe-area-inset-top, 0px));
   box-sizing: border-box;
   height: var(--app-vh-fill);
@@ -180,9 +181,12 @@
   touch-action: pan-y;
   width: min(
     100%,
-    var(
-      --play-board-live-width,
-      var(--play-board-stage-size, var(--play-board-tray-width))
+    calc(
+      var(
+          --play-board-live-width,
+          var(--play-board-stage-size, var(--play-board-tray-width))
+        ) +
+        (var(--play-board-border, 6px) * 2)
     )
   );
   max-width: min(100%, var(--play-board-tray-width));

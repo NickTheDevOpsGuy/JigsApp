@@ -37,6 +37,17 @@
     grid-template-columns: 1fr;
   }
 
+  .boardModeSwitch {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .boardModeBtn {
+    min-width: 0;
+    white-space: normal;
+  }
+
   .weekAlbumGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -105,13 +116,6 @@
   .pbDaily {
     font-size: 12px;
     padding: 2px 6px;
-  }
-
-  /* Share + filters stay compact on very narrow widths */
-  .leaderboardHeader {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
   }
 
   /* Tighter achievements */

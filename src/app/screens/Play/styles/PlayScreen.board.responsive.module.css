@@ -2,6 +2,7 @@
 @media (max-width: 600px) {
   .page {
     --play-board-tray-width: 100%;
+    --play-board-border: 4px;
     --play-top-bar-outer-h: calc(52px + env(safe-area-inset-top, 0px));
     height: var(--app-vh-fill, 100dvh);
     min-height: var(--app-vh-fill, 100dvh);
@@ -132,9 +133,12 @@
   .boardLayoutShell .topBarWrap {
     width: min(
       100%,
-      var(
-        --play-board-live-width,
-        var(--play-board-stage-size, var(--play-board-tray-width))
+      calc(
+        var(
+            --play-board-live-width,
+            var(--play-board-stage-size, var(--play-board-tray-width))
+          ) +
+          (var(--play-board-border, 4px) * 2)
       )
     );
     max-height: var(--play-top-bar-outer-h);
@@ -480,13 +484,14 @@
 
 @media (min-width: 601px) and (max-width: 1024px) and (pointer: coarse) {
   .page {
-    --play-board-tray-width: 100%;
+    --play-board-tray-width: min(100%, 640px);
+    --play-board-border: 6px;
     --play-top-bar-outer-h: calc(60px + env(safe-area-inset-top, 0px));
   }
 
   .boardLayoutShell {
     width: 100%;
-    max-width: 100%;
+    max-width: min(100%, 680px);
     gap: 8px;
   }
 
@@ -511,7 +516,7 @@
   }
 
   .playBody {
-    --play-board-tray-width: 100%;
+    --play-board-tray-width: min(100%, 640px);
     --play-board-tray-gap: 12px;
     --play-board-stage-size: min(
       calc(
