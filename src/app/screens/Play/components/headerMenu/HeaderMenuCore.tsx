@@ -50,6 +50,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
     top: number;
     left: number;
     minWidth: number;
+    maxHeight: number;
   } | null>(null);
 
   const items = buildMenuItems(props, setOpen, (path) => navigate(path));
@@ -61,11 +62,13 @@ export function HeaderMenu(props: HeaderMenuProps) {
     const gap = 6;
     const { width: vw, height: vh } = getLayoutViewportSize();
     const maxWidth = Math.min(360, vw - 24);
-    const left = Math.min(Math.max(8, rect.left), vw - maxWidth - 8);
+    const left = Math.min(Math.max(12, rect.left), Math.max(12, vw - maxWidth - 12));
+    const top = Math.min(rect.bottom + gap, Math.max(12, vh - 24));
     setMenuRect({
-      top: Math.min(rect.bottom + gap, Math.max(12, vh - 24)),
+      top,
       left,
-      minWidth: Math.min(rect.width, maxWidth),
+      minWidth: Math.min(Math.max(220, rect.width), maxWidth),
+      maxHeight: Math.max(160, vh - top - 12),
     });
   }, []);
 
@@ -158,7 +161,13 @@ export function HeaderMenu(props: HeaderMenuProps) {
       }
     };
 
-    const onScroll = () => closeMenu();
+    const onScroll = (e: Event) => {
+      const panel = document.querySelector(
+        "[data-header-menu-panel='true']",
+      ) as HTMLElement | null;
+      if (panel && e.target && panel.contains(e.target as Node)) return;
+      closeMenu();
+    };
 
     window.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("keydown", onKeyDown);
@@ -313,6 +322,7 @@ export function HeaderMenu(props: HeaderMenuProps) {
               top: menuRect.top,
               left: menuRect.left,
               minWidth: menuRect.minWidth,
+              maxHeight: menuRect.maxHeight,
             }}
           >
             {showSubPanel && activeSubMenu ? (

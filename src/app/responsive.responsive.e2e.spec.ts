@@ -165,6 +165,76 @@ test.describe("Responsive smoke", () => {
     await expectNoDocumentOverflow(page);
   });
 
+  test("play header menu stays anchored and scrolls internally", async ({ page }) => {
+    for (const viewport of [
+      { width: 393, height: 852 },
+      { width: 820, height: 1180 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto("/play");
+
+      const openMenu = page.getByRole("button", { name: /open menu/i }).first();
+      await expect(openMenu).toBeVisible({ timeout: 15000 });
+      await openMenu.evaluate((node) => (node as HTMLButtonElement).click());
+
+      const panel = page.locator("[data-header-menu-panel='true']");
+      const closeMenu = page.getByRole("button", { name: /close menu/i }).first();
+      await expect(panel).toBeVisible();
+      await page.waitForTimeout(200);
+
+      const triggerBox = await closeMenu.boundingBox();
+      const panelBox = await panel.boundingBox();
+
+      expect(triggerBox).not.toBeNull();
+      expect(panelBox).not.toBeNull();
+      const triggerBottom = (triggerBox?.y ?? 0) + (triggerBox?.height ?? 0);
+      expect(panelBox?.y ?? 0).toBeGreaterThanOrEqual(triggerBottom - 3);
+      expect(panelBox?.y ?? 0).toBeLessThanOrEqual(triggerBottom + 12);
+      expect(Math.abs((panelBox?.x ?? 0) - (triggerBox?.x ?? 0))).toBeLessThanOrEqual(
+        12,
+      );
+      expect(panelBox?.width ?? 0).toBeGreaterThanOrEqual(220);
+      await expectWithinViewport(page, panel);
+      await expectNoDocumentOverflow(page);
+
+      await closeMenu.evaluate((node) => (node as HTMLButtonElement).click());
+    }
+
+    await page.setViewportSize({ width: 393, height: 300 });
+    await page.goto("/play");
+    await page
+      .getByRole("button", { name: /open menu/i })
+      .first()
+      .evaluate((node) => (node as HTMLButtonElement).click());
+    await page
+      .getByRole("menuitem", { name: /^Settings$/ })
+      .evaluate((node) => (node as HTMLButtonElement).click());
+
+    const panel = page.locator("[data-header-menu-panel='true']");
+    await expect(panel).toBeVisible();
+    await panel.evaluate((node) => {
+      (node as HTMLElement).style.maxHeight = "80px";
+    });
+    await expect
+      .poll(() =>
+        panel.evaluate((node) => {
+          const el = node as HTMLElement;
+          return el.scrollHeight - el.clientHeight;
+        }),
+      )
+      .toBeGreaterThan(0);
+
+    await panel.evaluate((node) => {
+      const el = node as HTMLElement;
+      el.scrollTop = el.scrollHeight;
+      el.dispatchEvent(new Event("scroll", { bubbles: true }));
+    });
+
+    await expect(panel).toBeVisible();
+    await expectNoDocumentOverflow(page);
+  });
+
   test("tablet landscape keeps tray below the board", async ({ page }) => {
     await page.setViewportSize({ width: 1180, height: 820 });
     await page.goto("/play");

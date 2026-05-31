@@ -144,9 +144,9 @@
 .topBarInner {
   min-width: 0;
   width: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
   padding-inline: 14px 12px;
 }
@@ -162,11 +162,14 @@
 
 /* Center: timer, pause, moves, pieces – centered over the game board */
 .topBarCenter {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 0;
+}
+
+.topBarRight:empty {
+  display: none;
 }
 
 .topBarWrap {

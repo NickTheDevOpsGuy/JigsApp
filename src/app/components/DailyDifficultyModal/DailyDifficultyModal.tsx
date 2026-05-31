@@ -158,155 +158,158 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
       title="Today's Puzzle"
       showCloseButton={true}
       variant="choosePuzzle"
+      contentClassName={styles.dailyModalContent}
     >
-      <div className={styles.headerCustom}>
-        <Puzzle size={24} className={styles.headerIcon} />
-        <p className={styles.subtitle}>
-          {spotlight ? (
-            <>
-              <span className={styles.spotlightLead}>
-                {spotlight.categoryEmoji} {spotlight.categoryName} ·{" "}
-                {spotlight.puzzleName}
-              </span>
-              <span className={styles.spotlightSub}>Same puzzle for everyone today</span>
-            </>
-          ) : (
-            "Same puzzle for everyone"
-          )}
-        </p>
-      </div>
-
-      <div className={styles.puzzleImageWrap}>
-        <img src={puzzle.fullImage} alt="Today's puzzle" className={styles.puzzleImage} />
-      </div>
-
-      {showFreezeOffer && (
-        <div
-          className={styles.freezeOffer}
-          role="alert"
-          aria-labelledby="streak-freeze-label"
-          aria-describedby="streak-freeze-hint"
-        >
-          <span id="streak-freeze-label">Missed yesterday? Use your freeze.</span>
-          <span id="streak-freeze-hint" className={styles.freezeHint}>
-            1 per week
-          </span>
-          <div className={styles.freezeActions}>
-            <button
-              ref={useFreezeBtnRef}
-              type="button"
-              className={styles.freezeBtn}
-              onClick={handleUseFreeze}
-              aria-label="Use streak freeze for yesterday"
-              title="Use streak freeze"
-            >
-              🧊 Use Freeze
-            </button>
-            <button
-              type="button"
-              className={styles.freezeSkip}
-              onClick={() => {
-                setFreezeUsed(true);
-                dismissFreezeOfferToday();
-              }}
-              aria-label="Decline streak freeze"
-              title="No thanks"
-            >
-              No thanks
-            </button>
-          </div>
+      <div className={styles.dailyContent}>
+        <div className={styles.headerCustom}>
+          <Puzzle size={24} className={styles.headerIcon} />
+          <p className={styles.subtitle}>
+            {spotlight ? (
+              <>
+                <span className={styles.spotlightLead}>
+                  {spotlight.categoryEmoji} {spotlight.categoryName} ·{" "}
+                  {spotlight.puzzleName}
+                </span>
+                <span className={styles.spotlightSub}>Same puzzle for everyone today</span>
+              </>
+            ) : (
+              "Same puzzle for everyone"
+            )}
+          </p>
         </div>
-      )}
 
-      <div className={styles.difficultySection}>
-        <div className={styles.difficultyStack}>
-          {primaryOptions.map((opt, i) => (
-            <DifficultyCard
-              key={`${opt.rows}x${opt.cols}`}
-              opt={opt}
-              index={i}
-              selected={selectedIndex === i}
-              onSelect={() => setSelectedIndex(i)}
-              isRecommended={i === RECOMMENDED_INDEX}
-            />
-          ))}
+        <div className={styles.puzzleImageWrap}>
+          <img src={puzzle.fullImage} alt="Today's puzzle" className={styles.puzzleImage} />
+        </div>
+
+        {showFreezeOffer && (
+          <div
+            className={styles.freezeOffer}
+            role="alert"
+            aria-labelledby="streak-freeze-label"
+            aria-describedby="streak-freeze-hint"
+          >
+            <span id="streak-freeze-label">Missed yesterday? Use your freeze.</span>
+            <span id="streak-freeze-hint" className={styles.freezeHint}>
+              1 per week
+            </span>
+            <div className={styles.freezeActions}>
+              <button
+                ref={useFreezeBtnRef}
+                type="button"
+                className={styles.freezeBtn}
+                onClick={handleUseFreeze}
+                aria-label="Use streak freeze for yesterday"
+                title="Use streak freeze"
+              >
+                🧊 Use Freeze
+              </button>
+              <button
+                type="button"
+                className={styles.freezeSkip}
+                onClick={() => {
+                  setFreezeUsed(true);
+                  dismissFreezeOfferToday();
+                }}
+                aria-label="Decline streak freeze"
+                title="No thanks"
+              >
+                No thanks
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className={styles.difficultySection}>
+          <div className={styles.difficultyStack}>
+            {primaryOptions.map((opt, i) => (
+              <DifficultyCard
+                key={`${opt.rows}x${opt.cols}`}
+                opt={opt}
+                index={i}
+                selected={selectedIndex === i}
+                onSelect={() => setSelectedIndex(i)}
+                isRecommended={i === RECOMMENDED_INDEX}
+              />
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className={styles.moreOptionsBtn}
+            onClick={() => setShowMore((v) => !v)}
+            aria-expanded={showMore}
+            aria-label={showMore ? "Hide more options" : "More options"}
+            title={showMore ? "Hide more options" : "More options"}
+          >
+            More Options
+            {showMore ? (
+              <ChevronUp size={18} className={styles.moreOptionsIcon} />
+            ) : (
+              <ChevronDown size={18} className={styles.moreOptionsIcon} />
+            )}
+          </button>
+
+          {showMore && (
+            <div className={styles.moreOptionsList}>
+              {moreOptions.map((opt, i) => {
+                const idx = PRIMARY_COUNT + i;
+                return (
+                  <DifficultyCard
+                    key={`${opt.rows}x${opt.cols}`}
+                    opt={opt}
+                    index={idx}
+                    selected={selectedIndex === idx}
+                    onSelect={() => setSelectedIndex(idx)}
+                    isRecommended={false}
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <button
           type="button"
-          className={styles.moreOptionsBtn}
-          onClick={() => setShowMore((v) => !v)}
-          aria-expanded={showMore}
-          aria-label={showMore ? "Hide more options" : "More options"}
-          title={showMore ? "Hide more options" : "More options"}
+          className={styles.startBtn}
+          onClick={handleStart}
+          aria-label="Start puzzle"
+          title="Start puzzle"
         >
-          More Options
-          {showMore ? (
-            <ChevronUp size={18} className={styles.moreOptionsIcon} />
-          ) : (
-            <ChevronDown size={18} className={styles.moreOptionsIcon} />
-          )}
+          Start Puzzle
+          <span className={styles.startBtnArrow}>→</span>
         </button>
 
-        {showMore && (
-          <div className={styles.moreOptionsList}>
-            {moreOptions.map((opt, i) => {
-              const idx = PRIMARY_COUNT + i;
-              return (
-                <DifficultyCard
-                  key={`${opt.rows}x${opt.cols}`}
-                  opt={opt}
-                  index={idx}
-                  selected={selectedIndex === idx}
-                  onSelect={() => setSelectedIndex(idx)}
-                  isRecommended={false}
-                />
-              );
-            })}
-          </div>
+        {archiveItems.length > 0 && (
+          <section className={styles.archiveSection} aria-label="Daily archive">
+            <div className={styles.archiveHeader}>
+              <span className={styles.archiveTitle}>Daily archive</span>
+              <span className={styles.archiveHint}>Past dailies do not affect streaks</span>
+            </div>
+            <div className={styles.archiveRail}>
+              {archiveItems.map((item) => (
+                <button
+                  key={item.dateStr}
+                  type="button"
+                  className={styles.archiveItem}
+                  onClick={() => handleStartArchive(item.dateStr)}
+                  aria-label={`Play archived daily ${item.dateStr}`}
+                  title={`Play archived daily ${item.dateStr}`}
+                >
+                  <img
+                    src={item.puzzle.fullImage}
+                    alt=""
+                    className={styles.archiveThumb}
+                    aria-hidden
+                  />
+                  <span className={styles.archiveDate}>{item.dateStr.slice(5)}</span>
+                  {item.completed && <span className={styles.archiveDone}>Done</span>}
+                </button>
+              ))}
+            </div>
+          </section>
         )}
       </div>
-
-      <button
-        type="button"
-        className={styles.startBtn}
-        onClick={handleStart}
-        aria-label="Start puzzle"
-        title="Start puzzle"
-      >
-        Start Puzzle
-        <span className={styles.startBtnArrow}>→</span>
-      </button>
-
-      {archiveItems.length > 0 && (
-        <section className={styles.archiveSection} aria-label="Daily archive">
-          <div className={styles.archiveHeader}>
-            <span className={styles.archiveTitle}>Daily archive</span>
-            <span className={styles.archiveHint}>Past dailies do not affect streaks</span>
-          </div>
-          <div className={styles.archiveRail}>
-            {archiveItems.map((item) => (
-              <button
-                key={item.dateStr}
-                type="button"
-                className={styles.archiveItem}
-                onClick={() => handleStartArchive(item.dateStr)}
-                aria-label={`Play archived daily ${item.dateStr}`}
-                title={`Play archived daily ${item.dateStr}`}
-              >
-                <img
-                  src={item.puzzle.fullImage}
-                  alt=""
-                  className={styles.archiveThumb}
-                  aria-hidden
-                />
-                <span className={styles.archiveDate}>{item.dateStr.slice(5)}</span>
-                {item.completed && <span className={styles.archiveDone}>Done</span>}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
     </Modal>
   );
 }

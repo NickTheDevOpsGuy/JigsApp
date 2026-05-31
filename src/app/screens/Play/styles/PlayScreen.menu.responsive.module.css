@@ -49,19 +49,16 @@
   padding-bottom: 4px;
 }
 
-/* Compact header menu on small screens – constrained bottom sheet, no flyouts */
+/* Compact header menu on small screens – still anchored to the hamburger trigger */
 @media (max-height: 700px), (max-width: 500px) {
   .headerMenuPanel {
     position: fixed;
-    inset: auto 12px max(12px, env(safe-area-inset-bottom, 0px)) 12px;
-    top: auto !important;
-    left: 12px !important;
-    width: auto;
-    min-width: 0 !important;
-    max-width: none;
-    max-height: min(92dvh, 90vh, 640px);
+    inset: auto;
+    width: max-content;
+    min-width: min(220px, calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px);
     padding: 4px 0;
-    border-radius: 18px;
+    border-radius: 14px;
   }
 
   .headerMenuItem,

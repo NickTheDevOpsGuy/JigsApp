@@ -36,7 +36,7 @@
   .playBody {
     --play-board-stage-size: min(
       var(--play-board-tray-width, min(100%, 760px)),
-      calc(var(--app-vh-fill, 100dvh) - 286px)
+      calc(var(--app-vh-fill, 100dvh) - 242px)
     );
   }
 
@@ -47,6 +47,15 @@
     overflow: hidden;
     border-bottom-left-radius: calc(var(--radius-board, 20px) + 10px);
     border-bottom-right-radius: calc(var(--radius-board, 20px) + 10px);
+  }
+}
+
+@media (min-width: 900px) and (min-height: 780px) {
+  .playBody {
+    --play-board-stage-size: min(
+      var(--play-board-tray-width, min(100%, 760px)),
+      calc(var(--app-vh-fill, 100dvh) - 236px)
+    );
   }
 }
 

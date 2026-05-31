@@ -7,9 +7,9 @@
 }
 
 .topBarInner {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
   min-width: 0;
 }
@@ -98,6 +98,10 @@
   flex: 0 1 auto;
   min-width: 0;
   justify-self: end;
+}
+
+.topBarRight:empty {
+  display: none;
 }
 
 @media (max-width: 1100px) {

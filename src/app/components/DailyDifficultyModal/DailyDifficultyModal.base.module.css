@@ -1,5 +1,17 @@
 /* DailyDifficultyModal – Today's Puzzle mockup design */
 
+.dailyContent {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dailyModalContent {
+  flex: 0 1 auto !important;
+  overflow: hidden !important;
+}
+
 .headerCustom {
   display: flex;
   align-items: flex-start;

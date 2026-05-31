@@ -15,6 +15,7 @@ type ModalProps = {
   children: React.ReactNode;
   showCloseButton?: boolean;
   variant?: string;
+  contentClassName?: string;
 };
 
 export function Modal({
@@ -24,6 +25,7 @@ export function Modal({
   children,
   showCloseButton = true,
   variant,
+  contentClassName,
 }: ModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -111,7 +113,9 @@ export function Modal({
               )}
             </div>
           )}
-          <div className={styles.content}>{children}</div>
+          <div className={`${styles.content} ${contentClassName ?? ""}`.trim()}>
+            {children}
+          </div>
         </div>
       </div>
     </>,

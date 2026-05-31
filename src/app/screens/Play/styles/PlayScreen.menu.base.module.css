@@ -32,6 +32,15 @@
   box-sizing: border-box;
 }
 
+.headerMenuPanelPortal {
+  position: fixed;
+  top: auto;
+  left: auto;
+  margin-top: 0;
+  min-width: 220px;
+  max-width: min(360px, calc(100vw - 24px));
+}
+
 .headerMenuPanel::-webkit-scrollbar {
   display: none;
 }
