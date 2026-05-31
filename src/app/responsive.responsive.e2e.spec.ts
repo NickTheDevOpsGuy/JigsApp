@@ -191,9 +191,7 @@ test.describe("Responsive smoke", () => {
       const triggerBottom = (triggerBox?.y ?? 0) + (triggerBox?.height ?? 0);
       expect(panelBox?.y ?? 0).toBeGreaterThanOrEqual(triggerBottom - 3);
       expect(panelBox?.y ?? 0).toBeLessThanOrEqual(triggerBottom + 12);
-      expect(Math.abs((panelBox?.x ?? 0) - (triggerBox?.x ?? 0))).toBeLessThanOrEqual(
-        12,
-      );
+      expect(Math.abs((panelBox?.x ?? 0) - (triggerBox?.x ?? 0))).toBeLessThanOrEqual(12);
       expect(panelBox?.width ?? 0).toBeGreaterThanOrEqual(220);
       await expectWithinViewport(page, panel);
       await expectNoDocumentOverflow(page);

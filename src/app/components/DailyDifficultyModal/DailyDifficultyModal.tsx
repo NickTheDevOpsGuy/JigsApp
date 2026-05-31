@@ -170,7 +170,9 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
                   {spotlight.categoryEmoji} {spotlight.categoryName} ·{" "}
                   {spotlight.puzzleName}
                 </span>
-                <span className={styles.spotlightSub}>Same puzzle for everyone today</span>
+                <span className={styles.spotlightSub}>
+                  Same puzzle for everyone today
+                </span>
               </>
             ) : (
               "Same puzzle for everyone"
@@ -179,7 +181,11 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
         </div>
 
         <div className={styles.puzzleImageWrap}>
-          <img src={puzzle.fullImage} alt="Today's puzzle" className={styles.puzzleImage} />
+          <img
+            src={puzzle.fullImage}
+            alt="Today's puzzle"
+            className={styles.puzzleImage}
+          />
         </div>
 
         {showFreezeOffer && (
@@ -284,7 +290,9 @@ export function DailyDifficultyModal({ isOpen, onClose }: Props) {
           <section className={styles.archiveSection} aria-label="Daily archive">
             <div className={styles.archiveHeader}>
               <span className={styles.archiveTitle}>Daily archive</span>
-              <span className={styles.archiveHint}>Past dailies do not affect streaks</span>
+              <span className={styles.archiveHint}>
+                Past dailies do not affect streaks
+              </span>
             </div>
             <div className={styles.archiveRail}>
               {archiveItems.map((item) => (
