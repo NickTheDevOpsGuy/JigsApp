@@ -27,6 +27,7 @@
 
 /* GameplayShell: single layout anchor. TopHUD, PuzzleBoard, TrayHandle, PieceTray share same left edge and width. */
 .boardLayoutShell {
+  --play-board-tray-gap: 12px;
   width: 100%;
   max-width: var(--play-board-tray-width);
   flex: 1;
@@ -182,17 +183,8 @@
   z-index: 200;
   scrollbar-width: none;
   touch-action: pan-y;
-  width: min(
-    100%,
-    calc(
-      var(
-          --play-board-live-width,
-          var(--play-board-stage-size, var(--play-board-tray-width))
-        ) +
-        (var(--play-board-border, 6px) * 2)
-    )
-  );
-  max-width: min(100%, var(--play-board-tray-width));
+  width: calc(100% - (var(--play-board-tray-gap, 12px) * 2));
+  max-width: 100%;
   align-self: center;
 }
 

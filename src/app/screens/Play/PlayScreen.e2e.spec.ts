@@ -455,29 +455,29 @@ test.describe("Play screen tablet touch", () => {
     ).toBeLessThan(1024);
   });
 
-  test("tablet gameplay keeps top HUD aligned to the board and prevents horizontal overflow", async ({
+  test("tablet gameplay keeps top HUD aligned to the tray and prevents horizontal overflow", async ({
     page,
   }) => {
     await gotoPlay(page);
 
-    const boardWrapper = page.locator('[data-layout="puzzle-board"] > div');
     const topHud = page.locator('[data-layout="top-hud"]');
+    const trayDock = page.locator('[data-layout="tray-dock"]');
 
-    await expect(boardWrapper).toBeVisible({ timeout: 15000 });
     await expect(topHud).toBeVisible({ timeout: 15000 });
+    await expect(trayDock).toBeVisible({ timeout: 15000 });
 
-    const boardWrapperBox = await boardWrapper.boundingBox();
     const topHudBox = await topHud.boundingBox();
-    expect(boardWrapperBox).not.toBeNull();
+    const trayDockBox = await trayDock.boundingBox();
     expect(topHudBox).not.toBeNull();
+    expect(trayDockBox).not.toBeNull();
 
-    const boardLeft = boardWrapperBox?.x ?? 0;
-    const boardRight = (boardWrapperBox?.x ?? 0) + (boardWrapperBox?.width ?? 0);
+    const trayLeft = trayDockBox?.x ?? 0;
+    const trayRight = (trayDockBox?.x ?? 0) + (trayDockBox?.width ?? 0);
     const topHudLeft = topHudBox?.x ?? 0;
     const topHudRight = (topHudBox?.x ?? 0) + (topHudBox?.width ?? 0);
 
-    expect(topHudLeft).toBeGreaterThanOrEqual(boardLeft - 2);
-    expect(topHudRight).toBeLessThanOrEqual(boardRight + 2);
+    expect(Math.abs(topHudLeft - trayLeft)).toBeLessThanOrEqual(2);
+    expect(Math.abs(topHudRight - trayRight)).toBeLessThanOrEqual(2);
 
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
     const innerWidth = await page.evaluate(() => window.innerWidth);

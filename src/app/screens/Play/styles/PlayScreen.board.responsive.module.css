@@ -14,6 +14,7 @@
   }
 
   .boardLayoutShell {
+    --play-board-tray-gap: 8px;
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -131,16 +132,7 @@
   }
 
   .boardLayoutShell .topBarWrap {
-    width: min(
-      100%,
-      calc(
-        var(
-            --play-board-live-width,
-            var(--play-board-stage-size, var(--play-board-tray-width))
-          ) +
-          (var(--play-board-border, 4px) * 2)
-      )
-    );
+    width: calc(100% - (var(--play-board-tray-gap, 8px) * 2));
     max-height: var(--play-top-bar-outer-h);
     min-height: var(--play-top-bar-outer-h);
     flex-shrink: 0;
@@ -490,6 +482,7 @@
   }
 
   .boardLayoutShell {
+    --play-board-tray-gap: 12px;
     width: 100%;
     max-width: min(100%, 680px);
     gap: 8px;
@@ -608,6 +601,7 @@
   }
 
   .boardLayoutShell {
+    --play-board-tray-gap: 10px;
     width: 100%;
     max-width: 100%;
     gap: 6px;
@@ -656,6 +650,7 @@
   }
 
   .boardLayoutShell {
+    --play-board-tray-gap: 10px;
     max-width: 100%;
     gap: 6px;
   }
@@ -672,7 +667,7 @@
     align-items: stretch;
     justify-content: flex-start;
     gap: 0;
-    padding: 4px 14px 0;
+    padding: 4px var(--play-board-tray-gap) 0;
   }
 
   .playBody .main {
@@ -753,6 +748,7 @@
 
 @media (max-height: 500px) and (pointer: coarse) {
   .boardLayoutShell {
+    --play-board-tray-gap: 8px;
     gap: 6px;
   }
 

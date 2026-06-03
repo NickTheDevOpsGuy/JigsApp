@@ -131,54 +131,18 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
+      target: "es2022",
+      modulePreload: {
+        resolveDependencies(_filename, _deps, context) {
+          return context.hostType === "html" ? [] : _deps;
+        },
+      },
       // Single CSS bundle avoids "Unable to preload CSS for /assets/..." errors on Vercel.
       // Per-chunk CSS can fail when filenames are truncated or misresolved after deploy.
       cssCodeSplit: false,
       rollupOptions: {
         output: {
           manualChunks(id) {
-            // Keep storage/time/daily helpers in stable shared chunks to avoid
-            // cross-chunk initialization cycles (menu <-> play-setup).
-            if (id.includes("utils/safeLocalStorage")) {
-              return "storage";
-            }
-            if (id.includes("screens/Play/timeMode")) {
-              return "time-mode";
-            }
-            if (id.includes("/daily/")) {
-              return "daily";
-            }
-            if (id.includes("samplePuzzles") || id.includes("puzzlePacks")) {
-              return "puzzles";
-            }
-            // Play helpers imported by Choose/Pack modals must not live in play-setup, or Rollup
-            // reports a circular chunk: play-setup -> modals -> play-setup.
-            if (id.includes("screens/Play/loadPlayScreen")) {
-              return "play-shared";
-            }
-            if (
-              id.includes("screens/Play/core/utils/playScreenUtils") &&
-              !id.includes(".test")
-            ) {
-              return "play-shared";
-            }
-            // Screen chunks: use short names to avoid CSS preload failures.
-            // Play + Menu in one chunk to avoid circular chunk warnings (e.g. play-setup <-> menu).
-            if (id.includes("screens/Play") || id.includes("screens/Menu")) {
-              return "play-setup";
-            }
-            if (id.includes("screens/Stats")) return "stats";
-            if (id.includes("screens/Packs/PackListScreen")) return "pack-list";
-            if (id.includes("screens/Packs/PackDetailScreen")) return "pack-detail";
-            if (id.includes("screens/Packs/")) return "pack-list";
-            // Same chunk as Play/Menu: these modals are only used from there and share
-            // deps with Play; a separate "modals" chunk caused Rollup circular chunk warnings.
-            if (
-              id.includes("components/PackChoiceModal") ||
-              id.includes("components/ChoosePuzzleModal")
-            ) {
-              return "play-setup";
-            }
             // Split vendor chunks to avoid a single >500kB bundle
             if (id.includes("node_modules")) {
               if (id.includes("react-dom") || id.includes("react/")) {

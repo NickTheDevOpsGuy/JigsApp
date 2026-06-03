@@ -2,17 +2,12 @@
  * MenuScreen – full-bleed mobile home. Fills the screen, no floating card.
  * Primary: Play Today. Secondary: Packs + Quick Play as rows. Tertiary: Feedback link.
  */
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Package, ImagePlus, ChevronRight, Flame, Snowflake, Trophy } from "lucide-react";
 import { useHomeData } from "./hooks/useHomeData";
 import type { WeekDot } from "./hooks/useHomeData";
-import { ChoosePuzzleModal } from "@/components/ChoosePuzzleModal";
-import { PackChoiceModal } from "@/components/PackChoiceModal";
-import { FeedbackChoiceModal } from "@/components/FeedbackChoiceModal";
-import { DailyDifficultyModal } from "@/components/DailyDifficultyModal";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
-import { WhatsNewModal } from "@/components/WhatsNew";
 import { shouldShowChangelog } from "@/data/content/changelog";
 import { DAILY_DATE_KEY, DAILY_MODIFIER_KEY } from "@/daily/dailyPuzzleCore";
 import { clearPuzzleState } from "@/puzzle/storage/puzzleStorage";
@@ -29,6 +24,32 @@ import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import styles from "./MenuScreen.module.css";
 
 const FIRST_FAST_START_KEY = "phuzzle:firstFastStart";
+
+const ChoosePuzzleModal = lazy(() =>
+  import("@/components/ChoosePuzzleModal").then((m) => ({
+    default: m.ChoosePuzzleModal,
+  })),
+);
+const PackChoiceModal = lazy(() =>
+  import("@/components/PackChoiceModal").then((m) => ({
+    default: m.PackChoiceModal,
+  })),
+);
+const FeedbackChoiceModal = lazy(() =>
+  import("@/components/FeedbackChoiceModal").then((m) => ({
+    default: m.FeedbackChoiceModal,
+  })),
+);
+const DailyDifficultyModal = lazy(() =>
+  import("@/components/DailyDifficultyModal").then((m) => ({
+    default: m.DailyDifficultyModal,
+  })),
+);
+const WhatsNewModal = lazy(() =>
+  import("@/components/WhatsNew").then((m) => ({
+    default: m.WhatsNewModal,
+  })),
+);
 
 function shouldShowFastStart(): boolean {
   if (typeof window === "undefined") return false;
@@ -212,11 +233,6 @@ export function MenuScreen() {
                 type="button"
                 className={`${styles.primaryBtn} ${isCompleted ? styles.primaryBtnDone : ""}`}
                 onClick={handleDailyPlay}
-                aria-label={
-                  isCompleted
-                    ? "Today's puzzle complete — play again"
-                    : "Play today's puzzle"
-                }
                 title={isCompleted ? "Play today's puzzle again" : "Play today's puzzle"}
               >
                 <div className={styles.primaryBtnInner}>
@@ -236,7 +252,6 @@ export function MenuScreen() {
                   type="button"
                   className={styles.fastStartBtn}
                   onClick={() => void handleFastStart()}
-                  aria-label="Start fast 3 by 3 puzzle"
                 >
                   <span className={styles.fastStartCopy}>
                     <span className={styles.fastStartTitle}>Start fast 3×3</span>
@@ -348,7 +363,6 @@ export function MenuScreen() {
                   type="button"
                   className={styles.secondaryRow}
                   onClick={handlePacks}
-                  aria-label="Puzzle packs — browse themed collections"
                   title="Browse puzzle packs"
                 >
                   <span className={styles.secondaryIcon} aria-hidden>
@@ -367,7 +381,6 @@ export function MenuScreen() {
                   type="button"
                   className={styles.secondaryRow}
                   onClick={handleQuickPlay}
-                  aria-label="Quick play — pick any image"
                   title="Start a quick play puzzle"
                 >
                   <span className={styles.secondaryIcon} aria-hidden>
@@ -386,23 +399,35 @@ export function MenuScreen() {
           </div>
         </div>
       </div>
-      <ChoosePuzzleModal
-        isOpen={showChoosePuzzleModal}
-        onClose={() => setShowChoosePuzzleModal(false)}
-      />
-      <PackChoiceModal
-        isOpen={showPackChoiceModal}
-        onClose={() => setShowPackChoiceModal(false)}
-      />
-      <FeedbackChoiceModal
-        isOpen={showFeedbackModal}
-        onClose={() => setShowFeedbackModal(false)}
-      />
-      <DailyDifficultyModal
-        isOpen={showDailyDifficultyModal}
-        onClose={() => setShowDailyDifficultyModal(false)}
-      />
-      <WhatsNewModal isOpen={showWhatsNewModal} onClose={handleCloseWhatsNew} />
+      <Suspense fallback={null}>
+        {showChoosePuzzleModal ? (
+          <ChoosePuzzleModal
+            isOpen={showChoosePuzzleModal}
+            onClose={() => setShowChoosePuzzleModal(false)}
+          />
+        ) : null}
+        {showPackChoiceModal ? (
+          <PackChoiceModal
+            isOpen={showPackChoiceModal}
+            onClose={() => setShowPackChoiceModal(false)}
+          />
+        ) : null}
+        {showFeedbackModal ? (
+          <FeedbackChoiceModal
+            isOpen={showFeedbackModal}
+            onClose={() => setShowFeedbackModal(false)}
+          />
+        ) : null}
+        {showDailyDifficultyModal ? (
+          <DailyDifficultyModal
+            isOpen={showDailyDifficultyModal}
+            onClose={() => setShowDailyDifficultyModal(false)}
+          />
+        ) : null}
+        {showWhatsNewModal ? (
+          <WhatsNewModal isOpen={showWhatsNewModal} onClose={handleCloseWhatsNew} />
+        ) : null}
+      </Suspense>
     </>
   );
 }

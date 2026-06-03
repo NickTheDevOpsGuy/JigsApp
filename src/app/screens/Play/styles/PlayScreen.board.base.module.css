@@ -60,6 +60,10 @@
 }
 
 @media (min-width: 601px) and (max-width: 1024px) and (pointer: coarse) {
+  .boardLayoutShell {
+    --play-board-tray-gap: 14px;
+  }
+
   .playBody {
     --play-board-tray-width: min(100%, 820px);
     --play-board-tray-gap: 14px;
@@ -86,6 +90,10 @@
 }
 
 @media (min-width: 601px) and (max-width: 1366px) and (pointer: coarse) and (orientation: landscape) {
+  .boardLayoutShell {
+    --play-board-tray-gap: 10px;
+  }
+
   .playBody {
     --play-board-tray-width: min(100%, 960px);
     --play-board-tray-gap: 10px;

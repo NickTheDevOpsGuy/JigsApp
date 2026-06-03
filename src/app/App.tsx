@@ -5,7 +5,6 @@ import { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { initStreakFreeze } from "@/daily/dailyPuzzleCore";
-import { ensureSignedIn } from "@/supabase/auth";
 import { OfflineIndicator } from "@/components/OfflineIndicator/OfflineIndicator";
 import { ErrorBoundary } from "@/components/ErrorBoundary/ErrorBoundary";
 import { loadPlayScreenModule } from "@/screens/Play/loadPlayScreen";
@@ -71,8 +70,19 @@ function PageFallback() {
 
 export function App() {
   useEffect(() => {
-    ensureSignedIn();
     initStreakFreeze();
+
+    const signIn = () => {
+      void import("@/supabase/auth").then((m) => m.ensureSignedIn());
+    };
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      const idleId = window.requestIdleCallback(signIn, { timeout: 5000 });
+      return () => window.cancelIdleCallback?.(idleId);
+    }
+
+    const timeoutId = globalThis.setTimeout(signIn, 2500);
+    return () => globalThis.clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
@@ -145,33 +155,6 @@ export function App() {
       vv?.removeEventListener("resize", onResize);
       vv?.removeEventListener("scroll", onResize);
     };
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const warmCommonRoutes = () => {
-      void loadPlayScreenModule();
-      void loadStatsScreenModule();
-      void loadPackListScreenModule();
-    };
-
-    if (typeof window.requestIdleCallback === "function") {
-      const idleId = window.requestIdleCallback(
-        () => {
-          warmCommonRoutes();
-        },
-        { timeout: 1200 },
-      );
-      return () => {
-        if (typeof window.cancelIdleCallback === "function") {
-          window.cancelIdleCallback(idleId);
-        }
-      };
-    }
-
-    const timeoutId = window.setTimeout(warmCommonRoutes, 350);
-    return () => window.clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
