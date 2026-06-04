@@ -203,7 +203,7 @@
   }
 
   .scrollerWrap {
-    min-height: 72px;
+    min-height: 0;
     padding: 4px 6px 8px;
   }
 

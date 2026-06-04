@@ -14,6 +14,8 @@ import {
 /** Outer stroke: crisp silhouette without heavy inner bleed on curves. */
 const OUTLINE_STROKE_STYLE = "rgba(2, 7, 18, 0.62)";
 const OUTLINE_LINE_WIDTH = 1.9;
+const FALLBACK_FILL_TOP = "#e6edf6";
+const FALLBACK_FILL_BOTTOM = "#b8c6d8";
 
 function getPieceSurfaceVariation(piece: Piece): {
   brightness: number;
@@ -25,6 +27,48 @@ function getPieceSurfaceVariation(piece: Piece): {
     brightness: 1 + normalized * 0.02,
     saturation: 1 + normalized * 0.01,
   };
+}
+
+function isDrawableImage(img: HTMLImageElement): boolean {
+  return (
+    img.complete &&
+    Number.isFinite(img.naturalWidth) &&
+    Number.isFinite(img.naturalHeight) &&
+    img.naturalWidth > 0 &&
+    img.naturalHeight > 0
+  );
+}
+
+function isDrawableRect(rect: ImageSourceRect): boolean {
+  return (
+    Number.isFinite(rect.srcX) &&
+    Number.isFinite(rect.srcY) &&
+    Number.isFinite(rect.srcW) &&
+    Number.isFinite(rect.srcH) &&
+    Number.isFinite(rect.destX) &&
+    Number.isFinite(rect.destY) &&
+    Number.isFinite(rect.destW) &&
+    Number.isFinite(rect.destH) &&
+    rect.srcW > 0 &&
+    rect.srcH > 0 &&
+    rect.destW > 0 &&
+    rect.destH > 0
+  );
+}
+
+function fillPieceImageFallback(
+  ctx: CanvasRenderingContext2D,
+  path: Path2D,
+  piece: Piece,
+): void {
+  const fill = ctx.createLinearGradient(0, 0, piece.w, piece.h);
+  fill.addColorStop(0, FALLBACK_FILL_TOP);
+  fill.addColorStop(1, FALLBACK_FILL_BOTTOM);
+  ctx.fillStyle = fill;
+  ctx.fill(path);
+
+  ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
+  ctx.fill(path);
 }
 
 /**
@@ -86,19 +130,29 @@ export function drawPieceImageInPath(
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   ctx.clip(path);
-  ctx.filter = `brightness(${variation.brightness}) saturate(${variation.saturation})`;
-  ctx.drawImage(
-    img,
-    rect.srcX,
-    rect.srcY,
-    rect.srcW,
-    rect.srcH,
-    rect.destX,
-    rect.destY,
-    rect.destW,
-    rect.destH,
-  );
-  ctx.filter = "none";
+  const canDrawImage = isDrawableImage(img) && isDrawableRect(rect);
+  if (canDrawImage) {
+    try {
+      ctx.filter = `brightness(${variation.brightness}) saturate(${variation.saturation})`;
+      ctx.drawImage(
+        img,
+        rect.srcX,
+        rect.srcY,
+        rect.srcW,
+        rect.srcH,
+        rect.destX,
+        rect.destY,
+        rect.destW,
+        rect.destH,
+      );
+    } catch {
+      fillPieceImageFallback(ctx, path, piece);
+    } finally {
+      ctx.filter = "none";
+    }
+  } else {
+    fillPieceImageFallback(ctx, path, piece);
+  }
 
   if (isPlacedOrLocked) {
     /* Placed/locked: no edge strokes so pieces meet with no visible seam. */

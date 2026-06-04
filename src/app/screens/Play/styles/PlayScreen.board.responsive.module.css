@@ -36,6 +36,18 @@
   .playBody {
     --play-board-tray-width: 100%;
     --play-board-tray-gap: 8px;
+    --play-board-tray-h: clamp(104px, 15vh, 128px);
+    --play-board-stage-size: min(
+      calc(
+        100dvw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) -
+          (var(--play-board-tray-gap) * 2)
+      ),
+      calc(
+        var(--app-vh-fill, 100dvh) - var(--play-top-bar-outer-h, 52px) -
+          var(--play-board-tray-h) - (var(--play-board-tray-gap) * 3) -
+          max(6px, env(safe-area-inset-bottom, 0px))
+      )
+    );
     gap: 0;
     min-height: 0;
     flex: 1;
@@ -86,14 +98,14 @@
 
   .playBody .trayArea .trayInDock,
   .playBody .trayArea .trayInDock.trayWrapLarge {
-    height: clamp(128px, 16vh, 148px);
-    max-height: min(148px, 22vh);
-    min-height: 124px;
+    height: var(--play-board-tray-h);
+    max-height: var(--play-board-tray-h);
+    min-height: min(104px, var(--play-board-tray-h));
   }
 
   .boardWrapper {
-    width: min(100%, calc(var(--app-vh-fill, 100dvh) - 246px));
-    max-width: min(100%, calc(var(--app-vh-fill, 100dvh) - 246px));
+    width: min(100%, var(--play-board-stage-size));
+    max-width: min(100%, var(--play-board-stage-size));
     flex: 0 1 auto;
     min-height: 0;
     max-height: 100%;
@@ -314,7 +326,7 @@
     max-width: 100%;
     align-self: stretch;
     flex: 0 0 auto;
-    padding: 0 0 max(8px, env(safe-area-inset-bottom, 0));
+    padding: 0;
     border-radius: 16px;
     transform: none;
   }

@@ -4,6 +4,7 @@ import { dismissWhatsNewModalIfOpen } from "@/e2e/helpers";
 const TINY_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 const BOARD_SQUARE_TOLERANCE_PX = 4;
+const ALIGNMENT_TOLERANCE_PX = 2;
 
 async function expectNoDocumentOverflow(page: Page) {
   const metrics = await page.evaluate(() => {
@@ -34,6 +35,88 @@ async function expectWithinViewport(page: Page, locator: Locator) {
   expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(
     (viewport?.height ?? 0) + 1,
   );
+}
+
+async function expectPlayChromeAligned(page: Page) {
+  const metrics = await page.evaluate(() => {
+    const top = document.querySelector<HTMLElement>(
+      "[data-layout='gameplay-shell'] [class*='topBarWrap']",
+    );
+    const board = document.querySelector<HTMLElement>("[data-testid='play-board']");
+    const tray = document.querySelector<HTMLElement>("[data-layout='tray-dock']");
+    if (!top || !board || !tray) return null;
+
+    const topBox = top.getBoundingClientRect();
+    const boardBox = board.getBoundingClientRect();
+    const trayBox = tray.getBoundingClientRect();
+    return {
+      topLeft: topBox.left,
+      topRight: topBox.right,
+      boardLeft: boardBox.left,
+      boardRight: boardBox.right,
+      trayLeft: trayBox.left,
+      trayRight: trayBox.right,
+    };
+  });
+
+  expect(metrics).not.toBeNull();
+  expect(Math.abs(metrics!.topLeft - metrics!.trayLeft)).toBeLessThanOrEqual(
+    ALIGNMENT_TOLERANCE_PX,
+  );
+  expect(Math.abs(metrics!.topRight - metrics!.trayRight)).toBeLessThanOrEqual(
+    ALIGNMENT_TOLERANCE_PX,
+  );
+  expect(metrics!.boardLeft).toBeGreaterThanOrEqual(metrics!.trayLeft - 1);
+  expect(metrics!.boardRight).toBeLessThanOrEqual(metrics!.trayRight + 1);
+}
+
+async function expectTrayThumbsHaveFilledPieces(page: Page) {
+  let metrics: { nonTransparent: number; light: number; black: number } | null = null;
+  await expect
+    .poll(
+      async () => {
+        metrics = await page.evaluate(async () => {
+          const imgs = Array.from(
+            document.querySelectorAll<HTMLImageElement>("[class*='thumbImg']"),
+          ).slice(0, 4);
+          if (imgs.length === 0) return null;
+
+          let nonTransparent = 0;
+          let light = 0;
+          let black = 0;
+          for (const img of imgs) {
+            if (!img.complete || img.naturalWidth <= 0 || img.naturalHeight <= 0) {
+              return null;
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return null;
+            ctx.drawImage(img, 0, 0);
+            const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < data.length; i += 4) {
+              const alpha = data[i + 3];
+              if (alpha < 8) continue;
+              nonTransparent += 1;
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              if (r > 80 || g > 80 || b > 80) light += 1;
+              if (r < 20 && g < 20 && b < 20) black += 1;
+            }
+          }
+          return { nonTransparent, light, black };
+        });
+        return metrics?.nonTransparent ?? 0;
+      },
+      { timeout: 15000 },
+    )
+    .toBeGreaterThan(400);
+
+  expect(metrics).not.toBeNull();
+  expect(metrics!.light).toBeGreaterThan(100);
+  expect(metrics!.black / metrics!.nonTransparent).toBeLessThan(0.5);
 }
 
 test.describe("Responsive smoke", () => {
@@ -146,6 +229,8 @@ test.describe("Responsive smoke", () => {
     expect(
       (trayBox?.y ?? Number.POSITIVE_INFINITY) + (trayBox?.height ?? 0),
     ).toBeLessThanOrEqual((viewport?.height ?? 0) + 2);
+    await expectPlayChromeAligned(page);
+    await expectTrayThumbsHaveFilledPieces(page);
 
     const trayClipping = await tray.evaluate((node) => {
       const scroller = node as HTMLElement;
