@@ -3,8 +3,10 @@ name: 🧩 Phuzzle
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - develop
+  workflow_dispatch:
 
 concurrency:
   group: Phuzzle-${{ github.ref }}
@@ -59,7 +61,7 @@ jobs:
 
       - name: 📦 Bundle size check
         env:
-          BASELINE_REF: origin/${{ github.base_ref }}
+          BASELINE_REF: origin/${{ github.base_ref || 'develop' }}
           CHECK_BUNDLE_USE_EXISTING_DIST: "1"
         run: npm run check:bundle
 
@@ -67,7 +69,7 @@ jobs:
         run: npm run test
 
       - name: 📤 Upload production build
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: phuzzle-dist
           path: dist
@@ -92,7 +94,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: 🧰 Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: "24"
           cache: npm
@@ -102,7 +104,7 @@ jobs:
         run: npm ci
 
       - name: 📥 Download production build
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: phuzzle-dist
           path: dist
@@ -115,7 +117,7 @@ jobs:
 
       - name: 📤 Upload Playwright artifacts
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-smoke-artifacts
           path: |
@@ -141,7 +143,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: 🧰 Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: "24"
           cache: npm
@@ -151,7 +153,7 @@ jobs:
         run: npm ci
 
       - name: 📥 Download production build
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: phuzzle-dist
           path: dist
@@ -164,7 +166,7 @@ jobs:
 
       - name: 📤 Upload Playwright artifacts
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-layout-artifacts
           path: |
@@ -194,7 +196,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: 🧰 Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: "24"
           cache: npm
@@ -204,7 +206,7 @@ jobs:
         run: npm ci
 
       - name: 📥 Download production build
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: phuzzle-dist
           path: dist
@@ -216,7 +218,7 @@ jobs:
 
       - name: 📤 Upload Lighthouse reports
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: lhci-reports
           path: lhci-reports
